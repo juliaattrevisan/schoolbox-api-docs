@@ -11,6 +11,13 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 {
 
     /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'Poll';
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
@@ -32,7 +39,6 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
         if (!parent::loadTemplate($templateHandle, 'poll')) {
             return false;
         }
-        $this->parseConfig();
 
         $this->setBlock($templateHandle, "poll_question", "poll_question_block");
         $this->setBlock('poll_question', "poll_vote", "poll_vote_block");
@@ -66,10 +72,11 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                 $author = \Schoolbox\UserMapper::getInstance()->getUnknownUser();
             }
             if ($poll['pollID']) {
+                $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
+
                 $this->setVar(
                     array(
                         'POLL_ID'           => $poll['pollID'],
-                        'POLL_TITLE'        => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Poll',
                         'POLL_QUESTION'     => Scrub::text($poll['question']),
                         'POLL_AUTHOR_ID'    => $author->getId(),
                         'POLL_AUTHOR_THUMB' => "/portrait.php?userId={$author->getExternalId()}&size=square32",
@@ -183,6 +190,10 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                 $this->parse('new_poll_block', 'new_poll');
             }
         }
+
+        /* Need the title injected here
+         */
+        $this->parseConfig();
 
         return true;
     }
