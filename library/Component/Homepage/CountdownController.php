@@ -11,6 +11,13 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
 {
 
     /**
+     * Component name
+     * 
+     * @var string
+     */
+    protected $componentName = 'Countdown';
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
