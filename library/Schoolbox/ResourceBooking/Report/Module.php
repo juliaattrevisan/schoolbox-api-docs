@@ -17,8 +17,9 @@ use Aura\Router\Router;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Booking;
+use Schoolbox\ResourceBooking\Category;
+use Schoolbox\ResourceBooking\Item;
 
 class Module extends BaseModule
 {
@@ -70,8 +71,9 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->params[Controller::class]['bookingMapper'] = $injector->lazyNew(Booking\Mapper::class);
-        $injector->params[Controller::class]['itemMapper']    = $injector->lazyNew(Item\Mapper::class);
+        $injector->params[Controller::class]['bookingMapper']  = $injector->lazyNew(Booking\Mapper::class);
+        $injector->params[Controller::class]['itemMapper']     = $injector->lazyNew(Item\Mapper::class);
+        $injector->params[Controller::class]['categoryMapper'] = $injector->lazyNew(Category\Mapper::class);
         $injector->set('controller:resourceBookingReport', $injector->lazyNew(Controller::class));
     }
 }
