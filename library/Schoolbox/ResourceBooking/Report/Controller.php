@@ -88,10 +88,23 @@ class Controller extends Base
             );
         }
 
+        // Filter out non-existent from $selectedCategories
+        $categoryList = [];
+        foreach ($this->getCategoryMapper()->findAll(['order' => ['name' => 'asc']]) as $category) {
+            $categoryList[$category->getId()] = $category;
+        }
+        $allCategories = array_keys($categoryList);
+
+        if (!empty($selectedCategories)) {
+            $selectedCategories = array_intersect($selectedCategories, $allCategories);
+        } else {
+            $selectedCategories = $allCategories;
+        }
+
         $this->getResponse()->content->set([
             'template' => '@resourceBookingReport/index.twig',
             'data'     => [
-                'categoryList' => $this->getCategoryMapper()->findAll(['order' => ['name' => 'asc']]),
+                'categoryList' => $categoryList,
                 'bookingList'  => $this->getBookingMapper()->findForTimespan(
                     $start->getUnixTimeStamp(),
                     $end->getUnixTimeStamp(),

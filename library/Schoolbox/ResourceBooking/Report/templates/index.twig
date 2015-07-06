@@ -1,6 +1,21 @@
-<h1>Bookings: {{ search.start.getLongDateOnly() }} – {{ search.end.getLongDateOnly() }}</h1>
+<h1>Resource Booking Report</h1>
 
 <div class="directory">
+
+    <!-- Only show if printing -->
+    <h2 class="hide allow-print">
+        Bookings: {{ search.start.getLongDateOnly() }} – {{ search.end.getLongDateOnly() }},
+        categories:
+        {% if search.category|length == categoryList|length %}
+            All
+        {% else %}
+            {% spaceless %}
+                {% for categoryId in search.category %}
+                    {{ categoryList[categoryId].getName() }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            {% endspaceless %}
+        {% endif %}
+    </h2>
 
     <form method='get' action='?' class="noprint" data-action="search">
     <h2>Search Filter Options</h2>
@@ -23,7 +38,7 @@
                 <label>
                     <input type="checkbox"
                            data-selectall="category[]"
-                           {% if search.category is empty or search.category|length == categoryList|length %}checked{% endif %}
+                           {% if search.category|length == categoryList|length %}checked{% endif %}
                     />
                     All
                 </label>
@@ -32,7 +47,7 @@
                     <input type="checkbox"
                            name="category[]"
                            value="{{ category.getId() }}"
-                           {% if search.category is empty or category.getId() in search.category %}checked{% endif %}
+                           {% if category.getId() in search.category %}checked{% endif %}
                     />
                     {{ category.getName() }}
                 </label>
