@@ -28,51 +28,47 @@ if (!($currentUser instanceof User)) {
 /* Delete a post
  */
 if (is_numeric($_GET['delete'])) {
-	/* Softdelete the post and the entire thread
-	 */
-	$postMapper = new PostMapper();
-	$post = $postMapper->findById($_GET['delete']);
+    /* Softdelete the post and the entire thread
+     */
+    $postMapper = new PostMapper();
+    $post = $postMapper->findById($_GET['delete']);
 
-	/* Determine permissions
-	 * Component instance not necessary in this context
-	 */
-	$authenticator = new Authenticator($post, new \Component_Instance(), $currentUser);
+    /* Determine permissions
+     * Component instance not necessary in this context
+     */
+    $authenticator = new Authenticator($post, new \Component_Instance(), $currentUser);
 
-	if ($authenticator->canDelete()) {
-		$postMapper->delete($post);
+    if ($authenticator->canDelete()) {
+        $postMapper->delete($post);
 
-		/* This is for top-level posts
-		 */
-		if ($post->getRootId() == 0) {
-			$allPosts = $postMapper->findByColumn('root_id', $_GET['delete']);
-		}
-		/* For any threaded stuff that isn't a top-level post
-		 * delete by parent_id
-		 */
-		else {
-			$allPosts = $postMapper->findByColumn('parent_id', $_GET['delete']);
-		}
+        /* This is for top-level posts
+         */
+        if ($post->getRootId() == 0) {
+            $allPosts = $postMapper->findByColumn('root_id', $_GET['delete']);
+        } /* For any threaded stuff that isn't a top-level post
+         * delete by parent_id
+         */
+        else {
+            $allPosts = $postMapper->findByColumn('parent_id', $_GET['delete']);
+        }
 
-		/* Softdelete the entire thread for the specified post
-		 */
-		$postMapper->delete($allPosts);
+        /* Softdelete the entire thread for the specified post
+         */
+        $postMapper->delete($allPosts);
 
-		$page->backToTheFuture(1);
-	}
-	else {
-		error(19);
-	}
-}
-/* Otherwise create a post
+        $page->backToTheFuture(1);
+    } else {
+        error(19);
+    }
+} /* Otherwise create a post
  */
 else {
-
-	/* Compile some misc data
-	 */
-	$data = array_merge($_POST, array(
-		'ownerId'     => $currentUser->getId(),
-		'requestTime' => \Alaress_Date_Format::now(),
-	));
+    /* Compile some misc data
+     */
+    $data = array_merge($_POST, array(
+        'ownerId'     => $currentUser->getId(),
+        'requestTime' => \Alaress_Date_Format::now(),
+    ));
 
     /* Check that you have a message, and one of Attachment or URL
      * to prevent you from submitting wholly empty data
@@ -98,34 +94,33 @@ else {
         }
     }
 
-	/* Create new SocialStream Post
-	 */
-	$factory = new Post\Factory\Creational($url);
-	$newPost = $factory->produce($data);
+    /* Create new SocialStream Post
+     */
+    $factory = new Post\Factory\Creational($url);
+    $newPost = $factory->produce($data);
 
-	/* Set up authentication
-	 * Put your permissions and stuff in here, just like ePortfolio v2
-	 */
-	$instanceMapper = \Component_InstanceMapper::getInstance();
+    /* Set up authentication
+     * Put your permissions and stuff in here, just like ePortfolio v2
+     */
+    $instanceMapper = \Component_InstanceMapper::getInstance();
 
-	/* Seriously?
-	 */
-	$instanceArray = $instanceMapper->findByInstanceId($_POST['instanceId']);
-	$instance = $instanceArray[$_POST['instanceId']];
+    /* Seriously?
+     */
+    $instanceArray = $instanceMapper->findByInstanceId($_POST['instanceId']);
+    $instance = $instanceArray[$_POST['instanceId']];
 
-	/* Authenticate!
-	 */
-	$authenticator = new Authenticator($newPost, $instance, $currentUser);
+    /* Authenticate!
+     */
+    $authenticator = new Authenticator($newPost, $instance, $currentUser);
 
-	/* Find out if you can collaborate on this
-	*/
-	if ($authenticator->canCollaborate() || $authenticator->canAddComment()) {
-		$mapper = new PostMapper();
-		$mapper->save($newPost);
+    /* Find out if you can collaborate on this
+    */
+    if ($authenticator->canCollaborate() || $authenticator->canAddComment()) {
+        $mapper = new PostMapper();
+        $mapper->save($newPost);
 
-		$page->backToTheFuture(1);
-	}
-	else {
-		error(19);
-	}
+        $page->backToTheFuture(1);
+    } else {
+        error(19);
+    }
 }
