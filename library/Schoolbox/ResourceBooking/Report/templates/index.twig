@@ -3,7 +3,7 @@
 <div class="directory">
 
     <!-- Only show if printing -->
-    <h2 class="hide allow-print">
+    <h2 class="hide printable">
         Bookings: {{ search.start.getLongDateOnly() }} – {{ search.end.getLongDateOnly() }},
         categories:
         {% if search.category|length == categoryList|length %}
