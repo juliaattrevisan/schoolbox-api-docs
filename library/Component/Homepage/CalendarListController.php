@@ -15,6 +15,14 @@ use Calendar\Event\Collection\Lister;
 
 class Component_Homepage_CalendarListController extends Component_Homepage_ControllerAbstract
 {
+
+    /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'Campus Calendar';
+
     /**
      * @var DeprecatedDatabase
      */
@@ -53,10 +61,9 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
         $this->setBlock($templateHandle, 'campus_event_day', 'campus_event_day_block');
         $this->setBlock('campus_event_day', 'campus_events', 'campus_events_block');
 
-
-
-        $this->setVar(array('CALENDAR_TITLE' => 'Campus Calendar',
-                            'LIST_DATE'      => '',));
+        $this->setVar(array(
+            'LIST_DATE' => '',
+        ));
 
         if($this->getConfig('size') > 0) {
             $days = $this->getConfig('size');
