@@ -10,6 +10,14 @@ use Calendar\Event\Collection\Lister;
 
 class Component_Homepage_EventListController extends Component_Homepage_ControllerAbstract
 {
+
+    /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'Group Calendar';
+
     /**
      * Prepares data for the render function. Business logic.
      *
@@ -36,7 +44,6 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         $this->setBlock('event_day', 'group_events', 'group_events_block');
         $this->setBlock($templateHandle, 'import_events', 'import_events_block');
 
-        $this->setVar('CALENDAR_TITLE', 'Group Calendar');
         $this->setVar(
             array(
                 'CALENDAR_PREFIX' => 'group',
