@@ -10,6 +10,14 @@ use Schoolbox\Resource\Folder;
  */
 class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract
 {
+
+    /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'Image Slideshow';
+
     /**
      * An instance of Category
      *
@@ -54,7 +62,6 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         if (!parent::loadTemplate($templateHandle, 'scroller')) {
             return false;
         }
-        $this->parseConfig();
 
         if ($this->permission < READ_ACCESS) {
             return false;
@@ -79,10 +86,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         );
 
         // Set up component name
-        $this->setVar(
-            'COMPONENT_NAME',
-            strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Image Slideshow'
-        );
+        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
         /* Prevent multiple galleries from other categories stacking up in the wrong place
          * and initialise empty gallery by default
@@ -121,6 +125,10 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
 
             $this->parse('image_scroller_block', 'image_scroller', true);
         }
+
+        /* Need name injected here
+         */
+        $this->parseConfig();
 
         return true; // everything went according to plan
     }
