@@ -10,24 +10,28 @@
                 dataType: 'json'
             }
         }
-        var id = $("#textboxSearch{COMPONENT_TEXTBOX_ID}").val()
+
+        var id = $('#textboxSearch{COMPONENT_TEXTBOX_ID}').val();
+
         if (id != 0) {
             options.value = {
                 id:   id,
-                name: $("#textbox_search{COMPONENT_TEXTBOX_ID}").val()
+                name: $('#textbox_search{COMPONENT_TEXTBOX_ID}').val()
             }
         }
+
         $('#textbox_search{COMPONENT_TEXTBOX_ID}').selectizeSelector(options)
-        .on('selectize.item_add', function(event, value) {
-            $('#textboxSearch{COMPONENT_TEXTBOX_ID}').val(value)
-        })
-        .on('selectize.item_remove', function() {
-            $('#textboxSearch{COMPONENT_TEXTBOX_ID}').val('')
-        })
+            .on('selectize.item_add', function(event, value) {
+                $('#textboxSearch{COMPONENT_TEXTBOX_ID}').val(value);
+            })
+            .on('selectize.item_remove', function() {
+                $('#textboxSearch{COMPONENT_TEXTBOX_ID}').val('');
+            });
     });
 </script>
 
 <input type="text" id="textbox_search{COMPONENT_TEXTBOX_ID}" value="{COMPONENT_TEXTBOX_NAME}" placeholder="Search Textboxes">
 <input type="hidden" id="textboxSearch{COMPONENT_TEXTBOX_ID}" name="textboxSearch" value="{COMPONENT_TEXTBOX_ID}">
 
-<a href='{EDIT_URL}' class="btn modify"><span></span>Edit</a> <a href='{VIEW_URL}' class="btn"><span></span>View</a>
+<a href='{EDIT_URL}' class="button icon-modify">Edit</a>
+<a href='{VIEW_URL}' class="button icon-view">View</a>
