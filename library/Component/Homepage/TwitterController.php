@@ -13,6 +13,13 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
 {
 
     /**
+     * Component name
+     * 
+     * @var string
+     */
+    protected $componentName = 'Twitter';
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
