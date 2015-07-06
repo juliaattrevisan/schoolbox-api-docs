@@ -19,6 +19,13 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
 {
 
     /**
+     * Component name
+     * 
+     * @var string
+     */
+    protected $componentName = 'Course Builder';
+
+    /**
      * @var Group
      */
     protected $group_handler;
