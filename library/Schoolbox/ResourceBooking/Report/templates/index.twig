@@ -1,9 +1,9 @@
-<table>
+<table class="fullwidth table">
     <thead>
     <tr>
         <th>Start</th>
         <th>End</th>
-        <th>Name Of Organisation</th>
+        <th>Name</th>
         <th>Venue</th>
         <th>Notes</th>
     </tr>
@@ -21,8 +21,16 @@
                 {{ booking.getEvent().getEndDateTime().getLocal() }}
             </time>
         </td>
-        <td>{{ booking.getName() }}</td>
-        <td>{{ booking.getResource().getRoomCode() }}</td>
+        <td>
+            <a href="{{ routeLookup('resourceBooking.edit', {id: booking.getId()}) }}">
+                {{ booking.getName() }}
+            </a>
+        </td>
+        <td>
+            <a href="{{ routeLookup('resourceItem.read', {id: booking.getResource().getId()}) }}">
+                {% include "@resourceItem/sub/itemName.twig" with {item: booking.getResource()} %}
+            </a>
+        </td>
         <td>{{ booking.getNotes()|purify }}</td>
     </tr>
     {% endfor %}
