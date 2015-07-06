@@ -11,6 +11,13 @@ class Component_Homepage_BialikSearchController extends Component_Homepage_Contr
 {
 
     /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'Bialik Search';
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
@@ -35,7 +42,7 @@ class Component_Homepage_BialikSearchController extends Component_Homepage_Contr
             'COMPONENT_NAME',
             strlen(trim($this->getConfig('componentname'))) ?
                 $this->getConfig('componentname') :
-                'Bialik Search'
+                $this->getComponentName()
         );
 
         return true;
