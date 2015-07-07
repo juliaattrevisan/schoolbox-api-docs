@@ -25,43 +25,43 @@
                 </ul>
             </section>
         </nav>
-    </div>
 
-    <!-- BEGIN settings_panel -->
-    <div class="small-12 island">
-        <section>
-            <div data-component-panel="settings" class="editPanel">
-                <form action="/homepage/configForm.php" method="GET">
-                    <input type="hidden" name="cid" value="{ID}" />
-                    <input type="hidden" name="type" value="config" />
-                    <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}" />
-                    <!-- BEGIN config_element -->
-                    <div class="{CONFIG_ELEMENT_CLASS}" {CONFIG_DISPLAY}>
-                        <span>{CONFIG_ELEMENT_LABEL}: </span>
-                        {CONFIG_ELEMENT_CONTENT}
-                    </div>
-                    <!-- END config_element -->
-                    <input type="submit" value="Update" class="submit-btn-plain update" />
-                </form>
-            </div>
-        </section>
-    </div>
-    <!-- END settings_panel -->
+        <!-- BEGIN settings_panel -->
+        <div data-component-panel="settings" class="editPanel small-12 ">
+            <section>
+                <div>
+                    <form action="/homepage/configForm.php" method="GET">
+                        <input type="hidden" name="cid" value="{ID}" />
+                        <input type="hidden" name="type" value="config" />
+                        <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}" />
+                        <!-- BEGIN config_element -->
+                        <div class="{CONFIG_ELEMENT_CLASS}" {CONFIG_DISPLAY}>
+                            <span>{CONFIG_ELEMENT_LABEL}: </span>
+                            {CONFIG_ELEMENT_CONTENT}
+                        </div>
+                        <!-- END config_element -->
+                        <input type="submit" value="Update" class="submit-btn-plain update" />
+                    </form>
+                </div>
+            </section>
+        </div>
+        <!-- END settings_panel -->
 
-    <div class="small-12 island">
-        <section>
-            <div data-component-panel='delete' class="editPanel">
-                Are you sure you want to remove this component?
-                <form action="#" method="post">
-                    <input type="hidden" name="cid" value="{ID}" />
-                    <input type="hidden" name="delete" value="{COMPONENT_INSTANCE_ID}" />
-                    <input type="hidden" class="defn-id" name="component" value="{COMPONENT_DEFINITION_ID}" />
+        <div data-component-panel='delete' class="editPanel small-12 ">
+            <section>
+                <div>
+                    <p>Are you sure you want to remove this component?</p>
+                    <form action="#" method="post">
+                        <input type="hidden" name="cid" value="{ID}" />
+                        <input type="hidden" name="delete" value="{COMPONENT_INSTANCE_ID}" />
+                        <input type="hidden" class="defn-id" name="component" value="{COMPONENT_DEFINITION_ID}" />
 
-                    <a href="#" class="button secondary" data-remove="1">Yes</a>
-                    <a href="#" class="button" data-remove="0">No</a>
-                </form>
-            </div>
-        </section>
+                        <a href="#" class="button secondary" data-remove="1">Yes</a>
+                        <a href="#" class="button" data-remove="0">No</a>
+                    </form>
+                </div>
+            </section>
+        </div>
     </div>
 </div>
 

@@ -323,7 +323,7 @@
             page    = $(this.element);
         page.on(
             'submit',
-            opt.component.controlPanelSelector+'.settings form',
+            opt.component.controlPanelSelector+' form',
             function(event) {
                 var form       = $(this),
                     formData   = form.serializeArray(),
