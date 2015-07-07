@@ -356,9 +356,9 @@ abstract class Component_ControllerAbstract
         /* Explicitly clear configTpl - repeated assignations won't work
          * and will erroneously use _wrapper.html
          */
-//        $this->sitepage->setVar(array(
-//            'configTpl' => ''
-//        ));
+        $this->sitepage->setVar(array(
+            'configTpl' => ''
+        ));
 
         // if we're building in the context of the admin system, use a different template (_templatewrapper.html),
         // otherwise use the regular one (_wrapper.html)
