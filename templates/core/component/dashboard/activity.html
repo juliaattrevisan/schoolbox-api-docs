@@ -12,52 +12,101 @@
         </div>
     </div>
 
-    <div class="text">
-        <!-- BEGIN mail_block -->
-        <p><img src="/images/icons/mail.png" /> You have {NEW_MAIL} unread emails</p>
-        <!-- END mail_block -->
-        <ul>
-        <!-- BEGIN category_block -->
-        <li>
-            <h3><a class="home-icon" href="/homepage/{NEW_CATEGORY_ID}/">{NEW_CATEGORY_NAME}</a></h3>
-            <ul>
-                <!-- BEGIN due_work -->
-                <li class="icon"><a href="/submission/dueWork">New work due</a></li>
-                <!-- END due_work -->
-                <!-- BEGIN new_online_assessment -->
-                <li class="icon"><a href="/submission/dueWork">New quiz due</a></li>
-                <!-- END new_online_assessment -->
-                <!-- BEGIN reviewed_online_assessment -->
-                <li class="icon"><a href="/submission/dueWork">Quiz reviewed</a></li>
-                <!-- END reviewed_online_assessment -->
-                <!-- BEGIN ret_work -->
-                <li class="icon"><a href="/submission/dueWork">Work returned</a></li>
-                <!-- END ret_work -->
-                <!-- BEGIN sub_work -->
-                <li class="icon"><a href="/submission/viewSubmission/{BOX_ID}">{BOX_NAME} has {BOX_COUNT} new submission{BOX_PLURAL}</a></li>
-                <!-- END sub_work -->
-                <!-- BEGIN new_news -->
-                <li class="icon"><a href="/homepage/{NEW_CATEGORY_ID}/">{NEW_NEWS} News Article{NEW_PLURAL_NEWS}</a></li>
-                <!-- END new_news -->
-                <!-- BEGIN new_blog -->
-                <li class="icon"><a href="/homepage/{NEW_CATEGORY_ID}/">{NEW_BLOG} Blog Post{NEW_PLURAL_BLOG}</a></li>
-                <!-- END new_blog -->
-                <!-- BEGIN new_file -->
-                <li class="icon"><a href="/homepage/{NEW_CATEGORY_ID}/">{NEW_FILES} File{NEW_PLURAL_FILE}</a></li>
-                <!-- END new_file -->
-                <!-- BEGIN new_url -->
-                <li class="icon"><a href="/homepage/{NEW_CATEGORY_ID}/">{NEW_URLS} Link{NEW_PLURAL_LINK}</a></li>
-                <!-- END new_url -->
-                <!-- BEGIN new_forum -->
-                <li class="icon"><a href="/forum/{NEW_CATEGORY_ID}">{NEW_FORUM} Forum Post{NEW_PLURAL_FORUM}</a></li>
-                <!-- END new_forum -->
-                <!-- BEGIN new_wiki -->
-                <li class="icon"><a href="/homepage/{NEW_CATEGORY_ID}/">{NEW_WIKI} Wiki Revision{NEW_PLURAL_WIKI}</a></li>
-                <!-- END new_wiki -->
-            </ul>
-        </li>
-        <!-- END category_block -->
-        </ul>
+    <div class="row">
+        <div class="small-12 island">
+            <!-- BEGIN mail_block -->
+            <p><img src="/images/rows/mail.png" /> You have {NEW_MAIL} unread emails</p>
+            <!-- END mail_block -->
+            <!-- BEGIN category_block -->
+            <section>
+                <ul class="activity-list">
+                    <li class="row">
+                        <h3><a href="/homepage/{NEW_CATEGORY_ID}/">{NEW_CATEGORY_NAME}</a></h3>
+                    </li>
+                    <!-- BEGIN due_work -->
+                    <li class="row">
+                        <div class="small-1 columns"><span class="icon-due-work"></span></div>
+                        <div class="small-11 columns"><a href="/submission/dueWork">New work due</a></div>
+                    </li>
+                    <!-- END due_work -->
+                    <!-- BEGIN new_online_assessment -->
+                    <li class="row">
+                        <div class="small-1 columns"><span class="icon-quiz"></span></div>
+                        <div class="small-11 columns"><a href="/submission/dueWork">New work due</a></div>
+                    </li>
+                    <!-- END new_online_assessment -->
+                    <!-- BEGIN reviewed_online_assessment -->
+                    <li class="row">
+                        <div class="small-1 columns"><span class="icon-quiz"></span></div>
+                        <div class="small-11 columns"><a href="/submission/dueWork">Quiz reviewed</a></div>
+                    </li>
+                    <!-- END reviewed_online_assessment -->
+                    <!-- BEGIN ret_work -->
+                    <li class="row">
+                        <div class="small-1 columns"><span class="icon-due-work"></span></div>
+                        <div class="small-11 columns"><a href="/submission/dueWork">Work returned</a></div>
+                    </li>
+                    <!-- END ret_work -->
+                    <!-- BEGIN sub_work -->
+                    <li class="row">
+                        <div class="small-1 columns"><span class="icon-due-work"></span></div>
+                        <div class="small-11 columns">
+                            <a href="/submission/viewSubmission/{BOX_ID}">{BOX_NAME} has {BOX_COUNT} new submission{BOX_PLURAL}</a>
+                        </div>
+                    </li>
+                    <!-- END sub_work -->
+                    <!-- BEGIN new_news -->
+                    <li class="row">
+                        <div class="small-1 columns"><span class="icon-news"></span></div>
+                        <div class="small-11 columns">
+                            <a href="/homepage/{NEW_CATEGORY_ID}/">{NEW_NEWS} News Article{NEW_PLURAL_NEWS}</a>
+                        </div>
+                    </li>
+                    <!-- END new_news -->
+                    <!-- BEGIN new_blog -->
+                    <li class="row">
+                        <div class="small-1 columns"><span class="icon-news"></span></div>
+                        <div class="small-11 columns">
+                            <a href="/homepage/{NEW_CATEGORY_ID}/">{NEW_BLOG} Blog Post{NEW_PLURAL_BLOG}</a>
+                        </div>
+                    </li>
+                    <!-- END new_blog -->
+                    <!-- BEGIN new_file -->
+                    <li class="row">
+                        <div class="small-1 columns"><span class="icon-files"></span></div>
+                        <div class="small-11 columns">
+                            <a href="/homepage/{NEW_CATEGORY_ID}/">{NEW_FILES} File{NEW_PLURAL_FILE}</a>
+                        </div>
+                    </li>
+                    <!-- END new_file -->
+                    <!-- BEGIN new_url -->
+                    <li class="row">
+                        <div class="small-1 columns"><span class="icon-link"></span></div>
+                        <div class="small-11 columns">
+                            <a href="/homepage/{NEW_CATEGORY_ID}/">{NEW_URLS} Link{NEW_PLURAL_LINK}</a>
+                        </div>
+                    </li>
+                    <!-- END new_url -->
+                    <!-- BEGIN new_forum -->
+                    <li class="row">
+                        <div class="small-1 columns"><span class="icon-forum"></span></div>
+                        <div class="small-11 columns">
+                            <a href="/forum/{NEW_CATEGORY_ID}">{NEW_FORUM} Forum Post{NEW_PLURAL_FORUM}</a>
+                        </div>
+                    </li>
+                    <!-- END new_forum -->
+                    <!-- BEGIN new_wiki -->
+                    <li class="row">
+                        <div class="small-1 columns"><span class="icon-wiki"></span></div>
+                        <div class="small-11 columns">
+                            <a href="/homepage/{NEW_CATEGORY_ID}/">{NEW_WIKI} Wiki Revision{NEW_PLURAL_WIKI}</a>
+                        </div>
+                    </li>
+                    <!-- END new_wiki -->
+                </ul>
+            </section>
+            <!-- END category_block -->
+        </div>
     </div>
 </div>
 
