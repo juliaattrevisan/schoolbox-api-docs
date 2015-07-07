@@ -1,56 +1,59 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div id="component{COMPONENT_INSTANCE_ID}">
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <ul class="information-list">
-            <!-- BEGIN assess -->
-            <li class="{ON_OFF}">
-                <span class="actions">
-                    <!-- BEGIN resultLink -->
-                    <a class="btn statistics no-text" href="/assess/results/{ASSESS_ASSESS_ID}" title="View Results"><span></span></a>
-                    <!-- END resultLink -->
+    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="island small-12">
+            <section>
+                <ul class="action-list">
+                    <!-- BEGIN assess -->
+                    <li class="row" data-equalizer>
+                        <div class="column small-10" data-equalizer-watch>
+                            <!-- BEGIN assessLink -->
+                            <h3><a href="/assess/intro/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></h3>
+                            <!-- END assessLink -->
 
-                    <!-- BEGIN teacherLink -->
-                    <a class="btn modify no-text" href="/assess/modify/{ASSESS_ASSESS_ID}" title="Modify Quiz"><span></span></a>
-                    <!-- END teacherLink -->
+                            <!-- BEGIN resumeLink -->
+                            <h3><a href="/assess/attempt/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}">{ASSESS_TITLE}</a></h3>
+                            <!-- END resumeLink -->
 
-                    <!-- BEGIN has_previous_attempts -->
-                    <a class="btn no-text list" href="/assess/attempts/{ASSESS_ASSESS_ID}/{ASSESS_RESPONDENT_ID}" title="See previous attempts"><span></span></a>
-                    <!-- END has_previous_attempts -->
-                </span>
+                            <!-- BEGIN assessNoLink -->
+                            <h3>{ASSESS_TITLE}</h3>
+                            <!-- END assessNoLink -->
 
-                <!-- BEGIN assessLink -->
-                <h4><a href="/assess/intro/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></h4>
-                <!-- END assessLink -->
+                            <!-- BEGIN assessDue -->
+                            <p class="meta">
+                                <span class="gradient-{ASSESS_FINISH_URGENCY}">Due {ASSESS_FINISH_RELATIVE_DATE}</span>
+                                <!-- BEGIN assess_finish_date -->
+                                on {ASSESS_FINISH_DATE}
+                                <!-- END assess_finish_date -->
+                            </p>
+                            <!-- END assessDue -->
+                            <article class="{COMPONENT_COMPACTMODE}">{ASSESS_DESCRIPTION}</article>
+                            <p class="{COMPONENT_COMPACTMODE}">Created by <a href='/search/user/{ASSESS_USER_ID}'>{ASSESS_USER_FIRSTNAME} {ASSESS_USER_LASTNAME}</a> {ASSESS_CREATED}</p>
+                        </div>
+                        <div class="two actions">
+                            <!-- BEGIN resultLink -->
+                            <a data-equalizer-watch class="icon-poll no-text" data-tooltip href="/assess/results/{ASSESS_ASSESS_ID}" title="View Results"></a>
+                            <!-- END resultLink -->
 
-                <!-- BEGIN resumeLink -->
-                <h4><a href="/assess/attempt/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}">{ASSESS_TITLE}</a></h4>
-                <!-- END resumeLink -->
+                            <!-- BEGIN teacherLink -->
+                            <a data-equalizer-watch class="icon-modify no-text" data-tooltip href="/assess/modify/{ASSESS_ASSESS_ID}" title="Modify Quiz"></a>
+                            <!-- END teacherLink -->
 
-                <!-- BEGIN assessNoLink -->
-                <h4>{ASSESS_TITLE}</h4>
-                <!-- END assessNoLink -->
-
-                <!-- BEGIN assessDue -->
-                <p class="meta">
-                    <span class="gradient-{ASSESS_FINISH_URGENCY}">Due {ASSESS_FINISH_RELATIVE_DATE}</span>
-                    <!-- BEGIN assess_finish_date -->
-                    on {ASSESS_FINISH_DATE}
-                    <!-- END assess_finish_date -->
-                </p>
-                <!-- END assessDue -->
-
-                <div class="wysiwyg summ {COMPONENT_COMPACTMODE} ">{ASSESS_DESCRIPTION}</div>
-
-                <p class="footnote {COMPONENT_COMPACTMODE}">Created by <a href='/search/user/{ASSESS_USER_ID}'>{ASSESS_USER_FIRSTNAME} {ASSESS_USER_LASTNAME}</a> {ASSESS_CREATED}</p>
-            </li>
-            <!-- END assess -->
-        </ul>
-
-        <!-- BEGIN createAssessment -->
-        <p class="interact">
-            <a href="/assess/create/{ID}" class="btn add"><span></span>Create Quiz</a>
-        </p>
-        <!-- END createAssessment -->
+                            <!-- BEGIN has_previous_attempts -->
+                            <a data-equalizer-watch class="icon-list no-text" data-tooltip href="/assess/attempts/{ASSESS_ASSESS_ID}/{ASSESS_RESPONDENT_ID}" title="See previous attempts"></a>
+                            <!-- END has_previous_attempts -->
+                        </div>
+                    </li>
+                    <!-- END assess -->
+                </ul>
+                <div class="content">
+                    <!-- BEGIN createAssessment -->
+                    <a href="/assess/create/{ID}" class="button add">Create Quiz</a>
+                    <!-- END createAssessment -->
+                </div>
+            </section>
+        </div>
     </div>
+
 </div>
