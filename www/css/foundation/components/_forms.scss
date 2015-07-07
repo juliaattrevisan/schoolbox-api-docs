@@ -162,7 +162,7 @@ label.checkbox-label		{ background-position: 0 -120px; }
 // Component Forms
 .editPanel{
 	background-color: $gainsboro;
-	display: block;
+	display: none;
 	padding: rem-calc(($base-font-size));
 
 	input[type=radio] +
