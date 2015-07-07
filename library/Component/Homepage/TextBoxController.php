@@ -10,13 +10,6 @@
 class Component_Homepage_TextBoxController extends Component_Homepage_ControllerAbstract
 {
 
-    /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Text Box';
-
     /** @var \Schoolbox\Textbox\Model */
     protected $textbox;
 

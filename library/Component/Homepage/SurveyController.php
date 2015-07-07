@@ -11,13 +11,6 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Survey';
-
-    /**
      * @var Group
      */
     private $groupHandler;

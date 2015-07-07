@@ -11,13 +11,6 @@ class Component_Homepage_DutiesController extends Component_Homepage_ControllerA
 {
 
     /**
-     * Hook method
-     */
-    protected function hook() {
-        $this->setComponentName("DATE", 'Duties for ' . date('l, jS \of F Y'));
-    }
-
-    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
@@ -39,6 +32,9 @@ class Component_Homepage_DutiesController extends Component_Homepage_ControllerA
         if (!parent::loadTemplate($templateHandle, 'duties')) {
             return false;
         }
+
+        $this->setComponentName("DATE", 'Duties for ' . date('l, jS \of F Y'));
+
         $this->parseConfig();
 
         $this->setBlock($templateHandle, "duties", "d_block");

@@ -10,7 +10,6 @@
 class Component_Homepage_ImageController extends Component_Homepage_ControllerAbstract
 {
 
-    protected $componentName = 'Feature Image';
     /**
      * @var DeprecatedDatabase
      */

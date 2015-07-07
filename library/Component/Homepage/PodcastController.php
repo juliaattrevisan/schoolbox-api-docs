@@ -11,13 +11,6 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Podcast';
-
-    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void

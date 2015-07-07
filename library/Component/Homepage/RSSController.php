@@ -11,13 +11,6 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'RSS Feed';
-
-    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void

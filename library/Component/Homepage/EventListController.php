@@ -12,13 +12,6 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Group Calendar';
-
-    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void

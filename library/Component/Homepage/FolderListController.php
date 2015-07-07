@@ -10,13 +10,6 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 {
 
     /**
-     * Component name
-     * 
-     * @var string
-     */
-    protected $componentName = 'Folders';
-
-    /**
      * @var Group
      */
     private $groupHandler;

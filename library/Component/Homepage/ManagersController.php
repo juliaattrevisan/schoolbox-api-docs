@@ -11,13 +11,6 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Group Managers';
-
-    /**
      * @var Group
      */
     protected $groupHandler;

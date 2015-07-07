@@ -11,13 +11,6 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Poll';
-
-    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void

@@ -11,13 +11,6 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'News';
-
-    /**
      * @var Group
      */
     private $groupHandler;

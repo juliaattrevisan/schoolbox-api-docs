@@ -12,13 +12,6 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Breadcrumbs';
-
-    /**
      * Category Mapper
      *
      * @var \Schoolbox\Resource\CategoryMapper

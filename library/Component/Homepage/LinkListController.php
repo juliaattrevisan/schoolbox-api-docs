@@ -10,13 +10,6 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Links';
-
-    /**
      * Group handler
      *
      * @var Group

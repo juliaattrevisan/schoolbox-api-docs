@@ -9,13 +9,6 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Video';
-
-    /**
      * @var \Schoolbox\Collection|\Schoolbox\Video\ResourceVideo[]
      */
     protected $outputList;

@@ -17,13 +17,6 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Campus Calendar';
-
-    /**
      * @var DeprecatedDatabase
      */
     private $db;

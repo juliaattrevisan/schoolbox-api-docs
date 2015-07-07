@@ -11,13 +11,6 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
 {
 
     /**
-     * Component name
-     * 
-     * @var string
-     */
-    protected $componentName = 'Image Gallery';
-
-    /**
      * A group handler
      *
      * @var Group

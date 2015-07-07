@@ -14,13 +14,6 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Homepage Feed';
-
-    /**
      * @var Feed
      */
     protected $feed;

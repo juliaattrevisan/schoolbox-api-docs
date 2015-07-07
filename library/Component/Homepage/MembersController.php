@@ -11,13 +11,6 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Members';
-
-    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void

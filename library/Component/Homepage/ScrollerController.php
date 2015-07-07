@@ -12,13 +12,6 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Image Slideshow';
-
-    /**
      * An instance of Category
      *
      * @var \Schoolbox\Resource\Category

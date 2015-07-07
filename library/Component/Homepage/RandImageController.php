@@ -11,13 +11,6 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Random Image';
-
-    /**
      * @var DeprecatedDatabase
      */
     private $db;

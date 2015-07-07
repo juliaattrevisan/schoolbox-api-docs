@@ -11,13 +11,6 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Class List';
-
-    /**
      * @var Group
      */
     protected $groupHandler;

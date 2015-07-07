@@ -11,13 +11,6 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Manage Folder';
-
-    /**
      * @var Group
      */
     private $groupHandler;

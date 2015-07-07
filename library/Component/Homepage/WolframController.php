@@ -11,13 +11,6 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Wolfram|Alpha';
-
-    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void

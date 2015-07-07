@@ -10,13 +10,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Files';
-
-    /**
      * @var Group
      */
     private $groupHandler;

@@ -11,13 +11,6 @@ class Component_Homepage_BialikSearchController extends Component_Homepage_Contr
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Bialik Search';
-
-    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void

@@ -11,13 +11,6 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'ClickView';
-
-    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void

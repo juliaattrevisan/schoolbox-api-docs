@@ -11,13 +11,6 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Wiki';
-
-    /**
      * @var Group
      */
     private $groupHandler;

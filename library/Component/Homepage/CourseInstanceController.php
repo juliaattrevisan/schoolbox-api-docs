@@ -21,8 +21,6 @@ use Schoolbox\UserMapper;
 class Component_Homepage_CourseInstanceController extends Component_Homepage_ControllerAbstract
 {
 
-    protected $componentName = 'Course Outline';
-
     /**
      * A list of units within this course.
      *

@@ -11,13 +11,6 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 {
 
     /**
-     * Component name
-     *
-     * @var string
-     */
-    protected $componentName = 'Forumx';
-
-    /**
      * @var Group
      */
     private $groupHandler;
