@@ -6,9 +6,10 @@
 $.fn.configurator = function(opts) {
     var defaults = {
         context: 'dashboard',
-        dropDownSelector: '#group-select',
+        dropDownSelector: '[data-group-select]',
         disabledMsg: 'This component can only be used once, and is already active for the group selected.'
     };
+
     var options = $.extend({}, defaults, opts);
     var configurator = this;
     var dropDownSelector = $(options.dropDownSelector);
@@ -24,49 +25,12 @@ $.fn.configurator = function(opts) {
         this.setupCustomise();
     };
 
-
-    this.help = function() {
-        $('h2 span').each(function() {
-            var activeContent = $(this).siblings('em').html();
-            $(this).qtip({
-                content: activeContent,
-                style: {
-                    classes: 'qtip-green qtip-shadow qtip-rounded'
-                },
-                position: {
-                    my: 'bottom left',
-                    at: 'top left'
-                }
-            });
-        });
-
-        // We'll encapsulate our .qtip() call in your .on() handler method
-        $(document).on('mouseover', '.disabled', function(event) {
-            // Bind the qTip within the event handler
-            $(this).qtip({
-                overwrite: false,
-                content: options.disabledMsg,
-                show: {
-                    event: event.type,
-                    ready: true
-                },
-                style: {
-                    classes: 'qtip-green qtip-shadow qtip-rounded'
-                },
-                position: {
-                    my: 'bottom left',
-                    at: 'top left'
-                }
-            }, event); // Pass through our original event to qTip
-        });
-    };
-
     this.checkForPreselection = function() {
         var hashStripped = location.href.split("#")[1];
         if (hashStripped) {
             dropDownSelector.val(hashStripped);
             $.get('/adminv2/component/get/'+options.context+'/'+hashStripped, function ($layout) {
-                $('#'+options.context+'-layout').fadeOut(function() {
+                $('[data-'+options.context+'-layout]').fadeOut(function() {
                     $(this).empty().append($layout);
                     $(this).fadeIn();
                     configurator.dragAndDrop();
@@ -79,9 +43,9 @@ $.fn.configurator = function(opts) {
         var instID;
         var templID;
 
-        $('#'+options.context+'-layout .component-holder').sortable({
+        $('[data-'+options.context+'-layout] .component-holder').sortable({
             helper: 'clone',
-            connectWith: '#'+options.context+'-layout .component-holder',
+            connectWith: '[data-'+options.context+'-layout] .component-holder',
             update: function (event, ui) {
 
                 var instanceID;
@@ -156,10 +120,10 @@ $.fn.configurator = function(opts) {
 
         $('#definition-palette .component').draggable({
             helper: 'clone',
-            connectToSortable: '#'+options.context+'-layout .component-holder'
+            connectToSortable: '[data-'+options.context+'-layout] .component-holder'
         });
 
-        $('#'+options.context+'-layout .component-holder').sortable('refresh');
+        $('[data-'+options.context+'-layout] .component-holder').sortable('refresh');
 
         this.refreshPalette();
     };
@@ -170,7 +134,7 @@ $.fn.configurator = function(opts) {
             var definitionElement = $(this);
             var definitionIDClass = definitionElement.attr('class').match(/(definition\-id\-\d+)/)[1];
 
-            var search = '#'+options.context+'-layout .component.' + definitionIDClass;
+            var search = '[data'+options.context+'-layout] .component.' + definitionIDClass;
 
             var singleton = definitionElement.hasClass('single-instance');
             var instantiated = $(search).length > 0;
@@ -207,7 +171,7 @@ $.fn.configurator = function(opts) {
             location.hash = groupID;
 
             $.get('/adminv2/component/get/'+options.context+'/'+groupID, function ($layout) {
-                $('#'+options.context+'-layout').fadeOut(function() {
+                $('[data-'+options.context+'-layout]').fadeOut(function() {
                     var self = $(this);
                     self.empty().append($layout);
                     self.fadeIn();
@@ -245,7 +209,7 @@ $.fn.configurator = function(opts) {
         // The controls for the individual components ie. edit, delete
         setupCustomise.activeComponents();
 
-        $(document).on('submit', '#'+options.context+'-layout form', function(event) {
+        $(document).on('submit', '[data-'+options.context+'-layout] form', function(event) {
             var self = $(this);
             var panel = self.parent('.editPanel');
             var component = panel.parent('.component');
