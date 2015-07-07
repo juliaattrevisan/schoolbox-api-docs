@@ -83,8 +83,6 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
             return false;
         }
 
-        $this->parseConfig();
-
         if ($this->permission < READ_ACCESS) {
             return false;
         }
@@ -111,19 +109,15 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 
         /* Set up component name
          */
-        $this->setVar(
-            array(
-                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig(
-                        'componentname'
-                    ) : 'Blog',
-                // These are for the Select Alternate Source resourcebrowser
-                'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId() ? 'Local' : $this->source->getName(),
-                /* Have update form to back to this homepage, not the wiki's homepage
-                 */
-                'BLOG_CATEGORY_ID'          => $this->source->getId(),
-            )
-        );
+        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
+        $this->setVar(array(
+            // These are for the Select Alternate Source resourcebrowser
+            'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
+            'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId() ? 'Local' : $this->source->getName(),
+            /* Have update form to back to this homepage, not the wiki's homepage
+             */
+            'BLOG_CATEGORY_ID'          => $this->source->getId(),
+        ));
 
         $allItems = $this->getBlogMapper()->findForCategory($this->source, $this->getConfig('size'));
 
@@ -243,6 +237,10 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         if ($this->permission >= WRITE_ACCESS) {
             $this->parse('create_blog_block', 'create_blog');
         }
+
+        /* Need title injected here
+         */
+        $this->parseConfig();
 
         return true;
     }
