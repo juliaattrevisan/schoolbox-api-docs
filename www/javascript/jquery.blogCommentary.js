@@ -28,7 +28,7 @@
 			}
 
 			var derived = {
-			}
+			};
 
 			return $.extend(defaults, derived, options);
 		}
@@ -47,38 +47,33 @@
 			 * By Shahbaz Saleem
 			 * http://yuji.wordpress.com/2010/02/22/jquery-click-event-fires-twice/
 			 */
-			component.find('.closeComment').unbind('click').click(function() {
-				var id = $(this).attr('rel');
-				component.find('#' + id).toggle();
+			component.find('[data-toggle]').unbind('click').click(function() {
+				$('#' + $(this).data('toggle')).toggle();
 			});
 
 			/* For viewing comment thread
 			 */
-			component.find('.viewCommentThread').hide();
-			component.find('.viewComments').unbind('click').click(function(event) {
+			component.find('[data-thread]').hide();
+			component.find('[data-interaction=showcomments]').unbind('click').click(function(event) {
 				event.preventDefault();
 
-				var matches = $(this).attr('rel').match(/^viewComments_(\d+)$/);
+                var element = component.find('[data-thread]');
 
-				if (matches) {
-					var postId = matches[1];
+                element.toggle();
 
-					var element = component.find('#blogComment_' + postId + ' .viewCommentThread');
-					element.toggle();
+                /* Update button text when toggling
+                 */
+                var button = component.find('[data-interaction=showcomments]'),
+                    state;
 
-					/* Update button text when toggling
-					 */
-					var button = component.find('a[rel=viewComments_' + postId + ']');
+                if ($(element).is(':visible')) {
+                    state = 'Hide';
+                }
+                else {
+                    state = 'Show';
+                }
 
-					if ($(element).is(':visible')) {
-						var state = 'Hide';
-					}
-					else {
-						var state = 'Show';
-					}
-
-					button.html('<span></span>' + state + ' Comments (' + button.data('numcomments') + ')');
-				}
+                button.html(state + ' Comments (' + button.data('numcomments') + ')');
 			});
 		}
 	}
