@@ -410,6 +410,15 @@ abstract class Component_ControllerAbstract
          */
         // every config key has a corresponding controller and template to be called
         foreach ($this->instance->getConfigArray() as $key => $params) {
+
+            /* Special case for componentname default value when empty
+             */
+            if (($key == 'componentname') && !strlen(trim($params['value']))) {
+                $this->sitepage->setVar(array(
+                    'COMPONENT_NAME' => $this->getComponentName(),
+                ));
+            }
+
             $this->sitepage->setVar(
                 array(
                     'CONFIG_ELEMENT_LABEL' => $params['label'],
@@ -506,6 +515,7 @@ abstract class Component_ControllerAbstract
 
         $page->setFile($key, $templateFile);
         $conf->parse($page, $key, $key, Scrub::text($params['value']), $this);
+
         $page->parse('CONFIG_ELEMENT_CONTENT', $key);
         $page->setVar('CONFIG_DISPLAY', $params['label'] ? '' : ' style="display:none;"');
         $page->parse('config_element_block', 'config_element', true);
@@ -686,6 +696,7 @@ abstract class Component_ControllerAbstract
     /**
      * Assign component name default
      *
+     * @param $componentName
      * @return string
      */
     protected function setComponentName($componentName)
@@ -699,6 +710,15 @@ abstract class Component_ControllerAbstract
      */
     protected function getComponentName()
     {
+        /* Return db version of the name if class var is empty
+         * or not set
+         */
+        if (!strlen(trim($this->componentName))) {
+            return $this->instance->getDefinition()->getName();
+        }
+
+        /* Otherwise allow a per-controller hardcoded version
+         */
         return $this->componentName;
     }
 }
