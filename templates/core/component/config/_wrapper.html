@@ -30,7 +30,7 @@
     <!-- BEGIN settings_panel -->
     <div class="small-12 island">
         <section>
-            <div data-component-panel="settings" class="component-form editPanel">
+            <div data-component-panel="settings" class="editPanel">
                 <form action="/homepage/configForm.php" method="GET">
                     <input type="hidden" name="cid" value="{ID}" />
                     <input type="hidden" name="type" value="config" />
@@ -47,16 +47,21 @@
         </section>
     </div>
     <!-- END settings_panel -->
+
+    <div class="small-12 island">
+        <section>
+            <div data-component-panel='delete' class="editPanel">
+                Are you sure you want to remove this component?
+                <form action="#" method="post">
+                    <input type="hidden" name="cid" value="{ID}" />
+                    <input type="hidden" name="delete" value="{COMPONENT_INSTANCE_ID}" />
+                    <input type="hidden" class="defn-id" name="component" value="{COMPONENT_DEFINITION_ID}" />
+
+                    <a href="#" class="button secondary" data-remove="1">Yes</a>
+                    <a href="#" class="button" data-remove="0">No</a>
+                </form>
+            </div>
+        </section>
+    </div>
 </div>
 
-<div data-component-panel='delete' class="editPanel">
-    <p>Are you sure you want to remove this component?</p>
-    <form action="#" method="post">
-        <input type="hidden" name="cid" value="{ID}" />
-        <input type="hidden" name="delete" value="{COMPONENT_INSTANCE_ID}" />
-        <input type="hidden" class="defn-id" name="component" value="{COMPONENT_DEFINITION_ID}" />
-
-        <a href="#" class="button secondary" data-remove="1">Yes</a>
-        <a href="#" class="button" data-remove="0">No</a>
-    </form>
-</div>
