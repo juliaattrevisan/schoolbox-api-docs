@@ -97,14 +97,6 @@ abstract class Component_ControllerAbstract
         $this->sitepage = $sitepage;
         $this->config   = $instance->getConfigArray();
         $this->context  = new \Schoolbox\Resource\Category();
-
-        $this->hook();
-    }
-
-    /**
-     * Constructor hook method, for dynamic manipulation on a per-component basis
-     */
-    protected function hook() {
     }
 
     /**
@@ -710,9 +702,16 @@ abstract class Component_ControllerAbstract
      */
     protected function getComponentName()
     {
-        /* Return db version of the name if class var is empty
-         * or not set
+        /* Special case for Manage Folders and any other
+         * arbitrarily-constructed components
          */
+        if (!$this->instance->getId()) {
+            return '';
+        }
+
+        /* Return db version of the name if class var is empty
+        * or not set
+        */
         if (!strlen(trim($this->componentName))) {
             return $this->instance->getDefinition()->getName();
         }
