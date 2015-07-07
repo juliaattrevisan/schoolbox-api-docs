@@ -155,14 +155,21 @@ class DueWork_Rubric_Handler
      */
     public function getStudentMarksWithDescription($studentID, $boxID, $set = 0)
     {
+        // Search both rubric_descriptor and rubric_result for description
         $stmt = Database::getInstance()->prepare("
-            SELECT rubric_mark.criterion_id, mark, description, UNIX_TIMESTAMP(tstamp) AS tstamp
-            FROM rubric_mark
-            LEFT JOIN rubric_descriptor ON rubric_mark.criterion_id = rubric_descriptor.criterion_id AND mark = value
-            WHERE student_id = :sid
-            AND rubric_mark.submission_box_id = :sbid
-            AND rubric_mark.valid = 1
-            ORDER BY tstamp DESC, rubric_mark.criterion_id ASC
+            SELECT
+                rm.criterion_id,
+                rm.mark,
+                COALESCE(rd.description, rr.label) AS description,
+                UNIX_TIMESTAMP(rm.tstamp) AS tstamp
+            FROM rubric_mark rm
+            LEFT JOIN rubric_descriptor rd ON rm.criterion_id = rd.criterion_id AND rm.mark = rd.value
+            LEFT JOIN submission_box sb ON rm.submission_box_id = sb.id
+            LEFT JOIN rubric_result rr ON sb.rubric_result_set = rr.resultset_id AND rm.mark = rr.value
+            WHERE rm.student_id = :sid
+            AND rm.submission_box_id = :sbid
+            AND rm.valid = 1
+            ORDER BY rm.tstamp DESC, rm.criterion_id ASC
         ");
 
         $stmt->execute(
