@@ -32,7 +32,6 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
         }
 
         $this->setBlock($templateHandle, 'category_block', 'new_category');
-        $this->setBlock($templateHandle, 'mail_block', 'new_mail_block');
         $this->setBlock('category_block', 'new_online_assessment', 'online_assessment_block');
         $this->setBlock('category_block', 'reviewed_online_assessment', 'reviewed_block');
         $this->setBlock('category_block', 'due_work', 'due_block');
@@ -46,8 +45,6 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
         $this->setBlock("category_block", "new_blog", "new_blog_item");
 
         $flag = 0;
-
-        $this->setVar('new_mail_block','');
 
         //for each subject
         $this->setVar('new_category','');
