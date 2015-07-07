@@ -50,10 +50,10 @@
 
 					/* Random starting slide
 					 */
-					var isRandomStart = {COMPONENT_CONFIG_RANDOM_STARTING_SLIDE};
+					var isRandomStart = '{COMPONENT_CONFIG_RANDOM_STARTING_SLIDE}';
 					var startingSlide = 0;
 
-					if (isRandomStart) {
+					if (parseInt(isRandomStart)) {
 						var startingSlide = Math.floor(Math.random()*slideshow.length);
 					}
 
