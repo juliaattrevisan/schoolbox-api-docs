@@ -327,12 +327,12 @@ abstract class Component_ControllerAbstract
      * @return string
      */
     protected function determineTemplate() {
-        if (in_array($this->instance->getModule(), array('dashboard', 'homepage_template', 'eportfolio_template'))) {
+        if (in_array($this->instance->getModule(), array('homepage_template', 'eportfolio_template'))) {
             $template = 'component/config/_templatewrapper.html';
         }
         /* eportfolio uses a special version of le wrapier
          */
-        else if (in_array($this->instance->getModule(), array('homepage', 'eportfolio'))) {
+        else if (in_array($this->instance->getModule(), array('dashboard', 'homepage', 'eportfolio'))) {
             $template = 'component/config/' . $this->instance->getModule() . '_wrapper.html';
         }
         /* default template
