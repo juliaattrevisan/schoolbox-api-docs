@@ -39,11 +39,20 @@
             immovableFilter: '.permanent',
             controlPanelSelector: '[data-component-panel]',
             editBtnSelector: 'a.edit',
-            removeBtnSelector: 'a.close-delete',
+            removeBtnSelector: '[data-target=delete]',
             removeActionSelector: 'a[data-remove]',
+
+            /* All the buttons that activate a panel - cog, close/delete
+             */
+            allButtons: '[data-target]',
+
+            /* All the panels that can be opened by a button - settings, delete confirmation
+             */
+            allPanels: '[data-component-panel]',
+
             mceEditorClass: 'mceEditor',
             calcSequenceData: noop,
-            url: null
+            url: null,
         },
 
         // default options for defining "columns" (includes top and bottom)
@@ -257,17 +266,23 @@
 
             event.preventDefault();
 
+            /* Start hiding all open panels
+             */
+            box.find(opt.component.allPanels).slideUp();
+            box.find(opt.component.allButtons).attr('data-state', 'closed');
+
+            /* Only start opening the one you choze
+             */
             if (state == 'opened') {
                 btn.attr('data-state', 'closed').removeClass(activeClass);
 
                 target.off('click', opt.component.removeActionSelector);
-                target.stop().slideUp();
+                target.slideUp();
             }
             else {
                 btn.attr('data-state', 'opened').addClass(activeClass);
 
                 target
-                    .stop()
                     .slideDown()
                     .one('click', opt.component.removeActionSelector, function (event) {
                         var btn = $(this);

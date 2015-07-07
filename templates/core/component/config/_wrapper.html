@@ -16,11 +16,11 @@
                     <li class="divider"></li>
                     <!-- END settings_link -->
                     <!-- BEGIN settings_collapse -->
-                    <li><a data-collapser="true" class="component-control-button collapse" href="#" title="Collapse Content"><span>{CONFIG_COLLAPSED_ICON}</span></a></li>
+                    <li><a data-collapser="true" href="#" class="component-control-button collapse"  title="Collapse Content"><span>{CONFIG_COLLAPSED_ICON}</span></a></li>
                     <li class="divider"></li>
                     <!-- END settings_collapse -->
                     <!-- BEGIN settings_close -->
-                    <li><a data-target="delete" href="#" class="button no-text icon-close" title="Close"></a></li>
+                    <li><a data-target="delete" data-state='closed' href="#" class="button no-text icon-close" title="Close"></a></li>
                     <!-- END settings_close -->
                 </ul>
             </section>
@@ -49,17 +49,14 @@
     <!-- END settings_panel -->
 </div>
 
-<div data-component-panel='delete' class="editPanel hide">
+<div data-component-panel='delete' class="editPanel">
     <p>Are you sure you want to remove this component?</p>
     <form action="#" method="post">
         <input type="hidden" name="cid" value="{ID}" />
         <input type="hidden" name="delete" value="{COMPONENT_INSTANCE_ID}" />
         <input type="hidden" class="defn-id" name="component" value="{COMPONENT_DEFINITION_ID}" />
-        <a href="#" class="delete-accept btn delete" data-remove="1">
-            <span></span>Yes
-        </a>
-        <a href="#" class="delete-reject btn cross" data-remove="0">
-            <span></span>No
-        </a>
+
+        <a href="#" class="button secondary" data-remove="1">Yes</a>
+        <a href="#" class="button" data-remove="0">No</a>
     </form>
 </div>
