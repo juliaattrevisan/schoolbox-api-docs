@@ -714,7 +714,7 @@
             counts  = {},
             handles = this.palette.find(this.options.palette.handleSelector);
 
-        $(this.element).find('input.defn-id').each(function () {
+        $(this.element).find('input[data-defn-id]').each(function () {
             if (!counts[this.value]) {
                 counts[this.value] = 0;
             }
