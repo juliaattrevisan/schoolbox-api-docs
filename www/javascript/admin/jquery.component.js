@@ -285,10 +285,10 @@ setupCustomise = {
 
             var sibs;
 
-            if((sibs = $this.siblings('.editPanel.settings.hide')).length) {
+            if((sibs = $this.siblings('.editPanel.settings')).length) {
                 sibs.slideToggle("fast");
             }
-            else if((sibs = $this.parent('span').siblings('.editPanel.settings.hide')).length) {
+            else if((sibs = $this.parent('span').siblings('.editPanel.settings')).length) {
                 sibs.slideToggle("fast");
             }
 
@@ -306,7 +306,7 @@ setupCustomise = {
                 $this.siblings('a.config-this').removeClass('active');
                 $this.siblings('a.config-this').children('em').removeClass('show-it');
             }
-            $this.siblings('.editPanel.delete-it.hide').slideToggle("fast");
+            $this.siblings('.editPanel.delete-it').slideToggle("fast");
         });
 
         $(document).on('click', '.delete-accept', function(event) {
