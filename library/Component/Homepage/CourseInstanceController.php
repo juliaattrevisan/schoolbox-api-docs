@@ -144,13 +144,11 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             return false;
         }
 
-        $this->parseConfig();
-
+        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? trim($this->getConfig('componentname')) : $this->getComponentName());
         $this->setVar(
             array(
                 'SESSION_NAME'    => session_name(),
                 'SESSION_ID'      => session_id(),
-                'COMPONENT_NAME'  => $this->getConfig('componentname'),
                 'COURSE_HOMEPAGE' => str_replace('/homepage/', '', Config::get('course_homepage')),
             )
         );
@@ -197,6 +195,10 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         } else {
             $this->renderTemplateForCourseSelector();
         }
+
+        /* Need title injected here
+         */
+        $this->parseConfig();
 
         return true;
     }
