@@ -120,7 +120,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
          */
         $this->setVar(
             array(
-                'COMPONENT_NAME'           => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Image Gallery',
+                'COMPONENT_NAME'           => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
                 'IMAGEGALLERY_CATEGORY_ID' => $this->getSource()->getId()
             )
         );

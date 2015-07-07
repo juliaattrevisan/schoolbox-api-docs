@@ -9,6 +9,7 @@
  */
 class Component_Homepage_MembersController extends Component_Homepage_ControllerAbstract
 {
+
     /**
      * Prepares data for the render function. Business logic.
      *

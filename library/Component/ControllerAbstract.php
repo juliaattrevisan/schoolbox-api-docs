@@ -77,6 +77,13 @@ abstract class Component_ControllerAbstract
     protected $filterFields = null;
 
     /**
+     * Name of the component
+     *
+     * @var string
+     */
+    protected $componentName = '';
+
+    /**
     * Constructor
     *
     * @param Component_Instance $instance
@@ -91,7 +98,6 @@ abstract class Component_ControllerAbstract
         $this->config   = $instance->getConfigArray();
         $this->context  = new \Schoolbox\Resource\Category();
     }
-
 
     /**
      * Method to provide global config details to the component
@@ -371,6 +377,10 @@ abstract class Component_ControllerAbstract
             /* Collapsable control button
              */
             'settings_collapse_block' => '',
+
+            /* Component Name
+             */
+            'COMPONENT_NAME' => $this->getComponentName()
         ));
     }
 
@@ -392,6 +402,22 @@ abstract class Component_ControllerAbstract
          */
         // every config key has a corresponding controller and template to be called
         foreach ($this->instance->getConfigArray() as $key => $params) {
+
+            /* Special case for componentname default value when empty
+             */
+            if ($key == 'componentname') {
+                if (!strlen(trim($params['value']))) {
+                    $componentname = $this->getComponentName();
+                }
+                else {
+                    $componentname = $params['value'];
+                }
+
+                $this->sitepage->setVar(array(
+                    'COMPONENT_NAME' => $componentname,
+                ));
+            }
+
             $this->sitepage->setVar(
                 array(
                     'CONFIG_ELEMENT_LABEL' => $params['label'],
@@ -488,6 +514,7 @@ abstract class Component_ControllerAbstract
 
         $page->setFile($key, $templateFile);
         $conf->parse($page, $key, $key, Scrub::text($params['value']), $this);
+
         $page->parse('CONFIG_ELEMENT_CONTENT', $key);
         $page->setVar('CONFIG_DISPLAY', $params['label'] ? '' : ' style="display:none;"');
         $page->parse('config_element_block', 'config_element', true);
@@ -663,5 +690,41 @@ abstract class Component_ControllerAbstract
     public function hasFullAccess()
     {
         return $this->permission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
+    }
+
+    /**
+     * Assign component name default
+     *
+     * @param $componentName
+     * @return string
+     */
+    protected function setComponentName($componentName)
+    {
+        $this->componentName = $componentName;
+    }
+    /**
+     * Get component name default
+     *
+     * @return string
+     */
+    protected function getComponentName()
+    {
+        /* Special case for Manage Folders and any other
+         * arbitrarily-constructed components
+         */
+        if (!$this->instance->getId()) {
+            return '';
+        }
+
+        /* Return db version of the name if class var is empty
+        * or not set
+        */
+        if (!strlen(trim($this->componentName))) {
+            return $this->instance->getDefinition()->getName();
+        }
+
+        /* Otherwise allow a per-controller hardcoded version
+         */
+        return $this->componentName;
     }
 }

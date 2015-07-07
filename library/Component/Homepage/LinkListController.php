@@ -8,6 +8,7 @@
  */
 class Component_Homepage_LinkListController extends Component_Homepage_ControllerAbstract
 {
+
     /**
      * Group handler
      *
@@ -95,7 +96,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 'LINK_CATEGORY_ID'          => $this->source->getId(),
                 'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname')))
                         ? $this->getConfig('componentname')
-                        : 'News',
+                        : $this->getComponentName(),
             )
         );
 

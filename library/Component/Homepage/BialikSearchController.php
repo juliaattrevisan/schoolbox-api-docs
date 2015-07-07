@@ -30,13 +30,9 @@ class Component_Homepage_BialikSearchController extends Component_Homepage_Contr
             return false;
         }
 
+        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
+
         $this->parseConfig();
-        $this->setVar(
-            'COMPONENT_NAME',
-            strlen(trim($this->getConfig('componentname'))) ?
-                $this->getConfig('componentname') :
-                'Bialik Search'
-        );
 
         return true;
     }

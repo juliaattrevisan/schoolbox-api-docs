@@ -29,13 +29,11 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
         if (!parent::loadTemplate($templateHandle, 'podcast')) {
             return false;
         }
-        $this->parseConfig();
 
         $this->setBlock($templateHandle, 'podcast_list', 'podcast_list_block');
         $this->setBlock($templateHandle, 'default_podcast', 'default_podcast_block');
         $this->setVar('default_podcast_block', '');
         $this->setVar('podcast_list_block', '');
-
 
         if ($this->getConfig('url')) {
             $xml = new Xml($this->getConfig('url'));
@@ -43,7 +41,7 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
             // Podcasts from xml feed
             if ($xml->channel) {
                 $j = 0;
-                $this->setVar('PODCAST_COMPONENT_TITLE', Scrub::text($xml->channel->title));
+                $this->setComponentName(Scrub::text($xml->channel->title));
 
                 // Iterate through each item in the channel
                 if (strlen(trim($this->getConfig('url')))) {
@@ -103,6 +101,10 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
             $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - Please set URL');
             $this->setVar('podcast_list_block', '');
         }
+
+        /* Need the podcast title injected here
+         */
+        $this->parseConfig();
 
         return true; // everything went according to plan
     }

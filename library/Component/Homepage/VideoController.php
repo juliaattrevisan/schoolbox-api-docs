@@ -55,7 +55,6 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         }
         $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
-        $this->parseConfig();
         $source = $this->getConfig('src');
         if (empty($source)) {
             $source = $this->getContext()->getId();
@@ -111,14 +110,11 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         }
 
         // Set up component name
-        $this->setVar(
-            array(
-                'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname')))
-                        ? $this->getConfig('componentname')
-                        : 'Video',
-                'FILE_CAT_ID'    => $this->source_category_id,
-            )
-        );
+        $this->setVar(array(
+            'FILE_CAT_ID' => $this->source_category_id,
+        ));
+
+        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname'): $this->getComponentName());
 
         $this->setBlock($templateHandle, 'default_video', 'default_video_block');
         $this->setBlock($templateHandle, 'video_list', 'video_list_block');
@@ -172,6 +168,10 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         } else {
             $this->setVar('submit_video_block', '');
         }
+
+        /* Need title injected here
+         */
+        $this->parseConfig();
 
         return true; // everything went according to plan
     }

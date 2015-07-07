@@ -32,6 +32,9 @@ class Component_Homepage_DutiesController extends Component_Homepage_ControllerA
         if (!parent::loadTemplate($templateHandle, 'duties')) {
             return false;
         }
+
+        $this->setComponentName("DATE", 'Duties for ' . date('l, jS \of F Y'));
+
         $this->parseConfig();
 
         $this->setBlock($templateHandle, "duties", "d_block");
@@ -39,7 +42,6 @@ class Component_Homepage_DutiesController extends Component_Homepage_ControllerA
         $dutyHandler = new Duty;
 
         $dutyList = $dutyHandler->getAllInCategory($this->getContext()->getId());
-        $this->setVar("DATE", 'Duties for ' . date('l, jS \of F Y'));
 
         $block = false;
         if (is_array($dutyList)) {

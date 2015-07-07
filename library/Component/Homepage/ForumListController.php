@@ -89,7 +89,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
                 'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
                 'COMPONENT_CONFIG_SRC_NAME' => $this->source->getName(),
                 'COMPONENT_HANDLE'          => strtolower($templateHandle),
-                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Forum',
+                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
             )
         );
 

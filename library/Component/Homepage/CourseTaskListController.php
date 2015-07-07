@@ -17,7 +17,6 @@ use Schoolbox\Collection;
 
 class Component_Homepage_CourseTaskListController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * @var Group
      */

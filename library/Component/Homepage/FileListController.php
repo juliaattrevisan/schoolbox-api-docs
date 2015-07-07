@@ -9,7 +9,6 @@
 class Component_Homepage_FileListController extends Component_Homepage_ControllerAbstract
 {
 
-
     /**
      * @var Group
      */
@@ -107,7 +106,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             array(
                 'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname')))
                         ? $this->getConfig('componentname')
-                        : 'Files',
+                        : $this->getComponentName(),
                 // These are for the Select Alternate Source resourcebrowser
                 'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
                 'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId()

@@ -13,6 +13,7 @@ use Schoolbox\Collection;
 
 class Component_Homepage_DueWorkListController extends Component_Homepage_ControllerAbstract
 {
+
     /**
      * @var Group
      */

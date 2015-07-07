@@ -9,6 +9,7 @@
  */
 class Component_Homepage_ManagersController extends Component_Homepage_ControllerAbstract
 {
+
     /**
      * @var Group
      */

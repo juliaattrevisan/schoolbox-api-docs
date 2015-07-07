@@ -67,7 +67,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         if (!parent::loadTemplate($templateHandle, 'wiki')) {
             return false;
         }
-        $this->parseConfig();
+
 
         if ($this->permission < READ_ACCESS) {
             return false;
@@ -85,12 +85,11 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         $userHandler = new User();
 
         // Set up component name
-        $this->setVar(
-            array(
-                'COMPONENT_NAME'        => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Wiki',
-                'COMPONENT_INSTANCE_ID' => $this->instance->getId(),
-            )
-        );
+        $this->setVar(array(
+            'COMPONENT_INSTANCE_ID' => $this->instance->getId(),
+        ));
+
+        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
         /* Prevent multiple blog entries from other categories stacking up in the wrong place
         * and initialise empty wiki roll by default
@@ -160,6 +159,10 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
                 $this->parse('wiki_row_block', 'wiki_row', true);
             }
         }
+
+        /* Need title injected here
+         */
+        $this->parseConfig();
 
         return true; // everything went according to plan
     }

@@ -11,8 +11,6 @@ use Schoolbox\Collection;
 class Component_Homepage_DropBoxController extends Component_Homepage_ControllerAbstract
 {
 
-
-
     /**
      * Prepares data for the render function. Business logic.
      *

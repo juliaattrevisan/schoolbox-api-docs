@@ -36,11 +36,9 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
         if (!parent::loadTemplate($templateHandle, 'image')) {
             return false;
         }
-        $this->parseConfig();
 
         //outputs an custom image and link to the homepage
         $this->setBlock($templateHandle, 'previewimage', 'preview_block');
-        $this->setVar('IMAGE_TITLE', 'Feature Image');
 
         // Get the image
         $images = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
@@ -74,7 +72,11 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
             }
         }
         /** @var Schoolbox\Resource\File\Model $image */
-        $this->setVar('IMAGE_TITLE', $image->getTitle());
+        $this->setComponentName($image->getTitle());
+
+        /* Need image title to be injected here
+         */
+        $this->parseConfig();
 
         if ($this->getConfig('pixel') > 600) {
             $pixel = 600;
