@@ -37,7 +37,7 @@
             selector: '.box',
             handleSelector: 'h2',
             immovableFilter: '.permanent',
-            controlPanelSelector: '.editPanel',
+            controlPanelSelector: '[data-component-panel]',
             editBtnSelector: 'a.edit',
             removeBtnSelector: 'a.close-delete',
             removeActionSelector: 'a[data-remove]',
@@ -251,23 +251,24 @@
         // attach control panel button listener
         page.on('click', btnsSelector, function (event) {
             var btn    = $(this),
+                state  = btn.attr('data-state'),
                 box    = btn.closest(opt.component.selector),
-                open   = btn.hasClass(activeClass),
-                target = box.children(opt.component.controlPanelSelector)
-                            .filter('.' + btn.data('target'));
+                target = box.find('[data-component-panel='+btn.data('target')+']');
 
             event.preventDefault();
 
-            // eeeeeeeeeiww... but it works
-            box.children(opt.component.controlPanelSelector).slideUp();
-            box.find(btnsSelector).removeClass(activeClass);
+            if (state == 'opened') {
+                btn.attr('data-state', 'closed').removeClass(activeClass);
 
-            if (open) {
                 target.off('click', opt.component.removeActionSelector);
-            } else {
-                btn.addClass(activeClass);
+                target.stop().slideUp();
+            }
+            else {
+                btn.attr('data-state', 'opened').addClass(activeClass);
+
                 target
-                    .slideDown('fast')
+                    .stop()
+                    .slideDown()
                     .one('click', opt.component.removeActionSelector, function (event) {
                         var btn = $(this);
 
@@ -295,7 +296,6 @@
                     });
             }
         });
-
     };
 
     /**

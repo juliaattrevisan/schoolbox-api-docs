@@ -12,7 +12,7 @@
                 <ul class="right">
                     <!-- BEGIN settings_link -->
                     <li class="divider"></li>
-                    <li><a href="#" class="component-control-button settings edit button icon-settings no-text" title="Settings"></a></li>
+                    <li><a data-target='settings' data-state='closed' href="#" class="component-control-button settings edit button icon-settings no-text" title="Settings"></a></li>
                     <li class="divider"></li>
                     <!-- END settings_link -->
                     <!-- BEGIN settings_collapse -->
@@ -20,7 +20,7 @@
                     <li class="divider"></li>
                     <!-- END settings_collapse -->
                     <!-- BEGIN settings_close -->
-                    <li><a href="#" class="button no-text icon-close" data-target="delete-it" title="Close"></a></li>
+                    <li><a data-target="delete" href="#" class="button no-text icon-close" title="Close"></a></li>
                     <!-- END settings_close -->
                 </ul>
             </section>
@@ -30,7 +30,7 @@
     <!-- BEGIN settings_panel -->
     <div class="small-12 island">
         <section>
-            <div class="component-form editPanel">
+            <div data-component-panel="settings" class="component-form editPanel">
                 <form action="/homepage/configForm.php" method="GET">
                     <input type="hidden" name="cid" value="{ID}" />
                     <input type="hidden" name="type" value="config" />
@@ -49,7 +49,7 @@
     <!-- END settings_panel -->
 </div>
 
-<div class="editPanel delete-it hide clearfix">
+<div data-component-panel='delete' class="editPanel hide">
     <p>Are you sure you want to remove this component?</p>
     <form action="#" method="post">
         <input type="hidden" name="cid" value="{ID}" />
