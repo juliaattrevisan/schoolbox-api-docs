@@ -405,9 +405,16 @@ abstract class Component_ControllerAbstract
 
             /* Special case for componentname default value when empty
              */
-            if (($key == 'componentname') && !strlen(trim($params['value']))) {
+            if ($key == 'componentname') {
+                if (!strlen(trim($params['value']))) {
+                    $componentname = $this->getComponentName();
+                }
+                else {
+                    $componentname = $params['value'];
+                }
+
                 $this->sitepage->setVar(array(
-                    'COMPONENT_NAME' => $this->getComponentName(),
+                    'COMPONENT_NAME' => $componentname,
                 ));
             }
 
