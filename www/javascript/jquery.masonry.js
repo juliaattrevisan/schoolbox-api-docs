@@ -34,7 +34,7 @@
         context: {},
 
         component: {
-            selector: '.box',
+            selector: '[data-component]',
             handleSelector: 'h2',
             immovableFilter: '.permanent',
             controlPanelSelector: '[data-component-panel]',
