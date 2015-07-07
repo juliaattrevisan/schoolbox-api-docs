@@ -268,7 +268,7 @@
 
             /* Start hiding all open panels
              */
-            box.find(opt.component.allPanels).slideUp();
+            box.find(opt.component.allPanels).stop().slideUp();
             box.find(opt.component.allButtons).attr('data-state', 'closed');
 
             /* Only start opening the one you choze
@@ -277,12 +277,13 @@
                 btn.attr('data-state', 'closed').removeClass(activeClass);
 
                 target.off('click', opt.component.removeActionSelector);
-                target.slideUp();
+                target.stop().slideUp();
             }
             else {
                 btn.attr('data-state', 'opened').addClass(activeClass);
 
                 target
+                    .stop()
                     .slideDown()
                     .one('click', opt.component.removeActionSelector, function (event) {
                         var btn = $(this);
