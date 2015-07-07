@@ -242,6 +242,7 @@ class HtmlTemplate
             }
 
             $file = $this->_filename($filename);
+            var_dump($this->isError($file));
             if ($this->isError($file)) {
                 $this->file[$handle] = false;
                 return $file;
