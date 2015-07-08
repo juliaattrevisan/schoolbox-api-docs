@@ -79,7 +79,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             return false;
         }
 
-        $this->parseConfig();
+        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
         if ($this->permission < READ_ACCESS) {
             return false;
@@ -94,9 +94,6 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                         ? 'Local'
                         : $this->source->getName(),
                 'LINK_CATEGORY_ID'          => $this->source->getId(),
-                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname')))
-                        ? $this->getConfig('componentname')
-                        : $this->getComponentName(),
             )
         );
 
@@ -156,6 +153,10 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         } else {
             $this->parse("submit_link_block", "submit_link");
         }
+
+        /* Need title injected here
+         */
+        $this->parseConfig();
 
         return true;
     }
