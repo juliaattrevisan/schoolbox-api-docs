@@ -160,7 +160,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                 $output = array(
                     'FILE_DESCRIPTION'     => Scrub::text($file->getTitle()),
                     'FILE_ID'              => $file->getId(),
-                    'FILE_MIME_IMAGE'      => $file->getStorage()->getMimetype()->getIconClass(),
+                    'FILE_MIME_IMAGE'      => $file->getStorage()->getMimetype()->getIconFile(),
                     'FILE_POSTED_BY'       => $file->getOwner()->formatName(),
                     'FILE_POSTED_BY_ID'    => $file->getOwner()->getId(),
                     'FILE_POSTED_DATE'     => $file->getCreatedAt()->getShort(),
