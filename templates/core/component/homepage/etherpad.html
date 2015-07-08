@@ -1,29 +1,34 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <ul class="information-list">
-            <!-- BEGIN etherpad_pad -->
-            <li>
-                <span class="actions">
-                    <!-- BEGIN etherpad_has_modify -->
-                    <a class="btn no-text modify" href="/collabdoc/modify/{ETHERPAD_PAD_ID}" title="Modify Collab Doc"><span></span></a>
-                    <!-- END etherpad_has_modify -->
-                </span>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <ul class="action-list">
+                    <!-- BEGIN etherpad_pad -->
+                    <li class="row" data-equalizer>
+                        <div class="column small-11" data-equalizer-watch>
+                            <h3>
+                                <a href='/collabdoc/edit/{ETHERPAD_PAD_ID}/{ID}'>{ETHERPAD_NAME}</a>
+                            </h3>
 
-                <h4>
-                    <a href='/collabdoc/edit/{ETHERPAD_PAD_ID}/{ID}'>{ETHERPAD_NAME}</a>
-                </h4>
-                <p class="meta">
-                    Last updated on
-                    {ETHERPAD_UPDATED_AT}
-                </p>
-            </li>
-            <!-- END etherpad_pad -->
-        </ul>
+                            <p class="meta">Last updated on {ETHERPAD_UPDATED_AT}</p>
+                        </div>
+                        <div class="one actions">
+                            <!-- BEGIN etherpad_has_modify -->
+                            <a class="icon-modify no-text" href="/collabdoc/modify/{ETHERPAD_PAD_ID}" title="Modify Collab Doc"></a>
+                            <!-- END etherpad_has_modify -->
+                        </div>
+                    </li>
+                    <!-- END etherpad_pad -->
+                </ul>
 
-        <!-- BEGIN etherpad_has_create -->
-        <a href="/collabdoc/create/{ID}" class="btn create"><span></span>Create Document</a>
-        <!-- END etherpad_has_create -->
+                <div class="content">
+                    <!-- BEGIN etherpad_has_create -->
+                    <a href="/collabdoc/create/{ID}" class="button icon-add">Create Document</a>
+                    <!-- END etherpad_has_create -->
+                </div>
+            </section>
+        </div>
     </div>
 </div>
