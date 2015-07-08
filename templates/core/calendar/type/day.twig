@@ -1,12 +1,17 @@
-<li class="{{ event.getEventClasses() }} {% if renderer.isTranslucent() %}translucent{% endif %}">
-    <span class="eventListing">
-        <strong>{{ event.getEventSpan()|raw }}</strong>
-        <span style="background-color:{{ event.colour }}">{{ event.title }}
+<li class="row {{ event.getEventClasses() }} {% if renderer.isTranslucent() %}translucent{% endif %}">
+    <div class="eventListing">
+        <div class="small-6 columns">
+            <strong>{{ event.getEventSpan()|raw }}</strong>
+        </div>
+        <div class="small-6 columns">
+        <span style="background-color:{{ event.colour }}">
+            {{ event.title }}
             {% if event.attendance %}
-            <span class="float-right">A</span>
+                <span class="float-right">A</span>
             {% endif %}
         </span>
-    </span>
+        </div>
+    </div>
 
     <div class="hidden-fields clearfix">
         <h3>{{ event.title }}</h3>
