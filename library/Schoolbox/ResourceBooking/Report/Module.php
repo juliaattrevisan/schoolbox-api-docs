@@ -14,10 +14,11 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Calendar_Api_Composite;
+use External_Timetable;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Item;
 
@@ -71,8 +72,21 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
+        // Build a calendar API composite and an API factory
+        $injector->params[CalendarApiFactory::class]['user']
+            = $injector->lazy(
+                function () use ($injector) {
+                    $session = $injector->get('session');
+                    return $session->getAuthUser();
+                }
+            );
+        $injector->params[CalendarApiFactory::class]['timetable']
+            = $injector->lazyNew(External_Timetable::class);
+
         $injector->params[Controller::class]['itemMapper']     = $injector->lazyNew(Item\Mapper::class);
         $injector->params[Controller::class]['categoryMapper'] = $injector->lazyNew(Category\Mapper::class);
+        $injector->params[Controller::class]['apiFactory']     = $injector->lazyNew(CalendarApiFactory::class);
+        $injector->params[Controller::class]['api']            = $injector->lazyNew(Calendar_Api_Composite::class);
         $injector->set('controller:resourceBookingReport', $injector->lazyNew(Controller::class));
     }
 }
