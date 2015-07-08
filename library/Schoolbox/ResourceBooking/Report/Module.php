@@ -73,15 +73,8 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         // Build a calendar API composite and an API factory
-        $injector->params[CalendarApiFactory::class]['user']
-            = $injector->lazy(
-                function () use ($injector) {
-                    $session = $injector->get('session');
-                    return $session->getAuthUser();
-                }
-            );
-        $injector->params[CalendarApiFactory::class]['timetable']
-            = $injector->lazyNew(External_Timetable::class);
+        $injector->params[CalendarApiFactory::class]['user']      = $injector->lazyGet('user');
+        $injector->params[CalendarApiFactory::class]['timetable'] = $injector->lazyNew(External_Timetable::class);
 
         $injector->params[Controller::class]['itemMapper']     = $injector->lazyNew(Item\Mapper::class);
         $injector->params[Controller::class]['categoryMapper'] = $injector->lazyNew(Category\Mapper::class);
