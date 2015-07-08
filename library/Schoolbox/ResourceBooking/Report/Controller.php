@@ -131,20 +131,15 @@ class Controller extends Base
             }
         }
 
+        $events = $api->getEvents(
+            $start->getUnixTimeStamp(),
+            $end->getUnixTimeStamp()
+        );
         $this->getResponse()->content->set([
             'template' => '@resourceBookingReport/index.twig',
             'data'     => [
                 'categoryList' => $categoryList,
-                'eventList'    => $api->getEvents(
-                    $start->getUnixTimeStamp(),
-                    $end->getUnixTimeStamp()
-                ),
-                'bookingList'  => $this->getBookingMapper()->findForTimespan(
-                    $start->getUnixTimeStamp(),
-                    $end->getUnixTimeStamp(),
-                    [Booking\Status\Model::STATUS_APPROVED],
-                    $extras
-                ),
+                'eventList'    => $events,
                 'search'       => [
                     'start'    => $start,
                     'end'      => $end,

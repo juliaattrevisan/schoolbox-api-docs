@@ -72,36 +72,36 @@
         </tr>
         </thead>
         <tbody>
-        {% for booking in bookingList %}
+        {% for event in eventList %}
             <tr>
                 <td>
-                    <time datetime="{{ booking.getStartTime().getDatabase() }}">
-                        {{ booking.getStartTime().getLocal() }}
+                    <time datetime="{{ event.getStartTime().getDatabase() }}">
+                        {{ event.getStartTime().getLocal() }}
                     </time>
                 </td>
                 <td>
-                    <time datetime="{{ booking.getEndTime().getDatabase() }}">
-                        {{ booking.getEndTime().getLocal() }}
+                    <time datetime="{{ event.getEndTime().getDatabase() }}">
+                        {{ event.getEndTime().getLocal() }}
                     </time>
                 </td>
                 <td>
-                    {{ booking.getTitle() }}
+                    {{ event.getTitle() }}
                     {#
-                    <a href="{{ routeLookup('resourceBooking.edit', {id: booking.getId()}) }}">
-                        {{ booking.getTitle() }}
+                    <a href="{{ routeLookup('resourceBooking.edit', {id: event.getId()}) }}">
+                        {{ event.getTitle() }}
                     </a>
                     #}
                 </td>
                 <td>
-                    {% include "@resourceItem/sub/itemName.twig" with {item: booking.getBooking().getResource()} %}
-                    {{ booking.getLocation() }}
+                    {% include "@resourceItem/sub/itemName.twig" with {item: event.getBooking().getResource()} %}
+                    {{ event.getLocation() }}
                     {#
-                    <a href="{{ routeLookup('resourceItem.read', {id: booking.getResource().getId()}) }}">
-                        {% include "@resourceItem/sub/itemName.twig" with {item: booking.getResource()} %}
+                    <a href="{{ routeLookup('resourceItem.read', {id: event.getResource().getId()}) }}">
+                        {% include "@resourceItem/sub/itemName.twig" with {item: event.getResource()} %}
                     </a>
                     #}
                 </td>
-                <td>{{ booking.getTitle()|purify }}</td>
+                <td>{{ event.getTitle()|purify }}</td>
             </tr>
         {% endfor %}
         </tbody>
