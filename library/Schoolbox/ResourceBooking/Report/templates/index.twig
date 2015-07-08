@@ -73,6 +73,7 @@
         </thead>
         <tbody>
         {% for event in eventList %}
+            {% set booking = event.getBooking() %}
             <tr>
                 <td>
                     <time datetime="{{ event.getStartTime().getDatabase() }}">
@@ -85,23 +86,30 @@
                     </time>
                 </td>
                 <td>
-                    {{ event.getTitle() }}
-                    {#
-                    <a href="{{ routeLookup('resourceBooking.edit', {id: event.getId()}) }}">
+                    {% if booking is empty %}
                         {{ event.getTitle() }}
-                    </a>
-                    #}
+                    {% else %}
+                        <a href="{{ routeLookup('resourceBooking.edit', {id: booking.getId()}) }}">
+                            {{ event.getTitle() }}
+                        </a>
+                    {% endif %}
                 </td>
                 <td>
-                    {% include "@resourceItem/sub/itemName.twig" with {item: event.getBooking().getResource()} %}
-                    {{ event.getLocation() }}
-                    {#
-                    <a href="{{ routeLookup('resourceItem.read', {id: event.getResource().getId()}) }}">
-                        {% include "@resourceItem/sub/itemName.twig" with {item: event.getResource()} %}
-                    </a>
-                    #}
+                    {% if booking is empty %}
+                        {{ event.getLocation() }}
+                    {% else %}
+                        <a href="{{ routeLookup('resourceItem.read', {id: booking.getResource().getId()}) }}">
+                            {{ booking.getResource().getRoomCode() | default(booking.getResource.getName()) }}
+                        </a>
+                    {% endif %}
                 </td>
-                <td>{{ event.getTitle()|purify }}</td>
+                <td>
+                    {% if booking is empty %}
+                        &nbsp;
+                    {% else %}
+                        {{ booking.getNotes()|purify }}
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
         </tbody>
