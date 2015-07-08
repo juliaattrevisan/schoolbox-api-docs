@@ -10,7 +10,8 @@
                 modal: true
             });
 
-            $('#videoadd{COMPONENT_INSTANCE_ID}').click(function () {
+            $('#videoadd{COMPONENT_INSTANCE_ID}').click(function (e) {
+                event.preventDefault();
 
                 // Use the ClickView Events API to catch the cv-lms-addvideo event
                 var eventsApi = new CVEventsApi(document.getElementById('plugin-frame{COMPONENT_INSTANCE_ID}').contentWindow);
