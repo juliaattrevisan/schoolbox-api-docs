@@ -91,6 +91,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
             )
         );
 
+        /** @var Alaress_Date_Format $prevDay */
         $prevDay = false;
 
         if (count($this->eventRenderer->getAllEvents()) === 0) {
