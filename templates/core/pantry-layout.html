@@ -19,6 +19,46 @@
     <code>~/.WebIde70/config/templates/Foundation.xml</code>
 </p>
 
+<p class="divider">Component Prototype (Adam)</p>
+<div class="row">
+    <div class="small-6 columns">
+        <div id='component{COMPONENT_INSTANCE_ID}' data-component>
+            <!-- Custom javascript -->
+
+            {CONFIGURATION}
+
+            <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+                <div class="small-12 island">
+                    <section>
+                        <div class="content">
+
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="small-6 columns">
+        <pre>
+&lt;div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    &lt;!-- Custom javascript -->
+
+    {CONFIGURATION}
+
+    &lt;div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        &lt;div class="small-12 island">
+            &lt;section>
+                &lt;div class="content">
+
+                &lt;/div>
+            &lt;/section>
+        &lt;/div>
+    &lt;/div>
+&lt;/div>
+        </pre>
+    </div>
+</div>
+
 <p class="divider">Jelly Tot Menu Layout</p>
 <div class="row">
     <div class="small-6 columns">
