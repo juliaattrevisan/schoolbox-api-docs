@@ -42,7 +42,7 @@
             $(config.element).click(function(event) {
                 event.preventDefault();
 
-                var component = $(this).closest('.box').find('[data-collapsable=true]');
+                var component = $(this).closest('[data-component]').find('[data-collapsable=true]');
 
                 if (component.attr('data-collapse-state') == 'collapsed') {
                     component.stop().slideDown();
