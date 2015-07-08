@@ -3,13 +3,13 @@
 {% block eventBubbleButtons %}
 <div>
     {% if event.getIsAssessment() %}
-        <a class="btn up-arrow float-left" href="/assess/intro/{{ event.submissionBoxId }}"><span></span>Start Quiz</a>
+        <a class="button icon-quiz" href="/assess/intro/{{ event.submissionBoxId }}">Start Quiz</a>
     {% else %}
-        {%  if renderer.isEditable()  %}
-            <a class="btn eyeball float-left" href="/submission/viewSubmission/{{ event.eventID }}"><span></span>View Submissions</a>
-            <a class="btn modify float-left" href="/submission/createSubmission/modify/{{ event.eventID }}"><span></span>Modify</a>
+        {% if renderer.isEditable() %}
+            <a class="button icon-due-work" href="/submission/viewSubmission/{{ event.eventID }}">View Submissions</a>
+            <a class="button icon-modify" href="/submission/createSubmission/modify/{{ event.eventID }}">Modify</a>
         {% else %}
-            <a class="btn eyeball float-left" href="/submission/submissionHistory/{{ event.eventID }}/{{ renderer.viewer.id }}"><span></span>View Details</a>
+            <a class="button icon-due-work" href="/submission/submissionHistory/{{ event.eventID }}/{{ renderer.viewer.id }}">View Details</a>
         {% endif %}
     {% endif %}
 </div>

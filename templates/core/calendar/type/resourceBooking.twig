@@ -29,16 +29,16 @@
 {% block eventBubbleButtons %}
 <div>
     {% if renderer.getEditURL() != '' %}
-    <a class="btn float-left modify booking-modify" href="{{ renderer.getEditURL() }}"><span></span>Modify</a>
+    <a class="button icon-modify" href="{{ renderer.getEditURL() }}">Modify</a>
     {% endif %}
     {% if renderer.getCancelURL() != '' %}
-    <a class="btn float-left delete booking-cancel" href="{{ renderer.getCancelURL() }}"><span></span>Delete</a>
+    <a class="button icon-delete" href="{{ renderer.getCancelURL() }}">Delete</a>
     {% endif %}
     {% if renderer.getApproveURL() != '' %}
-    <a class="btn float-left tick booking-approve" href="{{ renderer.getApproveURL() }}"><span></span>Approve</a>
+    <a class="button icon-approve" href="{{ renderer.getApproveURL() }}">Approve</a>
     {% endif %}
     {% if renderer.getRejectURL() != '' %}
-    <a class="btn float-left tick booking-reject" href="{{ renderer.getRejectURL() }}"><span></span>Reject</a>
+    <a class="button icon-close" href="{{ renderer.getRejectURL() }}">Reject</a>
     {% endif %}
 </div>
 {% endblock eventBubbleButtons %}

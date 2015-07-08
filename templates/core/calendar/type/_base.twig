@@ -53,20 +53,19 @@
                     <form method="post">
                         <input name="event[id]" type="hidden" value="{{ event.eventId }}">
                         {% if renderer.attendanceStatus() %}
-                        <a class="btn modify float-left attendance-request" href="#"><span></span>Unattend</a>
+                        <a class="button icon-close" href="#">Unattend</a>
                         {% else %}
-                        <a class="btn modify float-left attendance-request" href="#"><span></span>RSVP</a>
+                        <a class="button icon-approve" href="#">RSVP</a>
                         {% endif %}
                     </form>
 
                     {%if event.isEditable %}
-                    <a class="btn groups float-left"
-                       href="/calendar/attendance/list/{{ event.eventId }}"><span></span>Attendees</a>
+                    <a class="button icon-group" href="/calendar/attendance/list/{{ event.eventId }}">Attendees</a>
                     {% endif %}
                 {% endif %}
                 {% if event.isEditable %}
-                <a class="btn modify float-left" href="/calendar/modify.php?eventID={{ event.eventId }}&returnTo=calendar"><span></span>Modify</a>
-                <a class="btn delete float-left" href="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}&returnTo=calendar" onclick="return(confirm('Are you sure you wish to delete this event?'))"><span></span>Delete</a>
+                <a class="button icon-modify" href="/calendar/modify.php?eventID={{ event.eventId }}&returnTo=calendar">Modify</a>
+                <a class="button icon-delete" href="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}&returnTo=calendar" onclick="return(confirm('Are you sure you wish to delete this event?'))">Delete</a>
                 {% endif %}
             </div>
             {% endblock eventBubbleButtons %}
