@@ -1,23 +1,34 @@
-<div class="box" id="component{COMPONENT_HOMEPAGE_ID}">
-	{CONFIGURATION}
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class='text clearfix'>
-            <form action="http://elibcat.bialik.vic.edu.au/amlibweb/webquery.dll" enctype="application/x-www-form-urlencoded" method="post" target="_blank">
-                <div>
-                    <input name="v20" type="hidden" value="20" />
-                    <input name="v22" type="hidden" value="20E" />
+    {CONFIGURATION}
 
-                    <input name="v2" size="40" type="text" /> in
-                    <select name="v3">
-                        <option selected="selected" value="All">Anywhere</option>
-                        <option value="T">Title</option>
-                        <option value="A">Author</option>
-                        <option value="S">Subject</option>
-                    </select>
-                    <input type="submit" value="Search" />
-                </div>
-            </form>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section class="content">
+                <form action="http://elibcat.bialik.vic.edu.au/amlibweb/webquery.dll" enctype="application/x-www-form-urlencoded" method="post" target="_blank">
+                    <div>
+                        <input name="v20" type="hidden" value="20" />
+                        <input name="v22" type="hidden" value="20E" />
+
+                        <label>
+                            Search for
+                            <input name="v2" size="40" type="text" />
+                        </label>
+                        <label>
+                            in
+                            <select name="v3">
+                                <option selected="selected" value="All">Anywhere</option>
+                                <option value="T">Title</option>
+                                <option value="A">Author</option>
+                                <option value="S">Subject</option>
+                            </select>
+                        </label>
+
+                        <input type="submit" value="Search" />
+                    </div>
+                </form>
+            </section>
         </div>
     </div>
 </div>
