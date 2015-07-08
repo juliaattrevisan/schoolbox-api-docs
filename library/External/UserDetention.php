@@ -26,7 +26,7 @@ class External_UserDetention implements External_UserDetentionInterface {
      */
     public function __construct($databaseName = '') {
         $factory = new External_DatabaseFactory();
-        $this->database = $factory->buildUserDetentionConnector($databaseName);
+        $this->setDatabase($factory->buildUserDetentionConnector($databaseName));
         $this->setCache(Redis::getInstance());
         $this->setTimeout(Config::get('external_cache_timeout'));
     }
@@ -86,4 +86,23 @@ class External_UserDetention implements External_UserDetentionInterface {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
+    /**
+     * @param External_UserDetentionInterface $database
+     * @return $this
+     */
+    private function setDatabase($database)
+    {
+        $this->database = $database;
+        return $this;
+    }
+
+    /**
+     * Used by External_CacheTrait->getCachedResult()
+     *
+     * @return External_UserDetentionInterface
+     */
+    private function getDatabase()
+    {
+        return $this->database;
+    }
 }
