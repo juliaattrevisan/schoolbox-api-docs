@@ -1,65 +1,14 @@
-<li class="row clearfix">
-    <div class="eventListing">
-        <div class="small-6 columns">
-            <strong>
-            {% if not event.startTime.isAtStartOfDay() %}
-                {{ event.startTime.getTimeOnly() }}
-            {% endif %}
-            {% if not event.endTime.isAtStartOfDay() %}
-                : {{ event.endTime.getTimeOnly() }}
-            {% endif %}
-            </strong>
-        </div>
-        <div class="small-6 columns">
-            <span style="background-color:{{ event.colour }}">{{ event.title }}
-                {% if event.attendance %}
-                    <span class="float-right">A</span>
-                {% endif %}
-            </span>
-        </div>
-    </div>
+{% extends 'calendar/type/base.twig' %}
 
-    <div class="hidden-fields clearfix">
-        <h3>{{ event.title }}</h3>
-        <h4>
-            {% if event.eventType %}
-                {{ event.eventType }}:
-            {% endif %}
-            {{ event.startTime.getLong() }}</h4>
-        <p class="location">{{ event.location }}</p>
-
-        <p class="wysiwyg">
-            {{ event.detail|purify}}
-
-        <div class="created meta">
-            {% if event.author %}
-                Posted by <a href="/search/user/{{ event.authorId }}">{{ event.author }}</a>
-            {% endif %}
-
-            {% if event.category %}
-                in <a href='/homepage/{{ event.categoryId }}'>{{ event.categoryName }}</a>
-            {% endif %}
-        </div>
-        </p>
-        {% if event.attendance %}
-            <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
-        {% endif %}
-        <div>
-            {% if event.attendance %}
-                <form method="post">
-                    <input name="event[id]" type="hidden" value="{EVENT_ID}">
-                    <a class="btn modify float-left attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
-                </form>
-            {% endif %}
-
-            {%if event.attendance and event.isEditable %}
-                <a class="btn groups float-left"
-                   href="/calendar/attendance/list/{EVENT_ID}"><span></span>Attendance List</a>
-            {% endif %}
-
-            {% if event.isEditable %}
-                <a class="btn modify float-left" href="/modules/eotc/manage/modify.php?eventID={{ event.eventId }}"><span></span>Modify</a>
-            {% endif %}
-        </div>
-    </div>
-</li>
+{% block eventSpan %}
+<div class="small-6 columns">
+    <strong>
+    {% if not event.startTime.isAtStartOfDay() %}
+        {{ event.startTime.getTimeOnly() }}
+    {% endif %}
+    {% if not event.endTime.isAtStartOfDay() %}
+        : {{ event.endTime.getTimeOnly() }}
+    {% endif %}
+    </strong>
+</div>
+{% endblock eventSpan %}
