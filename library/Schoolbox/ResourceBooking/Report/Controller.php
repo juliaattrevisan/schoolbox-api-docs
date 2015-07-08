@@ -78,27 +78,30 @@ class Controller extends Base
             }
         }
 
-        // Calculate extras
-        $selectedCategories = $this->getRequest()->query->get('category', []);
-        $extras             = [];
-        if (!empty($selectedCategories)) {
-            $extras['resource_id'] = $this->getItemMapper()->findIdsByColumn(
-                'resource_category_id',
-                $selectedCategories
-            );
-        }
-
-        // Filter out non-existent from $selectedCategories
+        // Set up category list
         $categoryList = [];
         foreach ($this->getCategoryMapper()->findAll(['order' => ['name' => 'asc']]) as $category) {
             $categoryList[$category->getId()] = $category;
         }
         $allCategories = array_keys($categoryList);
 
+        // Filter out non-existent categories from $selectedCategories
+        $selectedCategories = $this->getRequest()->query->get('category', []);
         if (!empty($selectedCategories)) {
             $selectedCategories = array_intersect($selectedCategories, $allCategories);
         } else {
             $selectedCategories = $allCategories;
+        }
+
+        // Fill in extras
+        $extras = [];
+        if (!empty($selectedCategories)) {
+            $extras['resource_id'] = $this->getItemMapper()->findIdsByColumn(
+                'resource_category_id',
+                $selectedCategories
+            );
+        } else {
+            $extras['resource_id'] = $this->getItemMapper()->findAllIds();
         }
 
         $this->getResponse()->content->set([
