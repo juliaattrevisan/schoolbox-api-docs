@@ -93,7 +93,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                 $output = array(
                     'FOLDER_ID'   => $currentFolder['id'],
                     'FOLDER_NAME' => Scrub::text($currentFolder['text']),
-                    'FOLDER_ICON' => $currentFolder['type'] == 'homepage' ? 'house' : 'folder_blue_full',
+                    'FOLDER_ICON' => $currentFolder['type'] == 'homepage' ? 'home' : 'folder',
                     'ON_OFF'      => ++$j % 2 ? '' : 'dark',
                 );
 
