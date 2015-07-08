@@ -1,8 +1,8 @@
 <?php
 
-session_start();
-
 require_once dirname(__FILE__) . '/../include/Bootstrap.php';
+
+session_start();
 
 $page = new SitePage( false );
 $userHandler = new User;
