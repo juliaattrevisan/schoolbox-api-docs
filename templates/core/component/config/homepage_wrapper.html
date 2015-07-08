@@ -1,47 +1,67 @@
-<section class="component-control-container">
-    <!-- BEGIN settings_close -->
-    <a data-target="delete-it" class="component-control-button delete close-delete" href="#" >
-        <span>&times;</span>
-    </a>
-    <!-- END settings_close -->
+<div class="row">
+    <div class="small-12 columns">
+        <nav class="top-bar" data-topbar>
+            <ul class="title-area">
+                <!-- Title Area -->
+                <li class="name">
+                    <h2><a href="#">{COMPONENT_NAME}</a></h2>
+                </li>
+            </ul>
+            <section class="top-bar-section">
+                <!-- Right Nav Section -->
+                <ul class="right">
+                    <!-- BEGIN settings_link -->
+                    <li class="divider"></li>
+                    <li><a data-target='settings' data-state='closed' href="#" class="component-control-button settings edit button icon-settings no-text" title="Settings"></a></li>
+                    <li class="divider"></li>
+                    <!-- END settings_link -->
+                    <!-- BEGIN settings_collapse -->
+                    <li><a data-collapser="true" href="#" class="component-control-button collapse"  title="Collapse Content"><span>{CONFIG_COLLAPSED_ICON}</span></a></li>
+                    <li class="divider"></li>
+                    <!-- END settings_collapse -->
+                    <!-- BEGIN settings_close -->
+                    <li><a data-target="delete" data-state='closed' href="#" class="button no-text icon-close" title="Close"></a></li>
+                    <!-- END settings_close -->
+                </ul>
+            </section>
+        </nav>
 
-    <!-- BEGIN settings_collapse -->
-    <a data-collapser="true" class="component-control-button collapse" href="#">
-        <span>{CONFIG_COLLAPSED_ICON}</span>
-    </a>
-    <!-- END settings_collapse -->
+        <!-- BEGIN settings_panel -->
+        <div data-component-panel="settings" class="editPanel small-12 ">
+            <section>
+                <div>
+                    <form action="/homepage/configForm.php" method="GET">
+                        <input type="hidden" name="cid" value="{ID}" />
+                        <input type="hidden" name="type" value="config" />
+                        <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}" />
+                        <!-- BEGIN config_element -->
+                        <div class="{CONFIG_ELEMENT_CLASS}" {CONFIG_DISPLAY}>
+                        <span>{CONFIG_ELEMENT_LABEL}: </span>
+                        {CONFIG_ELEMENT_CONTENT}
+                    </div>
+                    <!-- END config_element -->
+                    <input type="submit" value="Update" />
+                    </form>
+            </div>
+            </section>
+        </div>
+        <!-- END settings_panel -->
 
-    <!-- BEGIN settings_link -->
-    <a data-target="settings" class="component-control-button settings edit" href="#" >
-        <span>&#9660;</span>
-    </a>
-    <!-- END settings_link -->
-</section>
+        <div data-component-panel='delete' class="editPanel small-12 ">
+            <section>
+                <div>
+                    <p>Are you sure you want to remove this component?</p>
+                    <form action="#" method="post">
+                        <input type="hidden" name="cid" value="{ID}" />
+                        <input type="hidden" name="delete" value="{COMPONENT_INSTANCE_ID}" />
+                        <input type="hidden" data-defn-id name="component" value="{COMPONENT_DEFINITION_ID}" />
 
-<!-- BEGIN settings_panel -->
-<div class="editPanel settings hide">
-    <form action="/homepage/configForm.php" method="GET">
-        <input type="hidden" name="cid" value="{ID}" />
-        <input type="hidden" name="type" value="config" />
-        <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}" />
-        <!-- BEGIN config_element -->
-        <div class="{CONFIG_ELEMENT_CLASS}" {CONFIG_DISPLAY}><span>{CONFIG_ELEMENT_LABEL}: </span>{CONFIG_ELEMENT_CONTENT}</div>
-        <!-- END config_element -->
-        <input type="submit" value="Update" class="submit-btn-plain update" />
-    </form>
+                        <a href="#" class="button secondary" data-remove="1">Yes</a>
+                        <a href="#" class="button" data-remove="0">No</a>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
 </div>
-<!-- END settings_panel -->
-<div class="editPanel delete-it hide clearfix">
-    <p>Are you sure you want to remove this component?</p>
-    <form action="#" method="post">
-        <input type="hidden" name="cid" value="{ID}" />
-        <input type="hidden" name="delete" value="{COMPONENT_INSTANCE_ID}" />
-        <input type="hidden" class="defn-id" name="component" value="{COMPONENT_DEFINITION_ID}" />
-        <a href="#" class="delete-accept btn delete" data-remove="1">
-            <span></span>Yes
-        </a>
-        <a href="#" class="delete-reject btn cross" data-remove="0">
-            <span></span>No
-        </a>
-    </form>
-</div>
+
