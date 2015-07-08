@@ -7,13 +7,11 @@
         {% endblock eventSpan %}
 
         {% block eventTitle %}
-        <div class="small-6 columns">
-        <span style="background-color:{{ event.colour }}">
+        <div class="small-6 columns" style="background-color:{{ event.colour }}">
             {{ event.title }}
             {% if event.attendance %}
                 <span class="float-right">A</span>
             {% endif %}
-        </span>
         </div>
         {% endblock eventTitle %}
     </div>
