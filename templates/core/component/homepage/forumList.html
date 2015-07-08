@@ -1,32 +1,44 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
+
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <ul class="information-list">
-            <!-- BEGIN forum -->
-            <li class="{ON_OFF}">
-                <!-- BEGIN forum_reply -->
-                <span class="actions">
-                    <a class="btn no-text chat" href="/forum/modify/{ID}/{THREAD_ID}" title="Post a reply"><span></span></a>
-                </span>
-                <!-- END forum_reply -->
-                <h3><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a></h3>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <ul class="action-list">
+                    <!-- BEGIN forum -->
+                    <li class="row" data-equalizer>
+                        <div class="ten-column" data-equalizer-watch>
+                            <h3>
+                                <a href='/forum/thread/{THREAD_ID}'>{THREAD_TITLE}</a>
+                            </h3>
 
-                <p class="meta">
-                    <a href="/search/user/{THREAD_USER_ID}" class="author">
-                        <img height="32" width="32" src="/portrait.php?userId={THREAD_USER_EXTERNAL_ID}&size=square32"/>
-                        {THREAD_USER}
-                    </a><br />
-                    Posted on {THREAD_DATE}</p>
-            </li>
-            <!-- END forum -->
-        </ul>
+                            <div class="avatar-card clearfix">
+                                <a href="/search/user/{THREAD_USER_ID}" title="View Profile">
+                                    <img src="/portrait.php?userId={THREAD_USER_EXTERNAL_ID}&size=square32" alt="View Profile" />
+                                    <p>{THREAD_USER}</p>
+                                </a>
+                                <p class="meta">Posted on {THREAD_DATE}</p>
+                            </div>
+                        </div>
+                        <div class="two actions">
+                            <!-- BEGIN forum_reply -->
+                            <a class="icon-forum no-text" href="/forum/modify/{ID}/{THREAD_ID}" title="Post a reply"></a>
+                            <!-- END forum_reply -->
 
-        <p class="interact">
-            <a href="/forum/{COMPONENT_CONFIG_SRC_ID}" class="btn go-to"><span></span>Go to Forum</a>
-            <!-- BEGIN forum_post -->
-            <a class="btn add" href="/forum/modify/{COMPONENT_CONFIG_SRC_ID}"><span></span>Post Thread</a>
-            <!-- END forum_post -->
-        </p>
+                            <a class="icon-next no-text" href="/forum/{COMPONENT_CONFIG_SRC_ID}" title="Go to Forum"></a>
+                        </div>
+                    </li>
+                    <!-- END forum -->
+                </ul>
+
+                <div class="content">
+                    <!-- BEGIN forum_post -->
+                    <a class="button icon-add" href="/forum/modify/{COMPONENT_CONFIG_SRC_ID}">Post Thread</a>
+                    <!-- END forum_post -->
+                </div>
+            </section>
+        </div>
     </div>
 </div>
