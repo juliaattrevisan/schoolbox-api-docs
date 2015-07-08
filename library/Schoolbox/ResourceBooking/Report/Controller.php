@@ -95,19 +95,50 @@ class Controller extends Base
 
         // Fill in extras
         $extras = [];
+        /** @var Item\Model[] $resources */
         if (!empty($selectedCategories)) {
             $extras['resource_id'] = $this->getItemMapper()->findIdsByColumn(
                 'resource_category_id',
                 $selectedCategories
             );
+            $resources = $this->getItemMapper()->findByColumn(
+                'resource_category_id',
+                $selectedCategories
+            );
         } else {
             $extras['resource_id'] = $this->getItemMapper()->findAllIds();
+            $resources = $this->getItemMapper()->findAll();
+        }
+
+        // Build the list of events (slowly)
+        $api       = new \Calendar_Api_Composite();
+        $timetable = new \External_Timetable();
+        foreach ($resources as $resource) {
+            $resourceApi = new \Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
+                $this->getUser(),
+                array()
+            );
+            $resourceApi->setResourceId($resource->getId());
+            $api->add($resourceApi);
+
+            if ($roomCode = $resource->getRoomCode()) {
+                $timetableApi = new \Calendar_Api_EventType_Timetable_Room(
+                    $this->getUser(),
+                    array()
+                );
+                $timetableApi->setRoomCode($roomCode)->setExternalTimetable($timetable);
+                $api->add($timetableApi);
+            }
         }
 
         $this->getResponse()->content->set([
             'template' => '@resourceBookingReport/index.twig',
             'data'     => [
                 'categoryList' => $categoryList,
+                'eventList'    => $api->getEvents(
+                    $start->getUnixTimeStamp(),
+                    $end->getUnixTimeStamp()
+                ),
                 'bookingList'  => $this->getBookingMapper()->findForTimespan(
                     $start->getUnixTimeStamp(),
                     $end->getUnixTimeStamp(),
