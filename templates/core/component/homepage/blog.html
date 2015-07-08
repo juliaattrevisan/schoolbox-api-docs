@@ -1,19 +1,17 @@
-<div id="component{COMPONENT_INSTANCE_ID}">
+<div id="component{COMPONENT_INSTANCE_ID}" data-component>
 	<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 	<script type="text/javascript" src="/javascript/jquery.blogCommentary.js"></script>
 	<script type="text/javascript">
+        $(function() {
+            var comp = $('#component{COMPONENT_INSTANCE_ID}');
 
-    $(function() {
+            comp.find('[data-interaction=deletecomment]').click(function(event) {
+                event.preventDefault();
+                $(this).confirmDialog({text:'Delete this comment?'});
+            });
 
-        var comp = $('#component{COMPONENT_INSTANCE_ID}');
-
-        comp.find('[data-interaction=deletecomment]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({text:'Delete this comment?'});
+            comp.blogCommentary();
         });
-        comp.blogCommentary();
-
-    });
     </script>
 
     {CONFIGURATION}
