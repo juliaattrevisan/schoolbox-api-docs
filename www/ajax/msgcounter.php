@@ -17,6 +17,7 @@ if(isset($this)) {
 header('Content-Type: application/json');
 
 // make sure we've got access to the session
+// (No bootstrap is okay, $_SESSION['user'] is not used)
 session_start();
 
 // only 1 var, must be 'c', must be a number >= 0

@@ -1,7 +1,5 @@
 <?php
 
-session_start();
-
 //This script is a generic email handler which can email the values of a form to an email address
 //Also now supports handling of files which are attached to the email
 //Typically this script would be used for contact forms and enquiry forms on a website
@@ -15,6 +13,8 @@ session_start();
 
 
 require_once dirname(__FILE__) . '/../include/Bootstrap.php';
+
+session_start();
 
 $recaptcha = new ReCaptcha( Config::get('recaptcha_public_api_key'), Config::get('recaptcha_private_api_key') );
 
