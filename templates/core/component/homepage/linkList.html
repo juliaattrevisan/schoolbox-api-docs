@@ -1,4 +1,4 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
     <script type='text/javascript' src='/javascript/preview/preview.js'></script>
     <script type="text/javascript">
         $(function() {
@@ -8,28 +8,44 @@
 
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <ul class="information-list">
-            <!-- BEGIN link -->
-            <li class="{ON_OFF} clearfix">
-                <!-- BEGIN modify_link -->
-                <span class="actions">
-                    <a class="btn no-text modify" href="/cms/link/{LINK_ID}" title="Edit link"><span></span></a>
-                </span>
-                <!-- END modify_link -->
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <ul class="action-list">
+                    <!-- BEGIN link -->
+                    <li class="row" data-equalizer>
+                        <div class="column small-11 {HIDDEN}" data-equalizer-watch>
+                            <h3>
+                                <a data-plugin="preview" rel="{LINK_TARGET}" href="/redir.php?id={LINK_ID}">{LINK_NAME}</a>
+                            </h3>
 
-                <h4><a data-plugin="preview" class="icons link {HIDDEN}" rel="{LINK_TARGET}" href="/redir.php?id={LINK_ID}">{LINK_NAME}</a></h4>
-                <p class="{COMPONENT_COMPACTMODE}">{LINK_COMMENT}</p>
-                <p class="{COMPONENT_COMPACTMODE} footnote">
-                    Posted by <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a> on {LINK_POSTED_DATE}
-                </p>
-            </li>
-            <!-- END link -->
-        </ul>
-        <p class="interact"><a href="/resources/{LINK_CAT_ID}" class="btn"><span></span>View All Links</a>
-            <!-- BEGIN submit_link -->
-            <a href="/cms/link/new/{LINK_CAT_ID}" class="btn add"><span></span>Add Link</a>
-            <!-- END submit_link -->
-        </p>
+                            <p class="meta {COMPONENT_COMPACTMODE}">
+                                {LINK_COMMENT}
+                            </p>
+                            
+                            <p class="meta {COMPONENT_COMPACTMODE}">
+                                Posted by
+                                <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a>
+                                on {LINK_POSTED_DATE}
+                            </p>
+                        </div>
+                        <div class="one actions">
+                            <!-- BEGIN modify_link -->
+                            <a class="icon-modify no-text" href="/cms/link/{LINK_ID}" title="Edit link"></a>
+                            <!-- END modify_link -->
+                        </div>
+                    </li>
+                    <!-- END link -->
+                </ul>
+
+                <div class="content">
+                    <a href="/resources/{LINK_CAT_ID}" class="button icon-view">View All Links</a>
+
+                    <!-- BEGIN submit_link -->
+                    <a href="/cms/link/new/{LINK_CAT_ID}" class="button icon-add">Add Link</a>
+                    <!-- END submit_link -->
+                </div>
+            </section>
+        </div>
     </div>
 </div>
