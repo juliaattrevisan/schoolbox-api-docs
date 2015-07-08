@@ -60,12 +60,12 @@ $(function() {
      * Each skin does NOT have a slightly different header height or a different left navigation.
      * From now on, it's always placed relative to the clicked element.
      */
-    $(document).on('click', 'ul.js_happening li', function(event) {
+    $(document).on('click', '[data-role="event"]', function(event) {
         var currentObject = $(this);
         var bubble = $('.cal-bubble');
         bubble.find('.bottom, .bottom strong').removeAttr("style");
         bubble.find('.bottom').show();
-        var dynamicHTML = currentObject.children('.hidden-fields').html();
+        var dynamicHTML = currentObject.find('[data-relation="eventBubble"]').html();
         bubble.find('.middle').children('.js-data').html(dynamicHTML);
         var position = currentObject.offset();
         bubble.show();

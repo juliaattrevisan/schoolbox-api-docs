@@ -1,4 +1,6 @@
-<li class="row {{ event.getEventClasses() }} {% if renderer.isTranslucent() %}translucent{% endif %}">
+<li data-role="event"
+    class="row {{ event.getEventClasses() }} {% if renderer.isTranslucent() %}translucent{% endif %}"
+>
     <div class="eventListing">
         {% block eventSpan %}
         <div class="small-6 columns">
@@ -16,7 +18,7 @@
         {% endblock eventTitle %}
     </div>
 
-    <div class="hidden-fields clearfix">
+    <div class="hidden-fields" data-relation="eventBubble">
         {% block eventBubble %}
 
             {% block eventBubbleSummary %}
