@@ -75,26 +75,33 @@
         {% for booking in bookingList %}
             <tr>
                 <td>
-                    <time datetime="{{ booking.getEvent().getStartDateTime().getDatabase() }}">
-                        {{ booking.getEvent().getStartDateTime().getLocal() }}
+                    <time datetime="{{ booking.getStartTime().getDatabase() }}">
+                        {{ booking.getStartTime().getLocal() }}
                     </time>
                 </td>
                 <td>
-                    <time datetime="{{ booking.getEvent().getEndDateTime().getDatabase() }}">
-                        {{ booking.getEvent().getEndDateTime().getLocal() }}
+                    <time datetime="{{ booking.getEndTime().getDatabase() }}">
+                        {{ booking.getEndTime().getLocal() }}
                     </time>
                 </td>
                 <td>
+                    {{ booking.getTitle() }}
+                    {#
                     <a href="{{ routeLookup('resourceBooking.edit', {id: booking.getId()}) }}">
-                        {{ booking.getName() }}
+                        {{ booking.getTitle() }}
                     </a>
+                    #}
                 </td>
                 <td>
+                    {% include "@resourceItem/sub/itemName.twig" with {item: booking.getBooking().getResource()} %}
+                    {{ booking.getLocation() }}
+                    {#
                     <a href="{{ routeLookup('resourceItem.read', {id: booking.getResource().getId()}) }}">
                         {% include "@resourceItem/sub/itemName.twig" with {item: booking.getResource()} %}
                     </a>
+                    #}
                 </td>
-                <td>{{ booking.getNotes()|purify }}</td>
+                <td>{{ booking.getTitle()|purify }}</td>
             </tr>
         {% endfor %}
         </tbody>
