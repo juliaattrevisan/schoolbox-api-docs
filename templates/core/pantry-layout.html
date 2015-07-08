@@ -19,7 +19,72 @@
     <code>~/.WebIde70/config/templates/Foundation.xml</code>
 </p>
 
-<p class="divider">Component Prototype (Adam)</p>
+
+<p class="divider">Component Prototype - Action List (Eve)</p>
+<div class="row">
+    <div class="small-6 columns">
+        <div id='component{COMPONENT_INSTANCE_ID}' data-component>
+            <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+                <div class="small-12 island">
+                    <section>
+                        <ul class="action-list">
+                            <li class="row" data-equalizer>
+                                <div class="column small-11" data-equalizer-watch>
+                                    <h3>
+                                        <a href='#'>Your thing</a>
+                                    </h3>
+
+                                    <p class="meta">Last updated on Thingo</p>
+                                </div>
+                                <div class="one actions">
+                                    <a class="icon-modify no-text" href="#" title="Modify your thing"></a>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="content">
+                            <a href="" class="button icon-add">Add new thing</a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="small-6 columns">
+        <pre>
+&lt;div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    {CONFIGURATION}
+
+    &lt;div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        &lt;div class="small-12 island">
+            &lt;section>
+                &lt;ul class="action-list">
+                    &lt;li class="row" data-equalizer>
+                        &lt;div class="column small-11" data-equalizer-watch>
+                            &lt;h3>
+                                &lt;a href='#'>&lt;/a>
+                            &lt;/h3>
+
+                            &lt;p class="meta">Last updated on &lt;/p>
+                        &lt;/div>
+                        &lt;div class="one actions">
+                            &lt;a class="icon-modify no-text" href="#" title="">&lt;/a>
+                        &lt;/div>
+                    &lt;/li>
+                &lt;/ul>
+
+                &lt;div class="content">
+                    &lt;a href="" class="button icon-add">&lt;/a>
+                &lt;/div>
+            &lt;/section>
+        &lt;/div>
+    &lt;/div>
+&lt;/div>
+        </pre>
+    </div>
+</div>
+
+<p class="divider">Component Prototype - Basic (Adam)</p>
 <div class="row">
     <div class="small-6 columns">
         <div id='component{COMPONENT_INSTANCE_ID}' data-component>
