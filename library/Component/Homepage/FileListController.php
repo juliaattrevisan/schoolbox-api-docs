@@ -94,7 +94,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         if (!parent::loadTemplate($templateHandle, 'fileList')) {
             return false;
         }
-        $this->parseConfig();
 
         if ($this->permission < READ_ACCESS) {
             return false;
@@ -102,11 +101,10 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
         /* Set up component name
          */
+        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
+
         $this->setVar(
             array(
-                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname')))
-                        ? $this->getConfig('componentname')
-                        : $this->getComponentName(),
                 // These are for the Select Alternate Source resourcebrowser
                 'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
                 'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId()
@@ -205,6 +203,10 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         } else {
             $this->parse("submit_file_block", "submit_file");
         }
+
+        /* Need title injected here
+         */
+        $this->parseConfig();
 
         return true;
     }
