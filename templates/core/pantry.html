@@ -1,7 +1,22 @@
 <!-- This is the 'Pantry', a place where developers come to pick their 'Ingredients' -->
 
 <div class="scroll-container" role="main">
-    
+    <div id='component{COMPONENT_INSTANCE_ID}' data-component>
+        <!-- Custom javascript -->
+
+        {CONFIGURATION}
+
+        <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+            <div class="small-12 island">
+                <section>
+                    <div class="content">
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="large-12 columns">
             <h2 class="subheader">Little Manc Islands</h2>
