@@ -84,6 +84,14 @@ abstract class Component_ControllerAbstract
     protected $componentName = '';
 
     /**
+     * Configuration template to use.
+     *
+     * Usually determined by `$this->determineTemplate()`, but can be set with
+     * `$this->setConfigurationTemplate()`.
+     */
+    protected $configurationTemplate = '';
+
+    /**
     * Constructor
     *
     * @param Component_Instance $instance
@@ -320,14 +328,37 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Determine which config template to use
+     * Sets the configuration template for this component.
+     *
+     * @param string $template
+     */
+    public function setConfigurationTemplate($template)
+    {
+        $this->configurationTemplate = $template;
+    }
+
+    /**
+     * Gets the configuration template for this component.
+     *
+     * @return string
+     */
+    protected function getConfigurationTemplate()
+    {
+        return $this->configurationTemplate;
+    }
+
+    /**
+     * Determine which config template to use, if it hasn't been set with
+     * `$this->setConfigurationTemplate()`.
      *
      * Ingredient of parseConfig() facade
      *
      * @return string
      */
     protected function determineTemplate() {
-        if (in_array($this->instance->getModule(), array('homepage_template', 'eportfolio_template'))) {
+        if ($configTemplate = $this->getConfigurationTemplate()) {
+            $template = $configTemplate;
+        } elseif (in_array($this->instance->getModule(), array('homepage_template', 'eportfolio_template'))) {
             $template = 'component/config/_templatewrapper.html';
         }
         /* eportfolio uses a special version of le wrapier
