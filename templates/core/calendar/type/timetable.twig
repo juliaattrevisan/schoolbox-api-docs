@@ -1,16 +1,9 @@
 {% extends 'calendar/type/_base.twig' %}
 
-{% block eventBubble %}
-    <h3>{{ event.title }}</h3>
-    <h4>
-        {% if event.eventType %}
-            {{ event.eventType }}:
-        {% endif %}
-        {{ event.getFullDate()|raw }}</h4>
-    <p class="location">{{ event.location }}</p>
-    <div>
-        {% if event.categoryId > 0 %}
-            <a class="btn house float-left" href="/homepage/{{ event.categoryId }}"><span></span>Go To Homepage</a>
-        {% endif %}
-    </div>
-{% endblock eventBubble %}
+{% block eventBubbleButtons %}
+<div>
+    {% if event.categoryId > 0 %}
+        <a class="btn house float-left" href="/homepage/{{ event.categoryId }}"><span></span>Go To Homepage</a>
+    {% endif %}
+</div>
+{% endblock eventBubbleButtons %}
