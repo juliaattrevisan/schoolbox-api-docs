@@ -14,7 +14,7 @@ class Component_Config_CompactMode extends Component_Config_Abstract
 
         if ($configValue == '1') {
             $page->setVar(array(
-                'COMPONENT_COMPACTMODE'                 => 'compact-mode',
+                'COMPONENT_COMPACTMODE'                 => 'hide',
                 'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => 'checked="checked"'
             ));
         } else {
