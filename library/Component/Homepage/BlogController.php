@@ -128,7 +128,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                         'BLOG_AUTHOR_ID'          => $currentItem->getOwner()->getId(),
                         'BLOG_AUTHOR_EXTERNAL_ID' => $currentItem->getOwner()->getExternalId(),
                         'BLOG_AUTHOR_NAME'        => $currentItem->getOwner()->formatName(),
-                        'BLOG_AUTHOR_THUMB'       => "/portrait.php?userId={$currentItem->getOwner()->getExternalId()}&size=square32",
+                        'BLOG_AUTHOR_THUMB'       => "/portrait.php?userId={$currentItem->getOwner()->getExternalId()}&size=square64",
                         'BLOG_CREATED'            => $currentItem->getCreated()->getRelativeTime(),
                         'BLOG_SHADING'            => ++$i % 2 ? '' : 'dark',
                         'BLOG_COMMENTS'           => '',
