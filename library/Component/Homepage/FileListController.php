@@ -168,7 +168,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                     'FILE_MODIFIED_DATE'   => $file->getModifiedAt()->getRelativeTime(),
                     'FILE_COMMENT'         => nl2br(Scrub::text($file->getDescription())),
                     'ON_OFF'               => ++$j % 2 ? '' : 'dark',
-                    'HIDDEN'               => $file->isHidden() ? 'hidden' : '',
+                    'HIDDEN'               => $file->isHidden() ? 'translucent' : '',
                 );
                 $this->setVar($output);
 
