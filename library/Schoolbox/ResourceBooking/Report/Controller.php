@@ -93,20 +93,14 @@ class Controller extends Base
             $selectedCategories = $allCategories;
         }
 
-        // Fill in extras
-        $extras = [];
+        // Fill in resources
         /** @var Item\Model[] $resources */
         if (!empty($selectedCategories)) {
-            $extras['resource_id'] = $this->getItemMapper()->findIdsByColumn(
-                'resource_category_id',
-                $selectedCategories
-            );
             $resources = $this->getItemMapper()->findByColumn(
                 'resource_category_id',
                 $selectedCategories
             );
         } else {
-            $extras['resource_id'] = $this->getItemMapper()->findAllIds();
             $resources = $this->getItemMapper()->findAll();
         }
 
