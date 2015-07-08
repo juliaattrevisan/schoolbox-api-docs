@@ -18,7 +18,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
 {
 
     /**
-     * @var External_Timetable
+     * @var External_TimetableInterface
      */
     protected $externalTimetable = null;
 
@@ -183,7 +183,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     }
 
     /**
-     * @param  \External_Timetable $externalTimetable
+     * @param  \External_TimetableInterface $externalTimetable
      *
      * @return $this
      */
@@ -194,7 +194,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     }
 
     /**
-     * @return \External_Timetable
+     * @return \External_TimetableInterface
      */
     public function getExternalTimetable()
     {
