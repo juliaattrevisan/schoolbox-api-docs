@@ -71,7 +71,6 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->params[Controller::class]['bookingMapper']  = $injector->lazyNew(Booking\Mapper::class);
         $injector->params[Controller::class]['itemMapper']     = $injector->lazyNew(Item\Mapper::class);
         $injector->params[Controller::class]['categoryMapper'] = $injector->lazyNew(Category\Mapper::class);
         $injector->set('controller:resourceBookingReport', $injector->lazyNew(Controller::class));

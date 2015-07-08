@@ -11,17 +11,11 @@ namespace Schoolbox\ResourceBooking\Report;
 
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
-use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Item;
 
 class Controller extends Base
 {
-    /**
-     * @var Booking\Mapper
-     */
-    protected $bookingMapper;
-
     /**
      * @var Item\Mapper
      */
@@ -35,17 +29,14 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Booking\Mapper  $bookingMapper
      * @param Item\Mapper     $itemMapper
      * @param Category\Mapper $categoryMapper
      */
     public function __construct(
-        Booking\Mapper $bookingMapper,
         Item\Mapper $itemMapper,
         Category\Mapper $categoryMapper
     ) {
         $this
-            ->setBookingMapper($bookingMapper)
             ->setItemMapper($itemMapper)
             ->setCategoryMapper($categoryMapper)
         ;
@@ -137,24 +128,6 @@ class Controller extends Base
                 ],
             ],
         ]);
-    }
-
-    /**
-     * @return Booking\Mapper
-     */
-    protected function getBookingMapper()
-    {
-        return $this->bookingMapper;
-    }
-
-    /**
-     * @param  Booking\Mapper $bookingMapper
-     * @return $this
-     */
-    protected function setBookingMapper($bookingMapper)
-    {
-        $this->bookingMapper = $bookingMapper;
-        return $this;
     }
 
     /**
