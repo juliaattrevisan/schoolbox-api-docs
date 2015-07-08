@@ -28,14 +28,9 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
     protected $end;
 
     /**
-     * @var Renderer
+     * @var Lister
      */
     protected $eventRenderer;
-
-    /**
-     * @var Collection|Calendar_Event_Type_Abstract[]
-     */
-    protected $eventList;
 
     public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage)
     {
