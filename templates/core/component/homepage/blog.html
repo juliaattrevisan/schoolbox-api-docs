@@ -76,7 +76,7 @@
                         </p>
                     </div>
                 </li>
-                <li class="row" id="commentform-{BLOG_ID}" style="display:none;">
+                <li class="row hide" id="commentform-{BLOG_ID}">
                     <div class="column small-12">
                         <form action="/blog/comment/new/{BLOG_ID}" method="post">
                             <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
@@ -84,8 +84,8 @@
                         </form>
                     </div>
                 </li>
-
                 <!-- END blog -->
+                
                 <li class="row">
                     <div class="content">
                         <a href="/homepage/blogArchive/{BLOG_CATEGORY_ID}" class="button">View Blog Archive</a>

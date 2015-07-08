@@ -48,7 +48,7 @@
 			 * http://yuji.wordpress.com/2010/02/22/jquery-click-event-fires-twice/
 			 */
 			component.find('[data-toggle]').unbind('click').click(function() {
-				$('#' + $(this).data('toggle')).toggle();
+				$('#' + $(this).data('toggle')).toggleClass('hide');
 			});
 
 			/* For viewing comment thread
