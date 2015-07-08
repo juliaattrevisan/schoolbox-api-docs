@@ -9,17 +9,11 @@
  
 namespace Schoolbox\ResourceBooking\Report;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
-use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
 use Calendar_Api_Composite;
 use Calendar_Api_EventType_Interface;
 use External_TimetableInterface;
-use Twig_Loader_Chain;
-use Twig_Loader_Filesystem;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\User;
 
