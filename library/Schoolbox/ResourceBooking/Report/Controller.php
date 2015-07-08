@@ -11,6 +11,7 @@ namespace Schoolbox\ResourceBooking\Report;
 
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
+use Calendar_Api_Composite;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Item;
 
@@ -27,18 +28,34 @@ class Controller extends Base
     protected $categoryMapper;
 
     /**
+     * @var Calendar_Api_Composite
+     */
+    protected $api;
+
+    /**
+     * @var CalendarApiFactory
+     */
+    protected $apiFactory;
+
+    /**
      * Constructor
      *
-     * @param Item\Mapper     $itemMapper
-     * @param Category\Mapper $categoryMapper
+     * @param Item\Mapper            $itemMapper
+     * @param Category\Mapper        $categoryMapper
+     * @param Calendar_Api_Composite $api
+     * @param CalendarApiFactory     $apiFactory
      */
     public function __construct(
         Item\Mapper $itemMapper,
-        Category\Mapper $categoryMapper
+        Category\Mapper $categoryMapper,
+        Calendar_Api_Composite $api,
+        CalendarApiFactory $apiFactory
     ) {
         $this
             ->setItemMapper($itemMapper)
             ->setCategoryMapper($categoryMapper)
+            ->setApi($api)
+            ->setApiFactory($apiFactory)
         ;
     }
 
@@ -96,31 +113,17 @@ class Controller extends Base
         }
 
         // Build the list of events (slowly)
-        $api       = new \Calendar_Api_Composite();
-        $timetable = new \External_Timetable();
         foreach ($resources as $resource) {
-            $resourceApi = new \Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
-                $this->getUser(),
-                array()
+            $this->getApi()->add(
+                $this->getApiFactory()->build($resource)
             );
-            $resourceApi->setResourceId($resource->getId());
-            $api->add($resourceApi);
-
-            if ($roomCode = $resource->getRoomCode()) {
-                $timetableApi = new \Calendar_Api_EventType_Timetable_Room(
-                    $this->getUser(),
-                    array()
-                );
-                $timetableApi->setRoomCode($roomCode)->setExternalTimetable($timetable);
-                $api->add($timetableApi);
-            }
         }
 
         $this->getResponse()->content->set([
             'template' => '@resourceBookingReport/index.twig',
             'data'     => [
                 'categoryList' => $categoryList,
-                'eventList'    => $api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp()),
+                'eventList'    => $this->getApi()->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp()),
                 'search'       => [
                     'start'    => $start,
                     'end'      => $end,
@@ -152,7 +155,7 @@ class Controller extends Base
     /**
      * @return Category\Mapper
      */
-    public function getCategoryMapper()
+    protected function getCategoryMapper()
     {
         return $this->categoryMapper;
     }
@@ -162,9 +165,45 @@ class Controller extends Base
      *
      * @return $this
      */
-    public function setCategoryMapper($categoryMapper)
+    protected function setCategoryMapper($categoryMapper)
     {
         $this->categoryMapper = $categoryMapper;
+        return $this;
+    }
+
+    /**
+     * @return Calendar_Api_Composite
+     */
+    protected function getApi()
+    {
+        return $this->api;
+    }
+
+    /**
+     * @param  Calendar_Api_Composite $api
+     * @return $this
+     */
+    protected function setApi($api)
+    {
+        $this->api = $api;
+        return $this;
+    }
+
+    /**
+     * @return CalendarApiFactory
+     */
+    protected function getApiFactory()
+    {
+        return $this->apiFactory;
+    }
+
+    /**
+     * @param  CalendarApiFactory $apiFactory
+     * @return $this
+     */
+    protected function setApiFactory($apiFactory)
+    {
+        $this->apiFactory = $apiFactory;
         return $this;
     }
 }
