@@ -4,3 +4,10 @@
 .translucent {
     opacity: 0.3;
 }
+
+.top-bar .name h2 a {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    width: 100%;
+}
