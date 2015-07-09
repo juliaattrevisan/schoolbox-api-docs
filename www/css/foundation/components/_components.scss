@@ -17,13 +17,9 @@
     position: relative;
     .as-next-arrow,
     .as-prev-arrow{
-        height: 25px;
         display: inline-block;
-//        overflow: hidden;
         position: absolute;
-//        text-indent: 100%;
         white-space: nowrap;
-        width: 17px;
         z-index: 50;
     }
     .as-prev-arrow,
@@ -34,6 +30,7 @@
         &:hover{
             color: black;
         }
+        font-size: 25px;
     }
     .as-prev-arrow{
         left: 20px;
