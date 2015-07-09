@@ -25,15 +25,15 @@
     .as-prev-arrow,
     .as-next-arrow{
         top: 50%;
-        margin-top: -12px;
+        margin-top: rem-calc($base-font-size * -0.75);
         color: white;
         &:hover{
             color: black;
         }
-        font-size: 25px;
+        font-size: rem-calc($base-font-size * 1.5);
     }
     .as-prev-arrow{
-        left: 20px;
+        left: rem-calc($base-font-size * 1.25);
         &:before {
             // Previous
             font-family: 'schoolbox';
@@ -41,7 +41,7 @@
         }
     }
     .as-next-arrow{
-        right: 20px;
+        right: rem-calc($base-font-size * 1.25);
         &:before {
             // Next
             font-family: 'schoolbox';
