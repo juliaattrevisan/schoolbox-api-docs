@@ -31,9 +31,11 @@
             color: black;
         }
         font-size: rem-calc($base-font-size * 1.5);
+        line-height: rem-calc($base-font-size * 3);
     }
     .as-prev-arrow{
         left: rem-calc($base-font-size * 1.25);
+        padding-right: rem-calc($base-font-size * 1.25);
         &:before {
             // Previous
             font-family: 'schoolbox';
@@ -42,6 +44,7 @@
     }
     .as-next-arrow{
         right: rem-calc($base-font-size * 1.25);
+        padding-left: rem-calc($base-font-size * 1.25);
         &:before {
             // Next
             font-family: 'schoolbox';
