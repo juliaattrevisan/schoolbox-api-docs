@@ -19,9 +19,9 @@
     .as-prev-arrow{
         height: 25px;
         display: inline-block;
-        overflow: hidden;
+//        overflow: hidden;
         position: absolute;
-        text-indent: 100%;
+//        text-indent: 100%;
         white-space: nowrap;
         width: 17px;
         z-index: 50;
@@ -30,14 +30,26 @@
     .as-next-arrow{
         top: 50%;
         margin-top: -12px;
+        color: white;
+        &:hover{
+            color: black;
+        }
     }
     .as-prev-arrow{
-        background: url("/images/core/icons/arrows.png") top left no-repeat; left: 10px;
-        &:hover{ background: url("/images/core/icons/arrows.png") bottom left no-repeat; }
+        left: 20px;
+        &:before {
+            // Previous
+            font-family: 'schoolbox';
+            content: "\e642";
+        }
     }
     .as-next-arrow{
-        background: url("/images/core/icons/arrows.png") top right no-repeat; right: 10px;
-        &:hover{ background: url("/images/core/icons/arrows.png") bottom right no-repeat; }
+        right: 20px;
+        &:before {
+            // Next
+            font-family: 'schoolbox';
+            content: "\e63c";
+        }
     }
 }
 .as-nav{
