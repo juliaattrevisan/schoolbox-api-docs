@@ -250,9 +250,29 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         $eventStartTimestamp = strtotime("{$currentEvent->DTSTART}");
         $eventEndTimestamp   = strtotime("{$currentEvent->DTEND}");
 
+        // No end timestamp?
+        if ($eventEndTimestamp === false) {
+            if (isset($currentEvent->DURATION)) {
+                // Use duration if there
+                $eventEndDatetime = new DateTime();
+                $eventEndDatetime->setTimestamp($eventStartTimestamp);
+                $eventEndDatetime->add(\Sabre\VObject\DateTimeParser::parseDuration($currentEvent->DURATION));
+                $eventEndTimestamp = $eventEndDatetime->getTimestamp();
+            } elseif ($allDay) {
+                // All day? end at end of day
+                $eventEndTimestamp = strtotime('+1 day', $eventStartTimestamp);
+            } else {
+                // Otherwise: end and start at same time
+                $eventEndTimestamp = $eventStartTimestamp;
+            }
+        }
+
         // According to VCAL standard: end of all day event is 12am next day
         if ($allDay) {
             $eventEndTimestamp -= 1;
+            if ($eventEndTimestamp < $eventStartTimestamp) {
+                $eventEndTimestamp = $eventStartTimestamp;
+            }
         }
 
         // Get category list for this event.
