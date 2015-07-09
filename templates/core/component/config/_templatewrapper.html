@@ -1,30 +1,66 @@
-<span class="actions two nodrag" data-equalizer-watch>
-  <!-- BEGIN settings_link -->
-  <a class="config-this icon-settings no-text" href="#" data-equalizer-watch></a>
-  <!-- END settings_link -->
+<div class="row collapse">
+    <div class="small-12 columns">
+        <nav class="top-bar" data-topbar>
+            <ul class="title-area">
+                <!-- Title Area -->
+                <li class="name">
+                    <h2><a href="#">{COMPONENT_NAME}</a></h2>
+                </li>
+            </ul>
+            <section class="top-bar-section">
+                <!-- Right Nav Section -->
+                <ul class="right">
+                    <!-- BEGIN settings_link -->
+                    <li class="divider"></li>
+                    <li><a data-target='settings' data-state='closed' href="#" class="component-control-button settings edit button icon-settings no-text" title="Settings"></a></li>
+                    <li class="divider"></li>
+                    <!-- END settings_link -->
+                    <!-- BEGIN settings_collapse -->
+                    <li><a data-collapser="true" href="#" class="component-control-button collapse"  title="Collapse Content"><span>{CONFIG_COLLAPSED_ICON}</span></a></li>
+                    <li class="divider"></li>
+                    <!-- END settings_collapse -->
+                    <!-- BEGIN settings_close -->
+                    <li><a data-target="delete" data-state='closed' href="#" class="button no-text icon-close" title="Close"></a></li>
+                    <!-- END settings_close -->
+                </ul>
+            </section>
+        </nav>
 
-  <!-- BEGIN settings_collapse -->
-  <a data-collapser="true" class="component-control-button collapse" href="#" data-equalizer-watch>
-    {CONFIG_COLLAPSED_ICON}
-  </a>
-  <!-- END settings_collapse -->
+        <!-- BEGIN settings_panel -->
+        <div data-component-panel="settings" class="editPanel small-12 ">
+            <section>
+                <div>
+                    <form action="/homepage/configForm.php" method="GET">
+                        <input type="hidden" name="cid" value="{ID}" />
+                        <input type="hidden" name="type" value="config" />
+                        <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}" />
+                        <!-- BEGIN config_element -->
+                        <div class="{CONFIG_ELEMENT_CLASS}" {CONFIG_DISPLAY}>
+                        <span>{CONFIG_ELEMENT_LABEL}: </span>
+                        {CONFIG_ELEMENT_CONTENT}
+                    </div>
+                    <!-- END config_element -->
+                    <input type="submit" value="Update" />
+                    </form>
+            </div>
+            </section>
+        </div>
+        <!-- END settings_panel -->
 
-  <!-- BEGIN settings_close -->
-  <a class="delete-this icon-close no-text" href="#" data-equalizer-watch></a>
-  <!-- END settings_close -->
+        <div data-component-panel='delete' class="editPanel small-12 ">
+            <section>
+                <div>
+                    <p>Are you sure you want to remove this component?</p>
+                    <form action="#" method="post">
+                        <input type="hidden" name="cid" value="{ID}" />
+                        <input type="hidden" name="delete" value="{COMPONENT_INSTANCE_ID}" />
+                        <input type="hidden" data-defn-id name="component" value="{COMPONENT_DEFINITION_ID}" />
 
-  <!-- BEGIN settings_panel -->
-</span>
-<div class="editPanel settings">
-  <form action="/homepage/configForm.php" method="GET">
-    <input type="hidden" name="cid" value="{ID}" />
-    <input type="hidden" name="type" value="config" />
-    <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}" />
-    <!-- BEGIN config_element -->
-    <div class="{CONFIG_ELEMENT_CLASS}"><span>{CONFIG_ELEMENT_LABEL}: </span>{CONFIG_ELEMENT_CONTENT}</div>
-    <!-- END config_element -->
-    <input type="submit" value="Update" class="submit-btn-plain update" />
-
-  </form>
+                        <a href="#" class="button secondary" data-remove="1">Yes</a>
+                        <a href="#" class="button" data-remove="0">No</a>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
 </div>
-<!-- END settings_panel -->

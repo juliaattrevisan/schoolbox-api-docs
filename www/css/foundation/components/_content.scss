@@ -910,35 +910,22 @@ tr:hover{
     overflow: auto;
 }
 
-// Drag & Drop
-#dashboard-layout{
-	.component{
-		@include single-transition(background-color, 0.15s, linear);
-		background-color: $vapor;
-	    border: 1px solid $monsoon;
-	    margin: 0 0 rem-calc(($base-font-size / 2)) 0;
+// Admin Component Dashboard
+.component{
+	//@include single-transition(background-color, 0.15s, linear);
+	//background-color: $vapor;
+    //border: 1px solid $monsoon;
+    .top-bar{
+    	margin-bottom: rem-calc(($base-font-size));
+    }
+    &:last-child .top-bar{
+		margin: 0;
+	}
 
-	    &:hover{
-	    	background-color: $ocean-sunset;
-			cursor: move;
-			.actions a{
-				opacity: 1;
-			}
-	    }
-	    &:last-child{
-	    	margin: 0;
-	    }
-	    .actions{
-	    	@include absolute (0, auto, auto, 0);
-	    	font-size: rem-calc(($base-font-size));
-	    	a{
-	    		@media #{$small-up} {
-					padding: rem-calc(($base-font-size - 8));
-				}
-	    	}
-	    }
-	}
-	.information-list{
-		padding: 0;
-	}
+}
+
+.marker{
+	border: 4px dashed $success-color;
+	background-color: rgba($success-color, 0.3);
+	min-height: 2.6875rem;
 }
