@@ -56,23 +56,23 @@ $anyslider-color-hover: rgb(121, 121, 121);
             content: "\e63c";
         }
     }
-}
-.as-nav{
-    position: relative;
-    text-align: center;
-    z-index: 1;
-    a {
-        color: $anyslider-color;
-        font-size: 0;
-        &:before {
-            // Bullet point
-            content: "\2022";
-            font-size: rem-calc($base-font-size * 2);
-            padding: rem-calc($base-font-size * .5);
+    .as-nav{
+        position: relative;
+        text-align: center;
+        z-index: 1;
+        a {
+            color: $anyslider-color;
+            font-size: 0;
+            &:before {
+                // Bullet point
+                content: "\2022";
+                font-size: rem-calc($base-font-size * 2);
+                padding: rem-calc($base-font-size * .5);
+            }
         }
-    }
-    a.as-active,
-    a:hover{
-        color: $anyslider-color-hover;
+        a.as-active,
+        a:hover{
+            color: $anyslider-color-hover;
+        }
     }
 }
