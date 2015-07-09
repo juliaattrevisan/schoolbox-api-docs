@@ -29,7 +29,7 @@
                 <ul class="action-list">
                     <!-- BEGIN poll_question -->
                     <li class="row" data-equalizer>
-                        <div class="column small-11" data-equalizer-watch>
+                        <div class="small-9 columns" data-equalizer-watch>
                             <h3>
                                 {POLL_QUESTION}
                             </h3>
@@ -79,8 +79,15 @@
                             </form>
                             <!-- END poll_vote -->
                         </div>
-                        <div class="one actions">
-                            <a class="icon-modify no-text" href="#" title=""></a>
+                        <div class="three actions">
+                            <!-- BEGIN show_results -->
+                            <a href="/homepage/{ID}/pollResults" class="icon-poll no-text" title="Show Results"></a>
+                            <!-- END show_results -->
+
+                            <!-- BEGIN modify_poll -->
+                            <a href="/poll/modify/{POLL_ID}" class="icon-modify no-text" title="Modify Poll"></a>
+                            <a href="/poll/modifyForm.php?delete={POLL_ID}&amp;homepageComponentID={COMPONENT_INSTANCE_ID}" data-poll-delete class="icon-delete no-text" title="Delete Poll"></a>
+                            <!-- END modify_poll -->
                         </div>
                     </li>
                     <!-- BEGIN poll_chart -->
@@ -121,18 +128,10 @@
                 </ul>
 
                 <div class="content">
-                    <!-- BEGIN modify_poll -->
-                    <a href="/poll/modifyForm.php?delete={POLL_ID}&amp;homepageComponentID={COMPONENT_INSTANCE_ID}" data-poll-delete class="button icon-delete">Delete</a>
-                    <a href="/poll/modify/{POLL_ID}" class="button icon-modify">Modify</a>
-                    <!-- END modify_poll -->
-
                     <!-- BEGIN new_poll -->
                     <a href="/poll/modify/new/{ID}/{COMPONENT_INSTANCE_ID}" class="button icon-add">Create Poll</a>
                     <!-- END new_poll -->
 
-                    <!-- BEGIN show_results -->
-                    <a href="/homepage/{ID}/pollResults" class="button icon-poll">Show results</a>
-                    <!-- END show_results -->
                 </div>
             </section>
         </div>
