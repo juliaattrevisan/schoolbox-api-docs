@@ -44,7 +44,7 @@ class Result extends Base
 				LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
 				LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
 				LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
-				LEFT JOIN {$mapper->getJoinSql('category', 'f', 'c')}
+				INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
 				LEFT JOIN `perms` p ON `f`.category = `p`.cid
 					AND p.gid = :role_id
 					AND p.type >= :min_access
@@ -105,7 +105,7 @@ class Result extends Base
 				LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
 				LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
 				LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
-				LEFT JOIN {$mapper->getJoinSql('category', 'f', 'c')}
+				INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
 				LEFT JOIN `perms` p ON `f`.category = `p`.cid
 					AND p.gid = :role_id
 					AND p.type >= :min_access

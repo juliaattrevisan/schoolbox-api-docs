@@ -40,7 +40,7 @@ class Result extends Base
 			FROM
 				`{$mapper->getTable()}` `l`
 				LEFT JOIN {$mapper->getJoinSql('user', 'l', 'u')}
-				LEFT JOIN {$mapper->getJoinSql('category', 'l', 'c')}
+				INNER JOIN {$mapper->getJoinSql('category', 'l', 'c')}
 				LEFT JOIN {$mapper->getJoinSql('perms', 'l', 'p')}
 					AND p.gid = :role_id
 					AND p.type >= :min_access
@@ -94,7 +94,7 @@ class Result extends Base
 			FROM
 				`{$mapper->getTable()}` `l`
 				LEFT JOIN {$mapper->getJoinSql('user', 'l', 'u')}
-				LEFT JOIN {$mapper->getJoinSql('category', 'l', 'c')}
+				INNER JOIN {$mapper->getJoinSql('category', 'l', 'c')}
 				LEFT JOIN {$mapper->getJoinSql('perms', 'l', 'p')}
 					AND p.gid = :role_id
 					AND p.type >= :min_access
