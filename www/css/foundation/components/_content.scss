@@ -811,13 +811,74 @@ table{
 
 // Avatar Card
 .avatar-card{
-	img{
-	  	float: left;
-  		margin: 0 rem-calc(($base-font-size )) rem-calc(($base-font-size)) 0;
+    padding: 0.5rem 0.5rem 0 1rem;
+
+    @media #{$small-up} {
+        min-height: (3 * rem-calc($base-font-size));
+    }
+    @media #{$medium-up} {
+        min-height: (4 * rem-calc($base-font-size));
+    }
+
+    h3 {
+      margin: 0;
+    }
+    h3, .meta {
+      text-overflow: ellipsis;
+      overflow-x: hidden;
+      white-space: nowrap;
+    }
+	img, [class^="icon-"] {
+		float: left;
+
+        @media #{$small-up} {
+            margin: (-1 * rem-calc(($base-font-size - 8))) rem-calc($base-font-size) 0 -1rem;
+            width: (3 * rem-calc($base-font-size));
+        }
+        @media #{$medium-up} {
+            width: (4 * rem-calc($base-font-size));
+        }
 	}
+    [class^="icon-"] {
+
+      @media #{$small-up} {
+        padding: 0 0 0 0.375rem;
+        margin-top: -0.625rem;
+      }
+      @media #{$medium-up} {
+        padding: 0.125rem 0 0 0.875rem;
+        margin-top: -0.5rem;
+      }
+
+    }
+
 	p{
 		margin: 0;
 	}
+    &+ article {
+      clear:both;
+      margin-top: 0.5rem;
+
+      @media #{$small-up} {
+          margin-left: (4 * rem-calc($base-font-size));
+      }
+      @media #{$medium-up} {
+          margin-left: (5 * rem-calc($base-font-size));
+      }
+    }
+}
+
+p{
+  @media #{$small-up} {
+    margin-bottom: rem-calc(($base-font-size - 8));
+  }
+  @media #{$medium-up} {
+    margin-bottom: rem-calc(($base-font-size - 4));
+  }
+  @media #{$large-up} {
+    margin-bottom: rem-calc(($base-font-size));
+  }
+
 }
 
 // Social Stream
