@@ -7,15 +7,19 @@
         <div class="small-12 island">
             <section>
                 <div class="content">
-                    <div class="clearfix">
+                    <ul class="clearing-thumbs" data-clearing>
                         <!-- BEGIN image_gallery -->
-                        <div class="float-left image-thumbnail">
-                            <a class="thumb" href="/cms/image.php?id={THUMBNAIL_ID}&height=600&width=800" rel="lightbox[homepage-{COMPONENT_INSTANCE_ID}]" style="height:{IMAGE_HEIGHT}px;" alt="{THUMBNAIL_DESCRIPTION}" title="{THUMBNAIL_DESCRIPTION}">
+                        <li>
+                            <a class="th"
+                               href="/cms/image.php?id={THUMBNAIL_ID}&height=600&width=800"
+                               style="height:{IMAGE_HEIGHT}px;"
+                               title="{THUMBNAIL_DESCRIPTION}"
+                            >
                                 <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0" alt="{THUMBNAIL_DESCRIPTION}" border="0"/>
                             </a>
-                        </div>
+                        </li>
                         <!-- END image_gallery -->
-                    </div>
+                    </ul>
                 </div>
             </section>
         </div>
