@@ -157,8 +157,8 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                 }
                 else {
                     $this->setVar(array(
-                            'can_modify_news_block' => ''
-                        ));
+                        'can_modify_news_block' => ''
+                    ));
                 }
 
                 /* Anyone with write access can now see the publish date for news items
