@@ -77,6 +77,13 @@ class Mapper extends BaseMapper
                 'type'     => self::TYPE_STRING,
             )
         );
+        $this->hasMap(
+            array(
+                'column'   => 'link_target',
+                'property' => 'linkTarget',
+                'type'     => self::TYPE_STRING,
+            )
+        );
 
         // Background related fields
         $this->hasMap(

@@ -46,7 +46,7 @@
     <span class="title {{ tile.getTitlePositionStyle() }}">{{ tile.titleText }}</span>
 
     {% if tile.link %}
-    <a href="{{ tile.link|e('html_attr') }}" class="tile-link"></a>
+    <a href="{{ tile.link|e('html_attr') }}" target="{{ tile.getLinkTarget()|e('html_attr') }}" class="tile-link"></a>
     {% else %}
     <span class="tile-link"></span>
     {% endif %}
