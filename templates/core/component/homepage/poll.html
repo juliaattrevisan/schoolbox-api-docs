@@ -47,11 +47,9 @@
                             <script type="text/javascript">
                                 $(function() {
 
-                                    /* Vote validate
+                                    /* Vote validate on a per-poll basis
                                      */
-                                    $('[data-poll-form={COMPONENT_INSTANCE_ID}]').submit(function(event) {
-                                        event.preventDefault();
-
+                                    $('[data-component-poll={COMPONENT_INSTANCE_ID}]').submit(function(event) {
                                         var valid = false;
 
                                         $(this).find('[data-poll-option]').each(function(index, element) {
@@ -69,7 +67,7 @@
                                 });
                             </script>
 
-                            <form data-poll-form="{COMPONENT_INSTANCE_ID}" action="/poll/modifyForm.php" method="post">
+                            <form data-component-poll="{COMPONENT_INSTANCE_ID}" action="/poll/modifyForm.php" method="post">
                                 <input type="hidden" name="pollID" value="{POLL_ID}" />
                                 <input type="hidden" name="categoryID" value="{ID}" />
 
