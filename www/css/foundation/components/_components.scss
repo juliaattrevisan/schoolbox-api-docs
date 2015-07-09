@@ -13,24 +13,26 @@
 }
 
 /* AnySlider stylage */
-.imageslider-container{
+$anyslider-color: rgb(238, 238, 238);
+$anyslider-color-hover: rgb(121, 121, 121);
+.imageslider-container {
     position: relative;
     .imageslider {
         position: relative;
     }
     .as-next-arrow,
-    .as-prev-arrow{
+    .as-prev-arrow {
         display: inline-block;
         position: absolute;
         white-space: nowrap;
         z-index: 50;
     }
     .as-prev-arrow,
-    .as-next-arrow{
+    .as-next-arrow {
         top: 50%;
-        color: white;
-        &:hover{
-            color: black;
+        color: $anyslider-color;
+        &:hover {
+            color: $anyslider-color-hover;
         }
         font-size: rem-calc($base-font-size * 1.5);
         line-height: rem-calc($base-font-size * 3);
@@ -38,15 +40,15 @@
         margin-top: rem-calc($base-font-size * -1.5);
         padding: 0 rem-calc($base-font-size * .5);
     }
-    .as-prev-arrow{
-        left: 0
+    .as-prev-arrow {
+        left: 0;
         &:before {
             // Previous
             font-family: 'schoolbox';
             content: "\e642";
         }
     }
-    .as-next-arrow{
+    .as-next-arrow {
         right: 0;
         &:before {
             // Next
@@ -60,7 +62,7 @@
     text-align: center;
     z-index: 1;
     a {
-        color: white;
+        color: $anyslider-color;
         font-size: 0;
         &:before {
             // Bullet point
@@ -71,6 +73,6 @@
     }
     a.as-active,
     a:hover{
-        color: black;
+        color: $anyslider-color-hover;
     }
 }
