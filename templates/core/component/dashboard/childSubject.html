@@ -8,12 +8,14 @@
             <section>
                 <div class="content">
                     <!-- BEGIN student_block -->
-                    <div class="avatar-card">
-                        <a href="/search/user/{STUDENT_ID}" title="View Profile">
-                            <img src="/portrait.php?userId={STUDENT_EXTERNAL_ID}&size=constrain64" alt="{STUDENT_NAME}"/>
-                            <p>{STUDENT_NAME}</p>
-                        </a>
-                        <p class="meta">Year {STUDENT_YEAR}</p>
+                    <div class="row">
+                        <div class="small-12 columns avatar-card">
+                            <a href="/search/user/{STUDENT_ID}" title="View Profile">
+                                <img src="/portrait.php?userId={STUDENT_EXTERNAL_ID}&size=constrain64" alt="{STUDENT_NAME}"/>
+                                <p>{STUDENT_NAME}</p>
+                            </a>
+                            <p class="meta">Year {STUDENT_YEAR}</p>
+                        </div>
                     </div>
 
                     <ul class="action-list">
