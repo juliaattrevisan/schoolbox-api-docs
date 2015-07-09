@@ -7,43 +7,47 @@
         <div class="small-12 island">
             <section>
                 <div class="content">
-                    <ul class="listing">
-                        <!-- BEGIN student_block -->
-                        <li class="avatar-card">
-                            <a href="/search/user/{STUDENT_ID}" title="View Profile">
-                                <img src="/portrait.php?userId={STUDENT_EXTERNAL_ID}&size=constrain64" alt="{STUDENT_NAME}"/>
-                                <p>{STUDENT_NAME}</p>
-                            </a>
-                            <p class="meta">Year {STUDENT_YEAR}</p>
-                        </li>
+                    <!-- BEGIN student_block -->
+                    <div class="avatar-card">
+                        <a href="/search/user/{STUDENT_ID}" title="View Profile">
+                            <img src="/portrait.php?userId={STUDENT_EXTERNAL_ID}&size=constrain64" alt="{STUDENT_NAME}"/>
+                            <p>{STUDENT_NAME}</p>
+                        </a>
+                        <p class="meta">Year {STUDENT_YEAR}</p>
+                    </div>
 
-                        <li class="image-height clearfix">
-                            <div class="student-details">
-                                <ul class="listing subjects">
-                                    <!-- BEGIN subject_block -->
-                                    <li><a href="/homepage/{STUDENT_SUBJECT_CODE}">{STUDENT_SUBJECT_NAME}</a></li>
-                                    <!-- END subject_block -->
-                                </ul>
-                                <a href="/timetable/{STUDENT_ID}" class="btn float-left time-table"><span></span>Timetable</a>
-
-                                <a href="/calendar/full/{CAL_TODAY_DATE}/{STUDENT_ID}" class="btn float-left calendar"><span></span>Calendar</a>
-
-                                <!-- BEGIN due_work -->
-                                <a href="/submission/dueWork/0/{STUDENT_ID}" class="btn float-left due-work"><span></span>Due Work</a>
-                                <!-- END due_work -->
-
-                                <!-- BEGIN grades_button -->
-                                <a href="/submission/allWork/{STUDENT_ID}" class="btn float-left tick" title="View grades"><span></span>Grades</a>
-                                <!-- END grades_button -->
-
-                                <!-- BEGIN eportfolio -->
-                                <a href="/eportfolio/{STUDENT_ID}/profile" class="btn float-left eportfolio"><span></span>ePortfolio</a>
-                                <!-- END eportfolio -->
-
+                    <ul class="action-list">
+                        <!-- BEGIN subject_block -->
+                        <li class="row">
+                            <div class="small-11 columns">
+                                <a href="/homepage/{STUDENT_SUBJECT_CODE}">{STUDENT_SUBJECT_NAME}</a>
+                            </div>
+                            <div class="small-1 columns">
+                                <a href="/homepage/{STUDENT_SUBJECT_CODE}">
+                                    <i class="icon-next no-text"></i>
+                                </a>
                             </div>
                         </li>
-                        <!-- END student_block -->
+                        <!-- END subject_block -->
                     </ul>
+
+                    <a href="/timetable/{STUDENT_ID}" class="btn float-left time-table"><span></span>Timetable</a>
+
+                    <a href="/calendar/full/{CAL_TODAY_DATE}/{STUDENT_ID}" class="btn float-left calendar"><span></span>Calendar</a>
+
+                    <!-- BEGIN due_work -->
+                    <a href="/submission/dueWork/0/{STUDENT_ID}" class="btn float-left due-work"><span></span>Due Work</a>
+                    <!-- END due_work -->
+
+                    <!-- BEGIN grades_button -->
+                    <a href="/submission/allWork/{STUDENT_ID}" class="btn float-left tick" title="View grades"><span></span>Grades</a>
+                    <!-- END grades_button -->
+
+                    <!-- BEGIN eportfolio -->
+                    <a href="/eportfolio/{STUDENT_ID}/profile" class="btn float-left eportfolio"><span></span>ePortfolio</a>
+                    <!-- END eportfolio -->
+
+                    <!-- END student_block -->
                 </div>
             </section>
         </div>
