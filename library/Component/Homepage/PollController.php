@@ -96,9 +96,8 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                         $pollJson = [];
                         foreach ($pollData as $data) {
                             $pollJson[] = [
-                                'label' => $data['option'],
-                                'data'  => [[$i, intval($data['result'])]],
-                                'bars'  => ['show' => true],
+                                'name' => $data['option'],
+                                'data'  => [intval($data['result'])],
                             ];
                             $i++;
                         }

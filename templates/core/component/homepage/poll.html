@@ -101,30 +101,16 @@
                                         }
                                     },
                                     yAxis: {
+                                        allowDecimals: false,
+                                        min: 0,
                                         title: {
                                             text: ''
                                         }
                                     },
-                                    legend: {
-                                        enabled: false
-                                    },
                                     credits: {
                                         enabled: false
                                     },
-                                    series: [
-                                        {
-                                            name: '',
-                                            data: [1]
-                                        },
-                                        {
-                                            name: '',
-                                            data: [4]
-                                        },
-                                        {
-                                            name: '',
-                                            data: [2]
-                                        }
-                                    ]
+                                    series: {POLL_DATA}
                                 });
                             });
                         </script>
