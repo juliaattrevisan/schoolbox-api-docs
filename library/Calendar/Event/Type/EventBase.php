@@ -550,10 +550,11 @@ abstract class EventBase implements EventInterface
      */
     public function setPublishDate($publishDate)
     {
-        if ($publishDate == null) {
+        if ($publishDate instanceof Alaress_Date_Format) {
+            $this->publishDate = $publishDate;
+        } elseif ($publishDate == null) {
             $this->publishDate = new \Alaress_Date_NullDate();
-        }
-        else {
+        } else {
             $this->publishDate = new Alaress_Date_Format($publishDate, 'Y-m-d H:i:s');
         }
     }
