@@ -1,8 +1,17 @@
-<div class="box">
-	<h2>Homepage Activity</h2>
-	<div class="listing long">
-		<ul class="activity-list">
-			{ACTIVITY_LIST}
-		</ul>
-	</div>
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
+
+    {CONFIGURATION}
+
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <ul class="activity-list row">
+                        {ACTIVITY_LIST}
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
 </div>
