@@ -7,15 +7,18 @@
         <div class="small-12 island">
             <section>
                 <div class="content">
-                    <ul class="clearing-thumbs" data-clearing>
+                    <ul class="clearing-thumbs" data-clearing data-equalizer>
                         <!-- BEGIN image_gallery -->
                         <li>
                             <a class="th"
                                href="/cms/image.php?id={THUMBNAIL_ID}&height=600&width=800"
-                               style="height:{IMAGE_HEIGHT}px;"
                                title="{THUMBNAIL_DESCRIPTION}"
+                               data-equalizer-watch
                             >
-                                <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0" alt="{THUMBNAIL_DESCRIPTION}" border="0"/>
+                                <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0"
+                                     alt="{THUMBNAIL_DESCRIPTION}"
+                                     data-caption="{THUMBNAIL_DESCRIPTION}"
+                                />
                             </a>
                         </li>
                         <!-- END image_gallery -->
