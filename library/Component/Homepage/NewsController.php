@@ -74,6 +74,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
         $this->setBlock($templateHandle, 'news', 'news_block');
         $this->setBlock($templateHandle, "submit_news", "submit_news_block");
         $this->setBlock('news', "has_publish_date", "has_publish_date_block");
+        $this->setBlock('news', 'can_modify_news', 'can_modify_news_block');
 
         /* Set up component name
          */
@@ -91,8 +92,11 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
         /* Prevent multiple news from other categories stacking up in the wrong place
          * and initialise empty news roll by default
          */
-        $this->setVar('news_block', '');
-        $this->setVar('submit_news_block', '');
+        $this->setVar(array(
+            'news_block' => '',
+            'submit_news_block' => '',
+            'can_modify_news_block' => '',
+        ));
 
         $newsPermission = $this->permission;
 
@@ -124,20 +128,6 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                 if ($newsPermission < WRITE_ACCESS && $news['published'] > $_SERVER['REQUEST_TIME']) {
                     continue;
                 }
-                // news_edit_other allows users with write access to edit other's news
-                if ($news['owner'] == $_SESSION['id']
-                    || $this->permission >= FULL_ACCESS
-                    || ($this->permission >= WRITE_ACCESS && Config::get('news_edit_other'))
-                ) {
-                    $this->setVar(
-                        'MOD_NEWS',
-                        '<a class="btn no-text modify" href="/news/homepage/'
-                        . $news['id']
-                        . '" title="Modify News"><span></span></a>'
-                    );
-                } else {
-                    $this->setVar('MOD_NEWS', '');
-                }
 
                 $postedTime = new Alaress_Date_Format($news['posted'], 'U');
 
@@ -156,6 +146,20 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                         'ON_OFF'             => ++$j % 2 ? '' : 'dark'
                     )
                 );
+
+                // news_edit_other allows users with write access to edit other's news
+                $canModify = $news['owner'] == $_SESSION['id']
+                    || $this->permission >= FULL_ACCESS
+                    || ($this->permission >= WRITE_ACCESS && Config::get('news_edit_other'));
+
+                if ($canModify) {
+                    $this->parse('can_modify_news_block', 'can_modify_news');
+                }
+                else {
+                    $this->setVar(array(
+                            'can_modify_news_block' => ''
+                        ));
+                }
 
                 /* Anyone with write access can now see the publish date for news items
 		         */
@@ -179,6 +183,12 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                 }
 
                 $this->parse("news_block", "news", true);
+
+                /* Clear children after parsing out the parent
+                 */
+                $this->setVar(array(
+                    'can_modify_news_block' => ''
+                ));
             }
         }
 
