@@ -94,7 +94,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         if (!parent::loadTemplate($templateHandle, 'fileList')) {
             return false;
         }
-        $this->parseConfig();
 
         if ($this->permission < READ_ACCESS) {
             return false;
@@ -102,11 +101,10 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
         /* Set up component name
          */
+        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
+
         $this->setVar(
             array(
-                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname')))
-                        ? $this->getConfig('componentname')
-                        : $this->getComponentName(),
                 // These are for the Select Alternate Source resourcebrowser
                 'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
                 'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId()
@@ -162,7 +160,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                 $output = array(
                     'FILE_DESCRIPTION'     => Scrub::text($file->getTitle()),
                     'FILE_ID'              => $file->getId(),
-                    'FILE_MIME_IMAGE'      => $file->getStorage()->getMimetype()->getIconClass(),
+                    'FILE_MIME_IMAGE'      => $file->getStorage()->getMimetype()->getIconFile(),
                     'FILE_POSTED_BY'       => $file->getOwner()->formatName(),
                     'FILE_POSTED_BY_ID'    => $file->getOwner()->getId(),
                     'FILE_POSTED_DATE'     => $file->getCreatedAt()->getShort(),
@@ -170,7 +168,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                     'FILE_MODIFIED_DATE'   => $file->getModifiedAt()->getRelativeTime(),
                     'FILE_COMMENT'         => nl2br(Scrub::text($file->getDescription())),
                     'ON_OFF'               => ++$j % 2 ? '' : 'dark',
-                    'HIDDEN'               => $file->isHidden() ? 'hidden' : '',
+                    'HIDDEN'               => $file->isHidden() ? 'translucent' : '',
                 );
                 $this->setVar($output);
 
@@ -205,6 +203,10 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         } else {
             $this->parse("submit_file_block", "submit_file");
         }
+
+        /* Need title injected here
+         */
+        $this->parseConfig();
 
         return true;
     }

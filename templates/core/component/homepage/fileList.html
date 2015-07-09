@@ -1,4 +1,4 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
     <script type='text/javascript' src='/javascript/preview/preview.js'></script>
     <script type="text/javascript">
         $(function() {
@@ -8,66 +8,88 @@
 
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="dz-wrap">
-            <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1"
-                  method="post"></form>
-            <ul class="information-list dz-container">
-                <!-- BEGIN files -->
-                <li class="{ON_OFF} clearfix">
-                    <!-- BEGIN modify_file -->
-                    <span class="actions oneline">
-                        <a class="btn no-text modify" href="/cms/file/{FILE_ID}" title="Modify File"><span></span></a>
-                    </span>
-                    <!-- END modify_file -->
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <div class="dz-wrap">
+                    <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post"></form>
 
-                    <!-- BEGIN file_url -->
-                    <h4>
-                        <a data-plugin="preview" class="icons {HIDDEN} {FILE_MIME_IMAGE}" href="{FILE_URL}" rel="external">{FILE_DESCRIPTION}</a>
-                    </h4>
-                    <!-- END file_url -->
+                    <ul class="action-list">
+                        <!-- BEGIN files -->
+                        <li class="row" data-equalizer>
+                            <div class="one-column {HIDDEN}">
+                                <img src="/images/mime/60x60/{FILE_MIME_IMAGE}" />
+                            </div>
+                            <div class="ten-column {HIDDEN}" data-equalizer-watch>
 
-                    <!-- BEGIN file_no_url -->
-                    <h4>{FILE_DESCRIPTION}</h4>
-                    <!-- END file_no_url -->
+                                <!-- BEGIN file_url -->
+                                <h3>
+                                    <a data-plugin="preview" href="{FILE_URL}" rel="external">{FILE_DESCRIPTION}</a>
+                                </h3>
+                                <!-- END file_url -->
 
-                    <p class="{COMPONENT_COMPACTMODE}">{FILE_COMMENT}</p>
+                                <!-- BEGIN file_no_url -->
+                                <h3>{FILE_DESCRIPTION}</h3>
+                                <!-- END file_no_url -->
 
-                    <p class="{COMPONENT_COMPACTMODE} footnote">
-                        Posted by <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a> {FILE_POSTED_RELATIVE}
-                    </p>
-                </li>
-                <!-- END files -->
-            </ul>
+                                <p class="meta {COMPONENT_COMPACTMODE}">
+                                    {FILE_COMMENT}
+                                </p>
+
+                                <p class="meta {COMPONENT_COMPACTMODE}">
+                                    Posted by
+                                    <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a>
+                                    {FILE_POSTED_RELATIVE}
+                                </p>
+                            </div>
+                            <div class="one actions">
+                                <!-- BEGIN modify_file -->
+                                <a class="icon-modify no-text" href="/cms/file/{FILE_ID}" title="Modify File"></a>
+                                <!-- END modify_file -->
+                            </div>
+                        </li>
+                        <!-- END files -->
+                    </ul>
+                </div>
+
+                <div class="content">
+                    <a href="/resources/{FILE_CAT_ID}" class="button icon-view">View All Files</a>
+
+                    <!-- BEGIN submit_file -->
+                    <a href="/cms/file/new/{FILE_CAT_ID}" class="button icon-upload">Post File</a>
+                    <a href="/cms/file/multi/{FILE_CAT_ID}" class="button icon-upload">Post Multiple Files</a>
+                    <script type="text/javascript">
+                        $(function() {
+                            $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                                wrapClass: 'dragging',
+                                previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
+                                tplWrap: '<li class="dz-preview" />',
+                                refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                                refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+                                dictDefaultMessage: 'You can drag files into this space.',
+                                addedfile: function (file) {
+                                    $(file.previewElement).addClass('category-{FILE_CAT_ID}').data('node', {FILE_CAT_ID});
+                                },
+                                sending: function (file, xhr, formData) {
+                                    formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                                    formData.append('category', $(file.previewElement).data('node'));
+                                    formData.append('comment', '');
+                                    formData.append('hidden', 0);
+                                },
+                                complete: function (file) {
+                                    $(file.previewElement).find('img').remove();
+                                }
+                            });
+                        });
+                    </script>
+                    <!-- END submit_file -->
+                </div>
+            </section>
         </div>
-        <p class="interact">
-            <a href="/resources/{FILE_CAT_ID}" class="btn"><span></span>View All Files</a>
-            <!-- BEGIN submit_file -->
-            <a href="/cms/file/new/{FILE_CAT_ID}" class="btn up-arrow"><span></span>Post File</a>
-            <a href="/cms/file/multi/{FILE_CAT_ID}" class="btn up-arrow"><span></span>Post Multiple Files</a>
-            <script type="text/javascript">
-                $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                    wrapClass: 'dragging',
-                    previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
-                    tplWrap: '<li class="dz-preview" />',
-                    refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                    refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
-                    dictDefaultMessage: 'You can drag files into this space.',
-                    addedfile: function (file) {
-                        $(file.previewElement).addClass('category-{FILE_CAT_ID}').data('node', {FILE_CAT_ID});
-                    },
-                    sending: function (file, xhr, formData) {
-                        formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                        formData.append('category', $(file.previewElement).data('node'));
-                        formData.append('comment', '');
-                        formData.append('hidden', 0);
-                    },
-                    complete: function (file) {
-                        $(file.previewElement).find('img').remove();
-                    }
-                });
-            </script>
-            <!-- END submit_file -->
-        </p>
     </div>
 </div>
+
+
+
+
+
