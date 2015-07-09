@@ -3,7 +3,7 @@
     <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
     <script type="text/javascript">
         $(function(){
-            $("#imageSlider").AnySlider({
+            $("#component{COMPONENT_INSTANCE_ID}").find("[data-imageslider]").AnySlider({
                 interval: {COMPONENT_CONFIG_TIMING_VALUE_MS}
             });
         });
@@ -16,7 +16,7 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
-                <div class="content" id="imageSlider">
+                <div class="content" data-imageslider>
                     <!-- BEGIN image_scroller -->
                     <div>
                         <a href="{IMAGE_URL}">
