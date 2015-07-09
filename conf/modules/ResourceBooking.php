@@ -13,6 +13,7 @@ use Alaress\Application\Kernel;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Item;
+use Schoolbox\ResourceBooking\Report;
 
 class ResourceBooking implements ModuleConfigInterface {
 
@@ -34,6 +35,9 @@ class ResourceBooking implements ModuleConfigInterface {
 
 			$bookingModule = new Booking\Module($di);
 			$bookingModule->init('/resource-booking/booking');
+
+            $reportModule = new Report\Module($di);
+            $reportModule->init('/resource-booking/report');
 		}
 
 	}

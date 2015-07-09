@@ -200,6 +200,17 @@ class Bootstrap implements BootstrapInterface {
 			)
 		);
 
+        // User from session
+        $di->set(
+            'user',
+            $di->lazy(
+                function () use ($di) {
+                    $session = $di->get('session');
+                    return $session->getAuthUser();
+                }
+            )
+        );
+
 		// Preload of route parameters
 		$di->set('preloader', $di->lazyNew('Alaress\\Web\\Router\\PathMatcher'));
 
