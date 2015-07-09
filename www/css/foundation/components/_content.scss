@@ -773,6 +773,11 @@ table{
 		&:hover{
 			background-color: darken($ocean-sunset, 7%);
 		}
+		&:before{
+			@media #{$small-only, $medium-only}{
+				font-size: rem-calc(($base-font-size - 4));
+			}
+		}
 	}
 	//Grid for 1 action
 	&.one{
@@ -909,16 +914,31 @@ tr:hover{
 #dashboard-layout{
 	.component{
 		@include single-transition(background-color, 0.15s, linear);
-
-	    margin: 0 8px 8px 8px;
+		background-color: $vapor;
 	    border: 1px solid $monsoon;
-	    background-color: $vapor;
-	    min-height: 30px;
-	    padding: rem-calc(($base-font-size));
-	    position: relative;
+	    margin: 0 0 rem-calc(($base-font-size / 2)) 0;
 
 	    &:hover{
+	    	background-color: $ocean-sunset;
 			cursor: move;
+			.actions a{
+				opacity: 1;
+			}
 	    }
+	    &:last-child{
+	    	margin: 0;
+	    }
+	    .actions{
+	    	@include absolute (0, auto, auto, 0);
+	    	font-size: rem-calc(($base-font-size));
+	    	a{
+	    		@media #{$small-up} {
+					padding: rem-calc(($base-font-size - 8));
+				}
+	    	}
+	    }
+	}
+	.information-list{
+		padding: 0;
 	}
 }
