@@ -140,8 +140,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
 
         //
         // Load this file's contents.
-        $storage = Storage\Mapper::getInstance()->createModel();
-        $storage->writeStream($data);
+        $storage = Storage\Mapper::getInstance()->acceptStream($this->getName(), $data, false);
 
         //
         // And put it in the submission object.
