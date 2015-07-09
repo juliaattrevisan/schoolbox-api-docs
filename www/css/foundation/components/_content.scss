@@ -798,6 +798,11 @@ table{
 		@media #{$small-up} { @include grid-column(3); }
 		a{
 			@media #{$small-up} { @include grid-column(4); }
+			
+			// When you need space for 3 actions but only have 2
+			@include with-count(2) {
+			    width: 50%;
+			}
 		}
 	}
 	// Respsonsive Padding
