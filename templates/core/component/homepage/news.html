@@ -1,37 +1,54 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
+
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <ul class="information-list">
-            <!-- BEGIN news -->
-            <li class="{ON_OFF} clearfix">
-                <span class="actions">
-                    {MOD_NEWS}
-                </span>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <ul class="action-list">
+                    <!-- BEGIN news -->
+                    <li class="row" data-equalizer>
+                        <div class="small-11 columns" data-equalizer-watch>
+                            <h3>
+                                {NEWS_HEADING}
+                            </h3>
 
-                <h3>{NEWS_HEADING}</h3>
+                            <div class="avatar-card clearfix">
+                                <a href="/search/user/{AUTHOR_ID}" title="View Profile">
+                                    <img src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square32" alt="View Profile" />
+                                    <p>{AUTHOR}</p>
+                                </a>
 
-                <p class="meta">
-                    <a href="/search/user/{AUTHOR_ID}" class="author">
-                        <img width="32" height="32" src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square32"/>
-                        {AUTHOR}
-                    </a><br />
-                    Posted {POSTED_DATE}
-                    <!-- BEGIN has_publish_date -->
-                        (Published on {NEWS_PUBLISH_DATE})
-                    <!-- END has_publish_date -->
-                </p>
+                                <p class="meta">
+                                    Posted {POSTED_DATE}
+                                    <!-- BEGIN has_publish_date -->
+                                    (Published on {NEWS_PUBLISH_DATE})
+                                    <!-- END has_publish_date -->
+                                </p>
+                            </div>
+                        </div>
+                        <div class="one actions">
+                            {MOD_NEWS}
+                            <a class="icon-modify no-text" href="#" title=""></a>
+                        </div>
 
-                <div class="wysiwyg">{NEWS_BODY}</div>
-            </li>
-            <!-- END news -->
-        </ul>
+                        <div class="small-12 columns">
+                            <article>
+                                {NEWS_BODY}
+                            </article>
+                        </div>
+                    </li>
+                    <!-- END news -->
+                </ul>
 
-        <p class="interact">
-            <a href="/homepage/newsArchive/{NEWS_CATEGORY_ID}" class="btn"><span></span>View News Archive</a>
-            <!-- BEGIN submit_news -->
-            <a href="/news/homepage/new/{NEWS_CATEGORY_ID}" class="btn up-arrow"><span></span>Post News</a>
-            <!-- END submit_news -->
-        </p>
+                <div class="content">
+                    <a href="/homepage/newsArchive/{NEWS_CATEGORY_ID}" class="button icon-view">View News Archive</a>
+                    <!-- BEGIN submit_news -->
+                    <a href="/news/homepage/new/{NEWS_CATEGORY_ID}" class="button icon-upload">Post News</a>
+                    <!-- END submit_news -->
+                </div>
+            </section>
+        </div>
     </div>
 </div>

@@ -67,8 +67,6 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
             return false;
         }
 
-        $this->parseConfig();
-
         if ($this->permission < READ_ACCESS) {
             return false;
         }
@@ -77,12 +75,12 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
         $this->setBlock($templateHandle, "submit_news", "submit_news_block");
         $this->setBlock('news', "has_publish_date", "has_publish_date_block");
 
-
         /* Set up component name
          */
+        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
+
         $this->setVar(
             array(
-                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
                 // These are for the Select Alternate Source resourcebrowser
                 'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
                 'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId() ? 'Local' : $this->source->getName(),
@@ -99,11 +97,10 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
         $newsPermission = $this->permission;
 
         switch ($newsPermission) {
-
             case FULL_ACCESS:
             case WRITE_ACCESS:
                 $this->parse("submit_news_block", "submit_news");
-            // no break, intentionally carry through
+                // no break, intentionally carry through
 
             case READ_ACCESS:
                 $newsList = $this->newsHandler->getAllForCategory(
@@ -116,7 +113,6 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                 $newsList = null;
                 break;
         }
-
 
         // Got news? Yes? Go.
         if (is_array($newsList)) {
@@ -185,6 +181,10 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                 $this->parse("news_block", "news", true);
             }
         }
+
+        /* Need title injected here
+         */
+        $this->parseConfig();
 
         return true;
     }
