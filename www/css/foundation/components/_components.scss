@@ -106,3 +106,17 @@ $anyslider-color-hover: rgb(121, 121, 121);
     }
 }
 
+}
+
+/* Countdown
+ */
+ul.countdown {
+    width: 100%;
+    margin-left: 0;
+    list-style: none;
+    li {
+        width: 20%;
+        text-align: center;
+        float: left;
+    }
+}

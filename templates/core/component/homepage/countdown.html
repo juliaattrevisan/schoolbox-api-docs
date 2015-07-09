@@ -1,16 +1,16 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
     <script type="text/javascript" src="/javascript/components/jquery.countdown/dist/jquery.countdown.js"></script>
     <script type='text/javascript'>
         $(function () {
-            var element       = $('#countdown{COMPONENT_INSTANCE_ID}');
-            var weekDisplay   = element.find('.weeks_dash   .digit');
-            var dayDisplay    = element.find('.days_dash    .digit');
-            var hourDisplay   = element.find('.hours_dash   .digit');
-            var minuteDisplay = element.find('.minutes_dash .digit');
-            var secondDisplay = element.find('.seconds_dash .digit');
+            var element       = $('#component{COMPONENT_INSTANCE_ID}-countdown');
+            var weekDisplay   = element.find('[data-countdown=weeks]   [data-countdown-digits]');
+            var dayDisplay    = element.find('[data-countdown=days]    [data-countdown-digits]');
+            var hourDisplay   = element.find('[data-countdown=hours]   [data-countdown-digits]');
+            var minuteDisplay = element.find('[data-countdown=minutes] [data-countdown-digits]');
+            var secondDisplay = element.find('[data-countdown=seconds] [data-countdown-digits]');
             var endTime = new Date({DEADLINE_YEAR}, ({DEADLINE_MONTH}-1), {DEADLINE_DAY}, {DEADLINE_HOUR}, {DEADLINE_MIN}, {DEADLINE_SEC});
 
-            $('#countdown{COMPONENT_INSTANCE_ID}').countdown(endTime)
+            $('#component{COMPONENT_INSTANCE_ID}-countdown').countdown(endTime)
                 .on('update.countdown', function(event) {
                     // Parse time into weeks, days, hours, minutes, seconds
                     weekDisplay.text(event.strftime('%w'));
@@ -31,32 +31,52 @@
 
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div id='countdown{COMPONENT_INSTANCE_ID}'>
-            <div class="dash weeks_dash">
-                <span class="dash_title">weeks</span>
-                <div class="digit">00</div>
-            </div>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <div id='component{COMPONENT_INSTANCE_ID}-countdown' class="row">
 
-            <div class="dash days_dash">
-                <span class="dash_title">days</span>
-                <div class="digit">00</div>
-            </div>
+                        <ul class="countdown">
+                            <li>
+                                <dl>
+                                    <dt>weeks</dt>
+                                    <dd data-countdown='weeks'><h1 data-countdown-digits>00</h1></dd>
+                                </dl>
+                            </li>
 
-            <div class="dash hours_dash">
-                <span class="dash_title">hours</span>
-                <div class="digit">00</div>
-            </div>
-
-            <div class="dash minutes_dash">
-                <span class="dash_title">minutes</span>
-                <div class="digit">00</div>
-            </div>
-
-            <div class="dash seconds_dash">
-                <span class="dash_title">seconds</span>
-                <div class="digit">00</div>
-            </div>
+                            <li>
+                                <dl>
+                                    <dt>days</dt>
+                                    <dd data-countdown='days'><h1 data-countdown-digits>00</h1></dd>
+                                </dl>
+                            </li>
+                            <li>
+                                <dl>
+                                    <dt>hours</dt>
+                                    <dd data-countdown='hours'><h1 data-countdown-digits>00</h1></dd>
+                                </dl>
+                            </li>
+                            <li>
+                                <dl>
+                                    <dt>minutes</dt>
+                                    <dd data-countdown='minutes'><h1 data-countdown-digits>00</h1></dd>
+                                </dl>
+                            </li>
+                            <li>
+                                <dl>
+                                    <dt>seconds</dt>
+                                    <dd data-countdown='seconds'><h1 data-countdown-digits>00</h1></dd>
+                                </dl>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 </div>
+
+
+
+
