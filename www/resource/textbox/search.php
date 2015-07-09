@@ -29,7 +29,14 @@ $type = 'textbox';
  * Everything here is self-contained
  */
 $mapper = new \Schoolbox\Resource\Search\Results($page, $type, $keyword);
-$mapper->search($_SESSION['user'], $keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'));
+$mapper->search(
+    $_SESSION['user'],
+    $keyword,
+    ($current_page - 1) * Cfg::get('search_type_limit'),
+    Cfg::get('search_type_limit'),
+    'score',
+    'desc'
+);
 $mapper->render();
 $mapper->renderPagination($current_page);
 
