@@ -911,21 +911,23 @@ tr:hover{
 }
 
 // Admin Component Dashboard
-.component{
-	//@include single-transition(background-color, 0.15s, linear);
-	//background-color: $vapor;
-    //border: 1px solid $monsoon;
-    .top-bar{
-    	margin-bottom: rem-calc(($base-font-size));
-    }
-    &:last-child .top-bar{
-		margin: 0;
+.dashboard{
+	.component{
+	    .top-bar{
+	    	margin-bottom: rem-calc(($base-font-size));
+	    	&:hover{
+	    		cursor: move;
+	    	}
+	    }
+	    &:last-child .top-bar{
+			margin: 0;
+		}
 	}
-
 }
 
 .marker{
 	border: 4px dashed $success-color;
 	background-color: rgba($success-color, 0.3);
 	min-height: 2.6875rem;
+	margin-bottom: rem-calc(($base-font-size));
 }
