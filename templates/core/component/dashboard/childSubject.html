@@ -9,12 +9,15 @@
                 <div class="content">
                     <ul class="listing">
                         <!-- BEGIN student_block -->
-                        <h2><a class="student-name" href="/search/user/{STUDENT_ID}">{STUDENT_NAME}, Year {STUDENT_YEAR}</span></a></h2>
-                        <li class="image-height clearfix">
-                            <a class="link-image" href="/search/user/{STUDENT_ID}">
-                                <img src="/portrait.php?userId={STUDENT_EXTERNAL_ID}&size=constrain128" alt="{STUDENT_NAME}"/>
+                        <li class="avatar-card">
+                            <a href="/search/user/{STUDENT_ID}" title="View Profile">
+                                <img src="/portrait.php?userId={STUDENT_EXTERNAL_ID}&size=constrain64" alt="{STUDENT_NAME}"/>
+                                <p>{STUDENT_NAME}</p>
                             </a>
+                            <p class="meta">Year {STUDENT_YEAR}</p>
+                        </li>
 
+                        <li class="image-height clearfix">
                             <div class="student-details">
                                 <ul class="listing subjects">
                                     <!-- BEGIN subject_block -->
