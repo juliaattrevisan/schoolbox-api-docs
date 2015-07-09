@@ -11,3 +11,51 @@
     overflow-x: hidden;
     width: 100%;
 }
+
+/* AnySlider stylage */
+.imageslider-container{
+    .as-next-arrow,
+    .as-prev-arrow{
+        height: 25px;
+        display: inline-block;
+        overflow: hidden;
+        position: absolute;
+        text-indent: 100%;
+        white-space: nowrap;
+        width: 17px;
+        z-index: 50;
+    }
+    .as-prev-arrow,
+    .as-next-arrow{
+        top: 50%;
+        margin-top: -12px;
+    }
+    .as-prev-arrow{
+        background: url("/images/core/icons/arrows.png") top left no-repeat; left: 10px;
+        &:hover{ background: url("/images/core/icons/arrows.png") bottom left no-repeat; }
+    }
+    .as-next-arrow{
+        background: url("/images/core/icons/arrows.png") top right no-repeat; right: 10px;
+        &:hover{ background: url("/images/core/icons/arrows.png") bottom right no-repeat; }
+    }
+}
+.as-nav{
+    bottom: -10px;
+    left: 50%;
+    margin: 0 0 0 -24px;
+    position: absolute;
+    text-align: left;
+    z-index: 1;
+    a {
+        background: url("/images/core/icons/bullets.png") no-repeat;
+        height: 17px;
+        display: inline-block;
+        margin: 0 3px;
+        overflow: hidden;
+        text-indent: 100%;
+        white-space: nowrap;
+        width: 10px;
+    }
+    a.as-active,
+    a:hover{ background-position: 0 -10px; }
+}
