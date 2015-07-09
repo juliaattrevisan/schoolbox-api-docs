@@ -365,6 +365,7 @@ input[type="submit"]{
 		a{
 			color: $primary-color;
 			text-decoration: none;
+			line-height: rem-calc($base-font-size);
 			padding: rem-calc(($base-font-size / 2));
 			padding-left: rem-calc($base-font-size);
 			background-color: tint($tertiary, 74%);
