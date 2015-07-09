@@ -811,13 +811,55 @@ table{
 
 // Avatar Card
 .avatar-card{
-	img{
+    padding: 0.5rem 0.5rem 0;
+    h3 {
+      margin: 0;
+      text-overflow: ellipsis;
+      overflow-x: hidden;
+      white-space: nowrap;
+    }
+	img, [class^="icon-"] {
 	  	float: left;
-  		margin: 0 rem-calc(($base-font-size )) rem-calc(($base-font-size)) 0;
+
+        @media #{$small-up} {
+            margin: (-1 * rem-calc(($base-font-size - 8))) rem-calc(($base-font-size - 8)) 0 (-1 * rem-calc(($base-font-size - 8)));
+            width: (3 * rem-calc($base-font-size));
+        }
+        @media #{$medium-up} {
+            width: (4 * rem-calc($base-font-size));
+        }
 	}
+    [class^="icon-"] {
+      padding: 0.125rem 1rem;
+    }
+
 	p{
 		margin: 0;
 	}
+    &+ article {
+      clear:both;
+      margin-top: 0.5rem;
+
+      @media #{$small-up} {
+        margin-left: (3.5 * rem-calc($base-font-size));
+      }
+      @media #{$medium-up} {
+        margin-left: (4.5 * rem-calc($base-font-size));
+      }
+    }
+}
+
+p{
+  @media #{$small-up} {
+    margin-bottom: rem-calc(($base-font-size - 8));
+  }
+  @media #{$medium-up} {
+    margin-bottom: rem-calc(($base-font-size - 4));
+  }
+  @media #{$large-up} {
+    margin-bottom: rem-calc(($base-font-size));
+  }
+
 }
 
 // Social Stream
