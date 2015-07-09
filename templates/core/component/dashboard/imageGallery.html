@@ -1,12 +1,23 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-    <h2>{COMPONENT_NAME}</h2>
-    <div class="clearfix">
-        <!-- BEGIN image_gallery -->
-        <div class="float-left image-thumbnail">
-            <a class="thumb" href="/cms/image.php?id={THUMBNAIL_ID}&height=600&width=800" rel="lightbox[homepage-{COMPONENT_INSTANCE_ID}]" style="height:{IMAGE_HEIGHT}px;" alt="{THUMBNAIL_DESCRIPTION}" title="{THUMBNAIL_DESCRIPTION}">
-                <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0" alt="{THUMBNAIL_DESCRIPTION}" border="0"/>
-            </a>
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
+
+    {CONFIGURATION}
+
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <div class="clearfix">
+                        <!-- BEGIN image_gallery -->
+                        <div class="float-left image-thumbnail">
+                            <a class="thumb" href="/cms/image.php?id={THUMBNAIL_ID}&height=600&width=800" rel="lightbox[homepage-{COMPONENT_INSTANCE_ID}]" style="height:{IMAGE_HEIGHT}px;" alt="{THUMBNAIL_DESCRIPTION}" title="{THUMBNAIL_DESCRIPTION}">
+                                <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0" alt="{THUMBNAIL_DESCRIPTION}" border="0"/>
+                            </a>
+                        </div>
+                        <!-- END image_gallery -->
+                    </div>
+                </div>
+            </section>
         </div>
-        <!-- END image_gallery -->
     </div>
 </div>
