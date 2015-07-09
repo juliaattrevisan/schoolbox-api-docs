@@ -35,7 +35,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
         $this->setBlock($templateHandle, "poll_question", "poll_question_block");
         $this->setBlock('poll_question', "poll_vote", "poll_vote_block");
-        $this->setBlock($templateHandle, "show_results", "show_results_block");
+        $this->setBlock('poll_question', "show_results", "show_results_block");
         $this->setBlock("poll_vote", "poll_options", "poll_options_block");
 
         $this->setBlock($templateHandle, "response_count", "response_count_block");
@@ -46,7 +46,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 //        $this->setBlock('poll_responses', 'series_separator', 'series_separator_block');
         $this->setVar('poll_responses_block', '');
 
-        $this->setBlock($templateHandle, "modify_poll", "modify_poll_block");
+        $this->setBlock('poll_question', "modify_poll", "modify_poll_block");
 
         $pollHandler = new Poll();
 
@@ -96,9 +96,8 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                         $pollJson = [];
                         foreach ($pollData as $data) {
                             $pollJson[] = [
-                                'label' => $data['option'],
-                                'data'  => [[$i, intval($data['result'])]],
-                                'bars'  => ['show' => true],
+                                'name' => $data['option'],
+                                'data'  => [intval($data['result'])],
                             ];
                             $i++;
                         }
