@@ -1,6 +1,5 @@
 <div id='component{COMPONENT_INSTANCE_ID}' data-component>
-    <script type='text/javascript' src='/javascript/components/flot/jquery.flot.js'></script>
-    <script type='text/javascript' src='/javascript/components/flot/jquery.flot.resize.js'></script>
+    <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
     <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
     <script type="text/javascript">
         $(function() {
@@ -72,19 +71,66 @@
                                 <input type="hidden" name="categoryID" value="{ID}" />
 
                                 <!-- BEGIN poll_options -->
-                                <input type="radio" name="vote" data-poll-option id="component{COMPONENT_INSTANCE_ID}-poll-option-{POLL_OPTION_INDEX}" value="{POLL_OPTION_INDEX}" />
-                                <label for="component{COMPONENT_INSTANCE_ID}-poll-option-{POLL_OPTION_INDEX}" class="radio-label">{POLL_OPTION}</label>
+                                <input type="radio" name="vote" data-poll-option id="component{COMPONENT_INSTANCE_ID}-poll{POLL_ID}-option-{POLL_OPTION_INDEX}" value="{POLL_OPTION_INDEX}" />
+                                <label for="component{COMPONENT_INSTANCE_ID}-poll{POLL_ID}-option-{POLL_OPTION_INDEX}" class="radio-label">{POLL_OPTION}</label>
                                 <!-- END poll_options -->
 
                                 <input type="submit" value="Vote" data-poll-validate="{COMPONENT_INSTANCE_ID}" />
                             </form>
                             <!-- END poll_vote -->
-
                         </div>
                         <div class="one actions">
                             <a class="icon-modify no-text" href="#" title=""></a>
                         </div>
                     </li>
+                    <!-- BEGIN poll_chart -->
+                    <li>
+                        <script type='text/javascript'>
+                            $(function() {
+                                $('#component-poll{POLL_ID}-graph').highcharts({
+                                    chart: {
+                                        height: 300,
+                                        type: 'column'
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        labels: {
+                                            enabled: false
+                                        }
+                                    },
+                                    yAxis: {
+                                        title: {
+                                            text: ''
+                                        }
+                                    },
+                                    legend: {
+                                        enabled: false
+                                    },
+                                    credits: {
+                                        enabled: false
+                                    },
+                                    series: [
+                                        {
+                                            name: '',
+                                            data: [1]
+                                        },
+                                        {
+                                            name: '',
+                                            data: [4]
+                                        },
+                                        {
+                                            name: '',
+                                            data: [2]
+                                        }
+                                    ]
+                                });
+                            });
+                        </script>
+                        <div id='component-poll{POLL_ID}-graph'></div>
+                    </li>
+                    <!-- END poll_chart -->
                     <!-- END poll_question -->
                 </ul>
 
@@ -105,27 +151,12 @@
             </section>
         </div>
 
-        <div id='poll_legend{POLL_ID}'></div>
+        <div id='component-poll{POLL_ID}-legend'></div>
     </div>
 </div>
 
 
-            <!-- BEGIN poll_chart -->
-            <!--<script type='text/javascript'>-->
-            <!--$(function() {-->
-                <!--$.plot($("#poll-graph{POLL_ID}"),-->
-                    <!--{POLL_DATA},-->
-                    <!--{-->
-                        <!--legend: {container: '#poll_legend{POLL_ID}'},-->
-                        <!--xaxis: {show:false}-->
-                    <!--}-->
-                <!--);-->
-            <!--});-->
-            <!--</script>-->
-            <!--<div class="pad-it">-->
-                <!--<div id='poll-graph{POLL_ID}' style="width:100%; height:300px; "></div>-->
-            <!--</div>-->
-            <!-- END poll_chart -->
+
 
 
 
