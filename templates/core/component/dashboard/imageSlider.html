@@ -1,23 +1,29 @@
-<script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
-<script type="text/javascript">
-    $(function(){
-        $("#imageSlider").AnySlider({
-            interval: {COMPONENT_CONFIG_TIMING_VALUE_MS}
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
+    <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            $("#component{COMPONENT_INSTANCE_ID}").find("[data-imageslider]").anyslider({
+                interval: {COMPONENT_CONFIG_TIMING_VALUE_MS},
+                prevLabel: '',
+                nextLabel: ''
+            });
         });
-    });
-</script>
+    </script>
 
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <!-- BEGIN has_header -->
-    <h2>{COMPONENT_NAME}</h2>
+    {CONFIGURATION}
     <!-- END has_header -->
-    <div id="imageSlider" class="box clearfix">
-        <!-- BEGIN image_scroller -->
-        <div>
-            <a href="{IMAGE_URL}">
-                <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
-            </a>
+
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island imageslider-container">
+            <div data-imageslider class="imageslider">
+                <!-- BEGIN image_scroller -->
+                <a href="{IMAGE_URL}">
+                    <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
+                </a>
+                <!-- END image_scroller -->
+            </div>
         </div>
-        <!-- END image_scroller -->
     </div>
 </div>
