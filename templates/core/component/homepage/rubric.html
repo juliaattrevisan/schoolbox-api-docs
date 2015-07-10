@@ -1,27 +1,39 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
+
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="rubric_listing listing box clearfix">
-            <ul class="information-list">
-                <!-- BEGIN rubric_criterion -->
-                <li class="criterion clearfix {DARK}">
-                    <h4>{CRITERION_GROUP}</h4>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <ul class="information-list">
+                    <!-- BEGIN rubric_criterion -->
+                    <li class="row">
+                        <div class="twelve-column">
+                            <h3>{CRITERION_GROUP}</h3>
+                            <ul>
+                                <!-- BEGIN rubric_descriptor -->
+                                <li class="row">
+                                    <div class="twelve-column">
+                                        {CRITERION_NAME}
+                                    </div>
+                                </li>
+                                <!-- END rubric_descriptor -->
+                            </ul>
+                        </div>
+                    </li>
+                    <!-- END rubric_criterion -->
+                </ul>
 
-                    <ul>
-                        <!-- BEGIN rubric_descriptor -->
-                        <li class="descriptor"><span class="name">{CRITERION_NAME}</span></li>
-                        <!-- END rubric_descriptor -->
-                    </ul>
-                </li>
-                <!-- END rubric_criterion -->
-            </ul>
-
-            <!-- BEGIN modify_rubric -->
-            <p class="interact">
-                <a href="/submission/rubricCriteria/{ID}" class="btn modify"><span></span>Edit Rubrics</a>
-            </p>
-            <!-- END modify_rubric -->
+                <!-- BEGIN modify_rubric -->
+                <div class="content">
+                    <a href="/submission/rubricCriteria/{ID}" class="button icon-modify">Edit Rubrics</a>
+                </div>
+                <!-- END modify_rubric -->
+            </section>
         </div>
     </div>
 </div>
+
+
+
