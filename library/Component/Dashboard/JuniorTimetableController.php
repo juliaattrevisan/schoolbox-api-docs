@@ -67,7 +67,7 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                     $day_number                        = $timetableHandler->getDayNumber($campus);
 
                     if ($day_number) {
-                        $timetable = $timetableHandler->getTimetableByDate(
+                        $timetable = $timetableHandler->getTimetableForDate(
                             $_SESSION['user']->getExternalId(),
                             $_SESSION['user']->getId(),
                             $campus,
