@@ -82,7 +82,11 @@ $anyslider-color-hover: rgb(121, 121, 121);
 /* Dashboard: Timetable
  */
 .timetable {
+    .period {
+        padding: 0;
+    }
     .timetabled-class {
+        padding: rem-calc($base-font-size);
         display: block;
         .class-name {
             display: block;

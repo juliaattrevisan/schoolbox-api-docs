@@ -21,7 +21,7 @@
                         <thead>
                         <tr>
                             <!-- BEGIN timetable_header -->
-                            <th width="{TIMETABLE_FIELD_WIDTH}%" scope="col" class="{PERIOD_TH_CLASS}">
+                            <th width="{TIMETABLE_FIELD_WIDTH}%" scope="col" class="period-name {PERIOD_TH_CLASS}">
                                 <dl>
                                     <dt>{PERIOD_NAME}</dt>
                                     <dd>{PERIOD_START} - {PERIOD_END}</dd>
@@ -30,18 +30,25 @@
                             <!-- END timetable_header -->
                         </tr>
                         </thead>
-                        <tbody>
+                        <tbody data-equalizer="component{COMPONENT_INSTANCE_ID}-timetable">
                         <tr>
                             <!-- BEGIN timetable_period -->
-                            <td width="{TIMETABLE_FIELD_WIDTH}%" class="{PERIOD_CLASS}">
+                            <td width="{TIMETABLE_FIELD_WIDTH}%" class="period {PERIOD_CLASS}">
                                 <!-- BEGIN period_class_link -->
-                                <a href="{PERIOD_URL}" class="timetabled-class" style="background:{PERIOD_COLOUR};">
+                                <a href="{PERIOD_URL}"
+                                   class="timetabled-class"
+                                   style="background:{PERIOD_COLOUR};"
+                                   data-equalizer-watch="component{COMPONENT_INSTANCE_ID}-timetable"
+                                >
                                     <span class="class-name">{PERIOD_DESC}</span>
                                     <span class="meta">{PERIOD_CODE} {PERIOD_ROOM}</span>
                                 </a>
                                 <!-- END period_class_link -->
                                 <!-- BEGIN period_class -->
-                                <span class="timetabled-class" style="background:{PERIOD_COLOUR};">
+                                <span class="timetabled-class"
+                                      style="background:{PERIOD_COLOUR};"
+                                      data-equalizer-watch="component{COMPONENT_INSTANCE_ID}-timetable"
+                                >
                                     <span class="class-name">{PERIOD_DESC}</span>
                                     <span class="meta">{PERIOD_CODE} {PERIOD_ROOM}</span>
                                 </span>
