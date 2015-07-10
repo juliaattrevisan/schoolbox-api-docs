@@ -10,7 +10,7 @@
                 defaultFileSelectedText: '<span></span>File selected'
             });
 
-            $('.dropBox').validate();
+            $('component{COMPONENT_INSTANCE_ID}-dropBox').validate();
         });
     </script>
 
@@ -20,7 +20,7 @@
         <div class="small-12 island">
             <section>
                 <!-- BEGIN drop_student -->
-                <form action="/subject/modDropBox.php" method="post" enctype="multipart/form-data" class="dropBox" >
+                <form action="/subject/modDropBox.php" method="post" enctype="multipart/form-data" id="component{COMPONENT_INSTANCE_ID}-dropBox" >
                     <input type="hidden" name="category" value="{ID}" />
 
                     <!-- BEGIN drop_success -->
@@ -49,7 +49,7 @@
                         <div class="eleven-column" data-equalizer-watch>
                             <div class="avatar-card clearfix">
                                 <a href="#" title="View Profile">
-                                    {DROPBOX_MIME_IMAGE}
+                                    <img src="/images/mime/60x60/{DROPBOX_MIME_IMAGE}" />
                                     <h3>
                                         <a href="/subject/modDropBox.php?id={DROPBOX_ID}" rel="external">{DROPBOX_DESCRIPTION}</a>
                                     </h3>
