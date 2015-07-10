@@ -84,6 +84,7 @@ $anyslider-color-hover: rgb(121, 121, 121);
 .timetable {
     .period {
         padding: 0;
+        vertical-align: top;
     }
     .timetabled-class {
         padding: rem-calc($base-font-size);
