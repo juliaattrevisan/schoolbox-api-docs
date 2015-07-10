@@ -231,20 +231,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                     }
                                 }
                             }
-                        } else {
-                            $this->setVar(
-                                array(
-                                    'PERIOD_COLOUR'         => '',
-                                    'PERIOD_DESC'           => '',
-                                    'PERIOD_CODE'           => '',
-                                    'PERIOD_ROOM'           => '',
-                                    'PERIOD_ABSENTEES'      => '',
-                                    'PERIOD_URL'            => '#',
-                                    'has_attendances_block' => '',
-                                )
-                            );
-
-                            $this->parse('period_class_block', 'period_class');
                         }
 
                         //output period block
