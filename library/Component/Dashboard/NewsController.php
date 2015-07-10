@@ -35,11 +35,13 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
         $this->setBlock($templateHandle, "topic", "topic_block");
         $this->setBlock('topic', "news", "news_block");
         $this->setBlock('news', "news_image", "news_image_block");
+        $this->setBlock('news', "news_no_image", "news_no_image_block");
 
         $this->setVar("topic_block", "");
         $this->setVar("topic_header_block", "");
         $this->setVar("news_block", "");
         $this->setVar("news_image_block", "");
+        $this->setVar("news_no_image_block", "");
 
         if (is_array($this->headlineList)) {
 
@@ -68,6 +70,7 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                 }
             }
 
+            $userFormatter = new User();
             foreach ($this->headlineList as $item) {
                 $j++;
                 $url = new Url($previous['topicName']);
@@ -82,14 +85,18 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                     'NEWS_TOPIC' => Scrub::text($previous['topicName']),
                     'NEWS_IMAGE' => $item['item_image'],
                     'TOPIC_CLEAN' => $url->getSlug(),
+                    'NEWS_AUTHOR_NAME' => $userFormatter->formatName($item),
+                    'NEWS_AUTHOR_ID' => $item['uid'],
                 );
 
                 $this->setVar($output);
 
                 if ($item['item_image']) {
                     $this->parse('news_image_block', 'news_image');
+                    $this->setVar('news_no_image_block', '');
                 } else {
-                    $this->setVar('news_image_block');
+                    $this->parse('news_no_image_block', 'news_no_image');
+                    $this->setVar('news_image_block', '');
                 }
 
                 $topicList[$item['topicName']] = 1;
