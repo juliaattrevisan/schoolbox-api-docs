@@ -1,23 +1,35 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
+
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div>
-            <ul class="information-list">
-                <!-- BEGIN rss_stories -->
-                <li class=" clearfix {ON_OFF}">
-                    <div class="clearfix">
-                        <h3><a href="/redir.php?url={RSS_URL}">{RSS_TITLE}</a></h3>
-                        <!-- BEGIN rss_date -->
-                        <span class="meta">Posted {RSS_POSTED_DATE}</span>
-                        <!-- END rss_date -->
-                    </div>
-                    <!-- BEGIN rss_brief_output -->
-                    <div class='wysiwyg'>{RSS_BRIEF}</div>
-                    <!-- END rss_brief_output -->
-                </li>
-                <!-- END rss_stories -->
-            </ul>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <ul class="action-list">
+                    <!-- BEGIN rss_stories -->
+                    <li class="row" data-equalizer>
+                        <div class="twelve-column" data-equalizer-watch>
+                            <h3>
+                                <a href="/redir.php?url={RSS_URL}">{RSS_TITLE}</a>
+                            </h3>
+
+                            <!-- BEGIN rss_date -->
+                            <p class="meta">
+                                Posted {RSS_POSTED_DATE}
+                            </p>
+                            <!-- END rss_date -->
+
+                            <!-- BEGIN rss_brief_output -->
+                            <article>
+                                {RSS_BRIEF}
+                            </article>
+                            <!-- END rss_brief_output -->
+                        </div>
+                    </li>
+                    <!-- END rss_stories -->
+                </ul>
+            </section>
         </div>
     </div>
 </div>
