@@ -4,7 +4,7 @@
         $(function () {
             // Show all news in first category
             var firstCategory = $('#category li:first-child a').addClass('current');
-            $('ul.topic li').filter('.'+firstCategory.attr('title')).show();
+            $('ul.topic li').filter('.'+firstCategory.attr('title')).removeClass('hide');
 
             // Switch titles
             $('#category a').click(function (event) {
@@ -13,8 +13,8 @@
                     $('#category a').removeClass('current');
                     $(this).addClass('current');
                     var el = $(this).attr('title');
-                    $('ul.topic > li').hide();
-                    $('ul.topic > li.' + el).show();
+                    $('ul.topic > li').addClass('hide');;
+                    $('ul.topic > li.' + el).removeClass('hide');;
                 }
             });
         });
