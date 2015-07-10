@@ -86,6 +86,10 @@ $anyslider-color-hover: rgb(121, 121, 121);
         padding: 0;
         vertical-align: top;
     }
+    .attendance-link {
+        float: right;
+        padding: rem-calc($base-font-size) rem-calc($base-font-size * .25) 0 0;
+    }
     .timetabled-class {
         padding: rem-calc($base-font-size);
         display: block;
