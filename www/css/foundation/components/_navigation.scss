@@ -101,7 +101,7 @@ $topbar-height: rem-calc(($base-font-size + 27));
 
 // Controlling the styles for the title in the top bar
 $topbar-title-weight: $font-weight-normal;
-$topbar-title-font-size: $base-font-size - 2;
+$topbar-title-font-size: $h2-font-size;
 
 // Style the top bar dropdown elements
 $topbar-dropdown-bg: $topbar-bg-color;
@@ -148,8 +148,8 @@ $topbar-dropdown-label-bg: $topbar-dropdown-link-bg;
 // $topbar-menu-link-weight: $font-weight-bold;
 // $topbar-menu-link-color: $white;
 // $topbar-menu-icon-color: $white;
-// $topbar-menu-link-color-toggled: $jumbo;
-// $topbar-menu-icon-color-toggled: $jumbo;
+$topbar-menu-link-color-toggled: $white;
+$topbar-menu-icon-color-toggled: $white;
 
 // Transitions and breakpoint styles
 // $topbar-transition-speed: 300ms;
@@ -277,6 +277,19 @@ $menu-slide: "transform 500ms ease";
 }
 
 // Top bar
+[data-component]{
+    margin-bottom: rem-calc(($base-font-size));
+    section{
+    	margin-bottom: 0;
+    }
+}
+
+.top-bar{
+	.name h2 a{
+		width: auto;
+	}
+}
+
 .top-bar-section{
 	.button{
 		padding: rem-calc(($base-font-size / 2));
@@ -289,5 +302,12 @@ $menu-slide: "transform 500ms ease";
 	}
 	.dropdown li a{
 		line-height: rem-calc(($base-font-size - 2));
+	}
+	.right a,
+	.right a:before{
+		@media #{$small-only} {
+			text-align: left;
+			float: left;
+		}
 	}
 }

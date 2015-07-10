@@ -48,13 +48,13 @@
                     component.stop().slideDown();
                     component.attr('data-collapse-state', 'uncollapsed');
 
-                    $(this).find('span').html('&ndash;');
+                    $(this).closest('[data-collapser="true"]').toggleClass('icon-collapse icon-add');
                 }
                 else {
                     component.attr('data-collapse-state', 'collapsed');
                     component.stop().slideUp();
 
-                    $(this).find('span').html('+');
+                    $(this).closest('[data-collapser="true"]').toggleClass('icon-add icon-collapse');
                 }
             });
         }

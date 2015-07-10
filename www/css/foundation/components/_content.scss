@@ -582,11 +582,14 @@ table{
 
 // Hints
 .hint {
+	color: $white !important;
 	top: -3px;
 	margin-left: 4px;
+
 	@include label(
 		$padding: rem-calc(($base-font-size - 12)) rem-calc(($base-font-size - 10)),
-		$bg: $iron
+		$bg: $iron,
+		$radius: 12px
 	);
 
 	&.icon-help:before{
@@ -599,7 +602,6 @@ table{
 }
 
 // The original list
-// This list can use up to 4 columns
 // All other lists include (@extend) these styles
 .information-list{
 	@include responsive-sides(1, padding);
@@ -771,6 +773,11 @@ table{
 		&:hover{
 			background-color: darken($ocean-sunset, 7%);
 		}
+		&:before{
+			@media #{$small-only, $medium-only}{
+				font-size: rem-calc(($base-font-size - 4));
+			}
+		}
 	}
 	//Grid for 1 action
 	&.one{
@@ -791,6 +798,11 @@ table{
 		@media #{$small-up} { @include grid-column(3); }
 		a{
 			@media #{$small-up} { @include grid-column(4); }
+			
+			// When you need space for 3 actions but only have 2
+			@include with-count(2) {
+			    width: 50%;
+			}
 		}
 	}
 	// Respsonsive Padding
@@ -962,4 +974,26 @@ tr:hover{
 
 .overflow {
     overflow: auto;
+}
+
+// Admin Component Dashboard
+.dashboard{
+	.component{
+	    .top-bar{
+	    	margin-bottom: rem-calc(($base-font-size));
+	    	&:hover{
+	    		cursor: move;
+	    	}
+	    }
+	    &:last-child .top-bar{
+			margin: 0;
+		}
+	}
+}
+
+.marker{
+	border: 4px dashed $success-color;
+	background-color: rgba($success-color, 0.3);
+	min-height: 2.6875rem;
+	margin-bottom: rem-calc(($base-font-size));
 }
