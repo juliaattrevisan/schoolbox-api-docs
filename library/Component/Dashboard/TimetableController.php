@@ -216,7 +216,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                             'ATTENDANCE_CLASS_CODE'        => $class['campus'] ? $class['campus'] . '/' . $class['code'] : '0/' . $class['code'],
                                             'ATTENDANCE_ATTENDANCE_DATE'   => $attendance_date,
                                             'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
-                                            'ATTENDANCE_MARKED'            => $class['AttendanceMarked'] ? 'marked' : '',
+                                            'ATTENDANCE_ICON'              => $class['AttendanceMarked'] ? 'icon-approve' : 'icon-class-list',
                                         )
                                     );
 
