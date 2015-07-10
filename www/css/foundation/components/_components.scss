@@ -82,9 +82,15 @@ $anyslider-color-hover: rgb(121, 121, 121);
 /* Dashboard: Timetable
  */
 .timetable {
+    .period-name.dayCurrent {
+        background-color: #ffffe5;
+    }
     .period {
         padding: 0;
         vertical-align: top;
+        &.current {
+            background-color: #ffffb2;
+        }
     }
     .attendance-link {
         float: right;
