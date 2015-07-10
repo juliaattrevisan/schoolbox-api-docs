@@ -96,6 +96,7 @@ foreach ($componentCollection as $component) {
         array(),
         $component->getInstance()->getConfigArray()
     );
+    $component->setConfigurationTemplate('component/config/_templatewrapper.html');
     $component->parseConfigForTemplate();
 
     $this->parse("{$position}_block", $position, true);
