@@ -3,19 +3,24 @@
     <script type="text/javascript">
         $(function () {
             // Show all news in first category
-            var firstCategory = $('#category li:first-child a').addClass('current');
-            $('ul.topic li').filter('.'+firstCategory.attr('title')).removeClass('hide');
+            var component     = $('#component{COMPONENT_INSTANCE_ID}');
+            var categoryLinks = component.find('[data-relation]');
+            var newsItems     = component.find('[data-news-topic]');
+            var firstCategory = categoryLinks.first();
+
+            var newsFilter = function(topic) {
+                var comparator = function() {
+                    return $(this).data('news-topic') == topic;
+                };
+                newsItems.filter(comparator).removeClass('hide');
+                newsItems.not(comparator).addClass('hide');
+            };
+            newsFilter(firstCategory.data('relation'));
 
             // Switch titles
-            $('#category a').click(function (event) {
+            categoryLinks.click(function (event) {
                 event.preventDefault();
-                if (!$(this).hasClass("current")) {
-                    $('#category a').removeClass('current');
-                    $(this).addClass('current');
-                    var el = $(this).attr('title');
-                    $('ul.topic > li').addClass('hide');;
-                    $('ul.topic > li.' + el).removeClass('hide');;
-                }
+                newsFilter($(this).data('relation'));
             });
         });
     </script>
@@ -26,30 +31,27 @@
         <div class="small-12 island">
             <section>
                 <div class="content">
-                    <ul id="category" class="admin-nav">
+                    <ul>
                         <!-- BEGIN topic_header -->
-                        <li><a href="#" title="{TOPIC_CLEAN}">{NEWS_TOPIC}</a></li>
+                        <li><a href="#" data-relation="{TOPIC_CLEAN}">{NEWS_TOPIC}</a></li>
                         <!-- END topic_header -->
                     </ul>
-                    <ul class="topic">
-                        <!-- BEGIN topic -->
-                        <li class="hide {TOPIC_CLEAN}">
-                            <ul class="information-list">
-                                <!-- BEGIN news -->
-                                <li class="{ON_OFF} clearfix">
-                                    <!-- BEGIN news_image -->
-                                    <a class="thumbnail" href="{NEWS_URL}" title="{NEWS_TITLE}">
-                                        <img width="64" height="64" src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/>
-                                    </a>
-                                    <!-- END news_image -->
 
-                                    <h3><a href="{NEWS_URL}" title="{NEWS_TITLE}">{NEWS_TITLE}</a></h3>
-                                    <p class="meta">Posted {NEWS_TIME}</p>
-                                    <p>{NEWS_SHORT}</p>
-                                </li>
-                                <!-- END news -->
-                            </ul>
+                    <ul class="action-list">
+                        <!-- BEGIN topic -->
+                        <!-- BEGIN news -->
+                        <li class="row" data-news-topic="{TOPIC_CLEAN}">
+                            <!-- BEGIN news_image -->
+                            <a class="thumbnail" href="{NEWS_URL}" title="{NEWS_TITLE}">
+                                <img width="64" height="64" src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/>
+                            </a>
+                            <!-- END news_image -->
+
+                            <h3><a href="{NEWS_URL}" title="{NEWS_TITLE}">{NEWS_TITLE}</a></h3>
+                            <p class="meta">Posted {NEWS_TIME}</p>
+                            <p>{NEWS_SHORT}</p>
                         </li>
+                        <!-- END news -->
                         <!-- END topic -->
                     </ul>
                 </div>
