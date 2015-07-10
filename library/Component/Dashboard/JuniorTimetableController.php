@@ -78,6 +78,7 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
 
                         $this->timetable[$campus_id] = $processed['condensed'];
                         $this->dayNumber[$campus_id] = $day_number;
+                        $this->dayName[$campus_id]   = $timetableHandler->getDayName($day_number);
                     }
                 }
             }

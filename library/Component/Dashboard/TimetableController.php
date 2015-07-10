@@ -11,6 +11,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 {
     private $externalTimetable;
 
+    protected $dayName = array();
+
     protected $dayNumber = array();
 
     private $currentPeriod = array();
