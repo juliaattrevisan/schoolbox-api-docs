@@ -1,6 +1,7 @@
 <div id='component{COMPONENT_INSTANCE_ID}' data-component>
     <!-- Custom javascript -->
 
+    <!-- Probably doesn't have a configuration -->
     {CONFIGURATION}
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
@@ -11,9 +12,9 @@
                     <h2>
                         <a href="/timetable/">
                             <!-- BEGIN timetable_campus_name -->
-                            {CAMPUS_NAME}
+                            {CAMPUS_NAME} -
                             <!-- END timetable_campus_name -->
-                            Timetable <span>- {DAYNAME}</span>
+                            {DAYNAME}
                         </a>
                     </h2>
                     <table id="timetable" class="timetable">
