@@ -35,6 +35,11 @@
                             <!-- BEGIN timetable_period -->
                             <td width="{TIMETABLE_FIELD_WIDTH}%" class="period {PERIOD_CLASS}">
                                 <!-- BEGIN period_class_link -->
+                                <!-- BEGIN period_class_link_attendance -->
+                                <a class="icon-class-list attendance-link {ATTENDANCE_MARKED}"
+                                   href='/modules/attendance/modify/{ATTENDANCE_CLASS_CODE}/{ATTENDANCE_ATTENDANCE_DATE}/{ATTENDANCE_ATTENDANCE_PERIOD}'
+                                   title="Mark Attendance"></a>
+                                <!-- END period_class_link_attendance -->
                                 <a href="{PERIOD_URL}"
                                    class="timetabled-class"
                                    style="background:{PERIOD_COLOUR};"
@@ -43,7 +48,13 @@
                                     <span class="meta">{PERIOD_CODE} {PERIOD_ROOM}</span>
                                 </a>
                                 <!-- END period_class_link -->
+
                                 <!-- BEGIN period_class -->
+                                <!-- BEGIN period_class_attendance -->
+                                <a class="icon-class-list attendance-link {ATTENDANCE_MARKED}"
+                                   href='/modules/attendance/modify/{ATTENDANCE_CLASS_CODE}/{ATTENDANCE_ATTENDANCE_DATE}/{ATTENDANCE_ATTENDANCE_PERIOD}'
+                                   title="Mark Attendance"></a>
+                                <!-- END period_class_attendance -->
                                 <span class="timetabled-class"
                                       style="background:{PERIOD_COLOUR};"
                                 >
@@ -51,11 +62,6 @@
                                     <span class="meta">{PERIOD_CODE} {PERIOD_ROOM}</span>
                                 </span>
                                 <!-- END period_class -->
-                                <!-- BEGIN has_attendances -->
-                                <a class="icon-class-list {ATTENDANCE_MARKED}"
-                                   href='/modules/attendance/modify/{ATTENDANCE_CLASS_CODE}/{ATTENDANCE_ATTENDANCE_DATE}/{ATTENDANCE_ATTENDANCE_PERIOD}'
-                                   title="Mark Attendance"></a>
-                                <!-- END has_attendances -->
                             </td>
                             <!-- END timetable_period -->
                         </tr>
