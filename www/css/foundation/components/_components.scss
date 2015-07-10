@@ -12,7 +12,9 @@
     width: 100%;
 }
 
-/* AnySlider stylage */
+/* Dashboard: Image Slider
+ * AnySlider stylage
+ */
 $anyslider-color: rgb(238, 238, 238);
 $anyslider-color-hover: rgb(121, 121, 121);
 .imageslider-container {
@@ -76,3 +78,31 @@ $anyslider-color-hover: rgb(121, 121, 121);
         }
     }
 }
+
+/* Dashboard: Timetable
+ */
+.timetable {
+    // TODO remove hardcoded highlight colors, replace with a SASS var
+    .period-name.dayCurrent {
+        background-color: #ffffe5;
+    }
+    .period {
+        padding: 0;
+        vertical-align: top;
+        &.current {
+            background-color: #ffffb2;
+        }
+    }
+    .attendance-link {
+        float: right;
+        padding: rem-calc($base-font-size) rem-calc($base-font-size * .5) 0 0;
+    }
+    .timetabled-class {
+        padding: rem-calc($base-font-size);
+        display: block;
+        .class-name {
+            display: block;
+        }
+    }
+}
+

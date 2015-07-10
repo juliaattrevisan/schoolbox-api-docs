@@ -11,6 +11,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 {
     private $externalTimetable;
 
+    protected $dayName = array();
+
     protected $dayNumber = array();
 
     private $currentPeriod = array();
@@ -94,7 +96,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         $this->setBlock("campus_timetable", "timetable_header", "timetable_header_block");
         $this->setBlock('timetable_period', 'period_class_link', 'period_class_link_block');
         $this->setBlock('timetable_period', 'period_class', 'period_class_block');
-        $this->setBlock('timetable_period', 'has_attendances', "has_attendances_block");
+        $this->setBlock('period_class_link', 'period_class_link_attendance', "period_class_link_attendance_block");
+        $this->setBlock('period_class', 'period_class_attendance', "period_class_attendance_block");
 
         $periodCount = 0;
 
@@ -152,7 +155,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                     if ($period['periodSequence'] == 1) {
                         $this->setVar('period_class_block', '');
                         $this->setVar('period_class_link_block', '');
-                        $this->setVar('has_attendances_block', '');
+                        $this->setVar('period_class_attendance_block', '');
+                        $this->setVar('period_class_link_attendance_block', '');
                         $this->setVar("PERIOD_NAME", $period['periodName']);
                         $this->setVar("PERIOD_START", $period['periodStart']);
                         $this->setVar("PERIOD_END", $period['periodEnd']);
@@ -199,12 +203,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                                 $this->setVar('PERIOD_COLOUR', '#' . Scrub::text($subjectColourMap[$class['code']]));
 
-                                $cat = $this->category->getByCode($class['code']);
-                                if ($cat['id'] && $this->group->getPermission($cat['id']) >= READ_ACCESS) {
-                                    $this->parse('period_class_link_block', 'period_class_link',true);
-                                } else {
-                                    $this->parse('period_class_block', 'period_class',true);
-                                }
+                                $cat     = $this->category->getByCode($class['code']);
+                                $hasLink = $cat['id'] && $this->group->getPermission($cat['id']) >= READ_ACCESS;
 
                                 // Link to Attendance Records
                                 if (strlen($class['code'])
@@ -218,33 +218,22 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                             'ATTENDANCE_CLASS_CODE'        => $class['campus'] ? $class['campus'] . '/' . $class['code'] : '0/' . $class['code'],
                                             'ATTENDANCE_ATTENDANCE_DATE'   => $attendance_date,
                                             'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
-                                            'ATTENDANCE_MARKED'            => $class['AttendanceMarked'] ? 'marked' : '',
+                                            'ATTENDANCE_ICON'              => $class['AttendanceMarked'] ? 'icon-approve' : 'icon-class-list',
                                         )
                                     );
 
-                                    /* This appends the attendance link to the correct phplib class block depending on permissions above */
-                                    if ($cat['id'] && $this->group->getPermission($cat['id']) >= READ_ACCESS) {
-                                        $this->parse('period_class_link_block', 'has_attendances',true);
+                                    if ($hasLink) {
+                                        $this->parse('period_class_link_attendance_block', 'period_class_link_attendance',true);
                                     } else {
-                                        $this->parse('period_class_block', 'has_attendances',true);
-
+                                        $this->parse('period_class_attendance_block', 'period_class_attendance',true);
                                     }
                                 }
+                                if ($hasLink) {
+                                    $this->parse('period_class_link_block', 'period_class_link',true);
+                                } else {
+                                    $this->parse('period_class_block', 'period_class',true);
+                                }
                             }
-                        } else {
-                            $this->setVar(
-                                array(
-                                    'PERIOD_COLOUR'         => '',
-                                    'PERIOD_DESC'           => '',
-                                    'PERIOD_CODE'           => '',
-                                    'PERIOD_ROOM'           => '',
-                                    'PERIOD_ABSENTEES'      => '',
-                                    'PERIOD_URL'            => '#',
-                                    'has_attendances_block' => '',
-                                )
-                            );
-
-                            $this->parse('period_class_block', 'period_class');
                         }
 
                         //output period block
