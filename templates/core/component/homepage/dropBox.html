@@ -1,6 +1,7 @@
 <div id='component{COMPONENT_INSTANCE_ID}' data-component>
     <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
     <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+    <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
     <script type="text/javascript">
         $(function() {
             $('input[type=file].pretty-file-input').prettyFileInput({
@@ -10,7 +11,20 @@
                 defaultFileSelectedText: '<span></span>File selected'
             });
 
-            $('component{COMPONENT_INSTANCE_ID}-dropBox').validate();
+            $('#component{COMPONENT_INSTANCE_ID}-dropBox').validate();
+
+            $('#component{COMPONENT_INSTANCE_ID}').find('[data-delete]').click(function(event) {
+                console.log('fox');
+                event.preventDefault();
+
+                var element = $(this);
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this file?',
+                    confirmEvent: function() {
+                        window.location.href = element.attr('href');
+                    }
+                });
+            });
         });
     </script>
 
@@ -60,7 +74,7 @@
                             </div>
                         </div>
                         <div class="one actions">
-                            <a class="icon-delete no-text" href="/subject/modDropBox.php?delete={DROPBOX_ID}" title="Delete"></a>
+                            <a class="icon-delete no-text" data-delete href="/subject/modDropBox.php?delete={DROPBOX_ID}" title="Delete"></a>
                         </div>
                     </li>
                     <!-- END drop_file -->
