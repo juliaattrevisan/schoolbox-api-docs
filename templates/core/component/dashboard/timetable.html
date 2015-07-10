@@ -17,12 +17,16 @@
                             {DAYNAME}
                         </a>
                     </h2>
-                    <table id="timetable" class="timetable">
+                    <table>
                         <thead>
                         <tr>
                             <!-- BEGIN timetable_header -->
-                            <th width="{TIMETABLE_FIELD_WIDTH}%" scope="col" class="{PERIOD_TH_CLASS}">{PERIOD_NAME}
-                                <span class="time">{PERIOD_START} - {PERIOD_END}</span></th>
+                            <th width="{TIMETABLE_FIELD_WIDTH}%" scope="col" class="{PERIOD_TH_CLASS}">
+                                <dl>
+                                    <dt>{PERIOD_NAME}</dt>
+                                    <dd>{PERIOD_START} - {PERIOD_END}</dd>
+                                </dl>
+                            </th>
                             <!-- END timetable_header -->
                         </tr>
                         </thead>
