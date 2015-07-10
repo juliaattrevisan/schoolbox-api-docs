@@ -129,7 +129,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
             $this->setVar(
                 array(
                     'THUMBNAIL_ID'          => $currentImage->getId(),
-                    'THUMBNAIL_DESCRIPTION' => $currentImage->getDescription(),
+                    'THUMBNAIL_DESCRIPTION' => $currentImage->getTitle(),
                     'THUMBNAIL_SIZE'        => $this->getConfig('pixel') ? $this->getConfig('pixel') : Cfg::get('thumbnail_size'),
                     'IMAGE_HEIGHT'          => $this->getConfig('pixel') ? $this->getConfig('pixel') : Cfg::get('thumbnail_size'),
                 )
