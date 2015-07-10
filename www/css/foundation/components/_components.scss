@@ -82,6 +82,7 @@ $anyslider-color-hover: rgb(121, 121, 121);
 /* Dashboard: Timetable
  */
 .timetable {
+    // TODO remove hardcoded highlight colors, replace with a SASS var
     .period-name.dayCurrent {
         background-color: #ffffe5;
     }
