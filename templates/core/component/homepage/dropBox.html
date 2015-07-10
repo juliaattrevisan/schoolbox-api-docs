@@ -1,6 +1,7 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
     <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
     <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+    <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
     <script type="text/javascript">
         $(function() {
             $('input[type=file].pretty-file-input').prettyFileInput({
@@ -10,49 +11,78 @@
                 defaultFileSelectedText: '<span></span>File selected'
             });
 
-            $('.dropBox').validate();
+            $('#component{COMPONENT_INSTANCE_ID}-dropBox').validate();
+
+            $('#component{COMPONENT_INSTANCE_ID}').find('[data-delete]').click(function(event) {
+                console.log('fox');
+                event.preventDefault();
+
+                var element = $(this);
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this file?',
+                    confirmEvent: function() {
+                        window.location.href = element.attr('href');
+                    }
+                });
+            });
         });
     </script>
 
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="listing clearfix">
-            <!-- BEGIN drop_student -->
-            <form action="/subject/modDropBox.php" method="post" enctype="multipart/form-data" class="dropBox" >
-                <!-- BEGIN drop_success -->
-                <fieldset>
-                    <p class="icons success pad">File upload completed successfully.</p>
-                </fieldset>
-                <!-- END drop_success -->
-                <fieldset class="drop-left">
-                    <h3>Description</h3>
-                    <label>
-                        <input name="description" class="required" type="text" />
-                    </label>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <!-- BEGIN drop_student -->
+                <form action="/subject/modDropBox.php" method="post" enctype="multipart/form-data" id="component{COMPONENT_INSTANCE_ID}-dropBox" >
                     <input type="hidden" name="category" value="{ID}" />
-                </fieldset>
-                <fieldset class="drop-right">{ATTACH_ZONE}</fieldset>
-                <fieldset class="submit">
-                    <input type="submit" value="Upload" class="drop-submit submit-btn-plain"/>
-                </fieldset>
-            </form>
-            <!-- END drop_student -->
-            <!-- BEGIN drop_staff -->
-            <ul class="information-list">
-                <!-- BEGIN drop_file -->
-                <li class="{ON_OFF}">
-                    <span class="actions">
-                        <a class="btn delete no-text" href="/subject/modDropBox.php?delete={DROPBOX_ID}" title="Delete"><span></span></a>
-                    </span>
-                    <h4>
-                        <a class="icons {DROPBOX_MIME_IMAGE}" href="/subject/modDropBox.php?id={DROPBOX_ID}" rel="external">{DROPBOX_DESCRIPTION}</a>
-                    </h4>
-                    <p class="meta">By {DROP_SUBMITTED_BY} on {DROP_SUBMITTED_TIME}</p>
-                </li>
-                <!-- END drop_file -->
-            </ul>
-            <!-- END drop_staff -->
+
+                    <!-- BEGIN drop_success -->
+                    <fieldset>
+                        <p>File upload completed successfully.</p>
+                    </fieldset>
+                    <!-- END drop_success -->
+                    <fieldset>
+                        <label>
+                            Description
+                            <input name="description" class="required" type="text" />
+                        </label>
+                    </fieldset>
+                    <fieldset>
+                        {ATTACH_ZONE}
+                    </fieldset>
+                    <fieldset>
+                        <input type="submit" value="Upload" class="secondary"/>
+                    </fieldset>
+                </form>
+                <!-- END drop_student -->
+                <!-- BEGIN drop_staff -->
+                <ul class="action-list">
+                    <!-- BEGIN drop_file -->
+                    <li class="row" data-equalizer>
+                        <div class="eleven-column" data-equalizer-watch>
+                            <div class="avatar-card clearfix">
+                                <a href="/subject/modDropBox.php?id={DROPBOX_ID}" title="View File" rel="external">
+                                    <img src="/images/mime/60x60/{DROPBOX_MIME_IMAGE}" />
+                                    <p>{DROPBOX_DESCRIPTION}</p>
+                                </a>
+                                <p class="meta">
+                                    By {DROP_SUBMITTED_BY} on {DROP_SUBMITTED_TIME}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="one actions">
+                            <a class="icon-delete no-text" data-delete href="/subject/modDropBox.php?delete={DROPBOX_ID}" title="Delete"></a>
+                        </div>
+                    </li>
+                    <!-- END drop_file -->
+                </ul>
+                <!-- END drop_staff -->
+            </section>
         </div>
     </div>
 </div>
+
+
+
+
