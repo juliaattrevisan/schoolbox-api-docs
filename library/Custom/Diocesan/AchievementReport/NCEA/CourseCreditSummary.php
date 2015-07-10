@@ -156,25 +156,26 @@ class CourseCreditSummary extends Base {
      */
     private function findEndorsements() {
 
-        /* Temporary test result, since the db table doesn't exist yet
-         */
-        return array(
-            array(
-                'CourseDescription' => 'NCEA Level 1 Business Enterprise',
-                'Endorsement' => 'Alaress Test Value: Merit 1'
-            ),
-            array(
-                'CourseDescription' => 'NCEA Level 1 Mathematics',
-                'Endorsement' => 'Alaress Test Value: Merit 3'
-            ),
-        );
+//        /* Temporary test result, since the db table doesn't exist yet
+//         */
+//        return array(
+//            array(
+//                'CourseDescription' => 'NCEA Level 1 Business Enterprise',
+//                'Endorsement' => 'Alaress Test Value: Merit 1'
+//            ),
+//            array(
+//                'CourseDescription' => 'NCEA Level 1 Mathematics',
+//                'Endorsement' => 'Alaress Test Value: Merit 3'
+//            ),
+//        );
 
+        new \Alaress_Probe($this->explorerReporting());
         $query = "
             SELECT
                 CourseDescription,
                 Endorsement
             FROM
-                SynergyOne.dbo.uvSchoolBoxNCEAResultsWithEndorsements
+                SynergyOne.dbo.uv schoolboxncearesultswithendorsements
             WHERE
                 id = '{$this->getExternalUserId()}' AND
                 StudentYear = '{$this->getYear()}'
