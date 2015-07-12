@@ -77,10 +77,7 @@ $j(function() {
 		 * Loads a new select element into config.target
 		 */
 		function load() {
-			$j.get(config.url, config.payload, function(responseText) {
-				var response = new Function('return ' + responseText);
-				var allTextboxes = response();
-
+			$j.get(config.url, config.payload, function(allTextboxes) {
 				/* If there are textboxes for this homepage, glue
 				 * them all together
 				 */
@@ -105,7 +102,7 @@ $j(function() {
 				if (config.target.length) {
 					config.target.empty().append(allOptions);
 				}
-			});
+			}, 'json');
 		}
 	}
 }(jQuery));
