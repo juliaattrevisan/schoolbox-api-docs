@@ -81,18 +81,17 @@ $j(function() {
 				/* If there are textboxes for this homepage, glue
 				 * them all together
 				 */
+				var allOptions = [];
 				if (allTextboxes.length) {
-					var allOptions = '';
 
 					/* Accumulate a list of <options>
 					 */
 					for (var i = 0; i < allTextboxes.length; i++) {
-						var currentOption = '<option value="'+allTextboxes[i].value+'">'+allTextboxes[i].name+'</option>';
-						allOptions += currentOption;
+						allOptions.push($('<option/>').val(allTextboxes[i].value).text(allTextboxes[i].name));
 					}
 				}
 				else {
-					var allOptions = '<option value="0" disabled="disabled"> (none) </option>';
+					allOptions.push($('<option/>').val(0).text('(none)').prop('disabled', true));
 				}
 
 				/* If the target exists, replace it - since Resource Browser

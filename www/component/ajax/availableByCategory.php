@@ -62,7 +62,7 @@ if (is_numeric($_GET['categoryId'])) {
 
                 foreach ($allTextboxes as $currentTextbox) {
                     $element = array(
-                        'name' => Scrub::text($currentTextbox->getHeading()),
+                        'name'  => $currentTextbox->getHeading(),
                         'value' => $currentTextbox->getId(),
                     );
 
