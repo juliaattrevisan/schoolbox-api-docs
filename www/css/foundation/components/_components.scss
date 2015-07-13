@@ -211,6 +211,7 @@ ul.countdown {
         font: 0/0 a;
         text-shadow: none;
         color: transparent;
+        transition: all 0s;
         &:hover {
             background-position: 0 -170px;
         }
