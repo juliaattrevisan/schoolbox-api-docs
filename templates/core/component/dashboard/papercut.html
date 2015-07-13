@@ -8,11 +8,12 @@
 
         $.getScript(url, function(script, textStatus, jqXHR) {
             if (pcUserDetails.balanceFormatted != undefined) {
-                document.getElementById('userBalance').innerHTML = pcUserDetails.balanceFormatted;
-                document.getElementById('userPages').innerHTML = pcUserDetails.printStats.pages;
-                document.getElementById('userJobs').innerHTML = pcUserDetails.printStats.jobs;
-                document.getElementById('userCO2').innerHTML = pcUserDetails.environmentalImpact.gramsCO2Formatted;
-                document.getElementById('userTrees').innerHTML = pcUserDetails.environmentalImpact.treesFormatted;
+                var component = $('#component{COMPONENT_INSTANCE_ID}');
+                component.find('[data-relation="userBalance"]').text(pcUserDetails.balanceFormatted);
+                component.find('[data-relation="userPages"]').text(pcUserDetails.printStats.pages);
+                component.find('[data-relation="userJobs"]').text(pcUserDetails.printStats.jobs);
+                component.find('[data-relation="userCO2"]').text(pcUserDetails.environmentalImpact.gramsCO2Formatted);
+                component.find('[data-relation="userTrees"]').text(pcUserDetails.environmentalImpact.treesFormatted);
             }
         });
     </script>
@@ -26,23 +27,23 @@
                     <table>
                         <tr>
                             <th>Balance:</th>
-                            <td id="userBalance"></td>
+                            <td data-relation="userBalance"></td>
                         </tr>
                         <tr>
                             <th>Jobs:</th>
-                            <td id="userJobs"></td>
+                            <td data-relation="userJobs"></td>
                         </tr>
                         <tr>
                             <th>Pages:</th>
-                            <td id="userPages"></td>
+                            <td data-relation="userPages"></td>
                         </tr>
                         <tr>
                             <th>CO2:</th>
-                            <td id="userCO2"></td>
+                            <td data-relation="userCO2"></td>
                         </tr>
                         <tr>
                             <th>Trees:</th>
-                            <td id="userTrees"></td>
+                            <td data-relation="userTrees"></td>
                         </tr>
                     </table>
                 </div>
