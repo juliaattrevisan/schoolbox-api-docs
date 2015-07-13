@@ -31,6 +31,8 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
             return false;
         }
 
+        $this->parseConfig();
+
         $this->setBlock($templateHandle, "topic_header", "topic_header_block");
         $this->setBlock($templateHandle, "topic", "topic_block");
         $this->setBlock('topic', "news", "news_block");
