@@ -8,7 +8,7 @@
                 <div class="content">
                     <ul class="tabs" data-tab>
                         <!-- BEGIN topic_header -->
-                        <li class="tab-title">
+                        <li class="tab-title {TOPIC_ACTIVE}">
                             <a href="#component{COMPONENT_INSTANCE_ID}-{TOPIC_CLEAN}">{NEWS_TOPIC}</a>
                         </li>
                         <!-- END topic_header -->
@@ -16,7 +16,7 @@
 
                     <div class="tabs-content">
                         <!-- BEGIN topic -->
-                        <ul class="action-list content" id="component{COMPONENT_INSTANCE_ID}-{TOPIC_CLEAN}">
+                        <ul class="action-list content {TOPIC_ACTIVE}" id="component{COMPONENT_INSTANCE_ID}-{TOPIC_CLEAN}">
                             <!-- BEGIN news -->
                             <li class="row" data-news-topic="{TOPIC_CLEAN}">
                                 <div class="avatar-card">

@@ -81,12 +81,14 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
             $topicList = array_keys($groupedList);
 
             $userFormatter = new User();
+            $i             = 0;
             foreach ($groupedList as $topicName => $headlineList) {
                 $url = new Url($topicName);
                 $this->setVar([
-                    'NEWS_TOPIC'  => Scrub::text($topicName),
-                    'TOPIC_CLEAN' => $url->getSlug(),
-                    'news_block'  => '',
+                    'NEWS_TOPIC'   => Scrub::text($topicName),
+                    'TOPIC_CLEAN'  => $url->getSlug(),
+                    'news_block'   => '',
+                    'TOPIC_ACTIVE' => ($i++ == 0 ? 'active' : ''),
                 ]);
                 foreach ($headlineList as $item) {
                     $newsTime = new Alaress_Date_Format($item['item_datetime_posted'], 'Y-m-d H:i:s');
@@ -119,12 +121,13 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
 
         // output tabs
         if (is_array($topicList)) {
-            foreach ($topicList as $topic) {
+            foreach ($topicList as $i => $topic) {
                 $url = new Url($topic);
 
                 $output = array(
-                    'NEWS_TOPIC'  => $topic,
-                    'TOPIC_CLEAN' => $url->getSlug(),
+                    'NEWS_TOPIC'   => $topic,
+                    'TOPIC_CLEAN'  => $url->getSlug(),
+                    'TOPIC_ACTIVE' => ($i == 0 ? 'active' : ''),
                 );
                 $this->setVar($output);
                 $this->parse('topic_header_block', 'topic_header', true);
