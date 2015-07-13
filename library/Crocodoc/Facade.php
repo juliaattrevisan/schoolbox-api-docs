@@ -59,7 +59,7 @@ class Facade
             try {
                 $document = new Document($submission);
                 $response = $document->upload();
-            } catch (\DomainException $e) {
+            } catch (\RangeException $e) {
                 echo "Error encountered: ".$e->getMessage();
             }
 

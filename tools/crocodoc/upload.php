@@ -38,7 +38,7 @@ if(Config::get('crocodoc_api_token')) {
             else {
                 $logger->notice("Upload completed successfully");
             }
-        } catch (DomainException $e) {
+        } catch (\RangeException $e) {
             $logger->error($e->getMessage());
         }
     }

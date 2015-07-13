@@ -21,7 +21,7 @@ class Authenticator
 
     /**
      * Constructor
-     * @throws DomainException
+     * @throws \RangeException
      */
     public function __construct()
     {
@@ -29,7 +29,7 @@ class Authenticator
             $this->setApiToken(\Cfg::get('crocodoc_api_token'));
         }
         else {
-            throw new \DomainException('Crocodoc API token is not defined');
+            throw new \RangeException('Crocodoc API token is not defined');
         }
     }
 
