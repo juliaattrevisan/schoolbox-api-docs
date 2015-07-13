@@ -86,10 +86,10 @@ class Results implements Searchable
 
         /* Add searchables (synonymous with values from omaha)
          */
-        $this->getRegistry()->add(new Definition('link', new LinkMapper(), new LinkRenderer($page)));
-        $this->getRegistry()->add(new Definition('folder', new FolderMapper(), new FolderRenderer($page)));
-        $this->getRegistry()->add(new Definition('textbox', new TextboxMapper(), new TextboxRenderer($page)));
         $this->getRegistry()->add(new Definition('file', new File\Mapper(), new FileRenderer($page)));
+        $this->getRegistry()->add(new Definition('folder', new FolderMapper(), new FolderRenderer($page)));
+        $this->getRegistry()->add(new Definition('link', new LinkMapper(), new LinkRenderer($page)));
+        $this->getRegistry()->add(new Definition('textbox', new TextboxMapper(), new TextboxRenderer($page)));
     }
 
     /**
