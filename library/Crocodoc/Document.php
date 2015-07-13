@@ -108,8 +108,9 @@ class Document
         }
 
         return array(
-            'result' => $result,
-            'errors' => isset($result->error) ? $result->error : implode(', ',$curl->getErrors()),
+            'result'       => $result,
+            'errors'       => isset($result->error) ? $result->error : implode(', ',$curl->getErrors()),
+            'responseCode' => $curl->getResponseCode(),
         );
     }
 

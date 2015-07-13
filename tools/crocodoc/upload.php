@@ -23,8 +23,17 @@ if(Config::get('crocodoc_api_token')) {
         try{
             $document = new Document($submission);
             $result = $document->upload();
-            if($result['errors']) {
+            if ($result['errors']) {
                 $logger->error($result['errors']);
+                switch ($result['responseCode']) {
+                    case 401:
+                        // This is an authentication error, caused by a wrong token.
+                        // Give up because the token is not going to fix itself.
+                        $logger->error('Authentication error received - exiting!');
+                        exit;
+                    default:
+                        break;
+                }
             }
             else {
                 $logger->notice("Upload completed successfully");
