@@ -422,7 +422,7 @@ class FileMapper extends Mapper
                                         ext like 'pptx' OR
                                         ext like 'pdf')
                  AND YEAR(submitted) = YEAR(NOW())
-
+                LIMIT BY 0,100
             ";
 
         $statement = $this->database->prepare($query);
