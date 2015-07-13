@@ -1,45 +1,52 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-	<h2>{COMPONENT_NAME}</h2>
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
+    <script type="text/javascript">
+        var pcUsername = '{PAPERCUT_USERNAME}';
+        var pcServerURL = '{PAPERCUT_SERVER}';
 
-	<div>
-		<table>
-			<tr>
-				<th>Balance:</th>
-				<td id="userBalance"></td>
-			</tr>
-			<tr>
-				<th>Jobs:</th>
-				<td id="userJobs"></td>
-			</tr>
-			<tr>
-				<th>Pages:</th>
-				<td id="userPages"></td>
-			</tr>
-			<tr>
-				<th>CO2:</th>
-				<td id="userCO2"></td>
-			</tr>
-			<tr>
-				<th>Trees:</th>
-				<td id="userTrees"></td>
-			</tr>
-		</table>
-	</div>
+        var url = '{PAPERCUT_SERVER}/rpc/api/web/user/' + pcUsername + '/details.js';
 
-	<script type="text/javascript">
-		var pcUsername = '{PAPERCUT_USERNAME}';
-		var pcServerURL = '{PAPERCUT_SERVER}';
+        $.getScript(url, function(script, textStatus, jqXHR) {
+            if (pcUserDetails.balanceFormatted != undefined) {
+                document.getElementById('userBalance').innerHTML = pcUserDetails.balanceFormatted;
+                document.getElementById('userPages').innerHTML = pcUserDetails.printStats.pages;
+                document.getElementById('userJobs').innerHTML = pcUserDetails.printStats.jobs;
+                document.getElementById('userCO2').innerHTML = pcUserDetails.environmentalImpact.gramsCO2Formatted;
+                document.getElementById('userTrees').innerHTML = pcUserDetails.environmentalImpact.treesFormatted;
+            }
+        });
+    </script>
 
-		var url = '{PAPERCUT_SERVER}/rpc/api/web/user/' + pcUsername + '/details.js';
+    {CONFIGURATION}
 
-		$.getScript(url, function(script, textStatus, jqXHR) {
-			if (pcUserDetails.balanceFormatted != undefined) {
-				document.getElementById('userBalance').innerHTML = pcUserDetails.balanceFormatted;
-				document.getElementById('userPages').innerHTML = pcUserDetails.printStats.pages;
-				document.getElementById('userJobs').innerHTML = pcUserDetails.printStats.jobs;
-				document.getElementById('userCO2').innerHTML = pcUserDetails.environmentalImpact.gramsCO2Formatted;
-				document.getElementById('userTrees').innerHTML = pcUserDetails.environmentalImpact.treesFormatted;
-			}
-		});
-	</script>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <table>
+                        <tr>
+                            <th>Balance:</th>
+                            <td id="userBalance"></td>
+                        </tr>
+                        <tr>
+                            <th>Jobs:</th>
+                            <td id="userJobs"></td>
+                        </tr>
+                        <tr>
+                            <th>Pages:</th>
+                            <td id="userPages"></td>
+                        </tr>
+                        <tr>
+                            <th>CO2:</th>
+                            <td id="userCO2"></td>
+                        </tr>
+                        <tr>
+                            <th>Trees:</th>
+                            <td id="userTrees"></td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
 </div>
