@@ -202,10 +202,9 @@ ul.countdown {
 // MGS primary dashboard
 .primary-dashboard {
     .item {
-        display: block;
+        display: inline-block;
         width: 170px;
         height: 170px;
-        float: left;
         margin: 0 12px 12px 0;
         cursor: pointer;
         font: 0/0 a;
@@ -227,4 +226,10 @@ ul.countdown {
     .pe-dash { background: url(/images/grimwade/icon-pe.gif) no-repeat; }
     .music-dash { background: url(/images/grimwade/icon-music.gif) no-repeat; }
     .chinese-dash { background: url(/images/grimwade/icon-chinese.gif) no-repeat; }
+    .primary-dashboard-list {
+        margin-left: 0;
+        li {
+            margin-left: 0;
+        }
+    }
 }
