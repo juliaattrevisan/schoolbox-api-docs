@@ -1,29 +1,4 @@
 <div id='component{COMPONENT_INSTANCE_ID}' data-component>
-    <!-- Custom javascript -->
-    <script type="text/javascript">
-        $(function () {
-            // Show all news in first category
-            var component     = $('#component{COMPONENT_INSTANCE_ID}');
-            var categoryLinks = component.find('[data-relation]');
-            var newsItems     = component.find('[data-news-topic]');
-            var firstCategory = categoryLinks.first();
-
-            var newsFilter = function(topic) {
-                var comparator = function() {
-                    return $(this).data('news-topic') == topic;
-                };
-                newsItems.filter(comparator).removeClass('hide');
-                newsItems.not(comparator).addClass('hide');
-            };
-            newsFilter(firstCategory.data('relation'));
-
-            // Switch titles
-            categoryLinks.click(function (event) {
-                event.preventDefault();
-                newsFilter($(this).data('relation'));
-            });
-        });
-    </script>
 
     {CONFIGURATION}
 
@@ -31,36 +6,39 @@
         <div class="small-12 island">
             <section>
                 <div class="content">
-                    <ul>
+                    <ul class="tabs" data-tab>
                         <!-- BEGIN topic_header -->
-                        <li><a href="#" data-relation="{TOPIC_CLEAN}">{NEWS_TOPIC}</a></li>
+                        <li class="tab-title">
+                            <a href="#component{COMPONENT_INSTANCE_ID}-{TOPIC_CLEAN}">{NEWS_TOPIC}</a>
+                        </li>
                         <!-- END topic_header -->
                     </ul>
 
-                    <ul class="action-list">
+                    <div class="tabs-content">
                         <!-- BEGIN topic -->
-                        <!-- BEGIN news -->
-                        <li class="row" data-news-topic="{TOPIC_CLEAN}">
-
-                            <div class="avatar-card">
-                                <a href="{NEWS_URL}" title="{NEWS_TITLE}">
-                                    <!-- BEGIN news_image -->
-                                    <img src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/>
-                                    <!-- END news_image -->
-                                    <!-- BEGIN news_no_image -->
-                                    <div class="icon-news icon-64"></div>
-                                    <!-- END news_no_image -->
-                                    <h3>{NEWS_TITLE}</h3>
-                                </a>
-                                <p class="meta">
-                                    Posted by <a href="/user/profile/{NEWS_AUTHOR_ID}">{NEWS_AUTHOR_NAME}</a> {NEWS_TIME}
-                                </p>
-                            </div>
-                            <article>{NEWS_SHORT}</article>
-                        </li>
-                        <!-- END news -->
+                        <ul class="action-list content" id="component{COMPONENT_INSTANCE_ID}-{TOPIC_CLEAN}">
+                            <!-- BEGIN news -->
+                            <li class="row" data-news-topic="{TOPIC_CLEAN}">
+                                <div class="avatar-card">
+                                    <a href="{NEWS_URL}" title="{NEWS_TITLE}">
+                                        <!-- BEGIN news_image -->
+                                        <img src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/>
+                                        <!-- END news_image -->
+                                        <!-- BEGIN news_no_image -->
+                                        <div class="icon-news icon-64"></div>
+                                        <!-- END news_no_image -->
+                                        <h3>{NEWS_TITLE}</h3>
+                                    </a>
+                                    <p class="meta">
+                                        Posted by <a href="/user/profile/{NEWS_AUTHOR_ID}">{NEWS_AUTHOR_NAME}</a> {NEWS_TIME}
+                                    </p>
+                                </div>
+                                <article>{NEWS_SHORT}</article>
+                            </li>
+                            <!-- END news -->
+                        </ul>
                         <!-- END topic -->
-                    </ul>
+                    </div>
                 </div>
             </section>
         </div>
