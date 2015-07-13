@@ -42,7 +42,8 @@ class CourseCreditSummary extends Base {
                 Result,
                 StrippedResult,
                 EnteredCredits,
-                ResultCredits
+                ResultCredits,
+                Endorsement
             FROM
                 SynergyOne.dbo.uvSchoolBoxNCEAResults
             WHERE
@@ -83,6 +84,7 @@ class CourseCreditSummary extends Base {
             $letter = $current['StrippedResult'];
             $courseName = $current['CourseDescription'];
             $internalExternal = $current['InternalorExternalAssessment'];
+            $endorsement = $current['Endorsement'];
 
             if (!is_array($finalStack['courses'][$courseName])) {
                 $finalStack['courses'][$courseName] = array(
@@ -98,6 +100,10 @@ class CourseCreditSummary extends Base {
              */
             $finalStack['courses'][$courseName]['enteredCredits'] += $current['EnteredCredits'];
             $finalStack['totals']['enteredCredits'] += $current['EnteredCredits'];
+
+            /* Endorsement
+             */
+            $finalStack['courses'][$courseName]['endorsement'] = $endorsement;
 
             /* Only accumulate non-progressive results
              *
@@ -135,59 +141,6 @@ class CourseCreditSummary extends Base {
 
         ksort($finalStack['courses']);
 
-        /* Append endorsements
-         */
-        $allEndorsements = $this->findEndorsements();
-
-        foreach ($allEndorsements as $currentEndorsement) {
-            $courseName = $currentEndorsement['CourseDescription'];
-            $endorsement = $currentEndorsement['Endorsement'];
-
-            $finalStack['courses'][$courseName]['endorsement'] = $endorsement;
-        }
-
         return $finalStack;
-    }
-
-    /**
-     * Get subject endorsement results
-     *
-     * @return array
-     */
-    private function findEndorsements() {
-
-//        /* Temporary test result, since the db table doesn't exist yet
-//         */
-//        return array(
-//            array(
-//                'CourseDescription' => 'NCEA Level 1 Business Enterprise',
-//                'Endorsement' => 'Alaress Test Value: Merit 1'
-//            ),
-//            array(
-//                'CourseDescription' => 'NCEA Level 1 Mathematics',
-//                'Endorsement' => 'Alaress Test Value: Merit 3'
-//            ),
-//        );
-
-        new \Alaress_Probe($this->explorerReporting());
-        $query = "
-            SELECT
-                CourseDescription,
-                Endorsement
-            FROM
-                SynergyOne.dbo.uv schoolboxncearesultswithendorsements
-            WHERE
-                id = '{$this->getExternalUserId()}' AND
-                StudentYear = '{$this->getYear()}'
-            GROUP BY CourseDescription
-        ";
-
-        $result = $this->getDb()->getAll($query);
-
-        if (is_array($result)) {
-            return $result;
-        }
-
-        return array();
     }
 }
