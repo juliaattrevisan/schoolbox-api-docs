@@ -13,19 +13,26 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
 use Crocodoc\Document;
 use Alaress\Lumberjack\Logger;
 
-$pendingUpload = FileMapper::getInstance()->getCrocodoc();
 
-$logger = new Logger;
+if(Config::get('crocodoc_api_token')) {
 
+    $pendingUpload = FileMapper::getInstance()->getCrocodoc();
 
-foreach($pendingUpload as $submission) {
-    $logger->notice("Uploading ".$submission->getFileName()."(".$submission->getId().")");
-    $document = new Document($submission);
-    $result = $document->upload();
-    if($result['errors']) {
-        $logger->error($result['errors']);
-    }
-    else {
-        $logger->notice("Upload completed successfully");
+    $logger = new Logger;
+
+    foreach($pendingUpload as $submission) {
+        $logger->notice("Uploading ".$submission->getFileName()."(".$submission->getId().")");
+        try{
+            $document = new Document($submission);
+            $result = $document->upload();
+            if($result['errors']) {
+                $logger->error($result['errors']);
+            }
+            else {
+                $logger->notice("Upload completed successfully");
+            }
+        } catch (DomainException $e) {
+            $logger->error($e->getMessage());
+        }
     }
 }
