@@ -163,6 +163,7 @@ class External_TimetableDatePeriod implements Iterator {
      * @return void
      */
     public function rewind() {
+        $this->isValid = true;
         $this->index   = 0;
         $this->current = $this->start;
         $this->invert  = ($this->end < $this->start);
