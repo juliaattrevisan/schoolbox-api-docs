@@ -1,9 +1,8 @@
-[class^="icon-"]:before,
-[class*=" icon-"]:before {
+[class^="icon-"]:before, [class*=" icon-"]:before {
 	font-family: 'schoolbox';
-	font-size: 1rem;
 	speak: none;
 	font-style: normal;
+	font-weight: normal;
 	font-variant: normal;
 	text-transform: none;
 	padding-right: 10px;
@@ -16,7 +15,7 @@
 .icon [class^="icon-"]:before,
 .icon [class*=" icon-"]:before{
 	text-align: center;
-  	width: 100%;
+  width: 100%;
 	font-size: 20px;
 }
 
@@ -42,403 +41,339 @@
 .icon-add:before {
 	content: "\e600";
 }
-
 .icon-advanced-list:before {
 	content: "\e601";
 }
-
 .icon-alert:before {
 	content: "\e602";
 }
-
 .icon-anchor:before {
 	content: "\e603";
 }
-
 .icon-approve:before {
 	content: "\e604";
 }
-
-.icon-audio:before {
+.icon-attach:before {
 	content: "\e605";
 }
-
-.icon-boarder-leave:before {
+.icon-audio:before {
 	content: "\e606";
 }
-
-.icon-breadcrumbs:before {
+.icon-boarder-leave:before {
 	content: "\e607";
 }
-
-.icon-calendar:before {
+.icon-breadcrumbs:before {
 	content: "\e608";
 }
-
-.icon-chat:before {
+.icon-calendar:before {
 	content: "\e609";
 }
-
-.icon-class-list:before {
+.icon-chat:before {
 	content: "\e60a";
 }
-
-.icon-click-view:before {
+.icon-class-list:before {
 	content: "\e60b";
 }
-
-.icon-close:before {
+.icon-click-view:before {
 	content: "\e60c";
 }
-
-.icon-collab-docs:before {
+.icon-close:before {
 	content: "\e60d";
 }
-
-.icon-collapse:before {
+.icon-collab-docs:before {
 	content: "\e60e";
 }
-
-.icon-comment:before {
+.icon-collapse:before {
 	content: "\e60f";
 }
-
-.icon-components:before {
+.icon-comment:before {
 	content: "\e610";
 }
-
-.icon-copy:before {
+.icon-components:before {
 	content: "\e611";
 }
-
-.icon-countdown:before {
+.icon-copy:before {
 	content: "\e612";
 }
-
-.icon-course-builder:before {
+.icon-countdown:before {
 	content: "\e613";
 }
-
-.icon-course-outline:before {
+.icon-course-builder:before {
 	content: "\e614";
 }
-
-.icon-curriculum:before {
+.icon-course-outline:before {
 	content: "\e615";
 }
-
-.icon-delete:before {
+.icon-criteria:before {
 	content: "\e616";
 }
-
-.icon-directory:before {
+.icon-curriculum:before {
 	content: "\e617";
 }
-
-.icon-document:before {
+.icon-curriculum-details:before {
 	content: "\e618";
 }
-
-.icon-download:before {
+.icon-delete:before {
 	content: "\e619";
 }
-
-.icon-drag-drop:before {
+.icon-directory:before {
 	content: "\e61a";
 }
-
-.icon-drop-box:before {
+.icon-document:before {
 	content: "\e61b";
 }
-
-.icon-dropdown:before {
+.icon-download:before {
 	content: "\e61c";
 }
-
-.icon-due-work:before {
+.icon-drag-drop:before {
 	content: "\e61d";
 }
-
-.icon-edit-columns:before {
+.icon-drop-box:before {
 	content: "\e61e";
 }
-
-.icon-email:before {
+.icon-dropdown:before {
 	content: "\e61f";
 }
-
-.icon-eportfolio:before {
+.icon-due-work:before {
 	content: "\e620";
 }
-
-.icon-export:before {
+.icon-edit-columns:before {
 	content: "\e621";
 }
-
-.icon-favourite:before {
+.icon-email:before {
 	content: "\e622";
 }
-
-.icon-files:before {
+.icon-eportfolio:before {
 	content: "\e623";
 }
-
-.icon-filter:before {
+.icon-equals:before {
 	content: "\e624";
 }
-
-.icon-folder:before {
+.icon-export:before {
 	content: "\e625";
 }
-
-.icon-forms:before {
+.icon-favourite:before {
 	content: "\e626";
 }
-
-.icon-forum:before {
+.icon-files:before {
 	content: "\e627";
 }
-
-.icon-grip:before {
+.icon-filter:before {
 	content: "\e628";
 }
-
-.icon-group:before {
+.icon-folder:before {
 	content: "\e629";
 }
-
-.icon-group-managers:before {
+.icon-forms:before {
 	content: "\e62a";
 }
-
-.icon-help:before {
+.icon-forum:before {
 	content: "\e62b";
 }
-
-.icon-history:before {
+.icon-google-drive:before {
 	content: "\e62c";
 }
-
-.icon-homepagefeed:before {
+.icon-grip:before {
 	content: "\e62d";
 }
-
-.icon-homepage:before {
+.icon-group:before {
 	content: "\e62e";
 }
-
-.icon-image:before {
+.icon-group-managers:before {
 	content: "\e62f";
 }
-
-.icon-image-gallery:before {
+.icon-help:before {
 	content: "\e630";
 }
-
-.icon-image-slideshow:before {
+.icon-history:before {
 	content: "\e631";
 }
-
-.icon-link:before {
+.icon-home:before {
 	content: "\e632";
 }
-
-.icon-list:before {
+.icon-homepagefeed:before {
 	content: "\e633";
 }
-
-.icon-locked:before {
+.icon-iconsv21-01:before {
 	content: "\e634";
 }
-
-.icon-logout:before {
+.icon-image:before {
 	content: "\e635";
 }
-
-.icon-menu:before {
+.icon-image-gallery:before {
 	content: "\e636";
 }
-
-.icon-mobile:before {
+.icon-image-slideshow:before {
 	content: "\e637";
 }
-
-.icon-modify:before {
+.icon-link:before {
 	content: "\e638";
 }
-
-.icon-more:before {
+.icon-list:before {
 	content: "\e639";
 }
-
-.icon-network:before {
+.icon-locked:before {
 	content: "\e63a";
 }
-
-.icon-news:before {
+.icon-logout:before {
 	content: "\e63b";
 }
-
-.icon-next:before {
+.icon-menu:before {
 	content: "\e63c";
 }
-
-.icon-notifications:before {
+.icon-mic:before {
 	content: "\e63d";
 }
-
-.icon-open:before {
+.icon-mobile:before {
 	content: "\e63e";
 }
-
-.icon-pinterest:before {
+.icon-modify:before {
 	content: "\e63f";
 }
-
-.icon-podcast:before {
+.icon-more:before {
 	content: "\e640";
 }
-
-.icon-poll:before {
+.icon-mute:before {
 	content: "\e641";
 }
-
-.icon-previous:before {
+.icon-muted:before {
 	content: "\e642";
 }
-
-.icon-print:before {
+.icon-network:before {
 	content: "\e643";
 }
-
-.icon-progress:before {
+.icon-news:before {
 	content: "\e644";
 }
-
-.icon-quiz:before {
+.icon-next:before {
 	content: "\e645";
 }
-
-.icon-random-image:before {
+.icon-notifications:before {
 	content: "\e646";
 }
-
-.icon-refresh:before {
+.icon-office-365:before {
 	content: "\e647";
 }
-
-.icon-reply:before {
+.icon-open:before {
 	content: "\e648";
 }
-
-.icon-resource-booking:before {
+.icon-pause:before {
 	content: "\e649";
 }
-
-.icon-rss:before {
+.icon-pinterest:before {
 	content: "\e64a";
 }
-
-.icon-rubrics:before {
+.icon-podcast:before {
 	content: "\e64b";
 }
-
-.icon-schoolbox:before {
+.icon-poll:before {
 	content: "\e64c";
 }
-
-.icon-search:before {
+.icon-previous:before {
 	content: "\e64d";
 }
-
-.icon-settings:before {
+.icon-print:before {
 	content: "\e64e";
 }
-
-.icon-showcase:before {
+.icon-progress:before {
 	content: "\e64f";
 }
-
-.icon-shuffle:before {
+.icon-quiz:before {
 	content: "\e650";
 }
-
-.icon-social-stream:before {
+.icon-random-image:before {
 	content: "\e651";
 }
-
-.icon-sport:before {
+.icon-recording:before {
 	content: "\e652";
 }
-
-.icon-staff:before {
+.icon-refresh:before {
 	content: "\e653";
 }
-
-.icon-staff-students:before {
+.icon-reply:before {
 	content: "\e654";
 }
-
-.icon-surveys:before {
+.icon-resource-booking:before {
 	content: "\e655";
 }
-
-.icon-synergetic:before {
+.icon-rss:before {
 	content: "\e656";
 }
-
-.icon-task:before {
+.icon-schoolbox:before {
 	content: "\e657";
 }
-
-.icon-teacher:before {
+.icon-search:before {
 	content: "\e658";
 }
-
-.icon-textbox:before {
+.icon-settings:before {
 	content: "\e659";
 }
-
-.icon-tiles:before {
+.icon-showcase:before {
 	content: "\e65a";
 }
-
-.icon-timetable:before {
+.icon-shuffle:before {
 	content: "\e65b";
 }
-
-.icon-time-value:before {
+.icon-social-stream:before {
 	content: "\e65c";
 }
-
-.icon-twitter:before {
+.icon-sport:before {
 	content: "\e65d";
 }
-
-.icon-undo:before {
+.icon-staff:before {
 	content: "\e65e";
 }
-
-.icon-upload:before {
+.icon-staff-students:before {
 	content: "\e65f";
 }
-
-.icon-video:before {
+.icon-surveys:before {
 	content: "\e660";
 }
-
-.icon-view:before {
+.icon-synergetic:before {
 	content: "\e661";
 }
-
-.icon-weather:before {
+.icon-task:before {
 	content: "\e662";
 }
-
-.icon-wiki:before {
+.icon-teacher:before {
 	content: "\e663";
 }
-
-.icon-wolfram-alpha:before {
+.icon-textbox:before {
 	content: "\e664";
+}
+.icon-tiles:before {
+	content: "\e665";
+}
+.icon-timetable:before {
+	content: "\e666";
+}
+.icon-time-value:before {
+	content: "\e667";
+}
+.icon-twitter:before {
+	content: "\e668";
+}
+.icon-undo:before {
+	content: "\e669";
+}
+.icon-unlocked:before {
+	content: "\e66a";
+}
+.icon-upload:before {
+	content: "\e66b";
+}
+.icon-video:before {
+	content: "\e66c";
+}
+.icon-view:before {
+	content: "\e66d";
+}
+.icon-weather:before {
+	content: "\e66e";
+}
+.icon-wiki:before {
+	content: "\e66f";
+}
+.icon-wolfram-alpha:before {
+	content: "\e670";
 }
