@@ -198,3 +198,32 @@ ul.countdown {
         li a.evi-parent-homepage{ background-position: -177px -89px; }
     }
 }
+
+// MGS primary dashboard
+.primary-dashboard {
+    .item {
+        display: block;
+        width: 170px;
+        height: 170px;
+        float: left;
+        margin: 0 12px 12px 0;
+        cursor: pointer;
+        font: 0/0 a;
+        text-shadow: none;
+        color: transparent;
+        &:hover {
+            background-position: 0 -170px;
+        }
+    }
+    .timetable-dash { background: url(/images/grimwade/icon-timetable.gif) no-repeat; }
+    .myclass-dash { background: url(/images/grimwade/icon-myclass.gif) no-repeat; }
+    .sport-dash { background: url(/images/grimwade/icon-sport.gif) no-repeat; }
+    .library-dash { background: url(/images/grimwade/icon-library.gif) no-repeat; }
+    .science-dash { background: url(/images/grimwade/icon-science.gif) no-repeat; }
+    .art-dash { background: url(/images/grimwade/icon-art.gif) no-repeat; }
+    .rave-dash { background: url(/images/grimwade/icon-rave.gif) no-repeat; }
+    .elearning-dash { background: url(/images/grimwade/icon-elearning.gif) no-repeat; }
+    .pe-dash { background: url(/images/grimwade/icon-pe.gif) no-repeat; }
+    .music-dash { background: url(/images/grimwade/icon-music.gif) no-repeat; }
+    .chinese-dash { background: url(/images/grimwade/icon-chinese.gif) no-repeat; }
+}
