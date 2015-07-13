@@ -93,7 +93,6 @@ class External_TimetableDatePeriod implements Iterator {
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Return the current element
      *
      * @link http://php.net/manual/en/iterator.current.php
@@ -104,7 +103,6 @@ class External_TimetableDatePeriod implements Iterator {
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Move forward to next element
      *
      * @link http://php.net/manual/en/iterator.next.php
@@ -133,18 +131,16 @@ class External_TimetableDatePeriod implements Iterator {
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Return the key of the current element
      *
      * @link http://php.net/manual/en/iterator.key.php
-     * @return mixed scalar on success, or null on failure.
+     * @return int
      */
     public function key() {
         return $this->index;
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Checks if current position is valid
      *
      * @link http://php.net/manual/en/iterator.valid.php
@@ -161,7 +157,6 @@ class External_TimetableDatePeriod implements Iterator {
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Rewind the Iterator to the first element
      *
      * @link http://php.net/manual/en/iterator.rewind.php
