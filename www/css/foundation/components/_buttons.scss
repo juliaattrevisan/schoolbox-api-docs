@@ -344,16 +344,15 @@ input[type="submit"]{
 // Dropdown
 .f-dropdown{
 	@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
+	&.content-drop {
+		background-color: $f-dropdown-content-bg;
+    }
 }
 
 // Dropdown Buttons - Is this a joke?
 .dropdown.button::after,
 .split.button span:after{
 	border-color: $primary-color transparent transparent transparent;
-}
-
-#contentDrop{ 
-	background-color: $f-dropdown-content-bg;
 }
 
 // Custom breadcrumbs
