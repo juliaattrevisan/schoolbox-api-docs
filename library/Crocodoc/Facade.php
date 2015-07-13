@@ -56,8 +56,12 @@ class Facade
          * Otherwise upload it and start a new scribble
          */
         if (!strlen($submission->getUuid())) {
-            $document = new Document($submission);
-            $response = $document->upload();
+            try {
+                $document = new Document($submission);
+                $response = $document->upload();
+            } catch (\RangeException $e) {
+                echo "Error encountered: ".$e->getMessage();
+            }
 
             if ($response['error']) {
                 echo json_encode($response);

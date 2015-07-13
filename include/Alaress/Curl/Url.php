@@ -11,6 +11,8 @@ class Alaress_Curl_Url {
 	private $errors = array();
 	private $result = '';
 
+    private $responseCode = 0;
+
 	/* Default options
 	 */
 	private $options = array(
@@ -62,6 +64,7 @@ class Alaress_Curl_Url {
 
 		$this->setResult(curl_exec($ch));
 		$this->addErrors(curl_error($ch));
+		$this->setResponseCode(curl_getinfo($ch, CURLINFO_HTTP_CODE));
 
 		curl_close($ch);
 
@@ -108,6 +111,24 @@ class Alaress_Curl_Url {
 	public function getResult() {
 		return $this->result;
 	}
+
+    /**
+     * @return int
+     */
+    public function getResponseCode()
+    {
+        return $this->responseCode;
+    }
+
+    /**
+     * @param  int $responseCode
+     * @return $this
+     */
+    private function setResponseCode($responseCode)
+    {
+        $this->responseCode = $responseCode;
+        return $this;
+    }
 
 	/**
 	 * Set url
