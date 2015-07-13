@@ -11,9 +11,10 @@
 
 ini_set('display_errors',1);
 error_reporting(E_ALL & ~E_NOTICE);
-session_start();
 
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
+
+session_start();
 
 $ac = new AjaxChat($_SESSION['id'], $_POST);
 $ac->prepare($_POST);
