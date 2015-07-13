@@ -73,7 +73,7 @@ class Lister extends Renderer
                     $eventEndTime = clone $endTime;
                 }
 
-                for($i=0; $eventStartTime->lt($eventEndTime); $i++)  {
+                for($i=0; $eventStartTime->lte($eventEndTime); $i++)  {
                     $clone      = clone($currentEvent);
                     $clone->setStartTime(clone $eventStartTime);
                     $clone->setEndTime(clone $eventStartTime);
@@ -82,8 +82,9 @@ class Lister extends Renderer
 
                     $newCollection->add($clone);
 
-                    //Increment day counter
-                    $eventStartTime->addDays(1);
+                    // Increment day counter
+                    // Ensure start time is start of day for comparing against end time
+                    $eventStartTime->startOfDay()->addDays(1);
                 }
             }
             else {
