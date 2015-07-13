@@ -66,5 +66,19 @@ $type_list = array(
  * old search.php contexts
  */
 $omaha = array(
-    'link', 'folder', 'file'
+    'folder', 'file', 'link', 'textbox',
 );
+
+// Order of results, independent of whether it has landed on Omaha or not
+$order = [
+    'user',
+    'file',
+    'category',
+    'link',
+    'sitenews',
+    'homepagenews',
+    'blog',
+    'wiki',
+    'forum',
+    'event',
+];

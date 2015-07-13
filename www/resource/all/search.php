@@ -65,6 +65,11 @@ if (!$count['all']) {
 
     $this->getPage()->parse('RESULT', 'no_results', true);
 } else {
+    // Render users before all else
+    $userRenderer = new \Schoolbox\User\Search\Renderer($page, $result, $count, 0);
+    $userRenderer->setUseSeymourLinks(true);
+    $userRenderer->render();
+
     /* Omaha Beach
      *
      * These have landed
@@ -96,8 +101,8 @@ if (!$count['all']) {
     /* Dump them
      */
     $oldHandlerRenderers = new \Schoolbox\Collection();
-    $oldHandlerRenderers->add(new \Schoolbox\User\Search\Renderer($page, $result, $count, 0));
-    $oldHandlerRenderers->add(new \Schoolbox\File\Search\Renderer($page, $result, $count, 0));
+//    $oldHandlerRenderers->add(new \Schoolbox\User\Search\Renderer($page, $result, $count, 0));
+//    $oldHandlerRenderers->add(new \Schoolbox\File\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\News\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\Folder\News\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\Blog\Search\Renderer($page, $result, $count, 0));
