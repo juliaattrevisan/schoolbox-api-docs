@@ -13,12 +13,10 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
 use Crocodoc\Document;
 use Alaress\Lumberjack\Logger;
 
-
+$logger = new Logger;
 if(Config::get('crocodoc_api_token')) {
 
     $pendingUpload = FileMapper::getInstance()->getCrocodoc();
-
-    $logger = new Logger;
 
     foreach($pendingUpload as $submission) {
         $logger->notice("Uploading ".$submission->getFileName()."(".$submission->getId().")");
@@ -35,4 +33,6 @@ if(Config::get('crocodoc_api_token')) {
             $logger->error($e->getMessage());
         }
     }
+} else {
+    $logger->warning("Crocodoc API token not defined - exiting!");
 }
