@@ -365,8 +365,9 @@ input[type="submit"]{
 		a{
 			color: $primary-color;
 			text-decoration: none;
-			padding: rem-calc(($base-font-size - 8));
-			padding-left: 45px;
+			line-height: rem-calc($base-font-size);
+			padding: rem-calc(($base-font-size / 2));
+			padding-left: rem-calc($base-font-size);
 			background-color: tint($tertiary, 74%);
 			position: relative;
 			display: block;
@@ -382,20 +383,20 @@ input[type="submit"]{
 				display: block;
 				width: 0;
 				height: 0;
-				border-top: 50px solid transparent;
+				border-top: rem-calc($base-font-size) solid transparent;
 				@include single-transition(all, 0.15s, linear);
-				border-bottom: 50px solid transparent;
+				border-bottom: rem-calc($base-font-size) solid transparent;
 				position: absolute;
 				top: 50%;
-				margin-top: -50px;
+				margin-top: rem-calc($base-font-size) * -1;
 				left: 100%;
 				z-index: 2;
 			}
 			&:before{
-				margin-left: 1px; border-left: 20px solid $white;
+				margin-left: 1px; border-left: rem-calc($base-font-size * .4) solid $white;
 			}
 			&:after{
-				border-left: 20px solid tint($tertiary, 74%);
+				border-left: rem-calc($base-font-size * .4) solid tint($tertiary, 74%);
 			}
 			&:hover{
 				background-color: tint($tertiary, 87%);
