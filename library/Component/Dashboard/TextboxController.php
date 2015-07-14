@@ -23,7 +23,7 @@ class Component_Dashboard_TextboxController extends Component_Dashboard_Controll
 
 			try {
 				$textbox = $mapper->findById($textBoxID);
-
+                $this->setComponentName($textbox->getHeading());
 				$this->content = array(
 					'BOX_TITLE' => Scrub::text($textbox->getHeading()),
 					'BOX_CONTENT' => Scrub::HTML($textbox->getBody())
@@ -58,6 +58,7 @@ class Component_Dashboard_TextboxController extends Component_Dashboard_Controll
 		}
 
 
+        $this->parseConfig();
 		return true;
 	}
 
