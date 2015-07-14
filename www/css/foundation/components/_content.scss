@@ -691,6 +691,23 @@ table{
 			}
 		}
 	}
+    .reply{
+        border-top: 1px solid $body-bg;
+        clear: both;
+
+        @media #{$medium-up} {
+            margin-left: rem-calc((4.3 * $base-font-size));
+        }
+
+        @media #{$small-up} {
+            margin-left: rem-calc((2 * $base-font-size));
+        }
+
+        li,
+        .component-form{
+            clear: both;
+        }
+    }
 }
 
 // Activity list
@@ -840,61 +857,85 @@ table{
 }
 
 // Avatar Card
-.avatar-card{
-    padding: 0.5rem 0.5rem 0 1rem;
+.avatar-card {
+    @extend .card;
+    @extend .avatar;
+}
+
+.card {
 
     @media #{$small-up} {
         min-height: (3 * rem-calc($base-font-size));
+        padding: 0.25rem 0.5rem 0 1rem;
     }
     @media #{$medium-up} {
         min-height: (4 * rem-calc($base-font-size));
+        padding: 0.5rem 0.5rem 0 1rem;
+    }
+
+    &.avatar {
+        img, [class^="icon-"] {
+            float: left;
+            @media #{$small-up} {
+                margin: (-1 * rem-calc(($base-font-size - 12))) rem-calc($base-font-size) 0 -1rem;
+                width: (3 * rem-calc($base-font-size));
+            }
+            @media #{$medium-up} {
+                margin: (-1 * rem-calc(($base-font-size - 8))) rem-calc($base-font-size) 0 -1rem;
+                width: (4 * rem-calc($base-font-size));
+            }
+        }
+
+        [class^="icon-"] {
+            @media #{$small-up} {
+                padding: 0 0 0 0.375rem;
+                margin-top: -0.625rem;
+            }
+            @media #{$medium-up} {
+                padding: 0.125rem 0 0 0.875rem;
+                margin-top: -0.5rem;
+            }
+        }
+
+        ~ article, ~ .list-item-content {
+            @media #{$small-up} {
+                margin-left: (rem-calc($base-font-size));
+            }
+            @media #{$medium-up} {
+                margin-left: (5 * rem-calc($base-font-size));
+            }
+        }
+    }
+
+    &.info {
+        ~ article, ~ .list-item-content {
+            margin-left: (rem-calc($base-font-size));
+        }
     }
 
     h3 {
       margin: 0;
     }
+
     h3, .meta {
       text-overflow: ellipsis;
       overflow-x: hidden;
       white-space: nowrap;
     }
-	img, [class^="icon-"] {
-		float: left;
-
-        @media #{$small-up} {
-            margin: (-1 * rem-calc(($base-font-size - 8))) rem-calc($base-font-size) 0 -1rem;
-            width: (3 * rem-calc($base-font-size));
-        }
-        @media #{$medium-up} {
-            width: (4 * rem-calc($base-font-size));
-        }
-	}
-    [class^="icon-"] {
-
-      @media #{$small-up} {
-        padding: 0 0 0 0.375rem;
-        margin-top: -0.625rem;
-      }
-      @media #{$medium-up} {
-        padding: 0.125rem 0 0 0.875rem;
-        margin-top: -0.5rem;
-      }
-
-    }
 
 	p{
 		margin: 0;
 	}
-    &+ article {
-      clear:both;
-      margin-top: 0.5rem;
 
-      @media #{$small-up} {
-          margin-left: (4 * rem-calc($base-font-size));
-      }
-      @media #{$medium-up} {
-          margin-left: (5 * rem-calc($base-font-size));
-      }
+    textarea {
+        width: #{'calc(100% - 4rem)'};
+        max-width: #{'calc(100% - 4rem)'};
+    }
+
+    ~ article, ~ .list-item-content {
+        clear:both;
+        margin-top: 0.5rem;
+        padding-right: (0.5 * rem-calc($base-font-size));
     }
 }
 
@@ -918,15 +959,6 @@ p{
 		margin: rem-calc(($base-font-size - 8)) 0 rem-calc(($base-font-size - 8)) 74px;
 		p{
 			margin: $paragraph-margin-bottom 0;
-		}
-	}
-	.reply{
-		border-top: 1px solid $body-bg;
-		clear: both;
-		margin-left: 4.3rem;
-		li,
-		.component-form{
-			clear: both;
 		}
 	}
 
