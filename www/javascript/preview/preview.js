@@ -64,7 +64,8 @@
                         }
                     });
 
-                    var url = config.baseUrl + '/' + encodeURIComponent($(this).attr(config.attribute));
+                    var href = $(this).attr(config.attribute);
+                    var url  = config.baseUrl + '/' + encodeURIComponent(href);
 
                     $.get(url, function(response) {
                         $.magnificPopup.close();
@@ -96,6 +97,12 @@
                                 }
                             });
                         }
+                    })
+                    .fail(function() {
+                        // Did something break?
+                        // Just pretend this preview never happened.
+                        $.magnificPopup.close();
+                        window.location.href = href;
                     });
                 }
             });
