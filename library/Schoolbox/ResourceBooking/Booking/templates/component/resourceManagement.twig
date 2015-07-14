@@ -4,75 +4,82 @@
             <div class="content">
                 <ul class="action-list">
                     {% for item in bookingsByResource %}
-                        <li class="resource {% if item.resource.image.hash is empty %}no-image{% endif %}">
+                        <li class="row">
                             {# Show image for item if it's there, otherwise some empty image? #}
-                            <div class="avatar-card">
-                                <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">
-                                    {% if item.resource.image.hash %}
-                                        <img src="/storage/image.php?size=square64&amp;hash={{ item.resource.image.hash|e('url') }}" />
-                                    {% else %}
-                                        {# this icon needs to be responsive to screen size #}
-                                        <span class="icon-resource-booking icon-64 no-text"></span>
-                                    {% endif %}
-                                    <p>{{ item.resource.name }}</p>
-                                </a>
+                            <div class="small-12 columns">
+                                <div class="avatar-card">
+                                    <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">
+                                        {% if item.resource.image.hash %}
+                                            <img src="/storage/image.php?size=square64&amp;hash={{ item.resource.image.hash|e('url') }}" />
+                                        {% else %}
+                                            {# this icon needs to be responsive to screen size #}
+                                            <span class="icon-resource-booking icon-64 no-text"></span>
+                                        {% endif %}
+                                        <p>{{ item.resource.name }}</p>
+                                    </a>
+                                </div>
                             </div>
 
-                            <ul>
-                                {% for event in item.bookingEvents %}
+                            {% for event in item.bookingEvents %}
+                            <div class="small-11 small-offset-1 columns">
+                                {# show booker's avatar card #}
+                                <div class="avatar-card">
+                                    <a href="/search/user/{{ event.booking.event.owner.id }}">
+                                        <img class="portrait" src="/portrait.php?userId={{ event.booking.event.owner.externalId|e('url') }}&amp;size=square32" />
+                                        <p>{{ event.booking.event.owner.formatName }}</p>
+                                    </a>
+
+                                    <p class="meta">
+                                        requested on <time datetime="{{ event.booking.createdAt.getDatabase() }}">{{ event.booking.createdAt.getShort() }}</time>
+                                        {% if event.booking.event.owner.id != event.booking.event.author.id %}
+                                            by
+                                            <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="small-11 small-offset-1 columns">
+                                <p>
+                                    {% include 'sub/timespan.twig' with {
+                                        start: event.booking.event.startDateTime,
+                                        end:   event.booking.event.endDateTime
+                                    } %}
+                                </p>
+                            </div>
+
+                            <div class="small-11 small-offset-1 columns">
+                                <button data-dropdown="resourceManagement-status-{{ event.getBooking().getId() }}"
+                                        aria-controls="resourceManagement-status-{{ event.getBooking().getId() }}"
+                                        aria-expanded="false"
+                                        class="button primary dropdown">Set Status</button>
+                                <br>
+                                <ul data-dropdown-content
+                                    id="resourceManagement-status-{{ event.getBooking().getId() }}"
+                                    class="f-dropdown"
+                                    aria-hidden="true"
+                                >
                                     <li>
-                                        {# show booker's avatar card #}
-                                        <div class="avatar-card">
-                                            <a href="/search/user/{{ event.booking.event.owner.id }}">
-                                                <img class="portrait" src="/portrait.php?userId={{ event.booking.event.owner.externalId|e('url') }}&amp;size=square32" />
-                                                <p>{{ event.booking.event.owner.formatName }}</p>
-                                            </a>
-
-                                            <p class="meta">
-                                                requested on <time datetime="{{ event.booking.createdAt.getDatabase() }}">{{ event.booking.createdAt.getShort() }}</time>
-                                                {% if event.booking.event.owner.id != event.booking.event.author.id %}
-                                                    by
-                                                    <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
-                                                {% endif %}
-                                            </p>
-                                        </div>
-
-                                        <p>
-                                            <time datetime="{{ event.booking.event.evenstartDateTime.getDatabase() }}">{{ event.booking.event.startDateTime.getShort() }}</time>
-                                            –
-                                            <time datetime="{{ event.booking.event.endDateTime.getDatabase() }}">{{ event.booking.event.endDateTime.getShort() }}</time>.
-                                        </p>
-
-                                        <button data-dropdown="resourceManagement-status-{{ event.getBooking().getId() }}"
-                                                aria-controls="resourceManagement-status-{{ event.getBooking().getId() }}"
-                                                aria-expanded="false"
-                                                class="button primary dropdown">Set Status</button>
-                                        <br>
-                                        <ul data-dropdown-content
-                                            id="resourceManagement-status-{{ event.getBooking().getId() }}"
-                                            class="f-dropdown"
-                                            aria-hidden="true"
-                                        >
-                                            <li>
-                                                <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
-                                                   class="icon-approve">Approved</a>
-                                            </li>
-                                            <li>
-                                                <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
-                                                   class="icon-undo">Pending</a>
-                                            </li>
-                                            <li>
-                                                <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
-                                                   class="icon-close">Rejected</a>
-                                            </li>
-                                        </ul>
+                                        <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
+                                           class="icon-approve">Approved</a>
                                     </li>
-                                {% endfor %}
-                            </ul>
+                                    <li>
+                                        <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
+                                           class="icon-undo">Pending</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
+                                           class="icon-close">Rejected</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            {% endfor %}
                         </li>
                     {% else %}
-                        <li class="dark clearfix no_events">
-                            <em>There are no upcoming bookings for you to confirm.</em>
+                        <li class="row">
+                            <div class="small-12 columns">
+                                <em>There are no upcoming bookings for you to confirm.</em>
+                            </div>
                         </li>
                     {% endfor %}
                 </ul>
