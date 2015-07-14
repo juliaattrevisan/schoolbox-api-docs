@@ -1,37 +1,51 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-	{CONFIGURATION}
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <ul class="information-list">
-            <!-- BEGIN duework -->
-            <li class="{ON_OFF}">
-                <!-- BEGIN has_actions -->
-                <span class="actions">
-                    <!-- BEGIN duework_result_link -->
-                    <a class="btn statistics no-text" href="/submission/viewSubmission/{DUE_ID}" title="View Results"><span></span></a>
-                    <!-- END duework_result_link -->
+    {CONFIGURATION}
 
-                    <!-- BEGIN duework_actions -->
-                    <a class="btn no-text {DUE_ACTION_ICON}" href="{DUE_ACTION}" title="{DUE_ACTION_NAME}"><span></span></a>
-                    <!-- END duework_actions -->
-                </span>
-                <!-- END has_actions -->
-                <h4><a href="/submission/submissionHistory/{DUE_ID}">{DUE_NAME}</a></h4>
-                <!-- BEGIN duework_due_date -->
-                <span class="gradient-{WORK_URGENCY}">Due {DUE_DATE_RELATIVE}</span> on {DUE_DATE}
-                <!-- END duework_due_date -->
-                <div class="wysiwyg {COMPONENT_COMPACTMODE}">{DUE_COMMENT}</div>
-            </li>
-            <!-- END duework -->
-        </ul>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <ul class="action-list">
+                    <!-- BEGIN duework -->
+                    <li class="row" data-equalizer>
+                        <div class="small-10 columns" data-equalizer-watch>
+                            <a href='/submission/submissionHistory/{DUE_ID}'>
+                                <h3>{DUE_NAME}</h3>
+                            </a>
 
-        <p class="interact">
-            <!-- BEGIN allwork_button -->
-            <a href="/submission/allWork/{USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ID}" title="View grades"  class="btn tick"><span></span>View Grades</a>
-            <!-- END allwork_button -->
-            <!-- BEGIN submit_dw -->
-            <a href="/submission/createSubmission/new/{ID}/" class="btn due-work"><span></span>Post Due Work</a>
-            <!-- END submit_dw -->
-        </p>
+                            <!-- BEGIN duework_due_date -->
+                            <p class="meta">
+                                <span class="gradient-{WORK_URGENCY}">Due {DUE_DATE_RELATIVE}</span> on {DUE_DATE}
+                            </p>
+                            <!-- END duework_due_date -->
+
+                            <article class="{COMPONENT_COMPACTMODE}">{DUE_COMMENT}</article>
+                        </div>
+                        <div class="two actions">
+                            <!-- BEGIN has_actions -->
+                            <!-- BEGIN duework_result_link -->
+                            <a data-equalizer-watch class="icon-poll no-text" href="/submission/viewSubmission/{DUE_ID}" title="View Results"></a>
+                            <!-- END duework_result_link -->
+
+                            <!-- BEGIN duework_actions -->
+                            <a data-equalizer-watch class="icon-{DUE_ACTION_ICON} no-text" href="{DUE_ACTION}" title="{DUE_ACTION_NAME}"></a>
+                            <!-- END duework_actions -->
+                            <!-- END has_actions -->
+                        </div>
+                    </li>
+                    <!-- END duework -->
+                </ul>
+
+                <div class="content">
+                    <!-- BEGIN allwork_button -->
+                    <a href="/submission/allWork/{USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ID}" title="View grades" class="button icon-approve">View Grades</a>
+                    <!-- END allwork_button -->
+                    <!-- BEGIN submit_dw -->
+                    <a href="/submission/createSubmission/new/{ID}/" class="button icon-due-work">Post Due Work</a>
+                    <!-- END submit_dw -->
+                </div>
+            </section>
+        </div>
     </div>
 </div>
