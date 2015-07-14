@@ -9,25 +9,23 @@
                 <ul class="action-list">
                     <!-- BEGIN forum -->
                     <li class="row" data-equalizer>
-                        <div class="ten-column" data-equalizer-watch>
-                            <h3>
-                                <a href='/forum/thread/{THREAD_ID}'>{THREAD_TITLE}</a>
-                            </h3>
-
-                            <div class="avatar-card clearfix">
-                                <a href="/search/user/{THREAD_USER_ID}" title="View Profile">
-                                    <img src="/portrait.php?userId={THREAD_USER_EXTERNAL_ID}&size=square32" alt="View Profile" />
-                                    <p>{THREAD_USER}</p>
+                        <div class="ten-column no-pad" data-equalizer-watch>
+                            <div class="avatar card">
+                                <a href='/forum/thread/{THREAD_ID}'>
+                                    <img src="/portrait.php?userId={THREAD_USER_EXTERNAL_ID}&size=square64" alt="{THREAD_USER}" />
+                                    <h3>
+                                        {THREAD_TITLE}
+                                    </h3>
                                 </a>
-                                <p class="meta">Posted on {THREAD_DATE}</p>
+                                <p class="meta">Posted by {THREAD_USER} {THREAD_DATE}</p>
                             </div>
                         </div>
                         <div class="two actions">
                             <!-- BEGIN forum_reply -->
-                            <a class="icon-forum no-text" href="/forum/modify/{ID}/{THREAD_ID}" title="Post a reply"></a>
+                            <a data-equalizer-watch class="icon-forum no-text" href="/forum/modify/{ID}/{THREAD_ID}" data-tooltip title="Post a reply"></a>
                             <!-- END forum_reply -->
 
-                            <a class="icon-next no-text" href="/forum/{COMPONENT_CONFIG_SRC_ID}" title="Go to Forum"></a>
+                            <a data-equalizer-watch class="icon-next no-text" href="/forum/{COMPONENT_CONFIG_SRC_ID}" data-tooltip title="Go to Forum"></a>
                         </div>
                     </li>
                     <!-- END forum -->
