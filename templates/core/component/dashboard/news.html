@@ -1,28 +1,27 @@
 <div id='component{COMPONENT_INSTANCE_ID}' data-component>
-
     {CONFIGURATION}
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
-            <section>
-                <div class="content">
-                    <ul class="tabs" data-tab>
-                        <!-- BEGIN topic_header -->
-                        <li class="tab-title {TOPIC_ACTIVE}">
-                            <a href="#component{COMPONENT_INSTANCE_ID}-{TOPIC_CLEAN}">{NEWS_TOPIC}</a>
-                        </li>
-                        <!-- END topic_header -->
-                    </ul>
+            <ul class="tabs" data-tab>
+                <!-- BEGIN topic_header -->
+                <li class="tab-title {TOPIC_ACTIVE}">
+                    <a href="#component{COMPONENT_INSTANCE_ID}-{TOPIC_CLEAN}">{NEWS_TOPIC}</a>
+                </li>
+                <!-- END topic_header -->
+            </ul>
 
-                    <div class="tabs-content">
-                        <!-- BEGIN topic -->
-                        <ul class="action-list content {TOPIC_ACTIVE}" id="component{COMPONENT_INSTANCE_ID}-{TOPIC_CLEAN}">
-                            <!-- BEGIN news -->
-                            <li class="row">
+            <section>
+                <div class="tabs-content">
+                    <!-- BEGIN topic -->
+                    <ul class="action-list content {TOPIC_ACTIVE}" id="component{COMPONENT_INSTANCE_ID}-{TOPIC_CLEAN}">
+                        <!-- BEGIN news -->
+                        <li class="row">
+                            <div class="column no-pad small-11" data-equalizer-watch>
                                 <div class="avatar-card">
                                     <a href="{NEWS_URL}" title="{NEWS_TITLE}">
                                         <!-- BEGIN news_image -->
-                                        <img src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/>
+                                        <img src="/storage/image.php?hash={NEWS_IMAGE}&size=square64" />
                                         <!-- END news_image -->
                                         <!-- BEGIN news_no_image -->
                                         <div class="icon-news icon-64"></div>
@@ -33,14 +32,20 @@
                                         Posted by <a href="/user/profile/{NEWS_AUTHOR_ID}">{NEWS_AUTHOR_NAME}</a> {NEWS_TIME}
                                     </p>
                                 </div>
-                                <article>{NEWS_SHORT}</article>
-                            </li>
-                            <!-- END news -->
-                        </ul>
-                        <!-- END topic -->
-                    </div>
+                                <article>
+                                    <p>
+                                        {NEWS_SHORT}
+                                    </p>
+                                </article>
+                            </div>
+                        </li>
+                        <!-- END news -->
+                    </ul>
+                    <!-- END topic -->
                 </div>
             </section>
         </div>
     </div>
 </div>
+
+
