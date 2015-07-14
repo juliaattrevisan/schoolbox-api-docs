@@ -20,71 +20,69 @@
 
                             <ul>
                                 {% for event in item.bookingEvents %}
-                                    <li class="{% if loop.index0 is even %}dark{% endif %} booking-details">
-
-                                        <div class="booking-event">
-                                            {# Show event's owner #}
+                                    <li>
+                                        {# show booker's avatar card #}
+                                        <div class="avatar-card">
                                             <a href="/search/user/{{ event.booking.event.owner.id }}">
                                                 <img class="portrait" src="/portrait.php?userId={{ event.booking.event.owner.externalId|e('url') }}&amp;size=square32" />
+                                                <p>{{ event.booking.event.owner.formatName }}</p>
                                             </a>
 
-                            <span class="event-data">
-                                <span class="event-timespan">{{ event.eventSpan|raw }}</span>
-                                <span class="event-ownership">
-                                    {% if event.booking.event.owner.id != event.booking.event.author.id %}
-                                        requested for
-                                        <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
-                                        by
-                                        <a href="/search/user/{{ event.booking.event.author.id }}">{{ event.booking.event.author.formatName }}</a>
-                                        {% include 'sub/userLink.twig' with {user: event.booking.event.author} %}
-                                    {% else %}
-                                        requested by
-                                        <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
-                                    {% endif %}
-                                    on {{ event.booking.createdAt.long }}
-                                </span>
-                            </span>
+                                            <p class="meta">
+                                                requested on <time datetime="{{ event.booking.createdAt.getDatabase() }}">{{ event.booking.createdAt.getShort() }}</time>
+                                                {% if event.booking.event.owner.id != event.booking.event.author.id %}
+                                                    by
+                                                    <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
+                                                {% endif %}
+                                            </p>
                                         </div>
-                        <span class="actions booking-controls">
-                            {##
-                             # approve/reject selector
-                             #}
-                            <div class="status-selector">
-                                <span class="btn no-text
-                                        {% if event.booking.status.approved %}tick
-                                        {% elseif event.booking.status.pending %}time-table
-                                        {% elseif event.booking.status.rejected %}cross
-                                        {% endif %}"
-                                      title="Current Status: {{ event.booking.status.name }}"><span></span></span>
-                                <ul class="status-buttons">
-                                    <li class="status-header">Set Status</li>
-                                    <li>
-                                        <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
-                                           class="status-option">
-                                            <span class="actions btn no-text tick"><span></span></span>
-                                            <span class="status-label">Approve</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
-                                           class="status-option">
-                                            <span class="actions btn no-text time-table"><span></span></span>
-                                            <span class="status-label">Pending</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
-                                           class="status-option">
-                                            <span class="actions btn no-text cross"><span></span></span>
-                                            <span class="status-label">Deny</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <a class="btn no-text modify" href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}" title="Modify Booking">
-                                <span></span>
-                            </a>
-                        </span>
+
+                                        <p>
+                                            <time datetime="{{ event.booking.event.evenstartDateTime.getDatabase() }}">{{ event.booking.event.startDateTime.getShort() }}</time>
+                                            –
+                                            <time datetime="{{ event.booking.event.endDateTime.getDatabase() }}">{{ event.booking.event.endDateTime.getShort() }}</time>.
+                                        </p>
+
+                                        <span class="actions booking-controls">
+                                            {##
+                                             # approve/reject selector
+                                             #}
+                                            <div class="status-selector">
+                                                <span class="btn no-text
+                                                        {% if event.booking.status.approved %}tick
+                                                        {% elseif event.booking.status.pending %}time-table
+                                                        {% elseif event.booking.status.rejected %}cross
+                                                        {% endif %}"
+                                                      title="Current Status: {{ event.booking.status.name }}"><span></span></span>
+                                                <ul class="status-buttons">
+                                                    <li class="status-header">Set Status</li>
+                                                    <li>
+                                                        <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
+                                                           class="status-option">
+                                                            <span class="actions btn no-text tick"><span></span></span>
+                                                            <span class="status-label">Approve</span>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
+                                                           class="status-option">
+                                                            <span class="actions btn no-text time-table"><span></span></span>
+                                                            <span class="status-label">Pending</span>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
+                                                           class="status-option">
+                                                            <span class="actions btn no-text cross"><span></span></span>
+                                                            <span class="status-label">Deny</span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <a class="btn no-text modify" href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}" title="Modify Booking">
+                                                <span></span>
+                                            </a>
+                                        </span>
                                     </li>
                                 {% endfor %}
                             </ul>
