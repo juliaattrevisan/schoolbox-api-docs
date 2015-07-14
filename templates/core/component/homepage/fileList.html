@@ -11,40 +11,38 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
-                <div class="dz-wrap">
-                    <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post"></form>
+                <div class="dropzone-wrap">
+                    <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post"></form>
 
-                    <ul class="action-list">
+                    <ul data-dz-container class="action-list">
                         <!-- BEGIN files -->
                         <li class="row" data-equalizer>
-                            <div class="one-column {HIDDEN}">
-                                <img src="/images/mime/60x60/{FILE_MIME_IMAGE}" />
-                            </div>
-                            <div class="ten-column {HIDDEN}" data-equalizer-watch>
+                            <div class="small-11 columns no-pad {HIDDEN}" data-equalizer-watch>
+                                <div class="avatar-card">
+                                    <!-- BEGIN file_url -->
+                                    <a data-plugin="preview" href="{FILE_URL}" rel="external">
+                                        <img class="content" src="/images/mime/60x60/{FILE_MIME_IMAGE}" />
+                                        <h3>{FILE_DESCRIPTION}</h3>
+                                    </a>
+                                    <!-- END file_url -->
+                                    <!-- BEGIN file_no_url -->
+                                    <img src="/images/mime/60x60/{FILE_MIME_IMAGE}" />
+                                    <h3>{FILE_DESCRIPTION}</h3>
+                                    <!-- END file_no_url -->
 
-                                <!-- BEGIN file_url -->
-                                <h3>
-                                    <a data-plugin="preview" href="{FILE_URL}" rel="external">{FILE_DESCRIPTION}</a>
-                                </h3>
-                                <!-- END file_url -->
-
-                                <!-- BEGIN file_no_url -->
-                                <h3>{FILE_DESCRIPTION}</h3>
-                                <!-- END file_no_url -->
-
-                                <p class="meta {COMPONENT_COMPACTMODE}">
-                                    {FILE_COMMENT}
-                                </p>
-
-                                <p class="meta {COMPONENT_COMPACTMODE}">
-                                    Posted by
-                                    <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a>
-                                    {FILE_POSTED_RELATIVE}
-                                </p>
+                                    <p class="meta">
+                                        Posted by
+                                        <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a>
+                                        {FILE_POSTED_RELATIVE}
+                                    </p>
+                                </div>
+                                <div class="list-item-content {COMPONENT_COMPACTMODE}">
+                                    <p>{FILE_COMMENT}</p>
+                                </div>
                             </div>
                             <div class="one actions">
                                 <!-- BEGIN modify_file -->
-                                <a class="icon-modify no-text" href="/cms/file/{FILE_ID}" title="Modify File"></a>
+                                <a data-equalizer-watch class="icon-modify no-text" href="/cms/file/{FILE_ID}" title="Modify File"></a>
                                 <!-- END modify_file -->
                             </div>
                         </li>
@@ -62,7 +60,7 @@
                         $(function() {
                             $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
                                 wrapClass: 'dragging',
-                                previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
+                                previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
                                 tplWrap: '<li class="dz-preview" />',
                                 refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
                                 refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
