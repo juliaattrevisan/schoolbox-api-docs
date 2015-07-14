@@ -2,18 +2,22 @@
     <div class="small-12 island">
         <section>
             <div class="content">
-                <ul>
+                <ul class="action-list">
                     {% for item in bookingsByResource %}
                         <li class="resource {% if item.resource.image.hash is empty %}no-image{% endif %}">
                             {# Show image for item if it's there, otherwise some empty image? #}
-                            <div class="resource-item">
-                                {% if item.resource.image.hash %}
-                                    <img class="resource-image" src="/storage/image.php?size=square32&amp;hash={{ item.resource.image.hash|e('url') }}" />
-                                {% endif %}
-                                <h3>
-                                    <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">{{ item.resource.name }}</a>
-                                </h3>
+                            <div class="avatar-card">
+                                <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">
+                                    {% if item.resource.image.hash %}
+                                        <img src="/storage/image.php?size=square64&amp;hash={{ item.resource.image.hash|e('url') }}" />
+                                    {% else %}
+                                        {# this icon needs to be responsive to screen size #}
+                                        <span class="icon-resource-booking icon-64 no-text"></span>
+                                    {% endif %}
+                                    <p>{{ item.resource.name }}</p>
+                                </a>
                             </div>
+
                             <ul>
                                 {% for event in item.bookingEvents %}
                                     <li class="{% if loop.index0 is even %}dark{% endif %} booking-details">
