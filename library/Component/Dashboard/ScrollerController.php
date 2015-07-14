@@ -72,18 +72,11 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
 
         $this->setBlock($templateHandle, 'image_scroller', 'image_scroller_block');
         $this->setBlock('image_scroller', 'show_caption', 'show_caption_block');
-        $this->setBlock($templateHandle, 'has_header', 'has_header_block');
 
         /* Hide header bar if desired
          */
         if ($this->getConfig('compactMode')) {
-            $this->setVar(
-                array(
-                    'has_header_block' => ''
-                )
-            );
-        } else {
-            $this->parse('has_header_block', 'has_header');
+            $this->setVar('CONFIGURATION', '');
         }
 
         // Make sure there a config option
