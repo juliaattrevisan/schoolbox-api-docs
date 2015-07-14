@@ -14,6 +14,9 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
     private $submissions;
     private $dump;
 
+    protected $componentName = 'Most Recent Submissions';
+    protected $componentHref = '/submission/listSubmission/';
+
     public function execute () {
         // init handlers
         $this->groupHandler = new Group();
