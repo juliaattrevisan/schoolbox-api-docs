@@ -1,51 +1,51 @@
-<script type="text/javascript">
-    $(function () {
-        // Show all news in first category
-        var firstCategory = $('#category li:first-child a').addClass('current');
-        $('ul.topic li').filter('.'+firstCategory.attr('title')).show();
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    {CONFIGURATION}
 
-        // Switch titles
-        $('#category a').click(function (event) {
-            event.preventDefault();
-            if (!$(this).hasClass("current")) {
-                $('#category a').removeClass('current');
-                $(this).addClass('current');
-                var el = $(this).attr('title');
-                $('ul.topic > li').hide();
-                $('ul.topic > li.' + el).show();
-            }
-        });
-    });
-</script>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <ul class="tabs" data-tab>
+                <!-- BEGIN topic_header -->
+                <li class="tab-title {TOPIC_ACTIVE}">
+                    <a href="#component{COMPONENT_INSTANCE_ID}-{TOPIC_CLEAN}">{NEWS_TOPIC}</a>
+                </li>
+                <!-- END topic_header -->
+            </ul>
 
-<div class="box clearfix news">
-    <h2><a href="/news/">News Headlines</a></h2>
-
-    <ul id="category" class="admin-nav">
-        <!-- BEGIN topic_header -->
-        <li><a href="#" title="{TOPIC_CLEAN}">{NEWS_TOPIC}</a></li>
-        <!-- END topic_header -->
-    </ul>
-	<ul class="topic">
-		<!-- BEGIN topic -->
-		<li class="hide {TOPIC_CLEAN}">
-			<ul class="information-list">
-				<!-- BEGIN news -->
-				<li class="{ON_OFF} clearfix">
-					<!-- BEGIN news_image -->
-					<a class="thumbnail" href="{NEWS_URL}" title="{NEWS_TITLE}">
-						<img width="64" height="64" src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/>
-					</a>
-					<!-- END news_image -->
-
-					<h3><a href="{NEWS_URL}" title="{NEWS_TITLE}">{NEWS_TITLE}</a></h3>
-					<p class="meta">Posted {NEWS_TIME}</p>
-					<p>{NEWS_SHORT}</p>
-				</li>
-				<!-- END news -->
-			</ul>
-		</li>
-		<!-- END topic -->
-	</ul>
+            <section>
+                <div class="tabs-content">
+                    <!-- BEGIN topic -->
+                    <ul class="information-list content {TOPIC_ACTIVE}" id="component{COMPONENT_INSTANCE_ID}-{TOPIC_CLEAN}">
+                        <!-- BEGIN news -->
+                        <li class="row">
+                            <div class="column no-pad small-11" data-equalizer-watch>
+                                <div class="avatar-card">
+                                    <a href="{NEWS_URL}" title="{NEWS_TITLE}">
+                                        <!-- BEGIN news_image -->
+                                        <img src="/storage/image.php?hash={NEWS_IMAGE}&size=square64" />
+                                        <!-- END news_image -->
+                                        <!-- BEGIN news_no_image -->
+                                        <div class="icon-news icon-64"></div>
+                                        <!-- END news_no_image -->
+                                        <h3>{NEWS_TITLE}</h3>
+                                    </a>
+                                    <p class="meta">
+                                        Posted by <a href="/user/profile/{NEWS_AUTHOR_ID}">{NEWS_AUTHOR_NAME}</a> {NEWS_TIME}
+                                    </p>
+                                </div>
+                                <article>
+                                    <p>
+                                        {NEWS_SHORT}
+                                    </p>
+                                </article>
+                            </div>
+                        </li>
+                        <!-- END news -->
+                    </ul>
+                    <!-- END topic -->
+                </div>
+            </section>
+        </div>
+    </div>
 </div>
+
 
