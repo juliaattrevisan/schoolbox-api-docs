@@ -42,8 +42,8 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
         $this->setBlock('rss_stories', 'rss_brief_output', 'rss_brief_output_block');
         $this->setVar('rss_block','');
 
-        $this->setVar('RSS_NAME', Scrub::text($this->rss->getTitle()));
-        $this->setVar('RSS_LINK', urlencode(base64_encode($this->rss->getLink())));
+        $this->setComponentName($this->rss->getTitle());
+        $this->setComponentHref($this->rss->getLink());
 
         $allRss = $this->rss->getOutput();
         $compactMode = $this->getConfig('compactMode');
