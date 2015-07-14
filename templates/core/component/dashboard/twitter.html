@@ -1,26 +1,45 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-    <h2>{COMPONENT_NAME}</h2>
-	<ul class="information-list">
-		<!-- BEGIN tweet -->
-		<li class="{ON_OFF}">
-			<p class="meta">
-                <a class="author" href="https://twitter.com/{TWEET_AUTHOR}">
-                    <img height="32" width="32" src="{TWEET_AVATAR}" />
-                    {TWEET_FULLNAME} @{TWEET_AUTHOR}
-                </a><br />
-				Tweeted on {TWEET_DATE}
-			</p>
-			<p>{TWEET_TEXT}<p>
-			
-			<div>
-				<!-- BEGIN tweet_media -->
-				<img src="{TWEET_MEDIA_URL}:small" /><br />
-				<!-- END tweet_media -->
-			</div>
-		</li>
-		<!-- END tweet -->
-	</ul>
-	<p class="interact">
-		<a class="btn search" href="{SEARCH_URL}"><span></span>Search on Twitter</a>
-	</p>
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
+
+    {CONFIGURATION}
+
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <ul class="information-list">
+                    <!-- BEGIN tweet -->
+                    <li class="row" data-equalizer>
+                        <div class="avatar-card clearfix">
+                            <a href="https://twitter.com/{TWEET_AUTHOR}" title="View Profile">
+                                <img src="{TWEET_AVATAR}" alt="View Profile" />
+                                <p>{TWEET_FULLNAME}</p>
+
+                                <p class="meta">@{TWEET_AUTHOR}</p>
+                            </a>
+
+                            <p class="meta">Tweeted on {TWEET_DATE}</p>
+                        </div>
+
+                        <article>
+                            <p>
+                                {TWEET_TEXT}
+                            </p>
+
+                            <!-- BEGIN tweet_media -->
+                            <p>
+                                <img src="{TWEET_MEDIA_URL}:small" />
+                            </p>
+                            <!-- END tweet_media -->
+                        </article>
+                    </li>
+                    <!-- END tweet -->
+                </ul>
+
+                <div class="content">
+                    <a class="button icon-twitter" href="{SEARCH_URL}">Search on Twitter</a>
+                </div>
+            </section>
+        </div>
+    </div>
 </div>
+
