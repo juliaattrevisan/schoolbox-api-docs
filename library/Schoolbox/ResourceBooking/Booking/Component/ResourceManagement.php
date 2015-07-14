@@ -95,18 +95,12 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
             return false;
         }
 
-        // Where do I get a Twig loader from?
-        // I should get the dependency injected one, but that means getting the
-        // global DI container.
-        // I could always get the controller out of DI.
-        $this->setVar(
-            'COMPONENT_CONTENT',
-            $this->templateEngine->render(
-                '@resourceBooking/component/resourceManagement.twig',
-                array(
-                    'bookingsByResource' => $this->bookings,
-                    'component'          => $this,
-                )
+        $this->renderTwigTemplate(
+            $templateHandle,
+            '@resourceBooking/component/resourceManagement.twig',
+            array(
+                'bookingsByResource' => $this->bookings,
+                'component'          => $this,
             )
         );
         return true;
