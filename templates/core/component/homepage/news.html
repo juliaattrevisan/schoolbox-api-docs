@@ -6,7 +6,7 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
-                <ul class="action-list">
+                <ul class="information-list">
                     <!-- BEGIN news -->
                     <li class="row" data-equalizer>
                         <div class="small-11 columns" data-equalizer-watch>
@@ -16,7 +16,7 @@
 
                             <div class="avatar-card clearfix">
                                 <a href="/search/user/{AUTHOR_ID}" title="View Profile">
-                                    <img src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square32" alt="View Profile" />
+                                    <img src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square64" alt="View Profile" />
                                     <p>{AUTHOR}</p>
                                 </a>
 
@@ -44,7 +44,7 @@
                 </ul>
 
                 <div class="content">
-                    <a href="/homepage/newsArchive/{NEWS_CATEGORY_ID}" class="button icon-view">View News Archive</a>
+                    <a href="/homepage/newsArchive/{NEWS_CATEGORY_ID}" class="button icon-view">View Archive</a>
                     <!-- BEGIN submit_news -->
                     <a href="/news/homepage/new/{NEWS_CATEGORY_ID}" class="button icon-upload">Post News</a>
                     <!-- END submit_news -->
