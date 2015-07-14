@@ -553,13 +553,31 @@ table{
 	@include label(
 		$bg: $gainsboro
 	);
-	color: $charcoal;
+	color: darken($gainsboro, 50%);
 }
 .warning.label {
 	@include label(
 		$bg: tint($warning-color, 74%)
 	);
 	color: $warning-color;
+}
+.hot.label {
+    @include label(
+        $bg: $hot-color
+    );
+    color: $white;
+}
+.cold.label {
+    @include label(
+        $bg: $cold-color
+    );
+    color: $white;
+}
+.neutral.label {
+    @include label(
+        $bg: $neutral-color
+    );
+    color: darken($neutral-color, 50%);
 }
 
 .highlight-panel {
@@ -628,7 +646,7 @@ table{
 		[class*=" icon-"]:before{
 			float: none;
 		}
-		.one-column{	
+		.one-column{
 			@media #{$small-up} { @include grid-column(1); }
 		}
 		.two-column{
@@ -644,10 +662,10 @@ table{
 			@media #{$small-up} { @include grid-column(10); }
 		}
 		.eleven-column{
-			@media #{$small-up} { @include grid-column(11); }	
+			@media #{$small-up} { @include grid-column(11); }
 		}
 		.twelve-column{
-			@media #{$small-up} { @include grid-column(12); }	
+			@media #{$small-up} { @include grid-column(12); }
 		}
 		// Column with thumbnail - No Padding
 		.one-column.thumbnail{
@@ -798,7 +816,7 @@ table{
 		@media #{$small-up} { @include grid-column(3); }
 		a{
 			@media #{$small-up} { @include grid-column(4); }
-			
+
 			// When you need space for 3 actions but only have 2
 			@include with-count(2) {
 			    width: 50%;
