@@ -6,30 +6,37 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
-                <div class="content">
-                    <ul class="activity-list">
-                        <!-- BEGIN work -->
-                        <li class="row">
-                            <div class="one-column">
-                                <span title="{WORK_COUNT} new submission(s)">{WORK_COUNT}</span>
-                            </div>
-                            <div class="eleven-column">
-                                <!-- BEGIN submission -->
+                <ul class="activity-list">
+                    <!-- BEGIN work -->
+                    <li class="row">
+                        <div class="one-column text-center">
+                            <span title="{WORK_COUNT} new submission(s)">{WORK_COUNT}</span>
+                        </div>
+                        <div class="eleven-column">
+                            <!-- BEGIN submission -->
+                            <h3>
                                 <a href="/submission/viewSubmission/{WORK_BOX_ID}">
-                                    <p>{WORK_DESCRIPTION}</p>
+                                    {WORK_DESCRIPTION}
                                 </a>
-                                <!-- END submission -->
-                                <!-- BEGIN assess -->
+                            </h3>
+                            <!-- END submission -->
+
+                            <!-- BEGIN assess -->
+                            <p>
                                 <a href="/assess/results/{WORK_BOX_ID}">
-                                    <p>{WORK_DESCRIPTION}</p>
+                                    {WORK_DESCRIPTION}
                                 </a>
-                                <!-- END assess -->
-                                <p class="meta">Last submission {WORK_DATE} in <a href="/homepage/{WORK_SUBJECT_ID}">{WORK_SUBJECT}</a></p>
-                            </div>
-                        </li>
-                        <!-- END work -->
-                    </ul>
-                </div>
+                            </p>
+                            <!-- END assess -->
+
+                            <p class="meta">
+                                Last submission {WORK_DATE} in
+                                <a href="/homepage/{WORK_SUBJECT_ID}">{WORK_SUBJECT}</a>
+                            </p>
+                        </div>
+                    </li>
+                    <!-- END work -->
+                </ul>
             </section>
         </div>
     </div>
