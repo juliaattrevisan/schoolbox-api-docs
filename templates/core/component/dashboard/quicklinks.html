@@ -1,12 +1,24 @@
-<div class="box quicklinks">
-    <div class="evi"></div>
-    <div class="quicklinks-container">
-        <ul class="{GROUP_NAME}-links">
-            <!-- BEGIN qlinks_item -->
-            <li class="{GROUP_NAME}">
-                <a class="{QUICKLINK_CLASS}" href="{QUICKLINK_HREF}">{QUICKLINK_LABEL}</a>
-            </li>
-            <!-- END qlinks_item -->
-        </ul>
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
+
+    {CONFIGURATION}
+
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <div class="evi"></div>
+                    <div class="quicklinks-container">
+                        <ul class="{GROUP_NAME}-links">
+                            <!-- BEGIN qlinks_item -->
+                            <li class="{GROUP_NAME}">
+                                <a class="{QUICKLINK_CLASS}" href="{QUICKLINK_HREF}">{QUICKLINK_LABEL}</a>
+                            </li>
+                            <!-- END qlinks_item -->
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
     </div>
 </div>
