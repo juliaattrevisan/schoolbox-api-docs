@@ -86,32 +86,13 @@ if ($groupHandler->isParent()) {
             error(19);
         }
     } else {
-        //Output a timetable for each campus a staff is involved in
-        if ($groupHandler->isStaff()) {
-            $user       = $userHandler->getByID($_SESSION['id']);
-            $campusList = $userHandler->getUserCampus($_SESSION['id']);
-
-            /* Don't output if multiple timetables if external campus code is the same */
-            $checked_campus_list = array();
-            foreach ($campusList as $campus) {
-                $campusObj = Schoolbox\CampusMapper::getInstance()->findById($campus);
-                if ($campusObj instanceof Schoolbox\Campus) {
-                    $campus_code = $campusObj->getExtTimetableCode();
-                    if (!isset($checked_campus_list[$campus_code])) {
-                        $checked_campus_list[$campus_code] = true;
-                        $user['campus']                    = $campusObj;
-                        $user['campusName']                = $campusObj->getName();
-                        $outputList[]                      = $user;
-                    }
-                }
-            }
-        } else {
-            // Output only the student's default campus timetable
-            /** @var Schoolbox\User $userObject **/
-            $userObject         = $_SESSION['user'];
-            $user               = $userHandler->getByID($userObject->getId());
-            $user['campus']     = $userObject->getDefaultCampus();
-            $user['campusName'] = $userObject->getDefaultCampus()->getName();
+        // Output my own timetable (all campuses)
+        /** @var Schoolbox\User $userObject **/
+        $userObject = $_SESSION['user'];
+        $user       = $userHandler->getByID($userObject->getId());
+        foreach ($userObject->getCampusCollection() as $campus) {
+            $user['campus']     = $campus;
+            $user['campusName'] = $campus->getName();
             $outputList[]       = $user;
         }
     }
