@@ -10,21 +10,23 @@
                     <!-- BEGIN wiki_row -->
                     <li class="row" data-equalizer>
                         <div class="small-11 columns" data-equalizer-watch>
-                            <a href='/wiki/{WIKI_CATEGORYID}/{WIKI_SLUG}'>
-                                <h3>{WIKI_HEADING}</h3>
-                            </a>
-
-                            <!-- BEGIN compact_hide -->
-                            <p class="meta {COMPONENT_COMPACTMODE}">
-                                Last edited by
-                                <a href="/search/user/{WIKI_AUTHOR_ID}">{WIKI_AUTHOR}</a>
-                                {WIKI_MODIFIED}
-                            </p>
-                            <!-- END compact_hide -->
+                            <div class="avatar card">
+                                <a href='/wiki/{WIKI_CATEGORYID}/{WIKI_SLUG}'>
+                                    <img class="content" src="/images/mime/60x60/document.png">
+                                    <h3>{WIKI_HEADING}</h3>
+                                </a>
+                                <p class="meta">
+                                    Last edited by
+                                    <a href="/search/user/{WIKI_AUTHOR_ID}">{WIKI_AUTHOR}</a>
+                                    {WIKI_MODIFIED}
+                                </p>
+                                <!-- BEGIN compact_hide -->
+                                <!-- END compact_hide -->
+                            </div>
                         </div>
                         <div class="one actions">
                             <!-- BEGIN modify_wiki -->
-                            <a class="icon-modify no-text" href="/wiki/modify/{WIKI_ID}" title="Modify Wiki"></a>
+                            <a data-equalizer-watch class="icon-modify no-text" href="/wiki/modify/{WIKI_ID}" title="Modify Wiki"></a>
                             <!-- END modify_wiki -->
                         </div>
                     </li>
