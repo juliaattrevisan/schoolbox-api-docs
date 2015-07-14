@@ -20,7 +20,7 @@ class IFrame extends Base {
      * @var array
      */
     private $contentTypes = [
-        'html', 'htm', 'txt', 'csv', 'pdf', 'swf',
+        'html', 'htm', 'txt', 'swf',
     ];
 
     /**
