@@ -19,12 +19,18 @@
                             
                             <p class="meta">Tweeted on {TWEET_DATE}</p>
                         </div>
-                        <article>{TWEET_TEXT}</article>
-                        <div>
+
+                        <article>
+                            <p>
+                                {TWEET_TEXT}
+                            </p>
+
                             <!-- BEGIN tweet_media -->
-                            <img src="{TWEET_MEDIA_URL}:small" /><br />
+                            <p>
+                                <img src="{TWEET_MEDIA_URL}:small" />
+                            </p>
                             <!-- END tweet_media -->
-                        </div>
+                        </article>
                     </li>
                     <!-- END tweet -->
                 </ul>
