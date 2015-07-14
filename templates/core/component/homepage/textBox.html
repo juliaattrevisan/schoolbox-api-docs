@@ -20,14 +20,14 @@
                     });
                 </script>
 
-                <div class="content">
-                    <a name="go-to{COMPONENT_INSTANCE_ID}"></a>
+                <form action="/textbox/textBoxForm.php" method="post" id="textBoxForm{TEXTBOX_ID}">
+                    <input type="hidden" name="originID" value="{ID}" />
+                    <input type="hidden" name="categoryID" value="{TEXTBOX_CATEGORY_ID}" />
+                    <input type="hidden" name="textBoxID" value="{TEXTBOX_ID}" />
+                    <input type="hidden" name="componentID" value="{COMPONENT_INSTANCE_ID}" />
 
-                    <form action="/textbox/textBoxForm.php" method="post" id="textBoxForm{TEXTBOX_ID}">
-                        <input type="hidden" name="originID" value="{ID}" />
-                        <input type="hidden" name="categoryID" value="{TEXTBOX_CATEGORY_ID}" />
-                        <input type="hidden" name="textBoxID" value="{TEXTBOX_ID}" />
-                        <input type="hidden" name="componentID" value="{COMPONENT_INSTANCE_ID}" />
+                    <div class="content">
+                        <a name="go-to{COMPONENT_INSTANCE_ID}"></a>
 
                         <label for="textBoxHeading{TEXTBOX_ID}">
                             Textbox Heading
@@ -38,10 +38,12 @@
                             Textbox Content
                             <textarea rows="20" name="textBoxBody" id="textBoxBody{TEXTBOX_ID}">{TEXTBOX_BODY}</textarea>
                         </label>
-                    </form>
+                    </div>
 
-                    <a href="#" class="button icon-modify" onclick="$('#textBoxForm{TEXTBOX_ID}').submit(); return false;">Save Document</a>
-                </div>
+                    <div class="content">
+                        <input type="submit" value="Save Document" />
+                    </div>
+                </form>
                 <!-- END text_editable -->
 
                 <!-- BEGIN text_locked -->
