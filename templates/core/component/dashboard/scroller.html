@@ -1,4 +1,5 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
     <script type="text/javascript" src="/javascript/components/jquery-cycle/jquery.cycle.all.js"></script>
     <script type="text/javascript" src="/javascript/components/eventie/eventie.js"></script>
     <script type="text/javascript" src="/javascript/components/eventEmitter/EventEmitter.js"></script>
@@ -61,18 +62,27 @@
             }
         });
     </script>
-	<!-- BEGIN has_header -->
-    <h2>{COMPONENT_NAME}</h2>
-	<!-- END has_header -->
-    <div id="galleryCycle-{COMPONENT_INSTANCE_ID}" class="scroller box clearfix" style="padding:0;border:0;margin:0;">
-        <!-- BEGIN image_scroller -->
-        <div class="slideshow-cycle">
-            <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}"
-                 alt="{IMAGE_NAME}"/>
-            <!-- BEGIN show_caption -->
-            <div class="caption-holder">{IMAGE_NAME}</div>
-            <!-- END show_caption -->
+
+    {CONFIGURATION}
+
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <div id="galleryCycle-{COMPONENT_INSTANCE_ID}" class="scroller box clearfix" style="padding:0;border:0;margin:0;">
+                        <!-- BEGIN image_scroller -->
+                        <div class="slideshow-cycle">
+                            <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}"
+                                 alt="{IMAGE_NAME}"/>
+                            <!-- BEGIN show_caption -->
+                            <div class="caption-holder">{IMAGE_NAME}</div>
+                            <!-- END show_caption -->
+                        </div>
+                        <!-- END image_scroller -->
+                    </div>
+                </div>
+            </section>
         </div>
-        <!-- END image_scroller -->
     </div>
 </div>
+
