@@ -33,11 +33,6 @@ foreach ($componentCollection as $component) {
                 $occupiedPositionList[] = $instance->getPosition();
             }
 
-            /* Admin configuration and index.php both use the same template.
-             * The former uses the template to configure; but the latter doesn't
-             * even display the title bar (which is now part of wrappers).
-             */
-            $this->setVar('CONFIGURATION', '');
             $this->parse($templateTarget, $templateHandle, true);
         }
     }
