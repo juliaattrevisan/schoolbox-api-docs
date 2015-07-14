@@ -1,10 +1,15 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <!-- BEGIN has_wolfram -->
-        <script type='text/javascript' id="WolframAlphaScript{WIDGET_ID}" src="http://www.wolframalpha.com/widget/widget.jsp?id={WIDGET_ID}&amp;output={WIDGET_OUTPUT_TYPE}"></script>
-        <!-- END has_wolfram -->
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <!-- BEGIN has_wolfram -->
+                    <script type='text/javascript' id="WolframAlphaScript{WIDGET_ID}" src="http://www.wolframalpha.com/widget/widget.jsp?id={WIDGET_ID}&amp;output={WIDGET_OUTPUT_TYPE}"></script>
+                    <!-- END has_wolfram -->
+                </div>
+            </section>
+        </div>
     </div>
 </div>
-
