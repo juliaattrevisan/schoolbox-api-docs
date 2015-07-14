@@ -7,29 +7,31 @@
                 <ul class="action-list">
                     <!-- BEGIN assess -->
                     <li class="row" data-equalizer>
-                        <div class="column small-10" data-equalizer-watch>
-                            <!-- BEGIN assessLink -->
-                            <h3><a href="/assess/intro/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></h3>
-                            <!-- END assessLink -->
+                        <div class="column small-10 no-pad" data-equalizer-watch>
+                            <div class="info card">
+                                <!-- BEGIN assessLink -->
+                                <h3><a href="/assess/intro/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></h3>
+                                <!-- END assessLink -->
 
-                            <!-- BEGIN resumeLink -->
-                            <h3><a href="/assess/attempt/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}">{ASSESS_TITLE}</a></h3>
-                            <!-- END resumeLink -->
+                                <!-- BEGIN resumeLink -->
+                                <h3><a href="/assess/attempt/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}">{ASSESS_TITLE}</a></h3>
+                                <!-- END resumeLink -->
 
-                            <!-- BEGIN assessNoLink -->
-                            <h3>{ASSESS_TITLE}</h3>
-                            <!-- END assessNoLink -->
+                                <!-- BEGIN assessNoLink -->
+                                <h3>{ASSESS_TITLE}</h3>
+                                <!-- END assessNoLink -->
 
-                            <!-- BEGIN assessDue -->
-                            <p class="meta">
-                                <span class="gradient-{ASSESS_FINISH_URGENCY}">Due {ASSESS_FINISH_RELATIVE_DATE}</span>
-                                <!-- BEGIN assess_finish_date -->
-                                on {ASSESS_FINISH_DATE}
-                                <!-- END assess_finish_date -->
-                            </p>
-                            <!-- END assessDue -->
+                                <!-- BEGIN assessDue -->
+                                <p class="meta">
+                                    <span class="gradient-{ASSESS_FINISH_URGENCY}">Due {ASSESS_FINISH_RELATIVE_DATE}</span>
+                                    <!-- BEGIN assess_finish_date -->
+                                    on {ASSESS_FINISH_DATE}
+                                    <!-- END assess_finish_date -->
+                                </p>
+                                <!-- END assessDue -->
+                            </div>
                             <article class="{COMPONENT_COMPACTMODE}">{ASSESS_DESCRIPTION}</article>
-                            <p class="{COMPONENT_COMPACTMODE}">Created by <a href='/search/user/{ASSESS_USER_ID}'>{ASSESS_USER_FIRSTNAME} {ASSESS_USER_LASTNAME}</a> {ASSESS_CREATED}</p>
+                            <p class="list-item-content {COMPONENT_COMPACTMODE}">Created by <a href='/search/user/{ASSESS_USER_ID}'>{ASSESS_USER_FIRSTNAME} {ASSESS_USER_LASTNAME}</a> {ASSESS_CREATED}</p>
                         </div>
                         <div class="two actions">
                             <!-- BEGIN resultLink -->
