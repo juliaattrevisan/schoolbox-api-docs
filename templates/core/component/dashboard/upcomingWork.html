@@ -1,32 +1,54 @@
-<h2><a href="/submission/dueWork/">Upcoming Due Work</a>
-    <!-- BEGIN view_all_due_work -->
-    <a href="/submission/allWork/{WORK_USER_ID}" title="View grades"  class="btn tick"><span></span>Grades</a>
-    <!-- END view_all_due_work -->
-</h2>
-<div class="listing">
-    <table class="upcoming-work table ruler">
-        <tbody>
-        <!-- BEGIN upcoming_work -->
-        <tr class="{ON_OFF}">
-            <td>
-                <!-- BEGIN upcoming_work_link -->
-                <a class="title" href="{UPCOMING_HREF}">{UPCOMING_TITLE}</a>
-                <!-- END upcoming_work_link -->
-                <!-- BEGIN upcoming_work_nolink -->
-                <span class="title">{UPCOMING_TITLE}</span>
-                <!-- END upcoming_work_nolink -->
-                <br />
-                <a href="/homepage/{UPCOMING_SUBJ_ID}">{UPCOMING_SUBJ_NAME}</a> {UPCOMING_TYPE}</td>
-            <td><span class="gradient-{UPCOMING_URGENCY}">Due {UPCOMING_DATE}</span> on {UPCOMING_TIME}</td>
-            <td>
-				<Span class="actions one-button">
-				<!-- BEGIN upcoming_work_actionable -->
-				<a href="{UPCOMING_BUTTON_HREF}" class="btn {UPCOMING_BTN_ICON} no-text"><span></span></a>
-				<!-- END upcoming_work_actionable -->
-				</span>
-            </td>
-        </tr>
-        <!-- END upcoming_work -->
-        </tbody>
-    </table>
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
+
+    {CONFIGURATION}
+
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <h2>
+                        <a href="/submission/dueWork/">Upcoming Due Work</a>
+                    </h2>
+
+                    <!-- BEGIN view_all_due_work -->
+                    <a href="/submission/allWork/{WORK_USER_ID}" title="View grades" class="button icon-tick">Grades</a>
+                    <!-- END view_all_due_work -->
+                </div>
+
+                <ul class="action-list">
+                    <!-- BEGIN upcoming_work -->
+                    <li class="row" data-equalizer>
+                        <div class="small-11 columns" data-equalizer-watch>
+                            <!-- BEGIN upcoming_work_link -->
+                            <h3>
+                                <a class="title" href="{UPCOMING_HREF}">{UPCOMING_TITLE}</a>
+                            </h3>
+                            <!-- END upcoming_work_link -->
+
+                            <!-- BEGIN upcoming_work_nolink -->
+                            <h3>
+                                {UPCOMING_TITLE}
+                            </h3>
+                            <!-- END upcoming_work_nolink -->
+
+                            <p class="meta">
+                                <a href="/homepage/{UPCOMING_SUBJ_ID}">{UPCOMING_SUBJ_NAME}</a> {UPCOMING_TYPE}
+                            </p>
+
+                            <p class="meta">
+                                <span class="gradient-{UPCOMING_URGENCY}">Due {UPCOMING_DATE}</span> on {UPCOMING_TIME}
+                            </p>
+                        </div>
+                        <div class="one actions">
+                            <!-- BEGIN upcoming_work_actionable -->
+                            <a href="{UPCOMING_BUTTON_HREF}" class="{UPCOMING_BTN_ICON} no-text"></a>
+                            <!-- END upcoming_work_actionable -->
+                        </div>
+                    </li>
+                    <!-- END upcoming_work -->
+                </ul>
+            </section>
+        </div>
+    </div>
 </div>
