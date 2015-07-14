@@ -101,7 +101,7 @@ foreach ($componentCollection as $component) {
         'component.definition.name' => Scrub::text($component->getInstance()->getDefinition()->getName()),
     ));
 
-
+    $component->setConfigurationTemplate('component/config/_templatewrapper.html');
     $component->parseConfigForTemplate();
 
     $this->parse("{$position}_block", $position, true);

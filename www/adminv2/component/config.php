@@ -64,6 +64,7 @@ function readConfig($vars, SitePage $page)
     }
 
     $component->setup(null, $component->getInstance()->getConfigArray());
+    $component->setConfigurationTemplate('component/config/_templatewrapper.html');
     $component->parseConfigForTemplate();
 
     $page->setVar(array(
