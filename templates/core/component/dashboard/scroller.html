@@ -30,8 +30,8 @@
                 $(this).css('text-align', slide_position);
             };
 
-            var container = $('#galleryCycle-{COMPONENT_INSTANCE_ID}');
-            var slideshow = container.find('.slideshow-cycle');
+            var container = $('#component{COMPONENT_INSTANCE_ID}').find('[data-imagescroller]');
+            var slideshow = container.find('[data-imagescroller-image]');
             if (slideshow.length > 1) {
                 slideshow.hide();
             }
@@ -42,7 +42,7 @@
                     //
                     // Set width to widest slide.
                     var width = 0;
-                    container.find('.slideshow-cycle').each(function() {
+                    slideshow.each(function() {
                         var this_width = $(this).width();
                         if (this_width > width) {
                             width = this_width;
@@ -69,13 +69,13 @@
         <div class="small-12 island">
             <section>
                 <div class="content">
-                    <div id="galleryCycle-{COMPONENT_INSTANCE_ID}" class="scroller box clearfix" style="padding:0;border:0;margin:0;">
+                    <div data-imagescroller style="padding:0;border:0;margin:0;">
                         <!-- BEGIN image_scroller -->
-                        <div class="slideshow-cycle">
+                        <div data-imagescroller-image>
                             <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}"
                                  alt="{IMAGE_NAME}"/>
                             <!-- BEGIN show_caption -->
-                            <div class="caption-holder">{IMAGE_NAME}</div>
+                            <p class="meta">{IMAGE_NAME}</p>
                             <!-- END show_caption -->
                         </div>
                         <!-- END image_scroller -->
