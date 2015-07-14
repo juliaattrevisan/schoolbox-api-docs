@@ -236,11 +236,9 @@ ul.countdown {
 
 // Dashboard subject list
 .dashboard-subject-list {
-    padding: 12px 0 0 17px;
-
-    li{
-        float: left;
-        padding: 0 !important;
+    margin: 0;
+    .subject{
+        list-style-type: none;
         margin: 3px;
 
         &[class*='KMG_'],
