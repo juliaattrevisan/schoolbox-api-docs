@@ -43,46 +43,29 @@
                                             <time datetime="{{ event.booking.event.endDateTime.getDatabase() }}">{{ event.booking.event.endDateTime.getShort() }}</time>.
                                         </p>
 
-                                        <span class="actions booking-controls">
-                                            {##
-                                             # approve/reject selector
-                                             #}
-                                            <div class="status-selector">
-                                                <span class="btn no-text
-                                                        {% if event.booking.status.approved %}tick
-                                                        {% elseif event.booking.status.pending %}time-table
-                                                        {% elseif event.booking.status.rejected %}cross
-                                                        {% endif %}"
-                                                      title="Current Status: {{ event.booking.status.name }}"><span></span></span>
-                                                <ul class="status-buttons">
-                                                    <li class="status-header">Set Status</li>
-                                                    <li>
-                                                        <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
-                                                           class="status-option">
-                                                            <span class="actions btn no-text tick"><span></span></span>
-                                                            <span class="status-label">Approve</span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
-                                                           class="status-option">
-                                                            <span class="actions btn no-text time-table"><span></span></span>
-                                                            <span class="status-label">Pending</span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
-                                                           class="status-option">
-                                                            <span class="actions btn no-text cross"><span></span></span>
-                                                            <span class="status-label">Deny</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <a class="btn no-text modify" href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}" title="Modify Booking">
-                                                <span></span>
-                                            </a>
-                                        </span>
+                                        <button data-dropdown="resourceManagement-status-{{ event.getBooking().getId() }}"
+                                                aria-controls="resourceManagement-status-{{ event.getBooking().getId() }}"
+                                                aria-expanded="false"
+                                                class="button primary dropdown">Set Status</button>
+                                        <br>
+                                        <ul data-dropdown-content
+                                            id="resourceManagement-status-{{ event.getBooking().getId() }}"
+                                            class="f-dropdown"
+                                            aria-hidden="true"
+                                        >
+                                            <li>
+                                                <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
+                                                   class="icon-approve">Approved</a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
+                                                   class="icon-undo">Pending</a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
+                                                   class="icon-close">Rejected</a>
+                                            </li>
+                                        </ul>
                                     </li>
                                 {% endfor %}
                             </ul>
