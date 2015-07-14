@@ -1,17 +1,3 @@
-<style type="text/css">
-    #container.foundation .weather .label.actual {
-        background-color: #aaa;
-    }
-
-    #container.foundation .weather .label.cold {
-        background-color: #f00;
-    }
-
-    #container.foundation .weather .label.hot {
-        background-color: #00f;
-    }
-</style>
-
 <div id='component{COMPONENT_INSTANCE_ID}' data-component>
     {CONFIGURATION}
 
@@ -34,11 +20,11 @@
                                 <h5>{FC_DAY}</h5>
 
                                 <!-- BEGIN temp_now -->
-                                <span class="label actual">{FC_ACTUAL}&deg;</span>
+                                <span class="label neutral">{FC_ACTUAL}&deg;</span>
                                 <!-- END temp_now -->
                                 <!-- BEGIN temp_range -->
-                                <span class="label cold">{FC_HIGH}&deg;</span>
-                                <span class="label hot">{FC_LOW}&deg;</span>
+                                <span class="label hot">{FC_HIGH}&deg;</span>
+                                <span class="label cold">{FC_LOW}&deg;</span>
                                 <!-- END temp_range -->
                             </div>
                         </div>
