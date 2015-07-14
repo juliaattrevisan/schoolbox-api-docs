@@ -7,16 +7,17 @@
                 <ul class="action-list">
                     <!-- BEGIN etherpad_pad -->
                     <li class="row" data-equalizer>
-                        <div class="column small-11" data-equalizer-watch>
-                            <h3>
-                                <a href='/collabdoc/edit/{ETHERPAD_PAD_ID}/{ID}'>{ETHERPAD_NAME}</a>
-                            </h3>
-
-                            <p class="meta">Last updated on {ETHERPAD_UPDATED_AT}</p>
+                        <div class="column small-11 no-pad" data-equalizer-watch>
+                            <div class="avatar card">
+                                <a href='/collabdoc/edit/{ETHERPAD_PAD_ID}/{ID}'>
+                                    <h3>{ETHERPAD_NAME}</h3>
+                                </a>
+                                <p class="meta">Last updated on {ETHERPAD_UPDATED_AT}</p>
+                            </div>
                         </div>
                         <div class="one actions">
                             <!-- BEGIN etherpad_has_modify -->
-                            <a class="icon-modify no-text" href="/collabdoc/modify/{ETHERPAD_PAD_ID}" title="Modify Collab Doc"></a>
+                            <a data-equalizer-watch class="icon-modify no-text" href="/collabdoc/modify/{ETHERPAD_PAD_ID}" data-tooltip title="Modify Collab Doc"></a>
                             <!-- END etherpad_has_modify -->
                         </div>
                     </li>

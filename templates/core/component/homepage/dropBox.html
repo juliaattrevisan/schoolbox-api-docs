@@ -33,27 +33,20 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
+                <div class="content">
                 <!-- BEGIN drop_student -->
                 <form action="/subject/modDropBox.php" method="post" enctype="multipart/form-data" id="component{COMPONENT_INSTANCE_ID}-dropBox" >
                     <input type="hidden" name="category" value="{ID}" />
 
                     <!-- BEGIN drop_success -->
-                    <fieldset>
-                        <p>File upload completed successfully.</p>
-                    </fieldset>
+                    <p>File upload completed successfully.</p>
                     <!-- END drop_success -->
-                    <fieldset>
-                        <label>
-                            Description
-                            <input name="description" class="required" type="text" />
-                        </label>
-                    </fieldset>
-                    <fieldset>
-                        {ATTACH_ZONE}
-                    </fieldset>
-                    <fieldset>
-                        <input type="submit" value="Upload" class="secondary"/>
-                    </fieldset>
+                    <label>
+                        Description
+                        <input name="description" class="required" type="text" />
+                    </label>
+                    {ATTACH_ZONE}
+                    <input type="submit" value="Upload" class="secondary"/>
                 </form>
                 <!-- END drop_student -->
                 <!-- BEGIN drop_staff -->
@@ -61,7 +54,7 @@
                     <!-- BEGIN drop_file -->
                     <li class="row" data-equalizer>
                         <div class="eleven-column" data-equalizer-watch>
-                            <div class="avatar-card clearfix">
+                            <div class="avatar card">
                                 <a href="/subject/modDropBox.php?id={DROPBOX_ID}" title="View File" rel="external">
                                     <img src="/images/mime/60x60/{DROPBOX_MIME_IMAGE}" />
                                     <p>{DROPBOX_DESCRIPTION}</p>
@@ -78,6 +71,7 @@
                     <!-- END drop_file -->
                 </ul>
                 <!-- END drop_staff -->
+                </div>
             </section>
         </div>
     </div>

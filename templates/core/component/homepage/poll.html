@@ -29,19 +29,15 @@
                 <ul class="action-list">
                     <!-- BEGIN poll_question -->
                     <li class="row" data-equalizer>
-                        <div class="small-9 columns" data-equalizer-watch>
-                            <h3>
-                                {POLL_QUESTION}
-                            </h3>
-
-                            <div class="avatar-card clearfix">
-                                <a href="/search/user/{POLL_AUTHOR_ID}" title="View Profile">
+                        <div class="small-9 columns no-pad" data-equalizer-watch>
+                            <div class="avatar card">
+                                <a>
                                     <img src="{POLL_AUTHOR_THUMB}" alt="View Profile" />
-                                    <p>{POLL_AUTHOR_NAME}</p>
+                                    <h3>{POLL_QUESTION}</h3>
                                 </a>
-                                <p class="meta">Posted {POLL_CREATED}</p>
+                                <p class="meta">Posted by <a href="/search/user/{POLL_AUTHOR_ID}">{POLL_AUTHOR_NAME}</a> {POLL_CREATED}</p>
                             </div>
-
+                            <div class="list-item-content">
                             <!-- BEGIN poll_vote -->
                             <script type="text/javascript">
                                 $(function() {
@@ -78,15 +74,16 @@
                                 <input type="submit" value="Vote" data-poll-validate="{COMPONENT_INSTANCE_ID}" />
                             </form>
                             <!-- END poll_vote -->
+                            </div>
                         </div>
                         <div class="three actions">
                             <!-- BEGIN show_results -->
-                            <a href="/homepage/{ID}/pollResults" class="icon-poll no-text" title="Show Results"></a>
+                            <a data-equalizer-watch data-tooltip href="/homepage/{ID}/pollResults" class="icon-poll no-text" title="Show Results"></a>
                             <!-- END show_results -->
 
                             <!-- BEGIN modify_poll -->
-                            <a href="/poll/modify/{POLL_ID}" class="icon-modify no-text" title="Modify Poll"></a>
-                            <a href="/poll/modifyForm.php?delete={POLL_ID}&amp;homepageComponentID={COMPONENT_INSTANCE_ID}" data-poll-delete class="icon-delete no-text" title="Delete Poll"></a>
+                            <a data-equalizer-watch data-tooltip href="/poll/modify/{POLL_ID}" class="icon-modify no-text" title="Modify Poll"></a>
+                            <a data-equalizer-watch data-tooltip href="/poll/modifyForm.php?delete={POLL_ID}&amp;homepageComponentID={COMPONENT_INSTANCE_ID}" data-poll-delete class="icon-delete no-text" title="Delete Poll"></a>
                             <!-- END modify_poll -->
                         </div>
                     </li>
