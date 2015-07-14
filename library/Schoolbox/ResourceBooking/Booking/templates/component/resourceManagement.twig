@@ -25,7 +25,7 @@
                                 {# show booker's avatar card #}
                                 <div class="avatar-card">
                                     <a href="/search/user/{{ event.booking.event.owner.id }}">
-                                        <img class="portrait" src="/portrait.php?userId={{ event.booking.event.owner.externalId|e('url') }}&amp;size=square32" />
+                                        <img src="/portrait.php?userId={{ event.booking.event.owner.externalId|e('url') }}&amp;size=square64" />
                                         <p>{{ event.booking.event.owner.formatName }}</p>
                                     </a>
 
