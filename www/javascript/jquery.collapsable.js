@@ -44,8 +44,13 @@
 
                 var component = $(this).closest('[data-component]').find('[data-collapsable=true]');
 
+                /* When it's collapsed by default, it just renders with .hide
+                 * It's actually uncollapsed, just hidden.
+                 *
+                 * This slides it up real fast so it can slide back down gracefully
+                 */
                 if (component.attr('data-collapse-state') == 'collapsed') {
-                    component.stop().slideDown();
+                    component.stop().removeClass('hide').slideUp(1).slideDown();
                     component.attr('data-collapse-state', 'uncollapsed');
 
                     $(this).closest('[data-collapser="true"]').toggleClass('icon-collapse icon-add');
