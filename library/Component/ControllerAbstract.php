@@ -84,6 +84,13 @@ abstract class Component_ControllerAbstract
     protected $componentName = '';
 
     /**
+     * Link that the component header points to. Usually nowhere?
+     *
+     * @var string
+     */
+    protected $componentHref = '#';
+
+    /**
      * Configuration template to use.
      *
      * Usually determined by `$this->determineTemplate()`, but can be set with
@@ -419,7 +426,8 @@ abstract class Component_ControllerAbstract
 
             /* Component Name
              */
-            'COMPONENT_NAME' => $this->getComponentName()
+            'COMPONENT_NAME' => $this->getComponentName(),
+            'COMPONENT_HREF' => $this->getComponentHref(),
         ));
     }
 
@@ -454,6 +462,7 @@ abstract class Component_ControllerAbstract
 
                 $this->sitepage->setVar(array(
                     'COMPONENT_NAME' => $componentname,
+                    'COMPONENT_HREF' => $this->getComponentHref(),
                 ));
             }
 
@@ -765,5 +774,28 @@ abstract class Component_ControllerAbstract
         /* Otherwise allow a per-controller hardcoded version
          */
         return $this->componentName;
+    }
+
+    /**
+     * Assign component href default
+     *
+     * @param $componentHref
+     */
+    protected function setComponentHref($componentHref)
+    {
+        $this->componentHref = $componentHref;
+    }
+
+    /**
+     * Get component href
+     *
+     * @return string
+     */
+    protected function getComponentHref()
+    {
+        if (!strlen(trim($this->componentHref))) {
+            return '#';
+        }
+        return $this->componentHref;
     }
 }
