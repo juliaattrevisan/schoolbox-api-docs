@@ -18,6 +18,9 @@ $path = '/images/core/icons/activity-icons-72x72px.png';
 $icon = isset($_GET['icon']) ? $_GET['icon'] : '';
 $size = isset($_GET['size']) ? $_GET['size'] : 64;
 
+// handle "square32" as well as just `32`
+$size = str_replace('square', '', $size);
+
 // Try to output the fail image. If even THAT fails, just redirect to the image.
 try {
     $transform = new \Alaress\Image\Transformation\Icon($icon, $size);
