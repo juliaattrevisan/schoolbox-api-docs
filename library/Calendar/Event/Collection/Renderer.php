@@ -12,6 +12,8 @@ namespace Calendar\Event\Collection;
 use Calendar_Api_EventType_Interface;
 use SitePage;
 use Calendar\Event\Collection;
+use Calendar\Event\Type\EventInterface;
+use Calendar\Event\Type\RendererInterface;
 use \Schoolbox\User;
 
 class Renderer
@@ -128,9 +130,16 @@ class Renderer
         return $output;
     }
 
+    /**
+     * @param EventInterface $event
+     * @param string         $type
+     *
+     * @return mixed
+     */
     public function renderEvent($event, $type)
     {
         $rendererClass = $event->getRendererClass($type);
+        /** @var RendererInterface $renderObj */
         $renderObj = new $rendererClass($this->getPage(), $event, $this->getViewer(), $this->getGroupHandler(), $this->getCalendarHandler());
         return $renderObj->render();
     }

@@ -1,31 +1,16 @@
-<li class="{{ event.getEventClasses() }}">
-    <span class="eventListing">
-        <strong>{{ event.getEventSpan()|raw }}</strong>
-        <span style="background-color:{{ event.colour }}">{{ event.title }}</span>
-    </span>
+{% extends 'calendar/type/_base.twig' %}
 
-    <div class="hidden-fields clearfix">
-        <h3>{{ event.title }}</h3>
-        <h4>Due {{ event.getFullDate()|raw }}</h4>
-        <p class="wysiwyg">{{ event.detail|purify}}</p>
-        <div class="created meta">
-            {% if event.authorName %}
-                Posted by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a>
-            {% endif %}
-
-            {% if event.category %}
-                in <a href='/homepage/{{ event.category.getId() }}'>{{ event.category.getName() }}</a>
-            {% endif %}
-        </div>
-        {% if event.getIsAssessment() %}
-        <a class="btn up-arrow float-left" href="/assess/intro/{{ event.submissionBoxId }}"><span></span>Start Quiz</a>
+{% block eventBubbleButtons %}
+<div>
+    {% if event.getIsAssessment() %}
+        <a class="button icon-quiz" href="/assess/intro/{{ event.submissionBoxId }}">Start Quiz</a>
+    {% else %}
+        {% if renderer.isEditable() %}
+            <a class="button icon-due-work" href="/submission/viewSubmission/{{ event.eventID }}">View Submissions</a>
+            <a class="button icon-modify" href="/submission/createSubmission/modify/{{ event.eventID }}">Modify</a>
         {% else %}
-            {%  if renderer.isEditable()  %}
-                <a class="btn eyeball float-left" href="/submission/viewSubmission/{{ event.eventID }}"><span></span>View Submissions</a>
-                <a class="btn modify float-left" href="/submission/createSubmission/modify/{{ event.eventID }}"><span></span>Modify</a>
-            {% else %}
-                <a class="btn eyeball float-left" href="/submission/submissionHistory/{{ event.eventID }}/{{ renderer.viewer.id }}"><span></span>View Details</a>
-            {% endif %}
+            <a class="button icon-due-work" href="/submission/submissionHistory/{{ event.eventID }}/{{ renderer.viewer.id }}">View Details</a>
         {% endif %}
-    </div>
-</li>
+    {% endif %}
+</div>
+{% endblock eventBubbleButtons %}

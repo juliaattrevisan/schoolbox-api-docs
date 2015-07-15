@@ -1,18 +1,38 @@
-<div class="box text clearfix calendar">
-    <!-- BEGIN day -->
-    <h2><a href="/calendar/full/{CALENDAR_DATE}/#week">{LIST_DATE}</a></h2>
-    <ul class="js_happening calendar">
-        <!-- BEGIN note_block -->
-            <!-- twig calendar events go here -->
-        <!-- END note_block -->
-    </ul>
+<style type="text/css">
+    .hidden-fields {
+        display: none;
+    }
+</style>
 
-    <!-- BEGIN no_events -->
-    <div class="no_events">
-        <em>There are no upcoming events.</em>
+<div id="component{COMPONENT_INSTANCE_ID}" data-component="{COMPONENT_INSTANCE_ID}">
+    {CONFIGURATION}
+
+    <div class="row">
+        <div class="small-12 island">
+            <section>
+                <!-- BEGIN day -->
+                <ul class="activity-list">
+                    <li class="row">
+                        <div class="small-12 columns">
+                            <h3><a href="/calendar/full/{CALENDAR_DATE}/#week">{LIST_DATE}</a></h3>
+                        </div>
+                    </li>
+                    <!-- BEGIN note_block -->
+                    <!-- twig calendar events go here -->
+                    <!-- END note_block -->
+                </ul>
+
+                <!-- BEGIN no_events -->
+                <div class="row">
+                    <div class="small-12 columns">
+                        <em>There are no upcoming events.</em>
+                    </div>
+                </div>
+                <!-- END no_events -->
+                <!-- END day -->
+            </section>
+        </div>
     </div>
-    <!-- END no_events -->
-    <!-- END day -->
 </div>
 
 <script type="text/javascript">

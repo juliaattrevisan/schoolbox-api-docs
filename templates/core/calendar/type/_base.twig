@@ -1,0 +1,77 @@
+<li data-role="event"
+    class="row {{ event.getEventClasses() }} {% if renderer.isTranslucent() %}translucent{% endif %}"
+>
+    <div class="eventListing">
+        {% block eventSpan %}
+        <div class="small-6 columns">
+            <strong>{{ event.getEventSpan()|raw }}</strong>
+        </div>
+        {% endblock eventSpan %}
+
+        {% block eventTitle %}
+        <div class="small-6 columns" style="background-color:{{ event.colour }}">
+            {{ event.title }}
+            {% if event.attendance %}
+                <span class="float-right">A</span>
+            {% endif %}
+        </div>
+        {% endblock eventTitle %}
+    </div>
+
+    <div class="hidden-fields" data-relation="eventBubble">
+        {% block eventBubble %}
+
+            {% block eventBubbleSummary %}
+            <h3>{{ event.title }}</h3>
+            <h4>
+                {% if event.eventType %}
+                {{ event.eventType }}:
+                {% endif %}
+                {{ event.getFullDate()|raw }}</h4>
+            {% if event.location %}
+                <p class="location">{{ event.location }}</p>
+            {% endif %}
+            <p class="wysiwyg">{{ event.detail|purify }}</p>
+            {% endblock eventBubbleSummary %}
+
+            {% block eventBubbleMeta %}
+            <div class="created meta">
+                {% if event.authorName %}
+                Posted by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a>
+                {% endif %}
+
+                {% if event.category %}
+                in <a href='/homepage/{{ event.categoryId }}'>{{ event.categoryName }}</a>
+                {% endif %}
+            </div>
+            {% if event.attendance %}
+            <p class="meta">Attendance {{ renderer.attendanceStatus() }}</p>
+            {% endif %}
+            {% endblock eventBubbleMeta %}
+
+            {% block eventBubbleButtons %}
+            <div>
+                {% if event.attendance %}
+                    <form method="post">
+                        <input name="event[id]" type="hidden" value="{{ event.eventId }}">
+                        {% if renderer.attendanceStatus() %}
+                        <a class="button icon-close" href="#">Unattend</a>
+                        {% else %}
+                        <a class="button icon-approve" href="#">RSVP</a>
+                        {% endif %}
+                    </form>
+
+                    {%if event.isEditable %}
+                    <a class="button icon-group" href="/calendar/attendance/list/{{ event.eventId }}">Attendees</a>
+                    {% endif %}
+                {% endif %}
+                {% if event.isEditable %}
+                <a class="button icon-modify" href="/calendar/modify.php?eventID={{ event.eventId }}&returnTo=calendar">Modify</a>
+                <a class="button icon-delete" href="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}&returnTo=calendar" onclick="return(confirm('Are you sure you wish to delete this event?'))">Delete</a>
+                {% endif %}
+            </div>
+            {% endblock eventBubbleButtons %}
+
+        {% endblock eventBubble %}
+    </div>
+</li>
