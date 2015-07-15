@@ -1,21 +1,12 @@
 <div id='component{COMPONENT_INSTANCE_ID}' data-component>
     <!-- Custom javascript -->
 
-    {CONFIGURATION}
-
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
+            <h2 class="subheader">
+                Upcoming Due Work
+            </h2>
             <section>
-                <div class="content">
-                    <h2>
-                        <a href="/submission/dueWork/">Upcoming Due Work</a>
-                    </h2>
-
-                    <!-- BEGIN view_all_due_work -->
-                    <a href="/submission/allWork/{WORK_USER_ID}" title="View grades" class="button icon-tick">Grades</a>
-                    <!-- END view_all_due_work -->
-                </div>
-
                 <ul class="action-list">
                     <!-- BEGIN upcoming_work -->
                     <li class="row" data-equalizer>
@@ -48,6 +39,17 @@
                     </li>
                     <!-- END upcoming_work -->
                 </ul>
+
+                <div class="content">
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <a href="/submission/dueWork/" class="button icon-due-work">Upcoming Due Work</a>
+                            <!-- BEGIN view_all_due_work -->
+                            <a href="/submission/allWork/{WORK_USER_ID}" title="View grades" class="button icon-approve">Grades</a>
+                            <!-- END view_all_due_work -->
+                        </div>
+                    </div>
+                </div>
             </section>
         </div>
     </div>
