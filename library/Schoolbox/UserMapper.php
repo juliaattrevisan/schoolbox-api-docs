@@ -94,7 +94,7 @@ class UserMapper extends Mapper
             array(
                 'column' => 'year',
                 'property' => 'year',
-                'type' => Mapper::TYPE_INTEGER,
+                'type' => Mapper::TYPE_STRING,
             )
         );
 
