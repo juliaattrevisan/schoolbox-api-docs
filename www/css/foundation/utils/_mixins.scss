@@ -111,6 +111,13 @@
 	transition-timing-function: $transition-timing-function;
 }
 
+@mixin transition-delay($transition-transition-delay: 500ms) {
+	-webkit-transition-delay: 500ms;
+  -moz-transition-delay: 500ms;
+  -o-transition-delay: 500ms;
+  transition-delay: 500ms;
+}
+
 @mixin placeholder-color($color, $font-weight) {
 	::-webkit-input-placeholder { color: $color; font-weight: $font-weight; }
 	:-ms-input-placeholder { color: $color; font-weight: $font-weight; }

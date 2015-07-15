@@ -34,11 +34,11 @@
 		<div class="hybrid-bar">
 	    <nav class="tab-bar">
 				<section class="left-small">
-					<a class="left-off-canvas-toggle menu-icon show-for-medium-only" href="#"><span></span></a>
+					<a class="left-off-canvas-toggle menu-icon hide-for-large-up" href="#"><span></span></a>
 				</section>
 
 				<section class="row middle tab-bar-section">
-					<ul class="main-nav inline-list columns medium-6 no-pad">
+					<ul class="main-nav inline-list medium-10 large-6 columns no-pad">
 	          <li><a class="icon-due-work icon-32 no-text" href="#"><label>Work</label></a></li>
 	          <li><a class="icon-timetable icon-32 no-text" href="#"><label>Timetable</label></a></li>
 						<li><a class="icon-calendar icon-32 no-text" href="#"><label>Calendar</label></a></li>
@@ -49,7 +49,7 @@
 	        </ul>
 
 					<!-- BEGIN banner_logged_in -->
-					<ul id="infoPanel" class="columns medium-3">
+					<ul id="infoPanel" class="large-3 columns show-for-xlarge-up">
 					  <li class="user avatar">
 					    <a href="/search/user/{USER_ID}" class="button dropdown" title="View Profile" data-menu="account-menu" data-dropdown="avatar">
 					      <img height="80" width="80" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square64"/>
@@ -82,9 +82,8 @@
 					</ul>
 					<!-- END banner_logged_in -->
 
-					<form id="search" class="columns medium-3 no-pad" action="/search" method="get">
+					<form id="search" class="medium-2 large-3 columns no-pad" action="/search" method="get">
 		        <input id="search-field" type="text" name="keyword" placeholder="Search"/>
-		        <input id="search-button" type="submit" />
 						<i class="icon-search no-text"></i>
 					</form>
 				</section>
