@@ -17,6 +17,8 @@ class Component_Dashboard_SuggestionController extends Component_Dashboard_Contr
 
     protected $categoryNewsList;
 
+    protected $componentName = 'Tips & Tricks';
+
     public function __construct (Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, CategoryNews $categoryNews) {
         parent::__construct($instance, $user, $sitepage);
 
@@ -39,6 +41,7 @@ class Component_Dashboard_SuggestionController extends Component_Dashboard_Contr
             $this->setVar('TIPS_TRICKS_HEADING', Scrub::text($this->categoryNewsList[$newsItem]['heading']));
             $this->setVar('TIPS_TRICKS', Scrub::html($this->categoryNewsList[$newsItem]['body']));
 
+            $this->parseConfig();
             return true;
         }
         else {
