@@ -109,8 +109,8 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
     $files = $factory->build($attachments)->getAll();
 
     foreach ($files as $storage) {
-        $attach = Swift_Attachment::newInstance($storage->read(), $storage->getFilename(), $storage->getMime());
-        $attach->setFilename($storage->getFilename());
+        $attach = Swift_Attachment::newInstance($storage->read(), $storage->getBasename(), $storage->getMime());
+        $attach->setFilename($storage->getBasename());
         $attach->setContentType($storage->getMime());
         $mail->attach($attach);
     }
