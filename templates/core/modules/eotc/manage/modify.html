@@ -197,46 +197,48 @@
                             <input type="hidden" name="ramsUploaded" data-ramsuploaded="{EVENT_RAMS_UPLOADED}" />
                             <input type="hidden" name="ramsRequired" value="0" />
 
-                            <label>
-                                RAMS Required?
-                                <span class='hint has-tip tip-top' data-tooltip title="Please confirm if RAMS is required for this event to take place.">?</span>
-                            </label>
+                            <fieldset>
+                                <legend>
+                                    RAMS Required?
+                                    <span class='hint has-tip tip-top' data-tooltip title="Please confirm if RAMS is required for this event to take place.">?</span>
+                                </legend>
 
-                            <div class="small-12 large-4 columns">
-                                <input id='ramsRequiredCheckbox' type="checkbox" data-ramscheckbox name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />
-                                <label for="ramsRequiredCheckbox" class="checkbox-label">RAMS is required</label>
-                            </div>
-                            <div class="small-12 large-8 columns">
-                                <ul class="information-list">
-                                    <!-- BEGIN rams_list -->
-                                    <li>
-                                        <div class="one-column">
-                                            <img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" />
-                                        </div>
-                                        <div class="nine-column">
-                                            <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" alt="Download" title="Download">{EVENT_RAMS_FILE}</a>
-                                        </div>
-                                        <div class="two-column">
-                                            <input type="checkbox" id="deleteRamsFile-{EVENT_RAMS_HASH}" name="deleteRamsFile[{EVENT_RAMS_HASH}]" value="1" />
-                                            <label for="deleteRamsFile-{EVENT_RAMS_HASH}" class="checkbox-label">Delete?</label>
-                                        </div>
-                                    </li>
-                                    <!-- END rams_list -->
-                                </ul>
-
-                                <div data-ramsfile="true">
+                                <div class="small-12 large-4 columns">
+                                    <input id='ramsRequiredCheckbox' type="checkbox" data-ramscheckbox name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />
+                                    <label for="ramsRequiredCheckbox" class="checkbox-label">RAMS is required</label>
+                                </div>
+                                <div class="small-12 large-8 columns">
                                     <ul class="information-list">
+                                        <!-- BEGIN rams_list -->
                                         <li>
-                                            <div class="ten-column">
-                                                <input type="file" name="ramsFile[]" multiple />
+                                            <div class="one-column">
+                                                <img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" />
+                                            </div>
+                                            <div class="nine-column">
+                                                <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" alt="Download" title="Download">{EVENT_RAMS_FILE}</a>
                                             </div>
                                             <div class="two-column">
-                                                <a href="#" data-action="delete" class="icon-delete no-text hide"></a>
+                                                <input type="checkbox" id="deleteRamsFile-{EVENT_RAMS_HASH}" name="deleteRamsFile[{EVENT_RAMS_HASH}]" value="1" />
+                                                <label for="deleteRamsFile-{EVENT_RAMS_HASH}" class="checkbox-label">Delete?</label>
                                             </div>
                                         </li>
+                                        <!-- END rams_list -->
                                     </ul>
+
+                                    <div data-ramsfile="true">
+                                        <ul class="information-list">
+                                            <li>
+                                                <div class="ten-column">
+                                                    <input type="file" name="ramsFile[]" multiple />
+                                                </div>
+                                                <div class="two-column">
+                                                    <a href="#" data-action="delete" class="icon-delete no-text hide"></a>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
-                            </div>
+                            </fieldset>
                         </div>
                     </div>
                 </div>
