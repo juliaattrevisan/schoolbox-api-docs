@@ -1,5 +1,5 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-    <link href="/javascript/components/mediaelement/build/mediaelementplayer.min.css" rel="stylesheet">
+<div data-component id="component{COMPONENT_INSTANCE_ID}">
+    <link href="/javascript/components/mediaelement/build/mediaelementplayer.min.css" rel="stylesheet" property="stylesheet">
     <script src="/javascript/components/mediaelement/build/mediaelement-and-player.min.js"></script>
     <script src="/javascript/jquery.mediaPlaylist.js"></script>
     <script type="text/javascript">
@@ -7,7 +7,7 @@
             $('#component{COMPONENT_INSTANCE_ID}').mediaPlaylist();
             $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
                 wrapClass: 'dragging',
-                previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
+                previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
                 dictDefaultMessage: 'You can drag audio files into this space.',
                 refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
                 refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
@@ -30,49 +30,61 @@
 
 	{CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <!-- BEGIN default_audio -->
-        <div class="audioWrapper">
-            <h3 class="mejs-player-title" data-role="media-playlist-title">{DEFAULT_AUDIO_TITLE}</h3>
-            <audio id="schoolbox_audio{COMPONENT_INSTANCE_ID}"
-                   data-role="media-playlist-player"
-                   controls
-                   preload="none"
-                   width="100%">
-                <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_AUDIO_ID}" type="audio/mpeg" />
-            </audio>
-        </div>
-        <!-- END default_audio -->
+    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="island small-12">
+            <section>
+                <!-- BEGIN default_audio -->
+                <div>
+                    <h3 class="mejs-player-title" data-role="media-playlist-title">{DEFAULT_AUDIO_TITLE}</h3>
+                    <audio id="schoolbox_audio{COMPONENT_INSTANCE_ID}"
+                           data-role="media-playlist-player"
+                           controls
+                           preload="none"
+                           width="100%">
+                        <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_AUDIO_ID}" type="audio/mpeg" />
+                    </audio>
+                </div>
+                <!-- END default_audio -->
 
-        <div class="dz-wrap">
-            <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
-            <ul class="information-list dz-container">
-                <!-- BEGIN audio_list -->
-                <li class="{ON_OFF}">
-                    <a class="audio-link" href="/cms/sendVideo.php?type=sbfs&id={AUDIO_LIST_ID}" data-role="media-playlist-track">
-                        <!-- Replace audio thumb with a play button -->
-                        <!--<img class="thumbnail" width="64" height="64" src="{AUDIO_LIST_STATUSIMG}" title="Currently transcoding {AUDIO_LIST_TITLE}" />-->
-                        <!--<img class="thumbnail" width="64" height="64" src="/cms/audioThumb.php?type=sbfs&id={AUDIO_LIST_ID}" />-->
-                        <h4>{AUDIO_LIST_TITLE}</h4>
-                    </a>
-                    <p class="meta">{AUDIO_LIST_DURATION} | Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a></p>
-                    <p>{AUDIO_LIST_COMMENT}</p>
-                </li>
-                <!-- END audio_list -->
-                <!-- BEGIN audio_pending_list -->
-                <li class="{ON_OFF}">
-                    <img class="thumbnail" width="64" height="64" src="{AUDIO_LIST_STATUSIMG}" title="Currently transcoding {AUDIO_LIST_TITLE}" />
-                    <h4>{AUDIO_LIST_TITLE}</h4>
-                    <p class="meta">Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a></p>
-                    <p>{AUDIO_LIST_COMMENT}</p>
-                </li>
-                <!-- END audio_pending_list -->
-            </ul>
+                <div data-dz-wrap class="dropzone-wrap">
+                    <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
+                    <ul data-dz-container class="action-list">
+                        <!-- BEGIN audio_list -->
+                        <li class="row">
+                            <div class="avatar-card">
+                                <a href="/cms/sendVideo.php?type=sbfs&id={AUDIO_LIST_ID}" data-role="media-playlist-track">
+                                    <div class="icon-audio icon-32"></div>
+                                    <h3>{AUDIO_LIST_TITLE}</h3>
+                                </a>
+                                <p class="meta">
+                                    ({AUDIO_LIST_DURATION}) Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a>
+                                </p>
+                            </div>
+                            <article class="{COMPONENT_COMPACTMODE}">
+                                <p>{AUDIO_LIST_COMMENT}</p>
+                            </article>
+                        </li>
+                        <!-- END audio_list -->
+                        <!-- BEGIN audio_pending_list -->
+                        <li class="row">
+                            <div class="avatar-card">
+                                <img src="{AUDIO_LIST_STATUSIMG}" title="Currently transcoding {AUDIO_LIST_TITLE}" />
+                                <h3>{AUDIO_LIST_TITLE}</h3>
+                                <p class="meta">Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a></p>
+                            </div>
+                            <article class="{COMPONENT_COMPACTMODE}">
+                                <p>{AUDIO_LIST_COMMENT}</p>
+                            </article>
+                        </li>
+                        <!-- END audio_pending_list -->
+                    </ul>
+                </div>
+                <!-- BEGIN submit_file -->
+                <div class="content">
+                    <a href="/cms/file/new/{ID}" class="button icon-upload">Post Audio File</a>
+                </div>
+                <!-- END submit_file -->
+            </section>
         </div>
-        <!-- BEGIN submit_file -->
-        <p class="interact">
-            <a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post File</a>
-        </p>
-        <!-- END submit_file -->
     </div>
 </div>
