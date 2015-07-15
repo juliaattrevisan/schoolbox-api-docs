@@ -1,21 +1,23 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div data-component id="component{COMPONENT_INSTANCE_ID}">
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="long">
-            <ul class="events message-list time-right">
-              <!-- BEGIN event -->
-              <li class="event {EVENT_DARK}">
-                <span>
-                  <a href="{EVENT_HREF}" class="time">
-                    <time title="{EVENT_LONGTIME}">{EVENT_TIME}</time>
-                  </a>
-                  <img src="{EVENT_ICON}" alt="" width="24" height="24" />
-                  <span class="body">{EVENT_BODY}</span>
-                </span>
-              </li>
-              <!-- END event -->
-            </ul>
+    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="island small-12">
+            <section>
+                <ul class="information-list">
+                    <!-- BEGIN event -->
+                    <li class="row">
+                        <div class="avatar card">
+                            <a href="{EVENT_HREF}">
+                                <img src="{EVENT_ICON}" alt="" />
+                                <h3>{EVENT_BODY}</h3>
+                            </a>
+                            <time class="meta" title="{EVENT_LONGTIME}">{EVENT_TIME}</time>
+                        </div>
+                    </li>
+                    <!-- END event -->
+                </ul>
+            </section>
         </div>
     </div>
 </div>
