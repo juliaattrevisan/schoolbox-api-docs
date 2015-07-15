@@ -95,11 +95,19 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 );
 
                 /* Don't display images in list view
-			   */
+			     */
                 if ($this->getConfig('displayPortraits') == 'grid') {
+                    $this->setVar(array(
+                        'GRID_VIEW_CLASSES' => 'medium-block-grid-2 large-block-grid-3'
+                    ));
+
                     $this->parse('has_thumbnail_block', 'has_thumbnail');
                     $this->setVar('has_icon_block', '');
                 } else {
+                    $this->setVar(array(
+                        'GRID_VIEW_CLASSES' => ''
+                    ));
+
                     $this->setVar('has_thumbnail_block', '');
                     $this->parse('has_icon_block', 'has_icon');
                 }
@@ -107,10 +115,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 $this->parse('person_block', 'person', true);
 
                 /* Clear children after parsing out the parent
-			   */
+			     */
                 $this->setVar('has_thumbnail_block', '');
                 $this->setVar('has_icon_block', '');
-
             }
 
             $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
