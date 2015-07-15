@@ -1,44 +1,58 @@
-<div class="box calendar clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
+    <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
     <script type='text/javascript'>
         $(function () {
-            $(document).on('click', 'a.attendance-request', function (event) {
-                event.preventDefault();
+            $('#component{COMPONENT_INSTANCE_ID}').calendarAttendance();
 
-                var button = $(this);
-
-                var data = button.parent('form').serialize();
-
-                $.post('/service/attendance/processToggleAttendance', data, function (data) {
-
-                    if (data.error == undefined) {
-                        if (button.text() == 'RSVP') {
-                            button.html('<span></span>Unattend');
-                        }
-                        else {
-                            button.html('<span></span>RSVP');
-                        }
-                    }
-                });
+            $('#component{COMPONENT_INSTANCE_ID}').calendarExport({
+                userToken: '{USER_TOKEN}',
+                groupId: '{ID}'
             });
         });
     </script>
 
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <!-- BEGIN campus_event_day -->
-        <h3>{LIST_DATE}</h3>
-        <div class="listing clearfix">
-            <ul class="js_happening">
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <ul class="information-list">
+                    <!-- BEGIN campus_event_day -->
+                    <li class="row" data-equalizer>
+                        <div class="small-12 columns" data-equalizer-watch>
+                            <h3>{LIST_DATE}</h3>
+                            <ul class="action-list" data-calendar-bubble-activator>
+                                <!-- BEGIN campus_events -->
+                                <!-- twig data goes here -->
+                                <!-- END campus_events -->
+                            </ul>
+                        </div>
+                    </li>
+                    <!-- END campus_event_day -->
+                </ul>
 
-                <!-- BEGIN campus_events -->
-                    <!-- twig data goes here -->
-                <!-- END campus_events -->
-            </ul>
+                <div class="content">
+                    <!-- BEGIN submit_event -->
+                    <a href="/calendar/modify.php?level=3&homepageId={ID}&returnTo=homepage" class="button icon-add">Add Event</a>
+                    <!-- END submit_event -->
+                </div>
+            </section>
         </div>
-        <!-- END campus_event_day -->
-        <!-- BEGIN submit_event -->
-        <p class="interact"><a href="/calendar/modify.php?level=3&homepageId={ID}&returnTo=homepage" class="btn add"><span></span>Add Event</a></p>
-        <!-- END submit_event -->
+    </div>
+
+    <!--
+    Dialog for export. There's only one calendar component per homepage, so it's
+    okay to add item with ID here?
+    -->
+    <div id="calendar-export-dialog" class="reveal-modal" data-reveal>
+        <div id="calendar-export-dialog-text">
+            Use the following address to subscribe your favourite calendar application to a live feed.
+        </div>
+
+        <textarea readonly id="calendar-export-dialog-url" rows="6"></textarea>
+
+        <a class="button icon-copy" id="copy-button" data-clipboard-target="calendar-export-dialog-url" title="Click to copy me.">Copy to Clipboard</a>
     </div>
 </div>
