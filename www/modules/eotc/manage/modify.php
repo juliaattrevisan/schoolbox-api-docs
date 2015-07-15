@@ -56,7 +56,7 @@ if (is_numeric($_GET['eventID'])) {
     /* EOTC Administrators and event authors can edit this event
 	 */
     if ($canAdminister || $isAuthor || $isTeacherInCharge) {
-/* Do a check for missing metadata
+        /* Do a check for missing metadata
 		 */
         if (!$event->getMetadata()) {
             throw new \Exception('No metadata record found for this event.');
@@ -108,6 +108,7 @@ if (is_numeric($_GET['eventID'])) {
 
         // RAM in the RAMS
         $page->setVar('rams_list_block', '');
+
         if ($event->getMetadata()->getRamsRequired()) {
             foreach ($event->getMetadata()->getRamsFiles() as $ramsFile) {
                 try {
@@ -115,6 +116,7 @@ if (is_numeric($_GET['eventID'])) {
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     $mimetype = MimetypeMapper::getInstance()->getUnknownMime();
                 }
+
                 $page->setVar(
                     array(
                         'EVENT_RAMS_HASH'              => $ramsFile->getHash(),
@@ -123,6 +125,7 @@ if (is_numeric($_GET['eventID'])) {
                         'EVENT_RAMS_MIMETYPE_ICONFILE' => $mimetype->getIconFile(),
                     )
                 );
+
                 $page->parse('rams_list_block', 'rams_list', true);
             }
         }
@@ -154,7 +157,6 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_END_AM' => $event->getEndDateTime()->isAM() ? 'selected="selected"' : '',
             'EVENT_END_PM' => $event->getEndDateTime()->isPM() ? 'selected="selected"' : '',
             'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
-            'EVENT_STATUS_CLASS' => $event->getMetadata()->getStatus()->getStyle(),
             'EVENT_LOCATION' => $event->getLocation(),
             'EVENT_DETAIL' => $event->getDetail(),
             'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
@@ -166,10 +168,12 @@ if (is_numeric($_GET['eventID'])) {
 		 */
         // Is there a recurrence? If so don't show the repeat selector.
         $recurrence = array();
+
         if ($event->getSeriesId()) {
             $eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($mapper);
             $recurrence = $eventRecurrenceMapper->getSeriesRecurrence($event);
         }
+
         if (!empty($recurrence)) {
             $page->setVar('EVENT_REC_FREQ', ucfirst($recurrence['freq']));
             $page->setVar('EVENT_REC_START', $recurrence['start']->getLongDateOnly());
@@ -188,7 +192,7 @@ if (is_numeric($_GET['eventID'])) {
             $resourceBookingMapper = new \Schoolbox\ResourceBooking\Booking\Mapper();
 
             foreach ($event->getMetadata()->getResourceBookings() as $currentResourceBooking) {
-/* TODO: Optimise this!
+                /* TODO: Optimise this!
 				 */
                 $resource = $resourceMapper->findById($currentResourceBooking->getResource()->getId());
                 $resourceBooking = $resourceBookingMapper->findById($currentResourceBooking->getId());
@@ -216,7 +220,8 @@ if (is_numeric($_GET['eventID'])) {
         $i = 0;
 
         foreach ($event->getMetadata()->getActivityLog() as $currentLog) {
-/* If there are no activityLog items, mappers will spawn a single
+
+            /* If there are no activityLog items, mappers will spawn a single
 			 * object where every property is null
 			 *
 			 * TODO: Mappers probably shouldn't spawn you such objects
@@ -265,10 +270,12 @@ if (is_numeric($_GET['eventID'])) {
     } else {
         error(19);
     }
-} /* Create new event
+}
+/* Create new event
  */
 elseif ($authenticator->isEOTCCreator($_SESSION['user'])) {
-/* Set up default dates
+
+    /* Set up default dates
 	 */
     $event = new \EOTC\Event();
     $event->setupDates($_GET['date']);
@@ -377,7 +384,8 @@ elseif ($authenticator->isEOTCCreator($_SESSION['user'])) {
     /* There's no RAMS rammed in yet either
 	 */
     $page->setVar('rams_list_block', '');
-} /* Nobody else should be here
+}
+/* Nobody else should be here
  */
 else {
     error(19);
