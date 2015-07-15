@@ -72,7 +72,7 @@ class Component_Dashboard_WeatherController extends Component_Dashboard_Controll
                 "FC_IMAGE" => $imageLocation . parse_url($currentConditions['styles']['wxug_icon'], PHP_URL_PATH),
                 "FC_PRECIS" => $currentConditions['conditions'],
                 "FC_ACTUAL" => $currentConditions['temp']['actual'],
-                'FC_CLASS' => 'current'
+                'FC_CLASS' => 'highlight-panel'
             )
         );
         $this->setVar('temp_range_block', '');

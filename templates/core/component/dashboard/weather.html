@@ -1,26 +1,47 @@
-<div class="box">
-	<h2><a href="/weather/">Weather{WEATHER_LOCATION}</a></h2>
-    <div class="weather clearfix">
-    <!-- BEGIN weather_forecast -->
-		<div class="weatherDay {FC_CLASS}">
-            <div class="image">
-                <img src="{FC_IMAGE}" title="{FC_PRECIS}" alt="{FC_PRECIS}" />
-            </div>
-            <div class="data">
-                <h4>{FC_DAY}</h4>
-                <!-- BEGIN temp_now -->
-                <span class="temp-actual">{FC_ACTUAL}&deg;</span>
-                <!-- END temp_now -->
-                <!-- BEGIN temp_range -->
-                <span class="temp-h">{FC_HIGH}&deg;</span> | <span class="temp-l">{FC_LOW}&deg;</span>
-                <!-- END temp_range -->
-            </div>
-		</div>
-    <!-- END weather_forecast -->
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    {CONFIGURATION}
+
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <h2>
+                        <a href="/weather/">Weather{WEATHER_LOCATION}</a>
+                    </h2>
+                </div>
+
+                <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+                    <!-- BEGIN weather_forecast -->
+                    <li>
+                        <div class="weather content {FC_CLASS}">
+                            <div class="avatar-card clearfix">
+                                <img src="{FC_IMAGE}" title="{FC_PRECIS}" alt="{FC_PRECIS}" />
+
+                                <h5>{FC_DAY}</h5>
+
+                                <!-- BEGIN temp_now -->
+                                <span class="label neutral">{FC_ACTUAL}&deg;</span>
+                                <!-- END temp_now -->
+                                <!-- BEGIN temp_range -->
+                                <span class="label hot">{FC_HIGH}&deg;</span>
+                                <span class="label cold">{FC_LOW}&deg;</span>
+                                <!-- END temp_range -->
+                            </div>
+                        </div>
+                    </li>
+                    <!-- END weather_forecast -->
+                </ul>
+
+                <!-- BEGIN weather_unavailable -->
+                <div class="content">
+                    <p class="information-notification">Weather service is temporarily unavailable.</p>
+                </div>
+                <!-- END weather_unavailable -->
+
+                <div class="content">
+                    <a href="/weather/" title="View weekly forecast" class="button icon-weather">View weekly forecast</a>
+                </div>
+            </section>
+        </div>
     </div>
-    <!-- BEGIN weather_unavailable -->
-    <br />
-    <p class="information-notification">Weather service is temporarily unavailable.</p>
-    <!-- END weather_unavailable -->
-	<p class="interact"><a href="/weather/" title="" class="btn weather"><span></span>View weekly forecast</a></p>
 </div>
