@@ -10,6 +10,8 @@ class Component_Dashboard_SubjectController extends Component_Dashboard_Controll
 
     protected $subject_list;
 
+    protected $componentName = 'My Subjects';
+
     /**
      * Business logic to collate data ready for output
      *
@@ -46,6 +48,7 @@ class Component_Dashboard_SubjectController extends Component_Dashboard_Controll
             $this->parse('subject_block', 'subject', true);
         }
 
+        $this->parseConfig();
         return true;
     }
 }

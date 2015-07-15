@@ -1,16 +1,21 @@
-<div class="box clearfix">
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
 
-    <h2>My Subjects</h2>
+    {CONFIGURATION}
 
-    <div class="dashboard-subject-list">
-        <ul>
-            <!-- BEGIN subject -->
-            <li class="subject subject-{SUBJECT_CODE}">
-                <a href="/homepage/{SUBJECT_CODE}">{SUBJECT_NAME}</a>
-            </li>
-            <!-- END subject -->
-        </ul>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <ul class="dashboard-subject-list clearfix">
+                        <!-- BEGIN subject -->
+                        <li class="subject subject-{SUBJECT_CODE}">
+                            <a href="/homepage/{SUBJECT_CODE}">{SUBJECT_NAME}</a>
+                        </li>
+                        <!-- END subject -->
+                    </ul>
+                </div>
+            </section>
+        </div>
     </div>
-
 </div>
-
