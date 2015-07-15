@@ -13,17 +13,15 @@
             <section>
                 <div class="content">
                     <!-- BEGIN default_video -->
-                    <div class="videoWrapper">
-                        <video data-role="media-player"
-                               controls
-                               preload="none"
-                               poster="/cms/videoThumb.php?type=sbfs&id={DEFAULT_VIDEO_ID}&size=poster"
-                               height="400"
-                               width="100%"
-                                >
-                            <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_VIDEO_ID}" type='video/mp4'>
-                        </video>
-                    </div>
+                    <video data-role="media-player"
+                           controls
+                           preload="none"
+                           poster="/cms/videoThumb.php?type=sbfs&id={DEFAULT_VIDEO_ID}&size=poster"
+                           height="400"
+                           width="100%"
+                    >
+                        <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_VIDEO_ID}" type='video/mp4'>
+                    </video>
                     <!-- END default_video -->
 
                     <ul class="information-list">
@@ -31,7 +29,7 @@
                         <li class="row">
                             <div class="avatar-card">
                                 <a href="#" data-media-id="{VIDEO_LIST_ID}">
-                                    <img class="thumbnail" width="64" height="64" src="/cms/videoThumb.php?type=sbfs&id={VIDEO_LIST_ID}" />
+                                    <img src="/cms/videoThumb.php?type=sbfs&id={VIDEO_LIST_ID}" />
                                     <p>{VIDEO_LIST_TITLE}</p>
                                 </a>
                                 <p class="meta">{VIDEO_LIST_DURATION} | Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
@@ -42,7 +40,7 @@
                         <!-- BEGIN video_pending_list -->
                         <li class="row">
                             <div class="avatar-card">
-                                <img class="thumbnail" width="64" height="64" src="{VIDEO_LIST_STATUSIMG}" title="Currently transcoding {VIDEO_LIST_TITLE}" />
+                                <img src="{VIDEO_LIST_STATUSIMG}" title="Currently transcoding {VIDEO_LIST_TITLE}" />
                                 <p>{VIDEO_LIST_TITLE}</p>
                                 <p class="meta">Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
                             </div>
