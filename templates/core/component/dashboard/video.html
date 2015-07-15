@@ -14,7 +14,7 @@
                 <div class="content">
                     <!-- BEGIN default_video -->
                     <div class="videoWrapper">
-                        <video id="schoolbox_video{COMPONENT_INSTANCE_ID}"
+                        <video data-role="media-player"
                                controls
                                preload="none"
                                poster="/cms/videoThumb.php?type=sbfs&id={DEFAULT_VIDEO_ID}&size=poster"
@@ -23,10 +23,6 @@
                                 >
                             <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_VIDEO_ID}" type='video/mp4'>
                         </video>
-                        <script>
-                            var videoElement = $("#schoolbox_video{COMPONENT_INSTANCE_ID}").mediaelementplayer();
-                            var video        = videoElement.data('mediaelementplayer');
-                        </script>
                     </div>
                     <!-- END default_video -->
 
@@ -34,7 +30,7 @@
                         <!-- BEGIN video_list -->
                         <li class="row">
                             <div class="avatar-card">
-                                <a class="video-link" href="#" rel="{VIDEO_LIST_ID}">
+                                <a href="#" data-media-id="{VIDEO_LIST_ID}">
                                     <img class="thumbnail" width="64" height="64" src="/cms/videoThumb.php?type=sbfs&id={VIDEO_LIST_ID}" />
                                     <p>{VIDEO_LIST_TITLE}</p>
                                 </a>
@@ -60,10 +56,14 @@
     </div>
 
     <script type="text/javascript">
-        $('#component{COMPONENT_INSTANCE_ID} a.video-link').click(function(event) {
+        var component    = $('#component{COMPONENT_INSTANCE_ID}');
+        var videoElement = component.find('[data-role="media-player"]').mediaelementplayer();
+        var video        = videoElement.data('mediaelementplayer');
+        component.find('[data-media-id]').click(function(event) {
             event.preventDefault();
-            var $target = "/cms/sendVideo.php?type=sbfs&id="+$(this).attr("rel");
-            var $poster = "/cms/videoThumb.php?type=sbfs&id="+$(this).attr("rel")+"&size=poster";
+            var videoId = $(this).data('media-id');
+            var $target = "/cms/sendVideo.php?type=sbfs&id="+videoId;
+            var $poster = "/cms/videoThumb.php?type=sbfs&id="+videoId+"&size=poster";
             // setting video plugin's poster doesn't work as expected,
             // so set the video's poster directly
             videoElement.attr('poster', $poster);
