@@ -262,12 +262,12 @@ $.widget("ui.chat",  {
                 for (var $i in $data.users) {
                     var $user = $data.users[$i];
 
-                    var $user_el = $('<li></li>');
+                    var $user_el = $('<li class="row"></li>');
 					$tpl =
-                        '<div class="column no-pad small-9">' +
+                        '<div class="column no-pad small-11">' +
                             '<div class="avatar card">' +
                                 '<img class="icon" src="/portrait.php?userId={1}&size=square64" title="{0}" />' +
-                                '<p>{0}</p>' +
+                                '<h3>{0}</h3>' +
                             '</div>' +
                         '</div>';
 
@@ -286,10 +286,11 @@ $.widget("ui.chat",  {
 
                     /* Mute/unmute buttons */
                     if ($self.options.user_perm > $user.perm && $user.user_id != $self.options.user_id) {
-                        var $mute_el = $('<div class="three actions"><a href="#" class="no-text icon-mute" title="Mute"></a></div>');
+                        var $mute_el = $('<div class="one actions"><a href="#" data-interaction-mute class="no-text icon-mute" title="Mute"></a></div>');
 
                         if ($data.config.muted_users != undefined && $.inArray($user.user_id, $data.config.muted_users) > -1) {
                             $user_el.addClass('chat-user-muted');
+                            $mute_el.find('a[data-interaction-mute]').removeClass('icon-mute').addClass('icon-approve').attr('title', 'Unmute');
                         }
 
                         $mute_el.click(function ($event) {
