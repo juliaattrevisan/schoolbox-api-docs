@@ -118,3 +118,83 @@ ul.countdown {
         float: left;
     }
 }
+
+/* Quicklinks: MGGS only
+ */
+.quicklinks {
+    .evi {
+        // Mascot
+        background: url('/images/mggs/evi.png') top left no-repeat;
+        display: block;
+        width: 160px;
+        height: 213px;
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 1;
+    }
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+    padding: 30px 0 0 0;
+    height: 242px;
+    width: 100%;
+
+    .quicklinks-container {
+        background: #f2f6fa;
+        border: 1px solid #e5edf5;
+        border-radius: 3px;
+        -moz-border-radius: 3px;
+        -webkit-border-radius: 3px;
+        margin: 0 0 16px 62px;
+        position: relative;
+        height: 160px;
+        width: 90%;
+        margin-left: 80px;
+        margin-top: 25px;
+        padding: 10px 0px 40px 32px;
+
+        ul {
+            margin: 15px 0 0 -20px;
+            overflow: visible;
+        }
+
+        li {
+            list-style: none;
+            padding: 0;
+            float: left;
+            width: 25%;
+            /* bandaid patch for li wounds */
+            margin: 0 !important;
+        }
+
+        li a {
+            color: #002e52;
+            display: block;
+            float: left;
+            margin: 0 20px;
+            height: 0;
+            width: 88px;
+            text-align: center;
+            text-decoration: none;
+            padding-top: 79px;
+        }
+
+        li a:hover{
+            text-decoration: underline;
+        }
+
+        li a {
+            background: url('/images/mggs/quicklinks-icons.png') no-repeat;
+        }
+
+        li a.calendar{ background-position: 0 0; }
+        li a.news{ background-position: 0 -89px; }
+        li a.my-timetable{ background-position: 0 -176px; }
+        li a.synergetic{ background-position: 0 -265px; }
+
+        li a.eportfolio{ background-position: -91px 0; }
+        li a.synergetic-parent-portal{ background-position: -177px 0; }
+        li a.evi-parent-homepage{ background-position: -177px -89px; }
+    }
+}
