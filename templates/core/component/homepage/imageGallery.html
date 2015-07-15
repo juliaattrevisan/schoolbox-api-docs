@@ -1,64 +1,65 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div data-component id="component{COMPONENT_INSTANCE_ID}">
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="clearfix">
-            <div class="dz-wrap clearfix">
-                <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post"
-                      data-accepts="image">
-                    <div class="float-left image-thumbnail dz-preview dz-file-preview">
-                        <a class="thumb dz-details" style="height:100px;">
-                            <img class="dz-pending" width="16" height="16" src="/images/resources/ajax.gif" style="top:4px;left:0px;"/>
-                            <img data-dz-thumbnail border="0" style="position:static;">
-                        </a>
+    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="island small-12">
+            <section>
+                <div class="content">
+                    <div class="dropzone-wrap">
+                        <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post"
+                              data-accepts="image">
+                            <div class="float-left image-thumbnail dz-preview dz-file-preview">
+                                <a class="thumb dz-details" style="height:100px;">
+                                    <img class="dz-pending" width="16" height="16" src="/images/resources/ajax.gif" style="top:4px;left:0px;"/>
+                                    <img data-dz-thumbnail border="0" style="position:static;">
+                                </a>
 
-                        <div class="dz-progress"><span class="dz-upload" style="height:100%;position:absolute;top:0"></span>
+                                <div class="dz-progress"><span class="dz-upload" style="height:100%;position:absolute;top:0"></span>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="clearing-thumbs" data-clearing data-dz-container>
+                            <!-- BEGIN image_gallery -->
+                            <li>
+                                <a class="th" href="/cms/image.php?id={THUMBNAIL_ID}&height=600&width=800"
+                                   rel="lightbox[homepage-{COMPONENT_INSTANCE_ID}]" style="height:{IMAGE_HEIGHT}px;"
+                                   alt="{THUMBNAIL_DESCRIPTION}" title="{THUMBNAIL_DESCRIPTION}">
+                                    <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0" alt="{THUMBNAIL_DESCRIPTION}" border="0"/>
+                                </a>
+                            </li>
+                            <!-- END image_gallery -->
                         </div>
                     </div>
-                </form>
-                <div class="dz-container">
-                    <!-- BEGIN image_gallery -->
-                    <div class="float-left image-thumbnail">
-                        <a class="thumb" href="/cms/image.php?id={THUMBNAIL_ID}&height=600&width=800"
-                           rel="lightbox[homepage-{COMPONENT_INSTANCE_ID}]" style="height:{IMAGE_HEIGHT}px;"
-                           alt="{THUMBNAIL_DESCRIPTION}" title="{THUMBNAIL_DESCRIPTION}">
-                            <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0" alt="{THUMBNAIL_DESCRIPTION}" border="0"/>
-                        </a>
-                    </div>
-                    <!-- END image_gallery -->
+                    <!-- BEGIN submit_image -->
+                    <script type="text/javascript">
+                        $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                            wrapClass: 'dragging',
+                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                            acceptedFiles: 'image/*',
+                            createImageThumbnails: true,
+                            dictDefaultMessage: 'You can drag images into this space.',
+                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                            refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+
+                            addedfile: function (file) {
+                                $(file.previewElement).addClass('category-{IMAGEGALLERY_CATEGORY_ID}').data('node', {IMAGEGALLERY_CATEGORY_ID});
+                            },
+                            sending: function (file, xhr, formData) {
+                                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                                formData.append('category', $(file.previewElement).data('node'));
+                                formData.append('comment', '');
+                                formData.append('hidden', 0);
+                            },
+                            complete: function (file) {
+                                $(file.previewElement).find('img.dz-pending').remove();
+                            }
+                        });
+                    </script>
+                    <a href="/cms/file/multi/{IMAGEGALLERY_CATEGORY_ID}" class="button icon-add">Post Images</a>
+                    <!-- END submit_image -->
+                    <a href="/cms/imageGallery/{IMAGEGALLERY_CATEGORY_ID}/returnTo:{ID}" class="button icon-view">View Full Gallery</a>
                 </div>
-            </div>
+            </section>
         </div>
-        <!-- BEGIN submit_image -->
-        <a href="/cms/file/multi/{IMAGEGALLERY_CATEGORY_ID}" class="btn up-arrow"><span></span>Post Images</a>
-        <script type="text/javascript">
-            $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                wrapClass: 'dragging',
-                previewsContainer: '#component{COMPONENT_INSTANCE_ID} .dz-container',
-                acceptedFiles: 'image/*',
-                createImageThumbnails: true,
-                dictDefaultMessage: 'You can drag images into this space.',
-                refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
-
-                addedfile: function (file) {
-                    $(file.previewElement).addClass('category-{IMAGEGALLERY_CATEGORY_ID}').data('node', {IMAGEGALLERY_CATEGORY_ID});
-                },
-                sending: function (file, xhr, formData) {
-                    formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                    formData.append('category', $(file.previewElement).data('node'));
-                    formData.append('comment', '');
-                    formData.append('hidden', 0);
-                },
-                complete: function (file) {
-                    $(file.previewElement).find('img.dz-pending').remove();
-                }
-            });
-        </script>
-
-        <!-- END submit_image -->
-        <p class="interact"><a href="/cms/imageGallery/{IMAGEGALLERY_CATEGORY_ID}/returnTo:{ID}" class="btn"><span></span>View
-            Full Gallery</a>
-        </p>
     </div>
 </div>
