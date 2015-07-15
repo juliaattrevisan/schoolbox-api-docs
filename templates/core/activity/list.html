@@ -1,26 +1,17 @@
-<li>
-    <div class="large-12 columns">
-        <div class="icon">
-            <span class="grade">
-                <span class="gradient-{ACTLIST_GRADEIANT}">{ACTLIST_GRADE}</span>
-            </span>
-        </div>
-        <div class="avatar-card">
-            <a href="#" title="View Profile">
-                <!-- BEGIN avatar -->
-                <img src="{ACTLIST_AVATAR}" alt="{ACTLIST_AVATAR_TITLE}" title="{ACTLIST_AVATAR_TITLE}" />
-                <p>{ACTLIST_CONTENT}</p>
-                <!-- END avatar -->
-            </a>
-
-            <p>
-                <!-- BEGIN icon -->
-                <span class="no-text icon-{ACTLIST_ICON}"></span>
-                <!-- END icon -->
-                <!-- BEGIN time -->
-                {ACTLIST_TIME}
-                <!-- END time -->
-            </p>
-        </div>
-    </div>
+<li class="{DARK} {ACTLIST_HAS_GRADE}">
+    <!-- BEGIN icon -->
+    <span class="icon {ACTLIST_ICON}"><span></span></span>
+    <!-- END icon -->
+    <!-- BEGIN avatar -->
+    <span class="avatar"><img src="{ACTLIST_AVATAR}" title="{ACTLIST_AVATAR_TITLE}" alt="{ACTLIST_AVATAR_TITLE}" /></span>
+    <!-- END avatar -->
+    <p>
+        {ACTLIST_CONTENT}
+        <!-- BEGIN time -->
+        <span class="time">{ACTLIST_TIME}</span>
+        <!-- END time -->
+    </p>
+    <span class="grade">
+        <span class="gradient-{ACTLIST_GRADEIANT}">{ACTLIST_GRADE}</span>
+    </span>
 </li>

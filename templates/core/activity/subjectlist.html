@@ -1,45 +1,29 @@
-<li class="subject-group">
-    <div data-equalizer>
-        <div class="grade current-grade-avg gradient-{SUBJ_GRADEIENT} gradient-{SUBJ_GRADEIENT}-bg" data-equalizer-watch>
-            <!-- BEGIN subject_grade -->
-            <a href="/submission/allWork/{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{SUBJ_CAT_ID}">
-                <span>{SUBJ_GRADE}</span>
-                <br />
-                {SUBJ_TREND_AMT} {SUBJ_TREND_DIR}
-            </a>
-            <!-- END subject_grade -->
-        </div>
-        <a href="{SUBJ_SUBJECT_URL}" title="View Subject">
-            <div class="ten-column" data-equalizer-watch>
-                <h3>{SUBJ_SUBJECT_NAME} {SUBJ_SUBJECT_CODE}</h3>
-            </div>
-        </a>
-        <a href="{SUBJ_SUBJECT_URL}" title="View Subject">
-            <div class="one-column text-center" data-equalizer-watch>
-                <span class="no-text icon-next"></span>
-            </div>
-        </a>
+<li class="{DARK} {SUBJ_HAS_GRADE}">
+    <!-- BEGIN subject_grade -->
+    <a class="grade gradient-{SUBJ_GRADEIANT}-bg" href="/submission/allWork/{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{SUBJ_CAT_ID}">
+        <span class="gradient-{SUBJ_GRADEIANT}">{SUBJ_GRADE}</span>
+        {SUBJ_TREND_AMT} {SUBJ_TREND_DIR}
+    </a>
+    <!-- END subject_grade -->
+    <a class="listlink subject to-subject left-bar" href="{SUBJ_SUBJECT_URL}">
+        <!-- BEGIN icon -->
+<!--
+        <span class="avatar">
+            <img src="{SUBJ_SUBJECT_ICON}" title="{SUBJ_SUBJECT_NAME}" alt="{SUBJ_SUBJECT_NAME}">
+        </span>
+-->
+        <!-- END icon -->
+        {SUBJ_SUBJECT_NAME} {SUBJ_SUBJECT_CODE}
+        <span class="icon"></span>
+    </a>
+    <!-- BEGIN teacher -->
+    <div class="profile teacher left-bar">
+      <a href="/search/user/{SUBJ_TEACHER_ID}" class="listlink teacher-profile">
+        <img src="{SUBJ_TEACHER_AVATAR}" title="{SUBJ_TEACHER_AVATAR_TITLE}" alt="{SUBJ_TEACHER_AVATAR_TITLE}" />
+        <span class="name">{SUBJ_TEACHER_NAME}</span>
+        <span class="role">Teacher</span>
+      </a>
+      <a class="listlink mail-teacher" href="{SUBJ_TEACHER_URL}">Mail</a>
     </div>
-    <ul>
-        <!-- BEGIN teacher -->
-        <li data-equalizer>
-            <a href="/search/user/{SUBJ_TEACHER_ID}" title="View Profile">
-                <div class="one-column text-center" data-equalizer-watch>
-                    <img src="{SUBJ_TEACHER_AVATAR}" alt="{SUBJ_TEACHER_AVATAR_TITLE}" title="{SUBJ_TEACHER_AVATAR_TITLE}" />
-                </div>
-            </a>
-            <a href="/search/user/{SUBJ_TEACHER_ID}" title="View Profile">
-                <div class="ten-column" data-equalizer-watch>
-                    {SUBJ_TEACHER_NAME}
-                    <p class="meta">Teacher</p>
-                </div>
-            </a>
-            <a href="{SUBJ_TEACHER_URL}" title="Email Teacher">
-                <div class="one-column text-center" data-equalizer-watch>
-                    <span class="no-text icon-email"></span>
-                </div>
-            </a>
-        </li>
-        <!-- END teacher -->
-    </ul>
+    <!-- END teacher -->
 </li>
