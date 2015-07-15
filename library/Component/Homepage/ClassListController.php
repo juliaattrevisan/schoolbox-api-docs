@@ -117,9 +117,17 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                     /* Don't display images in list view
                         */
                     if ($this->getConfig('displayPortraits') == 'grid') {
+                        $this->setVar(array(
+                            'GRID_VIEW_CLASSES' => 'medium-block-grid-2 large-block-grid-3'
+                        ));
+
                         $this->parse('has_thumbnail_block', 'has_thumbnail');
                         $this->setVar('has_icon_block', '');
                     } else {
+                        $this->setVar(array(
+                            'GRID_VIEW_CLASSES' => ''
+                        ));
+
                         $this->setVar('has_thumbnail_block', '');
                         $this->parse('has_icon_block', 'has_icon');
                     }

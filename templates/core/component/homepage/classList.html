@@ -1,38 +1,55 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
+
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <ul class="information-list {LIST_STYLE}">
-            <!-- BEGIN person -->
-            <li class="{ON_OFF}">
-                <a href="/search/user/{PERSON_UID}" alt="{PERSON_NAME}" class="author" title="{PERSON_NAME}">
-                    <!-- BEGIN has_thumbnail -->
-                    <img class="thumbnail" height="64" width="64" src='/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square64'/>
-                    <!-- END has_thumbnail -->
-                    <!-- BEGIN has_icon -->
-                    <img class="icon" height="32" width="32" src='/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square32'/>
-                    <!-- END has_icon -->
-                    <h4>{PERSON_NAME}</h4>
-                </a>
-                <p class="meta">{PERSON_GROUP}</p>
-            </li>
-            <!-- END person -->
-        </ul>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <ul class="grid small-block-grid-1 {GRID_VIEW_CLASSES}">
+                    <!-- BEGIN person -->
+                    <li>
+                        <div class="avatar-card clearfix">
+                            <a href="/search/user/{PERSON_UID}" title="View Profile">
+                                <!-- BEGIN has_thumbnail -->
+                                <img src="/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square64" alt="View Profile" />
+                                <!-- END has_thumbnail -->
+                                <!-- BEGIN has_icon -->
+                                <img src="/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square64" alt="View Profile" />
+                                <!-- END has_icon -->
 
-        <!-- BEGIN student_email -->
-        <form action="/mail/createMail.php" method="post" name="form2">
-            <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLY_TO}&gt;"/>
-            <input type="hidden" name="bcc" value="{EMAIL_ALL_STUDENTS}"/>
-            <a href="#" class="btn submit-this email"><span></span>Email Students</a>
-        </form>
-        <!-- END student_email -->
+                                <p>{PERSON_NAME}</p>
+                            </a>
+                            <p class="meta">{PERSON_GROUP}</p>
+                        </div>
+                    </li>
+                    <!-- END person -->
+                </ul>
 
-        <!-- BEGIN parent_email -->
-        <form action="/mail/createMail.php" method="post" name="form2">
-            <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLY_TO}&gt;"/>
-            <input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
-            <a href="#" class="btn submit-this email"><span></span>Email Parents</a>
-        </form>
-        <!-- END parent_email -->
+                <div class="content">
+                    <ul class="inline-list">
+                        <!-- BEGIN student_email -->
+                        <li>
+                            <form action="/mail/createMail.php" method="post" name="form2">
+                                <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLY_TO}&gt;"/>
+                                <input type="hidden" name="bcc" value="{EMAIL_ALL_STUDENTS}"/>
+                                <input type="submit" value="Email Students" />
+                            </form>
+                        </li>
+                        <!-- END student_email -->
+
+                        <!-- BEGIN parent_email -->
+                        <li>
+                            <form action="/mail/createMail.php" method="post" name="form2">
+                                <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLY_TO}&gt;"/>
+                                <input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
+                                <input type="submit" value="Email Parents" />
+                            </form>
+                        </li>
+                        <!-- END parent_email -->
+                    </ul>
+                </div>
+            </section>
+        </div>
     </div>
 </div>
