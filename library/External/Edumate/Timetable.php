@@ -341,10 +341,11 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         }
 
         $campusCode = explode(',',$campus->getExtTimetableCode());
-	if (count($campusCode) > 1){
-            $campus = "( campus = :campus OR campus = :campus2 )";
+
+        if (count($campusCode) > 1){
+            $campusSql = "( campus = :campus OR campus = :campus2 )";
         } else {
-            $campus = "campus = :campus";
+            $campusSql = "campus = :campus";
         }
 
         $stmt = $this->getDatabase()->prepare(
@@ -353,7 +354,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             FROM db2inst1.schoolbox_timetable t
             LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code
             $join
-            AND $campus
+            AND $campusSql
             AND day_number <= :d
         "
         );
@@ -363,7 +364,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
                 'sn' => $externalUserId,
                 'campus' => $campusCode[0],
                 'campus2' => $campusCode[1],
-                'd' => $this->getCycleLength($campusId),
+                'd' => $this->getCycleLength($campus),
             )
         );
 
