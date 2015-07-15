@@ -1,19 +1,28 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
+
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="listing clearfix">
-            <ul>
-                <!-- BEGIN duties -->
-                <li class="{ON_OFF} clearfix">
-                    <h3>{DUTY}</h3>
-                    <p class="interact">{ASSIGNEDUSER}</p>
-                </li>
-                <!-- END duties -->
-            </ul>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <ul class="information-list">
+                    <!-- BEGIN duties -->
+                    <li class="row" data-equalizer>
+                        <div class="small-12 columns" data-equalizer-watch>
+                            <h3>{DUTY}</h3>
+                            <p class='meta'>{ASSIGNEDUSER}</p>
+                        </div>
+                    </li>
+                    <!-- END duties -->
+                </ul>
+
+                <div class="content">
+                    <!-- BEGIN edit_duties -->
+                    <a class='button icon-modify' href="/modules/duties/editDuties.php?category={ID}">Edit Duties</a>
+                    <!-- END edit_duties -->
+                </div>
+            </section>
         </div>
-        <!-- BEGIN edit_duties -->
-        <p class="interact"><a href="/modules/duties/editDuties.php?category={ID}">Edit Duties</a></p>
-        <!-- END edit_duties -->
     </div>
 </div>

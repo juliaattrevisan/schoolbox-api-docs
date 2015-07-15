@@ -33,7 +33,7 @@ class Component_Homepage_DutiesController extends Component_Homepage_ControllerA
             return false;
         }
 
-        $this->setComponentName("DATE", 'Duties for ' . date('l, jS \of F Y'));
+        $this->setComponentName('Duties for ' . date('l, jS \of F Y'));
 
         $this->parseConfig();
 
