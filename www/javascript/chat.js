@@ -202,26 +202,37 @@ $.widget("ui.chat",  {
     },
 
     _append_message: function ($message) {
-        var $message_el = $('<li></li>').addClass('chat-message-' + $message.type);
+
+        var last = this.options.log_el.find('li').last();
+
+        if ($message.user_id == last.data('user')) {
+            last.find('.card').append('<p class="spaced">{0}</p>'.format($message.body));
+
+            return;
+        }
+
+        var $message_el = $('<li data-user="{0}" class="row"></li>'.format($message.user_id)).addClass('chat-message-' + $message.type);
 
         /* If admin */
         if ($message.user_perm > 1) {
             $message_el.addClass('chat-message-user-admin');
         }
 
-        if ($message.user_id == this.options.user_id) {
-            $message_el.addClass('chat-message-user-me');
-        }
-
 		$tpl =
-
-				'<img class="chat-avatar" height="32" width="32" src="/portrait.php?userId={1}&size=square32" title="{0}" />' +
-				'<p class="chat-message">' +
-					'<span class="chat-time">{2}</span>' +
-					'<span class="chat-username">{0}</span>' +
-					'{3}</p>';
+                '<div class="avatar card">' +
+                    '<img src="/portrait.php?userId={1}&size=square64" title="{0}" />' +
+                    '<p class="spaced">{3}</p>' +
+                    //'<p class="chat-username">{2} {0}</p>' +
+                '</div>'
+                //'<div class="chat-message">' +
+                //+ '</div>'
+        ;
 
         $message_el.html($tpl.format($message.name, $message.user_ext_id, $message.time, $message.body));
+
+        if ($message.user_id != this.options.user_id) {
+            //$message_el.find('p.alert-box').addClass('secondary');
+        }
 
         this.options.log_el.append($message_el).prop({ scrollTop: this.options.log_el.prop("scrollHeight") });
 
@@ -253,17 +264,15 @@ $.widget("ui.chat",  {
 
                     var $user_el = $('<li></li>');
 					$tpl =
-						'<img class="icon" height="32" width="32" src="/portrait.php?userId={1}&size=square32" title="{0}" />' +
-						'<h4>{0}</h4>';
+                        '<div class="column no-pad small-9">' +
+                            '<div class="avatar card">' +
+                                '<img class="icon" src="/portrait.php?userId={1}&size=square64" title="{0}" />' +
+                                '<p>{0}</p>' +
+                            '</div>' +
+                        '</div>';
 
 					$user_el.html($tpl.format($user.name, $user.user_ext_id));
                     $user_el.data('user_id', $user.user_id);
-
-                    //every two add in the dark class chimchim
-                    if ($x%2 != 0) {
-                        $user_el.addClass('dark');
-                    }
-                    $x++;
 
                     /* If admin */
                     if ($user.perm > 1) {
@@ -277,7 +286,7 @@ $.widget("ui.chat",  {
 
                     /* Mute/unmute buttons */
                     if ($self.options.user_perm > $user.perm && $user.user_id != $self.options.user_id) {
-                        var $mute_el = $('<a href="#">mute</a>');
+                        var $mute_el = $('<div class="three actions"><a href="#" class="no-text icon-mute" title="Mute"></a></div>');
 
                         if ($data.config.muted_users != undefined && $.inArray($user.user_id, $data.config.muted_users) > -1) {
                             $user_el.addClass('chat-user-muted');
