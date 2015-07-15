@@ -50,7 +50,7 @@ class Notifier extends ResourceNotifier {
 			    'homepage' => new CategoryParam($category),
 			    'heading'  => new Param($resource->getHeading())
 		    ))
-		    ->setIcon("/portrait.php?size=square32&userId=".$effector->getExternalId())
+		    ->setIcon("/portrait.php?size={$this->iconSize}&userId=".$effector->getExternalId())
 		    ->setHref("/homepage/".$category->getId())
 			->setNamespace($this->getSlug())
 		    ->setSeverity(Logger::INFO)

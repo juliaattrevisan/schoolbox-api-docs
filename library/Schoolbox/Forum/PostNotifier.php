@@ -173,7 +173,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
                 'thread' => new Param($thread->getTitle(), $href),
                 'folder' => new CategoryParam($cat)
             ))
-            ->setIcon("/portrait.php?size=square32&userId=" . $poster->getExternalId())
+            ->setIcon("/portrait.php?size={$this->iconSize}&userId=" . $poster->getExternalId())
             ->setHref($href . ($deduplicate ? "#$postId" : ''))
             ->setSeverity(Logger::INFO)
             ->setNamespace($this->getSlug())

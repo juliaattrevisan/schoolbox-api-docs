@@ -195,7 +195,7 @@ class TimetableNotifier extends WorkNotifier {
                     ->setTitle($body)
                     ->setTopics(array("notify.campus.$campusId"))
                     ->putMeta('title', $title ?: 'Timetable')
-                    ->setIcon($icon ?: '/images/icon.php?icon=clock&size=32');
+                    ->setIcon($icon ?: "/images/icon.php?icon=clock&size={$this->iconSize}");
 
         $json = $bob->build()->jsonSerialize();
 

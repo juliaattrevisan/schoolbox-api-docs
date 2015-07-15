@@ -121,7 +121,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 	protected function generateNotification($roleType, $news, $user) {
 		$msgr = new Messenger();
 
-		$icon = sprintf("/portrait.php?userId=%s&size=square32", $user->getExternalId());
+		$icon = sprintf("/portrait.php?userId=%s&size={$this->iconSize}", $user->getExternalId());
 
 		$articleId = $news->getId();
 		$heading = $news->getHeading();

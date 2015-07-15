@@ -149,7 +149,7 @@ class CommentNotifier extends AbstractModuleNotifier
 
         // create base essentials first
         $bob->setNamespace(NSMapper::NS_REPORT_CARD)
-            ->setIcon('/portrait.php?size=square32&userId=' . $author->getExternalId())
+            ->setIcon('/portrait.php?size={$this->iconSize}&userId=' . $author->getExternalId())
             ->setHref($href)
             ->setBody($comment->getBody())
             ->setSeverity(Logger::WARNING)

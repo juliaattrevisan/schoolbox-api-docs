@@ -120,7 +120,7 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 				'title'  => new Param($blog->getHeading()),
 				'catname' => new CategoryParam($category)
 			))
-			->setIcon("/portrait.php?userId=$authorExtId&size=square32")
+			->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
 			->setHref("/homepage/$categoryId#blog_$blogId")
 			->setSeverity(Logger::INFO)
 			->setNamespace($this->getSlug())

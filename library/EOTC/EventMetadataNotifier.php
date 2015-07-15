@@ -142,7 +142,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                     'event'     => new Param($relEvent->getTitle(), $href)
                 )
             )
-            ->setIcon("/portrait.php?size=square32&userId=".$applicant->getExternalId())
+            ->setIcon("/portrait.php?size={$this->iconSize}&userId=".$applicant->getExternalId())
             ->setHref($href)
             ->setSeverity(Logger::WARNING)
             ->setNamespace($this->getSlug())
@@ -205,7 +205,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         );
 
         // prep msg data
-        $bob->setIcon("/portrait.php?size=square32&userId=$effectorExtId");
+        $bob->setIcon("/portrait.php?size={$this->iconSize}&userId=$effectorExtId");
         $href = "/modules/eotc/status/modify/$relEventId";
 
         // change was made by applicant or TiC: inform moderators
@@ -285,7 +285,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
         // setup initial condition of the builder
         $bob = new Builder();
-        $bob->setIcon("/portrait.php?size=square32&userId=$effectorExtId")
+        $bob->setIcon("/portrait.php?size={$this->iconSize}&userId=$effectorExtId")
             ->setNamespace($this->getSlug())
             ->addTopic("eotc.$relEventId.statuschanged")
             ->setSeverity(Logger::WARNING)

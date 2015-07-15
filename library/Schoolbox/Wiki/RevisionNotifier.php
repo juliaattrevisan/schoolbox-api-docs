@@ -147,7 +147,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 
         $bob->setTitle(':author revised the wiki :title in :folder')
             ->setHref("/wiki/$categoryId/$revisionSlug")
-            ->setIcon("/portrait.php?userId=$authorExtId&size=square32")
+            ->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
             ->addTopic("wiki.$revisionId.created")
             ->setSeverity(Logger::INFO)
             ->setNamespace(self::getNamespace())

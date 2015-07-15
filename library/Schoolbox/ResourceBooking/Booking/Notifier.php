@@ -203,7 +203,7 @@ class Notifier extends AbstractModuleNotifier
         // Notify the owner of the booking (usually the person who the booking is for)
         $ownerMessage = new Message(
             $messageText,
-            '/portrait.php?userId=' . $user->getExternalId() . '&size=square32',
+            '/portrait.php?userId=' . $user->getExternalId() . '&size={$this->iconSize}',
             $resourceUrl
         );
         $ownerMessageParams = $messageParams;
@@ -221,7 +221,7 @@ class Notifier extends AbstractModuleNotifier
         // Send a message to all the moderators of the object
         $moderatorMessage = new Message(
             $messageText,
-            '/portrait.php?userId=' . $user->getExternalId() . '&size=square32',
+            '/portrait.php?userId=' . $user->getExternalId() . '&size={$this->iconSize}',
             $resourceUrl
         );
         foreach ($object->getResource()->getModeratorList() as $moderator) {

@@ -216,7 +216,7 @@ class FileNotifier extends AbstractModuleNotifier
                     'catname' => new CategoryParam($cat)
                 )
             )
-            ->setIcon("/portrait?userId=$studentExtId&size=square32")
+            ->setIcon("/portrait?userId=$studentExtId&size={$this->iconSize}")
             ->setHref("/submission/viewSubmission/$boxId")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
@@ -285,7 +285,7 @@ class FileNotifier extends AbstractModuleNotifier
         $ownerId    = $user->getId();
         $ownerExtId = $user->getExternalId();
 
-        $icon = "/portrait?userId=$ownerExtId&size=square32";
+        $icon = "/portrait?userId=$ownerExtId&size={$this->iconSize}";
         $href = "/submission/submissionHistory/$boxId/$studentId";
 
         $msg = new Message(":owner removed your previous submission to :boxname in :catname, you can now resubmit",

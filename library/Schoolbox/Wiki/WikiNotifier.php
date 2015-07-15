@@ -166,7 +166,7 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 		$msg = new Message(
 			':author created the wiki :title in :catname',
-			"/portrait.php?userId=$authorExtId&size=square32",
+			"/portrait.php?userId=$authorExtId&size={$this->iconSize}",
 			"/wiki/$categoryId/$wikiSlug",
 			array(
 				'subtitle',

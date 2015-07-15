@@ -316,7 +316,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 'cat'  => new CategoryParam($cat)
             ))
             ->setHref("/submission/submissionHistory/$boxId")
-            ->setIcon("/portrait?userId=$authorExtId&size=square32")
+            ->setIcon("/portrait?userId=$authorExtId&size={$this->iconSize}")
             ->setNamespace($this->getSlug())
             ->addTopic("duework.$boxId.open")
             ->addFilter('roletype', array(Role::STUDENT))
@@ -564,7 +564,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 'boxname' => new Param($boxName, $href),
                 'catname' => new CategoryParam($cat),
             ))
-            ->setIcon('/images/icon.php?size=32&icon=work')
+            ->setIcon("/images/icon.php?size={$this->iconSize}&icon=work")
             ->setHref($href)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::WARNING)
@@ -772,7 +772,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 'boxname' => new Param($submissionBox->getName(), $href),
                 'catname' => new CategoryParam($submissionBox->getCategory()),
             ))
-            ->setIcon('/images/icon.php?size=32&icon=cross')
+            ->setIcon("/images/icon.php?size={$this->iconSize}&icon=cross")
             ->setHref($href)
             ->setSeverity(Logger::NOTICE)
             ->setNamespace($this->getSlug())
@@ -816,7 +816,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             'boxname' => new Param($boxName, $href),
             'catname' => new CategoryParam($cat),
         ))
-            ->setIcon('/images/icon.php?size=32&icon=work')
+            ->setIcon("/images/icon.php?size={$this->iconSize}&icon=work")
             ->setHref($href)
             ->setSeverity(Logger::ERROR)
             ->setNamespace($this->getSlug())
@@ -910,7 +910,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         }
 
         $bob->setTitle(":boxname has closed and :number did not submit work")
-            ->setIcon('/images/icon.php?size=32&icon=work')
+            ->setIcon("/images/icon.php?size={$this->iconSize}&icon=work")
             ->setHref("/submission/viewSubmission/$boxId")
             ->setNamespace($this->getSlug())
             ->setParams(array(
