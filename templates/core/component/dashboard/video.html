@@ -32,20 +32,24 @@
 
                     <ul class="information-list">
                         <!-- BEGIN video_list -->
-                        <li class="{ON_OFF}">
-                            <a class="video-link" href="#" rel="{VIDEO_LIST_ID}">
-                                <img class="thumbnail" width="64" height="64" src="/cms/videoThumb.php?type=sbfs&id={VIDEO_LIST_ID}" />
-                                <h4>{VIDEO_LIST_TITLE}</h4>
-                            </a>
-                            <p class="meta">{VIDEO_LIST_DURATION} | Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
+                        <li class="row">
+                            <div class="avatar-card">
+                                <a class="video-link" href="#" rel="{VIDEO_LIST_ID}">
+                                    <img class="thumbnail" width="64" height="64" src="/cms/videoThumb.php?type=sbfs&id={VIDEO_LIST_ID}" />
+                                    <p>{VIDEO_LIST_TITLE}</p>
+                                </a>
+                                <p class="meta">{VIDEO_LIST_DURATION} | Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
+                            </div>
                             <p>{VIDEO_LIST_COMMENT}</p>
                         </li>
                         <!-- END video_list -->
                         <!-- BEGIN video_pending_list -->
-                        <li class="{ON_OFF}">
-                            <img class="thumbnail" width="64" height="64" src="{VIDEO_LIST_STATUSIMG}" title="Currently transcoding {VIDEO_LIST_TITLE}" />
-                            <h4>{VIDEO_LIST_TITLE}</h4>
-                            <p class="meta">Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
+                        <li class="row">
+                            <div class="avatar-card">
+                                <img class="thumbnail" width="64" height="64" src="{VIDEO_LIST_STATUSIMG}" title="Currently transcoding {VIDEO_LIST_TITLE}" />
+                                <p>{VIDEO_LIST_TITLE}</p>
+                                <p class="meta">Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
+                            </div>
                             <p>{VIDEO_LIST_COMMENT}</p>
                         </li>
                         <!-- END video_pending_list -->
