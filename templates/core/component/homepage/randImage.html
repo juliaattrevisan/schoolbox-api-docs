@@ -1,13 +1,16 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div data-component id="component{COMPONENT_INSTANCE_ID}">
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <!-- BEGIN previewimage -->
-        <div class="text" style="text-align:center;"><img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}"/></div>
-        <!-- END previewimage -->
-
-        <!-- BEGIN submit_image -->
-        <p class="interact"><a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post Image</a></p>
-        <!-- END submit_image -->
+    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="island small-12">
+            <!-- BEGIN previewimage -->
+            <div class="content" style="text-align: center">
+                <img class="th" src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}"/>
+            </div>
+            <!-- END previewimage -->
+            <!-- BEGIN submit_image -->
+            <a href="/cms/file/new/{ID}" class="button up-arrow">Post Image</a>
+            <!-- END submit_image -->
+        </div>
     </div>
 </div>
