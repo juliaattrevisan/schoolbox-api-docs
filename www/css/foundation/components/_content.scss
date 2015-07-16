@@ -774,6 +774,7 @@ table{
 		opacity: 1;
 	}
 	.expanded .task-list{
+		max-height: 100%;
 		@include single-transition(max-height, 0.3s, ease-in);
 	}
 }
