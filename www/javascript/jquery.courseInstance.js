@@ -182,8 +182,13 @@
             '[data-add-button][data-form_class="for-task"]',
             function(event) {
                 event.preventDefault();
-                var allCreateForms = component.find('[data-new-task-container]');
                 var thisCreateForm = $(this).closest('.unit').find('[data-new-task-container]');
+
+                /* Hide all other forms first
+                 */
+                var allForms = component.find('[data-form-container]');
+                allForms.removeClass('hide').not(thisCreateForm).slideUp('fast');
+                console.log(allForms);
 
                 if (thisCreateForm.hasClass('hide')) {
                     thisCreateForm.stop().removeClass('hide').slideUp(1).slideDown('fast');
@@ -191,8 +196,6 @@
                 else {
                     thisCreateForm.stop().slideToggle('fast');
                 }
-
-                allCreateForms.removeClass('hide').not(thisCreateForm).slideUp('fast');
             }
         );
 
@@ -204,6 +207,11 @@
                 var element      = $(this);
                 var unit_element = element.closest('[data-unit-task]');
                 var container    = unit_element.find('[data-interaction="edit_task_container"]');
+
+                /* Hide all other forms first
+                 */
+                var allForms = component.find('[data-form-container]');
+                allForms.removeClass('hide').not(container).slideUp('fast');
 
                 if (container.length) {
                     event.preventDefault();
