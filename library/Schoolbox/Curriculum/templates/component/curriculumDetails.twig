@@ -1,4 +1,4 @@
-<div class="box clearfix">
+<div class="content">
     {% if node %}
         <h3>
             {% if node.code %}
@@ -10,15 +10,14 @@
             {% endif %}
             {{ node.name }}
         </h3>
+
         {% if node.description %}
-            {{ node.description|purify }}
+        <div class="transparent-panel">
+            <article>{{ node.description|purify }}</article>
+        </div>
         {% endif %}
     {% else %}
         No curriculum codes have been set for this folder.
-        You may set them in the
-        <a href="/cms/category/{{ context.id }}" class="btn modify inline-block">
-            <span></span> Modify Folder
-        </a>
-        screen.
+        <a href="/cms/category/{{ context.id }}" class="button icon-modify">Set curriculum codes</a>
     {% endif %}
 </div>
