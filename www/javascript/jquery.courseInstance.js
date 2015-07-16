@@ -141,9 +141,15 @@
             function(event) {
                 event.preventDefault();
                 var element      = $(this);
-                var unit_element = element.closest('.unit-task');
+                var unit_element = element.closest('[data-unit-task]');
                 var container    = unit_element.find('[data-interaction="delete_task_container"]');
-                container.slideToggle('fast');
+
+                if (container.hasClass('hide')) {
+                    container.stop().removeClass('hide').slideUp(1).slideDown('fast');
+                }
+                else {
+                    container.stop().slideToggle('fast');
+                }
             }
         );
         // Yes
