@@ -83,6 +83,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
         $this->setVar('folders_block', '');
 
+        $maxFolders = $this->getConfig('size');
         if (count($allFolders) && $this->permission > DENY_ACCESS) {
             $j = 0;
 
@@ -96,6 +97,9 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                     'FOLDER_ICON' => $currentFolder['type'] == 'homepage' ? 'home' : 'folder',
                     'ON_OFF'      => ++$j % 2 ? '' : 'dark',
                 );
+                if ($maxFolders > 0 && $j > $maxFolders) {
+                    break;
+                }
 
                 $this->setVar($output);
 
