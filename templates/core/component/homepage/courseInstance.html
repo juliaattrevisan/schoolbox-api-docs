@@ -1,11 +1,11 @@
-<div class="box clearfix component course_instance" id="component{COMPONENT_INSTANCE_ID}">
+<div id='component{COMPONENT_INSTANCE_ID}' class="course_instance" data-component>
     <script type="text/javascript" src="/javascript/uploadify/swfobject.js"></script>
     <script type="text/javascript" src="/javascript/uploadify/jquery.uploadify.v2.1.4.js"></script>
     <script type="text/javascript" src="/javascript/jquery.courseInstance.js"></script>
     <script type="text/javascript" src="/javascript/jquery.ajaxUploadDialog.js"></script>
     <script type='text/javascript' src='/javascript/resource/jquery.resourceAttach.js'></script>
     <script type='text/javascript' src='/javascript/preview/preview.js'></script>
-    
+
     <script type="text/javascript">
         (function($) {
             $(function() {
@@ -56,22 +56,50 @@
 
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="box clearfix">
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <!-- BEGIN course_selector -->
+                <div class="content">
+                    <p>Please select which course you would like to import to this homepage.</p>
 
-            <!-- BEGIN course_selector -->
-            <h3>Please select which course you would like to import to this homepage.</h3>
-            <input type="hidden" name="homepage" value="" />
-            <span data-resource_text></span>
-            <p class="interact add_buttons">
-                <a href="#" class="btn float-right folder" data-interaction="homepage_selector">
-                    <span></span>Select Source
-                </a>
-                <a href="/course/importDeleted/{ID}/{COMPONENT_INSTANCE_ID}" class="btn float-right export">
-                    <span></span>Import Deleted Courses
-                </a>
-            </p>
-            <!-- END course_selector -->
+                    <input type="hidden" name="homepage" value="" />
+                    <span data-resource_text></span>
+
+                    <a href="#" class="button icon-folder" data-add-button data-interaction="homepage_selector">Select Source</a>
+                    <a href="/course/importDeleted/{ID}/{COMPONENT_INSTANCE_ID}" data-add-button class="button icon-export">Import Deleted Courses</a>
+                </div>
+                <!-- END course_selector -->
+            </section>
+        </div>
+
+        <!-- Form for reodering tasks -->
+        <div class="hide">
+            <form action="/task/saveInstanceForm.php" method="post" class="reorder_form">
+                <input type="hidden" name="action"    value="reorder"/>
+                <input type="hidden" name="category"  value="{ID}"/>
+                <input type="hidden" name="unit_id" value=""/>
+            </form>
+        </div>
+
+        <!-- Dialog for file browser -->
+        <div class="file_uploader hide">
+            If you upload a file, its URL will appear in the Link section.
+            <form action="/storage/asyncUpload.php" method="post" enctype="multipart/form-data">
+                <input id="upload" name="upload" type="file" />
+                <input type="submit" value="Upload" class="submit-btn-plain hide" data-action="upload" />
+            </form>
+        </div>
+
+        <!-- Dialog for resource browser -->
+        <div class="resource_browser hide"></div>
+    </div>
+</div>
+
+
+
+
+
 
 
             <!-- BEGIN course_unit_list -->
@@ -302,27 +330,6 @@
             </ul>
             <!-- END course_unit_list -->
 
-        </div>
 
-        <!-- Form for reodering tasks -->
-        <div class="hide">
-            <form action="/task/saveInstanceForm.php" method="post" class="reorder_form">
-                <input type="hidden" name="action"    value="reorder"/>
-                <input type="hidden" name="category"  value="{ID}"/>
-                <input type="hidden" name="unit_id" value=""/>
-            </form>
-        </div>
 
-        <!-- Dialog for file browser -->
-        <div class="file_uploader hide">
-            If you upload a file, its URL will appear in the Link section.
-            <form action="/storage/asyncUpload.php" method="post" enctype="multipart/form-data">
-                <input id="upload" name="upload" type="file" />
-                <input type="submit" value="Upload" class="submit-btn-plain hide" data-action="upload" />
-            </form>
-        </div>
 
-        <!-- Dialog for resource browser -->
-        <div class="resource_browser hide"></div>
-    </div>
-</div>

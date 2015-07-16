@@ -173,7 +173,7 @@
         // Create new tasks: show inline form if there is one.
         component.on(
             'click.courseInstance',
-            '.add_buttons .btn',
+            '[data-add-button]',
             function(event) {
                 var create_forms = $(this).closest('.unit').find('.form_container');
                 var form_class   = $(this).data('form_class');
