@@ -71,39 +71,35 @@
                 <!-- END course_selector -->
 
                 <!-- BEGIN course_unit_list -->
-                <ul class="information-list">
+                <ul class="action-list">
                     <!-- BEGIN unit -->
-                    <li class="unit interact {UNIT_EXPANDED_STATE} {UNIT_BACKGROUND}" data-unit_id="{UNIT_ID}" data-open_date="{UNIT_OPEN_DATE}" data-due_date="{UNIT_DUE_DATE}">
-                        <span class="actions">
-                                <!-- BEGIN unit_delete -->
-                                <a href="#" class="btn delete no-text" title="Delete this unit" data-interaction="open_delete_unit_form"><span></span></a>
-                                <!-- END unit_delete -->
-
-                                <!-- BEGIN unit_modify -->
-                                <a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="btn modify no-text" title="Modify this unit"><span></span></a>
-                                <!-- END unit_modify -->
-                            </span>
-
-                        <h3>
-                            <!-- BEGIN unit_expand -->
-                            <a href="#" class="unit-name expand-link" data-interaction="toggle-expanded" data-interaction-state="{UNIT_EXPANDED_STATE}">
-                                <span class="expand-button"></span>&nbsp;
+                    <li class="row unit interact {UNIT_EXPANDED_STATE} {UNIT_BACKGROUND}" data-unit_id="{UNIT_ID}" data-open_date="{UNIT_OPEN_DATE}" data-due_date="{UNIT_DUE_DATE}">
+                        <div class="ten-column">
+                            <h3>
+                                <!-- BEGIN unit_expand -->
+                                <a class="expand-link icon-add" data-interaction="toggle-expanded" data-interaction-state="{UNIT_EXPANDED_STATE}"></a>
                                 <a href="/homepage/{UNIT_HOMEPAGE_ID}">{UNIT_NAME}</a>
+                                <!-- END unit_expand -->
 
-                            </a>
-                            <!-- END unit_expand -->
+                                <!-- BEGIN unit_no_expand -->
+                                {UNIT_NAME}
+                                <!-- END unit_no_expand -->
+                            </h3>
 
-                            <!-- BEGIN unit_no_expand -->
-                            <span class="unit-name no-expand">&nbsp;</span>
-                            {UNIT_NAME}
-                            <!-- END unit_no_expand -->
-                        </h3>
+                            <!-- BEGIN unit_completion -->
+                            <span class="gradient-{UNIT_UPCOMING_URGENCY}">{UNIT_COMPLETION_STATUS} {UNIT_RELATIVE_DATE}.</span>
+                            <!-- END unit_completion -->
+                        </div>
 
-                        <!-- BEGIN unit_completion -->
-                            <span class="unit-completion gradient-{UNIT_UPCOMING_URGENCY}">
-                                {UNIT_COMPLETION_STATUS} {UNIT_RELATIVE_DATE}.
-                            </span>
-                        <!-- END unit_completion -->
+                        <div class="two actions">
+                            <!-- BEGIN unit_delete -->
+                            <a href="#" class="icon-delete no-text" title="Delete this unit" data-interaction="open_delete_unit_form"></a>
+                            <!-- END unit_delete -->
+
+                            <!-- BEGIN unit_modify -->
+                            <a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="icon-modify no-text" title="Modify this unit"></a>
+                            <!-- END unit_modify -->
+                        </div>
 
                         <div class="hide clear form_container" data-interaction="delete_unit_container">
                             <p class="notice">Are you sure you wish to delete this unit?</p>
