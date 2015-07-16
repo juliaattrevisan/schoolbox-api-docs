@@ -186,7 +186,7 @@
                 var thisCreateForm = $(this).closest('.unit').find('[data-new-task-container]');
 
                 allCreateForms.removeClass('hide').slideUp('fast');
-                thisCreateForm.removeClass('hide').slideUp(1).slideDown('fast');
+                thisCreateForm.removeClass('hide').slideToggle('fast');
             }
         );
 
