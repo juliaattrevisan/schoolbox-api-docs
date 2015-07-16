@@ -822,7 +822,8 @@ class External_Synergetic_User implements External_UserInterface
                 StudentCampus
             FROM SynergyOne.dbo.vStudents vStudents
             LEFT JOIN Community ON Community.ID = StudentID
-            AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
+            WHERE
+            FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
             AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
         ";
         return $this->getDatabase()->getAll($query);
