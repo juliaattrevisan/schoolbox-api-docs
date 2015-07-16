@@ -1,9 +1,10 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div data-component id="component{COMPONENT_INSTANCE_ID}">
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="dz-wrap">
-            <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image">
+    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="island small-12">
+        <div class="dropzone-wrap">
+            <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image">
                 <div class="text dz-preview dz-file-preview" style="text-align:{IMAGE_ALIGN};">
                     <span class="dz-details">
                         <img class="dz-pending" width="16" height="16" src="/images/resources/ajax.gif" style="top:50%;left:50%;"/>
@@ -15,12 +16,11 @@
                     </div>
                 </div>
             </form>
-
-            <div class="dz-container">
+            <div class="content" data-dz-container>
                 <!-- BEGIN previewimage -->
-                <div class="text" style="text-align:{IMAGE_ALIGN};">
+                <div style="text-align:{IMAGE_ALIGN};">
                     {CONTENT_URL_START}
-                    <img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}"/>
+                    <img class="th" src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}"/>
                     {CONTENT_URL_END}
                 </div>
                 <!-- END previewimage -->
@@ -28,12 +28,13 @@
         </div>
 
         <!-- BEGIN submit_image -->
-        <p class="interact"><a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post Image</a></p>
+            <a href="/cms/file/new/{ID}" class="button up-arrow">Post Image</a>
 
         <script type="text/javascript">
             $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
                 wrapClass: 'dragging',
-                previewsContainer: '#component{COMPONENT_INSTANCE_ID} .dz-container',
+                wrap: '#content',
+                previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
                 createImageThumbnails: true,
                 thumbnailHeight: {COMPONENT_CONFIG_PIXEL},
                 thumbnailWidth: null,
@@ -48,7 +49,7 @@
                     $(file.previewElement)
                         .addClass('category-{ID}')
                         .data('node', {ID})
-                        .closest('.dz-container')
+                        .closest('[data-dz-container]')
                         .find('div.text:not(.dz-preview)').remove();
 
                     formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
@@ -58,7 +59,7 @@
                 },
                 error: function (file) {
                     $(file.previewElement)
-                        .closest('.dz-container')
+                        .closest('[data-dz-container]')
                         .find('.dz-preview').remove();
                 },
                 success: function (file, response) {
@@ -84,5 +85,6 @@
             });
         </script>
         <!-- END submit_image -->
+        </div>
     </div>
 </div>
