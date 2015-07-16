@@ -1,38 +1,35 @@
 {% macro outputCurriculumNode(node) %}
-    <li>
-        {% if node.code %}
-            {% if isRouteAuthorized('curriculum.browse') %}
-                [<a title="View in curriculum browser" href="{{ routeLookup('curriculum.browse') }}#{{ node.id }}">{{ node.code }}</a>]
-            {% else %}
-                [{{ node.code }}]
+    <li class="row">
+        <div class="twelve-column">
+            {% if node.code %}
+                {% if isRouteAuthorized('curriculum.browse') %}
+                    [<a title="View in curriculum browser" href="{{ routeLookup('curriculum.browse') }}#{{ node.id }}">{{ node.code }}</a>]
+                {% else %}
+                    [{{ node.code }}]
+                {% endif %}
             {% endif %}
-        {% endif %}
-        {{ node.name }}
+            {{ node.name }}
 
-        <ul>
-            {% if node.children %}
-                {% for subnode in node.children %}
-                    {# _self should work here even in twig 2.x #}
-                    {{ _self.outputCurriculumNode(subnode) }}
-                {% endfor %}
-            {% endif %}
-        </ul>
+            <ul class="information-list">
+                {% if node.children %}
+                    {% for subnode in node.children %}
+                        {# _self should work here even in twig 2.x #}
+                        {{ _self.outputCurriculumNode(subnode) }}
+                    {% endfor %}
+                {% endif %}
+            </ul>
+        </div>
     </li>
 {% endmacro %}
 
 {% import _self as macros %}
 
-<div class="box clearfix">
-    {% if node %}
-        <ul class="wysiwyg">
-            {{ macros.outputCurriculumNode(node) }}
-        </ul>
-    {% else %}
-        No curriculum codes have been set for this folder.
-        You may set them in the
-        <a href="/cms/category/{{ context.id }}" class="btn modify inline-block">
-            <span></span> Modify Folder
-        </a>
-        screen.
-    {% endif %}
-</div>
+{% if node %}
+    <ul class="information-list">
+        {{ macros.outputCurriculumNode(node) }}
+    </ul>
+{% else %}
+    No curriculum codes have been set for this folder.
+    <a href="/cms/category/{{ context.id }}" class="button icon-modify">Set curriculum codes</a>
+{% endif %}
+

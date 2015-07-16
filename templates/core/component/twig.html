@@ -1,8 +1,13 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
     <!-- BEGIN header -->
     {CONFIGURATION}
     <!-- END header -->
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-    {COMPONENT_CONTENT}
+
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                {COMPONENT_CONTENT}
+            </section>
+        </div>
     </div>
 </div>
