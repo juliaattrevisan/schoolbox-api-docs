@@ -378,18 +378,18 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $undoable         = false;
         $completable      = false;
         if ($this->readOnly) {
-            $unit_task_class = 'incomplete';
+            $unit_task_class = 'icon-countdown incomplete';
             $unit_task_title = 'Incomplete';
             $completion_item = $completion_list[$_SESSION['id']];
             if ($completion_item instanceof Task\InstanceCompletion) {
                 switch ($completion_item->getCompletionStatus()) {
                     case Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE:
-                        $unit_task_class  = 'complete';
+                        $unit_task_class  = 'icon-drop-box complete';
                         $unit_task_status = 'Approved';
                         $unit_task_title  = 'Approved';
                         break;
                     case Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
-                        $unit_task_class  = 'pending';
+                        $unit_task_class  = 'icon-rss pending';
                         $unit_task_status = 'Completed';
                         $unit_task_title  = 'Completed';
                         $undoable         = true;
