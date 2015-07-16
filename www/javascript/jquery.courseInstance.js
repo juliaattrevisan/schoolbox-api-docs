@@ -179,7 +179,7 @@
         // Create new tasks: show inline form if there is one.
         component.on(
             'click.courseInstance',
-            '[data-add-button]',
+            '[data-add-button][data-form_class="for-task"]',
             function(event) {
                 event.preventDefault();
                 var allCreateForms = component.find('[data-new-task-container]');
@@ -189,7 +189,7 @@
                     thisCreateForm.stop().removeClass('hide').slideUp(1).slideDown('fast');
                 }
                 else {
-                    thisCreateForm.slideToggle('fast');
+                    thisCreateForm.stop().slideToggle('fast');
                 }
 
                 allCreateForms.removeClass('hide').not(thisCreateForm).slideUp('fast');
