@@ -194,11 +194,12 @@
             'a[data-interaction="open_edit_task_form"]',
             function(event) {
                 var element      = $(this);
-                var unit_element = element.closest('.unit-task');
+                var unit_element = element.closest('[data-unit-task]');
                 var container    = unit_element.find('[data-interaction="edit_task_container"]');
+
                 if (container.length) {
                     event.preventDefault();
-                    container.slideToggle('fast');
+                    container.stop().removeClass('hide').slideToggle('fast');
                 }
             }
         );

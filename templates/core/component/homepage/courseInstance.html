@@ -128,7 +128,7 @@
 
                         <ul class="action-list task-list {UNIT_LIST_CLASS}">
                             <!-- BEGIN unit_task -->
-                            <li class="row unit-task interact {UNIT_TASK_COMPLETE_CLASS}" data-unit_task_id="{UNIT_TASK_ID}">
+                            <li class="row interact {UNIT_TASK_COMPLETE_CLASS}" data-unit-task data-unit_task_id="{UNIT_TASK_ID}">
                                 <div class="nine-column">
                                     <a class="icon-16 {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}" {UNIT_TASK_PREVIEW} href="/task/start/{UNIT_TASK_ID}">{UNIT_TASK_NAME}</a>
 
@@ -180,29 +180,22 @@
                                     <!-- END unit_task_start -->
                                 </div>
 
-
-
-
-
-
-
-
-
-
-
                                 <!-- BEGIN unit_task_modify_form -->
-                                <div class="hide clear form_container" data-interaction="edit_task_container">
-                                    <form action="/task/saveInstanceForm.php" method="post" class="edit_form" data-form_type="task">
+                                <div class="hide clearfix" data-form-container data-interaction="edit_task_container">
+                                    <form action="/task/saveInstanceForm.php" method="post" data-form_type="task">
                                         <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
                                         <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
                                         <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
                                         <input type="hidden" name="type"      value="string" />
                                         <input type="hidden" name="link"      value="{UNIT_TASK_LINK}" id="link-{UNIT_TASK_ID}" />
 
-                                        <ul>
-                                            <li><label for="title-{UNIT_TASK_ID}">Task:
-                                                <input id="title-{UNIT_TASK_ID}" name="title" type="text" value="{UNIT_TASK_NAME}" />
-                                            </label></li>
+                                        <ul class="action-list">
+                                            <li>
+                                                <label for="title-{UNIT_TASK_ID}">
+                                                    Task:
+                                                    <input id="title-{UNIT_TASK_ID}" name="title" type="text" value="{UNIT_TASK_NAME}" />
+                                                </label>
+                                            </li>
                                             <li class="clearfix dz-wrap">
                                                 <div class="post-attachment attach" style="{UNIT_TASK_ATTACH_DISPLAY}">
                                                     {ATTACH_ZONE}
@@ -221,12 +214,13 @@
                                                 </div>
 
                                             </li>
-                                            <li><label for="self_assess-{UNIT_TASK_ID}">
-                                                <input name="self_assess" value="0" type="hidden" />
-                                                <input name="self_assess" value="1" type="checkbox" id="self_assess-{UNIT_TASK_ID}" {UNIT_TASK_SELF_ASSESS} />
-                                                Allow self-assessment
-                                            </label></li>
-
+                                            <li>
+                                                <label for="self_assess-{UNIT_TASK_ID}">
+                                                    <input name="self_assess" value="0" type="hidden" />
+                                                    <input name="self_assess" value="1" type="checkbox" id="self_assess-{UNIT_TASK_ID}" {UNIT_TASK_SELF_ASSESS} />
+                                                    Allow self-assessment
+                                                </label>
+                                            </li>
                                             <li>
                                                 <input type="submit" name="Submit" value="Update" class="submit-btn-plain" />
                                             </li>
@@ -234,6 +228,13 @@
                                     </form>
                                 </div>
                                 <!-- END unit_task_modify_form -->
+
+
+
+
+
+
+
 
                                 <!-- BEGIN unit_task_delete_form -->
                                 <div class="hide" data-form-container data-interaction="delete_task_container">
