@@ -199,7 +199,13 @@
 
                 if (container.length) {
                     event.preventDefault();
-                    container.stop().removeClass('hide').slideToggle('fast');
+
+                    if (container.hasClass('hide')) {
+                        container.stop().removeClass('hide').slideUp(1).slideDown('fast');
+                    }
+                    else {
+                        container.stop().slideToggle('fast');
+                    }
                 }
             }
         );
