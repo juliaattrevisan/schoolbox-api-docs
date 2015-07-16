@@ -40,7 +40,7 @@ if (is_numeric($_GET['delete'])) {
 
         //send headers
         header("Content-Type: {$file->getStorage()->getMimetype()->getMime()}");
-        header("Content-Disposition: $attach filename=\"" . $file->getFilename() . "\"");
+        header("Content-Disposition: $attach filename=\"" . $file->getStorage()->getBasename() . "\"");
         header("Content-Length: " . $file->getStorage()->getSize());
 
         fpassthru($file->getStorage()->readStream());
