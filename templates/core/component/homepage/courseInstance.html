@@ -182,7 +182,7 @@
 
                                 <!-- BEGIN unit_task_modify_form -->
                                 <div class="content">
-                                    <div class="twelve-column panel hide" data-form-container data-interaction="edit_task_container">
+                                    <div class="twelve-column panel hide " data-form-container data-interaction="edit_task_container">
                                         <form action="/task/saveInstanceForm.php" method="post" data-form_type="task">
                                             <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
                                             <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
@@ -200,21 +200,19 @@
                                                 <li class="row clearfix dz-wrap">
                                                     <div class="post-attachment attach" style="{UNIT_TASK_ATTACH_DISPLAY}">
                                                         {ATTACH_ZONE}
-                                                        <p class="alt-src">
-                                                            or
-                                                            <a class='btn links sstream-attachment' data-value="url"><span></span>Link</a>
-                                                        </p>
                                                     </div>
+                                                    <p>
+                                                        <a class='button icon-link sstream-attachment' data-value="url">Link</a>
+                                                    </p>
 
                                                     <div class="post-attachment url" style="{UNIT_TASK_URL_DISPLAY}">
                                                         <label>
                                                             <input type="text" class="url" name="url" maxlength='1024' placeholder="http://" value="{UNIT_TASK_LINK}" />
                                                         </label>
-
-                                                        <p class="alt-src">
-                                                            or <a class='btn attach sstream-attachment' data-value="attach"><span></span>Attach</a>
-                                                        </p>
                                                     </div>
+                                                    <p>
+                                                        or <a class='button icon-files' data-sstream-attachment data-value="attach">Attach</a>
+                                                    </p>
                                                 </li>
                                                 <li class="row">
                                                     <label for="self_assess-{UNIT_TASK_ID}">
@@ -224,7 +222,7 @@
                                                     </label>
                                                 </li>
                                                 <li>
-                                                    <input type="submit" name="Submit" value="Update" class="submit-btn-plain" />
+                                                    <input type="submit" name="Submit" value="Update" />
                                                 </li>
                                             </ul>
                                         </form>
