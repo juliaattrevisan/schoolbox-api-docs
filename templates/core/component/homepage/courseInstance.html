@@ -50,6 +50,14 @@
                 component.on('click', 'a[data-dz-remove]', function() {
                     $(this).closest('form').find('input[name=url]').val('').prop('readonly', false);
                 });
+
+                /* Alternate expando style
+                 */
+                $('a[data-interaction="toggle-expanded"]').on('click', function(){
+                    $(this).toggleClass('icon-add icon-collapse');
+                    $(this).closest('li').toggleClass('expanded');
+                    event.preventDefault();
+                });
             });
         })(jQuery);
     </script>
@@ -77,7 +85,7 @@
                         <div class="ten-column">
                             <h3>
                                 <!-- BEGIN unit_expand -->
-                                <a class="expand-link icon-add" data-interaction="toggle-expanded" data-interaction-state="{UNIT_EXPANDED_STATE}"></a>
+                                <a class="expand-link icon-collapse" data-interaction="toggle-expanded" data-interaction-state="{UNIT_EXPANDED_STATE}"></a>
                                 <a href="/homepage/{UNIT_HOMEPAGE_ID}">{UNIT_NAME}</a>
                                 <!-- END unit_expand -->
 
