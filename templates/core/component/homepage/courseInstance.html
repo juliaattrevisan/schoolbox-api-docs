@@ -229,7 +229,7 @@
                                         <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
                                         <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
                                         <button type="submit" class="button icon-approve" data-interaction="delete_confirm">Yes</button>
-                                        
+
                                         <a href="#" class="button icon-close" data-interaction="delete_reject">No</a>
                                     </form>
                                 </div>
@@ -238,16 +238,16 @@
                             <!-- END unit_task -->
                         </ul>
 
-                        <p class="interact clear add_buttons">
+                        <div class="content">
                             <!-- BEGIN unit_report_actions -->
-                            <a href="/task/progressReport/{ID}/{UNIT_ID}" class="btn line-graph"><span></span>Progress Report</a>
+                            <a href="/task/progressReport/{ID}/{UNIT_ID}" class="button icon-progress" data-add-button>Progress Report</a>
                             <!-- END unit_report_actions -->
                             <!-- BEGIN unit_add_task_actions -->
-                            <a href="/submission/createSubmission/new/{ID}/unit:{UNIT_ID}" class="btn due-work" data-form_class="for_due_work"><span></span>Post Due Work</a>
-                            <a href="/assess/create/{ID}/unit:{UNIT_ID}" class="btn list" data-form_class="for_assessment"><span></span>Create Quiz</a>
-                            <a href="/task/createInstance/{UNIT_ID}" class="btn tick" data-form_class="for_task"><span></span>Add Task</a>
+                            <a href="/submission/createSubmission/new/{ID}/unit:{UNIT_ID}" class="button icon-due-work" data-add-button data-form_class="for_due_work">Post Due Work</a>
+                            <a href="/assess/create/{ID}/unit:{UNIT_ID}" class="button icon-quiz" data-add-button data-form_class="for_assessment">Create Quiz</a>
+                            <a href="/task/createInstance/{UNIT_ID}" class="button icon-task" data-add-button data-form_class="for_task">Add Task</a>
                             <!-- END unit_add_task_actions -->
-                        </p>
+                        </div>
 
                         <!-- This is the form for inline creation of tasks -->
                         <div class="clear form_container for_task hide">
