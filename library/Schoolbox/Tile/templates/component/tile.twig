@@ -8,12 +8,16 @@
                     editable: false
                 }
             %}
+            {% if showButtons %}
             <div class="content">
-                {% if showButtons %}
-                    <a href="/tile/layout/{{ tile_component_instance_id }}" class="btn modify"><span></span>Modify Layout</a>
-                    <a href="/tile/add/{{ tile_component_instance_id }}" class="btn add"><span></span>Add Tile</a>
-                {% endif %}
+                <div class="row">
+                    <div class="small-12 columns">
+                        <a href="/tile/layout/{{ tile_component_instance_id }}" class="button icon-modify">Modify Layout</a>
+                        <a href="/tile/add/{{ tile_component_instance_id }}" class="button icon-add">Add Tile</a>
+                    </div>
+                </div>
             </div>
+            {% endif %}
         </section>
     </div>
 </div>
