@@ -181,16 +181,12 @@
             'click.courseInstance',
             '[data-add-button]',
             function(event) {
-                var create_forms = $(this).closest('.unit').find('[data-form-container]');
-                var form_class   = $(this).data('form_class');
-                if (form_class) {
-                    var create_form = create_forms.filter('.'+form_class);
-                    if (create_form.length) {
-                        event.preventDefault();
-                        create_forms.not(create_form).slideUp('fast');
-                        create_form.slideToggle('fast');
-                    }
-                }
+                event.preventDefault();
+                var allCreateForms = component.find('[data-new-task-container]');
+                var thisCreateForm = $(this).closest('.unit').find('[data-new-task-container]');
+
+                allCreateForms.removeClass('hide').slideUp('fast');
+                thisCreateForm.removeClass('hide').slideUp(1).slideDown('fast');
             }
         );
 
