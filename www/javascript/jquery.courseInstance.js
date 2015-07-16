@@ -98,7 +98,7 @@
                 var element      = $(this);
                 var unit_element = element.closest('.unit');
                 var container    = unit_element.find('[data-interaction="delete_unit_container"]');
-                container.slideToggle('fast');
+                container.stop().removeClass('hide').slideUp(1).slideToggle('fast');
             }
         );
 
