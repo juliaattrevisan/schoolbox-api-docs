@@ -100,7 +100,6 @@
                             <!-- END unit_completion -->
                         </div>
 
-
                         <div class="two actions">
                             <!-- BEGIN unit_delete -->
                             <a href="#" class="icon-delete no-text" title="Delete this unit" data-interaction="open_delete_unit_form"></a>
@@ -131,29 +130,29 @@
                             <!-- BEGIN unit_task -->
                             <li class="row unit-task interact {UNIT_TASK_COMPLETE_CLASS}" data-unit_task_id="{UNIT_TASK_ID}">
                                 <div class="nine-column">
-                                        <a class="icon-16 {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}" {UNIT_TASK_PREVIEW} href="/task/start/{UNIT_TASK_ID}">{UNIT_TASK_NAME}</a>
+                                    <a class="icon-16 {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}" {UNIT_TASK_PREVIEW} href="/task/start/{UNIT_TASK_ID}">{UNIT_TASK_NAME}</a>
 
-                                        <!--
-                                        Student: see buttons for starting/ending task
-                                        Teacher: sees completion stats
-                                        -->
-                                        <!-- BEGIN unit_task_completion -->
-                                        <p class="meta">
-                                            <span class="unit-task-completion">{UNIT_TASK_COMPLETION_STATUS}</span>
-                                        </p>
-                                        <!-- END unit_task_completion -->
+                                    <!--
+                                    Student: see buttons for starting/ending task
+                                    Teacher: sees completion stats
+                                    -->
+                                    <!-- BEGIN unit_task_completion -->
+                                    <p class="meta">
+                                        <span class="unit-task-completion">{UNIT_TASK_COMPLETION_STATUS}</span>
+                                    </p>
+                                    <!-- END unit_task_completion -->
 
-                                        <!-- BEGIN unit_task_count -->
-                                        <p class="meta">
-                                            <span class="gradient-{UNIT_TASK_GRADIENT}">{UNIT_TASK_COMPLETION_COUNT}/{UNIT_STUDENT_COUNT} students completed</span>
-                                        </p>
-                                        <!-- END unit_task_count -->
+                                    <!-- BEGIN unit_task_count -->
+                                    <p class="meta">
+                                        <span class="gradient-{UNIT_TASK_GRADIENT}">{UNIT_TASK_COMPLETION_COUNT}/{UNIT_STUDENT_COUNT} students completed</span>
+                                    </p>
+                                    <!-- END unit_task_count -->
 
-                                        <!-- BEGIN unit_task_due_date -->
-                                        <p class="meta">
-                                            <span class="unit-task-due-date">Due {UNIT_TASK_RELATIVE_DUE_DATE} on {UNIT_TASK_DUE_DATE}</span>
-                                        </p>
-                                        <!-- END unit_task_due_date -->
+                                    <!-- BEGIN unit_task_due_date -->
+                                    <p class="meta">
+                                        <span class="unit-task-due-date">Due {UNIT_TASK_RELATIVE_DUE_DATE} on {UNIT_TASK_DUE_DATE}</span>
+                                    </p>
+                                    <!-- END unit_task_due_date -->
                                 </div>
                                 <div class="three actions">
                                     <!-- BEGIN unit_task_quiz_results -->
@@ -184,6 +183,14 @@
                                     </a>
                                     <!-- END unit_task_start -->
                                 </div>
+
+
+
+
+
+
+
+
 
 
 
