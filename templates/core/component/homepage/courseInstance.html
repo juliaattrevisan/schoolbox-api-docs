@@ -112,9 +112,9 @@
                         </div>
 
                         <div class="content">
-                            <div class="twelve-column hide transparent-panel clearfix" data-form-container data-interaction="delete_unit_container">
-                                <p><span class="label alert">Are you sure you wish to delete this unit?</span></p>
-                                <p>All tasks within the unit will be deleted, as will any linked due work and quizzes.</p>
+                            <div class="twelve-column hide panel clearfix" data-form-container data-interaction="delete_unit_container">
+                                <p><span class="label alert full-width">Are you sure you wish to delete this unit?</span></p>
+                                <p>All tasks, linked due work and quizzes within the unit will be deleted.</p>
 
                                 <form action="/course/modifyForm.php" method="post" data-form_type="delete_unit">
                                     <input type="hidden" name="action"    value="delete" />
@@ -127,65 +127,65 @@
                             </div>
                         </div>
 
-                        <ul class="task-list information-list {UNIT_LIST_CLASS}">
+                        <ul class="action-list task-list {UNIT_LIST_CLASS}">
                             <!-- BEGIN unit_task -->
-                            <li class="unit-task interact {UNIT_BACKGROUND} {UNIT_TASK_COMPLETE_CLASS}" data-unit_task_id="{UNIT_TASK_ID}">
+                            <li class="row unit-task interact {UNIT_TASK_COMPLETE_CLASS}" data-unit_task_id="{UNIT_TASK_ID}">
+                                <div class="nine-column">
+                                        <a class="icon-16 icon-quiz {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}" {UNIT_TASK_PREVIEW} href="/task/start/{UNIT_TASK_ID}">{UNIT_TASK_NAME}</a>
 
-                                    <span class="actions">
-                                        <!-- BEGIN unit_task_quiz_results -->
-                                        <a href="/assess/results/{UNIT_QUIZ_ID}" class="btn statistics no-text" title="View Results"><span></span></a>
-                                        <!-- END unit_task_quiz_results -->
+                                        <!--
+                                        Student: see buttons for starting/ending task
+                                        Teacher: sees completion stats
+                                        -->
+                                        <!-- BEGIN unit_task_completion -->
+                                        <p class="meta">
+                                            <span class="unit-task-completion">{UNIT_TASK_COMPLETION_STATUS}</span>
+                                        </p>
+                                        <!-- END unit_task_completion -->
 
-                                        <!-- BEGIN unit_task_quiz_attempts -->
-                                        <a href="/assess/attempts/{UNIT_QUIZ_ID}/{USER_ID}" class="btn list no-text" title="See previous attempts"><span></span></a>
-                                        <!-- END unit_task_quiz_attempts -->
+                                        <!-- BEGIN unit_task_count -->
+                                        <p class="meta">
+                                            <span class="gradient-{UNIT_TASK_GRADIENT}">{UNIT_TASK_COMPLETION_COUNT}/{UNIT_STUDENT_COUNT} students completed</span>
+                                        </p>
+                                        <!-- END unit_task_count -->
 
-                                        <!-- BEGIN unit_task_duework_results -->
-                                        <a href="/submission/viewSubmission/{UNIT_DUEWORK_ID}" class="btn statistics no-text" title="View Results"><span></span></a>
-                                        <!-- END unit_task_duework_results -->
+                                        <!-- BEGIN unit_task_due_date -->
+                                        <p class="meta">
+                                            <span class="unit-task-due-date">Due {UNIT_TASK_RELATIVE_DUE_DATE} on {UNIT_TASK_DUE_DATE}</span>
+                                        </p>
+                                        <!-- END unit_task_due_date -->
+                                </div>
+                                <div class="three actions">
+                                    <!-- BEGIN unit_task_quiz_results -->
+                                    <a href="/assess/results/{UNIT_QUIZ_ID}" class="icon-progress no-text" title="View Results"></a>
+                                    <!-- END unit_task_quiz_results -->
 
-                                        <!-- BEGIN unit_task_delete -->
-                                        <a href="#" class="btn delete no-text" title="Delete this task" data-interaction="open_delete_task_form"><span></span></a>
-                                        <!-- END unit_task_delete -->
+                                    <!-- BEGIN unit_task_quiz_attempts -->
+                                    <a href="/assess/attempts/{UNIT_QUIZ_ID}/{USER_ID}" class="icon-quiz no-text" title="See previous attempts"></a>
+                                    <!-- END unit_task_quiz_attempts -->
 
-                                        <!-- BEGIN unit_task_modify -->
-                                        <a href="/task/instance/modify/{UNIT_TASK_ID}" class="btn modify no-text" title="Modify this task" data-interaction="open_edit_task_form"><span></span></a>
-                                        <!-- END unit_task_modify -->
+                                    <!-- BEGIN unit_task_duework_results -->
+                                    <a href="/submission/viewSubmission/{UNIT_DUEWORK_ID}" class="icon-progress no-text" title="View Results"></a>
+                                    <!-- END unit_task_duework_results -->
 
-                                        <!-- BEGIN unit_task_start -->
-                                        <a href="/task/start/{UNIT_TASK_ID}{UNIT_TASK_SET_STATUS}"
-                                           class="ticks {UNIT_TASK_COMPLETE_CLASS}"
-                                           title="{UNIT_TASK_COMPLETION_TITLE} - click to update"
-                                           data-interaction="update_progress"><span></span>
-                                        </a>
-                                        <!-- END unit_task_start -->
-                                    </span>
+                                    <!-- BEGIN unit_task_delete -->
+                                    <a href="#" class="icon-close no-text" title="Delete this task" data-interaction="open_delete_task_form"></a>
+                                    <!-- END unit_task_delete -->
 
-                                <!--
-                                Student: see buttons for starting/ending task
-                                Teacher: sees completion stats
-                                -->
-                                <span class="icon {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}"><span></span></span>
+                                    <!-- BEGIN unit_task_modify -->
+                                    <a href="/task/instance/modify/{UNIT_TASK_ID}" class="icon-modify no-text" title="Modify this task" data-interaction="open_edit_task_form"></a>
+                                    <!-- END unit_task_modify -->
 
-                                <h4><a {UNIT_TASK_PREVIEW} href="/task/start/{UNIT_TASK_ID}">{UNIT_TASK_NAME}</a></h4>
+                                    <!-- BEGIN unit_task_start -->
+                                    <a href="/task/start/{UNIT_TASK_ID}{UNIT_TASK_SET_STATUS}"
+                                       class="ticks {UNIT_TASK_COMPLETE_CLASS}"
+                                       title="{UNIT_TASK_COMPLETION_TITLE} - click to update"
+                                       data-interaction="update_progress"><span></span>
+                                    </a>
+                                    <!-- END unit_task_start -->
+                                </div>
 
-                                <p class="meta">
-                                    <!-- BEGIN unit_task_completion -->
-                                    <span class="unit-task-completion">{UNIT_TASK_COMPLETION_STATUS}</span>
-                                    <!-- END unit_task_completion -->
 
-                                    <!-- BEGIN unit_task_count -->
-                                        <span class="gradient-{UNIT_TASK_GRADIENT}">
-                                        {UNIT_TASK_COMPLETION_COUNT}/{UNIT_STUDENT_COUNT} students completed
-                                        </span>
-                                    <!-- END unit_task_count -->
-
-                                    <!-- BEGIN unit_task_due_date -->
-                                        <span class="unit-task-due-date">
-                                        Due {UNIT_TASK_RELATIVE_DUE_DATE} on {UNIT_TASK_DUE_DATE}
-                                        </span>
-                                    <!-- END unit_task_due_date -->
-                                </p>
 
                                 <!-- BEGIN unit_task_modify_form -->
                                 <div class="hide clear form_container" data-interaction="edit_task_container">
