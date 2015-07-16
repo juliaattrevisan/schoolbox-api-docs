@@ -175,7 +175,7 @@
             'click.courseInstance',
             '[data-add-button]',
             function(event) {
-                var create_forms = $(this).closest('.unit').find('.form_container');
+                var create_forms = $(this).closest('.unit').find('[data-form-container]');
                 var form_class   = $(this).data('form_class');
                 if (form_class) {
                     var create_form = create_forms.filter('.'+form_class);
@@ -261,7 +261,7 @@
          *             the contents of this component.
          */
         var postCallback = function(form, data) {
-            var container = form.closest('.form_container');
+            var container = form.closest('[data-form-container]');
             container.slideUp('fast', function() {
                 reloadTaskList(data);
             });
