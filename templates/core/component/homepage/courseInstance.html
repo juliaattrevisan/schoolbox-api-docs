@@ -219,7 +219,7 @@
                                 <!-- END unit_task_modify_form -->
 
                                 <!-- BEGIN unit_task_delete_form -->
-                                <div class="hide clear form_container" data-interaction="delete_task_container">
+                                <div class="hide" data-form-container data-interaction="delete_task_container">
                                     <p class="notice">Are you sure you wish to delete this task?</p>
                                     <p class="notice">Any linked due work items and quizzes will be deleted, as will all student's completion of this task.</p>
                                     <form action="/task/saveInstanceForm.php" method="post" data-form_type="delete_task">
@@ -227,8 +227,8 @@
                                         <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
                                         <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
                                         <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
-                                        <button type="submit" class="btn delete" data-interaction="delete_confirm"><span></span> Yes</button>
-                                        <a href="#" class="btn cross delete-reject" data-interaction="delete_reject"><span></span> No</a>
+                                        <button type="submit" class="button icon-approve" data-interaction="delete_confirm">Yes</button>
+                                        <a href="#" class="button icon-close" data-interaction="delete_reject">No</a>
                                     </form>
                                 </div>
                                 <!-- END unit_task_delete_form -->
