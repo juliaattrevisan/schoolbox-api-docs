@@ -185,8 +185,14 @@
                 var allCreateForms = component.find('[data-new-task-container]');
                 var thisCreateForm = $(this).closest('.unit').find('[data-new-task-container]');
 
-                allCreateForms.removeClass('hide').slideUp('fast');
-                thisCreateForm.removeClass('hide').slideToggle('fast');
+                if (thisCreateForm.hasClass('hide')) {
+                    thisCreateForm.stop().removeClass('hide').slideUp(1).slideDown('fast');
+                }
+                else {
+                    thisCreateForm.slideToggle('fast');
+                }
+
+                allCreateForms.removeClass('hide').not(thisCreateForm).slideUp('fast');
             }
         );
 
