@@ -1,23 +1,17 @@
-<div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-    <div class="small-12 island">
-        <section>
-            {% include '@tile/sub/tileList.twig'
-                with {
-                    layout:   component.layout,
-                    tileList: component.layout.tileList,
-                    editable: false
-                }
-            %}
-            {% if showButtons %}
-            <div class="content">
-                <div class="row">
-                    <div class="small-12 columns">
-                        <a href="/tile/layout/{{ tile_component_instance_id }}" class="button icon-modify">Modify Layout</a>
-                        <a href="/tile/add/{{ tile_component_instance_id }}" class="button icon-add">Add Tile</a>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-        </section>
+{% include '@tile/sub/tileList.twig'
+    with {
+        layout:   component.layout,
+        tileList: component.layout.tileList,
+        editable: false
+    }
+%}
+{% if showButtons %}
+<div class="content">
+    <div class="row">
+        <div class="small-12 columns">
+            <a href="/tile/layout/{{ tile_component_instance_id }}" class="button icon-modify">Modify Layout</a>
+            <a href="/tile/add/{{ tile_component_instance_id }}" class="button icon-add">Add Tile</a>
+        </div>
     </div>
 </div>
+{% endif %}
