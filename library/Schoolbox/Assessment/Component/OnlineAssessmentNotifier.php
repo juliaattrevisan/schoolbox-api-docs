@@ -241,7 +241,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$quizId   = $quiz->getId();
 		$quizName = $quiz->getTitle();
 
-		$icon = '/images/icon.php?size=32&icon=work';
+		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
 		$href = "/assess/results/$quizId";
 
 		$msg = new Message(":quizname has closed and :number did not submit work", $icon, $href);
@@ -283,7 +283,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 		$msg = new Message(
 			":username opened $indefArticle $quizType, :quizname, in :catname",
-			"/portrait?userId=$ownerExtId&size=square32", "/assess/intro/$quizId"
+			"/portrait?userId=$ownerExtId&size={$this->iconSize}", "/assess/intro/$quizId"
 		);
 
 		$params = array(
@@ -318,7 +318,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$catId   = $cat->getId();
 		$catName = $cat->getName();
 
-		$icon = '/images/icon.php?size=32&icon=work';
+		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
 		$href = "/assess/intro/$quizId";
 
 		$msg = new Message(":boxname has closed in :catname", $icon, $href);
@@ -358,7 +358,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$catId   = $cat->getId();
 		$catName = $cat->getName();
 
-		$icon = '/images/icon.php?size=32&icon=work';
+		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
 		$href = "/assess/intro/$quizId";
 
 		$msg = new Message(":child did not attempt :quizname in :catname", $icon, $href);
@@ -400,7 +400,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$catId   = $cat->getId();
 		$catName = $cat->getName();
 
-		$icon = '/images/icon.php?size=32&icon=work';
+		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
 		$href = "/assess/intro/$quizId";
 
 		$when = self::UPCOMING_WINDOW . " hour" . self::UPCOMING_WINDOW == 1 ? '' : 's';
@@ -450,7 +450,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			$childId = $student->getId();
 			$childExtId = $student->getExternalId();
 
-			$icon = "/portrait?userId=$childExtId&size=square32";
+			$icon = "/portrait?userId=$childExtId&size={$this->iconSize}";
 
 			$msg = new Message(":child has not yet attempted :quizname in :catname", $icon, $href);
 
@@ -505,7 +505,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$ownerId    = $owner->getId();
 		$ownerName  = $owner->formatName();
 
-		$icon = '/images/icon.php?size=32&icon=work';
+		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
 		$href = "/assess/intro/$quizId";
 
 
@@ -618,7 +618,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
         $catId   = $cat->getId();
         $catName = $cat->getName();
 
-        $icon = '/images/icon.php?size=32&icon=work';
+        $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
         $href = "/assess/intro/$quizId";
 
         // notify all student's parents
@@ -722,7 +722,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$catId   = $cat->getId();
 		$catName = $cat->getName();
 
-		$icon = '/images/icon.php?size=32&icon=cross';
+		$icon = "/images/icon.php?size={$this->iconSize}&icon=cross";
 		$href = "/intro/assess/$quizId";
 
 		$msg = new Message("Submissions have closed for :boxname in :catname", $icon, $href);

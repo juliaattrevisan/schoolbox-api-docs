@@ -132,7 +132,7 @@ class ThreadNotifier extends AbstractModuleNotifier implements SourceInterface {
                 'thread' => new Param($thread->getTitle(), $href),
                 'folder' => new CategoryParam($cat)
             ))
-            ->setIcon("/portrait.php?size=square32&userId=" . $author->getExternalId())
+            ->setIcon("/portrait.php?size={$this->iconSize}&userId=" . $author->getExternalId())
             ->setHref($href)
             ->setSeverity(Logger::INFO)
             ->setNamespace($this->getSlug())

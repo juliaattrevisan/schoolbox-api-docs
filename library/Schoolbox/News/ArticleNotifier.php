@@ -101,7 +101,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
             $thumb = "/storage/image.php?hash=$hash&size=square200";
 		}
 		else {
-			$icon = "/portrait.php?userId={$user->getExternalId()}&size=square32";
+			$icon = "/portrait.php?userId={$user->getExternalId()}&size={$this->iconSize}";
             $thumb = '/images/emails/spacer.gif';
 		}
 

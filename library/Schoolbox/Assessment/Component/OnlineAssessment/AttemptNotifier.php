@@ -121,7 +121,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 			))
 			->setNamespace($this->getSlug())
 			->setSeverity(Logger::NOTICE)
-			->setIcon("/portrait?size=square32&userId=".$student->getExternalId())
+			->setIcon("/portrait?size={$this->iconSize}&userId=".$student->getExternalId())
 			->setHref($href)
 			->addTopic("assess.$assessId.attempted");
 
@@ -153,7 +153,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 		$bob->setSeverity(Logger::NOTICE)
 			->setNamespace($this->getSlug())
 			->setHref($href)
-			->setIcon("/portrait?size=square32&userId=".$teacher->getExternalId())
+			->setIcon("/portrait?size={$this->iconSize}&userId=".$teacher->getExternalId())
 			->setTitle(":staff has marked your attempt of :quiz in :cat")
 			->setParams(array(
 				'staff' => new UserParam($teacher),
@@ -194,7 +194,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 		$bob->setSeverity(Logger::NOTICE)
 		    ->setNamespace($this->getSlug())
 		    ->setHref($href)
-		    ->setIcon("/portrait?size=square32&userId=".$teacher->getExternalId())
+		    ->setIcon("/portrait?size={$this->iconSize}&userId=".$teacher->getExternalId())
 		    ->setTitle(":staff has marked :child's attempt of :quiz in :cat")
 		    ->setParams(array(
 			    'staff' => new UserParam($teacher),

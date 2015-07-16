@@ -44,6 +44,9 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
     /** @var Mapper */
     protected $srcMapper;
 
+    /** @var int */
+    protected $iconSize = 'square64';
+
 
     /**
      * @param IConfigLoader $configLoader

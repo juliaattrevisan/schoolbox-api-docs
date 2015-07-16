@@ -103,14 +103,14 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
     protected function getPostIcon($post, $author)
     {
         if ($post instanceof \SocialStream_Post_Url) {
-            return '/socialstream/image.php?size=square32&id=' . $post->getPostId();
+            return '/socialstream/image.php?size={$this->iconSize}&id=' . $post->getPostId();
         } elseif ($post instanceof \SocialStream_Post_Video) {
-            return '/portrait.php?size=square32&userId=' . $author->getExternalId();
+            return '/portrait.php?size={$this->iconSize}&userId=' . $author->getExternalId();
         } elseif ($post instanceof \SocialStream_Post_Image) {
-            return '/socialstream/image.php?size=square32&id=' . $post->getPostId();
+            return '/socialstream/image.php?size={$this->iconSize}&id=' . $post->getPostId();
         }
         // string
-        return '/portrait.php?size=square32&userId=' . $author->getExternalId();
+        return '/portrait.php?size={$this->iconSize}&userId=' . $author->getExternalId();
     }
 
 

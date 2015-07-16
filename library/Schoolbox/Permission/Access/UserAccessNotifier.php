@@ -147,7 +147,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
 
         $bob->setTitle($body)
             ->setHref("/group/modify/" . $cat->getId())
-            ->setIcon("/portrait.php?size=square32&userId=" . $user->getExternalId())
+            ->setIcon("/portrait.php?size={$this->iconSize}&userId=" . $user->getExternalId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
             ->addTopic("group.{$cat->getId()}.$label")
@@ -247,7 +247,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
 
         $msg = new Message(
             ":moderator has given you {$map[$userAccess->getAccessLevel()]} access to :groupname",
-            "/portrait.php?size=square32&userId=" . $user->getExternalId(),
+            "/portrait.php?size={$this->iconSize}&userId=" . $user->getExternalId(),
             "/homepage/" . $cat->getId()
         );
 
