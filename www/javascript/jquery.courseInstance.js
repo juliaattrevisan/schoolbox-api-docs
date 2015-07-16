@@ -144,6 +144,11 @@
                 var unit_element = element.closest('[data-unit-task]');
                 var container    = unit_element.find('[data-interaction="delete_task_container"]');
 
+                /* Hide all other forms first
+                 */
+                var allForms = component.find('[data-form-container]');
+                allForms.removeClass('hide').not(container).slideUp('fast');
+
                 if (container.hasClass('hide')) {
                     container.stop().removeClass('hide').slideUp(1).slideDown('fast');
                 }
