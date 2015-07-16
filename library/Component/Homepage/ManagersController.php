@@ -32,7 +32,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
      */
     public function renderTemplate($templateHandle)
     {
-        if (!parent::loadTemplate($templateHandle, 'managers')) {
+        if (!parent::loadTemplate($templateHandle, 'members')) {
             return false;
         }
         $this->parseConfig();
@@ -102,9 +102,17 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 /* Don't display images in list view
 			  	 */
                 if ($this->getConfig('displayPortraits') == 'grid') {
+                    $this->setVar(array(
+                        'GRID_VIEW_CLASSES' => 'medium-block-grid-2 large-block-grid-3'
+                    ));
+
                     $this->parse('has_thumbnail_block', 'has_thumbnail');
                     $this->setVar('has_icon_block', '');
                 } else {
+                    $this->setVar(array(
+                        'GRID_VIEW_CLASSES' => ''
+                    ));
+
                     $this->setVar('has_thumbnail_block', '');
                     $this->parse('has_icon_block', 'has_icon');
                 }
