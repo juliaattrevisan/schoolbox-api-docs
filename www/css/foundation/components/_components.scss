@@ -343,6 +343,10 @@ ul.tileList {
     word-spacing: 0;
     line-height: 0;
 
+    // TODO: remove margin padding 0 when Foundation is moved out of container
+    margin: 0;
+    padding: 0;
+
     &.ui-sortable li {
         // Get rid of border and background on sortable tiles
         background-image: none;
@@ -351,7 +355,8 @@ ul.tileList {
 
     // Styles for individual tiles
     li.tile {
-        padding: 0;
+        // TODO: uncomment padding 0 when Foundation is moved out of container
+//        padding: 0;
         position: relative;
         display: inline-block;
         height: auto;
