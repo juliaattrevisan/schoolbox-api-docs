@@ -1,89 +1,83 @@
-<div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-    <div class="small-12 island">
-        <section>
-            <div class="content">
-                <ul class="action-list">
-                    {% for item in bookingsByResource %}
-                        <li class="row">
-                            {# Show image for item if it's there, otherwise some empty image? #}
-                            <div class="small-12 columns">
-                                <div class="avatar-card">
-                                    <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">
-                                        {% if item.resource.image.hash %}
-                                            <img src="/storage/image.php?size=square64&amp;hash={{ item.resource.image.hash|e('url') }}" />
-                                        {% else %}
-                                            {# this icon needs to be responsive to screen size #}
-                                            <span class="icon-resource-booking icon-64 no-text"></span>
-                                        {% endif %}
-                                        <p>{{ item.resource.name }}</p>
-                                    </a>
-                                </div>
-                            </div>
+<div class="content">
+    <ul class="action-list">
+        {% for item in bookingsByResource %}
+            <li class="row">
+                {# Show image for item if it's there, otherwise some empty image? #}
+                <div class="small-12 columns">
+                    <div class="avatar-card">
+                        <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">
+                            {% if item.resource.image.hash %}
+                                <img src="/storage/image.php?size=square64&amp;hash={{ item.resource.image.hash|e('url') }}" />
+                            {% else %}
+                                {# this icon needs to be responsive to screen size #}
+                                <span class="icon-resource-booking icon-64 no-text"></span>
+                            {% endif %}
+                            <p>{{ item.resource.name }}</p>
+                        </a>
+                    </div>
+                </div>
 
-                            {% for event in item.bookingEvents %}
-                            <div class="small-11 small-offset-1 columns">
-                                {# show booker's avatar card #}
-                                <div class="avatar-card">
-                                    <a href="/search/user/{{ event.booking.event.owner.id }}">
-                                        <img src="/portrait.php?userId={{ event.booking.event.owner.externalId|e('url') }}&amp;size=square64" />
-                                        <p>{{ event.booking.event.owner.formatName }}</p>
-                                    </a>
+                {% for event in item.bookingEvents %}
+                <div class="small-11 small-offset-1 columns">
+                    {# show booker's avatar card #}
+                    <div class="avatar-card">
+                        <a href="/search/user/{{ event.booking.event.owner.id }}">
+                            <img src="/portrait.php?userId={{ event.booking.event.owner.externalId|e('url') }}&amp;size=square64" />
+                            <p>{{ event.booking.event.owner.formatName }}</p>
+                        </a>
 
-                                    <p class="meta">
-                                        requested on <time datetime="{{ event.booking.createdAt.getDatabase() }}">{{ event.booking.createdAt.getShort() }}</time>
-                                        {% if event.booking.event.owner.id != event.booking.event.author.id %}
-                                            by
-                                            <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
-                                        {% endif %}
-                                    </p>
-                                </div>
-                            </div>
+                        <p class="meta">
+                            requested on <time datetime="{{ event.booking.createdAt.getDatabase() }}">{{ event.booking.createdAt.getShort() }}</time>
+                            {% if event.booking.event.owner.id != event.booking.event.author.id %}
+                                by
+                                <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
 
-                            <div class="small-11 small-offset-1 columns">
-                                <p>
-                                    {% include 'sub/timespan.twig' with {
-                                        start: event.booking.event.startDateTime,
-                                        end:   event.booking.event.endDateTime
-                                    } %}
-                                </p>
-                            </div>
+                <div class="small-11 small-offset-1 columns">
+                    <p>
+                        {% include 'sub/timespan.twig' with {
+                            start: event.booking.event.startDateTime,
+                            end:   event.booking.event.endDateTime
+                        } %}
+                    </p>
+                </div>
 
-                            <div class="small-11 small-offset-1 columns">
-                                <button data-dropdown="resourceManagement-status-{{ event.getBooking().getId() }}"
-                                        aria-controls="resourceManagement-status-{{ event.getBooking().getId() }}"
-                                        aria-expanded="false"
-                                        class="button primary dropdown">Set Status</button>
-                                <br>
-                                <ul data-dropdown-content
-                                    id="resourceManagement-status-{{ event.getBooking().getId() }}"
-                                    class="f-dropdown"
-                                    aria-hidden="true"
-                                >
-                                    <li>
-                                        <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
-                                           class="icon-approve">Approved</a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
-                                           class="icon-undo">Pending</a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
-                                           class="icon-close">Rejected</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            {% endfor %}
+                <div class="small-11 small-offset-1 columns">
+                    <button data-dropdown="resourceManagement-status-{{ event.getBooking().getId() }}"
+                            aria-controls="resourceManagement-status-{{ event.getBooking().getId() }}"
+                            aria-expanded="false"
+                            class="button primary dropdown">Set Status</button>
+                    <br>
+                    <ul data-dropdown-content
+                        id="resourceManagement-status-{{ event.getBooking().getId() }}"
+                        class="f-dropdown"
+                        aria-hidden="true"
+                    >
+                        <li>
+                            <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
+                               class="icon-approve">Approved</a>
                         </li>
-                    {% else %}
-                        <li class="row">
-                            <div class="small-12 columns">
-                                <em>There are no upcoming bookings for you to confirm.</em>
-                            </div>
+                        <li>
+                            <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
+                               class="icon-undo">Pending</a>
                         </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </section>
-    </div>
+                        <li>
+                            <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
+                               class="icon-close">Rejected</a>
+                        </li>
+                    </ul>
+                </div>
+                {% endfor %}
+            </li>
+        {% else %}
+            <li class="row">
+                <div class="small-12 columns">
+                    <em>There are no upcoming bookings for you to confirm.</em>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
 </div>
