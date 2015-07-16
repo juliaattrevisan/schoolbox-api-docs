@@ -53,10 +53,11 @@
 
                 /* Alternate expando style
                  */
-                $('a[data-interaction="toggle-expanded"]').on('click', function(){
+                $('a[data-interaction="toggle-expanded"]').on('click', function(event){
+                    event.preventDefault();
+
                     $(this).toggleClass('icon-add icon-collapse');
                     $(this).closest('li').toggleClass('expanded');
-                    event.preventDefault();
                 });
             });
         })(jQuery);
