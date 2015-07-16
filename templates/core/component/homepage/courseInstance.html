@@ -230,27 +230,22 @@
                                 </div>
                                 <!-- END unit_task_modify_form -->
 
-
-
-
-
-
-
-
                                 <!-- BEGIN unit_task_delete_form -->
-                                <div class="hide" data-form-container data-interaction="delete_task_container">
-                                    <p>Are you sure you wish to delete this task?</p>
-                                    <p>Any linked due work items and quizzes will be deleted, as will all student's completion of this task.</p>
+                                <div class="content">
+                                    <div class="twelve-column panel" data-form-container data-interaction="edit_task_container">
+                                        <p><span class="label alert full-width">Are you sure you wish to delete this task?</span></p>
+                                        <p>Any linked due work items and quizzes will be deleted, as will all student's completion of this task.</p>
 
-                                    <form action="/task/saveInstanceForm.php" method="post" data-form_type="delete_task">
-                                        <input type="hidden" name="action"    value="delete" />
-                                        <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
-                                        <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
-                                        <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
-                                        <button type="submit" class="button icon-approve" data-interaction="delete_confirm">Yes</button>
+                                        <form action="/task/saveInstanceForm.php" method="post" data-form_type="delete_task">
+                                            <input type="hidden" name="action"    value="delete" />
+                                            <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
+                                            <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                                            <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
 
-                                        <a href="#" class="button icon-close" data-interaction="delete_reject">No</a>
-                                    </form>
+                                            <input type="submit" data-interaction="delete_confirm" value="Yes" />
+                                            <a href="#" class="button" data-interaction="delete_reject">No</a>
+                                        </form>
+                                    </div>
                                 </div>
                                 <!-- END unit_task_delete_form -->
                             </li>
@@ -268,6 +263,15 @@
                             <!-- END unit_add_task_actions -->
                         </div>
 
+
+
+
+
+
+
+
+
+                        
                         <!-- This is the form for inline creation of tasks -->
                         <div class="hide" data-for-task data-form-container>
                             <form action="/task/saveInstanceForm.php" method="post" data-form_type="task">
