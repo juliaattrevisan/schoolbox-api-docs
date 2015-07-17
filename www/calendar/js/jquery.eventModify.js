@@ -78,9 +78,6 @@
 
 			$.each(allDatepickerElements, function(index, element) {
 				$(element).datepicker({
-					showOn: 'both',
-					buttonImage: '/images/core/calendar/calendar-click.png',
-					buttonImageOnly: true,
 					constrainInput: false,
 					onClose: function(string) {
 						$.getJSON('/ajax/strtotime.php', {string: string}, function(data) {
@@ -132,10 +129,10 @@
 		function setupAllDay() {
 			config.element.find('input[name=allday]').change(function() {
 				if ($(this).is(':checked')) {
-					config.element.find('.timeInputs').hide();
+					config.element.find('.timeInputs, [data-timeinputs]').hide();
 				}
 				else {
-					config.element.find('.timeInputs').show();
+					config.element.find('.timeInputs, [data-timeinputs]').show();
 				}
 			});
 		}
@@ -144,7 +141,7 @@
 		 * Set up Advanced Option toggle
 		 */
 		function setupAdvancedOptions() {
-			$('.customise').click(function(event) {
+			$('.customise, [data-customise]').click(function(event) {
 				event.preventDefault();
 
 				/* Alternate between button texts
@@ -154,6 +151,13 @@
 				/* Alternate between option visibility
 				 */
 				$('.advanced').toggle();
+
+                if ($('[data-advanced]').hasClass('hide')) {
+                    $('[data-advanced]').removeClass('hide');
+                }
+                else {
+                    $('[data-advanced]').addClass('hide');
+                }
 			});
 		}
 
@@ -164,10 +168,12 @@
 			config.element.find('select[name=repeat]').change(function(event) {
 				if ($(this).val() !== '') {
 					$('#repeatUntil').show();
+                    $('[data-repeat-until]').removeClass('hide');
 					config.element.find('input[name=repeat_until]').rules('add', 'required');
 				}
 				else {
-					$('#repeatUntil').hide();
+					$('#repeatUntil, [data-repeat-until]').hide();
+                    $('[data-repeat-until]').addClass('hide');
 					config.element.find('input[name=repeat_until]').rules('remove', 'required');
 				}
 			});
@@ -177,37 +183,37 @@
 		 * Add "select all" capability to checkboxes
 		 */
 		function setupSelectAll() {
-			config.element.find('[data-selectall="true"]').change(function(){
-				if ($(this).is(':checked')) {
-					$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
-				}
-				else {
-					$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
-				}
-			});
+//			config.element.find('[data-selectall="true"]').change(function(){
+//				if ($(this).is(':checked')) {
+//					$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
+//				}
+//				else {
+//					$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+//				}
+//			});
 		}
 
 		/**
 		 * Set up checkbox styles upon click
 		 */
 		function setupCheckboxStyles() {
-			$(':checkbox').each(function () {
-				if ($(this).is(':checked')) {
-					$(this).parent().addClass('active-checkbox');
-				}
-			});
-
-			$(':checkbox').click(function () {
-				if ($(this).parent().hasClass('active-checkbox')) {
-					$(this).parent().removeClass('active-checkbox')
-					if($(this).closest('.checkboxes').find('.select_all').is(':checked')){
-						$(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
-					}
-				}
-				else {
-					$(this).parent().addClass('active-checkbox');
-				}
-			});
+//			$(':checkbox').each(function () {
+//				if ($(this).is(':checked')) {
+//					$(this).parent().addClass('active-checkbox');
+//				}
+//			});
+//
+//			$(':checkbox').click(function () {
+//				if ($(this).parent().hasClass('active-checkbox')) {
+//					$(this).parent().removeClass('active-checkbox')
+//					if($(this).closest('.checkboxes').find('.select_all').is(':checked')){
+//						$(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+//					}
+//				}
+//				else {
+//					$(this).parent().addClass('active-checkbox');
+//				}
+//			});
 		}
 
 		/**
@@ -407,13 +413,13 @@
 
 					// the desired action, and if this is a series event or not
 					var act = $('#action').val();
-					var multi = $('#repeat-reminder').length != 0;
+					var multi = $('#repeat-reminder, [data-repeat-reminder]').length != 0;
 
 					// series
 					if (multi) {
-						$('.bulk-update').css('display', act === 'Update' ? 'inline' : 'none');
-						$('.bulk-delete').css('display', act === 'Delete' ? 'inline' : 'none');
-						$("#dialog-bulk").dialog({
+						$('.bulk-update, [data-message=bulk-update]').css('display', act === 'Update' ? 'inline' : 'none');
+						$('.bulk-delete, [data-message=bulk-delete]').css('display', act === 'Delete' ? 'inline' : 'none');
+						$("#dialog-bulk, [data-dialog=bulk]").dialog({
 							resizable: false,
 							height: 180,
 							width: 500,
@@ -443,7 +449,7 @@
 							form.submit();
 						} else if (act == 'Delete') {
 							// dialog time
-							$("#dialog-delete").dialog({
+							$("#dialog-delete, [data-dialog=bulk]").dialog({
 								resizable: false,
 									height: 180,
 									width: 500,
