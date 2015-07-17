@@ -44,9 +44,8 @@
 
 {# spaceless because spaces between inline-block elements split the element. WTF #}
 {% spaceless %}
-<ul id="tileList-{{ layout.id }}"
-    class="clearfix tileList {{ layout.isGridLayoutType() ? 'grid' : 'column' }}"
->
+{% if (tileList|length > 0) or editable %}
+<ul id="tileList-{{ layout.id }}" class="tileList">
     {% for tile in tileList %}
         {% include '@tile/sub/tile.twig' with {layout: layout, tile: tile, editable: editable} %}
     {% endfor %}
@@ -62,4 +61,5 @@
     </li>
     {% endif %}
 </ul>
+{% endif %}
 {% endspaceless %}
