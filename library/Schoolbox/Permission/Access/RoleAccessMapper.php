@@ -60,18 +60,25 @@ class RoleAccessMapper extends Mapper
 
     }
 
+    /**
+     * Gets all role permissions for $category.
+     *
+     * @param CategoryModel $category
+     *
+     * @return Collection|RoleAccess[]
+     * @throws Mapper\Exception
+     */
     public function getGroupPermissions(CategoryModel $category)
     {
+        // Get permissions for all roles, regardless of whether there's one in
+        // the database for this category.
         $query = "
             SELECT
                 {$this->getColumnString('ra')},
-                {$this->getJoinColumnString('category', 'c')},
                 {$this->getJoinColumnString('role', 'r')}
-            FROM `{$this->getTable()}` `ra`
-            LEFT JOIN {$this->getJoinSql('role', 'ra', 'r')}
-            LEFT JOIN {$this->getJoinSql('category', 'ra', 'c')}
-            WHERE c.id = :categoryId
-            ORDER BY c.id
+            FROM `{$this->getJoinMapper('role')->getTable()}` `r`
+            LEFT JOIN {$this->getTable()} `ra` ON r.id=ra.gid AND ra.cid=:categoryId
+            ORDER BY r.id
         ";
 
         $statement = $this->database->prepare($query);
@@ -83,12 +90,8 @@ class RoleAccessMapper extends Mapper
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $roleAccess = $this->hydrate($row, 'ra');
-            $folder = $this->getJoinMapper('category')->hydrate($row, 'c');
             $role = $this->getJoinMapper('role')->hydrate($row, 'r');
-
-            $roleAccess->setCategory($folder);
             $roleAccess->setRole($role);
-
             $collection->add($roleAccess);
         }
 
