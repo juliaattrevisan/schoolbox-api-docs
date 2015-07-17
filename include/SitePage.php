@@ -455,15 +455,18 @@ class SitePage extends Page
                 $username = $redis->executeCommand($redis->createCommand('get', array($_COOKIE['remember'])));
 
                 if (strlen($username) === 0 || !$sessionHandler->create($username)) {
+                    $sessionHandler->destroy();
                     $this->goLoginPage();
                 }
             } //Catch already logged in users via kerberos or other means
             elseif (\Config::get('kerb_enable') && $_SERVER['REMOTE_USER']) {
                 list($username, $domain) = explode('@', $_SERVER['REMOTE_USER']);
                 if (!$sessionHandler->create($username)) {
+                    $sessionHandler->destroy();
                     $this->goLoginPage();
                 }
             } else {
+                $sessionHandler->destroy();
                 $this->goLoginPage();
             }
         }
