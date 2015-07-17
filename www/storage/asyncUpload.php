@@ -14,15 +14,20 @@ require_once __DIR__ . '/../../include/Bootstrap.php';
 
 // Force session usage due to flash audio recorder.
 // (Uploadify will die, but this is still needed for flash audio upload.)
-if (!empty($_POST[session_name()])) {
-    session_id($_POST[session_name()]);
+$session     = new Session();
+$sessionName = session_name();
+if (isset($_POST[$sessionName]) && $session->validateSessionId($_POST[$sessionName])) {
+    session_id($_POST[$sessionName]);
     session_start();
 }
-if (!empty($_GET[session_name()])) {
-    session_id($_GET[session_name()]);
+if (isset($_GET[$sessionName]) && $session->validateSessionId($_GET[$sessionName])) {
+    session_id($_GET[$sessionName]);
     session_start();
 }
-if (isset($_POST['fallback']) && !empty($_COOKIE[session_name()])) {
+if (isset($_POST['fallback'])
+    && isset($_COOKIE[$sessionName])
+    && $session->validateSessionId($_COOKIE[$sessionName])
+) {
     session_start();
 }
 

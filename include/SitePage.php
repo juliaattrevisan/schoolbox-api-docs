@@ -446,7 +446,7 @@ class SitePage extends Page
 
         // Validate the session ID - it has no right to be empty after it's started
         $sessionHandler = new Session();
-        if (session_id() === '') {
+        if (!$sessionHandler->validateSessionId(session_id())) {
             $sessionHandler->destroy();
             $this->goLoginPage();
         }

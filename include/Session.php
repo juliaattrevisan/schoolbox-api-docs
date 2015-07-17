@@ -21,6 +21,20 @@ class Session
     }
 
     /**
+     * Is this a valid session ID? If not, this session should be thrown out
+     * and you should be given a new session ID.
+     *
+     * @param string $sessionId Usually from `session_id()` but could be a
+     *                          value you want to set `session_id()` to.
+     *
+     * @return bool
+     */
+    public function validateSessionId($sessionId)
+    {
+        return !empty($sessionId);
+    }
+
+    /**
      * Function for returning user ip (tries to work around issues with proxies)
      * Access it via Session class
      *
