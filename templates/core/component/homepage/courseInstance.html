@@ -56,6 +56,7 @@
                 $('a[data-interaction="toggle-expanded"]').on('click', function(event){
                     event.preventDefault();
 
+                    $(this).closest('li').find('.task-list').removeClass('hide');
                     $(this).toggleClass('icon-add icon-collapse');
                     $(this).closest('li').toggleClass('expanded');
                 });
