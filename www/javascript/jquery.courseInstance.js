@@ -64,7 +64,7 @@
                 var element = $(this);
                 var is_collapsed = element.data('interaction-state') == "collapsed";
                 var unit_element = element.closest('.unit');
-                var task_list    = unit_element.find('.task-list');
+                var task_list    = unit_element.find('[data-task-list]');
                 if (is_collapsed) {
                     unit_element.removeClass('collapsed').addClass('expanded');
                     task_list.slideDown('fast');
@@ -316,6 +316,7 @@
         };
 
         var initTaskList = function() {
+
             /* Apply Preview to all anchor links in the task-list for
              * this component. This is used when a new task is dynamically
              * added via ajax - this applies the preview plugin when
@@ -324,6 +325,7 @@
              * Pass it in from the course instance plugin instantiation
              */
             component.find(settings.previewSelector).preview();
+
             if (settings.readonly) {
                 return;
             }
