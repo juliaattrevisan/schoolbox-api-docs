@@ -124,6 +124,7 @@ class Session
 
     public function destroy()
     {
+        session_regenerate_id(true);
         @session_destroy();
     }
 

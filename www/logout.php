@@ -4,6 +4,7 @@
 require_once('../include/Bootstrap.php');
 
 session_start();
+session_regenerate_id(true);
 session_destroy();
 
 //Destroy remember me cookie
