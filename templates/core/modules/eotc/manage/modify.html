@@ -491,17 +491,23 @@
             /* Untick the checkbox
              */
             if (!$(this).is(':checked')) {
-                $('#ramsModal').foundation('reveal', 'open');
+                var modal = $('#ramsModal');
 
-                $('#ramsModal').find('[data-rams-ok]').click(function(event) {
+                modal.foundation('reveal', 'open');
+
+                modal.find('[data-rams-ok]').click(function(event) {
                     self.attr('checked', false);
                     $('#ramsModal').foundation('reveal', 'close');
                 });
 
-                $('#ramsModal').find('[data-rams-cancel]').click(function(event) {
+                modal.find('[data-rams-cancel]').click(function(event) {
                     self.attr('checked', true);
                     $('#ramsModal').foundation('reveal', 'close');
                 });
+
+                /* Execute modal, then stop
+                 */
+                event.preventDefault();
             }
             /* Tick the checkbox
              */
