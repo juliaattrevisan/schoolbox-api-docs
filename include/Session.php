@@ -31,7 +31,7 @@ class Session
      */
     public function validateSessionId($sessionId)
     {
-        return !empty($sessionId);
+        return !empty(trim($sessionId));
     }
 
     /**
