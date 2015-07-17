@@ -280,6 +280,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 'UNIT_STUDENT_COUNT'          => count($this->student_list),
                 'UNIT_TASK_COMPLETE_CLASS'    => '',
                 'UNIT_EXPANDED_STATE'         => ($is_expanded ? 'expanded' : 'collapsed'),
+                'UNIT_EXPANDED_STATE_ICON'    => ($is_expanded  ? 'icon-collapse' : 'icon-add'),
                 'UNIT_LIST_CLASS'             => ($is_expanded ? '' : 'hide'),
                 'unit_task_block'             => '',
                 'unit_completion_block'       => '',
