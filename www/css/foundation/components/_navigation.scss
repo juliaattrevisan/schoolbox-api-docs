@@ -329,6 +329,7 @@ $menu-slide: "transform 500ms ease";
 
 .tab-bar-section{
 	padding: 0 rem-calc(($base-font-size * 10)) 0 0;
+	position: relative;
 }
 
 .main-nav{
@@ -380,11 +381,14 @@ $menu-slide: "transform 500ms ease";
 
 #search{
 	margin: 0;
+	//@include transition(all, 0.3s, ease-in-out);
 	#search-field{
 		border: 2px solid $secondary-color;
 		background-color: $white;
 		color: $black;
+		float: right;
 		height: $tabbar-height;
+		width: $tabbar-height;
 		padding: $base-font-size;
 		margin: 0;
 	}
@@ -399,11 +403,57 @@ $menu-slide: "transform 500ms ease";
 	}
 }
 
-@media #{$small-only} {
+#search{
+	position: absolute;
+	right: 21rem;
+	top: 0;
+	#search-field{
+		opacity: 0;
+	}
+	.icon-search{
+		@include absolute (0, auto, auto, 32px);
+	}
+	&:hover{
+		width: 100%;
+		//@include transition(all, 0.3s, ease-in-out);
+	}
 	#search-field:focus,
 	#search-field:active,
-	#search:hover #search-field{
+	&:hover #search-field{
+		background-color: $white;
+		border: 2px solid $secondary-color;
+		width: 100%;
+		opacity: 1;
+	}
+	#search-field:focus + .icon-search,
+	#search-field:active + .icon-search,
+	&:hover .icon-search{
+		@include absolute (0, auto, auto, 16px);
+	}
+}
 
+// Only show notifications sidebar on x-large screens
+@media (min-width: 90.063em) {
+	#search{
+		&:hover{
+			width: 100%;
+			padding-left: 32rem !important;
+			//@include transition(all, 0.3s, ease-in-out);
+		}
+	}
+  .right-off-canvas-menu{
+    position: static;
+    transform: none;
+    float: right;
+  }
+  .move-right > .inner-wrap {
+    transform: none;
+  }
+  .main-section {
+    overflow: hidden;
+  }
+	.tab-bar-section.middle{
+		padding-right: 330px;
 	}
 }
 
@@ -425,57 +475,24 @@ $menu-slide: "transform 500ms ease";
 	}
 }
 
-// Search
-@media (max-width: 64em) {
-	#search{
-		position: absolute;
+// large
+@media (max-width: 90em) {
+	.main-nav a {
+  	padding: 0.5rem 0.6;
+	}
+
+  #search{
 		right: 10rem;
-		top: 0;
-		@include transition(all, 0.3s, ease-in-out);
-		#search-field{
-			background-color: transparent;
-			border: 2px solid transparent;
-			width: $tabbar-height;
-			opacity: 0;
-		}
-		.icon-search{
-			@include absolute (0, auto, auto, 32px);
-		}
 		&:hover{
-			width: 100%;
-			padding-left: 10rem !important;
-			@include transition(all, 0.3s, ease-in-out);
-		}
-		#search-field:focus,
-		#search-field:active,
-		&:hover #search-field{
-			background-color: $white;
-			border: 2px solid $secondary-color;
-			width: 100%;
-			opacity: 1;
-		}
-		#search-field:focus + .icon-search,
-		#search-field:active + .icon-search,
-		&:hover .icon-search{
-			@include absolute (0, auto, auto, 16px);
+			padding-left: 21rem !important;
 		}
 	}
 }
 
-// Only show notifications sidebar on x-large screens
-@media (min-width: 90.063em) {
-  .right-off-canvas-menu{
-    position: static;
-    transform: none;
-    float: right;
-  }
-  .move-right > .inner-wrap {
-    transform: none;
-  }
-  .main-section {
-    overflow: hidden;
-  }
-	.tab-bar-section.middle{
-		padding-right: 330px;
+@media (max-width: 64em) {
+	#search{
+		&:hover{
+			padding-left: 10rem !important;
+		}
 	}
 }

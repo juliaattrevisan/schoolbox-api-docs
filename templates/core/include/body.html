@@ -38,58 +38,25 @@
 				</section>
 
 				<section class="row middle tab-bar-section">
-					<ul class="main-nav inline-list medium-10 large-6 columns no-pad">
-	          <li><a class="icon-due-work icon-32 no-text" href="#"><label>Work</label></a></li>
-	          <li><a class="icon-timetable icon-32 no-text" href="#"><label>Timetable</label></a></li>
-						<li><a class="icon-calendar icon-32 no-text" href="#"><label>Calendar</label></a></li>
+					<ul class="main-nav inline-list small-11 columns no-pad">
 						<li><a class="icon-news icon-32 no-text" href="#"><label>News</label></a></li>
-						<li><a class="icon-teacher icon-32 no-text" href="#"><label>Subjects</label></a></li>
-						<li><a class="icon-group icon-32 no-text" href="#"><label>Groups</label></a></li>
-						<li><a class="icon-approve icon-32 no-text" href="#"><label>Grades</label></a></li>
+						<li><a class="icon-email icon-32 no-text" href="#"><label>Webmail</label></a></li>
+						<li><a class="icon-calendar icon-32 no-text" href="#"><label>Calendar</label></a></li>
+						<li><a class="icon-timetable icon-32 no-text" href="#"><label>Timetable</label></a></li>
+	          <li><a class="icon-folder icon-32 no-text" href="#"><label>Resources</label></a></li>
+						<li><a class="icon-approve icon-32 no-text" href="#"><label>Submissions</label></a></li>
+						<li><a class="icon-files icon-32 no-text" href="#"><label>My Files</label></a></li>
+						<li><a class="icon-network icon-32 no-text" href="#"><label>Drives</label></a></li>
 	        </ul>
 
-					<!-- BEGIN banner_logged_in -->
-					<ul id="infoPanel" class="large-3 columns show-for-xlarge-up">
-					  <li class="user avatar">
-					    <a href="/search/user/{USER_ID}" class="button dropdown" title="View Profile" data-menu="account-menu" data-dropdown="avatar">
-					      <img height="80" width="80" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square64"/>
-								{SITE_LOGINNAME}
-					    </a>
-					    <ul class="account-menu flyout-menu f-dropdown" id="avatar" data-dropdown-content>
-					      <li><a href="/search/user/{USER_ID}">Profile</a></li>
-					      <li><a href="/settings/messages">Settings</a></li>
-					      <li><a href="/logout.php">Logout</a></li>
-					      <!-- BEGIN switch_user -->
-					      <li class="switch-user">
-					        <a href="/user/switch/{MENU_SWITCH_USERID}" title="Switch to">
-					            <img height="32" width="32" src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square32">
-					            {MENU_SWITCH_USER_FULLNAME}<br />
-					            <span class="meta">{MENU_SWITCH_USER_ROLE}</span>
-					        </a>
-					      </li>
-					      <!-- END switch_user -->
-					      <!-- BEGIN recover_user -->
-					      <li class="switch-user">
-					        <a href="/user/recoverSession" title="Return to">
-					            <img height="32" width="32" src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square32">
-					            {MENU_SWITCH_USER_FULLNAME}<br />
-					            <span class="meta">{MENU_SWITCH_USER_ROLE}</span>
-					        </a>
-					      </li>
-					      <!-- END recover_user -->
-					    </ul>
-					  </li>
-					</ul>
-					<!-- END banner_logged_in -->
-
-					<form id="search" class="medium-2 large-3 columns no-pad" action="/search" method="get">
+					<form id="search"  action="/search" method="get">
 		        <input id="search-field" type="text" name="keyword" placeholder="Search"/>
 						<i class="icon-search no-text"></i>
 					</form>
 				</section>
 
 				<section class="right-small">
-					<a class="right-off-canvas-toggle icon-notifications hide-for-xlarge-only" href="#"><span></span></a>
+					<a class="right-off-canvas-toggle icon-notifications hide-for-xlarge-up" href="#"><span></span></a>
 				</section>
 	    </nav>
     </div>
@@ -98,6 +65,39 @@
     	<a href="/" class="logo">
     		<a href="/" class="logo"><img src="/images/{SITE_LOCATION}/hercules.png" height="86" width="127" alt="{SITE_NAME}"/></a>
   		</a>
+			<!-- BEGIN banner_logged_in -->
+			<ul id="infoPanel" class="hide-for-xlarge-up">
+				<li class="user avatar">
+					<a href="/search/user/{USER_ID}" class="button dropdown" title="View Profile" data-menu="account-menu" data-dropdown="avatar2">
+						<img height="80" width="80" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square64"/>
+						{SITE_LOGINNAME}
+					</a>
+					<ul class="account-menu flyout-menu f-dropdown" id="avatar2" data-dropdown-content>
+						<li><a href="/search/user/{USER_ID}">Profile</a></li>
+						<li><a href="/settings/messages">Settings</a></li>
+						<li><a href="/logout.php">Logout</a></li>
+						<!-- BEGIN switch_user -->
+						<li class="switch-user">
+							<a href="/user/switch/{MENU_SWITCH_USERID}" title="Switch to">
+									<img height="32" width="32" src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square32">
+									{MENU_SWITCH_USER_FULLNAME}<br />
+									<span class="meta">{MENU_SWITCH_USER_ROLE}</span>
+							</a>
+						</li>
+						<!-- END switch_user -->
+						<!-- BEGIN recover_user -->
+						<li class="switch-user">
+							<a href="/user/recoverSession" title="Return to">
+									<img height="32" width="32" src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square32">
+									{MENU_SWITCH_USER_FULLNAME}<br />
+									<span class="meta">{MENU_SWITCH_USER_ROLE}</span>
+							</a>
+						</li>
+						<!-- END recover_user -->
+					</ul>
+				</li>
+			</ul>
+			<!-- END banner_logged_in -->
     	{MAIN_NAV_REGION}
     </aside>
 
