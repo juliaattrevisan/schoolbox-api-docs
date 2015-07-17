@@ -29,11 +29,10 @@ abstract class Leave_Kings_Notice_Parent_Abstract extends Leave_Notice_Abstract_
                 $hmarray['6'] = '10345';
                 $hmarray['7'] = '1629'; // House to be deleted
                 $hmarray['9'] = '1568'; // House to be deleted
-                $hmarray['11'] = '1575';
+                $hmarray['11'] = '1700';
                 $hmarray['13'] = '1568';
                 $hmarray['14'] = '1632';
-              #  $hmarray['20'] = '1570';
-		$hmarray['20'] = '1643';
+                $hmarray['20'] = '1570';
 
 		// $housemasterInitials = $this->getExternalUser()->getHousemasterByHouseId($this->getRequest()->getUser()->getResidentialHouse());
 
