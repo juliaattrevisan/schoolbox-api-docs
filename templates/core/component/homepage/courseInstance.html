@@ -56,7 +56,7 @@
                 $('a[data-interaction="toggle-expanded"]').on('click', function(event){
                     event.preventDefault();
 
-                    $(this).closest('li').find('.task-list').removeClass('hide');
+                    $(this).closest('li').find('[data-task-list]').removeClass('hide');
                     $(this).toggleClass('icon-add icon-collapse');
                     $(this).closest('li').toggleClass('expanded');
                 });
@@ -127,7 +127,7 @@
                             </div>
                         </div>
 
-                        <ul class="action-list task-list {UNIT_LIST_CLASS}">
+                        <ul class="action-list task-list {UNIT_LIST_CLASS}" data-task-list>
                             <!-- BEGIN unit_task -->
                             <li class="row interact {UNIT_TASK_COMPLETE_CLASS}" data-unit-task data-unit_task_id="{UNIT_TASK_ID}">
                                 <div class="nine-column">

@@ -327,7 +327,7 @@
             if (settings.readonly) {
                 return;
             }
-            var task_list = component.find('.task-list');
+            var task_list = component.find('[data-task-list]');
             task_list.sortable({
                 placeholder: "sortable-placeholder",
                 forcePlaceholderSize: true
