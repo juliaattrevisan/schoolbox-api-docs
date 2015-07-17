@@ -79,7 +79,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
 
     // set attributes
     if (is_null($file->getFilename())) {
-        $file->setFilename($file->getStorage()->getBasename());
+        $file->setFilename($file->getStorage()->getFilename());
     }
 
     $file->setOwner($_SESSION['user']);
