@@ -150,6 +150,7 @@ class Authenticator {
     }
 
     public function destroySession() {
+        session_regenerate_id(true);
         @session_destroy();
     }
 

@@ -17,6 +17,7 @@ if (isset($_POST['SAMLRequest'])) {
     SAMLDebugLog('SAMLRequest assertion received, assuming logout');
     SAMLDebugLog(base64_decode($_POST['SAMLRequest']));
     session_start();
+    session_regenerate_id(true);
     session_destroy();
     header('Location: ' . Config::get('saml_logout_url'));
     exit;

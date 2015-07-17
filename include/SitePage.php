@@ -444,26 +444,38 @@ class SitePage extends Page
     {
         session_start();
 
+        // Validate the session ID - it has no right to be empty after it's started
+        $sessionHandler = new Session();
+        if (!$sessionHandler->validateSessionId(session_id())) {
+            $sessionHandler->destroy();
+            $this->goLoginPage();
+        }
+
         if (!isset($_SESSION['id']) || //If session does not exist
             ( ($_SESSION['lasttime'] + \Config::get('session_length')) < time() ) || //If session has expired
             ( \Config::get('track_ip') && $_SESSION['ip'] != Session::getIP())  // If IP is not the same
         ) {
-            $sessionHandler = new Session;
             //Catch users with the remember me cookie
             if (\Config::get('session_remember') && isset($_COOKIE['remember']) && $_COOKIE['remember']) {
                 $redis = \Alaress\Redis::getClientInstance();
                 $username = $redis->executeCommand($redis->createCommand('get', array($_COOKIE['remember'])));
 
                 if (strlen($username) === 0 || !$sessionHandler->create($username)) {
+                    $sessionHandler->destroy();
                     $this->goLoginPage();
+                } else {
+                    // For safety's sake regenerate their session ID
+                    session_regenerate_id(true);
                 }
             } //Catch already logged in users via kerberos or other means
             elseif (\Config::get('kerb_enable') && $_SERVER['REMOTE_USER']) {
                 list($username, $domain) = explode('@', $_SERVER['REMOTE_USER']);
                 if (!$sessionHandler->create($username)) {
+                    $sessionHandler->destroy();
                     $this->goLoginPage();
                 }
             } else {
+                $sessionHandler->destroy();
                 $this->goLoginPage();
             }
         }
