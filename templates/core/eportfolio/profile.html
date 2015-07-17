@@ -2,6 +2,30 @@
     <!-- BEGIN allowed_files -->
     a.{NAME}{background-image: url(/images/mime/22x22/{ICON});}
     <!-- END allowed_files -->
+
+    #container.foundation .eportfolio.cover-photo {
+        position: relative;
+        margin-bottom: 5rem;
+    }
+
+    #container.foundation .eportfolio.cover-photo-controls {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+    }
+
+    #container.foundation .eportfolio.profile {
+        position: absolute;
+        text-align: center;
+        width: 40%;
+        bottom: -36px;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0.5rem;
+        background-color: #fff;
+    }
 </style>
 
 <div class="row">
@@ -23,37 +47,32 @@
 
 <div class="row">
     <div class="small-12 columns">
-		<!-- BEGIN has_cover_photo -->
-        <img src="/storage/image.php?size=eportfolioCoverPhoto&hash={COVERPHOTO_IMAGEHASH}" />
-        <!-- END has_cover_photo -->
-		<!-- BEGIN no_cover_photo -->
-		<img src="/images/core/eportfolio/coverphotoPlaceholder.jpg" />
-		<!-- END no_cover_photo -->
-    </div>
-    <div class="small-12 columns">
-        <!-- BEGIN no_cover_photo_control -->
-        <a class="button icon-add" id="add-coverphoto">Add a cover photo</a>
-        <!-- END no_cover_photo_control -->
-
-        <!-- BEGIN has_cover_photo_control -->
-        <a class="button icon-modify" id="add-coverphoto">Edit your cover picture</a>
-        <!-- END has_cover_photo_control -->
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-2 island">
-        <section>
-            <div class="content">
-                <img src='/portrait.php?userId={USER_EXTERNAL_ID}&size=constrain200' />
+        <div class="eportfolio cover-photo text-center">
+            <div class="eportfolio profile">
+                <img src='/portrait.php?userId={USER_EXTERNAL_ID}&size=square64' />
+                <h1>{USER_FULLNAME}</h1>
+                <p class="meta">
+                    {USER_YEAR}{USER_CAMPUS}{USER_HOUSE}
+                </p>
             </div>
-        </section>
-    </div>
-    <div class="small-10 columns">
-        <h1>{USER_FULLNAME}</h1>
-        <p>
-            {USER_YEAR}{USER_CAMPUS}{USER_HOUSE}
-        </p>
+
+            <!-- BEGIN has_cover_photo -->
+            <img src="/storage/image.php?size=eportfolioCoverPhoto&hash={COVERPHOTO_IMAGEHASH}" />
+            <!-- END has_cover_photo -->
+            <!-- BEGIN no_cover_photo -->
+            <img src="/images/core/eportfolio/coverphotoPlaceholder.jpg" />
+            <!-- END no_cover_photo -->
+
+            <div class="eportfolio cover-photo-controls">
+                <!-- BEGIN no_cover_photo_control -->
+                <a class="button icon-add no-text" title="Add a cover photo" id="add-coverphoto"></a>
+                <!-- END no_cover_photo_control -->
+
+                <!-- BEGIN has_cover_photo_control -->
+                <a class="button icon-modify no-text" title="Edit your cover picture" id="add-coverphoto"></a>
+                <!-- END has_cover_photo_control -->
+            </div>
+        </div>
     </div>
 </div>
 
