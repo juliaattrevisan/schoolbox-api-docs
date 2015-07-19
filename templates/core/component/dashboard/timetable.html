@@ -6,17 +6,17 @@
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
+            <!-- BEGIN campus_timetable -->
+            <h2 class="subheader">
+                <a href="/timetable/">
+                    <!-- BEGIN timetable_campus_name -->
+                    {CAMPUS_NAME} -
+                    <!-- END timetable_campus_name -->
+                    {DAYNAME}
+                </a>
+            </h2>
             <section>
                 <div class="content">
-                    <!-- BEGIN campus_timetable -->
-                    <h2>
-                        <a href="/timetable/">
-                            <!-- BEGIN timetable_campus_name -->
-                            {CAMPUS_NAME} -
-                            <!-- END timetable_campus_name -->
-                            {DAYNAME}
-                        </a>
-                    </h2>
                     <table class="timetable">
                         <thead>
                         <tr>
@@ -67,9 +67,9 @@
                         </tr>
                         </tbody>
                     </table>
-                    <!-- END campus_timetable -->
                 </div>
             </section>
+            <!-- END campus_timetable -->
         </div>
     </div>
 </div>
