@@ -11,44 +11,42 @@
                 {COMPONENT_NAME}
             </h2>
             <section>
-                <div class="content">
-                    <!-- BEGIN default_video -->
-                    <video data-role="media-player"
-                           controls
-                           preload="none"
-                           poster="/cms/videoThumb.php?type=sbfs&id={DEFAULT_VIDEO_ID}&size=poster"
-                           height="400"
-                           width="100%"
-                    >
-                        <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_VIDEO_ID}" type='video/mp4'>
-                    </video>
-                    <!-- END default_video -->
+                <!-- BEGIN default_video -->
+                <video data-role="media-player"
+                       controls
+                       preload="none"
+                       poster="/cms/videoThumb.php?type=sbfs&id={DEFAULT_VIDEO_ID}&size=poster"
+                       height="400"
+                       width="100%"
+                >
+                    <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_VIDEO_ID}" type='video/mp4'>
+                </video>
+                <!-- END default_video -->
 
-                    <ul class="information-list">
-                        <!-- BEGIN video_list -->
-                        <li class="row">
-                            <div class="avatar-card">
-                                <a href="#" data-media-id="{VIDEO_LIST_ID}">
-                                    <img src="/cms/videoThumb.php?type=sbfs&id={VIDEO_LIST_ID}" />
-                                    <p>{VIDEO_LIST_TITLE}</p>
-                                </a>
-                                <p class="meta">{VIDEO_LIST_DURATION} | Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
-                            </div>
-                            <article>{VIDEO_LIST_COMMENT}</article>
-                        </li>
-                        <!-- END video_list -->
-                        <!-- BEGIN video_pending_list -->
-                        <li class="row">
-                            <div class="avatar-card">
-                                <img src="{VIDEO_LIST_STATUSIMG}" title="Currently transcoding {VIDEO_LIST_TITLE}" />
+                <ul class="information-list">
+                    <!-- BEGIN video_list -->
+                    <li class="row">
+                        <div class="avatar-card">
+                            <a href="#" data-media-id="{VIDEO_LIST_ID}">
+                                <img src="/cms/videoThumb.php?type=sbfs&id={VIDEO_LIST_ID}" />
                                 <p>{VIDEO_LIST_TITLE}</p>
-                                <p class="meta">Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
-                            </div>
-                            <article>{VIDEO_LIST_COMMENT}</article>
-                        </li>
-                        <!-- END video_pending_list -->
-                    </ul>
-                </div>
+                            </a>
+                            <p class="meta">{VIDEO_LIST_DURATION} | Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
+                        </div>
+                        <article>{VIDEO_LIST_COMMENT}</article>
+                    </li>
+                    <!-- END video_list -->
+                    <!-- BEGIN video_pending_list -->
+                    <li class="row">
+                        <div class="avatar-card">
+                            <img src="{VIDEO_LIST_STATUSIMG}" title="Currently transcoding {VIDEO_LIST_TITLE}" />
+                            <p>{VIDEO_LIST_TITLE}</p>
+                            <p class="meta">Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
+                        </div>
+                        <article>{VIDEO_LIST_COMMENT}</article>
+                    </li>
+                    <!-- END video_pending_list -->
+                </ul>
             </section>
         </div>
     </div>
