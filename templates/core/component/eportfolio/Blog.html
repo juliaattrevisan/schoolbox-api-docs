@@ -11,125 +11,121 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
-                <ul class="action-list">
+                <ul class="information-list">
                     <!-- BEGIN list_item -->
                     <li class="row" data-equalizer>
-                        <div class="small-10 columns" data-equalizer-watch>
-                            <div data-content>
+                        <div class="small-10 columns no-pad" data-equalizer-watch>
+                            <div class="avatar-card">
+                                <img src="/portrait.php?userId={LIST_ITEM_AUTHOR_EXTERNAL_USER_ID}&size=square64" alt="View Profile" />
                                 <h3>{LIST_ITEM_TITLE}</h3>
-
-                                <div class="avatar-card clearfix">
-                                    <a href="/search/user/{LIST_ITEM_AUTHOR_ID}" title="View Profile">
-                                        <img src="/portrait.php?userId={LIST_ITEM_AUTHOR_EXTERNAL_USER_ID}&size=square64" alt="View Profile" />
-                                        <p>{LIST_ITEM_AUTHOR_FULLNAME}</p>
-                                    </a>
-                                    <p class="meta">Updated on {LIST_ITEM_UPDATED_AT}</p>
-                                </div>
-
-                                <article>
-                                    {LIST_ITEM_CONTENT}
-                                </article>
-
-                                <!-- BEGIN has_comments -->
-                                <ul class="action-list" id="blogComment_{LIST_ITEM_ID}">
-                                    <!-- BEGIN comment -->
-                                    <li class='viewCommentThread' id='comment_{COMMENT_ID}'>
-                                        <div class="eleven-column">
-                                            <div class="avatar-card clearfix">
-                                                <a href="/search/user/{COMMENT_AUTHOR_ID}" title="View Profile">
-                                                    <img src="/portrait.php?userId={COMMENT_EXTERNAL_USER_ID}&size=square64" alt="View Profile" />
-                                                    <p>{COMMENT_AUTHOR_FULLNAME}</p>
-                                                </a>
-                                                <p class="meta">Commented {COMMENT_CREATED_AT}</p>
-                                            </div>
-
-                                            <p>{COMMENT_CONTENT}</p>
-                                        </div>
-                                        <div class="one-column">
-                                            <!-- BEGIN has_delete_comment_form -->
-                                            <a class="delete-comment btn delete no-text" href="/eportfolio/component/blogcomment/modifyForm.php?action=removeComment&userId={LIST_ITEM_AUTHOR_ID}&pageId={PAGE_ID}&commentId={COMMENT_ID}" title="Delete Comment" onclick="return confirm('Do you want to delete this comment?');"><span></span></a>
-                                            <!-- END has_delete_comment_form -->
-                                        </div>
-                                    </li>
-                                    <!-- END comment -->
-                                </ul>
-                                <!-- END has_comments -->
-
-                                <div class="row">
-                                    <div class="small-12 columns">
-                                        <a data-interaction="showcomments" class="button icon-comment" data-numcomments="{COMMENT_TOTAL}">Show Comments ({COMMENT_TOTAL})</a>
-                                        <a data-toggle="commentform-{LIST_ITEM_ID}" class='button icon-add'>Add Comment</a>
-                                    </div>
-                                </div>
+                                <p class="meta">Posted by <a href="/search/user/{LIST_ITEM_AUTHOR_ID}" title="View Profile">{LIST_ITEM_AUTHOR_FULLNAME}</a></p>
+                                <p class="meta">Updated on {LIST_ITEM_UPDATED_AT}</p>
                             </div>
 
-                            <!-- BEGIN has_create_form -->
-                            <form id='modify_blog_form_{COMPONENT_INSTANCE_ID}' action='/eportfolio/component/blog/modifyForm.php' method='post' enctype='multipart/form-data'>
-                                <input type='hidden' name='action' value='addItem' />
-                                <input type='hidden' name='userId' value='{ID}' />
-                                <input type='hidden' name='pageId' value='{PAGE_ID}' />
-
-                                <label>
-                                    Blog Heading
-                                    <input type="text" maxlength="100" name="title" value="" />
-                                </label>
-
-                                <label>
-                                    Blog Content
-                                    <textarea type='text' name='content' class='mceEditor' rows="20" /></textarea>
-                                </label>
-
-                                <input type='submit' value='Add item' />
-                            </form>
-                            <!-- END has_create_form -->
-
-                            <!-- BEGIN has_modify_form -->
-                            <form id='modify_blog_form_{LIST_ITEM_ID}' class='modifyForm' action='/eportfolio/component/blog/modifyForm.php' method='post'>
-                                <input type='hidden' name='action' value='updateItem' />
-                                <input type='hidden' name='userId' value='{ID}' />
-                                <input type='hidden' name='pageId' value='{PAGE_ID}' />
-                                <input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
-
-                                <label>
-                                    Blog Heading
-                                    <input type="text" maxlength="100" name="title" value="{LIST_ITEM_TITLE}" />
-                                </label>
-
-                                <label>
-                                    Blog Content
-                                    <textarea type='text' name='content' class='mceEditor' style="width:100%" rows="20" />{LIST_ITEM_CONTENT}</textarea>
-                                </label>
-
-                                <input type='submit' value='Update' />
-                            </form>
-                            <!-- END has_modify_form -->
-
-                            <!-- BEGIN has_delete_form -->
-                            <!-- END has_delete_form -->
+                            <article>
+                                {LIST_ITEM_CONTENT}
+                            </article>
                         </div>
+
+                        <!-- BEGIN modify_text -->
                         <div class="two actions">
-                            <!-- BEGIN modify_text -->
                             <a href="/eportfolio/component/blog/modifyForm.php?action=removeItem&userId={ID}&pageId={PAGE_ID}&listItemId={LIST_ITEM_ID}" class="icon-delete no-text" title="Delete Blog post" onclick="return confirm('Do you want to delete this comment?');"></a>
                             <a href="/eportfolio/{ID}/{PAGE_ID}/blog/modify/{LIST_ITEM_ID}#modify_blog_form_{LIST_ITEM_ID}" class="icon-modify no-text" title="Modify Blog post"></a>
-                            <!-- END modify_text -->
                         </div>
-                    </li>
-                    <li class="row hide" id='commentform-{LIST_ITEM_ID}'>
+                        <!-- END modify_text -->
+
                         <div class="small-12 columns">
-                            <form action='/eportfolio/component/blogcomment/modifyForm.php' method='post'>
-                                <input type='hidden' name='action' value='addComment' />
-                                <input type='hidden' name='userId' value='{ID}' />
-                                <input type='hidden' name='pageId' value='{PAGE_ID}' />
-                                <input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
-
-                                <div class="avatar card">
-                                    <img src="/portrait.php?userId={EXTERNAL_ID}&size=square64" />
-                                    <textarea name="content" rows="2" cols="100" placeholder="Add your comment"></textarea>
-                                </div>
-
-                                <input type="submit" name="comment" value="Add comment" />
-                            </form>
+                            <p>
+                                <a data-interaction="showcomments" class="button icon-comment" data-numcomments="{COMMENT_TOTAL}">Show Comments ({COMMENT_TOTAL})</a>
+                                <a data-toggle="commentform-{LIST_ITEM_ID}" class='button icon-add'>Add Comment</a>
+                            </p>
                         </div>
+
+                        <ul class="information-list reply" id="blogComment_{LIST_ITEM_ID}">
+                            <!-- BEGIN has_comments -->
+                            <!-- BEGIN comment -->
+                            <li class="row" data-thread>
+                                <div class="eleven-column no-pad">
+                                    <div class="avatar card">
+                                        <a href="/search/user/{COMMENT_AUTHOR_ID}" title="View Profile">
+                                            <img src="/portrait.php?userId={COMMENT_EXTERNAL_USER_ID}&size=square64" alt="View Profile" />
+                                            <p>{COMMENT_AUTHOR_FULLNAME}</p>
+                                        </a>
+                                        <p class="meta">Commented {COMMENT_CREATED_AT}</p>
+                                    </div>
+
+                                    <p class="list-item-content">{COMMENT_CONTENT}</p>
+                                </div>
+                                <!-- BEGIN has_delete_comment_form -->
+                                <div class="one actions">
+                                    <a data-interaction="deletecomment" class="icon-delete no-text" href="/eportfolio/component/blogcomment/modifyForm.php?action=removeComment&userId={LIST_ITEM_AUTHOR_ID}&pageId={PAGE_ID}&commentId={COMMENT_ID}" title="Delete Comment" onclick="return confirm('Do you want to delete this comment?');"><span></span></a>
+                                </div>
+                                <!-- END has_delete_comment_form -->
+                            </li>
+                            <!-- END comment -->
+                            <!-- END has_comments -->
+                            <li class="row hide" id='commentform-{LIST_ITEM_ID}'>
+                                <div class="small-12 columns">
+                                    <form action='/eportfolio/component/blogcomment/modifyForm.php' method='post'>
+                                        <input type='hidden' name='action' value='addComment' />
+                                        <input type='hidden' name='userId' value='{ID}' />
+                                        <input type='hidden' name='pageId' value='{PAGE_ID}' />
+                                        <input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
+
+                                        <div class="avatar card">
+                                            <img src="/portrait.php?userId={EXTERNAL_ID}&size=square64" />
+                                            <textarea name="content" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                                        </div>
+
+                                        <input type="submit" name="comment" value="Add comment" />
+                                    </form>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <!-- BEGIN has_create_form -->
+                        <form id='modify_blog_form_{COMPONENT_INSTANCE_ID}' action='/eportfolio/component/blog/modifyForm.php' method='post' enctype='multipart/form-data'>
+                            <input type='hidden' name='action' value='addItem' />
+                            <input type='hidden' name='userId' value='{ID}' />
+                            <input type='hidden' name='pageId' value='{PAGE_ID}' />
+
+                            <label>
+                                Blog Heading
+                                <input type="text" maxlength="100" name="title" value="" />
+                            </label>
+
+                            <label>
+                                Blog Content
+                                <textarea type='text' name='content' class='mceEditor' rows="20" /></textarea>
+                            </label>
+
+                            <input type='submit' value='Add item' />
+                        </form>
+                        <!-- END has_create_form -->
+
+                        <!-- BEGIN has_modify_form -->
+                        <form id='modify_blog_form_{LIST_ITEM_ID}' class='modifyForm' action='/eportfolio/component/blog/modifyForm.php' method='post'>
+                            <input type='hidden' name='action' value='updateItem' />
+                            <input type='hidden' name='userId' value='{ID}' />
+                            <input type='hidden' name='pageId' value='{PAGE_ID}' />
+                            <input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
+
+                            <label>
+                                Blog Heading
+                                <input type="text" maxlength="100" name="title" value="{LIST_ITEM_TITLE}" />
+                            </label>
+
+                            <label>
+                                Blog Content
+                                <textarea type='text' name='content' class='mceEditor' style="width:100%" rows="20" />{LIST_ITEM_CONTENT}</textarea>
+                            </label>
+
+                            <input type='submit' value='Update' />
+                        </form>
+                        <!-- END has_modify_form -->
+
+                        <!-- BEGIN has_delete_form -->
+                        <!-- END has_delete_form -->
                     </li>
                     <!-- END list_item -->
                 </ul>
