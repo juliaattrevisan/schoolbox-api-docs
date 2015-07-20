@@ -55,22 +55,11 @@
                                 </ul>
                                 <!-- END has_comments -->
 
-                                <form id='modify_blogcomment_form_{LIST_ITEM_ID}' class='modifyForm hide' action='/eportfolio/component/blogcomment/modifyForm.php' method='post'>
-                                    <input type='hidden' name='action' value='addComment' />
-                                    <input type='hidden' name='userId' value='{ID}' />
-                                    <input type='hidden' name='pageId' value='{PAGE_ID}' />
-                                    <input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
-
-                                    <label>
-                                        <textarea name="content" rows="2" cols="100" placeholder="Add your comment"></textarea>
-                                    </label>
-
-                                    <input type="submit" name="comment" value="Add comment" />
-                                </form>
-
-                                <div>
-                                    <a href="#" class="viewComments button icon-comment" rel='viewComments_{LIST_ITEM_ID}' data-numcomments="{COMMENT_TOTAL}"><span></span>Show Comments ({COMMENT_TOTAL})</a>
-                                    <a rel='modify_blogcomment_form_{LIST_ITEM_ID}' class='closeComment button icon-add'>Add Comment</a>
+                                <div class="row">
+                                    <div class="small-12 columns">
+                                        <a data-interaction="showcomments" class="button icon-comment" data-numcomments="{COMMENT_TOTAL}">Show Comments ({COMMENT_TOTAL})</a>
+                                        <a data-toggle="commentform-{LIST_ITEM_ID}" class='button icon-add'>Add Comment</a>
+                                    </div>
                                 </div>
                             </div>
 
@@ -123,6 +112,23 @@
                             <a href="/eportfolio/component/blog/modifyForm.php?action=removeItem&userId={ID}&pageId={PAGE_ID}&listItemId={LIST_ITEM_ID}" class="icon-delete no-text" title="Delete Blog post" onclick="return confirm('Do you want to delete this comment?');"></a>
                             <a href="/eportfolio/{ID}/{PAGE_ID}/blog/modify/{LIST_ITEM_ID}#modify_blog_form_{LIST_ITEM_ID}" class="icon-modify no-text" title="Modify Blog post"></a>
                             <!-- END modify_text -->
+                        </div>
+                    </li>
+                    <li class="row hide" id='commentform-{LIST_ITEM_ID}'>
+                        <div class="small-12 columns">
+                            <form action='/eportfolio/component/blogcomment/modifyForm.php' method='post'>
+                                <input type='hidden' name='action' value='addComment' />
+                                <input type='hidden' name='userId' value='{ID}' />
+                                <input type='hidden' name='pageId' value='{PAGE_ID}' />
+                                <input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
+
+                                <div class="avatar card">
+                                    <img src="/portrait.php?userId={EXTERNAL_ID}&size=square64" />
+                                    <textarea name="content" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                                </div>
+
+                                <input type="submit" name="comment" value="Add comment" />
+                            </form>
                         </div>
                     </li>
                     <!-- END list_item -->
