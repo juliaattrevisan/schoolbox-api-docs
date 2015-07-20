@@ -9,8 +9,7 @@ $groupHandler = new Group(HOMEPAGE_SERVICE);
 /* Update page, or its stuff
  */
 if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
-
-    /* Check permissions
+/* Check permissions
 	 */
     $eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
 
@@ -20,7 +19,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 	 * Superusers, staff and page owners can modify contents/settings.
 	 */
     if ($authenticator->canModify()) {
-        $componentInstanceMapper       = Component_InstanceMapper::getInstance();
+        $componentInstanceMapper = Component_InstanceMapper::getInstance();
         $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
         /* Ajax save page colours. When instantiating the Eportfolio object, assume page owner
@@ -44,9 +43,9 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 		 */
         elseif ($_POST['type'] == 'components') {
             $columns = array(
-                'left'  => $_POST['column1'],
+                'left' => $_POST['column1'],
                 'right' => $_POST['column2'],
-                'top'   => $_POST['column3']
+                'top' => $_POST['column3']
             );
 
             foreach ($columns as $position => $componentString) {
@@ -73,11 +72,10 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
         } /* AJAX request to delete component from eportfolio
 		 */
         elseif (is_numeric($_POST['delete'])) {
-
-            // locate the instance, locate its config instances, then blast them away
+// locate the instance, locate its config instances, then blast them away
             /** @var Component_Instance $instance */
             $instance = $componentInstanceMapper->findById($_POST['delete']);
-            $configs  = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->getId());
+            $configs = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->getId());
 
             foreach ($configs as $c) {
                 $componentConfigInstanceMapper->delete($c);
@@ -111,7 +109,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
             // $component instanceof Component_ControllerAbstract
             $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
-            $cList         = array_values($componentList);
+            $cList = array_values($componentList);
 
             $component = $factory->buildComponent($cList[0]);
 
@@ -124,12 +122,10 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                 foreach ($component->getInstance()->getConfig() as $currentConfig) {
                     /** @var Component_ConfigDefinition $currentConfig */
                     if ($currentConfig->getKey() == 'componentname') {
-                        $configInstance = Component_ConfigMapper::getInstance()->findByColumnList(
-                            array(
-                                'component_config_definition_id' => $currentConfig->getId(),
-                                'component_instance_id'          => $_POST['from'],
-                            )
-                        )->first();
+                        $configInstance = Component_ConfigMapper::getInstance()->findByColumnList(array(
+                            'component_config_definition_id' => $currentConfig->getId(),
+                            'component_instance_id' => $_POST['from'],
+                        ))->first();
 
                         if ($configInstance instanceof Component_Config) {
                             $componentName = $configInstance->getValue();
@@ -188,7 +184,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             $config = $_POST;
 
             /** @var Component_Instance $instance */
-            $instance                        = reset($componentInstanceMapper->findByInstanceId($config['component']));
+            $instance = reset($componentInstanceMapper->findByInstanceId($config['component']));
             $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
 
             $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
@@ -214,8 +210,8 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                 $cclass = $instance->getDefinition()->getClass();
                 /** @var \Component_ControllerAbstract $controller */
                 $controller = new $cclass($instance, new \Schoolbox\User(), $page);
-                $fields     = $controller->getFilterFields();
-                $val        = 0;
+                $fields = $controller->getFilterFields();
+                $val = 0;
                 for ($i = 0; $i < count($fields); $i++) {
                     $add = isset($config['filter'][$fields[$i]]) && $config['filter'][$fields[$i]] ? 1 : 0;
                     $val += $add * pow(2, $i);
@@ -226,14 +222,12 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             /** @var Component_ConfigDefinition $confD */
             foreach ($configDefinitionCollection as $confD) {
                 if (isset($config[$confD->getKey()])) {
-                    // this should be 1:1 relation, so return only the first instance of this definition
+// this should be 1:1 relation, so return only the first instance of this definition
                     /** @var Component_Config $confI */
-                    $confI = $componentConfigInstanceMapper->findByColumnList(
-                        array(
-                            'component_config_definition_id' => $confD->getId(),
-                            'component_instance_id'          => $instance->getId()
-                        )
-                    )->first();
+                    $confI = $componentConfigInstanceMapper->findByColumnList(array(
+                        'component_config_definition_id' => $confD->getId(),
+                        'component_instance_id'          => $instance->getId()
+                    ))->first();
                     if (!($confI instanceof Component_Config)) {
                         $confI = new Component_Config();
                     }
@@ -274,15 +268,14 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
         error(19);
     }
 } else {
-
-    /* Create page
+/* Create page
 	 */
     if (isset($_POST['page_title']) && strlen(trim($_POST['page_title'])) && isset($_POST['page_template']) && is_numeric($_POST['page_template'])) {
-        /* Create page for the currently logged-in user
+/* Create page for the currently logged-in user
 		 */
-        $userId     = $_POST['userId'];
-        $pageId     = null;
-        $pageTitle  = $_POST['page_title'];
+        $userId = $_POST['userId'];
+        $pageId = null;
+        $pageTitle = $_POST['page_title'];
         $templateId = $_POST['page_template'];
 
         $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $userId, null);
