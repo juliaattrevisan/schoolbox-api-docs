@@ -26,7 +26,8 @@ $.widget("ui.chat",  {
         send_el: 'input[type="submit"]',
         base_freq: 3,
         poll_freq: 6, // seconds,
-        recv_freq: 3
+        recv_freq: 3,
+        max_height: '300px'
     },
 
     _create: function () {
@@ -91,6 +92,12 @@ $.widget("ui.chat",  {
                     $self._send($self);
 				}
             }
+        });
+
+        // apply some really specific styling
+        this.options.log_el.css({
+            'max-height' : this.options.max_height,
+            'overflow-y' : 'scroll'
         });
 
     },
@@ -230,10 +237,6 @@ $.widget("ui.chat",  {
         ;
 
         $message_el.html($tpl.format($message.name, $message.user_ext_id, $message.time, $message.body));
-
-        if ($message.user_id != this.options.user_id) {
-            //$message_el.find('p.alert-box').addClass('secondary');
-        }
 
         this.options.log_el.append($message_el).prop({ scrollTop: this.options.log_el.prop("scrollHeight") });
 
