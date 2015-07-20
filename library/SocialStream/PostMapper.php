@@ -480,12 +480,11 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
 
         $c = $this->createCollection();
 
-        while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             /** @var SocialStream_Post_Abstract $post */
             $post = $this->hydrate($r);
             $c->add($post);
         }
         return $c;
     }
-
 }
