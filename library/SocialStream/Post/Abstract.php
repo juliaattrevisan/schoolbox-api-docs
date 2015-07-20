@@ -9,6 +9,7 @@
  */
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\User;
 
 abstract class SocialStream_Post_Abstract implements ISoftDeletable {
 
@@ -30,9 +31,9 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable {
 	/**
 	 * The person who owns this post
 	 *
-	 * @var
+	 * @var User
 	 */
-	protected $ownerId;
+	protected $owner;
 
 	/**
 	 * The homepage on which this post can be found
@@ -238,21 +239,21 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable {
 	}
 
 	/**
-	 * Set owner id
+	 * Set owner
 	 *
-	 * @param $ownerId
+	 * @param User $owner
 	 */
-	public function setOwnerId($ownerId) {
-		$this->ownerId = $ownerId;
+	public function setOwner($owner) {
+		$this->owner = $owner;
 	}
 
 	/**
-	 * Get owner id
+	 * Get owner
 	 *
-	 * @return mixed
+	 * @return User
 	 */
-	public function getOwnerId() {
-		return $this->ownerId;
+	public function getOwner() {
+		return $this->owner;
 	}
 
 	/**
