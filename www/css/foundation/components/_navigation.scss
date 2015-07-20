@@ -174,9 +174,9 @@ $topbar-divider-border-top: solid 1px tint($topbar-bg, 20%);
 $include-html-off-canvas-classes: $include-html-classes !default;
 
 $tabbar-bg: $body-bg;
-$tabbar-height: rem-calc(80);
-$tabbar-icon-width: $tabbar-height;
-$tabbar-line-height: $tabbar-height;
+$tabbar-height: rem-calc(160);
+$tabbar-icon-width: $tabbar-height / 2;
+$tabbar-line-height: $tabbar-height / 2;
 $tabbar-color: $black;
 $tabbar-middle-padding: 0 rem-calc(($base-font-size - 4));
 
@@ -193,12 +193,13 @@ $tabbar-header-margin: 0;
 // Off Canvas Menu Variables
 $off-canvas-width: rem-calc(250);
 $off-canvas-bg: $body-bg;
+$off-canvas-bg-hover: scale-color($tabbar-bg, $lightness: -20%);
 
 // Off Canvas Menu List Variables
 $off-canvas-label-padding: rem-calc(($base-font-size));
 $off-canvas-label-color: $black;
 $off-canvas-label-text-transform: uppercase;
-$off-canvas-label-font-size: rem-calc(($base-font-size - 4));
+$off-canvas-label-font-size: rem-calc(($base-font-size - 2));
 $off-canvas-label-font-weight: $font-weight-bold;
 $off-canvas-label-bg: $body-bg;
 $off-canvas-label-border-top: 0px; //1px solid scale-color($off-canvas-label-bg, $lightness: 14%);
@@ -207,6 +208,12 @@ $off-canvas-label-margin:0;
 $off-canvas-link-padding: rem-calc(($base-font-size));
 $off-canvas-link-color: $black;
 $off-canvas-link-border-bottom: 0px; //1px solid scale-color($off-canvas-bg, $lightness: -25%);
+$off-canvas-back-bg: scale-color($tabbar-bg, $lightness: -30%);
+$off-canvas-back-border-top: $off-canvas-label-border-top;
+$off-canvas-back-border-bottom: $off-canvas-label-border-bottom;
+$off-canvas-back-hover-bg: scale-color($off-canvas-back-bg, $lightness: -30%);
+$off-canvas-back-hover-border-top: 0px;
+$off-canvas-back-hover-border-bottom: none;
 
 // Off Canvas Menu Icon Variables
 $tabbar-menu-icon-color: $primary-color;
@@ -312,13 +319,40 @@ $menu-slide: "transform 500ms ease";
 }
 
 // Hybrid Bar
-.hybrid-bar{
-	height: $tabbar-height;
+@media #{$small-only} {
+	.tab-bar,
+	.left-small{
+		height: $tabbar-height / 2;
+	}
+}
+
+@media #{$small-up} {
+	.tab-bar .menu-icon{
+		height: $tabbar-height / 2;
+	}
 }
 
 .left-off-canvas-toggle:hover,
 .right-off-canvas-toggle:hover{
 	background-color: $white;
+}
+
+.left-off-canvas-menu{
+	.dropdown{
+		background-color: transparent;
+		padding-top: 0;
+		padding-bottom: 0;
+		padding-left: 0;
+		font-weight: $font-weight-bold;
+		width: 100%;
+		img{
+			float: left;
+		}
+	}
+	.f-dropdown{
+		box-shadow: none;
+		max-width: none;
+	}
 }
 
 .right-off-canvas-toggle:before{
@@ -332,7 +366,7 @@ $menu-slide: "transform 500ms ease";
 	position: relative;
 }
 
-.main-nav{
+.icon-nav{
 	margin: 0;
 	height: inherit;
 	li{
@@ -355,67 +389,33 @@ $menu-slide: "transform 500ms ease";
 	}
 }
 
-#infoPanel,
-.flyout-menu{
-	list-style: none;
-	margin: 0;
-}
-
-#infoPanel{
-	.dropdown{
-		background-color: transparent;
-		padding-top: 0;
-		padding-bottom: 0;
-		padding-left: 0;
-		font-weight: $font-weight-bold;
-		width: 100%;
-		&:hover{
-			background-color: $ocean-sunset;
-		}
-		img{
-			margin-right: $base-font-size;
-			float: left;
-		}
-	}
-}
-
 #search{
 	margin: 0;
-	//@include transition(all, 0.3s, ease-in-out);
+	position: absolute;
+	right: 21rem;
+	top: 0;
+	&:hover{
+		width: 100%;
+	}
 	#search-field{
 		border: 2px solid $secondary-color;
 		background-color: $white;
 		color: $black;
 		float: right;
-		height: $tabbar-height;
-		width: $tabbar-height;
+		height: $tabbar-height / 2;
+		width: $tabbar-height / 2;
 		padding: $base-font-size;
 		margin: 0;
+		opacity: 0;
 	}
 	.icon-search{
-		@include absolute (0, auto, auto, 16px);
+		@include absolute (0, auto, auto, 32px);
 		@include transition(all, 0.3s, ease-in);
 		margin: 0;
 		z-index: 1;
 		&:before{
 			color: $primary-color;
 		}
-	}
-}
-
-#search{
-	position: absolute;
-	right: 21rem;
-	top: 0;
-	#search-field{
-		opacity: 0;
-	}
-	.icon-search{
-		@include absolute (0, auto, auto, 32px);
-	}
-	&:hover{
-		width: 100%;
-		//@include transition(all, 0.3s, ease-in-out);
 	}
 	#search-field:focus,
 	#search-field:active,
@@ -438,7 +438,6 @@ $menu-slide: "transform 500ms ease";
 		&:hover{
 			width: 100%;
 			padding-left: 32rem !important;
-			//@include transition(all, 0.3s, ease-in-out);
 		}
 	}
   .right-off-canvas-menu{
@@ -460,9 +459,10 @@ $menu-slide: "transform 500ms ease";
 // Only show left nav on large-up screens
 @media (min-width: 64.063em) {
   .left-off-canvas-menu{
-    position: static;
+    position: relative;
     transform: none;
     float: left;
+		top: -160px;
   }
   .move-right > .inner-wrap {
     transform: none;
