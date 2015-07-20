@@ -5,17 +5,31 @@
                 event.preventDefault();
 
                 var id = $(this).attr('data-list-item-id');
-
-                /* Show editor form
-                 */
-                var panel = $('#component{COMPONENT_INSTANCE_ID}').find('[data-create-panel='+id+']');
-                panel.removeClass('hide');
-                panel.find('[data-first-focus]').focus();
-
-                /* Hide actual content
-                 */
+                var allContent = $('#component{COMPONENT_INSTANCE_ID}').find('[data-content-row]');
                 var content = $('#component{COMPONENT_INSTANCE_ID}').find('[data-content-row='+id+']');
-                content.addClass('hide');
+                var allPanels = $('#component{COMPONENT_INSTANCE_ID}').find('[data-create-panel]');
+                var panel = $('#component{COMPONENT_INSTANCE_ID}').find('[data-create-panel='+id+']');
+
+                /* Hide all editor panels
+                 * show all content rows
+                 */
+                if (content.hasClass('hide')) {
+                    allPanels.addClass('hide');
+                    allContent.removeClass('hide');
+                }
+                /* Hide all editor panels
+                 * Show this editor panel
+                 * Show all content rows
+                 * Hide this content row
+                 */
+                else {
+                    allPanels.addClass('hide');
+                    panel.removeClass('hide');
+                    panel.find('[data-first-focus]').focus();
+
+                    allContent.removeClass('hide');
+                    content.addClass('hide');
+                }
             });
 
             /* Create button, swap form in
