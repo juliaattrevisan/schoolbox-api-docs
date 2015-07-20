@@ -1,102 +1,146 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-	<script type='text/javascript'>
-		$(function() {
-			$('a.modify_link').click(function() {
-				var id = $(this).attr('rel');
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <script type='text/javascript'>
+        $(function() {
+            $('#component{COMPONENT_INSTANCE_ID}').find('[data-list-item-id]').click(function() {
+                event.preventDefault();
 
-				/* Show editor form
-				 */
-				$('#modify_link_form_' + id).show();
-				$('#modify_link_form_' + id).find('.firstFocus').focus();
+                var id = $(this).attr('data-list-item-id');
+                var allContent = $('#component{COMPONENT_INSTANCE_ID}').find('[data-content-row]');
+                var content = $('#component{COMPONENT_INSTANCE_ID}').find('[data-content-row='+id+']');
+                var allPanels = $('#component{COMPONENT_INSTANCE_ID}').find('[data-create-panel]');
+                var panel = $('#component{COMPONENT_INSTANCE_ID}').find('[data-create-panel='+id+']');
 
-				/* Hide actual content
-				 */
-				$('#list_item_link_content_' + id).hide();
-			});
+                /* Hide all editor panels
+                 * show all content rows
+                 */
+                if (content.hasClass('hide')) {
+                    allPanels.addClass('hide');
+                    allContent.removeClass('hide');
+                }
+                /* Hide all editor panels
+                 * Show this editor panel
+                 * Show all content rows
+                 * Hide this content row
+                 */
+                else {
+                    allPanels.addClass('hide');
+                    panel.removeClass('hide');
+                    panel.find('[data-first-focus]').focus();
+
+                    allContent.removeClass('hide');
+                    content.addClass('hide');
+                }
+            });
 
             /* Create button, swap form in
              */
-            $('a.create_link').click(function(event) {
-				event.preventDefault();
+            $('#component{COMPONENT_INSTANCE_ID}').find('[data-create]').click(function(event) {
+                event.preventDefault();
 
                 $(this).hide();
-                $(this).next().show();
+                $('#component{COMPONENT_INSTANCE_ID}').find('[data-create-panel=new]').removeClass('hide');
             });
 
-			/* Close button
-			 */
-			$('a.modify_link_close').click(function() {
-				var id = $(this).attr('rel');
+            $('#component{COMPONENT_INSTANCE_ID}').find('[data-delete]').click(function(event) {
+                event.preventDefault();
 
-				/* Show actual content
-				 */
-				$('#list_item_link_content_' + id).show();
+                var element = $(this);
 
-				/* Hide editor form
-				 */
-				$('#modify_link_form_' + id).hide();
-			});
-		});
-	</script>
-	<h2>{COMPONENT_NAME}</h2>
-	{CONFIGURATION}
+                $(this).confirmDialog({
+                    text: 'Do you want to delete this item?',
+                    confirmEvent: function() {
+                        window.location.href = element.attr('href');
+                    }
+                });
+            });
+        });
+    </script>
 
-    <div class="listing">
-		<ul>
-			<!-- BEGIN list_item -->
-			<li class="clearfix {ON_OFF}">
-				<div id='list_item_link_content_{LIST_ITEM_ID}'>
-					<h4><a class="icons link"  rel="{LIST_ITEM_TARGET}" href='{LIST_ITEM_ENCODED_URL}'>{LIST_ITEM_TITLE}</a></h4>
-					<!-- BEGIN has_modify_button -->
-					<a class='btn modify no-text modify_link' title="Edit link" rel='{LIST_ITEM_ID}'><span></span></a>
-					<!-- END has_modify_button -->
-					<!-- BEGIN has_delete_form -->
-					<a title="Remove link" class="btn delete no-text" href="/eportfolio/component/linklist/modifyForm.php?action=removeItem&userId={USER_ID}&pageId={PAGE_ID}&componentInstanceId={COMPONENT_INSTANCE_ID}&listItemId={LIST_ITEM_ID}" onclick="return confirm('Do you want to delete this item?');"><span></span></a>
-					<!-- END has_delete_form -->
-				</div>
+    {CONFIGURATION}
 
-				<!-- BEGIN has_modify_form -->
-				<div class="editPanelImitation hide" id='modify_link_form_{LIST_ITEM_ID}'>
-					<form class='modifyForm' action='/eportfolio/component/linklist/modifyForm.php' method="post">
-						<input type='hidden' name='action' value='updateItem' />
-						<input type='hidden' name='userId' value='{ID}' />
-						<input type='hidden' name='pageId' value='{PAGE_ID}' />
-						<input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
-						<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <ul class="action-list">
+                    <!-- BEGIN list_item -->
+                    <li class="row" data-list-item-basic='{LIST_ITEM_ID}'>
+                        <div class="small-10 columns no-pad">
+                            <div class="avatar card" data-content-row="{LIST_ITEM_ID}">
+                                <a rel="{LIST_ITEM_TARGET}" href='{LIST_ITEM_ENCODED_URL}'>
+                                    <img src="/images/mime/60x60/html.png" alt="{LIST_ITEM_TITLE}" class="content" />
+                                    <h3>{LIST_ITEM_TITLE}</h3>
+                                    <p class="meta">{LIST_ITEM_URL}</p>
+                                </a>
+                            </div>
 
-						<div class="title"><span>Title: </span>
-							<input type='text' class="firstFocus" name='title' value='{LIST_ITEM_TITLE}' />
-						</div>
-						<div class="content"><span>Link address: </span>
-							<input type='text' name='content' value='{LIST_ITEM_URL}' />
-						</div>
+                            <!-- BEGIN has_modify_form -->
+                            <div class="content hide" data-create-panel="{LIST_ITEM_ID}">
+                                <form class='modifyForm' action='/eportfolio/component/linklist/modifyForm.php' method="post">
+                                    <input type='hidden' name='action' value='updateItem' />
+                                    <input type='hidden' name='userId' value='{ID}' />
+                                    <input type='hidden' name='pageId' value='{PAGE_ID}' />
+                                    <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
+                                    <input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
 
-						<input type='submit' value='Update' />
-					</form>
-				</div>
-				<!-- END has_modify_form -->
-			</li>
-			<!-- END list_item -->
-		</ul>
+                                    <label>
+                                        Title
+                                        <input type='text' name='title' value='{LIST_ITEM_TITLE}' data-first-focus />
+                                    </label>
+                                    <label>
+                                        Link Address
+                                        <input type='text' name='content' value='{LIST_ITEM_URL}' />
+                                    </label>
+
+                                    <input type='submit' value='Update' />
+                                </form>
+                            </div>
+                            <!-- END has_modify_form -->
+                        </div>
+                        <div class="two actions">
+                            <!-- BEGIN has_delete_form -->
+                            <a class="icon-delete no-text" title="Remove link" href="/eportfolio/component/linklist/modifyForm.php?action=removeItem&userId={USER_ID}&pageId={PAGE_ID}&componentInstanceId={COMPONENT_INSTANCE_ID}&listItemId={LIST_ITEM_ID}" data-delete></a>
+                            <!-- END has_delete_form -->
+
+                            <!-- BEGIN has_modify_button -->
+                            <a class='icon-modify no-text' data-list-item-id='{LIST_ITEM_ID}' title="Edit item"></a>
+                            <!-- END has_modify_button -->
+                        </div>
+                    </li>
+                    <!-- END list_item -->
+                </ul>
+
+                <!-- BEGIN has_create_form -->
+                <div class="content">
+                    <a href="#" class="button icon-add" data-create>Add to List</a>
+
+                    <div class="hide" data-create-panel="new">
+                        <form action='/eportfolio/component/linklist/modifyForm.php' method='post'>
+                            <input type='hidden' name='action' value='addItem' />
+                            <input type='hidden' name='userId' value='{ID}' />
+                            <input type='hidden' name='pageId' value='{PAGE_ID}' />
+                            <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
+
+                            <label>
+                                Title
+                                <input type='text' name='title' value='' />
+                            </label>
+
+                            <label>
+                                Link Address
+                                <input type='text' name='content' value='' />
+                            </label>
+
+                            <input type='submit' value='Add item' />
+                        </form>
+                    </div>
+                </div>
+                <!-- END has_create_form -->
+            </section>
+        </div>
     </div>
-    <!-- BEGIN has_create_form -->
-	<a href="#" class="btn add create_link"><span></span>Add to List</a>
-
-    <div class="editPanelImitation hide">
-        <form action='/eportfolio/component/linklist/modifyForm.php' method='post'>
-            <input type='hidden' name='action' value='addItem' />
-            <input type='hidden' name='userId' value='{ID}' />
-            <input type='hidden' name='pageId' value='{PAGE_ID}' />
-            <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
-            <div class="title"><span>Title: </span>
-                <input type='text' name='title' value='' />
-            </div>
-            <div class="content"><span>Link address: </span>
-                <input type='text' name='content' value='' />
-            </div>
-
-            <input type='submit' value='Add item' />
-        </form>
-    </div>
-    <!-- END has_create_form -->
 </div>
+
+
+
+
+
