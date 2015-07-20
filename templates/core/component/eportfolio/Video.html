@@ -22,33 +22,37 @@
                     <!-- END default_video -->
                 </div>
                 <div data-dz-wrap class="dropzone-wrap">
-                    <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post" data-accepts="video">
-                        <ul class="information-list">
-                            <!-- BEGIN video_list -->
-                            <li class="row">
-                                <div class="avatar-card">
-                                    <a href="#" data-media-id="{VIDEO_LIST_ID}">
-                                        <img src="/cms/videoThumb.php?type=myfile&id={VIDEO_LIST_ID}" />
-                                        <p>{VIDEO_LIST_TITLE}</p>
-                                    </a>
-                                    <p class="meta">{VIDEO_LIST_DURATION} | Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
-                                </div>
-                                <article>{VIDEO_LIST_COMMENT}</article>
-                            </li>
-                            <!-- END video_list -->
-                            <!-- BEGIN video_pending_list -->
-                            <li class="row">
-                                <div class="avatar-card">
-                                    <img src="{VIDEO_LIST_STATUSIMG}" title="Currently transcoding {VIDEO_LIST_TITLE}" />
+                    <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post" data-accepts="video"></form>
+                    <ul class="information-list">
+                        <!-- BEGIN video_list -->
+                        <li class="row">
+                            <div class="avatar-card">
+                                <a href="#" data-media-id="{VIDEO_LIST_ID}">
+                                    <img src="/cms/videoThumb.php?type=myfile&id={VIDEO_LIST_ID}" />
                                     <p>{VIDEO_LIST_TITLE}</p>
-                                    <p class="meta">Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
-                                </div>
-                                <article>{VIDEO_LIST_COMMENT}</article>
-                            </li>
-                            <!-- END video_pending_list -->
-                        </ul>
-                    </form>
+                                </a>
+                                <p class="meta">{VIDEO_LIST_DURATION} | Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
+                            </div>
+                            <article>{VIDEO_LIST_COMMENT}</article>
+                        </li>
+                        <!-- END video_list -->
+                        <!-- BEGIN video_pending_list -->
+                        <li class="row">
+                            <div class="avatar-card">
+                                <img src="{VIDEO_LIST_STATUSIMG}" title="Currently transcoding {VIDEO_LIST_TITLE}" />
+                                <p>{VIDEO_LIST_TITLE}</p>
+                                <p class="meta">Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
+                            </div>
+                            <article>{VIDEO_LIST_COMMENT}</article>
+                        </li>
+                        <!-- END video_pending_list -->
+                    </ul>
                 </div>
+                <!-- BEGIN submit_video -->
+                <div class="content">
+                    <a href="/cms/myFile/new/{ID}/0/{COMPONENT_INSTANCE_ID}" class="button icon-upload">Post Video</a>
+                </div>
+                <!-- END submit_video -->
             </section>
         </div>
     </div>
@@ -69,13 +73,6 @@
             video.setSrc($target);
             video.setPoster($poster);
         });
-    </script>
-
-    <!-- BEGIN submit_video -->
-    <p class="interact">
-        <a href="/cms/myFile/new/{ID}/0/{COMPONENT_INSTANCE_ID}" class="btn up-arrow"><span></span>Post Video</a>
-    </p>
-    <script type="text/javascript">
         $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
             wrapClass: 'dragging',
             previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
@@ -97,5 +94,4 @@
             }
         });
     </script>
-    <!-- END submit_video -->
 </div>
