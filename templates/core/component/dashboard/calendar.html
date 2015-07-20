@@ -1,37 +1,31 @@
-<style type="text/css">
-    .hidden-fields {
-        display: none;
-    }
-</style>
-
 <div id="component{COMPONENT_INSTANCE_ID}" data-component="{COMPONENT_INSTANCE_ID}">
     {CONFIGURATION}
 
     <div class="row">
         <div class="small-12 island">
+            <!-- BEGIN day -->
+            <h2 class="subheader">
+                <a href="/calendar/full/{CALENDAR_DATE}/#week">{LIST_DATE}</a>
+            </h2>
             <section>
-                <!-- BEGIN day -->
                 <ul class="activity-list">
-                    <li class="row">
-                        <div class="small-12 columns">
-                            <h3><a href="/calendar/full/{CALENDAR_DATE}/#week">{LIST_DATE}</a></h3>
-                        </div>
-                    </li>
                     <!-- BEGIN note_block -->
                     <!-- twig calendar events go here -->
                     <!-- END note_block -->
+                    <!-- BEGIN no_events -->
+                    <li class="row">
+                        <div class="row">
+                            <div class="twelve-column">
+                                <em>There are no upcoming events.</em>
+                            </div>
+                        </div>
+                    </li>
+                    <!-- END no_events -->
                 </ul>
-
-                <!-- BEGIN no_events -->
-                <div class="row">
-                    <div class="small-12 columns">
-                        <em>There are no upcoming events.</em>
-                    </div>
-                </div>
-                <!-- END no_events -->
                 <!-- END day -->
             </section>
         </div>
+        <!-- END day -->
     </div>
 </div>
 

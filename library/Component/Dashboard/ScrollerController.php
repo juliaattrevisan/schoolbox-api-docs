@@ -76,7 +76,13 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         /* Hide header bar if desired
          */
         if ($this->getConfig('compactMode')) {
-            $this->setVar('CONFIGURATION', '');
+            $this->setVar(
+                array(
+                    'has_header_block' => ''
+                )
+            );
+        } else {
+            $this->parse('has_header_block', 'has_header');
         }
 
         // Make sure there a config option
