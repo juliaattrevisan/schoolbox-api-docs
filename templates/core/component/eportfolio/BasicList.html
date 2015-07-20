@@ -14,7 +14,7 @@
 
                 /* Hide actual content
                  */
-                var content = $('#component{COMPONENT_INSTANCE_ID}').find('[data-list-item-basic='+id+']');
+                var content = $('#component{COMPONENT_INSTANCE_ID}').find('[data-content-row='+id+']');
                 content.addClass('hide');
             });
 
@@ -51,7 +51,7 @@
                     <!-- BEGIN list_item -->
                     <li class="row" data-list-item-basic='{LIST_ITEM_ID}'>
                         <div class="small-10 columns no-pad">
-                            <div class="info card">
+                            <div class="info card" data-content-row="{LIST_ITEM_ID}">
                                 <h3>{LIST_ITEM_CONTENT}</h3>
                             </div>
 
