@@ -19,6 +19,8 @@ use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 use SocialStream\UrlDetection;
 
 class Creational extends AbstractFactory {
@@ -335,7 +337,17 @@ class Creational extends AbstractFactory {
 		$this->getProduct()->setRootId($data['rootId']);
 		$this->getProduct()->setParentId($data['parentId']);
 		$this->getProduct()->setHomepageId($data['homepageId']);
-		$this->getProduct()->setOwnerId($data['ownerId']);
+		// Owner ID is probably passed as an int value, convert to actual user
+		$owner = $data['ownerId'];
+		if (!$owner instanceof User) {
+			$userMapper = new UserMapper();
+			try {
+				$owner = $userMapper->findById($owner);
+			} catch (\Schoolbox\Mapper\Exception $e) {
+				// noop: retain blank user
+			}
+		}
+		$this->getProduct()->setOwner($owner);
 		$this->getProduct()->setBody(trim($data['body']));
 		$this->getProduct()->setCreatedAt($data['requestTime']);
 		$this->getProduct()->setUpdatedAt($data['requestTime']);
