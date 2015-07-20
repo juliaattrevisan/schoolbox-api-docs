@@ -246,6 +246,41 @@
                 </div>
             </div>
 
+            <!--------------------->
+            <!-- Component Tab 3 -->
+            <!--------------------->
+            <div id="eportfolio-page-controls-tab-3" class="content">
+                <form method='post' action='/eportfolio/configForm.php'>
+                    <input type='hidden' name='user_id' value='{ID}' />
+                    <input type='hidden' name='page_id' value='{PAGE_ID}' />
+
+                    <label>
+                        Page Title
+                        <span class="hint has-tip tip-tip" data-tooltip title="Specify a title for this page.">?</span>
+
+                        <input type='text' name='pageTitle' value="{PAGE_TITLE}" />
+                    </label>
+
+                    <input type="submit" value="Update Page" />
+                </form>
+            </div>
+
+            <!--------------------->
+            <!-- Component Tab 5 -->
+            <!--------------------->
+            <div id="eportfolio-page-controls-tab-5" class="content">
+                <form method='post' action='/eportfolio/configForm.php'>
+                    <input type='hidden' name='page_id' value='{PAGE_ID}' />
+                    <input type='hidden' name='deletePage' value='true' />
+
+                    <label>
+                        Delete Page
+                        <span class="hint has-tip tip-top" data-tooltip title="Remove this page from your ePortfolio.">?</span>
+                    </label>
+
+                    <input type='submit' value='Delete page' />
+                </form>
+            </div>
 
         </section>
     </div>
@@ -339,28 +374,6 @@
         <div class="clearfix"></div>
 	</div>
 
-    <div id="tabs-3" class="customise-components">
-        <div class="clearfix">
-            <form method='post' action='/eportfolio/configForm.php'>
-                <table class="standardForm table">
-                    <tr>
-                        <td class="formLabelWidth">
-                            <h4>Page Title</h4>
-                            <em>Specify a title for this page</em>
-                        </td>
-                        <td>
-                            <p>
-                                <input type='text' name='pageTitle' value="{PAGE_TITLE}" />
-                                <input type='hidden' name='user_id' value='{ID}' />
-                                <input type='hidden' name='page_id' value='{PAGE_ID}' />
-                                <input type="submit" label="Submit" value="Update Page" class="submit-btn-plain" style="float:none;"/>
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </form>
-        </div>
-    </div>
 
 	<div id="tabs-4" class="customise-components">
 		<div class="clearfix">
@@ -410,27 +423,7 @@
 		</div>
 	</div>
 
-    <div id="tabs-5" class="customise-components">
-        <div class="clearfix">
-            <form method='post' action='/eportfolio/configForm.php'>
-                <table class="standardForm table">
-                    <tr>
-                        <td class="formLabelWidth">
-                            <h4>Delete Page</h4>
-                            <em>Remove this page from your ePortfolio</em>
-                        </td>
-                        <td>
-                            <p>
-                                <input type='hidden' name='page_id' value='{PAGE_ID}' />
-                                <input type='hidden' name='deletePage' value='true' />
-                                <input type='submit' label="Submit" value='Delete page' class="submit-btn-plain" style="float:none;"/>
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </form>
-        </div>
-    </div>
+
 </div>
 <!-- END customise_page -->
 
