@@ -45,7 +45,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
 
         $this->hasMap(array(
             'column'   => 'owner_id',
-            'property' => 'ownerId',
+            'property' => 'owner',
             'type'     => self::TYPE_MODEL,
             'join'     => 'user',
         ));
