@@ -52,6 +52,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 		$this->setBlock('list_item', 'has_modify_form', 'has_modify_form_block');
 		$this->setBlock('list_item', 'has_delete_form', 'has_delete_form_block');
 		$this->setBlock('list_item', 'has_image', 'has_image_block');
+        $this->setBlock('list_item', 'no_image', 'no_image_block');
 		$this->setBlock('has_modify_form', 'has_image_modify', 'has_image_modify_block');
 
 		$this->setVar(array(
@@ -60,6 +61,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 			'has_image_modify_block' => '',
 			'has_delete_form_block' => '',
 			'has_image_block' => '',
+            'no_image_block' => '',
 			'list_item_block' => '',
 		));
 
@@ -75,14 +77,11 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $instance_id);
 
 		if ($allItems->count()) {
-			$j = 0;
-
 			foreach ($allItems as $currentItem ) {
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
 					'LIST_ITEM_TITLE' => Scrub::text($currentItem->getTitle()),
 					'LIST_ITEM_CONTENT' => Scrub::text($currentItem->getContent()),
-					'ON_OFF' => ++$j % 2 ? '' : 'dark'
 				));
 
 				/* Parse out the image if one was assigned
@@ -95,6 +94,9 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 					$this->parse('has_image_block', 'has_image');
 					$this->parse('has_image_modify_block', 'has_image_modify');
 				}
+                else {
+                    $this->parse('no_image_block', 'no_image');
+                }
 
 				/* Controls
 				 */
@@ -109,6 +111,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 				/* Clear children after parsing out the parent
 				 */
 				$this->setVar('has_image_block', '');
+                $this->setVar('no_image_block', '');
 				$this->setVar('has_modify_button_block', '');
 				$this->setVar('has_modify_form_block', '');
 				$this->setVar('has_delete_form_block', '');
