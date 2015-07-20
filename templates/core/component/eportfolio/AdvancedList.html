@@ -15,7 +15,7 @@
 
                 /* Hide actual content
                  */
-                var content = $('#component{COMPONENT_INSTANCE_ID}').find('[data-list-item-advanced-content='+id+']');
+                var content = $('#component{COMPONENT_INSTANCE_ID}').find('[data-content-row='+id+']');
                 content.addClass('hide');
             });
 
@@ -54,7 +54,7 @@
                         <div class="small-10 columns no-pad">
 
                             <!-- BEGIN has_image -->
-                            <div class="avatar-card clearfix">
+                            <div class="avatar-card clearfix" data-content-row="{LIST_ITEM_ID}">
                                 <a href="/storage/image.php?size=maxsize&hash={LIST_ITEM_IMAGEHASH}" rel="lightbox[eportfolio-{COMPONENT_INSTANCE_ID}]" title="{LIST_ITEM_TITLE}">
                                     <img src="/storage/image.php?size=square64&hash={LIST_ITEM_IMAGEHASH}" alt="{LIST_ITEM_TITLE}" />
                                     <p>{LIST_ITEM_TITLE}</p>
@@ -66,7 +66,7 @@
                             <!-- END has_image -->
 
                             <!-- BEGIN no_image -->
-                            <div class="info card">
+                            <div class="info card" data-content-row="{LIST_ITEM_ID}">
                                 <h3>{LIST_ITEM_TITLE}</h3>
                                 <article>
                                     <p class="meta">{LIST_ITEM_CONTENT}</p>
