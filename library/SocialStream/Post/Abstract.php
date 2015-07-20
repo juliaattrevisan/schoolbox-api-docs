@@ -134,6 +134,7 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable {
 	 */
 	public function __construct() {
 		$this->setChildren(new Schoolbox\Collection());
+		$this->setOwner(new User());
 	}
 
 	/**
