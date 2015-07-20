@@ -169,7 +169,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
             $postItem = $this->hydrate($row, 'p');
 
             $userItem = $user_mapper->hydrate($row, 'u');
-            $postItem->setOwnerId($userItem);
+            $postItem->setOwner($userItem);
 
             $this->throwIfDeleted($postItem);
 
@@ -258,7 +258,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
             $postItem = $this->hydrate($row, 'p');
             $userItem = $user_mapper->hydrate($row, 'u');
 
-            $postItem->setOwnerId($userItem);
+            $postItem->setOwner($userItem);
 
             $collection->add($postItem);
         }
@@ -307,7 +307,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
             $postItem = $this->hydrate($row, 'p');
             $userItem = $user_mapper->hydrate($row, 'u');
 
-            $postItem->setOwnerId($userItem);
+            $postItem->setOwner($userItem);
 
             $collection->add($postItem);
         }
@@ -351,7 +351,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
             $postItem = $this->hydrate($row, 'p');
             $userItem = $user_mapper->hydrate($row, 'u');
 
-            $postItem->setOwnerId($userItem);
+            $postItem->setOwner($userItem);
 
             $collection->add($postItem);
         }

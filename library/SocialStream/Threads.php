@@ -306,9 +306,9 @@ class Threads
                     'SOCIALSTREAM_POST_POST_ID'          => $currentPost->getPostId(),
                     'SOCIALSTREAM_POST_BODY'             => nl2br(\Scrub::text($currentPost->getBody())),
                     'SOCIALSTREAM_POST_CREATED_AT'       => $currentPost->getCreatedAt()->getRelativeTime(),
-                    'SOCIALSTREAM_POST_USER_ID'          => $currentPost->getOwnerId()->getId(),
-                    'SOCIALSTREAM_POST_USER_EXTERNAL_ID' => $currentPost->getOwnerId()->getExternalId(),
-                    'SOCIALSTREAM_POST_USER_FULLNAME'    => \Scrub::text($currentPost->getOwnerId()->getFullname()),
+                    'SOCIALSTREAM_POST_USER_ID'          => $currentPost->getOwner()->getId(),
+                    'SOCIALSTREAM_POST_USER_EXTERNAL_ID' => $currentPost->getOwner()->getExternalId(),
+                    'SOCIALSTREAM_POST_USER_FULLNAME'    => \Scrub::text($currentPost->getOwner()->getFullname()),
                     'SOCIALSTREAM_POST_TIMESTAMP'        => $currentPost->getCreatedAt()->getUnixTimestamp(),
                     'ON_OFF'                             => $i % 2 ? 'dark' : '',
                 )
@@ -370,9 +370,9 @@ class Threads
                         'SOCIALSTREAM_COMMENT_POST_ID'          => $currentComment->getPostId(),
                         'SOCIALSTREAM_COMMENT_BODY'             => nl2br(\Scrub::text($currentComment->getBody())),
                         'SOCIALSTREAM_COMMENT_CREATED_AT'       => $currentComment->getCreatedAt()->getRelativeTime(),
-                        'SOCIALSTREAM_COMMENT_USER_ID'          => $currentComment->getOwnerId()->getId(),
-                        'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => $currentComment->getOwnerId()->getExternalId(),
-                        'SOCIALSTREAM_COMMENT_USER_FULLNAME'    => \Scrub::text($currentComment->getOwnerId()->getFullname()),
+                        'SOCIALSTREAM_COMMENT_USER_ID'          => $currentComment->getOwner()->getId(),
+                        'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => $currentComment->getOwner()->getExternalId(),
+                        'SOCIALSTREAM_COMMENT_USER_FULLNAME'    => \Scrub::text($currentComment->getOwner()->getFullname()),
                     )
                 );
 
@@ -432,9 +432,9 @@ class Threads
                             'SOCIALSTREAM_REPLY_POST_ID'          => $currentReply->getPostId(),
                             'SOCIALSTREAM_REPLY_BODY'             => nl2br(\Scrub::text($currentReply->getBody())),
                             'SOCIALSTREAM_REPLY_CREATED_AT'       => $currentReply->getCreatedAt()->getRelativeTime(),
-                            'SOCIALSTREAM_REPLY_USER_ID'          => $currentReply->getOwnerId()->getId(),
-                            'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => $currentReply->getOwnerId()->getExternalId(),
-                            'SOCIALSTREAM_REPLY_USER_FULLNAME'    => \Scrub::text($currentReply->getOwnerId()->getFullname()),
+                            'SOCIALSTREAM_REPLY_USER_ID'          => $currentReply->getOwner()->getId(),
+                            'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => $currentReply->getOwner()->getExternalId(),
+                            'SOCIALSTREAM_REPLY_USER_FULLNAME'    => \Scrub::text($currentReply->getOwner()->getFullname()),
                         )
                     );
 
@@ -589,7 +589,7 @@ class Threads
     /**
      * Get tree
      *
-     * @return null
+     * @return \SocialStream_Post_Abstract[]
      */
     private function getTree()
     {

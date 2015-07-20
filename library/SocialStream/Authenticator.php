@@ -120,7 +120,7 @@ class Authenticator
         /* Post/Comment/Reply owner can softdelete a post's children regardless
          * of their children's owner_ids
          */
-        if ($this->getCurrentUser()->getId() == $this->getNewPost()->getOwnerId()->getId()) {
+        if ($this->getCurrentUser()->getId() == $this->getNewPost()->getOwner()->getId()) {
             return true;
         }
 
@@ -261,7 +261,7 @@ class Authenticator
      *
      * Public for setting values from within a loop
      *
-     * @param null $newPost
+     * @param \SocialStream_Post_Abstract $newPost
      */
     public function setNewPost($newPost)
     {
@@ -271,7 +271,7 @@ class Authenticator
     /**
      * Get new post
      *
-     * @return null
+     * @return \SocialStream_Post_Abstract
      */
     private function getNewPost()
     {

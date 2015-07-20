@@ -191,7 +191,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
             return $envelope;
         }
 
-        $parentAuthorId = $parent->getOwnerId();
+        $parentAuthorId = $parent->getOwner()->getId();
 
         // compensate for inconsistent return types -_-
         if ($parentAuthorId instanceof User) {
@@ -307,7 +307,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
 
         foreach($posts as $post) {
             try {
-                $owner = $this->userMapper->findById($post->getOwnerId());
+                $owner = $this->userMapper->findById($post->getOwner()->getId());
             } catch (Mapper\Exception $e) {
                 $owner = new User();
                 $owner->setFirstname('Unknown')->setLastname('User')->setId(0);
