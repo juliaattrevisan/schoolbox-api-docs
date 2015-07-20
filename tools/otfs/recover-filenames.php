@@ -40,7 +40,7 @@ $tables = [
     'storage'            => [ 'storage_id', 'filename', 'hash' ],
     'file'               => [ 'id', 'realname', 'description' ],
     'myFile'             => [ 'id', 'realname', 'description' ],
-    'student_submission' => [ 'id', 'realname', 'id' ],
+    'student_submission' => [ 'id', 'realname', 'hash' ],
     'submission_return'  => [ 'id', 'filename', null ],
     'dropbox'            => [ 'id', 'realname', 'description' ]
 ];
