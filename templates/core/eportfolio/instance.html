@@ -170,30 +170,84 @@
 <!-- END modify_layout -->
 <!-- END custom_head -->
 
-<h1>{HEADING} - {PAGE_TITLE}</h1>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{HEADING} - {PAGE_TITLE}</h1>
+
+        <ul class='sub-nav'>
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
+            <!-- BEGIN showcase_page -->
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
+            <!-- END showcase_page -->
+            <!-- BEGIN eportfolio_page -->
+            <li {EPORTFOLIO_CURRENT_PAGE}><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
+            <!-- END eportfolio_page -->
+            <!-- BEGIN can_add_page -->
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="button icon-add">Add page</a></li>
+            <!-- END can_add_page -->
+        </ul>
+    </div>
+</div>
 
 <!-- BEGIN edit_page -->
-<dl class="tabs" data-tab id="eportfolio-page-controls">
-    <dd><a class="icon-delete" id="tabs-5" title="Delete this page"></a></dd>
-    <dd><a class="icon-modify" id="tabs-4" title="Change Permissions"></a></dd>
-    <dd><a class="icon-modify" id="tabs-3" title="Edit the page title"></a></dd>
-    <dd><a class="icon-modify" id="tabs-2" title="Edit columns"></a></dd>
-    <dd><a class="icon-modify" id="tabs-1" title="Add components"></a></dd>
-</dl>
+<div class="row">
+    <div class="small-12 columns">
+        <dl class="tabs" data-tab id="eportfolio-page-controls">
+            <dd><a class="icon-modify" href="#eportfolio-page-controls-tab-1" title="Add components"></a></dd>
+            <dd><a class="icon-modify" href="#eportfolio-page-controls-tab-2" title="Edit columns"></a></dd>
+            <dd><a class="icon-modify" href="#eportfolio-page-controls-tab-3" title="Edit the page title"></a></dd>
+            <dd><a class="icon-modify" href="#eportfolio-page-controls-tab-4" title="Change Permissions"></a></dd>
+            <dd><a class="icon-delete" href="#eportfolio-page-controls-tab-5" title="Delete this page"></a></dd>
+        </dl>
+    </div>
+</div>
 <!-- END edit_page -->
 
-<ul class='sub-nav'>
-    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
-    <!-- BEGIN showcase_page -->
-    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
-    <!-- END showcase_page -->
-    <!-- BEGIN eportfolio_page -->
-    <li {EPORTFOLIO_CURRENT_PAGE}><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
-    <!-- END eportfolio_page -->
-    <!-- BEGIN can_add_page -->
-    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="button icon-add">Add page</a></li>
-    <!-- END can_add_page -->
-</ul>
+
+<!-- BEGIN customise_page -->
+<div class="row">
+    <div class="small-12 island">
+        <section class="tabs-content">
+            <div id="eportfolio-page-controls-tab-1" class="content">
+                <!-- BEGIN no_eportfolio_components -->
+                <p>No components are available for you to add.</p>
+                <!-- END no_eportfolio_components -->
+
+                <div id="tabs-sub">
+                    <ul class="ui-tabs admin-nav">
+                        <!-- BEGIN eportfolio_component_tab -->
+                        <li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
+                        <!-- END eportfolio_component_tab -->
+                    </ul>
+                    <div class="components clearfix">
+                        <!-- BEGIN eportfolio_component_page -->
+                        <div id="tabs-sub-{EPORTFOLIO_COMPONENT_CATEGORY_ID}">
+                            <!-- BEGIN eportfolio_component -->
+                            <div class="add-component clearfix {EPORTFOLIO_COMPONENT_MULTIPLE_STATE}">
+                                <a href="#"
+                                   rel="{EPORTFOLIO_COMPONENT_DEFINITION_ID} {EPORTFOLIO_COMPONENT_ID}"
+                                   class="{EPORTFOLIO_COMPONENT_CLASS}"
+                                   title="{EPORTFOLIO_COMPONENT_DESCRIPTION}"
+                                        >
+                                    <span class="icon"></span>
+                                    <span class="notification"><strong></strong>Added</span>
+                                    <h4>{EPORTFOLIO_COMPONENT_NAME}</strong></h4>
+                                </a>
+                            </div>
+                            <!-- END eportfolio_component -->
+                        </div>
+                        <!-- END eportfolio_component_page -->
+                    </div>
+                </div>
+            </div>
+
+
+        </section>
+    </div>
+</div>
+
+
+
 
 
 
@@ -208,37 +262,8 @@
 
 
         
-<!-- BEGIN customise_page -->
+
 <div id="tabs-homepage">
-	<div id="tabs-1" class="customise-components">
-		<div id="tabs-sub"> <!-- tabs-sub -->
-			<ul class="ui-tabs admin-nav">
-				<!-- BEGIN eportfolio_component_tab -->
-				<li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
-				<!-- END eportfolio_component_tab -->
-			</ul>
-			<div class="clearfix"></div>
-			<div class="components clearfix">
-				<!-- BEGIN eportfolio_component_page -->
-				<div id="tabs-sub-{EPORTFOLIO_COMPONENT_CATEGORY_ID}">
-					<!-- BEGIN eportfolio_component -->
-					<div class="add-component clearfix {EPORTFOLIO_COMPONENT_MULTIPLE_STATE}">
-						<a href="#"
-						   rel="{EPORTFOLIO_COMPONENT_DEFINITION_ID} {EPORTFOLIO_COMPONENT_ID}"
-						   class="{EPORTFOLIO_COMPONENT_CLASS}"
-						   title="{EPORTFOLIO_COMPONENT_DESCRIPTION}"
-								>
-							<span class="icon"></span>
-							<span class="notification"><strong></strong>Added</span>
-							<h4>{EPORTFOLIO_COMPONENT_NAME}</strong></h4>
-						</a>
-					</div>
-					<!-- END eportfolio_component -->
-				</div>
-				<!-- END eportfolio_component_page -->
-			</div>
-		</div>
-	</div>
 	<!--/tabs-1-->
 
 	<div id="tabs-2" class="customise-components">
