@@ -28,10 +28,10 @@
         </nav>
 
         <!-- BEGIN settings_panel -->
-        <div data-component-panel="settings" class="editPanel small-12 ">
+        <div data-component-panel="settings" class="editPanel small-12">
             <section>
                 <div>
-                    <form action="/eportfolio/configForm.php" method="GET">
+                    <form action="/eportfolio/configForm.php" method="post">
                         <input type="hidden" name="user_id" value="{USER_ID}"/>
                         <input type="hidden" name="page_id" value="{PAGE_ID}"/>
                         <input type="hidden" name="type" value="config"/>
@@ -49,7 +49,7 @@
         </div>
         <!-- END settings_panel -->
 
-        <div data-component-panel='delete' class="editPanel small-12 ">
+        <div data-component-panel='delete' class="editPanel small-12">
             <section>
                 <div>
                     <p>Are you sure you want to remove this component?</p>
