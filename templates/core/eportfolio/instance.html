@@ -32,8 +32,6 @@
     <!-- END allowed_files -->
 </style>
 <!-- BEGIN modify_layout -->
-<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
-<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript" src="/javascript/components/tinycolor/tinycolor.js"></script>
 <script type="text/javascript" src="/javascript/jquery.component.js"></script>
 <link rel="stylesheet" type="text/css" href="/javascript/components/spectrum/spectrum.css" />
@@ -44,7 +42,6 @@
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/javascript/jquery.masonry.js"></script>
 <script type="text/javascript" src="/javascript/jquery.masonry.spectrum.js"></script>
-<script type="text/javascript" src="/javascript/jquery.droptab.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 <script type="text/javascript">
 
@@ -168,54 +165,49 @@
 				dataType: 'json'
 			}
 		});
-
-        $('#tabs-homepage').droptab({
-            buttonSelector: '#tab-control a.btn',
-            tabSelector: '> div.customise-components',
-            onOpen: function () {
-                if (this.id == 'tab-component') {
-                    $('#e-portfolio').addClass('show-empty');
-                } else {
-                    $('#e-portfolio').removeClass('show-empty');
-                }
-            },
-            onClose: function () {
-                $('#e-portfolio').removeClass('show-empty');
-            }
-        });
-
     });
 </script>
 <!-- END modify_layout -->
 <!-- END custom_head -->
 
-<h1><span>{HEADING}</span> - {PAGE_TITLE}</h1>
+<h1>{HEADING} - {PAGE_TITLE}</h1>
 
-<ul id="tab-control" class="homepage-controls clearfix">
-    <!-- BEGIN edit_page -->
-    <li><a id="tab-delete" class="btn homepage-delete no-text" data-tab="tabs-5" title="Delete this page"><span></span></a></li>
-    <li><a id="tab-permissions" class="btn homepage-permissions no-text" data-tab="tabs-4" title="Change Permissions"><span></span></a></li>
-    <li><a id="tab-update" class="btn homepage-edit no-text" data-tab="tabs-3" title="Edit the page title"><span></span></a></li>
-    <li><a id="tab-columns" class="btn homepage-columns no-text" data-tab="tabs-2" title="Edit columns"><span></span></a></li>
-    <li><a id="tab-component" class="btn homepage-component no-text" data-tab="tabs-1" title="Add components"><span></span></a></li>
-    <!-- END edit_page -->
-</ul>
+<!-- BEGIN edit_page -->
+<dl class="tabs" data-tab id="eportfolio-page-controls">
+    <dd><a class="icon-delete" id="tabs-5" title="Delete this page"></a></dd>
+    <dd><a class="icon-modify" id="tabs-4" title="Change Permissions"></a></dd>
+    <dd><a class="icon-modify" id="tabs-3" title="Edit the page title"></a></dd>
+    <dd><a class="icon-modify" id="tabs-2" title="Edit columns"></a></dd>
+    <dd><a class="icon-modify" id="tabs-1" title="Add components"></a></dd>
+</dl>
+<!-- END edit_page -->
 
-<ul class='admin-nav'>
+<ul class='sub-nav'>
     <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
     <!-- BEGIN showcase_page -->
     <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
     <!-- END showcase_page -->
     <!-- BEGIN eportfolio_page -->
-    <li><a {EPORTFOLIO_CURRENT_PAGE} href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
+    <li {EPORTFOLIO_CURRENT_PAGE}><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
     <!-- END eportfolio_page -->
     <!-- BEGIN can_add_page -->
-    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="add"><span></span> Add page</a></li>
+    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="button icon-add">Add page</a></li>
     <!-- END can_add_page -->
 </ul>
 
-<div class='clearfix'></div>
 
+
+
+
+
+
+
+
+
+
+
+
+        
 <!-- BEGIN customise_page -->
 <div id="tabs-homepage">
 	<div id="tabs-1" class="customise-components">
@@ -416,7 +408,7 @@
 </div>
 <!-- END customise_page -->
 
-<div id="e-portfolio" class="homepage clearfix">
+<div id="e-portfolio" class="homepage">
     <div class="column top clearfix" data-position="top">{component_position_top}</div>
     <div class="column left clearfix" data-position="left" style="width: {TEMPLATE_LEFT_COLUMN_WIDTH}%">{component_position_left}</div>
     <div class="column right clearfix" data-position="right" style="width: {TEMPLATE_RIGHT_COLUMN_WIDTH}%">{component_position_right}</div>

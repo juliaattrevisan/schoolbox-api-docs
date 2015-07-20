@@ -185,7 +185,7 @@ abstract class Eportfolio_Page_Abstract {
 					$this->getPage()->setVar(array(
 						'EPORTFOLIO_PAGE_ID' => $currentPage->getPageId(),
 						'EPORTFOLIO_PAGE_NAME' => $currentPage->getPageTitle(),
-						'EPORTFOLIO_CURRENT_PAGE' => $currentPage->getPageId()==$this->getPageId()?'class="current"':'',
+                        'EPORTFOLIO_CURRENT_PAGE' => $currentPage->getPageId() == $this->getPageId() ? 'class="active"' : '',
 					));
 
 					$this->getPage()->parse('eportfolio_page_block', 'eportfolio_page', true);
