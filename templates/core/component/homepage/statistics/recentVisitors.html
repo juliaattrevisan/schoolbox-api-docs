@@ -1,14 +1,19 @@
-<div class="box">
-<h2>Recent Visitors</h2>
-<ul class="information-list grid">
-    <!-- BEGIN recent_visitor -->
-    <li>
-		<a title="{VISITOR_TOOLTIP}" class="author" href="/search/user/{VISITOR_ID}">
-			<img class="thumbnail" height="64" width="64" src="{VISITOR_THUMB}" />
-			<h4>{VISITOR_NAME}</h4>
-		</a>
-		<p class="meta">{VISITOR_GROUP}</p>
-	</li>
-    <!-- END recent_visitor -->
-</ul>
+<div class="small-12 island">
+    <h2 class="subheader">Recent Visitors</h2>
+    <section>
+        <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-3">
+            <!-- BEGIN recent_visitor -->
+            <li>
+                <div class="avatar-card clearfix">
+                    <a href="/search/user/{VISITOR_ID}" title="View Profile">
+                        <img src="{VISITOR_THUMB}" alt="View Profile" />
+
+                        <p>{VISITOR_NAME}</p>
+                    </a>
+                    <p class="meta">{VISITOR_GROUP}</p>
+                </div>
+            </li>
+            <!-- END recent_visitor -->
+        </ul>
+    </section>
 </div>
