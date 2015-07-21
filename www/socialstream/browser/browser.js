@@ -122,7 +122,7 @@ try {
 			 /* Resize dialog proportionally to window
 			  */
 			$j(window).resize(function (event) {
-				$j('.socialstream-browser').height($j(window).height() * 0.75);
+				$j('[data-socialstream-browser]').height($j(window).height() * 0.75);
 			});
 		}
 

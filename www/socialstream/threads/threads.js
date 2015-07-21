@@ -90,7 +90,7 @@
 
 				/* The form which spawns when making comments and replies
 				 */
-				addPostForm: '.addPostForm',
+				addPostForm: '[data-add-post-form]',
 
 				/* The element which allows you to spawn more
 				 */
@@ -139,7 +139,7 @@
 				// Does this have a post form already? If so, don't add it back
 				// after it gets removed.
 				var body = $j(this).closest('li').find('> .body');
-				var hasPostForm = (body.find('form.addPostForm').length > 0)
+				var hasPostForm = (body.find('[data-add-post-form]').length > 0)
 
 				/* Clear out all instances of .addPostForm in the socialstream
 				 */
@@ -184,7 +184,7 @@
 
 				/* Steal focus
 				 */
-				$(this).closest('li').find('.socialstream-form').find('textarea').focus();
+				$(this).closest('li').find('[data-socialstream-form]').find('textarea').focus();
 			});
 		}
 
