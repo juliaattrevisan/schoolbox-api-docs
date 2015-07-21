@@ -54,27 +54,42 @@ class Component_Homepage_Statistics_RecentVisitorsController extends Component_H
 
         $uHandler = new User();
         $this->setBlock($templateHandle, 'recent_visitor', 'recent_visitor_block');
-
-        for ($i = 0; $i < 8 && $i < count($this->visitors); ++$i) {
-            $dtime = new Alaress_Date_Format($this->visitors[$i]['datetime'], 'Y-m-d H:i:s');
-            $this->setVar(
-                array(
-                    'VISITOR_ID' => $this->visitors[$i]['id'],
-                    'VISITOR_THUMB' => sprintf('/portrait.php?userId=%s&size=square64', $this->visitors[$i]['synid']),
-                    'VISITOR_NAME' => $uHandler->formatName($this->visitors[$i]),
-                    'VISITOR_GROUP' => Scrub::text($this->visitors[$i]['gname']),
-                    'VISITOR_TOOLTIP' => sprintf(
-                        "%s (last visited %s)", $uHandler->formatName($this->visitors[$i]),
-                        lcfirst($dtime->getRelativeTime())
-                    )
-                )
-            );
-            $this->parse('recent_visitor_block', 'recent_visitor', true);
-        }
+        $this->setBlock($templateHandle, 'no_recent_visitor', 'no_recent_visitor_block');
 
         if (!count($this->visitors)) {
             $grp = $this->groupType == 'all' ? '' : $this->groupType;
-            $this->setVar('recent_visitor_block', "<p>No recent $grp visitors in this time period.</p>");
+
+            $this->setVar(array(
+                'has_recent_visitor_block' => '',
+                'recent_visitor_block' => '',
+                'NO_VISITOR_GROUP_NAME' => $grp
+            ));
+
+            $this->parse('no_recent_visitor_block', 'no_recent_visitor');
+        }
+        else {
+            for ($i = 0; $i < 8 && $i < count($this->visitors); ++$i) {
+                $dtime = new Alaress_Date_Format($this->visitors[$i]['datetime'], 'Y-m-d H:i:s');
+                $this->setVar(
+                    array(
+                        'VISITOR_ID' => $this->visitors[$i]['id'],
+                        'VISITOR_THUMB' => sprintf('/portrait.php?userId=%s&size=square64', $this->visitors[$i]['synid']),
+                        'VISITOR_NAME' => $uHandler->formatName($this->visitors[$i]),
+                        'VISITOR_GROUP' => Scrub::text($this->visitors[$i]['gname']),
+                        'VISITOR_TOOLTIP' => sprintf(
+                            "%s (last visited %s)", $uHandler->formatName($this->visitors[$i]),
+                            lcfirst($dtime->getRelativeTime())
+                        )
+                    )
+                );
+                $this->parse('recent_visitor_block', 'recent_visitor', true);
+            }
+
+            $this->parse('has_recent_visitor_block', 'has_recent_visitor');
+
+            $this->setVar(array(
+                'no_recent_visitor_block' => ''
+            ));
         }
 
         return true;

@@ -1,6 +1,7 @@
 <div class="small-12 island">
     <h2 class="subheader">Recent Visitors</h2>
     <section>
+        <!-- BEGIN has_recent_visitor -->
         <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-3">
             <!-- BEGIN recent_visitor -->
             <li>
@@ -15,5 +16,13 @@
             </li>
             <!-- END recent_visitor -->
         </ul>
+        <!-- END has_recent_visitor -->
+        <!-- BEGIN no_recent_visitor -->
+        <ul class="information-list">
+            <li class="content">
+                No recent {NO_VISITOR_GROUP_NAME} visitors in this time period.
+            </li>
+        </ul>
+        <!-- END no_recent_visitor -->
     </section>
 </div>
