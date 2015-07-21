@@ -102,7 +102,7 @@
 
 				/* Container div for a loading graphic or message
 				 */
-				loading: $j(element).find('.loading'),
+				loading: $j(element).find('[data-loader]'),
 
 				/* Container div for threads
 				 */
