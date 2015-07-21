@@ -65,7 +65,7 @@
     </div>
     <div class="actions two" data-equalizer-watch="no">
         <!-- BEGIN socialstream_post_has_delete -->
-        <a href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}" class="icon-delete no-text" title='Delete post' onclick="return confirm('Do you want to delete this item?');" data-equalizer-watch></a>
+        <a href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}" class="icon-delete no-text" title='Delete post' data-socialstream-delete data-equalizer-watch></a>
         <!-- END socialstream_post_has_delete -->
 
         <!-- BEGIN socialstream_post_has_add -->
@@ -145,7 +145,7 @@
             </div>
             <div class="actions two" data-equalizer-watch="two">
                 <!-- BEGIN socialstream_comment_has_delete -->
-                <a class="icon-delete no-text" data-equalizer-watch href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}" title="Delete Comment" onclick="return confirm('Do you want to delete this item?');"></a>
+                <a class="icon-delete no-text" data-equalizer-watch href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}" title="Delete Comment" data-socialstream-delete></a>
                 <!-- END socialstream_comment_has_delete -->
 
                 <!-- BEGIN socialstream_comment_has_add -->
@@ -224,7 +224,7 @@
                     </div>
                     <div class="one actions" data-equalizer-watch="three">
                         <!-- BEGIN socialstream_reply_has_delete -->
-                        <a class="icon-delete no-text" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}" title="Delete Reply" onclick="return confirm('Do you want to delete this item?');" data-equalizer-watch></a>
+                        <a class="icon-delete no-text" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}" title="Delete Reply" data-socialstream-delete data-equalizer-watch></a>
                         <!-- END socialstream_reply_has_delete -->
                     </div>
                 </li>

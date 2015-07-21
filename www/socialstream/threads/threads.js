@@ -224,6 +224,18 @@
                     removalDelay: 300,
                     mainClass: 'mfp-fade'
                 });
+
+                config.element.find('[data-socialstream-delete]').unbind('click').click(function(event) {
+                    event.preventDefault();
+
+                    var element = $(this);
+                    $(this).confirmDialog({
+                        text: 'Do you want to delete this item?',
+                        confirmEvent: function() {
+                            window.location.href = element.attr('href');
+                        }
+                    });
+                });
 			});
 
 			/**
