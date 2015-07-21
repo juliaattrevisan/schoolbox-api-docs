@@ -162,7 +162,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                                     'SHOWCASED_WORK_SUBMISSION_FILESIZE' =>
                                         Alaress_Byte_Format::bytesToString($submission->getSize()),
                                     'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $submission->getCreatedAt()->getShort(),
-                                    'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $submission->getMimetype()->getClass(),
+                                    'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $submission->getMimetype()->getIconFile(),
                                 )
                             );
 
