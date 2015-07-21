@@ -55,6 +55,7 @@ class Component_Homepage_Statistics_TopFilesController extends Component_Homepag
         }
 
         $this->setBlock($templateHandle, 'top_file', 'top_file_block');
+        $this->setBlock($templateHandle, 'no_top_file', 'no_top_file_block');
 
         if (count($this->files)) {
             $allowedHandler = new AllowedFile();
@@ -83,8 +84,16 @@ class Component_Homepage_Statistics_TopFilesController extends Component_Homepag
                 );
                 $this->parse('top_file_block', 'top_file', true);
             }
+
+            $this->setVar(array(
+                'no_top_file_block' => ''
+            ));
         } else {
-            $this->setVar('top_file_block', '<p>No files viewed.</p>');
+            $this->setVar(array(
+                'top_file_block' => ''
+            ));
+
+            $this->parse('no_top_file_block', 'no_top_file');
         }
 
         return true;
