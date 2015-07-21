@@ -38,7 +38,7 @@ class External_Isams_Batch_BaseApi
     /**
      * Retrieves a XML document representing the result from the API call.
      *
-     * @return SimpleXMLElement
+     * @return string
      * @throws RuntimeException if the retrieval of the XML doc failed
      */
     public function retrieveDocument()
@@ -52,7 +52,8 @@ class External_Isams_Batch_BaseApi
         $curl = new Alaress_Curl_Url($url);
         $curl->exec();
         if (empty($curl->getErrors())) {
-            return new SimpleXMLElement($curl->getResult());
+            // Too big to parse
+            return $curl->getResult();
         } else {
             throw new RuntimeException(
                 sprintf(
