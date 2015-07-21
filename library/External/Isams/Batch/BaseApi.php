@@ -38,10 +38,11 @@ class External_Isams_Batch_BaseApi
     /**
      * Retrieves a XML document representing the result from the API call.
      *
+     * @param  string $filter An XML document representing a filter
      * @return string
      * @throws RuntimeException if the retrieval of the XML doc failed
      */
-    public function retrieveDocument()
+    public function retrieveDocument($filter = '')
     {
         $url = new \Zend\Uri\Uri();
         $url->setScheme('https')
@@ -50,6 +51,13 @@ class External_Isams_Batch_BaseApi
             ->setQuery(['apikey' => $this->getApiKey()])
         ;
         $curl = new Alaress_Curl_Url($url);
+        if (strlen($filter) > 0) {
+            $curl->addOptions([
+                CURLOPT_HTTPHEADER => ['Content-Type: text/xml'],
+                CURLOPT_POST       => true,
+                CURLOPT_POSTFIELDS => $filter,
+            ]);
+        }
         $curl->exec();
         if (empty($curl->getErrors())) {
             // Too big to parse
