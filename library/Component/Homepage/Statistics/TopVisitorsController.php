@@ -66,30 +66,40 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
         }
 
         $this->setBlock($templateHandle, 'top_visitor', 'top_visitor_block');
+        $this->setBlock($templateHandle, 'no_top_visitor', 'no_top_visitor_block');
 
         $uHandler = new User();
 
-        for ($i = 0; $i < 5 && $i < count($this->visitors); ++$i) {
-            $this->setVar(
-                array(
-                    'VISITOR_ID' => $this->visitors[$i]['id'],
-                    'VISITOR_THUMB' => sprintf("/portrait.php?userId=%s&size=square32", $this->visitors[$i]['synid']),
-                    'VISITOR_NAME' => $uHandler->formatName($this->visitors[$i]),
-                    'VISITOR_GROUP' => Scrub::text($this->visitors[$i]['group_name']),
-                    'VISITOR_PROGRESS' => (int)($this->visitors[$i]['proportion'] * 100),
-                    'VISITOR_HITS' => $this->visitors[$i]['hits'],
-                )
-            );
-            $this->parse('top_visitor_block', 'top_visitor', true);
-        }
-
         if (!count($this->visitors)) {
             $grp = $this->groupType == 'all' ? '' : $this->groupType;
-            $this->setVar('top_visitor_block', "<p>No $grp visitors in this time period.</p>");
-        }
 
+            $this->setVar(array(
+                'top_visitor_block' => '',
+                'NO_TOP_VISITOR_GROUP_NAME' => $grp,
+            ));
+
+            $this->parse('no_top_visitor_block', 'no_top_visitor');
+        }
+        else {
+            for ($i = 0; $i < 5 && $i < count($this->visitors); ++$i) {
+                $this->setVar(
+                    array(
+                        'VISITOR_ID' => $this->visitors[$i]['id'],
+                        'VISITOR_THUMB' => sprintf("/portrait.php?userId=%s&size=square32", $this->visitors[$i]['synid']),
+                        'VISITOR_NAME' => $uHandler->formatName($this->visitors[$i]),
+                        'VISITOR_GROUP' => Scrub::text($this->visitors[$i]['group_name']),
+                        'VISITOR_PROGRESS' => (int)($this->visitors[$i]['proportion'] * 100),
+                        'VISITOR_HITS' => $this->visitors[$i]['hits'],
+                    )
+                );
+                $this->parse('top_visitor_block', 'top_visitor', true);
+            }
+
+            $this->setVar(array(
+                'no_top_visitor_block' => ''
+            ));
+        }
 
         return true;
     }
-
 }
