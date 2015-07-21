@@ -25,7 +25,7 @@ class Component_Config_EportfolioImage extends Component_Config_Abstract
             $allImages  = $fileMapper->findAllImagesByUser($pageInstance->getUserId());
         }
 
-        $page->setVar('IMAGE_TITLE', 'Image');
+        $page->setVar('COMPONENT_NAME', 'Image');
 
         if (count($allImages)) {
             foreach ($allImages as $currentImage) {
@@ -37,7 +37,7 @@ class Component_Config_EportfolioImage extends Component_Config_Abstract
                 if ($currentImage->getId() == $configValue) {
                     $page->setVar(array(
                         'COMPONENT_CONFIG_IMAGE_SELECTED' => ' selected="selected"',
-                        'IMAGE_TITLE' => $currentImage->getTitle()
+                        'COMPONENT_NAME' => $currentImage->getTitle()
                     ));
                 } else {
                     $page->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', '');
