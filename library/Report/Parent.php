@@ -67,7 +67,13 @@ class Report_Parent extends Report_Abstract
         $this->setSearchBoardingStatus(trim($searchBoardingStatus));
         $this->setSearchForm(trim($searchForm));
 
-        if (strlen($page->arg[0]) && !$this->checkPermissions()) {
+        $searching = strlen(
+            $this->getYearLevel()
+            . $this->getSearchName()
+            . $this->getSearchForm()
+            . $this->getSearchBoardingStatus()
+        ) > 0;
+        if ($searching && !$this->checkPermissions()) {
             error(155);
         } else {
             $this->setPage($page);
@@ -79,7 +85,7 @@ class Report_Parent extends Report_Abstract
             /* If all four options are empty, just show search form - don't show
              * all results (default is empty array)
              */
-            if (strlen($this->getYearLevel() . $this->getSearchName() . $this->getSearchForm() . $this->getSearchBoardingStatus())) {
+            if ($searching) {
                 $this->setAllRecords(
                     $this->getExternalUserHandler()->getStudentContactListExtended(
                         $this->getYearLevel(),
