@@ -110,7 +110,7 @@
 
 				/* Attachment selectors everywhere in the entire stream
 				 */
-				attachment: $j('.socialstream-attachment'),
+				attachment: $j('[data-socialstream-attachment]'),
 				attachmentUrlSelector: $j('.socialstream-attachment-url').closest('li'),
 				attachmentUploadSelector:  $j('.socialstream-attachment-upload').closest('li'),
 				attachmentResourceSelector: $j('.socialstream-attachment-resource').closest('li')

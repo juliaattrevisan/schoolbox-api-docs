@@ -1,193 +1,191 @@
 
 <!-- BEGIN socialstream_post -->
-	<li class='socialstream-post {ON_OFF}'>
-		<span class="actions">
-			<!-- BEGIN socialstream_post_has_delete -->
-			<a class="btn delete no-text" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}" title='Delete post' onclick="return confirm('Do you want to delete this item?');"><span></span></a>
-			<!-- END socialstream_post_has_delete -->
+<li class='socialstream-post {ON_OFF}'>
+    <span class="actions">
+        <!-- BEGIN socialstream_post_has_delete -->
+        <a class="btn delete no-text" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}" title='Delete post' onclick="return confirm('Do you want to delete this item?');"><span></span></a>
+        <!-- END socialstream_post_has_delete -->
 
-			<!-- BEGIN socialstream_post_has_add -->
-			<a href="#" class="btn chat no-text addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_POST_POST_ID}" title="Add Reply"><span></span></a>
-			<!-- END socialstream_post_has_add -->
-		</span>
+        <!-- BEGIN socialstream_post_has_add -->
+        <a href="#" class="btn chat no-text addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_POST_POST_ID}" title="Add Reply"><span></span></a>
+        <!-- END socialstream_post_has_add -->
+    </span>
 
-		<p class="meta">
-			<a href="/search/user/{SOCIALSTREAM_POST_USER_ID}" class="author">
-				<img height="32" width="32" src="/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square32" />
-				{SOCIALSTREAM_POST_USER_FULLNAME}
-			</a>
-		</p>
-		<div class="body">
-			{SOCIALSTREAM_POST_BODY}
+    <p class="meta">
+        <a href="/search/user/{SOCIALSTREAM_POST_USER_ID}" class="author">
+            <img height="32" width="32" src="/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square32" />
+            {SOCIALSTREAM_POST_USER_FULLNAME}
+        </a>
+    </p>
+    <div class="body">
+        {SOCIALSTREAM_POST_BODY}
 
-			<!-- BEGIN socialstream_post_has_attachment -->
-			<div class="socialstream-attachment clearfix">
-				<!-- BEGIN socialstream_post_has_icon -->
-				<a href='{SOCIALSTREAM_POST_URL}' target="_blank">
-					<img src="/images/mime/22x22/{SOCIALSTREAM_POST_ICON}" />
-				</a>
-				<!-- END socialstream_post_has_icon -->
+        <!-- BEGIN socialstream_post_has_attachment -->
+        <div class="socialstream-attachment clearfix">
+            <!-- BEGIN socialstream_post_has_icon -->
+            <a href='{SOCIALSTREAM_POST_URL}' target="_blank">
+                <img src="/images/mime/22x22/{SOCIALSTREAM_POST_ICON}" />
+            </a>
+            <!-- END socialstream_post_has_icon -->
 
-				<!-- BEGIN socialstream_post_has_thumbnail -->
-				<a href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox" alt="" title="">
-					<img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64" />
-				</a>
-				<!-- END socialstream_post_has_thumbnail -->
+            <!-- BEGIN socialstream_post_has_thumbnail -->
+            <a href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox" alt="" title="">
+                <img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64" />
+            </a>
+            <!-- END socialstream_post_has_thumbnail -->
 
-                <!-- BEGIN socialstream_post_has_image -->
-                <a href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
-                    <img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=constrain200" />
-                </a>
-                <!-- END socialstream_post_has_image -->
+            <!-- BEGIN socialstream_post_has_image -->
+            <a href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                <img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=constrain200" />
+            </a>
+            <!-- END socialstream_post_has_image -->
 
-				<!-- BEGIN socialstream_post_has_metadata -->
-				<a href="{SOCIALSTREAM_POST_URL}" target="_blank">{SOCIALSTREAM_POST_EXTERNAL_TITLE}</a><br />
-				<span class="description">{SOCIALSTREAM_POST_EXTERNAL_BODY}</span>
-				<!-- END socialstream_post_has_metadata -->
+            <!-- BEGIN socialstream_post_has_metadata -->
+            <a href="{SOCIALSTREAM_POST_URL}" target="_blank">{SOCIALSTREAM_POST_EXTERNAL_TITLE}</a><br />
+            <span class="description">{SOCIALSTREAM_POST_EXTERNAL_BODY}</span>
+            <!-- END socialstream_post_has_metadata -->
 
-				<!-- BEGIN socialstream_post_has_player -->
-				<iframe width="560" height="315" src="{SOCIALSTREAM_POST_URL}" frameborder="0" allowfullscreen seamless></iframe>
-				<!-- END socialstream_post_has_player -->
+            <!-- BEGIN socialstream_post_has_player -->
+            <iframe width="560" height="315" src="{SOCIALSTREAM_POST_URL}" frameborder="0" allowfullscreen seamless></iframe>
+            <!-- END socialstream_post_has_player -->
 
-				<!-- BEGIN socialstream_post_has_video -->
-				<div class="videoWrapper">
-					<video id="socialstream_video{SOCIALSTREAM_POST_POST_ID}"
-						controls
-						preload="none"
-						poster="{SOCIALSTREAM_POST_VIDEO_POSTER}"
-						width="100%"
-						height="400"
-					>
-						<source src="{SOCIALSTREAM_POST_VIDEO_SRC}" type='video/mp4'>
-					</video>
-					<script>
-						$("#socialstream_video{SOCIALSTREAM_POST_POST_ID}").mediaelementplayer();
-					</script>
-				</div>
-				<!-- END socialstream_post_has_video -->
+            <!-- BEGIN socialstream_post_has_video -->
+            <div class="videoWrapper">
+                <video id="socialstream_video{SOCIALSTREAM_POST_POST_ID}"
+                    controls
+                    preload="none"
+                    poster="{SOCIALSTREAM_POST_VIDEO_POSTER}"
+                    width="100%"
+                    height="400"
+                >
+                    <source src="{SOCIALSTREAM_POST_VIDEO_SRC}" type='video/mp4'>
+                </video>
+                <script>
+                    $("#socialstream_video{SOCIALSTREAM_POST_POST_ID}").mediaelementplayer();
+                </script>
+            </div>
+            <!-- END socialstream_post_has_video -->
 
-				<!-- BEGIN socialstream_post_has_video_pending -->
-				<img class="thumbnail" width="64" height="64" src="{SOCIALSTREAM_POST_VIDEO_STATUS_IMG}" title="Currently processing video" />
-				This video is currently processing - when it has finished, it will display for all users.
-				<!-- END socialstream_post_has_video_pending -->
+            <!-- BEGIN socialstream_post_has_video_pending -->
+            <img class="thumbnail" width="64" height="64" src="{SOCIALSTREAM_POST_VIDEO_STATUS_IMG}" title="Currently processing video" />
+            This video is currently processing - when it has finished, it will display for all users.
+            <!-- END socialstream_post_has_video_pending -->
 
-			</div>
-			<!-- END socialstream_post_has_attachment -->
+        </div>
+        <!-- END socialstream_post_has_attachment -->
+        <p class="meta">
+            Posted {SOCIALSTREAM_POST_CREATED_AT} |
+            <a href="#" class="addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_POST_POST_ID}" title="Add Reply"><span>Reply</span></a>
+        </p>
+    </div>
+
+    <ul>
+        <!-- BEGIN socialstream_comment -->
+        <li class="socialstream-comment">
+            <span class="actions">
+                <!-- BEGIN socialstream_comment_has_delete -->
+                <a class="btn delete no-text" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}" title="Delete Comment" onclick="return confirm('Do you want to delete this item?');"><span></span></a>
+                <!-- END socialstream_comment_has_delete -->
+
+                <!-- BEGIN socialstream_comment_has_add -->
+                <a href="#" class="btn chat no-text addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_COMMENT_POST_ID}" title="Add Reply"><span></span></a>
+                <!-- END socialstream_comment_has_add -->
+            </span>
+
             <p class="meta">
-                Posted {SOCIALSTREAM_POST_CREATED_AT} |
-                <a href="#" class="addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_POST_POST_ID}" title="Add Reply"><span>Reply</span></a>
+                <a href="/search/user/{SOCIALSTREAM_COMMENT_USER_ID}" class="author">
+                    <img height="32" width="32" src="/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32" />
+                    {SOCIALSTREAM_COMMENT_USER_FULLNAME}
+                </a>
             </p>
-		</div>
 
-		<ul>
-			<!-- BEGIN socialstream_comment -->
-			<li class="socialstream-comment">
-				<span class="actions">
-					<!-- BEGIN socialstream_comment_has_delete -->
-					<a class="btn delete no-text" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}" title="Delete Comment" onclick="return confirm('Do you want to delete this item?');"><span></span></a>
-					<!-- END socialstream_comment_has_delete -->
+            <div class="body">
+                {SOCIALSTREAM_COMMENT_BODY}
 
-					<!-- BEGIN socialstream_comment_has_add -->
-					<a href="#" class="btn chat no-text addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_COMMENT_POST_ID}" title="Add Reply"><span></span></a>
-					<!-- END socialstream_comment_has_add -->
-				</span>
+                <!-- BEGIN socialstream_comment_has_attachment -->
+                <div class="socialstream-attachment">
 
-				<p class="meta">
-					<a href="/search/user/{SOCIALSTREAM_COMMENT_USER_ID}" class="author">
-						<img height="32" width="32" src="/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32" />
-						{SOCIALSTREAM_COMMENT_USER_FULLNAME}
-					</a>
-				</p>
+                    <!-- BEGIN socialstream_comment_has_icon -->
+                    <a href="{SOCIALSTREAM_COMMENT_URL}" target="_blank">
+                        <img src="/images/mime/22x22/{SOCIALSTREAM_COMMENT_ICON}" />
+                    </a>
+                    <!-- END socialstream_comment_has_icon -->
 
-				<div class="body">
-					{SOCIALSTREAM_COMMENT_BODY}
-
-					<!-- BEGIN socialstream_comment_has_attachment -->
-					<div class="socialstream-attachment">
-
-						<!-- BEGIN socialstream_comment_has_icon -->
-						<a href="{SOCIALSTREAM_COMMENT_URL}" target="_blank">
-							<img src="/images/mime/22x22/{SOCIALSTREAM_COMMENT_ICON}" />
-						</a>
-						<!-- END socialstream_comment_has_icon -->
-
-                        <!-- BEGIN socialstream_comment_has_image -->
-                        <a href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
-                            <img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=constrain200" />
-                        </a>
-                        <!-- END socialstream_comment_has_image -->
+                    <!-- BEGIN socialstream_comment_has_image -->
+                    <a href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                        <img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=constrain200" />
+                    </a>
+                    <!-- END socialstream_comment_has_image -->
 
 
-						<!-- BEGIN socialstream_comment_has_thumbnail -->
-						<a href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
-							<img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64" />
-						</a>
-						<!-- END socialstream_comment_has_thumbnail -->
+                    <!-- BEGIN socialstream_comment_has_thumbnail -->
+                    <a href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                        <img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64" />
+                    </a>
+                    <!-- END socialstream_comment_has_thumbnail -->
 
-						<!-- BEGIN socialstream_comment_has_player -->
-						<iframe width="560" height="315" src="{SOCIALSTREAM_COMMENT_URL}" frameborder="0" allowfullscreen seamless></iframe>
-						<!-- END socialstream_comment_has_player -->
+                    <!-- BEGIN socialstream_comment_has_player -->
+                    <iframe width="560" height="315" src="{SOCIALSTREAM_COMMENT_URL}" frameborder="0" allowfullscreen seamless></iframe>
+                    <!-- END socialstream_comment_has_player -->
 
-						<!-- BEGIN socialstream_comment_has_video -->
-						<div class="videoWrapper">
-							<video id="socialstream_video{SOCIALSTREAM_COMMENT_POST_ID}"
-								controls
-								preload="none"
-								poster="{SOCIALSTREAM_COMMENT_VIDEO_POSTER}"
-								width="100%"
-								height="400"
-							>
-								<source src="{SOCIALSTREAM_COMMENT_VIDEO_SRC}" type='video/mp4'>
-							</video>
-							<script>
-								$("#socialstream_video{SOCIALSTREAM_COMMENT_POST_ID}").mediaelementplayer();
-							</script>
-						</div>
-						<!-- END socialstream_comment_has_video -->
+                    <!-- BEGIN socialstream_comment_has_video -->
+                    <div class="videoWrapper">
+                        <video id="socialstream_video{SOCIALSTREAM_COMMENT_POST_ID}"
+                            controls
+                            preload="none"
+                            poster="{SOCIALSTREAM_COMMENT_VIDEO_POSTER}"
+                            width="100%"
+                            height="400"
+                        >
+                            <source src="{SOCIALSTREAM_COMMENT_VIDEO_SRC}" type='video/mp4'>
+                        </video>
+                        <script>
+                            $("#socialstream_video{SOCIALSTREAM_COMMENT_POST_ID}").mediaelementplayer();
+                        </script>
+                    </div>
+                    <!-- END socialstream_comment_has_video -->
 
-						<!-- BEGIN socialstream_comment_has_video_pending -->
-						<img class="thumbnail" width="64" height="64" src="{SOCIALSTREAM_COMMENT_VIDEO_STATUS_IMG}" title="Currently processing video" />
-						This video is currently processing - when it has finished, it will display for all users.
-						<!-- END socialstream_comment_has_video_pending -->
+                    <!-- BEGIN socialstream_comment_has_video_pending -->
+                    <img class="thumbnail" width="64" height="64" src="{SOCIALSTREAM_COMMENT_VIDEO_STATUS_IMG}" title="Currently processing video" />
+                    This video is currently processing - when it has finished, it will display for all users.
+                    <!-- END socialstream_comment_has_video_pending -->
 
-						<!-- BEGIN socialstream_comment_has_metadata -->
-						<a href="{SOCIALSTREAM_COMMENT_URL}" target="_blank">{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</a><br />
-						<span class="description">{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</span>
-						<!-- END socialstream_comment_has_metadata -->
-					</div>
-                    <p class="meta">
-                        Posted {SOCIALSTREAM_COMMENT_CREATED_AT} |
-                        <a href="#" class="addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_COMMENT_POST_ID}" title="Add Reply"><span>Reply</span></a>
-                    </p>
-					<!-- END socialstream_comment_has_attachment -->
-				</div>
+                    <!-- BEGIN socialstream_comment_has_metadata -->
+                    <a href="{SOCIALSTREAM_COMMENT_URL}" target="_blank">{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</a><br />
+                    <span class="description">{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</span>
+                    <!-- END socialstream_comment_has_metadata -->
+                </div>
+                <p class="meta">
+                    Posted {SOCIALSTREAM_COMMENT_CREATED_AT} |
+                    <a href="#" class="addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_COMMENT_POST_ID}" title="Add Reply"><span>Reply</span></a>
+                </p>
+                <!-- END socialstream_comment_has_attachment -->
+            </div>
 
-				<ul>
-					<!-- BEGIN socialstream_reply -->
-					<li class="socialstream-reply">
-						<!-- BEGIN socialstream_reply_has_delete -->
-						<span class="actions">
-								<a class="btn delete no-text" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}" title="Delete Reply" onclick="return confirm('Do you want to delete this item?');"><span></span></a>
-						</span>
-						<!-- END socialstream_reply_has_delete -->
+            <!------------------------>
+            <!-- Socialstream Reply -->
+            <!------------------------>
+            <ul class="action-list reply">
+                <!-- BEGIN socialstream_reply -->
+                <li class="row" data-equalizer="three">
+                    <div class="eleven-column" data-equalizer-watch="three">
+                        <div class="avatar-card">
+                            <a href="/search/user/{SOCIALSTREAM_REPLY_USER_ID}" title="View Profile">
+                                <img src="/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square64" alt="" class="hide-for-small-only">
+                                <p>{SOCIALSTREAM_REPLY_USER_FULLNAME}</p>
+                                <p class="meta">Posted {SOCIALSTREAM_REPLY_CREATED_AT}</p>
+                            </a>
+                        </div>
+                        <div class="body">
+                            {SOCIALSTREAM_REPLY_BODY}
 
-						<p class="meta">
-							<a href="/search/user/{SOCIALSTREAM_REPLY_USER_ID}" class="author">
-								<img height="32" width="32" src="/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32" />
-								{SOCIALSTREAM_REPLY_USER_FULLNAME}
-							</a>
-						</p>
-
-						<div class="body">
-							{SOCIALSTREAM_REPLY_BODY}
-
-							<!-- BEGIN socialstream_reply_has_attachment -->
-							<div class="socialstream-attachment">
-								<!-- BEGIN socialstream_reply_has_icon -->
-								<a href="{SOCIALSTREAM_REPLY_URL}" target="_blank">
-									<img src="/images/mime/22x22/{SOCIALSTREAM_REPLY_ICON}" />
-								</a>
-								<!-- END socialstream_reply_has_icon -->
+                            <!-- BEGIN socialstream_reply_has_attachment -->
+                            <div data-socialstream-attachment>
+                                <!-- BEGIN socialstream_reply_has_icon -->
+                                <a href="{SOCIALSTREAM_REPLY_URL}" target="_blank">
+                                    <img src="/images/mime/22x22/{SOCIALSTREAM_REPLY_ICON}" />
+                                </a>
+                                <!-- END socialstream_reply_has_icon -->
 
                                 <!-- BEGIN socialstream_reply_has_image -->
                                 <a href="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
@@ -195,53 +193,93 @@
                                 </a>
                                 <!-- END socialstream_reply_has_image -->
 
-								<!-- BEGIN socialstream_reply_has_thumbnail -->
-								<a class="thumb" href="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
-									<img src="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square64" />
-								</a>
-								<!-- END socialstream_reply_has_thumbnail -->
+                                <!-- BEGIN socialstream_reply_has_thumbnail -->
+                                <a href="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                                    <img src="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square64" />
+                                </a>
+                                <!-- END socialstream_reply_has_thumbnail -->
 
-								<!-- BEGIN socialstream_reply_has_player -->
-								<iframe width="560" height="315" src="{SOCIALSTREAM_REPLY_URL}" frameborder="0" allowfullscreen seamless></iframe>
-								<!-- END socialstream_reply_has_player -->
+                                <!-- BEGIN socialstream_reply_has_player -->
+                                <iframe width="560" height="315" src="{SOCIALSTREAM_REPLY_URL}" frameborder="0" allowfullscreen seamless></iframe>
+                                <!-- END socialstream_reply_has_player -->
 
-								<!-- BEGIN socialstream_reply_has_video -->
-								<div class="videoWrapper">
-									<video id="socialstream_video{SOCIALSTREAM_REPLY_POST_ID}"
-										controls
-										preload="none"
-										poster="{SOCIALSTREAM_REPLY_VIDEO_POSTER}"
-										width="100%"
-										height="400"
-									>
-										<source src="{SOCIALSTREAM_REPLY_VIDEO_SRC}" type='video/mp4'>
-									</video>
-									<script>
-										$("#socialstream_video{SOCIALSTREAM_REPLY_POST_ID}").mediaelementplayer();
-									</script>
-								</div>
-								<!-- END socialstream_reply_has_video -->
+                                <!-- BEGIN socialstream_reply_has_video -->
+                                <video id="socialstream_video{SOCIALSTREAM_REPLY_POST_ID}"
+                                       controls
+                                       preload="none"
+                                       poster="{SOCIALSTREAM_REPLY_VIDEO_POSTER}"
+                                       width="100%"
+                                       height="400"
+                                        >
+                                    <source src="{SOCIALSTREAM_REPLY_VIDEO_SRC}" type='video/mp4'>
+                                </video>
+                                <script>
+                                    $("#socialstream_video{SOCIALSTREAM_REPLY_POST_ID}").mediaelementplayer();
+                                </script>
+                                <!-- END socialstream_reply_has_video -->
 
-								<!-- BEGIN socialstream_reply_has_video_pending -->
-								<img class="thumbnail" width="64" height="64" src="{SOCIALSTREAM_REPLY_VIDEO_STATUS_IMG}" title="Currently processing video" />
-								This video is currently processing - when it has finished, it will display for all users.
-								<!-- END socialstream_reply_has_video_pending -->
+                                <!-- BEGIN socialstream_reply_has_video_pending -->
+                                <img src="{SOCIALSTREAM_REPLY_VIDEO_STATUS_IMG}" title="Currently processing video" />
+                                This video is currently processing - when it has finished, it will display for all users.
+                                <!-- END socialstream_reply_has_video_pending -->
 
-								<!-- BEGIN socialstream_reply_has_metadata -->
-								<a href="{SOCIALSTREAM_REPLY_URL}" target="_blank">{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</a><br />
-								<span class="description">{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</span>
-								<!-- END socialstream_reply_has_metadata -->
-							</div>
-                            <p class="meta">
-                                Posted {SOCIALSTREAM_REPLY_CREATED_AT}
-                            </p>
-							<!-- END socialstream_reply_has_attachment -->
-						</div>
-					</li>
-					<!-- END socialstream_reply -->
-				</ul>
-			</li>
-			<!-- END socialstream_comment -->
-		</ul>
-	</li>
+                                <!-- BEGIN socialstream_reply_has_metadata -->
+                                <a href="{SOCIALSTREAM_REPLY_URL}" target="_blank">{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</a><br />
+                                {SOCIALSTREAM_REPLY_EXTERNAL_BODY}
+                                <!-- END socialstream_reply_has_metadata -->
+                            </div>
+                            <!-- END socialstream_reply_has_attachment -->
+                        </div>
+                    </div>
+                    <div class="one actions" data-equalizer-watch="three">
+                        <!-- BEGIN socialstream_reply_has_delete -->
+                        <a class="icon-delete no-text" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}" title="Delete Reply" onclick="return confirm('Do you want to delete this item?');" data-equalizer-watch></a>
+                        <!-- END socialstream_reply_has_delete -->
+                    </div>
+                    <div class="component-form editPanel">
+                        <!-- BEGIN socialstream_has_newpost -->
+                        <form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}' class='addPostForm {FORM_CLASS}' enctype='multipart/form-data'>
+                            <input type='hidden' name='type' value='string' />
+                            <input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
+                            <input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
+                            <input type='hidden' name='parentId' value='0' />
+                            <input type='hidden' name='rootId' value='0' />
+
+                            <textarea rows="3" cols="50" name="body" placeholder="This is the reply form"></textarea>
+
+                            <div class="dz-wrap">
+                                <div class="row post-attachment attach">
+                                    <div class="small-12s medium-9 columns">
+                                        <div class="dropzone" id="socialZone2" action="/cms/myFileForm.php?ajax=1"></div>
+                                    </div>
+                                    <p class="small-12 medium-1 columns"><strong>or</strong></p>
+                                    <p class="small-12 medium-2 columns">
+                                        <a class='button icon-link stream-attachment' data-value='url'>Link</a>
+                                    </p>
+                                </div>
+
+                                <div class="post-attachment url" style="display:none;">
+                                    <label>
+                                        <input type='text' class='url' name='url' maxlength='1024' placeholder="http://" />
+                                    </label>
+                                    <p class="alt-src">
+                                        or <a class='button icon-image stream-attachment' data-value='attach'>Attach</a>
+                                    </p>
+                                </div>
+                            </div>
+                            <input type='submit' value='Post' />
+                        </form>
+                        <!-- END socialstream_has_newpost -->
+                    </div>
+                </li>
+                <!-- END socialstream_reply -->
+            </ul>
+            <!------------------------>
+            <!-- Socialstream Reply -->
+            <!------------------------>
+
+        </li>
+        <!-- END socialstream_comment -->
+    </ul>
+</li>
 <!-- END socialstream_post -->
