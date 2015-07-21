@@ -1,15 +1,15 @@
 <?php
 /**
- * Maps results for `External_Isams_Batch_Reader_CurrentPupil->parse()`.
+ * Maps results for `External_Isams_Batch_Reader_Student->parse()`.
  *
- * Prevents traversal further down the tree than the Pupil node.
+ * Converts results to a format that is understandable by Schoolbox sync scripts.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
 
-class External_Isams_Batch_Reader_Iterator_PupilMap extends IteratorIterator
+class External_Isams_Batch_Reader_Iterator_Student_Map extends IteratorIterator
 {
     /**
      * @return bool
@@ -20,7 +20,7 @@ class External_Isams_Batch_Reader_Iterator_PupilMap extends IteratorIterator
         // //CurrentPupils/Pupil or //CurrentPupilsHealth/Pupil
         // I don't know where I came from.
         $current = $this->getInnerIterator()->current();
-        $result  = ['PupilId' => $current['attributes']['id']];
+        $result  = ['StudentId' => $current['attributes']['id']];
         foreach ($current['value'] as $key => $value) {
             $result[preg_replace('/^{.*?}/', '', $key)] = $value;
         }

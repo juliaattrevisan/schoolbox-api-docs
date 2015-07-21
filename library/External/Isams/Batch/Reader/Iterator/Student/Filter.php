@@ -1,6 +1,6 @@
 <?php
 /**
- * Iterator for a list of results from `External_Isams_Batch_Reader_CurrentPupil->parse()`.
+ * Iterator for a list of results from `External_Isams_Batch_Reader_Student->parse()`.
  *
  * Prevents traversal further down the tree than the Pupil node.
  *
@@ -9,7 +9,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-class External_Isams_Batch_Reader_Iterator_PupilFilter extends RecursiveArrayIterator
+class External_Isams_Batch_Reader_Iterator_Student_Filter extends RecursiveArrayIterator
 {
     /**
      * @return bool
