@@ -1,4 +1,4 @@
-<div class="box chat clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div data-component id="component{COMPONENT_INSTANCE_ID}">
     <script type="text/javascript" src="/javascript/chat.js"></script>
     <script type="text/javascript">
         $(function () {
@@ -10,8 +10,9 @@
                 user_ext_id: '{CHAT_USER_EXT_ID}',
                 user_name: '{CHAT_USER_NAME}',
                 user_perm: '{CHAT_USER_PERM}',
-                log_el: 'ul.chat-messages',
-                send_el: 'a.btn.chat'
+                log_el: 'ul[data-chat-log]',
+                send_el: 'a[data-interaction-send]',
+                users_el: 'ul[data-chat-users]'
             });
 
             $('.show-users').click(function(event) {
@@ -45,24 +46,28 @@
 
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="chat-box">
-            <ul class="information-list grid chat-users"></ul>
-            <a href="#" class="show-users"></a>
-            <ul class="chat-messages"></ul>
-            <form action="#" method="post" class="chat-send" id="chatSend">
-                <!-- BEGIN chat_state_active -->
-                <div class="chat-message-container">
-                    <textarea id="component{COMPONENT_INSTANCE_ID}-chatmessage" name="message" class="chat-message-box"></textarea>
-                </div>
-                <a href="#" class="btn chat float-right"><span></span>Send</a>
-                <!-- END chat_state_active -->
-                <!-- BEGIN chat_state_inactive -->
-                <p class="bold">The chat is inactive. <a href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Please click here to activate the chat.</a></p>
-                <!-- END chat_state_inactive -->
-            </form>
-            <a href="/homepage/chatArchive/{ID}/" class="btn"><span></span>View Chat Archive</a>
+    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <ul class="chat-users action-list" data-chat-users></ul>
+                <ul class="information-list chat-messages" data-chat-log></ul>
+                    <div class="content">
+                        <form action="#" method="post" class="chat-send" id="chatSend">
+                            <!-- BEGIN chat_state_active -->
+                            <div class="chat-message-container">
+                                <textarea id="component{COMPONENT_INSTANCE_ID}-chatmessage" name="message" class="chat-message-box"></textarea>
+                            </div>
+                            <a href="#" class="button secondary" data-interaction-send>Send</a>
+                            <!-- END chat_state_active -->
+                            <!-- BEGIN chat_state_inactive -->
+                            <p class="alert-box warning">The chat is inactive.</p>
+                            <a class="button icon-comment" href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Activate Chat</a>
+                            <!-- END chat_state_inactive -->
+                            <a href="/homepage/chatArchive/{ID}/" class="button icon-history">View Chat Archive</a>
+                        </form>
+                    </div>
+                <div class="chat-error hide"></div>
+            </section>
         </div>
-        <div class="chat-error hide"></div>
     </div>
 </div>

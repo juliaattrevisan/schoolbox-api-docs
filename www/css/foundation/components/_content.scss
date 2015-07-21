@@ -924,7 +924,20 @@ table{
     }
 
 	p{
-		margin: 0;
+		@media #{$small-up} {
+			margin: 0 0 0 (3 * rem-calc($base-font-size));
+		}
+		@media #{$medium-up} {
+			margin: 0 0 0 (4 * rem-calc($base-font-size));
+		}
+		&.spaced {
+			@media #{$small-up} {
+				padding-bottom: (0.2 * rem-calc($base-font-size));
+			}
+			@media #{$medium-up} {
+				padding-bottom: (0.5 * rem-calc($base-font-size));
+			}
+		}
 	}
 
     textarea {
