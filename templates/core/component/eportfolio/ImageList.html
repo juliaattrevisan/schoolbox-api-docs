@@ -1,53 +1,66 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-    <h2>{COMPONENT_NAME}</h2>
+<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <!-- Custom javascript -->
+
     {CONFIGURATION}
 
-    <div class="clearfix">
-        <div class="dz-wrap clearfix">
-            <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post" data-accepts="image">
-                <div class="float-left image-thumbnail dz-preview dz-file-preview">
-                    <a class="thumb dz-details" style="height:100px;">
-                        <img class="dz-pending" width="16" height="16" src="/images/resources/ajax.gif" style="top:4px;left:0px;" />
-                        <img data-dz-thumbnail border="0" style="position:static;">
-                    </a>
-                    <div class="dz-progress"><span class="dz-upload" style="height:100%;position:absolute;top:0"></span></div>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <div class="dz-wrap clearfix">
+                        <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post" data-accepts="image">
+                            <div class="float-left image-thumbnail dz-preview dz-file-preview">
+                                <a class="thumb dz-details" style="height:100px;">
+                                    <img class="dz-pending" width="16" height="16" src="/images/resources/ajax.gif" style="top:4px;left:0px;" />
+                                    <img data-dz-thumbnail border="0" style="position:static;">
+                                </a>
+                                <div class="dz-progress"><span class="dz-upload" style="height:100%;position:absolute;top:0"></span></div>
+                            </div>
+                        </form>
+                        <div class="dz-container">
+                            <ul class="inline-list">
+                                <!-- BEGIN list_item -->
+                                <li>
+                                    <a href="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryLarge" rel="lightbox[eportfolio-{COMPONENT_INSTANCE_ID}]" title='{IMAGE_DESCRIPTION}'>
+                                        <img src="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryThumbnail" alt="{IMAGE_DESCRIPTION}" border="0" />
+                                    </a>
+                                </li>
+                                <!-- END list_item -->
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- BEGIN modify_button -->
+                    <a href='/cms/myFile/new/{ID}/0/{COMPONENT_INSTANCE_ID}' class='button icon-upload'>Post Images</a>
+                    <a href='/cms/portfolio/' class='button icon-view'>Browse My Files</a>
+                    <script type="text/javascript">
+                        $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                            wrapClass: 'dragging',
+                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} .dz-container',
+                            createImageThumbnails: true,
+                            dictDefaultMessage: 'You can drag images into this space',
+                            refreshUrl: '/eportfolio/configForm.php',
+                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                            refreshData: {
+                                page_id: '{PAGE_ID}',
+                                reload: '{COMPONENT_INSTANCE_ID}'
+                            },
+                            sending: function (file, xhr, formData) {
+                                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                                formData.append('parent', 0);
+                                formData.append('published[{ID}][{PAGE_ID}]', 'value_ignored');
+                            },
+                            complete: function (file) {
+                                $(file.previewElement).find('img.dz-pending').remove();
+                            }
+                        });
+                    </script>
+                    <!-- END modify_button -->
                 </div>
-            </form>
-            <div class="dz-container">
-            <!-- BEGIN list_item -->
-                <div class="float-left image-thumbnail">
-                    <a href="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryLarge" rel="lightbox[eportfolio-{COMPONENT_INSTANCE_ID}]"  alt='{IMAGE_DESCRIPTION}' title='{IMAGE_DESCRIPTION}'>
-                        <img src="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryThumbnail" alt="{IMAGE_DESCRIPTION}" border="0"/>
-                    </a>
-                </div>
-            <!-- END list_item -->
-            </div>
+            </section>
         </div>
     </div>
-    <!-- BEGIN modify_button -->
-    <a href='/cms/myFile/new/{ID}/0/{COMPONENT_INSTANCE_ID}' class='btn up-arrow'><span></span>Post Images</a>
-    <a href='/cms/portfolio/' class='btn'><span></span>Browse My Files</a>
-    <script type="text/javascript">
-        $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-            wrapClass: 'dragging',
-            previewsContainer: '#component{COMPONENT_INSTANCE_ID} .dz-container',
-            createImageThumbnails: true,
-            dictDefaultMessage: 'You can drag images into this space',
-            refreshUrl: '/eportfolio/configForm.php',
-            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-            refreshData: {
-                page_id: '{PAGE_ID}',
-                reload: '{COMPONENT_INSTANCE_ID}'
-            },
-            sending: function (file, xhr, formData) {
-                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                formData.append('parent', 0);
-                formData.append('published[{ID}][{PAGE_ID}]', 'value_ignored');
-            },
-            complete: function (file) {
-                $(file.previewElement).find('img.dz-pending').remove();
-            }
-        });
-    </script>
-    <!-- END modify_button -->
 </div>
+
+
+
