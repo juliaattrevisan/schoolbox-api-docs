@@ -7,15 +7,14 @@
                 <div class="avatar card">
                     <a href="/search/user/{VISITOR_ID}" title="View Profile">
                         <img src="{VISITOR_THUMB}" alt="View Profile" />
-
                         <p>{VISITOR_NAME}</p>
                     </a>
-                    <p class="meta">{VISITOR_HITS}</p>
+                    <span class="meta tally">{VISITOR_HITS}</span>
                     <p class="meta">{VISITOR_GROUP}</p>
                 </div>
 
                 <div class="progress">
-                    <span class="meter" style="width: {VISITOR_PROGRESS}%"></span>
+                    <span class="meter" title='{VISITOR_HITS} visits' style="width: {VISITOR_PROGRESS}%"></span>
                 </div>
             </li>
             <!-- END top_visitor -->

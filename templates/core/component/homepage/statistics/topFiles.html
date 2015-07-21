@@ -11,12 +11,12 @@
                         <p>{FILE_NAME} <em>({FILE_SIZE})</em></p>
                     </a>
 
+                    <span class="meta tally">{FILE_HITS}</span>
                     <p class="meta">{FILE_DATE}</p>
-                    <p class="meta">{FILE_HITS}</p>
                 </div>
 
                 <div class="progress">
-                    <span class="meter" style="width: {FILE_PROGRESS}%"></span>
+                    <span class="meter" title="{FILE_HITS} hits" style="width: {FILE_PROGRESS}%"></span>
                 </div>
             </li>
             <!-- END top_file -->

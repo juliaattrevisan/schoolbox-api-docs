@@ -7,15 +7,13 @@
                 <div class="avatar card">
                     <a href="/redir.php?id={LINK_ID}" title="{LINK_NAME}">
                         <img src="{LINK_THUMB}" alt="{LINK_NAME}" class="content" />
-
                         <p>{LINK_NAME}</p>
                     </a>
-
-                    <p class="meta">{LINK_HITS}</p>
+                    <span class="meta tally">{LINK_HITS}</span>
                 </div>
 
                 <div class="progress">
-                    <span class="meter" style="width: {LINK_PROGRESS}%"></span>
+                    <span class="meter" title="{LINK_HITS} hits" style="width: {LINK_PROGRESS}%"></span>
                 </div>
             </li>
             <!-- END top_link -->
