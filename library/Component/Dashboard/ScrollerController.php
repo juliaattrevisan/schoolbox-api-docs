@@ -136,6 +136,9 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
                 $this->parse('image_scroller_block', 'image_scroller', true);
             }
         }
+        else {
+            return false;
+        }
 
         return true; // everything went according to plan
     }
