@@ -51,7 +51,7 @@ class External_Isams_Batch_BaseApi
         ;
         $curl = new Alaress_Curl_Url($url);
         $curl->exec();
-        if (!empty($curl->getErrors())) {
+        if (empty($curl->getErrors())) {
             return new SimpleXMLElement($curl->getResult());
         } else {
             throw new RuntimeException(
