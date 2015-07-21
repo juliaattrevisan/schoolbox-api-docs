@@ -106,7 +106,7 @@
 
 				/* Container div for threads
 				 */
-				threadContainer: $j(element).find('.socialstream-threads'),
+				threadContainer: $j(element).find('[data-socialstream-threads]'),
 
 				/* Attachment selectors everywhere in the entire stream
 				 */
