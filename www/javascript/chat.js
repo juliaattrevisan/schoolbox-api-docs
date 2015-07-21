@@ -212,6 +212,12 @@ $.widget("ui.chat",  {
 
         var last = this.options.log_el.find('li').last();
 
+        // Am I scrolled to the bottom already? If so scroll down
+        // If not, don't - I'm probably browsing through old posts
+        var scrollTop = this.options.log_el.prop('scrollTop');
+        var height    = this.options.log_el.prop('scrollHeight') - this.options.log_el.prop('offsetHeight');
+        var scroll    = (Math.abs(scrollTop - height) === 0);
+
         if ($message.user_id == last.data('user')) {
             last.find('.card').append('<p class="spaced">{0}</p>'.format($message.body));
         } else {
@@ -237,8 +243,9 @@ $.widget("ui.chat",  {
             $message_el.html($tpl.format($message.name, $message.user_ext_id, $message.time, $message.body));
             this.options.log_el.append($message_el);
         }
-        this.options.log_el.prop({ scrollTop: this.options.log_el.prop("scrollHeight") });
-
+        if (scroll) {
+            this.options.log_el.prop({ scrollTop: this.options.log_el.prop("scrollHeight") });
+        }
     },
 
     _poll: function () {
