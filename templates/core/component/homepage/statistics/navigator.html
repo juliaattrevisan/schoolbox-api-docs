@@ -1,34 +1,54 @@
-<div class="navigator">
-  <div class="star-rating" title="{RATING}">
-      <!-- BEGIN star -->
-      <span class="star mask"></span>
-      <!-- END star -->
-      <span class="star on" style="width:{STAR_WIDTH}%"></span>
-  </div>
-  <form class="totheright" method="GET" action="/statistics/homepage/{ID}">
-      <label for="date_start">
-          <select id="date_start" name="date_start">
-              <!-- BEGIN date_start_option -->
-              <option value="{DATE_START_VALUE}"{DATE_START_SELECTED}>{DATE_START_NAME}</option>
-              <!-- END date_start_option -->
-          </select>
-      </label>
-      to
-      <label for="date_end">
-          <select id="date_end" name="date_end">
-              <!-- BEGIN date_end_option -->
-              <option value="{DATE_END_VALUE}"{DATE_END_SELECTED}>{DATE_END_NAME}</option>
-              <!-- END date_end_option -->
-          </select>
-      </label>
-      <label for="drop">
-      <select id="drop" name="drop">
-        <!-- BEGIN drop_option -->
-        <option value="{DROP_VALUE}"{DROP_SELECTED}>{DROP_NAME}</option>
-        <!-- END drop_option -->
-      </select>
-    </label>
-      <input class="submit-btn-plain" type="submit" value="Update"/>
-  </form>
-  <div class="clearfix"></div>
+<div class="row">
+    <div class="small-12 large-6 columns">
+        <!-- BEGIN star -->
+        <!-- END star -->
+
+        <h2>{RATING}</h2>
+        
+        <div class="progress" title="{RATING}">
+            <span class="meter" style="width: {STAR_WIDTH}%"></span>
+        </div>
+    </div>
+    <div class="small-12 large-6 columns">
+        <div class="row">
+            <form action="/statistics/homepage/{ID}" method="GET">
+                <div class="small-3 columns">
+                    <label for="date_start">
+                        From
+                        <select id="date_start" name="date_start">
+                            <!-- BEGIN date_start_option -->
+                            <option value="{DATE_START_VALUE}"{DATE_START_SELECTED}>{DATE_START_NAME}</option>
+                            <!-- END date_start_option -->
+                        </select>
+                    </label>
+                </div>
+                <div class="small-3 columns">
+                    <label for="date_end">
+                        To
+                        <select id="date_end" name="date_end">
+                            <!-- BEGIN date_end_option -->
+                            <option value="{DATE_END_VALUE}"{DATE_END_SELECTED}>{DATE_END_NAME}</option>
+                            <!-- END date_end_option -->
+                        </select>
+                    </label>
+                </div>
+                <div class="small-3 columns">
+                    <label for="drop">
+                        Role
+                        <select id="drop" name="drop">
+                            <!-- BEGIN drop_option -->
+                            <option value="{DROP_VALUE}"{DROP_SELECTED}>{DROP_NAME}</option>
+                            <!-- END drop_option -->
+                        </select>
+                    </label>
+
+                </div>
+                <div class="small-3 columns">
+                    <label>
+                        <input type="submit" value="Update" />
+                    </label>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
