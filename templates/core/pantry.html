@@ -262,7 +262,7 @@
                         <td>Content</td>
                     </tr>
                     <tr>
-                        <td><input id="checkbox-table" type="checkbox"><label for="checkbox-table" class="checkbox-label"></label></td>
+                        <td><input id="checkbox-table-1" type="checkbox"><label for="checkbox-table-1" class="checkbox-label"></label></td>
                         <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
                         <td>Content</td>
                         <td>Content</td>
@@ -296,7 +296,7 @@
                         <td>Content</td>
                     </tr>
                     <tr>
-                        <td><input id="checkbox-table" type="checkbox"><label for="checkbox-table" class="checkbox-label"></label></td>
+                        <td><input id="checkbox-table-2" type="checkbox"><label for="checkbox-table-2" class="checkbox-label"></label></td>
                         <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
                         <td>Content</td>
                         <td>Content</td>
@@ -373,7 +373,7 @@
                 <div class="component-form editPanel">
                     <p>This is the settings area for components. Use the existing .editPanel class.</p>
                     <!-- BEGIN socialstream_has_newpost -->
-                    <form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}' class='addPostForm {FORM_CLASS}' enctype='multipart/form-data'>
+                    <form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}-1' class='addPostForm {FORM_CLASS}' enctype='multipart/form-data'>
                         <input type='hidden' name='type' value='string' />
                         <input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
                         <input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
@@ -476,7 +476,7 @@
                                         </div>
                                         <div class="component-form editPanel">
                                             <!-- BEGIN socialstream_has_newpost -->
-                                            <form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}' class='addPostForm {FORM_CLASS}' enctype='multipart/form-data'>
+                                            <form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}-2' class='addPostForm {FORM_CLASS}' enctype='multipart/form-data'>
                                                 <input type='hidden' name='type' value='string' />
                                                 <input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
                                                 <input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
@@ -630,7 +630,7 @@
                                     Ms Celia Glenn
                                     <p class="meta">Teacher</p>
                                 </a>
-                                <a href="#" class="one-column text-center"title="Email Teacher" data-equalizer-watch>
+                                <a href="#" class="one-column text-center" title="Email Teacher" data-equalizer-watch>
                                     <i class="icon-email no-text"></i>
                                 </a>
                             </li>
@@ -642,7 +642,7 @@
                                     Ms Celia Glenn
                                     <p class="meta">Teacher</p>
                                 </a>
-                                <a href="#" class="one-column text-center"title="Email Teacher" data-equalizer-watch>
+                                <a href="#" class="one-column text-center" title="Email Teacher" data-equalizer-watch>
                                     <i class="icon-email no-text"></i>
                                 </a>
                             </li>
@@ -866,9 +866,9 @@
                         <ul class="f-dropdown" data-dropdown-content="" id="overflow">
                             <li><a href="#" class="icon-chat" title="Link 1">This is a link</a></li>
 
-                            <li><a href="#"class="icon-chat" title="Link 2">This is another</a></li>
+                            <li><a href="#" class="icon-chat" title="Link 2">This is another</a></li>
 
-                            <li><a href="#"class="icon-chat" title="Link 3">Yet another</a></li>
+                            <li><a href="#" class="icon-chat" title="Link 3">Yet another</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -1553,7 +1553,7 @@
                 <legend>Fancy</legend>
                 <div class="large-6 columns">
                     <label>Choose Your Favorite</label>
-                    <input type="radio" name="pokemon" value="Red" id="pokemonRed" checked><label class="radio-label"for="pokemonRed">Red</label>
+                    <input type="radio" name="pokemon" value="Red" id="pokemonRed" checked><label class="radio-label" for="pokemonRed">Red</label>
                     <input type="radio" name="pokemon" value="Blue" id="pokemonBlue"><label class="radio-label" for="pokemonBlue">Blue</label>
                 </div>
                 <div class="large-6 columns">
@@ -1582,17 +1582,19 @@
 
     <h1>WYSIWYG / Article</h1>
     <article>
-        <li>An email will automatically be sent to the email address your parents/guardian have supplied the school. Your parents/guardian then need to contact your Housemaster (e.g. phone/fax/email) to confirm they are aware of your leave request and approve of it.</li>
-        <li>If you are staying at a host other than family, then the host parent/guardian will need to contact your Housemaster (e.g. phone/fax/email) to confirm they are aware of your leave request and approve of it.  You can forward your email copy of your leave request to them.</li>
-        <li>You and your parents/guardian will receive notification by email of the status of your leave - approved, modified or rejected.</li>
-        <li>Confirmation from your parents/guardian and/or hosts must be received by your Housemaster by 8:00pm on the Thursday prior to your leave request.</li>
-        <li>You should advise your Housemaster as soon as possible if your leave arrangements change.</li>
-        <li>This application is a request for leave and the School reserves the right to approve/deny leave.</li>
-    </artcle>
+        <ul>
+            <li>An email will automatically be sent to the email address your parents/guardian have supplied the school. Your parents/guardian then need to contact your Housemaster (e.g. phone/fax/email) to confirm they are aware of your leave request and approve of it.</li>
+            <li>If you are staying at a host other than family, then the host parent/guardian will need to contact your Housemaster (e.g. phone/fax/email) to confirm they are aware of your leave request and approve of it.  You can forward your email copy of your leave request to them.</li>
+            <li>You and your parents/guardian will receive notification by email of the status of your leave - approved, modified or rejected.</li>
+            <li>Confirmation from your parents/guardian and/or hosts must be received by your Housemaster by 8:00pm on the Thursday prior to your leave request.</li>
+            <li>You should advise your Housemaster as soon as possible if your leave arrangements change.</li>
+            <li>This application is a request for leave and the School reserves the right to approve/deny leave.</li>
+        </ul>
+    </article>
     <hr>
 
     <h1>Datepicker</h1>
-    <p>Date: <input type="text" id="datepicker"></p>
+    <p><label>Date: <input type="text" id="datepicker"></label></p>
     <hr>
 
     <h1>AutoSuggest / Selectize</h1>
@@ -2183,15 +2185,15 @@
         });
 
         Dropzone.options.socialZone = {
-            addRemoveLinks: true,
+            addRemoveLinks: true
         };
 
         Dropzone.options.socialZone2 = {
-            addRemoveLinks: true,
+            addRemoveLinks: true
         };
 
         Dropzone.options.myAwesomeDropzone = {
-            addRemoveLinks: true,
+            addRemoveLinks: true
         };
 
         $('[data-target="delete-it"]').on('click', function(){
