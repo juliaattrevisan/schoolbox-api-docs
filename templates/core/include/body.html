@@ -38,13 +38,17 @@
 				</section>
 
 				<section class="row middle tab-bar-section">
-					<ul class="icon-nav inline-list small-11 columns no-pad hide-for-small-only">
+					<a href="/" class="logo small-2 columns">
+						<img src="/images/{SITE_LOCATION}/m-hercules.png" height="51" width="86" alt="{SITE_NAME}"/>
+					</a>
+
+					<ul class="icon-nav medium-10 columns">
 						<li><a class="icon-news icon-32 no-text" href="#"><label>News</label></a></li>
 						<li><a class="icon-email icon-32 no-text" href="#"><label>Webmail</label></a></li>
 						<li><a class="icon-calendar icon-32 no-text" href="#"><label>Calendar</label></a></li>
 						<li><a class="icon-timetable icon-32 no-text" href="#"><label>Timetable</label></a></li>
-	          <li><a class="icon-folder icon-32 no-text" href="#"><label>Resources</label></a></li>
-						<li><a class="icon-approve icon-32 no-text" href="#"><label>Submissions</label></a></li>
+	          <li><a class="icon-folder icon-32 no-tex" href="#"><label>Resources</label></a></li>
+						<li><a class="icon-approve icon-32 no-tex" href="#"><label>Submissions</label></a></li>
 						<li><a class="icon-files icon-32 no-text" href="#"><label>My Files</label></a></li>
 						<li><a class="icon-network icon-32 no-text" href="#"><label>Drives</label></a></li>
 	        </ul>
@@ -56,7 +60,7 @@
 				</section>
 
 				<section class="right-small">
-					<a class="right-off-canvas-toggle icon-notifications hide-for-xlarge-up" href="#"><span></span></a>
+					<a class="right-off-canvas-toggle icon-notifications" href="#"><span></span></a>
 				</section>
 	    </nav>
     </div>
@@ -66,11 +70,7 @@
     		<img src="/images/{SITE_LOCATION}/hercules.png" height="86" width="127" alt="{SITE_NAME}"/>
   		</a>
 			<div class="row">
-				<ul class="icon-nav inline-list small-12 columns show-for-small-only no-pad">
-					<li><a class="icon-news icon-32 no-text" href="#"><label>News</label></a></li>
-					<li><a class="icon-email icon-32 no-text" href="#"><label>Webmail</label></a></li>
-					<li><a class="icon-calendar icon-32 no-text" href="#"><label>Calendar</label></a></li>
-					<li><a class="icon-timetable icon-32 no-text" href="#"><label>Timetable</label></a></li>
+				<ul class="icon-nav small-12 columns">
 					<li><a class="icon-folder icon-32 no-text" href="#"><label>Resources</label></a></li>
 					<li><a class="icon-approve icon-32 no-text" href="#"><label>Submissions</label></a></li>
 					<li><a class="icon-files icon-32 no-text" href="#"><label>My Files</label></a></li>
@@ -101,7 +101,7 @@
 						<a href="/user/recoverSession" title="Return to">
 								<img height="32" width="32" src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square32">
 								{MENU_SWITCH_USER_FULLNAME}<br />
-								<span class="meta">{MENU_SWITCH_USER_ROLE}</span>
+								<p class="meta">{MENU_SWITCH_USER_ROLE}</p>
 						</a>
 					</li>
 					<!-- END recover_user -->
