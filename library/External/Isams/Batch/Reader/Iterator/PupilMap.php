@@ -16,10 +16,13 @@ class External_Isams_Batch_Reader_Iterator_PupilMap extends IteratorIterator
      */
     public function current()
     {
+        // At this stage I still can't tell if I have:
+        // //CurrentPupils/Pupil or //CurrentPupilsHealth/Pupil
+        // I don't know where I came from.
         $current = $this->getInnerIterator()->current();
         $result  = ['PupilId' => $current['attributes']['id']];
         foreach ($current['value'] as $key => $value) {
-            $result[str_replace('{}', '', $key)] = $value;
+            $result[preg_replace('/^{.*?}/', '', $key)] = $value;
         }
         return $result;
     }
