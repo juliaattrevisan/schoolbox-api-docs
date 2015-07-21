@@ -86,7 +86,7 @@
 
 				/* The element which allows you to make comments and replies
 				 */
-				addPostLink: '.addPostLink',
+				addPostLink: '[data-add-post-link]',
 
 				/* The form which spawns when making comments and replies
 				 */
