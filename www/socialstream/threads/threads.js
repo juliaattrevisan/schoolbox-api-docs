@@ -94,7 +94,7 @@
 
 				/* The element which allows you to spawn more
 				 */
-				viewMoreLink: $j(element).find('.socialstreamViewMore'),
+				viewMoreLink: $j(element).find('[data-socialstream-view-more]'),
 
 				/* Lightboxed attachments are found using this key
 				 */
