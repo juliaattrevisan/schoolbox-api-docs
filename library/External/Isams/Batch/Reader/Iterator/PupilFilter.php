@@ -9,7 +9,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-class External_Isams_Batch_Reader_Iterator_Pupil extends RecursiveArrayIterator
+class External_Isams_Batch_Reader_Iterator_PupilFilter extends RecursiveArrayIterator
 {
     /**
      * @return bool
