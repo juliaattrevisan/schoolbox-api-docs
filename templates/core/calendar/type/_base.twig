@@ -1,25 +1,23 @@
 {% set augmentedId = random(10000000000) %}
 
 <li class="row {{ event.getEventClasses() }} {% if renderer.isTranslucent() %}translucent{% endif %}">
-    <div class="row">
-        {% block eventSpan %}
-        <div class="three-column">
-            {{ event.getEventSpan()|raw }}
-        </div>
-        {% endblock eventSpan %}
-
-        {% block eventTitle %}
-        <div class="nine-column" data-dropdown="contentDrop{{ event.getEventId() }}{{ augmentedId }}" style="background-color:{{ event.colour }}">
-            {{ event.title }}
-
-            <span class="right" style="background-color:{{ event.colour }}">
-                {% if event.attendance %}
-                    A
-                {% endif %}
-            </span>
-        </div>
-        {% endblock eventTitle %}
+    {% block eventSpan %}
+    <div class="three-column">
+        {{ event.getEventSpan()|raw }}
     </div>
+    {% endblock eventSpan %}
+
+    {% block eventTitle %}
+    <div class="nine-column" data-dropdown="contentDrop{{ event.getEventId() }}{{ augmentedId }}" style="background-color:{{ event.colour }}">
+        {{ event.title }}
+
+        <span class="right" style="background-color:{{ event.colour }}">
+            {% if event.attendance %}
+                A
+            {% endif %}
+        </span>
+    </div>
+    {% endblock eventTitle %}
 
 
     <div class="f-dropdown content content-drop medium" data-dropdown-content="" id="contentDrop{{ event.getEventId() }}{{ augmentedId }}">

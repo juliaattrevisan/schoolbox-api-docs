@@ -72,17 +72,21 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
      */
     public function renderTemplate($templateHandle)
     {
-        return $this->renderTwigTemplate(
-            $templateHandle,
-            '@tile/component/tile.twig',
-            array(
-                'component'                  => $this,
-                'showButtons'                => false,
-                'tile_component_instance_id' => $this->getConfig('tileSource') ?: $this->getInstance()->getId(),
-            ),
-            !$this->getConfig('compactMode'),
-            false
-        );
+        if ($this->getLayout()->getTileList()->count()) {
+            return $this->renderTwigTemplate(
+                $templateHandle,
+                '@tile/component/tile.twig',
+                array(
+                    'component'                  => $this,
+                    'showButtons'                => false,
+                    'tile_component_instance_id' => $this->getConfig('tileSource') ?: $this->getInstance()->getId(),
+                ),
+                !$this->getConfig('compactMode'),
+                false
+            );
+        }
+
+        return false;
     }
 
     /**

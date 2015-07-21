@@ -124,18 +124,23 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
         // Load images for the current homepage
         $allImages = $this->getCategoryMapper()->findImages($this->getSource(), $this->getConfig('size'), true);
 
-        // Iterate
-        foreach ($allImages as $currentImage) {
-            $this->setVar(
-                array(
-                    'THUMBNAIL_ID'          => $currentImage->getId(),
-                    'THUMBNAIL_DESCRIPTION' => $currentImage->getTitle(),
-                    'THUMBNAIL_SIZE'        => $this->getConfig('pixel') ? $this->getConfig('pixel') : Cfg::get('thumbnail_size'),
-                    'IMAGE_HEIGHT'          => $this->getConfig('pixel') ? $this->getConfig('pixel') : Cfg::get('thumbnail_size'),
-                )
-            );
+        if ($allImages->count()) {
+            // Iterate
+            foreach ($allImages as $currentImage) {
+                $this->setVar(
+                    array(
+                        'THUMBNAIL_ID'          => $currentImage->getId(),
+                        'THUMBNAIL_DESCRIPTION' => $currentImage->getTitle(),
+                        'THUMBNAIL_SIZE'        => $this->getConfig('pixel') ? $this->getConfig('pixel') : Cfg::get('thumbnail_size'),
+                        'IMAGE_HEIGHT'          => $this->getConfig('pixel') ? $this->getConfig('pixel') : Cfg::get('thumbnail_size'),
+                    )
+                );
 
-            $this->parse('image_gallery_block', 'image_gallery', true);
+                $this->parse('image_gallery_block', 'image_gallery', true);
+            }
+        }
+        else {
+            return false;
         }
 
         // everything went according to plan
