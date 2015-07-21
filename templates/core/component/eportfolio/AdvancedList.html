@@ -2,21 +2,35 @@
     <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
     <script type='text/javascript'>
         $(function() {
-            $('#component{COMPONENT_INSTANCE_ID}').find('[data-list-item-id]').click(function(event) {
+            $('#component{COMPONENT_INSTANCE_ID}').find('[data-list-item-id]').click(function() {
                 event.preventDefault();
 
                 var id = $(this).attr('data-list-item-id');
-
-                /* Show editor form
-                 */
+                var allContent = $('#component{COMPONENT_INSTANCE_ID}').find('[data-content-row]');
+                var content = $('#component{COMPONENT_INSTANCE_ID}').find('[data-content-row='+id+']');
+                var allPanels = $('#component{COMPONENT_INSTANCE_ID}').find('[data-create-panel]');
                 var panel = $('#component{COMPONENT_INSTANCE_ID}').find('[data-create-panel='+id+']');
-                panel.removeClass('hide');
-                panel.find('[data-first-focus]').focus();
 
-                /* Hide actual content
+                /* Hide all editor panels
+                 * show all content rows
                  */
-                var content = $('#component{COMPONENT_INSTANCE_ID}').find('[data-list-item-advanced-content='+id+']');
-                content.addClass('hide');
+                if (content.hasClass('hide')) {
+                    allPanels.addClass('hide');
+                    allContent.removeClass('hide');
+                }
+                /* Hide all editor panels
+                 * Show this editor panel
+                 * Show all content rows
+                 * Hide this content row
+                 */
+                else {
+                    allPanels.addClass('hide');
+                    panel.removeClass('hide');
+                    panel.find('[data-first-focus]').focus();
+
+                    allContent.removeClass('hide');
+                    content.addClass('hide');
+                }
             });
 
             /* Create button, swap form in
@@ -54,7 +68,7 @@
                         <div class="small-10 columns no-pad">
 
                             <!-- BEGIN has_image -->
-                            <div class="avatar-card clearfix">
+                            <div class="avatar-card clearfix" data-content-row="{LIST_ITEM_ID}">
                                 <a href="/storage/image.php?size=maxsize&hash={LIST_ITEM_IMAGEHASH}" rel="lightbox[eportfolio-{COMPONENT_INSTANCE_ID}]" title="{LIST_ITEM_TITLE}">
                                     <img src="/storage/image.php?size=square64&hash={LIST_ITEM_IMAGEHASH}" alt="{LIST_ITEM_TITLE}" />
                                     <p>{LIST_ITEM_TITLE}</p>
@@ -66,7 +80,7 @@
                             <!-- END has_image -->
 
                             <!-- BEGIN no_image -->
-                            <div class="info card">
+                            <div class="info card" data-content-row="{LIST_ITEM_ID}">
                                 <h3>{LIST_ITEM_TITLE}</h3>
                                 <article>
                                     <p class="meta">{LIST_ITEM_CONTENT}</p>
