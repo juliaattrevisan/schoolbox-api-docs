@@ -1,39 +1,59 @@
-<script type="text/javascript" src="/javascript/components/flot/jquery.flot.js"></script>
-<script type="text/javascript" src="/javascript/components/flot/jquery.flot.time.js"></script>
-<h2 class="square-bottom">Page Visits</h2>
-<div class="page-visits">
-    <div id="visit-chart"></div>
-</div>
+{GRAPH_JSON}
+        
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type="text/javascript">
-    var data = {GRAPH_JSON};
-    var options = {
-        series: {
-            points: {
-                show: true,
-                fill: true,
-                lineWidth: 6
+    $(function () {
+        $('#page-visit-graph').highcharts({
+            title: {
+                text: ''
             },
-            lines: {
-                show: true,
-                lineWidth: 4
+            colors: ['#579DCF', '#ff0000'],
+            xAxis: {
+                min: {GRAPH_XMIN},
+                max: {GRAPH_XMAX},
+                type: 'datetime'
+            },
+            yAxis: {
+                title: {
+                    text: 'Visits'
+                },
+                allowDecimals: false,
+                min: 0
+            },
+            series: [
+                {
+                    name: 'Staff',
+                    data: [
+                        [1410998400000,0],
+                        [1411084800000,1],
+                        [1411171200000,0]
+                    ]
+                },
+                {
+                    name: 'Student',
+                    data: [
+                        [1410999400000,3],
+                        [1411094800000,2],
+                        [1411181200000,4],
+                        [1411201200000,11]
+                    ]
+                }
+            ],
+            credits: {
+                enabled: false
             }
-        },
-        colors: {GRAPH_COLOURS},
-        xaxis:  {
-            mode: "time",
-            min: {GRAPH_XMIN},
-            max: {GRAPH_XMAX}
-        },
-        yaxis:  {
-            min: 0
-        },
-        grid:   {
-            borderWidth: 0,
-            show: true
-        }
-    };
-    $(function() {
-        $.plot($('#visit-chart'), data, options);
+        });
     });
 </script>
 
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Page Visits</h2>
+        <section>
+            <div class="content">
+                <div id="page-visit-graph">
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
