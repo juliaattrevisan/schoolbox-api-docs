@@ -58,7 +58,7 @@ class External_Isams_Batch_BaseApi
                 sprintf(
                     'XML retrieval failed: response code %d, message: %s',
                     $curl->getResponseCode(),
-                    $curl->getErrors()
+                    implode(', ', $curl->getErrors())
                 ),
                 $curl->getResponseCode()
             );
