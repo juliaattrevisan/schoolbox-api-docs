@@ -20,14 +20,10 @@
 </ul>
 
 <div class="row">
-    <div class="small-12 island">
-        <section>
-            <!-- BEGIN no_showcased_work -->
-            <div class="content">
-                <p>{USER_FIRSTNAME} {USER_LASTNAME} has no showcased work.</p>
-            </div>
-            <!-- END no_showcased_work -->
-
+    <div class="small-12 island no-pad">
+        <!-- BEGIN no_showcased_work -->
+        <h2 class="subheader">{USER_FIRSTNAME} {USER_LASTNAME} has no showcased work</h2>
+        <!-- END no_showcased_work -->
             <!-- BEGIN has_intro -->
             <div class="content">
                 <p>Visit your submission history page to publish items to your showcase.</p>
@@ -42,18 +38,18 @@
                 <table>
                     <colgroup>
                         <col width="46" />
-                        <col />
+                        <col width="400" />
                         <col width="154" />
-                        <col width="142" />
-                        <col width="91" />
+                        <col width="100" />
+                        <col width="1" />
                     </colgroup>
                     <thead>
                     <tr>
-                        <th>Type</th>
+                        <th>&nbsp;</th>
                         <th>Title</th>
                         <th>Submitted</th>
                         <th>Grade</th>
-                        <th></th>
+                        <th>&nbsp;</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -62,7 +58,7 @@
                         <!-- BEGIN has_submission -->
                         <td>
                             <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1">
-                                <img src="/images/mime/60x60/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" />
+                                <img class="minw-2" src="/images/mime/60x60/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" />
                             </a>
                         </td>
                         <td>
@@ -72,7 +68,7 @@
                         </td>
                         <!-- END has_submission -->
                         <!-- BEGIN no_submission -->
-                        <td></td>
+                        <td>&nbsp;</td>
                         <td>
                             {SHOWCASED_WORK_BOX_NAME} ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
                             <a href="">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a>
@@ -101,7 +97,6 @@
             </section>
             <!-- END showcased_work_subject -->
             <!-- END has_showcased_work -->
-        </section>
     </div>
 </div>
 
