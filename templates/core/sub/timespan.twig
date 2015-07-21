@@ -1,0 +1,14 @@
+{# Outputs the difference between two ADF objects (start, end) in a consistent format. #}
+<time datetime="{{ start.getDatabase() }}">{{ start.getShort() }}</time>
+
+{# don't bother showing end time if it's the same as start #}
+{% if start.getShort() != end.getShort() %}
+    –
+    <time datetime="{{ end.getDatabase() }}">
+        {% if start.getDatabaseDate() == end.getDatabaseDate() %}
+            {{ end.getTimeOnly() }}
+        {% else %}
+            {{ end.getShort() }}
+        {% endif %}
+    </time>
+{% endif %}
