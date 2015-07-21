@@ -1,6 +1,8 @@
 <?php
 /**
- * Class description here
+ * Iterator for a list of results from `External_Isams_Batch_Reader_CurrentPupil->parse()`.
+ *
+ * Prevents traversal further down the tree than the Pupil node.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
@@ -9,6 +11,9 @@
 
 class External_Isams_Batch_Reader_Iterator_Pupil extends RecursiveArrayIterator
 {
+    /**
+     * @return bool
+     */
     public function hasChildren()
     {
         $current = $this->current();
