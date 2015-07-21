@@ -8,6 +8,11 @@ require_once __DIR__ . '/../../include/Bootstrap.php';
 
 $reader = new External_Isams_Batch_Reader_CurrentPupil();
 $reader->open($argv[1]);
-foreach ($reader->getPupils() as $i => $pupil) {
+
+$i = 0;
+foreach ($reader->getPupils() as $pupil) {
     print_r($pupil);
+    if (++$i >= 100) {
+        exit;
+    }
 }
