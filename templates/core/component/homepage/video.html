@@ -23,80 +23,84 @@
     {CONFIGURATION}
 
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="column small-12">
-            <!-- BEGIN default_video -->
-            <video id="schoolbox_video{COMPONENT_INSTANCE_ID}"
-                   data-videocomponent
-                   controls
-                   preload="none"
-                   poster="/cms/videoThumb.php?type=sbfs&id={DEFAULT_VIDEO_ID}&size=poster"
-                   height="400"
-                   width="100%">
-              <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_VIDEO_ID}" type='video/mp4'>
-            </video>
-            <!-- END default_video -->
+        <div class="small-12 island">
+            <section>
+                <!-- BEGIN default_video -->
+                <video id="schoolbox_video{COMPONENT_INSTANCE_ID}"
+                       data-videocomponent
+                       controls
+                       preload="none"
+                       poster="/cms/videoThumb.php?type=sbfs&id={DEFAULT_VIDEO_ID}&size=poster"
+                       height="400"
+                       width="100%">
+                  <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_VIDEO_ID}" type='video/mp4'>
+                </video>
+                <!-- END default_video -->
 
-            <div class="dropzone-wrap">
-                <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="video"></form>
-                <ul class="information-list" data-dz-container>
-                    <!-- BEGIN video_list -->
-                    <li class="row">
-                        <div class="avatar card">
-                            <a data-videolink href="#" rel="{VIDEO_LIST_ID}">
-                                <img src="/cms/videoThumb.php?type=sbfs&id={VIDEO_LIST_ID}" />
+                <div class="dropzone-wrap">
+                    <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="video"></form>
+                    <ul class="information-list" data-dz-container>
+                        <!-- BEGIN video_list -->
+                        <li class="row">
+                            <div class="avatar card">
+                                <a data-videolink href="#" rel="{VIDEO_LIST_ID}">
+                                    <img src="/cms/videoThumb.php?type=sbfs&id={VIDEO_LIST_ID}" />
+                                    <h3>{VIDEO_LIST_TITLE}</h3>
+                                </a>
+                                <p class="meta">{VIDEO_LIST_DURATION}</p>
+                                <p class="meta">
+                                    Posted by
+                                    <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a>
+                                </p>
+                            </div>
+                            <p class="list-item-content">{VIDEO_LIST_COMMENT}</p>
+                        </li>
+                        <!-- END video_list -->
+                        <!-- BEGIN video_pending_list -->
+                        <li class="row">
+                            <div class="avatar card">
+                                <img src="{VIDEO_LIST_STATUSIMG}" title="Currently transcoding {VIDEO_LIST_TITLE}"/>
                                 <h3>{VIDEO_LIST_TITLE}</h3>
-                            </a>
-                            <p class="meta">{VIDEO_LIST_DURATION}</p>
-                            <p class="meta">
-                                Posted by
-                                <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a>
-                            </p>
-                        </div>
-                        <p class="list-item-content">{VIDEO_LIST_COMMENT}</p>
-                    </li>
-                    <!-- END video_list -->
-                    <!-- BEGIN video_pending_list -->
-                    <li class="row">
-                        <div class="avatar card">
-                            <img src="{VIDEO_LIST_STATUSIMG}" title="Currently transcoding {VIDEO_LIST_TITLE}"/>
-                            <h3>{VIDEO_LIST_TITLE}</h3>
-                            <p class="meta">
-                                Posted by
-                                <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a>
-                            </p>
-                        </div>
-                        <p class="list-item-content">{VIDEO_LIST_COMMENT}</p>
-                    </li>
-                    <!-- END video_pending_list -->
-                </ul>
-            </div>
+                                <p class="meta">
+                                    Posted by
+                                    <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a>
+                                </p>
+                            </div>
+                            <p class="list-item-content">{VIDEO_LIST_COMMENT}</p>
+                        </li>
+                        <!-- END video_pending_list -->
+                    </ul>
+                </div>
 
-            <!-- BEGIN submit_video -->
-            <a href="/cms/file/new/{FILE_CAT_ID}" class="button icon-upload">Post Video</a>
+                <!-- BEGIN submit_video -->
+                <div class="content">
+                    <a href="/cms/file/new/{FILE_CAT_ID}" class="button icon-upload">Post Video</a>
+                </div>
 
-            <script type="text/javascript">
-                $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                    wrapClass: 'dragging',
-                    previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
-                    tplWrap: '<li class="dz-preview" />',
-                    dictDefaultMessage: 'You can drag videos into this space.',
-                    refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                    refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
-                    addedfile: function (file) {
-                        $(file.previewElement).addClass('category-{FILE_CAT_ID}').data('node', {FILE_CAT_ID});
-                    },
-                    sending: function (file, xhr, formData) {
-                        formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                        formData.append('category', $(file.previewElement).data('node'));
-                        formData.append('comment', '');
-                        formData.append('hidden', 0);
-                    },
-                    complete: function (file) {
-                        $(file.previewElement).find('img').remove();
-                    }
-                });
-            </script>
-            <!-- END submit_video -->
+                <script type="text/javascript">
+                    $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                        wrapClass: 'dragging',
+                        previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                        tplWrap: '<li class="dz-preview" />',
+                        dictDefaultMessage: 'You can drag videos into this space.',
+                        refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                        refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+                        addedfile: function (file) {
+                            $(file.previewElement).addClass('category-{FILE_CAT_ID}').data('node', {FILE_CAT_ID});
+                        },
+                        sending: function (file, xhr, formData) {
+                            formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                            formData.append('category', $(file.previewElement).data('node'));
+                            formData.append('comment', '');
+                            formData.append('hidden', 0);
+                        },
+                        complete: function (file) {
+                            $(file.previewElement).find('img').remove();
+                        }
+                    });
+                </script>
+                <!-- END submit_video -->
+            </section>
         </div>
     </div>
 </div>
