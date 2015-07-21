@@ -223,7 +223,7 @@ $.widget("ui.chat",  {
                 $message_el.addClass('chat-message-user-admin');
             }
 
-            $tpl =
+            var $tpl =
                 '<div class="avatar card">' +
                 '<img src="/portrait.php?userId={1}&size=square64" title="{0}" />' +
                 '<h3>{0} <span class="meta">&bull; {2}</span></h3>' +
@@ -266,7 +266,7 @@ $.widget("ui.chat",  {
                     var $user = $data.users[$i];
 
                     var $user_el = $('<li class="row"></li>');
-					$tpl =
+					var $tpl =
                         '<div class="column no-pad small-11">' +
                             '<div class="avatar card">' +
                                 '<img class="icon" src="/portrait.php?userId={1}&size=square64" title="{0}" />' +
