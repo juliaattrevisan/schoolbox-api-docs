@@ -35,7 +35,9 @@ class External_Isams_Batch_Reader_CurrentPupil extends Reader
                     new External_Isams_Batch_Reader_Iterator_PupilFilter($this->parse())
                 ),
                 function ($value) {
-                    return $value['name'] == '{}Pupil';
+                    return is_array($value)
+                        && array_key_exists('name', $value)
+                        && $value['name'] == '{}Pupil';
                 }
             )
         );

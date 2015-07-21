@@ -18,7 +18,6 @@ class External_Isams_Batch_Reader_Iterator_PupilFilter extends RecursiveArrayIte
     {
         $current = $this->current();
         return is_array($current)
-//            && array_key_exists('name', $current)
-            && $current['name'] != '{}Pupil';
+            && (!(array_key_exists('name', $current) && $current['name'] == '{}Pupil'));
     }
 }
