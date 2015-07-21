@@ -43,10 +43,12 @@
                     <li class="row">
                         <div class="avatar card">
                             <a data-videolink href="#" rel="{VIDEO_LIST_ID}">
-                                <img width="64" height="64" src="/cms/videoThumb.php?type=sbfs&id={VIDEO_LIST_ID}"/>
+                                <img src="/cms/videoThumb.php?type=sbfs&id={VIDEO_LIST_ID}" />
                                 <h3>{VIDEO_LIST_TITLE}</h3>
                             </a>
-                            <p class="meta">{VIDEO_LIST_DURATION} | Posted by
+                            <p class="meta">{VIDEO_LIST_DURATION}</p>
+                            <p class="meta">
+                                Posted by
                                 <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a>
                             </p>
                         </div>
@@ -56,9 +58,12 @@
                     <!-- BEGIN video_pending_list -->
                     <li class="row">
                         <div class="avatar card">
-                            <img width="64" height="64" src="{VIDEO_LIST_STATUSIMG}" title="Currently transcoding {VIDEO_LIST_TITLE}"/>
+                            <img src="{VIDEO_LIST_STATUSIMG}" title="Currently transcoding {VIDEO_LIST_TITLE}"/>
                             <h3>{VIDEO_LIST_TITLE}</h3>
-                            <p class="meta">Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
+                            <p class="meta">
+                                Posted by
+                                <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a>
+                            </p>
                         </div>
                         <p class="list-item-content">{VIDEO_LIST_COMMENT}</p>
                     </li>
@@ -67,7 +72,7 @@
             </div>
 
             <!-- BEGIN submit_video -->
-            <a href="/cms/file/new/{FILE_CAT_ID}" class="button up-arrow">Post Video</a>
+            <a href="/cms/file/new/{FILE_CAT_ID}" class="button icon-upload">Post Video</a>
 
             <script type="text/javascript">
                 $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
