@@ -1351,6 +1351,17 @@
             </a>
         </li>
     </ul>
+    <ul class="inline-list" id="progress-icon" style="padding:1rem 0;">
+        <li>
+            <a href="#" class="progress-tick no-text"></a>
+        </li>
+        <li>
+            <a href="#" class="progress-tick pending no-text"></a>
+        </li>
+        <li>
+            <a href="#" class="progress-tick complete no-text"></a>
+        </li>
+    </ul>
     <hr>
 
     <h1>Preloader .gif</h1>
@@ -2172,6 +2183,21 @@
 
 <script>
     $(document).ready( function () {
+
+        $('#progress-icon').on('click', 'a', function (e) {
+            e.preventDefault();
+
+            var $a = $(this);
+
+            if ($a.hasClass('pending')) {
+                $a.removeClass('pending').addClass('complete');
+            } else if ($a.hasClass('complete')) {
+                $a.removeClass('complete');
+            } else {
+                $a.addClass('pending');
+            }
+
+        });
 
         $("#joyride-go").foundation('joyride', 'start');
 
