@@ -25,17 +25,15 @@
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="column small-12">
             <!-- BEGIN default_video -->
-            <div class="videoWrapper">
-                <video id="schoolbox_video{COMPONENT_INSTANCE_ID}"
-                       data-videocomponent
-                       controls
-                       preload="none"
-                       poster="/cms/videoThumb.php?type=sbfs&id={DEFAULT_VIDEO_ID}&size=poster"
-                       height="400"
-                       width="100%">
-                  <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_VIDEO_ID}" type='video/mp4'>
-                </video>
-            </div>
+            <video id="schoolbox_video{COMPONENT_INSTANCE_ID}"
+                   data-videocomponent
+                   controls
+                   preload="none"
+                   poster="/cms/videoThumb.php?type=sbfs&id={DEFAULT_VIDEO_ID}&size=poster"
+                   height="400"
+                   width="100%">
+              <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_VIDEO_ID}" type='video/mp4'>
+            </video>
             <!-- END default_video -->
 
             <div class="dropzone-wrap">
