@@ -161,6 +161,12 @@ label.checkbox-label		{ background-position: 0 -120px; }
 
 // Component Forms
 .editPanel{
+
+    // Socialstreams-specific colouring
+    &.socialstream-new-post {
+        background-color: $asgard;
+        display: block;
+    }
 	background-color: $gainsboro;
 	display: none;
 	padding: rem-calc(($base-font-size));
