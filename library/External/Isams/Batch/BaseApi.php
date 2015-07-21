@@ -50,12 +50,13 @@ class External_Isams_Batch_BaseApi
             ->setPath('/api/batch/1.0/xml.ashx')
             ->setQuery(['apikey' => $this->getApiKey()])
         ;
-        $curl = new Alaress_Curl_Url($url);
-        if (strlen($filter) > 0) {
+        $curl         = new Alaress_Curl_Url($url);
+        $filterString = "$filter";
+        if (strlen($filterString) > 0) {
             $curl->addOptions([
                 CURLOPT_HTTPHEADER => ['Content-Type: text/xml'],
                 CURLOPT_POST       => true,
-                CURLOPT_POSTFIELDS => $filter,
+                CURLOPT_POSTFIELDS => $filterString,
             ]);
         }
         $curl->exec();
