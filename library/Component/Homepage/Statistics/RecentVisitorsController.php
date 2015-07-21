@@ -53,7 +53,8 @@ class Component_Homepage_Statistics_RecentVisitorsController extends Component_H
         }
 
         $uHandler = new User();
-        $this->setBlock($templateHandle, 'recent_visitor', 'recent_visitor_block');
+        $this->setBlock($templateHandle, 'has_recent_visitor', 'has_recent_visitor_block');
+        $this->setBlock('has_recent_visitor', 'recent_visitor', 'recent_visitor_block');
         $this->setBlock($templateHandle, 'no_recent_visitor', 'no_recent_visitor_block');
 
         if (!count($this->visitors)) {
