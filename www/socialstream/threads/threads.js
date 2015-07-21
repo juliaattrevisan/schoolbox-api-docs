@@ -135,7 +135,8 @@
 
 				// Does this have a post form already? If so, don't add it back
 				// after it gets removed.
-				var body = $j(this).closest('li').find('[data-body]').first();
+                var row = $j(this).closest('[data-socialstream-row]');
+				var body = row.find('[data-body]').first();
 				var hasPostForm = (body.find('[data-add-post-form]').length > 0)
 
 				/* Clear out all instances of .addPostForm in the socialstream
@@ -181,7 +182,7 @@
 
 				/* Steal focus
 				 */
-				$(this).closest('li').find('[data-socialstream-form]').find('textarea').focus();
+				row.find('[data-socialstream-form]').find('textarea').focus();
 			});
 		}
 
