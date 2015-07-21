@@ -195,21 +195,21 @@ function mb_pathinfo($filepath, $options = null) {
 
     $ret = [];
 
-    if ($m[1]) {
+    if (isset($m[1]) && $m[1]) {
         $ret[$map[PATHINFO_DIRNAME]] = $m[1];
     }
-    if ($m[2]) {
+    if (isset($m[2]) && $m[2]) {
         $ret[$map[PATHINFO_BASENAME]] = $m[2];
     }
-    if ($m[5]) {
+    if (isset($m[5])) {
         $ret[$map[PATHINFO_EXTENSION]] = $m[5];
     }
-    if ($m[3]) {
+    if (isset($m[3]) && $m[3]) {
         $ret[$map[PATHINFO_FILENAME]] = $m[3];
     }
 
     if ($options && isset($map[$options])) {
-        return $ret[$map[$options]];
+        return array_key_exists($map[$options], $ret) ? $ret[$map[$options]] : '';
     }
 
     return $ret;
