@@ -87,7 +87,7 @@ sc.StudentYearLevel, sc.StudentCampus, sc.StudentGender
 FROM SynergyOne.dbo.vStudentContactAllAddress sc
 INNER JOIN dbo.uvStudentContactNetworkAccounts scn on scn.pk_id = sc.StudentContactID
 WHERE (sc.StudentContactType = 'SC1' or sc.StudentContactType = 'SC2' or sc.StudentContactType = 'SC3')
-and sc.FileSemester = '" . $this->getDatabase()->quote($this->getCurrentSemester()) . " and sc.FileYear = '" . $this->getDatabase()->quote($this->getCurrentYear()) . "' and sc.StudentCampus <> 'T'
+and sc.FileSemester = '" . $this->getDatabase()->quote($this->getCurrentSemester()) . "' and sc.FileYear = '" . $this->getDatabase()->quote($this->getCurrentYear()) . "' and sc.StudentCampus <> 'T'
 
 UNION
 
