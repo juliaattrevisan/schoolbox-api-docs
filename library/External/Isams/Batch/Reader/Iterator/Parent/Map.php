@@ -1,6 +1,6 @@
 <?php
 /**
- * Maps results for `External_Isams_Batch_Reader_Student->parse()`.
+ * Maps results for `External_Isams_Batch_Reader_Parent->parse()`.
  *
  * Converts results to the same format that
  * `External_UserInterface->getStudentUserAccountInfo()` returns.
@@ -16,18 +16,11 @@ class External_Isams_Batch_Reader_Iterator_Parent_Map extends External_Isams_Bat
      */
     public function current()
     {
-        // At this stage I still can't tell if I have:
-        // //CurrentPupils/Pupil or //CurrentPupilsHealth/Pupil
-        // I don't know where I came from.
         $current = $this->getInnerIterator()->current();
         $result  = $this->stripClarkNotationFromArrayKeys($current['value']);
-//        foreach ($current['value'] as $key => $value) {
-//            $result[$this->stripClarkNotation($key)] = $value;
-//        }
 
         // ID: the database's PK value, distinct from SchoolID
         $id = $current['attributes']['id'];
-        // Don't share CanShare = 0
         if (array_key_exists('Address', $result)) {
             // //Contacts/Contact: build student's contacts out of this
             // iSAMS contains no home phone
@@ -41,7 +34,7 @@ class External_Isams_Batch_Reader_Iterator_Parent_Map extends External_Isams_Bat
                 'email'         => $result['EmailAddress'],
                 // TODO add address as separate key
                 'address'       => $this->parseAddress($result['Address']),
-                'students'      => $this->parsePupils($result['Pupils']),
+                'students'      => $this->parseStudents($result['Pupils']),
             ];
         } else {
             return [
@@ -51,9 +44,14 @@ class External_Isams_Batch_Reader_Iterator_Parent_Map extends External_Isams_Bat
         }
     }
 
+    /**
+     * Parses the addresses in an Address element into a Schoolbox format.
+     *
+     * @param  array $address
+     * @return array
+     */
     protected function parseAddress($address)
     {
-        // Get addresses out of this contact.
         $address = $this->stripClarkNotationFromArrayKeys($address);
         return [
             'address'  => implode(', ', array_filter($address['AddressLines'])),
@@ -62,13 +60,19 @@ class External_Isams_Batch_Reader_Iterator_Parent_Map extends External_Isams_Bat
         ];
     }
 
-    protected function parsePupils($pupils)
+    /**
+     * Parses the student list in a Pupils element into a list of student IDs.
+     *
+     * @param  array $students
+     * @return array
+     */
+    protected function parseStudents($students)
     {
         $studentIds = [];
-        foreach ($pupils as $pupil) {
-            $values = $this->stripClarkNotationFromArrayKeys($pupil['value']);
+        foreach ($students as $student) {
+            $values = $this->stripClarkNotationFromArrayKeys($student['value']);
             if (strtolower($values['Status']) === 'current') {
-                $studentIds[] = $pupil['attributes']['id'];
+                $studentIds[] = $student['attributes']['id'];
             }
         }
         return $studentIds;

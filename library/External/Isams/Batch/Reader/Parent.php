@@ -1,6 +1,6 @@
 <?php
 /**
- * XML reader for finding pupil contacts in iSAMS' batch API response.
+ * XML reader for finding parent contacts in iSAMS' batch API response.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd

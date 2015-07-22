@@ -1,8 +1,8 @@
 <?php
 /**
- * Iterator for a list of results from `External_Isams_Batch_Reader_Contact->parse()`.
+ * Iterator for a list of results from `External_Isams_Batch_Reader_Parent->parse()`.
  *
- * Prevents traversal further down the tree than the Pupil node.
+ * Prevents traversal further down the tree than the Contact node.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
