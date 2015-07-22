@@ -31,7 +31,8 @@ $submissions = new Collection();
 if (trim($_POST['body'])) {
     $drafts = $subMap->getDrafts($_SESSION['id'], $_POST['box_id'], 1);
     if ($drafts->count()) {
-        $drafts->first()->setDraft(false)->setCreatedAt(Alaress_Date_Format::now());
+        // Create a new item that isn't a draft, instead of resaving the old one.
+        $drafts->first()->setId(null)->setDraft(false);
         $submissions->add($drafts->first());
     }
 }
