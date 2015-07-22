@@ -44,8 +44,8 @@
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/javascript/jquery.masonry.js"></script>
 <script type="text/javascript" src="/javascript/jquery.masonry.spectrum.js"></script>
-<script type="text/javascript" src="/javascript/jquery.droptab.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
+<script type="text/javascript" src="/javascript/jquery.collapsable.js"></script>
 <script type="text/javascript">
 
     var colours = {};
@@ -168,258 +168,267 @@
 				dataType: 'json'
 			}
 		});
-
-        $('#tabs-homepage').droptab({
-            buttonSelector: '#tab-control a.btn',
-            tabSelector: '> div.customise-components',
-            onOpen: function () {
-                if (this.id == 'tab-component') {
-                    $('#e-portfolio').addClass('show-empty');
-                } else {
-                    $('#e-portfolio').removeClass('show-empty');
-                }
-            },
-            onClose: function () {
-                $('#e-portfolio').removeClass('show-empty');
-            }
-        });
-
     });
 </script>
 <!-- END modify_layout -->
 <!-- END custom_head -->
 
-<h1><span>{HEADING}</span> - {PAGE_TITLE}</h1>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{HEADING} - {PAGE_TITLE}</h1>
 
-<ul id="tab-control" class="homepage-controls clearfix">
-    <!-- BEGIN edit_page -->
-    <li><a id="tab-delete" class="btn homepage-delete no-text" data-tab="tabs-5" title="Delete this page"><span></span></a></li>
-    <li><a id="tab-permissions" class="btn homepage-permissions no-text" data-tab="tabs-4" title="Change Permissions"><span></span></a></li>
-    <li><a id="tab-update" class="btn homepage-edit no-text" data-tab="tabs-3" title="Edit the page title"><span></span></a></li>
-    <li><a id="tab-columns" class="btn homepage-columns no-text" data-tab="tabs-2" title="Edit columns"><span></span></a></li>
-    <li><a id="tab-component" class="btn homepage-component no-text" data-tab="tabs-1" title="Add components"><span></span></a></li>
-    <!-- END edit_page -->
-</ul>
+        <ul class='sub-nav'>
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
+            <!-- BEGIN showcase_page -->
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
+            <!-- END showcase_page -->
+            <!-- BEGIN eportfolio_page -->
+            <li {EPORTFOLIO_CURRENT_PAGE}><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
+            <!-- END eportfolio_page -->
+            <!-- BEGIN can_add_page -->
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="button icon-add">Add page</a></li>
+            <!-- END can_add_page -->
+        </ul>
+    </div>
+</div>
 
-<ul class='admin-nav'>
-    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
-    <!-- BEGIN showcase_page -->
-    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
-    <!-- END showcase_page -->
-    <!-- BEGIN eportfolio_page -->
-    <li><a {EPORTFOLIO_CURRENT_PAGE} href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
-    <!-- END eportfolio_page -->
-    <!-- BEGIN can_add_page -->
-    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="add"><span></span> Add page</a></li>
-    <!-- END can_add_page -->
-</ul>
+<!-- BEGIN edit_page -->
+<div class="row">
+    <div class="small-12 columns">
+        <dl class="tabs" data-tab id="eportfolio-page-controls">
+            <dd><a class="icon-modify" href="#eportfolio-page-controls-tab-1" title="Add components"></a></dd>
+            <dd><a class="icon-modify" href="#eportfolio-page-controls-tab-2" title="Edit columns"></a></dd>
+            <dd><a class="icon-modify" href="#eportfolio-page-controls-tab-3" title="Edit the page title"></a></dd>
+            <dd><a class="icon-modify" href="#eportfolio-page-controls-tab-4" title="Change Permissions"></a></dd>
+            <dd><a class="icon-delete" href="#eportfolio-page-controls-tab-5" title="Delete this page"></a></dd>
+        </dl>
+    </div>
+</div>
+<!-- END edit_page -->
 
-<div class='clearfix'></div>
 
 <!-- BEGIN customise_page -->
-<div id="tabs-homepage">
-	<div id="tabs-1" class="customise-components">
-		<div id="tabs-sub"> <!-- tabs-sub -->
-			<ul class="ui-tabs admin-nav">
-				<!-- BEGIN eportfolio_component_tab -->
-				<li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
-				<!-- END eportfolio_component_tab -->
-			</ul>
-			<div class="clearfix"></div>
-			<div class="components clearfix">
-				<!-- BEGIN eportfolio_component_page -->
-				<div id="tabs-sub-{EPORTFOLIO_COMPONENT_CATEGORY_ID}">
-					<!-- BEGIN eportfolio_component -->
-					<div class="add-component clearfix {EPORTFOLIO_COMPONENT_MULTIPLE_STATE}">
-						<a href="#"
-						   rel="{EPORTFOLIO_COMPONENT_DEFINITION_ID} {EPORTFOLIO_COMPONENT_ID}"
-						   class="{EPORTFOLIO_COMPONENT_CLASS}"
-						   title="{EPORTFOLIO_COMPONENT_DESCRIPTION}"
-								>
-							<span class="icon"></span>
-							<span class="notification"><strong></strong>Added</span>
-							<h4>{EPORTFOLIO_COMPONENT_NAME}</strong></h4>
-						</a>
-					</div>
-					<!-- END eportfolio_component -->
-				</div>
-				<!-- END eportfolio_component_page -->
-			</div>
-		</div>
-	</div>
-	<!--/tabs-1-->
+<div class="row">
+    <div class="small-12 island">
+        <section class="tabs-content">
 
-	<div id="tabs-2" class="customise-components">
-        <div class="column-colours">
-            <!-- These are selectable items - default to top selected only -->
-            <a href="#" id="top" class="columns left-right selected" data-column-selector data-interaction-state="selected">Top</a>
-            <a href="#" id="left" class="columns left-right" data-column-selector>Left</a>
-            <a href="#" id="right" class="columns left-right" data-column-selector>Right</a>
-            <!--
-            <a href="#" id="bottom" class="columns left-right" data-column-selector>Bottom</a>
-            -->
-        </div>
-        <div class="colours">
-            <div class="colours-split top-split">
-                <h3>Heading: </h3>
-                <div class="colour clearfix">
-                    <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
-                    <p>Text</p>
-                </div>
-                <div class="colour clearfix">
-                    <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
-                    <p>Background</p>
-                </div>
-            </div>
-            <div class="colours-split">
-                <h3>Content: </h3>
-                <div class="colour clearfix">
-                    <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
-                    <p>Primary Background</p>
-                </div>
-                <div class="colour clearfix">
-                    <input id="bg_secondary" class="colorBox" name="colors[bg_secondary]" type="text" data-colorpicker />
-                    <p>Secondary Background</p>
-                </div>
-                <div class="colour clearfix">
-                    <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
-                    <p>Text</p>
-                </div>
-                <div class="colour clearfix">
-                    <input id="link" class="colorBox" name="colors[link]" type="text" data-colorpicker />
-                    <p>Link</p>
-                </div>
-                <div class="colour clearfix">
-                    <input id="hover" class="colorBox" name="colors[hover]" type="text" data-colorpicker />
-                    <p>Link Hover</p>
+            <!--------------------->
+            <!-- Component Tab 1 -->
+            <!--------------------->
+            <div id="eportfolio-page-controls-tab-1" class="content">
+                <!-- BEGIN no_eportfolio_components -->
+                <p>No components are available for you to add.</p>
+                <!-- END no_eportfolio_components -->
+
+                <dl class="tabs" data-tab id="eportfolio-page-controls-sub">
+                    <!-- BEGIN eportfolio_component_tab -->
+                    <dd><a href="#eportfolio-page-controls-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></dd>
+                    <!-- END eportfolio_component_tab -->
+                </dl>
+
+                <div class="tabs-content">
+                    <!-- BEGIN eportfolio_component_page -->
+                    <div id="eportfolio-page-controls-sub-{EPORTFOLIO_COMPONENT_CATEGORY_ID}" class="content">
+                        <ul class="inline-list">
+                            <!-- BEGIN eportfolio_component -->
+                            <li>
+                                <div class="add-component {EPORTFOLIO_COMPONENT_MULTIPLE_STATE}">
+                                    <a href="#" rel="{EPORTFOLIO_COMPONENT_DEFINITION_ID} {EPORTFOLIO_COMPONENT_ID}" class="{EPORTFOLIO_COMPONENT_CLASS}" title="{EPORTFOLIO_COMPONENT_DESCRIPTION}">
+                                        <span class="icon"></span>
+
+                                        <h3>{EPORTFOLIO_COMPONENT_NAME}</h3>
+
+                                        <span class='success label' data-notification="component-added">Added</span>
+                                    </a>
+                                </div>
+                            </li>
+                            <!-- END eportfolio_component -->
+                        </ul>
+                    </div>
+                    <!-- END eportfolio_component_page -->
                 </div>
             </div>
-            <div class="colours-buttons">
-                <form method="POST" action="" name="saveColours">
-                    <button class="submit-btn-plain save-colours inline-block" type="button" id="saveColour">Save</button>
-                    <button class="submit-btn-plain inline-block" type="button" id="restore">Reset</button>
-                    <button class="submit-btn-plain inline-block" type="button" id="cancel">Cancel</button>
-                </form>
-                <div class="saved-colours">Saved colour set!</div>
-            </div>
-        </div>
-        <div style="clear:both;">
-            <form method="POST" action="" >
-                <p class="information-notification pad-it ">In order to adjust the
-                    widths of the left and right columns on the page, drag the slider
-                    below left and right. </p>
-                <div class="clearfix slide-guide">
-                    <h3>Column width slider</h3>
-                    <div class="slider-house">
-                        <div id="slider"></div>
+
+            <!--------------------->
+            <!-- Component Tab 2 -->
+            <!--------------------->
+            <div id="eportfolio-page-controls-tab-2" class="content">
+                <div class="row">
+                    <div class="small-12 columns">
+                        <a href="#" class='button full-width' data-column-selector="top" data-interaction-state="selected">Top</a>
                     </div>
                 </div>
-                <div class="saved-layout">Saved layout</div>
 
-            </form>
-        </div>
-        <div class="clearfix"></div>
-	</div>
+                <div class="row">
+                    <div class="small-6 columns">
+                        <a href="#" class='button full-width' data-column-selector="left">Left</a>
+                    </div>
+                    <div class="small-6 columns">
+                        <a href="#" class='button full-width' data-column-selector="right">Right</a>
+                    </div>
+                </div>
 
-    <div id="tabs-3" class="customise-components">
-        <div class="clearfix">
-            <form method='post' action='/eportfolio/configForm.php'>
-                <table class="standardForm table">
-                    <tr>
-                        <td class="formLabelWidth">
-                            <h4>Page Title</h4>
-                            <em>Specify a title for this page</em>
-                        </td>
-                        <td>
-                            <p>
-                                <input type='text' name='pageTitle' value="{PAGE_TITLE}" />
-                                <input type='hidden' name='user_id' value='{ID}' />
-                                <input type='hidden' name='page_id' value='{PAGE_ID}' />
-                                <input type="submit" label="Submit" value="Update Page" class="submit-btn-plain" style="float:none;"/>
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </form>
-        </div>
-    </div>
+                <form method="POST" action="" name="saveColours">
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <h3>Heading</h3>
+                            <label>
+                                Text
+                                <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
+                            </label>
+                            <label>
+                                Background
+                                <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
+                            </label>
+                        </div>
+                    </div>
 
-	<div id="tabs-4" class="customise-components">
-		<div class="clearfix">
-			<form action="/eportfolio/configForm.php" method="post" id="folderForm" class="clearfix">
-				<input type='hidden' name='page_id' value='{PAGE_ID}' />
-				<input type='hidden' name='update' value='permissions' />
-				<table class="standardForm table">
-					<tr>
-						<td>
-							<h4>Allow Parents</h4>
-							<em>Allow your parents to view your ePortfolio page.</em>
-						</td>
-						<td>
-							<input type="hidden" name="parent_permission" value="0" />
-							<input type="checkbox" name="parent_permission" value="1" {PARENT_PERMISSION_SELECTED} />
-						</td>
-					</tr>
-					<tr>
-						<td class="formLabelWidth">
-							<h4>Group Permissions</h4>
-							<em>Allow predefined groups to view your ePortfolio page.</em>
-						</td>
-						<td>
-							<!-- BEGIN has_group_permissions -->
-							<ul>
-								<!-- BEGIN group_permission -->
-								<li><input type="checkbox" name="group_permission[]" value="{GROUP_PERMISSION_GROUP_ID}" {GROUP_PERMISSION_SELECTED}/> {GROUP_PERMISSION_NAME}</li>
-								<!-- END group_permission -->
-							</ul>
-							<!-- END has_group_permissions -->
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<h4>Student Permissions</h4>
-							<em>Allow certain students to view your ePortfolio page.</em>
-						</td>
-						<td>
-							<p>
-								<select id='addIndividualPermission' name="individual_permission[]" multiple placeholder="Search Students"></select>
-							</p>
-						</td>
-					</tr>
-				</table>
-				<input type="submit" label="Submit" value="Update Page" class="submit-btn-plain"/>
-			</form>
-		</div>
-	</div>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <h3>Content</h3>
+                            <label>
+                                Primary Background
+                                <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
+                            </label>
+                            <label>
+                                Secondary Background
+                                <input id="bg_secondary" class="colorBox" name="colors[bg_secondary]" type="text" data-colorpicker />
+                            </label>
+                            <label>
+                                Text
+                                <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
+                            </label>
+                            <label>
+                                Link
+                                <input id="link" class="colorBox" name="colors[link]" type="text" data-colorpicker />
+                            </label>
+                            <label>
+                                Link Hover
+                                <input id="hover" class="colorBox" name="colors[hover]" type="text" data-colorpicker />
+                            </label>
+                            <label>
+                            </label>
+                        </div>
+                    </div>
 
-    <div id="tabs-5" class="customise-components">
-        <div class="clearfix">
-            <form method='post' action='/eportfolio/configForm.php'>
-                <table class="standardForm table">
-                    <tr>
-                        <td class="formLabelWidth">
-                            <h4>Delete Page</h4>
-                            <em>Remove this page from your ePortfolio</em>
-                        </td>
-                        <td>
-                            <p>
-                                <input type='hidden' name='page_id' value='{PAGE_ID}' />
-                                <input type='hidden' name='deletePage' value='true' />
-                                <input type='submit' label="Submit" value='Delete page' class="submit-btn-plain" style="float:none;"/>
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </form>
-        </div>
+                    <input type='submit' data-configure-columns-control='save' value="Save" />
+                    <input type='submit' data-configure-columns-control='restore' value="Restore" />
+                    <input type='submit' data-configure-columns-control='cancel' value="Cancel" />
+                </form>
+
+                <div data-configure-columns-control-notification>
+                    <span class="success label">Saved colour set</span>
+                </div>
+
+                <div class="row">
+                    <div class="small-12 columns">
+                        <h3>Column Widths</h3>
+                        <p>
+                            Adjust column widths on the page by dragging this slider left and right.
+                        </p>
+
+                        <form method="POST" action="">
+                            <div class="slide-guide">
+                                <div class="slider-house">
+                                    <div id="slider"></div>
+                                </div>
+                            </div>
+
+                            <span class="success label" data-configure-columnwidths-notification>Saved column widths</span>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!--------------------->
+            <!-- Component Tab 3 -->
+            <!--------------------->
+            <div id="eportfolio-page-controls-tab-3" class="content">
+                <form method='post' action='/eportfolio/configForm.php'>
+                    <input type='hidden' name='user_id' value='{ID}' />
+                    <input type='hidden' name='page_id' value='{PAGE_ID}' />
+
+                    <label>
+                        Page Title
+                        <span class="hint has-tip tip-tip" data-tooltip title="Specify a title for this page.">?</span>
+
+                        <input type='text' name='pageTitle' value="{PAGE_TITLE}" />
+                    </label>
+
+                    <input type="submit" value="Update Page" />
+                </form>
+            </div>
+
+            <!--------------------->
+            <!-- Component Tab 4 -->
+            <!--------------------->
+            <div id="eportfolio-page-controls-tab-4" class="content">
+                <form action="/eportfolio/configForm.php" method="post">
+                    <input type='hidden' name='page_id' value='{PAGE_ID}' />
+                    <input type='hidden' name='update' value='permissions' />
+
+                    <div class="row">
+                        <div class="small-12 large-6 columns">
+                            <label>
+                                Group Permissions
+                                <span class="hint has-tip tip-top" data-tooltip title="Allow predefined groups to view your ePortfolio page.">?</span>
+                            </label>
+                            <!-- BEGIN has_group_permissions -->
+                            <!-- BEGIN group_permission -->
+                            <input type="checkbox" name="group_permission[]" id="group-permission-{GROUP_PERMISSION_GROUP_ID}" value="{GROUP_PERMISSION_GROUP_ID}" {GROUP_PERMISSION_SELECTED}/>
+                            <label for="group-permission-{GROUP_PERMISSION_GROUP_ID}" class="checkbox-label">
+                            {GROUP_PERMISSION_NAME}
+                            </label>
+                            <!-- END group_permission -->
+                            <!-- END has_group_permissions -->
+                        </div>
+                        <div class="small-12 large-6 columns">
+                            <label>
+                                Student Permissions
+                                <span class="hint has-tip tip-top" data-tooltip title="Allow certain students to view your ePortfolio page.">?</span>
+                            </label>
+                            <select id='addIndividualPermission' name="individual_permission[]" multiple placeholder="Search Students"></select>
+
+                            <input type="hidden" name="parent_permission" value="0" />
+                            <input type="checkbox" id='parent_permission' name="parent_permission" value="1" {PARENT_PERMISSION_SELECTED} />
+                            <label for="parent_permission" class="checkbox-label">
+                                Allow Parents
+                                <span class="hint has-tip tip-top" data-tooltip title="Allow your parents to view your ePortfolio page.">?</span>
+                            </label>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <input type="submit" value="Update Page" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!--------------------->
+            <!-- Component Tab 5 -->
+            <!--------------------->
+            <div id="eportfolio-page-controls-tab-5" class="content">
+                <form method='post' action='/eportfolio/configForm.php'>
+                    <input type='hidden' name='page_id' value='{PAGE_ID}' />
+                    <input type='hidden' name='deletePage' value='true' />
+
+                    <label>
+                        Delete Page
+                        <span class="hint has-tip tip-top" data-tooltip title="Remove this page from your ePortfolio.">?</span>
+                    </label>
+
+                    <input type='submit' value='Delete page' />
+                </form>
+            </div>
+        </section>
     </div>
 </div>
 <!-- END customise_page -->
 
-<div id="e-portfolio" class="homepage clearfix">
+<div id="e-portfolio" class="homepage">
     <div class="column top clearfix" data-position="top">{component_position_top}</div>
     <div class="column left clearfix" data-position="left" style="width: {TEMPLATE_LEFT_COLUMN_WIDTH}%">{component_position_left}</div>
     <div class="column right clearfix" data-position="right" style="width: {TEMPLATE_RIGHT_COLUMN_WIDTH}%">{component_position_right}</div>
 </div>
-<input type="hidden" id="userID" value="{ID}" />
+
 <div id="resource-browser" class="hide"></div>

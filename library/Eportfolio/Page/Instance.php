@@ -81,6 +81,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
         $this->getPage()->setBlock('customise_page', 'eportfolio_component_tab', 'eportfolio_component_tab_block');
         $this->getPage()->setBlock('customise_page', 'eportfolio_component_page', 'eportfolio_component_page_block');
         $this->getPage()->setBlock('eportfolio_component_page', 'eportfolio_component', 'eportfolio_component_block');
+        $this->getPage()->setBlock('customise_page', 'no_eportfolio_components', 'no_eportfolio_components_block');
 
         /* Permissions list for groups
 		 */
@@ -259,10 +260,17 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                 $this->tabList[$this_category]['name'] = Scrub::text($component->getDefinition()->getComponentCategoryName());
                 $this->tabList[$this_category]['count']++;
             }
-        } else {
+
+            $this->getPage()->setVar(array(
+                'no_eportfolio_components_block' => ''
+            ));
+        }
+        else {
+            $this->getPage()->parse('no_eportfolio_components_block', 'no_eportfolio_components');
+
             $this->getPage()->setVar(array(
                 'eportfolio_component_block' => '',
-                'eportfolio_component_page_block' => 'No components are available for you to add.',
+                'eportfolio_component_page_block' => '',
                 'eportfolio_component_tab_block' => '',
             ));
         }
