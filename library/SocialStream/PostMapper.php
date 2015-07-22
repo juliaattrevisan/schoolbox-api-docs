@@ -45,8 +45,9 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
 
         $this->hasMap(array(
             'column'   => 'owner_id',
-            'property' => 'ownerId',
-            'type'     => self::TYPE_INTEGER,
+            'property' => 'owner',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'user',
         ));
 
         $this->hasMap(array(
@@ -168,7 +169,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
             $postItem = $this->hydrate($row, 'p');
 
             $userItem = $user_mapper->hydrate($row, 'u');
-            $postItem->setOwnerId($userItem);
+            $postItem->setOwner($userItem);
 
             $this->throwIfDeleted($postItem);
 
@@ -257,7 +258,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
             $postItem = $this->hydrate($row, 'p');
             $userItem = $user_mapper->hydrate($row, 'u');
 
-            $postItem->setOwnerId($userItem);
+            $postItem->setOwner($userItem);
 
             $collection->add($postItem);
         }
@@ -306,7 +307,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
             $postItem = $this->hydrate($row, 'p');
             $userItem = $user_mapper->hydrate($row, 'u');
 
-            $postItem->setOwnerId($userItem);
+            $postItem->setOwner($userItem);
 
             $collection->add($postItem);
         }
@@ -350,7 +351,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
             $postItem = $this->hydrate($row, 'p');
             $userItem = $user_mapper->hydrate($row, 'u');
 
-            $postItem->setOwnerId($userItem);
+            $postItem->setOwner($userItem);
 
             $collection->add($postItem);
         }
@@ -479,12 +480,11 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
 
         $c = $this->createCollection();
 
-        while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             /** @var SocialStream_Post_Abstract $post */
             $post = $this->hydrate($r);
             $c->add($post);
         }
         return $c;
     }
-
 }

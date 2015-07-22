@@ -9,7 +9,6 @@
 
 namespace SocialStream;
 
-
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Logger;
@@ -191,7 +190,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
             return $envelope;
         }
 
-        $parentAuthorId = $parent->getOwnerId();
+        $parentAuthorId = $parent->getOwner()->getId();
 
         // compensate for inconsistent return types -_-
         if ($parentAuthorId instanceof User) {
@@ -298,16 +297,16 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         $c = new Collection();
 
         // be sure the target method exists
-        if(!$this->mapper instanceof FeedableMapperInterface) {
+        if (!$this->mapper instanceof FeedableMapperInterface) {
             return $c;
         }
 
         /** @var Collection|SocialStream_Post_Abstract[] $posts */
         $posts = $this->mapper->findForFeed($context, $limit, $offset);
 
-        foreach($posts as $post) {
+        foreach ($posts as $post) {
             try {
-                $owner = $this->userMapper->findById($post->getOwnerId());
+                $owner = $this->userMapper->findById($post->getOwner()->getId());
             } catch (Mapper\Exception $e) {
                 $owner = new User();
                 $owner->setFirstname('Unknown')->setLastname('User')->setId(0);
@@ -316,5 +315,4 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         }
         return $c;
     }
-
-} 
+}
