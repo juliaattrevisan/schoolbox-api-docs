@@ -71,22 +71,21 @@
                 <ul class="action-list">
                     <!-- BEGIN task -->
                     <li class="row" data-task_id="{TASK_ID}">
+                        <div class="nine-column">
+                            <!-- BEGIN task_link -->
+                            <a {TASK_PREVIEW} href="{TASK_LINK}" class="icon-16 icon-{TASK_CLASS}" title="{TASK_TYPE_LABEL}">{TASK_TITLE}</a>
+                            <!-- END task_link -->
+                            <!-- BEGIN task_no_link -->
+                            <span class="icon-16 icon-{TASK_CLASS}" title="{TASK_TYPE_LABEL}">{TASK_TITLE}</span>
+                            <!-- END task_no_link -->
+                        </div>
                         <!-- BEGIN edit_task -->
-                        <span class="actions">
-                            <a href="#" class="btn delete no-text" title="Delete this task" data-interaction="open_delete_task_form"><span></span></a>
-                            <a href="/task/modify/{TASK_ID}" class="btn modify no-text" title="Modify this task"><span></span></a>
-                            <a href="/task/export/{TASK_ID}" class="btn export no-text" title="Copy this task into classes"><span></span></a>
-                        </span>
+                        <div class="three actions">
+                            <a href="/task/export/{TASK_ID}" class="no-text icon-export" title="Copy this task into classes"></a>
+                            <a href="/task/modify/{TASK_ID}" class="no-text icon-modify" title="Modify this task"></a>
+                            <a href="#" class="no-text icon-delete" title="Delete this task" data-interaction="open_delete_task_form"></a>
+                        </div>
                         <!-- END edit_task -->
-
-                        <span class="icon {TASK_CLASS}" title="{TASK_TYPE_LABEL}"><span></span></span>
-
-                        <!-- BEGIN task_link -->
-                        <h4><a {TASK_PREVIEW} href="{TASK_LINK}">{TASK_TITLE}</a></h4>
-                        <!-- END task_link -->
-                        <!-- BEGIN task_no_link -->
-                        <h4>{TASK_TITLE}</h4>
-                        <!-- END task_no_link -->
 
                         <div class="delete_task_form_container">
                             <p class="notice">Are you sure you wish to delete this task?</p>
