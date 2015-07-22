@@ -787,12 +787,13 @@ table{
 	//@media #{$medium-up} { @include block-grid(2); }
 	//@media #{$small-up} { @include block-grid(2); }
 	@extend .information-list;
-	li{
+	> li{
+        padding-bottom: 0 !important; // SORRY! foundation's selector is just too specific :'(
 		border-right: 1px solid $body-bg;
-		border-bottom: 0;
-		&:last-child{
-			border: 0;
-		}
+		border-bottom: 1px solid $body-bg;
+		//&:last-child{
+		//	border: 0;
+		//}
 	}
 }
 
@@ -864,10 +865,8 @@ table{
 
 .card {
 
-    @media #{$small-up} {
-        min-height: (3 * rem-calc($base-font-size));
-        padding: 0.25rem 0.5rem 0 1rem;
-    }
+    min-height: (3 * rem-calc($base-font-size));
+    padding: 0.25rem 0.5rem 0 1rem;
     @media #{$medium-up} {
         min-height: (4 * rem-calc($base-font-size));
         padding: 0.5rem 0.5rem 0 1rem;
@@ -876,10 +875,8 @@ table{
     &.avatar {
         img, [class^="icon-"] {
             float: left;
-            @media #{$small-up} {
-                margin: (-1 * rem-calc(($base-font-size - 12))) rem-calc($base-font-size) 0 -1rem;
-                width: (3 * rem-calc($base-font-size));
-            }
+            margin: (-1 * rem-calc(($base-font-size - 12))) rem-calc($base-font-size) 0 -1rem;
+            width: (3 * rem-calc($base-font-size));
             @media #{$medium-up} {
                 margin: (-1 * rem-calc(($base-font-size - 8))) rem-calc($base-font-size) 0 -1rem;
                 width: (4 * rem-calc($base-font-size));
@@ -887,10 +884,8 @@ table{
         }
 
         [class^="icon-"] {
-            @media #{$small-up} {
-                padding: 0 0 0 0.375rem;
-                margin-top: -0.625rem;
-            }
+            padding: 0 0 0 0.375rem;
+            margin-top: -0.625rem;
             @media #{$medium-up} {
                 padding: 0.125rem 0 0 0.875rem;
                 margin-top: -0.5rem;
@@ -898,11 +893,20 @@ table{
         }
 
         ~ article, ~ .list-item-content {
-            @media #{$small-up} {
-                margin-left: (rem-calc($base-font-size));
-            }
+            margin-left: (rem-calc($base-font-size));
             @media #{$medium-up} {
                 margin-left: (5 * rem-calc($base-font-size));
+            }
+        }
+
+        ~ .progress {
+            margin-bottom: 0;
+        }
+
+        p {
+            margin: 0 0 0 (3 * rem-calc($base-font-size));
+            @media #{$medium-up} {
+                margin: 0 0 0 (4 * rem-calc($base-font-size));
             }
         }
     }
@@ -911,25 +915,23 @@ table{
         ~ article, ~ .list-item-content {
             margin-left: (rem-calc($base-font-size));
         }
+        ~ .progress {
+            margin-bottom: 0;
+        }
     }
 
     h3 {
       margin: 0;
     }
 
-    h3, .meta {
+    h3, p, .meta {
       text-overflow: ellipsis;
       overflow-x: hidden;
       white-space: nowrap;
     }
 
 	p{
-		@media #{$small-up} {
-			margin: 0 0 0 (3 * rem-calc($base-font-size));
-		}
-		@media #{$medium-up} {
-			margin: 0 0 0 (4 * rem-calc($base-font-size));
-		}
+        margin: 0;
 		&.spaced {
 			@media #{$small-up} {
 				padding-bottom: (0.2 * rem-calc($base-font-size));
@@ -1066,3 +1068,48 @@ tr:hover{
 .minw-2  { min-width: 2rem; }
 .minw-3  { min-width: 3rem; }
 .minw-4  { min-width: 4rem; }
+
+
+.progress-tick {
+    width: 32px; // ~2.5rem
+    height: 32px; // ~2.5rem
+    display: block;
+    background-color: $base;
+    @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
+
+    &:before{
+        color: $white;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+        line-height: 36px; // ~2.9rem;
+    }
+
+    &:hover {
+        @extend .icon-approve;
+    }
+
+    &.pending {
+        @extend .icon-approve;
+        background-color: $warning-color;
+        // this needs to be a different shape somehow
+        border-radius: 8px;
+        transform: rotate(135deg);
+        &:before {
+            transform: rotate(-135deg);
+        }
+    }
+
+    &.complete {
+        @extend .icon-approve;
+        background-color: $success-color;
+        border-radius: 16px;
+        transform: rotate(360deg);
+    }
+}
+
+
+ul.meta {
+    list-style: none;
+    line-height: 1.5rem;
+}
