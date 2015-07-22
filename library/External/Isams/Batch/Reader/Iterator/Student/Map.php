@@ -31,6 +31,7 @@ class External_Isams_Batch_Reader_Iterator_Student_Map extends IteratorIterator
             // //CurrentPupils/Pupil: contains SchoolCode
             // don't know StudentCampus yet. Probably in AcademicHouse?
             return [
+                'RecordType'           => 'CurrentPupils',
                 'ID'                   => $id,
                 'StudentID'            => $result['SchoolId'],
                 'NetworkLogin'         => $result['UserName'],
@@ -49,6 +50,7 @@ class External_Isams_Batch_Reader_Iterator_Student_Map extends IteratorIterator
             // //CurrentPupilsHealth/Pupil: doesn't
             // I assume HealthNotes is what should show on the profile
             return [
+                'RecordType'          => 'CurrentPupilsHealth',
                 'ID'                  => $id,
                 'StudentMedicalAlert' => $result['HealthNotes'],
             ];

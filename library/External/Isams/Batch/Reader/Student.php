@@ -29,17 +29,25 @@ class External_Isams_Batch_Reader_Student extends Reader
         // * RecursiveIteratorIterator flattens recursive iterator
         // * CallbackFilterIterator removes all non-pupils from return
         // * External_Isams_Batch_Reader_Iterator_Student_Map formats results nicely
-        return new External_Isams_Batch_Reader_Iterator_Student_Map(
-            new CallbackFilterIterator(
-                new RecursiveIteratorIterator(
-                    new External_Isams_Batch_Reader_Iterator_Student_Filter($this->parse())
-                ),
-                function ($value) {
-                    return is_array($value)
-                        && array_key_exists('name', $value)
-                        && $value['name'] == '{}Pupil';
-                }
-            )
+        // * CallbackFilterIterator removes anything that's not a CurrentPupils result
+        return new CallbackFilterIterator(
+            new External_Isams_Batch_Reader_Iterator_Student_Map(
+                new CallbackFilterIterator(
+                    new RecursiveIteratorIterator(
+                        new External_Isams_Batch_Reader_Iterator_Student_Filter($this->parse())
+                    ),
+                    function ($value) {
+                        return is_array($value)
+                            && array_key_exists('name', $value)
+                            && $value['name'] == '{}Pupil';
+                    }
+                )
+            ),
+            function ($value) {
+                return is_array($value)
+                    && array_key_exists('RecordType', $value)
+                    && $value['RecordType'] == 'CurrentPupils';
+            }
         );
     }
 }
