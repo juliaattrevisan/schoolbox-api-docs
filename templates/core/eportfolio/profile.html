@@ -137,20 +137,21 @@
             <div class="small-12 island">
                 <h2 class="subheader">Recent Journals</h2>
                 <section>
-                    <table>
-                        <colgroup>
-                            <col width="20%">
-                            <col />
-                        </colgroup>
-                        <tbody>
-                            <!-- BEGIN recent_blog -->
-                            <tr>
-                                <td>{RECENT_BLOG_CREATED_AT}</td>
-                                <td><a href="/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{RECENT_BLOG_PAGE_ID}#blog_{RECENT_BLOG_BLOG_ID}">{RECENT_BLOG_TITLE}</a></td>
-                            </tr>
-                            <!-- END recent_blog -->
-                        </tbody>
-                    </table>
+                    <ul class="action-list">
+                        <!-- BEGIN recent_blog -->
+                        <li class="row">
+                            <div class="two-column">
+                                {RECENT_BLOG_CREATED_AT}
+                            </div>
+                            <div class="nine-column">
+                                <a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{RECENT_BLOG_PAGE_ID}#blog_{RECENT_BLOG_BLOG_ID}' title="{RECENT_BLOG_TITLE}">{RECENT_BLOG_TITLE}</a>
+                            </div>
+                            <div class="one actions">
+                                <a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{RECENT_BLOG_PAGE_ID}#blog_{RECENT_BLOG_BLOG_ID}' class="icon-next no-text"></a>
+                            </div>
+                        </li>
+                        <!-- END recent_blog -->
+                    </ul>
                 </section>
             </div>
         </div>
@@ -184,16 +185,19 @@
         <div class="row">
             <h2 class="subheader">My Current Subjects</h2>
             <section>
-                <ul class="activity-list">
+                <ul class="action-list">
                     <!-- BEGIN subject -->
                     <li class="row">
-                        <div class="twelve-column">
+                        <div class="eleven-column">
                             <!-- BEGIN subject_linked -->
                             <a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a>
                             <!-- END subject_linked -->
                             <!-- BEGIN subject_unlinked -->
                             {SUBJECT_NAME}
                             <!-- END subject_unlinked -->
+                        </div>
+                        <div class="one actions">
+                            <a href='/homepage/{SUBJECT_ID}' class="icon-next no-text"></a>
                         </div>
                     </li>
                     <!-- END subject -->
@@ -206,16 +210,19 @@
         <div class="row">
             <h2 class="subheader">My Current Groups</h2>
             <section>
-                <ul class="activity-list">
+                <ul class="action-list">
                     <!-- BEGIN group -->
                     <li class="row">
-                        <div class="twelve-column">
+                        <div class="eleven-column">
                             <!-- BEGIN group_linked -->
                             <a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a>
                             <!-- END group_linked -->
                             <!-- BEGIN group_unlinked -->
                             {GROUP_NAME}
                             <!-- END group_unlinked -->
+                        </div>
+                        <div class="one actions">
+                            <a href='/homepage/{GROUP_ID}' class="icon-next no-text"></a>
                         </div>
                     </li>
                     <!-- END group -->
