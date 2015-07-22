@@ -24,79 +24,66 @@
         <!-- BEGIN no_showcased_work -->
         <h2 class="subheader">{USER_FIRSTNAME} {USER_LASTNAME} has no showcased work</h2>
         <!-- END no_showcased_work -->
-            <!-- BEGIN has_intro -->
-            <div class="content">
-                <p>Visit your submission history page to publish items to your showcase.</p>
-                <p><a href='/submission/allWork/{USER_ID}' class="button icon-due-work">Submission History</a></p>
-            </div>
-            <!-- END has_intro -->
 
-            <!-- BEGIN has_showcased_work -->
-            <!-- BEGIN showcased_work_subject -->
-            <h2 class="subheader">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</h2>
-            <section>
-                <table>
-                    <colgroup>
-                        <col width="46" />
-                        <col width="400" />
-                        <col width="154" />
-                        <col width="100" />
-                        <col width="1" />
-                    </colgroup>
-                    <thead>
-                    <tr>
-                        <th>&nbsp;</th>
-                        <th>Title</th>
-                        <th>Submitted</th>
-                        <th>Grade</th>
-                        <th>&nbsp;</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- BEGIN showcased_work -->
-                    <tr>
-                        <!-- BEGIN has_submission -->
-                        <td>
-                            <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1">
-                                <img class="minw-2" src="/images/mime/60x60/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" />
+        <!-- BEGIN has_intro -->
+        <div class="content">
+            <p>Visit your submission history page to publish items to your showcase.</p>
+            <p><a href='/submission/allWork/{USER_ID}' class="button icon-due-work">Submission History</a></p>
+        </div>
+        <!-- END has_intro -->
+
+        <!-- BEGIN has_showcased_work -->
+        <!-- BEGIN showcased_work_subject -->
+        <h2 class="subheader">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</h2>
+        <section>
+            <ul class="information-list">
+                <!-- BEGIN showcased_work -->
+                <li class="row">
+                    <!-- BEGIN has_submission -->
+                    <div class="five-column" data-equalizer-watch>
+                        <div class="avatar card">
+                            <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1" title="View Profile">
+                                <img src="/images/mime/60x60/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="" class="content" />
+                                <p>{SHOWCASED_WORK_BOX_NAME}</p>
                             </a>
-                        </td>
-                        <td>
-                            <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1">{SHOWCASED_WORK_BOX_NAME}</a>
-                            ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
-                            {SHOWCASED_WORK_BOX_TYPE}
-                        </td>
-                        <!-- END has_submission -->
-                        <!-- BEGIN no_submission -->
-                        <td>&nbsp;</td>
-                        <td>
-                            {SHOWCASED_WORK_BOX_NAME} ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
-                            <a href="">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a>
-                        </td>
-                        <!-- END no_submission -->
-                        <td>
-                            {SHOWCASED_WORK_SUBMISSION_SUBMITTED}
-                        </td>
-                        <td class="grade">
-                            <span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span>
-                        </td>
-                        <td>
-                            <!-- BEGIN has_modify_form -->
-                            <form action='/eportfolio/showcase/modifyForm.php' method='post'>
-                                <input type='hidden' name='action' value='unpublish' />
-                                <input type='hidden' name='userId' value='{SHOWCASED_WORK_ITEM_USER_ID}' />
-                                <input type='hidden' name='showcaseItemId' value='{SHOWCASED_WORK_ITEM_ID}' />
-                                <input type='submit' value='Remove' />
-                            </form>
-                            <!-- END has_modify_form -->
-                        </td>
-                    </tr>
-                    <!-- END showcased_work -->
-                    </tbody>
-                </table>
-            </section>
-            <!-- END showcased_work_subject -->
-            <!-- END has_showcased_work -->
+                            <p class="meta"><a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></p>
+                            <p class="meta">{SHOWCASED_WORK_BOX_TYPE} ({SHOWCASED_WORK_SUBMISSION_FILESIZE})</p>
+                        </div>
+                    </div>
+                    <!-- END has_submission -->
+
+                    <!-- BEGIN no_submission -->
+                    <div class="five-column" data-equalizer-watch>
+                        <div class="info card">
+                            <h3>{{SHOWCASED_WORK_BOX_NAME}}</h3>
+                            <p class="meta">{SHOWCASED_WORK_SUBMISSION_FILESIZE}</p>
+                            <p class="meta"><a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></p>
+                        </div>
+                    </div>
+                    <!-- END no_submission -->
+
+                    <div class="three-column">
+                        {SHOWCASED_WORK_SUBMISSION_SUBMITTED}
+                    </div>
+                    <div class="two-column text-center">
+                        <span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span>
+                    </div>
+                    <div class="two-column">
+                        <!-- BEGIN has_modify_form -->
+                        <form action='/eportfolio/showcase/modifyForm.php' method='post'>
+                            <input type='hidden' name='action' value='unpublish' />
+                            <input type='hidden' name='userId' value='{SHOWCASED_WORK_ITEM_USER_ID}' />
+                            <input type='hidden' name='showcaseItemId' value='{SHOWCASED_WORK_ITEM_ID}' />
+                            <input type='submit' value='Remove' />
+                        </form>
+                        <!-- END has_modify_form -->
+                    </div>
+                </li>
+                <!-- END showcased_work -->
+            </ul>
+        </section>
+        <!-- END showcased_work_subject -->
+        <!-- END has_showcased_work -->
     </div>
 </div>
 

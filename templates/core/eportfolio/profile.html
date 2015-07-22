@@ -1,5 +1,227 @@
-<script>
-    $(document).ready(function(){
+<style type='text/css'>
+    <!-- BEGIN allowed_files -->
+    a.{NAME}{background-image: url(/images/mime/22x22/{ICON});}
+    <!-- END allowed_files -->
+</style>
+
+<div class="row">
+    <div class="small-12 columns">
+        <ul class='sub-nav'>
+            <li class="active"><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
+            <!-- BEGIN showcase_page -->
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
+            <!-- END showcase_page -->
+            <!-- BEGIN eportfolio_page -->
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
+            <!-- END eportfolio_page -->
+            <!-- BEGIN can_add_page -->
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="button icon-add" id="add-page">Add page</a></li>
+            <!-- END can_add_page -->
+        </ul>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <div class="eportfolio cover-photo text-center">
+            <img class='eportfolio profile-image' src='/portrait.php?userId={USER_EXTERNAL_ID}&size=constrain200' alt="{USER_FULLNAME}" />
+
+            <!-- BEGIN has_cover_photo -->
+            <img src="/storage/image.php?size=eportfolioCoverPhoto&hash={COVERPHOTO_IMAGEHASH}" />
+            <!-- END has_cover_photo -->
+            <!-- BEGIN no_cover_photo -->
+            <img src="/images/core/eportfolio/coverphotoPlaceholder.jpg" />
+            <!-- END no_cover_photo -->
+
+            <div class="eportfolio cover-photo-controls">
+                <!-- BEGIN no_cover_photo_control -->
+                <a class="button icon-add no-text" title="Add a cover photo" id="add-coverphoto"></a>
+                <!-- END no_cover_photo_control -->
+
+                <!-- BEGIN has_cover_photo_control -->
+                <a class="button icon-modify no-text" title="Edit your cover picture" id="add-coverphoto"></a>
+                <!-- END has_cover_photo_control -->
+            </div>
+        </div>
+    </div>
+    <div class="small-12 columns text-center eportfolio profile-name">
+        <h1>{USER_FULLNAME}</h1>
+        <p class="meta">
+            {USER_YEAR}{USER_CAMPUS}{USER_HOUSE}
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 large-8 island">
+        <!-- BEGIN has_showcased_work -->
+        <div class="row">
+            <div class="small-12 island">
+                <span class="header-actions">
+                    <a href="/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase" class="button icon-due-work">Showcased Work</a>
+                </span>
+
+                <h2 class="subheader">Recent Showcased Work</h2>
+                <section>
+                    <ul class="information-list">
+                        <!-- BEGIN showcased_work -->
+                        <li class="row">
+                            <!-- BEGIN has_submission -->
+                            <div class="six-column" data-equalizer-watch>
+                                <div class="avatar card">
+                                    <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1" title="View Profile">
+                                        <img src="/images/mime/60x60/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="" class="content" />
+                                        <p>{SHOWCASED_WORK_BOX_NAME}</p>
+                                    </a>
+                                    <p class="meta"><a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></p>
+                                    <p class="meta">{SHOWCASED_WORK_BOX_TYPE} ({SHOWCASED_WORK_SUBMISSION_FILESIZE})</p>
+                                </div>
+                            </div>
+                            <!-- END has_submission -->
+
+                            <!-- BEGIN no_submission -->
+                            <div class="six-column" data-equalizer-watch>
+                                <div class="info card">
+                                    <a href="#">
+                                        <h3>{SHOWCASED_WORK_BOX_NAME}</h3>
+                                    </a>
+                                    <p class="meta">{SHOWCASED_WORK_SUBMISSION_FILESIZE}</p>
+                                    <p class="meta"><a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></p>
+                                </div>
+                            </div>
+                            <!-- END no_submission -->
+
+                            <div class="four-column">
+                                {SHOWCASED_WORK_SUBMISSION_SUBMITTED}
+                            </div>
+                            <div class="two-column text-center">
+                                <span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span>
+                            </div>
+                        </li>
+                        <!-- END showcased_work -->
+                    </ul>
+                </section>
+            </div>
+        </div>
+        <!-- END has_showcased_work -->
+
+        <!-- BEGIN no_showcased_work -->
+        <!--<p>{USER_FIRSTNAME} {USER_LASTNAME} has no showcased work.</p>-->
+        <!-- END no_showcased_work -->
+
+        <!-- BEGIN has_recent_blog -->
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">Recent Journals</h2>
+                <section>
+                    <ul class="action-list">
+                        <!-- BEGIN recent_blog -->
+                        <li class="row">
+                            <div class="two-column">
+                                {RECENT_BLOG_CREATED_AT}
+                            </div>
+                            <div class="nine-column">
+                                <a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{RECENT_BLOG_PAGE_ID}#blog_{RECENT_BLOG_BLOG_ID}' title="{RECENT_BLOG_TITLE}">{RECENT_BLOG_TITLE}</a>
+                            </div>
+                            <div class="one actions">
+                                <a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{RECENT_BLOG_PAGE_ID}#blog_{RECENT_BLOG_BLOG_ID}' class="icon-next no-text"></a>
+                            </div>
+                        </li>
+                        <!-- END recent_blog -->
+                    </ul>
+                </section>
+            </div>
+        </div>
+        <!-- END has_recent_blog -->
+
+        <!-- BEGIN no_recent_blog -->
+        <!--<p>{USER_FIRSTNAME} {USER_LASTNAME} has no recent blogs.</p>-->
+        <!-- END no_recent_blog -->
+
+        <!-- BEGIN has_recent_photo -->
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">Recent Photos</h2>
+                <section>
+                    <!-- BEGIN recent_photo -->
+                    <a href="/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&amp;key=eportfolioImageGalleryLarge" title="{RECENT_PHOTO_FILE_DESC}" rel="lightbox-eportfolio">
+                        <img alt="{RECENT_PHOTO_FILE_DESC}" src='/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&amp;key=eportfolioRecentPhoto' />
+                    </a>
+                    <!-- END recent_photo -->
+                </section>
+            </div>
+        </div>
+        <!-- END has_recent_photo -->
+
+        <!-- BEGIN no_recent_photo -->
+        <!--<p>{USER_FIRSTNAME} {USER_LASTNAME} has no recent photos.</p>-->
+        <!-- END no_recent_photo -->
+    </div>
+    <div class="small-12 large-4 island">
+        <!-- BEGIN has_subjects -->
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">My Current Subjects</h2>
+                <section>
+                    <ul class="action-list">
+                        <!-- BEGIN subject -->
+                        <li class="row">
+                            <div class="eleven-column">
+                                <!-- BEGIN subject_linked -->
+                                <a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a>
+                                <!-- END subject_linked -->
+                                <!-- BEGIN subject_unlinked -->
+                                {SUBJECT_NAME}
+                                <!-- END subject_unlinked -->
+                            </div>
+                            <div class="one actions">
+                                <a href='/homepage/{SUBJECT_ID}' class="icon-next no-text"></a>
+                            </div>
+                        </li>
+                        <!-- END subject -->
+                    </ul>
+                </section>
+            </div>
+        </div>
+        <!-- END has_subjects -->
+
+        <!-- BEGIN has_groups -->
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">My Current Groups</h2>
+                <section>
+                    <ul class="action-list">
+                        <!-- BEGIN group -->
+                        <li class="row">
+                            <div class="eleven-column">
+                                <!-- BEGIN group_linked -->
+                                <a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a>
+                                <!-- END group_linked -->
+                                <!-- BEGIN group_unlinked -->
+                                {GROUP_NAME}
+                                <!-- END group_unlinked -->
+                            </div>
+                            <div class="one actions">
+                                <a href='/homepage/{GROUP_ID}' class="icon-next no-text"></a>
+                            </div>
+                        </li>
+                        <!-- END group -->
+                    </ul>
+                </section>
+            </div>
+        </div>
+        <!-- END has_groups -->
+    </div>
+</div>
+
+<form class='hide' id="coverphoto-form" method='post' action='/eportfolio/coverphoto/modifyForm.php' enctype='multipart/form-data'>
+    <input type='hidden' name='action' value='addCoverPhoto' />
+    <input type='hidden' name='userId' value='{USER_ID}' />
+    <input id="coverphoto-image" type='file' name='imagehash' value='' />
+</form>
+
+<script type="text/javascript">
+    $(function() {
         $('#add-coverphoto').click(function(event){
             event.preventDefault();
             $('#coverphoto-image').show().trigger('click').hide();
@@ -9,177 +231,3 @@
         })
     });
 </script>
-
-<style type='text/css'>
-    <!-- BEGIN allowed_files -->
-    a.{NAME}{background-image: url(/images/mime/22x22/{ICON});}
-    <!-- END allowed_files -->
-</style>
-
-<ul class='admin-nav'>
-	<li><a class="current" href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
-    <!-- BEGIN showcase_page -->
-	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
-    <!-- END showcase_page -->
-	<!-- BEGIN eportfolio_page -->
-	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
-	<!-- END eportfolio_page -->
-	<!-- BEGIN can_add_page -->
-    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="add" id="add-page"><span></span> Add page</a></li>
-	<!-- END can_add_page -->
-</ul>
-
-<div class="profile-banner">
-    <div class="background">
-		<!-- BEGIN has_cover_photo_control -->
-		<label id="add-coverphoto" for="coverphoto-image" class="btn modify no-text" title="Edit your cover picture"><span></span></label>
-		<!-- END has_cover_photo_control -->
-		<!-- BEGIN has_cover_photo -->
-        <img src="/storage/image.php?size=eportfolioCoverPhoto&hash={COVERPHOTO_IMAGEHASH}" />
-        <!-- END has_cover_photo -->
-
-		<!-- BEGIN no_cover_photo_control -->
-		<label id="add-coverphoto" for="coverphoto-image" class="btn add" title="Add a cover photo"><span></span>Add a cover photo</label>
-		<!-- END no_cover_photo_control -->
-		<!-- BEGIN no_cover_photo -->
-		<img src="/images/core/eportfolio/coverphotoPlaceholder.jpg" />
-		<!-- END no_cover_photo -->
-
-        <form id="coverphoto-form" method='post' action='/eportfolio/coverphoto/modifyForm.php' enctype='multipart/form-data'>
-            <input type='hidden' name='action' value='addCoverPhoto' />
-            <input type='hidden' name='userId' value='{USER_ID}' />
-            <input id="coverphoto-image" type='file' name='imagehash' value='' />
-            <input id="coverphoto-submit" class="btn no-icon" type='submit' value='Add' />
-        </form>
-    </div>
-    <div class="profile-name clearfix">
-        <img src='/portrait.php?userId={USER_EXTERNAL_ID}&size=constrain200' />
-        <h1>{USER_FULLNAME}</h1>
-        <p>{USER_YEAR}{USER_CAMPUS}{USER_HOUSE}
-		</p>
-    </div>
-</div>
-
-<div class="left clearfix" style="width: 69%">
-	<!-- BEGIN has_showcased_work -->
-    <div class="box component">
-        <h2>Recent Showcased Work
-            <a href="/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase" class="btn"><span></span>Showcased work</a>
-        </h2>
-        <div class="listing">
-            <table class="showcased-work table">
-                <colgroup>
-                    <col width="46" />
-                    <col />
-                    <col />
-                    <col width="142" />
-                </colgroup>
-                <tbody>
-                <!-- BEGIN showcased_work -->
-                <tr class="{ON_OFF}">
-                    <!-- BEGIN has_submission -->
-                    <td class="icon"><a class="icons {SHOWCASED_WORK_MIMETYPE_ICONFILE}" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1"></a></td>
-                    <td><a class="title" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1">
-                        {SHOWCASED_WORK_BOX_NAME}</a> ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
-                        <a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></td>
-                    <!-- END has_submission -->
-                    <!-- BEGIN no_submission -->
-                    <td></td>
-                    <td>{SHOWCASED_WORK_BOX_NAME} ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
-                        <a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></td>
-                    <!-- END no_submission -->
-                    <td>{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</td>
-                    <td class="grade"><span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span></td>
-                </tr>
-                <!-- END showcased_work -->
-                </tbody>
-            </table>
-
-        </div>
-    </div>
-	<!-- END has_showcased_work -->
-	<!-- BEGIN no_showcased_work -->
-	<!--<p>{USER_FIRSTNAME} {USER_LASTNAME} has no showcased work.</p>-->
-	<!-- END no_showcased_work -->
-
-	<!-- BEGIN has_recent_blog -->
-    <div class="box component">
-        <h2>Recent Journals</h2>
-        <div class="listing">
-
-            <table class="upcoming-work table">
-                <tbody>
-					<!-- BEGIN recent_blog -->
-					<tr class="{ON_OFF}">
-						<td>{RECENT_BLOG_CREATED_AT}</td>
-						<td><a class="title" href="/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{RECENT_BLOG_PAGE_ID}#blog_{RECENT_BLOG_BLOG_ID}">{RECENT_BLOG_TITLE}</a></td>
-					</tr>
-					<!-- END recent_blog -->
-                </tbody>
-            </table>
-
-        </div>
-    </div>
-	<!-- END has_recent_blog -->
-	<!-- BEGIN no_recent_blog -->
-	<!--<p>{USER_FIRSTNAME} {USER_LASTNAME} has no recent blogs.</p>-->
-	<!-- END no_recent_blog -->
-
-	<!-- BEGIN has_recent_photo -->
-    <div class="box component">
-        <h2>Recent Photos</h2>
-        <div class="listing photos">
-			<!-- BEGIN recent_photo -->
-            <a href="/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&amp;key=eportfolioImageGalleryLarge" title="{RECENT_PHOTO_FILE_DESC}" rel="lightbox-eportfolio">
-				<img alt="{RECENT_PHOTO_FILE_DESC}" src='/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&amp;key=eportfolioRecentPhoto' />
-            </a>
-			<!-- END recent_photo -->
-        </div>
-    </div>
-	<!-- END has_recent_photo -->
-	<!-- BEGIN no_recent_photo -->
-	<!--<p>{USER_FIRSTNAME} {USER_LASTNAME} has no recent photos.</p>-->
-	<!-- END no_recent_photo -->
-</div>
-
-<div class="right clearfix" style="width: 29%">
-    <!-- BEGIN has_subjects -->
-    <div class="box clearfix">
-        <h2>My Current Subjects</h2>
-        <div class="listing clearfix">
-            <ul>
-                <!-- BEGIN subject -->
-                <li class="{ON_OFF}">
-					<!-- BEGIN subject_linked -->
-					<a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a>
-					<!-- END subject_linked -->
-					<!-- BEGIN subject_unlinked -->
-					{SUBJECT_NAME}
-					<!-- END subject_unlinked -->
-				</li>
-                <!-- END subject -->
-            </ul>
-        </div>
-    </div>
-    <!-- END has_subjects -->
-
-    <!-- BEGIN has_groups -->
-    <div class="box clearfix">
-        <h2>My Current Groups</h2>
-        <div class="listing clearfix">
-            <ul>
-                <!-- BEGIN group -->
-                <li class="{ON_OFF}">
-					<!-- BEGIN group_linked -->
-					<a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a>
-					<!-- END group_linked -->
-					<!-- BEGIN group_unlinked -->
-					{GROUP_NAME}
-					<!-- END group_unlinked -->
-				</li>
-                <!-- END group -->
-            </ul>
-        </div>
-    </div>
-    <!-- END has_groups -->
-</div>
