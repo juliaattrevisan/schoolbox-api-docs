@@ -2,30 +2,6 @@
     <!-- BEGIN allowed_files -->
     a.{NAME}{background-image: url(/images/mime/22x22/{ICON});}
     <!-- END allowed_files -->
-
-    #container.foundation .eportfolio.cover-photo {
-        position: relative;
-        margin-bottom: 5rem;
-    }
-
-    #container.foundation .eportfolio.cover-photo-controls {
-        position: absolute;
-        top: 0px;
-        right: 0px;
-    }
-
-    #container.foundation .eportfolio.profile {
-        position: absolute;
-        text-align: center;
-        width: 40%;
-        bottom: -36px;
-        left: 0;
-        right: 0;
-        margin-left: auto;
-        margin-right: auto;
-        padding: 0.5rem;
-        background-color: #fff;
-    }
 </style>
 
 <div class="row">
@@ -48,13 +24,7 @@
 <div class="row">
     <div class="small-12 columns">
         <div class="eportfolio cover-photo text-center">
-            <div class="eportfolio profile">
-                <img src='/portrait.php?userId={USER_EXTERNAL_ID}&size=square64' />
-                <h1>{USER_FULLNAME}</h1>
-                <p class="meta">
-                    {USER_YEAR}{USER_CAMPUS}{USER_HOUSE}
-                </p>
-            </div>
+            <img class='eportfolio profile-image' src='/portrait.php?userId={USER_EXTERNAL_ID}&size=constrain200' alt="{USER_FULLNAME}" />
 
             <!-- BEGIN has_cover_photo -->
             <img src="/storage/image.php?size=eportfolioCoverPhoto&hash={COVERPHOTO_IMAGEHASH}" />
@@ -73,6 +43,12 @@
                 <!-- END has_cover_photo_control -->
             </div>
         </div>
+    </div>
+    <div class="small-12 columns text-center eportfolio profile-name">
+        <h1>{USER_FULLNAME}</h1>
+        <p class="meta">
+            {USER_YEAR}{USER_CAMPUS}{USER_HOUSE}
+        </p>
     </div>
 </div>
 
