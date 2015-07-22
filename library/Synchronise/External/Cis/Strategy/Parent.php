@@ -63,7 +63,7 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
-            ->addHydrator(new Synchronise_Base_Hydrator_AllowUpdateOnly())
+//            ->addHydrator(new Synchronise_Base_Hydrator_AllowUpdateOnly())
             // no separate spouse entries.
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
