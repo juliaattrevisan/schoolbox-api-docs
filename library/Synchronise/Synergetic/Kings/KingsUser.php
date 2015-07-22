@@ -58,8 +58,8 @@ class Synchronise_Synergetic_Kings_KingsUser extends External_Synergetic_User {
 					LEFT JOIN luBoardingHouse lub ON vStudents.StudentBoardingHouse = lub.Code
 				WHERE
 					vStudents.StudentID = '$synID'
-					AND vStudents.FileSemester=" . $_SESSION['FileSemester'] . "
-					AND vStudents.FileYear=" . $_SESSION['FileYear'] . "
+					AND vStudents.FileSemester='" . $this->getDatabase()->quote($this->getCurrentSemester()) . "'
+					AND vStudents.FileYear='" . $this->getDatabase()->quote($this->getCurrentYear()) . "'
 		";
 		$student = $this->getDatabase()->getRow($query);
 
@@ -87,7 +87,7 @@ sc.StudentYearLevel, sc.StudentCampus, sc.StudentGender
 FROM SynergyOne.dbo.vStudentContactAllAddress sc
 INNER JOIN dbo.uvStudentContactNetworkAccounts scn on scn.pk_id = sc.StudentContactID
 WHERE (sc.StudentContactType = 'SC1' or sc.StudentContactType = 'SC2' or sc.StudentContactType = 'SC3')
-and sc.FileSemester = '{$_SESSION['FileSemester']}' and sc.FileYear = '{$_SESSION[ 'FileYear']}' and sc.StudentCampus <> 'T'
+and sc.FileSemester = '" . $this->getDatabase()->quote($this->getCurrentSemester()) . " and sc.FileYear = '" . $this->getDatabase()->quote($this->getCurrentYear()) . "' and sc.StudentCampus <> 'T'
 
 UNION
 
@@ -99,7 +99,7 @@ sc.StudentYearLevel, sc.StudentCampus, sc.StudentGender
 FROM SynergyOne.dbo.vStudentContactAllAddress sc
 INNER JOIN dbo.uvStudentContactNetworkAccounts scn on scn.pk_id = sc.StudentContactSpouseID
 WHERE (sc.StudentContactType = 'SC1' or sc.StudentContactType = 'SC2' or sc.StudentContactType = 'SC3') and sc.StudentContactPrimaryOnlyFlag <> 1 and sc.StudentContactSpouseID is not null
-and sc.FileSemester = '{$_SESSION['FileSemester']}' and sc.FileYear = '{$_SESSION[ 'FileYear']}' and sc.StudentCampus <> 'T'
+and sc.FileSemester = '" . $this->getDatabase()->quote($this->getCurrentSemester()) . "' and sc.FileYear = '" . $this->getDatabase()->quote($this->getCurrentYear()) . "' and sc.StudentCampus <> 'T'
                 ";
 
                 return $this->getDatabase()->getAll($query);
@@ -113,8 +113,8 @@ and sc.FileSemester = '{$_SESSION['FileSemester']}' and sc.FileYear = '{$_SESSIO
 					vStudents.StudentYearLevel, vStudents.StudentHouse, StudentCampus
 				FROM SynergyOne.dbo.vStudents vStudents
 				LEFT JOIN Community ON Community.ID = StudentID
-				WHERE vStudents.FileSemester = '{$_SESSION['FileSemester']}'
-				AND vStudents.FileYear = '{$_SESSION[ 'FileYear']}'
+				WHERE vStudents.FileSemester = '" . $this->getDatabase()->quote($this->getCurrentSemester()) . "'
+				AND vStudents.FileYear = '" . $this->getDatabase()->quote($this->getCurrentYear()) . "'
 			";
 		
 			return $this->getDatabase()->getAll($query);
