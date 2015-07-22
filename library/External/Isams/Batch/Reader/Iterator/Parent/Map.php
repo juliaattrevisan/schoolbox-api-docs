@@ -27,15 +27,19 @@ class External_Isams_Batch_Reader_Iterator_Parent_Map extends External_Isams_Bat
             return [
                 'RecordType'    => 'Contacts',
                 'ID'            => $id,
-                'name'          => $result['Forename'].' '.$result['Surname'],
-                'home_phone'    => '',
-                'work_phone'    => $result['Telephone'],
-                'mobile_phone'  => $result['Mobile'],
-                'email'         => $result['EmailAddress'],
-                // TODO add address as separate key
-                'address'       => $this->parseAddress($result['Address']),
-                'students'      => $this->parseStudents($result['Pupils']),
-            ];
+                // getParentUserAccountInfo fields
+                'Title'         => $result['Title'],
+                'Preferred'     => $result['Forename'],
+                'Surname'       => $result['Surname'],
+                'Email'         => $result['EmailAddress'],
+                'StudentIds'    => $this->parseStudents($result['Pupils']),
+                // getStudentContactList fields
+                'PhoneActual'   => '',
+                'OccupPhone'    => $result['Telephone'],
+                'MobilePhone'   => $result['Mobile'],
+                'Relation'      => $result['RelationshipRaw'],
+                'DefaultEmail'  => $result['EmailAddress'],
+            ] + $this->parseAddress($result['Address']);
         } else {
             return [
                 'RecordType' => 'Unknown',
@@ -52,11 +56,16 @@ class External_Isams_Batch_Reader_Iterator_Parent_Map extends External_Isams_Bat
      */
     protected function parseAddress($address)
     {
-        $address = $this->stripClarkNotationFromArrayKeys($address);
+        $address                 = $this->stripClarkNotationFromArrayKeys($address);
+        $address['AddressLines'] = $this->stripClarkNotationFromArrayKeys($address['AddressLines']);
         return [
-            'address'  => implode(', ', array_filter($address['AddressLines'])),
-            'postcode' => $address['Postcode'],
-            'suburb'   => $address['Town'],
+            'Address1' => $address['AddressLines']['Address1'],
+            'Address2' => $address['AddressLines']['Address2'],
+            'Address3' => $address['AddressLines']['Address3'],
+            'PostCode' => $address['Postcode'],
+            'Suburb'   => $address['Town'],
+            'State'    => $address['County'],
+            'Country'  => $address['Country'],
         ];
     }
 
