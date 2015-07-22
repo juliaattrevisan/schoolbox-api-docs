@@ -81,7 +81,8 @@ class External_Isams_Batch_Reader_Iterator_Parent_Map extends External_Isams_Bat
         foreach ($students as $student) {
             $values = $this->stripClarkNotationFromArrayKeys($student['value']);
             if (strtolower($values['Status']) === 'current') {
-                $studentIds[] = $student['attributes']['id'];
+                // SchoolId is a legacy ID, according to documentation
+                $studentIds[] = $values['SchoolId'];
             }
         }
         return $studentIds;
