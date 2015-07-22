@@ -87,42 +87,43 @@
 
                 <h2 class="subheader">Recent Showcased Work</h2>
                 <section>
-                    <table>
-                        <colgroup>
-                            <col width="10%" />
-                            <col />
-                            <col />
-                            <col width="10%" />
-                        </colgroup>
-                        <tbody>
-                            <!-- BEGIN showcased_work -->
-                            <tr>
-                                <!-- BEGIN has_submission -->
-                                <td>
-                                    {SHOWCASED_WORK_MIMETYPE_ICONFILE}
-                                    <a class="{SHOWCASED_WORK_MIMETYPE_ICONFILE}" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1"></a>
-                                </td>
-                                <td>
-                                    <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1">
-                                    {SHOWCASED_WORK_BOX_NAME}</a> ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
-                                    <a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a>
-                                </td>
-                                <!-- END has_submission -->
+                    <ul class="information-list">
+                        <!-- BEGIN showcased_work -->
+                        <li class="row">
+                            <!-- BEGIN has_submission -->
+                            <div class="six-column" data-equalizer-watch>
+                                <div class="avatar card">
+                                    <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1" title="View Profile">
+                                        <img src="/images/mime/60x60/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="" class="content" />
+                                        <p>{SHOWCASED_WORK_BOX_NAME}</p>
+                                    </a>
+                                    <p class="meta">{SHOWCASED_WORK_SUBMISSION_FILESIZE}</p>
+                                    <p class="meta"><a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></p>
+                                </div>
+                            </div>
+                            <!-- END has_submission -->
 
-                                <!-- BEGIN no_submission -->
-                                <td></td>
-                                <td>
-                                    {SHOWCASED_WORK_BOX_NAME} ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
-                                    <a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a>
-                                </td>
-                                <!-- END no_submission -->
+                            <!-- BEGIN no_submission -->
+                            <div class="six-column" data-equalizer-watch>
+                                <div class="info card">
+                                    <a href="#">
+                                        <h3>{SHOWCASED_WORK_BOX_NAME}</h3>
+                                    </a>
+                                    <p class="meta">{SHOWCASED_WORK_SUBMISSION_FILESIZE}</p>
+                                    <p class="meta"><a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></p>
+                                </div>
+                            </div>
+                            <!-- END no_submission -->
 
-                                <td>{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</td>
-                                <td><span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span></td>
-                            </tr>
-                            <!-- END showcased_work -->
-                        </tbody>
-                    </table>
+                            <div class="four-column">
+                                {SHOWCASED_WORK_SUBMISSION_SUBMITTED}
+                            </div>
+                            <div class="two-column text-center">
+                                <span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span>
+                            </div>
+                        </li>
+                        <!-- END showcased_work -->
+                    </ul>
                 </section>
             </div>
         </div>
