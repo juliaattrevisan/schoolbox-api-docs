@@ -25,20 +25,22 @@ class External_Isams_Batch_Reader_Iterator_Parent_Map extends External_Isams_Bat
             // //Contacts/Contact: build student's contacts out of this
             // iSAMS contains no home phone
             return [
-                'RecordType'    => 'Contacts',
-                'ID'            => $id,
+                'RecordType'                  => 'Contacts',
+                'ID'                          => $id,
+                'StudentContactID'            => $id,
                 // getParentUserAccountInfo fields
-                'Title'         => $result['Title'],
-                'Preferred'     => $result['Forename'],
-                'Surname'       => $result['Surname'],
-                'Email'         => $result['EmailAddress'],
-                'StudentIds'    => $this->parseStudents($result['Pupils']),
+                'StudentContactTitle'         => $result['Title'],
+                'StudentContactPreferred'     => $result['Forename'],
+                'StudentContactSurname'       => $result['Surname'],
+                'StudentContactEmail'         => $result['EmailAddress'],
+                // Derive student ID from these
+                'StudentContactStudentIds'    => $this->parseStudents($result['Pupils']),
                 // getStudentContactList fields
-                'PhoneActual'   => '',
-                'OccupPhone'    => $result['Telephone'],
-                'MobilePhone'   => $result['Mobile'],
-                'Relation'      => $result['RelationshipRaw'],
-                'DefaultEmail'  => $result['EmailAddress'],
+                'StudentContactPhoneActual'   => '',
+                'StudentContactOccupPhone'    => $result['Telephone'],
+                'StudentContactMobilePhone'   => $result['Mobile'],
+                'StudentContactRelation'      => $result['RelationshipRaw'],
+                'StudentContactDefaultEmail'  => $result['EmailAddress'],
             ] + $this->parseAddress($result['Address']);
         } else {
             return [
@@ -59,13 +61,13 @@ class External_Isams_Batch_Reader_Iterator_Parent_Map extends External_Isams_Bat
         $address                 = $this->stripClarkNotationFromArrayKeys($address);
         $address['AddressLines'] = $this->stripClarkNotationFromArrayKeys($address['AddressLines']);
         return [
-            'Address1' => $address['AddressLines']['Address1'],
-            'Address2' => $address['AddressLines']['Address2'],
-            'Address3' => $address['AddressLines']['Address3'],
-            'PostCode' => $address['Postcode'],
-            'Suburb'   => $address['Town'],
-            'State'    => $address['County'],
-            'Country'  => $address['Country'],
+            'StudentContactAddress1' => $address['AddressLines']['Address1'],
+            'StudentContactAddress2' => $address['AddressLines']['Address2'],
+            'StudentContactAddress3' => $address['AddressLines']['Address3'],
+            'StudentContactPostCode' => $address['Postcode'],
+            'StudentContactSuburb'   => $address['Town'],
+            'StudentContactState'    => $address['County'],
+            'StudentContactCountry'  => $address['Country'],
         ];
     }
 

@@ -85,38 +85,42 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
 
             // Set guardian 1 if it isn't set yet, guardian 2 if it is,
             // skip if both are set
-            $name    = trim($externalUser['Preferred'].' '.$externalUser['Surname']);
+            $name    = trim($externalUser['StudentContactPreferred'].' '.$externalUser['StudentContactSurname']);
             $address = implode(
                 ', ',
                 array_filter(
                     array_map(
                         'trim',
-                        [$externalUser['Address1'], $externalUser['Address3'], $externalUser['Address3'],]
+                        [
+                            $externalUser['StudentContactAddress1'],
+                            $externalUser['StudentContactAddress3'],
+                            $externalUser['StudentContactAddress3'],
+                        ]
                     )
                 )
             );
             if (strlen($profile->setGuardian1Name()) === 0) {
                 $profile
                     ->setGuardian1Name($name)
-                    ->setGuardian1HomePhone($externalUser['PhoneActual'])
-                    ->setGuardian1WorkPhone($externalUser['OccupPhone'])
-                    ->setGuardian1MobilePhone($externalUser['MobilePhone'])
+                    ->setGuardian1HomePhone($externalUser['StudentContactPhoneActual'])
+                    ->setGuardian1WorkPhone($externalUser['StudentContactOccupPhone'])
+                    ->setGuardian1MobilePhone($externalUser['StudentContactMobilePhone'])
                     ->setGuardian1Address($address)
-                    ->setGuardian1Suburb($externalUser['Suburb'])
-                    ->setGuardian1Postcode($externalUser['PostCode'])
-                    ->setGuardian1Email($externalUser['DefaultEmail'])
+                    ->setGuardian1Suburb($externalUser['StudentContactSuburb'])
+                    ->setGuardian1Postcode($externalUser['StudentContactPostCode'])
+                    ->setGuardian1Email($externalUser['StudentContactDefaultEmail'])
                 ;
                 $profileMapper->save($profile);
             } elseif (strlen($profile->setGuardian2Name()) === 0) {
                 $profile
                     ->setGuardian2Name($name)
-                    ->setGuardian2HomePhone($externalUser['PhoneActual'])
-                    ->setGuardian2WorkPhone($externalUser['OccupPhone'])
-                    ->setGuardian2MobilePhone($externalUser['MobilePhone'])
+                    ->setGuardian2HomePhone($externalUser['StudentContactPhoneActual'])
+                    ->setGuardian2WorkPhone($externalUser['StudentContactOccupPhone'])
+                    ->setGuardian2MobilePhone($externalUser['StudentContactMobilePhone'])
                     ->setGuardian2Address($address)
-                    ->setGuardian2Suburb($externalUser['Suburb'])
-                    ->setGuardian2Postcode($externalUser['PostCode'])
-                    ->setGuardian2Email($externalUser['DefaultEmail'])
+                    ->setGuardian2Suburb($externalUser['StudentContactSuburb'])
+                    ->setGuardian2Postcode($externalUser['StudentContactPostCode'])
+                    ->setGuardian2Email($externalUser['StudentContactDefaultEmail'])
                 ;
                 $profileMapper->save($profile);
             }
@@ -125,6 +129,7 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
         }
 
         // Set up relations
+        $userMapper     = UserMapper::getInstance();
         $relationMapper = UserRelationMapper::getInstance();
 
         // Delete old relations
@@ -132,7 +137,7 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
 
         // Set up new relation for the parent
         $relations = new \Schoolbox\Collection();
-        foreach (UserMapper::getInstance()->findByColumn('external_id', $externalUser['StudentIds']) as $student) {
+        foreach ($userMapper->findByColumn('external_id', $externalUser['StudentContactStudentIds']) as $student) {
             $relations->add(
                 $relationMapper->createModel()
                     ->setUser($newUser['id'])
