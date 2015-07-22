@@ -905,11 +905,18 @@ table{
                 margin-left: (5 * rem-calc($base-font-size));
             }
         }
+
+        ~ .progress {
+            margin-bottom: 0;
+        }
     }
 
     &.info {
         ~ article, ~ .list-item-content {
             margin-left: (rem-calc($base-font-size));
+        }
+        ~ .progress {
+            margin-bottom: 0;
         }
     }
 
