@@ -1,14 +1,27 @@
-<div class="box">
-	<h2>Top Links</h2>
-	<ul class="information-list">
-		<!-- BEGIN top_link -->
-		<li>
-			<a href="/redir.php?id={LINK_ID}">
-				<img class="icon" height="32" width="32" src="{LINK_THUMB}" />
-				<h4>{LINK_NAME} <span class="float-right">{LINK_HITS}</span></h4>
-			</a>
-			<span class="prog" style="width:{LINK_PROGRESS}%"></span>
-		</li>
-		<!-- END top_link -->
-	</ul>
+<div class="small-12 island">
+    <h2 class="subheader">Top Links</h2>
+    <section>
+        <ul class="information-list">
+            <!-- BEGIN top_link -->
+            <li class="row">
+                <div class="avatar card">
+                    <a href="/redir.php?id={LINK_ID}" title="{LINK_NAME}">
+                        <img src="{LINK_THUMB}" alt="{LINK_NAME}" class="content" />
+                        <p>{LINK_NAME}</p>
+                    </a>
+                    <span class="meta tally">{LINK_HITS}</span>
+                </div>
+
+                <div class="progress">
+                    <span class="meter" title="{LINK_HITS} hits" style="width: {LINK_PROGRESS}%"></span>
+                </div>
+            </li>
+            <!-- END top_link -->
+            <!-- BEGIN no_top_link -->
+            <li class="content">
+                No links viewed.
+            </li>
+            <!-- END no_top_link -->
+        </ul>
+    </section>
 </div>

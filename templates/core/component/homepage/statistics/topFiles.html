@@ -1,15 +1,30 @@
-<div class="box">
-<h2>Top Files</h2>
-	<ul class="information-list">
-    	<!-- BEGIN top_file -->
-		<li>
-			<a href="/send.php?id={FILE_ID}">
-				<img class="icon" height="32" width="32" src="{FILE_THUMB}" />
-				<h4>{FILE_NAME} <em>({FILE_SIZE})</em><span class="float-right">{FILE_HITS}</span></h4>
-			</a>
-			<p class="meta">{FILE_DATE}</p>
-			<span class="prog" style="width:{FILE_PROGRESS}%"></span>
-		</li>
-    	<!-- END top_file -->
-	</ul>
+<div class="small-12 island">
+    <h2 class="subheader">Top Files</h2>
+    <section>
+        <ul class="information-list">
+            <!-- BEGIN top_file -->
+            <li class="row">
+                <div class="avatar card">
+                    <a href="/send.php?id={FILE_ID}" title="{FILE_NAME}">
+                        <img src="{FILE_THUMB}" alt="{FILE_NAME}" class="content" />
+
+                        <p>{FILE_NAME} <em>({FILE_SIZE})</em></p>
+                    </a>
+
+                    <span class="meta tally">{FILE_HITS}</span>
+                    <p class="meta">{FILE_DATE}</p>
+                </div>
+
+                <div class="progress">
+                    <span class="meter" title="{FILE_HITS} hits" style="width: {FILE_PROGRESS}%"></span>
+                </div>
+            </li>
+            <!-- END top_file -->
+            <!-- BEGIN no_top_file -->
+            <li class="content">
+                No files viewed.
+            </li>
+            <!-- END no_top_file -->
+        </ul>
+    </section>
 </div>

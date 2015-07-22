@@ -1,14 +1,19 @@
-<div class="box">
-	<h2>Yet to Visit</h2>
-	<ul class="information-list grid">
-    <!-- BEGIN unvisitor -->
-	<li>
-		<a title="{VISITOR_TOOLTIP}" class="author" href="/search/user/{VISITOR_ID}">
-			<img class="thumbnail" height="64" width="64" src="{VISITOR_THUMB}" />
-			<h4>{VISITOR_NAME}</h4>
-		</a>
-		<p class="meta">{VISITOR_GROUP}</p>
-	</li>
-    <!-- END unvisitor -->
-    </ul>
+<div class="small-12 island">
+    <h2 class="subheader">Yet to Visit</h2>
+    <section>
+        <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-3">
+            <!-- BEGIN unvisitor -->
+            <li>
+                <div class="avatar-card clearfix">
+                    <a href="/search/user/{VISITOR_ID}" title="View Profile">
+                        <img src="{VISITOR_THUMB}" alt="View Profile" />
+
+                        <p>{VISITOR_NAME}</p>
+                    </a>
+                    <p class="meta">{VISITOR_GROUP}</p>
+                </div>
+            </li>
+            <!-- END unvisitor -->
+        </ul>
+    </section>
 </div>

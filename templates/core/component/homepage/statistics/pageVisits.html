@@ -1,39 +1,37 @@
-<script type="text/javascript" src="/javascript/components/flot/jquery.flot.js"></script>
-<script type="text/javascript" src="/javascript/components/flot/jquery.flot.time.js"></script>
-<h2 class="square-bottom">Page Visits</h2>
-<div class="page-visits">
-    <div id="visit-chart"></div>
-</div>
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type="text/javascript">
-    var data = {GRAPH_JSON};
-    var options = {
-        series: {
-            points: {
-                show: true,
-                fill: true,
-                lineWidth: 6
+    $(function () {
+        $('#page-visit-graph').highcharts({
+            title: {
+                text: ''
             },
-            lines: {
-                show: true,
-                lineWidth: 4
+            colors: {GRAPH_COLOURS},
+            xAxis: {
+                min: {GRAPH_XMIN},
+                max: {GRAPH_XMAX},
+                type: 'datetime'
+            },
+            yAxis: {
+                title: {
+                    text: 'Visits'
+                },
+                allowDecimals: false,
+                min: 0
+            },
+            series: {GRAPH_JSON},
+            credits: {
+                enabled: false
             }
-        },
-        colors: {GRAPH_COLOURS},
-        xaxis:  {
-            mode: "time",
-            min: {GRAPH_XMIN},
-            max: {GRAPH_XMAX}
-        },
-        yaxis:  {
-            min: 0
-        },
-        grid:   {
-            borderWidth: 0,
-            show: true
-        }
-    };
-    $(function() {
-        $.plot($('#visit-chart'), data, options);
+        });
     });
 </script>
 
+<div class="small-12 island">
+    <h2 class="subheader">Page Visits</h2>
+    <section>
+        <div class="content">
+            <div id="page-visit-graph">
+            </div>
+        </div>
+    </section>
+</div>

@@ -1,16 +1,30 @@
-<div class="box">
-<h2>Top Visitors</h2>
-<ul class="information-list">
-    <!-- BEGIN top_visitor -->
-	<li>
-		<a class="author" href="/search/user/{VISITOR_ID}">
-			<img class="icon" width="32" height="32" src="{VISITOR_THUMB}"/>
-			<h4>{VISITOR_NAME} <span class="float-right">{VISITOR_HITS}</span></h4>
-		</a>
+<div class="small-12 island">
+    <h2 class="subheader">Top Visitors</h2>
+    <section>
+        <ul class="information-list">
+            <!-- BEGIN top_visitor -->
+            <li class="row">
+                <div class="avatar card">
+                    <a href="/search/user/{VISITOR_ID}" title="View Profile">
+                        <img src="{VISITOR_THUMB}" alt="View Profile" />
+                        <p>{VISITOR_NAME}</p>
+                    </a>
+                    <span class="meta tally">{VISITOR_HITS}</span>
+                    <p class="meta">{VISITOR_GROUP}</p>
+                </div>
 
-		<p class="meta">{VISITOR_GROUP}</p>
-		<span class="prog" style="width:{VISITOR_PROGRESS}%"></span>
-	</li>
-	<!-- END top_visitor -->
-</ul>
+                <div class="progress">
+                    <span class="meter" title='{VISITOR_HITS} visits' style="width: {VISITOR_PROGRESS}%"></span>
+                </div>
+            </li>
+            <!-- END top_visitor -->
+            <!-- BEGIN no_top_visitor -->
+            <li class="content">
+                No {NO_TOP_VISITOR_GROUP_NAME} visitors in this time period.
+            </li>
+            <!-- END no_top_visitor -->
+        </ul>
+    </section>
 </div>
+
+

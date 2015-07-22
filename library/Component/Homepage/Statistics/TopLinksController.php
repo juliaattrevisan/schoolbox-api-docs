@@ -57,6 +57,7 @@ class Component_Homepage_Statistics_TopLinksController extends Component_Homepag
         }
 
         $this->setBlock($templateHandle, 'top_link', 'top_link_block');
+        $this->setBlock($templateHandle, 'no_top_link', 'no_top_link_block');
 
         if (count($this->links)) {
             for ($i = 0; $i < 5 && $i < count($this->links); ++$i) {
@@ -71,8 +72,16 @@ class Component_Homepage_Statistics_TopLinksController extends Component_Homepag
                 );
                 $this->parse('top_link_block', 'top_link', true);
             }
+
+            $this->setVar(array(
+                'no_top_link_block' => ''
+            ));
         } else {
-            $this->setVar('top_link_block', '<p>No links followed.</p>');
+            $this->setVar(array(
+                'top_link_block' => ''
+            ));
+
+            $this->parse('no_top_link_block', 'no_top_link');
         }
 
         return true;
