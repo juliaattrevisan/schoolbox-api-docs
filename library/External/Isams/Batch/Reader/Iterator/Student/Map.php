@@ -9,7 +9,7 @@
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class External_Isams_Batch_Reader_Iterator_Student_Map extends IteratorIterator
+class External_Isams_Batch_Reader_Iterator_Student_Map extends External_Isams_Batch_Reader_Iterator_BaseMap
 {
     /**
      * @return array
@@ -20,10 +20,7 @@ class External_Isams_Batch_Reader_Iterator_Student_Map extends IteratorIterator
         // //CurrentPupils/Pupil or //CurrentPupilsHealth/Pupil
         // I don't know where I came from.
         $current = $this->getInnerIterator()->current();
-        $result  = [];
-        foreach ($current['value'] as $key => $value) {
-            $result[preg_replace('/^{.*?}/', '', $key)] = $value;
-        }
+        $result  = $this->stripClarkNotationFromArrayKeys($current['value']);
 
         // ID: the database's PK value, distinct from SchoolID
         $id = $current['attributes']['id'];
