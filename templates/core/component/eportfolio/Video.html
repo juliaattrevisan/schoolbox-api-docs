@@ -93,7 +93,6 @@
                                 formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
                                 formData.append('parent', 0);
                                 formData.append('published[{ID}][{PAGE_ID}]', 'value_ignored');
-                                formData.append('comment', '');
                             },
                             complete: function (file) {
                                 $(file.previewElement).find('img').remove();
