@@ -34,16 +34,16 @@
         <div class="island small-12">
             <section>
                 <!-- BEGIN default_audio -->
-                <div>
+                <div class="content">
                     <h3 class="mejs-player-title" data-role="media-playlist-title">{DEFAULT_AUDIO_TITLE}</h3>
-                    <audio id="schoolbox_audio{COMPONENT_INSTANCE_ID}"
-                           data-role="media-playlist-player"
-                           controls
-                           preload="none"
-                           width="100%">
-                        <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_AUDIO_ID}" type="audio/mpeg" />
-                    </audio>
                 </div>
+                <audio id="schoolbox_audio{COMPONENT_INSTANCE_ID}"
+                       data-role="media-playlist-player"
+                       controls
+                       preload="none"
+                       width="100%">
+                    <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_AUDIO_ID}" type="audio/mpeg" />
+                </audio>
                 <!-- END default_audio -->
 
                 <div data-dz-wrap class="dropzone-wrap">
