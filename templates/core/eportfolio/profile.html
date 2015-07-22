@@ -160,51 +160,55 @@
     <div class="small-12 large-4 island">
         <!-- BEGIN has_subjects -->
         <div class="row">
-            <h2 class="subheader">My Current Subjects</h2>
-            <section>
-                <ul class="action-list">
-                    <!-- BEGIN subject -->
-                    <li class="row">
-                        <div class="eleven-column">
-                            <!-- BEGIN subject_linked -->
-                            <a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a>
-                            <!-- END subject_linked -->
-                            <!-- BEGIN subject_unlinked -->
-                            {SUBJECT_NAME}
-                            <!-- END subject_unlinked -->
-                        </div>
-                        <div class="one actions">
-                            <a href='/homepage/{SUBJECT_ID}' class="icon-next no-text"></a>
-                        </div>
-                    </li>
-                    <!-- END subject -->
-                </ul>
-            </section>
+            <div class="small-12 island">
+                <h2 class="subheader">My Current Subjects</h2>
+                <section>
+                    <ul class="action-list">
+                        <!-- BEGIN subject -->
+                        <li class="row">
+                            <div class="eleven-column">
+                                <!-- BEGIN subject_linked -->
+                                <a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a>
+                                <!-- END subject_linked -->
+                                <!-- BEGIN subject_unlinked -->
+                                {SUBJECT_NAME}
+                                <!-- END subject_unlinked -->
+                            </div>
+                            <div class="one actions">
+                                <a href='/homepage/{SUBJECT_ID}' class="icon-next no-text"></a>
+                            </div>
+                        </li>
+                        <!-- END subject -->
+                    </ul>
+                </section>
+            </div>
         </div>
         <!-- END has_subjects -->
 
         <!-- BEGIN has_groups -->
         <div class="row">
-            <h2 class="subheader">My Current Groups</h2>
-            <section>
-                <ul class="action-list">
-                    <!-- BEGIN group -->
-                    <li class="row">
-                        <div class="eleven-column">
-                            <!-- BEGIN group_linked -->
-                            <a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a>
-                            <!-- END group_linked -->
-                            <!-- BEGIN group_unlinked -->
-                            {GROUP_NAME}
-                            <!-- END group_unlinked -->
-                        </div>
-                        <div class="one actions">
-                            <a href='/homepage/{GROUP_ID}' class="icon-next no-text"></a>
-                        </div>
-                    </li>
-                    <!-- END group -->
-                </ul>
-            </section>
+            <div class="small-12 island">
+                <h2 class="subheader">My Current Groups</h2>
+                <section>
+                    <ul class="action-list">
+                        <!-- BEGIN group -->
+                        <li class="row">
+                            <div class="eleven-column">
+                                <!-- BEGIN group_linked -->
+                                <a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a>
+                                <!-- END group_linked -->
+                                <!-- BEGIN group_unlinked -->
+                                {GROUP_NAME}
+                                <!-- END group_unlinked -->
+                            </div>
+                            <div class="one actions">
+                                <a href='/homepage/{GROUP_ID}' class="icon-next no-text"></a>
+                            </div>
+                        </li>
+                        <!-- END group -->
+                    </ul>
+                </section>
+            </div>
         </div>
         <!-- END has_groups -->
     </div>
