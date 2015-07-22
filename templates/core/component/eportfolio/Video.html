@@ -78,26 +78,26 @@
                 </div>
 
                 <script type="text/javascript">
-                        $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                            wrapClass: 'dragging',
-                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
-                            tplWrap: '<li class="dz-preview" />',
-                            dictDefaultMessage: 'You can drag videos into this space',
-                            refreshUrl: '/eportfolio/configForm.php',
-                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                            refreshData: {
-                                page_id: '{PAGE_ID}',
-                                reload: '{COMPONENT_INSTANCE_ID}'
-                            },
-                            sending: function (file, xhr, formData) {
-                                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                                formData.append('parent', 0);
-                                formData.append('published[{ID}][{PAGE_ID}]', 'value_ignored');
-                            },
-                            complete: function (file) {
-                                $(file.previewElement).find('img').remove();
-                            }
-                        });
+                    $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                        wrapClass: 'dragging',
+                        previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                        tplWrap: '<li class="dz-preview" />',
+                        dictDefaultMessage: 'You can drag videos into this space',
+                        refreshUrl: '/eportfolio/configForm.php',
+                        refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                        refreshData: {
+                            page_id: '{PAGE_ID}',
+                            reload: '{COMPONENT_INSTANCE_ID}'
+                        },
+                        sending: function (file, xhr, formData) {
+                            formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                            formData.append('parent', 0);
+                            formData.append('published[{ID}][{PAGE_ID}]', 'value_ignored');
+                        },
+                        complete: function (file) {
+                            $(file.previewElement).find('img').remove();
+                        }
+                    });
                 </script>
                 <!-- END submit_video -->
             </section>
