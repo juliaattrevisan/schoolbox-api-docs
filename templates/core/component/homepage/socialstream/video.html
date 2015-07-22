@@ -1,14 +1,12 @@
-<div class="videoWrapper">
-	<video id="socialstream_video"
-		controls
-		preload="none"
-		poster="/cms/videoThumb.php?id={SOCIALSTREAM_STORAGE_HASH}&type=storage&size=poster"
-		width="100%"
-		height="400"
-	>
-		<source src="/cms/sendVideo.php?id={SOCIALSTREAM_STORAGE_HASH}&type=storage" type='video/mp4'>
-	</video>
-	<script>
-		$("#socialstream_video").mediaelementplayer();
-	</script>
-</div>
+<video id="socialstream_video"
+    controls
+    preload="none"
+    poster="/cms/videoThumb.php?id={SOCIALSTREAM_STORAGE_HASH}&type=storage&size=poster"
+    width="100%"
+    height="400"
+>
+    <source src="/cms/sendVideo.php?id={SOCIALSTREAM_STORAGE_HASH}&type=storage" type='video/mp4'>
+</video>
+<script>
+    $("#socialstream_video").mediaelementplayer();
+</script>

@@ -86,15 +86,15 @@
 
 				/* The element which allows you to make comments and replies
 				 */
-				addPostLink: '.addPostLink',
+				addPostLink: '[data-add-post-link]',
 
 				/* The form which spawns when making comments and replies
 				 */
-				addPostForm: '.addPostForm',
+				addPostForm: '[data-add-post-form]',
 
 				/* The element which allows you to spawn more
 				 */
-				viewMoreLink: $j(element).find('.socialstreamViewMore'),
+				viewMoreLink: $j(element).find('[data-socialstream-view-more]'),
 
 				/* Lightboxed attachments are found using this key
 				 */
@@ -102,18 +102,15 @@
 
 				/* Container div for a loading graphic or message
 				 */
-				loading: $j(element).find('.loading'),
+				loading: $j(element).find('[data-loader]'),
 
 				/* Container div for threads
 				 */
-				threadContainer: $j(element).find('.socialstream-threads'),
+				threadContainer: $j(element).find('[data-socialstream-threads]'),
 
 				/* Attachment selectors everywhere in the entire stream
 				 */
-				attachment: $j('.socialstream-attachment'),
-				attachmentUrlSelector: $j('.socialstream-attachment-url').closest('li'),
-				attachmentUploadSelector:  $j('.socialstream-attachment-upload').closest('li'),
-				attachmentResourceSelector: $j('.socialstream-attachment-resource').closest('li')
+				attachment: $j('[data-socialstream-attachment]')
 			}
 
 			/* Force integer (use the force)
@@ -138,8 +135,9 @@
 
 				// Does this have a post form already? If so, don't add it back
 				// after it gets removed.
-				var body = $j(this).closest('li').find('> .body');
-				var hasPostForm = (body.find('form.addPostForm').length > 0)
+                var row = $j(this).closest('[data-socialstream-row]');
+				var body = row.find('[data-body]').first();
+				var hasPostForm = (body.find('[data-add-post-form]').length > 0)
 
 				/* Clear out all instances of .addPostForm in the socialstream
 				 */
@@ -184,7 +182,7 @@
 
 				/* Steal focus
 				 */
-				$(this).closest('li').find('.socialstream-form').find('textarea').focus();
+				row.find('[data-socialstream-form]').find('textarea').focus();
 			});
 		}
 
@@ -225,6 +223,18 @@
                     type: 'image',
                     removalDelay: 300,
                     mainClass: 'mfp-fade'
+                });
+
+                config.element.find('[data-socialstream-delete]').unbind('click').click(function(event) {
+                    event.preventDefault();
+
+                    var element = $(this);
+                    $(this).confirmDialog({
+                        text: 'Do you want to delete this item?',
+                        confirmEvent: function() {
+                            window.location.href = element.attr('href');
+                        }
+                    });
                 });
 			});
 
