@@ -28,7 +28,7 @@ class External_Isams_Batch_Reader_Iterator_Parent_Map extends External_Isams_Bat
         // ID: the database's PK value, distinct from SchoolID
         $id = $current['attributes']['id'];
         // Don't share CanShare = 0
-        if (array_key_exists('Address', $result) && $result['CanShare']) {
+        if (array_key_exists('Address', $result)) {
             // //Contacts/Contact: build student's contacts out of this
             // iSAMS contains no home phone
             return [
