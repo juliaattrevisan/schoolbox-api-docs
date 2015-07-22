@@ -22,7 +22,7 @@ class External_Isams_Batch_Reader_Student extends Reader
      * @return Traversable
      * @throws \Sabre\Xml\LibXMLException
      */
-    public function getPupils()
+    public function getAccountInfo()
     {
         // So what's with iterator chain?
         // * External_Isams_Batch_Reader_Iterator_Student_Filter stops iterating below Pupil
