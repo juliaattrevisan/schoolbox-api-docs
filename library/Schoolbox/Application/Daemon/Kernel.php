@@ -317,7 +317,7 @@ EOL;
     /**
      * @return LoggerInterface
      */
-    protected function logger() {
+    public function logger() {
         if(!$this->log instanceof LoggerInterface) {
             // if verbose output is on
             $level     = $this->getOpt('level');

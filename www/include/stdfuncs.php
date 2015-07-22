@@ -173,3 +173,44 @@ function score2pascal($score, $delim = '_') {
     }
     return implode('', $xpl);
 }
+
+/**
+ * This function exists because pathinfo() breaks non-latin things
+ *
+ * @see http://php.net/manual/en/function.pathinfo.php#107461
+ *
+ * @param string $filepath
+ * @param int    $options
+ * @return array
+ */
+function mb_pathinfo($filepath, $options = null) {
+    preg_match('%^(.*?)[\\\\/]*(([^/\\\\]*?)(\.([^\.\\\\/]+?)|))[\\\\/\.]*$%im', $filepath, $m);
+
+    $map = [
+        PATHINFO_DIRNAME   => 'dirname',
+        PATHINFO_BASENAME  => 'basename',
+        PATHINFO_EXTENSION => 'extension',
+        PATHINFO_FILENAME  => 'filename'
+    ];
+
+    $ret = [];
+
+    if ($m[1]) {
+        $ret[$map[PATHINFO_DIRNAME]] = $m[1];
+    }
+    if ($m[2]) {
+        $ret[$map[PATHINFO_BASENAME]] = $m[2];
+    }
+    if ($m[5]) {
+        $ret[$map[PATHINFO_EXTENSION]] = $m[5];
+    }
+    if ($m[3]) {
+        $ret[$map[PATHINFO_FILENAME]] = $m[3];
+    }
+
+    if ($options && isset($map[$options])) {
+        return $ret[$map[$options]];
+    }
+
+    return $ret;
+}

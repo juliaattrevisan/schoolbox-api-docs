@@ -242,8 +242,8 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $storage->setPath($tempLocation);
 
         // set filetype metadata
-        $storage->setFilename(pathinfo($basename, PATHINFO_FILENAME));
-        $storage->setExtension(pathinfo($basename, PATHINFO_EXTENSION));
+        $storage->setFilename(mb_pathinfo($basename, PATHINFO_FILENAME));
+        $storage->setExtension(mb_pathinfo($basename, PATHINFO_EXTENSION));
         try {
             $storage->setMimetype($mtm->getByFilename($basename));
         } catch (File\Exception $e) {

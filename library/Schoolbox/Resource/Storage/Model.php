@@ -96,8 +96,8 @@ class Model extends File implements IStorage
     public function setBasename($basename)
     {
         return $this
-            ->setFilename(pathinfo($basename, PATHINFO_FILENAME))
-            ->setExtension(pathinfo($basename, PATHINFO_EXTENSION))
+            ->setFilename(mb_pathinfo($basename, PATHINFO_FILENAME))
+            ->setExtension(mb_pathinfo($basename, PATHINFO_EXTENSION))
         ;
     }
 

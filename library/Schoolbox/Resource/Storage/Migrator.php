@@ -124,8 +124,8 @@ class Migrator
                 continue;
             }
 
-            $filename = pathinfo($basename, PATHINFO_FILENAME);
-            $ext      = pathinfo($basename, PATHINFO_EXTENSION);
+            $filename = mb_pathinfo($basename, PATHINFO_FILENAME);
+            $ext      = mb_pathinfo($basename, PATHINFO_EXTENSION);
 
             // generate a "temporary file"
             $file = $this->storageMapper
@@ -242,8 +242,8 @@ class Migrator
                 $oldPrefix   = $queueType.'-'.$fileId;
                 $newPrefix   = $file->getHash();
                 $newFilepath = str_replace($oldPrefix, $newPrefix, $oldFilepath);
-                $oldFilename = pathinfo($oldFilepath, PATHINFO_FILENAME);
-                $newFilename = pathinfo($newFilepath, PATHINFO_FILENAME);
+                $oldFilename = mb_pathinfo($oldFilepath, PATHINFO_FILENAME);
+                $newFilename = mb_pathinfo($newFilepath, PATHINFO_FILENAME);
 
                 $this->log->info("Migrating queue file '$oldFilename' to '$newFilename'");
 
