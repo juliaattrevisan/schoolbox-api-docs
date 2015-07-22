@@ -2,17 +2,17 @@
 /**
  * Maps results for `External_Isams_Batch_Reader_Student->parse()`.
  *
- * Converts results to a format that is understandable by Schoolbox sync scripts.
+ * Converts results to the same format that
+ * `External_UserInterface->getStudentUserAccountInfo()` returns.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
 class External_Isams_Batch_Reader_Iterator_Student_Map extends IteratorIterator
 {
     /**
-     * @return bool
+     * @return array
      */
     public function current()
     {
@@ -20,10 +20,38 @@ class External_Isams_Batch_Reader_Iterator_Student_Map extends IteratorIterator
         // //CurrentPupils/Pupil or //CurrentPupilsHealth/Pupil
         // I don't know where I came from.
         $current = $this->getInnerIterator()->current();
-        $result  = ['StudentId' => $current['attributes']['id']];
+        $result  = [];
         foreach ($current['value'] as $key => $value) {
             $result[preg_replace('/^{.*?}/', '', $key)] = $value;
         }
-        return $result;
+
+        // ID: the database's PK value, distinct from SchoolID
+        $id = $current['attributes']['id'];
+        if (array_key_exists('SchoolCode', $result)) {
+            // //CurrentPupils/Pupil: contains SchoolCode
+            // don't know StudentCampus yet. Probably in AcademicHouse?
+            return [
+                'ID'                   => $id,
+                'StudentID'            => $result['SchoolId'],
+                'NetworkLogin'         => $result['UserName'],
+                'StudentTitle'         => $result['Title'],
+                'StudentPreferred'     => $result['Preferredname'],
+                'StudentSurname'       => $result['Surname'],
+                'StudentGender'        => $result['Gender'],
+                'StudentEmail'         => $result['EmailAddress'],
+                'StudentOccupEmail'    => $result['EmailAddress'],
+                'StudentYearLevel'     => $result['NCYear'],
+                'StudentHouse'         => $result['AcademicHouse'],
+                'StudentBoarder'       => $result['PupilType'],
+                'StudentBoardingHouse' => $result['BoardingHouse'],
+            ];
+        } else {
+            // //CurrentPupilsHealth/Pupil: doesn't
+            // I assume HealthNotes is what should show on the profile
+            return [
+                'ID'                  => $id,
+                'StudentMedicalAlert' => $result['HealthNotes'],
+            ];
+        }
     }
 }
