@@ -787,12 +787,13 @@ table{
 	//@media #{$medium-up} { @include block-grid(2); }
 	//@media #{$small-up} { @include block-grid(2); }
 	@extend .information-list;
-	li{
+	> li{
+        padding-bottom: 0 !important; // SORRY! foundation's selector is just too specific :'(
 		border-right: 1px solid $body-bg;
-		border-bottom: 0;
-		&:last-child{
-			border: 0;
-		}
+		border-bottom: 1px solid $body-bg;
+		//&:last-child{
+		//	border: 0;
+		//}
 	}
 }
 
@@ -924,7 +925,7 @@ table{
       margin: 0;
     }
 
-    h3, .meta {
+    h3, p, .meta {
       text-overflow: ellipsis;
       overflow-x: hidden;
       white-space: nowrap;
