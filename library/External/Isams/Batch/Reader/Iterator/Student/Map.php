@@ -46,13 +46,18 @@ class External_Isams_Batch_Reader_Iterator_Student_Map extends IteratorIterator
                 'StudentBoarder'       => $result['PupilType'],
                 'StudentBoardingHouse' => $result['BoardingHouse'],
             ];
-        } else {
+        } elseif (array_key_exists('HealthNotes', $result)) {
             // //CurrentPupilsHealth/Pupil: doesn't
             // I assume HealthNotes is what should show on the profile
             return [
                 'RecordType'          => 'CurrentPupilsHealth',
                 'ID'                  => $id,
                 'StudentMedicalAlert' => $result['HealthNotes'],
+            ];
+        } else {
+            return [
+                'RecordType' => 'Unknown',
+                'ID'         => $id,
             ];
         }
     }
