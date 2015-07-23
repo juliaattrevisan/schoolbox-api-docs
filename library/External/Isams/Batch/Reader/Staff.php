@@ -7,20 +7,8 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Sabre\Xml\Reader;
-
-class External_Isams_Batch_Reader_Staff extends Reader
+class External_Isams_Batch_Reader_Staff extends External_Isams_Batch_Reader_Base
 {
-    /**
-     * Teachers are in /HRManager/CurrentStaff/StaffMember
-     *
-     * @var array
-     */
-    public $elementMap = [
-        '{}StaffMember' => Sabre\Xml\Element\KeyValue::class,
-    ];
-
-
     /**
      * Gets the pupils from whatever XML document was set into this reader.
      *
@@ -29,24 +17,11 @@ class External_Isams_Batch_Reader_Staff extends Reader
      */
     public function getAccountInfo()
     {
-        return new CallbackFilterIterator(
-            new External_Isams_Batch_Reader_Iterator_Staff_Map(
-                new CallbackFilterIterator(
-                    new RecursiveIteratorIterator(
-                        new External_Isams_Batch_Reader_Iterator_Staff_Filter($this->parse())
-                    ),
-                    function ($value) {
-                        return is_array($value)
-                            && array_key_exists('name', $value)
-                            && $value['name'] == '{}StaffMember';
-                    }
-                )
-            ),
-            function ($value) {
-                return is_array($value)
-                && array_key_exists('RecordType', $value)
-                && $value['RecordType'] == 'StaffMember';
-            }
+        return new External_Isams_Batch_Reader_Iterator_Staff_Map(
+            new \Alaress\Xml\Filter\Path(
+                $this->iterator,
+                '//HRManager/CurrentStaff/StaffMember'
+            )
         );
     }
 }
