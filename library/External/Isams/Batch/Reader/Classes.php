@@ -16,7 +16,7 @@ class External_Isams_Batch_Reader_Classes extends External_Isams_Batch_Reader_Ba
      */
     public function getAccountInfo()
     {
-        return new External_Isams_Batch_Reader_Iterator_Staff_Map(
+        return new External_Isams_Batch_Reader_Iterator_Classes_Map(
             new \Alaress\Xml\Filter\Path(
                 $this->iterator,
                 [
