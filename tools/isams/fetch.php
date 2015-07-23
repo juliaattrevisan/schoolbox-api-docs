@@ -6,9 +6,5 @@
 
 require_once __DIR__ . '/../../include/Bootstrap.php';
 
-$api = new External_Isams_Batch_BaseApi(
-    'isamstest.cis.edu.sg',
-    '6AEE01B5-ABC5-4293-BE3F-B8FBAF452764'
-);
-
+$api = new External_Isams_Batch_BaseApi('isamstest.cis.edu.sg', $argv[1]);
 echo $api->retrieveDocument();
