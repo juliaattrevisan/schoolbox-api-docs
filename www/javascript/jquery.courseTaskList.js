@@ -230,20 +230,19 @@
                 );
             }
         );
-        //
-        //// Create new tasks: show inline form if there is one.
-        //component.find('.add_buttons .btn').bind('click.courseTaskList', function(event) {
-        //    var create_forms = component.find('.create_task_form_container');
-        //    var form_class   = $(this).data('form_class');
-        //    if (form_class) {
-        //        var create_form = create_forms.filter('.'+form_class);
-        //        if (create_form.length) {
-        //            event.preventDefault();
-        //            create_forms.not(create_form).slideUp('fast');
-        //            create_form.slideToggle('fast');
-        //        }
-        //    }
-        //});
+
+        // Create new tasks: show inline form if there is one.
+        component.on(
+            'click.courseTaskList',
+            'a[data-interaction="create_task"]',
+                function(event) {
+                var create_form = component.find('[data-interaction="create_task_container"]');
+                if (create_form.length) {
+                    event.preventDefault();
+                    create_form.toggleClass('hide');
+                }
+            }
+        );
         //
         //// Event - save new item, no copy
         //component.on('submitNoCopy.courseTaskList', 'form.edit_task_form, form.create_task_form', {}, function(event) {

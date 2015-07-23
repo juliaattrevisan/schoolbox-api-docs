@@ -155,14 +155,14 @@
                 </ul>
 
                 <div class="content">
-                    <a href="/submission/createSubmission/new/{ID}/task" class="button icon-due-work" data-form_class="for_due_work">Post Due Work</a>
-                    <a href="/assess/create/{ID}/task" class="button icon-quiz" data-form_class="for_assessment">Create Quiz</a>
-                    <a href="/task/create/{ID}" class="button icon-task" data-form_class="for_task">Add Task</a>
+                    <a href="/submission/createSubmission/new/{ID}/task" class="button icon-due-work">Post Due Work</a>
+                    <a href="/assess/create/{ID}/task" class="button icon-quiz">Create Quiz</a>
+                    <a href="/task/create/{ID}" class="button icon-task" data-interaction="create_task">Add Task</a>
                 </div>
 
                 <!-- This is the form for inline creation of tasks -->
                 <div class="content">
-                    <div class="twelve-column panel hide" data-form-container data-for-task data-new-task-container>
+                    <div class="twelve-column panel hide" data-form-container data-for-task data-new-task-container data-interaction="create_task_container">
                         <form action="/task/saveForm.php" method="post" data-interaction="create_task">
                             <input type="hidden" name="id"        value=""/>
                             <input type="hidden" name="category"  value="{ID}"/>
