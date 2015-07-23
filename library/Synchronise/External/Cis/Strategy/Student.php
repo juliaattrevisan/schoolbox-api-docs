@@ -24,10 +24,10 @@ class Synchronise_External_Cis_Strategy_Student extends Synchronise_Base_Strateg
      */
     public function generateList()
     {
-        // Let CIS download the XML themselves, we'll get it from wherever it is.
-        $reader = new External_Isams_Batch_Reader_Student();
+        $reader = new XMLReader();
         $reader->open(SITE_root.'/output-stripped-more.xml');
-        $this->list = $reader->getAccountInfo();
+        $iterator   = new External_Isams_Batch_Reader_Student($reader);
+        $this->list = $iterator->getAccountInfo();
     }
 
     /**
