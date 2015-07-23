@@ -10,10 +10,10 @@
 
 namespace Alaress\Xml\Filter;
 
-use Alaress\Xml\Reader;
+use Alaress\Xml\State;
 use FilterIterator;
+use Iterator;
 use UnexpectedValueException;
-use XmlReader;
 
 class Path extends FilterIterator
 {
@@ -27,12 +27,12 @@ class Path extends FilterIterator
     /**
      * Constructor
      *
-     * @param Reader $reader
-     * @param array  $paths  A list of paths to match against.
+     * @param Iterator $iterator
+     * @param array    $paths    A list of paths to match against.
      */
-    public function __construct(Reader $reader, $paths)
+    public function __construct(Iterator $iterator, $paths)
     {
-        parent::__construct($reader);
+        parent::__construct($iterator);
         if (is_scalar($paths)) {
             $paths = [$paths];
         }
@@ -46,23 +46,15 @@ class Path extends FilterIterator
      */
     public function accept()
     {
-        $iterator = $this->getInnerIterator();
-        $reader   = $this->current();
-        if (!$iterator instanceof Reader) {
-            throw new \UnexpectedValueException("Iterator must be a Alaress\\Xml\\Reader, got something else");
-        }
-        if (!$reader instanceof XMLReader) {
+        $state = $this->current();
+        if (!$state instanceof State) {
             throw new \UnexpectedValueException("Current value must be a XMLReader, got something else");
         }
-        if ($reader->nodeType === XMLReader::ELEMENT
-            || ($reader->nodeType === XMLReader::END_ELEMENT && $reader->isEmptyElement)
-        ) {
-            // test paths
-            $path = $iterator->getPath();
-            foreach ($this->paths as $thisPath) {
-                if ($path === $thisPath) {
-                    return true;
-                }
+        // test paths
+        $path = $state->getPath();
+        foreach ($this->paths as $thisPath) {
+            if ($path === $thisPath) {
+                return true;
             }
         }
         return false;

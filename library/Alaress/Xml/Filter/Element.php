@@ -1,0 +1,50 @@
+<?php
+/**
+ * Filter iterator for Alaress\Xml\Reader - filters out things that aren't
+ * elements.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2015, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Alaress\Xml\Filter;
+
+use Alaress\Xml\State;
+use FilterIterator;
+use UnexpectedValueException;
+use XmlReader;
+
+class Element extends FilterIterator
+{
+    /**
+     * Paths to check against
+     *
+     * @var array
+     */
+    protected $paths = [];
+
+    /**
+     * Check whether the current element of the iterator is acceptable
+     *
+     * @return bool true if the current element is acceptable, otherwise false.
+     */
+    public function accept()
+    {
+//        $iterator = $this->getInnerIterator();
+//        if (!$iterator instanceof Reader) {
+//            throw new \UnexpectedValueException("Iterator must be a Alaress\\Xml\\Reader, got something else");
+//        }
+        $state = $this->current();
+        if (!$state instanceof State) {
+            throw new \UnexpectedValueException("Current value must be a XMLReader, got something else");
+        }
+        $reader = $state->getReader();
+        if ($reader->nodeType === XMLReader::ELEMENT
+            || ($reader->nodeType === XMLReader::END_ELEMENT && $reader->isEmptyElement)
+        ) {
+            return true;
+        }
+        return false;
+    }
+}

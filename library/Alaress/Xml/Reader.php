@@ -66,7 +66,7 @@ class Reader implements \Iterator
     /**
      * Return the current element
      *
-     * @return XMLReader Current state of $this->reader
+     * @return State Current state of $this->reader
      */
     public function current()
     {
@@ -74,7 +74,7 @@ class Reader implements \Iterator
         if ($this->reader->nodeType === XMLReader::ELEMENT) {
             array_push($this->elementStack, $this->reader->name);
         }
-        return $this->reader;
+        return new State($this->reader, $this->elementStack);
     }
 
     /**
