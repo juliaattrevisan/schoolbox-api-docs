@@ -115,4 +115,14 @@ class Reader implements \Iterator
     {
         return $this->elementStack;
     }
+
+    /**
+     * Gets the current path
+     *
+     * @return array
+     */
+    public function getPath()
+    {
+        return '/'.implode('/', $this->getElementStack());
+    }
 }
