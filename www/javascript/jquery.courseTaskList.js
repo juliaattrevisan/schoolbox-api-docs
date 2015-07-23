@@ -159,25 +159,13 @@
             function(event) {
                 var form = $(this);
                 event.preventDefault();
+                submitSaveTaskForm($(this), false);
                 if (form.data("interaction") == 'create_task' && settings.units.length > 0) {
-                    copyTaskDialog.foundation('reveal', 'open')
+                    // Open the foundation modal reveal, which asks the question
+                    //copyTaskDialog.foundation('reveal', 'open');
                 } else {
                     //form.trigger('submitNoCopy.courseTaskList');
                 }
-                //'option', 'buttons',
-                //[{
-                //    text: "Yes",
-                //    click: function() {
-                //        form.trigger('submitCopy.courseTaskList');
-                //        copyTaskDialog.dialog('close');
-                //    }
-                //}, {
-                //    text: "No",
-                //    click: function() {
-                //        form.trigger('submitNoCopy.courseTaskList');
-                //        copyTaskDialog.dialog('close');
-                //    }
-                //}]
             });
 
         // Modify task: if there's a modify form inline, show/hide it.
