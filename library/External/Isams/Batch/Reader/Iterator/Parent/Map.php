@@ -76,10 +76,12 @@ class External_Isams_Batch_Reader_Iterator_Parent_Map extends External_Isams_Bat
     protected function parseStudents($students)
     {
         $studentIds = [];
-        foreach ($students->children() as $student) {
-            if (strtolower("$student->Status") === 'current') {
-                // SchoolId is a legacy ID, according to documentation
-                $studentIds[] = "$student->SchoolId";
+        if ($students instanceof SimpleXMLElement) {
+            foreach ($students->children() as $student) {
+                if (strtolower("$student->Status") === 'current') {
+                    // SchoolId is a legacy ID, according to documentation
+                    $studentIds[] = "$student->SchoolId";
+                }
             }
         }
         return $studentIds;
