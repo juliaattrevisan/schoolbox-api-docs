@@ -6,13 +6,18 @@
 
 require_once __DIR__ . '/../../include/Bootstrap.php';
 
-$reader = new External_Isams_Batch_Reader_Parent();
+$reader = new XMLReader();
 $reader->open($argv[1]);
 
-$i = 0;
-foreach ($reader->getAccountInfo() as $account) {
-    print_r($account);
-    if (++$i >= 100) {
-        exit;
-    }
+$iterator = new Alaress\Xml\ReaderIterator($reader);
+foreach (
+    new Alaress\Xml\Filter\Path(
+        new Alaress\Xml\Filter\Element($iterator),
+        [
+            '/iSAMS/PupilManager/CurrentPupils/Pupil',
+            '/iSAMS/PupilManager/Contacts/Contact/Pupils/Pupil'
+        ]
+    ) as $readerState
+) {
+    var_dump($readerState->getReader()->readInnerXml());
 }
