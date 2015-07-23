@@ -10,10 +10,9 @@
 
 namespace Alaress\Xml\Filter;
 
-use FilterIterator;
 use Iterator;
 
-class Path extends FilterIterator
+class Path extends Base
 {
     /**
      * Paths to check against
@@ -45,9 +44,8 @@ class Path extends FilterIterator
     public function accept()
     {
         $state = $this->current();
-        $path  = $state->getPath();
         foreach ($this->paths as $thisPath) {
-            if ($path === $thisPath) {
+            if ($state->testPath($thisPath)) {
                 return true;
             }
         }

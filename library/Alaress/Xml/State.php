@@ -72,4 +72,26 @@ class State
     {
         return '/'.implode('/', $this->getElementStack());
     }
+
+    /**
+     * Does $path match the current state path?
+     *
+     * @param string $path
+     *
+     * @return bool
+     */
+    public function testPath($path)
+    {
+        $thisPath = $this->getPath();
+        if ($thisPath === $path) {
+            return true;
+        }
+        // Is $path a //xxx path?
+        // Test path ends with xxx
+        if (substr($path, 0, 2) === '//') {
+            $pathPart = substr($path, 2);
+            return substr($thisPath, -strlen($pathPart)) === $pathPart;
+        }
+        return false;
+    }
 }
