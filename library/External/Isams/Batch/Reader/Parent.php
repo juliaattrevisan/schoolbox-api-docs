@@ -7,18 +7,8 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Sabre\Xml\Reader;
-
 class External_Isams_Batch_Reader_Parent extends External_Isams_Batch_Reader_Base
 {
-    public $elementMap = [
-        '{}Contact'      => Sabre\Xml\Element\KeyValue::class,
-        '{}Address'      => Sabre\Xml\Element\KeyValue::class,
-        '{}AddressLines' => Sabre\Xml\Element\KeyValue::class,
-        '{}Pupil'        => Sabre\Xml\Element\KeyValue::class,
-    ];
-
-
     /**
      * Gets the pupils from whatever XML document was set into this reader.
      *
