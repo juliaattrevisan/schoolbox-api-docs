@@ -86,7 +86,7 @@
                         <!-- END edit_task -->
 
                         <div class="content">
-                            <div class="twelve-column panel" data-form-container data-interaction="delete_task_form_container">
+                            <div class="twelve-column panel hide" data-form-container data-interaction="delete_task_form_container">
                                 <p><span class="label alert full-width">Are you sure you wish to delete this task?</span></p>
                                 <form action="/task/saveForm.php" method="post" data-form_type="delete_task">
                                     <input type="hidden" name="action"    value="delete" />
@@ -103,7 +103,7 @@
 
                         <!-- BEGIN edit_task_form -->
                         <div class="content">
-                            <div class="twelve-column panel" data-form-container data-interaction="edit_task_container">
+                            <div class="twelve-column panel hide" data-form-container data-interaction="edit_task_container">
                                 <form action="/task/saveForm.php" method="post">
                                     <input type="hidden" name="id"        value="{TASK_ID}"/>
                                     <input type="hidden" name="category"  value="{ID}"/>
@@ -162,7 +162,7 @@
 
                 <!-- This is the form for inline creation of tasks -->
                 <div class="content">
-                    <div class="twelve-column panel" data-form-container data-for-task data-new-task-container>
+                    <div class="twelve-column panel hide" data-form-container data-for-task data-new-task-container>
                         <form action="/task/saveForm.php" method="post">
                             <input type="hidden" name="id"        value=""/>
                             <input type="hidden" name="category"  value="{ID}"/>
