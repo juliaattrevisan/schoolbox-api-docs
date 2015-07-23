@@ -15,7 +15,7 @@ use FilterIterator;
 use UnexpectedValueException;
 use XmlReader;
 
-class Element extends FilterIterator
+class Element extends Base
 {
     /**
      * Paths to check against
@@ -31,14 +31,7 @@ class Element extends FilterIterator
      */
     public function accept()
     {
-//        $iterator = $this->getInnerIterator();
-//        if (!$iterator instanceof Reader) {
-//            throw new \UnexpectedValueException("Iterator must be a Alaress\\Xml\\Reader, got something else");
-//        }
-        $state = $this->current();
-        if (!$state instanceof State) {
-            throw new \UnexpectedValueException("Current value must be a XMLReader, got something else");
-        }
+        $state  = $this->current();
         $reader = $state->getReader();
         if ($reader->nodeType === XMLReader::ELEMENT
             || ($reader->nodeType === XMLReader::END_ELEMENT && $reader->isEmptyElement)

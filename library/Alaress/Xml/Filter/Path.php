@@ -47,11 +47,7 @@ class Path extends FilterIterator
     public function accept()
     {
         $state = $this->current();
-        if (!$state instanceof State) {
-            throw new \UnexpectedValueException("Current value must be a XMLReader, got something else");
-        }
-        // test paths
-        $path = $state->getPath();
+        $path  = $state->getPath();
         foreach ($this->paths as $thisPath) {
             if ($path === $thisPath) {
                 return true;
