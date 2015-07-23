@@ -16,9 +16,6 @@ class External_Isams_Batch_Reader_Iterator_Student_Map extends External_Isams_Ba
      */
     public function current()
     {
-        // At this stage I still can't tell if I have:
-        // //CurrentPupils/Pupil or //CurrentPupilsHealth/Pupil
-        // I don't know where I came from.
         /** @var Alaress\Xml\State $current */
         $current = $this->getInnerIterator()->current();
         $result  = new SimpleXMLElement($current->getReader()->readOuterXml());
