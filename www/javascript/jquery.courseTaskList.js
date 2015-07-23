@@ -11,7 +11,7 @@
         var component = $(this);
 
         // Replace with reveal modal
-        //var copyTaskDialog = component.find('.dialog.copy_new_task');
+        var copyTaskDialog = component.find('[data-interaction="copy_task_dialog"]');
         //copyTaskDialog.dialog({
         //    autoOpen: false,
         //    modal: true
@@ -73,7 +73,7 @@
             });
             task_list.bind('sortstop', function(event, ui) {
                 // Calculate ordering of all items
-                var form   = component.find('form.reorder_form');
+                var form   = component.find('form[data-interaction="reorder-tasks"]');
                 var params = form.serializeArray();
                 task_list.each(function(index) {
                     var taskId = $(this).data('task_id');
@@ -152,37 +152,33 @@
 
         // AJAX form submissions
         // Only show the dialog if there's a class using this unit.
-        //component.on(
-        //    'submit.courseTaskList',
-        //    'form[data-interaction="new_task"], form[data-interaction="edit_task"]',
-        //    {},
-        //    function(event) {
-        //        var form = $(this);
-        //        event.preventDefault();
-        //        if (form.data("interaction") == 'create_task' && settings.units.length > 0) {
-        //            copyTaskDialog
-        //                .dialog(
-        //                    'option', 'buttons',
-        //                    [{
-        //                        text: "Yes",
-        //                        click: function() {
-        //                            form.trigger('submitCopy.courseTaskList');
-        //                            copyTaskDialog.dialog('close');
-        //                        }
-        //                    }, {
-        //                        text: "No",
-        //                        click: function() {
-        //                            form.trigger('submitNoCopy.courseTaskList');
-        //                            copyTaskDialog.dialog('close');
-        //                        }
-        //                    }]
-        //                )
-        //                .dialog('open');
-        //        }
-        //        else {
-        //            form.trigger('submitNoCopy.courseTaskList');
-        //        }
-        //    });
+        component.on(
+            'submit.courseTaskList',
+            'form[data-interaction="create_task"], form[data-interaction="edit_task"]',
+            {},
+            function(event) {
+                var form = $(this);
+                event.preventDefault();
+                if (form.data("interaction") == 'create_task' && settings.units.length > 0) {
+                    copyTaskDialog.foundation('reveal', 'open')
+                } else {
+                    //form.trigger('submitNoCopy.courseTaskList');
+                }
+                //'option', 'buttons',
+                //[{
+                //    text: "Yes",
+                //    click: function() {
+                //        form.trigger('submitCopy.courseTaskList');
+                //        copyTaskDialog.dialog('close');
+                //    }
+                //}, {
+                //    text: "No",
+                //    click: function() {
+                //        form.trigger('submitNoCopy.courseTaskList');
+                //        copyTaskDialog.dialog('close');
+                //    }
+                //}]
+            });
 
         // Modify task: if there's a modify form inline, show/hide it.
         // (Delegate because extra elements can be added via AJAX)

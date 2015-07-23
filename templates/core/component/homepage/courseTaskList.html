@@ -213,7 +213,7 @@
 
         <!-- Form for reodering tasks -->
         <div class="hide">
-            <form action="/task/saveForm.php" method="post" class="reorder_form">
+            <form action="/task/saveForm.php" method="post" data-interaction="reorder-tasks">
                 <input type="hidden" name="action"    value="reorder"/>
                 <input type="hidden" name="category"  value="{ID}"/>
                 <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
@@ -228,8 +228,11 @@
             Dialog for asking:
             When adding a new task - does it get copied into classes that use this unit?
         -->
-        <div class="dialog copy_new_task hide" title="This unit is in use by other classes">
-            Do you want to add this task to the classes which are currently using this unit?
+        <div class="reveal-modal" data-reveal role="dialog" data-interaction="copy_task_dialog">
+            <h2>This unit is in use by other classes</h2>
+            <p>Do you want to add this task to the classes which are currently using this unit?</p>
+            <a href="#" class="button primary" data-interaction="copy_task">Yes</a>
+            <a href="#" class="button secondary" data-interaction="copy_task">No</a>
         </div>
     </div>
 </div>
