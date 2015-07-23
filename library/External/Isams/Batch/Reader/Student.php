@@ -10,7 +10,7 @@
 class External_Isams_Batch_Reader_Student extends External_Isams_Batch_Reader_Base
 {
     /**
-     * Gets the pupils from whatever XML document was set into this reader.
+     * Gets the students from whatever XML document was set into this reader.
      *
      * @return Iterator
      */

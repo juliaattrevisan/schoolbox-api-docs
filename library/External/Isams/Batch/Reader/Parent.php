@@ -10,10 +10,9 @@
 class External_Isams_Batch_Reader_Parent extends External_Isams_Batch_Reader_Base
 {
     /**
-     * Gets the pupils from whatever XML document was set into this reader.
+     * Gets the parents from whatever XML document was set into this reader.
      *
-     * @return Traversable
-     * @throws \Sabre\Xml\LibXMLException
+     * @return Iterator
      */
     public function getAccountInfo()
     {
