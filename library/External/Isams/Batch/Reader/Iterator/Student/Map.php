@@ -19,37 +19,33 @@ class External_Isams_Batch_Reader_Iterator_Student_Map extends External_Isams_Ba
         // At this stage I still can't tell if I have:
         // //CurrentPupils/Pupil or //CurrentPupilsHealth/Pupil
         // I don't know where I came from.
+        /** @var Alaress\Xml\State $current */
         $current = $this->getInnerIterator()->current();
-        $result  = $this->stripClarkNotationFromArrayKeys($current['value']);
-
-        // ID: the database's PK value, distinct from SchoolID
-        $id = $current['attributes']['id'];
-        if (array_key_exists('SchoolCode', $result)) {
-            // //CurrentPupils/Pupil: contains SchoolCode
-            // don't know StudentCampus yet. Probably in AcademicHouse?
+        $result  = new SimpleXMLElement($current->getReader()->readOuterXml());
+        $id      = (string)$result->attributes()->id;
+        if ($current->matches('//CurrentPupils/Pupil')) {
             return [
                 'RecordType'           => 'CurrentPupils',
                 'ID'                   => $id,
-                'StudentID'            => $result['SchoolId'],
-                'NetworkLogin'         => $result['UserName'],
-                'StudentTitle'         => $result['Title'],
-                'StudentPreferred'     => $result['Preferredname'],
-                'StudentSurname'       => $result['Surname'],
-                'StudentGender'        => $result['Gender'],
-                'StudentEmail'         => $result['EmailAddress'],
-                'StudentOccupEmail'    => $result['EmailAddress'],
-                'StudentYearLevel'     => $result['NCYear'],
-                'StudentHouse'         => $result['AcademicHouse'],
-                'StudentBoarder'       => $result['PupilType'],
-                'StudentBoardingHouse' => $result['BoardingHouse'],
+                'StudentID'            => "$result->SchoolId",
+                'NetworkLogin'         => "$result->UserName",
+                'StudentTitle'         => "$result->Title",
+                'StudentPreferred'     => "$result->Preferredname",
+                'StudentSurname'       => "$result->Surname",
+                'StudentGender'        => "$result->Gender",
+                'StudentEmail'         => "$result->EmailAddress",
+                'StudentOccupEmail'    => "$result->EmailAddress",
+                'StudentYearLevel'     => "$result->NCYear",
+                'StudentHouse'         => "$result->AcademicHouse",
+                'StudentBoarder'       => "$result->PupilType",
+                'StudentBoardingHouse' => "$result->BoardingHouse",
             ];
-        } elseif (array_key_exists('HealthNotes', $result)) {
+        } elseif ($current->matches('//CurrentPupilsHealth/Pupil')) {
             // //CurrentPupilsHealth/Pupil: doesn't
-            // I assume HealthNotes is what should show on the profile
             return [
                 'RecordType'          => 'CurrentPupilsHealth',
                 'ID'                  => $id,
-                'StudentMedicalAlert' => $result['HealthNotes'],
+                'StudentMedicalAlert' => "$result->HealthNotes",
             ];
         } else {
             return [

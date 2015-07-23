@@ -7,47 +7,20 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Sabre\Xml\Reader;
-
-class External_Isams_Batch_Reader_Student extends Reader
+class External_Isams_Batch_Reader_Student extends External_Isams_Batch_Reader_Base
 {
-    public $elementMap = [
-        '{}Pupil' => Sabre\Xml\Element\KeyValue::class,
-    ];
-
-
     /**
      * Gets the pupils from whatever XML document was set into this reader.
      *
-     * @return Traversable
-     * @throws \Sabre\Xml\LibXMLException
+     * @return Iterator
      */
     public function getAccountInfo()
     {
-        // So what's with iterator chain?
-        // * External_Isams_Batch_Reader_Iterator_Student_Filter stops iterating below Pupil
-        // * RecursiveIteratorIterator flattens recursive iterator
-        // * CallbackFilterIterator removes all non-pupils from return
-        // * External_Isams_Batch_Reader_Iterator_Student_Map formats results nicely
-        // * CallbackFilterIterator removes anything that's not a CurrentPupils result
-        return new CallbackFilterIterator(
-            new External_Isams_Batch_Reader_Iterator_Student_Map(
-                new CallbackFilterIterator(
-                    new RecursiveIteratorIterator(
-                        new External_Isams_Batch_Reader_Iterator_Student_Filter($this->parse())
-                    ),
-                    function ($value) {
-                        return is_array($value)
-                            && array_key_exists('name', $value)
-                            && $value['name'] == '{}Pupil';
-                    }
-                )
-            ),
-            function ($value) {
-                return is_array($value)
-                    && array_key_exists('RecordType', $value)
-                    && $value['RecordType'] == 'CurrentPupils';
-            }
+        return new External_Isams_Batch_Reader_Iterator_Student_Map(
+            new \Alaress\Xml\Filter\Path(
+                $this->iterator,
+                '//Pupil'
+            )
         );
     }
 }
