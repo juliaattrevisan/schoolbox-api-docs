@@ -1,0 +1,118 @@
+<?php
+/**
+ * Class description here
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2015, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Alaress\Xml;
+
+use XmlReader;
+
+class Reader implements \Iterator
+{
+    /**
+     * The stack of elements.
+     *
+     * @var array
+     */
+    protected $elementStack = [];
+
+    /**
+     * The number of elements
+     *
+     * @var int
+     */
+    protected $elementCount = 0;
+
+    /**
+     * The XML reader, with whatever its internal state is
+     *
+     * @var XMLReader
+     */
+    protected $reader;
+
+    /**
+     * Constructor
+     *
+     * @param XmlReader $reader
+     */
+    public function __construct(XMLReader $reader)
+    {
+        $this->reader = $reader;
+    }
+
+    /**
+     * Move forward to next element
+     *
+     * @return void
+     */
+    public function next()
+    {
+        $this->elementCount++;
+
+        // Pop this node name off the stack if I'm done with it
+        if ($this->reader->nodeType === XMLReader::ELEMENT) {
+            if ($this->reader->isEmptyElement) {
+                array_pop($this->elementStack);
+            }
+        } elseif ($this->reader->nodeType === XMLReader::END_ELEMENT) {
+            array_pop($this->elementStack);
+        }
+    }
+
+    /**
+     * Return the current element
+     *
+     * @return XMLReader Current state of $this->reader
+     */
+    public function current()
+    {
+        // Push this node name on the stack for navigation
+        if ($this->reader->nodeType === XMLReader::ELEMENT) {
+            array_push($this->elementStack, $this->reader->name);
+        }
+        return $this->reader;
+    }
+
+    /**
+     * Return the key of the current element
+     *
+     * @return int
+     */
+    public function key()
+    {
+        return $this->elementCount;
+    }
+
+    /**
+     * Checks if current position is valid
+     *
+     * @return bool
+     */
+    public function valid()
+    {
+        return $this->reader->read();
+    }
+
+    /**
+     * This isn't rewindable, the XMLReader isn't even cloneable
+     *
+     * @return void
+     */
+    public function rewind()
+    {
+    }
+
+    /**
+     * Gets the element stack
+     *
+     * @return array
+     */
+    public function getElementStack()
+    {
+        return $this->elementStack;
+    }
+}
