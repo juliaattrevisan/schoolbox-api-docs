@@ -45,7 +45,7 @@ class Path extends Base
     {
         $state = $this->current();
         foreach ($this->paths as $thisPath) {
-            if ($state->testPath($thisPath)) {
+            if ($state->matches($thisPath)) {
                 return true;
             }
         }

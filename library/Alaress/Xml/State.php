@@ -80,7 +80,7 @@ class State
      *
      * @return bool
      */
-    public function testPath($path)
+    public function matches($path)
     {
         $thisPath = $this->getPath();
         if ($thisPath === $path) {
