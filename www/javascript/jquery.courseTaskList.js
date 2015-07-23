@@ -200,21 +200,36 @@
             }
         );
 
-        //// Delete task: "are you sure?"
-        //component.on('click.courseTaskList', 'a[data-interaction="open_delete_task_form"], .delete_task_form_container a.delete-reject', {}, function(event) {
-        //    event.preventDefault();
-        //    var delete_form = $(this).closest('.task').find('.delete_task_form_container');
-        //    delete_form.slideToggle('fast');
-        //});
-        //
-        //// "why, yes I am"
-        //component.on('submit.courseTaskList', '.delete_form', {}, function(event) {
-        //    event.preventDefault();
-        //    var form = $(this);
-        //    $.post(form.attr('action'), form.serialize(), function(data) {
-        //        postCallback(form, data);
-        //    }, 'json');
-        //});
+        // Delete task: "are you sure?"
+        component.on(
+            'click.courseTaskList',
+            'a[data-interaction="open_delete_task_form"], a[data-interaction="delete_reject"]',
+            {},
+            function(event) {
+                event.preventDefault();
+                var delete_form = $(this).closest('[data-task_id]').find('[data-interaction="delete_task_container"]');
+                delete_form.toggleClass('hide');
+            }
+        );
+
+        // "why, yes I am"
+        component.on(
+            'submit.courseTaskList',
+            'form[data-interaction="delete_task"]',
+            {},
+            function(event) {
+                event.preventDefault();
+                var form = $(this);
+                $.post(
+                    form.attr('action'),
+                    form.serialize(),
+                    function(data) {
+                        postCallback(form, data);
+                    },
+                    'json'
+                );
+            }
+        );
         //
         //// Create new tasks: show inline form if there is one.
         //component.find('.add_buttons .btn').bind('click.courseTaskList', function(event) {
