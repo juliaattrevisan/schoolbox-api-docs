@@ -66,7 +66,7 @@
              * Pass it in from the course taskList plugin instantiation
              */
             component.find(settings.previewSelector).preview();
-            var task_list = component.find('[data-task_id]');
+            var task_list = component.find('[data-task_list]');
             task_list.sortable({
 				placeholder: "sortable-placeholder",
 				forcePlaceholderSize: true
@@ -75,7 +75,7 @@
                 // Calculate ordering of all items
                 var form   = component.find('form[data-interaction="reorder-tasks"]');
                 var params = form.serializeArray();
-                task_list.each(function(index) {
+                task_list.find('[data-task_id]').each(function(index) {
                     var taskId = $(this).data('task_id');
                     if (taskId) {
                         // Switch dark on/off
