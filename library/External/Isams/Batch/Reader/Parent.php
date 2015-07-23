@@ -9,7 +9,7 @@
 
 use Sabre\Xml\Reader;
 
-class External_Isams_Batch_Reader_Parent extends Reader
+class External_Isams_Batch_Reader_Parent extends External_Isams_Batch_Reader_Base
 {
     public $elementMap = [
         '{}Contact'      => Sabre\Xml\Element\KeyValue::class,
@@ -27,30 +27,11 @@ class External_Isams_Batch_Reader_Parent extends Reader
      */
     public function getAccountInfo()
     {
-        // So what's with iterator chain?
-        // * External_Isams_Batch_Reader_Iterator_PupilFilter stops iterating below Pupil
-        // * RecursiveIteratorIterator flattens recursive iterator
-        // * CallbackFilterIterator removes all non-pupils from return
-        // * External_Isams_Batch_Reader_Iterator_PupilMap formats results nicely
-        // Also reduce down to a to a single row per student
-        return new CallbackFilterIterator(
-            new External_Isams_Batch_Reader_Iterator_Parent_Map(
-                new CallbackFilterIterator(
-                    new RecursiveIteratorIterator(
-                        new External_Isams_Batch_Reader_Iterator_Parent_Filter($this->parse())
-                    ),
-                    function ($value) {
-                        return is_array($value)
-                            && array_key_exists('name', $value)
-                            && $value['name'] == '{}Contact';
-                    }
-                )
-            ),
-            function ($value) {
-                return is_array($value)
-                && array_key_exists('RecordType', $value)
-                && $value['RecordType'] == 'Contacts';
-            }
+        return new External_Isams_Batch_Reader_Iterator_Parent_Map(
+            new \Alaress\Xml\Filter\Path(
+                $this->iterator,
+                '//PupilManager/Contacts/Contact'
+            )
         );
     }
 }

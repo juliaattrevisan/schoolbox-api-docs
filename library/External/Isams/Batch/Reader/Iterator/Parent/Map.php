@@ -16,32 +16,30 @@ class External_Isams_Batch_Reader_Iterator_Parent_Map extends External_Isams_Bat
      */
     public function current()
     {
+        /** @var Alaress\Xml\State $current */
         $current = $this->getInnerIterator()->current();
-        $result  = $this->stripClarkNotationFromArrayKeys($current['value']);
-
-        // ID: the database's PK value, distinct from SchoolID
-        $id = $current['attributes']['id'];
-        if (array_key_exists('Address', $result)) {
-            // //Contacts/Contact: build student's contacts out of this
+        $result  = new SimpleXMLElement($current->getReader()->readOuterXml());
+        $id      = (string)$result->attributes()->id;
+        if ($current->matches('//PupilManager/Contacts/Contact')) {
             // iSAMS contains no home phone
             return [
                 'RecordType'                  => 'Contacts',
                 'ID'                          => $id,
                 'StudentContactID'            => $id,
                 // getParentUserAccountInfo fields
-                'StudentContactTitle'         => $result['Title'],
-                'StudentContactPreferred'     => $result['Forename'],
-                'StudentContactSurname'       => $result['Surname'],
-                'StudentContactEmail'         => $result['EmailAddress'],
+                'StudentContactTitle'         => "$result->Title",
+                'StudentContactPreferred'     => "$result->Forename",
+                'StudentContactSurname'       => "$result->Surname",
+                'StudentContactEmail'         => "$result->EmailAddress",
                 // Derive student ID from these
-                'StudentContactStudentIds'    => $this->parseStudents($result['Pupils']),
+                'StudentContactStudentIds'    => $this->parseStudents($result->Pupils[0]),
                 // getStudentContactList fields
                 'StudentContactPhoneActual'   => '',
-                'StudentContactOccupPhone'    => $result['Telephone'],
-                'StudentContactMobilePhone'   => $result['Mobile'],
-                'StudentContactRelation'      => $result['RelationshipRaw'],
-                'StudentContactDefaultEmail'  => $result['EmailAddress'],
-            ] + $this->parseAddress($result['Address']);
+                'StudentContactOccupPhone'    => "$result->Telephone",
+                'StudentContactMobilePhone'   => "$result->Mobile",
+                'StudentContactRelation'      => "$result->RelationshipRaw",
+                'StudentContactDefaultEmail'  => "$result->EmailAddress",
+            ] + $this->parseAddress($result->Address[0]);
         } else {
             return [
                 'RecordType' => 'Unknown',
@@ -53,38 +51,35 @@ class External_Isams_Batch_Reader_Iterator_Parent_Map extends External_Isams_Bat
     /**
      * Parses the addresses in an Address element into a Schoolbox format.
      *
-     * @param  array $address
+     * @param  SimpleXMLElement $address
      * @return array
      */
     protected function parseAddress($address)
     {
-        $address                 = $this->stripClarkNotationFromArrayKeys($address);
-        $address['AddressLines'] = $this->stripClarkNotationFromArrayKeys($address['AddressLines']);
         return [
-            'StudentContactAddress1' => $address['AddressLines']['Address1'],
-            'StudentContactAddress2' => $address['AddressLines']['Address2'],
-            'StudentContactAddress3' => $address['AddressLines']['Address3'],
-            'StudentContactPostCode' => $address['Postcode'],
-            'StudentContactSuburb'   => $address['Town'],
-            'StudentContactState'    => $address['County'],
-            'StudentContactCountry'  => $address['Country'],
+            'StudentContactAddress1' => (string)$address->AddressLines->Address1,
+            'StudentContactAddress2' => (string)$address->AddressLines->Address2,
+            'StudentContactAddress3' => (string)$address->AddressLines->Address3,
+            'StudentContactPostCode' => (string)$address->Postcode,
+            'StudentContactSuburb'   => (string)$address->Town,
+            'StudentContactState'    => (string)$address->County,
+            'StudentContactCountry'  => (string)$address->Country,
         ];
     }
 
     /**
      * Parses the student list in a Pupils element into a list of student IDs.
      *
-     * @param  array $students
+     * @param  SimpleXMLElement $students
      * @return array
      */
     protected function parseStudents($students)
     {
         $studentIds = [];
-        foreach ($students as $student) {
-            $values = $this->stripClarkNotationFromArrayKeys($student['value']);
-            if (strtolower($values['Status']) === 'current') {
+        foreach ($students->children() as $student) {
+            if (strtolower("$student->Status") === 'current') {
                 // SchoolId is a legacy ID, according to documentation
-                $studentIds[] = $values['SchoolId'];
+                $studentIds[] = "$student->SchoolId";
             }
         }
         return $studentIds;
