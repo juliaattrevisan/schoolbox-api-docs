@@ -283,13 +283,13 @@ class Task implements ISoftDeletable {
     public function getIconClass() {
         switch ($this->getType()) {
             case self::TYPE_DUE_WORK:
-                return 'new';
+                return 'icon-due-work';
             case self::TYPE_ONLINE_ASSESS:
-                return 'onlineassessment';
+                return 'icon-quiz';
             default:
                 break;
         }
-        return 'task';
+        return 'icon-task';
     }
 
     /**
