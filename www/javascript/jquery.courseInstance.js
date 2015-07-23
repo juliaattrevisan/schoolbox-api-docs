@@ -63,7 +63,7 @@
                 event.preventDefault();
                 var element = $(this);
                 var is_collapsed = element.data('interaction-state') == "collapsed";
-                var unit_element = element.closest('.unit');
+                var unit_element = element.closest('[data-unit]');
                 var task_list    = unit_element.find('[data-task-list]');
                 if (is_collapsed) {
                     unit_element.removeClass('collapsed').addClass('expanded');
@@ -96,7 +96,7 @@
             function(event) {
                 event.preventDefault();
                 var element      = $(this);
-                var unit_element = element.closest('.unit');
+                var unit_element = element.closest('[data-unit]');
                 var container    = unit_element.find('[data-interaction="delete_unit_container"]');
                 container.stop().removeClass('hide').slideUp(1).slideToggle('fast');
             }
@@ -113,7 +113,7 @@
                 $.post(form.attr('action'), form.serialize(), function(data) {
                     //postCallback(form, data);
                     //container.slideToggle('fast');
-                    var unit = form.closest('.unit');
+                    var unit = form.closest('[data-unit]');
                     unit.slideUp(
                         'fast', function() {
                             unit.remove();
@@ -187,7 +187,7 @@
             '[data-add-button][data-form_class="for-task"]',
             function(event) {
                 event.preventDefault();
-                var thisCreateForm = $(this).closest('.unit').find('[data-new-task-container]');
+                var thisCreateForm = $(this).closest('[data-unit]').find('[data-new-task-container]');
 
                 /* Hide all other forms first
                  */
@@ -297,10 +297,10 @@
 
         // Reloads the task list, setting up drag/drop again too.
         var reloadTaskList = function(data) {
-            var unit_list = $(data.html).find('.unit');
+            var unit_list = $(data.html).find('[data-unit]');
             // Multiple task lists exist, inject the task list for each unit in
             // data into the matching task list on the page.
-            component.find('.unit').each(function() {
+            component.find('[data-unit]').each(function() {
                 var element = $(this);
                 var unit_id = element.data('unit_id');
                 if (unit_id) {
@@ -337,10 +337,10 @@
             task_list.bind('sortstop', function(event, ui) {
                 // Calculate ordering of all items
                 var form = component.find('form.reorder_form');
-                var unit = ui.item.closest('.unit');
+                var unit = ui.item.closest('[data-unit]');
                 form.find('input[name="unit_id"]').val(unit.data('unit_id'))
                 var params = form.serializeArray();
-                unit.find('.unit-task').each(function() {
+                unit.find('[data-unit-task]').each(function() {
                     // Switch dark on/off
                     params.push({name: 'id[]', value: $(this).data('unit_task_id')});
                 });
