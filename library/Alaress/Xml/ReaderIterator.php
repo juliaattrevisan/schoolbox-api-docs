@@ -105,24 +105,4 @@ class ReaderIterator implements \Iterator
     public function rewind()
     {
     }
-
-    /**
-     * Gets the element stack
-     *
-     * @return array
-     */
-    public function getElementStack()
-    {
-        return $this->elementStack;
-    }
-
-    /**
-     * Gets the current path
-     *
-     * @return array
-     */
-    public function getPath()
-    {
-        return '/'.implode('/', $this->getElementStack());
-    }
 }
