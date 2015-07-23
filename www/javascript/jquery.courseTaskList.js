@@ -24,16 +24,16 @@
          *             this unit?
          */
         var submitSaveTaskForm = function(form, copy) {
-            var formData = form.serializeArray()
+            var formData = form.serializeArray();
             // Booleans in data get passed as string 'true' or 'false', wtf?
-            formData.push({name: 'copy', value: (copy ? 1 : 0)})
+            formData.push({name: 'copy', value: (copy ? 1 : 0)});
             $.post(form.attr('action'), formData, function(data) {
                 if (form.hasClass("create_task_form")) {
                     form.get(0).reset();
                 }
                 postCallback(form, data);
             }, 'json');
-        }
+        };
 
         // Post-AJAX form event
         var postCallback = function(form, data) {
@@ -47,14 +47,14 @@
                     this.dispatchEvent(event);
                 });
             });
-        }
+        };
 
         // Reloads the task list, setting up drag/drop again too.
         var reloadTaskList = function(data) {
             var new_tasks = $(data.html).find('.task-list');
             component.find('.task-list').replaceWith(new_tasks);
             initTaskList();
-        }
+        };
 
         // Initialises the task list, setting up drag/drop as well.
         var initTaskList = function() {
