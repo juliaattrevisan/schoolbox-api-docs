@@ -4,20 +4,11 @@
 (function($) {
     $.fn.setupCourseTaskList = function(options) {
         var defaults = {
-            session_name: '',
-            session_id:   '',
             units:        [],
             previewSelector: '[data-plugin=preview]'
         };
         var settings  = $.extend({}, defaults, options);
         var component = $(this);
-        var fileDialog = component.find('.file_uploader');
-        fileDialog.ajaxUploadDialog({
-            session: {
-                name: settings.session_name,
-                id:   settings.session_id
-            }
-        });
 
         var copyTaskDialog = component.find('.dialog.copy_new_task');
         copyTaskDialog.dialog({
@@ -125,11 +116,6 @@
 			
             // Set the form that this dialog was triggered from.
             var source_form = $(this).closest('form');
-            fileDialog.ajaxUploadDialog('open', function(output) {
-                var result = JSON.parse(output);
-                var link   = '/storage/fetch.php?hash='+result.hash+'&save=1';
-                source_form.find(':input[name="link"]').val(link);
-            });
         });
 
         // Set up the same resource browser as is used in the social stream.
