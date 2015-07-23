@@ -10,10 +10,8 @@
 
 namespace Alaress\Xml\Filter;
 
-use Alaress\Xml\State;
 use FilterIterator;
 use Iterator;
-use UnexpectedValueException;
 
 class Path extends FilterIterator
 {

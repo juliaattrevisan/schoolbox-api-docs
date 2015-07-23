@@ -1,6 +1,6 @@
 <?php
 /**
- * Class description here
+ * Iterator over a XMLReader
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
@@ -11,7 +11,7 @@ namespace Alaress\Xml;
 
 use XmlReader;
 
-class Reader implements \Iterator
+class ReaderIterator implements \Iterator
 {
     /**
      * The stack of elements.

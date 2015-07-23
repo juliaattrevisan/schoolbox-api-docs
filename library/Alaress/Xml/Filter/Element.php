@@ -10,9 +10,6 @@
 
 namespace Alaress\Xml\Filter;
 
-use Alaress\Xml\State;
-use FilterIterator;
-use UnexpectedValueException;
 use XmlReader;
 
 class Element extends Base
