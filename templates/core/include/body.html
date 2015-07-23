@@ -39,18 +39,17 @@
 
 				<section class="row middle tab-bar-section">
 					<a href="/" class="logo small-2 columns">
-						<img src="/images/{SITE_LOCATION}/m-hercules.png" height="51" width="86" alt="{SITE_NAME}"/>
+						<img src="/images/{SITE_LOCATION}/m-hercules.png" width="80" height="47" alt="{SITE_NAME}"/>
 					</a>
 
-					<ul class="icon-nav medium-10 columns">
-						<li><a class="icon-news icon-32 no-text" href="#"><label>News</label></a></li>
-						<li><a class="icon-email icon-32 no-text" href="#"><label>Webmail</label></a></li>
-						<li><a class="icon-calendar icon-32 no-text" href="#"><label>Calendar</label></a></li>
-						<li><a class="icon-timetable icon-32 no-text" href="#"><label>Timetable</label></a></li>
-	          <li><a class="icon-folder icon-32 no-tex" href="#"><label>Resources</label></a></li>
-						<li><a class="icon-approve icon-32 no-tex" href="#"><label>Submissions</label></a></li>
-						<li><a class="icon-files icon-32 no-text" href="#"><label>My Files</label></a></li>
-						<li><a class="icon-network icon-32 no-text" href="#"><label>Drives</label></a></li>
+					<ul class="icon-nav small-10 columns">
+						<li><a class="icon-due-work" href="#"><label>Work</label></a></li>
+						<li><a class="icon-timetable" href="#"><label>Timetable</label></a></li>
+						<li><a class="icon-calendar" href="#"><label>Calendar</label></a></li>
+						<li><a class="icon-news" href="#"><label>News</label></a></li>
+	          <li><a class="icon-teacher" href="#"><label>Subjects</label></a></li>
+						<li><a class="icon-group" href="#"><label>Groups</label></a></li>
+						<li><a class="icon-approve" href="#"><label>Grades</label></a></li>
 	        </ul>
 
 					<form id="search"  action="/search" method="get">
@@ -71,17 +70,16 @@
   		</a>
 			<div class="row">
 				<ul class="icon-nav small-12 columns">
-					<li><a class="icon-folder icon-32 no-text" href="#"><label>Resources</label></a></li>
-					<li><a class="icon-approve icon-32 no-text" href="#"><label>Submissions</label></a></li>
-					<li><a class="icon-files icon-32 no-text" href="#"><label>My Files</label></a></li>
-					<li><a class="icon-network icon-32 no-text" href="#"><label>Drives</label></a></li>
+					<li><a class="icon-teacher" href="#"><label>Subjects</label></a></li>
+					<li><a class="icon-group" href="#"><label>Groups</label></a></li>
+					<li><a class="icon-approve" href="#"><label>Grades</label></a></li>
 				</ul>
 			</div>
 			<!-- BEGIN banner_logged_in -->
 			<div class="row">
 				<a href="/search/user/{USER_ID}" class="button dropdown" title="View Profile" data-menu="account-menu" data-dropdown="avatar2">
 					<img height="80" width="80" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square64"/>
-					{SITE_LOGINNAME}
+					<span>{SITE_LOGINNAME}</span>
 				</a>
 				<ul class="account-menu flyout-menu f-dropdown" id="avatar2" data-dropdown-content>
 					<li><a class="icon-staff-students" href="/search/user/{USER_ID}">Profile</a></li>
