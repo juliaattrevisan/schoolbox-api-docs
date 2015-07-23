@@ -13,11 +13,8 @@ $iterator = new Alaress\Xml\ReaderIterator($reader);
 foreach (
     new Alaress\Xml\Filter\Path(
         new Alaress\Xml\Filter\Element($iterator),
-        [
-            '/iSAMS/PupilManager/CurrentPupils/Pupil',
-            '/iSAMS/PupilManager/Contacts/Contact/Pupils/Pupil'
-        ]
+        ['//Pupil',]
     ) as $readerState
 ) {
-    var_dump($readerState->getReader()->readInnerXml());
+    var_dump($readerState->getPath(), $readerState->getReader()->readOuterXml());
 }
