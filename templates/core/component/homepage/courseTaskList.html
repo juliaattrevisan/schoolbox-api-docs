@@ -112,35 +112,39 @@
                                     <ul class="action-list">
                                         <li class="row">
                                             <label for="title-{TASK_ID}">
-                                                Task:
+                                                Task
                                                 <input id="title-{TASK_ID}" name="title" type="text" value="{TASK_TITLE}" />
                                             </label>
                                         </li>
 
-                                        <li class="row dz-wrap">
-                                            <div class="post-attachment attach" style="{TASK_ATTACH_DISPLAY}">
-                                                {ATTACH_ZONE}
-                                                <p class="alt-src">
-                                                    or <a class='btn links sstream-attachment' data-value="url"><span></span>Link</a>
-                                                </p>
-                                            </div>
-
-                                            <div class="post-attachment url" style="{TASK_URL_DISPLAY}">
+                                        <li class="row dz-wrap" style="{TASK_ATTACH_DISPLAY}">
+                                            <div class="post-attachment attach">
                                                 <label>
-                                                    <input type="text" class="url" name="url" maxlength='1024' placeholder="http://" value="{TASK_LINK}" />
+                                                Attachment
+                                                    {ATTACH_ZONE}
+                                                    <p class="alt-src">
+                                                        or <a class='btn links sstream-attachment' data-value="url"><span></span>Link</a>
+                                                    </p>
                                                 </label>
-                                                <p class="alt-src">
-                                                    or <a class='btn attach sstream-attachment' data-value="attach"><span></span>Attach</a>
-                                                </p>
                                             </div>
+                                        </li>
+
+                                        <li class="row" style="{TASK_URL_DISPLAY}">
+                                            <label>
+                                                Link
+                                                <input type="text" class="url" name="url" maxlength='1024' placeholder="http://" value="{TASK_LINK}" />
+                                            </label>
                                         </li>
 
                                         <li class="row">
                                             <label for="self_assess-{TASK_ID}">
+                                                Allow self-assessment?
+                                            </label>
+                                            <div class="switch">
                                                 <input name="self_assess" value="0" type="hidden" />
                                                 <input name="self_assess" value="1" type="checkbox" id="self_assess-{TASK_ID}" {TASK_SELF_ASSESS} />
-                                                Allow self-assessment
-                                            </label>
+                                                <label for="self_assess-{TASK_ID}"></label>
+                                            </div>
                                         </li>
                                         <li class="row">
                                             <input type="submit" name="Submit" value="Update" />
