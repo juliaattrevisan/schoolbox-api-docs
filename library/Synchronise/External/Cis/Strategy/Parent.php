@@ -48,7 +48,7 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
     public function generateList()
     {
         $reader = new XMLReader();
-        $reader->open(SITE_root.'/students.xml');
+        $reader->open(SITE_root.'/students-stripped.xml');
         $iterator   = new External_Isams_Batch_Reader_Parent($reader);
         $this->list = $iterator->getAccountInfo();
     }
@@ -78,11 +78,35 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
      */
     protected function executePostCreateUpdate($newUser, $externalUser)
     {
-        $profileMapper = UserProfileMapper::getInstance();
+        // Set up profile and relations
+        $userMapper     = UserMapper::getInstance();
+        $relationMapper = UserRelationMapper::getInstance();
+        $profileMapper  = UserProfileMapper::getInstance();
 
-        // Profile exists? update it, otherwise leave alone
-        try {
-            $profile = $profileMapper->findById($newUser['id']);
+        // Delete old relations
+        $relationMapper->deleteByColumn('user_id', $newUser['id']);
+
+        // Set up new relation for the parent
+        $relations = new \Schoolbox\Collection();
+        $profiles  = new \Schoolbox\Collection();
+        foreach ($userMapper->findByColumn('synergy_id', $externalUser['StudentContactStudentIds']) as $student) {
+            /** @var User $student */
+            /** @var UserRelation $relation */
+            $relation = $relationMapper->createModel();
+            $relations->add(
+                $relation
+                    ->setUser($newUser['id'])
+                    ->setRelation($student)
+                    ->setRelationType(UserRelation::RELATION_TYPE_PARENT)
+            );
+
+            // Update this student's profile
+            // Profile exists? update it, otherwise leave alone
+            try {
+                $profile = $profileMapper->findById($student->getId());
+            } catch (Exception $e) {
+                continue;
+            }
 
             // Set guardian 1 if it isn't set yet, guardian 2 if it is,
             // skip if both are set
@@ -94,7 +118,7 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
                         'trim',
                         [
                             $externalUser['StudentContactAddress1'],
-                            $externalUser['StudentContactAddress3'],
+                            $externalUser['StudentContactAddress2'],
                             $externalUser['StudentContactAddress3'],
                         ]
                     )
@@ -121,7 +145,7 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
                     ->setGuardian2Email('')
                     ->setGuardian2MailAddress('')
                 ;
-                $profileMapper->save($profile);
+                $profiles->add($profile);
             } elseif (strlen($profile->setGuardian2Name()) === 0) {
                 $profile
                     ->setGuardian2Name($name)
@@ -134,32 +158,10 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
                     ->setGuardian2Email($externalUser['StudentContactDefaultEmail'])
                     ->setGuardian2MailAddress('')
                 ;
-                $profileMapper->save($profile);
+                $profiles->add($profile);
             }
-        } catch (Exception $e) {
-            // forget about profile
-        }
-
-        // Set up relations
-        $userMapper     = UserMapper::getInstance();
-        $relationMapper = UserRelationMapper::getInstance();
-
-        // Delete old relations
-        $relationMapper->deleteByColumn('user_id', $newUser['id']);
-
-        // Set up new relation for the parent
-        $relations = new \Schoolbox\Collection();
-        foreach ($userMapper->findByColumn('synergy_id', $externalUser['StudentContactStudentIds']) as $student) {
-            /** @var UserRelation $relation */
-            $relation = $relationMapper->createModel();
-            ;
-            $relations->add(
-                $relation
-                    ->setUser($newUser['id'])
-                    ->setRelation($student)
-                    ->setRelationType(UserRelation::RELATION_TYPE_PARENT)
-            );
         }
         $relationMapper->save($relations);
+        $profileMapper->save($profiles);
     }
 }
