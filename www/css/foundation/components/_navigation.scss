@@ -357,8 +357,8 @@ $menu-slide: "transform 500ms ease";
 		.tab-bar{
 			height: $tabbar-height * 2;
 			.icon-nav{
-				position: fixed;
-			  left: 0px;
+				position: absolute;
+  			left: -5rem;
 			  top: 80px;
 				width: 100%;
 				li{
@@ -556,7 +556,7 @@ $menu-slide: "transform 500ms ease";
     position: relative;
     transform: none;
     float: left;
-		top: -95px;
+		top: -80px;
   }
   .move-right > .inner-wrap {
     transform: none;
