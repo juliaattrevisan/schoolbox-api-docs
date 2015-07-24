@@ -28,7 +28,8 @@
             // Booleans in data get passed as string 'true' or 'false', wtf?
             formData.push({name: 'copy', value: (copy ? 1 : 0)});
             $.post(form.attr('action'), formData, function(data) {
-                if (form.hasClass("create_task_form")) {
+                // Clear the create task form
+                if (form.data("interaction") === 'create_task') {
                     form.get(0).reset();
                 }
                 postCallback(form, data);
@@ -37,22 +38,22 @@
 
         // Post-AJAX form event
         var postCallback = function(form, data) {
-            var container = form.closest('.edit_task_form_container, .create_task_form_container, .delete_task_form_container');
-            container.slideUp('fast', function() {
-                // reload all tasks too.
-                reloadTaskList(data);
+            var container = form.closest('[data-form-container]');
+            container.addClass('hide');
 
-                form.find('.post-attachment.attach').find('p.actions a.delete').each(function() {
-                    var event = new CustomEvent('click');
-                    this.dispatchEvent(event);
-                });
+            // reload all tasks too.
+            reloadTaskList(data);
+
+            form.find('.post-attachment.attach').find('p.actions a.delete').each(function() {
+                var event = new CustomEvent('click');
+                this.dispatchEvent(event);
             });
         };
 
         // Reloads the task list, setting up drag/drop again too.
         var reloadTaskList = function(data) {
-            var new_tasks = $(data.html).find('.task-list');
-            component.find('.task-list').replaceWith(new_tasks);
+            var new_tasks = $(data.html).find('[data-task_list]');
+            component.find('[data-task_list]').replaceWith(new_tasks);
             initTaskList();
         };
 
