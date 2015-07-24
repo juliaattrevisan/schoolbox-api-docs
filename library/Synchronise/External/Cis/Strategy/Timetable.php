@@ -58,7 +58,7 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
     {
         $reader = new XMLReader();
         $reader->open(SITE_root.'/classes.xml');
-        $iterator   = new External_Isams_Batch_Reader_Classes($reader);
+        $iterator   = new External_Isams_Batch_Reader_Timetable($reader);
         $this->list = $iterator->getAccountInfo();
     }
 
@@ -91,20 +91,20 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
         // Timetable cycle: assume a cycle per campus
         /** @var TimetableCycle $cycle */
         try {
-            $cycle = $cycleMapper->findByColumn('title', $campusCode);
+            $cycle = $cycleMapper->findOneByColumn('title', $campusCode);
             if ($this->perform_update) {
                 printf("Updating timetable \"%s\"\n", $campusCode);
             } else {
                 printf("Planning update of timetable \"%s\"\n", $campusCode);
+                $this->verbose_filter->incrementUpdated();
             }
-
         } catch (\Schoolbox\Mapper\Exception $e) {
             $cycle = $cycleMapper->createModel();
-            $cycle->setTitle($new_item['TimetableCampusName']);
             if ($this->perform_update) {
                 printf("Creating timetable \"%s\"\n", $campusCode);
             } else {
                 printf("Planning create of timetable \"%s\"\n", $campusCode);
+                $this->verbose_filter->incrementCreated();
             }
         }
         // Assume day length is max of whatever periods are defined
@@ -115,14 +115,25 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
         $cycle
             ->setCycleLength(count($new_item['TimetableDays']))
             ->setDayLength($dayLength)
+            ->setTitle($campusCode)
         ;
         if ($this->perform_update) {
+            /** @var Campus $campus */
+            try {
+                $campus = $campusMapper->findOneByColumn('ext_timetable_code', $campusCode);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                printf("Skipping non-existent campus \"%s\"\n", $campusCode);
+                return 0;
+            }
+            if ($cycle->getId()) {
+                $this->verbose_filter->incrementUpdated();
+            } else {
+                $this->verbose_filter->incrementCreated();
+            }
+
             $cycleMapper->save($cycle);
 
             // Don't do any of this unless performing update
-
-            /** @var Campus $campus */
-            $campus = $campusMapper->findByColumn('ext_timetable_code', $campusCode);
 
             // Timetable campus: fill in for this campus
             // Assume timetable campus entries last forever
@@ -180,8 +191,9 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
                     // Dates are always H:i
                     $timetablePeriod
                         ->setTitle($period['PeriodName'])
+                        ->setSequence($identifier['sequence'])
                         ->setStart(new Alaress_Date_Format($period['PeriodStart'], 'H:i'))
-                        ->setFinish(new Alaress_Date_Format($period['PeriodFinish'], 'H:i'))
+                        ->setFinish(new Alaress_Date_Format($period['PeriodEnd'], 'H:i'))
                     ;
                     $timetablePeriods->add($timetablePeriod);
                 }
