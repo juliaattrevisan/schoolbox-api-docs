@@ -124,7 +124,7 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
                     )
                 )
             );
-            if (strlen($profile->setGuardian1Name()) === 0) {
+            if (strlen($profile->getGuardian1Name()) === 0) {
                 $profile
                     ->setGuardian1Name($name)
                     ->setGuardian1HomePhone($externalUser['StudentContactPhoneActual'])
@@ -146,7 +146,7 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
                     ->setGuardian2MailAddress('')
                 ;
                 $profiles->add($profile);
-            } elseif (strlen($profile->setGuardian2Name()) === 0) {
+            } elseif (strlen($profile->getGuardian2Name()) === 0) {
                 $profile
                     ->setGuardian2Name($name)
                     ->setGuardian2HomePhone($externalUser['StudentContactPhoneActual'])
