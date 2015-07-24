@@ -160,12 +160,12 @@
             function(event) {
                 var form = $(this);
                 event.preventDefault();
-                submitSaveTaskForm($(this), false);
+                //submitSaveTaskForm($(this), false);
                 if (form.data("interaction") == 'create_task' && settings.units.length > 0) {
                     // Open the foundation modal reveal, which asks the question
-                    //copyTaskDialog.foundation('reveal', 'open');
+                    copyTaskDialog.foundation('reveal', 'open');
                 } else {
-                    //form.trigger('submitNoCopy.courseTaskList');
+                    form.trigger('submitNoCopy.courseTaskList');
                 }
             });
 
@@ -231,16 +231,26 @@
                 }
             }
         );
-        //
-        //// Event - save new item, no copy
-        //component.on('submitNoCopy.courseTaskList', 'form.edit_task_form, form.create_task_form', {}, function(event) {
-        //    submitSaveTaskForm($(this), false)
-        //})
-        //
-        //// Event - save new item, copy it across
-        //component.on('submitCopy.courseTaskList', 'form.edit_task_form, form.create_task_form', {}, function(event) {
-        //    submitSaveTaskForm($(this), true)
-        //})
+
+        // Event - save new item, no copy
+        component.on(
+            'submitNoCopy.courseTaskList',
+            'form[data-interaction="create_task"], form[data-interaction="edit_task"]',
+            {},
+            function(event) {
+                submitSaveTaskForm($(this), false)
+            }
+        );
+
+        // Event - save new item, copy it across
+        component.on(
+            'submitCopy.courseTaskList',
+            'form[data-interaction="create_task"], form[data-interaction="edit_task"]',
+            {},
+            function(event) {
+                submitSaveTaskForm($(this), true)
+            }
+        );
 
     }
 })(jQuery);
