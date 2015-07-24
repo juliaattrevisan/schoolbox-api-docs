@@ -43,14 +43,8 @@
 					</a>
 
 					<ul class="icon-nav small-10 columns">
-						<li><a class="icon-due-work" href="#"><label>Work</label></a></li>
-						<li><a class="icon-timetable" href="#"><label>Timetable</label></a></li>
-						<li><a class="icon-calendar" href="#"><label>Calendar</label></a></li>
-						<li><a class="icon-news" href="#"><label>News</label></a></li>
-	          <li><a class="icon-teacher" href="#"><label>Subjects</label></a></li>
-						<li><a class="icon-group" href="#"><label>Groups</label></a></li>
-						<li><a class="icon-approve" href="#"><label>Grades</label></a></li>
-	        </ul>
+						{MAIN_TAB_REGION}
+					</ul>
 
 					<form id="search"  action="/search" method="get">
 		        <input id="search-field" type="text" name="keyword" placeholder="Search"/>
@@ -68,17 +62,10 @@
     	<a href="/" class="logo">
     		<img src="/images/{SITE_LOCATION}/hercules.png" height="86" width="127" alt="{SITE_NAME}"/>
   		</a>
-			<div class="row">
-				<ul class="icon-nav small-12 columns">
-					<li><a class="icon-teacher" href="#"><label>Subjects</label></a></li>
-					<li><a class="icon-group" href="#"><label>Groups</label></a></li>
-					<li><a class="icon-approve" href="#"><label>Grades</label></a></li>
-				</ul>
-			</div>
 			<!-- BEGIN banner_logged_in -->
 			<div class="row">
 				<a href="/search/user/{USER_ID}" class="account-menu button dropdown" title="View Profile" data-menu="account-menu" data-dropdown="avatar2">
-					<img height="80" width="80" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square64"/>
+					<img height="80" width="80" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square128"/>
 					<span>{SITE_LOGINNAME}</span>
 				</a>
 				<ul class="flyout-menu f-dropdown" id="avatar2" data-dropdown-content>
@@ -106,6 +93,11 @@
 				</ul>
 			</div>
 			<!-- END banner_logged_in -->
+		<div class="row">
+			<ul class="icon-nav small-12 columns">
+				{MAIN_TAB_REGION}
+			</ul>
+		</div>
     	{MAIN_NAV_REGION}
     </aside>
 
@@ -124,14 +116,6 @@
 
 			<div id="container" class="clearfix">
 				<div id="content" class="clearfix"> {MAIN_CONTENT_REGION} </div>
-			</div>
-
-			<div class="cal-bubble wysiwyg">
-				<div class="middle">
-					<div class="close">x</div>
-					<div class="js-data clearfix"></div>
-					<div class="bottom"><strong></strong></div>
-				</div>
 			</div>
 			{MAIN_FOOTER_REGION}
 			{DEBUGBAR_HEAD}

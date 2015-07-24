@@ -477,9 +477,12 @@ $menu-slide: "transform 500ms ease";
 		li{
 			width: 33.33%;
 		}
-		li:nth-child(-n+2){
+		li:nth-child(-n+6){
 			@extend .hide-for-large-only;
 		}
+        li:nth-child(-n+4){
+            @extend .hide-for-medium-down;
+        }
 		a{
 			padding: rem-calc(($base-font-size / 2));
 		}
