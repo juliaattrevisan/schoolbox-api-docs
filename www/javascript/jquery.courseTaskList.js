@@ -180,6 +180,7 @@
                 if (edit_form.length) {
                     event.preventDefault();
                     edit_form.toggleClass('hide');
+                    component.find('[data-form-container]').not(edit_form).addClass('hide');
                 }
             }
         );
@@ -193,6 +194,7 @@
                 event.preventDefault();
                 var delete_form = $(this).closest('[data-task_id]').find('[data-interaction="delete_task_container"]');
                 delete_form.toggleClass('hide');
+                component.find('[data-form-container]').not(delete_form).addClass('hide');
             }
         );
 
@@ -224,6 +226,7 @@
                 if (create_form.length) {
                     event.preventDefault();
                     create_form.toggleClass('hide');
+                    component.find('[data-form-container]').not(create_form).addClass('hide');
                 }
             }
         );
