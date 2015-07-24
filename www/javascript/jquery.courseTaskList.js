@@ -124,11 +124,11 @@
         if (socialstream_browser.length && $.fn.socialstreamBrowser) {
             component.on('click.courseTaskList', 'form a[data-function="browse"]', {}, function(event) {
 
-				/* Toggle the input
-				 * Toggle the label
-				 */
-				$('#link-new_task').hide();
-				$(this).closest('dd').prev('dt').hide();
+				///* Toggle the input
+				// * Toggle the label
+				// */
+				//$('#link-new_task').hide();
+				//$(this).closest('dd').prev('dt').hide();
 
                 var form = $(this).closest('form');
                 event.preventDefault();
