@@ -144,6 +144,7 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy
                 $user_id = $newUser['synergy_id'];
                 if (!isset($parents[$user_id])) {
                     $parents[$user_id] = $newUser;
+                    $parents[$user_id]['external_user'] = $currentUser;
                 }
 
                 // Overwrite default campus
@@ -162,8 +163,14 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy
 
         // Pass 2: insert/update into list of users
         foreach ($parents as $parent) {
+            $externalUser = $parent['external_user'];
+            unset($parent['external_user']);
             if (!empty($parent)) {
-                $this->executeCreateUpdate($parent);
+                $user_id = $this->executeCreateUpdate($parent);
+                if ($user_id > 0) {
+                    $parent['id'] = $user_id;
+                    $this->executePostCreateUpdate($parent, $externalUser);
+                }
             }
         }
         $this->verbose_filter->summary();
