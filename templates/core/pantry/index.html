@@ -1848,8 +1848,33 @@ $(function () {
 
 <section class="content">
     <div class="switch">
+        <p>Checkbox</p>
         <input id="exampleCheckboxSwitch" type="checkbox">
         <label for="exampleCheckboxSwitch"></label>
+
+        <p>Checkbox Disabled</p>
+        <input id="disableCheckboxSwitch" type="checkbox" disabled>
+        <label for="disableCheckboxSwitch"></label>
+    </div>
+    <!-- Using radio buttons – each switch turns off the other two -->
+    <div class="switch round">
+        <p>Radio</p>
+        <input id="exampleRadioSwitch1" type="radio" checked name="testGroup">
+        <label for="exampleRadioSwitch1"></label>
+    </div>
+    <div class="switch round">
+        <input id="exampleRadioSwitch2" type="radio" name="testGroup">
+        <label for="exampleRadioSwitch2"></label>
+    </div>
+
+    <div class="switch round">
+        <p>Radio Disabled</p>
+        <input id="disableRadioSwitch1" type="radio" name="testDisable" disabled>
+        <label for="disableRadioSwitch1"></label>
+    </div>
+    <div class="switch round">
+        <input id="disableRadioSwitch2" type="radio" name="testDisable" checked disabled>
+        <label for="disableRadioSwitch2"></label>
     </div>
 </section>
     <h2 class="subheader">Checkbox Switch with Text</h2>

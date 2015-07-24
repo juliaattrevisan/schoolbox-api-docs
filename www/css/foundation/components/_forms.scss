@@ -132,42 +132,101 @@ form{
 
 input,
 textarea,
-select 						{ @include single-transition(all, 0.15s, linear); font-weight: $font-weight-normal;
-	&:hover 				{ background-color: $input-hover-bg-color; color: $input-hover-color; }
-	&:focus 				{ color: $input-focus-color; outline: none; }
+select{
+	@include single-transition(all, 0.15s, linear);
+	font-weight: $font-weight-normal;
+	&:hover{
+		background-color: $input-hover-bg-color;
+		color: $input-hover-color;
+	}
+	&:focus{
+		color: $input-focus-color;
+		outline: none;
+	}
 }
 input, textarea 			{ padding-left: 0.75rem; }
 select option				{
 	&:hover 				{ background: $input-hover-bg-color; }
 }
+
 input[type=radio],
-input[type=checkbox] 		{ float: left; width: 0; height: 0; opacity: 0; }
-label.radio-label,
-label.checkbox-label		{ background-image: url('/images/foundation/form-elements.png'); }
-input[type=radio] +
-label.radio-label,
-input[type=checkbox] +
-label.checkbox-label		{ padding-left: 29px; height: 24px; display: block; line-height: 24px;
-							background-repeat: no-repeat; background-position: 0 0; font-weight: $font-weight-normal;
-							vertical-align: middle; cursor: pointer; margin: rem-calc(($base-font-size - 6));
+input[type=checkbox]{
+	float: left;
+	width: 0;
+	height: 0;
+	opacity: 0;
 }
-input[type=checkbox] +
-label.checkbox-label		{ background-position: 0 -72px; }
-//	input[type=radio]:hover +
-//	label.checkbox-label:hover	{ background-position: 0 -24px; }
-input[type=radio]:checked +
-label.radio-label			{ background-position: 0 -48px; }
-input[type=checkbox]:checked +
-label.checkbox-label		{ background-position: 0 -120px; }
+
+label.radio-label,
+label.checkbox-label { 
+	background-image: url('/images/foundation/form-elements.png'); 
+}
+
+input[type=radio] + label.radio-label,
+input[type=checkbox] + label.checkbox-label { 
+	padding-left: 29px; 
+	height: 24px; 
+	display: block; 
+	line-height: 24px;
+	background-repeat: no-repeat; 
+	background-position: 0 0; 
+	font-weight: $font-weight-normal;
+	vertical-align: middle; 
+	cursor: pointer; 
+	margin: rem-calc(($base-font-size - 6));
+}
+
+input[type=checkbox] + label.checkbox-label { 
+	background-position: 0 -72px; 
+}
+
+input[type=radio]:checked + label.radio-label { 
+	background-position: 0 -48px; 
+}
+
+input[type=checkbox]:checked + label.checkbox-label { 
+	background-position: 0 -120px; 
+}
+
+input[type=radio] + label.radio-label,
+input[type=checkbox] + label.checkbox-label{
+	padding-left: 29px;
+	height: 24px;
+	display: block;
+	line-height: 24px;
+	background-repeat: no-repeat;
+	background-position: 0 0;
+	font-weight: $font-weight-normal;
+	vertical-align: middle;
+	cursor: pointer;
+	margin: rem-calc(($base-font-size - 6));
+}
+
+input[type=checkbox] + label.checkbox-label{
+	background-position: 0 -72px;
+}
+
+input[type=radio]:checked + label.radio-label{
+	background-position: 0 -48px;
+}
+
+input[type=checkbox]:checked + label.checkbox-label{
+	background-position: 0 -120px;
+}
+
+input[type=radio]:disabled + label.radio-label,
+input[type=checkbox]:disabled + label.checkbox-label{
+	opacity: 0.5;
+}
 
 // Toggle Checkbox
 input[type=checkbox] + label.checkbox-toggle{
 	background-color: $button-color;
 	font-weight: $font-weight-normal;
 	margin-left: 0;
-  height: 1.5rem;
+	height: 1.5rem;
 	width: 1.5rem;
-  text-align: center;
+	text-align: center;
 	@include single-transition(background-color, 0.15s, linear);
 }
 
@@ -196,14 +255,11 @@ select.visibility {
 	display: none;
 	padding: rem-calc(($base-font-size));
 
-	input[type=radio] +
-	label.radio-label,
-	input[type=checkbox] +
-	label.checkbox-label{
+	input[type=radio] + label.radio-label,
+	input[type=checkbox] + label.checkbox-label{
 		display: inline-block;
 	}
 }
-
 
 //  Show/Hide Advanced form fields
 .form-advanced{
