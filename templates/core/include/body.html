@@ -27,25 +27,104 @@
 {CUSTOM_HEADER_REGION}
 </head>
 <body>
-<div id="wrap">
-	<div id="wrap-inner">
-		<div id="header" class="core"> {MAIN_BANNER_REGION}
-			{MAIN_TAB_REGION} </div>
-		{MAIN_NAV_REGION}
-		<div id="container" class="clearfix">
-			<div id="content" class="clearfix"> {MAIN_CONTENT_REGION} </div>
+	<div class="off-canvas-wrap docs-wrap" data-offcanvas>
+	  <div class="inner-wrap">
+
+		<!-- The Schoolbox Hybrid Bar -->
+		<div class="hybrid-bar">
+	    <nav class="tab-bar">
+				<section class="left-small">
+					<a class="left-off-canvas-toggle menu-icon hide-for-large-up" href="#"><span></span></a>
+				</section>
+
+				<section class="row middle tab-bar-section">
+					<a href="/" class="logo small-2 columns">
+						<img src="/images/{SITE_LOCATION}/m-hercules.png" width="80" height="47" alt="{SITE_NAME}"/>
+					</a>
+
+					<ul class="icon-nav small-10 columns">
+						{MAIN_TAB_REGION}
+					</ul>
+
+					<form id="search"  action="/search" method="get">
+		        <input id="search-field" type="text" name="keyword" placeholder="Search"/>
+						<i class="icon-search no-text"></i>
+					</form>
+				</section>
+
+				<section class="right-small">
+					<a class="right-off-canvas-toggle icon-notifications" href="#"><span></span></a>
+				</section>
+	    </nav>
+    </div>
+
+    <aside class="left-off-canvas-menu">
+    	<a href="/" class="logo">
+    		<img src="/images/{SITE_LOCATION}/hercules.png" height="86" width="127" alt="{SITE_NAME}"/>
+  		</a>
+			<!-- BEGIN banner_logged_in -->
+			<div class="row">
+				<a href="/search/user/{USER_ID}" class="account-menu button dropdown" title="View Profile" data-menu="account-menu" data-dropdown="avatar2">
+					<img height="80" width="80" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square128"/>
+					<span>{SITE_LOGINNAME}</span>
+				</a>
+				<ul class="flyout-menu f-dropdown" id="avatar2" data-dropdown-content>
+					<li><a class="icon-staff-students" href="/search/user/{USER_ID}">Profile</a></li>
+					<li><a class="icon-settings" href="/settings/messages">Settings</a></li>
+					<li><a class="icon-logout" href="/logout.php">Logout</a></li>
+					<!-- BEGIN switch_user -->
+					<li class="switch-user">
+						<a href="/user/switch/{MENU_SWITCH_USERID}" title="Switch to">
+								<img height="32" width="32" src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square32">
+								{MENU_SWITCH_USER_FULLNAME}<br />
+								<span class="meta">{MENU_SWITCH_USER_ROLE}</span>
+						</a>
+					</li>
+					<!-- END switch_user -->
+					<!-- BEGIN recover_user -->
+					<li class="switch-user">
+						<a href="/user/recoverSession" title="Return to">
+								<img height="32" width="32" src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square32">
+								{MENU_SWITCH_USER_FULLNAME}<br />
+								<p class="meta">{MENU_SWITCH_USER_ROLE}</p>
+						</a>
+					</li>
+					<!-- END recover_user -->
+				</ul>
+			</div>
+			<!-- END banner_logged_in -->
+		<div class="row">
+			<ul class="icon-nav small-12 columns">
+				{MAIN_TAB_REGION}
+			</ul>
 		</div>
+    	{MAIN_NAV_REGION}
+    </aside>
+
+    <aside class="right-off-canvas-menu">
+			<ul class="off-canvas-list">
+				<li><label>Notifications</label></li>
+				{INSTANTMESSAGE_BLOCK}
+			</ul>
+    </aside>
+
+		<!-- START CONTAINER -->
+	    <section class="main-section">
+			<div id="header" class="core">
+				{MAIN_BANNER_REGION}
+			</div>
+
+			<div id="container" class="clearfix">
+				<div id="content" class="clearfix"> {MAIN_CONTENT_REGION} </div>
+			</div>
+			{MAIN_FOOTER_REGION}
+			{DEBUGBAR_HEAD}
+			{DEBUGBAR}
+	    </section>
+		<!-- END CONTAINER -->
+
+		<!-- <a class="exit-off-canvas"></a> -->
+	  </div>
 	</div>
-</div>
-<div class="cal-bubble wysiwyg">
-	<div class="middle">
-		<div class="close">x</div>
-		<div class="js-data clearfix"></div>
-		<div class="bottom"><strong></strong></div>
-	</div>
-</div>
-{MAIN_FOOTER_REGION}
-{DEBUGBAR_HEAD}
-{DEBUGBAR}
 </body>
 </html>

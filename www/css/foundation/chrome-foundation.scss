@@ -10,37 +10,30 @@
 // Settings
 @import "settings";
 
-#container.foundation {
-  background: transparent;
-  // Base
-  //@import "base/reset";
+// Base
+@import "base/reset";
+@import "base/typography";
 
-  @import "base/typography";
-  @import "base/compatibility";
+// Components
+@import "components/alert-boxes";
+@import "components/buttons";
+@import "components/carousel";
+@import "components/content";
+@import "components/forms";
+@import "components/joyride";
+@import "components/navigation";
 
-  // Components
-  @import "components/alert-boxes";
-  @import "components/buttons";
-  @import "components/carousel";
-  @import "components/content";
-  @import "components/forms";
-  @import "components/joyride";
-  @import "components/navigation";
+// Layout
+@import "layout/footer";
+@import "layout/grid";
+@import "layout/header";
+@import "layout/sidebar";
+@import "layout/container";
 
-  // Dashboard/Homepage/Eportfolio component styles
-  @import "components/components";
-
-  // Layout
-  @import "layout/footer";
-  @import "layout/grid";
-  @import "layout/header";
-  @import "layout/sidebar";
-
-  // EOTC
-  @import "components/eotc/eotc";
-}
+// EOTC
+@import "components/eotc/eotc";
 
 // Needs to be included outside of container in order to work
-@import "../../javascript/components/foundation/scss/foundation/components/tooltips";
-@import "../../javascript/components/foundation/scss/foundation/components/reveal";
+//@import "../../javascript/components/foundation/scss/foundation/components/tooltips";
+//@import "../../javascript/components/foundation/scss/foundation/components/reveal";
 @import "selectize.customisation";

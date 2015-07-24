@@ -5,77 +5,7 @@
 <!-- BEGIN header_css -->
 <link rel="stylesheet" type="text/css" media="{HEADER_CSS_TYPE}" href="{HEADER_CSS_LOCATION}" />
 <!-- END header_css -->
-<style type="text/css">
-    body #container, body #content, body #header, body #tabs {
-        min-width: 0;
-    }
-    body #container {
-        background: transparent;
-    }
-    html body {
-        background: #F5F5F5;
-    }
-    body #header {
-        background: #F5F5F5;
-    }
-    body #header a {
-        color: #0066b0 !important;
-    }
-    body #header .logo img {
-        height: 54px;
-        width: 80px;
-        margin-left: 50px;
-    }
-    body #search-field {
-        background: rgba(0, 102, 176, 0.2) !important;
-    }
-    @media (max-width: 64em) {
-        body #tabs {
-            margin-left: 156px;
-        }
-        body #infoPanel {
-            margin-bottom: 20px;
-        }
-        body .core #tabs li a {
-            font-size: 10px;
-            height: 16px;
-            line-height: 16px;
-            padding: 0 6px;
-        }
-        body #nav {
-            left: -168px;
-        }
-        body #container {
-            margin-left: 32px;
-        }
-    }
-    @media (max-width: 40em) {
-        body #container {
-            margin-left: 0;
-            padding-top: 108px;
-        }
-        body #nav {
-            left: -200px;
-        }
-        body #header {
-            position: fixed;
-            overflow: hidden;
-            height: 100px;
-        }
-        body #search {
-            width: 150px;
-        }
-        body #infoPanel {
-            right: 150px;
-        }
-        body .core #search-field {
-            width: 140px;
-        }
-        body #infoPanel .avatar span {
-            display: none;
-        }
-    }
-</style>
+
 <!--[if lt IE 9]>
 <script type="text/javascript">
     // Upgrade your browser
@@ -95,6 +25,7 @@
   $(document).ready(function() {
       $('#nav').touchMenu();
   });
+
   // Date formats (global variable)
   var dateDisplayFormats = {
       datepicker: {DATEPICKER_FORMAT},
@@ -126,8 +57,6 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/foundation/chrome.css" />
 <script type="text/javascript">
-    $(function() {
-        $('#container').addClass('foundation').foundation();
-    });
+    $(document).foundation();
 </script>
 <!-- END custom_head -->
