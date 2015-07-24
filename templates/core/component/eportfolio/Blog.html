@@ -83,45 +83,27 @@
                             </li>
                         </ul>
 
-                        <!-- BEGIN has_create_form -->
-                        <form id='modify_blog_form_{COMPONENT_INSTANCE_ID}' action='/eportfolio/component/blog/modifyForm.php' method='post' enctype='multipart/form-data'>
-                            <input type='hidden' name='action' value='addItem' />
-                            <input type='hidden' name='userId' value='{ID}' />
-                            <input type='hidden' name='pageId' value='{PAGE_ID}' />
-
-                            <label>
-                                Blog Heading
-                                <input type="text" maxlength="100" name="title" value="" />
-                            </label>
-
-                            <label>
-                                Blog Content
-                                <textarea type='text' name='content' class='mceEditor' rows="20" /></textarea>
-                            </label>
-
-                            <input type='submit' value='Add item' />
-                        </form>
-                        <!-- END has_create_form -->
-
                         <!-- BEGIN has_modify_form -->
-                        <form id='modify_blog_form_{LIST_ITEM_ID}' class='modifyForm' action='/eportfolio/component/blog/modifyForm.php' method='post'>
-                            <input type='hidden' name='action' value='updateItem' />
-                            <input type='hidden' name='userId' value='{ID}' />
-                            <input type='hidden' name='pageId' value='{PAGE_ID}' />
-                            <input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
+                        <div class="content">
+                            <form id='modify_blog_form_{LIST_ITEM_ID}' class='modifyForm' action='/eportfolio/component/blog/modifyForm.php' method='post'>
+                                <input type='hidden' name='action' value='updateItem' />
+                                <input type='hidden' name='userId' value='{ID}' />
+                                <input type='hidden' name='pageId' value='{PAGE_ID}' />
+                                <input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
 
-                            <label>
-                                Blog Heading
-                                <input type="text" maxlength="100" name="title" value="{LIST_ITEM_TITLE}" />
-                            </label>
+                                <label>
+                                    Blog Heading
+                                    <input type="text" maxlength="100" name="title" value="{LIST_ITEM_TITLE}" />
+                                </label>
 
-                            <label>
-                                Blog Content
-                                <textarea type='text' name='content' class='mceEditor' style="width:100%" rows="20" />{LIST_ITEM_CONTENT}</textarea>
-                            </label>
+                                <label>
+                                    Blog Content
+                                    <textarea type='text' name='content' class='mceEditor' style="width:100%" rows="20" />{LIST_ITEM_CONTENT}</textarea>
+                                </label>
 
-                            <input type='submit' value='Update' />
-                        </form>
+                                <input type='submit' value='Update' />
+                            </form>
+                        </div>
                         <!-- END has_modify_form -->
 
                         <!-- BEGIN has_delete_form -->
@@ -129,6 +111,28 @@
                     </li>
                     <!-- END list_item -->
                 </ul>
+
+                <!-- BEGIN has_create_form -->
+                <div class="content">
+                    <form id='modify_blog_form_{COMPONENT_INSTANCE_ID}' action='/eportfolio/component/blog/modifyForm.php' method='post' enctype='multipart/form-data'>
+                        <input type='hidden' name='action' value='addItem' />
+                        <input type='hidden' name='userId' value='{ID}' />
+                        <input type='hidden' name='pageId' value='{PAGE_ID}' />
+
+                        <label>
+                            Blog Heading
+                            <input type="text" maxlength="100" name="title" value="" />
+                        </label>
+
+                        <label>
+                            Blog Content
+                            <textarea type='text' name='content' class='mceEditor' rows="20" /></textarea>
+                        </label>
+
+                        <input type='submit' value='Add item' />
+                    </form>
+                </div>
+                <!-- END has_create_form -->
 
                 <div class="content">
                     <!-- BEGIN create_text -->
