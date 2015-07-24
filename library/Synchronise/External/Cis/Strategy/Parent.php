@@ -110,6 +110,16 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
                     ->setGuardian1Suburb($externalUser['StudentContactSuburb'])
                     ->setGuardian1Postcode($externalUser['StudentContactPostCode'])
                     ->setGuardian1Email($externalUser['StudentContactDefaultEmail'])
+                    ->setGuardian1MailAddress('')
+                    ->setGuardian2Name('')
+                    ->setGuardian2HomePhone('')
+                    ->setGuardian2WorkPhone('')
+                    ->setGuardian2MobilePhone('')
+                    ->setGuardian2Address('')
+                    ->setGuardian2Suburb('')
+                    ->setGuardian2Postcode('')
+                    ->setGuardian2Email('')
+                    ->setGuardian2MailAddress('')
                 ;
                 $profileMapper->save($profile);
             } elseif (strlen($profile->setGuardian2Name()) === 0) {
@@ -122,6 +132,7 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
                     ->setGuardian2Suburb($externalUser['StudentContactSuburb'])
                     ->setGuardian2Postcode($externalUser['StudentContactPostCode'])
                     ->setGuardian2Email($externalUser['StudentContactDefaultEmail'])
+                    ->setGuardian2MailAddress('')
                 ;
                 $profileMapper->save($profile);
             }
