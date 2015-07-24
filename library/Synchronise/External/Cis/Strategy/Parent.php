@@ -138,11 +138,15 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
 
         // Set up new relation for the parent
         $relations = new \Schoolbox\Collection();
-        foreach ($userMapper->findByColumn('external_id', $externalUser['StudentContactStudentIds']) as $student) {
+        foreach ($userMapper->findByColumn('synergy_id', $externalUser['StudentContactStudentIds']) as $student) {
+            /** @var UserRelation $relation */
+            $relation = $relationMapper->createModel();
+            ;
             $relations->add(
-                $relationMapper->createModel()
+                $relation
                     ->setUser($newUser['id'])
                     ->setRelation($student)
+                    ->setRelationType(UserRelation::RELATION_TYPE_PARENT)
             );
         }
         $relationMapper->save($relations);
