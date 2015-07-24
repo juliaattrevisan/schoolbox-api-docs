@@ -521,7 +521,7 @@ $menu-slide: "transform 500ms ease";
 
 // Only show notifications sidebar on x-large-up screens
 // 1440px >
-@media (min-width: 90em) {
+@media #{$xlarge-up} {
 	#search{
 		right: 22.22rem;
 		&:hover{
@@ -540,7 +540,7 @@ $menu-slide: "transform 500ms ease";
     overflow: hidden;
   }
 	.tab-bar-section.middle{
-		padding-right: 330px;
+		padding-right: 20.625rem;
 	}
 	.icon-nav{
   	a{
@@ -551,12 +551,12 @@ $menu-slide: "transform 500ms ease";
 
 // Only show left nav on large-up screens
 // 1024px >
-@media (min-width: 64em) {
+@media #{$large-up} {
   .left-off-canvas-menu{
     position: relative;
-    transform: none;
+    @include transform(none);
     float: left;
-		top: -80px;
+    top: -5rem;
   }
   .move-right > .inner-wrap {
     transform: none;
@@ -565,13 +565,13 @@ $menu-slide: "transform 500ms ease";
     overflow: hidden;
   }
 	.tab-bar-section.middle{
-		padding-left: 198px;
+		padding-left: 12.375rem;
 	}
 }
 
 // Large
 // < 1024px
-@media (max-width: 64em) {
+@media #{$medium-down} {
 	#search{
 		&:hover{
 			padding-left: 10rem;
