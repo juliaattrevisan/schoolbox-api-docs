@@ -162,6 +162,24 @@
                 event.preventDefault();
                 //submitSaveTaskForm($(this), false);
                 if (form.data("interaction") == 'create_task' && settings.units.length > 0) {
+                    // Rewire copy task events
+                    copyTaskDialog.off('click.courseTaskList', '[data-action]');
+                    copyTaskDialog.on(
+                        'click.courseTaskList',
+                        '[data-action="copy_task"]',
+                        function(e) {
+                            e.preventDefault();
+                            form.trigger('submitCopy.courseTaskList');
+                        }
+                    );
+                    copyTaskDialog.on(
+                        'click.courseTaskList',
+                        '[data-action="no_copy_task"]',
+                        function(e) {
+                            e.preventDefault();
+                            form.trigger('submitNoCopy.courseTaskList');
+                        }
+                    );
                     // Open the foundation modal reveal, which asks the question
                     copyTaskDialog.foundation('reveal', 'open');
                 } else {
