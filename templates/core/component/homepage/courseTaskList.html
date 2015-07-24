@@ -118,21 +118,25 @@
                                         </li>
 
                                         <li class="row dz-wrap">
-                                            <label>
-                                                Attachment
-                                            </label>
-                                            <div class="post-attachment attach">
+                                            <div class="post-attachment attach" style="{TASK_ATTACH_DISPLAY}">
+                                                <label>
+                                                    Attachment
+                                                </label>
                                                 {ATTACH_ZONE}
+                                                <p class="alt-src">
+                                                    <a class='button icon-link sstream-attachment' data-value="url">Link</a>
+                                                </p>
                                             </div>
-                                            or <a class='button icon-link' data-action="link">Link</a>
-                                        </li>
 
-                                        <li class="row">
-                                            <label>
-                                                Link
-                                                <input type="text" class="url" name="url" maxlength='1024' placeholder="http://" value="{TASK_LINK}" />
-                                            </label>
-                                            or <a class='button icon-upload' data-action="upload">Upload</a>
+                                            <div class="post-attachment url" style="{TASK_URL_DISPLAY}">
+                                                <label>
+                                                    Link
+                                                    <input type="text" class="url" name="url" maxlength='1024' placeholder="http://" value="{TASK_LINK}" />
+                                                </label>
+                                                <p class="alt-src">
+                                                    <a class='button icon-attach sstream-attachment' data-value='attach'>Attach</a>
+                                                </p>
+                                            </div>
                                         </li>
 
                                         <li class="row">
