@@ -35,7 +35,7 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
                 'SetID'           => (string)$result->attributes()->SetId,
                 'StudentID'       => (string)$result->attributes()->PupilId,
             ];
-        } elseif ($current->matches('//TimetableManager/PublishedTimetable/Timetable/Schedules/Schedule')) {
+        } elseif ($current->matches('//TimetableManager/PublishedTimetables/Timetable/Schedules/Schedule')) {
             // Period that room is in
             // (This should have a roomId and TeacherId attribute but doesn't)
             return [

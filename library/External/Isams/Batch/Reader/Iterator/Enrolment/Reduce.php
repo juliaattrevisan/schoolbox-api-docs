@@ -19,7 +19,10 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Reduce
         if ($item['RecordType'] === 'Set') {
             $setId = $item['ID'];
             if (!array_key_exists($setId, $carry)) {
-                $carry[$setId] = ['ClassStudents' => [],];
+                $carry[$setId] = [
+                    'ClassStudents' => [],
+                    'ClassPeriods'  => [],
+                ];
             }
             $carry[$setId]['ID']            = $setId;
             $carry[$setId]['ClassYear']     = $item['ClassYear'];
@@ -28,9 +31,25 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Reduce
         } elseif ($item['RecordType'] === 'SetList') {
             $setId = $item['SetID'];
             if (!array_key_exists($setId, $carry)) {
-                $carry[$setId] = ['ClassStudents' => [],];
+                $carry[$setId] = [
+                    'ClassStudents' => [],
+                    'ClassPeriods'  => [],
+                ];
             }
             $carry[$setId]['ClassStudents'][] = $item['StudentID'];
+        } elseif ($item['RecordType'] === 'Schedule') {
+            // Schedule stores only a class code, not a class ID.
+            // For that reason the Set records need to be parsed before Schedule.
+            // TODO write this into a separate map/reduce process
+            foreach ($carry as $setId => $carryItem) {
+                if ($item['ClassCode'] === $carry[$setId]['ClassCode']) {
+                    $carry[$setId]['ClassPeriods'][] = [
+                        'ClassPeriodID' => $item['ClassPeriodID'],
+                        'ClassRoomID'   => $item['ClassRoomID'],
+                    ];
+                    break;
+                }
+            }
         }
         return $carry;
     }

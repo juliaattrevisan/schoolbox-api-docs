@@ -26,7 +26,7 @@ class External_Isams_Batch_Reader_Enrolment extends External_Isams_Batch_Reader_
                     [
                         '//TeachingManager/Sets/Set',
                         '//TeachingManager/SetLists/SetList',
-                        '//TimetableManager/PublishedTimetable/Timetable/Schedules/Schedule',
+                        '//TimetableManager/PublishedTimetables/Timetable/Schedules/Schedule',
                     ]
                 )
             ) as $row
