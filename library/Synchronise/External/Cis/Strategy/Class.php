@@ -77,31 +77,36 @@ class Synchronise_External_Cis_Strategy_Class extends Synchronise_Base_Strategy_
     public function createUpdateClass($newItem)
     {
         $classMapper = ClassEntryMapper::getInstance();
+        $className   = $newItem['ClassName'];
         $classCode   = $newItem['ClassCode'];
+        $classId     = $newItem['ID'];
         if (empty($classCode)) {
-            printf("Skipping class without code \"%s\"\n", $newItem['ClassName']);
+            printf("Skipping class without code \"%s\"\n", $className);
             return null;
         }
 
         // Create or update class
+        // I am setting the ID of the class directly, instead of auto-increment
         /** @var ClassEntry $class */
         try {
-            $class = $classMapper->findOneByColumn('code', $classCode);
+            $class = $classMapper->findById($classId);
             if ($this->perform_update) {
                 printf("Updating class \"%s\"\n", $classCode);
             } else {
                 printf("Planning update of class \"%s\"\n", $classCode);
             }
         } catch (Exception $e) {
-            $class = $classMapper->createModel();
-            $class->setCode($classCode);
+            $class = $classMapper->createModel($classId);
             if ($this->perform_update) {
                 printf("Creating class \"%s\"\n", $classCode);
             } else {
                 printf("Planning create of class \"%s\"\n", $classCode);
             }
         }
-        $class->setName($newItem['ClassName']);
+        $class
+            ->setCode($classCode)
+            ->setName($className)
+        ;
         $classMapper->save($class);
         return $class;
     }
