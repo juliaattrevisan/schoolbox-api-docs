@@ -60,10 +60,7 @@ class Synchronise_External_Cis_Strategy_Class extends Synchronise_Base_Strategy_
      */
     public function executeCreateUpdate($new_item)
     {
-        $class = $this->createUpdateClass($new_item);
-//        if ($class instanceof ClassEntry && $this->perform_update) {
-//            $this->createUpdateClassPeriods($new_item, $class);
-//        }
+        $this->createUpdateClass($new_item);
         return 1;
     }
 
@@ -72,43 +69,47 @@ class Synchronise_External_Cis_Strategy_Class extends Synchronise_Base_Strategy_
      *
      * @param array $newItem Array passed to `executeCreateUpdate()`.
      *
-     * @return ClassEntry
+     * @return void
      */
     public function createUpdateClass($newItem)
     {
         $classMapper = ClassEntryMapper::getInstance();
         $className   = $newItem['ClassName'];
-        $classCode   = $newItem['ClassCode'];
-        $classId     = $newItem['ID'];
-        if (empty($classCode)) {
-            printf("Skipping class without code \"%s\"\n", $className);
-            return null;
-        }
+        foreach ($newItem['Set'] as $set) {
+            $classCode   = $set['ClassCode'];
+            $classId     = $set['ID'];
+            if (empty($classCode)) {
+                printf("Skipping class without code \"%s\"\n", $className);
+                return null;
+            }
 
-        // Create or update class
-        // I am setting the ID of the class directly, instead of auto-increment
-        /** @var ClassEntry $class */
-        try {
-            $class = $classMapper->findById($classId);
-            if ($this->perform_update) {
-                printf("Updating class \"%s\"\n", $classCode);
-            } else {
-                printf("Planning update of class \"%s\"\n", $classCode);
+            // Create or update class
+            // I am setting the ID of the class directly, instead of auto-increment
+            /** @var ClassEntry $class */
+            try {
+                $class = $classMapper->findById($classId);
+                if ($this->perform_update) {
+                    printf("Updating class \"%s\"\n", $classCode);
+                } else {
+                    printf("Planning update of class \"%s\"\n", $classCode);
+                }
+            } catch (Exception $e) {
+                $class = $classMapper->createModel($classId);
+                if ($this->perform_update) {
+                    printf("Creating class \"%s\"\n", $classCode);
+                } else {
+                    printf("Planning create of class \"%s\"\n", $classCode);
+                }
             }
-        } catch (Exception $e) {
-            $class = $classMapper->createModel($classId);
+            $class
+                ->setCode($classCode)
+                ->setName($className)
+            ;
+
             if ($this->perform_update) {
-                printf("Creating class \"%s\"\n", $classCode);
-            } else {
-                printf("Planning create of class \"%s\"\n", $classCode);
+                $classMapper->save($class);
             }
         }
-        $class
-            ->setCode($classCode)
-            ->setName($className)
-        ;
-        $classMapper->save($class);
-        return $class;
     }
 
 //    /**
