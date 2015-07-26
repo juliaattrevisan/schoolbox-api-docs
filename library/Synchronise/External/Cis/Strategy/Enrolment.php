@@ -29,7 +29,7 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
     {
         $reader = new XMLReader();
         $reader->open(SITE_root.'/classes.xml');
-        $iterator   = new External_Isams_Batch_Reader_Classes($reader);
+        $iterator   = new External_Isams_Batch_Reader_Enrolment($reader);
         $this->list = $iterator->getAccountInfo();
     }
 
