@@ -64,6 +64,7 @@ class External_Isams_Batch_Reader_Iterator_Timetable_Map extends External_Isams_
         if ($periods instanceof SimpleXMLElement) {
             foreach ($periods->children() as $period) {
                 $results[] = [
+                    'ID'           => (int)$period->attributes()->id,
                     'PeriodName'   => "$period->ShortName",
                     'PeriodNumber' => (int)$period->Ordinal,
                     'PeriodStart'  => (string)$period->StartTime,
