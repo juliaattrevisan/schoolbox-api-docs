@@ -407,7 +407,13 @@ class Factory
             }
 
         }
-        foreach (SubmissionBoxMapper::getInstance()->findByColumn('id', $assessKeys) as $assess) {
+
+        // Fetch only assessment tasks
+        $assessments = SubmissionBoxMapper::getInstance()->findByColumnList([
+            'id'   => $assessKeys,
+            'type' => SubmissionBox\WorkType::TYPE_ASSESSMENT_TASK,
+        ]);
+        foreach ($assessments as $assess) {
             /** @var SubmissionBox $assess */
             $assessId = $assess->getId();
             $gradeKey = 'a'.$assessId;
@@ -421,10 +427,11 @@ class Factory
                 $grades[$gradeKey]['rubric'] = $rubricMark->toArray();
             }
         }
-        foreach (OnlineAssessmentMapper::getInstance()->findByColumn('assess_id', $quizKeys) as $quiz) {
-            /** @var OnlineAssessment $quiz */
-            $grades['q'.$quiz->getId()]['quiz'] = $quiz;
-        }
+        // No quizzes anymore
+//        foreach (OnlineAssessmentMapper::getInstance()->findByColumn('assess_id', $quizKeys) as $quiz) {
+//            /** @var OnlineAssessment $quiz */
+//            $grades['q'.$quiz->getId()]['quiz'] = $quiz;
+//        }
         return $grades;
     }
 
@@ -469,6 +476,7 @@ class Factory
             array(
                 'name'     => $assessmentName,
                 'category' => $cohortFolderIds,
+                'type'     => SubmissionBox\WorkType::TYPE_ASSESSMENT_TASK,
             )
         );
         $assessments->add($grade['assessment']);
