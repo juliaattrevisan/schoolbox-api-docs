@@ -26,6 +26,7 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Reduce
             }
             $carry[$setId]['ID']            = $setId;
             $carry[$setId]['ClassYear']     = $item['ClassYear'];
+            $carry[$setId]['ClassName']     = $item['ClassName'];
             $carry[$setId]['ClassCode']     = $item['ClassCode'];
             $carry[$setId]['ClassTeachers'] = $item['ClassTeacherIds'];
         } elseif ($item['RecordType'] === 'SetList') {

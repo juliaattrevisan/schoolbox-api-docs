@@ -25,6 +25,7 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
                 'ClassYear'       => (string)$result->attributes()->YearId,
                 'ClassID'         => (string)$result->attributes()->SubjectId,
                 'ClassCode'       => "$result->SetCode",
+                'ClassName'       => "$result->Name",
                 'ClassTeacherIds' => $this->parseTeachers($result->Teachers[0]),
             ];
         } elseif ($current->matches('//TeachingManager/SetLists/SetList')) {
