@@ -60,27 +60,13 @@ class Synchronise_External_Cis_Strategy_Class extends Synchronise_Base_Strategy_
      */
     public function executeCreateUpdate($new_item)
     {
-        $this->createUpdateClass($new_item);
-        return 1;
-    }
-
-    /**
-     * Creates or updates a new class entry.
-     *
-     * @param array $newItem Array passed to `executeCreateUpdate()`.
-     *
-     * @return void
-     */
-    public function createUpdateClass($newItem)
-    {
         $classMapper = ClassEntryMapper::getInstance();
-        $className   = $newItem['ClassName'];
-        foreach ($newItem['Set'] as $set) {
+        $className = $new_item['ClassName'];
+        foreach ($new_item['Set'] as $set) {
             $classCode   = $set['ClassCode'];
             $classId     = $set['ID'];
             if (empty($classCode)) {
                 printf("Skipping class without code \"%s\"\n", $className);
-                return null;
             }
 
             // Create or update class
@@ -110,6 +96,7 @@ class Synchronise_External_Cis_Strategy_Class extends Synchronise_Base_Strategy_
                 $classMapper->save($class);
             }
         }
+        return 1;
     }
 
 //    /**
