@@ -61,7 +61,7 @@ class Synchronise_External_Cis_Strategy_Class extends Synchronise_Base_Strategy_
     public function executeCreateUpdate($new_item)
     {
         $class = $this->createUpdateClass($new_item);
-//        if ($this->perform_update) {
+//        if ($class instanceof ClassEntry && $this->perform_update) {
 //            $this->createUpdateClassPeriods($new_item, $class);
 //        }
         return 1;
@@ -76,8 +76,12 @@ class Synchronise_External_Cis_Strategy_Class extends Synchronise_Base_Strategy_
      */
     public function createUpdateClass($newItem)
     {
-        $classCode   = $newItem['ClassCode'];
         $classMapper = ClassEntryMapper::getInstance();
+        $classCode   = $newItem['ClassCode'];
+        if (empty($classCode)) {
+            printf("Skipping class without code \"%s\"\n", $newItem['ClassName']);
+            return null;
+        }
 
         // Create or update class
         /** @var ClassEntry $class */
