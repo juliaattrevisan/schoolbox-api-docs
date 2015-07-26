@@ -85,8 +85,6 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
         $campusCode            = $new_item['TimetableCampusName'];
         $cycleMapper           = TimetableCycleMapper::getInstance();
         $campusMapper          = CampusMapper::getInstance();
-        $timetableCampusMapper = TimetableCampusMapper::getInstance();
-        $timetablePeriodMapper = TimetablePeriodMapper::getInstance();
 
         // Timetable cycle: assume a cycle per campus
         /** @var TimetableCycle $cycle */
@@ -132,74 +130,92 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
             }
 
             $cycleMapper->save($cycle);
-
-            // Don't do any of this unless performing update
-
-            // Timetable campus: fill in for this campus
-            // Assume timetable campus entries last forever
-            /** @var TimetableCampus $timetableCampus */
-            try {
-                $timetableCampus = $timetableCampusMapper->findById($cycle->getId());
-                printf("Updating timetable campus \"%s\"\n", $campusCode);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                // Assume this timetable started this Monday, and continues forever
-                $startDate       = new Datetime('this Monday');
-                $timetableCampus = $timetableCampusMapper->createModel($cycle->getId());
-                $timetableCampus
-                    ->setCampus($campus)
-                    ->setStart(new Alaress_Date_Format($startDate))
-                    ->setFinish(new Alaress_Date_Format($startDate->modify('+100 year')))
-                    ->setOffset(0)
-                ;
-                printf("Updating timetable campus \"%s\"\n", $campusCode);
-            }
-            $timetableCampusMapper->save($timetableCampus);
-
-            // Timetable periods
-            $timetablePeriods = new \Schoolbox\Collection();
-            foreach ($new_item['TimetableDays'] as $day) {
-                foreach ($day['DayPeriods'] as $period) {
-                    // Should delete unfound ones
-                    $identifier = [
-                        'cycle_id' => $cycle->getId(),
-                        'day'      => $day['DayNumber'],
-                        'sequence' => $period['PeriodNumber'],
-                    ];
-                    /** @var TimetablePeriod $timetablePeriod */
-                    try {
-                        $timetablePeriod = $timetablePeriodMapper->findOneByColumnList($identifier);
-                        printf(
-                            "Updating timetable period \"%s\", day %d, period %d\n",
-                            $campusCode,
-                            $identifier['day'],
-                            $identifier['sequence']
-                        );
-                    } catch (\Schoolbox\Mapper\Exception $e) {
-                        $timetablePeriod = $timetablePeriodMapper->createModel();
-                        $timetablePeriod
-                            ->setCycle($cycle)
-                            ->setDay($identifier['day'])
-                            ->setSequence($identifier['period'])
-                        ;
-                        printf(
-                            "Creating timetable period \"%s\", day %d, period %d\n",
-                            $campusCode,
-                            $identifier['day'],
-                            $identifier['sequence']
-                        );
-                    }
-                    // Dates are always H:i
-                    $timetablePeriod
-                        ->setTitle($period['PeriodName'])
-                        ->setSequence($identifier['sequence'])
-                        ->setStart(new Alaress_Date_Format($period['PeriodStart'], 'H:i'))
-                        ->setFinish(new Alaress_Date_Format($period['PeriodEnd'], 'H:i'))
-                    ;
-                    $timetablePeriods->add($timetablePeriod);
-                }
-            }
-            $timetablePeriodMapper->save($timetablePeriods);
+            $this->executeCreateUpdateTimetableCampus($cycle, $campusCode, $campus);
+            $this->executeCreateUpdateTimetablePeriod($new_item, $cycle, $campusCode);
         }
         return 1;
+    }
+
+    /**
+     * @param $new_item
+     * @param $cycle
+     * @param $campusCode
+     */
+    protected function executeCreateUpdateTimetablePeriod($new_item, $cycle, $campusCode)
+    {
+        $timetablePeriodMapper = TimetablePeriodMapper::getInstance();
+
+        // Timetable periods
+        $timetablePeriods = new \Schoolbox\Collection();
+        foreach ($new_item['TimetableDays'] as $day) {
+            foreach ($day['DayPeriods'] as $period) {
+                // Should delete unfound ones
+                $identifier = [
+                    'cycle_id' => $cycle->getId(),
+                    'day'      => $day['DayNumber'],
+                    'sequence' => $period['PeriodNumber'],
+                ];
+                /** @var TimetablePeriod $timetablePeriod */
+                try {
+                    $timetablePeriod = $timetablePeriodMapper->findOneByColumnList($identifier);
+                    printf(
+                        "Updating timetable period \"%s\", day %d, period %d\n",
+                        $campusCode,
+                        $identifier['day'],
+                        $identifier['sequence']
+                    );
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $timetablePeriod = $timetablePeriodMapper->createModel();
+                    $timetablePeriod
+                        ->setCycle($cycle)
+                        ->setDay($identifier['day'])
+                        ->setSequence($identifier['period']);
+                    printf(
+                        "Creating timetable period \"%s\", day %d, period %d\n",
+                        $campusCode,
+                        $identifier['day'],
+                        $identifier['sequence']
+                    );
+                }
+                // Dates are always H:i
+                $timetablePeriod
+                    ->setTitle($period['PeriodName'])
+                    ->setSequence($identifier['sequence'])
+                    ->setStart(new Alaress_Date_Format($period['PeriodStart'], 'H:i'))
+                    ->setFinish(new Alaress_Date_Format($period['PeriodEnd'], 'H:i'));
+                $timetablePeriods->add($timetablePeriod);
+            }
+        }
+        $timetablePeriodMapper->save($timetablePeriods);
+    }
+
+    /**
+     * @param $timetableCampusMapper
+     * @param $cycle
+     * @param $campusCode
+     * @param $campus
+     */
+    protected function executeCreateUpdateTimetableCampus($cycle, $campusCode, $campus)
+    {
+        $timetableCampusMapper = TimetableCampusMapper::getInstance();
+
+        // Timetable campus: fill in for this campus
+        // Assume timetable campus entries last forever
+        /** @var TimetableCampus $timetableCampus */
+        try {
+            $timetableCampus = $timetableCampusMapper->findById($cycle->getId());
+            printf("Updating timetable campus \"%s\"\n", $campusCode);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // Assume this timetable started this Monday, and continues forever
+            $startDate       = new Datetime('this Monday');
+            $timetableCampus = $timetableCampusMapper->createModel($cycle->getId());
+            $timetableCampus
+                ->setCampus($campus)
+                ->setStart(new Alaress_Date_Format($startDate))
+                ->setFinish(new Alaress_Date_Format($startDate->modify('+100 year')))
+                ->setOffset(0);
+            printf("Updating timetable campus \"%s\"\n", $campusCode);
+        }
+        $timetableCampusMapper->save($timetableCampus);
     }
 }
