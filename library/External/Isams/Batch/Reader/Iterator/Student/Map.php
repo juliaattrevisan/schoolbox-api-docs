@@ -38,7 +38,6 @@ class External_Isams_Batch_Reader_Iterator_Student_Map extends External_Isams_Ba
                 'StudentBoardingHouse' => "$result->BoardingHouse",
             ];
         } elseif ($current->matches('//CurrentPupilsHealth/Pupil')) {
-            // //CurrentPupilsHealth/Pupil: doesn't
             return [
                 'RecordType'          => 'CurrentPupilsHealth',
                 'ID'                  => $id,

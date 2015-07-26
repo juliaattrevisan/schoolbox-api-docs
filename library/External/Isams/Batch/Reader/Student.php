@@ -19,7 +19,10 @@ class External_Isams_Batch_Reader_Student extends External_Isams_Batch_Reader_Ba
         return new External_Isams_Batch_Reader_Iterator_Student_Map(
             new \Alaress\Xml\Filter\Path(
                 $this->iterator,
-                '//Pupil'
+                [
+                    '//CurrentPupils/Pupil',
+                    '//CurrentPupilsHealth/Pupil',
+                ]
             )
         );
     }
