@@ -25,6 +25,7 @@ class External_Isams_Batch_Reader_Iterator_Classes_Map extends External_Isams_Ba
                 'RecordType'   => 'Subject',
                 'ID'           => $id,
                 'ClassName'    => "$result->Name",
+                'ClassCode'    => "$result->Code",
             ];
         } elseif ($current->matches('//TeachingManager/Sets/Set')) {
             return [

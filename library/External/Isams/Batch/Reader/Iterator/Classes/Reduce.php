@@ -19,19 +19,23 @@ class External_Isams_Batch_Reader_Iterator_Classes_Reduce
         if ($item['RecordType'] === 'Subject') {
             $subjectId = $item['ID'];
             if (!array_key_exists($subjectId, $carry)) {
-                $carry[$subjectId] = [];
+                $carry[$subjectId] = ['Sets' => [],];
             }
             $carry[$subjectId]['ID']        = $subjectId;
             $carry[$subjectId]['ClassName'] = $item['ClassName'];
+            $carry[$subjectId]['ClassCode'] = $item['ClassCode'];
         } elseif ($item['RecordType'] === 'Set') {
             $subjectId = $item['ClassID'];
             if (!array_key_exists($subjectId, $carry)) {
-                $carry[$subjectId] = [];
+                $carry[$subjectId] = ['Sets' => [],];
             }
-            $carry[$subjectId]['ID']              = $subjectId;
-            $carry[$subjectId]['ClassYear']       = $item['ClassYear'];
-            $carry[$subjectId]['ClassCode']       = $item['ClassCode'];
-            $carry[$subjectId]['ClassTeacherIds'] = $item['ClassTeacherIds'];
+            $carry[$subjectId]['ID']     = $subjectId;
+            $carry[$subjectId]['Sets'][] = [
+                'ID'              => $item['ID'],
+                'ClassYear'       => $item['ClassYear'],
+                'ClassCode'       => $item['ClassCode'],
+                'ClassTeacherIds' => $item['ClassTeacherIds'],
+            ];
         }
         return $carry;
     }
