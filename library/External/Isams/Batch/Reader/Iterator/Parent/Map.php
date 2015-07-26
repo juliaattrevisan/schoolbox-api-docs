@@ -79,8 +79,7 @@ class External_Isams_Batch_Reader_Iterator_Parent_Map extends External_Isams_Bat
         if ($students instanceof SimpleXMLElement) {
             foreach ($students->children() as $student) {
                 if (strtolower("$student->Status") === 'current') {
-                    // SchoolId is a legacy ID, according to documentation
-                    $studentIds[] = "$student->SchoolId";
+                    $studentIds[] = (int)$student->attributes()->id;
                 }
             }
         }

@@ -88,9 +88,15 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
         $relationMapper->deleteByColumn('user_id', $newUser['id']);
 
         // Set up new relation for the parent
-        $relations = new \Schoolbox\Collection();
-        $profiles  = new \Schoolbox\Collection();
-        foreach ($userMapper->findByColumn('synergy_id', $externalUser['StudentContactStudentIds']) as $student) {
+        $relations  = new \Schoolbox\Collection();
+        $profiles   = new \Schoolbox\Collection();
+        $studentIds = array_map(
+            function ($v) {
+                return 'S-' . $v;
+            },
+            $externalUser['StudentContactStudentIds']
+        );
+        foreach ($userMapper->findByColumn('synergy_id', $studentIds) as $student) {
             /** @var User $student */
             /** @var UserRelation $relation */
             $relation = $relationMapper->createModel();
