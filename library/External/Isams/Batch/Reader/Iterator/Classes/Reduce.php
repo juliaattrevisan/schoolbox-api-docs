@@ -31,10 +31,9 @@ class External_Isams_Batch_Reader_Iterator_Classes_Reduce
             }
             $carry[$subjectId]['ID']     = $subjectId;
             $carry[$subjectId]['Sets'][] = [
-                'ID'              => $item['ID'],
-                'ClassYear'       => $item['ClassYear'],
-                'ClassCode'       => $item['ClassCode'],
-                'ClassTeacherIds' => $item['ClassTeacherIds'],
+                'ID'        => $item['ID'],
+                'ClassYear' => $item['ClassYear'],
+                'ClassCode' => $item['ClassCode'],
             ];
         }
         return $carry;

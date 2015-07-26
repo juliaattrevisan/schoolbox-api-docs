@@ -25,6 +25,7 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
                 'ClassYear'       => (string)$result->attributes()->YearId,
                 'ClassID'         => (string)$result->attributes()->SubjectId,
                 'ClassCode'       => "$result->SetCode",
+                'ClassTeacherIds' => $this->parseTeachers($result->Teachers[0]),
             ];
         } elseif ($current->matches('//TeachingManager/SetLists/SetList')) {
             // Students for this class
@@ -40,5 +41,22 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
                 'ID'           => $id,
             ];
         }
+    }
+
+    /**
+     * Parses the teachers in an Teacher element.
+     *
+     * @param  SimpleXMLElement $teachers
+     * @return array
+     */
+    protected function parseTeachers($teachers)
+    {
+        $ids = [];
+        if ($teachers instanceof SimpleXMLElement) {
+            foreach ($teachers->children() as $teacher) {
+                $ids[] = (string)$teacher->attributes()->StaffId;
+            }
+        }
+        return $ids;
     }
 }

@@ -34,7 +34,6 @@ class External_Isams_Batch_Reader_Iterator_Classes_Map extends External_Isams_Ba
                 'ClassYear'       => (string)$result->attributes()->YearId,
                 'ClassID'         => (string)$result->attributes()->SubjectId,
                 'ClassCode'       => "$result->SetCode",
-                'ClassTeacherIds' => $this->parseTeachers($result->Teachers[0]),
             ];
         } else {
             return [
@@ -43,22 +42,4 @@ class External_Isams_Batch_Reader_Iterator_Classes_Map extends External_Isams_Ba
             ];
         }
     }
-
-    /**
-     * Parses the teachers in an Teacher element.
-     *
-     * @param  SimpleXMLElement $teachers
-     * @return array
-     */
-    protected function parseTeachers($teachers)
-    {
-        $ids = [];
-        if ($teachers instanceof SimpleXMLElement) {
-            foreach ($teachers->children() as $teacher) {
-                $ids[] = (string)$teacher->attributes()->StaffId;
-            }
-        }
-        return $ids;
-    }
-
 }

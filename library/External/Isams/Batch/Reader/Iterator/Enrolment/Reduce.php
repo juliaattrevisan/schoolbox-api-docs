@@ -21,9 +21,10 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Reduce
             if (!array_key_exists($setId, $carry)) {
                 $carry[$setId] = ['ClassStudents' => [],];
             }
-            $carry[$setId]['ID']        = $setId;
-            $carry[$setId]['ClassYear'] = $item['ClassYear'];
-            $carry[$setId]['ClassCode'] = $item['ClassCode'];
+            $carry[$setId]['ID']            = $setId;
+            $carry[$setId]['ClassYear']     = $item['ClassYear'];
+            $carry[$setId]['ClassCode']     = $item['ClassCode'];
+            $carry[$setId]['ClassTeachers'] = $item['ClassTeacherIds'];
         } elseif ($item['RecordType'] === 'SetList') {
             $setId = $item['SetID'];
             if (!array_key_exists($setId, $carry)) {
