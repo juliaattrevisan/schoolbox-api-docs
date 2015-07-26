@@ -130,18 +130,19 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
             }
 
             $cycleMapper->save($cycle);
-            $this->executeCreateUpdateTimetableCampus($cycle, $campusCode, $campus);
-            $this->executeCreateUpdateTimetablePeriod($new_item, $cycle, $campusCode);
+            $this->executeCreateUpdateTimetableCampus($cycle, $campus);
+            $this->executeCreateUpdateTimetablePeriod($new_item, $cycle);
         }
         return 1;
     }
 
     /**
-     * @param $new_item
-     * @param $cycle
-     * @param $campusCode
+     * Creates or updates a timetable_period entry.
+     *
+     * @param array          $new_item
+     * @param TimetableCycle $cycle
      */
-    protected function executeCreateUpdateTimetablePeriod($new_item, $cycle, $campusCode)
+    protected function executeCreateUpdateTimetablePeriod($new_item, $cycle)
     {
         $timetablePeriodMapper = TimetablePeriodMapper::getInstance();
 
@@ -158,24 +159,24 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
                 /** @var TimetablePeriod $timetablePeriod */
                 try {
                     $timetablePeriod = $timetablePeriodMapper->findOneByColumnList($identifier);
-                    printf(
-                        "Updating timetable period \"%s\", day %d, period %d\n",
-                        $campusCode,
-                        $identifier['day'],
-                        $identifier['sequence']
-                    );
+//                    printf(
+//                        "Updating timetable period \"%s\", day %d, period %d\n",
+//                        $campusCode,
+//                        $identifier['day'],
+//                        $identifier['sequence']
+//                    );
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     $timetablePeriod = $timetablePeriodMapper->createModel();
                     $timetablePeriod
                         ->setCycle($cycle)
                         ->setDay($identifier['day'])
                         ->setSequence($identifier['period']);
-                    printf(
-                        "Creating timetable period \"%s\", day %d, period %d\n",
-                        $campusCode,
-                        $identifier['day'],
-                        $identifier['sequence']
-                    );
+//                    printf(
+//                        "Creating timetable period \"%s\", day %d, period %d\n",
+//                        $campusCode,
+//                        $identifier['day'],
+//                        $identifier['sequence']
+//                    );
                 }
                 // Dates are always H:i
                 $timetablePeriod
@@ -190,12 +191,12 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
     }
 
     /**
-     * @param $timetableCampusMapper
-     * @param $cycle
-     * @param $campusCode
-     * @param $campus
+     * Creates a timetable_campus entry for this record.
+     *
+     * @param TimetableCycle $cycle
+     * @param Campus $campus
      */
-    protected function executeCreateUpdateTimetableCampus($cycle, $campusCode, $campus)
+    protected function executeCreateUpdateTimetableCampus($cycle, $campus)
     {
         $timetableCampusMapper = TimetableCampusMapper::getInstance();
 
@@ -204,7 +205,7 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
         /** @var TimetableCampus $timetableCampus */
         try {
             $timetableCampus = $timetableCampusMapper->findById($cycle->getId());
-            printf("Updating timetable campus \"%s\"\n", $campusCode);
+//            printf("Updating timetable campus \"%s\"\n", $campusCode);
         } catch (\Schoolbox\Mapper\Exception $e) {
             // Assume this timetable started this Monday, and continues forever
             $startDate       = new Datetime('this Monday');
@@ -214,7 +215,7 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
                 ->setStart(new Alaress_Date_Format($startDate))
                 ->setFinish(new Alaress_Date_Format($startDate->modify('+100 year')))
                 ->setOffset(0);
-            printf("Updating timetable campus \"%s\"\n", $campusCode);
+//            printf("Updating timetable campus \"%s\"\n", $campusCode);
         }
         $timetableCampusMapper->save($timetableCampus);
     }
