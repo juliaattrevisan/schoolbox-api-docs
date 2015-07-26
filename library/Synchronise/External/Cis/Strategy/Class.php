@@ -2,7 +2,7 @@
 /**
  * Synchronise_Schoolbox_Cis_Strategy_Class
  *
- * Populates the class and class_period (period and teacher info) tables.
+ * Populates the class table.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
@@ -98,31 +98,4 @@ class Synchronise_External_Cis_Strategy_Class extends Synchronise_Base_Strategy_
         }
         return 1;
     }
-
-//    /**
-//     * Creates or updates periods for a class.
-//     *
-//     * @param array      $newItem Array passed to `executeCreateUpdate()`.
-//     * @param ClassEntry $class   The class to add periods to.
-//     *
-//     * @throws \Schoolbox\Mapper\Exception
-//     */
-//    public function createUpdateClassPeriods($newItem, ClassEntry $class)
-//    {
-//         // Update teachers in this class too
-//        $periodMapper = ClassPeriodMapper::getInstance();
-//        /** @var User[] $teachers */
-//        $teachers     = UserMapper::getInstance()->findByColumn(
-//            'synergy_id',
-//            $newItem['ClassTeacherIds']
-//        );
-//        foreach ($teachers as $teacher) {
-//            $search = [
-//                'class_id'   => $class->getId(),
-//                'teacher_id' => $teacher->getId(),
-//            ];
-//            $periodMapper->deleteByColumnList($search);
-//        }
-//        // Fill periods in again for this teacher
-//    }
 }
