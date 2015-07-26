@@ -217,7 +217,13 @@
                 {% set reportHalf = (report.subjectList|length / 2)|round(0, 'ceil') %}
                 <ul>
                     {% for subject in report.subjectList|slice(0, reportHalf) %}
-                        {% include '@customMeridenPastoral/sub/subject.twig' with {subject: subject, showEmail: false, showPortrait: false} %}
+                        {% include '@customMeridenPastoral/sub/subject.twig' with {
+                            student: report.student,
+                            year: report.tutorGroupReport.year,
+                            subject: subject,
+                            showEmail: false,
+                            showPortrait: false
+                        } %}
                     {% endfor %}
                 </ul>
                 {##
@@ -227,7 +233,13 @@
                  #}
                 {% for subject in report.subjectList|slice(reportHalf) %}
                     <ul>
-                        {% include '@customMeridenPastoral/sub/subject.twig' with {subject: subject, showEmail: false, showPortrait: false} %}
+                        {% include '@customMeridenPastoral/sub/subject.twig' with {
+                            student: report.student,
+                            year: report.tutorGroupReport.year,
+                            subject: subject,
+                            showEmail: false,
+                            showPortrait: false}
+                        %}
                     </ul>
                 {% endfor %}
             </div>
