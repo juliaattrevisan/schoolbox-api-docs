@@ -16,14 +16,21 @@ class External_Isams_Batch_Reader_Student extends External_Isams_Batch_Reader_Ba
      */
     public function getAccountInfo()
     {
-        return new External_Isams_Batch_Reader_Iterator_Student_Map(
-            new \Alaress\Xml\Filter\Path(
-                $this->iterator,
-                [
-                    '//CurrentPupils/Pupil',
-                    '//CurrentPupilsHealth/Pupil',
-                ]
-            )
-        );
+        $reducer = new External_Isams_Batch_Reader_Iterator_Student_Reduce();
+        $result  = [];
+        foreach (
+            new External_Isams_Batch_Reader_Iterator_Student_Map(
+                new \Alaress\Xml\Filter\Path(
+                    $this->iterator,
+                    [
+                        '//CurrentPupils/Pupil',
+                        '//CurrentPupilsHealth/Pupil',
+                    ]
+                )
+            ) as $row
+        ) {
+            $result = $reducer($result, $row);
+        }
+        return new ArrayIterator($result);
     }
 }
