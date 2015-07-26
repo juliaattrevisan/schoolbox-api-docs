@@ -124,7 +124,7 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
                 function ($v) {
                     return 'T-'.$v;
                 },
-                $newItem['ClassTeacherIds']
+                $newItem['ClassTeachers']
             )
         );
         foreach ($teachers as $teacher) {
