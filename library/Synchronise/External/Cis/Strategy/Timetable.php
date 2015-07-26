@@ -158,7 +158,9 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
                 ];
                 /** @var TimetablePeriod $timetablePeriod */
                 try {
-                    $timetablePeriod = $timetablePeriodMapper->findOneByColumnList($identifier);
+                    // Period ID also has to be set manually
+                    // This is because class periods need to know the ID.
+                    $timetablePeriod = $timetablePeriodMapper->findById($period['ID']);
 //                    printf(
 //                        "Updating timetable period \"%s\", day %d, period %d\n",
 //                        $campusCode,
@@ -166,11 +168,7 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
 //                        $identifier['sequence']
 //                    );
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    $timetablePeriod = $timetablePeriodMapper->createModel();
-                    $timetablePeriod
-                        ->setCycle($cycle)
-                        ->setDay($identifier['day'])
-                        ->setSequence($identifier['period']);
+                    $timetablePeriod = $timetablePeriodMapper->createModel($period['ID']);
 //                    printf(
 //                        "Creating timetable period \"%s\", day %d, period %d\n",
 //                        $campusCode,
@@ -180,8 +178,10 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
                 }
                 // Dates are always H:i
                 $timetablePeriod
+                    ->setCycle($cycle)
+                    ->setDay($day['DayNumber'])
                     ->setTitle($period['PeriodName'])
-                    ->setSequence($identifier['sequence'])
+                    ->setSequence($period['PeriodNumber'])
                     ->setStart(new Alaress_Date_Format($period['PeriodStart'], 'H:i'))
                     ->setFinish(new Alaress_Date_Format($period['PeriodEnd'], 'H:i'));
                 $timetablePeriods->add($timetablePeriod);
