@@ -33,6 +33,7 @@
     {{ report.subjectReport.description }}
     </p>
 
+    {% if report.subjectReport.grades is not empty %}
     <dl id="course-info">
         {# course grade - derived from grade for this class #}
         <dt>
@@ -137,4 +138,5 @@
             with {work: report.subjectReport.grades, student: report.student}
         %}
     </div>
+    {% endif %}
 </div>
