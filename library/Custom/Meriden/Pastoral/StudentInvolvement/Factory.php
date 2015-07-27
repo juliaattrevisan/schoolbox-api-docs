@@ -161,6 +161,17 @@ class Factory
             ->moveToNamedGrade('learningApproaches', 'Approaches to Learning')
         ;
 
+        // Add grade distributions
+        $newGrades = array();
+        foreach ($subject->getGrades() as $key => $grade) {
+            $grade['distribution'] = $this->buildDistribution(
+                $grade,
+                $subject->getCohortFolders()
+            );
+            $newGrades[$key] = $grade;
+        }
+        $subject->setGrades($newGrades);
+
         // What are the other grade distributions?
         $courseGrade = $subject->getNamedGrade('courseGrade');
         $courseGrade['distribution'] = $this->buildDistribution(
@@ -486,6 +497,7 @@ class Factory
         $assessments->add($grade['assessment']);
 
         $groupedDistribution = array();
+        $continuousDistribution = array();
         foreach ($assessments as $assessment) {
             // Get everyone who has submitted to this assessment
             $returnStudents = array();
@@ -508,29 +520,53 @@ class Factory
             }
 
             // What are the possible pretty marks for this assessment?
-            $levels = SubmissionBox\GradeLevel\Mapper::getInstance()
-                ->findByColumn(
-                    'submission_grade_group_id',
-                    $assessment->getGradeGroup()->getId(),
-                    array(
-                        'order' => array('raw_grade' => 'desc')
-                    )
-                );
+            // Assume all assessments use the same assessment type, otherwise chaos occurs!
+            if ($assessment->getMarkType()->getId() == SubmissionBox\MarkType::TYPE_LETTER) {
+                $levels = SubmissionBox\GradeLevel\Mapper::getInstance()
+                    ->findByColumn(
+                        'submission_grade_group_id',
+                        $assessment->getGradeGroup()->getId(),
+                        array(
+                            'order' => array('raw_grade' => 'desc')
+                        )
+                    );
 
-            // For now, assume that distributions are only calculated for
-            // letter grade assessments.
-            foreach ($levels as $level) {
-                $caption = $level->getCaption();
-                if (!empty($caption) && empty($groupedDistribution[$caption])) {
-                    $groupedDistribution[$caption] = array();
+                // For now, assume that distributions are only calculated for
+                // letter grade assessments.
+                foreach ($levels as $level) {
+                    $caption = $level->getCaption();
+                    if (!empty($caption) && empty($groupedDistribution[$caption])) {
+                        $groupedDistribution[$caption] = array();
+                    }
+                }
+                foreach ($distribution as $item) {
+                    $key = $item['pretty_mark'];
+                    if (array_key_exists($key, $groupedDistribution)) {
+                        $groupedDistribution[$key][] = $item;
+                    }
+                }
+            } else {
+                // Pretty marks are continuous and hence not to be grouped
+                foreach ($distribution as $item) {
+                    $continuousDistribution[] = $item['mark'];
                 }
             }
-            foreach ($distribution as $item) {
-                $key = $item['pretty_mark'];
-                if (array_key_exists($key, $groupedDistribution)) {
-                    $groupedDistribution[$key][] = $item;
-                }
-            }
+        }
+
+        // Calculate mean and SD for continuous distributions
+        if (!empty($continuousDistribution)) {
+            $mean = array_sum($continuousDistribution) / count($continuousDistribution);
+            $sd   = sqrt(
+                array_sum(
+                    array_map(
+                        function ($v) use ($mean) {
+                            return pow($v - $mean, 2);
+                        },
+                        $continuousDistribution
+                    )
+                ) / count($continuousDistribution)
+            );
+            // Convert mean and SD to pretty mark somehow?
         }
         return $groupedDistribution;
     }
