@@ -16,35 +16,40 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Reduce
      */
     public function __invoke($carry, $item)
     {
-        if ($item['RecordType'] === 'Set') {
+        if ($item['RecordType'] === 'Subject') {
+            $subjectId = $item['ID'];
+            $carry['subjects'][$subjectId]['SubjectName'] = $item['SubjectName'];
+            $carry['subjects'][$subjectId]['SubjectCode'] = $item['SubjectCode'];
+        } elseif ($item['RecordType'] === 'Set') {
             $setId = $item['ID'];
-            if (!array_key_exists($setId, $carry)) {
-                $carry[$setId] = [
+            if (!array_key_exists($setId, $carry['classes'])) {
+                $carry['classes'][$setId] = [
                     'ClassStudents' => [],
                     'ClassPeriods'  => [],
                 ];
             }
-            $carry[$setId]['ID']            = $setId;
-            $carry[$setId]['ClassYear']     = $item['ClassYear'];
-            $carry[$setId]['ClassName']     = $item['ClassName'];
-            $carry[$setId]['ClassCode']     = $item['ClassCode'];
-            $carry[$setId]['ClassTeachers'] = $item['ClassTeacherIds'];
+            $carry['classes'][$setId]['ID']            = $setId;
+            $carry['classes'][$setId]['SubjectID']     = $item['SubjectID'];
+            $carry['classes'][$setId]['ClassYear']     = $item['ClassYear'];
+            $carry['classes'][$setId]['ClassName']     = $item['ClassName'];
+            $carry['classes'][$setId]['ClassCode']     = $item['ClassCode'];
+            $carry['classes'][$setId]['ClassTeachers'] = $item['ClassTeacherIds'];
         } elseif ($item['RecordType'] === 'SetList') {
             $setId = $item['SetID'];
-            if (!array_key_exists($setId, $carry)) {
-                $carry[$setId] = [
+            if (!array_key_exists($setId, $carry['classes'])) {
+                $carry['classes'][$setId] = [
                     'ClassStudents' => [],
                     'ClassPeriods'  => [],
                 ];
             }
-            $carry[$setId]['ClassStudents'][] = $item['StudentID'];
+            $carry['classes'][$setId]['ClassStudents'][] = $item['StudentID'];
         } elseif ($item['RecordType'] === 'Schedule') {
             // Schedule stores only a class code, not a class ID.
             // For that reason the Set records need to be parsed before Schedule.
             // TODO write this into a separate map/reduce process
-            foreach ($carry as $setId => $carryItem) {
-                if ($item['ClassCode'] === $carry[$setId]['ClassCode']) {
-                    $carry[$setId]['ClassPeriods'][] = [
+            foreach ($carry['classes'] as $setId => $carryItem) {
+                if ($item['ClassCode'] === $carry['classes'][$setId]['ClassCode']) {
+                    $carry['classes'][$setId]['ClassPeriods'][] = [
                         'ClassPeriodID' => $item['ClassPeriodID'],
                         'ClassRoomID'   => $item['ClassRoomID'],
                     ];

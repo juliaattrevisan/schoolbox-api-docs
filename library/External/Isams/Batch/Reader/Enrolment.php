@@ -18,12 +18,13 @@ class External_Isams_Batch_Reader_Enrolment extends External_Isams_Batch_Reader_
     {
         // There's no way to reduce an iterator politely
         $reducer = new External_Isams_Batch_Reader_Iterator_Enrolment_Reduce();
-        $result  = [];
+        $result  = ['subjects' => [], 'classes' => [],];
         foreach (
             new External_Isams_Batch_Reader_Iterator_Enrolment_Map(
                 new \Alaress\Xml\Filter\Path(
                     $this->iterator,
                     [
+                        '//TeachingManager/Departments/Department/Subjects/Subject',
                         '//TeachingManager/Sets/Set',
                         '//TeachingManager/SetLists/SetList',
                         '//TimetableManager/PublishedTimetables/Timetable/Schedules/Schedule',
@@ -33,6 +34,13 @@ class External_Isams_Batch_Reader_Enrolment extends External_Isams_Batch_Reader_
         ) {
             $result = $reducer($result, $row);
         }
-        return new ArrayIterator($result);
+//        return new ArrayIterator($result);
+        // Merge the class name into the subject
+        $actualResult = [];
+        foreach ($result['classes'] as $class) {
+            $class['ClassName'] = $result['subjects'][$class['SubjectID']]['SubjectName'];
+            $actualResult[] = $class;
+        }
+        return new ArrayIterator($actualResult);
     }
 }

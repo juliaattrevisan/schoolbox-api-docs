@@ -17,13 +17,20 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
         $current = $this->getInnerIterator()->current();
         $result  = new SimpleXMLElement($current->getReader()->readOuterXml());
         $id      = (string)$result->attributes()->id;
-        if ($current->matches('//TeachingManager/Sets/Set')) {
+        if ($current->matches('//TeachingManager/Departments/Department/Subjects/Subject')) {
+            return [
+                'RecordType'  => 'Subject',
+                'ID'          => $id,
+                'SubjectName' => "$result->Name",
+                'SubjectCode' => "$result->Code",
+            ];
+        } elseif ($current->matches('//TeachingManager/Sets/Set')) {
             // This class
             return [
                 'RecordType'      => 'Set',
                 'ID'              => $id,
+                'SubjectID'       => (string)$result->attributes()->SubjectId,
                 'ClassYear'       => (string)$result->attributes()->YearId,
-                'ClassID'         => (string)$result->attributes()->SubjectId,
                 'ClassCode'       => "$result->SetCode",
                 'ClassName'       => "$result->Name",
                 'ClassTeacherIds' => $this->parseTeachers($result->Teachers[0]),
