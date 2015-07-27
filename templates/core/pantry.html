@@ -1627,6 +1627,32 @@
             </fieldset>
         </div>
         <div class="row">
+            <fieldset id="times">
+                <legend>Dates and Times</legend>
+                <div class="column small-12">
+                    <p>
+                        When invoking <code>$.timepicker()</code>, use the <code>appendTo</code> option to attach to the parent of the <code>label</code>.
+                        That way, the picker dropdown can adopt a width to match the input, which will be 100% of its container&mdash;ignore the "too wide" issue for now.
+                    </p>
+                </div>
+                <div class="column small-4">
+                    <label>Select start:
+                        <input class="timepicker" type="text" autocomplete="off" />
+                    </label>
+                </div>
+                <div class="column small-4">
+                    <label>Select end:
+                        <input class="timepicker" type="text" autocomplete="off" />
+                    </label>
+                </div>
+                <div class="column small-4">
+                    <label>Select &hellip;something:
+                        <input class="timepicker" type="text" autocomplete="off" />
+                    </label>
+                </div>
+            </fieldset>
+        </div>
+        <div class="row">
             <fieldset>
                 <legend>Legend</legend>
                 <label>Textarea Label
@@ -2231,8 +2257,8 @@
 <!-- DataTables CSS -->
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.5/css/jquery.dataTables.css">
 <!-- DataTables -->
-<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.js"></script>
-
+<script type="text/javascript" charset="utf-8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
 <script>
     $(document).ready( function () {
 
@@ -2289,6 +2315,12 @@
             $(this).toggleClass('icon-add icon-collapse');
             $(this).closest('li').toggleClass('expanded');
             event.preventDefault();
+        });
+
+        $('#times').find('input[type=text]').timepicker({
+            appendTo: function ($input) {
+                return $input.closest('.column');
+            }
         });
 
     });
