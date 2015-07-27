@@ -154,6 +154,10 @@ class Factory
             ->setGrades($this->augmentGradesWithAssessment($folderWithGrades['grades'], $student))
             ->moveToNamedGrade('courseGrade', 'Course Grade')
             ->moveToNamedGrade('endeavourGrades', 'Endeavour Grades')
+            ->moveToNamedGrade('endeavourGrade1', 'Endeavour Grade Term 1')
+            ->moveToNamedGrade('endeavourGrade2', 'Endeavour Grade Term 2')
+            ->moveToNamedGrade('endeavourGrade3', 'Endeavour Grade Term 3')
+            ->moveToNamedGrade('endeavourGrade4', 'Endeavour Grade Term 4')
             ->moveToNamedGrade('learningApproaches', 'Approaches to Learning')
         ;
 
