@@ -14,6 +14,7 @@
             list:      '#message-list',
             readall:   '#msg-mar',
             alertBox:  '#alert-dialog',
+            footer:    '[data-msgfooter-action]',
 
             prefetch:  5,
             maxstack:  3,
@@ -22,7 +23,23 @@
             transport: 'socket',
             timeout:   500,
             maxRetry:  10,
-            alertTtl:  30
+            alertTtl:  30,
+
+            // data attributes
+
+            tplItem:      'msgitem',
+            tplItemHref:  'msgitem-href',
+            tplItemThumb: 'msgitem-thumb',
+            tplItemTitle: 'msgitem-title',
+            tplItemTime:  'msgitem-time',
+            tplItemAck:   'msgitem-ack',
+
+            itemUnread:   'unread',
+            itemTimeFormat: 'LLLL',
+
+            dictFooterSeeAll: 'See All',
+            dictFooterNoMessages: 'No Messages'
+
         }, options);
 
         var backoff = 0;
@@ -114,19 +131,6 @@
 
                 var i;
 
-                // template for message list items
-                var msgLiTpl = $('<li/>').addClass('msg').append(
-                    $('<a/>').addClass('action').attr('href', '#').append(
-                        $('<img/>').attr('width', '32').attr('height', '32')
-                    ).append(
-                        $('<span/>').addClass('descript')
-                    ).append(
-                        $('<time/>').addClass('time')
-                    )
-                ).append(
-                    $('<a/>').addClass('pip').attr('href', '#').attr('title', 'Mark as read')
-                );
-
                 var footerText = '';
 
                 if(toInsert.length > 0) {
@@ -142,29 +146,28 @@
                         var message = applyTokens(data.body, data.params);
                         var timestamp = data.timestamp;
 
-                        var li = msgLiTpl.clone();
-
+                        var li  = settings.tpl.clone();
                         var now = moment.unix(timestamp);
 
-                        li.attr('id', 'm-'+id).addClass(status);
-                        li.find('a').attr('href', href);
-                        li.find('span').html(message);
-                        li.find('time').html(now.fromNow()).attr('title', now.format('LLLL'));
-                        li.find('img').attr('src', icon);
+                        li.attr('id', 'm-'+id).attr('data-status', status).addClass('status-' + status);
+                        li.find('[data-' + settings.tplItemHref + ']').attr('href', href);
+                        li.find('[data-' + settings.tplItemTitle + ']').html(message);
+                        li.find('[data-' + settings.tplItemTime + ']').html(now.fromNow()).attr('title', now.format(settings.itemTimeFormat));
+                        li.find('[data-' + settings.tplItemThumb + ']').attr('src', icon);
                         content.append(li);
                     }
-                    footerText = 'See All';
+                    footerText = settings.dictFooterSeeAll;
                 }
                 else {
-                    footerText = 'No Messages'
+                    footerText = settings.dictFooterNoMessages;
                 }
 
                 // update the actual DOM
-                $(settings.list).children('.footer').children('a').html(footerText);
-                $(settings.content).replaceWith(content);
+                $(settings.list).find(settings.footer).html(footerText);
+                $(settings.content).replaceWith(content)/*.foundation('equalizer')*/;
 
                 // update the counter (duplicate selector intentional)
-                var unreadTotal = $(settings.content).children('li.unread').length;
+                var unreadTotal = $(settings.content).children('[data-status="unread"]').length;
 
                 // set the counter
                 dom.attr('data-unread', unreadTotal).children(settings.counter).html(unreadTotal ? unreadTotal : '');
@@ -527,6 +530,9 @@
             var domTimeout;
             var ii;
 
+            // yank the template content out of its container
+            settings.tpl = $(settings.content).find('[data-' + settings.tplItem + ']').clone(false);
+            $(settings.content).empty();
 
             // whenever the flyout is about to open, update relative times so they appear correctly
             $(settings.counter).on('click', function(e) {
@@ -536,11 +542,14 @@
 
             // mark-as-read listener
             $(settings.list).on('click', 'a', function(e) {
-                var pip = $(this).hasClass('pip');
-                var action = $(this).hasClass('action') && $(this).closest('li').hasClass('unread');
 
-                if(pip || action) {
-                    var msgId = $(this).closest('li.msg').attr('id').split('-')[1];
+                var $a     = $(this);
+                var $item  = $a.closest('[data-' + settings.tplItem + ']');
+                var pip    = $a.dataIsset(settings.tplItemAck);
+                var action = $a.dataIsset(settings.tplItemHref) && $item.dataIsset(settings.itemUnread);
+
+                if (pip || action) {
+                    var msgId = $item.attr('id').split('-')[1];
                     send({ack : msgId});
 
                     if(pip) {
@@ -559,34 +568,13 @@
                 e.stopPropagation();
 
                 var unreads = [];
-                $(settings.content).find('li.unread').each(function() {
+                $(settings.content).find('[data-' + settings.itemUnread + ']').each(function() {
                     unreads.push(this.id.substr(2));
                 });
 
                 send({ack : unreads});
                 return false;
             });
-
-
-            // testing: toggle indicator
-            if(settings.debug) {
-                var bell = $('#infoPanel').children('li.bell');
-                var a = $('#go-msg');
-                // test add remove count
-                $('#header a.logo').on('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if(bell.attr('data-unread') == 0) {
-                        var i = parseInt(Math.random() * 26 + 1);
-                        a.html(i);
-                        bell.attr('data-unread', i);
-                    }
-                    else {
-                        a.html('');
-                        bell.attr('data-unread', '0');
-                    }
-                });
-            }
 
             // attempt a connection
             establishConnection();
@@ -661,6 +649,14 @@
         String.prototype.replaceLast = function (what, replacement) {
             return this.reverse().replace(new RegExp(what.reverse()), replacement.reverse()).reverse();
         };
+    }
+
+    if(!$.fn.dataIsset) {
+        $.fn.dataIsset = function (data) {
+            return this.each(function () {
+                return ('undefined' != typeof this.data(data));
+            });
+        }
     }
 
 } (jQuery));
