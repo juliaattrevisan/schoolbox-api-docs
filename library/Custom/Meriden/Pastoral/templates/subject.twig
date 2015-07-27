@@ -57,14 +57,14 @@
             <table>
                 <thead>
                 <tr>
-                    {% for gradeLevel,_ in report.subjectReport.namedGrades.courseGrade.distribution %}
+                    {% for gradeLevel,_ in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
                         <th>{{ gradeLevel }}</th>
                     {% endfor %}
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
-                    {% for _,results in report.subjectReport.namedGrades.courseGrade.distribution %}
+                    {% for _,results in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
                         <td>{{ results|length }}</td>
                     {% endfor %}
                 </tr>

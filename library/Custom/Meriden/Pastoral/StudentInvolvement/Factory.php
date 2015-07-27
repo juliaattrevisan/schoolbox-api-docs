@@ -496,8 +496,12 @@ class Factory
         );
         $assessments->add($grade['assessment']);
 
-        $groupedDistribution = array();
-        $continuousDistribution = array();
+        $distribution = array(
+            'grouped'    => array(),
+            'continuous' => array(
+                'marks' => array(),
+            ),
+        );
         foreach ($assessments as $assessment) {
             // Get everyone who has submitted to this assessment
             $returnStudents = array();
@@ -508,14 +512,14 @@ class Factory
 
             // Slurp out all student marks for this folder, and put back the one we
             // actually want if it's there.
-            $distribution = array();
+            $studentMarks = array();
             foreach ($returnStudents as $studentId) {
                 $marks = $returnedWorkMapper->getStudentMarks(
                     $assessment->getCategory()->getId(),
                     $studentId
                 );
                 if (array_key_exists($assessment->getId(), $marks)) {
-                    $distribution[$studentId] = $marks[$assessment->getId()];
+                    $studentMarks[$studentId] = $marks[$assessment->getId()];
                 }
             }
 
@@ -535,40 +539,55 @@ class Factory
                 // letter grade assessments.
                 foreach ($levels as $level) {
                     $caption = $level->getCaption();
-                    if (!empty($caption) && empty($groupedDistribution[$caption])) {
-                        $groupedDistribution[$caption] = array();
+                    if (!empty($caption) && empty($distribution['grouped'][$caption])) {
+                        $distribution['grouped'][$caption] = array();
                     }
                 }
-                foreach ($distribution as $item) {
-                    $key = $item['pretty_mark'];
-                    if (array_key_exists($key, $groupedDistribution)) {
-                        $groupedDistribution[$key][] = $item;
+                foreach ($studentMarks as $item) {
+                    $caption = $item['pretty_mark'];
+                    if (array_key_exists($caption, $distribution['grouped'])) {
+                        $distribution['grouped'][$caption][] = $item;
                     }
                 }
             } else {
                 // Pretty marks are continuous and hence not to be grouped
-                foreach ($distribution as $item) {
-                    $continuousDistribution[] = $item['mark'];
-                }
+                $distribution['continuous']['marks'] = array_merge(
+                    $distribution['continuous']['marks'],
+                    $studentMarks
+                );
             }
         }
 
         // Calculate mean and SD for continuous distributions
-        if (!empty($continuousDistribution)) {
-            $mean = array_sum($continuousDistribution) / count($continuousDistribution);
-            $sd   = sqrt(
+        if (!empty($distribution['continuous']['marks'])) {
+            $marks = array_map(
+                function ($v) {
+                    return $v['mark'];
+                },
+                $distribution['continuous']['marks']
+            );
+            $count = count($marks);
+            $mean  = array_sum($marks) / $count;
+            $sd    = sqrt(
                 array_sum(
                     array_map(
                         function ($v) use ($mean) {
                             return pow($v - $mean, 2);
                         },
-                        $continuousDistribution
+                        $marks
                     )
-                ) / count($continuousDistribution)
+                ) / $count
             );
-            // Convert mean and SD to pretty mark somehow?
+
+            // Convert mean and SD to pretty mark
+            $distribution['continuous']['mean'] = array(
+                'mark' => $mean,
+            );
+            $distribution['continuous']['sd'] = array(
+                'mark' => $sd,
+            );
         }
-        return $groupedDistribution;
+        return $distribution;
     }
 
     /**
