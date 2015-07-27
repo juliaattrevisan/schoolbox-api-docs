@@ -12,7 +12,7 @@
 </div>
 
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12 large-8 island">
         <h2 class="subheader">Initial Details</h2>
         <section>
             <div class="content">
@@ -158,6 +158,11 @@
             </div>
         </section>
     </div>
+    <div class="small-12 large-4 island">
+        <!-- BEGIN allQuestions -->
+
+        <!-- END allQuestions -->
+    </div>
 </div>
 
 <div id="import-modal" class="reveal-modal" data-reveal>
@@ -172,14 +177,6 @@
         </label>
     </form>
 </div>
-
-
-<div class="evaluation-menu">
-	<!-- BEGIN allQuestions -->
-
-	<!-- END allQuestions -->
-</div>
-
 
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
@@ -265,16 +262,6 @@
                     error.insertAfter(element);
                 }
             }
-        });
-
-        /* Create dialog for importing XML assess */
-        $( "#importForm" ).dialog({
-            autoOpen: false,
-            modal: true
-        });
-
-        $('#import').click(function() {
-            $( '#importForm').dialog("open");
         });
     });
 </script>
