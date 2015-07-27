@@ -54,11 +54,15 @@
 				</section>
 				<!-- BEGIN instantmessage_toggle -->
 				<section class="right-small">
-					<a class="right-off-canvas-toggle icon-notifications" href="#"><span></span></a>
+					<a id="notifier" class="right-off-canvas-toggle icon-notifications" href="#" data-unread="{WEBSOCKET_UNREAD_COUNT}">
+						<span id="go-msg">{WEBSOCKET_UNREAD_LABEL}</span>
+					</a>
 				</section>
 				<!-- END instantmessage_toggle -->
 	    </nav>
     </div>
+
+		  {INSTANTMESSAGE_BLOCK}
 
     <aside class="left-off-canvas-menu">
     	<a href="/" class="logo">
@@ -108,13 +112,6 @@
 			</ul>
 		</div>
     	{MAIN_NAV_REGION}
-    </aside>
-
-    <aside class="right-off-canvas-menu">
-			<ul class="off-canvas-list">
-				<li><label>Notifications</label></li>
-				{INSTANTMESSAGE_BLOCK}
-			</ul>
     </aside>
 
 		<!-- START CONTAINER -->
