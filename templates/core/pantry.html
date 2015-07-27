@@ -255,6 +255,78 @@
         </div>
     </div>
     <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">You Can Rearrange This List</h2>
+            <ul class="meta">
+                <li class="icon-alert icon-16">Any kind of list will work, not just information lists with avatar cards</li>
+            </ul>
+            <section>
+                <ul class="information-list sortable" data-sortable>
+                    <li class="row">
+                        <div class="grip"></div>
+                        <div class="small-11 column no-pad">
+                            <div class="avatar card">
+                                <a href="/search/user/230">
+                                    <img src="/portrait.php?userId=135&amp;size=square64" />
+                                    <h3>David Rhodes</h3>
+                                    <p class="meta">Senior Students</p>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="row">
+                        <div class="grip"></div>
+                        <div class="small-11 column no-pad">
+                            <div class="avatar card">
+                                <a href="/search/user/206">
+                                    <img src="/portrait.php?userId=134&amp;size=square64" />
+                                    <h3>Maddison Rhodes</h3>
+                                    <p class="meta">Senior Students</p>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="row">
+                        <div class="grip"></div>
+                        <div class="small-11 column no-pad">
+                            <div class="avatar card">
+                                <a href="/search/user/151">
+                                    <img src="/portrait.php?userId=165&amp;size=square64" />
+                                    <h3>Zane Smith</h3>
+                                    <p class="meta">Teachers</p>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="row">
+                        <div class="grip"></div>
+                        <div class="small-11 column no-pad">
+                            <div class="avatar card">
+                                <a href="/search/user/229">
+                                    <img src="/portrait.php?userId=133&amp;size=square64" />
+                                    <h3>Rachel Rhodes</h3>
+                                    <p class="meta">Senior Students</p>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="row">
+                        <div class="grip"></div>
+                        <div class="small-11 column no-pad">
+                            <div class="avatar card">
+                                <a href="/search/user/245">
+                                    <img src="/portrait.php?userId=493&amp;size=square64" />
+                                    <h3>Caleb Rhodes</h3>
+                                    <p class="meta">Junior Students</p>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="row">
         <div class="large-12 columns">
             <h2 class="subheader">Little Manc Islands</h2>
         </div>
@@ -2304,6 +2376,12 @@
                 return $input.closest('.column');
             }
         });
+
+        $('#content').find('ul[data-sortable]').sortable({
+            handle:      '.grip',
+            axis:        'y',
+        });
+        
 
     });
 </script>
