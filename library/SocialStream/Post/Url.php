@@ -16,7 +16,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 	 * 
 	 * @return bool
 	 */
-	private function determineIcon() {
+	public function determineIcon() {
 		if (preg_match('#^icon:(.*)#', $this->getThumbnail(), $matches)) {
 			return $matches;
 		}
@@ -29,7 +29,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 	 *
 	 * @return bool
 	 */
-	private function hasThumbnail() {
+	public function hasThumbnail() {
 		if (strlen($this->getThumbnail())) {
 			return true;
 		}

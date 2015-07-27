@@ -16,7 +16,7 @@ class SocialStream_Post_Image extends SocialStream_Post_Abstract {
 	 *
 	 * @return bool
 	 */
-	private function hasThumbnail() {
+	public function hasThumbnail() {
 		if (strlen($this->getThumbnail())) {
 			return true;
 		}
