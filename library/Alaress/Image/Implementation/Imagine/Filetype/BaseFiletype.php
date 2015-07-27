@@ -65,7 +65,11 @@ abstract class BaseFiletype implements FiletypeInterface
             $options['animated'] = true;
             $options['animated.loops'] = 0;
         }
-        $file->write($image->get($this->getFormat(), $options));
+        try {
+            $file->write($image->get($this->getFormat(), $options));
+        } catch (Flysystem\FileExistsException $e) {
+            //If it exists, thats ok we can continue
+        }
     }
 
     /**
