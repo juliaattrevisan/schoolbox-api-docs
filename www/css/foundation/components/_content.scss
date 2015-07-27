@@ -900,7 +900,7 @@ table{
             margin-bottom: 0;
         }
 
-        p {
+        p, h3 {
             margin: 0 0 0 (3 * rem-calc($base-font-size));
             @media #{$medium-up} {
                 margin: 0 0 0 (4 * rem-calc($base-font-size));
@@ -914,6 +914,13 @@ table{
         }
         ~ .progress {
             margin-bottom: 0;
+        }
+    }
+
+    &.wrap-down {
+        h3, p, .meta {
+            overflow-x: visible;
+            white-space: normal;
         }
     }
 
@@ -971,9 +978,7 @@ table{
 	p{
         margin: 0;
 		&.spaced {
-			@media #{$small-up} {
-				padding-bottom: (0.2 * rem-calc($base-font-size));
-			}
+            padding-bottom: (0.2 * rem-calc($base-font-size));
 			@media #{$medium-up} {
 				padding-bottom: (0.5 * rem-calc($base-font-size));
 			}
