@@ -72,7 +72,7 @@
             </table>
         </dd>
 
-        {# Endeavor Grades - a rubric #}
+        {# Endeavor Grades - was a rubric, now four separate assessments #}
         <dt class="fullwidth">
             Endeavour Grades
             <div class="description-link">[<a href="/homepage/3461">Grade Description</a>]</div>
@@ -81,27 +81,50 @@
             <table>
                 <thead>
                 <tr>
-                    {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
-                        <th>{{ criterion.label }}</th>
-                    {% else %}
-                        {# fill all with N/A #}
+                    {% if report.subjectReport.namedGrades.endeavourGrade1
+                        or report.subjectReport.namedGrades.endeavourGrade2
+                        or report.subjectReport.namedGrades.endeavourGrade3
+                        or report.subjectReport.namedGrades.endeavourGrade4
+                    %}
                         <th>Term 1</th>
                         <th>Term 2</th>
                         <th>Term 3</th>
                         <th>Term 4</th>
-                    {% endfor %}
+                    {% else %}
+                        {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
+                            <th>{{ criterion.label }}</th>
+                        {% else %}
+                            {# fill all with N/A #}
+                            <th>Term 1</th>
+                            <th>Term 2</th>
+                            <th>Term 3</th>
+                            <th>Term 4</th>
+                        {% endfor %}
+                    {% endif %}
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
-                    {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
-                        <td>{{ criterion.results[criterion.value]|default('N/A') }}</td>
+                    {% if report.subjectReport.namedGrades.endeavourGrade1
+                        or report.subjectReport.namedGrades.endeavourGrade2
+                        or report.subjectReport.namedGrades.endeavourGrade3
+                        or report.subjectReport.namedGrades.endeavourGrade4
+                    %}
+                        <td>{{ report.subjectReport.namedGrades.endeavourGrade1.pretty_mark }}</td>
+                        <td>{{ report.subjectReport.namedGrades.endeavourGrade2.pretty_mark }}</td>
+                        <td>{{ report.subjectReport.namedGrades.endeavourGrade3.pretty_mark }}</td>
+                        <td>{{ report.subjectReport.namedGrades.endeavourGrade4.pretty_mark }}</td>
                     {% else %}
-                        <td>N/A</td>
-                        <td>N/A</td>
-                        <td>N/A</td>
-                        <td>N/A</td>
-                    {% endfor %}
+                        {# Old-style rubric endeavor grade #}
+                        {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
+                            <td>{{ criterion.results[criterion.value]|default('N/A') }}</td>
+                        {% else %}
+                            <td>N/A</td>
+                            <td>N/A</td>
+                            <td>N/A</td>
+                            <td>N/A</td>
+                        {% endfor %}
+                    {% endif %}
                 </tr>
                 </tbody>
             </table>
