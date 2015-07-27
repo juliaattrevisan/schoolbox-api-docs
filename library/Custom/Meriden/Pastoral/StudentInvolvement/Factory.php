@@ -580,11 +580,21 @@ class Factory
             );
 
             // Convert mean and SD to pretty mark
+            $markType  = SubmissionBox\MarkTypeMapper::getInstance()->findById(
+                $grade['assessment']->getMarkType()->getId()
+            );
+            $converter = \Marksheet_Factory::build(
+                $markType->getSlug(),
+                $grade['assessment']
+            );
+            $maxMark = $grade['assessment']->getMaxMark();
             $distribution['continuous']['mean'] = array(
-                'mark' => $mean,
+                'mark'        => round($mean, 2),
+                'pretty_mark' => $converter->convertRawMark($mean, $maxMark, true),
             );
             $distribution['continuous']['sd'] = array(
-                'mark' => $sd,
+                'mark'        => round($sd, 2),
+                'pretty_mark' => $converter->convertRawMark($sd, $maxMark, true),
             );
         }
         return $distribution;
