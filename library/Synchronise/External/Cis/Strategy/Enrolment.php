@@ -2,7 +2,7 @@
 /**
  * Synchronise_Schoolbox_Cis_Strategy_Enrolment
  *
- * Populates the class_period (teachers) and class_user (students) tables.
+ * Populates the class, class_period (teachers) and class_user (students) tables.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
@@ -155,7 +155,7 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
      */
     public function createUpdateClassEnrolments($newItem, ClassEntry $class)
     {
-        $enrolmentMapper = \Schoolbox\External\ClassInvolvementMapper::getInstance();
+        $enrolmentMapper = ClassInvolvementMapper::getInstance();
 
         // Clear the existing enrolments for this class
         $enrolmentMapper->deleteByColumn('class_id', $class->getId());
