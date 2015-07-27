@@ -1,253 +1,178 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
+<div class="row">
+    <div class="small-12 columns">
+        <span class='header-actions'>
+            <a href='/homepage/{ASSESS_CATEGORY_ID}' class='button icon-previous'>Return to Homepage</a>
+            <!-- BEGIN importXML -->
+            <a href="#importForm" id="import" class="button icon-upload">Import from XML file</a>
+            <!-- END importXML -->
+        </span>
 
-<script type="text/javascript">
-$(function() {
-	$.fn.alaressTiny({
-		mode: 'exact',
-		elements: "description, completion-message",
-		file_browser_category_id: '{ASSESS_CATEGORY_ID}'
-	});
+        <h1>{ASSESS_ACTION} {ASSESS_KIND}</h1>
+    </div>
+</div>
 
-	/* date picker */
-	$('#start_date, #finish_date').datepicker({
-		showOn: 'both',
-		buttonImage: '/images/core/calendar/calendar-click.png',
-		buttonImageOnly: true,
-		constrainInput: false,
-		onClose: function (string) {
-			var input = $(this);
-			$.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-				input.val(data.time);
-			})
-		}
-	});
-	$('#start_date').syncDates({endDate: $('#finish_date')});
-	/* date picker */
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Initial Details</h2>
+        <section>
+            <div class="content">
+                <form name="create" action="/assess/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" method="post">
+                    <input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
+                    <input name="is_task" type="hidden" value="{ASSESS_IS_TASK}" />
+                    <input name="unit_id" type="hidden" value="{ASSESS_UNIT_ID}" />
 
-	$('.show-duration').click(function() {
-		if ($('.edit-duration').is(':visible')) {
-			$('.edit-duration').toggle();
-			$('#minHours').val('0');
-			$('#minDuration').val('00');
-		} else {
-			$('.edit-duration').toggle();
-			$('#minDuration').val('15');
-		}
-	});
-
-	if ($('.show-duration').is(':checked')) {
-        $('.edit-duration').show();
-	}
-
-	var actionPlace = '{ACTION}';
-
-	$('#createAssess').validate({
-		rules: {
-			title: {
-				required: true,
-				minlength: 2
-			},
-            weight: {
-                required: true,
-                maxlength: 3,
-                digits: true
-            },
-            "finish[hour]": {
-                required: true,
-                '12hour': true
-            },
-            "finish[minute]": {
-                required: true,
-                minute: true
-            },
-            "start[hour]": {
-                required: true,
-                '12hour': true
-            },
-            "start[minute]": {
-                required: true,
-                minute: true
-            }
-		},
-		messages: {
-			title: "Please enter a title",
-			description: "Please enter a description",
-            weight: "Please add a numeric weight"
-		},
-        errorPlacement: function(error, element) {
-            var fieldset = element.closest('fieldset');
-            if (fieldset.length) {
-                error.appendTo(fieldset);
-            } else {
-                error.insertAfter(element);
-            }
-        }
-	});
-
-    /* Create dialog for importing XML assess */
-    $( "#importForm" ).dialog({
-        autoOpen: false,
-        modal: true
-    });
-
-    $('#import').click(function() {
-        $( '#importForm').dialog("open");
-    });
-});
-</script>
-<!-- END custom_head -->
-<h1>{ASSESS_ACTION} {ASSESS_KIND}
-    <a class="btn go-back marg tiny" href="/homepage/{ASSESS_CATEGORY_ID}"><span></span>Return to Homepage</a>
-</h1>
-<div class="evaluation-content">
-	<h2>Initial Details</h2>
-	<form name="create" action="/assess/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" method="post">
-		<input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
-        <input name="is_task" type="hidden" value="{ASSESS_IS_TASK}" />
-        <input name="unit_id" type="hidden" value="{ASSESS_UNIT_ID}" />
-		<table class="standardForm table" width="100%">
-			<tr>
-				<td class="formLabelWidth">
                     <label>
-					<strong>Title</strong>
-                    <input name="title" type="text" maxlength="100" value="{ASSESS_TITLE}" id="title"/></label>
-                </td>
-			</tr>
-
-			<!-- BEGIN assess_timespan -->
-			<tr>
-				<!-- Available from this time -->
-				<td>
-					<strong>Open Date</strong>
-					<em>The date and time from when the quiz will be available.</em>
-					<fieldset>
-						<input name="start[date]" id="start_date" type="text" size="15" maxlength="30" value="{ASSESS_START_DATE}" />
-
-						<input name="start[hour]" type="text" class='timeField' value="{START_HOUR_VALUE}" /> :
-						<input name="start[minute]" type="text" class='timeField' value="{START_MINUTE_VALUE}" />
-						<select name="start[meridiem]">
-							<!-- BEGIN startMeridiem -->
-							<option value="{START_MERIDIEM_VALUE}" {START_MERIDIEM_SELECTED}>{START_MERIDIEM_VALUE}</option>
-							<!-- END startMeridiem -->
-						</select>
-					</fieldset>
-				</td>
-			</tr>
-			<tr>
-				<!-- Available until this time -->
-				<td>
-					<strong>Due Date</strong>
-					<em>Actual date and time the quiz is due. Students will not be able to take the quiz after this date.</em>
-					<fieldset>
-						<input name="finish[date]" id="finish_date" type="text" size="15" maxlength="30" value="{ASSESS_FINISH_DATE}" />
-
-						<input name="finish[hour]" type="text" class='timeField' value="{FINISH_HOUR_VALUE}" /> :
-						<input name="finish[minute]" type="text" class='timeField' value="{FINISH_MINUTE_VALUE}" />
-						<select name="finish[meridiem]">
-							<!-- BEGIN finishMeridiem -->
-							<option value="{FINISH_MERIDIEM_VALUE}" {FINISH_MERIDIEM_SELECTED}>{FINISH_MERIDIEM_VALUE}</option>
-							<!-- END finishMeridiem -->
-						</select>
-					</fieldset>
-				</td>
-			</tr>
-			<!-- END assess_timespan -->
-
-			<tr>
-				<td>
-					<strong>Duration</strong>
-					<em>To set a quiz duration, tick the box and fill out a time.</em>
-					<label class="float-left">
-						<input type="hidden" name="durationSelected" value="0" />
-						<input type="checkbox" name='durationSelected' class="float-left show-duration" value='1' {ASSESS_DURATION_CHECKED} />
-					</label>
-					<fieldset class="hide float-left edit-duration">
-						<input name='duration[hour]' type='text' class="timeField" value='{DURATION_HOUR_VALUE}' maxlength='1'>hr
-						<input name='duration[minute]' type='text' class="timeField" value='{DURATION_MINUTE_VALUE}' maxlength='2'>min
-					</fieldset>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<strong>Description</strong>
-					<div class="textarea-container">
-						<textarea id='description' name="description" style="width: 100%;">{ASSESS_DESCRIPTION}</textarea>
-					</div>
-				</td>
-			</tr>
-            <tr>
-                <td>
-                    <strong>Completion Message</strong>
-                    <div class="textarea-container">
-                        <textarea id='completion-message' name="completion_message">{ASSESS_COMPLETION_MESSAGE}</textarea>
-                    </div>
-                </td>
-            </tr>
-			<tr>
-				<td>
-                    <label>
-					<strong>Maximum Attempts</strong>
-					<em>
-						The maximum number of times someone can attempt this quiz.
-					</em>
-					<select name='max_attempts'>
-						<option value='0'>Unlimited</option>
-						<!-- BEGIN max_attempts -->
-						<option value='{MAX_ATTEMPTS_VALUE}' {MAX_ATTEMPTS_CHECKED}>{MAX_ATTEMPTS_VALUE}</option>
-						<!-- END max_attempts -->
-					</select>
+                        Title
+                        <input name="title" type="text" maxlength="100" value="{ASSESS_TITLE}" id="title"/>
                     </label>
-				</td>
-			</tr>
-            <tr>
-                <td>
-                    <strong>Visibility</strong>
-                    <em>Control who can view marks for this quiz.</em>
-					<!-- BEGIN marktype -->
-					<select name="mark_visibility" class="formfield" id="marktype">
-						<!-- BEGIN mark_visibility_drop -->
-						<option value="{MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_VALUE_SELECTED}>{MARK_VISIBILITY_TEXT}</option>
-						<!-- END mark_visibility_drop -->
-					</select>
-					<!-- END marktype -->
-                </td>
-            </tr>
-      <!-- BEGIN mark_weight -->
-      <tr>
-        <td>
-          <strong>Weight</strong>
-          <em>Control the weight of this quiz towards the student's overall grade average (default is 0).</em>
-          <label>
-            <input name="weight" type="text" size="3" maxlength="3" value="{ASSESS_WEIGHT}" id="weight"/>
-          </label>
-        </td>
-      </tr>
-      <!-- END mark_weight -->
-      <!-- BEGIN curriculum_code_input -->
-      <tr>
-        <td>
-            <strong>Curriculum Codes</strong>
-            <em>If you want to associate curriculum codes with this assessment, enter them here.</em>
-            <em>(By default, it will be associated with the same codes that its folder is.)</em>
-            {CURRICULUM_CODE_INPUT}
-        </td>
-      </tr>
-      <!-- END curriculum_code_input -->
-      </table>
-		<label class="clearfix">
-			<input type="submit" value="Continue" class="submit-btn-plain no-marg" />
-        </label>
-        <!-- BEGIN importXML -->
-        <a href="#importForm"  id="import">Import from XML file</a>
-        <!-- END importXML -->
-    </form>
 
+                    <!-- BEGIN assess_timespan -->
+                    <!-- Available from this time -->
+                    <label>
+                        Open Date
+                        <span class="hint has-tip tip-top" data-tooltip title="The date and time from when the quiz will be available.">?</span>
+                    </label>
+                    <div class="row">
+                        <div class="small-12 large-6 columns">
+                            <input name="start[date]" id="start_date" type="text" size="15" maxlength="30" value="{ASSESS_START_DATE}" />
+                        </div>
+                        <div class="small-12 large-2 columns">
+                            <input name="start[hour]" type="text" class='timeField' value="{START_HOUR_VALUE}" />
+                        </div>
+                        <div class="small-12 large-2 columns">
+                            <input name="start[minute]" type="text" class='timeField' value="{START_MINUTE_VALUE}" />
+                        </div>
+                        <div class="small-12 large-2 columns">
+                            <select name="start[meridiem]">
+                                <!-- BEGIN startMeridiem -->
+                                <option value="{START_MERIDIEM_VALUE}" {START_MERIDIEM_SELECTED}>{START_MERIDIEM_VALUE}</option>
+                                <!-- END startMeridiem -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Available until this time -->
+                    <label>
+                        Due Date
+                        <span class="hint has-tip tip-top" data-tooltip title="Actual date and time the quiz is due. Students will not be able to take the quiz after this date.">?</span>
+                    </label>
+                    <div class="row">
+                        <div class="small-12 large-6 columns">
+                            <input name="finish[date]" id="finish_date" type="text" size="15" maxlength="30" value="{ASSESS_FINISH_DATE}" />
+                        </div>
+                        <div class="small-12 large-2 columns">
+                            <input name="finish[hour]" type="text" class='timeField' value="{FINISH_HOUR_VALUE}" />
+                        </div>
+                        <div class="small-12 large-2 columns">
+                            <input name="finish[minute]" type="text" class='timeField' value="{FINISH_MINUTE_VALUE}" />
+                        </div>
+                        <div class="small-12 large-2 columns">
+                            <select name="finish[meridiem]">
+                                <!-- BEGIN finishMeridiem -->
+                                <option value="{FINISH_MERIDIEM_VALUE}" {FINISH_MERIDIEM_SELECTED}>{FINISH_MERIDIEM_VALUE}</option>
+                                <!-- END finishMeridiem -->
+                            </select>
+                        </div>
+                    </div>
+                    <!-- END assess_timespan -->
+
+                    <label>
+                        Duration
+                        <span class="hint has-tip tip-top" data-tooltip title="To set a quiz duration, tick the box and fill out a time.">?</span>
+                    </label>
+                    <div class="switch">
+                        <input type="hidden" name="durationSelected" value="0" />
+                        <input type="checkbox" id='durationSelected' name='durationSelected' data-show-duration value='1' {ASSESS_DURATION_CHECKED} />
+                        <label for="durationSelected"></label>
+                    </div>
+                    <div data-edit-duration class="row hide">
+                        <div class="small-12 large-6 columns">
+                            <label>
+                                Hours
+                                <input name='duration[hour]' type='text' class="timeField" value='{DURATION_HOUR_VALUE}' maxlength='1'>
+                            </label>
+                        </div>
+                        <div class="small-12 large-6 columns">
+                            <label>
+                                Minutes
+                                <input name='duration[minute]' type='text' class="timeField" value='{DURATION_MINUTE_VALUE}' maxlength='2'>
+                            </label>
+                        </div>
+                    </div>
+
+                    <label>
+                        Description
+                        <textarea id='description' name="description">{ASSESS_DESCRIPTION}</textarea>
+                    </label>
+
+                    <label>
+                        Completion Message
+                        <textarea id='completion-message' name="completion_message">{ASSESS_COMPLETION_MESSAGE}</textarea>
+                    </label>
+
+                    <label>
+                        Maximum Attempts
+                        <span class="hint has-tip tip-top" data-tooltip title="The maximum number of times someone can attempt this quiz.">?</span>
+
+                        <select name='max_attempts'>
+                            <option value='0'>Unlimited</option>
+                            <!-- BEGIN max_attempts -->
+                            <option value='{MAX_ATTEMPTS_VALUE}' {MAX_ATTEMPTS_CHECKED}>{MAX_ATTEMPTS_VALUE}</option>
+                            <!-- END max_attempts -->
+                        </select>
+                    </label>
+
+                    <label>
+                        Visibility
+                        <span class="hint has-tip tip-top" data-tooltip title="Control who can view marks for this quiz.">?</span>
+
+                        <!-- BEGIN marktype -->
+                        <select name="mark_visibility" id="marktype">
+                            <!-- BEGIN mark_visibility_drop -->
+                            <option value="{MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_VALUE_SELECTED}>{MARK_VISIBILITY_TEXT}</option>
+                            <!-- END mark_visibility_drop -->
+                        </select>
+                        <!-- END marktype -->
+                    </label>
+
+                    <!-- BEGIN mark_weight -->
+                    <label>
+                        Weight
+                        <span class="hint has-tip tip-top" data-tooltip title="Control the weight of this quiz towards the student's overall grade average (default is 0).">?</span>
+                        <input name="weight" type="text" size="3" maxlength="3" value="{ASSESS_WEIGHT}" id="weight"/>
+                    </label>
+                    <!-- END mark_weight -->
+
+                    <!-- BEGIN curriculum_code_input -->
+                    <label>
+                        Curriculum Codes
+                        <span class="hint has-tip tip-top" data-tooltip title="If you want to associate curriculum codes with this assessment, enter them here. (By default, it will be associated with the same codes that its folder is.)">?</span>
+                        {CURRICULUM_CODE_INPUT}
+                    </label>
+                    <!-- END curriculum_code_input -->
+
+                    <label>
+                        <input type="submit" value="Continue" />
+                    </label>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="evaluation-content">
     <div id="importForm" class="hide" title="Import quiz from an XML file">
     <form action="/assess/import/xml/{ASSESS_CATEGORY_ID}" method="post" enctype="multipart/form-data">
 		<input type='hidden' name="is_task" value="{ASSESS_IS_TASK}" />
@@ -266,3 +191,118 @@ $(function() {
 
 	<!-- END allQuestions -->
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+        $.fn.alaressTiny({
+            mode: 'exact',
+            elements: "description, completion-message",
+            file_browser_category_id: '{ASSESS_CATEGORY_ID}'
+        });
+
+        /* date picker */
+        $('#start_date, #finish_date').datepicker({
+            constrainInput: false,
+            onClose: function (string) {
+                var input = $(this);
+                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
+
+        $('#start_date').syncDates({endDate: $('#finish_date')});
+
+        $('[data-show-duration]').change(function() {
+            $('[data-edit-duration]').toggleClass('hide');
+
+            if ($('[data-edit-duration]').hasClass('hide')) {
+                $('#minDuration').val('15');
+            } else {
+                $('#minHours').val('0');
+                $('#minDuration').val('00');
+            }
+        });
+
+        if ($('[data-show-duration]').is(':checked')) {
+            $('[data-edit-duration]').show();
+        }
+
+        $('#createAssess').validate({
+            rules: {
+                title: {
+                    required: true,
+                    minlength: 2
+                },
+                weight: {
+                    required: true,
+                    maxlength: 3,
+                    digits: true
+                },
+                "finish[hour]": {
+                    required: true,
+                    '12hour': true
+                },
+                "finish[minute]": {
+                    required: true,
+                    minute: true
+                },
+                "start[hour]": {
+                    required: true,
+                    '12hour': true
+                },
+                "start[minute]": {
+                    required: true,
+                    minute: true
+                }
+            },
+            messages: {
+                title: "Please enter a title",
+                description: "Please enter a description",
+                weight: "Please add a numeric weight"
+            },
+            errorPlacement: function(error, element) {
+                var fieldset = element.closest('fieldset');
+                if (fieldset.length) {
+                    error.appendTo(fieldset);
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+
+        /* Create dialog for importing XML assess */
+        $( "#importForm" ).dialog({
+            autoOpen: false,
+            modal: true
+        });
+
+        $('#import').click(function() {
+            $( '#importForm').dialog("open");
+        });
+    });
+</script>
