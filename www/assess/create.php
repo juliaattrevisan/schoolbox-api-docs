@@ -188,10 +188,14 @@ else {
     $this->setBlock(TEMPLATE_content,  'importXML', 'importXML_block');
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
     $this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
+    $this->setBlock(TEMPLATE_content, 'has_due_date', 'has_due_date_block');
 
-    $this->setTitle('Manage Assessment');
+    $this->setVar(array(
+        'assess_timespan_block' => '',
+        'has_due_date_block' => '',
+    ));
 
-    $this->setVar('assess_timespan_block', '');
+    $this->setTitle('Manage Quiz');
 
     if (Config::get('curriculum_tagging_enabled')) {
         $this->parse('curriculum_code_input_block', 'curriculum_code_input');

@@ -122,10 +122,15 @@ else {
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
 	$this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
-    $this->setTitle('Manage Assessment');
+    $this->setBlock(TEMPLATE_content, 'has_due_date', 'has_due_date_block');
 
-    $this->setVar('question_block', '');
-    $this->setVar('assess_timespan_block', '');
+    $this->setVar(array(
+        'assess_timespan_block' => '',
+        'question_block' => '',
+        'has_due_date_block' => ''
+    ));
+
+    $this->setTitle('Manage Quiz');
 
     /** @var OnlineAssessment $assessment */
     $task_id = null;
@@ -275,5 +280,9 @@ else {
 
         $i++;
     }
+
+    /* Parse due date meta
+     */
+    $this->parse('has_due_date_block', 'has_due_date');
 }
 

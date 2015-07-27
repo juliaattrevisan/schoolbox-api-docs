@@ -83,6 +83,8 @@ if (!empty($_POST)) {
     $this->setBlock(TEMPLATE_content, 'durationHour', 'durationHour_block');
     $this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
+    $this->setBlock(TEMPLATE_content, 'has_due_date', 'has_due_date_block');
+
     $this->setTitle('Manage Survey');
 
     $assessStartDate  = new Alaress_Date_Format(strtotime($assess['start']), 'U');
@@ -213,4 +215,8 @@ if (!empty($_POST)) {
 
         $i++;
     }
+
+    /* Parse due date meta
+     */
+    $this->parse('has_due_date_block', 'has_due_date');
 }
