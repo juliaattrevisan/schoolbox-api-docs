@@ -243,6 +243,32 @@ label.checkbox-label		{ background-position: 0 -120px; }
 }
 
 
+//  TIMEPICKER
+.ui-timepicker-wrapper {
+	z-index: 1;
+	max-height: 10rem;
+	width: 100%;
+	overflow-y: scroll;
+	background: $white;
+	outline: none;
+	.ui-timepicker-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		li {
+			cursor: pointer;
+			padding: 0.25rem 0 0.25rem 0.625rem;
+			&:hover {
+				color: $input-hover-color;
+				background: $input-hover-bg-color;
+			}
+			&.ui-timepicker-selected {
+				background: $secondary-color;
+			}
+		}
+	}
+}
+
 $overlay-duration: 800ms;
 
 .dragging {
