@@ -12,33 +12,39 @@
 
 <!-- BEGIN section -->
 <section>
-    <ul class='information-list'>
+    <ul class='action-list'>
         <li class="row">
-            <div class="twelve-column">
-                <span class='header-actions'>
-                    <a class="icon-delete" href="/{ASSESS_KIND_LC}/section/delete/{SECTION_SECTION_ID}" data-delete></a>
-                    <a class="icon-modify" href="/{ASSESS_KIND_LC}/section/modify/{SECTION_SECTION_ID}"></a>
-                </span>
-
+            <div class="eleven-column">
                 <h3>{SECTION_TITLE}</h3>
+            </div>
+            <div class="one actions">
+                <a href='#' class='icon-more no-text' data-dropdown='section{SECTION_SECTION_ID}-options'></a>
+                <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='section{SECTION_SECTION_ID}-options'>
+                    <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/section/delete/{SECTION_SECTION_ID}" data-delete>Delete</a></li>
+                    <li><a class="icon-modify" href="/{ASSESS_KIND_LC}/section/modify/{SECTION_SECTION_ID}">Modify</a></li>
+                </ul>
             </div>
         </li>
     </ul>
-    <ul class='information-list' id='section{SECTION_SECTION_ID}' data-question-list>
+    <ul class='action-list' id='section{SECTION_SECTION_ID}' data-question-list>
         <!-- BEGIN question -->
         <li class='row' id='question_{QUESTION_QUESTION_ID}'>
-            <div class="twelve-column">
-                <strong data-seq>
+            <div class="eleven-column">
+                <h4 data-seq>
                     Q{QUESTION_SEQUENCE})
                     <!-- BEGIN has_mark -->
                     ({QUESTION_MARKS} marks)
                     <!-- END has_mark -->
-                </strong>
+                </h4>
 
                 <article>{QUESTION_QUESTION}</article>
-
-                <a class="button icon-delete" href="/{ASSESS_KIND_LC}/question/delete/{QUESTION_QUESTION_ID}" data-delete>Delete</a>
-                <a class='button icon-modify' href="/{ASSESS_KIND_LC}/question/modify/{QUESTION_QUESTION_ID}">Modify</a>
+            </div>
+            <div class="one actions">
+                <a href='#' class='icon-more no-text' data-dropdown='question{QUESTION_QUESTION_ID}-options'></a>
+                <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='question{QUESTION_QUESTION_ID}-options'>
+                    <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/question/delete/{QUESTION_QUESTION_ID}" data-delete>Delete</a></li>
+                    <li><a class='icon-modify' href="/{ASSESS_KIND_LC}/question/modify/{QUESTION_QUESTION_ID}">Modify</a></li>
+                </ul>
             </div>
         </li>
         <!-- END question -->
