@@ -157,6 +157,11 @@ class Controller extends Base
             if (!$exists) {
                 throw new \RangeException("Student was not in subject $subjectCode in $year");
             }
+            // Some subjects aren't supposed to show
+            list(, $code, ) = explode('-', $subjectCode);
+            if (in_array($code, array('0107', '0074', '4099', '0087', '0093', '0103',))) {
+                throw new \RangeException("Subject code $subjectCode is not in the eReport");
+            }
             $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode);
         }
         return array(
