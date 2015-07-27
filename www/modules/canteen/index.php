@@ -17,14 +17,14 @@
 $this->setFile(TEMPLATE_content, 'modules/remote/frame.html');
 $remoteUrl = 'http://campusonline.cis.edu.sg/signon.asp';
 
-//// is this specifying a height for the parent frame?
-//$height = '460px';
-//if(strpos($remoteUrl, 'zx_h=')) {
-//    preg_match("#zx_h=([0-9]*(?:%|px|&))#", $remoteUrl, $matches);
-//    if(isset($matches[1])) {
-//        $height = str_replace('&', '', $matches[1]);
-//    }
-//}
+// is this specifying a height for the parent frame?
+$height = '460px';
+if(strpos($remoteUrl, 'zx_h=')) {
+    preg_match("#zx_h=([0-9]*(?:%|px|&))#", $remoteUrl, $matches);
+    if(isset($matches[1])) {
+        $height = str_replace('&', '', $matches[1]);
+    }
+}
 //
 //if (!filter_var($remoteUrl, FILTER_VALIDATE_URL)) {
 //    $this->error(2);
