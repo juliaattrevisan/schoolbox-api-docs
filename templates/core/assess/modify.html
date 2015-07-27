@@ -3,7 +3,7 @@
         <span class='header-actions'>
             <a href='/homepage/{ASSESS_CATEGORY_ID}' class='button icon-previous'>Return to Homepage</a>
             <!-- BEGIN importXML -->
-            <a href="#importForm" id="import" class="button icon-upload">Import from XML file</a>
+            <a href="#" id="import" data-reveal-id="import-modal" class="button icon-upload">Import from XML file</a>
             <!-- END importXML -->
         </span>
 
@@ -160,53 +160,25 @@
     </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="evaluation-content">
-    <div id="importForm" class="hide" title="Import quiz from an XML file">
+<div id="import-modal" class="reveal-modal" data-reveal>
     <form action="/assess/import/xml/{ASSESS_CATEGORY_ID}" method="post" enctype="multipart/form-data">
-		<input type='hidden' name="is_task" value="{ASSESS_IS_TASK}" />
-		<input name="unit_id" type="hidden" value="{ASSESS_UNIT_ID}" />
-		<label>
-			<input name="importXML" type="file" />
-		</label>
-		<label class="clearfix">
-			<input type="submit" value="Import from XML file"  class="submit-btn-plain no-marg"/>
-		</label>
-	</form>
-    </div>
+        <input type='hidden' name="is_task" value="{ASSESS_IS_TASK}" />
+        <input type="hidden" name="unit_id" value="{ASSESS_UNIT_ID}" />
+        <label>
+            <input name="importXML" type="file" />
+        </label>
+        <label>
+            <input type="submit" value="Import from XML file" />
+        </label>
+    </form>
 </div>
+
+
 <div class="evaluation-menu">
 	<!-- BEGIN allQuestions -->
 
 	<!-- END allQuestions -->
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
