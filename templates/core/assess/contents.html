@@ -1,19 +1,70 @@
+<span class='header-actions'>
+    <a href='#' class='button icon-more' data-dropdown='header-options'>Options</a>
+</span>
+<ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
+    <li><a class="icon-add" href="/{ASSESS_KIND_LC}/section/create/{ASSESS_ASSESS_ID}">Add Section</a></li>
+    <li><a class="icon-modify" href="/{ASSESS_KIND_LC}/modify/{ASSESS_ASSESS_ID}">Modify</a></li>
+    <li><a class="icon-export" href="/{ASSESS_KIND_LC}/export/xml/{ASSESS_ASSESS_ID}">Export</a></li>
+    <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/delete/{ASSESS_ASSESS_ID}" data-delete>Delete</a></li>
+</ul>
+
+<h2 class="subheader">Sections</h2>
+
+<!-- BEGIN section -->
+<section>
+    <ul class='information-list'>
+        <li class="row">
+            <div class="twelve-column">
+                <span class='header-actions'>
+                    <a class="icon-delete" href="/{ASSESS_KIND_LC}/section/delete/{SECTION_SECTION_ID}" data-delete></a>
+                    <a class="icon-modify" href="/{ASSESS_KIND_LC}/section/modify/{SECTION_SECTION_ID}"></a>
+                </span>
+
+                <h3>{SECTION_TITLE}</h3>
+            </div>
+        </li>
+    </ul>
+    <ul class='information-list' id='section{SECTION_SECTION_ID}' data-question-list>
+        <!-- BEGIN question -->
+        <li class='row' id='question_{QUESTION_QUESTION_ID}'>
+            <div class="twelve-column">
+                <strong data-seq>
+                    Q{QUESTION_SEQUENCE})
+                    <!-- BEGIN has_mark -->
+                    ({QUESTION_MARKS} marks)
+                    <!-- END has_mark -->
+                </strong>
+
+                <article>{QUESTION_QUESTION}</article>
+
+                <a class="button icon-delete" href="/{ASSESS_KIND_LC}/question/delete/{QUESTION_QUESTION_ID}" data-delete>Delete</a>
+                <a class='button icon-modify' href="/{ASSESS_KIND_LC}/question/modify/{QUESTION_QUESTION_ID}">Modify</a>
+            </div>
+        </li>
+        <!-- END question -->
+    </ul>
+
+    <a class="button icon-add" href="/{ASSESS_KIND_LC}/question/create/{SECTION_SECTION_ID}">New Question</a>
+    <a class="button icon-download" href="/{ASSESS_KIND_LC}/questionbank/contents/0/{ASSESS_ASSESS_ID}/{SECTION_SECTION_ID}">Add from Question Bank</a>
+</section>
+<!-- END section -->
+
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
     $(function () {
-        $('a.delete').click(function (event) {
+        $('[data-delete]').click(function (event) {
             event.preventDefault();
             $(this).confirmDialog();
         });
 
         /* Make questions sortable
          */
-        $(".question-list").sortable({
+        $("[data-question-list]").sortable({
             placeholder: "sortable-placeholder",
             forcePlaceholderSize: true,
             stop: function () {
                 var allQuestions = $(this).children('li'),
-                    data         = [];
+                        data         = [];
 
                 $.each(allQuestions, function (index, element) {
                     data.push(element.id);
@@ -36,49 +87,3 @@
         .disableSelection();
     });
 </script>
-
-<h2>Manage {ASSESS_KIND}</h2>
-<div class="pad-it">
-
-	<p class="clearfix tiny-btns">
-		<a class="btn add float-left marg" href="/{ASSESS_KIND_LC}/section/create/{ASSESS_ASSESS_ID}"><span></span>Add Section</a>
-		<a href="/{ASSESS_KIND_LC}/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left marg" ><span></span>Modify</a>
-		<a href="/{ASSESS_KIND_LC}/export/xml/{ASSESS_ASSESS_ID}" class="btn export float-left marg" ><span></span>Export</a>
-		<a href="/{ASSESS_KIND_LC}/delete/{ASSESS_ASSESS_ID}" class="btn delete float-left marg" ><span></span>Delete</a>
-    </p>
-
-	<!-- BEGIN section -->
-	<div class="evaluation-section">
-		<h3>{SECTION_TITLE}
-            <a href="/{ASSESS_KIND_LC}/section/delete/{SECTION_SECTION_ID}" class="btn delete no-text"><span></span></a>
-            <a href="/{ASSESS_KIND_LC}/section/modify/{SECTION_SECTION_ID}" class="btn modify no-text"><span></span></a>
-
-        </h3>
-		<ul class="question-list" id='section{SECTION_SECTION_ID}'>
-			<!-- BEGIN question -->
-			<li id='question_{QUESTION_QUESTION_ID}'>
-				<strong data-seq>
-          Q{QUESTION_SEQUENCE})
-          <!-- BEGIN has_mark -->
-          ({QUESTION_MARKS} marks)
-          <!-- END has_mark -->
-        </strong>
-        <div class="wysiwyg">{QUESTION_QUESTION}</div>
-				<a href="/{ASSESS_KIND_LC}/question/modify/{QUESTION_QUESTION_ID}">Modify</a> |
-				<a class="delete" href="/{ASSESS_KIND_LC}/question/delete/{QUESTION_QUESTION_ID}">Delete</a>
-			</li>
-			<!-- END question -->
-		</ul>
-
-		<ul>
-			<li class="clearfix">
-				<p class="clearfix no-marg">
-					<a class="btn add marg" href="/{ASSESS_KIND_LC}/question/create/{SECTION_SECTION_ID}"><span></span>New Question</a>
-					<a class="btn download marg" href="/{ASSESS_KIND_LC}/questionbank/contents/0/{ASSESS_ASSESS_ID}/{SECTION_SECTION_ID}"><span></span>Add from Question Bank</a>
-				</p>
-			</li>
-		</ul>
-	</div>
-	<!-- END section -->
-</div>
-
