@@ -4,6 +4,8 @@
             <tr>
                 <th>Title</th>
                 <th>Result</th>
+                <th>Standard Deviation</th>
+                <th>Mean</th>
                 <th>Date Due</th>
             </tr>
         </thead>
@@ -32,6 +34,8 @@
                     {{ workItem.pretty_mark }}
                 {% endif %}
             </td>
+            <td></td>
+            <td></td>
             <td>
                 {% if workItem.assessment %}
                     {{ workItem.assessment.dueDate|date('jS F') }}
