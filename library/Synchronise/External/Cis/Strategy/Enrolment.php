@@ -11,6 +11,8 @@
 
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassInvolvement;
+use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\User;
@@ -96,6 +98,7 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
         if ($this->perform_update) {
             $classMapper->save($class);
             $this->createUpdateClassPeriods($new_item, $class);
+            $this->createUpdateClassEnrolments($new_item, $class);
         }
         return 1;
     }
@@ -140,5 +143,45 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
             }
         }
         $periodMapper->save($periods);
+    }
+
+    /**
+     * Creates or updates students for a class.
+     *
+     * @param array      $newItem Array passed to `executeCreateUpdate()`.
+     * @param ClassEntry $class   The class to add students to.
+     *
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function createUpdateClassEnrolments($newItem, ClassEntry $class)
+    {
+        $enrolmentMapper = \Schoolbox\External\ClassInvolvementMapper::getInstance();
+
+        // Clear the existing enrolments for this class
+        $enrolmentMapper->deleteByColumn('class_id', $class->getId());
+
+        // Re-add enrolments in this class
+        $enrolments = new \Schoolbox\Collection();
+        /** @var User[] $teachers */
+        $students = UserMapper::getInstance()->findByColumn(
+            'synergy_id',
+            array_map(
+                function ($v) {
+                    return 'S-'.$v;
+                },
+                $newItem['ClassStudents']
+            )
+        );
+        foreach ($students as $student) {
+            /** @var ClassInvolvement $enrolment */
+            $enrolment = $enrolmentMapper->createModel();
+            $enrolments->add(
+                $enrolment
+                    ->setClass($class)
+                    ->setUser($student)
+            );
+        }
+        $enrolmentMapper->save($enrolments);
+
     }
 }
