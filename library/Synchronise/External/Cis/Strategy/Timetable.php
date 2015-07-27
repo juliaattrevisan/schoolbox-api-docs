@@ -114,6 +114,7 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
             ->setCycleLength(count($new_item['TimetableDays']))
             ->setDayLength($dayLength)
             ->setTitle($campusCode)
+            ->setRegular(true)
         ;
         if ($this->perform_update) {
             /** @var Campus $campus */
