@@ -215,6 +215,7 @@ else {
         'ASSESS_START_DATE'         => $assessDate->getLocalShort(),
         'ASSESS_FINISH_DATE'        => $assessEndDate->getLocalShort(),
         'ASSESS_COMPLETION_MESSAGE' => '',
+        'HAS_ALL_QUESTIONS'         => 'large-12'
     ));
 
     // Curriculum codes: by default use the ones that are part of the folder
@@ -304,8 +305,14 @@ else {
 
     /* Don't display questions contents, which appears in Modify
      */
-    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
-    $this->setVar('allQuestions_block', '');
+    $this->setBlock(TEMPLATE_content, 'has_all_questions', 'has_all_questions_block');
+    $this->setBlock('has_all_questions', 'allQuestions', 'allQuestions_block');
+
+    $this->setVar(array(
+        'has_all_questions_block' => '',
+        'allQuestions_block' => ''
+    ));
+
     $this->parse('importXML_block', 'importXML');
 
     /* Render out breadcrumbs
