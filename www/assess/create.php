@@ -200,19 +200,20 @@ else {
     }
 
     $this->setVar(array(
-        'ACTION'             => 'create',
-        'ASSESS_ACTION'      => 'Create',
-        'ASSESS_KIND_LC'     => 'assess',
-        'ASSESS_KIND'        => 'Quiz',
-        'ASSESS_IS_TASK'     => $is_task ? 1 : 0,
-        'ASSESS_ASSESS_ID'   => '',
-        'ASSESS_CATEGORY_ID' => $category_id,
-        'ASSESS_UNIT_ID'     => $unit_id,
-        'ASSESS_TITLE'       => '',
-        'ASSESS_WEIGHT'      => 0,
-        'ASSESS_DESCRIPTION' => '',
-        'ASSESS_START_DATE'  => $assessDate->getLocalShort(),
-        'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort(),
+        'ACTION'                    => 'create',
+        'ASSESS_ACTION'             => 'Create',
+        'ASSESS_KIND_LC'            => 'assess',
+        'ASSESS_KIND'               => 'Quiz',
+        'ASSESS_IS_TASK'            => $is_task ? 1 : 0,
+        'ASSESS_ASSESS_ID'          => '',
+        'ASSESS_CATEGORY_ID'        => $category->getId(),
+        'ASSESS_CATEGORY_NAME'      => $category->getName(),
+        'ASSESS_UNIT_ID'            => $unit_id,
+        'ASSESS_TITLE'              => '',
+        'ASSESS_WEIGHT'             => 0,
+        'ASSESS_DESCRIPTION'        => '',
+        'ASSESS_START_DATE'         => $assessDate->getLocalShort(),
+        'ASSESS_FINISH_DATE'        => $assessEndDate->getLocalShort(),
         'ASSESS_COMPLETION_MESSAGE' => '',
     ));
 

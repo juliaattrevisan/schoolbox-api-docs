@@ -7,7 +7,6 @@
 <div class="row">
     <div class="small-12 columns">
         <span class='header-actions'>
-            <a href='/homepage/{ASSESS_CATEGORY_ID}' class='button icon-previous'>Return to Homepage</a>
             <!-- BEGIN importXML -->
             <a href="#" id="import" data-reveal-id="import-modal" class="button icon-upload">Import from XML file</a>
             <!-- END importXML -->
@@ -19,7 +18,10 @@
 
 <div class="row">
     <div class="small-12 large-8 island">
-        <h2 class="subheader">Initial Details</h2>
+        <ul class="meta">
+            <li class="icon-due-work icon-16"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a> Quiz</li>
+        </ul>
+
         <section>
             <div class="content">
                 <form name="create" action="/assess/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" method="post">
