@@ -521,7 +521,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 }
 
 .right-off-canvas-toggle{
-	@extend .hide-for-xlarge-up;
+	//@extend .hide-for-xlarge-up;
 
 	&:before{
 		text-align: center;
@@ -594,9 +594,10 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		}
 	}
   .right-off-canvas-menu{
-    position: static;
+    position: relative;
     transform: none;
     float: right;
+    top: -5rem;
   }
   .move-right > .inner-wrap {
     transform: none;
