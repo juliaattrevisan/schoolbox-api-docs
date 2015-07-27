@@ -36,6 +36,9 @@ $outputList = array();
 /* Fetch list of homepage colours for use */
 $colourList = Timetable_ColourMapper::getInstance()->findAll();
 
+/* Don't output if multiple timetables if external campus code is the same */
+$checked_campus_list = array();
+
 $child_id = $this->arg[0];
 if ($groupHandler->isParent()) {
     if (is_array($_SESSION['children'])) {
@@ -65,16 +68,12 @@ if ($groupHandler->isParent()) {
             //Output a timetable for each campus user is involved in
             $user       = $userHandler->getByID($child_id);
             $campusList = $userHandler->getUserCampus($child_id);
-
-            /* Don't output if multiple timetables if external campus code is the same */
-            $checked_campus_list = array();
             foreach ($campusList as $campus) {
                 $campusObj = Schoolbox\CampusMapper::getInstance()->findById($campus);
                 if ($campusObj instanceof Schoolbox\Campus) {
                     $campus_code = $campusObj->getExtTimetableCode();
                     if (!isset($checked_campus_list[$campus_code])) {
                         $checked_campus_list[$campus_code] = true;
-
                         $user['campus']     = $campusObj;
                         $user['campusName'] = $campusObj->getName();
                         $outputList[]       = $user;
@@ -90,10 +89,13 @@ if ($groupHandler->isParent()) {
         /** @var Schoolbox\User $userObject **/
         $userObject = $_SESSION['user'];
         $user       = $userHandler->getByID($userObject->getId());
-        foreach ($userObject->getCampusCollection() as $campus) {
-            $user['campus']     = $campus;
-            $user['campusName'] = $campus->getName();
-            $outputList[]       = $user;
+        foreach ($userObject->getCampusCollection() as $campusObj) {
+            $campus_code = $campusObj->getExtTimetableCode();
+            if (!isset($checked_campus_list[$campus_code])) {
+                $user['campus']     = $campus;
+                $user['campusName'] = $campus->getName();
+                $outputList[]       = $user;
+            }
         }
     }
 }
