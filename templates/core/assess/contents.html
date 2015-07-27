@@ -1,11 +1,13 @@
 <span class='header-actions'>
-    <a href='#' class='button icon-more' data-dropdown='header-options'>Options</a>
+    <a href='#' class='icon-more no-text' data-dropdown='header-options'></a>
 </span>
 <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
-    <li><a class="icon-add" href="/{ASSESS_KIND_LC}/section/create/{ASSESS_ASSESS_ID}">Add Section</a></li>
-    <li><a class="icon-modify" href="/{ASSESS_KIND_LC}/modify/{ASSESS_ASSESS_ID}">Modify</a></li>
+    <li><a href="#">{ASSESS_KIND}</a></li>
     <li><a class="icon-export" href="/{ASSESS_KIND_LC}/export/xml/{ASSESS_ASSESS_ID}">Export</a></li>
     <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/delete/{ASSESS_ASSESS_ID}" data-delete>Delete</a></li>
+    <li><a class="icon-modify" href="/{ASSESS_KIND_LC}/modify/{ASSESS_ASSESS_ID}">Modify</a></li>
+    <li><a href="#">Section</a></li>
+    <li><a class="icon-add" href="/{ASSESS_KIND_LC}/section/create/{ASSESS_ASSESS_ID}">Add Section</a></li>
 </ul>
 
 <h2 class="subheader">Sections</h2>
@@ -20,8 +22,12 @@
             <div class="one actions">
                 <a href='#' class='icon-more no-text' data-dropdown='section{SECTION_SECTION_ID}-options'></a>
                 <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='section{SECTION_SECTION_ID}-options'>
+                    <li><a href="#">This Section</a></li>
                     <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/section/delete/{SECTION_SECTION_ID}" data-delete>Delete</a></li>
                     <li><a class="icon-modify" href="/{ASSESS_KIND_LC}/section/modify/{SECTION_SECTION_ID}">Modify</a></li>
+                    <li><a href="#">Questions</a></li>
+                    <li><a class="icon-add" href="/{ASSESS_KIND_LC}/question/create/{SECTION_SECTION_ID}">New Question</a></li>
+                    <li><a class="icon-download" href="/{ASSESS_KIND_LC}/questionbank/contents/0/{ASSESS_ASSESS_ID}/{SECTION_SECTION_ID}">Add from Question Bank</a></li>
                 </ul>
             </div>
         </li>
@@ -31,9 +37,9 @@
         <li class='row' id='question_{QUESTION_QUESTION_ID}'>
             <div class="eleven-column">
                 <h4 data-seq>
-                    Q{QUESTION_SEQUENCE})
+                    Q{QUESTION_SEQUENCE}
                     <!-- BEGIN has_mark -->
-                    ({QUESTION_MARKS} marks)
+                    <span class="meta">({QUESTION_MARKS} marks)</span>
                     <!-- END has_mark -->
                 </h4>
 
@@ -49,9 +55,6 @@
         </li>
         <!-- END question -->
     </ul>
-
-    <a class="button icon-add" href="/{ASSESS_KIND_LC}/question/create/{SECTION_SECTION_ID}">New Question</a>
-    <a class="button icon-download" href="/{ASSESS_KIND_LC}/questionbank/contents/0/{ASSESS_ASSESS_ID}/{SECTION_SECTION_ID}">Add from Question Bank</a>
 </section>
 <!-- END section -->
 
@@ -82,9 +85,9 @@
                     var sequence = 1;
 
                     allQuestions.each(function (index, element) {
-                        var strong = $(element).children('strong[data-seq]');
+                        var seq = $(element).children('[data-seq]');
 
-                        strong.html(strong.text().trim().replace(/^Q\d+/, 'Q' + sequence));
+                        seq.html(seq.text().trim().replace(/^Q\d+/, 'Q' + sequence));
                         sequence++;
                     });
                 });
