@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
 $groupHandler  = new Group();
 $assessHandler = new Survey_Main();
 
@@ -67,6 +69,14 @@ if (!empty($_POST)) {
         error(117);
     }
 
+    try {
+        $folderMapper = new FolderMapper();
+        $folder = $folderMapper->findById($this->arg[0]);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(117);
+        exit;
+    }
+
     if ($groupHandler->getPermission($this->arg[0]) < WRITE_ACCESS) {
         error(126);
     }
@@ -91,7 +101,8 @@ if (!empty($_POST)) {
             'ASSESS_KIND_LC'                  => 'survey',
             'ASSESS_KIND'                     => 'Survey',
             'ASSESS_ASSESS_ID'                => '',
-            'ASSESS_CATEGORY_ID'              => $this->arg[0],
+            'ASSESS_CATEGORY_ID'              => $folder->getId(),
+            'ASSESS_CATEGORY_NAME'            => $folder->getName(),
             'ASSESS_TITLE'                    => '',
             'ASSESS_DESCRIPTION'              => '',
             'ASSESS_START_DATE'               => $assessDate->getLocalShort(),
@@ -177,5 +188,31 @@ if (!empty($_POST)) {
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setVar('allQuestions_block', '');
     $this->parse('importXML_block', 'importXML');
+
+    /* Render out breadcrumbs
+     */
+    $this->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
+
+    $allBreadcrumbs = $folderMapper->breadcrumb($folder, true);
+    $i = 1;
+
+    foreach ($allBreadcrumbs as $currentBreadcrumb) {
+        if ($i == $allBreadcrumbs->count()) {
+            $active = 'active';
+        }
+        else {
+            $active = '';
+        }
+
+        $this->setVar(array(
+            'BREADCRUMB_FOLDER_ID' => $currentBreadcrumb->getId(),
+            'BREADCRUMB_FOLDER_NAME' => $currentBreadcrumb->getName(),
+            'BREADCRUMB_ACTIVE' => $active,
+        ));
+
+        $this->parse('breadcrumb_block', 'breadcrumb', true);
+
+        $i++;
+    }
 }
 
