@@ -84,12 +84,44 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
         $relationMapper = UserRelationMapper::getInstance();
         $profileMapper  = UserProfileMapper::getInstance();
 
+        // Update this user's profile
+        try {
+            $profile = $profileMapper->findById($newUser['id']);
+        } catch (Exception $e) {
+            $profile = $profileMapper->createModel($newUser['id']);
+        }
+        $name    = trim($externalUser['StudentContactPreferred'].' '.$externalUser['StudentContactSurname']);
+        $address = implode(
+            ', ',
+            array_filter(
+                array_map(
+                    'trim',
+                    [
+                        $externalUser['StudentContactAddress1'],
+                        $externalUser['StudentContactAddress2'],
+                        $externalUser['StudentContactAddress3'],
+                    ]
+                )
+            )
+        );
+        $profile
+            ->setGuardian1Name($name)
+            ->setGuardian1HomePhone($externalUser['StudentContactPhoneActual'])
+            ->setGuardian1WorkPhone($externalUser['StudentContactOccupPhone'])
+            ->setGuardian1MobilePhone($externalUser['StudentContactMobilePhone'])
+            ->setGuardian1Address($address)
+            ->setGuardian1Suburb($externalUser['StudentContactSuburb'])
+            ->setGuardian1Postcode($externalUser['StudentContactPostCode'])
+            ->setGuardian1Email($externalUser['StudentContactDefaultEmail'])
+            ->setGuardian1MailAddress('')
+        ;
+        $profileMapper->save($profile);
+
         // Delete old relations
         $relationMapper->deleteByColumn('user_id', $newUser['id']);
 
         // Set up new relation for the parent
         $relations  = new \Schoolbox\Collection();
-        $profiles   = new \Schoolbox\Collection();
         $studentIds = array_map(
             function ($v) {
                 return 'S-' . $v;
@@ -106,69 +138,7 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
                     ->setRelation($student)
                     ->setRelationType(UserRelation::RELATION_TYPE_PARENT)
             );
-
-            // Update this student's profile
-            // Profile exists? update it, otherwise leave alone
-            try {
-                $profile = $profileMapper->findById($student->getId());
-            } catch (Exception $e) {
-                continue;
-            }
-
-            // Set guardian 1 if it isn't set yet, guardian 2 if it is,
-            // skip if both are set
-            $name    = trim($externalUser['StudentContactPreferred'].' '.$externalUser['StudentContactSurname']);
-            $address = implode(
-                ', ',
-                array_filter(
-                    array_map(
-                        'trim',
-                        [
-                            $externalUser['StudentContactAddress1'],
-                            $externalUser['StudentContactAddress2'],
-                            $externalUser['StudentContactAddress3'],
-                        ]
-                    )
-                )
-            );
-            if (strlen($profile->getGuardian1Name()) === 0) {
-                $profile
-                    ->setGuardian1Name($name)
-                    ->setGuardian1HomePhone($externalUser['StudentContactPhoneActual'])
-                    ->setGuardian1WorkPhone($externalUser['StudentContactOccupPhone'])
-                    ->setGuardian1MobilePhone($externalUser['StudentContactMobilePhone'])
-                    ->setGuardian1Address($address)
-                    ->setGuardian1Suburb($externalUser['StudentContactSuburb'])
-                    ->setGuardian1Postcode($externalUser['StudentContactPostCode'])
-                    ->setGuardian1Email($externalUser['StudentContactDefaultEmail'])
-                    ->setGuardian1MailAddress('')
-                    ->setGuardian2Name('')
-                    ->setGuardian2HomePhone('')
-                    ->setGuardian2WorkPhone('')
-                    ->setGuardian2MobilePhone('')
-                    ->setGuardian2Address('')
-                    ->setGuardian2Suburb('')
-                    ->setGuardian2Postcode('')
-                    ->setGuardian2Email('')
-                    ->setGuardian2MailAddress('')
-                ;
-                $profiles->add($profile);
-            } elseif (strlen($profile->getGuardian2Name()) === 0) {
-                $profile
-                    ->setGuardian2Name($name)
-                    ->setGuardian2HomePhone($externalUser['StudentContactPhoneActual'])
-                    ->setGuardian2WorkPhone($externalUser['StudentContactOccupPhone'])
-                    ->setGuardian2MobilePhone($externalUser['StudentContactMobilePhone'])
-                    ->setGuardian2Address($address)
-                    ->setGuardian2Suburb($externalUser['StudentContactSuburb'])
-                    ->setGuardian2Postcode($externalUser['StudentContactPostCode'])
-                    ->setGuardian2Email($externalUser['StudentContactDefaultEmail'])
-                    ->setGuardian2MailAddress('')
-                ;
-                $profiles->add($profile);
-            }
         }
         $relationMapper->save($relations);
-        $profileMapper->save($profiles);
     }
 }
