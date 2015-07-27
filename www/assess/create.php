@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -167,7 +168,8 @@ else {
     }
 
     try {
-        $category = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($category_id);
+        $folderMapper = new FolderMapper();
+        $category = $folderMapper->findById($category_id);
     } catch (\Schoolbox\Mapper\Exception $e) {
         error(117);
         exit;
@@ -304,6 +306,32 @@ else {
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setVar('allQuestions_block', '');
     $this->parse('importXML_block', 'importXML');
+
+    /* Render out breadcrumbs
+     */
+    $this->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
+
+    $allBreadcrumbs = $folderMapper->breadcrumb($category, true);
+    $i = 1;
+
+    foreach ($allBreadcrumbs as $currentBreadcrumb) {
+        if ($i == $allBreadcrumbs->count()) {
+            $active = 'active';
+        }
+        else {
+            $active = '';
+        }
+
+        $this->setVar(array(
+            'BREADCRUMB_FOLDER_ID' => $currentBreadcrumb->getId(),
+            'BREADCRUMB_FOLDER_NAME' => $currentBreadcrumb->getName(),
+            'BREADCRUMB_ACTIVE' => $active,
+        ));
+
+        $this->parse('breadcrumb_block', 'breadcrumb', true);
+
+        $i++;
+    }
 }
 
 
