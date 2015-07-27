@@ -66,14 +66,14 @@ if (!empty($_POST)) {
     SitePage::localRedir('/survey/section/create/' . $assess_id);
 } else {
     if (!is_numeric($this->arg[0])) {
-        error(117);
+        error(13);
     }
 
     try {
         $folderMapper = new FolderMapper();
         $folder = $folderMapper->findById($this->arg[0]);
     } catch (\Schoolbox\Mapper\Exception $e) {
-        error(117);
+        error(13);
         exit;
     }
 
@@ -110,6 +110,7 @@ if (!empty($_POST)) {
             'ASSESS_ANONYMOUS_RESULT_CHECKED' => '',
             'ASSESS_NOTIFY_AUTHOR_CHECKED'    => '',
             'ASSESS_COMPLETION_MESSAGE'       => '',
+            'HAS_ALL_QUESTIONS'               => 'large-12'
         )
     );
 

@@ -7,6 +7,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $groupHandler  = new Group();
 $assessHandler = new Survey_Main();
@@ -87,6 +88,15 @@ if (!empty($_POST)) {
     $assessStartDate  = new Alaress_Date_Format(strtotime($assess['start']), 'U');
     $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
+    $folderMapper = new FolderMapper();
+
+    try {
+        $folder = $folderMapper->findById($assess['category_id']);
+    }
+    catch (\Exception $e) {
+        error(117);
+    }
+
     $this->setVar(
         array(
             'ACTION'                          => 'modify',
@@ -94,7 +104,8 @@ if (!empty($_POST)) {
             'ASSESS_ACTION'                   => 'Modify',
             'ASSESS_KIND'                     => 'Survey',
             'ASSESS_KIND_LC'                  => 'survey',
-            'ASSESS_CATEGORY_ID'              => $assess['category_id'],
+            'ASSESS_CATEGORY_ID'              => $folder->getId(),
+            'ASSESS_CATEGORY_NAME'            => $folder->getName(),
             'ASSESS_TITLE'                    => Scrub::text($assess['title']),
             'ASSESS_DESCRIPTION'              => $assess['description'],
             'ASSESS_START_DATE'               => $assessStartDate->getLocalShort(),
@@ -102,6 +113,7 @@ if (!empty($_POST)) {
             'ASSESS_ANONYMOUS_RESULT_CHECKED' => $assess['anonymous_result'] ? 'checked="checked"' : '',
             'ASSESS_NOTIFY_AUTHOR_CHECKED'    => $assess['notify_author'] ? 'checked="checked"' : '',
             'ASSESS_COMPLETION_MESSAGE'       => Scrub::text($assess['completion_message']),
+            'HAS_ALL_QUESTIONS'               => 'large-8',
         )
     );
 
@@ -175,4 +187,30 @@ if (!empty($_POST)) {
     /* Prevent importXML form from appearing
      */
     $this->setVar('importXML_block', '');
+
+    /* Render out breadcrumbs
+     */
+    $this->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
+
+    $allBreadcrumbs = $folderMapper->breadcrumb($folder, true);
+    $i = 1;
+
+    foreach ($allBreadcrumbs as $currentBreadcrumb) {
+        if ($i == $allBreadcrumbs->count()) {
+            $active = 'active';
+        }
+        else {
+            $active = '';
+        }
+
+        $this->setVar(array(
+                'BREADCRUMB_FOLDER_ID' => $currentBreadcrumb->getId(),
+                'BREADCRUMB_FOLDER_NAME' => $currentBreadcrumb->getName(),
+                'BREADCRUMB_ACTIVE' => $active,
+            ));
+
+        $this->parse('breadcrumb_block', 'breadcrumb', true);
+
+        $i++;
+    }
 }
