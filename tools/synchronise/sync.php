@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-$options = getopt("v", array('perform-update', 'diagnostic'));
+$options = getopt("v", array('perform-update', 'diagnostic', 'site-location:'));
 
 echo "[".date('Y-m-d H:i:s')."] Running sync script\n";
 
@@ -16,7 +16,11 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 if (Cfg::get('external_sync_data') == 1) {
 
-    $siteLocation = Cfg::get('site_location');
+    if (isset($options['site-location'])) {
+        $siteLocation = $options['site-location'];
+    } else {
+        $siteLocation = Cfg::get('site_location');
+    }
 
     // check for Saint Something as best we can in a simple fashion
     if(preg_match('/^st([^aeiouyr])/', $siteLocation, $matches) > 0) {
