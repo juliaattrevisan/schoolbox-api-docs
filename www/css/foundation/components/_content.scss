@@ -552,6 +552,27 @@ table{
 	list-style: none;
 	margin: 0;
 	padding: 0;
+    &.sortable {
+        .ui-sortable-helper {
+            border-bottom: none;
+            background-color: darken($ocean-sunset, 7%);
+        }
+        .grip {
+            @include grid-column(1);
+            @extend .icon-grip;
+            @extend [class^="icon-"]; // (this is valid)
+
+            padding: 0;
+            text-align: center;
+            cursor: move;
+
+            &:before {
+                line-height: 3rem;
+                padding: 0;
+                color: $primary-color;
+            }
+        }
+    }
 	li{
 		border-bottom: 1px solid $body-bg;
 		position: relative;
