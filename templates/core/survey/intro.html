@@ -1,23 +1,75 @@
-<h2>{ASSESS_TITLE}</h2>
-<div class="wysiwyg">
-    {ASSESS_DESCRIPTION}
+<div class="row">
+    <div class="small-12 column">
+        <h1>{ASSESS_TITLE}</h1>
+        <ul class="meta">
+            <li class="icon-quiz"><a href="/homepage/{ASSESS_FOLDER_ID}">{ASSESS_FOLDER}</a> Quiz</li>
+        </ul>
+    </div>
 </div>
-
-<p><strong>Created by</strong><br />
-    {ASSESS_AUTHOR}
-</p>
-<table class="table ruler">
-    <thead>
-    <tr><th>Section</th><th>Number of questions</th></tr>
-    </thead>
-    <tbody>
-    <!-- BEGIN section -->
-    <tr><td>{SECTION_TITLE}</td><td>{SECTION_NUMQUESTIONS}</td></tr>
-    <!-- END section -->
-    </tbody>
-</table>
-<p class="clearfix">
-    <a href="/survey/init/{ASSESS_ASSESS_ID}/{FIRST_SECTION}" class="btn go-to float-left"><span></span >Begin Survey</a>
-</p>
-<!-- BEGIN startTest -->
-<!-- END startTest -->
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div class="content">
+                <h3>Time allowed: {ASSESS_DURATION}</h3>
+                <article>
+                    {ASSESS_DESCRIPTION}
+                </article>
+            </div>
+            <table>
+                <thead>
+                <tr><th>Section</th><th>Number of questions</th></tr>
+                </thead>
+                <tbody>
+                <!-- BEGIN section -->
+                <tr><td>{SECTION_TITLE}</td><td>{SECTION_NUMQUESTIONS}</td></tr>
+                <!-- END section -->
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 column">
+        <p>
+            <a href="/assess/init/{ASSESS_ASSESS_ID}/{FIRST_SECTION}" class="button expand secondary">Begin survey</a>
+        </p>
+        <!-- BEGIN startTest -->
+        <!-- END startTest -->
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <ul class="action-list">
+                <li class="row">
+                    <div class="small-11 column no-pad">
+                        <div class="info card">
+                            <a href="/homepage/{ASSESS_FOLDER_ID}">
+                                <h3>{ASSESS_FOLDER}</h3>
+                                <p class="meta">{ASSESS_FOLDER_CODES}</p>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="one actions">
+                        <a href="/homepage/{ASSESS_FOLDER_ID}" class="icon-next no-text"></a>
+                    </div>
+                </li>
+                <li class="row">
+                    <div class="small-10 column no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/{ASSESS_AUTHOR_ID}">
+                                <img src="/portrait.php?userId={ASSESS_AUTHOR_EXT_ID}&size=square64" />
+                                <h3>{ASSESS_AUTHOR}</h3>
+                                <p class="meta">{ASSESS_AUTHOR_ROLE}</p>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="two actions">
+                        <a href="/search/user/{ASSESS_AUTHOR_ID}" class="icon-next no-text"></a>
+                        <a href="#" class="icon-email no-text"></a>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+</div>
