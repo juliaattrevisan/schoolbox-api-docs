@@ -39,7 +39,7 @@ $bob->setTitle($body)
     ->setSeverity(\Monolog\Logger::INFO)
     ->setNamespace('ALERT')
     ->setHref('#')
-    ->setIcon('/images/icon.php?icon=bolt&size=32')
+    ->setIcon('/images/icon.php?icon=bolt&size=64')
     ->addTopic("notify.user.$userId")
     ->putMeta('ttl', 30)
     ->putMeta('title', 'Message from ' . $user->formatName());
