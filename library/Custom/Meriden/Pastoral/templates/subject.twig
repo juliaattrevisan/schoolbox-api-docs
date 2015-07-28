@@ -33,9 +33,9 @@
     {{ report.subjectReport.description }}
     </p>
 
-    {% if report.subjectReport.grades is not empty %}
     <dl id="course-info">
         {# course grade - derived from grade for this class #}
+        {% if report.subjectReport.namedGrades.courseGrade %}
         <dt>
             Course Grade
             <div class="description-link">[<a href="/homepage/3403">Grade Description</a>]</div>
@@ -71,7 +71,14 @@
                 </tbody>
             </table>
         </dd>
+        {% endif %}
 
+        {% if report.subjectReport.namedGrades.endeavourGrade1
+            or report.subjectReport.namedGrades.endeavourGrade2
+            or report.subjectReport.namedGrades.endeavourGrade3
+            or report.subjectReport.namedGrades.endeavourGrade4
+            or report.subjectReport.namedGrades.endeavourGrades
+        %}
         {# Endeavor Grades - was a rubric, now four separate assessments #}
         <dt class="fullwidth">
             Endeavour Grades
@@ -129,8 +136,10 @@
                 </tbody>
             </table>
         </dd>
+        {% endif %}
 
         {# Approaches to learning - another rubric #}
+        {% if report.subjectReport.namedGrades.learningApproaches %}
         <dt class="fullwidth">
             Approaches to Learning
             <div class="description-link">[<a href="/homepage/3462">Grade Description</a>]</div>
@@ -149,8 +158,10 @@
                 Unknown
             {% endif %}
         </dd>
+        {% endif %}
     </dl>
 
+    {% if report.subjectReport.grades %}
     <div id="assessment-info">
         <h2>
             Assessments
