@@ -74,7 +74,7 @@ $input-include-glowing-effect: false;
 $select-bg-color: $input-bg-color;
 $select-hover-bg-color: tint($warning-color, 50%);
 
-//  
+//
 // SWITCH
 //
 
@@ -158,6 +158,26 @@ input[type=radio]:checked +
 label.radio-label			{ background-position: 0 -48px; }
 input[type=checkbox]:checked +
 label.checkbox-label		{ background-position: 0 -120px; }
+
+// Toggle Checkbox
+input[type=checkbox] + label.checkbox-toggle{
+	background-color: $button-color;
+	font-weight: $font-weight-normal;
+	margin-left: 0;
+  height: 1.5rem;
+	width: 1.5rem;
+  text-align: center;
+	@include single-transition(background-color, 0.15s, linear);
+}
+
+input[type=checkbox]:hover + label.checkbox-toggle{
+	background-color: $button-bg-hover;
+}
+
+input[type=checkbox]:checked + label.checkbox-toggle{
+	background-color: $success-color;
+}
+
 
 // Component Forms
 .editPanel{
@@ -717,7 +737,7 @@ ul.az-error-list {
 		border: 2px solid tint($tertiary, 66%);
 		padding: 0.4rem;
 	}
-	
+
 	.dz-preview.dz-error .dz-error-mark,
 	.dropzone-previews .dz-preview.dz-error .dz-error-mark,
 	.dz-preview.dz-success .dz-success-mark,
