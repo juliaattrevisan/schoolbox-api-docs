@@ -359,38 +359,21 @@ class UserBulkMapper extends UserMapper
          * using the mappers in their current form
          */
 
-        /* If a default campus AND a set of campuses were chosen,
-         * apply campus updates and then assign the default.
+        /* Update campus settings
          */
-        $campusInvolvementUnchanged = in_array($this->getUnchanged(), array_values($allCampusIds));
-        if (($defaultCampusId != $this->getUnchanged())
-            && is_array($allCampusIds)
+        $defaultCampusChanged     = $defaultCampusId != $this->getUnchanged();
+        $campusInvolvementChanged = is_array($allCampusIds)
             && count($allCampusIds)
-        ) {
-            /* Only update the defaultCampus
-             */
-            if ($campusInvolvementUnchanged) {
-                $this->updateDefaultCampusOnly($user, $defaultCampusId);
-            }
-            /* Update defaultCampus and campus involvement
-             */
-            else {
+            && !in_array($this->getUnchanged(), array_values($allCampusIds));
+
+        if ($campusInvolvementChanged) {
+            if ($defaultCampusChanged) {
                 $this->updateAllCampusOptions($user, $defaultCampusId, $allCampusIds);
-            }
-        }
-        /* Only update the defaultCampus
-         */
-        else {
-            if ($defaultCampusId != $this->getUnchanged()) {
-                $this->updateDefaultCampusOnly($user, $defaultCampusId);
-            }
-            /* Otherwise if a set of campuses were chosen, apply campus updates
-             * defaultCampus, if unchanged, will always persist in campus choices.
-             * This results in the defaultCampus + any other new campuses chosen
-             */
-            elseif (!$campusInvolvementUnchanged && count($allCampusIds)) {
+            } else {
                 $this->updateCampusInvolvementOnly($user, $allCampusIds);
             }
+        } elseif ($defaultCampusChanged) {
+            $this->updateDefaultCampusOnly($user, $defaultCampusId);
         }
 
         /* Logging for Samuel
