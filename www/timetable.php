@@ -92,8 +92,8 @@ if ($groupHandler->isParent()) {
         foreach ($userObject->getCampusCollection() as $campusObj) {
             $campus_code = $campusObj->getExtTimetableCode();
             if (!isset($checked_campus_list[$campus_code])) {
-                $user['campus']     = $campus;
-                $user['campusName'] = $campus->getName();
+                $user['campus']     = $campusObj;
+                $user['campusName'] = $campusObj->getName();
                 $outputList[]       = $user;
             }
         }
@@ -204,6 +204,7 @@ if (is_array($outputList)) {
                                 }
 
                                 // format teacher output
+                                $period_staff = '';
 
                                 // if not staff and external db is enabled
                                 if (!$staffFlag && Cfg::get('external_enable')) {
@@ -226,9 +227,6 @@ if (is_array($outputList)) {
                                             break;
                                     }
                                 } // staff, or external_db is disabled
-                                else {
-                                    $period_staff = '';
-                                }
 
                                 $outputPeriod = array(
                                     'PERIOD_DESC'   => Scrub::Text($class['description']),
