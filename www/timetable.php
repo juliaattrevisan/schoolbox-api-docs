@@ -36,6 +36,9 @@ $outputList = array();
 /* Fetch list of homepage colours for use */
 $colourList = Timetable_ColourMapper::getInstance()->findAll();
 
+/* Don't output if multiple timetables if external campus code is the same */
+$checked_campus_list = array();
+
 $child_id = $this->arg[0];
 if ($groupHandler->isParent()) {
     if (is_array($_SESSION['children'])) {
@@ -65,16 +68,12 @@ if ($groupHandler->isParent()) {
             //Output a timetable for each campus user is involved in
             $user       = $userHandler->getByID($child_id);
             $campusList = $userHandler->getUserCampus($child_id);
-
-            /* Don't output if multiple timetables if external campus code is the same */
-            $checked_campus_list = array();
             foreach ($campusList as $campus) {
                 $campusObj = Schoolbox\CampusMapper::getInstance()->findById($campus);
                 if ($campusObj instanceof Schoolbox\Campus) {
                     $campus_code = $campusObj->getExtTimetableCode();
                     if (!isset($checked_campus_list[$campus_code])) {
                         $checked_campus_list[$campus_code] = true;
-
                         $user['campus']     = $campusObj;
                         $user['campusName'] = $campusObj->getName();
                         $outputList[]       = $user;
@@ -86,33 +85,17 @@ if ($groupHandler->isParent()) {
             error(19);
         }
     } else {
-        //Output a timetable for each campus a staff is involved in
-        if ($groupHandler->isStaff()) {
-            $user       = $userHandler->getByID($_SESSION['id']);
-            $campusList = $userHandler->getUserCampus($_SESSION['id']);
-
-            /* Don't output if multiple timetables if external campus code is the same */
-            $checked_campus_list = array();
-            foreach ($campusList as $campus) {
-                $campusObj = Schoolbox\CampusMapper::getInstance()->findById($campus);
-                if ($campusObj instanceof Schoolbox\Campus) {
-                    $campus_code = $campusObj->getExtTimetableCode();
-                    if (!isset($checked_campus_list[$campus_code])) {
-                        $checked_campus_list[$campus_code] = true;
-                        $user['campus']                    = $campusObj;
-                        $user['campusName']                = $campusObj->getName();
-                        $outputList[]                      = $user;
-                    }
-                }
+        // Output my own timetable (all campuses)
+        /** @var Schoolbox\User $userObject **/
+        $userObject = $_SESSION['user'];
+        $user       = $userHandler->getByID($userObject->getId());
+        foreach ($userObject->getCampusCollection() as $campusObj) {
+            $campus_code = $campusObj->getExtTimetableCode();
+            if (!isset($checked_campus_list[$campus_code])) {
+                $user['campus']     = $campusObj;
+                $user['campusName'] = $campusObj->getName();
+                $outputList[]       = $user;
             }
-        } else {
-            // Output only the student's default campus timetable
-            /** @var Schoolbox\User $userObject **/
-            $userObject         = $_SESSION['user'];
-            $user               = $userHandler->getByID($userObject->getId());
-            $user['campus']     = $userObject->getDefaultCampus();
-            $user['campusName'] = $userObject->getDefaultCampus()->getName();
-            $outputList[]       = $user;
         }
     }
 }
@@ -221,6 +204,7 @@ if (is_array($outputList)) {
                                 }
 
                                 // format teacher output
+                                $period_staff = '';
 
                                 // if not staff and external db is enabled
                                 if (!$staffFlag && Cfg::get('external_enable')) {
@@ -243,9 +227,6 @@ if (is_array($outputList)) {
                                             break;
                                     }
                                 } // staff, or external_db is disabled
-                                else {
-                                    $period_staff = '';
-                                }
 
                                 $outputPeriod = array(
                                     'PERIOD_DESC'   => Scrub::Text($class['description']),
