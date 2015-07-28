@@ -165,6 +165,8 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
             );
         } catch (Schoolbox\External\Exception $e) {
             // Can't fetch timetable? assume it's empty
+        }
+        if (empty($timetable)) {
             $timetable = array();
         }
 
@@ -172,6 +174,9 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
         $timetableStaff      = array();
         $timetableCategories = array();
         foreach ($timetable as $periodDetail) {
+            if (empty($periodDetail['class'])) {
+                continue;
+            }
             foreach ($periodDetail['class'] as $classDetail) {
                 // Build the day timetable detail.
                 $period             = $periodDetail + $classDetail;
