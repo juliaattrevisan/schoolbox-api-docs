@@ -11,6 +11,7 @@
         </thead>
         <tbody>
         {% for workItem in work %}
+        {% if workItem.assessment or workItem.quiz %}
         <tr>
             <td>
                 {% if workItem.assessment %}
@@ -44,6 +45,7 @@
                 {% endif %}
             </td>
         </tr>
+        {% endif %}
         {% endfor %}
         </tbody>
     </table>
