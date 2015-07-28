@@ -34,7 +34,7 @@ $externalUserId = 'CIS000041-02';
 $secret         = Config::get('remote_secret');
 $time           = time();
 
-$key = hash('sha256', $secret . $time . $externalUserId);
+$key = hash('sha256', $externalUserId.$time.$secret);
 
 /* Check if the $remoteUrl already has a query string in it. If so,
  * just appened the $key, $time and $id parameters
