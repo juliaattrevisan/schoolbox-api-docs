@@ -44,8 +44,8 @@
 @import "components/eotc/eotc";
 
 // Needs to be included outside of container in order to work
+@import "../../javascript/components/foundation/scss/foundation/components/reveal";
 @import "../../javascript/components/foundation/scss/foundation/components/tooltips";
-//@import "../../javascript/components/foundation/scss/foundation/components/reveal";
 @import "selectize.customisation";
 // combobox relies on selectize styles
 @import "components/combobox";
