@@ -121,9 +121,8 @@
                     var inner = jsEvent.find('.fc-content')
                     var title = jsEvent.find('.fc-title')
 
-                    // newer fullCalendar implementations escape event title -
-                    // we've already done this, so reset the title.
-                    title.html(calEvent.title);
+                    // We no longer escape title
+                    title.text(calEvent.title);
 
                     // If appropriate, indicate this event can be attended
                     var span = '<span class="att">(A)</span>';
