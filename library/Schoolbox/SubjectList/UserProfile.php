@@ -118,13 +118,11 @@ class UserProfile extends SubjectListAbstract
 
                         // Yes, you DO have to urlencode() this twice
                         // (It gets decoded twice in /homepage/index.php)
-                        $encodedCode = urlencode(urlencode($currentSubject['category']['code']->getCode()));
-
                         $this->getPage()->setVar(array(
                             'SUBJECT_NAME' => \Scrub::text($currentSubject['categoryName']),
                             'SUBJECT_URL'  => is_array($currentSubject['category'])
                                 && $this->getGroupHandler()->getPermission($currentSubject['category']['id']) >= READ_ACCESS
-                                    ? \Scrub::text("/homepage/code/".$encodedCode)
+                                    ? \Scrub::text("/homepage/code/".urlencode(urlencode($currentSubject['category']['code']->getCode())))
                                     : '#',
                         ));
 
