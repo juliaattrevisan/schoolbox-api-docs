@@ -189,8 +189,13 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                 $this->setVar('PERIOD_DESC', $class['description']);
                                 $this->setVar('PERIOD_CODE', '(' . $class['code'] . ')');
                                 $this->setVar('PERIOD_ROOM', $class['room']);
-                                $this->setVar('PERIOD_URL', '/homepage/code/' . urlencode($class['code']));
-
+                                // Yes you really do need to double url-encode this
+                                $this->setVar(
+                                    'PERIOD_URL',
+                                    Scrub::text(
+                                        '/homepage/code/' . urlencode(urlencode($class['code']))
+                                    )
+                                );
 
                                 /* Handle colour array */
                                 if ($class['code'] && !array_key_exists($class['code'], $subjectColourMap)) {
