@@ -587,14 +587,20 @@ class Factory
                 $markType->getSlug(),
                 $grade['assessment']
             );
-            $maxMark = $grade['assessment']->getMaxMark();
+            $maxMark    = $grade['assessment']->getMaxMark();
+            $prettyMean = $converter->convertRawMark($mean, $maxMark);
+            $prettySd   = $converter->convertRawMark($sd, $maxMark);
             $distribution['continuous']['mean'] = array(
-                'mark'        => round($mean, 2),
-                'pretty_mark' => $converter->convertRawMark($mean, $maxMark, true),
+                'mark'        => round($mean, 1),
+                'pretty_mark' => is_numeric($prettyMean)
+                    ? sprintf('%.1f', $prettyMean)
+                    : $prettyMean
             );
             $distribution['continuous']['sd'] = array(
-                'mark'        => round($sd, 2),
-                'pretty_mark' => $converter->convertRawMark($sd, $maxMark, true),
+                'mark'        => round($sd, 1),
+                'pretty_mark' => is_numeric($prettySd)
+                    ? sprintf('%.1f', $prettySd)
+                    : $prettySd
             );
         }
         return $distribution;
