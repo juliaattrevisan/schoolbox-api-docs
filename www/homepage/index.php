@@ -42,6 +42,7 @@ elseif (($this->arg[0] == $prefix) && (count($this->arg) > 1)) {
     $code = implode('/', $items);
 
     try {
+        // TODO investigate whether this needs to be double-decoded, or decoded at all
         $category = $categoryMapper->findByCode(urldecode(urldecode($code)));
     } catch (\Exception $e) {
         $this->pageNotFound();

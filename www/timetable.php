@@ -250,7 +250,13 @@ if (is_array($outputList)) {
                                 $this->setVar($outputPeriod);
 
                                 if ($catCache[$class['code']] && $groupHandler->getPermission($catCache[$class['code']]) >= READ_ACCESS) {
-                                    $this->setVar('PERIOD_URL', '/homepage/code/' . $class['code']);
+                                    // Yes you really do need to double url-encode this
+                                    $this->setVar(
+                                        'PERIOD_URL',
+                                        Scrub::text(
+                                            '/homepage/code/' . urlencode(urlencode($class['code']))
+                                        )
+                                    );
                                     $this->parse('period_class_link_block', 'period_class_link', true);
                                 } else {
                                     $this->parse('period_class_block', 'period_class', true);

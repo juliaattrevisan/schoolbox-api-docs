@@ -116,9 +116,16 @@ class UserProfile extends SubjectListAbstract
                             $code = $currentSubject['subject']['campusCode'].'/'.$currentSubject['subject']['code'];
                         }
 
+                        // Yes, you DO have to urlencode() this twice
+                        // (It gets decoded twice in /homepage/index.php)
+                        $encodedCode = urlencode(urlencode($currentSubject['category']['code']->getCode()));
+
                         $this->getPage()->setVar(array(
                             'SUBJECT_NAME' => \Scrub::text($currentSubject['categoryName']),
-                            'SUBJECT_URL' => is_array($currentSubject['category']) && $this->getGroupHandler()->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/code/{$currentSubject['category']['code']->getCode()}": '#',
+                            'SUBJECT_URL'  => is_array($currentSubject['category'])
+                                && $this->getGroupHandler()->getPermission($currentSubject['category']['id']) >= READ_ACCESS
+                                    ? \Scrub::text("/homepage/code/".$encodedCode)
+                                    : '#',
                         ));
 
                         /* Fetch teacher names */

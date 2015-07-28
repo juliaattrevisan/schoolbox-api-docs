@@ -65,9 +65,12 @@ class SideNav extends SubjectListAbstract {
 						if ($isStaff && !empty($currentSubject['subject']['code'])) {
 							$name .= ' ('.$currentSubject['subject']['code'].')';
 						}
+						// Yes, you DO have to urlencode() this twice
+						// (It gets decoded twice in /homepage/index.php)
+						$encodedCode = urlencode(urlencode($currentSubject['subject']['code']));
 						$this->getPage()->setVar(array(
 							'SUBJECT_NAME' => \Scrub::text($name),
-							'SUBJECT_URL' =>  "/homepage/code/{$currentSubject['subject']['code']}",
+							'SUBJECT_URL' =>  \Scrub::text("/homepage/code/".$encodedCode),
 						));
 
 						$this->getPage()->parse('msubject_item_block', 'msubject_item', true);
