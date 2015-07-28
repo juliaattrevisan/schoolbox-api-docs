@@ -208,8 +208,8 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
             $timetableCampus = $timetableCampusMapper->findById($cycle->getId());
 //            printf("Updating timetable campus \"%s\"\n", $campusCode);
         } catch (\Schoolbox\Mapper\Exception $e) {
-            // Assume this timetable started this Monday, and continues forever
-            $startDate       = new Datetime('this Monday');
+            // Assume this timetable started last Monday, and continues forever
+            $startDate       = new Datetime('last Monday');
             $timetableCampus = $timetableCampusMapper->createModel($cycle->getId());
             $timetableCampus
                 ->setCampus($campus)
