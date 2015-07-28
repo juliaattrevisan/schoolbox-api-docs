@@ -20,6 +20,11 @@ require_once '../include/Bootstrap.php';
 // Alaress_Image_Cache_Portrait needs to know if someone is logged in.
 session_start();
 
+/* If current user is not available return permission denied */
+if(! ($_SESSION['user'] instanceof Schoolbox\User)) {
+    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 403);
+}
+
 try {
 
     $image = new Image\Processor\Standard(
