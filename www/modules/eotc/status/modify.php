@@ -84,11 +84,11 @@ if ($event->getMetadata()->getRamsRequired()) {
 	 */
     foreach ($event->getMetadata()->getRamsFiles() as $ramsFile) {
         $mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
-        $mimetype = $mimetypeMapper->getByFilename($ramsFile->getFilename());
+        $mimetype = $mimetypeMapper->getByFilename($ramsFile->getBasename());
 
         $this->setVar(array(
-            'EVENT_RAMS_FILE' => $ramsFile->getFilename(),
-            'EVENT_RAMS_FILESIZE' => $ramsFile->getFilesize(),
+            'EVENT_RAMS_FILE' => $ramsFile->getBasename(),
+            'EVENT_RAMS_FILESIZE' => $ramsFile->getSize(),
             'EVENT_RAMS_MIMETYPE_ICONFILE' => $mimetype->getIconFile(),
             'EVENT_RAMS_HASH' => $ramsFile->getHash(),
         ));

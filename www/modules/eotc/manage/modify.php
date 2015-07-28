@@ -121,7 +121,7 @@ if (is_numeric($_GET['eventID'])) {
                     array(
                         'EVENT_RAMS_HASH'              => $ramsFile->getHash(),
                         'EVENT_RAMS_FILESIZE'          => $ramsFile->getSize(),
-                        'EVENT_RAMS_FILE'              => $ramsFile->getFilename(),
+                        'EVENT_RAMS_FILE'              => $ramsFile->getBasename(),
                         'EVENT_RAMS_MIMETYPE_ICONFILE' => $mimetype->getIconFile(),
                     )
                 );
