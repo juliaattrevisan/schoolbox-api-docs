@@ -559,6 +559,8 @@ if (is_numeric($this->arg[0])) {
                                 }
                             }
                         }
+                    } else {
+                        $this->setVar('emergency_block', '');
                     }
 
                     if (trim($synInfo['AlertMessage']) && $groupHandler->isStaff()) {
