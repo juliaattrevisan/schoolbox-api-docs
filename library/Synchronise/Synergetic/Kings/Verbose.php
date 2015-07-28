@@ -9,4 +9,7 @@
  */
 class Synchronise_Synergetic_Kings_Verbose extends Synchronise_Base_Verbose {
 
+    public function outputMessage($message) {
+        $this->allResults[] = $message;
+    }
 }
