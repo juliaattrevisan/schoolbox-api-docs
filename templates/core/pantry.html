@@ -1809,31 +1809,39 @@
     <h5 data-magellan-destination="js">Awesome JS Goodness</h5>
 
     <hr>
-    <h1 id="orbit">Orbit</h1>
-    <div class="row">
-        <div class="large-12 columns">
-            <ul id="featured1" data-orbit data-options="timer_speed:5000;">
-                <li>
-                    <img src="http://foundation.zurb.com/docs/assets/img/examples/satelite-orbit.jpg" alt=""/>
-                    <div class="orbit-caption">
-                        Caption One. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                    </div>
-                </li>
-                <li>
-                    <img src="http://foundation.zurb.com/docs/assets/img/examples/andromeda-orbit.jpg" alt=""/>
-                    <div class="orbit-caption">
-                        Caption Two. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                    </div>
-                </li>
-                <li>
-                    <img src="http://foundation.zurb.com/docs/assets/img/examples/launch-orbit.jpg" alt=""/>
-                    <div class="orbit-caption">
-                        Caption Three. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                    </div>
-                </li>
-            </ul>
+    <h1 id="imageslider">Image Slider</h1>
+        <!-- Custom javascript -->
+        <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
+        <script type="text/javascript">
+            $(function(){
+              $('[data-imageslider]').anyslider({
+                    interval: 200,
+                    prevLabel: '',
+                    nextLabel: ''
+                });
+            });
+        </script>
+        <div class="row">
+            <div class="small-12 island imageslider-container">
+                <div data-imageslider class="imageslider">
+                  <div>
+                  <a href="http://foundation.zurb.com/docs/assets/img/examples/comet.jpg"><img data-caption="Nulla vitae elit libero, a pharetra augue. Cras mattis consectetur purus sit amet fermentum." src="http://foundation.zurb.com/docs/assets/img/examples/comet-th-sm.jpg" alt=""></a>
+                  </div>
+                  <div>
+                  <a href="http://foundation.zurb.com/docs/assets/img/examples/earth.jpg"><img src="http://foundation.zurb.com/docs/assets/img/examples/earth-th-sm.jpg" alt=""></a>
+                  </div>
+                  <div>
+                  <a href="http://foundation.zurb.com/docs/assets/img/examples/launch.jpg"><img data-caption="Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus." src="http://foundation.zurb.com/docs/assets/img/examples/launch-th-sm.jpg" alt=""></a>
+                  </div>
+                  <div>
+                  <a href="http://foundation.zurb.com/docs/assets/img/examples/satelite.jpg"><img src="http://foundation.zurb.com/docs/assets/img/examples/satelite-th-sm.jpg" alt=""></a>
+                  </div>
+                  <div>
+                  <a href="http://foundation.zurb.com/docs/assets/img/examples/space.jpg"><img data-caption="Integer posuere erat a ante venenatis dapibus posuere velit aliquet." src="http://foundation.zurb.com/docs/assets/img/examples/space-th-sm.jpg" alt=""></a>
+                  </div>
+                </div>
+            </div>
         </div>
-    </div>
 
     <hr>
     <h1 id="panels">Panels</h1>
