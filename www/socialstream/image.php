@@ -56,6 +56,6 @@ try {
         new Imagine\Processor\Strategy\Factory()
     );
     $processor->load()->stream();
-} catch (\Exception_Schoolbox $e) {
+} catch (\Exception $e) {
     \SitePage::redirectToBrokenImageWithTransform('storage', $size);
 }
