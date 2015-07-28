@@ -1584,11 +1584,6 @@
                     <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
                     <input type="text" placeholder="large-12.columns" />
                 </label>
-            </fieldset>
-        </div>
-        <div class="row">
-            <fieldset>
-                <legend>Legend</legend>
                 <div class="row">
                     <label>Input Label</label>
                     <div class="small-9 columns">
@@ -1598,19 +1593,20 @@
                         <span class="postfix">.com</span>
                     </div>
                 </div>
+                <label>Select Box
+                    <select>
+                        <option value="husker">Husker</option>
+                        <option value="starbuck">Starbuck</option>
+                        <option value="hotdog">Hot Dog</option>
+                        <option value="apollo">Apollo</option>
+                    </select>
+                </label>
+                <label>Textarea Label
+                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
+                    <textarea placeholder="small-12.columns"></textarea>
+                </label>
             </fieldset>
         </div>
-        <fieldset>
-            <legend>Legend</legend>
-            <label>Select Box
-                <select>
-                    <option value="husker">Husker</option>
-                    <option value="starbuck">Starbuck</option>
-                    <option value="hotdog">Hot Dog</option>
-                    <option value="apollo">Apollo</option>
-                </select>
-            </label>
-        </fieldset>
         <div class="row">
             <fieldset>
                 <legend>Fancy</legend>
@@ -1624,15 +1620,52 @@
                     <input id="checkbox1" type="checkbox"><label for="checkbox1" class="checkbox-label">Checkbox 1</label>
                     <input id="checkbox2" type="checkbox"><label for="checkbox2" class="checkbox-label">Checkbox 2</label>
                 </div>
+                <div class="column small-12">
+                    <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+                    <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+                    <script type="text/javascript">
+                        $(function() {
+                            $('[data-selectizeuser]')
+                                    .selectizeSelector({
+                                        ajax: {
+                                            url:      '/ajax/user.php',
+                                            type:     'GET',
+                                            data:     {showCampus: true},
+                                            dataType: 'json'
+                                        }
+                                    })
+                            ;
+                        });
+                    </script>
+                    <label>AutoSuggest / Selectize</label>
+                    <input id='userId' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
+                </div>
             </fieldset>
         </div>
         <div class="row">
             <fieldset>
-                <legend>Legend</legend>
-                <label>Textarea Label
-                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
-                    <textarea placeholder="small-12.columns"></textarea>
-                </label>
+                <legend>Dates and Times</legend>
+                <div class="column small-12">
+                    <p>
+                        When invoking <code>$.timepicker()</code>, use the <code>appendTo</code> option to attach to the parent of the <code>label</code>.
+                        That way, the picker dropdown can adopt a width to match the input, which will be 100% of its container&mdash;ignore the "too wide" issue for now.
+                    </p>
+                </div>
+                <div class="column small-4">
+                    <label>Date:
+                        <input type="text" class="datepicker">
+                    </label>
+                </div>
+                <div class="column small-4">
+                    <label>Select start:
+                        <input class="timepicker" type="text" autocomplete="off" />
+                    </label>
+                </div>
+                <div class="column small-4">
+                    <label>Select end:
+                        <input class="timepicker" type="text" autocomplete="off" />
+                    </label>
+                </div>
             </fieldset>
         </div>
         <input type="submit" name='submit' value="Send" />
@@ -1655,31 +1688,6 @@
         </ul>
     </article>
     <hr>
-
-    <h1>Datepicker</h1>
-    <p><label>Date: <input type="text" id="datepicker"></label></p>
-    <hr>
-
-    <h1>AutoSuggest / Selectize</h1>
-    <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-    <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-    <script type="text/javascript">
-        $(function() {
-            $('[data-selectizeuser]')
-                .selectizeSelector({
-                    ajax: {
-                        url:      '/ajax/user.php',
-                        type:     'GET',
-                        data:     {showCampus: true},
-                        dataType: 'json'
-                    }
-                })
-            ;
-        });
-    </script>
-    <input id='userId' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
-    <hr>
-
     <h1 id="block-grid">Block Grid</h1>
     <ul class="small-block-grid-2 large-block-grid-4">
         <li><img class="th" src="https://placeimg.com/300/300/animals" alt=""></li>
@@ -2231,8 +2239,8 @@
 <!-- DataTables CSS -->
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.5/css/jquery.dataTables.css">
 <!-- DataTables -->
-<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.js"></script>
-
+<script type="text/javascript" charset="utf-8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
 <script>
     $(document).ready( function () {
 
@@ -2259,7 +2267,7 @@
         });
 
         $(function() {
-            $("#datepicker").datepicker();
+            $(".datepicker").datepicker();
         });
 
         Dropzone.options.socialZone = {
@@ -2289,6 +2297,12 @@
             $(this).toggleClass('icon-add icon-collapse');
             $(this).closest('li').toggleClass('expanded');
             event.preventDefault();
+        });
+
+        $('.timepicker').timepicker({
+            appendTo: function ($input) {
+                return $input.closest('.column');
+            }
         });
 
     });
