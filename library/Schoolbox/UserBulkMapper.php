@@ -359,38 +359,21 @@ class UserBulkMapper extends UserMapper
          * using the mappers in their current form
          */
 
-        /* If a default campus AND a set of campuses were chosen,
-         * apply campus updates and then assign the default.
+        /* Update campus settings
          */
-        if (($defaultCampusId != $this->getUnchanged()) && is_array($allCampusIds) && count($allCampusIds)) {
-            $campusInvolvementUnchanged = in_array($this->getUnchanged(), array_values($allCampusIds));
+        $defaultCampusChanged     = $defaultCampusId != $this->getUnchanged();
+        $campusInvolvementChanged = is_array($allCampusIds)
+            && count($allCampusIds)
+            && !in_array($this->getUnchanged(), array_values($allCampusIds));
 
-            /* Only update the defaultCampus
-             */
-            if ($campusInvolvementUnchanged) {
-                $this->updateDefaultCampusOnly($user, $defaultCampusId);
-            }
-            /* Update defaultCampus and campus involvement
-             */
-            else {
+        if ($campusInvolvementChanged) {
+            if ($defaultCampusChanged) {
                 $this->updateAllCampusOptions($user, $defaultCampusId, $allCampusIds);
+            } else {
+                $this->updateCampusInvolvementOnly($user, $allCampusIds);
             }
-        }
-        /* Only update the defaultCampus
-         */
-        else {
-            if ($defaultCampusId != $this->getUnchanged()) {
-                $this->updateDefaultCampusOnly($user, $defaultCampusId);
-            }
-            /* Otherwise if a set of campuses were chosen, apply campus updates
-             * defaultCampus, if unchanged, will always persist in campus choices.
-             * This results in the defaultCampus + any other new campuses chosen
-             */
-            else {
-                if (count($allCampusIds)) {
-                    $this->updateCampusInvolvementOnly($user, $allCampusIds);
-                }
-            }
+        } elseif ($defaultCampusChanged) {
+            $this->updateDefaultCampusOnly($user, $defaultCampusId);
         }
 
         /* Logging for Samuel
