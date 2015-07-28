@@ -210,18 +210,20 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $activity = new Activity;
 
-        if($result instanceof ReturnedWork) {
+        if ($result instanceof ReturnedWork) {
             /* Handle submission box result */
-            $activity->setSubmissionBox(SubmissionBoxMapper::getInstance()->findById($result->getSubmissionBox()->getId()));
+            $box = SubmissionBoxMapper::getInstance()->findById($result->getSubmissionBox()->getId());
+            $activity->setSubmissionBox($box);
+            $activity->setCategory($box->getCategory());
             $marker = UserMapper::getInstance()->findById($result->getMarker());
             $student = UserMapper::getInstance()->findById($result->getOwner()->getId());
             $mark = $result->getNormalizedMark();
             $comment = $result->getComment();
-
-        }
-        else if($result instanceof Attempt) {
+        } elseif ($result instanceof Attempt) {
             /* Handle quiz attempt */
-            $activity->setAssessment(\Schoolbox\Assessment\Component\OnlineAssessmentMapper::getInstance()->findByID($result->getAssessment()->getId()));
+            $quiz = \Schoolbox\Assessment\Component\OnlineAssessmentMapper::getInstance()->findByID($result->getAssessment()->getId());
+            $activity->setAssessment($quiz);
+            $activity->setCategory($quiz->getCategory());
             $student = UserMapper::getInstance()->findById($result->getUser()->getId());
             $marker = $activity->getAssessment()->getUser();
 
@@ -235,6 +237,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         else {
             throw new \Exception('Unknown object passed');
         }
+        $activity->setOwner($student);
 
         $assessmentRemoteList = $this->getAssessment($activity);
 
