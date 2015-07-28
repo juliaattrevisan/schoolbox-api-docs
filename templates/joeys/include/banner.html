@@ -1,9 +1,10 @@
-<a class="logo" title="St. Josephs College" href="/">St. Josephs College</a>
 <!-- BEGIN banner_logged_in -->
 <ul id="infoPanel">
-	<li class="first">{SITE_GREETING} <a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">{SITE_LOGINNAME}</a></li>
-  <li class="more">
-    <a href="#" data-menu="account-menu">&#9660;</a>
+  <li class="user first avatar">
+    <a href="/search/user/{USER_ID}" title="View Profile" data-menu="account-menu">
+      <span>{SITE_LOGINNAME}</span>
+      <img height="32" width="32" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square32"/>
+    </a>
     <ul id="account-menu" class="flyout-menu">
       <li>
         <a href="/search/user/{USER_ID}">Profile</a>
@@ -37,9 +38,11 @@
   {INSTANTMESSAGE_BLOCK}
 </ul>
 <form id="search" action="/search" method="get">
-	<fieldset>
-  	<input id="search-field" type="text" name="keyword" placeholder="search" />
-    <input id="search-button" type="image" src="/images/{SITE_LOCATION}/search-button.gif" value="Search" />
-  </fieldset>
+    <fieldset>
+        <input id="search-field" type="text" name="keyword" placeholder="Search"/>
+        <input id="search-button" type="submit" value="Search"/>
+    </fieldset>
 </form>
 <!-- END banner_logged_in -->
+<a href="/" class="logo"><img src="/images/{SITE_LOCATION}/logo.png" height="34" width="172" alt="{SITE_NAME}"/></a>
+
