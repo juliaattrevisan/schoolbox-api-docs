@@ -41,6 +41,9 @@ class Synchronise_External_Cis_Strategy_Student extends Synchronise_Base_Strateg
             ->addHydrator(new Synchronise_Base_Hydrator_Student())
             ->addHydrator(new Synchronise_Base_Hydrator_BasicMapping('ID', 'synergy_id', 'S-%s'))
             ->addHydrator(new Synchronise_Base_Hydrator_BasicMapping('StudentID', 'username'))
+            ->addHydrator(new Synchronise_Base_Hydrator_BasicValue('group_id', 22))
+            ->addHydrator(new Synchronise_Base_Hydrator_BasicValue('campus', [3]))
+            ->addHydrator(new Synchronise_Base_Hydrator_BasicValue('defaultCampus', 3))
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;

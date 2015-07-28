@@ -37,6 +37,7 @@ class Synchronise_External_Cis_Strategy_Staff extends Synchronise_Base_Strategy_
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
             ->addHydrator(new Synchronise_Base_Hydrator_BasicMapping('ID', 'synergy_id', 'T-%s'))
+            ->addHydrator(new Synchronise_Base_Hydrator_AllCampus())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
