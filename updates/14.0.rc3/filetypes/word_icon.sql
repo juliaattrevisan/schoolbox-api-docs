@@ -1,1 +1,0 @@
-UPDATE allowedFileTypes SET iconFile = 'msword_doc.png' WHERE mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';

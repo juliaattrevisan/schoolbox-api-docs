@@ -1,1 +1,0 @@
-UPDATE file SET mime_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' WHERE realname like '%.docx';
