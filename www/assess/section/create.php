@@ -66,6 +66,9 @@ if (!empty($_POST)) {
         error(117);
     }
 
+    $assessStartDate  = new Alaress_Date_Format(strtotime($assess['start']), 'U');
+    $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
+
     /* Render create page
      */
     $this->setFile(TEMPLATE_content, 'assess/section/create.html');
@@ -75,13 +78,17 @@ if (!empty($_POST)) {
     $sectionHandler = new Assess_Section();
 
     $this->setVar(array(
-        'ASSESS_ASSESS_ID' => $this->arg[0],
-        'ASSESS_KIND_LC'   => 'assess',
-        'ASSESS_KIND'      => 'Quiz',
-        'ASSESS_TITLE' => Scrub::text($assess['title']),
-        'ASSESS_CATEGORY_ID' => $assess['category_id'],
-        'SECTION_ID' => '',
-        'SEQUENCE' => $sectionHandler->getNextSequence($this->arg[0])
+        'ASSESS_ASSESS_ID'     => $this->arg[0],
+        'ASSESS_KIND_LC'       => 'assess',
+        'ASSESS_KIND'          => 'Quiz',
+        'ASSESS_TITLE'         => Scrub::text($assess['title']),
+        'ASSESS_START_DATE'    => $assessStartDate->getLocalShort(),
+        'ASSESS_FINISH_DATE'   => $assessFinishDate->getLocalShort(),
+        'ASSESS_CATEGORY_ID'   => $folder->getId(),
+        'ASSESS_CATEGORY_NAME' => $folder->getName(),
+        'ASSESS_DURATION'      => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
+        'SECTION_ID'           => '',
+        'SEQUENCE'             => $sectionHandler->getNextSequence($this->arg[0])
     ));
 
     /* Show this Assess' contents
