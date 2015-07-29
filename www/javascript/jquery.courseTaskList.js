@@ -165,7 +165,7 @@
                 //submitSaveTaskForm($(this), false);
                 if (form.data("interaction") == 'create_task' && settings.units.length > 0) {
                     // Rewire copy task events
-                    copyTaskDialog.off('click.courseTaskList', '[data-action]');
+                    copyTaskDialog.off('click.courseTaskList', '[data-action="copy_task"]');
                     copyTaskDialog.on(
                         'click.courseTaskList',
                         '[data-action="copy_task"]',
@@ -175,6 +175,7 @@
                             form.trigger('submitCopy.courseTaskList');
                         }
                     );
+                    copyTaskDialog.off('click.courseTaskList', '[data-action="no_copy_task"]');
                     copyTaskDialog.on(
                         'click.courseTaskList',
                         '[data-action="no_copy_task"]',
@@ -184,6 +185,7 @@
                             form.trigger('submitNoCopy.courseTaskList');
                         }
                     );
+                    copyTaskDialog.off('click.courseTaskList', '[data-action="cancel"]');
                     copyTaskDialog.on(
                         'click.courseTaskList',
                         '[data-action="cancel"]',
