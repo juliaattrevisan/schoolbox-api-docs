@@ -1597,6 +1597,28 @@
         <input id="exampleCheckboxSwitch" type="checkbox">
         <label for="exampleCheckboxSwitch"></label>
     </div>
+    
+    <div>
+        <h3>Checkbox Switch with Text</h3>
+        <input id="textCheckboxToggle" type="checkbox">
+        <label for="textCheckboxToggle" class="checkbox-toggle">V</label>
+        <input id="textCheckboxToggle2" type="checkbox">
+        <label for="textCheckboxToggle2" class="checkbox-toggle">A</label>
+        <input id="textCheckboxToggle3" type="checkbox">
+        <label for="textCheckboxToggle3" class="checkbox-toggle">P</label>
+        <input id="textCheckboxToggle4" type="checkbox">
+        <label for="textCheckboxToggle4" class="checkbox-toggle">O</label>
+        <input id="textCheckboxToggle5" type="checkbox">
+        <label for="textCheckboxToggle5" class="checkbox-toggle">R</label>
+        <input id="textCheckboxToggle6" type="checkbox">
+        <label for="textCheckboxToggle6" class="checkbox-toggle">W</label>
+        <input id="textCheckboxToggle7" type="checkbox">
+        <label for="textCheckboxToggle7" class="checkbox-toggle">A</label>
+        <input id="textCheckboxToggle8" type="checkbox">
+        <label for="textCheckboxToggle8" class="checkbox-toggle">V</label>
+        <input id="textCheckboxToggle9" type="checkbox">
+        <label for="textCheckboxToggle9" class="checkbox-toggle">E</label>
+    </div>
 
     <hr>
     <h1 id="alert-boxes">Alert Boxes</h1>
@@ -1809,13 +1831,13 @@
     <h5 data-magellan-destination="js">Awesome JS Goodness</h5>
 
     <hr>
-    <h1 id="imageslider">Image Slider</h1>
+    <h1 id="image-slider">Image Slider</h1>
         <!-- Custom javascript -->
         <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
         <script type="text/javascript">
             $(function(){
               $('[data-imageslider]').anyslider({
-                    interval: 200,
+                    interval: 2000,
                     prevLabel: '',
                     nextLabel: ''
                 });
@@ -1823,23 +1845,17 @@
         </script>
         <div class="row">
             <div class="small-12 island imageslider-container">
-                <div data-imageslider class="imageslider">
-                  <div>
-                  <a href="http://foundation.zurb.com/docs/assets/img/examples/comet.jpg"><img data-caption="Nulla vitae elit libero, a pharetra augue. Cras mattis consectetur purus sit amet fermentum." src="http://foundation.zurb.com/docs/assets/img/examples/comet-th-sm.jpg" alt=""></a>
-                  </div>
-                  <div>
-                  <a href="http://foundation.zurb.com/docs/assets/img/examples/earth.jpg"><img src="http://foundation.zurb.com/docs/assets/img/examples/earth-th-sm.jpg" alt=""></a>
-                  </div>
-                  <div>
-                  <a href="http://foundation.zurb.com/docs/assets/img/examples/launch.jpg"><img data-caption="Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus." src="http://foundation.zurb.com/docs/assets/img/examples/launch-th-sm.jpg" alt=""></a>
-                  </div>
-                  <div>
-                  <a href="http://foundation.zurb.com/docs/assets/img/examples/satelite.jpg"><img src="http://foundation.zurb.com/docs/assets/img/examples/satelite-th-sm.jpg" alt=""></a>
-                  </div>
-                  <div>
-                  <a href="http://foundation.zurb.com/docs/assets/img/examples/space.jpg"><img data-caption="Integer posuere erat a ante venenatis dapibus posuere velit aliquet." src="http://foundation.zurb.com/docs/assets/img/examples/space-th-sm.jpg" alt=""></a>
+              <section>
+                <div class="content">
+                  <div data-imageslider class="imageslider">
+                      <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                      <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                      <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                      <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                      <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
                   </div>
                 </div>
+              </section>
             </div>
         </div>
 
@@ -2159,7 +2175,6 @@
             </ul>
         </section>
     </nav>
-
     <!-- End Top Bar -->
     <hr>
 
@@ -2198,7 +2213,9 @@
     <h5 class="subheader">h5.subheader</h5>
     <h6 class="subheader">h6.subheader</h6>
 
-    <h1>Blockquote</h1>
+    <hr>
+
+    <h1 id="blockquote">Blockquote</h1>
     <blockquote>Just because everything else is square, doesn't mean the switch can't be round.<cite>Matthew Sambell</cite></blockquote>
 
     <hr>
@@ -2317,7 +2334,7 @@
             handle:      '.grip',
             axis:        'y',
         });
-        
+
 
 
 

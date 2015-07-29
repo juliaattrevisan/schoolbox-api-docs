@@ -365,6 +365,37 @@ $tooltip-font-color: $white;
 // $range-slider-handle-bg-hover-color: scale-color($primary-color, $lightness: -12%);
 // $range-slider-handle-cursor: pointer;
 
+//
+// CLEARING LIGHTBOX
+//
+
+// $include-html-clearing-classes: $include-html-classes;
+
+// We use these to set the background colors for parts of Clearing.
+$clearing-bg: rgba(0,0,0,0.9);
+$clearing-caption-bg: transparent;
+$clearing-carousel-bg: transparent;
+$clearing-img-bg: transparent;
+
+// We use these to style the close button
+$clearing-close-color: $white;
+$clearing-close-size: 30px;
+
+// We use these to style the arrows
+// $clearing-arrow-size: 12px;
+// $clearing-arrow-color: $clearing-close-color;
+
+// We use these to style captions
+$clearing-caption-font-color: $white;
+$clearing-caption-font-size: rem-calc(($base-font-size - 2));
+// $clearing-caption-padding: 10px 30px 20px;
+
+// We use these to make the image and carousel height and style
+$clearing-active-img-height: 90%;
+$clearing-carousel-height: 72px;
+$clearing-carousel-thumb-width: 72px;
+$clearing-carousel-thumb-active-border: 4px solid tint($tertiary, 26%);
+
 @import "../../../javascript/components/foundation/scss/foundation/components/inline-lists";
 @import "../../../javascript/components/foundation/scss/foundation/components/panels";
 @import "../../../javascript/components/foundation/scss/foundation/components/labels";
@@ -379,6 +410,8 @@ $tooltip-font-color: $white;
 @import "../../../javascript/components/foundation/scss/foundation/components/icon-bar";
 @import "../../../javascript/components/foundation/scss/foundation/components/range-slider";
 @import "../../../javascript/components/foundation/scss/foundation/components/visibility";
+@import "../../../javascript/components/foundation/scss/foundation/components/thumbs";
+@import "../../../javascript/components/foundation/scss/foundation/components/clearing";
 
 
 //

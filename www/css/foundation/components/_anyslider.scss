@@ -1,0 +1,66 @@
+/* Dashboard: Image Slider
+ * AnySlider stylage
+ */
+$anyslider-color: $iron;
+$anyslider-color-hover: $steel;
+.imageslider-container {
+    position: relative;
+    .imageslider {
+        position: relative;
+    }
+    .as-next-arrow,
+    .as-prev-arrow {
+        display: inline-block;
+        position: absolute;
+        white-space: nowrap;
+        z-index: 50;
+    }
+    .as-prev-arrow,
+    .as-next-arrow {
+        top: 50%;
+        color: $anyslider-color;
+        &:hover {
+            color: $anyslider-color-hover;
+        }
+        font-size: rem-calc($base-font-size * 1.5);
+        line-height: rem-calc($base-font-size * 3);
+        // Offset arrows up to be centred in slider
+        margin-top: rem-calc($base-font-size * -1.5);
+        padding: 0 rem-calc($base-font-size * .5);
+    }
+    .as-prev-arrow {
+        left: 0;
+        &:before {
+            // Previous
+            font-family: 'schoolbox';
+            content: "\e64d";
+        }
+    }
+    .as-next-arrow {
+        right: 0;
+        &:before {
+            // Next
+            font-family: 'schoolbox';
+            content: "\e645";
+        }
+    }
+    .as-nav{
+        position: relative;
+        text-align: center;
+        z-index: 1;
+        a {
+            color: $anyslider-color;
+            font-size: 0;
+            &:before {
+                // Bullet point
+                content: "\2022";
+                font-size: rem-calc($base-font-size * 2);
+                padding: rem-calc($base-font-size * .5);
+            }
+        }
+        a.as-active,
+        a:hover{
+            color: $anyslider-color-hover;
+        }
+    }
+}
