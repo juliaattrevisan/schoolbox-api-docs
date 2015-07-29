@@ -171,6 +171,7 @@
                         '[data-action="copy_task"]',
                         function(e) {
                             e.preventDefault();
+                            copyTaskDialog.foundation('reveal', 'close');
                             form.trigger('submitCopy.courseTaskList');
                         }
                     );
@@ -179,7 +180,16 @@
                         '[data-action="no_copy_task"]',
                         function(e) {
                             e.preventDefault();
+                            copyTaskDialog.foundation('reveal', 'close');
                             form.trigger('submitNoCopy.courseTaskList');
+                        }
+                    );
+                    copyTaskDialog.on(
+                        'click.courseTaskList',
+                        '[data-action="cancel"]',
+                        function(e) {
+                            e.preventDefault();
+                            copyTaskDialog.foundation('reveal', 'close');
                         }
                     );
                     // Open the foundation modal reveal, which asks the question
