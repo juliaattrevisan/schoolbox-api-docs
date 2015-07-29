@@ -24,6 +24,8 @@ class External_Isams_Batch_Reader_Iterator_Student_Reduce
             $carry['students'][$id] = array_merge($carry['students'][$id], $item);
         } elseif ($item['RecordType'] === 'Year') {
             $carry['years'][$id] = $item;
+        } elseif ($item['RecordType'] === 'SchoolDivision') {
+            $carry['campuses'][$id] = $item;
         }
         return $carry;
     }

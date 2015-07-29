@@ -51,11 +51,36 @@ class External_Isams_Batch_Reader_Iterator_Student_Map extends External_Isams_Ba
                 'YearName'   => "$result->Name",
                 'YearCode'   => "$result->Code",
             ];
+        } elseif ($current->matches('//SchoolManager/SchoolDivisions/SchoolDivision')) {
+            return [
+                'RecordType'       => 'SchoolDivision',
+                'ID'               => $id,
+                'CampusName'       => "$result->Name",
+                'CampusCode'       => "$result->Code",
+                'CampusYearLevels' => $this->parseCampusYears($result->Years[0]),
+            ];
         } else {
             return [
                 'RecordType' => 'Unknown',
                 'ID'         => $id,
             ];
         }
+    }
+
+    /**
+     * Parses the year list in a SchoolDivision element into a list of year IDs.
+     *
+     * @param  SimpleXMLElement $years
+     * @return array
+     */
+    protected function parseCampusYears($years)
+    {
+        $yearIds = [];
+        if ($years instanceof SimpleXMLElement) {
+            foreach ($years->children() as $year) {
+                $yearIds[] = (int)$year->attributes()->id;
+            }
+        }
+        return $yearIds;
     }
 }

@@ -17,7 +17,11 @@ class External_Isams_Batch_Reader_Student extends External_Isams_Batch_Reader_Ba
     public function getAccountInfo()
     {
         $reducer = new External_Isams_Batch_Reader_Iterator_Student_Reduce();
-        $result  = ['students' => [], 'years' => [],];
+        $result  = [
+            'students' => [],
+            'years'    => [],
+            'campuses' => [],
+        ];
         foreach (
             new External_Isams_Batch_Reader_Iterator_Student_Map(
                 new \Alaress\Xml\Filter\Path(
@@ -26,12 +30,21 @@ class External_Isams_Batch_Reader_Student extends External_Isams_Batch_Reader_Ba
                         '//CurrentPupils/Pupil',
                         '//CurrentPupilsHealth/Pupil',
                         '//SchoolManager/Years/Year',
+                        '//SchoolManager/SchoolDivisions/SchoolDivision',
                     ]
                 )
             ) as $row
         ) {
             $result = $reducer($result, $row);
         }
+        // Merge the campus into the year level
+//        new Alaress_Probe($result['campuses']);
+        foreach ($result['campuses'] as $campus) {
+            foreach ($campus['CampusYearLevels'] as $yearLevel) {
+                $result['years'][$yearLevel]['StudentCampus'][] = $campus['CampusCode'];
+            }
+        }
+//        new Alaress_Probe($result['years']);
         // Merge the year level into the student
         $actualResult = [];
         foreach ($result['students'] as $student) {
@@ -39,6 +52,7 @@ class External_Isams_Batch_Reader_Student extends External_Isams_Batch_Reader_Ba
             $student['StudentYearLevel'] = $result['years'][$yearLevel]['YearLevel'];
             $student['StudentYearName']  = $result['years'][$yearLevel]['YearName'];
             $student['StudentYearCode']  = $result['years'][$yearLevel]['YearCode'];
+            $student['StudentCampus']    = $result['years'][$yearLevel]['StudentCampus'];
             $actualResult[] = $student;
         }
         return new ArrayIterator($actualResult);
