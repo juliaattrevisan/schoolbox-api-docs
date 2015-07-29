@@ -32,12 +32,13 @@
             </div>
         </li>
     </ul>
-    <ul class='action-list' id='section{SECTION_SECTION_ID}' data-question-list>
+    <ul class='action-list sortable' id='section{SECTION_SECTION_ID}' data-question-list>
         <!-- BEGIN question -->
         <li class='row' id='question_{QUESTION_QUESTION_ID}'>
-            <div class="eleven-column">
-                <h4 data-seq>
-                    Q{QUESTION_SEQUENCE}
+            <div class="grip"></div>
+            <div class="ten-column">
+                <h4>
+                    <span data-seq>Q{QUESTION_SEQUENCE}</span>
                     <!-- BEGIN has_mark -->
                     <span class="meta">({QUESTION_MARKS} marks)</span>
                     <!-- END has_mark -->
@@ -68,9 +69,9 @@
 
         /* Make questions sortable
          */
-        $("[data-question-list]").sortable({
-            placeholder: "sortable-placeholder",
-            forcePlaceholderSize: true,
+        $('[data-question-list]').sortable({
+            handle: '.grip',
+            axis: 'y',
             stop: function () {
                 var allQuestions = $(this).children('li'),
                         data         = [];
@@ -85,14 +86,13 @@
                     var sequence = 1;
 
                     allQuestions.each(function (index, element) {
-                        var seq = $(element).children('[data-seq]');
+                        var seq = $(element).find('[data-seq]');
 
                         seq.html(seq.text().trim().replace(/^Q\d+/, 'Q' + sequence));
                         sequence++;
                     });
                 });
             }
-        })
-        .disableSelection();
+        });
     });
 </script>
