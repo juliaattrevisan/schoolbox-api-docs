@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Resource\Folder\Breadcrumbs;
+
 $surveyHandler   = new Survey_Main();
 $attemptHandler  = new Survey_Attempt();
 $questionHandler = new Survey_Question();
@@ -91,6 +93,13 @@ if (!$attempt['finish']) {
     $this->parse('alreadyEnded_block', 'alreadyEnded');
     $this->setVar('endAssess_block', '');
 }
+
+$folderMap = Schoolbox\Resource\Folder\Mapper::getInstance();
+$folder    = $folderMap->findById($assess['category_id']);
+
+$trail = new Breadcrumbs($folderMap);
+$trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
+
 
 /* Clear attempt
  */

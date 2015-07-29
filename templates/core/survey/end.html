@@ -1,16 +1,19 @@
-<h1>{ASSESS_TITLE}</h1>
-
-<!-- BEGIN endAssess -->
-<p>
-    You finished survey <strong>{ASSESS_TITLE}</strong> at {ATTEMPT_END}
-</p>
-{ASSESS_COMPLETION_MESSAGE}
-<!-- END endAssess -->
-
-<!-- BEGIN alreadyEnded -->
-<p>
-    You already finished survey <strong>{ASSESS_TITLE}</strong> at {ATTEMPT_END}
-</p>
-<!-- END alreadyEnded -->
-
-<p class="clearfix"><a class="btn go-back float-left" href="/homepage/{ASSESS_CATEGORY_ID}"><span></span>Return to Homepage</a></p>
+{BREADCRUMB}
+<div class="row">
+    <div class="small-12 column">
+        <h1>{ASSESS_TITLE}</h1>
+        <ul class="meta">
+            <!-- BEGIN endAssess -->
+            <li class="icon-calendar">Finished {ATTEMPT_END}</li>
+            <!-- END endAssess -->
+            <!-- BEGIN alreadyEnded -->
+            <li class="icon-calendar">Finished {ATTEMPT_END}</li>
+            <!-- END alreadyEnded -->
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 xlarge-3 column">
+        <a class="button secondary expand" href="/homepage/{ASSESS_CATEGORY_ID}">Return to Homepage</a>
+    </div>
+</div>
