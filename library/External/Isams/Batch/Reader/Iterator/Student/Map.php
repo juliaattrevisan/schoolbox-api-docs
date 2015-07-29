@@ -49,6 +49,7 @@ class External_Isams_Batch_Reader_Iterator_Student_Map extends External_Isams_Ba
                 'ID'         => $id,
                 'YearLevel'  => "$result->NationalCurriculumYear",
                 'YearName'   => "$result->Name",
+                'YearCode'   => "$result->Code",
             ];
         } else {
             return [

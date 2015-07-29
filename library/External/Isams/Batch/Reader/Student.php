@@ -38,8 +38,9 @@ class External_Isams_Batch_Reader_Student extends External_Isams_Batch_Reader_Ba
             $yearLevel = $student['StudentYearLevel'];
             $student['StudentYearLevel'] = $result['years'][$yearLevel]['YearLevel'];
             $student['StudentYearName']  = $result['years'][$yearLevel]['YearName'];
+            $student['StudentYearCode']  = $result['years'][$yearLevel]['YearCode'];
             $actualResult[] = $student;
         }
-        return new ArrayIterator($result);
+        return new ArrayIterator($actualResult);
     }
 }
