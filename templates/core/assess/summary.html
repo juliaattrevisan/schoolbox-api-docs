@@ -20,16 +20,11 @@
             <!-- BEGIN has_due_date -->
             <li class="icon-calendar icon-16">{ASSESS_START}&ndash;{ASSESS_FINISH}</li>
             <!-- END has_due_date -->
-            <li class="icon-due-work icon-16"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a> Quiz</li>
+            <li class="icon-time-value icon-16">Time allowed: {ASSESS_DURATION}</li>
         </ul>
 
         <section>
-            <div class="content">
-                <h3>Time allowed: {ASSESS_DURATION}</h3>
-
-                <article>{ASSESS_DESCRIPTION}</article>
-            </div>
-            
+            <article class="content">{ASSESS_DESCRIPTION}</article>
             <table>
                 <thead>
                     <tr>
