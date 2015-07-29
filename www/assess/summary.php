@@ -31,6 +31,14 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
     error(125);
 }
 
+try {
+    $folderMapper = new FolderMapper();
+    $folder = $folderMapper->findById($assess['category_id']);
+}
+catch (\Exception $e) {
+    error(117);
+}
+
 $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
 $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
@@ -41,7 +49,8 @@ $this->setVar(array(
     'ASSESS_START' => $assessStartDate->getShort(),
     'ASSESS_FINISH' => $assessFinishDate->getShort(),
     'FIRST_SECTION' => $allSections[0]['section_id'],
-    'ASSESS_CATEGORY_ID'   => $assess['category_id'],
+    'ASSESS_CATEGORY_ID'   => $folder->getId(),
+    'ASSESS_CATEGORY_NAME' => $folder->getName(),
 ));
 
 $this->setFile(TEMPLATE_content, 'assess/summary.html');
@@ -73,8 +82,6 @@ if (is_array($allSummary) && count($allSummary)) {
  */
 $this->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
 
-$folderMapper = new FolderMapper();
-$folder = $folderMapper->findById($assess['category_id']);
 $allBreadcrumbs = $folderMapper->breadcrumb($folder, true);
 
 $i = 1;

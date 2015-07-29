@@ -12,8 +12,13 @@
 
 <div class="row">
     <div class="small-12 island">
-        {ASSESS_START}
-        {ASSESS_FINISH}
+        <ul class="meta">
+            <!-- BEGIN has_due_date -->
+            <li class="icon-calendar icon-16">{ASSESS_START}&ndash;{ASSESS_FINISH}</li>
+            <!-- END has_due_date -->
+            <li class="icon-due-work icon-16"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a> Quiz</li>
+        </ul>
+
         <section>
             <div class="content">
                 <h3>Time allowed: {ASSESS_DURATION}</h3>
