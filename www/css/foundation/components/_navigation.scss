@@ -390,7 +390,9 @@ $menu-slide: "transform 500ms ease";
 // Logo - Top Bar
 .hybrid-bar{
   .logo{
-    @extend .hide-for-large-up;
+    @media #{$mediumwide-up} {
+        display: none !important;
+    }
     img{
       max-width: none;
     }
@@ -400,7 +402,9 @@ $menu-slide: "transform 500ms ease";
 // Logo - Side Bar
 .left-off-canvas-menu{
   .logo{
-    @extend .show-for-large-up;
+    @media #{$medium-down} {
+      display: none !important;
+    }
     display: block;
     margin: (($base-font-size * 2)) 0;
     img{
@@ -560,7 +564,7 @@ $menu-slide: "transform 500ms ease";
 
 // Only show left nav on large-up screens
 // 1024px >
-@media #{$large-up} {
+@media #{$mediumwide-up} {
   .left-off-canvas-menu{
     position: relative;
     @include transform(none);
