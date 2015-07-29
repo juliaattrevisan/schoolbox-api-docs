@@ -9,7 +9,7 @@
         <h2 class="subheader">Attempts</h2>
         <section>
             <form action='/survey/deleteAttempt' method='post'>
-                <table class="table ruler">
+                <table>
                     <thead>
                         <tr>
                             <th>Start</th>
@@ -30,10 +30,10 @@
                             <td>{ATTEMPT_MARKS}</td>
                             <td>
                                 <!-- BEGIN attempt_review -->
-                                <a href='/assess/studentReview/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}' class="icon-view no-text" alt="Review" title="Review"></a>
+                                <a href='/assess/studentReview/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}' class="icon-view no-text" title="Review"></a>
                                 <!-- END attempt_review -->
                                 <!-- BEGIN attempt_resume -->
-                                <a href='/assess/attempt/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}' class="icon-next no-text" alt="Resume" title="Resume"></a>
+                                <a href='/assess/attempt/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}' class="icon-next no-text" title="Resume"></a>
                                 <!-- END attempt_resume -->
                             </td>
                         </tr>
