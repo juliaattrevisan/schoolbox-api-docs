@@ -78,7 +78,7 @@ class External_Isams_Batch_Reader_Iterator_Student_Map extends External_Isams_Ba
         $yearIds = [];
         if ($years instanceof SimpleXMLElement) {
             foreach ($years->children() as $year) {
-                $yearIds[] = (int)$year->attributes()->id;
+                $yearIds[(int)$year->attributes()->id] = (int)$year->attributes()->YearId;
             }
         }
         return $yearIds;
