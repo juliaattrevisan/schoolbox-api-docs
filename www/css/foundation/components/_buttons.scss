@@ -312,6 +312,10 @@ $tabs-content-padding: rem-calc(($base-font-size - 8));
 			background-color: tint($warning-color, 20%);
 		}
 	}
+	&.expand {
+		padding: 1rem;
+		font-weight: 700;
+	}
 }
 
 input[type="submit"]{
