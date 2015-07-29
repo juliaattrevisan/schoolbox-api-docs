@@ -17,7 +17,7 @@ class External_Isams_Batch_Reader_Student extends External_Isams_Batch_Reader_Ba
     public function getAccountInfo()
     {
         $reducer = new External_Isams_Batch_Reader_Iterator_Student_Reduce();
-        $result  = [];
+        $result  = ['students' => [], 'years' => [],];
         foreach (
             new External_Isams_Batch_Reader_Iterator_Student_Map(
                 new \Alaress\Xml\Filter\Path(
@@ -25,11 +25,20 @@ class External_Isams_Batch_Reader_Student extends External_Isams_Batch_Reader_Ba
                     [
                         '//CurrentPupils/Pupil',
                         '//CurrentPupilsHealth/Pupil',
+                        '//SchoolManager/Years/Year',
                     ]
                 )
             ) as $row
         ) {
             $result = $reducer($result, $row);
+        }
+        // Merge the year level into the student
+        $actualResult = [];
+        foreach ($result['students'] as $student) {
+            $yearLevel = $student['StudentYearLevel'];
+            $student['StudentYearLevel'] = $result['years'][$yearLevel]['YearLevel'];
+            $student['StudentYearName']  = $result['years'][$yearLevel]['YearName'];
+            $actualResult[] = $student;
         }
         return new ArrayIterator($result);
     }

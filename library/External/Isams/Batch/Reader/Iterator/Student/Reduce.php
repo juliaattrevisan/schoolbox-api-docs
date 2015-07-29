@@ -18,10 +18,12 @@ class External_Isams_Batch_Reader_Iterator_Student_Reduce
     {
         $id = $item['ID'];
         if ($item['RecordType'] === 'CurrentPupils' || $item['RecordType'] === 'CurrentPupilsHealth') {
-            if (!array_key_exists($id, $carry)) {
-                $carry[$id] = [];
+            if (!array_key_exists($id, $carry['students'])) {
+                $carry['students'][$id] = [];
             }
-            $carry[$id] = array_merge($carry[$id], $item);
+            $carry['students'][$id] = array_merge($carry['students'][$id], $item);
+        } elseif ($item['RecordType'] === 'Year') {
+            $carry['years'][$id] = $item;
         }
         return $carry;
     }

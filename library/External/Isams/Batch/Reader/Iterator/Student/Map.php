@@ -43,6 +43,13 @@ class External_Isams_Batch_Reader_Iterator_Student_Map extends External_Isams_Ba
                 'ID'                  => $id,
                 'StudentMedicalAlert' => "$result->HealthNotes",
             ];
+        } elseif ($current->matches('//SchoolManager/Years/Year')) {
+            return [
+                'RecordType' => 'Year',
+                'ID'         => $id,
+                'YearLevel'  => "$result->NationalCurriculumYear",
+                'YearName'   => "$result->Name",
+            ];
         } else {
             return [
                 'RecordType' => 'Unknown',
