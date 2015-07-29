@@ -62,6 +62,9 @@ if (!empty($_POST)) {
         error(117);
     }
 
+    $assessStartDate  = new Alaress_Date_Format(strtotime($assess['start']), 'U');
+    $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
+
     /* Render create page
      */
     $this->setFile(TEMPLATE_content, 'survey/section/create.html');
@@ -71,13 +74,16 @@ if (!empty($_POST)) {
     $sectionHandler = new Survey_Section();
 
     $this->setVar(array(
-        'ASSESS_ASSESS_ID' => $this->arg[0],
-        'ASSESS_KIND_LC'   => 'survey',
-        'ASSESS_KIND'      => 'Survey',
-        'ASSESS_TITLE' => Scrub::text($assess['title']),
-        'ASSESS_CATEGORY_ID' => $assess['category_id'],
-        'SECTION_ID' => '',
-        'SEQUENCE' => $sectionHandler->getNextSequence($this->arg[0])
+        'ASSESS_ASSESS_ID'     => $this->arg[0],
+        'ASSESS_KIND_LC'       => 'survey',
+        'ASSESS_KIND'          => 'Survey',
+        'ASSESS_TITLE'         => Scrub::text($assess['title']),
+        'ASSESS_START_DATE'    => $assessStartDate->getLocalShort(),
+        'ASSESS_FINISH_DATE'   => $assessFinishDate->getLocalShort(),
+        'ASSESS_CATEGORY_ID'   => $folder->getId(),
+        'ASSESS_CATEGORY_NAME' => $folder->getName(),
+        'SECTION_ID'           => '',
+        'SEQUENCE'             => $sectionHandler->getNextSequence($this->arg[0])
     ));
 
     /* Show this Assess' contents
