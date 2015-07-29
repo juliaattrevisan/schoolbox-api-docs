@@ -70,7 +70,9 @@
             var task_list = component.find('[data-task_list]');
             task_list.sortable({
 				placeholder: "sortable-placeholder",
-				forcePlaceholderSize: true
+				forcePlaceholderSize: true,
+                handle:               '.grip',
+                axis:                 'y'
             });
             task_list.bind('sortstop', function(event, ui) {
                 // Calculate ordering of all items
