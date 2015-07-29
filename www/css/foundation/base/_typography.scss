@@ -129,7 +129,7 @@ h1{
 	font-weight: $font-weight-bold;
 }
 
-@media #{$medium-only} {
+@media #{$large-down} {
 	h1{ font-size: 1.875rem; }
 }
 

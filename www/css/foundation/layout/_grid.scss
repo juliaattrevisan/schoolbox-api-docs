@@ -67,3 +67,39 @@ $block-grid-default-spacing: rem-calc(16);
 .min-pad{
 	padding: rem-calc(($base-font-size - 8)) !important;
 }
+
+#content > .row {
+
+    > .small-12,
+    > .medium-12 {
+
+        @media #{$small-only} {
+            padding: 0 !important;
+
+            > h1,
+            > h2.subheader,
+            > ul.meta {
+                // on small screens, full width is FULL width, so indent floating content
+                margin-left: 2rem;
+                margin-right: 2rem;
+            }
+
+            .content {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+
+            table {
+                td:first-child, th:first-child {
+                    padding-left: 2rem;
+                }
+                td:last-child, th:last-child {
+                    padding-right: 2rem;
+                }
+            }
+        }
+        @media #{$medium-only} {
+            padding: 0 2.5rem !important;
+        }
+    }
+}
