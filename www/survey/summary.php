@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
 $assessHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
 $attemptHandler = new Survey_Attempt();
@@ -29,17 +31,26 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
     error(125);
 }
 
+try {
+    $folderMapper = new FolderMapper();
+    $folder = $folderMapper->findById($assess['category_id']);
+}
+catch (\Exception $e) {
+    error(13);
+}
+
 $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
 $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
 $this->setVar(array(
-    'ASSESS_ASSESS_ID' => $this->arg[0],
-    'ASSESS_TITLE' => Scrub::text($assess['title']),
-    'ASSESS_DESCRIPTION' => Scrub::html($assess['description']),
-    'ASSESS_START' => $assessStartDate->getShort(),
-    'ASSESS_FINISH' => $assessFinishDate->getShort(),
-    'FIRST_SECTION' => $allSections[0]['section_id'],
-    'ASSESS_CATEGORY_ID'   => $assess['category_id'],
+        'ASSESS_ASSESS_ID'     => $this->arg[0],
+        'ASSESS_TITLE'         => Scrub::text($assess['title']),
+        'ASSESS_DESCRIPTION'   => Scrub::html($assess['description']),
+        'ASSESS_START'         => $assessStartDate->getShort(),
+        'ASSESS_FINISH'        => $assessFinishDate->getShort(),
+        'FIRST_SECTION'        => $allSections[0]['section_id'],
+        'ASSESS_CATEGORY_ID'   => $folder->getId(),
+        'ASSESS_CATEGORY_NAME' => $folder->getName(),
 ));
 
 $this->setFile(TEMPLATE_content, 'survey/summary.html');
@@ -65,4 +76,30 @@ if (is_array($allSummary) && count($allSummary)) {
     }
 } else {
     $this->setVar('section_block', '');
+}
+
+/* Render out breadcrumbs
+ */
+$this->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
+
+$allBreadcrumbs = $folderMapper->breadcrumb($folder, true);
+
+$i = 1;
+
+foreach ($allBreadcrumbs as $currentBreadcrumb) {
+    if ($i == $allBreadcrumbs->count()) {
+        $active = 'active';
+    }
+    else {
+        $active = '';
+    }
+
+    $this->setVar(array(
+            'BREADCRUMB_FOLDER_ID' => $currentBreadcrumb->getId(),
+            'BREADCRUMB_FOLDER_NAME' => $currentBreadcrumb->getName(),
+            'BREADCRUMB_ACTIVE' => $active,
+        ));
+
+    $this->parse('breadcrumb_block', 'breadcrumb', true);
+    $i++;
 }

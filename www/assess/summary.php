@@ -43,14 +43,14 @@ $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
 $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
 $this->setVar(array(
-    'ASSESS_ASSESS_ID' => $this->arg[0],
-    'ASSESS_TITLE' => Scrub::text($assess['title']),
-    'ASSESS_DESCRIPTION' => Scrub::html($assess['description']),
-    'ASSESS_START' => $assessStartDate->getShort(),
-    'ASSESS_FINISH' => $assessFinishDate->getShort(),
-    'FIRST_SECTION' => $allSections[0]['section_id'],
-    'ASSESS_CATEGORY_ID'   => $folder->getId(),
-    'ASSESS_CATEGORY_NAME' => $folder->getName(),
+        'ASSESS_ASSESS_ID'     => $this->arg[0],
+        'ASSESS_TITLE'         => Scrub::text($assess['title']),
+        'ASSESS_DESCRIPTION'   => Scrub::html($assess['description']),
+        'ASSESS_START'         => $assessStartDate->getShort(),
+        'ASSESS_FINISH'        => $assessFinishDate->getShort(),
+        'FIRST_SECTION'        => $allSections[0]['section_id'],
+        'ASSESS_CATEGORY_ID'   => $folder->getId(),
+        'ASSESS_CATEGORY_NAME' => $folder->getName(),
 ));
 
 $this->setFile(TEMPLATE_content, 'assess/summary.html');
