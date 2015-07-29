@@ -48,7 +48,7 @@ class Synchronise_External_Cis_Hydrator_Student_Campus implements Synchronise_Ba
         $campusList = [];
         foreach ($externalUser['StudentCampus'] as $campus) {
             if (array_key_exists($campus, $this->campusMap)) {
-                $campusList[] = $campus;
+                $campusList[] = $this->campusMap[$campus];
             }
         }
         if (empty($campusList)) {
