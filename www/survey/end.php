@@ -50,6 +50,14 @@ if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['c
     error(144);
 }
 
+try {
+    $folderMap = Schoolbox\Resource\Folder\Mapper::getInstance();
+    $folder    = $folderMap->findById($survey['category_id']);
+}
+catch (\Exception $e) {
+    error(13);
+}
+
 $this->setFile(TEMPLATE_content, 'survey/end.html');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
@@ -94,12 +102,8 @@ if (!$attempt['finish']) {
     $this->setVar('endAssess_block', '');
 }
 
-$folderMap = Schoolbox\Resource\Folder\Mapper::getInstance();
-$folder    = $folderMap->findById($assess['category_id']);
-
 $trail = new Breadcrumbs($folderMap);
 $trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
-
 
 /* Clear attempt
  */
