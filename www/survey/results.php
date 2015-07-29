@@ -8,6 +8,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $assessHandler = new Survey_Main();
 $groupHandler = new Group();
@@ -20,6 +21,14 @@ if (!is_numeric($this->arg[0])) {
 
 if (!$assess) {
     error(112);
+}
+
+try {
+    $folderMapper = new FolderMapper();
+    $folder = $folderMapper->findById($assess['category_id']);
+}
+catch (\Exception $e) {
+    error(13);
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {
@@ -96,3 +105,28 @@ else {
 	$this->setVar('section_block', '');
 }
 
+/* Render out breadcrumbs
+ */
+$this->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
+
+$allBreadcrumbs = $folderMapper->breadcrumb($folder, true);
+
+$i = 1;
+
+foreach ($allBreadcrumbs as $currentBreadcrumb) {
+    if ($i == $allBreadcrumbs->count()) {
+        $active = 'active';
+    }
+    else {
+        $active = '';
+    }
+
+    $this->setVar(array(
+        'BREADCRUMB_FOLDER_ID' => $currentBreadcrumb->getId(),
+        'BREADCRUMB_FOLDER_NAME' => $currentBreadcrumb->getName(),
+        'BREADCRUMB_ACTIVE' => $active,
+    ));
+
+    $this->parse('breadcrumb_block', 'breadcrumb', true);
+    $i++;
+}
