@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
 $attemptHandler = new Assess_Attempt();
@@ -65,4 +67,32 @@ if (is_array($allSummary) && count($allSummary)) {
     }
 } else {
     $this->setVar('section_block', '');
+}
+
+/* Render out breadcrumbs
+ */
+$this->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
+
+$folderMapper = new FolderMapper();
+$folder = $folderMapper->findById($assess['category_id']);
+$allBreadcrumbs = $folderMapper->breadcrumb($folder, true);
+
+$i = 1;
+
+foreach ($allBreadcrumbs as $currentBreadcrumb) {
+    if ($i == $allBreadcrumbs->count()) {
+        $active = 'active';
+    }
+    else {
+        $active = '';
+    }
+
+    $this->setVar(array(
+        'BREADCRUMB_FOLDER_ID' => $currentBreadcrumb->getId(),
+        'BREADCRUMB_FOLDER_NAME' => $currentBreadcrumb->getName(),
+        'BREADCRUMB_ACTIVE' => $active,
+    ));
+
+    $this->parse('breadcrumb_block', 'breadcrumb', true);
+    $i++;
 }
