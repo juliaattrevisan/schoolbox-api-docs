@@ -1,38 +1,48 @@
-<h1>Quiz Summary
-    <a class="btn go-back marg tiny" href="/homepage/{ASSESS_CATEGORY_ID}"><span></span>Return to Homepage</a></h1>
-<div class="evaluation-content">
-<h2>{ASSESS_TITLE}</h2>
-    <div class="wysiwyg">{ASSESS_DESCRIPTION}</div>
-    <p class="clearfix">
-        <strong>Quiz open:</strong>
-        {ASSESS_START}
-        <span class="edit-assess-arrow"></span>
-        {ASSESS_FINISH}
-    </p>
-    <table class="table ruler">
-        <thead>
-        <tr>
-            <th>Section</th>
-            <th>Number of questions</th>
-            <th>Action</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- BEGIN section -->
-        <tr><td>{SECTION_TITLE}</td>
-            <td>{SECTION_NUMQUESTIONS}</td>
-            <td><span class="actions">
-                <a href="/assess/section/modify/{SECTION_SECTION_ID}" class="btn modify no-text float-left" title="Modify"><span></span></a>
-                </span>
-            </td>
-        </tr>
-        <!-- END section -->
-        </tbody>
-    </table>
+<ul class="breadcrumb">
+    <!-- BEGIN breadcrumb -->
+    <li class="{BREADCRUMB_ACTIVE}"><a href="/homepage/{BREADCRUMB_FOLDER_ID}">{BREADCRUMB_FOLDER_NAME}</a></li>
+    <!-- END breadcrumb -->
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <span class='header-actions'>
+            <a href='/assess/modify/{ASSESS_ASSESS_ID}' class='icon-modify'></a>
+        </span>
+
+        <h1>{ASSESS_TITLE}</h1>
+    </div>
 </div>
-<div class="evaluation-menu duration">
 
-	<h2><span></span>Duration</h2>
-	<p class="pad-it">{ASSESS_DURATION}</p>
+<div class="row">
+    <div class="small-12 island">
+        <ul class="meta">
+            <!-- BEGIN has_due_date -->
+            <li class="icon-calendar icon-16">{ASSESS_START}&ndash;{ASSESS_FINISH}</li>
+            <!-- END has_due_date -->
+            <li class="icon-time-value icon-16">Time allowed: {ASSESS_DURATION}</li>
+        </ul>
 
+        <section>
+            <article class="content">{ASSESS_DESCRIPTION}</article>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Section</th>
+                        <th>Number of questions</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                <!-- BEGIN section -->
+                <tr>
+                    <td>{SECTION_TITLE}</td>
+                    <td>{SECTION_NUMQUESTIONS}</td>
+                    <td><a href="/assess/section/modify/{SECTION_SECTION_ID}" class="icon-modify no-text" title="Modify"></a></td>
+                </tr>
+                <!-- END section -->
+                </tbody>
+            </table>
+        </section>
+    </div>
 </div>
