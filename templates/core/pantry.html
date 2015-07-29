@@ -1693,7 +1693,28 @@
                     <input id="checkbox1" type="checkbox"><label for="checkbox1" class="checkbox-label">Checkbox 1</label>
                     <input id="checkbox2" type="checkbox"><label for="checkbox2" class="checkbox-label">Checkbox 2</label>
                 </div>
+                <div class="column small-12">
+                    <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+                    <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+                    <script type="text/javascript">
+                        $(function() {
+                            $('[data-selectizeuser]')
+                                    .selectizeSelector({
+                                        ajax: {
+                                            url:      '/ajax/user.php',
+                                            type:     'GET',
+                                            data:     {showCampus: true},
+                                            dataType: 'json'
+                                        }
+                                    })
+                            ;
+                        });
+                    </script>
+                    <label>AutoSuggest / Selectize</label>
+                    <input id='userId' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
+                </div>
             </fieldset>
+
         </div>
         <div class="row">
             <fieldset>
