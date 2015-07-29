@@ -119,6 +119,7 @@ $this->setVar(array(
     'ASSESS_AUTHOR_ROLE' => $author->getRole()->getName(),
     'ASSESS_FOLDER' => $folder->getName(),
     'ASSESS_FOLDER_ID' => $folder->getId(),
+    'ASSESS_FOLDER_CODES' => $folder->getCodeString() ?: '',
     'ASSESS_DURATION' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
 
