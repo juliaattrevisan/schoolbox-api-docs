@@ -1113,3 +1113,22 @@ ul.meta {
     line-height: 1.5rem;
     margin-bottom: 1rem;
 }
+
+@media #{$small-only} {
+    // top level breadcrumbing: on mobile, only show current and previous
+    #content > .breadcrumb li {
+
+        a {
+            //width: 0;
+        }
+        display: none;
+
+        &:nth-last-child(-n+2) {
+            display: list-item;
+            a {
+                //width: auto;
+            }
+        }
+    }
+}
+
