@@ -11,6 +11,7 @@
 use Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Resource\Folder\Breadcrumbs;
 
 $assessHandler   = new Assess_Main();
 $attemptHandler  = new Assess_Attempt();
@@ -200,6 +201,12 @@ if ($visibility->isStaff() && $groupHandler->isStaff()) {
         }
     }
 }
+
+$folderMap = Schoolbox\Resource\Folder\Mapper::getInstance();
+$folder    = $folderMap->findById($assess['category_id']);
+
+$trail = new Breadcrumbs($folderMap);
+$trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
 
 /* Clear attempt
  */

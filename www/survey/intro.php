@@ -10,6 +10,9 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Resource\Folder\Breadcrumbs;
+use Schoolbox\UserMapper;
+
 $assessHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
 $attemptHandler = new Survey_Attempt();
@@ -89,7 +92,8 @@ if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration
 
 /* Continue once you get past checks
  */
-$author = $userHandler->getByID($assess['user_id']);
+$author = UserMapper::getInstance()->findById($assess['user_id']);
+$folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
 
 $allSummary = $assessHandler->getIntroSummary($assess['assess_id']);
 $allSections = $sectionHandler->getList($assess['assess_id']);
@@ -109,7 +113,13 @@ $this->setVar(array(
     'ASSESS_START' => $assessStartDate->getShort(),
     'ASSESS_FINISH' => $assessFinishDate->getShort(),
     'FIRST_SECTION' => $allSections[0]['section_id'],
-    'ASSESS_AUTHOR' => Scrub::text($userHandler->formatName($author)),
+    'ASSESS_AUTHOR' => Scrub::text($author->formatName()),
+    'ASSESS_AUTHOR_ID' => $author->getId(),
+    'ASSESS_AUTHOR_EXT_ID' => $author->getExternalId(),
+    'ASSESS_AUTHOR_ROLE' => $author->getRole()->getName(),
+    'ASSESS_FOLDER' => $folder->getName(),
+    'ASSESS_FOLDER_ID' => $folder->getId(),
+    'ASSESS_FOLDER_CODES' => $folder->getCodeString() ?: '',
     'ASSESS_DURATION' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
 
@@ -131,3 +141,6 @@ if (is_array($allSummary) && count($allSummary)) {
     $this->setVar('section_block', '');
     $this->setVar('startTest_block', '');
 }
+
+$trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);

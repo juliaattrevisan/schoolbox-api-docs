@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Resource\Folder\Breadcrumbs;
+
 $surveyHandler   = new Survey_Main();
 $attemptHandler  = new Survey_Attempt();
 $questionHandler = new Survey_Question();
@@ -46,6 +48,14 @@ if ($surveyHandler->isExpired($survey['assess_id'])) {
  */
 if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
     error(144);
+}
+
+try {
+    $folderMap = Schoolbox\Resource\Folder\Mapper::getInstance();
+    $folder    = $folderMap->findById($survey['category_id']);
+}
+catch (\Exception $e) {
+    error(13);
 }
 
 $this->setFile(TEMPLATE_content, 'survey/end.html');
@@ -91,6 +101,9 @@ if (!$attempt['finish']) {
     $this->parse('alreadyEnded_block', 'alreadyEnded');
     $this->setVar('endAssess_block', '');
 }
+
+$trail = new Breadcrumbs($folderMap);
+$trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
 
 /* Clear attempt
  */

@@ -1,37 +1,55 @@
-<h1>{ASSESS_TITLE}</h1>
+{BREADCRUMB}
+<div class="row">
+    <div class="small-12 column">
+        <h1>{ASSESS_TITLE}</h1>
+        <ul class="meta">
+            <!-- BEGIN endAssess -->
+            <li class="icon-calendar">Finished {ATTEMPT_END}</li>
+            <!-- END endAssess -->
+            <!-- BEGIN alreadyEnded -->
+            <li class="icon-calendar">Finished {ATTEMPT_END}</li>
+            <!-- END alreadyEnded -->
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <p>
+            <span class="submitted label">Finished</span>
+        </p>
+        <section>
+            <div class="content">
 
-<!-- BEGIN endAssess -->
-<p>
-    You finished quiz <strong>{ASSESS_TITLE}</strong> at {ATTEMPT_END}
-</p>
-{ASSESS_COMPLETION_MESSAGE}
-<!-- END endAssess -->
+                <!-- BEGIN has_marks -->
+                <p class="grade">
+                    <span>{ATTEMPT_MARKS}/{ATTEMPT_TOTAL} ({ATTEMPT_PERCENTAGE}%)</span>
+                </p>
 
-<!-- BEGIN alreadyEnded -->
-<p>
-    You already finished quiz <strong>{ASSESS_TITLE}</strong> at {ATTEMPT_END}
-</p>
-<!-- END alreadyEnded -->
+                <p>
+                    <em>This mark is unconfirmed and may change following teacher review.</em>
+                </p>
+                <!-- END has_marks -->
 
-<!-- BEGIN has_marks -->
-<p>
-	{ATTEMPT_NUM_MARKED_QUESTIONS}/{ATTEMPT_NUM_QUESTIONS} question(s) of your quiz have been marked.<br />
-	You received {ATTEMPT_MARKS}/{ATTEMPT_TOTAL} ({ATTEMPT_PERCENTAGE}%)
-</p>
-<p>
-	<strong>This mark is unconfirmed and may change following teacher review.</strong>
-</p>
-<!-- END has_marks -->
 
-<!-- BEGIN unmarkedRemaining -->
-<p>
-	There are {ATTEMPT_NUM_UNMARKED_QUESTIONS} questions remaining to be marked, worth {ATTEMPT_VALUE_UNMARKED_QUESTIONS} marks.
-</p>
-<!-- END unmarkedRemaining -->
+                <!-- BEGIN unmarkedRemaining -->
+                <p>
+                    {ATTEMPT_NUM_MARKED_QUESTIONS} out of {ATTEMPT_NUM_QUESTIONS} questions of your quiz have been marked.
+                    <strong>There are {ATTEMPT_NUM_UNMARKED_QUESTIONS} questions remaining to be marked, worth
+                    {ATTEMPT_VALUE_UNMARKED_QUESTIONS} marks.</strong>
+                </p>
+                <!-- END unmarkedRemaining -->
 
-<p class="clearfix">
-    <!-- BEGIN view_attempt -->
-	<a class="btn eyeball float-left" href="/assess/studentReview/{ASSESS_ID}/{SECTION_ID}/{ATTEMPT_ID}"><span></span>View Results</a>
-    <!-- END view_attempt -->
-    <a class="btn go-back float-left" href="/homepage/{ASSESS_CATEGORY_ID}"><span></span>Return to Homepage</a>
-</p>
+
+                <p>{ASSESS_COMPLETION_MESSAGE}</p>
+
+            </div>
+        </section>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 xlarge-3 column">
+        <!-- BEGIN view_attempt -->
+        <a class="button secondary expand" href="/assess/studentReview/{ASSESS_ID}/{SECTION_ID}/{ATTEMPT_ID}">View Results</a>
+        <!-- END view_attempt -->
+    </div>
+</div>
