@@ -1592,32 +1592,12 @@
     <hr>
 
     <h1 id="switches">Switches</h1>
-    <!--<div class="small-2 switch tiny">-->
-        <!--<input id="a" name="switch-a" type="radio" checked>-->
-        <!--<label for="a" onclick="">Off</label>-->
-
-        <!--<input id="a1" name="switch-a" type="radio">-->
-        <!--<label for="a1" onclick="">On</label>-->
-
-        <!--<span></span>-->
-    <!--</div>-->
-
-    <!--<div class="small-3 switch small">-->
-        <!--<input id="b" name="switch-b" type="radio" checked>-->
-        <!--<label for="b" onclick="">Off</label>-->
-
-        <!--<input id="b1" name="switch-b" type="radio">-->
-        <!--<label for="b1" onclick="">On</label>-->
-
-        <!--<span></span>-->
-    <!--</div>-->
-
     <div class="switch">
-        <h3>Checkbox Switch</h3>
+        <p>Checkbox</p>
         <input id="exampleCheckboxSwitch" type="checkbox">
         <label for="exampleCheckboxSwitch"></label>
     </div>
-
+    
     <div>
         <h3>Checkbox Switch with Text</h3>
         <input id="textCheckboxToggle" type="checkbox">
@@ -1639,18 +1619,6 @@
         <input id="textCheckboxToggle9" type="checkbox">
         <label for="textCheckboxToggle9" class="checkbox-toggle">E</label>
     </div>
-
-    <!-- Using radio buttons – each switch turns off the other two -->
-    <!-- <div class="switch round">
-        <p>Radio</p>
-        <input id="exampleRadioSwitch1" type="radio" checked name="testGroup">
-        <label for="exampleRadioSwitch1"></label>
-    </div>
-
-    <div class="switch round">
-      <input id="exampleRadioSwitch2" type="radio" name="testGroup">
-      <label for="exampleRadioSwitch2"></label>
-    </div> -->
 
     <hr>
     <h1 id="alert-boxes">Alert Boxes</h1>
@@ -1746,6 +1714,7 @@
                     <input id='userId' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
                 </div>
             </fieldset>
+
         </div>
         <div class="row">
             <fieldset>
@@ -1820,9 +1789,9 @@
     </div>
 
     <hr>
-    <h1 id="joyride">Joyride</h1>
+    <!-- <h1 id="joyride">Joyride</h1> -->
     <!-- At the bottom of your page but inside of the body tag -->
-    <ol class="joyride-list" data-joyride>
+    <!-- <ol class="joyride-list" data-joyride>
         <li data-id="firstStop" data-text="Next" data-options="tip_location: top; prev_button: false">
             <p>Hello and welcome to the Joyride documentation page.</p>
         </li>
@@ -1839,34 +1808,34 @@
             <p>It works as a modal too!</p>
         </li>
     </ol>
-    <!--<div id="firstStop" class="panel"><p>Ride the whale.</p></div>-->
-    <!--<p id="numero1" class="panel">Megalodon<p>-->
-    <!--<p id="numero2" class="panel">Kraken</p>-->
-    <!--<p id="End" class="panel">Whale</p>-->
-    <!--&lt;!&ndash; At the bottom of your page but inside of the body tag &ndash;&gt;-->
-    <!--<div id="joyride-go">-->
-        <!--<ol class="joyride-list" data-joyride>-->
-            <!--<li data-id="firstStop" data-text="Next" data-options="tip_location: top; prev_button: false">-->
-                <!--<p>Welcome to Rapture, the home of Schoolbox.</p>-->
-                <!--<p><img src="http://www.twinfinite.net/wp-content/uploads/2014/07/bioshock-rapture-city1.jpg" /></p>-->
-            <!--</li>-->
-            <!--<li data-id="numero1" data-class="custom so-awesome" data-text="Next" data-prev-text="Prev">-->
-                <!--<h1>Stop #1</h1>-->
-                <!--<p>You can control all the details for you tour stop. Any valid HTML will work inside of Joyride.</p>-->
-            <!--</li>-->
-            <!--<li data-id="numero2" data-button="Next" data-prev-text="Prev" data-options="tip_location:top;tip_animation:fade">-->
-                <!--<h1>Stop #2</h1>-->
-                <!--<p>Get the details right by styling Joyride with a custom stylesheet!</p>-->
-            <!--</li>-->
-            <!--<li data-button="End" data-prev-text="Prev">-->
-                <!--<h1>Stop #3</h1>-->
-                <!--<p>It works as a modal too!</p>-->
-                <!--<p><img src="http://www.emeraldene.com.au/blog/wp-content/uploads/2013/05/Whale-Watching-2013.jpg" /></p>-->
-            <!--</li>-->
-        <!--</ol>-->
-    <!--</div>-->
-    <!--<p>To make something pretty, press and hold <kbd>cmd + alt + shift + w + a + !</kbd></p>-->
-    <hr>
+    <div id="firstStop" class="panel"><p>Ride the whale.</p></div>
+    <p id="numero1" class="panel">Megalodon<p>
+    <p id="numero2" class="panel">Kraken</p>
+    <p id="End" class="panel">Whale</p>
+    &lt;!&ndash; At the bottom of your page but inside of the body tag &ndash;&gt;
+    <div id="joyride-go">
+        <ol class="joyride-list" data-joyride>
+            <li data-id="firstStop" data-text="Next" data-options="tip_location: top; prev_button: false">
+                <p>Welcome to Rapture, the home of Schoolbox.</p>
+                <p><img src="http://www.twinfinite.net/wp-content/uploads/2014/07/bioshock-rapture-city1.jpg" /></p>
+            </li>
+            <li data-id="numero1" data-class="custom so-awesome" data-text="Next" data-prev-text="Prev">
+                <h1>Stop #1</h1>
+                <p>You can control all the details for you tour stop. Any valid HTML will work inside of Joyride.</p>
+            </li>
+            <li data-id="numero2" data-button="Next" data-prev-text="Prev" data-options="tip_location:top;tip_animation:fade">
+                <h1>Stop #2</h1>
+                <p>Get the details right by styling Joyride with a custom stylesheet!</p>
+            </li>
+            <li data-button="End" data-prev-text="Prev">
+                <h1>Stop #3</h1>
+                <p>It works as a modal too!</p>
+                <p><img src="http://www.emeraldene.com.au/blog/wp-content/uploads/2013/05/Whale-Watching-2013.jpg" /></p>
+            </li>
+        </ol>
+    </div>
+    <p>To make something pretty, press and hold <kbd>cmd + alt + shift + w + a + !</kbd></p>
+    <hr> -->
 
     <h1 id="magellan">Magellan (Sticky Nav)</h1>
     <div class="magellan-container" data-magellan-expedition="fixed">
@@ -1883,31 +1852,33 @@
     <h5 data-magellan-destination="js">Awesome JS Goodness</h5>
 
     <hr>
-    <h1 id="orbit">Orbit</h1>
-    <div class="row">
-        <div class="large-12 columns">
-            <ul id="featured1" data-orbit data-options="timer_speed:5000;">
-                <li>
-                    <img src="http://foundation.zurb.com/docs/assets/img/examples/satelite-orbit.jpg" alt=""/>
-                    <div class="orbit-caption">
-                        Caption One. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                    </div>
-                </li>
-                <li>
-                    <img src="http://foundation.zurb.com/docs/assets/img/examples/andromeda-orbit.jpg" alt=""/>
-                    <div class="orbit-caption">
-                        Caption Two. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                    </div>
-                </li>
-                <li>
-                    <img src="http://foundation.zurb.com/docs/assets/img/examples/launch-orbit.jpg" alt=""/>
-                    <div class="orbit-caption">
-                        Caption Three. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                    </div>
-                </li>
-            </ul>
+    <h1 id="image-slider">Image Slider</h1>
+        <!-- Custom javascript -->
+        <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
+        <script type="text/javascript">
+            $(function(){
+              $('[data-imageslider]').anyslider({
+                    interval: 2000,
+                    prevLabel: '',
+                    nextLabel: ''
+                });
+            });
+        </script>
+        <div class="row">
+            <div class="small-12 island imageslider-container">
+              <section>
+                <div class="content">
+                  <div data-imageslider class="imageslider">
+                      <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                      <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                      <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                      <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                      <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                  </div>
+                </div>
+              </section>
+            </div>
         </div>
-    </div>
 
     <hr>
     <h1 id="panels">Panels</h1>
@@ -2225,7 +2196,6 @@
             </ul>
         </section>
     </nav>
-
     <!-- End Top Bar -->
     <hr>
 
@@ -2264,46 +2234,10 @@
     <h5 class="subheader">h5.subheader</h5>
     <h6 class="subheader">h6.subheader</h6>
 
-    <p><br></p>
-    <ul class="disc">
-        <li>List item with a much longer description or more content.</li>
-        <li>List item</li>
-        <li>List item
-            <ul>
-                <li>Nested List Item</li>
-                <li>Nested List Item</li>
-                <li>Nested List Item</li>
-            </ul>
-        </li>
-        <li>List item</li>
-        <li>List item</li>
-        <li>List item</li>
-    </ul>
+    <hr>
 
-    <h5>Ordered lists are great for lists that need order, duh.</h5>
-    <ol>
-        <li>List Item 1</li>
-        <li>List Item 2</li>
-        <li>List Item 3</li>
-    </ol>
-
-    <h5>Definition lists are great for small block of copy that describe the header</h5>
-    <dl>
-        <dt>Definition List</dt>
-        <dd>Definition Cras justo odio, dapibus ac facilisis in, egestas eget quam. Nullam id dolor id nibh ultricies vehicula ut id elit.</dd>
-    </dl>
-
-    <h1>Blockquote</h1>
-    <blockquote>I do not fear computers. I fear the lack of them. Maecenas faucibus mollis interdum. Aenean lacinia bibendum nulla sed consectetur.<cite>Isaac Asimov</cite></blockquote>
-
-    <h1>Vcard</h1>
-    <ul class="vcard">
-        <li class="fn">Gaius Baltar</li>
-        <li class="street-address">123 Colonial Ave.</li>
-        <li class="locality">Caprica City</li>
-        <li><span class="state">Caprica</span>, <span class="zip">12345</span></li>
-        <li class="email"><a href="#">g.baltar@example.com</a></li>
-    </ul>
+    <h1 id="blockquote">Blockquote</h1>
+    <blockquote>Just because everything else is square, doesn't mean the switch can't be round.<cite>Matthew Sambell</cite></blockquote>
 
     <hr>
     <h1 id="visibility-classes">Visibility Classes</h1>
@@ -2421,7 +2355,7 @@
             handle:      '.grip',
             axis:        'y',
         });
-        
+
 
 
 
