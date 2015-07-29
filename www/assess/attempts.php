@@ -11,6 +11,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
@@ -33,6 +35,14 @@ if (!is_numeric($this->arg[1])) {
 
 if ($groupHandler->isStudent() && ($_SESSION['user']->getId() != $this->arg[1])) {
 	error(19);
+}
+
+try {
+    $folderMapper = new FolderMapper();
+    $folder = $folderMapper->findById($assess['category_id']);
+}
+catch (\Exception $e) {
+    error(117);
 }
 
 $this->setFile(TEMPLATE_content, 'assess/attempts.html');
@@ -109,8 +119,6 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
         /* Misc details
          */
-
-
         $available = $attemptHandler->getTotalMarks($assess['assess_id'], $currentAttempt['attempt_id']);
 
         if ($currentAttempt['reviewed_at'] != null) {
@@ -183,4 +191,29 @@ if (is_array($allAttempts) && count($allAttempts)) {
 			'attempt_resume_block' => '',
 		));
     }
+}
+
+/* Render out breadcrumbs
+ */
+$this->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
+
+$allBreadcrumbs = $folderMapper->breadcrumb($folder, true);
+$i = 1;
+
+foreach ($allBreadcrumbs as $currentBreadcrumb) {
+    if ($i == $allBreadcrumbs->count()) {
+        $active = 'active';
+    }
+    else {
+        $active = '';
+    }
+
+    $this->setVar(array(
+        'BREADCRUMB_FOLDER_ID' => $currentBreadcrumb->getId(),
+        'BREADCRUMB_FOLDER_NAME' => $currentBreadcrumb->getName(),
+        'BREADCRUMB_ACTIVE' => $active,
+    ));
+
+    $this->parse('breadcrumb_block', 'breadcrumb', true);
+    $i++;
 }
