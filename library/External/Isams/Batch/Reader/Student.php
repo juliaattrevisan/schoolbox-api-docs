@@ -38,18 +38,16 @@ class External_Isams_Batch_Reader_Student extends External_Isams_Batch_Reader_Ba
             $result = $reducer($result, $row);
         }
         // Merge the campus into the year level
-//        new Alaress_Probe($result['campuses']);
         foreach ($result['campuses'] as $campus) {
-            foreach ($campus['CampusYearLevels'] as $yearLevel) {
+            foreach ($campus['CampusYearLevels'] as $yearId => $yearLevel) {
                 $result['years'][$yearLevel]['StudentCampus'][] = $campus['CampusCode'];
             }
         }
-//        new Alaress_Probe($result['years']);
         // Merge the year level into the student
         $actualResult = [];
         foreach ($result['students'] as $student) {
             $yearLevel = $student['StudentYearLevel'];
-            $student['StudentYearLevel'] = $result['years'][$yearLevel]['YearLevel'];
+            $student['StudentYear']      = $result['years'][$yearLevel]['YearLevel'];
             $student['StudentYearName']  = $result['years'][$yearLevel]['YearName'];
             $student['StudentYearCode']  = $result['years'][$yearLevel]['YearCode'];
             $student['StudentCampus']    = $result['years'][$yearLevel]['StudentCampus'];
