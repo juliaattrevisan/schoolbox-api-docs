@@ -853,13 +853,19 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
     /**
      * Creates a breadcrumb of a category's hierarchical navigation
+     * Optionally include the $category as the final crumb
      *
      * @param Model $category
+     * @param bool $includeCategory
      * @return Collection
      */
-    public function breadcrumb(Model $category)
+    public function breadcrumb(Model $category, $includeCategory = false)
     {
         $breadcrumb = new Collection();
+
+        if ($includeCategory) {
+            $breadcrumb->add($category);
+        }
 
         $parentId = $category->getParent()->getId();
 

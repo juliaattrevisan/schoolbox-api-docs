@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -167,7 +168,8 @@ else {
     }
 
     try {
-        $category = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($category_id);
+        $folderMapper = new FolderMapper();
+        $category = $folderMapper->findById($category_id);
     } catch (\Schoolbox\Mapper\Exception $e) {
         error(117);
         exit;
@@ -186,10 +188,14 @@ else {
     $this->setBlock(TEMPLATE_content,  'importXML', 'importXML_block');
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
     $this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
+    $this->setBlock(TEMPLATE_content, 'has_due_date', 'has_due_date_block');
 
-    $this->setTitle('Manage Assessment');
+    $this->setVar(array(
+        'assess_timespan_block' => '',
+        'has_due_date_block' => '',
+    ));
 
-    $this->setVar('assess_timespan_block', '');
+    $this->setTitle('Manage Quiz');
 
     if (Config::get('curriculum_tagging_enabled')) {
         $this->parse('curriculum_code_input_block', 'curriculum_code_input');
@@ -198,20 +204,22 @@ else {
     }
 
     $this->setVar(array(
-        'ACTION'             => 'create',
-        'ASSESS_ACTION'      => 'Create',
-        'ASSESS_KIND_LC'     => 'assess',
-        'ASSESS_KIND'        => 'Quiz',
-        'ASSESS_IS_TASK'     => $is_task ? 1 : 0,
-        'ASSESS_ASSESS_ID'   => '',
-        'ASSESS_CATEGORY_ID' => $category_id,
-        'ASSESS_UNIT_ID'     => $unit_id,
-        'ASSESS_TITLE'       => '',
-        'ASSESS_WEIGHT'      => 0,
-        'ASSESS_DESCRIPTION' => '',
-        'ASSESS_START_DATE'  => $assessDate->getLocalShort(),
-        'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort(),
+        'ACTION'                    => 'create',
+        'ASSESS_ACTION'             => 'Create',
+        'ASSESS_KIND_LC'            => 'assess',
+        'ASSESS_KIND'               => 'Quiz',
+        'ASSESS_IS_TASK'            => $is_task ? 1 : 0,
+        'ASSESS_ASSESS_ID'          => '',
+        'ASSESS_CATEGORY_ID'        => $category->getId(),
+        'ASSESS_CATEGORY_NAME'      => $category->getName(),
+        'ASSESS_UNIT_ID'            => $unit_id,
+        'ASSESS_TITLE'              => '',
+        'ASSESS_WEIGHT'             => 0,
+        'ASSESS_DESCRIPTION'        => '',
+        'ASSESS_START_DATE'         => $assessDate->getLocalShort(),
+        'ASSESS_FINISH_DATE'        => $assessEndDate->getLocalShort(),
         'ASSESS_COMPLETION_MESSAGE' => '',
+        'HAS_ALL_QUESTIONS'         => 'large-12'
     ));
 
     // Curriculum codes: by default use the ones that are part of the folder
@@ -301,9 +309,41 @@ else {
 
     /* Don't display questions contents, which appears in Modify
      */
-    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
-    $this->setVar('allQuestions_block', '');
+    $this->setBlock(TEMPLATE_content, 'has_all_questions', 'has_all_questions_block');
+    $this->setBlock('has_all_questions', 'allQuestions', 'allQuestions_block');
+
+    $this->setVar(array(
+        'has_all_questions_block' => '',
+        'allQuestions_block' => ''
+    ));
+
     $this->parse('importXML_block', 'importXML');
+
+    /* Render out breadcrumbs
+     */
+    $this->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
+
+    $allBreadcrumbs = $folderMapper->breadcrumb($category, true);
+    $i = 1;
+
+    foreach ($allBreadcrumbs as $currentBreadcrumb) {
+        if ($i == $allBreadcrumbs->count()) {
+            $active = 'active';
+        }
+        else {
+            $active = '';
+        }
+
+        $this->setVar(array(
+            'BREADCRUMB_FOLDER_ID' => $currentBreadcrumb->getId(),
+            'BREADCRUMB_FOLDER_NAME' => $currentBreadcrumb->getName(),
+            'BREADCRUMB_ACTIVE' => $active,
+        ));
+
+        $this->parse('breadcrumb_block', 'breadcrumb', true);
+
+        $i++;
+    }
 }
 
 

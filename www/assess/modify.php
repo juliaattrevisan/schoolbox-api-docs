@@ -12,6 +12,7 @@ use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -121,10 +122,15 @@ else {
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
 	$this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
-    $this->setTitle('Manage Assessment');
+    $this->setBlock(TEMPLATE_content, 'has_due_date', 'has_due_date_block');
 
-    $this->setVar('question_block', '');
-    $this->setVar('assess_timespan_block', '');
+    $this->setVar(array(
+        'assess_timespan_block' => '',
+        'question_block' => '',
+        'has_due_date_block' => ''
+    ));
+
+    $this->setTitle('Manage Quiz');
 
     /** @var OnlineAssessment $assessment */
     $task_id = null;
@@ -146,23 +152,25 @@ else {
     }
 
     $this->setVar(array(
-        'ACTION'                  => 'modify',
-        'ASSESS_ACTION'           => 'Modify',
-        'ASSESS_KIND_LC'          => 'assess',
-        'ASSESS_KIND'             => 'Quiz',
-        'ASSESS_IS_TASK'          => !empty($task_id) ? 1 : 0,
-        'ASSESS_ASSESS_ID'        => $assessment->getId(),
-        'ASSESS_CATEGORY_ID'      => $assessment->getCategory()->getId(),
-        'ASSESS_UNIT_ID'          => null,
-        'ASSESS_TITLE'            => Scrub::text($assessment->getTitle()),
-        'ASSESS_DESCRIPTION'      => Scrub::text($assessment->getDescription()),
-	    'ASSESS_WEIGHT'           => $assessment->getWeight(),
-        'ASSESS_START_DATE'       => $assessStartDate->getLocalShort(),
-        'ASSESS_FINISH_DATE'      => $assessFinishDate->getLocalShort(),
-        'ALLOW_RESIT_CHECKED'     => $assessment->getMaxAttempts() == 1 ? 'checked=\'checked\'' : '',
-        'ASSESS_DURATION_CHECKED' => $assessment->getDuration() >= 0 ? 'checked=\'checked\'' : '',
+        'ACTION'                    => 'modify',
+        'ASSESS_ACTION'             => 'Modify',
+        'ASSESS_KIND_LC'            => 'assess',
+        'ASSESS_KIND'               => 'Quiz',
+        'ASSESS_IS_TASK'            => !empty($task_id) ? 1 : 0,
+        'ASSESS_ASSESS_ID'          => $assessment->getId(),
+        'ASSESS_CATEGORY_ID'        => $assessment->getCategory()->getId(),
+        'ASSESS_CATEGORY_NAME'      => $assessment->getCategory()->getName(),
+        'ASSESS_UNIT_ID'            => null,
+        'ASSESS_TITLE'              => Scrub::text($assessment->getTitle()),
+        'ASSESS_DESCRIPTION'        => Scrub::text($assessment->getDescription()),
+        'ASSESS_WEIGHT'             => $assessment->getWeight(),
+        'ASSESS_START_DATE'         => $assessStartDate->getLocalShort(),
+        'ASSESS_FINISH_DATE'        => $assessFinishDate->getLocalShort(),
+        'ALLOW_RESIT_CHECKED'       => $assessment->getMaxAttempts() == 1 ? 'checked=\'checked\'' : '',
+        'ASSESS_DURATION_CHECKED'   => $assessment->getDuration() >= 0 ? 'checked=\'checked\'' : '',
         'ASSESS_COMPLETION_MESSAGE' => Scrub::text($assessment->getCompletionMessage()),
-        'CURRICULUM_CODE_INPUT'   => $this->getTwig()->render(
+        'HAS_ALL_QUESTIONS'         => 'large-8',
+        'CURRICULUM_CODE_INPUT'     => $this->getTwig()->render(
             'sub/curriculumCodeSelector.twig',
             ['codeList' => $assessment->getCurriculumNodes()]
         ),
@@ -243,5 +251,38 @@ else {
     /* Prevent importXML form from appearing
      */
     $this->setVar('importXML_block', '');
+
+    /* Render out breadcrumbs
+     */
+    $this->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
+
+    $folderMapper = new FolderMapper();
+    $folder = $folderMapper->findById($assessment->getCategory()->getId());
+
+    $allBreadcrumbs = $folderMapper->breadcrumb($folder, true);
+    $i = 1;
+
+    foreach ($allBreadcrumbs as $currentBreadcrumb) {
+        if ($i == $allBreadcrumbs->count()) {
+            $active = 'active';
+        }
+        else {
+            $active = '';
+        }
+
+        $this->setVar(array(
+            'BREADCRUMB_FOLDER_ID' => $currentBreadcrumb->getId(),
+            'BREADCRUMB_FOLDER_NAME' => $currentBreadcrumb->getName(),
+            'BREADCRUMB_ACTIVE' => $active,
+        ));
+
+        $this->parse('breadcrumb_block', 'breadcrumb', true);
+
+        $i++;
+    }
+
+    /* Parse due date meta
+     */
+    $this->parse('has_due_date_block', 'has_due_date');
 }
 
