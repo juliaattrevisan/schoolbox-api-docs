@@ -10,12 +10,7 @@
         var settings  = $.extend({}, defaults, options);
         var component = $(this);
 
-        // Replace with reveal modal
         var copyTaskDialog = component.find('[data-interaction="copy_task_dialog"]');
-        //copyTaskDialog.dialog({
-        //    autoOpen: false,
-        //    modal: true
-        //});
 
         /**
          * Submit save task callback.
@@ -91,48 +86,10 @@
         };
         initTaskList();
 
-        ///* Link button which shows the Link input field
-		 //* Hide the input
-		 //* Hide the label
-		 //*/
-        //$('#link-new_task').hide();
-        //$('form a[data-function="link"]').closest('dd').prev('dt').hide();
-        //
-        //component.find('form a[data-function="link"]').bind('click.courseTaskList', function(event) {
-			//event.preventDefault();
-        //
-			///* Toggle the input
-			// * Toggle the label
-			// */
-			//$('#link-new_task').show();
-			//$(this).closest('dd').prev('dt').show();
-        //});
-        //
-        //// Upload button for link items
-        //component.find('form a[data-function="upload"]').bind('click.courseTaskList', function(event) {
-        //    event.preventDefault();
-        //
-			///* Toggle the input
-			// * Toggle the label
-			// */
-			//$('#link-new_task').show();
-			//$(this).closest('dd').prev('dt').show();
-			//
-        //    // Set the form that this dialog was triggered from.
-        //    var source_form = $(this).closest('form');
-        //});
-
         // Set up the same resource browser as is used in the social stream.
         var socialstream_browser = component.find('.resource_browser');
         if (socialstream_browser.length && $.fn.socialstreamBrowser) {
             component.on('click.courseTaskList', 'form a[data-function="browse"]', {}, function(event) {
-
-				///* Toggle the input
-				// * Toggle the label
-				// */
-				//$('#link-new_task').hide();
-				//$(this).closest('dd').prev('dt').hide();
-
                 var form = $(this).closest('form');
                 event.preventDefault();
                 socialstream_browser.socialstreamBrowser({
