@@ -43,9 +43,8 @@ $this->setBlock('attempt', 'attempt_resume', 'attempt_resume_block');
 /* Generic details
  */
 $this->setVar(array(
-    'SURVEY_NAME' => Scrub::text($assess['title']),
+    'ASSESS_NAME' => Scrub::text($assess['title']),
     'CID' => $assess['category_id'],
-    'SURVEY_ID' => $assess['assess_id']
 ));
 
 /* Default
