@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Breadcrumbs;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -321,29 +322,8 @@ else {
 
     /* Render out breadcrumbs
      */
-    $this->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
-
-    $allBreadcrumbs = $folderMapper->breadcrumb($category, true);
-    $i = 1;
-
-    foreach ($allBreadcrumbs as $currentBreadcrumb) {
-        if ($i == $allBreadcrumbs->count()) {
-            $active = 'active';
-        }
-        else {
-            $active = '';
-        }
-
-        $this->setVar(array(
-            'BREADCRUMB_FOLDER_ID' => $currentBreadcrumb->getId(),
-            'BREADCRUMB_FOLDER_NAME' => $currentBreadcrumb->getName(),
-            'BREADCRUMB_ACTIVE' => $active,
-        ));
-
-        $this->parse('breadcrumb_block', 'breadcrumb', true);
-
-        $i++;
-    }
+    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', $category, true);
 }
 
 
