@@ -70,7 +70,7 @@
                     <!-- BEGIN task -->
                     <li class="row" data-task_id="{TASK_ID}">
                         <div class="one-column grip"></div>
-                        <div class="eight-column">
+                        <div class="ten-column">
                             <!-- BEGIN task_link -->
                             <a {TASK_PREVIEW} href="{TASK_LINK}" class="icon-16 {TASK_CLASS}" title="{TASK_TYPE_LABEL}">{TASK_TITLE}</a>
                             <!-- END task_link -->
@@ -78,13 +78,31 @@
                             <span class="icon-16 {TASK_CLASS}" title="{TASK_TYPE_LABEL}">{TASK_TITLE}</span>
                             <!-- END task_no_link -->
                         </div>
-                        <!-- BEGIN edit_task -->
-                        <div class="three actions">
-                            <a href="/task/export/{TASK_ID}" class="no-text icon-export" title="Copy this task into classes"></a>
-                            <a href="/task/modify/{TASK_ID}" class="no-text icon-modify" data-interaction="open_edit_task_form" title="Modify this task"></a>
-                            <a href="#" class="no-text icon-delete" title="Delete this task" data-interaction="open_delete_task_form"></a>
+                        <div class="one actions">
+                            <!-- BEGIN edit_task -->
+                            <a data-dropdown="task-actions-{TASK_ID}"
+                               href="#"
+                               class="no-text icon-more"
+                               aria-controls="task-actions-{TASK_ID}"
+                               aria-expanded="false"
+                            ></a>
+                            <ul data-dropdown-content
+                                id="task-actions-{TASK_ID}"
+                                class="f-dropdown"
+                                aria-hidden="true"
+                            >
+                                <li>
+                                    <a href="/task/export/{TASK_ID}" class="icon-export">Copy this task into classes</a>
+                                </li>
+                                <li>
+                                    <a href="/task/modify/{TASK_ID}" class="icon-modify" data-interaction="open_edit_task_form">Modify this task</a>
+                                </li>
+                                <li>
+                                    <a href="#" class="icon-delete" data-interaction="open_delete_task_form">Delete this task</a>
+                                </li>
+                            </ul>
+                            <!-- END edit_task -->
                         </div>
-                        <!-- END edit_task -->
 
                         <div class="content">
                             <div class="twelve-column panel hide" data-form-container data-interaction="delete_task_container">
