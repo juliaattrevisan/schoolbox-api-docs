@@ -31,7 +31,7 @@ class Mapper extends BaseMapper
         $this->hasMap(
             array(
                 'column'   => 'titleName',
-                'property' => 'name',
+                'property' => 'title',
                 'type'     => self::TYPE_STRING,
             )
         );
