@@ -45,6 +45,7 @@ class Synchronise_External_Cis_Strategy_Student extends Synchronise_Base_Strateg
             ->addHydrator(new Synchronise_External_Cis_Hydrator_Student_Campus(['HS']))
             ->addHydrator(new Synchronise_External_Cis_Hydrator_Student_Role())
             ->addHydrator(new Synchronise_External_Cis_Hydrator_Student_Year())
+            ->addHydrator(new Synchronise_External_Cis_Hydrator_Title('StudentTitle'))
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
