@@ -63,8 +63,8 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
             ->addHydrator(new Synchronise_Base_Hydrator_BasicMapping('ID', 'synergy_id', 'P-%s'))
-            ->addHydrator(new Synchronise_Base_Hydrator_BasicValue('campus', [3]))
-            ->addHydrator(new Synchronise_Base_Hydrator_BasicValue('defaultCampus', 3))
+            // Parent campuses - let's just say they're all in campus "HS" for now?
+            ->addHydrator(new Synchronise_External_Cis_Hydrator_Parent_Campus(['HS']))
             ->addHydrator(new Synchronise_External_Cis_Hydrator_Title('StudentContactTitle'))
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
