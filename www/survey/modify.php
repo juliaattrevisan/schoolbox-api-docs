@@ -8,6 +8,7 @@
  * @version     SVN: $Id$
  */
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Breadcrumbs;
 
 $groupHandler  = new Group();
 $assessHandler = new Survey_Main();
@@ -192,29 +193,8 @@ if (!empty($_POST)) {
 
     /* Render out breadcrumbs
      */
-    $this->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
-
-    $allBreadcrumbs = $folderMapper->breadcrumb($folder, true);
-    $i = 1;
-
-    foreach ($allBreadcrumbs as $currentBreadcrumb) {
-        if ($i == $allBreadcrumbs->count()) {
-            $active = 'active';
-        }
-        else {
-            $active = '';
-        }
-
-        $this->setVar(array(
-                'BREADCRUMB_FOLDER_ID' => $currentBreadcrumb->getId(),
-                'BREADCRUMB_FOLDER_NAME' => $currentBreadcrumb->getName(),
-                'BREADCRUMB_ACTIVE' => $active,
-            ));
-
-        $this->parse('breadcrumb_block', 'breadcrumb', true);
-
-        $i++;
-    }
+    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
 
     /* Parse due date meta
      */
