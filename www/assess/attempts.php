@@ -12,6 +12,7 @@
  * @version     SVN: $Id$
  */
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\UserMapper;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -38,6 +39,14 @@ if ($groupHandler->isStudent() && ($_SESSION['user']->getId() != $this->arg[1]))
 }
 
 try {
+    $userMapper = UserMapper::getInstance();
+    $user = $userMapper->findById($this->arg[1]);
+} catch (Schoolbox\Mapper\Exception $e) {
+    error(19);
+    exit;
+}
+
+try {
     $folderMapper = new FolderMapper();
     $folder = $folderMapper->findById($assess['category_id']);
 }
@@ -55,6 +64,8 @@ $this->setBlock('attempt', 'attempt_resume', 'attempt_resume_block');
 $this->setVar(array(
     'ASSESS_NAME' => Scrub::text($assess['title']),
     'CID' => $assess['category_id'],
+    'ATTEMPT_USER_ID' => $user->getId(),
+    'ATTEMPT_USER_NAME' => $user->formatName()
 ));
 
 /* Default
@@ -75,7 +86,6 @@ if (is_array($allAttempts) && count($allAttempts)) {
         $firstSection = $sectionHandler->getFirst($this->arg[0]);
 
         $this->setVar(array(
-            'ATTEMPT_USER_ID' => $currentAttempt['user_id'],
             'ATTEMPT_ASSESS_ID' => $this->arg[0],
             'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
             'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
