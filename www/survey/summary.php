@@ -44,6 +44,8 @@ $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
 $this->setVar(array(
         'ASSESS_ASSESS_ID'     => $this->arg[0],
+        'ASSESS_KIND_LC'       => 'survey',
+        'ASSESS_KIND'          => 'Survey',
         'ASSESS_TITLE'         => Scrub::text($assess['title']),
         'ASSESS_DESCRIPTION'   => Scrub::html($assess['description']),
         'ASSESS_START'         => $assessStartDate->getShort(),
