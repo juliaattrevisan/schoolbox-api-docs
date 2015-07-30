@@ -27,6 +27,12 @@ class Synchronise_External_Cis_Hydrator_Student_Year implements Synchronise_Base
     protected function getYear($yearCode)
     {
         switch ($yearCode) {
+            case 'G7':
+                // MYP Grade 7
+                return 7;
+            case 'G8':
+                // MYP Grade 8
+                return 8;
             case 'G9':
                 // MYP Grade 9
                 return 9;

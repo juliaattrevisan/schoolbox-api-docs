@@ -27,6 +27,12 @@ class Synchronise_External_Cis_Hydrator_Student_Role implements Synchronise_Base
     protected function getRole($yearCode)
     {
         switch ($yearCode) {
+            case 'G7':
+                // MYP Grade 9
+                return 16;
+            case 'G8':
+                // MYP Grade 10
+                return 17;
             case 'G9':
                 // MYP Grade 9
                 return 18;
