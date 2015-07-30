@@ -1,1 +1,0 @@
-UPDATE `config` SET `title` = 'Display Classes by Type', `description` = 'Split classes in side navigation and profile by class type (Academic, Music, Sport, etc). This only works when external database has support for type.' WHERE `name` like 'mysubjects_split';

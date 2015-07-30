@@ -1,3 +1,0 @@
-INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('external_liss_username', 'alaress', 'External Liss Username', 'Liss Password', '1', '7', 'true');
-INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('external_liss_password', 'alaress', 'External Liss Password', 'Liss Password', '1', '7', 'true');
-INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('external_liss_schoolcode', 'EDVALHIGH', 'External Liss Schoolcode', 'Liss School Code', '1', '7', 'true');

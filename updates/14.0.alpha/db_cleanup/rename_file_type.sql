@@ -1,1 +1,0 @@
-RENAME TABLE `file_type` TO `lu_submission_type`;
