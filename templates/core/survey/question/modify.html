@@ -1,136 +1,140 @@
-<!-- BEGIN custom_head -->
+{BREADCRUMB}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{ASSESS_SECTION_TITLE}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Modify Question</h2>
+        <form id="createQuestionForm" action="/survey/question/modify" class="" method="post">
+            <input name="section_id" type="hidden" value="{SECTION_ID}" />
+            <input name="question_id" type="hidden" value="{QUESTION_ID}" />
+            <input name="answer_id" type="hidden" value="{ANSWER_ID}" />
+            <input name="sequence" type="hidden" value="{SEQUENCE}" />
+            <input name="type_id" type="hidden" value="{QUESTIONTYPE_TYPE_ID}" />
+
+            <section>
+                <div class="content">
+                    <label>
+                        <span>{QUESTIONTYPE_DESCRIPTION}</span>
+                    </label>
+
+                    <label>
+                        Question
+                        <textarea name="question" id="question" />{QUESTION}</textarea>
+                    </label>
+
+                    <!-- BEGIN has_answer_configuration -->
+                    <fieldset>
+                        <legend>Configuration Options</legend>
+                        <!-- BEGIN answer_configuration -->
+
+                        <!-- END answer_configuration -->
+                    </fieldset>
+                    <!-- END has_answer_configuration -->
+
+                    <div>
+                        <!-- BEGIN answerInputs -->
+
+                        <!-- END answerInputs -->
+                    </div>
+                </div>
+            </section>
+            <label>
+                <input type="submit" class='expand' value="Modify" />
+            </label>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Import into Question Bank</h2>
+        <p>Move into the Summary screen pls</p>
+        <section>
+            <div class="content">
+                <form action='/survey/questionbank/addQuestion' class='' method='post'>
+                    <input name='type_id' type='hidden' value='{QUESTIONTYPE_TYPE_ID}' />
+                    <input name='question_id' type='hidden' value='{QUESTION_ID}' />
+                    <input name='answer_id' type='hidden' value='{ANSWER_ID}' />
+                    <input name='marks' type='hidden' value='{MARKS}' />
+                    <input name='question_category' type='hidden' id="question_category"/>
+                    <p>
+                        Puts this question into the Question Bank so you can import
+                        them into other surveys.
+                    </p>
+
+                    <label>
+                        Question Category
+                        <div id='categoryTree'>
+                            <!-- BEGIN category_list_start -->
+                            <ul>
+                                <!-- END category_list_start -->
+
+                                <!-- BEGIN category_list_item_start -->
+                                <ul>
+                                    <!-- END category_list_item_start -->
+
+                                    <!-- BEGIN category_list_item -->
+                                    <li id='{CATEGORY_LIST_ITEM_NODE}' class='{CATEGORY_LIST_ITEM_SELECTED}'>
+                                        <a href='#'>
+                                            {CATEGORY_LIST_ITEM_NAME} ({CATEGORY_LIST_ITEM_NUMQUESTIONS})
+                                        </a>
+                                        <!-- END category_list_item -->
+
+                                        <!-- BEGIN category_list_item_end -->
+                                </ul>
+                                </li>
+                                <!-- END category_list_item_end -->
+                            </ul>
+                        </div>
+
+                    </label>
+
+                    <label>
+                        <input type='submit' value='Add To Question Bank' />
+                    </label>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript">
-	$(function() {
-		$.fn.alaressTiny({
-			mode : "exact",
-			elements: "question",
-			file_browser_category_id : '{ASSESS_CATEGORY_ID}'
-		});
-
-		/* Enforce two decimal places
-		 */
-		$('input[name=marks]').change(function() {
-			$(this).val(parseFloat($(this).val()).toFixed(2));
-		});
+    $(function() {
+        $.fn.alaressTiny({
+            mode : "exact",
+            elements: "question",
+            file_browser_category_id : '{ASSESS_CATEGORY_ID}'
+        });
 
         /* Category tree
          */
         $("#categoryTree")
-            .on('select_node.jstree', function(event, jstree) {
-                $('#question_category').val(jstree.selected[0].replace(/^node_/, ''));
-            })
-            .on('deselect_node.jstree', function() {
-                $('#question_category').val('');
-            })
-            .jstree({
-                "animation":50,
-                "core":{
-                    force_text: true,
-                    multiple:false,
-                    "themes": {
-                        "variant" : "schoolbox",
-                        "dots" : true,
-                        "icons" : false
+                .on('select_node.jstree', function(event, jstree) {
+                    $('#question_category').val(jstree.selected[0].replace(/^node_/, ''));
+                })
+                .on('deselect_node.jstree', function() {
+                    $('#question_category').val('');
+                })
+                .jstree({
+                    "animation":50,
+                    "core":{
+                        force_text: true,
+                        multiple:false,
+                        "themes": {
+                            "variant" : "schoolbox",
+                            "dots" : true,
+                            "icons" : false
+                        }
                     }
-                }
-            });
+                });
     });
 </script>
-<!-- END custom_head -->
-<h1>Modify Question
-    <a class="btn go-back marg tiny" href="/homepage/{ASSESS_CATEGORY_ID}"><span></span>Return to Homepage</a>
-</h1>
-<div class="evaluation-content">
-	<h2>Question Details</h2>
-	<form id="createQuestionForm" action="/survey/question/modify" class="" method="post">
-
-		<label class="hide">
-			<input type="hidden" name="marks" />
-			<input name="section_id" type="hidden" value="{SECTION_ID}" />
-			<input name="question_id" type="hidden" value="{QUESTION_ID}" />
-			<input name="answer_id" type="hidden" value="{ANSWER_ID}" />
-			<input name="sequence" type="hidden" value="{SEQUENCE}" />
-		</label>
-
-		<label>Type
-			<input type="hidden" name="type_id" value="{QUESTIONTYPE_TYPE_ID}" />
-			<span>{QUESTIONTYPE_DESCRIPTION}</span>
-		</label>
-
-		<label>Question
-			<div class="textarea-container" id="question_container"><textarea name="question" class="mceSimple tinyValidate" id="question" />{QUESTION}</textarea></div>
-		</label>
-
-		<!-- BEGIN has_answer_configuration -->
-		<label>Configuration Options
-			<!-- BEGIN answer_configuration -->
-
-			<!-- END answer_configuration -->
-		</label>
-		<!-- END has_answer_configuration -->
-
-		<div id="answer">
-			<!-- BEGIN answerInputs -->
-
-			<!-- END answerInputs -->
-		</div>
-
-		<p class="clearfix">
-			<input type="submit" name="create" id="create" value="Modify" class="submit-btn-plain"/>
-		</p>
-	</form>
-
-	<h2>Import into Question Bank</h2>
-
-	<form action='/survey/questionbank/addQuestion' class='' method='post'>
-		<p>
-			Puts this question into the Question Bank so you can import
-			them into other surveys.
-		</p>
-		<label class="hide">
-			<input name='type_id' type='hidden' value='{QUESTIONTYPE_TYPE_ID}' />
-			<input name='question_id' type='hidden' value='{QUESTION_ID}' />
-			<input name='answer_id' type='hidden' value='{ANSWER_ID}' />
-			<input name='marks' type='hidden' value='{MARKS}' />
-		</label>
-		<label>
-			Question Category
-			<div id='categoryTree'>
-				<!-- BEGIN category_list_start -->
-				<ul>
-				<!-- END category_list_start -->
-
-					<!-- BEGIN category_list_item_start -->
-					<ul>
-					<!-- END category_list_item_start -->
-
-						<!-- BEGIN category_list_item -->
-						<li id='{CATEGORY_LIST_ITEM_NODE}' class='{CATEGORY_LIST_ITEM_SELECTED}'>
-							<a href='#'>
-								{CATEGORY_LIST_ITEM_NAME} ({CATEGORY_LIST_ITEM_NUMQUESTIONS})
-							</a>
-						<!-- END category_list_item -->
-
-					<!-- BEGIN category_list_item_end -->
-					</ul>
-					</li>
-					<!-- END category_list_item_end -->
-				</ul>
-			</div>
-			<input type='hidden' name='question_category' type='hidden' id="question_category" />
-		</label>
-
-		<p class="clearfix">
-			<input type='submit' class='submit-btn-plain' value='Add To Question Bank' />
-		</p>
-	</form>
-</div>
-<div class="evaluation-menu">
-<!-- BEGIN allQuestions -->
-
-<!-- END allQuestions -->
-</div>

@@ -174,16 +174,16 @@ if (!empty($_POST)) {
 
     $this->setVar(array(
         'ASSESS_SECTION_TITLE' => $section['title'],
-        'ASSESS_ASSESS_ID' => $section['assess_id'],
-        'ASSESS_KIND_LC'   => 'assess',
-        'ASSESS_KIND'      => 'Quiz',
-        'ASSESS_CATEGORY_ID' => $assess['category_id'],
-        'SECTION_ID' => $question['section_id'],
-        'SEQUENCE' => $question['sequence'],
-        'QUESTION_ID' => $question['question_id'],
-        'QUESTION' => Scrub::text($question['question']),
-        'MARKS' => $question['marks'],
-        'DISABLED_SELECTED' => '',
+        'ASSESS_ASSESS_ID'     => $section['assess_id'],
+        'ASSESS_KIND_LC'       => 'assess',
+        'ASSESS_KIND'          => 'Quiz',
+        'ASSESS_CATEGORY_ID'   => $assess['category_id'],
+        'SECTION_ID'           => $question['section_id'],
+        'SEQUENCE'             => $question['sequence'],
+        'QUESTION_ID'          => $question['question_id'],
+        'QUESTION'             => Scrub::text($question['question']),
+        'MARKS'                => $question['marks'],
+        'DISABLED_SELECTED'    => '',
     ));
 
     $assessHandler->renderAssessContents($section['assess_id'], $this);
