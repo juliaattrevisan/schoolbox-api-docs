@@ -10,6 +10,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Breadcrumbs;
+
 $groupHandler = new Group();
 $assessHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
@@ -27,6 +29,13 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
 
 if ($assessHandler->isDeleted($this->arg[0])) {
     error(112);
+}
+
+try {
+    $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
+} catch (Schoolbox\Mapper\Exception $e) {
+    error(126);
+    exit;
 }
 
 $this->setFile(TEMPLATE_content, 'survey/attempts.html');
@@ -106,3 +115,23 @@ if (is_array($allAttempts) && count($allAttempts)) {
         $this->setVar('respondent_name_block', '');
     }
 }
+
+$trail = new Breadcrumbs();
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text'  => $folder->getName(),
+        'href'  => '/homepage/' . $folder->getId(),
+        'class' => ''
+    ],
+    [
+        'text'  => $assess['title'],
+        'href'  => '/survey/summary/' . $assess['assess_id'],
+        'class' => ''
+    ],
+    [
+        'text'  => 'Attempts',
+        'href'  => '#',
+        'class' => 'active'
+    ],
+
+]);

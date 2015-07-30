@@ -1,71 +1,69 @@
-<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
-<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.widgets.js"></script>
+{BREADCRUMB}
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{SURVEY_NAME}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Attempts</h2>
+        <section>
+            <form action='/survey/deleteAttempt' method='post'>
+                <table data-sortable>
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <!-- BEGIN respondent_heading -->
+                        <th>Lastname</th>
+                        <th>Firstname</th>
+                        <!-- END respondent_heading -->
+                        <th>Start</th>
+                        <th>Finish</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- BEGIN attempt -->
+                    <tr>
+                        <td>
+                            <input type='checkbox' id='attempt-{ATTEMPT_ATTEMPT_ID}' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
+                            <label for="attempt-{ATTEMPT_ATTEMPT_ID}" class="checkbox-label"></label>
+                        </td>
+                        <!-- BEGIN respondent_name -->
+                        <td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_LASTNAME}</a></td>
+                        <td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_FIRSTNAME}</a></td>
+                        <!-- END respondent_name -->
+                        <td>{ATTEMPT_START}</td>
+                        <td>{ATTEMPT_FINISH}</td>
+                        <td><a href='/survey/review/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}' class="icon-view no-text"></a></td>
+                    </tr>
+                    <!-- END attempt -->
+                    </tbody>
+                </table>
+
+                <div class="content">
+                    <input type='submit' value='Delete selected' />
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.5/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf-8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.js"></script>
 <script type="text/javascript">
-$(function() {
-	$.tablesorter.addParser({
-		id: 'dataDate',
-		is: function() { return false },
-		format: function(value, table, cell) {
-			return $(cell).data('timestamp')
-		},
-		type: 'numeric'
-	});
-
-	$('.sort-it').tablesorter({
-		headers:{
-			0:{sorter:true},
-			1:{sorter:true},
-			2:{sorter:'dataDate'},
-			3:{sorter:'dataDate'},
-			4:{sorter:false},
-			5:{sorter:false}
-		},
-		widgets:['zebra'],
-		widgetZebra:{
-			css:["", "dark"]
-		},
-		cssHeader:"directory-sorter"
-	});
-});
+    $(function() {
+        $('[data-sortable]').DataTable({
+            paging: false,
+            searching: false,
+            columnDefs: [
+                {
+                    orderable: false,
+                    targets: [0, -1]
+                }
+            ]
+        });
+    });
 </script>
-<h1>{SURVEY_NAME}</h1>
 
-<div class="header_option clearfix">
-	<a href="/homepage/{CID}" class="btn go-back"><span></span>Return to Homepage</a>
-    <a href="/survey/results/{SURVEY_ID}" class="btn go-back"><span></span>Back to Survey Results</a>
-</div>
-
-<div class="evaluation-question-section directory">
-	<form action='/survey/deleteAttempt' method='post'>
-		<table class="table tablesorter sort-it">
-			<thead>
-				<tr>
-					<!-- BEGIN respondent_heading -->
-					<th>Lastname</th>
-					<th>Firstname</th>
-					<!-- END respondent_heading -->
-					<th>Start</th>
-					<th>Finish</th>
-					<th>Review</th>
-					<th>Action</th>
-				</tr>
-			</thead>
-			<tbody>
-				<!-- BEGIN attempt -->
-				<tr class='{ON_OFF}'>
-					<!-- BEGIN respondent_name -->
-					<td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_LASTNAME}</a></td>
-					<td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_FIRSTNAME}</a></td>
-					<!-- END respondent_name -->
-					<td data-timestamp="{ATTEMPT_START_TIMESTAMP}">{ATTEMPT_START}</td>
-					<td data-timestamp="{ATTEMPT_FINISH_TIMESTAMP}">{ATTEMPT_FINISH}</td>
-					<td><a href='/survey/review/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}'>Review</a></td>
-					<td><input type='checkbox' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'></td>
-				</tr>
-				<!-- END attempt -->
-			</tbody>
-		</table>
-
-		<input class='submit-btn-plain' type='submit' value='Delete selected' />
-	</form>
-</div>
