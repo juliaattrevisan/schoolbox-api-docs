@@ -1,7 +1,3 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
-<!-- END custom_head -->
-
 <div>
     <ul class="breadcrumb">
         <li><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a></li>
@@ -14,8 +10,8 @@
     <div class="small-12 columns">
         <h1>Reviewing {ASSESS_TITLE} response for {RESPONDENT_NAME}</h1>
         <ul class="meta">
-            <li class="icon-calendar">
-                Survey response created on {ATTEMPT_START_DATETIME},
+            <li class="icon-calendar">Survey response created on
+                {ATTEMPT_START_DATETIME},
                 <!-- BEGIN attemptFinished -->
                 finished on: {ATTEMPT_FINISH_DATETIME}
                 <!-- END attemptFinished -->
@@ -26,7 +22,7 @@
                 not finished by due date
                 <!-- END attemptUnfinished -->
             </li>
-            <li class="icon-survey"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a> Survey</li>
+            <li class="icon-surveys"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a> Survey</li>
             <li class="icon-time-value">Time taken: {ATTEMPT_TIME_TAKEN}</li>
         </ul>
     </div>
