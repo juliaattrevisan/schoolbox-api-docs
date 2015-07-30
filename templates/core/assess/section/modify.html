@@ -2,24 +2,20 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>{ASSESS_TITLE}</h1>
-        <ul class="meta">
-            <li class="icon-calendar">Due on {ASSESS_FINISH_DATE}</li>
-            <li class="icon-due-work"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a> Quiz</li>
-            <li class="icon-time-value">Time allowed: {ASSESS_DURATION}</li>
-        </ul>
+        <h1>{SECTION_TITLE}</h1>
     </div>
 </div>
 
 <div class="row">
-    <div class="small-12 large-8 island">
-        <section>
-            <div class="content">
-                <form name="create" action="/assess/section/modify" id="modifySection" method="post">
-                    <input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
-                    <input name="section_id" type="hidden" value="{SECTION_ID}" />
-                    <input name="sequence" type="hidden" value="{SEQUENCE}" />
+    <div class="small-12 island">
+        <h2 class="subheader">Modify Section</h2>
+        <form name="create" action="/assess/section/modify" id="modifySection" method="post">
+            <input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
+            <input name="section_id" type="hidden" value="{SECTION_ID}" />
+            <input name="sequence" type="hidden" value="{SEQUENCE}" />
 
+            <section>
+                <div class="content">
                     <label>
                         Section Title
                         <input name="title" type="text" size="35" value="{TITLE}" />
@@ -43,18 +39,12 @@
                         Description
                         <textarea name="description"></textarea>
                     </label>
-
-                    <label>
-                        <input type="submit" value="Modify Section" />
-                    </label>
-                </form>
-            </div>
-        </section>
-    </div>
-    <div class="small-12 large-4 island">
-        <!-- BEGIN allQuestions -->
-
-        <!-- END allQuestions -->
+                </div>
+            </section>
+            <label>
+                <input type="submit" class='expand' value="Modify Section" />
+            </label>
+        </form>
     </div>
 </div>
 

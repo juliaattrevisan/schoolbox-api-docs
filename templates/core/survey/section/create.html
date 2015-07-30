@@ -3,16 +3,13 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>{ASSESS_TITLE}</h1>
-        <ul class="meta">
-            <li class="icon-calendar">{ASSESS_START_DATE}&ndash;{ASSESS_FINISH_DATE}</li>
-            <li class="icon-due-work"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a> Survey</li>
-        </ul>
     </div>
 </div>
 
 <div class="row">
     <div class="small-12 island">
         <form name="create" action="/survey/section/create" id="createSection" method="post">
+            <h2 class="subheader">Create Section</h2>
             <section>
                 <div class="content">
                     <input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />

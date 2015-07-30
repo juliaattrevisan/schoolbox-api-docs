@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-use Schoolbox\Resource\Folder\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $assessHandler = new Assess_Main();
@@ -90,6 +90,7 @@ if (!empty($_POST)) {
         'ASSESS_CATEGORY_NAME' => $folder->getName(),
         'ASSESS_DURATION'      => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
         'SECTION_ID'           => $section['section_id'],
+        'SECTION_TITLE'        => $section['title'],
         'TITLE'                => Scrub::text($section['title']),
         'DESCRIPTION'          => Scrub::html($section['description']),
         'SEQUENCE'             => $section['sequence'],
@@ -109,5 +110,21 @@ if (!empty($_POST)) {
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => $assess['title'],
+            'href' => "/assess/modify/{$assess['assess_id']}",
+            'class' => '',
+        ],
+        [
+            'text' => $section['title'],
+            'href' => "",
+            'class' => 'active',
+        ]
+    ]);
 }
