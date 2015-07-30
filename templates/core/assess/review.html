@@ -53,14 +53,6 @@ $(document).ready(function() {
 	});
 
 	var assessAttempted = '{ASSESS_PREVIOUSLY_REVIEWED}';
-
-
-
-	if (assessAttempted == 'true') {
-		$('.tick').html('<span></span>Resubmit Review')
-		$('.review-submitted').show();
-	}
-
 	function showAlert(target) {
 		var relevantLabel = $(target).closest('form').find('.assess-alert');
 		if (assessAttempted == "false") {
@@ -75,8 +67,6 @@ $(document).ready(function() {
 		event.preventDefault();
 		$(this).confirmDialog();
 	});
-
-
 });
 </script>
 <!-- END custom_head -->
@@ -110,6 +100,7 @@ $(document).ready(function() {
         </ul>
     </div>
 
+    <!-- BEGIN resubmit_label -->
     <div class="small-12 columns">
         <p>
             <span class="alert label">
@@ -117,6 +108,7 @@ $(document).ready(function() {
             </span>
         </p>
     </div>
+    <!-- END resubmit_label -->
 
     <div class="small-12 island">
         <h2 class="subheader">Section: {SECTION_TITLE}</h2>
@@ -150,6 +142,9 @@ $(document).ready(function() {
         <!-- BEGIN writable_finalise -->
         <a class="button primary" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Finalise Review</a>
         <!-- END writable_finalise -->
+        <!-- BEGIN writable_resubmit -->
+        <a class="button primary" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Resubmit Review</a>
+        <!-- END writable_resubmit -->
         <!-- END endAssess -->
     </div>
 </div>

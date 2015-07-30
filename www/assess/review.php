@@ -84,6 +84,7 @@ $user = $userHandler->getByID($attempt['user_id']);
 /* Set up template
  */
 $this->setFile(TEMPLATE_content, 'assess/review.html');
+$this->setBlock(TEMPLATE_content, 'resubmit_label', 'resubmit_label_block');
 $this->setBlock(TEMPLATE_content, 'visible_staff', 'visible_staff_block');
 $this->setBlock(TEMPLATE_content, 'visible_staff_students', 'visible_staff_students_block');
 $this->setBlock(TEMPLATE_content, 'visible_staff_students_parents', 'visible_staff_students_parents_block');
@@ -93,6 +94,7 @@ $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
 $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock('endAssess', 'writable_finalise', 'writable_finalise_block');
+$this->setBlock('endAssess', 'writable_resubmit', 'writable_resubmit_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
 /* Show current Section's data, and other mandatory tokens needed to complete
@@ -123,10 +125,16 @@ $this->setVar(array(
     'ASSESS_CATEGORY_ID'      => $folder->getId(),
     'ASSESS_DUEWORK_YEAR'     => $dueDate->getYear(),
     'ASSESS_DUEWORK_SEMESTER' => $dueDate->getYearHalf(),
+    'resubmit_label_block' => '',
     'visible_staff_block' => '',
     'visible_staff_students_block' => '',
     'visible_staff_students_parents_block' => '',
 ));
+
+if ($attempt['reviewed_at'] != '') {
+    $this->parse('resubmit_label_block', 'resubmit_label');
+}
+
 switch ($assess['mark_visibility']) {
     case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE:
         $this->parse('visible_staff_block', 'visible_staff');
@@ -260,8 +268,12 @@ else {
     }
 }
 
-if ($readonly) {
-    $this->setVar('writable_finalise_block', '');
-} else {
-    $this->parse('writable_finalise_block', 'writable_finalise');
+$this->setVar('writable_finalise_block', '');
+$this->setVar('writable_resubmit_block', '');
+if (!$readonly) {
+    if ($attempt['reviewed_at'] != '') {
+        $this->parse('writable_resubmit_block', 'writable_resubmit');
+    } else {
+        $this->parse('writable_finalise_block', 'writable_finalise');
+    }
 }
