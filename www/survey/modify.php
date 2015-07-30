@@ -203,7 +203,7 @@ if (!empty($_POST)) {
         ],
         [
             'text' => $assess['title'],
-            'href' => "/assess/intro/{$assess['assess_id']}",
+            'href' => "/assess/summary/{$assess['assess_id']}",
             'class' => 'active',
         ]
     ]);

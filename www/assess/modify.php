@@ -268,7 +268,7 @@ else {
         ],
         [
             'text' => $assessment->getTitle(),
-            'href' => "/assess/intro/{$assessment->getId()}",
+            'href' => "/assess/summary/{$assessment->getId()}",
             'class' => 'active',
         ]
     ]);
