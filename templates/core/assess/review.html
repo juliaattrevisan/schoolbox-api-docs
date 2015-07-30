@@ -128,12 +128,10 @@ $(document).ready(function() {
         <!-- BEGIN question -->
         <section>
             <form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" name="question-submit" class='validation_{RESPONSE_ID} questionForm' method="post">
-                <h3><strong>Q{QUESTION_SEQUENCE}) ({QUESTION_MARKS} marks)</strong></h3>
-                <div class="wysiwyg">{QUESTION_QUESTION}</div>
-                <div class="evaluation-answer clearfix">
-                    <!-- BEGIN answerInputs -->
-                    <!-- END answerInputs -->
-                </div>
+                <h3>Q{QUESTION_SEQUENCE}) ({QUESTION_MARKS} marks)</h3>
+                <article>{QUESTION_QUESTION}</article>
+                <!-- BEGIN answerInputs -->
+                <!-- END answerInputs -->
             </form>
         </section>
         <!-- END question -->
@@ -150,7 +148,7 @@ $(document).ready(function() {
 
         <!-- BEGIN endAssess -->
         <!-- BEGIN writable_finalise -->
-        <a class="button primary icon-approve" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Finalise Review</a>
+        <a class="button primary" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Finalise Review</a>
         <!-- END writable_finalise -->
         <!-- END endAssess -->
     </div>
