@@ -31,6 +31,7 @@ class External_Isams_Batch_Reader_Iterator_Staff_Map extends External_Isams_Batc
                 'StaffPreferredName' => "$result->Forename",
                 'StaffSurname'       => "$result->Surname",
                 'Email'              => "$result->SchoolEmailAddress",
+                'OccupEmail'         => "$result->SchoolEmailAddress",
             ];
         } else {
             return [
