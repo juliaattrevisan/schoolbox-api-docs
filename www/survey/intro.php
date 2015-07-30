@@ -10,7 +10,7 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\Resource\Folder\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 use Schoolbox\UserMapper;
 
 $assessHandler = new Survey_Main();
@@ -142,5 +142,16 @@ if (is_array($allSummary) && count($allSummary)) {
     $this->setVar('startTest_block', '');
 }
 
-$trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
-$trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
+$trail = new Breadcrumbs();
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text'  => $folder->getName(),
+        'href'  => '/homepage/' . $folder->getId(),
+        'class' => ''
+    ],
+    [
+        'text'  => $assess['title'],
+        'href'  => '/assess/intro/' . $assess['assess_id'],
+        'class' => 'active'
+    ],
+]);
