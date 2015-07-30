@@ -45,8 +45,8 @@ class Synchronise_External_Cis_Strategy_Student extends Synchronise_Base_Strateg
             ->addHydrator(new Synchronise_Base_Hydrator_Student())
             ->addHydrator(new Synchronise_Base_Hydrator_BasicMapping('ID', 'synergy_id', 'S-%s'))
             ->addHydrator(new Synchronise_Base_Hydrator_Student_UsernameFromEmail())
-            // High school only right now
-            ->addHydrator(new Synchronise_External_Cis_Hydrator_Student_Campus(['HS']))
+            // Secondary school only right now
+            ->addHydrator(new Synchronise_External_Cis_Hydrator_Student_Campus(['SS']))
             ->addHydrator(new Synchronise_External_Cis_Hydrator_Student_Role())
             ->addHydrator(new Synchronise_External_Cis_Hydrator_Student_Year())
             ->addHydrator(new Synchronise_External_Cis_Hydrator_Title('StudentTitle'))

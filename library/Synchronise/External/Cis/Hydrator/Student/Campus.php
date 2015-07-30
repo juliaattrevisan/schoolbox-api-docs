@@ -44,7 +44,6 @@ class Synchronise_External_Cis_Hydrator_Student_Campus implements Synchronise_Ba
      */
     public function hydrate($externalUser, $newUser)
     {
-        // Currently HS is the only campus
         $campusList = [];
         foreach ($externalUser['StudentCampus'] as $campus) {
             if (array_key_exists($campus, $this->campusMap)) {
