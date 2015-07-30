@@ -83,6 +83,10 @@ $block-grid-default-spacing: rem-calc(16);
                 margin-left: 2rem;
                 margin-right: 2rem;
             }
+            > .header-actions {
+                margin-right: 2rem;
+                margin-left: 0.5rem;
+            }
 
             .content {
                 padding-left: 2rem;
