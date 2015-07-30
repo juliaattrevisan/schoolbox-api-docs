@@ -1,3 +1,4 @@
+{BREADCRUMB}
 <div class="row">
     <div class="small-12 columns">
         <h1>{SURVEY_NAME}</h1>
@@ -19,7 +20,7 @@
                         <!-- END respondent_heading -->
                         <th>Start</th>
                         <th>Finish</th>
-                        <th>Review</th>
+                        <th>&nbsp;</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -55,7 +56,13 @@
     $(function() {
         $('[data-sortable]').DataTable({
             paging: false,
-            searching: false
+            searching: false,
+            columnDefs: [
+                {
+                    orderable: false,
+                    targets: [0, -1]
+                }
+            ]
         });
     });
 </script>
