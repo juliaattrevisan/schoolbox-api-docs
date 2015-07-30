@@ -9,7 +9,7 @@
  */
 
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 
 $groupHandler  = new Group();
 $assessHandler = new Survey_Main();
@@ -90,11 +90,6 @@ if (!empty($_POST)) {
     $this->setBlock(TEMPLATE_content, 'durationHour', 'durationHour_block');
     $this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
-    $this->setBlock(TEMPLATE_content, 'has_due_date', 'has_due_date_block');
-
-    $this->setVar(array(
-        'has_due_date_block' => ''
-    ));
 
     $this->setTitle('Manage Survey');
 
@@ -104,6 +99,7 @@ if (!empty($_POST)) {
     $this->setVar(
         array(
             'ACTION'                          => 'create',
+            'ASSESS_HEADING'                  => 'New Survey',
             'ASSESS_ACTION'                   => 'Create',
             'ASSESS_KIND_LC'                  => 'survey',
             'ASSESS_KIND'                     => 'Survey',
@@ -191,15 +187,22 @@ if (!empty($_POST)) {
         )
     );
 
-    /* Don't display questions contents, which appears in Modify
-     */
-    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
-    $this->setVar('allQuestions_block', '');
     $this->parse('importXML_block', 'importXML');
 
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'New Survey',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }
 

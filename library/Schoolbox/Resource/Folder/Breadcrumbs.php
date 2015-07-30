@@ -10,12 +10,11 @@
 namespace Schoolbox\Resource\Folder;
 
 
+use Schoolbox\Collection;
 use SitePage;
 
-class Breadcrumbs
+class Breadcrumbs extends \Schoolbox\Breadcrumbs
 {
-
-    const TPL = 'breadcrumbTpl';
 
     /** @var Mapper */
     protected $mapper;
@@ -38,29 +37,23 @@ class Breadcrumbs
      */
     public function renderIntoSitePage(SitePage $page, $handle, Model $folder, $includeFolder = false)
     {
-        $page->setFile(self::TPL, 'resources/breadcrumbs.html');
-
-        $page->setBlock(self::TPL, 'breadcrumb', 'breadcrumb_block');
-        $page->setVar('breadcrumb_block', '');
-
-        $list = $this->mapper->findParents($folder);
-
-        // if the provided folder is to be included in the trail or not
-        if ($includeFolder) {
-            $list->add($folder);
-        }
+        /** @var Collection|Model[] $list */
+        $list = $this->mapper->breadcrumb($folder, $includeFolder);
 
         // let's just calculate this once
         $last = $list->count() - 1;
 
+        $data = [];
+
         foreach ($list as $i => $parent) {
-            $page->setVar('BREADCRUMB_FOLDER_ID', $parent->getId());
-            $page->setVar('BREADCRUMB_FOLDER_NAME', $parent->getName());
-            $page->setVar('BREADCRUMB_CLASS', $i == $last ? 'active' : '');
-            $page->parse('breadcrumb_block', 'breadcrumb', true);
+            $data[] = [
+                'href'  => '/homepage/'.$parent->getId(),
+                'text'  => $parent->getName(),
+                'class' => $i == $last ? 'active' : ''
+            ];
         }
 
-        $page->parse($handle, self::TPL);
+        parent::renderIntoSitePage($page, $handle, $data);
     }
 
 }

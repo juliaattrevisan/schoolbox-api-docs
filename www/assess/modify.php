@@ -13,7 +13,7 @@ use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -123,12 +123,10 @@ else {
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
 	$this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
-    $this->setBlock(TEMPLATE_content, 'has_due_date', 'has_due_date_block');
 
     $this->setVar(array(
         'assess_timespan_block' => '',
         'question_block' => '',
-        'has_due_date_block' => ''
     ));
 
     $this->setTitle('Manage Quiz');
@@ -154,6 +152,7 @@ else {
 
     $this->setVar(array(
         'ACTION'                    => 'modify',
+        'ASSESS_HEADING'            => Scrub::text($assessment->getTitle()),
         'ASSESS_ACTION'             => 'Modify',
         'ASSESS_KIND_LC'            => 'assess',
         'ASSESS_KIND'               => 'Quiz',
@@ -172,9 +171,9 @@ else {
         'ASSESS_COMPLETION_MESSAGE' => Scrub::text($assessment->getCompletionMessage()),
         'HAS_ALL_QUESTIONS'         => 'large-8',
         'CURRICULUM_CODE_INPUT'     => $this->getTwig()->render(
-            'sub/curriculumCodeSelector.twig',
-            ['codeList' => $assessment->getCurriculumNodes()]
-        ),
+                'sub/curriculumCodeSelector.twig',
+                ['codeList' => $assessment->getCurriculumNodes()]
+            ),
     ));
 
     /* Render starting times
@@ -258,11 +257,20 @@ else {
     $folderMapper = new FolderMapper();
     $folder = $folderMapper->findById($assessment->getCategory()->getId());
 
-    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
-
-    /* Parse due date meta
+    /* Render out breadcrumbs
      */
-    $this->parse('has_due_date_block', 'has_due_date');
+    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => $assessment->getTitle(),
+            'href' => "/assess/summary/{$assessment->getId()}",
+            'class' => 'active',
+        ]
+    ]);
 }
 

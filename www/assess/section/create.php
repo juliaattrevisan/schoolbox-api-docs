@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-use Schoolbox\Resource\Folder\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $assessHandler = new Assess_Main();
@@ -102,7 +102,23 @@ if (!empty($_POST)) {
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => $assess['title'],
+            'href' => "/assess/summary/{$assess['assess_id']}",
+            'class' => '',
+        ],
+        [
+            'text' => 'New Section',
+            'href' => "",
+            'class' => 'active',
+        ]
+    ]);
 }
 
 

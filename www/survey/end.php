@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\Resource\Folder\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 
 $surveyHandler   = new Survey_Main();
 $attemptHandler  = new Survey_Attempt();
@@ -102,8 +102,20 @@ if (!$attempt['finish']) {
     $this->setVar('endAssess_block', '');
 }
 
-$trail = new Breadcrumbs($folderMap);
-$trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
+$trail = new Breadcrumbs();
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text'  => $folder->getName(),
+        'href'  => '/homepage/' . $folder->getId(),
+        'class' => ''
+    ],
+    [
+        'text'  => $assess['title'],
+        'href'  => '/assess/intro/' . $assess['assess_id'],
+        'class' => 'active'
+    ],
+]);
+
 
 /* Clear attempt
  */

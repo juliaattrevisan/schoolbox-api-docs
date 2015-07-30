@@ -15,7 +15,7 @@ use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -170,7 +170,7 @@ else {
 
     try {
         $folderMapper = new FolderMapper();
-        $category = $folderMapper->findById($category_id);
+        $folder = $folderMapper->findById($category_id);
     } catch (\Schoolbox\Mapper\Exception $e) {
         error(117);
         exit;
@@ -189,11 +189,9 @@ else {
     $this->setBlock(TEMPLATE_content,  'importXML', 'importXML_block');
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
     $this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
-    $this->setBlock(TEMPLATE_content, 'has_due_date', 'has_due_date_block');
 
     $this->setVar(array(
         'assess_timespan_block' => '',
-        'has_due_date_block' => '',
     ));
 
     $this->setTitle('Manage Quiz');
@@ -206,13 +204,14 @@ else {
 
     $this->setVar(array(
         'ACTION'                    => 'create',
+        'ASSESS_HEADING'            => 'New Quiz',
         'ASSESS_ACTION'             => 'Create',
         'ASSESS_KIND_LC'            => 'assess',
         'ASSESS_KIND'               => 'Quiz',
         'ASSESS_IS_TASK'            => $is_task ? 1 : 0,
         'ASSESS_ASSESS_ID'          => '',
-        'ASSESS_CATEGORY_ID'        => $category->getId(),
-        'ASSESS_CATEGORY_NAME'      => $category->getName(),
+        'ASSESS_CATEGORY_ID'        => $folder->getId(),
+        'ASSESS_CATEGORY_NAME'      => $folder->getName(),
         'ASSESS_UNIT_ID'            => $unit_id,
         'ASSESS_TITLE'              => '',
         'ASSESS_WEIGHT'             => 0,
@@ -228,7 +227,7 @@ else {
         'CURRICULUM_CODE_INPUT',
         $this->getTwig()->render(
             'sub/curriculumCodeSelector.twig',
-            ['codeList' => $category->getCurriculumNodes()]
+            ['codeList' => $folder->getCurriculumNodes()]
         )
     );
 
@@ -308,22 +307,27 @@ else {
 	$widgets->outputVisibilityDropdown($this, \Config::get('submission_access'));
 	$this->parse('marktype_block', 'marktype');
 
-    /* Don't display questions contents, which appears in Modify
-     */
-    $this->setBlock(TEMPLATE_content, 'has_all_questions', 'has_all_questions_block');
-    $this->setBlock('has_all_questions', 'allQuestions', 'allQuestions_block');
-
-    $this->setVar(array(
-        'has_all_questions_block' => '',
-        'allQuestions_block' => ''
-    ));
-
     $this->parse('importXML_block', 'importXML');
 
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', $category, true);
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'New Quiz',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }
 
 
