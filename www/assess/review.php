@@ -37,6 +37,9 @@ if (!is_numeric($this->arg[2])) {
 $assess = $assessHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
 $attempt = $attemptHandler->getByID($this->arg[2]);
+// getListByAssessAndAttempt gets a rowset for some reason!
+$attemptList = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $this->arg[2]);
+$attempt     = array_pop($attemptList);
 
 if (!$assess) {
     error(112);
@@ -48,6 +51,8 @@ if (!$section) {
 
 if (!$attempt) {
     error(128);
+} else {
+    $attempt['totalAvailableMarks'] = $attemptHandler->getTotalMarks($this->arg[0], $this->arg[2]);
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {
@@ -105,6 +110,8 @@ $this->setVar(array(
     'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
     'ATTEMPT_FINISH' => $attemptDate->getShort(),
     'ATTEMPT_TIME_TAKEN' => $assessHandler->sec2hms($attemptFinish->diffInSeconds($attemptDate, true)),
+    'ATTEMPT_TOTAL_MARKS' => number_format($attempt['totalMarks'], 2),
+    'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($attempt['totalAvailableMarks'], 2),
     'SECTION_TITLE' => Scrub::text($section['title']),
     'SECTION_DESCRIPTION' => Scrub::html($section['description']),
     'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
