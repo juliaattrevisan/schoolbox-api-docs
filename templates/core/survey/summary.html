@@ -3,9 +3,14 @@
 <div class="row">
     <div class="small-12 columns">
         <span class='header-actions'>
-            <a href='/survey/modify/{ASSESS_ASSESS_ID}' class='icon-modify'></a>
+            <a href='#' class='icon-more no-text' data-dropdown='header-options'></a>
         </span>
-
+        <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
+            <li><a class="icon-modify" href="/{ASSESS_KIND_LC}/modify/{ASSESS_ASSESS_ID}">Modify</a></li>
+            <li><a class="icon-add" href="/{ASSESS_KIND_LC}/section/create/{ASSESS_ASSESS_ID}">Add Section</a></li>
+            <li><a class="icon-export" href="/{ASSESS_KIND_LC}/export/xml/{ASSESS_ASSESS_ID}">Export</a></li>
+            <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/delete/{ASSESS_ASSESS_ID}" data-delete>Delete</a></li>
+        </ul>
         <h1>{ASSESS_TITLE}</h1>
     </div>
 </div>
@@ -18,7 +23,6 @@
             <!-- END has_due_date -->
             <li class="icon-time-value icon-16">Time allowed: {ASSESS_DURATION}</li>
         </ul>
-
         <section>
             <article class="content">{ASSESS_DESCRIPTION}</article>
         </section>
