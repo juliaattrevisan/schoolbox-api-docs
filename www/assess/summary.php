@@ -44,6 +44,8 @@ $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
 $this->setVar(array(
         'ASSESS_ASSESS_ID'     => $this->arg[0],
+        'ASSESS_KIND_LC'       => 'assess',
+        'ASSESS_KIND'          => 'Quiz',
         'ASSESS_TITLE'         => Scrub::text($assess['title']),
         'ASSESS_DESCRIPTION'   => Scrub::html($assess['description']),
         'ASSESS_START'         => $assessStartDate->getShort(),
@@ -54,8 +56,13 @@ $this->setVar(array(
 ));
 
 $this->setFile(TEMPLATE_content, 'assess/summary.html');
+$this->setFile('assessContentsFragment', 'assess/contents.html');
+$this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setTitle('Assessment: ' . $assess['title']);
+
+$assessHandler->renderAssessContents($assess['assess_id'], $this);
+$this->parse('allQuestions_block', 'assessContentsFragment', true);
 
 $this->setVar(array(
     'ASSESS_DURATION' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
