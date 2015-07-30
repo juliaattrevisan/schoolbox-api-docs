@@ -12,6 +12,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Breadcrumbs;
 
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
@@ -96,6 +98,17 @@ if (!empty($_POST)) {
         error(115);
     }
 
+    try {
+        $folderMapper = new FolderMapper();
+        $folder = $folderMapper->findById($assess['category_id']);
+    }
+    catch (\Exception $e) {
+        error(117);
+    }
+
+    $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
+    $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
+
     /* Render create page
      */
     $this->setFile(TEMPLATE_content, 'assess/question/create.html');
@@ -113,14 +126,20 @@ if (!empty($_POST)) {
 	));
 
     $this->setVar(array(
-        'ASSESS_ASSESS_ID' => $section['assess_id'],
-        'ASSESS_KIND_LC'   => 'assess',
-        'ASSESS_KIND'      => 'Quiz',
-        'SECTION_ID' => $this->arg[0],
+        'ASSESS_TITLE'          => $assess['title'],
+        'ASSESS_ASSESS_ID'      => $section['assess_id'],
+        'ASSESS_KIND_LC'        => 'assess',
+        'ASSESS_KIND'           => 'Quiz',
+        'ASSESS_START'          => $assessStartDate->getShort(),
+        'ASSESS_FINISH'         => $assessFinishDate->getShort(),
+        'ASSESS_CATEGORY_ID'    => $folder->getId(),
+        'ASSESS_CATEGORY_NAME'  => $folder->getName(),
+        'ASSESS_DURATION'       => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
+        'SECTION_ID'            => $this->arg[0],
         'CURRENT_SECTION_TITLE' => Scrub::text($section['title']),
-        'SEQUENCE' => $questionHandler->getNextSequence($section['section_id']),
-        'QUESTION' => '',
-        'MARKS' => '',
+        'SEQUENCE'              => $questionHandler->getNextSequence($section['section_id']),
+        'QUESTION'              => '',
+        'MARKS'                 => '',
     ));
 
     /* If a particular question type has been selected; otherwise ignore it
@@ -223,5 +242,10 @@ if (!empty($_POST)) {
     ));
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
 }
 
