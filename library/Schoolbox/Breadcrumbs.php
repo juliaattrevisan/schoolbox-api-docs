@@ -22,7 +22,7 @@ class Breadcrumbs
      * @param string   $handle
      * @param array    $data
      */
-    protected function sitePage(SitePage $page, $handle, array $data)
+    public function renderIntoSitePage(SitePage $page, $handle, array $data)
     {
         $page->setFile(self::TPL, 'resources/breadcrumbs.html');
 

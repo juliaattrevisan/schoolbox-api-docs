@@ -53,7 +53,7 @@ class Breadcrumbs extends \Schoolbox\Breadcrumbs
             ];
         }
 
-        $this->sitePage($page, $handle, $data);
+        parent::renderIntoSitePage($page, $handle, $data);
     }
 
 }
