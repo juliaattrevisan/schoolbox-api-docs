@@ -121,7 +121,7 @@ if (!empty($_POST)) {
         ],
         [
             'text' => $survey['title'],
-            'href' => "/assess/modify/{$survey['assess_id']}",
+            'href' => "/assess/summary/{$survey['assess_id']}",
             'class' => '',
         ],
         [
