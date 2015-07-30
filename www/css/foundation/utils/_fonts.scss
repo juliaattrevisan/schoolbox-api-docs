@@ -43,7 +43,8 @@
 }
 
 // Icons
-.icon-add:before {
+.icon-add:before,
+.icon-plus:before {
 	content: "\e600";
 }
 .icon-advanced-list:before {
@@ -55,7 +56,8 @@
 .icon-anchor:before {
 	content: "\e603";
 }
-.icon-approve:before {
+.icon-approve:before,
+.icon-tick:before {
 	content: "\e604";
 }
 .icon-attach:before {
@@ -82,13 +84,16 @@
 .icon-click-view:before {
 	content: "\e60c";
 }
-.icon-close:before {
+.icon-close:before,
+.icon-cancel:before,
+.icon-x:before {
 	content: "\e60d";
 }
 .icon-collab-docs:before {
 	content: "\e60e";
 }
-.icon-collapse:before {
+.icon-collapse:before,
+.icon-minus:before {
 	content: "\e60f";
 }
 .icon-comment:before {
@@ -118,7 +123,8 @@
 .icon-curriculum-details:before {
 	content: "\e618";
 }
-.icon-delete:before {
+.icon-delete:before,
+.icon-bin:before {
 	content: "\e619";
 }
 .icon-directory:before {
@@ -145,7 +151,8 @@
 .icon-edit-columns:before {
 	content: "\e621";
 }
-.icon-email:before {
+.icon-email:before,
+.icon-mail:before {
 	content: "\e622";
 }
 .icon-eportfolio:before {
@@ -157,7 +164,8 @@
 .icon-export:before {
 	content: "\e625";
 }
-.icon-favourite:before {
+.icon-favourite:before,
+.icon-star:before {
 	content: "\e626";
 }
 .icon-files:before {
@@ -187,13 +195,15 @@
 .icon-group-managers:before {
 	content: "\e62f";
 }
-.icon-help:before {
+.icon-help:before,
+.icon-questionmark:before {
 	content: "\e630";
 }
 .icon-history:before {
 	content: "\e631";
 }
-.icon-home:before {
+.icon-home:before,
+.icon-house:before {
 	content: "\e632";
 }
 .icon-homepagefeed:before {
@@ -208,7 +218,8 @@
 .icon-image-gallery:before {
 	content: "\e636";
 }
-.icon-image-slideshow:before {
+.icon-image-slideshow:before,
+.icon-play:before {
 	content: "\e637";
 }
 .icon-link:before {
@@ -217,13 +228,15 @@
 .icon-list:before {
 	content: "\e639";
 }
-.icon-locked:before {
+.icon-locked:before,
+.icon-padlock:before {
 	content: "\e63a";
 }
 .icon-logout:before {
 	content: "\e63b";
 }
-.icon-menu:before {
+.icon-menu:before,
+.icon-hamburger:before {
 	content: "\e63c";
 }
 .icon-mic:before {
@@ -232,10 +245,12 @@
 .icon-mobile:before {
 	content: "\e63e";
 }
-.icon-modify:before {
+.icon-modify:before,
+.icon-pen:before {
 	content: "\e63f";
 }
-.icon-more:before {
+.icon-more:before,
+.icon-overflow:before {
 	content: "\e640";
 }
 .icon-mute:before {
@@ -250,10 +265,12 @@
 .icon-news:before {
 	content: "\e644";
 }
-.icon-next:before {
+.icon-next:before,
+.icon-goto:before {
 	content: "\e645";
 }
-.icon-notifications:before {
+.icon-notifications:before,
+.icon-bell:before {
 	content: "\e646";
 }
 .icon-office-365:before {
@@ -280,7 +297,8 @@
 .icon-print:before {
 	content: "\e64e";
 }
-.icon-progress:before {
+.icon-progress:before,
+.icon-report:before {
 	content: "\e64f";
 }
 .icon-quiz:before {
@@ -310,10 +328,12 @@
 .icon-search:before {
 	content: "\e658";
 }
-.icon-settings:before {
+.icon-settings:before,
+.icon-cog:before {
 	content: "\e659";
 }
-.icon-showcase:before {
+.icon-showcase:before,
+.icon-trophy:before {
 	content: "\e65a";
 }
 .icon-shuffle:before {
@@ -322,13 +342,16 @@
 .icon-social-stream:before {
 	content: "\e65c";
 }
-.icon-sport:before {
+.icon-sport:before,
+.icon-ball:before {
 	content: "\e65d";
 }
-.icon-staff:before {
+.icon-staff:before,
+.icon-users:before {
 	content: "\e65e";
 }
-.icon-staff-students:before {
+.icon-staff-students:before,
+.icon-user:before {
 	content: "\e65f";
 }
 .icon-surveys:before {
@@ -340,7 +363,8 @@
 .icon-task:before {
 	content: "\e662";
 }
-.icon-teacher:before {
+.icon-teacher:before,
+.icon-graduate:before {
 	content: "\e663";
 }
 .icon-textbox:before {
@@ -349,10 +373,12 @@
 .icon-tiles:before {
 	content: "\e665";
 }
-.icon-timetable:before {
+.icon-timetable:before,
+.icon-clock:before {
 	content: "\e666";
 }
-.icon-time-value:before {
+.icon-time-value:before,
+.icon-hourglass:before {
 	content: "\e667";
 }
 .icon-twitter:before {
@@ -370,7 +396,8 @@
 .icon-video:before {
 	content: "\e66c";
 }
-.icon-view:before {
+.icon-view:before,
+.icon-eye:before {
 	content: "\e66d";
 }
 .icon-weather:before {
