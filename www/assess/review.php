@@ -90,6 +90,13 @@ $this->setTitle('Assessment: ' . $assess['title']);
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the Assessment.
  */
+try {
+    $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
+} catch (Schoolbox\Mapper\Exception $e) {
+    error(112);
+    exit;
+}
+$dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => Scrub::text($assess['title']),
@@ -98,6 +105,10 @@ $this->setVar(array(
     'SECTION_DESCRIPTION' => Scrub::html($section['description']),
     'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
     'RESPONDENT_NAME' => $userHandler->formatName($user),
+    'ASSESS_CATEGORY_NAME'    => Scrub::text($folder->getName()),
+    'ASSESS_CATEGORY_ID'      => $folder->getId(),
+    'ASSESS_DUEWORK_YEAR'     => $dueDate->getYear(),
+    'ASSESS_DUEWORK_SEMESTER' => $dueDate->getYearHalf(),
 ));
 
 $readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
