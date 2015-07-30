@@ -54,9 +54,9 @@ class Synchronise_Synergetic_Seymour_Strategy_Student extends Synchronise_Synerg
         $newUser['title']              = '';
         $newUser['firstname']          = $currentUser['StudentPreferred'];
         $newUser['lastname']           = $currentUser['StudentSurname'];
-        $newUser['alt_email']          = $currentUser['StudentEmail'];
+        $newUser['alt_email']          = $currentUser['StudentOccupEmail'];
         $newUser['synergy_id']         = $currentUser['StudentID'];
-        $newUser['local_email']        = 1;
+        $newUser['local_email']        = 0;
         $newUser['eportfolio_enabled'] = 1;
         $newUser['year']               = $currentUser['StudentYearLevel'];
         // House config: needs to map to a house id
