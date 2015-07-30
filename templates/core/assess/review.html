@@ -8,10 +8,10 @@ $(document).ready(function() {
     var forms = $('form[data-role="question-submit"]');
 
     forms.each(function(index, formElement) {
-   		 $(formElement).validate({
-			submitHandler: function() {
-//				showAlert(formElement);
-				$.post(
+         $(formElement).validate({
+            submitHandler: function() {
+//                showAlert(formElement);
+                $.post(
                     $(formElement).attr('action'),
                     $(formElement).serialize()
 //                    ,function (responseText) {
@@ -19,22 +19,22 @@ $(document).ready(function() {
 //                        var result = dataFunction();
 //                    }
                 );
-				return false;
-			},
-			rules: {
-				reviewedMarks: {
-					number:true
-				}
-			},
-			messages: {
-				reviewedMarks: "Please enter a decimal number"
-			},
-			errorPlacement: function(error, element) {
+                return false;
+            },
+            rules: {
+                reviewedMarks: {
+                    number:true
+                }
+            },
+            messages: {
+                reviewedMarks: "Please enter a decimal number"
+            },
+            errorPlacement: function(error, element) {
 //                var offset = element.offset();
                 error.insertBefore(element)
-			}
-   		});
-	});
+            }
+        });
+    });
 
     forms.find('textarea').blur(function(e) {
         e.preventDefault();
@@ -53,8 +53,8 @@ $(document).ready(function() {
 
     forms.find('input').blur(function(e) {
         e.preventDefault();
-//		showAlert($(this));
-		$.post(
+//        showAlert($(this));
+        $.post(
             $(this).closest('form').attr('action'),
             $(this).closest('form').serialize()
 //            ,function(responseText) {
@@ -62,34 +62,34 @@ $(document).ready(function() {
 //                var result = dataFunction();
 //            }
         );
-	});
+    });
 
-//	var assessAttempted = '{ASSESS_PREVIOUSLY_REVIEWED}';
-//	function showAlert(target) {
-//		var relevantLabel = $(target).closest('form').find('.assess-alert');
-//		if (assessAttempted == "false") {
-//			relevantLabel.fadeIn(200);
-//		}
-//		if (assessAttempted == "true") {
-//			relevantLabel.html('<span>In order to finish your edits to this finalised review, click \'Resubmit Review\' at the end of the quiz\</span>').fadeIn(200);
-//		}
-//	}
+    var assessAttempted = '{ASSESS_PREVIOUSLY_REVIEWED}';
+    function showAlert(target) {
+        var relevantLabel = $(target).closest('form').find('.assess-alert');
+        if (assessAttempted == "false") {
+            relevantLabel.fadeIn(200);
+        }
+        if (assessAttempted == "true") {
+            relevantLabel.html('<span>In order to finish your edits to this finalised review, click \'Resubmit Review\' at the end of the quiz\</span>').fadeIn(200);
+        }
+    }
 
-	$('[data-action="finish-review"]').click(function(event) {
-		event.preventDefault();
-		$(this).confirmDialog();
-	});
+    $('[data-action="finish-review"]').click(function(event) {
+        event.preventDefault();
+        $(this).confirmDialog();
+    });
 });
 </script>
 <!-- END custom_head -->
 
 <div>
-	<ul class="breadcrumb">
-		<li><a href="/submission/listSubmission" >Submissions</a></li>
-		<li><a href="/submission/listSubmission/{ASSESS_DUEWORK_YEAR}/{ASSESS_DUEWORK_SEMESTER}/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a></li>
-		<li><a href="/assess/results/{ASSESS_ASSESS_ID}/">{ASSESS_TITLE}</a></li>
+    <ul class="breadcrumb">
+        <li><a href="/submission/listSubmission" >Submissions</a></li>
+        <li><a href="/submission/listSubmission/{ASSESS_DUEWORK_YEAR}/{ASSESS_DUEWORK_SEMESTER}/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a></li>
+        <li><a href="/assess/results/{ASSESS_ASSESS_ID}/">{ASSESS_TITLE}</a></li>
         <li><a href="#">{RESPONDENT_NAME}</a></li>
-	</ul>
+    </ul>
 </div>
 
 <div class="row">
