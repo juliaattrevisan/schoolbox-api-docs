@@ -152,6 +152,7 @@ else {
 
     $this->setVar(array(
         'ACTION'                    => 'modify',
+        'ASSESS_HEADING'            => Scrub::text($assessment->getTitle()),
         'ASSESS_ACTION'             => 'Modify',
         'ASSESS_KIND_LC'            => 'assess',
         'ASSESS_KIND'               => 'Quiz',
@@ -170,9 +171,9 @@ else {
         'ASSESS_COMPLETION_MESSAGE' => Scrub::text($assessment->getCompletionMessage()),
         'HAS_ALL_QUESTIONS'         => 'large-8',
         'CURRICULUM_CODE_INPUT'     => $this->getTwig()->render(
-            'sub/curriculumCodeSelector.twig',
-            ['codeList' => $assessment->getCurriculumNodes()]
-        ),
+                'sub/curriculumCodeSelector.twig',
+                ['codeList' => $assessment->getCurriculumNodes()]
+            ),
     ));
 
     /* Render starting times

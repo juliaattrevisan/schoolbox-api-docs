@@ -103,6 +103,7 @@ if (!empty($_POST)) {
     $this->setVar(
         array(
             'ACTION'                          => 'modify',
+            'ASSESS_HEADING'                  => Scrub::text($assess['title']),
             'ASSESS_ASSESS_ID'                => $assess['assess_id'],
             'ASSESS_ACTION'                   => 'Modify',
             'ASSESS_KIND'                     => 'Survey',

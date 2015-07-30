@@ -99,6 +99,7 @@ if (!empty($_POST)) {
     $this->setVar(
         array(
             'ACTION'                          => 'create',
+            'ASSESS_HEADING'                  => 'New Survey',
             'ASSESS_ACTION'                   => 'Create',
             'ASSESS_KIND_LC'                  => 'survey',
             'ASSESS_KIND'                     => 'Survey',

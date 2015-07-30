@@ -204,6 +204,7 @@ else {
 
     $this->setVar(array(
         'ACTION'                    => 'create',
+        'ASSESS_HEADING'            => 'New Quiz',
         'ASSESS_ACTION'             => 'Create',
         'ASSESS_KIND_LC'            => 'assess',
         'ASSESS_KIND'               => 'Quiz',
