@@ -73,7 +73,7 @@ class Synchronise_External_Cis_Strategy_Student extends Synchronise_Base_Strateg
         $profile
             ->setUserId($newUser['id'])
             ->setHouse($externalUser['StudentHouse'])
-            ->setLevel($externalUser['StudentYearLevel'])
+            ->setLevel($newUser['year'])
             ->setDob(new Alaress_Date_Format($externalUser['StudentBirthDate'], 'Y-m-d'))
             ->setBirthDate($externalUser['StudentBirthDate'])
             ->setHomegroup($externalUser['StudentClassGroup'])
