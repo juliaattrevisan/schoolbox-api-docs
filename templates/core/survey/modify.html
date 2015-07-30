@@ -15,12 +15,12 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">{ASSESS_ACTION} {ASSESS_KIND}</h2>
-        <section>
-            <div class="content">
-                <form name="create" action="/survey/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" method="post">
-                    <input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
-                    <input type="hidden" name="max_attempts" value="1" />
+        <form name="create" action="/survey/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" method="post">
+            <input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
+            <input type="hidden" name="max_attempts" value="1" />
 
+            <section>
+                <div class="content">
                     <label>
                         Title
                         <input name="title" type="text" maxlength="100" value="{ASSESS_TITLE}" id="title"/>
@@ -104,13 +104,12 @@
                             Notify creator via email when response received
                         </label>
                     </fieldset>
-
-                    <label>
-                        <input type="submit" value="Continue" />
-                    </label>
-                </form>
-            </div>
-        </section>
+                </div>
+            </section>
+            <label>
+                <input type="submit" class='expand' value="Continue" />
+            </label>
+        </form>
     </div>
 </div>
 

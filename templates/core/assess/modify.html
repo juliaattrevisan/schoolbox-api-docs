@@ -15,13 +15,13 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">{ASSESS_ACTION} {ASSESS_KIND}</h2>
-        <section>
-            <div class="content">
-                <form name="create" action="/assess/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" method="post">
-                    <input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
-                    <input name="is_task" type="hidden" value="{ASSESS_IS_TASK}" />
-                    <input name="unit_id" type="hidden" value="{ASSESS_UNIT_ID}" />
+        <form name="create" action="/assess/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" method="post">
+            <input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
+            <input name="is_task" type="hidden" value="{ASSESS_IS_TASK}" />
+            <input name="unit_id" type="hidden" value="{ASSESS_UNIT_ID}" />
 
+            <section>
+                <div class="content">
                     <label>
                         Title
                         <input name="title" type="text" maxlength="100" value="{ASSESS_TITLE}" id="title"/>
@@ -151,13 +151,12 @@
                         {CURRICULUM_CODE_INPUT}
                     </label>
                     <!-- END curriculum_code_input -->
-
-                    <label>
-                        <input type="submit" value="Continue" />
-                    </label>
-                </form>
-            </div>
-        </section>
+                </div>
+            </section>
+            <label>
+                <input type="submit" class="expand" value="Continue" />
+            </label>
+        </form>
     </div>
 </div>
 
