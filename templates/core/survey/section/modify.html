@@ -1,76 +1,91 @@
-<!-- BEGIN custom_head -->
+{BREADCRUMB}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{ASSESS_TITLE}</h1>
+        <ul class="meta">
+            <li class="icon-calendar">{ASSESS_START_DATE}&ndash;{ASSESS_FINISH_DATE}</li>
+            <li class="icon-due-work"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a> Survey</li>
+        </ul>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 large-8 island">
+        <h2 class="subheader">Modify Section</h2>
+        <section>
+            <div class="content">
+                <form name="create" action="/survey/section/modify" id="modifySection" method="post">
+                    <input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
+                    <input name="section_id" type="hidden" value="{SECTION_ID}" />
+                    <input name="sequence" type="hidden" value="{SEQUENCE}" />
+
+                    <label>
+                        Section Title
+                        <input name="title" type="text" size="35" value="{TITLE}" />
+                    </label>
+
+                    <label>
+                        Description
+                        <textarea name="description"></textarea>
+                    </label>
+
+                    <label>
+                        <input type="submit" value="Modify Section" />
+                    </label>
+                </form>
+            </div>
+        </section>
+    </div>
+    <div class="small-12 large-4 island">
+        <!-- BEGIN allQuestions -->
+
+        <!-- END allQuestions -->
+    </div>
+</div>
+
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 
 <script type="text/javascript">
-$(function() {
-	$.fn.alaressTiny({
-		mode: 'exact',
-		elements: 'description',
-		file_browser_category_id: '{ASSESS_CATEGORY_ID}'
-	});
+    $(function() {
+        $.fn.alaressTiny({
+            mode: 'exact',
+            elements: 'description',
+            file_browser_category_id: '{ASSESS_CATEGORY_ID}'
+        });
 
-	if ($('.checkbox').prop("checked")) {
-		$('.hide-questions').show();
-		$('.hide-questions :input').prop('disabled', false);
-	}
+        if ($('[data-shuffle]').prop("checked")) {
+            var prompt = $('[data-max-questions-prompt]');
+            var input = prompt.find('[data-max-questions]');
 
-	$('.checkbox').click(function() {
-		if ($('.hide-questions').css("display") == "block") {
-			$('.hide-questions').hide();
-			$('.hide-questions :input').prop('disabled', true);
-		} else {
-			$('.hide-questions').show();
-			$('.hide-questions :input').prop('disabled', false);
-		}
-	});
+            prompt.removeClass('hide');
+            input.prop('disabled', false);
+        }
 
-	$('#modifySection').validate({
-		rules: {
-			title: {
-				required: true,
-				minlength: 2
-			}
-		},
+        $('[data-shuffle]').change(function() {
+            if (prompt.hasClass("hide")) {
+                input.prop('disabled', false);
+            }
+            else {
+                input.prop('disabled', true);
+            }
 
-		messages: {
-			title: "Please enter a title",
-			description: "Please enter a description"
-		}
-	});
-});
+            prompt.toggleClass('hide');
+        });
+
+        $('#modifySection').validate({
+            rules: {
+                title: {
+                    required: true,
+                    minlength: 2
+                }
+            },
+
+            messages: {
+                title: "Please enter a title",
+                description: "Please enter a description"
+            }
+        });
+    });
 </script>
-<!-- END custom_head -->
-
-<h1>Modify {TITLE} in {ASSESS_TITLE}
-    <a class="btn go-back marg tiny" href="/homepage/{ASSESS_CATEGORY_ID}"><span></span>Return to Homepage</a>
-</h1>
-<div class="evaluation-content">
-	<h2>Section Details</h2>
-
-	<form name="create" action="/survey/section/modify" class="" id="modifySection" method="post">
-		<label class="hide">
-			<input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
-			<input name="section_id" type="hidden" value="{SECTION_ID}" />
-			<input name="sequence" type="hidden" value="{SEQUENCE}" />
-		</label>
-
-		<label>Section Title
-			<input name="title" type="text" size="35" value="{TITLE}" />
-		</label>
-
-		<label>Description
-			<div class="textarea-container"><textarea name="description">{DESCRIPTION}</textarea></div>
-		</label>
-
-		<label class="clearfix ">
-			<input type="submit" id="create" value="Modify" class="submit-btn-plain no-marg">
-		</label>
-	</form>
-</div>
-
-<div class="evaluation-menu">
-<!-- BEGIN allQuestions -->
-
-<!-- END allQuestions -->
-</div>
