@@ -311,21 +311,22 @@ else {
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
-            [
-                'text' => $folder->getName(),
-                'href' => "/homepage/{$folder->getId()}",
-                'class' => '',
-            ],
-            [
-                'text' => 'New Quiz',
-                'href' => '',
-                'class' => 'active',
-            ]
-        ]);
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'New Quiz',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }
 
 
