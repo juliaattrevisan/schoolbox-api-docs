@@ -109,38 +109,49 @@ $(document).ready(function() {
             <li class="icon-approve">Mark: {ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</li>
         </ul>
     </div>
-</div>
 
-<p class="information-notification review-submitted hide">Please note: You are currently editing an already submitted review.</p>
+    <div class="small-12 columns">
+        <p>
+            <span class="alert label">
+                Please note: You are currently editing an already submitted review.
+            </span>
+        </p>
+    </div>
 
-	<div class="evaluation-content mark-test">
-	<h2>Section: {SECTION_TITLE}</h2>
-	<div class="wysiwyg">{SECTION_DESCRIPTION}</div>
+    <div class="small-12 island">
+        <h2 class="subheader">Section: {SECTION_TITLE}</h2>
+        <section>
+            <article>{SECTION_DESCRIPTION}</article>
+        </section>
 
-	<!-- BEGIN question -->
-	<form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" name="question-submit" class='validation_{RESPONSE_ID} questionForm' method="post">
-        <h3><strong>Q{QUESTION_SEQUENCE}) ({QUESTION_MARKS} marks)</strong></h3>
-        <div class="wysiwyg">{QUESTION_QUESTION}</div>
-		<div class="evaluation-answer clearfix">
-			<!-- BEGIN answerInputs -->
-			<!-- END answerInputs -->
-		</div>
-	</form>
-	<!-- END question -->
+        <h2 class="subheader">Questions</h2>
+        <!-- BEGIN question -->
+        <section>
+            <form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" name="question-submit" class='validation_{RESPONSE_ID} questionForm' method="post">
+                <h3><strong>Q{QUESTION_SEQUENCE}) ({QUESTION_MARKS} marks)</strong></h3>
+                <div class="wysiwyg">{QUESTION_QUESTION}</div>
+                <div class="evaluation-answer clearfix">
+                    <!-- BEGIN answerInputs -->
+                    <!-- END answerInputs -->
+                </div>
+            </form>
+        </section>
+        <!-- END question -->
+    </div>
 
-	<p class="clearfix text-align-right">
-		<!-- BEGIN prevSection -->
-		<a class="btn go-back float-left" href="/assess/review/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Previous Section</a>
-		<!-- END prevSection -->
+    <div class="small-12 columns">
+        <!-- BEGIN prevSection -->
+        <a class="button secondary icon-previous" href="/assess/review/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Previous Section</a>
+        <!-- END prevSection -->
 
-		<!-- BEGIN nextSection -->
-		<a class="btn go-to" href="/assess/review/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Next Section</a>
-		<!-- END nextSection -->
+        <!-- BEGIN nextSection -->
+        <a class="button secondary icon-next" href="/assess/review/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Next Section</a>
+        <!-- END nextSection -->
 
-		<!-- BEGIN endAssess -->
-          <!-- BEGIN writable_finalise -->
-		<a class="btn tick finish-review" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Finalise Review</a>
-          <!-- END writable_finalise -->
+        <!-- BEGIN endAssess -->
+        <!-- BEGIN writable_finalise -->
+        <a class="button primary icon-approve" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Finalise Review</a>
+        <!-- END writable_finalise -->
         <!-- END endAssess -->
-	</p>
+    </div>
 </div>
