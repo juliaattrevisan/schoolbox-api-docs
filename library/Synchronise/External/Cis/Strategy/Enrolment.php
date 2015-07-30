@@ -20,6 +20,8 @@ use Schoolbox\UserMapper;
 
 class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strategy_Class
 {
+    use Synchronise_External_Cis_Strategy_BatchXmlTrait;
+
     protected $location = '';
     protected $columns  = array();
     protected $title    = "Update Schoolbox Enrolment Details Synchronisation";
@@ -29,9 +31,7 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
      */
     public function generateList()
     {
-        $reader = new XMLReader();
-        $reader->open(SITE_root.'/classes.xml');
-        $iterator   = new External_Isams_Batch_Reader_Enrolment($reader);
+        $iterator   = new External_Isams_Batch_Reader_Enrolment($this->getXmlReader());
         $this->list = $iterator->getAccountInfo();
     }
 

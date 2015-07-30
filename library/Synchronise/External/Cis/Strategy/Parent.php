@@ -22,7 +22,9 @@ use Schoolbox\External\UserProfileMapper;
 use Schoolbox\External\UserRelation;
 use Schoolbox\External\UserRelationMapper;
 
-class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy_Parent {
+class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy_Parent
+{
+    use Synchronise_External_Cis_Strategy_BatchXmlTrait;
 
     protected $location = '';
     protected $columns  = array();
@@ -47,9 +49,7 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
      */
     public function generateList()
     {
-        $reader = new XMLReader();
-        $reader->open(SITE_root.'/students.xml');
-        $iterator   = new External_Isams_Batch_Reader_Parent($reader);
+        $iterator   = new External_Isams_Batch_Reader_Parent($this->getXmlReader());
         $this->list = $iterator->getAccountInfo();
     }
 

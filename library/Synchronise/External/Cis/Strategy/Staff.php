@@ -10,7 +10,9 @@
  * @link      http://www.alaress.com.au/
  * @shamelessly_pilfered_from <steve.chan@alaress.com.au>, <matt.day@alaress.com.au>
  */
-class Synchronise_External_Cis_Strategy_Staff extends Synchronise_Base_Strategy_Staff {
+class Synchronise_External_Cis_Strategy_Staff extends Synchronise_Base_Strategy_Staff
+{
+    use Synchronise_External_Cis_Strategy_BatchXmlTrait;
 
     protected $location = '';
     protected $columns  = array();
@@ -21,9 +23,7 @@ class Synchronise_External_Cis_Strategy_Staff extends Synchronise_Base_Strategy_
      */
     public function generateList()
     {
-        $reader = new XMLReader();
-        $reader->open(SITE_root.'/staff.xml');
-        $iterator   = new External_Isams_Batch_Reader_Staff($reader);
+        $iterator   = new External_Isams_Batch_Reader_Staff($this->getXmlReader());
         $this->list = $iterator->getAccountInfo();
     }
 

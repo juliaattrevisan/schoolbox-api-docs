@@ -28,6 +28,8 @@ use Schoolbox\External\TimetablePeriodMapper;
 
 class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strategy_Timetable
 {
+    use Synchronise_External_Cis_Strategy_BatchXmlTrait;
+
     protected $location  = '';
     protected $columns   = array();
     protected $title     = "Update Schoolbox Timetable Details Synchronisation";
@@ -56,9 +58,7 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
      */
     public function generateList()
     {
-        $reader = new XMLReader();
-        $reader->open(SITE_root.'/classes.xml');
-        $iterator   = new External_Isams_Batch_Reader_Timetable($reader);
+        $iterator   = new External_Isams_Batch_Reader_Timetable($this->getXmlReader());
         $this->list = $iterator->getAccountInfo();
     }
 
