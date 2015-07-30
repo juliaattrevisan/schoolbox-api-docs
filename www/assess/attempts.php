@@ -11,6 +11,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Breadcrumbs;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 
@@ -203,27 +204,22 @@ if (is_array($allAttempts) && count($allAttempts)) {
     }
 }
 
-/* Render out breadcrumbs
- */
-$this->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
+$trail = new Breadcrumbs();
 
-$allBreadcrumbs = $folderMapper->breadcrumb($folder, true);
-$i = 1;
-
-foreach ($allBreadcrumbs as $currentBreadcrumb) {
-    if ($i == $allBreadcrumbs->count()) {
-        $active = 'active';
-    }
-    else {
-        $active = '';
-    }
-
-    $this->setVar(array(
-        'BREADCRUMB_FOLDER_ID' => $currentBreadcrumb->getId(),
-        'BREADCRUMB_FOLDER_NAME' => $currentBreadcrumb->getName(),
-        'BREADCRUMB_ACTIVE' => $active,
-    ));
-
-    $this->parse('breadcrumb_block', 'breadcrumb', true);
-    $i++;
-}
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text'  => $folder->getName(),
+        'href'  => '/homepage/' . $folder->getId(),
+        'class' => ''
+    ],
+    [
+        'text'  => $assess['title'],
+        'href'  => '/assess/summary.' . $assess['assess_id'],
+        'class' => ''
+    ],
+    [
+        'text'  => $user->formatName(),
+        'href'  => '#',
+        'class' => 'active'
+    ],
+]);
