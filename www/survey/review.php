@@ -106,21 +106,21 @@ $user = $attemptHandler->getUser($attempt['attempt_id']);
  */
 $this->setVar(
     array(
-        'ASSESS_ASSESS_ID' => $assess['assess_id'],
-        'ASSESS_TITLE' => Scrub::text($assess['title']),
-        'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
-        'SECTION_TITLE' => Scrub::text($section['title']),
-        'SECTION_DESCRIPTION' => Scrub::html($section['description']),
-        'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
-        'RESPONDENT_NAME' => $assess['anonymous_result'] ? 'Anonymous' : $userHandler->formatName($user),
-        'ATTEMPT_START_DATETIME' => $start->getShort(),
-        'ATTEMPT_FINISH_DATETIME' => $finish->getShort(),
-        'ATTEMPT_TIME_TAKEN' => $assessHandler->sec2hms($finish->diffInSeconds($start, true)),
-        'ASSESS_CATEGORY_NAME'    => Scrub::text($folder->getName()),
-        'ASSESS_CATEGORY_ID'      => $folder->getId(),
-        'attemptFinished_block' => '',
+        'ASSESS_ASSESS_ID'            => $assess['assess_id'],
+        'ASSESS_TITLE'                => Scrub::text($assess['title']),
+        'ATTEMPT_ATTEMPT_ID'          => $_SESSION['attempt_id'],
+        'SECTION_TITLE'               => Scrub::text($section['title']),
+        'SECTION_DESCRIPTION'         => Scrub::html($section['description']),
+        'ASSESS_PREVIOUSLY_REVIEWED'  => $reviewedAt,
+        'RESPONDENT_NAME'             => $assess['anonymous_result'] ? 'Anonymous' : $userHandler->formatName($user),
+        'ATTEMPT_START_DATETIME'      => $start->getShort(),
+        'ATTEMPT_FINISH_DATETIME'     => $finish->getShort(),
+        'ATTEMPT_TIME_TAKEN'          => $assessHandler->sec2hms($finish->diffInSeconds($start, true)),
+        'ASSESS_CATEGORY_NAME'        => Scrub::text($folder->getName()),
+        'ASSESS_CATEGORY_ID'          => $folder->getId(),
+        'attemptFinished_block'       => '',
         'attemptNotYetFinished_block' => '',
-        'attemptUnfinished_block' => '',
+        'attemptUnfinished_block'     => '',
     )
 );
 

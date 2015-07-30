@@ -112,31 +112,33 @@ try {
 $dueDate       = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
 $attemptDate   = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptFinish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
-$this->setVar(array(
-    'ASSESS_ASSESS_ID' => $assess['assess_id'],
-    'ASSESS_TITLE' => Scrub::text($assess['title']),
-    'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
-    'ATTEMPT_START' => $attemptDate->getShort(),
-    'ATTEMPT_FINISH' => $attemptFinish->getShort(),
-    'ATTEMPT_TIME_TAKEN' => $assessHandler->sec2hms($attemptFinish->diffInSeconds($attemptDate, true)),
-    'ATTEMPT_TOTAL_MARKS' => number_format($attempt['totalMarks'], 2),
-    'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($attempt['totalAvailableMarks'], 2),
-    'SECTION_TITLE' => Scrub::text($section['title']),
-    'SECTION_DESCRIPTION' => Scrub::html($section['description']),
-    'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
-    'RESPONDENT_NAME' => $userHandler->formatName($user),
-    'ASSESS_CATEGORY_NAME'    => Scrub::text($folder->getName()),
-    'ASSESS_CATEGORY_ID'      => $folder->getId(),
-    'ASSESS_DUEWORK_YEAR'     => $dueDate->getYear(),
-    'ASSESS_DUEWORK_SEMESTER' => $dueDate->getYearHalf(),
-    'resubmit_label_block' => '',
-    'visible_staff_block' => '',
-    'visible_staff_students_block' => '',
-    'visible_staff_students_parents_block' => '',
-    'attemptFinished_block' => '',
-    'attemptNotYetFinished_block' => '',
-    'attemptUnfinished_block' => '',
-));
+$this->setVar(
+    array(
+        'ASSESS_ASSESS_ID'                     => $assess['assess_id'],
+        'ASSESS_TITLE'                         => Scrub::text($assess['title']),
+        'ATTEMPT_ATTEMPT_ID'                   => $_SESSION['attempt_id'],
+        'ATTEMPT_START'                        => $attemptDate->getShort(),
+        'ATTEMPT_FINISH'                       => $attemptFinish->getShort(),
+        'ATTEMPT_TIME_TAKEN'                   => $assessHandler->sec2hms($attemptFinish->diffInSeconds($attemptDate, true)),
+        'ATTEMPT_TOTAL_MARKS'                  => number_format($attempt['totalMarks'], 2),
+        'ATTEMPT_TOTAL_AVAILABLE_MARKS'        => number_format($attempt['totalAvailableMarks'], 2),
+        'SECTION_TITLE'                        => Scrub::text($section['title']),
+        'SECTION_DESCRIPTION'                  => Scrub::html($section['description']),
+        'ASSESS_PREVIOUSLY_REVIEWED'           => $reviewedAt,
+        'RESPONDENT_NAME'                      => $userHandler->formatName($user),
+        'ASSESS_CATEGORY_NAME'                 => Scrub::text($folder->getName()),
+        'ASSESS_CATEGORY_ID'                   => $folder->getId(),
+        'ASSESS_DUEWORK_YEAR'                  => $dueDate->getYear(),
+        'ASSESS_DUEWORK_SEMESTER'              => $dueDate->getYearHalf(),
+        'resubmit_label_block'                 => '',
+        'visible_staff_block'                  => '',
+        'visible_staff_students_block'         => '',
+        'visible_staff_students_parents_block' => '',
+        'attemptFinished_block'                => '',
+        'attemptNotYetFinished_block'          => '',
+        'attemptUnfinished_block'              => '',
+    )
+);
 
 // Parse finished/unfinished/not finished yet blockage
 // Finished: $attempt.finish is set to something other that 0000-00-etc
