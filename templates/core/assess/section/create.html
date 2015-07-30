@@ -1,93 +1,104 @@
-<!-- BEGIN custom_head -->
+{BREADCRUMB}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{ASSESS_TITLE}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Create Section</h2>
+        <form name="create" action="/assess/section/create" id="createSection" method="post">
+            <section>
+                <div class="content">
+                    <input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
+                    <input name="section_id" type="hidden" value="{SECTION_ID}" />
+                    <input name="sequence" type="hidden" value="{SEQUENCE}" />
+
+                    <label>
+                        Section Title
+                        <input name="title" type="text" size="35" class="required"/>
+                    </label>
+
+                    <label>
+                        Shuffle Questions
+                        <span class="hint has-tip tip-top" data-tooltip title="Questions should be selected randomly">?</span>
+                    </label>
+                    <div class="switch">
+                        <input name="random" id="random" type="checkbox" value="1" data-shuffle />
+                        <label for="random"></label>
+                    </div>
+
+                    <label class="hide" data-max-questions-prompt>
+                        Maximum number of questions to show
+                        <input name="pool" disabled="disabled" type="text" data-max-questions />
+                    </label>
+
+                    <label>
+                        Description
+                        <textarea name="description"></textarea>
+                    </label>
+                </div>
+            </section>
+            <label>
+                <input class="expand" type="submit" value="Create Section" />
+            </label>
+        </form>
+    </div>
+</div>
+
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 
 <script type="text/javascript">
-$(function() {
-	$.fn.alaressTiny({
-		mode: 'exact',
-		elements: 'description',
-		file_browser_category_id: '{ASSESS_CATEGORY_ID}'
-	});
+    $(function() {
+        $.fn.alaressTiny({
+            mode: 'exact',
+            elements: 'description',
+            file_browser_category_id: '{ASSESS_CATEGORY_ID}'
+        });
 
-	$('.checkbox').click(function() {
-		if ($('.hide-questions').is(":visible")) {
-			$('.hide-questions :input').prop('disabled', true);
-		} else {
-			$('.hide-questions :input').prop('disabled', false);
-		}
-		$('.hide-questions').toggle();
-	});
-	
-	jQuery.validator.addMethod("combo", function(value, element)
-		{
-		if (($('.checkbox').is(':checked')) && ($('.pool').val() == ""))
-		{
-		  return false;
-		}
-		else return true;
-	  },
-	  "You've selected random selection of questions. Please enter the number of questions to put in the pool."
-	);	
-	
-	$('#createSection').validate({
-		rules: {
-			title: {
-				required: true,
-				minlength: 2
-			},
-			pool: {
-				number:true,
-				combo: true
-			}
-		},
-		messages: {
-			title: "Please enter a title",
-			description: "Please enter a description"
-		}
-	});
-});
+        $('[data-shuffle]').change(function() {
+            var prompt = $('[data-max-questions-prompt]');
+            var input = prompt.find('[data-max-questions]');
+
+            if (prompt.hasClass("hide")) {
+                input.prop('disabled', false);
+            }
+            else {
+                input.prop('disabled', true);
+            }
+
+            prompt.toggleClass('hide');
+        });
+
+        jQuery.validator.addMethod("combo", function(value, element)
+            {
+                if (($('[data-shuffle]').is(':checked')) && ($('[data-max-questions]').val() == ""))
+                {
+                    return false;
+                }
+                else return true;
+            },
+            "You've selected random selection of questions. Please enter the number of questions to put in the pool."
+        );
+
+        $('#createSection').validate({
+            rules: {
+                title: {
+                    required: true,
+                    minlength: 2
+                },
+                pool: {
+                    number:true,
+                    combo: true
+                }
+            },
+            messages: {
+                title: "Please enter a title",
+                description: "Please enter a description"
+            }
+        });
+    });
 </script>
-<!-- END custom_head -->
-<h1>Create Section in {ASSESS_TITLE}
-    <a class="btn go-back marg tiny" href="/homepage/{ASSESS_CATEGORY_ID}"><span></span>Return to Homepage</a>
-</h1>
-<div class="evaluation-content">
-	<h2>Section Details</h2>
-		<form name="create" action="/assess/section/create" id="createSection" method="post">
-		<fieldset class="hide">
-			<input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
-			<input name="section_id" type="hidden" value="{SECTION_ID}" />
-			<input name="sequence" type="hidden" value="{SEQUENCE}" />
-		</fieldset>
-		
-		<label>Section Title
-			<input name="title" type="text" size="35" class="required"/>
-		</label>
-
-		<label>
-			<strong>Shuffle Questions</strong>
-			<input name="random" type="checkbox" value="1" class="checkbox"/><span>Questions should be selected randomly</span>
-			</label>
-
-			<label class="hide hide-questions">Maximum number of questions to show
-				<input name="pool" disabled="disabled" type="text" class="pool" />
-			</label>
-		
-
-		<label>Description
-			<div class="textarea-container">
-			<textarea name="description"></textarea>
-			</div>
-		</label>
-		
-		<label class="clearfix">
-			<input type="submit" id="create" value="Create Section" class="submit-btn-plain float-right no-marg"/>
-		</label>
-	</form>
-</div>
-<div class="evaluation-menu">
-<!-- BEGIN allQuestions -->
-
-<!-- END allQuestions -->
-</div>

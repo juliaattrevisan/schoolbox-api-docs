@@ -7,6 +7,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+use Schoolbox\Resource\Folder\Breadcrumbs;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $surveyHandler = new Survey_Main();
 $groupHandler = new Group();
@@ -52,8 +54,7 @@ if (!empty($_POST)) {
     if ($section) {
         $survey = $surveyHandler->getByID($section['assess_id']);
     }
-
-    if (!$survey) {
+    else {
         error(112);
     }
 
@@ -65,6 +66,17 @@ if (!empty($_POST)) {
         error(112);
     }
 
+    try {
+        $folderMapper = new FolderMapper();
+        $folder = $folderMapper->findById($survey['category_id']);
+    }
+    catch (\Exception $e) {
+        error(13);
+    }
+
+    $assessStartDate  = new Alaress_Date_Format(strtotime($survey['start']), 'U');
+    $assessFinishDate = new Alaress_Date_Format(strtotime($survey['finish']), 'U');
+
     /* Render modify page
      */
     $this->setFile(TEMPLATE_content, 'survey/section/modify.html');
@@ -72,17 +84,20 @@ if (!empty($_POST)) {
     $this->setTitle('Create Section');
 
     $this->setVar(array(
-        'ASSESS_ASSESS_ID' => $section['assess_id'],
-        'ASSESS_KIND_LC'   => 'survey',
-        'ASSESS_KIND'      => 'Survey',
-        'ASSESS_TITLE' => Scrub::text($survey['title']),
-        'ASSESS_CATEGORY_ID' => $survey['category_id'],
-        'SECTION_ID' => $section['section_id'],
-        'TITLE' => Scrub::text($section['title']),
-        'DESCRIPTION' => Scrub::html($section['description']),
-        'SEQUENCE' => $section['sequence'],
-        'RANDOM_SELECTED' => $section['random'] == 0 ? '' : 'checked=\'checked\'',
-		'POOL' => $section['pool'] > 0 ? $section['pool'] : ''
+        'ASSESS_ASSESS_ID'     => $section['assess_id'],
+        'ASSESS_KIND_LC'       => 'survey',
+        'ASSESS_KIND'          => 'Survey',
+        'ASSESS_TITLE'         => Scrub::text($survey['title']),
+        'ASSESS_START_DATE'    => $assessStartDate->getLocalShort(),
+        'ASSESS_FINISH_DATE'   => $assessFinishDate->getLocalShort(),
+        'ASSESS_CATEGORY_ID'   => $folder->getId(),
+        'ASSESS_CATEGORY_NAME' => $folder->getName(),
+        'SECTION_ID'           => $section['section_id'],
+        'TITLE'                => Scrub::text($section['title']),
+        'DESCRIPTION'          => Scrub::html($section['description']),
+        'SEQUENCE'             => $section['sequence'],
+        'RANDOM_SELECTED'      => $section['random'] == 0 ? '' : 'checked=\'checked\'',
+        'POOL'                 => $section['pool'] > 0 ? $section['pool'] : ''
     ));
 
     /* Show this Assess' contents
@@ -93,4 +108,9 @@ if (!empty($_POST)) {
     $assessHandler->renderAssessContents($survey['assess_id'], $this);
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
 }
