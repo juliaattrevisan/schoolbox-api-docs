@@ -189,11 +189,9 @@ else {
     $this->setBlock(TEMPLATE_content,  'importXML', 'importXML_block');
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
     $this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
-    $this->setBlock(TEMPLATE_content, 'has_due_date', 'has_due_date_block');
 
     $this->setVar(array(
         'assess_timespan_block' => '',
-        'has_due_date_block' => '',
     ));
 
     $this->setTitle('Manage Quiz');
@@ -307,16 +305,6 @@ else {
 	$widgets = new \Schoolbox\Assessment\Widgets();
 	$widgets->outputVisibilityDropdown($this, \Config::get('submission_access'));
 	$this->parse('marktype_block', 'marktype');
-
-    /* Don't display questions contents, which appears in Modify
-     */
-    $this->setBlock(TEMPLATE_content, 'has_all_questions', 'has_all_questions_block');
-    $this->setBlock('has_all_questions', 'allQuestions', 'allQuestions_block');
-
-    $this->setVar(array(
-        'has_all_questions_block' => '',
-        'allQuestions_block' => ''
-    ));
 
     $this->parse('importXML_block', 'importXML');
 

@@ -8,19 +8,13 @@
             <!-- END importXML -->
         </span>
 
-        <h1>{ASSESS_ACTION} {ASSESS_KIND}</h1>
+        <h1>New {ASSESS_KIND}</h1>
     </div>
 </div>
 
 <div class="row">
     <div class="small-12 {HAS_ALL_QUESTIONS} island">
-        <ul class="meta">
-            <!-- BEGIN has_due_date -->
-            <li class="icon-calendar icon-16">Due on {ASSESS_FINISH_DATE}</li>
-            <!-- END has_due_date -->
-            <li class="icon-due-work icon-16"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a> Quiz</li>
-        </ul>
-
+        <h2 class="subheader">{ASSESS_ACTION} {ASSESS_KIND}</h2>
         <section>
             <div class="content">
                 <form name="create" action="/survey/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" method="post">

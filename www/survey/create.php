@@ -191,10 +191,6 @@ if (!empty($_POST)) {
         )
     );
 
-    /* Don't display questions contents, which appears in Modify
-     */
-    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
-    $this->setVar('allQuestions_block', '');
     $this->parse('importXML_block', 'importXML');
 
     /* Render out breadcrumbs
