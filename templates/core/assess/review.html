@@ -83,28 +83,24 @@ $(document).ready(function() {
 </script>
 <!-- END custom_head -->
 
-<div>
-    <ul class="breadcrumb">
-        <li><a href="/submission/listSubmission" >Submissions</a></li>
-        <li><a href="/submission/listSubmission/{ASSESS_DUEWORK_YEAR}/{ASSESS_DUEWORK_SEMESTER}/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a></li>
-        <li><a href="/assess/results/{ASSESS_ASSESS_ID}/">{ASSESS_TITLE}</a></li>
-        <li><a href="#">{RESPONDENT_NAME}</a></li>
-    </ul>
-</div>
+<ul class="breadcrumb">
+    <li><a href="/submission/listSubmission" >Submissions</a></li>
+    <li><a href="/submission/listSubmission/{ASSESS_DUEWORK_YEAR}/{ASSESS_DUEWORK_SEMESTER}/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a></li>
+    <li><a href="/assess/results/{ASSESS_ASSESS_ID}/">{ASSESS_TITLE}</a></li>
+    <li class="active"><a href="#">{RESPONDENT_NAME}</a></li>
+</ul>
 
 <div class="row">
     <div class="small-12 columns">
         <h1>Marking {ASSESS_TITLE} quiz results for {RESPONDENT_NAME}</h1>
         <ul class="meta">
-            <li class="icon-calendar">Quiz attempt started on: {ATTEMPT_START},
-                <!-- BEGIN attemptFinished -->
-                finished on: {ATTEMPT_FINISH}
-                <!-- END attemptFinished -->
+            <li class="icon-calendar">Attempted
+                <time>{ATTEMPT_START}</time><!-- BEGIN attemptFinished -->&ndash;<time>{ATTEMPT_FINISH}</time> ({ATTEMPT_TIME_TAKEN})<!-- END attemptFinished -->
                 <!-- BEGIN attemptNotYetFinished -->
-                not yet finished
+                (unfinished)
                 <!-- END attemptNotYetFinished -->
                 <!-- BEGIN attemptUnfinished -->
-                not finished by due date
+                (not finished by due date)
                 <!-- END attemptUnfinished -->
             </li>
             <li class="icon-due-work"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a> Quiz</li>
@@ -117,7 +113,6 @@ $(document).ready(function() {
             <!-- BEGIN visible_staff_students_parents -->
             <li class="icon-staff">Visible to staff, students and parents</li>
             <!-- END visible_staff_students_parents -->
-            <li class="icon-time-value">Time taken: {ATTEMPT_TIME_TAKEN}</li>
             <li class="icon-approve">Mark: {ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</li>
         </ul>
     </div>
@@ -133,14 +128,14 @@ $(document).ready(function() {
     <!-- END resubmit_label -->
 
     <div class="small-12 island">
-        <h2 class="subheader">Section: {SECTION_TITLE}</h2>
-        <section>
+        <h2 class="subheader">{SECTION_TITLE}</h2>
+        <section class="content">
             <article>{SECTION_DESCRIPTION}</article>
         </section>
 
         <h2 class="subheader">Questions</h2>
         <!-- BEGIN question -->
-        <section>
+        <section class="content">
             <form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}"
                   data-role="question-submit"
                   name="question-submit"
@@ -155,22 +150,23 @@ $(document).ready(function() {
         </section>
         <!-- END question -->
     </div>
-
+</div>
+<div class="row">
     <div class="small-12 columns">
         <!-- BEGIN prevSection -->
-        <a class="button secondary icon-previous" href="/assess/review/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Previous Section</a>
+            <a class="button icon-previous" href="/assess/review/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Previous Section</a>
         <!-- END prevSection -->
-
         <!-- BEGIN nextSection -->
-        <a class="button secondary icon-next" href="/assess/review/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Next Section</a>
+            <a class="button icon-next" href="/assess/review/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Next section</a>
         <!-- END nextSection -->
-
+    </div>
+    <div class="small-12 columns">
         <!-- BEGIN endAssess -->
         <!-- BEGIN writable_finalise -->
-        <a class="button primary" data-action="finish-review" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Finalise Review</a>
+        <a class="button secondary expand" data-action="finish-review" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Finalise Review</a>
         <!-- END writable_finalise -->
         <!-- BEGIN writable_resubmit -->
-        <a class="button primary" data-action="finish-review" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Resubmit Review</a>
+        <a class="button secondary expand" data-action="finish-review" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Resubmit Review</a>
         <!-- END writable_resubmit -->
         <!-- END endAssess -->
     </div>
