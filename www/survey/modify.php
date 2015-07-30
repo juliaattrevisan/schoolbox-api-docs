@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 
 $groupHandler  = new Group();
 $assessHandler = new Survey_Main();
@@ -182,8 +182,8 @@ if (!empty($_POST)) {
      */
     $this->setFile('assessContentsFragment', 'assess/contents.html');
 
-    $assess = new Survey_Main();
-    $assess->renderAssessContents($this->arg[0], $this);
+    $survey = new Survey_Main();
+    $survey->renderAssessContents($this->arg[0], $this);
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
@@ -194,5 +194,16 @@ if (!empty($_POST)) {
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => $assess['title'],
+            'href' => "/assess/intro/{$assess['assess_id']}",
+            'class' => 'active',
+        ]
+    ]);
 }

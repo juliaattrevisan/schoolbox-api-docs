@@ -13,7 +13,7 @@ use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -256,7 +256,20 @@ else {
     $folderMapper = new FolderMapper();
     $folder = $folderMapper->findById($assessment->getCategory()->getId());
 
+    /* Render out breadcrumbs
+     */
     $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => $assessment->getTitle(),
+            'href' => "/assess/intro/{$assessment->getId()}",
+            'class' => 'active',
+        ]
+    ]);
 }
 
