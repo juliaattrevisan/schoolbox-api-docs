@@ -63,6 +63,7 @@ class Synchronise_External_Cis_Strategy_Student extends Synchronise_Base_Strateg
      */
     protected function executePostCreateUpdate($newUser, $externalUser)
     {
+        /** @var UserProfile $profile */
         try {
             $profile = UserProfileMapper::getInstance()->findById($newUser['id']);
         } catch (Exception $e) {

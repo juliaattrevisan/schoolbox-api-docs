@@ -2,8 +2,9 @@
 /**
  * Maps results for `External_Isams_Batch_Reader_Student->parse()`.
  *
- * Converts results to the same format that
- * `External_UserInterface->getStudentUserAccountInfo()` returns.
+ * Converts results to a mixture of:
+ * `External_UserInterface->getStudentUserAccountInfo()` and
+ * `External_UserInterface->getStudent()` returns.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
@@ -36,6 +37,7 @@ class External_Isams_Batch_Reader_Iterator_Student_Map extends External_Isams_Ba
                 'StudentHouse'         => "$result->AcademicHouse",
                 'StudentBoarder'       => "$result->PupilType",
                 'StudentBoardingHouse' => "$result->BoardingHouse",
+                'StudentBirthDate'     => "$result->DOB",
             ];
         } elseif ($current->matches('//CurrentPupilsHealth/Pupil')) {
             return [
