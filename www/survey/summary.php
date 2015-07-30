@@ -56,8 +56,12 @@ $this->setVar(array(
 ));
 
 $this->setFile(TEMPLATE_content, 'survey/summary.html');
+$this->setFile('assessContentsFragment', 'assess/contents.html');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setTitle('Assessment: ' . $assess['title']);
+
+$assessHandler->renderAssessContents($assess['assess_id'], $this);
+$this->parse('allQuestions_block', 'assessContentsFragment', true);
 
 $this->setVar(array(
     'ASSESS_DURATION' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
