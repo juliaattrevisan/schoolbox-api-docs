@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 
 $factory = new Survey_Factory();
 $assessHandler = new Survey_Main();
@@ -199,6 +199,27 @@ else {
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => $assess['title'],
+            'href' => "/assess/summary/{$assess['assess_id']}",
+            'class' => '',
+        ],
+        [
+            'text' => $section['title'],
+            'href' => "/assess/summary/{$assess['assess_id']}",
+            'class' => '',
+        ],
+        [
+            'text' => "Q{$question['sequence']}",
+            'href' => "/assess/question/modify/{$question['question_id']}",
+            'class' => 'active',
+        ]
+    ]);
 }
 

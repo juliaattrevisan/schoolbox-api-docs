@@ -13,7 +13,7 @@
  * @version     SVN: $Id$
  */
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 
 $assessHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
@@ -133,18 +133,18 @@ if (!empty($_POST)) {
 
     $this->setVar(
         array(
-            'ASSESS_ASSESS_ID' => $section['assess_id'],
-            'ASSESS_KIND_LC'   => 'survey',
-            'ASSESS_KIND'      => 'Survey',
+            'ASSESS_ASSESS_ID'      => $section['assess_id'],
+            'ASSESS_KIND_LC'        => 'survey',
+            'ASSESS_KIND'           => 'Survey',
             'ASSESS_START'          => $assessStartDate->getShort(),
             'ASSESS_FINISH'         => $assessFinishDate->getShort(),
             'ASSESS_CATEGORY_ID'    => $folder->getId(),
             'ASSESS_CATEGORY_NAME'  => $folder->getName(),
-            'SECTION_ID' => $this->arg[0],
+            'SECTION_ID'            => $this->arg[0],
             'CURRENT_SECTION_TITLE' => Scrub::text($section['title']),
-            'SEQUENCE' => $questionHandler->getNextSequence($section['section_id']),
-            'QUESTION' => '',
-            'MARKS' => '',
+            'SEQUENCE'              => $questionHandler->getNextSequence($section['section_id']),
+            'QUESTION'              => '',
+            'MARKS'                 => '',
         )
     );
 
@@ -267,5 +267,26 @@ if (!empty($_POST)) {
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => $assess['title'],
+            'href' => "/assess/summary/{$assess['assess_id']}",
+            'class' => '',
+        ],
+        [
+            'text' => $section['title'],
+            'href' => "/assess/summary/{$assess['assess_id']}",
+            'class' => '',
+        ],
+        [
+            'text' => 'New Question',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }
