@@ -13,11 +13,11 @@ $(document).ready(function() {
 //				showAlert(formElement);
 				$.post(
                     $(formElement).attr('action'),
-                    $(formElement).serialize(),
-                    function (responseText) {
-                        var dataFunction = new Function('return ' + responseText);
-                        var result = dataFunction();
-                    }
+                    $(formElement).serialize()
+//                    ,function (responseText) {
+//                        var dataFunction = new Function('return ' + responseText);
+//                        var result = dataFunction();
+//                    }
                 );
 				return false;
 			},
@@ -36,27 +36,32 @@ $(document).ready(function() {
    		});
 	});
 
-	forms.find('textarea').blur(function() {
-		if ($(this).val() !== '') {
-			$.post($(this).closest('form').attr('action'),
-			$(this).closest('form').serialize(),
-			function(responseText) {
-				var dataFunction = new Function('return ' + responseText);
-				var result = dataFunction();
-			});
-			return false;
-		}
-	});
+    forms.find('textarea').blur(function(e) {
+        e.preventDefault();
+        if ($(this).val() !== '') {
+            $.post(
+                $(this).closest('form').attr('action'),
+                $(this).closest('form').serialize()
+//                ,function(responseText) {
+//                    var dataFunction = new Function('return ' + responseText);
+//                    var result = dataFunction();
+//                }
+            );
+            return false;
+        }
+    });
 
-    forms.find('input').blur(function() {
+    forms.find('input').blur(function(e) {
+        e.preventDefault();
 //		showAlert($(this));
-		$.post($(this).closest('form').attr('action'),
-		$(this).closest('form').serialize(),
-		function(responseText) {
-			var dataFunction = new Function('return ' + responseText);
-			var result = dataFunction();
-		});
-		return false;
+		$.post(
+            $(this).closest('form').attr('action'),
+            $(this).closest('form').serialize()
+//            ,function(responseText) {
+//                var dataFunction = new Function('return ' + responseText);
+//                var result = dataFunction();
+//            }
+        );
 	});
 
 //	var assessAttempted = '{ASSESS_PREVIOUSLY_REVIEWED}';
