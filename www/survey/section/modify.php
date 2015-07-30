@@ -71,7 +71,7 @@ if (!empty($_POST)) {
         $folder = $folderMapper->findById($survey['category_id']);
     }
     catch (\Exception $e) {
-        error(117);
+        error(13);
     }
 
     $assessStartDate  = new Alaress_Date_Format(strtotime($survey['start']), 'U');
