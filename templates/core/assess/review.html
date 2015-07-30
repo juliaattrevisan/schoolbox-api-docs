@@ -96,7 +96,17 @@ $(document).ready(function() {
     <div class="small-12 columns">
         <h1>Marking {ASSESS_TITLE} quiz results for {RESPONDENT_NAME}</h1>
         <ul class="meta">
-            <li class="icon-calendar">Quiz attempted on {ATTEMPT_FINISH}</li>
+            <li class="icon-calendar">Quiz attempt started on: {ATTEMPT_START},
+                <!-- BEGIN attemptFinished -->
+                finished on: {ATTEMPT_FINISH}
+                <!-- END attemptFinished -->
+                <!-- BEGIN attemptNotYetFinished -->
+                not yet finished
+                <!-- END attemptNotYetFinished -->
+                <!-- BEGIN attemptUnfinished -->
+                not finished by due date
+                <!-- END attemptUnfinished -->
+            </li>
             <li class="icon-due-work"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a> Quiz</li>
             <!-- BEGIN visible_staff -->
             <li class="icon-locked">Visible to staff only</li>

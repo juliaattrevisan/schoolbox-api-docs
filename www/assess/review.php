@@ -84,6 +84,9 @@ $user = $userHandler->getByID($attempt['user_id']);
 /* Set up template
  */
 $this->setFile(TEMPLATE_content, 'assess/review.html');
+$this->setBlock(TEMPLATE_content, 'attemptFinished', 'attemptFinished_block');
+$this->setBlock(TEMPLATE_content, 'attemptNotYetFinished', 'attemptNotYetFinished_block');
+$this->setBlock(TEMPLATE_content, 'attemptUnfinished', 'attemptUnfinished_block');
 $this->setBlock(TEMPLATE_content, 'resubmit_label', 'resubmit_label_block');
 $this->setBlock(TEMPLATE_content, 'visible_staff', 'visible_staff_block');
 $this->setBlock(TEMPLATE_content, 'visible_staff_students', 'visible_staff_students_block');
@@ -113,7 +116,8 @@ $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => Scrub::text($assess['title']),
     'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
-    'ATTEMPT_FINISH' => $attemptDate->getShort(),
+    'ATTEMPT_START' => $attemptDate->getShort(),
+    'ATTEMPT_FINISH' => $attemptFinish->getShort(),
     'ATTEMPT_TIME_TAKEN' => $assessHandler->sec2hms($attemptFinish->diffInSeconds($attemptDate, true)),
     'ATTEMPT_TOTAL_MARKS' => number_format($attempt['totalMarks'], 2),
     'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($attempt['totalAvailableMarks'], 2),
@@ -129,7 +133,27 @@ $this->setVar(array(
     'visible_staff_block' => '',
     'visible_staff_students_block' => '',
     'visible_staff_students_parents_block' => '',
+    'attemptFinished_block' => '',
+    'attemptNotYetFinished_block' => '',
+    'attemptUnfinished_block' => '',
 ));
+
+// Parse finished/unfinished/not finished yet blockage
+// Finished: $attempt.finish is set to something other that 0000-00-etc
+// Otherwise:
+// not yet finished if survey is open, unfinished if closed
+if (!isset($attempt['finish'])) {
+    $close = new DateTime($assess['finish']);
+    if ($close->getTimestamp() < $_SERVER['REQUEST_TIME']) {
+        $this->parse('attemptUnfinished_block', 'attemptUnfinished');
+    }
+    else {
+        $this->parse('attemptNotYetFinished_block', 'attemptNotYetFinished');
+    }
+}
+else {
+    $this->parse('attemptFinished_block', 'attemptFinished');
+}
 
 if ($attempt['reviewed_at'] != '') {
     $this->parse('resubmit_label_block', 'resubmit_label');
