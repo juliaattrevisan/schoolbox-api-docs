@@ -87,11 +87,18 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             SELECT days_in_cycle
             FROM db2inst1.schoolbox_timetable_days
             WHERE timetable_id = :campus
+            AND start_date <= :date
+            AND end_date >= :date
             FETCH FIRST 1 ROW ONLY
         ');
 
         $campusCode = explode(',',$campus->getExtTimetableCode());
-        $stmt->execute(array('campus' => $campusCode[0]));
+        $params = array(
+            'date'   => date('Y-m-d'),
+            'campus' => $campusCode[0],
+        );
+
+        $stmt->execute($params);
 
         return $stmt->fetchColumn();
     }
