@@ -11,10 +11,10 @@
 </div>
 
 <div class="row">
-    <div class="small-12 large-8 island">
-        <section>
-            <div class="content">
-                <form name="create" action="/survey/section/create" id="createSection" method="post">
+    <div class="small-12 island">
+        <form name="create" action="/survey/section/create" id="createSection" method="post">
+            <section>
+                <div class="content">
                     <input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
                     <input name="section_id" type="hidden" value="{SECTION_ID}" />
                     <input name="sequence" type="hidden" value="{SEQUENCE}" />
@@ -42,18 +42,12 @@
                         Description
                         <textarea name="description"></textarea>
                     </label>
-
-                    <label>
-                        <input type="submit" value="Create Section" />
-                    </label>
-                </form>
-            </div>
-        </section>
-    </div>
-    <div class="small-12 large-4 island">
-        <!-- BEGIN allQuestions -->
-
-        <!-- END allQuestions -->
+                </div>
+            </section>
+            <label>
+                <input class="expand" type="submit" value="Create Section" />
+            </label>
+        </form>
     </div>
 </div>
 
