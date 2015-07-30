@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-
+use Schoolbox\Breadcrumbs;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $assessHandler = new Survey_Main();
@@ -43,16 +43,16 @@ $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
 $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
 $this->setVar(array(
-        'ASSESS_ASSESS_ID'     => $this->arg[0],
-        'ASSESS_KIND_LC'       => 'survey',
-        'ASSESS_KIND'          => 'Survey',
-        'ASSESS_TITLE'         => Scrub::text($assess['title']),
-        'ASSESS_DESCRIPTION'   => Scrub::html($assess['description']),
-        'ASSESS_START'         => $assessStartDate->getShort(),
-        'ASSESS_FINISH'        => $assessFinishDate->getShort(),
-        'FIRST_SECTION'        => $allSections[0]['section_id'],
-        'ASSESS_CATEGORY_ID'   => $folder->getId(),
-        'ASSESS_CATEGORY_NAME' => $folder->getName(),
+    'ASSESS_ASSESS_ID'     => $this->arg[0],
+    'ASSESS_KIND_LC'       => 'survey',
+    'ASSESS_KIND'          => 'Survey',
+    'ASSESS_TITLE'         => Scrub::text($assess['title']),
+    'ASSESS_DESCRIPTION'   => Scrub::html($assess['description']),
+    'ASSESS_START'         => $assessStartDate->getShort(),
+    'ASSESS_FINISH'        => $assessFinishDate->getShort(),
+    'FIRST_SECTION'        => $allSections[0]['section_id'],
+    'ASSESS_CATEGORY_ID'   => $folder->getId(),
+    'ASSESS_CATEGORY_NAME' => $folder->getName(),
 ));
 
 $this->setFile(TEMPLATE_content, 'survey/summary.html');
@@ -82,26 +82,16 @@ if (is_array($allSummary) && count($allSummary)) {
 
 /* Render out breadcrumbs
  */
-$this->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
-
-$allBreadcrumbs = $folderMapper->breadcrumb($folder, true);
-
-$i = 1;
-
-foreach ($allBreadcrumbs as $currentBreadcrumb) {
-    if ($i == $allBreadcrumbs->count()) {
-        $active = 'active';
-    }
-    else {
-        $active = '';
-    }
-
-    $this->setVar(array(
-            'BREADCRUMB_FOLDER_ID' => $currentBreadcrumb->getId(),
-            'BREADCRUMB_FOLDER_NAME' => $currentBreadcrumb->getName(),
-            'BREADCRUMB_ACTIVE' => $active,
-        ));
-
-    $this->parse('breadcrumb_block', 'breadcrumb', true);
-    $i++;
-}
+$trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => $folder->getName(),
+        'href' => "/homepage/{$folder->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => $assess['title'],
+        'href' => "/survey/summary/{$assess['assess_id']}",
+        'class' => 'active',
+    ]
+]);
