@@ -919,6 +919,47 @@ table{
         }
     }
 
+	// default size is L:4rem, <L:3rem
+
+	// forcibly small: 32x32 (2rem)
+	&.small {
+		min-height: 2rem;
+		padding-top: 0;
+
+		&.avatar {
+			img {
+				width: 2rem;
+				margin-right: 0.5rem;
+				margin-top: 0;
+			}
+
+			p {
+				margin-left: 1.5rem;
+			}
+
+		}
+
+	}
+
+	// forcibly tiny: 24x24 (1.5rem)
+	&.tiny {
+		min-height: 1.5rem;
+		padding-top: 0;
+
+		&.avatar {
+			img {
+				width: 1.5rem;
+				margin-right: 0.5rem;
+				margin-top: 0;
+			}
+
+			p {
+				margin-left: 1.125rem;
+				line-height: 1.5rem;
+			}
+		}
+	}
+
     h3 {
       margin: 0;
     }
