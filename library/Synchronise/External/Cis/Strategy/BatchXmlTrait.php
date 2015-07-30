@@ -23,7 +23,9 @@ trait Synchronise_External_Cis_Strategy_BatchXmlTrait
         }
 
         $filename = $dir.strftime('/isams_batch-%Y%m%d.xml', $_SERVER['REQUEST_TIME']);
+        printf("Using file \"%s\"\n", $filename);
         if (!file_exists($filename)) {
+            printf("File \"%s\" doesn't exist - downloading...\n", $filename);
             // Download this file from their API
             $host = Config::get('external_sync_isams_batch_api_host');
             $key  = Config::get('external_sync_isams_batch_api_key');
