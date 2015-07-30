@@ -11,7 +11,7 @@
 use Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Assessment\Course\Task;
-use Schoolbox\Resource\Folder\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 
 $assessHandler   = new Assess_Main();
 $attemptHandler  = new Assess_Attempt();
@@ -205,9 +205,24 @@ if ($visibility->isStaff() && $groupHandler->isStaff()) {
 $folderMap = Schoolbox\Resource\Folder\Mapper::getInstance();
 $folder    = $folderMap->findById($assess['category_id']);
 
-$trail = new Breadcrumbs($folderMap);
-$trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
-
+$trail = new Breadcrumbs();
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text'  => 'Work',
+        'href'  => '/submission/allWork/' . $_SESSION['id'],
+        'class' => ''
+    ],
+    [
+        'text'  => $folder->getName(),
+        'href'  => sprintf('/submission/allWork/%d/%d/%d/%d', $_SESSION['id'], date('Y', strtotime($assess['finish'])), date('m', strtotime($assess['finish'])) > 6 ? 2 : 1, $folder->getId()),
+        'class' => ''
+    ],
+    [
+        'text'  => $assess['title'],
+        'href'  => '/assess/intro/' . $assess['assess_id'],
+        'class' => 'active'
+    ],
+]);
 /* Clear attempt
  */
 $_SESSION['attempt_id'] = '';
