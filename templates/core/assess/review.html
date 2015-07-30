@@ -79,13 +79,18 @@ $(document).ready(function() {
 
 });
 </script>
-<style>
-    form input[type=text] {
-        border: solid 1px #DBDBDB;
-    }
-</style>
 <!-- END custom_head -->
-<h1>Mark the quiz results for {RESPONDENT_NAME}</h1>
+
+<div>
+	<ul class="breadcrumb">
+		<li><a href="/submission/listSubmission" >Submissions</a></li>
+		<li><a href="/submission/listSubmission/{DUEWORK_YEAR}/{DUEWORK_SEMESTER}/{CID}">{CATEGORY_NAME}</a></li>
+		<li><a href="/assess/results/{ASSESS_ASSESS_ID}/">{ASSESS_TITLE}</a></li>
+        <li><a href="#">{RESPONDENT_NAME}</a></li>
+	</ul>
+</div>
+
+<h1>Marking {ASSESS_TITLE} quiz results for {RESPONDENT_NAME}</h1>
 
 <p class="information-notification review-submitted hide">Please note: You are currently editing an already submitted review.</p>
 
