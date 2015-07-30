@@ -7,6 +7,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+use Schoolbox\Resource\Folder\Breadcrumbs;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $assessHandler = new Assess_Main();
 $groupHandler = new Group();
@@ -48,6 +50,9 @@ if (!empty($_POST)) {
     if ($section) {
         $assess = $assessHandler->getByID($section['assess_id']);
     }
+    else {
+        error(115);
+    }
 
     if ($assessHandler->isDeleted($section['assess_id'])) {
         error(112);
@@ -57,6 +62,17 @@ if (!empty($_POST)) {
         error(130);
     }
 
+    try {
+        $folderMapper = new FolderMapper();
+        $folder = $folderMapper->findById($assess['category_id']);
+    }
+    catch (\Exception $e) {
+        error(117);
+    }
+
+    $assessStartDate  = new Alaress_Date_Format(strtotime($assess['start']), 'U');
+    $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
+
     /* Render modify page
      */
     $this->setFile(TEMPLATE_content, 'assess/section/modify.html');
@@ -64,17 +80,21 @@ if (!empty($_POST)) {
     $this->setTitle('Create Section');
 
     $this->setVar(array(
-        'ASSESS_ASSESS_ID' => $section['assess_id'],
-        'ASSESS_KIND_LC'   => 'assess',
-        'ASSESS_KIND'      => 'Quiz',
-        'ASSESS_TITLE' => Scrub::text($assess['title']),
-        'ASSESS_CATEGORY_ID' => $assess['category_id'],
-        'SECTION_ID' => $section['section_id'],
-        'TITLE' => Scrub::text($section['title']),
-        'DESCRIPTION' => Scrub::html($section['description']),
-        'SEQUENCE' => $section['sequence'],
-        'RANDOM_SELECTED' => $section['random'] == 0 ? '' : 'checked=\'checked\'',
-        'POOL' => $section['pool'] > 0 ? $section['pool'] : ''
+        'ASSESS_ASSESS_ID'     => $section['assess_id'],
+        'ASSESS_KIND_LC'       => 'assess',
+        'ASSESS_KIND'          => 'Quiz',
+        'ASSESS_TITLE'         => Scrub::text($assess['title']),
+        'ASSESS_START_DATE'    => $assessStartDate->getLocalShort(),
+        'ASSESS_FINISH_DATE'   => $assessFinishDate->getLocalShort(),
+        'ASSESS_CATEGORY_ID'   => $folder->getId(),
+        'ASSESS_CATEGORY_NAME' => $folder->getName(),
+        'ASSESS_DURATION'      => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
+        'SECTION_ID'           => $section['section_id'],
+        'TITLE'                => Scrub::text($section['title']),
+        'DESCRIPTION'          => Scrub::html($section['description']),
+        'SEQUENCE'             => $section['sequence'],
+        'RANDOM_SELECTED'      => $section['random'] == 0 ? '' : 'checked=\'checked\'',
+        'POOL'                 => $section['pool'] > 0 ? $section['pool'] : ''
     ));
 
     /* Show this Assess' contents
