@@ -351,23 +351,26 @@ class SitePage extends Page
         $this->renderSubjectList();
         $this->renderLinkList();
         $this->renderStudents();
+        $this->renderInstantMessages();
 
         $this->parseFooterMobileLink('footerTpl');
 
         $this->parse('MAIN_HEADER_REGION', 'headerTpl');
         $this->parse('MAIN_FOOTER_REGION', 'footerTpl');
 
-        $this->setBlock('bannerTpl', 'banner_logged_in', 'banner_logged_in_block');
-        if (Cfg::get('messaging_enabled')) {
-            $this->parse('INSTANTMESSAGE_BLOCK', 'instantTpl');
-        } else {
-            $this->setVar('INSTANTMESSAGE_BLOCK', '');
-        }
+        $this->setBlock(TEMPLATE_body, 'banner_logged_in', 'banner_logged_in_block');
 
         if ($_SESSION['id']) {
+
+            $canSwitch = false;
+
             /* Output switch user options */
             $this->setBlock('banner_logged_in', 'switch_user', 'switch_user_block');
-            $this->setVar('switch_user_block', '');
+            $this->setBlock('banner_logged_in', 'can_switch', 'can_switch_block');
+            $this->setVar([
+                'switch_user_block' => '',
+                'can_switch_block'  => ''
+            ]);
             $linkedUserList = array();
 
             $previousUser = $_SESSION['previous']['user'];
@@ -393,6 +396,7 @@ class SitePage extends Page
                                     )
                 );
                 $this->parse('switch_user_block', 'switch_user', true);
+                $canSwitch = true;
             }
             if(count($linkedUserList) > 0) {
                 $_SESSION['user']->setLinkedUser($linkedUserList);
@@ -410,9 +414,12 @@ class SitePage extends Page
                                     )
                 );
                 $this->parse('recover_user_block', 'recover_user', true);
-
+                $canSwitch = true;
             }
 
+            if ($canSwitch) {
+                $this->parse('can_switch_block', 'can_switch');
+            }
 
             $this->parse('MAIN_NAV_REGION', 'navTpl');
             $this->parse('MAIN_TAB_REGION', 'tabTpl');
@@ -898,6 +905,20 @@ class SitePage extends Page
             $this->parse("mstudent_section", "mstudent");
         } else {
             $this->setVar("mstudent_section", "");
+        }
+    }
+
+
+    function renderInstantMessages()
+    {
+        $this->setBlock(TEMPLATE_body, 'instantmessage_toggle', 'instantmessage_toggle_block');
+
+        if (Cfg::get('messaging_enabled')) {
+            $this->parse('INSTANTMESSAGE_BLOCK', 'instantTpl');
+            $this->parse('instantmessage_toggle_block', 'instantmessage_toggle');
+        } else {
+            $this->setVar('INSTANTMESSAGE_BLOCK', '');
+            $this->setVar('instantmessage_toggle_block', '');
         }
     }
 
