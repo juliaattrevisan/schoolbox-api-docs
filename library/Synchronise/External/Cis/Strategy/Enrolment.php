@@ -31,8 +31,12 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
      */
     public function generateList()
     {
-        $iterator   = new External_Isams_Batch_Reader_Enrolment($this->getXmlReader());
-        $this->list = $iterator->getAccountInfo();
+        try {
+            $iterator   = new External_Isams_Batch_Reader_Enrolment($this->getXmlReader());
+            $this->list = $iterator->getAccountInfo();
+        } catch (Exception $e) {
+            printf('Skipping enrolment sync: '.$e->getMessage());
+        }
     }
 
     /**

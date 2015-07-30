@@ -23,8 +23,12 @@ class Synchronise_External_Cis_Strategy_Staff extends Synchronise_Base_Strategy_
      */
     public function generateList()
     {
-        $iterator   = new External_Isams_Batch_Reader_Staff($this->getXmlReader());
-        $this->list = $iterator->getAccountInfo();
+        try {
+            $iterator   = new External_Isams_Batch_Reader_Staff($this->getXmlReader());
+            $this->list = $iterator->getAccountInfo();
+        } catch (Exception $e) {
+            printf('Skipping staff sync: '.$e->getMessage());
+        }
     }
 
     /**

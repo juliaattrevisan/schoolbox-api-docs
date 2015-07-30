@@ -58,8 +58,12 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
      */
     public function generateList()
     {
-        $iterator   = new External_Isams_Batch_Reader_Timetable($this->getXmlReader());
-        $this->list = $iterator->getAccountInfo();
+        try {
+            $iterator   = new External_Isams_Batch_Reader_Timetable($this->getXmlReader());
+            $this->list = $iterator->getAccountInfo();
+        } catch (Exception $e) {
+            printf('Skipping timetable sync: '.$e->getMessage());
+        }
     }
 
     /**

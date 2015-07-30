@@ -26,8 +26,12 @@ class Synchronise_External_Cis_Strategy_Student extends Synchronise_Base_Strateg
      */
     public function generateList()
     {
-        $iterator   = new External_Isams_Batch_Reader_Student($this->getXmlReader());
-        $this->list = $iterator->getAccountInfo();
+        try {
+            $iterator   = new External_Isams_Batch_Reader_Student($this->getXmlReader());
+            $this->list = $iterator->getAccountInfo();
+        } catch (Exception $e) {
+            printf('Skipping student sync: '.$e->getMessage());
+        }
     }
 
     /**

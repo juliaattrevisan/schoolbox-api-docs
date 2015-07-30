@@ -49,8 +49,12 @@ class Synchronise_External_Cis_Strategy_Parent extends Synchronise_Base_Strategy
      */
     public function generateList()
     {
-        $iterator   = new External_Isams_Batch_Reader_Parent($this->getXmlReader());
-        $this->list = $iterator->getAccountInfo();
+        try {
+            $iterator   = new External_Isams_Batch_Reader_Parent($this->getXmlReader());
+            $this->list = $iterator->getAccountInfo();
+        } catch (Exception $e) {
+            printf('Skipping parent sync: '.$e->getMessage());
+        }
     }
 
     /**
