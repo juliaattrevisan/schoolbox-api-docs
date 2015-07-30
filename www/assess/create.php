@@ -15,7 +15,7 @@ use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -170,7 +170,7 @@ else {
 
     try {
         $folderMapper = new FolderMapper();
-        $category = $folderMapper->findById($category_id);
+        $folder = $folderMapper->findById($category_id);
     } catch (\Schoolbox\Mapper\Exception $e) {
         error(117);
         exit;
@@ -209,8 +209,8 @@ else {
         'ASSESS_KIND'               => 'Quiz',
         'ASSESS_IS_TASK'            => $is_task ? 1 : 0,
         'ASSESS_ASSESS_ID'          => '',
-        'ASSESS_CATEGORY_ID'        => $category->getId(),
-        'ASSESS_CATEGORY_NAME'      => $category->getName(),
+        'ASSESS_CATEGORY_ID'        => $folder->getId(),
+        'ASSESS_CATEGORY_NAME'      => $folder->getName(),
         'ASSESS_UNIT_ID'            => $unit_id,
         'ASSESS_TITLE'              => '',
         'ASSESS_WEIGHT'             => 0,
@@ -226,7 +226,7 @@ else {
         'CURRICULUM_CODE_INPUT',
         $this->getTwig()->render(
             'sub/curriculumCodeSelector.twig',
-            ['codeList' => $category->getCurriculumNodes()]
+            ['codeList' => $folder->getCurriculumNodes()]
         )
     );
 
@@ -311,7 +311,21 @@ else {
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', $category, true);
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+            [
+                'text' => $folder->getName(),
+                'href' => "/homepage/{$folder->getId()}",
+                'class' => '',
+            ],
+            [
+                'text' => 'New Quiz',
+                'href' => '',
+                'class' => 'active',
+            ]
+        ]);
 }
 
 
