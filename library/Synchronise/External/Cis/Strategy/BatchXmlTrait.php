@@ -17,26 +17,27 @@ trait Synchronise_External_Cis_Strategy_BatchXmlTrait
      */
     protected function getXmlReader()
     {
-        $filename = Config::get('external_sync_isams_batch_xml');
-        if (!$filename) {
-            throw new Exception('external_sync_isams_batch_xml has not been configured');
-        }
-        if (!is_readable($filename)) {
-            throw new Exception(sprintf('File "%s" does not exist', $filename));
+        $dir = Config::get('stream_dir');
+        if (!$dir) {
+            throw new Exception('stream_dir has not been configured');
         }
 
-        $filemtime = filemtime($filename);
-        if ($filemtime && ($_SERVER['REQUEST_TIME'] - $filemtime) > 48*60*60) {
-            // File is more than 48 hours old: don't run sync again
-            throw new Exception(
-                sprintf(
-                    'File "%s" was last modified more than 48 hours ago',
-                    $filename
-                )
-            );
+        $filename = $dir.strftime('/isams_batch-%Y%m%d.xml', $_SERVER['REQUEST_TIME']);
+        if (!file_exists($filename)) {
+            // Download this file from their API
+            $host = Config::get('external_sync_isams_batch_api_host');
+            $key  = Config::get('external_sync_isams_batch_api_key');
+            if (!$host) {
+                throw new Exception('isams_batch_api_host has not been configured');
+            }
+            if (!$key) {
+                throw new Exception('isams_batch_api_key has not been configured');
+            }
+            $api = new External_Isams_Batch_BaseApi($host, $key);
+            file_put_contents($filename, $api->retrieveDocument());
         }
         $reader = new XMLReader();
-        $reader->open(Config::get('external_sync_isams_batch_xml'));
+        $reader->open($filename);
         return $reader;
     }
 }
