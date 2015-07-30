@@ -11,6 +11,10 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Breadcrumbs;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\UserMapper;
+
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
@@ -35,6 +39,22 @@ if ($groupHandler->isStudent() && ($_SESSION['user']->getId() != $this->arg[1]))
 	error(19);
 }
 
+try {
+    $userMapper = UserMapper::getInstance();
+    $user = $userMapper->findById($this->arg[1]);
+} catch (Schoolbox\Mapper\Exception $e) {
+    error(19);
+    exit;
+}
+
+try {
+    $folderMapper = new FolderMapper();
+    $folder = $folderMapper->findById($assess['category_id']);
+}
+catch (\Exception $e) {
+    error(117);
+}
+
 $this->setFile(TEMPLATE_content, 'assess/attempts.html');
 $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
 $this->setBlock('attempt', 'attempt_review', 'attempt_review_block');
@@ -43,9 +63,10 @@ $this->setBlock('attempt', 'attempt_resume', 'attempt_resume_block');
 /* Generic details
  */
 $this->setVar(array(
-    'SURVEY_NAME' => Scrub::text($assess['title']),
+    'ASSESS_NAME' => Scrub::text($assess['title']),
     'CID' => $assess['category_id'],
-    'SURVEY_ID' => $assess['assess_id']
+    'ATTEMPT_USER_ID' => $user->getId(),
+    'ATTEMPT_USER_NAME' => $user->formatName()
 ));
 
 /* Default
@@ -66,7 +87,6 @@ if (is_array($allAttempts) && count($allAttempts)) {
         $firstSection = $sectionHandler->getFirst($this->arg[0]);
 
         $this->setVar(array(
-            'ATTEMPT_USER_ID' => $currentAttempt['user_id'],
             'ATTEMPT_ASSESS_ID' => $this->arg[0],
             'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
             'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
@@ -110,8 +130,6 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
         /* Misc details
          */
-
-
         $available = $attemptHandler->getTotalMarks($assess['assess_id'], $currentAttempt['attempt_id']);
 
         if ($currentAttempt['reviewed_at'] != null) {
@@ -185,3 +203,23 @@ if (is_array($allAttempts) && count($allAttempts)) {
 		));
     }
 }
+
+$trail = new Breadcrumbs();
+
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text'  => $folder->getName(),
+        'href'  => '/homepage/' . $folder->getId(),
+        'class' => ''
+    ],
+    [
+        'text'  => $assess['title'],
+        'href'  => '/assess/summary.' . $assess['assess_id'],
+        'class' => ''
+    ],
+    [
+        'text'  => $user->formatName(),
+        'href'  => '#',
+        'class' => 'active'
+    ],
+]);

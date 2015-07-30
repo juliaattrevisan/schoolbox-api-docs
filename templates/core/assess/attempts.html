@@ -1,51 +1,46 @@
-<h1>Attempts for {SURVEY_NAME}
-    <a class="btn go-back marg tiny" href="/homepage/{CID}"><span></span>Return to Homepage</a></h1>
-
-<div class="header_option clearfix">
-	<!--<a href="/homepage/{CID}" class="btn go-back"><span></span>Return to Homepage</a>-->
-    <!--<a href="/survey/results/{SURVEY_ID}" class="btn go-back"><span></span>Back to Survey Results</a>-->
+{BREADCRUMB}
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{ASSESS_NAME}</h1>
+    </div>
 </div>
 
-<form action='/survey/deleteAttempt' method='post'>
-	<table class="table ruler">
-		<colgroup>
-			<col />
-			<col />
-			<col />
-			<col />
-			<col />
-			<col width="150"/>
-		</colgroup>
-		<thead>
-			<tr>
-				<th>Start</th>
-                <th>Finish</th>
-				<th>Time Taken</th>
-				<th>Reviewed</th>
-				<th>Grade</th>
-				<th>Actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			<!-- BEGIN attempt -->
-			<tr>
-				<td>{ATTEMPT_START}</td>
-                <td>{ATTEMPT_FINISH}</td>
-				<td>{ATTEMPT_TIME_TAKEN}</td>
-				<td>{ATTEMPT_REVIEWED_AT}</td>
-				<td>{ATTEMPT_MARKS}</td>
-				<td>
-					<span class="actions one-button">
-						<!-- BEGIN attempt_review -->
-						<a href='/assess/studentReview/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}' class="btn no-text eyeball float-left" alt="Review" title="Review"><span></span></a>
-						<!-- END attempt_review -->
-						<!-- BEGIN attempt_resume -->
-						<a href='/assess/attempt/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}' class="btn no-text go-to float-left" alt="Resume" title="Resume"><span></span></a>
-						<!-- END attempt_resume -->
-					</span>
-				</td>
-			</tr>
-			<!-- END attempt -->
-		</tbody>
-	</table>
-</form>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Attempts by {ATTEMPT_USER_NAME}</h2>
+        <section>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Start</th>
+                        <th>Finish</th>
+                        <th>Time Taken</th>
+                        <th>Reviewed</th>
+                        <th>Grade</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- BEGIN attempt -->
+                    <tr>
+                        <td>{ATTEMPT_START}</td>
+                        <td>{ATTEMPT_FINISH}</td>
+                        <td>{ATTEMPT_TIME_TAKEN}</td>
+                        <td>{ATTEMPT_REVIEWED_AT}</td>
+                        <td>{ATTEMPT_MARKS}</td>
+                        <td>
+                            <!-- BEGIN attempt_review -->
+                            <a href='/assess/studentReview/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}' class="icon-view no-text" title="Review"></a>
+                            <!-- END attempt_review -->
+                            <!-- BEGIN attempt_resume -->
+                            <a href='/assess/attempt/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}' class="icon-next no-text" title="Resume"></a>
+                            <!-- END attempt_resume -->
+                        </td>
+                    </tr>
+                    <!-- END attempt -->
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+
