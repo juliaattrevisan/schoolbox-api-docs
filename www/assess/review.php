@@ -37,6 +37,9 @@ if (!is_numeric($this->arg[2])) {
 $assess = $assessHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
 $attempt = $attemptHandler->getByID($this->arg[2]);
+// getListByAssessAndAttempt gets a rowset for some reason!
+$attemptList = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $this->arg[2]);
+$attempt     = array_pop($attemptList);
 
 if (!$assess) {
     error(112);
@@ -48,6 +51,8 @@ if (!$section) {
 
 if (!$attempt) {
     error(128);
+} else {
+    $attempt['totalAvailableMarks'] = $attemptHandler->getTotalMarks($this->arg[0], $this->arg[2]);
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {
@@ -79,26 +84,94 @@ $user = $userHandler->getByID($attempt['user_id']);
 /* Set up template
  */
 $this->setFile(TEMPLATE_content, 'assess/review.html');
+$this->setBlock(TEMPLATE_content, 'attemptFinished', 'attemptFinished_block');
+$this->setBlock(TEMPLATE_content, 'attemptNotYetFinished', 'attemptNotYetFinished_block');
+$this->setBlock(TEMPLATE_content, 'attemptUnfinished', 'attemptUnfinished_block');
+$this->setBlock(TEMPLATE_content, 'resubmit_label', 'resubmit_label_block');
+$this->setBlock(TEMPLATE_content, 'visible_staff', 'visible_staff_block');
+$this->setBlock(TEMPLATE_content, 'visible_staff_students', 'visible_staff_students_block');
+$this->setBlock(TEMPLATE_content, 'visible_staff_students_parents', 'visible_staff_students_parents_block');
 $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
 $this->setBlock(TEMPLATE_content, 'question', 'question_block');
 $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
 $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock('endAssess', 'writable_finalise', 'writable_finalise_block');
+$this->setBlock('endAssess', 'writable_resubmit', 'writable_resubmit_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the Assessment.
  */
-$this->setVar(array(
-    'ASSESS_ASSESS_ID' => $assess['assess_id'],
-    'ASSESS_TITLE' => Scrub::text($assess['title']),
-    'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
-    'SECTION_TITLE' => Scrub::text($section['title']),
-    'SECTION_DESCRIPTION' => Scrub::html($section['description']),
-    'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
-    'RESPONDENT_NAME' => $userHandler->formatName($user),
-));
+try {
+    $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
+} catch (Schoolbox\Mapper\Exception $e) {
+    error(112);
+    exit;
+}
+$dueDate       = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+$attemptDate   = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
+$attemptFinish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+$this->setVar(
+    array(
+        'ASSESS_ASSESS_ID'                     => $assess['assess_id'],
+        'ASSESS_TITLE'                         => Scrub::text($assess['title']),
+        'ATTEMPT_ATTEMPT_ID'                   => $_SESSION['attempt_id'],
+        'ATTEMPT_START'                        => $attemptDate->getShort(),
+        'ATTEMPT_FINISH'                       => $attemptFinish->getShort(),
+        'ATTEMPT_TIME_TAKEN'                   => $assessHandler->sec2hms($attemptFinish->diffInSeconds($attemptDate, true)),
+        'ATTEMPT_TOTAL_MARKS'                  => number_format($attempt['totalMarks'], 2),
+        'ATTEMPT_TOTAL_AVAILABLE_MARKS'        => number_format($attempt['totalAvailableMarks'], 2),
+        'SECTION_TITLE'                        => Scrub::text($section['title']),
+        'SECTION_DESCRIPTION'                  => Scrub::html($section['description']),
+        'ASSESS_PREVIOUSLY_REVIEWED'           => $reviewedAt,
+        'RESPONDENT_NAME'                      => $userHandler->formatName($user),
+        'ASSESS_CATEGORY_NAME'                 => Scrub::text($folder->getName()),
+        'ASSESS_CATEGORY_ID'                   => $folder->getId(),
+        'ASSESS_DUEWORK_YEAR'                  => $dueDate->getYear(),
+        'ASSESS_DUEWORK_SEMESTER'              => $dueDate->getYearHalf(),
+        'resubmit_label_block'                 => '',
+        'visible_staff_block'                  => '',
+        'visible_staff_students_block'         => '',
+        'visible_staff_students_parents_block' => '',
+        'attemptFinished_block'                => '',
+        'attemptNotYetFinished_block'          => '',
+        'attemptUnfinished_block'              => '',
+    )
+);
+
+// Parse finished/unfinished/not finished yet blockage
+// Finished: $attempt.finish is set to something other that 0000-00-etc
+// Otherwise:
+// not yet finished if survey is open, unfinished if closed
+if (!isset($attempt['finish'])) {
+    $close = new DateTime($assess['finish']);
+    if ($close->getTimestamp() < $_SERVER['REQUEST_TIME']) {
+        $this->parse('attemptUnfinished_block', 'attemptUnfinished');
+    }
+    else {
+        $this->parse('attemptNotYetFinished_block', 'attemptNotYetFinished');
+    }
+}
+else {
+    $this->parse('attemptFinished_block', 'attemptFinished');
+}
+
+if ($attempt['reviewed_at'] != '') {
+    $this->parse('resubmit_label_block', 'resubmit_label');
+}
+
+switch ($assess['mark_visibility']) {
+    case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE:
+        $this->parse('visible_staff_block', 'visible_staff');
+        break;
+    case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT:
+        $this->parse('visible_staff_students_block', 'visible_staff_students');
+        break;
+    case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT:
+        $this->parse('visible_staff_students_parents_block', 'visible_staff_students_parents');
+        break;
+}
 
 $readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
 
@@ -221,8 +294,12 @@ else {
     }
 }
 
-if ($readonly) {
-    $this->setVar('writable_finalise_block', '');
-} else {
-    $this->parse('writable_finalise_block', 'writable_finalise');
+$this->setVar('writable_finalise_block', '');
+$this->setVar('writable_resubmit_block', '');
+if (!$readonly) {
+    if ($attempt['reviewed_at'] != '') {
+        $this->parse('writable_resubmit_block', 'writable_resubmit');
+    } else {
+        $this->parse('writable_finalise_block', 'writable_finalise');
+    }
 }

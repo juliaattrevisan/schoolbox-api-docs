@@ -91,8 +91,14 @@ $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
-$start = new Alaress_Date_Format($attempt['start'], 'Y-m-d H:i:s');
-$finish = new Alaress_Date_Format($attempt['finish'], 'Y-m-d H:i:s');
+try {
+    $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
+} catch (Schoolbox\Mapper\Exception $e) {
+    error(112);
+    exit;
+}
+$start = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
+$finish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $user = $attemptHandler->getUser($attempt['attempt_id']);
 
 /* Show current Section's data, and other mandatory tokens needed to complete
@@ -100,18 +106,21 @@ $user = $attemptHandler->getUser($attempt['attempt_id']);
  */
 $this->setVar(
     array(
-        'ASSESS_ASSESS_ID' => $assess['assess_id'],
-        'ASSESS_TITLE' => Scrub::text($assess['title']),
-        'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
-        'SECTION_TITLE' => Scrub::text($section['title']),
-        'SECTION_DESCRIPTION' => Scrub::html($section['description']),
-        'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
-        'ATTEMPT_USERNAME' => $assess['anonymous_result'] ? 'Anonymous' : $userHandler->formatName($user),
-        'ATTEMPT_START_DATETIME' => $start->getShort(),
-        'ATTEMPT_FINISH_DATETIME' => $finish->getShort(),
-        'attemptFinished_block' => '',
+        'ASSESS_ASSESS_ID'            => $assess['assess_id'],
+        'ASSESS_TITLE'                => Scrub::text($assess['title']),
+        'ATTEMPT_ATTEMPT_ID'          => $_SESSION['attempt_id'],
+        'ATTEMPT_START'               => $start->getShort(),
+        'ATTEMPT_FINISH'              => $finish->getShort(),
+        'ATTEMPT_TIME_TAKEN'          => $assessHandler->sec2hms($finish->diffInSeconds($start, true)),
+        'SECTION_TITLE'               => Scrub::text($section['title']),
+        'SECTION_DESCRIPTION'         => Scrub::html($section['description']),
+        'ASSESS_PREVIOUSLY_REVIEWED'  => $reviewedAt,
+        'RESPONDENT_NAME'             => $assess['anonymous_result'] ? 'Anonymous' : $userHandler->formatName($user),
+        'ASSESS_CATEGORY_NAME'        => Scrub::text($folder->getName()),
+        'ASSESS_CATEGORY_ID'          => $folder->getId(),
+        'attemptFinished_block'       => '',
         'attemptNotYetFinished_block' => '',
-        'attemptUnfinished_block' => '',
+        'attemptUnfinished_block'     => '',
     )
 );
 
