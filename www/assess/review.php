@@ -84,6 +84,9 @@ $user = $userHandler->getByID($attempt['user_id']);
 /* Set up template
  */
 $this->setFile(TEMPLATE_content, 'assess/review.html');
+$this->setBlock(TEMPLATE_content, 'visible_staff', 'visible_staff_block');
+$this->setBlock(TEMPLATE_content, 'visible_staff_students', 'visible_staff_students_block');
+$this->setBlock(TEMPLATE_content, 'visible_staff_students_parents', 'visible_staff_students_parents_block');
 $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
 $this->setBlock(TEMPLATE_content, 'question', 'question_block');
 $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
@@ -120,7 +123,21 @@ $this->setVar(array(
     'ASSESS_CATEGORY_ID'      => $folder->getId(),
     'ASSESS_DUEWORK_YEAR'     => $dueDate->getYear(),
     'ASSESS_DUEWORK_SEMESTER' => $dueDate->getYearHalf(),
+    'visible_staff_block' => '',
+    'visible_staff_students_block' => '',
+    'visible_staff_students_parents_block' => '',
 ));
+switch ($assess['mark_visibility']) {
+    case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE:
+        $this->parse('visible_staff_block', 'visible_staff');
+        break;
+    case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT:
+        $this->parse('visible_staff_students_block', 'visible_staff_students');
+        break;
+    case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT:
+        $this->parse('visible_staff_students_parents_block', 'visible_staff_students_parents');
+        break;
+}
 
 $readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
 

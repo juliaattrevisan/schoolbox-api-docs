@@ -96,7 +96,15 @@ $(document).ready(function() {
         <ul class="meta">
             <li class="icon-calendar">Quiz attempted on {ATTEMPT_FINISH}</li>
             <li class="icon-due-work"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a> Quiz</li>
-            <li class="icon-{ASSESS_VISIBILITY_ICON}">Visible to {ASSESS_VISIBILITY}</li>
+            <!-- BEGIN visible_staff -->
+            <li class="icon-locked">Visible to staff only</li>
+            <!-- END visible_staff -->
+            <!-- BEGIN visible_staff_students -->
+            <li class="icon-staff-students">Visible to staff and students</li>
+            <!-- END visible_staff_students -->
+            <!-- BEGIN visible_staff_students_parents -->
+            <li class="icon-staff">Visible to staff, students and parents</li>
+            <!-- END visible_staff_students_parents -->
             <li class="icon-time-value">Time taken: {ATTEMPT_TIME_TAKEN}</li>
             <li class="icon-approve">Mark: {ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</li>
         </ul>
