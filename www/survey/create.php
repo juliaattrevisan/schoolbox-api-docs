@@ -90,11 +90,6 @@ if (!empty($_POST)) {
     $this->setBlock(TEMPLATE_content, 'durationHour', 'durationHour_block');
     $this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
-    $this->setBlock(TEMPLATE_content, 'has_due_date', 'has_due_date_block');
-
-    $this->setVar(array(
-        'has_due_date_block' => ''
-    ));
 
     $this->setTitle('Manage Survey');
 

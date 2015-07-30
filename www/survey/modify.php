@@ -195,8 +195,4 @@ if (!empty($_POST)) {
      */
     $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
     $trail->renderIntoSitePage($this, 'BREADCRUMB', $folder, true);
-
-    /* Parse due date meta
-     */
-    $this->parse('has_due_date_block', 'has_due_date');
 }
