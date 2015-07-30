@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-
+use Schoolbox\Breadcrumbs;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $assessHandler = new Assess_Main();
@@ -44,6 +44,8 @@ $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
 $this->setVar(array(
         'ASSESS_ASSESS_ID'     => $this->arg[0],
+        'ASSESS_KIND_LC'       => 'assess',
+        'ASSESS_KIND'          => 'Quiz',
         'ASSESS_TITLE'         => Scrub::text($assess['title']),
         'ASSESS_DESCRIPTION'   => Scrub::html($assess['description']),
         'ASSESS_START'         => $assessStartDate->getShort(),
@@ -54,8 +56,13 @@ $this->setVar(array(
 ));
 
 $this->setFile(TEMPLATE_content, 'assess/summary.html');
+$this->setFile('assessContentsFragment', 'assess/contents.html');
+$this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setTitle('Assessment: ' . $assess['title']);
+
+$assessHandler->renderAssessContents($assess['assess_id'], $this);
+$this->parse('allQuestions_block', 'assessContentsFragment', true);
 
 $this->setVar(array(
     'ASSESS_DURATION' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
@@ -82,24 +89,18 @@ if (is_array($allSummary) && count($allSummary)) {
  */
 $this->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
 
-$allBreadcrumbs = $folderMapper->breadcrumb($folder, true);
-
-$i = 1;
-
-foreach ($allBreadcrumbs as $currentBreadcrumb) {
-    if ($i == $allBreadcrumbs->count()) {
-        $active = 'active';
-    }
-    else {
-        $active = '';
-    }
-
-    $this->setVar(array(
-        'BREADCRUMB_FOLDER_ID' => $currentBreadcrumb->getId(),
-        'BREADCRUMB_FOLDER_NAME' => $currentBreadcrumb->getName(),
-        'BREADCRUMB_ACTIVE' => $active,
-    ));
-
-    $this->parse('breadcrumb_block', 'breadcrumb', true);
-    $i++;
-}
+/* Render out breadcrumbs
+ */
+$trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => $folder->getName(),
+        'href' => "/homepage/{$folder->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => $assess['title'],
+        'href' => "/assess/summary/{$assess['assess_id']}",
+        'class' => 'active',
+    ]
+]);
