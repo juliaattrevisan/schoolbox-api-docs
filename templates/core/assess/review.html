@@ -3,15 +3,22 @@
 <script type="text/javascript">
 $(document).ready(function() {
 
-   var currentForm = '';
-	$('form').each(function(index, formElement) {
+//    var currentForm = '';
+
+    var forms = $('form[data-role="question-submit"]');
+
+    forms.each(function(index, formElement) {
    		 $(formElement).validate({
 			submitHandler: function() {
-				showAlert(formElement);
-				$.post($(formElement).attr('action'), $(formElement).serialize(), function(responseText) {
-					var dataFunction = new Function('return ' + responseText);
-					var result = dataFunction();
-				});
+//				showAlert(formElement);
+				$.post(
+                    $(formElement).attr('action'),
+                    $(formElement).serialize(),
+                    function (responseText) {
+                        var dataFunction = new Function('return ' + responseText);
+                        var result = dataFunction();
+                    }
+                );
 				return false;
 			},
 			rules: {
@@ -23,13 +30,13 @@ $(document).ready(function() {
 				reviewedMarks: "Please enter a decimal number"
 			},
 			errorPlacement: function(error, element) {
-                            offset = element.offset();
-                            error.insertBefore(element)
+//                var offset = element.offset();
+                error.insertBefore(element)
 			}
    		});
 	});
 
-	$('.textarea-container textarea').blur(function() {
+	forms.find('textarea').blur(function() {
 		if ($(this).val() !== '') {
 			$.post($(this).closest('form').attr('action'),
 			$(this).closest('form').serialize(),
@@ -41,8 +48,8 @@ $(document).ready(function() {
 		}
 	});
 
-	$('.marks-amount input').blur(function() {
-		showAlert($(this));
+    forms.find('input').blur(function() {
+//		showAlert($(this));
 		$.post($(this).closest('form').attr('action'),
 		$(this).closest('form').serialize(),
 		function(responseText) {
@@ -52,18 +59,18 @@ $(document).ready(function() {
 		return false;
 	});
 
-	var assessAttempted = '{ASSESS_PREVIOUSLY_REVIEWED}';
-	function showAlert(target) {
-		var relevantLabel = $(target).closest('form').find('.assess-alert');
-		if (assessAttempted == "false") {
-			relevantLabel.fadeIn(200);
-		}
-		if (assessAttempted == "true") {
-			relevantLabel.html('<span>In order to finish your edits to this finalised review, click \'Resubmit Review\' at the end of the quiz\</span>').fadeIn(200);
-		}
-	}
+//	var assessAttempted = '{ASSESS_PREVIOUSLY_REVIEWED}';
+//	function showAlert(target) {
+//		var relevantLabel = $(target).closest('form').find('.assess-alert');
+//		if (assessAttempted == "false") {
+//			relevantLabel.fadeIn(200);
+//		}
+//		if (assessAttempted == "true") {
+//			relevantLabel.html('<span>In order to finish your edits to this finalised review, click \'Resubmit Review\' at the end of the quiz\</span>').fadeIn(200);
+//		}
+//	}
 
-	$('a.finish-review').click(function(event) {
+	$('[data-action="finish-review"]').click(function(event) {
 		event.preventDefault();
 		$(this).confirmDialog();
 	});
@@ -119,7 +126,12 @@ $(document).ready(function() {
         <h2 class="subheader">Questions</h2>
         <!-- BEGIN question -->
         <section>
-            <form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" name="question-submit" class='validation_{RESPONSE_ID} questionForm' method="post">
+            <form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}"
+                  data-role="question-submit"
+                  name="question-submit"
+                  class='validation_{RESPONSE_ID} questionForm'
+                  method="post"
+            >
                 <h3>Q{QUESTION_SEQUENCE}) ({QUESTION_MARKS} marks)</h3>
                 <article>{QUESTION_QUESTION}</article>
                 <!-- BEGIN answerInputs -->
@@ -140,10 +152,10 @@ $(document).ready(function() {
 
         <!-- BEGIN endAssess -->
         <!-- BEGIN writable_finalise -->
-        <a class="button primary" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Finalise Review</a>
+        <a class="button primary" data-action="finish-review" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Finalise Review</a>
         <!-- END writable_finalise -->
         <!-- BEGIN writable_resubmit -->
-        <a class="button primary" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Resubmit Review</a>
+        <a class="button primary" data-action="finish-review" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Resubmit Review</a>
         <!-- END writable_resubmit -->
         <!-- END endAssess -->
     </div>
