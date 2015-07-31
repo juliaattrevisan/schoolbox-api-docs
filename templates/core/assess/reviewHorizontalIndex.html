@@ -1,3 +1,17 @@
-<h1>Horizontal Marking for {ASSESS_TITLE} <a class='btn go-back' href='/assess/results/{ASSESS_ASSESS_ID}'><span></span>Back to quiz</a></h1>
-<!-- BEGIN allQuestions -->
-<!-- END allQuestions -->
+<ul class="breadcrumb">
+    <li><a href="/submission/listSubmission" >Submissions</a></li>
+    <li><a href="/submission/listSubmission/{ASSESS_DUEWORK_YEAR}/{ASSESS_DUEWORK_SEMESTER}/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a></li>
+    <li><a href="/assess/results/{ASSESS_ASSESS_ID}/">{ASSESS_TITLE}</a></li>
+    <li class="active"><a href="#">Horizontal Marking</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Horizontal Marking for {ASSESS_TITLE}</h1>
+    </div>
+
+    <div class="small-12 island">
+        <!-- BEGIN allQuestions -->
+        <!-- END allQuestions -->
+    </div>
+</div>

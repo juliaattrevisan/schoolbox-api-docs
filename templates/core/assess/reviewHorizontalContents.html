@@ -1,20 +1,29 @@
 <!-- BEGIN section -->
-<div class="box">
-	<h2>{SECTION_TITLE}</h2>
-    <!-- BEGIN question -->
-        <h3>
-          <a href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{QUESTION_QUESTION_ID}">
-            Q{QUESTION_SEQUENCE})
-            <!-- BEGIN has_mark -->
-            {QUESTION_MARKS} marks
-            <!-- END has_mark -->
-          </a>
-            <span class="actions">
-            <a class="btn go-to" href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{QUESTION_QUESTION_ID}"><span></span>Review question</a>
-        </span>
-        </h3>
-        <div class="wysiwyg">{QUESTION_QUESTION}</div>
-    <!-- END question -->
-</div>
+<h2 class="subheader">{SECTION_TITLE}</h2>
+<section>
+    <ul class="action-list">
+        <!-- BEGIN question -->
+        <li class="row">
+            <div class="eleven-column">
+                <a href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{QUESTION_QUESTION_ID}">
+                <h4>
+                    <span>Q{QUESTION_SEQUENCE})</span>
+                    <!-- BEGIN has_mark -->
+                    <span class="meta">({QUESTION_MARKS} marks)</span>
+                    <!-- END has_mark -->
+                </h4>
+                </a>
+                <article>{QUESTION_QUESTION}</article>
+            </div>
+            <div class="one actions">
+                <a href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{QUESTION_QUESTION_ID}"
+                   class="icon-view no-text"
+                   title="Review Question"
+                ></a>
+            </div>
+        </li>
+        <!-- END question -->
+        </ul>
+    </section>
 <!-- END section -->
 
