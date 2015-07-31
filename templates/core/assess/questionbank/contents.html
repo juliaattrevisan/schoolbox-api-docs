@@ -84,22 +84,19 @@
                         <!-- END question -->
                     </table>
 
-                    <p class="clearfix no-marg ">
-                        <!-- BEGIN show_submit -->
-                        <input type='submit' value='Copy to Quiz' class="submit-btn-plain no-marg"/>
-                        <!-- END show_submit -->
-                    </p>
-
-                    <!-- BEGIN no_questions -->
-                    <p>There are no questions in this category's Question Bank.</p>
-                    <!-- END no_questions -->
+                    <!-- BEGIN show_submit -->
+                    <input type='submit' value='Copy to Quiz' />
+                    <!-- END show_submit -->
                 </form>
+
+                <!-- BEGIN no_questions -->
+                <p>There are no questions in this category's Question Bank.</p>
+                <!-- END no_questions -->
             </div>
         </section>
         <!-- END category_selected -->
     </div>
 </div>
-
 
 <div class="row">
     <div class="small-12 island">
@@ -127,35 +124,28 @@
                     <!-- END category_list_item_end -->
                 </ul>
             </div>
-            <div class="edit-category">
+            <div class="content">
                 <!-- BEGIN has_edit_category -->
-                <a id="editCat" class="btn modify" href="#"><span></span>Edit Category</a>
+                <a id="editCat" class="button icon-modify" href="#">Edit Category</a>
 
-                <form action='/assess/questionbank/modify.php' method='post' id="editCatForm" title="Edit Category">
+                <form action='/assess/questionbank/modify.php' method='post' id="editCatForm">
                     <input name='questionCategoryId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
 
-                    <p class="clearfix no-marg">
-                        <input name='name' type='text' value='{QUESTION_CATEGORY}'/>
-                        <input type='submit' value='Rename Category' class="submit-btn-plain no-marg"/>
-                    </p>
+                    <input name='name' type='text' value='{QUESTION_CATEGORY}' />
+                    <input type='submit' value='Rename Category' />
                 </form>
                 <!-- END has_edit_category -->
 
-                <a id="newSubCat" class="btn add" href="#"><span></span>Add Subcategory</a>
+                <a id="newSubCat" class="button icon-add" href="#">Add Subcategory</a>
 
-                <form action='/assess/questionbank/create' method='post' id="subcategoryForm" title="Add New Subcategory">
+                <form action='/assess/questionbank/create' method='post' id="subcategoryForm">
                     <input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
 
-                    <p class="clearfix no-marg">
-                        <input name='name' type='text' value='' class="required"/>
-                        <input type='submit' value='Add New Subcategory' class="submit-btn-plain no-marg "/>
-                    </p>
+                    <input name='name' type='text' value='' class="required" />
+                    <input type='submit' value='Add New Subcategory' />
                 </form>
-                <form>
-                    <p class="clearfix no-marg">
-                        <a href='/assess/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="btn delete"><span></span>Remove this category</a>
-                    </p>
-                </form>
+
+                <a href='/assess/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="button icon-delete">Remove this category</a>
             </div>
         </section>
     </div>
