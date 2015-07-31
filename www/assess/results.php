@@ -212,7 +212,8 @@ catch (\Exception $e) {
 /* Set up template
  */
 $this->setFile(TEMPLATE_content, 'assess/results.html');
-$this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
+$this->setBlock(TEMPLATE_content, 'user_attempts', 'user_attempts_block');
+$this->setBlock('user_attempts', 'attempt', 'attempt_block');
 $this->setBlock('attempt', 'attempt_delete', 'attempt_delete_block');
 $this->setBlock('attempt', 'reviewed', 'reviewed_block');
 $this->setBlock('attempt', 'not_reviewed', 'not_reviewed_block');
@@ -238,6 +239,7 @@ $this->setTitle('Results for: ' . $assess['title']);
 $dueDate = new Alaress_Date_Format($assess['finish'],Alaress_Date_Format::DATABASE_DATE_FORMAT);
 
 $visibility = '';
+
 switch($assess['mark_visibility']) {
     case 0:
         $visibility = 'Staff Only';
@@ -253,20 +255,18 @@ switch($assess['mark_visibility']) {
         break;
 }
 
-$this->setVar(
-    array(
-        'ASSESS_ASSESS_ID'      => $assess['assess_id'],
-        'ASSESS_TITLE'          => Scrub::text($assess['title']),
-        'ASSESS_DUEDATE'        => $dueDate->getLongDateOnly(),
-        'GRADE_VISIBILITY'      => $visibility,
-        'GRADE_VISIBILITY_CODE' => $assess['mark_visibility'],
-        'VISIBILITY_CLASS'      => $visibilityClass,
-        'CID'                   => $folder->getId(),
-        'CATEGORY_NAME'         => Scrub::text($folder->getName()),
-        'DUEWORK_YEAR'          => $dueDate->getYear(),
-        'DUEWORK_SEMESTER'      => $dueDate->getYearHalf(),
-    )
-);
+$this->setVar(array(
+    'ASSESS_ASSESS_ID'      => $assess['assess_id'],
+    'ASSESS_TITLE'          => Scrub::text($assess['title']),
+    'ASSESS_DUEDATE'        => $dueDate->getLongDateOnly(),
+    'GRADE_VISIBILITY'      => $visibility,
+    'GRADE_VISIBILITY_CODE' => $assess['mark_visibility'],
+    'VISIBILITY_CLASS'      => $visibilityClass,
+    'CID'                   => $folder->getId(),
+    'CATEGORY_NAME'         => Scrub::text($folder->getName()),
+    'DUEWORK_YEAR'          => $dueDate->getYear(),
+    'DUEWORK_SEMESTER'      => $dueDate->getYearHalf(),
+));
 
 /**
  * If this assessment finishes in the past, don't allow editing except to superadmins
@@ -352,7 +352,7 @@ if (is_array($allStudents) && count($allStudents)) {
         }
 
         /* If no attempts, just show name
-           */
+         */
         if (!$numAttempts) {
             $this->setVar(array(
                 'ASSESS_FIRST_SECTION_ID' => '',
@@ -396,10 +396,21 @@ if (is_array($allStudents) && count($allStudents)) {
         }
 
         $numAttempts = 0;
+
+        $this->parse('user_attempts_block', 'user_attempts', true);
+
+        /* Clear children after parsing out the parent
+         */
+        $this->setVar(array(
+            'attempt_block' => ''
+        ));
     }
 } else {
-    $this->setVar('attempt_block', '');
-    $this->setVar('assess_delete_block', '');
+    $this->setVar(array(
+        'attempt_block' => '',
+        'assess_delete_block' => '',
+        'user_attempts_block' => '',
+    ));
 }
 
 /* Deal with remainder attempts
@@ -418,6 +429,8 @@ if ($allAttempts && count($allAttempts)) {
         }
     }
 }
+
+$this->parse('user_attempts_block', 'user_attempts', true);
 
 if ($readonly) {
     $this->setVar('delete_block', '');
