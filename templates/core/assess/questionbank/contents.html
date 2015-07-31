@@ -78,7 +78,7 @@
                         <div class="three actions">
                             <a class="icon-view no-text" href="#" title="Show Answers" data-show-answer-content="{QUESTION_BANK_ID}"></a>
                             <!-- BEGIN show_delete -->
-                            <a class="icon-delete no-text" href="/assess/questionbank/question/delete/{QUESTION_BANK_ID}" title="Delete"></a>
+                            <a class="icon-delete no-text" href="/assess/questionbank/question/delete/{QUESTION_BANK_ID}" title="Delete" data-delete-question></a>
                             <!-- END show_delete -->
                             <a class="icon-modify no-text" href="/assess/questionbank/question/modify/{QUESTION_BANK_ID}" title="Modify"></a>
                         </div>
@@ -88,7 +88,7 @@
             </section>
 
             <!-- BEGIN show_submit -->
-            <input type='submit' class='expand' value='Copy to Quiz' />
+            <input type='submit' class='expand' value='Copy selected questions to Quiz' />
             <!-- END show_submit -->
         </form>
         <!-- END category_selected -->
@@ -152,73 +152,71 @@
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type='text/javascript'>
-    $(function () {
-        $('#deleteButton').click(function (event) {
-            var allQuestions = $('#questionBankForm').find('input[name="question_bank_id[]"]:checked');
-
-            if (allQuestions.length && confirm('Do you want to remove the selected questions from the Question Bank?')) {
-                $.post('/assess/questionbank/removeQuestion', $('#questionBankForm').serialize(), function (response) {
-                    alert(response);
-                    location.reload();
-                });
-            }
+    $(function() {
+        $('[data-delete-question]').click(function(event) {
             event.preventDefault();
-            $(this).confirmDialog();
-        });
 
-        $('a.delete').click(function (event) {
-            event.preventDefault();
-            $(this).confirmDialog();
-        });
+            $(this).confirmDialog({
+                text: 'Do you want to remove this question from the Question Bank?',
+                confirmEvent: function() {
+                    // Build a hidden input with the delete button's name/val,
+                    // then submit
+                    var allQuestions = $('#questionBankForm').find('input[name="question_bank_id[]"]:checked');
 
-        $('input[type=checkbox]').click(function () {
-            $(this).closest('.question').toggleClass('checked')
-        })
+                    if (allQuestions.length) {
+                        $.post('/assess/questionbank/removeQuestion', $('#questionBankForm').serialize(), function (response) {
+                            alert(response);
+                            location.reload();
+                        });
+                    }
+                }
+            });
+        });
 
         $("#categoryTree")
-                .on('ready.jstree', function (event, jstree) {
-                    var openNodes = [
-                        {SELECTED_NODES}
-                    ];
+            .on('ready.jstree', function (event, jstree) {
+                var openNodes = [
+                    {SELECTED_NODES}
+                ];
 
-                    jstree.instance.open_node(openNodes);
+                jstree.instance.open_node(openNodes);
 
-                    /* Style selected node if one was chozen
-                     */
-                    if (openNodes.length) {
-                        $('#' + openNodes[0]).children('a.jstree-anchor').addClass('jstree-clicked');
-                    }
-                })
-                .on('click', 'a.jstree-anchor', function () {
-                    location.href = this.href
-                })
-                .on('move_node.jstree', function (e, data) {
-                    $.ajax({
-                        url: '/assess/questionbank/move.php',
-                        data: {
-                            position: data.position,
-                            destination: data.parent.split('_').pop(),
-                            target: data.node.id.split('_').pop()
-                        }
-                    });
-                })
-                .jstree({
-                    "core": {
-                        animation: 0,
-                        force_text: true,
-                        check_callback: true,
-                        multiple: false,
-                        "themes": {
-                            "variant": "schoolbox",
-                            "dots": true,
-                            "icons": false
-                        }
-                    },
-                    "plugins": ["dnd"],
-                    dnd: {
-                        copy: false
+                /* Style selected node if one was chozen
+                 */
+                if (openNodes.length) {
+                    $('#' + openNodes[0]).children('a.jstree-anchor').addClass('jstree-clicked');
+                }
+            })
+            .on('click', 'a.jstree-anchor', function () {
+                location.href = this.href
+            })
+            .on('move_node.jstree', function (e, data) {
+                $.ajax({
+                    url: '/assess/questionbank/move.php',
+                    data: {
+                        position: data.position,
+                        destination: data.parent.split('_').pop(),
+                        target: data.node.id.split('_').pop()
                     }
                 });
+            })
+            .jstree({
+                "core": {
+                    animation: 0,
+                    force_text: true,
+                    check_callback: true,
+                    multiple: false,
+                    "themes": {
+                        "variant": "schoolbox",
+                        "dots": true,
+                        "icons": false
+                    }
+                },
+                "plugins": ["dnd"],
+                dnd: {
+                    copy: false
+                }
+            });
 
         $("#editCatForm").dialog({
             autoOpen: false,
