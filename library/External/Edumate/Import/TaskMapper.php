@@ -8,7 +8,17 @@
  * @version     SVN: $Id$
  */
 
-class External_Edumate_Import_TaskMapper extends \Schoolbox\Mapper {
+class External_Edumate_Import_TaskMapper extends \Schoolbox\Mapper
+{
+	/**
+	 * Setup method. Implementing classes to define their SQL map here.
+	 *
+	 * @return void
+	 */
+	protected function mapping()
+	{
+		// nothing goes here
+	}
 
 	/**
 	 * Find out if an Edumate Task already exists as a SubmissionBox
