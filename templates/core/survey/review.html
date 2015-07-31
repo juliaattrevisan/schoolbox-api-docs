@@ -8,8 +8,12 @@
     <div class="small-12 columns">
         <h1>Reviewing {ASSESS_TITLE} response for {RESPONDENT_NAME}</h1>
         <ul class="meta">
-            <li class="icon-calendar">Survey taken
-                <time>{ATTEMPT_START}</time><!-- BEGIN attemptFinished -->&ndash;<time>{ATTEMPT_FINISH}</time> ({ATTEMPT_TIME_TAKEN})<!-- END attemptFinished -->
+            <li class="icon-calendar"><time>{ASSESS_START}</time>
+                &ndash; <time>{ASSESS_FINISH}</time>
+            </li>
+            <li class="icon-surveys"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a>
+                Survey, taken
+                <time>{ATTEMPT_START}</time><!-- BEGIN attemptFinished --> &ndash; <time>{ATTEMPT_FINISH}</time> ({ATTEMPT_TIME_TAKEN})<!-- END attemptFinished -->
                 <!-- BEGIN attemptNotYetFinished -->
                 (unfinished)
                 <!-- END attemptNotYetFinished -->
@@ -17,7 +21,6 @@
                 (not finished by close date)
                 <!-- END attemptUnfinished -->
             </li>
-            <li class="icon-surveys"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a> Survey</li>
         </ul>
     </div>
 

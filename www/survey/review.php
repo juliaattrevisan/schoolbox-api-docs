@@ -97,6 +97,8 @@ try {
     error(112);
     exit;
 }
+$openDate = new Alaress_Date_Format($assess['start'], Alaress_Date_Format::DATABASE_FORMAT);
+$dueDate  = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $start = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
 $finish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $user = $attemptHandler->getUser($attempt['attempt_id']);
@@ -108,6 +110,8 @@ $this->setVar(
     array(
         'ASSESS_ASSESS_ID'            => $assess['assess_id'],
         'ASSESS_TITLE'                => Scrub::text($assess['title']),
+        'ASSESS_START'                => $openDate->getShort(),
+        'ASSESS_FINISH'               => $dueDate->getShort(),
         'ATTEMPT_ATTEMPT_ID'          => $_SESSION['attempt_id'],
         'ATTEMPT_START'               => $start->getShort(),
         'ATTEMPT_FINISH'              => $finish->getShort(),

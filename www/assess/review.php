@@ -109,13 +109,16 @@ try {
     error(112);
     exit;
 }
-$dueDate       = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+$openDate      = new Alaress_Date_Format($assess['start'], Alaress_Date_Format::DATABASE_FORMAT);
+$dueDate       = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptDate   = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptFinish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $this->setVar(
     array(
         'ASSESS_ASSESS_ID'                     => $assess['assess_id'],
         'ASSESS_TITLE'                         => Scrub::text($assess['title']),
+        'ASSESS_START'                         => $openDate->getShort(),
+        'ASSESS_FINISH'                        => $dueDate->getShort(),
         'ATTEMPT_ATTEMPT_ID'                   => $_SESSION['attempt_id'],
         'ATTEMPT_START'                        => $attemptDate->getShort(),
         'ATTEMPT_FINISH'                       => $attemptFinish->getShort(),
