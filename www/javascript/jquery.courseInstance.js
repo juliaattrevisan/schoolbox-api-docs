@@ -194,7 +194,6 @@
                  */
                 var allForms = component.find('[data-form-container]');
                 allForms.removeClass('hide').not(thisCreateForm).slideUp('fast');
-                console.log(allForms);
 
                 if (thisCreateForm.hasClass('hide')) {
                     thisCreateForm.stop().removeClass('hide').slideUp(1).slideDown('fast');
