@@ -8,19 +8,13 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form action="/assess/question/create" method="post">
+        <h2 class="subheader">Create Question</h2>
+        <form action="/{ASSESS_KIND_LC}/question/create" method="post">
             <input name="section_id" type="hidden" value="{SECTION_ID}" />
             <input name="sequence" type="hidden" value="{SEQUENCE}" />
-
-            <h2 class="subheader">Create Question</h2>
-            <section>
-                <div class="content">
-                    <p>
-                        Now that you've created a section for the quiz, use the drop down below to select a question type.
-                    </p>
-
+            <section class="content">
                     <label>
-                        Type
+                        Question Type
                         <select name="type_id" id="type_id" data-question-type-select>
                             <option disabled {DISABLED_SELECTED} value='-1'>-- Select Type --</option>
                             <!-- BEGIN questionType -->
@@ -29,6 +23,7 @@
                         </select>
                     </label>
 
+                    <!-- BEGIN type_selected -->
                     <label>
                         Question
                         <input name="question" id="question" type="text" size="35" value="{QUESTION}" />
@@ -53,10 +48,10 @@
 
                         <!-- END answerInputs -->
                     </div>
-                </div>
+                <!-- END type_selected -->
             </section>
             <label>
-                <input class='expand' type="submit" value="Add Question" />
+                <input class='expand' type="submit" value="Add Question" {SUBMIT_DISABLED} />
             </label>
         </form>
     </div>

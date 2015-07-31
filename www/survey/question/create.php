@@ -116,18 +116,20 @@ if (!empty($_POST)) {
 
     /* Render create page
      */
-    $this->setFile(TEMPLATE_content, 'survey/question/create.html');
-    $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
+    $this->setFile(TEMPLATE_content, 'assess/question/create.html');
+    $this->setBlock(TEMPLATE_content, 'type_selected', 'type_selected_block');
+    $this->setBlock('type_selected', 'answerInputs', 'answerInputs_block');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
-    $this->setBlock(TEMPLATE_content, 'has_answer_configuration', 'has_answer_configuration_block');
+    $this->setBlock('type_selected', 'has_answer_configuration', 'has_answer_configuration_block');
     $this->setBlock('has_answer_configuration', 'answer_configuration', 'answer_configuration_block');
 
     $this->setTitle('Create Question');
 
     $this->setVar(
         array(
-            'has_answer_configuration_block' => ''
+            'has_answer_configuration_block' => '',
+            'type_selected_block' => '',
         )
     );
 
@@ -145,6 +147,7 @@ if (!empty($_POST)) {
             'SEQUENCE'              => $questionHandler->getNextSequence($section['section_id']),
             'QUESTION'              => '',
             'MARKS'                 => '',
+            'SUBMIT_DISABLED'       => '',
         )
     );
 
@@ -159,6 +162,9 @@ if (!empty($_POST)) {
                 'DISABLED_SELECTED' => '',
             )
         );
+
+        $this->parse('type_selected_block', 'type_selected');
+
     } else {
         if ($this->arg[1] == 'import') {
             $this->setVar(
@@ -172,7 +178,8 @@ if (!empty($_POST)) {
                 array(
                     'IMPORT_SELECTED' => '',
                     'DISABLED_SELECTED' => 'selected=\'selected\'',
-                    'ANSWER_INPUTS' => $answerTemplate
+                    'ANSWER_INPUTS' => $answerTemplate,
+                    'SUBMIT_DISABLED' => 'disabled="disabled"'
                 )
             );
         }
