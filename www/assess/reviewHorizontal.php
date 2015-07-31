@@ -40,6 +40,13 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
+try {
+	$category = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
+} catch (\Schoolbox\Mapper\Exception $e) {
+	error(112);
+	exit;
+}
+
 if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
 	error(127);
 }
@@ -76,6 +83,34 @@ if (!isset($this->arg[1])) {
 	));
 
 	$this->parse('allQuestions_block', 'assessContentsFragment', true);
+
+    /* Render out breadcrumbs
+     */
+    $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text'  => 'Submissions',
+            'href'  => '/submission/listSubmission',
+            'class' => ''
+        ],
+        [
+            'text'  => $folder->getName(),
+            'href'  => "/submission/listSubmission/{$dueDate->getYear()}/{$dueDate->getYearHalf()}/{$folder->getId()}",
+            'class' => ''
+        ],
+        [
+            'text'  => $assess['title'],
+            'href'  => "/assess/results/{$assess['assess_id']}",
+            'class' => ''
+        ],
+        [
+            'text'  => 'Horizontal Marking',
+            'href'  => "#",
+            'class' => 'active'
+        ],
+    ]);
 }
 /* Update the reviewed_at for all the latest attempts for a particular assess :D
  * How do you like them apples
@@ -93,12 +128,11 @@ else {
 	}
 
 	$question = $questionHandler->getByID($this->arg[1]);
+	$section  = $sectionHandler->getByID($question['section_id']);
 
 	if (!$question) {
 		error(119);
 	}
-
-	$user = $userHandler->getByID($attempt['user_id']);
 
 	/* Set up template
 	 */
@@ -108,7 +142,12 @@ else {
 	$this->setBlock(TEMPLATE_content, 'next_question', 'next_question_block');
 	$this->setBlock(TEMPLATE_content, 'previous_question', 'previous_question_block');
 	$this->setBlock(TEMPLATE_content, 'writable_finalise', 'writable_finalise_block');
+	$this->setBlock(TEMPLATE_content, 'writable_finalise_button', 'writable_finalise_button_block');
+	$this->setBlock(TEMPLATE_content, 'visible_staff', 'visible_staff_block');
+	$this->setBlock(TEMPLATE_content, 'visible_staff_students', 'visible_staff_students_block');
+	$this->setBlock(TEMPLATE_content, 'visible_staff_students_parents', 'visible_staff_students_parents_block');
 	$this->setVar('writable_finalise_block', '');
+	$this->setVar('writable_finalise_button_block', '');
 	$this->setTitle('Assessment: ' . $assess['title']);
 
 	/* Correct answer displayed once, at the top of the page, under the question
@@ -126,14 +165,36 @@ else {
 	/* Show current Section's data, and other mandatory tokens needed to complete
 	 * the Assessment.
 	 */
+	$openDate = new Alaress_Date_Format($assess['start'], Alaress_Date_Format::DATABASE_FORMAT);
+	$dueDate  = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 	$this->setVar(array(
 		'ASSESS_ASSESS_ID' => $assess['assess_id'],
 		'ASSESS_TITLE' => Scrub::text($assess['title']),
+		'ASSESS_START' => $openDate->getShort(),
+		'ASSESS_FINISH' => $dueDate->getShort(),
+		'SECTION_TITLE' => Scrub::text($section['title']),
 		'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
 		'QUESTION_TITLE' => Scrub::text($question['title']),
 		'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
-		'RESPONDENT_NAME' => $userHandler->formatName($user),
+		'ASSESS_CATEGORY_ID' => $category->getId(),
+		'ASSESS_CATEGORY_NAME' => $category->getName(),
+		'visible_staff_block'                  => '',
+		'visible_staff_students_block'         => '',
+		'visible_staff_students_parents_block' => '',
 	));
+
+	// Visibility copypaste
+	switch ($assess['mark_visibility']) {
+		case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE:
+			$this->parse('visible_staff_block', 'visible_staff');
+			break;
+		case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT:
+			$this->parse('visible_staff_students_block', 'visible_staff_students');
+			break;
+		case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT:
+			$this->parse('visible_staff_students_parents_block', 'visible_staff_students_parents');
+			break;
+	}
 
 	$readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
 
@@ -244,36 +305,42 @@ else {
 		 */
 		if (!$readonly) {
 			$this->parse('writable_finalise_block', 'writable_finalise');
+			$this->parse('writable_finalise_button_block', 'writable_finalise_button');
 		}
 
 		$this->setVar('next_question_block', '');
 	}
+
+    /* Render out breadcrumbs
+     */
+    $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text'  => 'Submissions',
+            'href'  => '/submission/listSubmission',
+            'class' => ''
+        ],
+        [
+            'text'  => $folder->getName(),
+            'href'  => "/submission/listSubmission/{$dueDate->getYear()}/{$dueDate->getYearHalf()}/{$folder->getId()}",
+            'class' => ''
+        ],
+        [
+            'text'  => $assess['title'],
+            'href'  => "/assess/results/{$assess['assess_id']}",
+            'class' => ''
+        ],
+        [
+            'text'  => 'Horizontal Marking',
+            'href'  => "/assess/reviewHorizontal/{$assess['assess_id']}",
+            'class' => ''
+        ],
+        [
+            'text'  => Scrub::text($section['title']),
+            'href'  => "#",
+            'class' => 'active'
+        ]
+    ]);
 }
-
-/* Render out breadcrumbs
- */
-$dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
-
-$trail = new Breadcrumbs();
-$trail->renderIntoSitePage($this, 'BREADCRUMB', [
-    [
-        'text'  => 'Submissions',
-        'href'  => '/submission/listSubmission',
-        'class' => ''
-    ],
-    [
-        'text'  => $folder->getName(),
-        'href'  => "/submission/listSubmission/{$dueDate->getYear()}/{$dueDate->getYearHalf()}/{$folder->getId()}",
-        'class' => ''
-    ],
-    [
-        'text'  => $assess['title'],
-        'href'  => "/assess/results/{$assess['assess_id']}",
-        'class' => ''
-    ],
-    [
-        'text'  => 'Horizontal Marking',
-        'href'  => "#",
-        'class' => 'active'
-    ],
-]);

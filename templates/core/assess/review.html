@@ -94,8 +94,12 @@ $(document).ready(function() {
     <div class="small-12 columns">
         <h1>Marking {ASSESS_TITLE} quiz results for {RESPONDENT_NAME}</h1>
         <ul class="meta">
-            <li class="icon-calendar">Attempted
-                <time>{ATTEMPT_START}</time><!-- BEGIN attemptFinished -->&ndash;<time>{ATTEMPT_FINISH}</time> ({ATTEMPT_TIME_TAKEN})<!-- END attemptFinished -->
+            <li class="icon-calendar"><time>{ASSESS_START}</time>
+                &ndash; <time>{ASSESS_FINISH}</time>
+            </li>
+            <li class="icon-due-work"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a>
+                Quiz, attempted
+                <time>{ATTEMPT_START}</time><!-- BEGIN attemptFinished --> &ndash; <time>{ATTEMPT_FINISH}</time> ({ATTEMPT_TIME_TAKEN})<!-- END attemptFinished -->
                 <!-- BEGIN attemptNotYetFinished -->
                 (unfinished)
                 <!-- END attemptNotYetFinished -->
@@ -103,7 +107,6 @@ $(document).ready(function() {
                 (not finished by due date)
                 <!-- END attemptUnfinished -->
             </li>
-            <li class="icon-due-work"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a> Quiz</li>
             <!-- BEGIN visible_staff -->
             <li class="icon-locked">Visible to staff only</li>
             <!-- END visible_staff -->
@@ -157,7 +160,7 @@ $(document).ready(function() {
             <a class="button icon-previous" href="/assess/review/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Previous Section</a>
         <!-- END prevSection -->
         <!-- BEGIN nextSection -->
-            <a class="button icon-next" href="/assess/review/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Next section</a>
+            <a class="button icon-next" href="/assess/review/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Next Section</a>
         <!-- END nextSection -->
     </div>
     <div class="small-12 columns">
