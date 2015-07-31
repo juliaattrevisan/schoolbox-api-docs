@@ -89,17 +89,20 @@
                 var unit_element = element.closest('[data-unit]');
                 var container    = unit_element.find('[data-interaction="delete_unit_container"]');
 
-                /* Hide all other forms first
-                 */
-                var allForms = component.find('[data-form-container]');
-                allForms.removeClass('hide').not(container).slideUp('fast');
+                container.toggleClass('hide');
+                component.find('[data-form-container]').not(container).addClass('hide');
 
-                if (container.hasClass('hide')) {
-                    container.stop().removeClass('hide').slideUp(1).slideDown('fast');
-                }
-                else {
-                    container.stop().slideToggle('fast');
-                }
+                ///* Hide all other forms first
+                // */
+                //var allForms = component.find('[data-form-container]');
+                //allForms.removeClass('hide').not(container).slideUp('fast');
+                //
+                //if (container.hasClass('hide')) {
+                //    container.stop().removeClass('hide').slideUp(1).slideDown('fast');
+                //}
+                //else {
+                //    container.stop().slideToggle('fast');
+                //}
             }
         );
 
@@ -112,14 +115,7 @@
                 // Submit form via Ajax
                 var form = $(this);
                 $.post(form.attr('action'), form.serialize(), function(data) {
-                    //postCallback(form, data);
-                    //container.slideToggle('fast');
-                    var unit = form.closest('[data-unit]');
-                    unit.slideUp(
-                        'fast', function() {
-                            unit.remove();
-                        }
-                    );
+                    postCallback(form, data);
                 }, 'json');
             }
         );
@@ -131,7 +127,8 @@
             function(event) {
                 event.preventDefault();
                 var container = $(this).closest('[data-interaction="delete_unit_container"]');
-                container.slideToggle('fast');
+                //container.slideToggle('fast');
+                container.toggleClass('hide');
             }
         );
 
@@ -145,17 +142,20 @@
                 var unit_element = element.closest('[data-unit-task]');
                 var container    = unit_element.find('[data-interaction="delete_task_container"]');
 
-                /* Hide all other forms first
-                 */
-                var allForms = component.find('[data-form-container]');
-                allForms.removeClass('hide').not(container).slideUp('fast');
+                container.toggleClass('hide');
+                component.find('[data-form-container]').not(container).addClass('hide');
 
-                if (container.hasClass('hide')) {
-                    container.stop().removeClass('hide').slideUp(1).slideDown('fast');
-                }
-                else {
-                    container.stop().slideToggle('fast');
-                }
+                ///* Hide all other forms first
+                // */
+                //var allForms = component.find('[data-form-container]');
+                //allForms.removeClass('hide').not(container).slideUp('fast');
+                //
+                //if (container.hasClass('hide')) {
+                //    container.stop().removeClass('hide').slideUp(1).slideDown('fast');
+                //}
+                //else {
+                //    container.stop().slideToggle('fast');
+                //}
             }
         );
         // Yes
@@ -178,7 +178,8 @@
             function(event) {
                 event.preventDefault();
                 var container = $(this).closest('[data-interaction="delete_task_container"]');
-                container.slideToggle('fast');
+                //container.slideToggle('fast');
+                container.toggleClass('hide');
             }
         );
 
@@ -190,17 +191,19 @@
                 event.preventDefault();
                 var thisCreateForm = $(this).closest('[data-unit]').find('[data-new-task-container]');
 
-                /* Hide all other forms first
-                 */
-                var allForms = component.find('[data-form-container]');
-                allForms.removeClass('hide').not(thisCreateForm).slideUp('fast');
-
-                if (thisCreateForm.hasClass('hide')) {
-                    thisCreateForm.stop().removeClass('hide').slideUp(1).slideDown('fast');
-                }
-                else {
-                    thisCreateForm.stop().slideToggle('fast');
-                }
+                thisCreateForm.toggleClass('hide');
+                component.find('[data-form-container]').not(thisCreateForm).addClass('hide');
+                ///* Hide all other forms first
+                // */
+                //var allForms = component.find('[data-form-container]');
+                //allForms.removeClass('hide').not(thisCreateForm).slideUp('fast');
+                //
+                //if (thisCreateForm.hasClass('hide')) {
+                //    thisCreateForm.stop().removeClass('hide').slideUp(1).slideDown('fast');
+                //}
+                //else {
+                //    thisCreateForm.stop().slideToggle('fast');
+                //}
             }
         );
 
@@ -215,18 +218,20 @@
 
                 /* Hide all other forms first
                  */
-                var allForms = component.find('[data-form-container]');
-                allForms.removeClass('hide').not(container).slideUp('fast');
+                //var allForms = component.find('[data-form-container]');
+                //allForms.removeClass('hide').not(container).slideUp('fast');
 
                 if (container.length) {
                     event.preventDefault();
+                    container.toggleClass('hide');
+                    component.find('[data-form-container]').not(container).addClass('hide');
 
-                    if (container.hasClass('hide')) {
-                        container.stop().removeClass('hide').slideUp(1).slideDown('fast');
-                    }
-                    else {
-                        container.stop().slideToggle('fast');
-                    }
+                    //if (container.hasClass('hide')) {
+                    //    container.stop().removeClass('hide').slideUp(1).slideDown('fast');
+                    //}
+                    //else {
+                    //    container.stop().slideToggle('fast');
+                    //}
                 }
             }
         );
@@ -274,9 +279,8 @@
          */
         var postCallback = function(form, data) {
             var container = form.closest('[data-form-container]');
-            container.slideUp('fast', function() {
-                reloadTaskList(data);
-            });
+            container.addClass('hide');
+            reloadTaskList(data);
         };
 
         // Reloads the task list, setting up drag/drop again too.
