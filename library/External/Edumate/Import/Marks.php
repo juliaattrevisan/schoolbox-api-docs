@@ -110,9 +110,9 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 			$submissionReturn->setComment('');
 			$submissionReturn->setMark($edumateMark->getMark() . ' / ' . $submissionBox->getMaxMark());
 			$submissionReturn->setNormalizedMark(100 * (float)$edumateMark->getMark()/(float)$submissionBox->getMaxMark());
-			$submissionReturn->setFilename(null);
-			$submissionReturn->setFilesize(null);
-			$submissionReturn->setMimetype(null);
+//			$submissionReturn->setFilename(null);
+//			$submissionReturn->setFilesize(null);
+//			$submissionReturn->setMimetype(null);
 			$submissionReturn->setSubmitted(null);
 
 			/* Save it
