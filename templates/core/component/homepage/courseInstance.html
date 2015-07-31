@@ -84,7 +84,7 @@
                 <ul class="information-list">
                     <!-- BEGIN unit -->
                     <li class="row interact {UNIT_EXPANDED_STATE}" data-unit data-unit_id="{UNIT_ID}" data-open_date="{UNIT_OPEN_DATE}" data-due_date="{UNIT_DUE_DATE}">
-                        <div class="ten-column">
+                        <div class="eleven-column">
                             <h3>
                                 <!-- BEGIN unit_expand -->
                                 <a class="expand-link {UNIT_EXPANDED_STATE_ICON}" data-interaction="toggle-expanded" data-interaction-state="{UNIT_EXPANDED_STATE}"></a>
@@ -101,14 +101,31 @@
                             <!-- END unit_completion -->
                         </div>
 
-                        <div class="two actions">
-                            <!-- BEGIN unit_delete -->
-                            <a href="#" class="icon-delete no-text" title="Delete this unit" data-interaction="open_delete_unit_form"></a>
-                            <!-- END unit_delete -->
-
-                            <!-- BEGIN unit_modify -->
-                            <a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="icon-modify no-text" title="Modify this unit"></a>
-                            <!-- END unit_modify -->
+                        <div class="one actions">
+                            <!-- BEGIN unit_actions -->
+                            <a data-dropdown="unit-actions-{UNIT_ID}"
+                               href="#"
+                               class="no-text icon-more"
+                               aria-controls="unit-actions-{UNIT_ID}"
+                               aria-expanded="false"
+                            ></a>
+                            <ul data-dropdown-content
+                                id="unit-actions-{UNIT_ID}"
+                                class="f-dropdown"
+                                aria-hidden="true"
+                            >
+                                <!-- BEGIN unit_modify -->
+                                <li>
+                                    <a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="icon-modify">Modify this unit</a>
+                                </li>
+                                <!-- END unit_modify -->
+                                <!-- BEGIN unit_delete -->
+                                <li>
+                                    <a href="#" class="icon-delete" data-interaction="open_delete_unit_form">Delete this unit</a>
+                                </li>
+                                <!-- END unit_delete -->
+                            </ul>
+                            <!-- END unit_actions -->
                         </div>
 
                         <div class="content">
