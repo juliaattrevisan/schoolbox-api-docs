@@ -26,29 +26,18 @@
 </div>
 
 <div class="row">
-    <div class="small-12 columns">
+    <div class="small-12 island">
         <form action='/assess/deleteAttempt' method='post'>
-            <table>
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Name</th>
-                        <th class="text-center">Mark</th>
-                        <th class="text-center">Percentage</th>
-                        <th class="text-center">Unmarked Questions</th>
-                        <th>Review Quiz</th>
-                        <th>Delete Attempt</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <section>
+                <ul class="action-list">
                     <!-- BEGIN attempt -->
-                    <tr class='{ATTEMPT_HIDDEN}' data-user="{USER_ID}" {ATTEMPT_EXPANDABLE}>
-                        <td>
+                    <li class='row {ATTEMPT_HIDDEN}' data-user="{USER_ID}" {ATTEMPT_EXPANDABLE}>
+                        <div class="one-column text-center">
                             <!-- BEGIN expand_attempts -->
                             <a href="#" class='icon-add no-text' data-attempt-expander="{USER_ID}" title="Expand attempts by {ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}"></a>
                             <!-- END expand_attempts -->
-                        </td>
-                        <td>
+                        </div>
+                        <div class="four-column">
                             <div class="avatar card">
                                 <a href="/search/user/{USER_ID}" title="View Profile">
                                     <img src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square64" alt="View Profile" />
@@ -57,9 +46,10 @@
 
                                 <p class="meta">{ATTEMPT_TIME_TAKEN}</p>
                             </div>
-
+                        </div>
+                        <div class="two-column">
                             <!-- BEGIN submitted -->
-                            <span class="submitted label full-width">Finished {ATTEMPT_FINISH}</span>
+                            <span class="submitted label full-width">Finished<br />{ATTEMPT_FINISH}</span>
                             <!-- END submitted -->
 
                             <!-- BEGIN unsubmitted -->
@@ -67,31 +57,32 @@
                             <!-- END unsubmitted -->
 
                             <!-- BEGIN reviewed -->
-                            <span class="success label full-width">Reviewed {ATTEMPT_REVIEW_STATUS}</span>
+                            <span class="success label full-width">Reviewed<br />{ATTEMPT_REVIEW_STATUS}</span>
                             <!-- END reviewed -->
 
                             <!-- BEGIN not_reviewed -->
                             <span class="neutral label full-width">Not Reviewed</span>
                             <!-- END not_reviewed -->
-                        </td>
-                        <td class="text-center">{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</td>
-                        <td class="text-center">{ATTEMPT_PERCENTAGE}%</td>
-                        <td class="text-center">{ATTEMPT_UNMARKED_RESPONSES}</td>
-                        <td>
+                        </div>
+                        <div class="three-column text-center">
+                            <h3>{ATTEMPT_PERCENTAGE}%</h3>
+                            <p>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</p>
+                            <p class="meta">{ATTEMPT_UNMARKED_RESPONSES} unmarked responses</p>
+                        </div>
+                        <div class="two actions">
                             <!-- BEGIN has_review -->
                             <a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}" class="icon-view no-text"></a>
                             <!-- END has_review -->
-                        </td>
-                        <td>
+
                             <!-- BEGIN attempt_delete -->
                             <input type='checkbox' id="attempt-{ATTEMPT_ATTEMPT_ID}" name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
                             <label for="attempt-{ATTEMPT_ATTEMPT_ID}" class="checkbox-label"></label>
                             <!-- END attempt_delete -->
-                        </td>
-                    </tr>
+                        </div>
+                    </li>
                     <!-- END attempt -->
-                </tbody>
-            </table>
+                </ul>
+            </section>
             <!-- BEGIN delete -->
             <input type='submit' value='Delete selected'/>
             <!-- END delete -->
