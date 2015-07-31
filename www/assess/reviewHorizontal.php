@@ -40,6 +40,13 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
+try {
+	$category = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
+} catch (\Schoolbox\Mapper\Exception $e) {
+	error(112);
+	exit;
+}
+
 if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
 	error(127);
 }
@@ -98,8 +105,6 @@ else {
 		error(119);
 	}
 
-	$user = $userHandler->getByID($attempt['user_id']);
-
 	/* Set up template
 	 */
 	$this->setFile(TEMPLATE_content, 'assess/reviewHorizontal.html');
@@ -132,7 +137,8 @@ else {
 		'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
 		'QUESTION_TITLE' => Scrub::text($question['title']),
 		'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
-		'RESPONDENT_NAME' => $userHandler->formatName($user),
+		'ASSESS_CATEGORY_ID' => $category->getId(),
+		'ASSESS_CATEGORY_NAME' => $category->getName(),
 	));
 
 	$readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
