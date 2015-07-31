@@ -52,7 +52,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         $finish = $responseHandler->getLastSave($currentAttempt['attempt_id']);
 
         if (empty($finish)) {
-            $finish = 'Unfinished';
+            $finish = 'Incomplete';
 
         } else {
             $attemptFinishDate = new Alaress_Date_Format($finish, Alaress_Date_Format::DATABASE_FORMAT);
@@ -64,8 +64,6 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 
             $page->parse('submitted_block', 'submitted');
         }
-
-        $finish = 'Incomplete';
 
         $page->setVar(array(
             'ATTEMPT_FINISH' => $finish,
