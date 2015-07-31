@@ -13,6 +13,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $factory = new Assess_Factory();
 $assessHandler = new Assess_Main();
@@ -42,6 +43,14 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
 	error(127);
 }
 
+try {
+    $folderMapper = new FolderMapper();
+    $folder = $folderMapper->findById($assess['category_id']);
+}
+catch (\Exception $e) {
+    error(117);
+}
+
 /* Index of questions
  */
 if (!isset($this->arg[1])) {
@@ -59,9 +68,10 @@ if (!isset($this->arg[1])) {
 	$assessHandler->renderAssessContents($assess['assess_id'], $this);
 
 	$this->setVar(array(
-		'ASSESS_TITLE' => $assess['title'],
-		'ASSESS_ASSESS_ID' => $assess['assess_id'],
-		'ASSESS_CATEGORY_ID' => $assess['category_id'],
+        'ASSESS_TITLE'         => $assess['title'],
+        'ASSESS_ASSESS_ID'     => $assess['assess_id'],
+        'ASSESS_CATEGORY_ID'   => $folder->getId(),
+        'ASSESS_CATEGORY_NAME' => $folder->getName(),
 	));
 
 	$this->parse('allQuestions_block', 'assessContentsFragment', true);
