@@ -100,6 +100,7 @@ else {
 	}
 
 	$question = $questionHandler->getByID($this->arg[1]);
+	$section  = $sectionHandler->getByID($question['section_id']);
 
 	if (!$question) {
 		error(119);
@@ -143,6 +144,7 @@ else {
 		'ASSESS_TITLE' => Scrub::text($assess['title']),
 		'ASSESS_START' => $openDate->getShort(),
 		'ASSESS_FINISH' => $dueDate->getShort(),
+		'SECTION_TITLE' => Scrub::text($section['title']),
 		'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
 		'QUESTION_TITLE' => Scrub::text($question['title']),
 		'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
