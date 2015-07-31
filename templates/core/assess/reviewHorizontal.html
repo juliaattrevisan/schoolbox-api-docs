@@ -26,56 +26,61 @@
             <!-- END visible_staff_students_parents -->
         </ul>
     </div>
+
+    <div class="small-12 island">
+        <h2 class="subheader">Question</h2>
+        <section class="content">
+            <article>{QUESTION_QUESTION}</article>
+        </section>
+    </div>
+
+    <div class="small-12 island">
+        <h2 class="subheader">Correct Answer</h2>
+        <section class="content">
+            <!-- BEGIN answerInputsTop -->
+            <!-- END answerInputsTop -->
+        </section>
+    </div>
+
+    <div class="small-12 island">
+        <!-- BEGIN attempt -->
+        <script type='text/javascript'>
+            $(function() {
+                $('questionForm-{RESPONSE_ID}').evaluationResponseReview({
+                    id: {RESPONSE_ID}
+                });
+            });
+        </script>
+
+        <form id='questionForm-{RESPONSE_ID}' action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" class='respondent-attempt {ON_OFF} validation_{RESPONSE_ID} questionForm' method="post">
+            <div class='column student'>
+                <img src='/portrait.php?userId={USER_EXTERNAL_ID}&size=square32'>
+                {USER_LASTNAME}, {USER_FIRSTNAME}
+            </div>
+            <!-- BEGIN answerInputs -->
+            <!-- END answerInputs -->
+        </form>
+        <!-- END attempt -->
+    </div>
 </div>
 
-<div class="box">
-	<h2>Q{QUESTION_SEQUENCE})</h2>
-	<div class="wysiwyg">
-		{QUESTION_QUESTION}
-	</div>
+<div class="row">
+    <div class="small-12 columns">
+        <!-- BEGIN previous_question -->
+        <a class="button icon-previous" href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{PREVIOUS_ID}">Previous Question</a>
+        <!-- END previous_question -->
 
-	<h2>Correct Answer:</h2>
-	<!-- BEGIN answerInputsTop -->
-	<!-- END answerInputsTop -->
+        <!-- BEGIN next_question -->
+        <a class="button icon-next" href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{NEXT_ID}">Next Question</a>
+        <!-- END next_question -->
 
-	<div class="horizontal-marking-table">
-		<!-- BEGIN attempt -->
+        <!-- BEGIN writable_finalise -->
+        <div class="assess-alert">
+            <span>In order to finalise your review, please click the "Finalise Review" button at the bottom of the page.</span>
+        </div>
+        <a href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/finalise' class="button primary">Finalise all attempts</a>
+        <!-- END writable_finalise -->
 
-			<script type='text/javascript'>
-				$(function() {
-					$('questionForm-{RESPONSE_ID}').evaluationResponseReview({
-						id: {RESPONSE_ID}
-					});
-				});
-			</script>
-
-			<form id='questionForm-{RESPONSE_ID}' action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" class='respondent-attempt {ON_OFF} validation_{RESPONSE_ID} questionForm' method="post">
-					<div class='column student'>
-						<img src='/portrait.php?userId={USER_EXTERNAL_ID}&size=square32'>
-						{USER_LASTNAME}, {USER_FIRSTNAME}
-					</div>
-
-					<!-- BEGIN answerInputs -->
-					<!-- END answerInputs -->
-			</form>
-		<!-- END attempt -->
-	</div>
-	<p class="clearfix text-align-right">
-		<!-- BEGIN next_question -->
-		<a class='btn go-to' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{NEXT_ID}'><span></span>Next</a>
-		<!-- END next_question -->
-
-		<!-- BEGIN previous_question -->
-		<a class='btn go-back' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{PREVIOUS_ID}'><span></span>Previous</a>
-		<!-- END previous_question -->
-
-		<!-- BEGIN writable_finalise -->
-		<div class="assess-alert">
-			<span>In order to finalise your review, please click the "Finalise Review" button at the bottom of the page.</span>
-		</div>
-		<a href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/finalise' class="submit-btn-plain float-right">Finalise all attempts</a>
-		<!-- END writable_finalise -->
-
-        <a class='btn go-back' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}'><span></span>Back to questions</a>
-    </p>
+        <!--<a class='button icon-back' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}'>Back to questions</a>-->
+    </div>
 </div>
