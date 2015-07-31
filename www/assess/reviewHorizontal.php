@@ -113,10 +113,12 @@ else {
 	$this->setBlock(TEMPLATE_content, 'next_question', 'next_question_block');
 	$this->setBlock(TEMPLATE_content, 'previous_question', 'previous_question_block');
 	$this->setBlock(TEMPLATE_content, 'writable_finalise', 'writable_finalise_block');
+	$this->setBlock(TEMPLATE_content, 'writable_finalise_button', 'writable_finalise_button_block');
 	$this->setBlock(TEMPLATE_content, 'visible_staff', 'visible_staff_block');
 	$this->setBlock(TEMPLATE_content, 'visible_staff_students', 'visible_staff_students_block');
 	$this->setBlock(TEMPLATE_content, 'visible_staff_students_parents', 'visible_staff_students_parents_block');
 	$this->setVar('writable_finalise_block', '');
+	$this->setVar('writable_finalise_button_block', '');
 	$this->setTitle('Assessment: ' . $assess['title']);
 
 	/* Correct answer displayed once, at the top of the page, under the question
@@ -269,6 +271,7 @@ else {
 		 */
 		if (!$readonly) {
 			$this->parse('writable_finalise_block', 'writable_finalise');
+			$this->parse('writable_finalise_button_block', 'writable_finalise_button');
 		}
 
 		$this->setVar('next_question_block', '');
