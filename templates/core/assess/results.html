@@ -34,9 +34,10 @@
                     <!-- BEGIN attempt -->
                     <li class='row {ATTEMPT_HIDDEN}' data-user="{USER_ID}" {ATTEMPT_EXPANDABLE}>
                         <div class="one-column text-center">
-                            <!-- BEGIN expand_attempts -->
-                            <a href="#" class='icon-add no-text' data-attempt-expander="{USER_ID}" title="Expand attempts by {ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}"></a>
-                            <!-- END expand_attempts -->
+                            <!-- BEGIN attempt_delete -->
+                            <input type='checkbox' id="attempt-{ATTEMPT_ATTEMPT_ID}" name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
+                            <label for="attempt-{ATTEMPT_ATTEMPT_ID}" class="checkbox-label"></label>
+                            <!-- END attempt_delete -->
                         </div>
                         <div class="four-column">
                             <div class="avatar card">
@@ -48,7 +49,12 @@
                                 <p class="meta">{ATTEMPT_TIME_TAKEN}</p>
                             </div>
                         </div>
-                        <div class="two-column">
+                        <div class="two-column text-center">
+                            <h3>{ATTEMPT_PERCENTAGE}%</h3>
+                            <p>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</p>
+                            <p class="meta">{ATTEMPT_UNMARKED_RESPONSES} unmarked responses</p>
+                        </div>
+                        <div class="three-column">
                             <!-- BEGIN submitted -->
                             <span class="submitted label full-width">Finished<br />{ATTEMPT_FINISH}</span>
                             <!-- END submitted -->
@@ -65,20 +71,14 @@
                             <span class="neutral label full-width">Not Reviewed</span>
                             <!-- END not_reviewed -->
                         </div>
-                        <div class="three-column text-center">
-                            <h3>{ATTEMPT_PERCENTAGE}%</h3>
-                            <p>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</p>
-                            <p class="meta">{ATTEMPT_UNMARKED_RESPONSES} unmarked responses</p>
-                        </div>
                         <div class="two actions">
                             <!-- BEGIN has_review -->
-                            <a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}" class="icon-view no-text"></a>
+                            <a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}" class="icon-view no-text" title="Review Attempt"></a>
                             <!-- END has_review -->
 
-                            <!-- BEGIN attempt_delete -->
-                            <input type='checkbox' id="attempt-{ATTEMPT_ATTEMPT_ID}" name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
-                            <label for="attempt-{ATTEMPT_ATTEMPT_ID}" class="checkbox-label"></label>
-                            <!-- END attempt_delete -->
+                            <!-- BEGIN expand_attempts -->
+                            <a href="#" class='icon-add no-text' data-attempt-expander="{USER_ID}" title="Expand attempts by {ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}"></a>
+                            <!-- END expand_attempts -->
                         </div>
                     </li>
                     <!-- END attempt -->
