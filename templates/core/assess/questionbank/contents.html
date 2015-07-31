@@ -46,16 +46,18 @@
                             <!-- END select_question -->
                         </div>
                         <div class="eight-column">
+                            <!-- BEGIN missing_class -->
+                            <div class="alert-panel">
+                                <p>
+                                    This question type no longer exists - it cannot be copied to the
+                                    survey, and should be removed from the question bank.
+                                </p>
+                            </div>
+                            <!-- END missing_class -->
+
                             <article>
                                 {QUESTION}
                             </article>
-
-                            <!-- BEGIN missing_class -->
-                            <p class="error-notification">
-                                This question type no longer exists - it cannot be copied to the
-                                survey, and should be removed from the question bank.
-                            </p>
-                            <!-- END missing_class -->
 
                             <div class="hide panel" data-answer-content="{QUESTION_BANK_ID}">
                                 <ul>
