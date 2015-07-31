@@ -259,11 +259,18 @@
                                             </div>
                                             <div class="row">
                                                 <div class="small-12 columns">
-                                                    <input name="self_assess" value="0" type="hidden" />
-                                                    <input name="self_assess" value="1" type="checkbox" id="self_assess-{UNIT_TASK_ID}" {UNIT_TASK_SELF_ASSESS} />
-                                                    <label for="self_assess-{UNIT_TASK_ID}" class="checkbox-label">
-                                                        Allow self-assessment
+                                                    <label for="self_assess-{UNIT_TASK_ID}">
+                                                        Allow self-assessment?
                                                     </label>
+                                                    <div class="switch">
+                                                        <input name="self_assess" value="0" type="hidden" />
+                                                        <input name="self_assess" value="1" type="checkbox" id="self_assess-{UNIT_TASK_ID}" {UNIT_TASK_SELF_ASSESS} />
+                                                        <label for="self_assess-{UNIT_TASK_ID}"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="small-12 columns">
                                                     <input type="submit" name="Submit" value="Update" />
                                                 </div>
                                             </div>
@@ -340,11 +347,18 @@
                                     </div>
                                     <div class="row">
                                         <div class="small-12 columns">
-                                            <input name="self_assess" value="0" type="hidden" />
-                                            <input name="self_assess" value="1" type="checkbox"  id="self_assess-new_task" />
-                                            <label for="self_assess-new_task" class="checkbox-label">
-                                                Allow self-assessment
+                                            <label for="self_assess-new_task">
+                                                Allow self-assessment?
                                             </label>
+                                            <div class="switch">
+                                                <input name="self_assess" value="0" type="hidden" />
+                                                <input name="self_assess" value="1" type="checkbox"  id="self_assess-new_task" />
+                                                <label for="self_assess-new_task"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="small-12 columns">
                                             <input type="submit" name="Submit" value="Create" />
                                         </div>
                                     </div>
