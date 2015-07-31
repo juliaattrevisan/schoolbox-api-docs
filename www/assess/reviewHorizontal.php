@@ -83,6 +83,34 @@ if (!isset($this->arg[1])) {
 	));
 
 	$this->parse('allQuestions_block', 'assessContentsFragment', true);
+
+    /* Render out breadcrumbs
+     */
+    $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text'  => 'Submissions',
+            'href'  => '/submission/listSubmission',
+            'class' => ''
+        ],
+        [
+            'text'  => $folder->getName(),
+            'href'  => "/submission/listSubmission/{$dueDate->getYear()}/{$dueDate->getYearHalf()}/{$folder->getId()}",
+            'class' => ''
+        ],
+        [
+            'text'  => $assess['title'],
+            'href'  => "/assess/results/{$assess['assess_id']}",
+            'class' => ''
+        ],
+        [
+            'text'  => 'Horizontal Marking',
+            'href'  => "#",
+            'class' => 'active'
+        ],
+    ]);
 }
 /* Update the reviewed_at for all the latest attempts for a particular assess :D
  * How do you like them apples
@@ -282,32 +310,37 @@ else {
 
 		$this->setVar('next_question_block', '');
 	}
+
+    /* Render out breadcrumbs
+     */
+    $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text'  => 'Submissions',
+            'href'  => '/submission/listSubmission',
+            'class' => ''
+        ],
+        [
+            'text'  => $folder->getName(),
+            'href'  => "/submission/listSubmission/{$dueDate->getYear()}/{$dueDate->getYearHalf()}/{$folder->getId()}",
+            'class' => ''
+        ],
+        [
+            'text'  => $assess['title'],
+            'href'  => "/assess/results/{$assess['assess_id']}",
+            'class' => ''
+        ],
+        [
+            'text'  => 'Horizontal Marking',
+            'href'  => "/assess/reviewHorizontal/{$assess['assess_id']}",
+            'class' => ''
+        ],
+        [
+            'text'  => Scrub::text($section['title']),
+            'href'  => "#",
+            'class' => 'active'
+        ]
+    ]);
 }
-
-/* Render out breadcrumbs
- */
-$dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
-
-$trail = new Breadcrumbs();
-$trail->renderIntoSitePage($this, 'BREADCRUMB', [
-    [
-        'text'  => 'Submissions',
-        'href'  => '/submission/listSubmission',
-        'class' => ''
-    ],
-    [
-        'text'  => $folder->getName(),
-        'href'  => "/submission/listSubmission/{$dueDate->getYear()}/{$dueDate->getYearHalf()}/{$folder->getId()}",
-        'class' => ''
-    ],
-    [
-        'text'  => $assess['title'],
-        'href'  => "/assess/results/{$assess['assess_id']}",
-        'class' => ''
-    ],
-    [
-        'text'  => 'Horizontal Marking',
-        'href'  => "#",
-        'class' => 'active'
-    ],
-]);
