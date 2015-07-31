@@ -136,9 +136,13 @@ else {
 	/* Show current Section's data, and other mandatory tokens needed to complete
 	 * the Assessment.
 	 */
+	$openDate = new Alaress_Date_Format($assess['start'], Alaress_Date_Format::DATABASE_FORMAT);
+	$dueDate  = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 	$this->setVar(array(
 		'ASSESS_ASSESS_ID' => $assess['assess_id'],
 		'ASSESS_TITLE' => Scrub::text($assess['title']),
+		'ASSESS_START' => $openDate->getShort(),
+		'ASSESS_FINISH' => $dueDate->getShort(),
 		'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
 		'QUESTION_TITLE' => Scrub::text($question['title']),
 		'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
