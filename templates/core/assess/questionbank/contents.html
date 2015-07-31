@@ -99,7 +99,7 @@
     <div class="small-12 island">
         <h2 class="subheader">Categories</h2>
         <section>
-            <div id='categoryTree' class="content">
+            <div id='folderTree' class="content">
                 <!-- BEGIN category_list_start -->
                 <ul>
                     <!-- END category_list_start -->
@@ -153,6 +153,19 @@
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type='text/javascript'>
     $(function() {
+
+        /* Toggle answer visibility
+         */
+        $('[data-show-answer-content]').click(function(event) {
+            event.preventDefault();
+
+            var id = $(this).attr('data-show-answer-content');
+
+            $('[data-answer-content='+id+']').toggleClass('hide');
+        });
+
+        /* Delete confirmation
+         */
         $('[data-delete-question]').click(function(event) {
             event.preventDefault();
 
@@ -173,7 +186,9 @@
             });
         });
 
-        $("#categoryTree")
+        /* Folder tree
+         */
+        $("#folderTree")
             .on('ready.jstree', function (event, jstree) {
                 var openNodes = [
                     {SELECTED_NODES}
@@ -218,6 +233,8 @@
                 }
             });
 
+        /* Reveals
+         */
         $("#editCatForm").dialog({
             autoOpen: false,
             modal: true
@@ -238,12 +255,6 @@
 
         $('#subcategoryForm').validate();
 
-        $('[data-show-answer-content]').click(function(event) {
-            event.preventDefault();
 
-            var id = $(this).attr('data-show-answer-content');
-
-            $('[data-answer-content='+id+']').toggleClass('hide');
-        });
     });
 </script>
