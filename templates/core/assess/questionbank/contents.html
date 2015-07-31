@@ -99,7 +99,7 @@
     <div class="small-12 island">
         <h2 class="subheader">Categories</h2>
         <section>
-            <div id='folderTree' class="content">
+            <div id='categoryTree' class="content">
                 <!-- BEGIN category_list_start -->
                 <ul>
                     <!-- END category_list_start -->
@@ -123,14 +123,16 @@
             </div>
             <div class="content">
                 <!-- BEGIN has_edit_category -->
-                <a id="editCat" class="button icon-modify" href="#">Edit Category</a>
+                <a class="button icon-modify" href="#" data-reveal-id="edit-category-modal">Edit Category</a>
 
-                <form action='/assess/questionbank/modify.php' method='post' id="editCatForm">
-                    <input name='questionCategoryId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
+                <div id="edit-category-modal" class='reveal-modal' data-reveal>
+                    <form action='/assess/questionbank/modify.php' method='post'>
+                        <input name='questionCategoryId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
 
-                    <input name='name' type='text' value='{QUESTION_CATEGORY}' />
-                    <input type='submit' value='Rename Category' />
-                </form>
+                        <input name='name' type='text' value='{QUESTION_CATEGORY}' />
+                        <input type='submit' value='Rename Category' />
+                    </form>
+                </div>
                 <!-- END has_edit_category -->
 
                 <a id="newSubCat" class="button icon-add" href="#">Add Subcategory</a>
@@ -188,7 +190,7 @@
 
         /* Folder tree
          */
-        $("#folderTree")
+        $("#categoryTree")
             .on('ready.jstree', function (event, jstree) {
                 var openNodes = [
                     {SELECTED_NODES}
@@ -235,15 +237,6 @@
 
         /* Reveals
          */
-        $("#editCatForm").dialog({
-            autoOpen: false,
-            modal: true
-        });
-
-        $('#editCat').click(function () {
-            $('#editCatForm').dialog("open");
-        });
-
         $("#subcategoryForm").dialog({
             autoOpen: false,
             modal: true
