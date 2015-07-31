@@ -342,8 +342,10 @@
             }
             var task_list = component.find('[data-task-list]');
             task_list.sortable({
-                placeholder: "sortable-placeholder",
-                forcePlaceholderSize: true
+                placeholder:          "sortable-placeholder",
+                forcePlaceholderSize: true,
+                handle:               '.grip',
+                axis:                 'y'
             });
             task_list.bind('sortstop', function(event, ui) {
                 // Calculate ordering of all items
