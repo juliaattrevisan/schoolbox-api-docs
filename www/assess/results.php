@@ -32,49 +32,10 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 {
     $firstSection = $sectionHandler->getFirst($page->arg[0]);
 
-    /* Finish time. Show the datetime when the person clicked Finish.
-      * Otherwise, show the last time their responses were updated, or that
-      * they never even attempted the test.
-      */
-    if ($currentAttempt['finish']) {
-        $attemptFinishDate = new Alaress_Date_Format($currentAttempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 
-        $finish = $attemptFinishDate->getShort();
-        $timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
-
-        $page->setVar(array(
-            'ATTEMPT_FINISH' => $finish,
-            'unsubmitted_block' => ''
-        ));
-
-        $page->parse('submitted_block', 'submitted');
-    } else {
-        $finish = $responseHandler->getLastSave($currentAttempt['attempt_id']);
-
-        if (empty($finish)) {
-            $finish = 'Incomplete';
-
-        } else {
-            $attemptFinishDate = new Alaress_Date_Format($finish, Alaress_Date_Format::DATABASE_FORMAT);
-
-            $page->setVar(array(
-                'ATTEMPT_FINISH' => $attemptFinishDate->getShort(),
-                'unsubmitted_block' => ''
-            ));
-
-            $page->parse('submitted_block', 'submitted');
-        }
-
-        $page->setVar(array(
-            'ATTEMPT_FINISH' => $finish,
-            'submitted_block' => ''
-        ));
-
-        $page->parse('unsubmitted_block', 'unsubmitted');
-    }
 
     /* The total available marks for this attempt
-      */
+     */
     $totalAvailableMarks = $attemptHandler->getTotalMarks($page->arg[0], $currentAttempt['attempt_id']);
 
     if ($totalAvailableMarks > 0) {
@@ -98,24 +59,66 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
      */
     $numNotAutomarked = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
 
-    $page->setVar(
-        array(
-            'ASSESS_ASSESS_ID' => $page->arg[0],
-            'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
-            'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
-            'USER_ID' => $currentAttempt['user_id'],
-            'ATTEMPT_EXTERNAL_ID' => $currentAttempt['synergy_id'],
-            'ATTEMPT_FIRSTNAME' => $currentAttempt['firstname'],
-            'ATTEMPT_SURNAME' => $currentAttempt['lastname'],
+    $page->setVar(array(
+        'ASSESS_ASSESS_ID' => $page->arg[0],
+        'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
+        'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
+        'USER_ID' => $currentAttempt['user_id'],
+        'ATTEMPT_EXTERNAL_ID' => $currentAttempt['synergy_id'],
+        'ATTEMPT_FIRSTNAME' => $currentAttempt['firstname'],
+        'ATTEMPT_SURNAME' => $currentAttempt['lastname'],
+        'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
+        'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
+        'ATTEMPT_PERCENTAGE' => $percentage,
+        'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
+        'ATTEMPT_UNMARKED_RESPONSES' => $numNotAutomarked,
+        'ATTEMPT_DELETE_LINK' => "<a href=\"/assess/deleteAttempt/{$currentAttempt['attempt_id']}\">Delete</a>",
+    ));
+
+    /* Finish time. Show the datetime when the person clicked Finish.
+     * Otherwise, show the last time their responses were updated, or that
+     * they never even attempted the test.
+     */
+    if ($currentAttempt['finish']) {
+        $attemptFinishDate = new Alaress_Date_Format($currentAttempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+
+        $finish = $attemptFinishDate->getShort();
+        $timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
+
+        $page->setVar(array(
             'ATTEMPT_TIME_TAKEN' => $timeTaken,
-            'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
-            'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
-            'ATTEMPT_PERCENTAGE' => $percentage,
-            'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
-            'ATTEMPT_UNMARKED_RESPONSES' => $numNotAutomarked,
-            'ATTEMPT_DELETE_LINK' => "<a href=\"/assess/deleteAttempt/{$currentAttempt['attempt_id']}\">Delete</a>",
-        )
-    );
+            'ATTEMPT_FINISH' => $finish,
+            'unsubmitted_block' => ''
+        ));
+
+        $page->parse('has_marks_block', 'has_marks');
+        $page->parse('submitted_block', 'submitted');
+    }
+    else {
+        $finish = $responseHandler->getLastSave($currentAttempt['attempt_id']);
+
+        if (empty($finish)) {
+            $page->setVar(array(
+                'ATTEMPT_FINISH' => 'Incomplete',
+                'submitted_block' => '',
+                'has_marks_block' => '',
+            ));
+
+            $page->parse('unsubmitted_block', 'unsubmitted');
+        }
+        else {
+            $attemptFinishDate = new Alaress_Date_Format($finish, Alaress_Date_Format::DATABASE_FORMAT);
+            $timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
+
+            $page->setVar(array(
+                'ATTEMPT_TIME_TAKEN' => $timeTaken,
+                'ATTEMPT_FINISH' => $attemptFinishDate->getShort(),
+                'unsubmitted_block' => ''
+            ));
+
+            $page->parse('submitted_block', 'submitted');
+        }
+    }
 
     $page->parse('has_review_block', 'has_review');
 
@@ -171,6 +174,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         'unsubmitted_block' => '',
         'has_review_block' => '',
         'expand_attempts_block' => '',
+        'has_marks_block' => '',
     ));
 }
 
@@ -221,6 +225,7 @@ $this->setBlock('attempt', 'submitted', 'submitted_block');
 $this->setBlock('attempt', 'unsubmitted', 'unsubmitted_block');
 $this->setBlock('attempt', 'has_review', 'has_review_block');
 $this->setBlock('attempt', 'expand_attempts', 'expand_attempts_block');
+$this->setBlock('attempt', 'has_marks', 'has_marks_block');
 $this->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
 $this->setBlock(TEMPLATE_content, 'delete', 'delete_block');
 $this->setBlock(TEMPLATE_content, 'has_attempt', 'has_attempt_block');
@@ -232,6 +237,7 @@ $this->setVar(array(
     'unsubmitted_block' => '',
     'has_review_block' => '',
     'expand_attempts_block' => '',
+    'has_marks_block' => '',
 ));
 
 $this->setTitle('Results for: ' . $assess['title']);
@@ -306,8 +312,12 @@ $allAttempts = $attemptHandler->getList($this->arg[0]);
  */
 if (is_array($allAttempts) && count($allAttempts)) {
     $this->parse('has_attempt_block', 'has_attempt');
+    $this->parse('has_marks_block', 'has_marks');
 } else {
-    $this->setVar('has_attempt_block', '');
+    $this->setVar(array(
+        'has_attempt_block' => '',
+        'has_marks_block' => '',
+    ));
 }
 
 /* Process everyone
@@ -378,6 +388,7 @@ if (is_array($allStudents) && count($allStudents)) {
                 'submitted_block' => '',
                 'reviewed_block' => '',
                 'has_review_block' => '',
+                'has_marks_block' => '',
             ));
 
             $this->parse('not_reviewed_block', 'not_reviewed');
@@ -392,6 +403,7 @@ if (is_array($allStudents) && count($allStudents)) {
                 'reviewed_block' => '',
                 'submitted_block' => '',
                 'unsubmitted_block' => '',
+                'has_marks_block' => '',
             ));
         }
 
@@ -410,6 +422,7 @@ if (is_array($allStudents) && count($allStudents)) {
         'attempt_block' => '',
         'assess_delete_block' => '',
         'user_attempts_block' => '',
+        'has_marks_block' => '',
     ));
 }
 
