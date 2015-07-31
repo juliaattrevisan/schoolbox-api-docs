@@ -56,23 +56,33 @@
     </div>
 
     <div class="small-12 island">
-        <!-- BEGIN attempt -->
-        <script type='text/javascript'>
-            $(function() {
-                $('questionForm-{RESPONSE_ID}').evaluationResponseReview({
-                    id: {RESPONSE_ID}
-                });
-            });
-        </script>
+        <h2 class="subheader">Respondents</h2>
 
-        <form id='questionForm-{RESPONSE_ID}' action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" class='respondent-attempt {ON_OFF} validation_{RESPONSE_ID} questionForm' method="post">
-            <div class='column student'>
-                <img src='/portrait.php?userId={USER_EXTERNAL_ID}&size=square32'>
-                {USER_LASTNAME}, {USER_FIRSTNAME}
-            </div>
-            <!-- BEGIN answerInputs -->
-            <!-- END answerInputs -->
-        </form>
+        <!-- BEGIN attempt -->
+        <section class="content">
+            <script type='text/javascript'>
+                $(function() {
+                    $('questionForm-{RESPONSE_ID}').evaluationResponseReview({
+                        id: {RESPONSE_ID}
+                    });
+                });
+            </script>
+            <form id='questionForm-{RESPONSE_ID}'
+                  action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}"
+                  class='respondent-attempt {ON_OFF} validation_{RESPONSE_ID} questionForm'
+                  method="post"
+            >
+                <div class="avatar-card">
+                    <a href="#" title="View Profile">
+                        <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64">
+                        <p>{USER_LASTNAME}, {USER_FIRSTNAME}</p>
+                    </a>
+                </div>
+
+                <!-- BEGIN answerInputs -->
+                <!-- END answerInputs -->
+            </form>
+        </section>
         <!-- END attempt -->
     </div>
 </div>
