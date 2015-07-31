@@ -95,19 +95,6 @@
 
 <script type="text/javascript">
     $(function () {
-
-        /*
-         * Add the dark class only to even rows that are visible (skip over the hidden ones)
-         * */
-        $('tbody tr:visible:even').addClass('dark');
-
-        /*
-         * Add another, darker class to th
-         *
-         * */
-        $('tbody tr:hidden').addClass('sub-table-row');
-
-
         $('tr.attempt').each(function () {
             if ($(this).next().hasClass('expandable') && !$(this).hasClass('expandable')) {
                 $(this).addClass('drop-parent').children('td:first-child').prepend('<a href="#" class="submission-dropdown">&#9660;</a>');
@@ -133,6 +120,5 @@
 
             return false;
         });
-
     });
 </script>
