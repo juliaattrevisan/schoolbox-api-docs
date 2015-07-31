@@ -136,22 +136,23 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
     }
 
     /* Expandable attempts
-      */
+     */
     if (($previousAttempt == null) || ($previousAttempt['user_id'] != $currentAttempt['user_id'])) {
-        $page->setVar(
-            array(
-                'ATTEMPT_EXPANDABLE' => '',
-                'ATTEMPT_HIDDEN' => ''
-            )
-        );
-    } else {
-        $page->setVar(
-            array(
-                'ATTEMPT_EXPANDABLE' => 'expandable',
-                'ATTEMPT_HIDDEN' => 'hide'
-            )
-        );
+        $page->setVar(array(
+            'ATTEMPT_EXPANDABLE' => '',
+            'ATTEMPT_HIDDEN' => ''
+        ));
+
+        $page->parse('expand_attempts_block', 'expand_attempts');
     }
+    else {
+        $page->setVar(array(
+            'ATTEMPT_EXPANDABLE' => 'data-expandable',
+            'ATTEMPT_HIDDEN' => 'hide',
+            'expand_attempts_block' => '',
+        ));
+    }
+
     if ($readonly) {
         $page->setVar('assess_delete_block', '');
         $page->setVar('attempt_delete_block', '');
@@ -159,6 +160,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         $page->parse('assess_delete_block', 'delete', false);
         $page->parse('attempt_delete_block', 'attempt_delete', false);
     }
+
     $page->parse('attempt_block', 'attempt', true);
 
     /* Clear children after parsing out the parent
@@ -169,6 +171,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         'submitted_block' => '',
         'unsubmitted_block' => '',
         'has_review_block' => '',
+        'expand_attempts_block' => '',
     ));
 }
 
@@ -217,6 +220,7 @@ $this->setBlock('attempt', 'not_reviewed', 'not_reviewed_block');
 $this->setBlock('attempt', 'submitted', 'submitted_block');
 $this->setBlock('attempt', 'unsubmitted', 'unsubmitted_block');
 $this->setBlock('attempt', 'has_review', 'has_review_block');
+$this->setBlock('attempt', 'expand_attempts', 'expand_attempts_block');
 $this->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
 $this->setBlock(TEMPLATE_content, 'delete', 'delete_block');
 $this->setBlock(TEMPLATE_content, 'has_attempt', 'has_attempt_block');
@@ -227,6 +231,7 @@ $this->setVar(array(
     'submitted_block' => '',
     'unsubmitted_block' => '',
     'has_review_block' => '',
+    'expand_attempts_block' => '',
 ));
 
 $this->setTitle('Results for: ' . $assess['title']);

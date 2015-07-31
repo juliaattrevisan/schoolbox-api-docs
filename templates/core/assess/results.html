@@ -31,6 +31,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th></th>
                         <th>Name</th>
                         <th class="text-center">Mark</th>
                         <th class="text-center">Percentage</th>
@@ -41,7 +42,12 @@
                 </thead>
                 <tbody>
                     <!-- BEGIN attempt -->
-                    <tr class='attempt user_{USER_ID} {ATTEMPT_EXPANDABLE} {ATTEMPT_HIDDEN}'>
+                    <tr class='attempt {ATTEMPT_HIDDEN}' data-user="{USER_ID}" {ATTEMPT_EXPANDABLE}>
+                        <td>
+                            <!-- BEGIN expand_attempts -->
+                            <a href="#" class='icon-add no-text' data-attempt-expander="{USER_ID}" title="Expand attempts by {ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}"></a>
+                            <!-- END expand_attempts -->
+                        </td>
                         <td>
                             <div class="avatar card">
                                 <a href="/search/user/{USER_ID}" title="View Profile">
@@ -95,10 +101,12 @@
 
 <script type="text/javascript">
     $(function () {
-        $('tr.attempt').each(function () {
-            if ($(this).next().hasClass('expandable') && !$(this).hasClass('expandable')) {
-                $(this).addClass('drop-parent').children('td:first-child').prepend('<a href="#" class="submission-dropdown">&#9660;</a>');
-            }
+        $('[data-attempt-expander]').click(function(event) {
+            event.preventDefault();
+
+            var userId = $(this).attr('data-attempt-expander');
+
+            $('[data-user='+userId+'][data-expandable]').toggleClass('hide')
         })
 
         $(document).on('click', '.submission-dropdown', function () {
