@@ -23,13 +23,14 @@ catch (\Exception $e) {
 $sectionHandler = new \Assess_Section();
 $section = $sectionHandler->getById($this->arg[2]);
 
-if (!$section) {
-    error(115);
-}
+//if (!$section) {
+//    error(115);
+//}
 
 $this->setFile(TEMPLATE_content, 'assess/questionbank/contents.html');
 $this->setBlock(TEMPLATE_content, 'welcome', 'welcome_block');
 $this->setBlock(TEMPLATE_content, 'category_selected', 'category_selected_block');
+$this->setBlock('category_selected', 'show_submit', 'show_submit_block');
 $this->setBlock('category_selected', 'show_delete', 'show_delete_block');
 $this->setBlock('category_selected', 'no_questions', 'no_questions_block');
 $this->setBlock('category_selected', 'question', 'question_block');
@@ -137,6 +138,14 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
         }
 
         $this->parse('category_selected_block', 'category_selected');
+
+        /* Hide submit button if we aren't adding contents to a section
+         */
+        if (is_numeric($this->arg[2])) {
+            $this->parse('show_submit_block', 'show_submit');
+        } else {
+            $this->setVar('show_submit_block', '');
+        }
 
         /* Hide 'no questions' message
          */
