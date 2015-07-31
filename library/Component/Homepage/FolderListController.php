@@ -88,13 +88,14 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             $j = 0;
 
             $this->setVar('folders_block', '');
+            $icons = array('homepage'=>'home','folder'=>'folder','course'=>'course');
 
             foreach ($allFolders as $currentFolder) {
                 //set name
                 $output = array(
                     'FOLDER_ID'   => $currentFolder['id'],
                     'FOLDER_NAME' => Scrub::text($currentFolder['text']),
-                    'FOLDER_ICON' => $currentFolder['type'] == 'homepage' ? 'home' : 'folder',
+                    'FOLDER_ICON' => $icons[$currentFolder['type']],
                     'ON_OFF'      => ++$j % 2 ? '' : 'dark',
                 );
                 if ($maxFolders > 0 && $j > $maxFolders) {
