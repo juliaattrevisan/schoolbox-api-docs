@@ -38,11 +38,6 @@
 
             // reload all tasks too.
             reloadTaskList(data);
-
-            form.find('.post-attachment.attach').find('p.actions a.delete').each(function() {
-                var event = new CustomEvent('click');
-                this.dispatchEvent(event);
-            });
         };
 
         // Reloads the task list, setting up drag/drop again too.
@@ -64,8 +59,8 @@
             component.find(settings.previewSelector).preview();
             var task_list = component.find('[data-task_list]');
             task_list.sortable({
-				placeholder: "sortable-placeholder",
-				forcePlaceholderSize: true,
+                placeholder:          "sortable-placeholder",
+                forcePlaceholderSize: true,
                 handle:               '.grip',
                 axis:                 'y'
             });
