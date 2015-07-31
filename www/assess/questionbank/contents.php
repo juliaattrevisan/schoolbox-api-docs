@@ -23,6 +23,10 @@ catch (\Exception $e) {
 $sectionHandler = new \Assess_Section();
 $section = $sectionHandler->getById($this->arg[2]);
 
+if (!$section) {
+    error(115);
+}
+
 $this->setFile(TEMPLATE_content, 'assess/questionbank/contents.html');
 $this->setBlock(TEMPLATE_content, 'welcome', 'welcome_block');
 $this->setBlock(TEMPLATE_content, 'category_selected', 'category_selected_block');
