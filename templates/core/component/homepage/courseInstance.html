@@ -130,8 +130,8 @@
                         <ul class="action-list sortable ui-sortable task-list {UNIT_LIST_CLASS}" data-task-list>
                             <!-- BEGIN unit_task -->
                             <li class="row interact {UNIT_TASK_COMPLETE_CLASS}" data-unit-task data-unit_task_id="{UNIT_TASK_ID}">
-                                <div class="grip"></div>
-                                <div class="eight-column">
+                                <div class="one-column grip"></div>
+                                <div class="ten-column">
                                     <a class="icon-16 {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}" {UNIT_TASK_PREVIEW} href="/task/start/{UNIT_TASK_ID}">{UNIT_TASK_NAME}</a>
 
                                     <!--
@@ -156,30 +156,53 @@
                                     </p>
                                     <!-- END unit_task_due_date -->
                                 </div>
-                                <div class="three actions">
-                                    <!-- BEGIN unit_task_delete -->
-                                    <a href="#" class="icon-delete no-text" title="Delete this task" data-interaction="open_delete_task_form"></a>
-                                    <!-- END unit_task_delete -->
+                                <div class="one actions">
 
-                                    <!-- BEGIN unit_task_quiz_results -->
-                                    <a href="/assess/results/{UNIT_QUIZ_ID}" class="icon-progress no-text" title="View Results"></a>
-                                    <!-- END unit_task_quiz_results -->
+                                    <a data-dropdown="task-actions-{UNIT_TASK_ID}"
+                                       href="#"
+                                       class="no-text icon-more"
+                                       aria-controls="task-actions-{UNIT_TASK_ID}"
+                                       aria-expanded="false"
+                                    ></a>
+                                    <ul data-dropdown-content
+                                        id="task-actions-{UNIT_TASK_ID}"
+                                        class="f-dropdown"
+                                        aria-hidden="true"
+                                    >
+                                        <!-- BEGIN unit_task_modify -->
+                                        <li>
+                                            <a href="/task/instance/modify/{UNIT_TASK_ID}" class="icon-modify" data-interaction="open_edit_task_form">Modify this task</a>
+                                        </li>
+                                        <!-- END unit_task_modify -->
+                                        <!-- BEGIN unit_task_delete -->
+                                        <li>
+                                            <a href="#" class="icon-delete" data-interaction="open_delete_task_form">Delete this task</a>
+                                        </li>
+                                        <!-- END unit_task_delete -->
+                                        <!-- BEGIN unit_task_quiz_results -->
+                                        <li>
+                                            <a href="/assess/results/{UNIT_QUIZ_ID}" class="icon-progress">View Results</a>
+                                        </li>
+                                        <!-- END unit_task_quiz_results -->
+                                        <!-- BEGIN unit_task_quiz_attempts -->
+                                        <li>
+                                            <a href="/assess/attempts/{UNIT_QUIZ_ID}/{USER_ID}" class="icon-quiz">See previous attempts</a>
+                                        </li>
+                                        <!-- END unit_task_quiz_attempts -->
+                                        <!-- BEGIN unit_task_duework_results -->
+                                        <li>
+                                            <a href="/submission/viewSubmission/{UNIT_DUEWORK_ID}" class="icon-progress">View Results</a>
+                                        </li>
+                                        <!-- END unit_task_duework_results -->
+                                        <!-- BEGIN unit_task_start -->
+                                        <li>
+                                            <a href="/task/start/{UNIT_TASK_ID}{UNIT_TASK_SET_STATUS}" class="{UNIT_TASK_COMPLETE_CLASS}" data-interaction="update_progress">
+                                                {UNIT_TASK_COMPLETION_TITLE} - click to update
+                                            </a>
+                                        </li>
+                                        <!-- END unit_task_start -->
+                                    </ul>
 
-                                    <!-- BEGIN unit_task_quiz_attempts -->
-                                    <a href="/assess/attempts/{UNIT_QUIZ_ID}/{USER_ID}" class="icon-quiz no-text" title="See previous attempts"></a>
-                                    <!-- END unit_task_quiz_attempts -->
-
-                                    <!-- BEGIN unit_task_duework_results -->
-                                    <a href="/submission/viewSubmission/{UNIT_DUEWORK_ID}" class="icon-progress no-text" title="View Results"></a>
-                                    <!-- END unit_task_duework_results -->
-
-                                    <!-- BEGIN unit_task_modify -->
-                                    <a href="/task/instance/modify/{UNIT_TASK_ID}" class="icon-modify no-text" title="Modify this task" data-interaction="open_edit_task_form"></a>
-                                    <!-- END unit_task_modify -->
-
-                                    <!-- BEGIN unit_task_start -->
-                                    <a href="/task/start/{UNIT_TASK_ID}{UNIT_TASK_SET_STATUS}" class="{UNIT_TASK_COMPLETE_CLASS} no-text" title="{UNIT_TASK_COMPLETION_TITLE} - click to update" data-interaction="update_progress"></a>
-                                    <!-- END unit_task_start -->
                                 </div>
 
                                 <!-- BEGIN unit_task_modify_form -->
