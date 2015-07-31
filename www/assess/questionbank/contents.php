@@ -192,12 +192,12 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         'class' => '',
     ],
     [
-        'text' => $quiz->getTitle(),
+        'text' => Scrub::text($quiz->getTitle()),
         'href' => "/assess/summary/{$quiz->getId()}",
         'class' => '',
     ],
     [
-        'text' => $section['title'],
+        'text' => Scrub::text($section['title']),
         'href' => "/assess/summary/{$quiz->getId()}",
         'class' => '',
     ],
