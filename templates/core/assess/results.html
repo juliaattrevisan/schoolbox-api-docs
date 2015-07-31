@@ -108,25 +108,5 @@
 
             $('[data-user='+userId+'][data-expandable]').toggleClass('hide')
         })
-
-        $(document).on('click', '.submission-dropdown', function () {
-            var currentUnicode = $(this).html().charCodeAt(0);
-
-            if (currentUnicode == '9660') {
-                $(this).html('&#9650;')
-            }
-            else {
-                $(this).html('&#9660;')
-            }
-
-            var matchingClasses = $(this).parents('tr').attr('class').toString().match(/user_(\d+)/);
-            var expandables = '.' + matchingClasses[0] + '.expandable';
-
-            /* Clear queue and complete animation
-             */
-            $(this).parents('tbody').find(expandables).stop(true, true).fadeToggle();
-
-            return false;
-        });
     });
 </script>
