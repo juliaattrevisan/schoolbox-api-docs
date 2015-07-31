@@ -5,8 +5,6 @@
     $.fn.setupCourseInstance = function(options) {
         var defaults = {
             course_homepage: '',
-            session_name:    '',
-            session_id:      '',
             import_base_url: '',
             readonly:        false,
             previewSelector: '[data-plugin=preview]'
@@ -14,14 +12,6 @@
         var settings  = $.extend({}, defaults, options);
         var component = $(this);
         var browser   = $('#resource-browser');
-
-        var dialog = component.find('.file_uploader');
-        dialog.ajaxUploadDialog({
-            session: {
-                name: settings.session_name,
-                id:   settings.session_id
-            }
-        });
 
         // Browser options: now based on component
         var component_id = component.attr('id');
@@ -258,22 +248,6 @@
                     }
                     postCallback(form, data);
                 }, 'json');
-            }
-        );
-
-        // Create/edit task upload file
-        component.on(
-            'click.courseInstance',
-            'form a[data-function="upload"]',
-            function(event) {
-                event.preventDefault();
-                // Set the form that this dialog was triggered from.
-                var source_form = $(this).closest('form');
-                dialog.ajaxUploadDialog('open', function(output) {
-                    var result = JSON.parse(output);
-                    var link   = '/storage/fetch.php?hash='+result.hash+'&save=1';
-                    source_form.find(':input[name="link"]').val(link);
-                });
             }
         );
 
