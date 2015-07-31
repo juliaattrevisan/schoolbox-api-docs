@@ -165,8 +165,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setBlock('unit', 'unit_task', 'unit_task_block');
         $this->setBlock('unit', 'unit_report_actions', 'unit_report_actions_block');
         $this->setBlock('unit', 'unit_add_task_actions', 'unit_add_task_actions_block');
-        $this->setBlock('unit_task', 'unit_task_quiz_results', 'unit_task_quiz_results_block');
-        $this->setBlock('unit_task', 'unit_task_quiz_attempts', 'unit_task_quiz_attempts_block');
         $this->setBlock('unit_task', 'unit_task_duework_results', 'unit_task_duework_results_block');
         $this->setBlock('unit_task', 'unit_task_link', 'unit_task_link_block');
         $this->setBlock('unit_task', 'unit_task_no_link', 'unit_task_no_link_block');
@@ -174,10 +172,13 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setBlock('unit_task', 'unit_task_completion', 'unit_task_completion_block');
         $this->setBlock('unit_task', 'unit_task_due_date', 'unit_task_due_date_block');
         $this->setBlock('unit_task', 'unit_task_start', 'unit_task_start_block');
-        $this->setBlock('unit_task', 'unit_task_modify', 'unit_task_modify_block');
-        $this->setBlock('unit_task', 'unit_task_delete', 'unit_task_delete_block');
         $this->setBlock('unit_task', 'unit_task_modify_form', 'unit_task_modify_form_block');
         $this->setBlock('unit_task', 'unit_task_delete_form', 'unit_task_delete_form_block');
+        $this->setBlock('unit_task', 'unit_task_actions', 'unit_task_actions_block');
+        $this->setBlock('unit_task_actions', 'unit_task_modify', 'unit_task_modify_block');
+        $this->setBlock('unit_task_actions', 'unit_task_delete', 'unit_task_delete_block');
+        $this->setBlock('unit_task_actions', 'unit_task_quiz_results', 'unit_task_quiz_results_block');
+        $this->setBlock('unit_task_actions', 'unit_task_quiz_attempts', 'unit_task_quiz_attempts_block');
 
         $this->setVar('course_selector_block', '');
         $this->setVar('course_unit_list_block', '');
@@ -438,6 +439,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 'unit_task_completion_block'      => '',
                 'unit_task_due_date_block'        => '',
                 'unit_task_start_block'           => '',
+                'unit_task_actions_block'         => '',
                 'unit_task_delete_block'          => '',
                 'unit_task_modify_block'          => '',
                 'unit_task_delete_form_block'     => '',
@@ -509,6 +511,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 $this->setVar('UNIT_QUIZ_ID', Scrub::text($task->getAssessment()->getId()));
                 $this->parse('unit_task_quiz_results_block', 'unit_task_quiz_results');
             }
+            $this->parse('unit_task_actions_block', 'unit_task_actions');
         }
 
         // Set due dates for tasks

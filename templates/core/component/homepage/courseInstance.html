@@ -157,7 +157,15 @@
                                     <!-- END unit_task_due_date -->
                                 </div>
                                 <div class="one actions">
+                                    <!-- BEGIN unit_task_start -->
+                                    <a href="/task/start/{UNIT_TASK_ID}{UNIT_TASK_SET_STATUS}"
+                                       class="{UNIT_TASK_COMPLETE_CLASS} no-text"
+                                       data-interaction="update_progress"
+                                       title="{UNIT_TASK_COMPLETION_TITLE} - click to update"
+                                    ></a>
+                                    <!-- END unit_task_start -->
 
+                                    <!-- BEGIN unit_task_actions -->
                                     <a data-dropdown="task-actions-{UNIT_TASK_ID}"
                                        href="#"
                                        class="no-text icon-more"
@@ -194,15 +202,8 @@
                                             <a href="/submission/viewSubmission/{UNIT_DUEWORK_ID}" class="icon-progress">View Results</a>
                                         </li>
                                         <!-- END unit_task_duework_results -->
-                                        <!-- BEGIN unit_task_start -->
-                                        <li>
-                                            <a href="/task/start/{UNIT_TASK_ID}{UNIT_TASK_SET_STATUS}" class="{UNIT_TASK_COMPLETE_CLASS}" data-interaction="update_progress">
-                                                {UNIT_TASK_COMPLETION_TITLE} - click to update
-                                            </a>
-                                        </li>
-                                        <!-- END unit_task_start -->
                                     </ul>
-
+                                    <!-- END unit_task_actions -->
                                 </div>
 
                                 <!-- BEGIN unit_task_modify_form -->
