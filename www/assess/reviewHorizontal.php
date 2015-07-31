@@ -14,6 +14,7 @@
  * @version     SVN: $Id$
  */
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Breadcrumbs;
 
 $factory = new Assess_Factory();
 $assessHandler = new Assess_Main();
@@ -248,3 +249,31 @@ else {
 		$this->setVar('next_question_block', '');
 	}
 }
+
+/* Render out breadcrumbs
+ */
+$dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+
+$trail = new Breadcrumbs();
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text'  => 'Submissions',
+        'href'  => '/submission/listSubmission',
+        'class' => ''
+    ],
+    [
+        'text'  => $folder->getName(),
+        'href'  => "/submission/listSubmission/{$dueDate->getYear()}/{$dueDate->getYearHalf()}/{$folder->getId()}",
+        'class' => ''
+    ],
+    [
+        'text'  => $assess['title'],
+        'href'  => "/assess/results/{$assess['assess_id']}",
+        'class' => ''
+    ],
+    [
+        'text'  => 'Horizontal Marking',
+        'href'  => "#",
+        'class' => 'active'
+    ],
+]);
