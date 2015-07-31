@@ -1,4 +1,166 @@
-<!-- BEGIN custom_head -->
+{BREADCRUMB}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Question Bank</h1>
+    </div>
+</div>
+
+<!-- BEGIN welcome -->
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Welcome</h2>
+        <section>
+            <div class="content">
+                <p>
+                    Welcome to the assessment question bank. Here you will find questions
+                    that can be used in your assessment. You can also store your own
+                    questions here for later use. To begin browse to the appropriate
+                    category and select the questions you wish to add. These questions
+                    will automatically be added to your assessment in the current
+                    section.
+                </p>
+            </div>
+        </section>
+    </div>
+</div>
+<!-- END welcome -->
+
+<div class="row">
+    <div class="small-12 island">
+        <!-- BEGIN category_selected -->
+        <h2 class="subheader">{QUESTION_CATEGORY}</h2>
+        <section>
+            <div class="content">
+                <form id='questionBankForm' action='/assess/questionbank/addToSection' method='post'>
+                    <input name='section_id' type='hidden' value='{SECTION_ID}'/>
+
+                    <table>
+                        <!-- BEGIN question -->
+                        <tr>
+                            <!-- BEGIN select_question -->
+                            <td>
+                                <label>
+                                    <input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}'/>
+                                </label>
+                            </td>
+                            <!-- END select_question -->
+                            <td>
+                                <article>
+                                    {QUESTION}
+                                </article>
+
+                                <div>
+                                    <!-- BEGIN missing_class -->
+                                    <p class="error-notification">
+                                        This question type no longer exists - it cannot be copied to the
+                                        survey, and should be removed from the question bank.
+                                    </p>
+                                    <!-- END missing_class -->
+
+                                    <div class='answer-content' data-answer-content="true">
+                                        <ul>
+                                            <!-- BEGIN answers -->
+                                            <li>
+                                                <div class="wysiwyg">
+                                                    {ANSWER_DESCRIPTION}
+                                                </div>
+                                            </li>
+                                            <!-- END answers -->
+                                        </ul>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="actions">
+                                    <a class="btn eyeball no-text" href="#" data-show-answer-content="true" title="Show Answers"><span></span></a>
+                                    <!-- BEGIN show_delete -->
+                                    <a class="btn delete no-text" href="/assess/questionbank/question/delete/{QUESTION_BANK_ID}" title="Delete"><span></span></a>
+                                    <!-- END show_delete -->
+                                    <a class="btn modify no-text" href="/assess/questionbank/question/modify/{QUESTION_BANK_ID}" title="Modify"><span></span></a>
+                                </span>
+                            </td>
+                        </tr>
+                        <!-- END question -->
+                    </table>
+
+                    <p class="clearfix no-marg ">
+                        <!-- BEGIN show_submit -->
+                        <input type='submit' value='Copy to Quiz' class="submit-btn-plain no-marg"/>
+                        <!-- END show_submit -->
+                    </p>
+
+                    <!-- BEGIN no_questions -->
+                    <p>There are no questions in this category's Question Bank.</p>
+                    <!-- END no_questions -->
+                </form>
+            </div>
+        </section>
+        <!-- END category_selected -->
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Categories</h2>
+        <section>
+            <div id='categoryTree' class="content">
+                <!-- BEGIN category_list_start -->
+                <ul>
+                    <!-- END category_list_start -->
+
+                    <!-- BEGIN category_list_item_start -->
+                    <ul>
+                        <!-- END category_list_item_start -->
+
+                        <!-- BEGIN category_list_item -->
+                        <li id='{CATEGORY_LIST_ITEM_NODE}' class='{CATEGORY_LIST_ITEM_SELECTED}'>
+                            <a href='/assess/questionbank/contents/{CATEGORY_LIST_ITEM_CATEGORY_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}'>
+                                {CATEGORY_LIST_ITEM_NAME} ({CATEGORY_LIST_ITEM_NUMQUESTIONS})
+                            </a>
+                            <!-- END category_list_item -->
+
+                            <!-- BEGIN category_list_item_end -->
+                    </ul>
+                    </li>
+                    <!-- END category_list_item_end -->
+                </ul>
+            </div>
+            <div class="edit-category">
+                <!-- BEGIN has_edit_category -->
+                <a id="editCat" class="btn modify" href="#"><span></span>Edit Category</a>
+
+                <form action='/assess/questionbank/modify.php' method='post' id="editCatForm" title="Edit Category">
+                    <input name='questionCategoryId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
+
+                    <p class="clearfix no-marg">
+                        <input name='name' type='text' value='{QUESTION_CATEGORY}'/>
+                        <input type='submit' value='Rename Category' class="submit-btn-plain no-marg"/>
+                    </p>
+                </form>
+                <!-- END has_edit_category -->
+
+                <a id="newSubCat" class="btn add" href="#"><span></span>Add Subcategory</a>
+
+                <form action='/assess/questionbank/create' method='post' id="subcategoryForm" title="Add New Subcategory">
+                    <input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
+
+                    <p class="clearfix no-marg">
+                        <input name='name' type='text' value='' class="required"/>
+                        <input type='submit' value='Add New Subcategory' class="submit-btn-plain no-marg "/>
+                    </p>
+                </form>
+                <form>
+                    <p class="clearfix no-marg">
+                        <a href='/assess/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="btn delete"><span></span>Remove this category</a>
+                    </p>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css"/>
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
@@ -98,151 +260,3 @@
         });
     });
 </script>
-<!-- END custom_head -->
-<h1>Question Bank</h1>
-<span class="header_option"><a href="/assess/modify/{ASSESS_ID}" class="btn go-back "><span></span>Return To Quiz</a></span>
-
-<div class="evaluation-questionbank-container">
-    <!-- BEGIN welcome -->
-    <h2>Welcome</h2>
-
-    <p class="pad-it">
-        Welcome to the assessment question bank. Here you will find questions
-        that can be used in your assessment. You can also store your own
-        questions here for later use. To begin browse to the appropriate
-        category and select the questions you wish to add. These questions
-        will automatically be added to your assessment in the current
-        section.
-    </p>
-    <!-- END welcome -->
-
-    <!-- BEGIN category_selected -->
-    <h2>Questions in category: {QUESTION_CATEGORY}</h2>
-
-    <form id='questionBankForm' action='/assess/questionbank/addToSection' method='post'>
-        <input name='section_id' type='hidden' value='{SECTION_ID}'/>
-
-        <table class="table ruler">
-            <colgroup>
-                <col width="20" />
-                <col />
-                <col width="128" />
-            </colgroup>
-            <!-- BEGIN question -->
-            <tr>
-                <!-- BEGIN select_question -->
-                <td>
-                    <label>
-                        <input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}'/>
-                    </label>
-                </td>
-                <!-- END select_question -->
-                <td>
-                    <div class="wysiwyg">
-                        {QUESTION}
-                    </div>
-
-                    <div>
-                        <!-- BEGIN missing_class -->
-                        <p class="error-notification">
-                            This question type no longer exists - it cannot be copied to the
-                            survey, and should be removed from the question bank.
-                        </p>
-                        <!-- END missing_class -->
-
-                        <div class='answer-content' data-answer-content="true">
-                            <ul>
-                                <!-- BEGIN answers -->
-                                <li>
-                                    <div class="wysiwyg">
-                                        {ANSWER_DESCRIPTION}
-                                    </div>
-                                </li>
-                                <!-- END answers -->
-                            </ul>
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <span class="actions">
-                        <a class="btn eyeball no-text" href="#" data-show-answer-content="true" title="Show Answers"><span></span></a>
-                        <!-- BEGIN show_delete -->
-                        <a class="btn delete no-text" href="/assess/questionbank/question/delete/{QUESTION_BANK_ID}" title="Delete"><span></span></a>
-                        <!-- END show_delete -->
-                        <a class="btn modify no-text" href="/assess/questionbank/question/modify/{QUESTION_BANK_ID}" title="Modify"><span></span></a>
-                    </span>
-                </td>
-            </tr>
-            <!-- END question -->
-        </table>
-
-        <p class="clearfix no-marg ">
-            <!-- BEGIN show_submit -->
-            <input type='submit' value='Copy to Quiz' class="submit-btn-plain no-marg"/>
-            <!-- END show_submit -->
-        </p>
-
-        <!-- BEGIN no_questions -->
-        <p>There are no questions in this category's Question Bank.</p>
-        <!-- END no_questions -->
-    </form>
-    <!-- END category_selected -->
-</div>
-
-<div class="evaluation-menu">
-    <h2>Categories</h2>
-
-    <div id='categoryTree'>
-        <!-- BEGIN category_list_start -->
-        <ul>
-            <!-- END category_list_start -->
-
-            <!-- BEGIN category_list_item_start -->
-            <ul>
-                <!-- END category_list_item_start -->
-
-                <!-- BEGIN category_list_item -->
-                <li id='{CATEGORY_LIST_ITEM_NODE}' class='{CATEGORY_LIST_ITEM_SELECTED}'>
-                    <a href='/assess/questionbank/contents/{CATEGORY_LIST_ITEM_CATEGORY_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}'>
-                        {CATEGORY_LIST_ITEM_NAME} ({CATEGORY_LIST_ITEM_NUMQUESTIONS})
-                    </a>
-                    <!-- END category_list_item -->
-
-                    <!-- BEGIN category_list_item_end -->
-            </ul>
-            </li>
-            <!-- END category_list_item_end -->
-        </ul>
-    </div>
-
-    <div class="edit-category">
-        <!-- BEGIN has_edit_category -->
-        <a id="editCat" class="btn modify" href="#"><span></span>Edit Category</a>
-
-        <form action='/assess/questionbank/modify.php' method='post' id="editCatForm" title="Edit Category">
-            <input name='questionCategoryId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
-
-            <p class="clearfix no-marg">
-                <input name='name' type='text' value='{QUESTION_CATEGORY}'/>
-                <input type='submit' value='Rename Category' class="submit-btn-plain no-marg"/>
-            </p>
-        </form>
-        <!-- END has_edit_category -->
-
-        <a id="newSubCat" class="btn add" href="#"><span></span>Add Subcategory</a>
-
-        <form action='/assess/questionbank/create' method='post' id="subcategoryForm" title="Add New Subcategory">
-            <input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
-
-            <p class="clearfix no-marg">
-                <input name='name' type='text' value='' class="required"/>
-                <input type='submit' value='Add New Subcategory' class="submit-btn-plain no-marg "/>
-            </p>
-        </form>
-        <form>
-            <p class="clearfix no-marg">
-                <a href='/assess/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="btn delete"><span></span>Remove this category</a>
-            </p>
-        </form>
-    </div>
-</div>
