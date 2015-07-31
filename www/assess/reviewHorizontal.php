@@ -113,6 +113,9 @@ else {
 	$this->setBlock(TEMPLATE_content, 'next_question', 'next_question_block');
 	$this->setBlock(TEMPLATE_content, 'previous_question', 'previous_question_block');
 	$this->setBlock(TEMPLATE_content, 'writable_finalise', 'writable_finalise_block');
+	$this->setBlock(TEMPLATE_content, 'visible_staff', 'visible_staff_block');
+	$this->setBlock(TEMPLATE_content, 'visible_staff_students', 'visible_staff_students_block');
+	$this->setBlock(TEMPLATE_content, 'visible_staff_students_parents', 'visible_staff_students_parents_block');
 	$this->setVar('writable_finalise_block', '');
 	$this->setTitle('Assessment: ' . $assess['title']);
 
@@ -139,7 +142,23 @@ else {
 		'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
 		'ASSESS_CATEGORY_ID' => $category->getId(),
 		'ASSESS_CATEGORY_NAME' => $category->getName(),
+		'visible_staff_block'                  => '',
+		'visible_staff_students_block'         => '',
+		'visible_staff_students_parents_block' => '',
 	));
+
+	// Visibility copypaste
+	switch ($assess['mark_visibility']) {
+		case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE:
+			$this->parse('visible_staff_block', 'visible_staff');
+			break;
+		case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT:
+			$this->parse('visible_staff_students_block', 'visible_staff_students');
+			break;
+		case Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT:
+			$this->parse('visible_staff_students_parents_block', 'visible_staff_students_parents');
+			break;
+	}
 
 	$readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
 

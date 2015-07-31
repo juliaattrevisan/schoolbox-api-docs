@@ -10,7 +10,23 @@
     <li class="active"><a href="#">Horizontal Marking</a></li>
 </ul>
 
-<h1>Horizontal Marking for {ASSESS_TITLE}<a class='btn go-back' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}'><span></span>Back to questions</a></h1>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Horizontal Marking for {ASSESS_TITLE}</h1>
+        <ul class="meta">
+            <li class="icon-due-work"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a> Quiz</li>
+            <!-- BEGIN visible_staff -->
+            <li class="icon-locked">Visible to staff only</li>
+            <!-- END visible_staff -->
+            <!-- BEGIN visible_staff_students -->
+            <li class="icon-staff-students">Visible to staff and students</li>
+            <!-- END visible_staff_students -->
+            <!-- BEGIN visible_staff_students_parents -->
+            <li class="icon-staff">Visible to staff, students and parents</li>
+            <!-- END visible_staff_students_parents -->
+        </ul>
+    </div>
+</div>
 
 <div class="box">
 	<h2>Q{QUESTION_SEQUENCE})</h2>
@@ -59,5 +75,7 @@
 		</div>
 		<a href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/finalise' class="submit-btn-plain float-right">Finalise all attempts</a>
 		<!-- END writable_finalise -->
-	</p>
+
+        <a class='btn go-back' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}'><span></span>Back to questions</a>
+    </p>
 </div>
