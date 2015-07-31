@@ -129,20 +129,30 @@
                     <form action='/assess/questionbank/modify.php' method='post'>
                         <input name='questionCategoryId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
 
-                        <input name='name' type='text' value='{QUESTION_CATEGORY}' />
+                        <label>
+                            Subcategory Name
+                            <input class='required' name='name' type='text' value='{QUESTION_CATEGORY}' />
+                        </label>
+
                         <input type='submit' value='Rename Category' />
                     </form>
                 </div>
                 <!-- END has_edit_category -->
 
-                <a id="newSubCat" class="button icon-add" href="#">Add Subcategory</a>
+                <a class="button icon-add" href="#" data-reveal-id="add-subcategory-modal">Add Subcategory</a>
 
-                <form action='/assess/questionbank/create' method='post' id="subcategoryForm">
-                    <input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
+                <div id="add-subcategory-modal" class='reveal-modal' data-reveal>
+                    <form action='/assess/questionbank/create' method='post'>
+                        <input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
 
-                    <input name='name' type='text' value='' class="required" />
-                    <input type='submit' value='Add New Subcategory' />
-                </form>
+                        <label>
+                            Subcategory Name
+                            <input class="required" name='name' type='text' value=''  />
+                        </label>
+
+                        <input type='submit' value='Add New Subcategory' />
+                    </form>
+                </div>
 
                 <a href='/assess/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="button icon-delete">Remove this category</a>
             </div>
@@ -237,17 +247,7 @@
 
         /* Reveals
          */
-        $("#subcategoryForm").dialog({
-            autoOpen: false,
-            modal: true
-        });
-
-        $('#newSubCat').click(function () {
-            $('#subcategoryForm').dialog("open");
-        });
-
-        $('#subcategoryForm').validate();
-
-
+        $('#edit-category-modal').find('form').validate();
+        $('#add-subcategory-modal').find('form').validate();
     });
 </script>
