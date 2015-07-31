@@ -109,6 +109,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
             'ATTEMPT_EXTERNAL_ID' => $currentAttempt['synergy_id'],
             'ATTEMPT_FIRSTNAME' => $currentAttempt['firstname'],
             'ATTEMPT_SURNAME' => $currentAttempt['lastname'],
+            'ATTEMPT_TIME_TAKEN' => $timeTaken,
             'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
             'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
             'ATTEMPT_PERCENTAGE' => $percentage,
