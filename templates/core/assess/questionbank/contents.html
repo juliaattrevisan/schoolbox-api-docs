@@ -30,7 +30,7 @@
         <!-- BEGIN category_selected -->
         <h2 class="subheader">{QUESTION_CATEGORY}</h2>
 
-        <form id='questionBankForm' action='/survey/questionbank/addToSection' method='post'>
+        <form id='questionBankForm' action='/assess/questionbank/addToSection' method='post'>
             <input name='section_id' type='hidden' value='{SECTION_ID}'/>
 
             <section>
@@ -56,7 +56,7 @@
                             <div class="alert-panel">
                                 <p>
                                     This question type no longer exists - it cannot be copied to the
-                                    survey, and should be removed from the Question Bank.
+                                    Quiz, and should be removed from the Question Bank.
                                 </p>
                             </div>
                             <!-- END missing_class -->
