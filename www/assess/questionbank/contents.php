@@ -17,7 +17,7 @@ try {
     $folder = $folderMapper->findById($quiz->getCategory()->getId());
 }
 catch (\Exception $e) {
-    error(117);
+    error(13);
 }
 
 $sectionHandler = new \Assess_Section();
