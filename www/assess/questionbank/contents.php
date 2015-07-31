@@ -188,6 +188,11 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         'class' => '',
     ],
     [
+        'text' => $section['title'],
+        'href' => "/assess/summary/{$quiz->getId()}",
+        'class' => '',
+    ],
+    [
         'text' => 'Add from Question Bank',
         'href' => '',
         'class' => 'active',
