@@ -71,70 +71,8 @@
         </dd>
         {% endif %}
 
-        {% if report.subjectReport.namedGrades.endeavourGrade1
-            or report.subjectReport.namedGrades.endeavourGrade2
-            or report.subjectReport.namedGrades.endeavourGrade3
-            or report.subjectReport.namedGrades.endeavourGrade4
-            or report.subjectReport.namedGrades.endeavourGrades
-        %}
-        {# Endeavor Grades - was a rubric, now four separate assessments #}
-        <dt class="fullwidth">
-            Endeavour Grades
-            <div class="description-link">[<a href="/homepage/3461">Grade Description</a>]</div>
-        </dt>
-        <dd class="fullwidth">
-            <table>
-                <thead>
-                <tr>
-                    {% if report.subjectReport.namedGrades.endeavourGrade1
-                        or report.subjectReport.namedGrades.endeavourGrade2
-                        or report.subjectReport.namedGrades.endeavourGrade3
-                        or report.subjectReport.namedGrades.endeavourGrade4
-                    %}
-                        <th>Term 1</th>
-                        <th>Term 2</th>
-                        <th>Term 3</th>
-                        <th>Term 4</th>
-                    {% else %}
-                        {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
-                            <th>{{ criterion.label }}</th>
-                        {% else %}
-                            {# fill all with N/A #}
-                            <th>Term 1</th>
-                            <th>Term 2</th>
-                            <th>Term 3</th>
-                            <th>Term 4</th>
-                        {% endfor %}
-                    {% endif %}
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    {% if report.subjectReport.namedGrades.endeavourGrade1
-                        or report.subjectReport.namedGrades.endeavourGrade2
-                        or report.subjectReport.namedGrades.endeavourGrade3
-                        or report.subjectReport.namedGrades.endeavourGrade4
-                    %}
-                        <td>{{ report.subjectReport.namedGrades.endeavourGrade1.pretty_mark|default('N/A') }}</td>
-                        <td>{{ report.subjectReport.namedGrades.endeavourGrade2.pretty_mark|default('N/A') }}</td>
-                        <td>{{ report.subjectReport.namedGrades.endeavourGrade3.pretty_mark|default('N/A') }}</td>
-                        <td>{{ report.subjectReport.namedGrades.endeavourGrade4.pretty_mark|default('N/A') }}</td>
-                    {% else %}
-                        {# Old-style rubric endeavor grade #}
-                        {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
-                            <td>{{ criterion.results[criterion.value]|default('N/A') }}</td>
-                        {% else %}
-                            <td>N/A</td>
-                            <td>N/A</td>
-                            <td>N/A</td>
-                            <td>N/A</td>
-                        {% endfor %}
-                    {% endif %}
-                </tr>
-                </tbody>
-            </table>
-        </dd>
-        {% endif %}
+        {# Endeavor Grades - complicated enough to be its own template #}
+        {% include '@customMeridenPastoral/sub/endeavourGrades.twig' %}
 
         {# Approaches to learning - another rubric #}
         {% if report.subjectReport.namedGrades.learningApproaches
