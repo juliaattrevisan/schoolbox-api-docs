@@ -11,41 +11,43 @@
         </thead>
         <tbody>
         {% for workItem in work %}
-        {% if workItem.assessment or workItem.quiz %}
-        <tr>
-            <td>
-                {% if workItem.assessment %}
-                    {% set showMark = workItem.assessment.isMarkShownToRole(user.role) %}
-                    <a class="title" href="/submission/submissionHistory/{{ workItem.assessment.id }}/{{ student.id }}">
-                        {{ workItem.assessment.name }}
-                    </a>
-                {% elseif workItem.quiz %}
-                    {% set showMark = workItem.quiz.isMarkShownToRole(user.role) %}
-                    <a class="title" href="/assess/attempts/{{ workItem.quiz.id }}/{{ student.id }}">
-                        {{ workItem.quiz.title }}
-                    </a>
-                {% else %}
-                    {% set showMark = false %}
-                    Unknown
-                {% endif %}
-            </td>
-            <td class="grade">
-                {# Does the current user have the right to view this assessment's mark? #}
-                {% if showMark %}
-                    {{ workItem.pretty_mark }}
-                {% endif %}
-            </td>
-            <td>{{ workItem.distribution.continuous.sd.pretty_mark }}</td>
-            <td>{{ workItem.distribution.continuous.mean.pretty_mark }}</td>
-            <td>
-                {% if workItem.assessment %}
-                    {{ workItem.assessment.dueDate|date('jS F') }}
-                {% elseif workItem.quiz %}
-                    {{ workItem.quiz.finish|date('jS F') }}
-                {% endif %}
-            </td>
-        </tr>
-        {% endif %}
+            {# Is this work item shown to the logged in user? #}
+            {% if workItem.assessment %}
+                {% set showMark = workItem.assessment.isMarkShownToRole(user.role) %}
+            {% elseif workItem.quiz %}
+                {% set showMark = workItem.quiz.isMarkShownToRole(user.role) %}
+            {% else %}
+                {% set showMark = false %}
+            {% endif %}
+            {% if showMark %}
+                <tr>
+                    <td>
+                        {% if workItem.assessment %}
+                            <a class="title" href="/submission/submissionHistory/{{ workItem.assessment.id }}/{{ student.id }}">
+                                {{ workItem.assessment.name }}
+                            </a>
+                        {% elseif workItem.quiz %}
+                            <a class="title" href="/assess/attempts/{{ workItem.quiz.id }}/{{ student.id }}">
+                                {{ workItem.quiz.title }}
+                            </a>
+                        {% else %}
+                            Unknown
+                        {% endif %}
+                    </td>
+                    <td class="grade">
+                        {{ workItem.pretty_mark }}
+                    </td>
+                    <td>{{ workItem.distribution.continuous.sd.pretty_mark }}</td>
+                    <td>{{ workItem.distribution.continuous.mean.pretty_mark }}</td>
+                    <td>
+                        {% if workItem.assessment %}
+                            {{ workItem.assessment.dueDate|date('jS F') }}
+                        {% elseif workItem.quiz %}
+                            {{ workItem.quiz.finish|date('jS F') }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
         {% endfor %}
         </tbody>
     </table>
