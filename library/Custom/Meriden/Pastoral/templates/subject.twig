@@ -35,7 +35,9 @@
 
     <dl id="course-info">
         {# course grade - derived from grade for this class #}
-        {% if report.subjectReport.namedGrades.courseGrade %}
+        {% if report.subjectReport.namedGrades.courseGrade
+           and report.subjectReport.namedGrades.courseGrade.assessment.isMarkShownToRole(user.role)
+        %}
         <dt>
             Course Grade
             <div class="description-link">[<a href="/homepage/3403">Grade Description</a>]</div>
