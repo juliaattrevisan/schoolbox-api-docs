@@ -137,24 +137,22 @@
         {% endif %}
 
         {# Approaches to learning - another rubric #}
-        {% if report.subjectReport.namedGrades.learningApproaches %}
+        {% if report.subjectReport.namedGrades.learningApproaches
+           and report.subjectReport.namedGrades.learningApproaches.assessment.isMarkShownToRole(user.role)
+        %}
         <dt class="fullwidth">
             Approaches to Learning
             <div class="description-link">[<a href="/homepage/3462">Grade Description</a>]</div>
         </dt>
         <dd class="fullwidth">
-            {% if report.subjectReport.namedGrades.learningApproaches %}
-                <table class="learning-approaches">
-                {% for criterion in report.subjectReport.namedGrades.learningApproaches.rubric.criteria %}
-                    <tr>
-                        <td>{{ criterion.label }}:</td>
-                        <td><strong>{{ criterion.results[criterion.value] }}</strong></td>
-                    </tr>
-                {% endfor %}
-                </table>
-            {% else %}
-                Unknown
-            {% endif %}
+            <table class="learning-approaches">
+            {% for criterion in report.subjectReport.namedGrades.learningApproaches.rubric.criteria %}
+                <tr>
+                    <td>{{ criterion.label }}:</td>
+                    <td><strong>{{ criterion.results[criterion.value] }}</strong></td>
+                </tr>
+            {% endfor %}
+            </table>
         </dd>
         {% endif %}
     </dl>
