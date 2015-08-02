@@ -1,6 +1,12 @@
-<div class="listing">
-    <table class="upcoming-work table ruler">
-        <thead>
+{% set thead %}
+<div id="assessment-info">
+    <h2>
+        Assessments
+        <span class="feedback">(Feedback is provided with the marked task)</span>
+    </h2>
+    <div class="listing">
+        <table class="upcoming-work table ruler">
+            <thead>
             <tr>
                 <th>Title</th>
                 <th>Result</th>
@@ -8,47 +14,65 @@
                 <th>Mean %</th>
                 <th>Date Due</th>
             </tr>
-        </thead>
-        <tbody>
-        {% for workItem in work %}
-            {# Is this work item shown to the logged in user? #}
-            {% if workItem.assessment %}
-                {% set showMark = workItem.assessment.isMarkShownToRole(user.role) %}
-            {% elseif workItem.quiz %}
-                {% set showMark = workItem.quiz.isMarkShownToRole(user.role) %}
-            {% else %}
-                {% set showMark = false %}
-            {% endif %}
-            {% if showMark %}
-                <tr>
-                    <td>
-                        {% if workItem.assessment %}
-                            <a class="title" href="/submission/submissionHistory/{{ workItem.assessment.id }}/{{ student.id }}">
-                                {{ workItem.assessment.name }}
-                            </a>
-                        {% elseif workItem.quiz %}
-                            <a class="title" href="/assess/attempts/{{ workItem.quiz.id }}/{{ student.id }}">
-                                {{ workItem.quiz.title }}
-                            </a>
-                        {% else %}
-                            Unknown
-                        {% endif %}
-                    </td>
-                    <td class="grade">
-                        {{ workItem.pretty_mark }}
-                    </td>
-                    <td>{{ workItem.distribution.continuous.sd.pretty_mark }}</td>
-                    <td>{{ workItem.distribution.continuous.mean.pretty_mark }}</td>
-                    <td>
-                        {% if workItem.assessment %}
-                            {{ workItem.assessment.dueDate|date('jS F') }}
-                        {% elseif workItem.quiz %}
-                            {{ workItem.quiz.finish|date('jS F') }}
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endif %}
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+{% endset %}
+
+{% set tfoot %}
+            </tbody>
+        </table>
+    </div>
 </div>
+{% endset %}
+
+{% set first = true %}
+{% for workItem in work %}
+    {# Is this work item shown to the logged in user? #}
+    {% if workItem.assessment %}
+        {% set showMark = workItem.assessment.isMarkShownToRole(user.role) %}
+    {% elseif workItem.quiz %}
+        {% set showMark = workItem.quiz.isMarkShownToRole(user.role) %}
+    {% else %}
+        {% set showMark = false %}
+    {% endif %}
+
+    {% if showMark %}
+        {# Is this the first row that's getting displayed? show the header and that #}
+        {% if first %}
+            {% set first = false %}
+            {{ thead }}
+        {% endif %}
+        <tr>
+            <td>
+                {% if workItem.assessment %}
+                    <a class="title" href="/submission/submissionHistory/{{ workItem.assessment.id }}/{{ student.id }}">
+                        {{ workItem.assessment.name }}
+                    </a>
+                {% elseif workItem.quiz %}
+                    <a class="title" href="/assess/attempts/{{ workItem.quiz.id }}/{{ student.id }}">
+                        {{ workItem.quiz.title }}
+                    </a>
+                {% else %}
+                    Unknown
+                {% endif %}
+            </td>
+            <td class="grade">
+                {{ workItem.pretty_mark }}
+            </td>
+            <td>{{ workItem.distribution.continuous.sd.pretty_mark }}</td>
+            <td>{{ workItem.distribution.continuous.mean.pretty_mark }}</td>
+            <td>
+                {% if workItem.assessment %}
+                    {{ workItem.assessment.dueDate|date('jS F') }}
+                {% elseif workItem.quiz %}
+                    {{ workItem.quiz.finish|date('jS F') }}
+                {% endif %}
+            </td>
+        </tr>
+    {% endif %}
+{% endfor %}
+
+{# Have any rows been shown? If so show the footer #}
+{% if not first %}
+    {{ tfoot }}
+{% endif %}
