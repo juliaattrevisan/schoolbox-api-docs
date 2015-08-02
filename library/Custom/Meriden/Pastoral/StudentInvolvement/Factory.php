@@ -174,11 +174,13 @@ class Factory
 
         // What are the other grade distributions?
         $courseGrade = $subject->getNamedGrade('courseGrade');
-        $courseGrade['distribution'] = $this->buildDistribution(
-            $courseGrade,
-            $subject->getCohortFolders()
-        );
-        $subject->setNamedGrade('courseGrade', $courseGrade);
+        if (!empty($courseGrade)) {
+            $courseGrade['distribution'] = $this->buildDistribution(
+                $courseGrade,
+                $subject->getCohortFolders()
+            );
+            $subject->setNamedGrade('courseGrade', $courseGrade);
+        }
 
         return $subject;
     }
