@@ -12,29 +12,58 @@ $(function() {
 </script>
 <!-- END custom_head -->
 
-<h1>View your results <a href="/assess/attempts/{ASSESS_ASSESS_ID}/{USER_ID}" class="btn go-back marg tiny"><span></span>Return to Attempts</a></h1>
-<div class="evaluation-content mark-test student-review">
-	<h2>{SECTION_TITLE}</h2>
-	<div class="wysiwyg">{SECTION_DESCRIPTION}</div>
-	<!-- BEGIN question -->
-	<div class="question no-pad">
-        <h3><strong>Q{QUESTION_SEQUENCE}) ({QUESTION_MARKS} marks)</strong></h3>
-        <div class="wysiwyg">{QUESTION_QUESTION}</div>
-		<div class="evaluation-answer clearfix">
-        <!-- BEGIN answerInputs -->
-        <!-- END answerInputs -->
-		</div>
-	</div>
-	<!-- END question -->
+{BREADCRUMB}
 
-	<p class="clearfix">
-	<!-- BEGIN nextSection -->
-		<a class="next-step btn go-to" href="/assess/studentReview/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Next Section</a>
-		<!-- END nextSection -->
-		<!-- BEGIN prevSection -->
-		<a class="next-step btn go-back" href="/assess/studentReview/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Previous Section</a>
-		<!-- END prevSection -->
-	
-		
-	</p>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>My results for {ASSESS_TITLE}</h1>
+        <ul class="meta">
+            <li class="icon-calendar"><time>{ASSESS_START}</time>
+                &ndash; <time>{ASSESS_FINISH}</time>
+            </li>
+            <li class="icon-quiz"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a>
+                Quiz, attempted
+                <time>{ATTEMPT_START}</time><!-- BEGIN attemptFinished --> &ndash; <time>{ATTEMPT_FINISH}</time> ({ATTEMPT_TIME_TAKEN})<!-- END attemptFinished -->
+                <!-- BEGIN attemptNotYetFinished -->
+                (unfinished)
+                <!-- END attemptNotYetFinished -->
+                <!-- BEGIN attemptUnfinished -->
+                (not finished by due date)
+                <!-- END attemptUnfinished -->
+            </li>
+            <li class="icon-approve">Mark: {ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</li>
+        </ul>
+    </div>
+
+    <div class="small-12 island">
+        <h2 class="subheader">{SECTION_TITLE}</h2>
+        <section class="content">
+            <article>{SECTION_DESCRIPTION}</article>
+        </section>
+
+        <h2 class="subheader">Questions</h2>
+        <!-- BEGIN question -->
+        <section>
+            <ul class="information-list">
+                <li class="row content">
+                    <h3>Q{QUESTION_SEQUENCE}) <span class="meta">({QUESTION_MARKS} marks)</span></h3>
+                    <article>{QUESTION_QUESTION}</article>
+                </li>
+                <!-- BEGIN answerInputs -->
+                <!-- END answerInputs -->
+            </ul>
+        </section>
+        <!-- END question -->
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <!-- BEGIN prevSection -->
+        <a class="button icon-previous" href="/assess/studentReview/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Previous Section</a>
+        <!-- END prevSection -->
+        <!-- BEGIN nextSection -->
+        <a class="button icon-next" href="/assess/studentReview/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Next Section</a>
+        <!-- END nextSection -->
+    </div>
 </div>

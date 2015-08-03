@@ -4,7 +4,6 @@
  * but the actual answers cannot be changed, only seen. Structurally, this is
  * similar to the normal undertaking of the test, only that answers for the
  * specified attempt are shown and you can only change the value of marks.
- *
  * You can add extra marks beyond the specified maximum for bonus answers, and
  * half marks are acceptable.
  *
@@ -14,11 +13,11 @@
  * @version     SVN: $Id$
  */
 
-$factory = new Survey_Factory();
-$surveyHandler = new Survey_Main();
-$attemptHandler = new Survey_Attempt();
+$factory         = new Survey_Factory();
+$surveyHandler   = new Survey_Main();
+$attemptHandler  = new Survey_Attempt();
 $responseHandler = new Survey_Response();
-$sectionHandler = new Survey_Section();
+$sectionHandler  = new Survey_Section();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -32,7 +31,7 @@ if (!is_numeric($this->arg[2])) {
     error(128);
 }
 
-$survey = $surveyHandler->getByID($this->arg[0]);
+$survey  = $surveyHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
 $attempt = $attemptHandler->getByID($this->arg[2]);
 
@@ -67,23 +66,65 @@ if (is_numeric($this->arg[2])) {
 /* Set up template
  */
 $this->setFile(TEMPLATE_content, 'survey/studentReview.html');
+$this->setBlock(TEMPLATE_content, 'attemptFinished', 'attemptFinished_block');
+$this->setBlock(TEMPLATE_content, 'attemptNotYetFinished', 'attemptNotYetFinished_block');
+$this->setBlock(TEMPLATE_content, 'attemptUnfinished', 'attemptUnfinished_block');
 $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
 $this->setBlock(TEMPLATE_content, 'question', 'question_block');
 $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
 $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
-$this->setTitle('Surveyment: ' . $survey['title']);
+$this->setTitle('Survey: ' . $survey['title']);
 
 /* Show current Section's data, and other mandatory tokens needed to complete
- * the Surveyment.
+ * the survey.
  */
-$this->setVar(array(
-    'SURVEY_ASSESS_ID' => $survey['assess_id'],
-    'SURVEY_TITLE' => Scrub::text($survey['title']),
-    'SURVEY_CATEGORY_ID' => $survey['category_id'],
-    'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
-    'SECTION_TITLE' => Scrub::text($section['title']),
-    'SECTION_DESCRIPTION' => Scrub::html($section['description']),
-));
+try {
+    $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($survey['category_id']);
+} catch (Schoolbox\Mapper\Exception $e) {
+    error(114);
+    exit;
+}
+try {
+    $userMapper = \Schoolbox\UserMapper::getInstance();
+    $user       = $userMapper->findById($attempt['user_id']);
+} catch (Schoolbox\Mapper\Exception $e) {
+    error(19);
+    exit;
+}
+$openDate      = new Alaress_Date_Format($survey['start'], Alaress_Date_Format::DATABASE_FORMAT);
+$dueDate       = new Alaress_Date_Format($survey['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+$attemptDate   = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
+$attemptFinish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+$this->setVar(
+    array(
+        'ASSESS_ASSESS_ID'            => $survey['assess_id'],
+        'ASSESS_TITLE'                => Scrub::text($survey['title']),
+        'ASSESS_START'                => $openDate->getShort(),
+        'ASSESS_FINISH'               => $dueDate->getShort(),
+        'ATTEMPT_ATTEMPT_ID'          => $_SESSION['attempt_id'],
+        'ATTEMPT_START'               => $attemptDate->getShort(),
+        'ATTEMPT_FINISH'              => $attemptFinish->getShort(),
+        'ATTEMPT_TIME_TAKEN'          => $surveyHandler->sec2hms($attemptFinish->diffInSeconds($attemptDate, true)),
+        'SECTION_TITLE'               => Scrub::text($section['title']),
+        'SECTION_DESCRIPTION'         => Scrub::html($section['description']),
+        'ASSESS_CATEGORY_NAME'        => Scrub::text($folder->getName()),
+        'ASSESS_CATEGORY_ID'          => $folder->getId(),
+        'attemptFinished_block'       => '',
+        'attemptNotYetFinished_block' => '',
+        'attemptUnfinished_block'     => '',
+    )
+);
+
+// Parse finished/unfinished/not finished yet blockage
+if (!isset($attempt['finish'])) {
+    if ($dueDate->getUnixTimeStamp() < $_SERVER['REQUEST_TIME']) {
+        $this->parse('attemptUnfinished_block', 'attemptUnfinished');
+    } else {
+        $this->parse('attemptNotYetFinished_block', 'attemptNotYetFinished');
+    }
+} else {
+    $this->parse('attemptFinished_block', 'attemptFinished');
+}
 
 /* Load all the questions for this section.
  * Note: only show the randomly-selected ones
@@ -105,18 +146,22 @@ if ($allQuestions) {
          */
         $this->setVar('answerOption_block', '');
 
-        $this->setVar(array(
-            'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
-            'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
-            'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
-        ));
+        $this->setVar(
+            array(
+                'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
+                'QUESTION_SEQUENCE'    => $currentQuestion['sequence'],
+                'QUESTION_QUESTION'    => Scrub::html($currentQuestion['question']),
+            )
+        );
 
         /* If this is a randomised section, number each question incrementally
          */
         if ($section['random'] == 1) {
-            $this->setVar(array(
-                'QUESTION_SEQUENCE' => $randomQuestionNumber
-            ));
+            $this->setVar(
+                array(
+                    'QUESTION_SEQUENCE' => $randomQuestionNumber
+                )
+            );
         }
 
         /* Load individual answers
@@ -133,8 +178,7 @@ if ($allQuestions) {
         $this->setVar('answerFormFragment', '');
         $this->setVar('answerInputs_block', '');
     }
-}
-else {
+} else {
     $this->setVar('question_block', '');
 }
 
@@ -149,32 +193,62 @@ $prevSection = $sectionHandler->getBefore($this->arg[0], $section['sequence']);
 if (!is_numeric($nextSection['section_id']) && !is_numeric($prevSection['section_id'])) {
     $this->setVar('nextSection_block', '');
     $this->setVar('prevSection_block', '');
-}
-/* If there is no next section, then provide the finish link and parse out the
+} /* If there is no next section, then provide the finish link and parse out the
  * previous button if applicable
  */
 else {
     if (is_numeric($nextSection['section_id'])) {
-        $this->setVar(array(
-            'NEXT_SECTION_ID' => $nextSection['section_id'],
-        ));
+        $this->setVar(
+            array(
+                'NEXT_SECTION_ID' => $nextSection['section_id'],
+            )
+        );
 
         $this->parse('nextSection_block', 'nextSection');
-    }
-	else {
+    } else {
         $this->setVar('nextSection_block', '');
     }
 
     /* Conditions where the previous button is available
      */
     if (is_numeric($prevSection['section_id'])) {
-        $this->setVar(array(
-            'PREV_SECTION_ID' => $prevSection['section_id'],
-        ));
+        $this->setVar(
+            array(
+                'PREV_SECTION_ID' => $prevSection['section_id'],
+            )
+        );
 
         $this->parse('prevSection_block', 'prevSection');
-    }
-	else {
+    } else {
         $this->setVar('prevSection_block', '');
     }
 }
+
+// Breadcrumbs
+$trail = new \Schoolbox\Breadcrumbs();
+$trail->renderIntoSitePage(
+    $this,
+    'BREADCRUMB',
+    [
+        [
+            'text'  => $folder->getName(),
+            'href'  => '/homepage/' . $folder->getId(),
+            'class' => ''
+        ],
+        [
+            'text'  => $survey['title'],
+            'href'  => '/survey/summary/' . $survey['assess_id'],
+            'class' => ''
+        ],
+        [
+            'text'  => $user->formatName(),
+            'href'  => '/survey/attempts/' . $survey['assess_id'] . '/' . $user->getId(),
+            'class' => 'active'
+        ],
+//        [
+//            'text'  => 'Review',
+//            'href'  => '#',
+//            'class' => 'active'
+//        ],
+    ]
+);
