@@ -850,7 +850,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $bob->setTitle(":boxname is now overdue in :catname");
 
         return $this->notifyOverdue($submissionBox, $envelope, $bob, function ($student) use (&$envelope, &$bob) {
-            $envelope->targetToUser($student->getId, $bob->build());
+            $envelope->targetToUser($student, $bob->build());
         });
     }
 
