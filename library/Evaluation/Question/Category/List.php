@@ -9,19 +9,29 @@
  */
 abstract class Evaluation_Question_Category_List
 {
-    private $page = null;
+    /** @var SitePage */
+    private $page;
+
+    /** @var array */
     private $allCategories = array();
+
+    /** @var int */
     private $selectedAssess = 0;
+
+    /** @var int */
     private $selectedCategory = 0;
-    private $categoryHandler = null;
+
+    /** @var Evaluation_Question_Category */
+    private $categoryHandler;
+
 
     /**
      * Constructor
      *
-     * @param $page
-     * @param $selectedAssess
-     * @param $selectedCategory
-     * @param $allCategories
+     * @param SitePage  $page
+     * @param int       $selectedAssess
+     * @param int       $selectedCategory
+     * @param array     $allCategories
      */
     public function __construct($page, $selectedAssess, $selectedCategory, $allCategories)
     {
@@ -84,10 +94,10 @@ abstract class Evaluation_Question_Category_List
      */
     private function setup()
     {
-        $this->getPage()->setBlock(TEMPLATE_content, 'category_list_start', 'category_list_start_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'category_list_item_start', 'category_list_item_start_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'category_list_item', 'category_list_item_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'category_list_item_end', 'category_list_item_end_block');
+        $this->getPage()->setBlock(TEMPLATE_body, 'category_list_start', 'category_list_start_block');
+        $this->getPage()->setBlock(TEMPLATE_body, 'category_list_item_start', 'category_list_item_start_block');
+        $this->getPage()->setBlock(TEMPLATE_body, 'category_list_item', 'category_list_item_block');
+        $this->getPage()->setBlock(TEMPLATE_body, 'category_list_item_end', 'category_list_item_end_block');
 
         $this->getPage()->parse('category_list_start_block', 'category_list_start', true);
 
@@ -156,7 +166,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Get page
      *
-     * @return null
+     * @return SitePage
      */
     private function getPage()
     {
@@ -166,7 +176,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Set page
      *
-     * @param $page
+     * @param SitePage $page
      */
     private function setPage($page)
     {
@@ -176,7 +186,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Set all categories
      *
-     * @param $allCategories
+     * @param array $allCategories
      */
     private function setAllCategories($allCategories)
     {
@@ -196,7 +206,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Set selected category
      *
-     * @param $selectedCategory
+     * @param int $selectedCategory
      */
     private function setSelectedCategory($selectedCategory)
     {
@@ -216,7 +226,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Set selected assess
      *
-     * @param $selectedAssess
+     * @param int $selectedAssess
      */
     private function setSelectedAssess($selectedAssess)
     {
@@ -236,7 +246,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Set category handler
      *
-     * @param $categoryHandler
+     * @param Assess_Question_Category $categoryHandler
      */
     private function setCategoryHandler($categoryHandler)
     {
@@ -246,7 +256,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Get category handler
      *
-     * @return Assess_Question_Category|null
+     * @return Assess_Question_Category
      */
     private function getCategoryHandler()
     {
