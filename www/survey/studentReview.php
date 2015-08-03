@@ -71,10 +71,10 @@ $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
 $this->setBlock(TEMPLATE_content, 'question', 'question_block');
 $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
 $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
-$this->setTitle('Surveyment: ' . $survey['title']);
+$this->setTitle('Survey: ' . $survey['title']);
 
 /* Show current Section's data, and other mandatory tokens needed to complete
- * the Surveyment.
+ * the survey.
  */
 $this->setVar(array(
     'SURVEY_ASSESS_ID' => $survey['assess_id'],
