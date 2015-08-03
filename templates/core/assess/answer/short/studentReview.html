@@ -1,16 +1,19 @@
-<li>
+<li class="row content">
     <h4>Your answer</h4>
     {ANSWER}
 </li>
 
-<li>
+<li class="row content highlight">
     <h4>The correct answer</h4>
     <!-- BEGIN answerOption -->
     {CORRECT_ANSWER}
     <!-- END answerOption -->
 </li>
 
-<li>
-    <p class="grade">{REVIEWED_MARKS} / {QUESTION_MARKS}</p>
+<li class="row content">
+    <p class="grade">
+        <span>{REVIEWED_MARKS} / {QUESTION_MARKS}</span>
+    </p>
+
     {REVIEWED_COMMENT}
 </li>
