@@ -60,7 +60,7 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
 	 * @param  $questionHandler
      * @param  $questionCategoryID
      * @param  $questionID
-     * @return void
+     * @return bool
      */
     public function addQuestion($questionHandler, $questionCategoryID,  $questionID) {
 
@@ -69,7 +69,7 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
         $question = $questionHandler->getByID($questionID);
         $answer   = $this->getAnswerHandler()->getByQuestionID($questionID);
 
-        $this->create(array(
+         return !!$this->create(array(
             'question_category_id' => $questionCategoryID,
             'type_id' => $question['type_id'],
             'question' => $question['question'],

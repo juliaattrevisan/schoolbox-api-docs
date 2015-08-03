@@ -23,13 +23,17 @@ if (!empty($_POST)) {
 
     $questionBankHandler = new Assess_Question_Bank();
 
-    $questionBankHandler->addQuestion(
+    $success = $questionBankHandler->addQuestion(
         new Assess_Question(),
         $_POST['question_category'],
         $_POST['question_id']
     );
 
-    SitePage::localRedir('/assess/questionbank/added/' . $_POST['question_id']);
+    if ($success) {
+        SitePage::localRedir('/assess/questionbank/added/' . $_POST['question_id']);
+    } else {
+        error(8);
+    }
 
 } elseif (isset($this) && count($this->arg) > 0) {
 
@@ -45,6 +49,7 @@ if (!empty($_POST)) {
 
     $this->setFile(TEMPLATE_body, 'assess/questionbank/add.html');
     $this->setVar('ASSESS_KIND_LC', 'assess');
+    $this->setVar('ASSESS_KIND_PLURAL', 'quizzes');
     $questionCategoryList = new Assess_Question_Category_List($this, $assessId, 0, $questionBankCategoryHandler->getPath());
     $questionCategoryList->render();
     $this->template->pparse('finaloutput', TEMPLATE_body);

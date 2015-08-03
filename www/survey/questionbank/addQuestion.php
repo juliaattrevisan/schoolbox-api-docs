@@ -24,13 +24,17 @@ if (!empty($_POST)) {
         error(166);
     }
 
-    $questionBankHandler->addQuestion(
+    $success = $questionBankHandler->addQuestion(
 		new Survey_Question(),
         $_POST['question_category'],
         $_POST['question_id']
     );
 
-    SitePage::localRedir('/survey/questionbank/added/' . $_POST['question_id']);
+    if ($success) {
+        SitePage::localRedir('/survey/questionbank/added/' . $_POST['question_id']);
+    } else {
+        error(8);
+    }
 
 } elseif (isset($this) && count($this->arg) > 0) {
 
@@ -46,6 +50,7 @@ if (!empty($_POST)) {
 
     $this->setFile(TEMPLATE_body, 'assess/questionbank/add.html');
     $this->setVar('ASSESS_KIND_LC', 'survey');
+    $this->setVar('ASSESS_KIND_PLURAL', 'surveys');
     $questionCategoryList = new Survey_Question_Category_List($this, $assessId, 0, $questionBankCategoryHandler->getPath());
     $questionCategoryList->render();
     $this->template->pparse('finaloutput', TEMPLATE_body);
