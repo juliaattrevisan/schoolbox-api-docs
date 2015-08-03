@@ -1,18 +1,18 @@
 <!-- BEGIN section -->
 <span class="header-actions">
-    <a href='#' class='icon-more no-text' data-dropdown='section{SECTION_SECTION_ID}-options'></a>
+    <a href="#" class="icon-more no-text" data-dropdown="section{SECTION_SECTION_ID}-options"></a>
 </span>
-<ul class='f-dropdown fadeInDown' data-dropdown-content='' id='section{SECTION_SECTION_ID}-options'>
-    <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/section/delete/{SECTION_SECTION_ID}" data-delete>Delete</a></li>
+<ul class="f-dropdown fadeInDown" data-dropdown-content="" id="section{SECTION_SECTION_ID}-options">
     <li><a class="icon-modify" href="/{ASSESS_KIND_LC}/section/modify/{SECTION_SECTION_ID}">Modify</a></li>
     <li><a class="icon-add" href="/{ASSESS_KIND_LC}/question/create/{SECTION_SECTION_ID}">New Question</a></li>
     <li><a class="icon-download" href="/{ASSESS_KIND_LC}/questionbank/contents/0/{ASSESS_ASSESS_ID}/{SECTION_SECTION_ID}">Add from Question Bank</a></li>
+    <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/section/delete/{SECTION_SECTION_ID}" data-delete>Delete</a></li>
 </ul>
 <h2 class="subheader">{SECTION_TITLE}</h2>
 <section>
-    <ul class='action-list sortable' id='section{SECTION_SECTION_ID}' data-question-list>
+    <ul class="action-list sortable" id="section{SECTION_SECTION_ID}" data-question-list>
         <!-- BEGIN question -->
-        <li class='row' id='question_{QUESTION_QUESTION_ID}'>
+        <li class="row" id="question_{QUESTION_QUESTION_ID}">
             <div class="grip"></div>
             <div class="ten-column">
                 <h4>
@@ -25,10 +25,11 @@
                 <article>{QUESTION_QUESTION}</article>
             </div>
             <div class="one actions">
-                <a href='#' class='icon-more no-text' data-dropdown='question{QUESTION_QUESTION_ID}-options'></a>
-                <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='question{QUESTION_QUESTION_ID}-options'>
+                <a href="#" class="icon-more no-text" data-dropdown="question{QUESTION_QUESTION_ID}-options"></a>
+                <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="question{QUESTION_QUESTION_ID}-options">
+                    <li><a class="icon-modify" href="/{ASSESS_KIND_LC}/question/modify/{QUESTION_QUESTION_ID}">Modify</a></li>
+                    <li><a class="icon-download" href="/assess/questionbank/addQuestion/{QUESTION_QUESTION_ID}" data-reveal-id="question-bank" data-reveal-ajax="true">Import into Question Bank</a></li>
                     <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/question/delete/{QUESTION_QUESTION_ID}" data-delete>Delete</a></li>
-                    <li><a class='icon-modify' href="/{ASSESS_KIND_LC}/question/modify/{QUESTION_QUESTION_ID}">Modify</a></li>
                 </ul>
             </div>
         </li>
@@ -36,7 +37,8 @@
     </ul>
 </section>
 <!-- END section -->
-
+<div id="question-bank" class="reveal-modal" data-reveal aria-hidden="true" role="dialog"></div>
+<div id="bank-success" class="reveal-modal" data-reveal aria-hidden="true" role="dialog"></div>
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
     $(function () {
