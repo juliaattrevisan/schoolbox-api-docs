@@ -4,31 +4,48 @@
 <script type='text/javascript' src='/javascript/components/flot/jquery.flot.stack.js'></script>
 <!-- END custom_head -->
 
-<h1>{SURVEY_NAME}</h1>
+<ul class="breadcrumb">
+    <!-- BEGIN breadcrumb -->
+    <li class="{BREADCRUMB_ACTIVE}"><a href="/homepage/{BREADCRUMB_FOLDER_ID}">{BREADCRUMB_FOLDER_NAME}</a></li>
+    <!-- END breadcrumb -->
+</ul>
 
-<div class="header_option clearfix">
-	<a href="/homepage/{CID}" class="btn go-back"><span></span>Return to Homepage</a>
-    <a href="/survey/attempts/{ASSESS_ID}" class="btn"><span></span>View All Attempts</a>
-	<a href="/survey/export/csv/{ASSESS_ID}" class="btn download"><span></span>Export Survey CSV</a>
+<div class="row">
+    <div class="small-12 columns">
+        <span class='header-actions'>
+            <a href='#' class='button icon-more no-text' data-dropdown='header-options'></a>
+        </span>
+        <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
+            <li><a href="/survey/attempts/{ASSESS_ID}" class="icon-view">View All Attempts</a></li>
+            <li><a href="/survey/export/csv/{ASSESS_ID}" class="icon-download">Export Survey CSV</a></li>
+        </ul>
+
+        <h1>{SURVEY_NAME}</h1>
+    </div>
 </div>
 
-
 <!-- BEGIN section -->
-<div class="evaluation-question-section">
-	<h2 class="clearfix">{SECTION_NAME}</h2>
-	<!-- BEGIN question -->
-	<div class="pad-it clearfix evaluation-question-result">
-		<h3>Q{QUESTION_INDEX})</h3>
-		<div class='wysiwyg'>
-			{QUESTION_QUESTION}
-		</div>
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div class="content">
+                <h3>{SECTION_NAME}</h3>
 
-		<!-- BEGIN graph -->
-		<!-- END graph -->
+                <!-- BEGIN question -->
+                <div>
+                    <h4>Q{QUESTION_INDEX})</h4>
 
-		<a href='/survey/export/csv/{ASSESS_ID}/{QUESTION_QUESTION_ID}/{QUESTION_INDEX}' class="btn download float-left"><span></span>Export CSV</a>
-		<a href='/survey/resultsForQuestion/{ASSESS_ID}/{QUESTION_QUESTION_ID}/{QUESTION_INDEX}' class="btn float-left"><span></span>View All Responses</a>
-	</div>
-	<!-- END question -->
+                    <article>{QUESTION_QUESTION}</article>
+
+                    <!-- BEGIN graph -->
+                    <!-- END graph -->
+
+                    <a href='/survey/export/csv/{ASSESS_ID}/{QUESTION_QUESTION_ID}/{QUESTION_INDEX}' class="button icon-export">Export CSV</a>
+                    <a href='/survey/resultsForQuestion/{ASSESS_ID}/{QUESTION_QUESTION_ID}/{QUESTION_INDEX}' class="button icon-view">View All Responses</a>
+                </div>
+                <!-- END question -->
+            </div>
+        </section>
+    </div>
 </div>
 <!-- END section -->
