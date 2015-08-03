@@ -67,6 +67,9 @@ if (is_numeric($this->arg[2])) {
 /* Set up template
  */
 $this->setFile(TEMPLATE_content, 'survey/studentReview.html');
+$this->setBlock(TEMPLATE_content, 'attemptFinished', 'attemptFinished_block');
+$this->setBlock(TEMPLATE_content, 'attemptNotYetFinished', 'attemptNotYetFinished_block');
+$this->setBlock(TEMPLATE_content, 'attemptUnfinished', 'attemptUnfinished_block');
 $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
 $this->setBlock(TEMPLATE_content, 'question', 'question_block');
 $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
@@ -89,8 +92,8 @@ try {
     error(19);
     exit;
 }
-$openDate      = new Alaress_Date_Format($assess['start'], Alaress_Date_Format::DATABASE_FORMAT);
-$dueDate       = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+$openDate      = new Alaress_Date_Format($survey['start'], Alaress_Date_Format::DATABASE_FORMAT);
+$dueDate       = new Alaress_Date_Format($survey['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptDate   = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptFinish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $this->setVar(array(
@@ -106,7 +109,21 @@ $this->setVar(array(
     'SECTION_DESCRIPTION' => Scrub::html($section['description']),
     'ASSESS_CATEGORY_NAME'          => Scrub::text($folder->getName()),
     'ASSESS_CATEGORY_ID'            => $folder->getId(),
+    'attemptFinished_block'         => '',
+    'attemptNotYetFinished_block'   => '',
+    'attemptUnfinished_block'       => '',
 ));
+
+// Parse finished/unfinished/not finished yet blockage
+if (!isset($attempt['finish'])) {
+    if ($dueDate->getUnixTimeStamp() < $_SERVER['REQUEST_TIME']) {
+        $this->parse('attemptUnfinished_block', 'attemptUnfinished');
+    } else {
+        $this->parse('attemptNotYetFinished_block', 'attemptNotYetFinished');
+    }
+} else {
+    $this->parse('attemptFinished_block', 'attemptFinished');
+}
 
 /* Load all the questions for this section.
  * Note: only show the randomly-selected ones
