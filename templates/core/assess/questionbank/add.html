@@ -1,6 +1,6 @@
 <h2>Import into Question Bank</h2>
 
-<form action="/assess/questionbank/addQuestion" method="post">
+<form action="/{ASSESS_KIND_LC}/questionbank/addQuestion" method="post">
     <input name="question_id" type="hidden" value="{CATEGORY_LIST_ITEM_ASSESS_ID}" />
     <input name="question_category" type="hidden" value="" />
 
@@ -73,7 +73,7 @@
             form.find('input[type=submit]').val('Adding to ' + catName).prop('disabled', true);
 
             $.post(form.action, $(form).serialize(), function () {
-                var href = window.location.origin + '/assess/questionbank/added/' + qid.val();
+                var href = window.location.origin + '/{ASSESS_KIND_LC}/questionbank/added/' + qid.val();
 
                 $('#bank-success').foundation('reveal').foundation('reveal', 'open', href);
             });

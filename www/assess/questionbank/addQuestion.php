@@ -44,6 +44,7 @@ if (!empty($_POST)) {
     $questionBankCategoryHandler = new Assess_Question_Category();
 
     $this->setFile(TEMPLATE_body, 'assess/questionbank/add.html');
+    $this->setVar('ASSESS_KIND_LC', 'assess');
     $questionCategoryList = new Assess_Question_Category_List($this, $assessId, 0, $questionBankCategoryHandler->getPath());
     $questionCategoryList->render();
     $this->template->pparse('finaloutput', TEMPLATE_body);
