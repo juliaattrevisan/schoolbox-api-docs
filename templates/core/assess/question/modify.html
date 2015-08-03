@@ -53,61 +53,6 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Import into Question Bank</h2>
-        <p>Move into the Summary screen pls</p>
-        <section>
-            <div class="content">
-                <form action='/assess/questionbank/addQuestion' class='' method='post'>
-                    <input name='type_id' type='hidden' value='{QUESTIONTYPE_TYPE_ID}' />
-                    <input name='question_id' type='hidden' value='{QUESTION_ID}' />
-                    <input name='answer_id' type='hidden' value='{ANSWER_ID}' />
-                    <input name='marks' type='hidden' value='{MARKS}' />
-                    <input name='question_category' type='hidden' id="question_category"/>
-                    <p>
-                        Puts this question into the Question Bank so you can import
-                        them into other quizzes.
-                    </p>
-
-                    <label>
-                        Question Category
-                        <div id='categoryTree'>
-                            <!-- BEGIN category_list_start -->
-                            <ul>
-                                <!-- END category_list_start -->
-
-                                <!-- BEGIN category_list_item_start -->
-                                <ul>
-                                    <!-- END category_list_item_start -->
-
-                                    <!-- BEGIN category_list_item -->
-                                    <li id='{CATEGORY_LIST_ITEM_NODE}' class='{CATEGORY_LIST_ITEM_SELECTED}'>
-                                        <a href='#'>
-                                            {CATEGORY_LIST_ITEM_NAME} ({CATEGORY_LIST_ITEM_NUMQUESTIONS})
-                                        </a>
-                                        <!-- END category_list_item -->
-
-                                        <!-- BEGIN category_list_item_end -->
-                                </ul>
-                                </li>
-                                <!-- END category_list_item_end -->
-                            </ul>
-                        </div>
-
-                    </label>
-
-                    <label>
-                        <input type='submit' value='Add To Question Bank' />
-                    </label>
-                </form>
-            </div>
-        </section>
-    </div>
-</div>
-
-<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
-<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript">
@@ -121,38 +66,18 @@
         /* Enforce two decimal places
          */
         $('input[name=marks]').change(function() {
+            var val;
 
             /* Empty string is classified as a number
              */
             if (isNaN($(this).val()) || $(this).val() == '') {
-                var val = 0;
+                val = 0;
             }
             else {
-                var val = $(this).val();
+                val = $(this).val();
             }
 
             $(this).val(parseFloat(val).toFixed(2));
         });
-        /* Category tree
-         */
-        $("#categoryTree")
-            .on('select_node.jstree', function(event, jstree) {
-                $('#question_category').val(jstree.selected[0].replace(/^node_/, ''));
-            })
-            .on('deselect_node.jstree', function() {
-                $('#question_category').val('');
-            })
-            .jstree({
-                "animation":50,
-                "core":{
-                    force_text: true,
-                    multiple:false,
-                    "themes": {
-                        "variant" : "schoolbox",
-                        "dots" : true,
-                        "icons" : false
-                    }
-                }
-            });
     });
 </script>
