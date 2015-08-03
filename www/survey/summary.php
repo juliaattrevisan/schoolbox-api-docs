@@ -55,7 +55,7 @@ $this->setVar(array(
     'ASSESS_CATEGORY_NAME' => $folder->getName(),
 ));
 
-$this->setFile(TEMPLATE_content, 'survey/summary.html');
+$this->setFile(TEMPLATE_content, 'assess/summary.html');
 $this->setFile('assessContentsFragment', 'assess/contents.html');
 $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
