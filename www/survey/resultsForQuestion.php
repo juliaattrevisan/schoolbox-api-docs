@@ -8,6 +8,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+use Schoolbox\Breadcrumbs;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $assessHandler   = new Survey_Main();
 $factory         = new Survey_Factory();
@@ -29,9 +31,17 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 }
 
 if (!$assessHandler->isOwner($assess['assess_id'])
-    && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)
+    && ($groupHandler->getPermission() < WRITE_ACCESS)
 ) {
     error(125);
+}
+
+try {
+    $folderMapper = new FolderMapper();
+    $folder = $folderMapper->findById($assess['category_id']);
+}
+catch (\Exception $e) {
+    error(13);
 }
 
 $surveyExporter = new Survey_Export_Graph(
@@ -134,6 +144,25 @@ $this->setVar(
     )
 );
 
+$trail = new Breadcrumbs();
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text'  => $folder->getName(),
+        'href'  => '/homepage/' . $folder->getId(),
+        'class' => ''
+    ],
+    [
+        'text'  => Scrub::text($assess['title']),
+        'href'  => '/survey/summary/' . $assess['assess_id'],
+        'class' => ''
+    ],
+    [
+        'text'  => 'Results',
+        'href'  => '#',
+        'class' => 'active'
+    ],
+]);
+
 
 /**
  * Custom comparison function as used on php.net
@@ -150,3 +179,4 @@ function cmp($a, $b)
     }
     return ($a < $b) ? -1 : 1;
 }
+

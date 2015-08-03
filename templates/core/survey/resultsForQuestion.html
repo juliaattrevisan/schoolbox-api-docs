@@ -13,67 +13,78 @@ $(function() {
 	if ($('.evaluation-legend').length > 0) {
 		$('.information-notification.hide').removeClass('hide');
 	}
+
+    $('[data-response-item]').click(function(event) {
+        event.preventDefault();
+
+        var data = $(this).attr('data-response-item');
+        var css = 'callout panel';
+
+        $('[data-response]').removeClass(css);
+        $('[data-response="'+data+'"]').addClass(css);
+    });
 });
 </script>
-<style type="text/css">
-    .graph-block {
-        float: left;
-        margin-top: 30px;
-    }
 
-    .evaluation-question-result .evaluation-results {
-        width: 46%;
-    }
-
-    .graph-block .legend {
-        float: left;
-        clear: both;
-        margin-left: 10%;
-    }
-
-    .evaluation-results th {
-        text-align: left;
-    }
-</style>
 <!-- END custom_head -->
 
-<h1>{SURVEY_NAME}</h1>
-<span class="header_option clearfix"><a class="btn go-back" href="/survey/results/{SURVEY_ID}"><span></span>Return to Survey</a></span>
+{BREADCRUMB}
 
-<h2>Responses</h2>
-<div class="evaluation-question-result pad-it clearfix">
-
-	<div class="evaluation-results">
-		<div class='wysiwyg'>
-			{QUESTION_QUESTION}
-		</div>
-
-		<h3>Results</h3>
-		<p class="information-notification clearfix hide">Click on a response letter to see the other students who selected that answer.</p>
-		<table class="table ruler">
-			<thead>
-				<tr>
-					<!-- BEGIN respondent_heading -->
-					<th>Respondent</th>
-					<!-- END respondent_heading -->
-					<th>Response</th>
-				</tr>
-			</thead>
-			<tbody>
-				<!-- BEGIN respondent -->
-				<tr>
-					<!-- BEGIN respondent_name -->
-					<td>{RESPONDENT_NAME}</td>
-					<!-- END respondent_name -->
-					<td class="evaluation-response"><ul><li><a class="response-item">{RESPONDENT_RESPONSE}</a></li></ul></td>
-				</tr>
-				<!-- END respondent -->
-			</tbody>
-		</table>
-	</div>
-    <div class="graph-block">
-    <!-- BEGIN graph -->
-    <!-- END graph -->
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{SURVEY_NAME}</h1>
     </div>
-
 </div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Responses</h2>
+        <section>
+            <div class="content">
+                <div class="row">
+                    <div class="small-12 large-6 columns">
+                        <article>{QUESTION_QUESTION}</article>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <!-- BEGIN respondent_heading -->
+                                    <th>Respondent</th>
+                                    <!-- END respondent_heading -->
+                                    <th>
+                                        Response
+                                        <span class="hint has-tip tip-top" data-tooltip title="Click on a response letter to see the other respondents who selected that answer.">?</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <!-- BEGIN respondent -->
+                            <tr>
+                                <!-- BEGIN respondent_name -->
+                                <td>
+                                    <span data-response="{RESPONDENT_RESPONSE}">{RESPONDENT_NAME}</span>
+                                </td>
+                                <!-- END respondent_name -->
+                                <td>
+                                    <ul class="inline-list">
+                                        <li>
+                                            <a href="#" data-response-item="{RESPONDENT_RESPONSE}">{RESPONDENT_RESPONSE}</a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <!-- END respondent -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="small-12 large-6 columns">
+                        <!-- BEGIN graph -->
+                        <!-- END graph -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+
