@@ -98,17 +98,32 @@ $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
 $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
+try {
+    $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
+} catch (Schoolbox\Mapper\Exception $e) {
+    error(112);
+    exit;
+}
+
+try {
+    $userMapper = \Schoolbox\UserMapper::getInstance();
+    $user = $userMapper->findById($attempt['user_id']);
+} catch (Schoolbox\Mapper\Exception $e) {
+    error(19);
+    exit;
+}
+
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the Assessment.
  */
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => Scrub::text($assess['title']),
-    'ASSESS_CATEGORY_ID' => $assess['category_id'],
     'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
     'SECTION_TITLE' => Scrub::text($section['title']),
     'SECTION_DESCRIPTION' => Scrub::html($section['description']),
-
+    'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
+    'ASSESS_CATEGORY_ID'   => $folder->getId(),
 ));
 
 /* Load all the questions for this section.
@@ -201,3 +216,32 @@ else {
         $this->setVar('prevSection_block', '');
     }
 }
+
+// Breadcrumbs
+$trail = new \Schoolbox\Breadcrumbs();
+$trail->renderIntoSitePage(
+    $this,
+    'BREADCRUMB',
+    [
+        [
+            'text'  => $folder->getName(),
+            'href'  => '/homepage/' . $folder->getId(),
+            'class' => ''
+        ],
+        [
+            'text'  => $assess['title'],
+            'href'  => '/assess/summary.' . $assess['assess_id'],
+            'class' => ''
+        ],
+        [
+            'text'  => $user->formatName(),
+            'href'  => '/assess/attempts/' . $assess['assess_id'] . '/' . $user->getId(),
+            'class' => ''
+        ],
+        [
+            'text'  => 'Review',
+            'href'  => '#',
+            'class' => 'active'
+        ],
+    ]
+);
