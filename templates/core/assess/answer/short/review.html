@@ -10,20 +10,20 @@
 </li>
 <!-- END answerOption -->
 
-<!-- BEGIN writable_comment -->
 <li class="row content">
-    <h4>Enter your comments</h4>
-    <textarea name="comment">{REVIEWED_COMMENT}</textarea>
-</li>
-<!-- END writable_comment -->
+    <!-- BEGIN writable_comment -->
+    <div class="small-12 columns no-pad">
+        <h4>Enter your comments</h4>
+        <textarea name="comment">{REVIEWED_COMMENT}</textarea>
+    </div>
+    <!-- END writable_comment -->
 
-<!-- BEGIN readonly_comment -->
-<li class="row content">
-    <em>{REVIEWED_COMMENT}</em>
-</li>
-<!-- END readonly_comment -->
+    <!-- BEGIN readonly_comment -->
+    <div class="small-12 columns no-pad">
+        <em>{REVIEWED_COMMENT}</em>
+    </div>
+    <!-- END readonly_comment -->
 
-<li class="row content">
     <!-- BEGIN writable_mark -->
     <div class="small-6 columns no-pad">
         <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" class="required number"/>
