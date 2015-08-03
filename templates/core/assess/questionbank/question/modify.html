@@ -7,9 +7,9 @@
 </div>
 
 <div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Modify Question</h2>
-        <form id="createQuestionForm" action="/assess/questionbank/question/modify" method="post">
+    <form id="createQuestionForm" action="/assess/questionbank/question/modify" method="post">
+        <div class="small-12 island">
+            <h2 class="subheader">Modify Question</h2>
             <input name="question_bank_id" type="hidden" value="{QUESTION_BANK_ID}" />
             <input type="hidden" name="type_id" value="{QUESTIONTYPE_TYPE_ID}" />
 
@@ -44,9 +44,11 @@
                 </div>
             </section>
 
-            <input type="submit" name="create" value="Modify" />
-        </form>
-    </div>
+        </div>
+        <div class="small-12 column">
+            <input class="expand" type="submit" name="create" value="Modify" />
+        </div>
+    </form>
 </div>
 
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
