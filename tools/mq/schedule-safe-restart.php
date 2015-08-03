@@ -10,6 +10,7 @@
  */
 
 use Psr\Log\LoggerInterface;
+use React\Stomp\Protocol\Frame;
 use Schoolbox\Realtime\Schedule\Event;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -159,53 +160,23 @@ $stomp->connect()->then(function($stomp) use ($d, $loop, $perform) {
 			Database::reinitialise();
 			DeprecatedDatabase::reinitialise();
 
-			try {
-				$formatted = \Schoolbox\Notif\Formatter\CompressedFormatter::uncompress($frame->body);
-				$event = unserialize($formatted['message']);
+			// if the interrogation says to dismiss the message, we do
+			if(interrogate($frame, $d)) {
+				$d->error("Message broken");
 
-                if (!$event instanceof Event) {
-                    throw new RuntimeException("Could not unserialize message data");
-                }
-
-				// if the interrogation says to dismiss the message, we do
-				if(interrogate($event, $d)) {
-					$d->error("Message broken");
-
-					if($perform) {
-						// split this message off onto a special queue
-						$amqpConn = new \Schoolbox\Notif\MQ\Connector();
-						$amqpConn->publish($frame->body, 'deadmessage');
-						$amqpConn->closeConnection();
-						unset($amqpConn);
-						$resolver->ack();
-					}
+				if($perform) {
+					// split this message off onto a special queue
+					$amqpConn = new \Schoolbox\Notif\MQ\Connector();
+					$amqpConn->publish($frame->body, 'deadmessage');
+					$amqpConn->closeConnection();
+					unset($amqpConn);
+					$resolver->ack();
 				}
-				else {
-					$d->notice("Message retained", array('char' => '+'));
-				}
-
-				// hold onto our NACK's
-				return;
 			}
-			catch(RuntimeException $e) {
-				// this message is can't be parsed, so we ACK it to make it go away
-				$d->error("RuntimeException: ".$e->getMessage());
-				$d->notice("Message unparseable", array('char' => '-'));
-			}
-			catch(\Schoolbox\Realtime\Schedule\ScheduleException $e) {
-				// we're happy to ignore this, it just means no scheduling strategy exists for this Model
-				$d->warning('Schedule Exception: ' . $e->getMessage());
-				$d->notice("Message ignorable", array('char' => '-'));
-			}
-			catch(\Schoolbox\Notif\Formatter\CompressionException $e) {
-				// this message is unparseable, so we'll eventually ACK it to make it go away
-				$d->error('Compression Exception: ' . $e->getMessage());
-				$d->notice("Message unparseable", array('char' => '-'));
+			else {
+				$d->notice("Message retained", array('char' => '+'));
 			}
 
-			if($perform) {
-				$resolver->ack();
-			}
 		});
 });
 
@@ -215,39 +186,12 @@ $loop->run();
 
 
 /**
- * @param Event $event
  * @param LoggerInterface $log
- * @throws \Schoolbox\Realtime\Schedule\ScheduleException
+ * @param Frame           $frame
  * @return bool whether or not to acknowledge the message
  */
-function interrogate(Event $event, LoggerInterface $log) {
-	// setup for ifs
-	$modelClass = get_class($event->getObject());
-	$pregClass = preg_replace('/([_\\\\])[^_\\\\]+$/', '$1Notifier', $modelClass);
-
-	// first try: does the event have a mapper, and if so, does it have a modulenotifier declared?
-	if($event->getMapper() instanceof \Schoolbox\Mapper && $event->getMapper()->getModuleNotifier()) {
-		$classname = $event->getMapper()->getModuleNotifier();
-	}
-	// next, try for '\Schoolbox\User' => '\Schoolbox\UserNotifier'
-	elseif(class_exists($modelClass.'Notifier')) {
-		$classname = $modelClass.'Notifier';
-	}
-	// then, try for '\Schoolbox\User' => '\Schoolbox\Notifier'
-	elseif(class_exists($pregClass)) {
-		$classname = $pregClass;
-	}
-	else {
-		throw new \Schoolbox\Realtime\Schedule\ScheduleException("No notifier for model '$modelClass'.");
-	}
-
-	$instance = new $classname(new \Schoolbox\ConfigLoader());
-	if(!$instance instanceof \Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface) {
-		throw new \Schoolbox\Realtime\Schedule\ScheduleException("Notifer class '$classname' must be instance of ModuleNotifierInterface.");
-	}
-
-	$log->debug(sprintf("Got a module instance of %s, continuing...", get_class($instance)));
-
+function interrogate(Frame $frame, LoggerInterface $log)
+{
 	// BEWARE! CUTLERY!
 	$pid = pcntl_fork();
 
@@ -270,9 +214,9 @@ function interrogate(Event $event, LoggerInterface $log) {
 	}
 
 	// YOU ARE IN CHILD CONTEXT HERE. DO NOT ATTEMPT TO RETURN. YOU MUST EXIT INSTEAD.
-    restore_error_handler();
+	restore_error_handler();
 	register_shutdown_function(function($d) {
-        /** @var \Psr\Log\LoggerInterface $d */
+		/** @var \Psr\Log\LoggerInterface $d */
 		$last = error_get_last();
 
 		if(in_array($last['type'], array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR))) {
@@ -280,6 +224,43 @@ function interrogate(Event $event, LoggerInterface $log) {
 			exit(1);
 		}
 	}, $log);
+
+	$formatted = \Schoolbox\Notif\Formatter\CompressedFormatter::uncompress($frame->body);
+	$event = unserialize($formatted['message']);
+
+	if (!$event instanceof Event) {
+		$log->critical("Could not unserialize message data");
+		exit(2);
+	}
+
+	// setup for ifs
+	$modelClass = get_class($event->getObject());
+	$pregClass = preg_replace('/([_\\\\])[^_\\\\]+$/', '$1Notifier', $modelClass);
+
+	// first try: does the event have a mapper, and if so, does it have a modulenotifier declared?
+	if($event->getMapper() instanceof \Schoolbox\Mapper && $event->getMapper()->getModuleNotifier()) {
+		$classname = $event->getMapper()->getModuleNotifier();
+	}
+	// next, try for '\Schoolbox\User' => '\Schoolbox\UserNotifier'
+	elseif(class_exists($modelClass.'Notifier')) {
+		$classname = $modelClass.'Notifier';
+	}
+	// then, try for '\Schoolbox\User' => '\Schoolbox\Notifier'
+	elseif(class_exists($pregClass)) {
+		$classname = $pregClass;
+	}
+	else {
+		$log->notice("No notifier for model '$modelClass'.");
+		exit(2);
+	}
+
+	$instance = new $classname(new \Schoolbox\ConfigLoader());
+	if(!$instance instanceof \Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface) {
+		$log->error("Notifer class '$classname' must be instance of ModuleNotifierInterface.");
+		exit(2);
+	}
+
+	$log->debug(sprintf("Got a module instance of %s, continuing...", get_class($instance)));
 
 	$exit = 0;
 
