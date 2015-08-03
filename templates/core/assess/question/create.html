@@ -77,7 +77,7 @@
         /* Change state
          */
         $('#type_id').change(function() {
-            window.location = '/assess/question/create/' + section_id + '/' + $('#type_id').val();
+            window.location = '/{ASSESS_KIND_LC}/question/create/' + section_id + '/' + $('#type_id').val();
         });
 
         /* Enforce two decimal places
