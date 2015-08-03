@@ -265,7 +265,7 @@ $trail->renderIntoSitePage(
         ],
         [
             'text'  => $assess['title'],
-            'href'  => '/assess/summary.' . $assess['assess_id'],
+            'href'  => '/assess/summary/' . $assess['assess_id'],
             'class' => ''
         ],
         [
