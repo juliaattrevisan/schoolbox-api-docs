@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Breadcrumbs;
+
 $factory = new Assess_Factory();
 $assessHandler = new Assess_Main();
 $groupHandler = new Group();
@@ -135,5 +137,19 @@ else {
 		'MARKS' => $question['marks'],
 		'QUESTION_BANK_REDIRECT_URL' => '/assess/questionbank/contents'
     ));
+
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text'  => 'Quiz Questionbank',
+            'href'  => '#',
+            'class' => ''
+        ],
+        [
+            'text'  => 'Modify Question',
+            'href'  => '#',
+            'class' => 'active'
+        ]
+    ]);
 }
 
