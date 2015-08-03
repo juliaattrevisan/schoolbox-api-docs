@@ -76,6 +76,19 @@ $this->setTitle('Survey: ' . $survey['title']);
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the survey.
  */
+try {
+    $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($survey['category_id']);
+} catch (Schoolbox\Mapper\Exception $e) {
+    error(114);
+    exit;
+}
+try {
+    $userMapper = \Schoolbox\UserMapper::getInstance();
+    $user       = $userMapper->findById($attempt['user_id']);
+} catch (Schoolbox\Mapper\Exception $e) {
+    error(19);
+    exit;
+}
 $openDate      = new Alaress_Date_Format($assess['start'], Alaress_Date_Format::DATABASE_FORMAT);
 $dueDate       = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptDate   = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
@@ -83,7 +96,6 @@ $attemptFinish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $survey['assess_id'],
     'ASSESS_TITLE' => Scrub::text($survey['title']),
-    'ASSESS_CATEGORY_ID' => $survey['category_id'],
     'ASSESS_START'                  => $openDate->getShort(),
     'ASSESS_FINISH'                 => $dueDate->getShort(),
     'ATTEMPT_ATTEMPT_ID'            => $_SESSION['attempt_id'],
@@ -92,6 +104,8 @@ $this->setVar(array(
     'ATTEMPT_TIME_TAKEN'            => $surveyHandler->sec2hms($attemptFinish->diffInSeconds($attemptDate, true)),
     'SECTION_TITLE' => Scrub::text($section['title']),
     'SECTION_DESCRIPTION' => Scrub::html($section['description']),
+    'ASSESS_CATEGORY_NAME'          => Scrub::text($folder->getName()),
+    'ASSESS_CATEGORY_ID'            => $folder->getId(),
 ));
 
 /* Load all the questions for this section.
@@ -187,3 +201,32 @@ else {
         $this->setVar('prevSection_block', '');
     }
 }
+
+// Breadcrumbs
+$trail = new \Schoolbox\Breadcrumbs();
+$trail->renderIntoSitePage(
+    $this,
+    'BREADCRUMB',
+    [
+        [
+            'text'  => $folder->getName(),
+            'href'  => '/homepage/' . $folder->getId(),
+            'class' => ''
+        ],
+        [
+            'text'  => $survey['title'],
+            'href'  => '/survey/summary/' . $survey['assess_id'],
+            'class' => ''
+        ],
+        [
+            'text'  => $user->formatName(),
+            'href'  => '/survey/attempts/' . $survey['assess_id'] . '/' . $user->getId(),
+            'class' => 'active'
+        ],
+//        [
+//            'text'  => 'Review',
+//            'href'  => '#',
+//            'class' => 'active'
+//        ],
+    ]
+);
