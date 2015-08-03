@@ -1,0 +1,125 @@
+/* This file is subject to Twig, beware the {{ vars }} */
+/* use classes, don't use id's */
+
+/* will be truncated by mail clients, but we use it for styling */
+body {
+    margin: 0;
+}
+
+table {
+    border-spacing: 0;
+    border-width: 0;
+    border-collapse: collapse;
+}
+td {
+    padding: 0;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+}
+
+a {
+    text-decoration: none;
+}
+a[href] {
+    text-decoration: underline;
+}
+
+img {
+    display: block;
+}
+
+.wrap {
+    width: 100%;
+}
+
+.inner-wrap {
+    background-color: {{ colours.body_background }};
+    width: 100%;
+}
+
+.header, .footer {
+    width: 100%;
+}
+
+.header {
+    background-color: #f9fcfe;
+}
+
+.header img {
+    color: {{ colours.banner_color }}
+}
+
+.content {
+    background-color: {{ colours.content_background }};
+}
+
+.content a {
+    color: {{ colours.link }};
+}
+.content p {
+    line-height: 20px;
+    font-size: 13px;
+    margin: 0;
+}
+
+tr.dark {
+    background-color: {{ colours.dark }};
+}
+
+.content .heading {
+    line-height: 36px;
+    font-weight: bold;
+    font-size: 18px;
+    color: {{ colours.banner_background }};
+    {#background: {{ colours.module_background }};#}
+}
+
+.content a.cta {
+    background-color: {{ colours.submit_btn }};
+    padding: 4px 8px 6px;
+    text-decoration: none;
+    color: {{ colours.white }};
+}
+
+.content em {
+    color: {{ colours.dgrey }}
+}
+
+.footer p {
+    color: {{ colours.footer_links }};
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    line-height: 18px;
+    text-align: right;
+    margin: 0; {# ignored by 50% of mail clients #}
+}
+
+.footer a {
+    color: {{ colours.footer_links }};
+    text-decoration: underline;
+}
+
+tr.underline td, td.underline {
+    border-bottom: solid 1px {{ colours.border_color }};
+}
+
+
+{# module specifics #}
+.work-month, .work-day {
+    text-align: center;
+    border: solid 2px {{ colours.banner_background }};
+}
+.work-month {
+    text-transform: uppercase;
+    font-size: 12px;
+    background-color: {{ colours.banner_background }};
+    color: {{ colours.banner_color }};
+    border-bottom: solid 1px #fff;
+}
+
+.work-day {
+    font-size: 22px;
+    line-height: 35px;
+    color: {{ colours.banner_background }};
+    background-color: {{ colours.content_background }};
+}
