@@ -1,23 +1,18 @@
-<label>
-    Your answer
-</label>
-<div>{ANSWER}</div>
+<label>Your answer</label>
 
+<div class="transparent-panel">
+    {ANSWER}
+</div>
+
+<label>The correct answer</label>
 <div class="highlight-panel">
-    <label>
-        The correct answer
-    </label>
-
     <!-- BEGIN answerOption -->
-    <div>{CORRECT_ANSWER}</div>
+    {CORRECT_ANSWER}
     <!-- END answerOption -->
 </div>
 
-<label>
-    Teacher's comments
-</label>
-<div>{REVIEWED_COMMENT}</div>
-
-<div>
+<div class="panel">
     <p class="grade">{REVIEWED_MARKS} / {QUESTION_MARKS}</p>
+
+    {REVIEWED_COMMENT}
 </div>
