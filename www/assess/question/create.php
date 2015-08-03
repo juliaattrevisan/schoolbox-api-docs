@@ -145,37 +145,17 @@ if (!empty($_POST)) {
         'SUBMIT_DISABLED'       => '',
     ));
 
-    /* If a particular question type has been selected; otherwise ignore it
-     */
-    if (is_numeric($this->arg[1])) {
-        $answerHandler = $factory->createAnswerModel($this->arg[1]);
-
-        $this->setVar(array(
-            'IMPORT_SELECTED' => '',
-            'DISABLED_SELECTED' => '',
-        ));
-
-        $this->parse('type_selected_block', 'type_selected');
-
-    } else if ($this->arg[1] == 'import') {
-        $this->setVar(array(
-            'IMPORT_SELECTED' => 'selected=\'selected\'',
-            'ANSWER_INPUTS' => ''
-        ));
-    } else {
-        $this->setVar(array(
-            'IMPORT_SELECTED' => '',
-            'DISABLED_SELECTED' => 'selected=\'selected\'',
-            'ANSWER_INPUTS' => $answerTemplate,
-            'SUBMIT_DISABLED' => 'disabled="disabled"'
-        ));
-    }
-
     /* Show question type options
      */
     $setTemplate = false;
 
     $questionTypes = $questionHandler->getAllQuestionTypes();
+
+    /* If a particular question type has been selected; otherwise ignore it
+     */
+    if (is_numeric($this->arg[1])) {
+        $answerHandler = $factory->createAnswerModel($this->arg[1]);
+    }
 
     foreach ($questionTypes as $currentQuestionType) {
         if (is_numeric($this->arg[1]) && ($this->arg[1] == $currentQuestionType['type_id'])) {
@@ -226,6 +206,30 @@ if (!empty($_POST)) {
         ));
 
         $this->parse('questionType_block', 'questionType', true);
+    }
+
+    /* If a particular question type has been selected; otherwise ignore it
+     */
+    if (is_numeric($this->arg[1])) {
+        $this->setVar(array(
+            'IMPORT_SELECTED' => '',
+            'DISABLED_SELECTED' => '',
+        ));
+
+        $this->parse('type_selected_block', 'type_selected');
+
+    } else if ($this->arg[1] == 'import') {
+        $this->setVar(array(
+            'IMPORT_SELECTED' => 'selected=\'selected\'',
+            'ANSWER_INPUTS' => ''
+        ));
+    } else {
+        $this->setVar(array(
+            'IMPORT_SELECTED' => '',
+            'DISABLED_SELECTED' => 'selected=\'selected\'',
+            'ANSWER_INPUTS' => $answerTemplate,
+            'SUBMIT_DISABLED' => 'disabled="disabled"'
+        ));
     }
 
     /* If the answer template wasn't set, then we haven't chosen an answer type
