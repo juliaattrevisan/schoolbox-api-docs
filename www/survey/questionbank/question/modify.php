@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Breadcrumbs;
+
 $factory = new Survey_Factory();
 $SurveyHandler = new Survey_Main();
 $groupHandler = new Group();
@@ -67,8 +69,6 @@ if (!empty($_POST)) {
 	 */
 	$questionBank = new Survey_Question_Bank();
 	$questionBank->getQuestionHandler()->update($data);
-new \Alaress_Probe($data);
-die();
 
     /* Find the Survey summary page
      */
@@ -135,5 +135,19 @@ else {
 		'QUESTION' => Scrub::text($question['question']),
 		'QUESTION_BANK_REDIRECT_URL' => '/survey/questionbank/contents'
     ));
+
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text'  => 'Quiz Questionbank',
+            'href'  => '#',
+            'class' => ''
+        ],
+        [
+            'text'  => 'Modify Question',
+            'href'  => '#',
+            'class' => 'active'
+        ]
+    ]);
 }
 
