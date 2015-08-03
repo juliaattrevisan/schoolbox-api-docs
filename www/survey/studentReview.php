@@ -81,9 +81,9 @@ $dueDate       = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format:
 $attemptDate   = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptFinish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $this->setVar(array(
-    'SURVEY_ASSESS_ID' => $survey['assess_id'],
-    'SURVEY_TITLE' => Scrub::text($survey['title']),
-    'SURVEY_CATEGORY_ID' => $survey['category_id'],
+    'ASSESS_ASSESS_ID' => $survey['assess_id'],
+    'ASSESS_TITLE' => Scrub::text($survey['title']),
+    'ASSESS_CATEGORY_ID' => $survey['category_id'],
     'ASSESS_START'                  => $openDate->getShort(),
     'ASSESS_FINISH'                 => $dueDate->getShort(),
     'ATTEMPT_ATTEMPT_ID'            => $_SESSION['attempt_id'],
