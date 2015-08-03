@@ -1,28 +1,36 @@
-<div class='column'>
-	{ANSWER}
+<div>
+    {ANSWER}
 </div>
 
 <!-- BEGIN answerOption -->
+
 <!-- END answerOption -->
 
 <!-- BEGIN writable_comment -->
-<div class='column'>
-	<textarea name="comment" cols="30" rows="2">{REVIEWED_COMMENT}</textarea>
-</div>
+<label>
+    <textarea name="comment">{REVIEWED_COMMENT}</textarea>
+</label>
 <!-- END writable_comment -->
+
 <!-- BEGIN readonly_comment -->
-<div class='column'>
-	<p>{REVIEWED_COMMENT}</p>
-</div>
+<label>
+    <p>{REVIEWED_COMMENT}</p>
+</label>
 <!-- END readonly_comment -->
 
-<div class='column'>
-	<p class="marks-amount">
-		<!-- BEGIN writable_mark -->
-		<input name="reviewedMarks" size="4" type="text" value="{REVIEWED_MARKS}" class="required number"/> / {QUESTION_MARKS}
-		<!-- END writable_mark -->
-		<!-- BEGIN readonly_mark -->
-		{REVIEWED_MARKS} / {QUESTION_MARKS}
-		<!-- END readonly_mark -->
-	</p>
+<div class="row">
+    <!-- BEGIN writable_mark -->
+    <div class="small-6 columns">
+        <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" class="required number"/>
+    </div>
+    <div class="small-6 columns">
+        / {QUESTION_MARKS}
+    </div>
+    <!-- END writable_mark -->
+
+    <!-- BEGIN readonly_mark -->
+    <div class="small-12 columns">
+        <p>{REVIEWED_MARKS} / {QUESTION_MARKS}</p>
+    </div>
+    <!-- END readonly_mark -->
 </div>
