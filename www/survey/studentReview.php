@@ -76,11 +76,20 @@ $this->setTitle('Survey: ' . $survey['title']);
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the survey.
  */
+$openDate      = new Alaress_Date_Format($assess['start'], Alaress_Date_Format::DATABASE_FORMAT);
+$dueDate       = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+$attemptDate   = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
+$attemptFinish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $this->setVar(array(
     'SURVEY_ASSESS_ID' => $survey['assess_id'],
     'SURVEY_TITLE' => Scrub::text($survey['title']),
     'SURVEY_CATEGORY_ID' => $survey['category_id'],
-    'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
+    'ASSESS_START'                  => $openDate->getShort(),
+    'ASSESS_FINISH'                 => $dueDate->getShort(),
+    'ATTEMPT_ATTEMPT_ID'            => $_SESSION['attempt_id'],
+    'ATTEMPT_START'                 => $attemptDate->getShort(),
+    'ATTEMPT_FINISH'                => $attemptFinish->getShort(),
+    'ATTEMPT_TIME_TAKEN'            => $surveyHandler->sec2hms($attemptFinish->diffInSeconds($attemptDate, true)),
     'SECTION_TITLE' => Scrub::text($section['title']),
     'SECTION_DESCRIPTION' => Scrub::html($section['description']),
 ));
