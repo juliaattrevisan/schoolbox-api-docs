@@ -1,14 +1,25 @@
-<strong>Your answer:</strong>
-<div class="answer-given-container">{ANSWER}</div>
-<strong>The correct answer:</strong>
+<label>
+    Your answer
+</label>
+<div>{ANSWER}</div>
+
+<div class="highlight-panel">
+    <label>
+        The correct answer
+    </label>
 
     <!-- BEGIN answerOption -->
-   <div class="correct-answer-container">{CORRECT_ANSWER}</div>
+    <div>{CORRECT_ANSWER}</div>
     <!-- END answerOption -->
+</div>
 
-    <label><strong>Teacher's comments:</strong>
-		<div class="textarea-container">{REVIEWED_COMMENT}</div>
-	</label>
-    <p class="marks-amount">
+<label>
+    Teacher's comments
+</label>
+<div>{REVIEWED_COMMENT}</div>
+
+<div>
+    <p>
         {REVIEWED_MARKS} / {QUESTION_MARKS}
     </p>
+</div>
