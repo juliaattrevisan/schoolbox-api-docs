@@ -128,7 +128,7 @@ h2{
 	#tabs{
 		position: relative;
 		top: 32px;
-		left: 6px;
+		padding-left: 6px;
 		z-index: 1;
 		li a{
 			color: #fdb415;
@@ -156,6 +156,9 @@ h2{
 	}
 	.bell.open {
 		.border-radius(3px);
+	}
+	> li.open:after{
+		height: 4px;
 	}
 }
 
@@ -191,9 +194,8 @@ body.login{
 			top: 0;
 			padding: 45px 2% 0 2%;
 			box-sizing: border-box;
-			.error, .forgotten a{
-				color: @link;
-				margin: 35px 0;
+			.error, .forgotten a, label{
+				color: @white;
 			}
 		}
 		#loginForm{
@@ -239,19 +241,20 @@ body.login{
 		position: fixed;
 		ul li,
   		ul li a{
-  			color: @link;
+  			color: @white;
+				text-decoration: underline;
   		}
 	}
 }
 
 /* ---- Mobile ---- */
-@media screen and (max-width: 760px) {
+@media screen and (max-width: 1024px) {
 	body.login{
 	  	#container #content{
-			width: 100%;
-			box-sizing: border-box;
-			top: 15px;
-			#login-logo{ margin-bottom: 15px; }
+				width: 100%;
+				box-sizing: border-box;
+				top: 15px;
+				#login-logo{ margin-bottom: 15px; }
 	  	}
 	  	#footer{
 	  		width: 90%;
