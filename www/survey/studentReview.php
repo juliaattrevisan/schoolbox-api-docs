@@ -4,7 +4,6 @@
  * but the actual answers cannot be changed, only seen. Structurally, this is
  * similar to the normal undertaking of the test, only that answers for the
  * specified attempt are shown and you can only change the value of marks.
- *
  * You can add extra marks beyond the specified maximum for bonus answers, and
  * half marks are acceptable.
  *
@@ -14,11 +13,11 @@
  * @version     SVN: $Id$
  */
 
-$factory = new Survey_Factory();
-$surveyHandler = new Survey_Main();
-$attemptHandler = new Survey_Attempt();
+$factory         = new Survey_Factory();
+$surveyHandler   = new Survey_Main();
+$attemptHandler  = new Survey_Attempt();
 $responseHandler = new Survey_Response();
-$sectionHandler = new Survey_Section();
+$sectionHandler  = new Survey_Section();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -32,7 +31,7 @@ if (!is_numeric($this->arg[2])) {
     error(128);
 }
 
-$survey = $surveyHandler->getByID($this->arg[0]);
+$survey  = $surveyHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
 $attempt = $attemptHandler->getByID($this->arg[2]);
 
@@ -96,23 +95,25 @@ $openDate      = new Alaress_Date_Format($survey['start'], Alaress_Date_Format::
 $dueDate       = new Alaress_Date_Format($survey['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptDate   = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptFinish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
-$this->setVar(array(
-    'ASSESS_ASSESS_ID' => $survey['assess_id'],
-    'ASSESS_TITLE' => Scrub::text($survey['title']),
-    'ASSESS_START'                  => $openDate->getShort(),
-    'ASSESS_FINISH'                 => $dueDate->getShort(),
-    'ATTEMPT_ATTEMPT_ID'            => $_SESSION['attempt_id'],
-    'ATTEMPT_START'                 => $attemptDate->getShort(),
-    'ATTEMPT_FINISH'                => $attemptFinish->getShort(),
-    'ATTEMPT_TIME_TAKEN'            => $surveyHandler->sec2hms($attemptFinish->diffInSeconds($attemptDate, true)),
-    'SECTION_TITLE' => Scrub::text($section['title']),
-    'SECTION_DESCRIPTION' => Scrub::html($section['description']),
-    'ASSESS_CATEGORY_NAME'          => Scrub::text($folder->getName()),
-    'ASSESS_CATEGORY_ID'            => $folder->getId(),
-    'attemptFinished_block'         => '',
-    'attemptNotYetFinished_block'   => '',
-    'attemptUnfinished_block'       => '',
-));
+$this->setVar(
+    array(
+        'ASSESS_ASSESS_ID'            => $survey['assess_id'],
+        'ASSESS_TITLE'                => Scrub::text($survey['title']),
+        'ASSESS_START'                => $openDate->getShort(),
+        'ASSESS_FINISH'               => $dueDate->getShort(),
+        'ATTEMPT_ATTEMPT_ID'          => $_SESSION['attempt_id'],
+        'ATTEMPT_START'               => $attemptDate->getShort(),
+        'ATTEMPT_FINISH'              => $attemptFinish->getShort(),
+        'ATTEMPT_TIME_TAKEN'          => $surveyHandler->sec2hms($attemptFinish->diffInSeconds($attemptDate, true)),
+        'SECTION_TITLE'               => Scrub::text($section['title']),
+        'SECTION_DESCRIPTION'         => Scrub::html($section['description']),
+        'ASSESS_CATEGORY_NAME'        => Scrub::text($folder->getName()),
+        'ASSESS_CATEGORY_ID'          => $folder->getId(),
+        'attemptFinished_block'       => '',
+        'attemptNotYetFinished_block' => '',
+        'attemptUnfinished_block'     => '',
+    )
+);
 
 // Parse finished/unfinished/not finished yet blockage
 if (!isset($attempt['finish'])) {
@@ -145,18 +146,22 @@ if ($allQuestions) {
          */
         $this->setVar('answerOption_block', '');
 
-        $this->setVar(array(
-            'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
-            'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
-            'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
-        ));
+        $this->setVar(
+            array(
+                'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
+                'QUESTION_SEQUENCE'    => $currentQuestion['sequence'],
+                'QUESTION_QUESTION'    => Scrub::html($currentQuestion['question']),
+            )
+        );
 
         /* If this is a randomised section, number each question incrementally
          */
         if ($section['random'] == 1) {
-            $this->setVar(array(
-                'QUESTION_SEQUENCE' => $randomQuestionNumber
-            ));
+            $this->setVar(
+                array(
+                    'QUESTION_SEQUENCE' => $randomQuestionNumber
+                )
+            );
         }
 
         /* Load individual answers
@@ -193,9 +198,11 @@ if (!is_numeric($nextSection['section_id']) && !is_numeric($prevSection['section
  */
 else {
     if (is_numeric($nextSection['section_id'])) {
-        $this->setVar(array(
-            'NEXT_SECTION_ID' => $nextSection['section_id'],
-        ));
+        $this->setVar(
+            array(
+                'NEXT_SECTION_ID' => $nextSection['section_id'],
+            )
+        );
 
         $this->parse('nextSection_block', 'nextSection');
     } else {
@@ -205,9 +212,11 @@ else {
     /* Conditions where the previous button is available
      */
     if (is_numeric($prevSection['section_id'])) {
-        $this->setVar(array(
-            'PREV_SECTION_ID' => $prevSection['section_id'],
-        ));
+        $this->setVar(
+            array(
+                'PREV_SECTION_ID' => $prevSection['section_id'],
+            )
+        );
 
         $this->parse('prevSection_block', 'prevSection');
     } else {
@@ -236,10 +245,10 @@ $trail->renderIntoSitePage(
             'href'  => '/survey/attempts/' . $survey['assess_id'] . '/' . $user->getId(),
             'class' => 'active'
         ],
-    //        [
-    //            'text'  => 'Review',
-    //            'href'  => '#',
-    //            'class' => 'active'
-    //        ],
+//        [
+//            'text'  => 'Review',
+//            'href'  => '#',
+//            'class' => 'active'
+//        ],
     ]
 );
