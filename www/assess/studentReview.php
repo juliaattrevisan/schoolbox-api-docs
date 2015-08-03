@@ -76,13 +76,13 @@ $quizVisibility->setId($assess['mark_visibility']);
 /* Mostly do nothing
  */
 if ($quizVisibility->isStaff() && $groupHandler->isStaff()) {
-}
-else if ($quizVisibility->isStaffStudent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
-}
-else if ($quizVisibility->isStaffStudentParent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
-}
-else {
-	error(129);
+    // noop
+} elseif ($quizVisibility->isStaffStudent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
+    // noop
+} elseif ($quizVisibility->isStaffStudentParent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
+    // noop
+} else {
+    error(129);
 }
 
 /* Find out which attempt was made
