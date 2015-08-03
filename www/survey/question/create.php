@@ -278,12 +278,12 @@ if (!empty($_POST)) {
         ],
         [
             'text' => $assess['title'],
-            'href' => "/assess/summary/{$assess['assess_id']}",
+            'href' => "/survey/summary/{$assess['assess_id']}",
             'class' => '',
         ],
         [
             'text' => $section['title'],
-            'href' => "/assess/summary/{$assess['assess_id']}",
+            'href' => "/survey/summary/{$assess['assess_id']}",
             'class' => '',
         ],
         [
