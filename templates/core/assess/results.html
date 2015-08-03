@@ -1,124 +1,110 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript">
-    $(function () {
+{BREADCRUMB}
 
-        /*
-         * Add the dark class only to even rows that are visible (skip over the hidden ones)
-         * */
-        $('tbody tr:visible:even').addClass('dark');
+<div class="row">
+    <div class="small-12 columns">
+        <span class='header-actions'>
+            <a href='#' class='button icon-more' data-dropdown='header-options'>Options</a>
+        </span>
+        <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
+            <!-- BEGIN has_attempt -->
+            <a href="/assess/export/csv/{ASSESS_ASSESS_ID}" class="button icon-download">Download All</a>
+            <a href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}" class="button icon-modify">Review Horizontally</a>
+            <!-- END has_attempt -->
+            <!-- BEGIN modify_btn -->
+            <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="button icon-modify">Modify</a>
+            <!-- END modify_btn -->
+        </ul>
 
-        /*
-         * Add another, darker class to th
-         *
-         * */
-        $('tbody tr:hidden').addClass('sub-table-row');
+        <h1>Submissions for {ASSESS_TITLE}</h1>
 
-
-        $('tr.attempt').each(function () {
-            if ($(this).next().hasClass('expandable') && !$(this).hasClass('expandable')) {
-                $(this).addClass('drop-parent').children('td:first-child').prepend('<a href="#" class="submission-dropdown">&#9660;</a>');
-            }
-        })
-
-        $(document).on('click', '.submission-dropdown', function () {
-            var currentUnicode = $(this).html().charCodeAt(0);
-
-            if (currentUnicode == '9660') {
-                $(this).html('&#9650;')
-            }
-            else {
-                $(this).html('&#9660;')
-            }
-
-            var matchingClasses = $(this).parents('tr').attr('class').toString().match(/user_(\d+)/);
-            var expandables = '.' + matchingClasses[0] + '.expandable';
-
-            /* Clear queue and complete animation
-             */
-            $(this).parents('tbody').find(expandables).stop(true, true).fadeToggle();
-
-            return false;
-        });
-
-    });
-</script>
-<style>
-    .warning {
-        float: left;
-        padding: 4px 8px 5px 8px;
-        margin: 4px 4px;
-        color: #c44;
-        background: #fbf9f9;
-        border-radius: 3px;
-    }
-
-    .warning:hover {
-        background: #c44;
-        color: #fff;
-    }
-</style>
-<!-- END custom_head -->
-<div id="assess">
-    <h1>Submissions for {ASSESS_TITLE}</h1>
-    <span class="header_option">
-        {ASSESS_ARCHIVED}
-        <!-- BEGIN has_attempt -->
-        <a href="/assess/export/csv/{ASSESS_ASSESS_ID}" class="btn download"><span></span>Download All</a>
-        <a href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}" class="btn modify"><span></span>Review Horizontally</a>
-        <!-- END has_attempt -->
-        <!-- BEGIN modify_btn -->
-        <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify"><span></span>Modify</a>
-        <!-- END modify_btn -->
-    </span>
-    <p class="sub-heading"><span class="visibility-subheader visibility_{GRADE_VISIBILITY_CODE}" title="{GRADE_VISIBILITY}"></span>Quiz - Due: {ASSESS_DUEDATE}</p>
-    <div class="listing">
-        <ul class="breadcrumb">
-            <li><a href="/submission/listSubmission" >Submissions</a></li>
-            <li><a href="/submission/listSubmission/{DUEWORK_YEAR}/{DUEWORK_SEMESTER}/{CID}" >{CATEGORY_NAME}</a></li>
-            <li class="last"><a href="#">{ASSESS_TITLE}</a></li>
+        <ul class="meta">
+            <li class="icon-calendar icon-16">Due {ASSESS_DUEDATE}</li>
+            <li class="{VISIBILITY_CLASS} icon-16">Visible to {GRADE_VISIBILITY}</li>
+            <!-- BEGIN is_archived -->
+            <li class="icon-locked">Archived</li>
+            <!-- END is_archived -->
         </ul>
     </div>
-
-    <form action='/assess/deleteAttempt' method='post'>
-        <table width="100%" class="table">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Last submitted on</th>
-                <th>Time taken</th>
-                <th>Mark</th>
-                <th>Percentage</th>
-                <th>Unmarked Questions</th>
-                <th>Review Quiz</th>
-                <th>Review Status</th>
-                <th>Delete Attempt</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- BEGIN attempt -->
-            <tr class='attempt user_{USER_ID} {ATTEMPT_EXPANDABLE} {ATTEMPT_HIDDEN}'>
-                <td class="name">
-                    <a href="/search/user/{USER_ID}" title="{ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}">
-                        <img height="32" width="32" class="student-icon" src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square32" alt="{ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}"/>
-                    {ATTEMPT_SURNAME}, {ATTEMPT_FIRSTNAME}</a></td>
-                <td>{ATTEMPT_FINISH}</td>
-                <td>{ATTEMPT_TIME_TAKEN}</td>
-                <td>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</td>
-                <td>{ATTEMPT_PERCENTAGE}%</td>
-                <td>{ATTEMPT_UNMARKED_RESPONSES}</td>
-                <td>{ATTEMPT_REVIEW_LINK}</td>
-                <td>{ATTEMPT_REVIEW_STATUS}</td>
-                <td>
-                    <!-- BEGIN attempt_delete -->
-                    <input type='checkbox' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
-                    <!-- END attempt_delete -->
-                </td>
-            </tr>
-            <!-- END attempt -->
-            </tbody>
-        </table>
-        <!-- BEGIN delete -->
-        <input class='submit-btn-plain' type='submit' value='Delete selected'/>
-        <!-- END delete -->
-    </form>
 </div>
+        
+<div class="row">
+    <div class="small-12 island">
+        <form action='/assess/deleteAttempt' method='post'>
+            <!-- BEGIN user_attempts -->
+            <section>
+                <ul class="action-list">
+                    <!-- BEGIN attempt -->
+                    <li class='row {ATTEMPT_HIDDEN}' data-user="{USER_ID}" {ATTEMPT_EXPANDABLE}>
+                        <div class="one-column text-center">
+                            <!-- BEGIN attempt_delete -->
+                            <input type='checkbox' id="attempt-{ATTEMPT_ATTEMPT_ID}" name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
+                            <label for="attempt-{ATTEMPT_ATTEMPT_ID}" class="checkbox-label"></label>
+                            <!-- END attempt_delete -->
+                        </div>
+                        <div class="four-column">
+                            <div class="avatar card">
+                                <a href="/search/user/{USER_ID}" title="View Profile">
+                                    <img src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square64" alt="View Profile" />
+                                    <p>{ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}</p>
+                                </a>
+
+                                <p class="meta">{ATTEMPT_TIME_TAKEN}</p>
+                            </div>
+                        </div>
+                        <div class="two-column text-center">
+                            <!-- BEGIN has_marks -->
+                            <h3>{ATTEMPT_PERCENTAGE}%</h3>
+                            <p>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</p>
+                            <p class="meta">{ATTEMPT_UNMARKED_RESPONSES} unmarked responses</p>
+                            <!-- END has_marks -->
+                        </div>
+                        <div class="three-column">
+                            <!-- BEGIN submitted -->
+                            <span class="submitted label full-width">Finished<br />{ATTEMPT_FINISH}</span>
+                            <!-- END submitted -->
+
+                            <!-- BEGIN unsubmitted -->
+                            <span class="unsubmitted label full-width">{ATTEMPT_FINISH}</span>
+                            <!-- END unsubmitted -->
+
+                            <!-- BEGIN reviewed -->
+                            <span class="success label full-width">Reviewed<br />{ATTEMPT_REVIEW_STATUS}</span>
+                            <!-- END reviewed -->
+
+                            <!-- BEGIN not_reviewed -->
+                            <span class="neutral label full-width">Not Reviewed</span>
+                            <!-- END not_reviewed -->
+                        </div>
+                        <div class="two actions">
+                            <!-- BEGIN has_review -->
+                            <a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}" class="icon-view no-text" title="Review Attempt"></a>
+                            <!-- END has_review -->
+
+                            <!-- BEGIN expand_attempts -->
+                            <a href="#" class='icon-add no-text' data-attempt-expander="{USER_ID}" title="Expand attempts by {ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}"></a>
+                            <!-- END expand_attempts -->
+                        </div>
+                    </li>
+                    <!-- END attempt -->
+                </ul>
+            </section>
+            <!-- END user_attempts -->
+
+            <!-- BEGIN delete -->
+            <input type='submit' value='Delete selected'/>
+            <!-- END delete -->
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('[data-attempt-expander]').click(function(event) {
+            event.preventDefault();
+
+            var userId = $(this).attr('data-attempt-expander');
+
+            $('[data-user='+userId+'][data-expandable]').toggleClass('hide')
+        })
+    });
+</script>
