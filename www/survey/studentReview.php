@@ -173,8 +173,7 @@ if ($allQuestions) {
         $this->setVar('answerFormFragment', '');
         $this->setVar('answerInputs_block', '');
     }
-}
-else {
+} else {
     $this->setVar('question_block', '');
 }
 
@@ -189,8 +188,7 @@ $prevSection = $sectionHandler->getBefore($this->arg[0], $section['sequence']);
 if (!is_numeric($nextSection['section_id']) && !is_numeric($prevSection['section_id'])) {
     $this->setVar('nextSection_block', '');
     $this->setVar('prevSection_block', '');
-}
-/* If there is no next section, then provide the finish link and parse out the
+} /* If there is no next section, then provide the finish link and parse out the
  * previous button if applicable
  */
 else {
@@ -200,8 +198,7 @@ else {
         ));
 
         $this->parse('nextSection_block', 'nextSection');
-    }
-	else {
+    } else {
         $this->setVar('nextSection_block', '');
     }
 
@@ -213,8 +210,7 @@ else {
         ));
 
         $this->parse('prevSection_block', 'prevSection');
-    }
-	else {
+    } else {
         $this->setVar('prevSection_block', '');
     }
 }
@@ -240,10 +236,10 @@ $trail->renderIntoSitePage(
             'href'  => '/survey/attempts/' . $survey['assess_id'] . '/' . $user->getId(),
             'class' => 'active'
         ],
-//        [
-//            'text'  => 'Review',
-//            'href'  => '#',
-//            'class' => 'active'
-//        ],
+    //        [
+    //            'text'  => 'Review',
+    //            'href'  => '#',
+    //            'class' => 'active'
+    //        ],
     ]
 );
