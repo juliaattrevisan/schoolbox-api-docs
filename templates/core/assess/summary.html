@@ -24,7 +24,9 @@
     <div class="small-12 island">
         <ul class="meta">
             <!-- BEGIN has_due_date -->
-            <li class="icon-calendar icon-16">{ASSESS_START}&ndash;{ASSESS_FINISH}</li>
+            <li class="icon-calendar icon-16">
+                <time>{ASSESS_START}</time>&ndash;<time>{ASSESS_FINISH}</time>
+            </li>
             <!-- END has_due_date -->
             <li class="icon-time-value icon-16">Time allowed: {ASSESS_DURATION}</li>
         </ul>
