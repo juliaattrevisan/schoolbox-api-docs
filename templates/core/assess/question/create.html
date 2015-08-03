@@ -9,47 +9,47 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Create Question</h2>
-        <form action="/{ASSESS_KIND_LC}/question/create" method="post">
+        <form id="createQuestionForm" action="/{ASSESS_KIND_LC}/question/create" method="post">
             <input name="section_id" type="hidden" value="{SECTION_ID}" />
             <input name="sequence" type="hidden" value="{SEQUENCE}" />
             <section class="content">
-                    <label>
-                        Question Type
-                        <select name="type_id" id="type_id" data-question-type-select>
-                            <option disabled {DISABLED_SELECTED} value='-1'>-- Select Type --</option>
-                            <!-- BEGIN questionType -->
-                            <option value="{QUESTIONTYPE_TYPE_ID}" {QUESTIONTYPE_SELECTED}>{QUESTIONTYPE_DESCRIPTION}</option>
-                            <!-- END questionType -->
-                        </select>
-                    </label>
+                <label>
+                    Question Type
+                    <select name="type_id" id="type_id" data-question-type-select>
+                        <option disabled {DISABLED_SELECTED} value='-1'>-- Select Type --</option>
+                        <!-- BEGIN questionType -->
+                        <option value="{QUESTIONTYPE_TYPE_ID}" {QUESTIONTYPE_SELECTED}>{QUESTIONTYPE_DESCRIPTION}</option>
+                        <!-- END questionType -->
+                    </select>
+                </label>
 
-                    <!-- BEGIN type_selected -->
-                    <label>
-                        Question
-                        <input name="question" id="question" type="text" size="35" value="{QUESTION}" />
-                    </label>
+                <!-- BEGIN type_selected -->
+                <label>
+                    Question
+                    <input name="question" id="question" type="text" size="35" value="{QUESTION}" />
+                </label>
 
-                    <!-- BEGIN has_answer_configuration -->
-                    <fieldset>
-                        <legend>Configuration Options</legend>
-                        <!-- BEGIN answer_configuration -->
+                <!-- BEGIN has_answer_configuration -->
+                <fieldset>
+                    <legend>Configuration Options</legend>
+                    <!-- BEGIN answer_configuration -->
 
-                        <!-- END answer_configuration -->
-                    </fieldset>
-                    <!-- END has_answer_configuration -->
+                    <!-- END answer_configuration -->
+                </fieldset>
+                <!-- END has_answer_configuration -->
 
-                    <!-- BEGIN has_marks -->
-                    <label>
-                        Marks
-                        <input data-marks name="marks" type="text" size="3" value="{MARKS}" />
-                    </label>
-                    <!-- END has_marks -->
+                <!-- BEGIN has_marks -->
+                <label>
+                    Marks
+                    <input data-marks name="marks" type="text" size="3" value="{MARKS}" />
+                </label>
+                <!-- END has_marks -->
 
-                    <div>
-                        <!-- BEGIN answerInputs -->
+                <div>
+                    <!-- BEGIN answerInputs -->
 
-                        <!-- END answerInputs -->
-                    </div>
+                    <!-- END answerInputs -->
+                </div>
                 <!-- END type_selected -->
             </section>
             <label>
