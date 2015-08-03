@@ -1,101 +1,109 @@
-<!-- BEGIN custom_head -->
+{BREADCRUMB}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Quiz Questionbank</h1>
+    </div>
+</div>
+
+<div class="row">
+    <form id="createQuestionForm" action="/assess/questionbank/question/modify" method="post">
+        <div class="small-12 island">
+            <h2 class="subheader">Modify Question</h2>
+            <input name="question_bank_id" type="hidden" value="{QUESTION_BANK_ID}" />
+            <input type="hidden" name="type_id" value="{QUESTIONTYPE_TYPE_ID}" />
+
+            <section>
+                <div class="content">
+                    <h3>{QUESTIONTYPE_DESCRIPTION}</h3>
+
+                    <label>
+                        Question
+                        <textarea name="question" />{QUESTION}</textarea>
+                    </label>
+
+                    <!-- BEGIN has_answer_configuration -->
+                    <fieldset>
+                        <legend>Configuration Options</legend>
+                        <!-- BEGIN answer_configuration -->
+
+                        <!-- END answer_configuration -->
+                    </fieldset>
+                    <!-- END has_answer_configuration -->
+
+                    <label>
+                        Marks
+                        <input name="marks" type="text" size="3" value="{MARKS}" />
+                    </label>
+
+                    <div>
+                        <!-- BEGIN answerInputs -->
+
+                        <!-- END answerInputs -->
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        <div class="small-12 column">
+            <input class="expand" type="submit" name="create" value="Modify" />
+        </div>
+    </form>
+</div>
+
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript">
-	$(function() {
-		$.fn.alaressTiny({
-			mode: 'exact',
-			elements: 'question',
-			file_browser_category_id: '{ASSESS_CATEGORY_ID}'
-		});
+    $(function() {
+        $.fn.alaressTiny({
+            mode: 'exact',
+            elements: 'question',
+            file_browser_category_id: '{ASSESS_CATEGORY_ID}'
+        });
 
-		/* Enforce two decimal places
-		 */
-		$('input[name=marks]').change(function() {
+        /* Enforce two decimal places
+         */
+        $('input[name=marks]').change(function() {
+            var val = $(this).val();
 
             /* Empty string is classified as a number
              */
             if (isNaN($(this).val()) || $(this).val() == '') {
-                var val = 0;
-            }
-            else {
-                var val = $(this).val();
+                val = 0;
             }
 
-			$(this).val(parseFloat(val).toFixed(2));
-		});
+            $(this).val(parseFloat(val).toFixed(2));
+        });
 
-		/* Category tree
-		 */
+        /* Category tree
+         */
         $("#categoryTree")
-            .on('select_node.jstree', function(event, jstree) {
-                $('#question_category').val(jstree.selected[0].replace(/^node_/, ''));
-            })
-            .on('deselect_node.jstree', function() {
-                $('#question_category').val('');
-            })
-            .jstree({
-                "animation":50,
-                "core":{
-                    force_text: true,
-                    multiple:false,
-                    "themes": {
-                        "variant" : "schoolbox",
-                        "dots" : true,
-                        "icons" : false
+                .on('select_node.jstree', function(event, jstree) {
+                    $('#question_category').val(jstree.selected[0].replace(/^node_/, ''));
+                })
+                .on('deselect_node.jstree', function() {
+                    $('#question_category').val('');
+                })
+                .jstree({
+                    "animation":50,
+                    "core":{
+                        force_text: true,
+                        multiple:false,
+                        "themes": {
+                            "variant" : "schoolbox",
+                            "dots" : true,
+                            "icons" : false
+                        }
                     }
-                }
-            });
+                });
     });
 
-	/* For overriding plugin redirection destination when modifying
-	 * questions inside the QuestionBank
-	 */
-	var questionBank = {
-		url: '{QUESTION_BANK_REDIRECT_URL}'
-	}
+    /* For overriding plugin redirection destination when modifying
+     * questions inside the QuestionBank
+     */
+    var questionBank = {
+        url: '{QUESTION_BANK_REDIRECT_URL}'
+    }
 </script>
-<!-- END custom_head -->
-<h1>Modify Question</h1>
-<div class="evaluation-content">
-	<h2>Question Details</h2>
-
-	<form id="createQuestionForm" action="/assess/questionbank/question/modify" class="" method="post">
-		<label class="hide">
-			<input name="question_bank_id" type="hidden" value="{QUESTION_BANK_ID}" />
-		</label>
-
-		<label>Type
-			<input type="hidden" name="type_id" value="{QUESTIONTYPE_TYPE_ID}" />
-			<span>{QUESTIONTYPE_DESCRIPTION}</span>
-		</label>
-
-		<label>Question
-			<div class="textarea-container" id="question_container"><textarea name="question" class="mceSimple tinyValidate" id="question" />{QUESTION}</textarea></div>
-		</label>
-
-		<!-- BEGIN has_answer_configuration -->
-		<label>Configuration Options
-			<!-- BEGIN answer_configuration -->
-
-			<!-- END answer_configuration -->
-		</label>
-		<!-- END has_answer_configuration -->
-
-		<label>Marks
-			<input name="marks" type="text" size="3" value="{MARKS}"/>
-		</label>
-
-		<div id="answer">
-			<!-- BEGIN answerInputs -->
-
-			<!-- END answerInputs -->
-		</div>
-
-		<p class="clearfix">
-			<input type="submit" name="create" id="create" value="Modify" class="submit-btn-plain"/>
-		</p>
-	</form>
-</div>
