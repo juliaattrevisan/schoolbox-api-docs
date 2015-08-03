@@ -4,7 +4,6 @@
  * but the actual answers cannot be changed, only seen. Structurally, this is
  * similar to the normal undertaking of the test, only that answers for the
  * specified attempt are shown and you can only change the value of marks.
- *
  * You can add extra marks beyond the specified maximum for bonus answers, and
  * half marks are acceptable.
  *
@@ -14,12 +13,12 @@
  * @version     SVN: $Id$
  */
 
-$factory = new Assess_Factory();
-$assessHandler = new Assess_Main();
-$attemptHandler = new Assess_Attempt();
+$factory         = new Assess_Factory();
+$assessHandler   = new Assess_Main();
+$attemptHandler  = new Assess_Attempt();
 $responseHandler = new Assess_Response();
-$sectionHandler = new Assess_Section();
-$groupHandler = new Group;
+$sectionHandler  = new Assess_Section();
+$groupHandler    = new Group;
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -33,7 +32,7 @@ if (!is_numeric($this->arg[2])) {
     error(128);
 }
 
-$assess = $assessHandler->getByID($this->arg[0]);
+$assess  = $assessHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
 // getListByAssessAndAttempt gets a rowset for some reason!
 $attemptList = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $this->arg[2]);
@@ -64,7 +63,8 @@ if (!$attempt) {
  */
 if (!$attemptHandler->isOwner($this->arg[2])
     && !$groupHandler->isStaff()
-    && !($groupHandler->isParentOfChild($attempt['user_id']) && !Config::get('restrict_parent_duework_access'))) {
+    && !($groupHandler->isParentOfChild($attempt['user_id']) && !Config::get('restrict_parent_duework_access'))
+) {
     error(129);
 }
 
@@ -114,7 +114,7 @@ try {
 
 try {
     $userMapper = \Schoolbox\UserMapper::getInstance();
-    $user = $userMapper->findById($attempt['user_id']);
+    $user       = $userMapper->findById($attempt['user_id']);
 } catch (Schoolbox\Mapper\Exception $e) {
     error(19);
     exit;
@@ -129,23 +129,23 @@ $attemptDate   = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format:
 $attemptFinish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $this->setVar(
     array(
-        'ASSESS_ASSESS_ID' => $assess['assess_id'],
-        'ASSESS_TITLE' => Scrub::text($assess['title']),
-        'ASSESS_START'                         => $openDate->getShort(),
-        'ASSESS_FINISH'                        => $dueDate->getShort(),
-        'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
-        'ATTEMPT_START'                        => $attemptDate->getShort(),
-        'ATTEMPT_FINISH'                       => $attemptFinish->getShort(),
-        'ATTEMPT_TIME_TAKEN'                   => $assessHandler->sec2hms($attemptFinish->diffInSeconds($attemptDate, true)),
-        'ATTEMPT_TOTAL_MARKS'                  => number_format($attempt['totalMarks'], 2),
-        'ATTEMPT_TOTAL_AVAILABLE_MARKS'        => number_format($attempt['totalAvailableMarks'], 2),
-        'SECTION_TITLE' => Scrub::text($section['title']),
-        'SECTION_DESCRIPTION' => Scrub::html($section['description']),
-        'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
-        'ASSESS_CATEGORY_ID'   => $folder->getId(),
-        'attemptFinished_block'                => '',
-        'attemptNotYetFinished_block'          => '',
-        'attemptUnfinished_block'              => '',
+        'ASSESS_ASSESS_ID'              => $assess['assess_id'],
+        'ASSESS_TITLE'                  => Scrub::text($assess['title']),
+        'ASSESS_START'                  => $openDate->getShort(),
+        'ASSESS_FINISH'                 => $dueDate->getShort(),
+        'ATTEMPT_ATTEMPT_ID'            => $_SESSION['attempt_id'],
+        'ATTEMPT_START'                 => $attemptDate->getShort(),
+        'ATTEMPT_FINISH'                => $attemptFinish->getShort(),
+        'ATTEMPT_TIME_TAKEN'            => $assessHandler->sec2hms($attemptFinish->diffInSeconds($attemptDate, true)),
+        'ATTEMPT_TOTAL_MARKS'           => number_format($attempt['totalMarks'], 2),
+        'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($attempt['totalAvailableMarks'], 2),
+        'SECTION_TITLE'                 => Scrub::text($section['title']),
+        'SECTION_DESCRIPTION'           => Scrub::html($section['description']),
+        'ASSESS_CATEGORY_NAME'          => Scrub::text($folder->getName()),
+        'ASSESS_CATEGORY_ID'            => $folder->getId(),
+        'attemptFinished_block'         => '',
+        'attemptNotYetFinished_block'   => '',
+        'attemptUnfinished_block'       => '',
     )
 );
 
@@ -181,19 +181,23 @@ if ($allQuestions) {
          */
         $this->setVar('answerOption_block', '');
 
-        $this->setVar(array(
-            'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
-            'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
-            'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
-            'QUESTION_MARKS' => $currentQuestion['marks'],
-        ));
+        $this->setVar(
+            array(
+                'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
+                'QUESTION_SEQUENCE'    => $currentQuestion['sequence'],
+                'QUESTION_QUESTION'    => Scrub::html($currentQuestion['question']),
+                'QUESTION_MARKS'       => $currentQuestion['marks'],
+            )
+        );
 
         /* If this is a randomised section, number each question incrementally
            */
         if ($section['random'] == 1) {
-            $this->setVar(array(
-                'QUESTION_SEQUENCE' => $randomQuestionNumber
-            ));
+            $this->setVar(
+                array(
+                    'QUESTION_SEQUENCE' => $randomQuestionNumber
+                )
+            );
         }
 
         /* Load individual answers
@@ -230,9 +234,11 @@ if (!is_numeric($nextSection['section_id']) && !is_numeric($prevSection['section
  */
 else {
     if (is_numeric($nextSection['section_id'])) {
-        $this->setVar(array(
-            'NEXT_SECTION_ID' => $nextSection['section_id'],
-        ));
+        $this->setVar(
+            array(
+                'NEXT_SECTION_ID' => $nextSection['section_id'],
+            )
+        );
 
         $this->parse('nextSection_block', 'nextSection');
     } else {
@@ -242,9 +248,11 @@ else {
     /* Conditions where the previous button is available
      */
     if (is_numeric($prevSection['section_id'])) {
-        $this->setVar(array(
-            'PREV_SECTION_ID' => $prevSection['section_id'],
-        ));
+        $this->setVar(
+            array(
+                'PREV_SECTION_ID' => $prevSection['section_id'],
+            )
+        );
 
         $this->parse('prevSection_block', 'prevSection');
     } else {
