@@ -7,7 +7,7 @@
     <div class="row">
         <div class="small-12 column no-pad">
             <p class="alert-box secondary">
-                Put this question into the Question Bank so you can import it into other quizzes.
+                Put this question into the Question Bank so you can import it into other {ASSESS_KIND_PLURAL}.
             </p>
         </div>
         <div class="small-12 island no-pad">
@@ -72,7 +72,7 @@
 
             form.find('input[type=submit]').val('Adding to ' + catName).prop('disabled', true);
 
-            $.post(form.action, $(form).serialize(), function () {
+            $.post(form[0].action, form.serialize(), function () {
                 var href = window.location.origin + '/{ASSESS_KIND_LC}/questionbank/added/' + qid.val();
 
                 $('#bank-success').foundation('reveal').foundation('reveal', 'open', href);
