@@ -1,4 +1,30 @@
 <?php
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Breadcrumbs;
+
+try {
+    $surveyHandler = new \Survey_Main();
+    $survey = $surveyHandler->getByID($this->arg[1]);
+}
+catch (\Exception $e) {
+    error(167);
+}
+
+try {
+    $folderMapper = new FolderMapper();
+    $folder = $folderMapper->findById($survey['category_id']);
+}
+catch (\Exception $e) {
+    error(13);
+}
+
+$sectionHandler = new \Assess_Section();
+$section = $sectionHandler->getById($this->arg[2]);
+
+//if (!$section) {
+//    error(115);
+//}
+
 $this->setFile(TEMPLATE_content, 'survey/questionbank/contents.html');
 $this->setBlock(TEMPLATE_content, 'welcome', 'welcome_block');
 $this->setBlock(TEMPLATE_content, 'category_selected', 'category_selected_block');
@@ -13,7 +39,7 @@ $this->setBlock(TEMPLATE_content, 'has_edit_category', 'has_edit_category_block'
 
 $this->setVar(array(
     'QUESTIONBANK_CATEGORY_ID' => $this->arg[0],
-    'SURVEY_ID' => $this->arg[1],
+    'SURVEY_ID' => $survey['assess_id'],
     'SECTION_ID' => $this->arg[2],
 ));
 
@@ -23,7 +49,7 @@ $questionBankHandler = new Survey_Question_Bank();
  */
 $questionBankCategoryHandler = new Survey_Question_Category();
 
-$questionCategoryList = new Survey_Question_Category_List($this, $this->arg[1], $this->arg[0], $questionBankCategoryHandler->getPath());
+$questionCategoryList = new Survey_Question_Category_List($this, $survey['assess_id'], $this->arg[0], $questionBankCategoryHandler->getPath());
 $questionCategoryList->render();
 
 /* If expanding a particular category
@@ -145,3 +171,29 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
 
     $this->parse('welcome_block', 'welcome');
 }
+
+/* Render out breadcrumbs
+ */
+$trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => $folder->getName(),
+        'href' => "/homepage/{$folder->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($survey['title']),
+        'href' => "/survey/summary/{$survey['assess_id']}",
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($section['title']),
+        'href' => "/survey/summary/{$survey['assess_id']}",
+        'class' => '',
+    ],
+    [
+        'text' => 'Add from Question Bank',
+        'href' => '',
+        'class' => 'active',
+    ]
+]);

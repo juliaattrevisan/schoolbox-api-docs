@@ -61,7 +61,7 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
             ));
         }
 
-        SitePage::localRedir('/survey/modify/' . $assess['assess_id']);
+        SitePage::localRedir('/survey/summary/' . $assess['assess_id']);
     } else {
         error(131);
     }

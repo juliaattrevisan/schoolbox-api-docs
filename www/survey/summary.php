@@ -57,6 +57,7 @@ $this->setVar(array(
 
 $this->setFile(TEMPLATE_content, 'survey/summary.html');
 $this->setFile('assessContentsFragment', 'assess/contents.html');
+$this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 

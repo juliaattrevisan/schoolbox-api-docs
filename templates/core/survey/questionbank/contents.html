@@ -1,31 +1,202 @@
-<!-- BEGIN custom_head -->
+{BREADCRUMB}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Question Bank</h1>
+    </div>
+</div>
+
+<!-- BEGIN welcome -->
+<div class="row">
+    <div class="small-12 island">
+        <section class="alert-box secondary content">
+            <p>
+                Welcome to the Survey Question Bank. Here you will find questions
+                that can be used in your Survey. You can also store your own
+                questions here for later use. To begin browse to the appropriate
+                category and select the questions you wish to add. These questions
+                will automatically be added to your Survey in the current section.
+            </p>
+        </section>
+    </div>
+</div>
+<!-- END welcome -->
+
+<div class="row">
+    <div class="small-12 island">
+        <!-- BEGIN category_selected -->
+        <h2 class="subheader">{QUESTION_CATEGORY}</h2>
+
+        <form id='questionBankForm' action='/survey/questionbank/addToSection' method='post'>
+            <input name='section_id' type='hidden' value='{SECTION_ID}'/>
+
+            <section>
+                <!-- BEGIN no_questions -->
+                <div class="content">
+                    <p>There are no questions in this category's Question Bank.</p>
+                </div>
+                <!-- END no_questions -->
+
+                <ul class="action-list">
+                    <!-- BEGIN question -->
+                    <li class="row">
+                        <div class="one-column">
+                            <!-- BEGIN select_question -->
+                            <label>
+                                <input name='question_bank_id[]' id='questionbank-id-{QUESTION_BANK_ID}' type='checkbox' value='{QUESTION_BANK_ID}' />
+                                <label for='questionbank-id-{QUESTION_BANK_ID}' class="checkbox-label"></label>
+                            </label>
+                            <!-- END select_question -->
+                        </div>
+                        <div class="eight-column">
+                            <!-- BEGIN missing_class -->
+                            <div class="alert-panel">
+                                <p>
+                                    This question type no longer exists - it cannot be copied to the
+                                    Survey, and should be removed from the Question Bank.
+                                </p>
+                            </div>
+                            <!-- END missing_class -->
+
+                            <article>
+                                {QUESTION}
+                            </article>
+
+                            <div class="hide panel" data-answer-content="{QUESTION_BANK_ID}">
+                                <ul>
+                                    <!-- BEGIN answers -->
+                                    <li>
+                                        <article>{ANSWER_DESCRIPTION}</article>
+                                    </li>
+                                    <!-- END answers -->
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="three actions">
+                            <a class="icon-view no-text" href="#" title="Show Answers" data-show-answer-content="{QUESTION_BANK_ID}"></a>
+                            <!-- BEGIN show_delete -->
+                            <a class="icon-delete no-text" href="/survey/questionbank/question/delete/{QUESTION_BANK_ID}" title="Delete" data-delete-question></a>
+                            <!-- END show_delete -->
+                            <a class="icon-modify no-text" href="/survey/questionbank/question/modify/{QUESTION_BANK_ID}" title="Modify"></a>
+                        </div>
+                    </li>
+                    <!-- END question -->
+                </ul>
+            </section>
+
+            <!-- BEGIN show_submit -->
+            <input type='submit' class='expand' value='Copy selected questions to Survey' />
+            <!-- END show_submit -->
+        </form>
+        <!-- END category_selected -->
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Categories</h2>
+        <section>
+            <div id='categoryTree' class="content">
+                <!-- BEGIN category_list_start -->
+                <ul>
+                    <!-- END category_list_start -->
+
+                    <!-- BEGIN category_list_item_start -->
+                    <ul>
+                        <!-- END category_list_item_start -->
+
+                        <!-- BEGIN category_list_item -->
+                        <li id='{CATEGORY_LIST_ITEM_NODE}' class='{CATEGORY_LIST_ITEM_SELECTED}'>
+                            <a href='/survey/questionbank/contents/{CATEGORY_LIST_ITEM_CATEGORY_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}'>
+                                {CATEGORY_LIST_ITEM_NAME} ({CATEGORY_LIST_ITEM_NUMQUESTIONS})
+                            </a>
+                            <!-- END category_list_item -->
+
+                            <!-- BEGIN category_list_item_end -->
+                    </ul>
+                    </li>
+                    <!-- END category_list_item_end -->
+                </ul>
+            </div>
+            <div class="content">
+                <!-- BEGIN has_edit_category -->
+                <a class="button icon-modify" href="#" data-reveal-id="edit-category-modal">Edit Category</a>
+
+                <div id="edit-category-modal" class='reveal-modal' data-reveal>
+                    <form action='/survey/questionbank/modify.php' method='post'>
+                        <input name='questionCategoryId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
+
+                        <label>
+                            Subcategory Name
+                            <input class='required' name='name' type='text' value='{QUESTION_CATEGORY}' />
+                        </label>
+
+                        <input type='submit' value='Rename Category' />
+                    </form>
+                </div>
+                <!-- END has_edit_category -->
+
+                <a class="button icon-add" href="#" data-reveal-id="add-subcategory-modal">Add Subcategory</a>
+
+                <div id="add-subcategory-modal" class='reveal-modal' data-reveal>
+                    <form action='/survey/questionbank/create' method='post'>
+                        <input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
+
+                        <label>
+                            Subcategory Name
+                            <input class="required" name='name' type='text' value=''  />
+                        </label>
+
+                        <input type='submit' value='Add New Subcategory' />
+                    </form>
+                </div>
+
+                <a href='/survey/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="button icon-delete">Remove this category</a>
+            </div>
+        </section>
+    </div>
+</div>
+
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css"/>
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type='text/javascript'>
-    $(function () {
-        $('#deleteButton').click(function (event) {
-            var allQuestions = $('#questionBankForm').find('input[name="question_bank_id[]"]:checked');
+    $(function() {
 
-            if (allQuestions.length && confirm('Do you want to remove the selected questions from the Question Bank?')) {
-                $.post('/survey/questionbank/removeQuestion', $('#questionBankForm').serialize(), function (response) {
-                    alert(response);
-                    location.reload();
-                });
-            }
+        /* Toggle answer visibility
+         */
+        $('[data-show-answer-content]').click(function(event) {
             event.preventDefault();
-            $(this).confirmDialog();
+
+            var id = $(this).attr('data-show-answer-content');
+
+            $('[data-answer-content='+id+']').toggleClass('hide');
         });
 
-        $('a.delete').click(function (event) {
+        /* Delete confirmation
+         */
+        $('[data-delete-question]').click(function(event) {
             event.preventDefault();
-            $(this).confirmDialog();
+
+            $(this).confirmDialog({
+                text: 'Do you want to remove this question from the Question Bank?',
+                confirmEvent: function() {
+                    // Build a hidden input with the delete button's name/val,
+                    // then submit
+                    var allQuestions = $('#questionBankForm').find('input[name="question_bank_id[]"]:checked');
+
+                    if (allQuestions.length) {
+                        $.post('/survey/questionbank/removeQuestion', $('#questionBankForm').serialize(), function (response) {
+                            alert(response);
+                            location.reload();
+                        });
+                    }
+                }
+            });
         });
 
-        $('input[type=checkbox]').click(function () {
-            $(this).closest('.question').toggleClass('checked')
-        })
-
+        /* Folder tree
+         */
         $("#categoryTree")
                 .on('ready.jstree', function (event, jstree) {
                     var openNodes = [
@@ -71,179 +242,9 @@
                     }
                 });
 
-        $("#editCatForm").dialog({
-            autoOpen: false,
-            modal: true
-        });
-
-        $('#editCat').click(function () {
-            $('#editCatForm').dialog("open");
-        });
-
-        $("#subcategoryForm").dialog({
-            autoOpen: false,
-            modal: true
-        });
-
-        $('#newSubCat').click(function () {
-            $('#subcategoryForm').dialog("open");
-        });
-
-        $('#subcategoryForm').validate();
-
-        $('[data-show-answer-content="true"]').click(function(event) {
-            $(this).parents('tr').find('[data-answer-content="true"]').slideToggle();
-
-            return false;
-        });
+        /* Reveals
+         */
+        $('#edit-category-modal').find('form').validate();
+        $('#add-subcategory-modal').find('form').validate();
     });
 </script>
-<!-- END custom_head -->
-<h1>Question Bank</h1>
-<span class="header_option"><a href="/survey/modify/{SURVEY_ID}" class="btn go-back "><span></span>Return To Survey</a></span>
-
-
-<div class="evaluation-questionbank-container">
-    <!-- BEGIN welcome -->
-    <h2>Welcome</h2>
-
-    <p class="pad-it">
-        Welcome to the surveyment question bank. Here you will find questions
-        that can be used in your surveyment. You can also store your own
-        questions here for later use. To begin browse to the appropriate
-        category and select the questions you wish to add. These questions
-        will automatically be added to your surveyment in the current
-        section.
-    </p>
-    <!-- END welcome -->
-
-    <!-- BEGIN category_selected -->
-    <h2>Questions in category: {QUESTION_CATEGORY}</h2>
-
-    <form id='questionBankForm' action='/survey/questionbank/addToSection' method='post'>
-        <input name='section_id' type='hidden' value='{SECTION_ID}'/>
-
-        <table class="table ruler">
-            <colgroup>
-                <col width="20" />
-                <col />
-                <col width="128" />
-            </colgroup>
-            <!-- BEGIN question -->
-            <tr>
-                <!-- BEGIN select_question -->
-                <td>
-                    <label>
-                        <input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}'/>
-                    </label>
-                </td>
-                <!-- END select_question -->
-                <td>
-                    <div class="wysiwyg">
-                        {QUESTION}
-                    </div>
-
-                    <div>
-                        <!-- BEGIN missing_class -->
-                        <p class="error-notification">
-                            This question type no longer exists - it cannot be copied to the
-                            survey, and should be removed from the question bank.
-                        </p>
-                        <!-- END missing_class -->
-
-                        <div class='answer-content' data-answer-content="true">
-                            <ul>
-                                <!-- BEGIN answers -->
-                                <li>
-                                    {ANSWER_DESCRIPTION}
-                                </li>
-                                <!-- END answers -->
-                            </ul>
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <span class="actions">
-                        <a class="btn eyeball no-text" href="#" data-show-answer-content="true" title="Show Answers"><span></span></a>
-                        <!-- BEGIN show_delete -->
-                        <a class="btn delete no-text" href="/survey/questionbank/question/delete/{QUESTION_BANK_ID}" title="Delete"><span></span></a>
-                        <!-- END show_delete -->
-                        <a class="btn modify no-text" href="/survey/questionbank/question/modify/{QUESTION_BANK_ID}" title="Modify"><span></span></a>
-                    </span>
-                </td>
-            </tr>
-            <!-- END question -->
-        </table>
-
-        <p class="clearfix no-marg ">
-            <!-- BEGIN show_submit -->
-            <input type='submit' value='Copy to survey' class="submit-btn-plain no-marg"/>
-            <!-- END show_submit -->
-        </p>
-
-        <!-- BEGIN no_questions -->
-        <p>There are no questions in this category's Question Bank.</p>
-        <!-- END no_questions -->
-    </form>
-    <!-- END category_selected -->
-</div>
-
-<div class="evaluation-menu">
-    <h2>Categories</h2>
-
-    <div id='categoryTree'>
-        <!-- BEGIN category_list_start -->
-        <ul>
-            <!-- END category_list_start -->
-
-            <!-- BEGIN category_list_item_start -->
-            <ul>
-                <!-- END category_list_item_start -->
-
-                <!-- BEGIN category_list_item -->
-                <li id='{CATEGORY_LIST_ITEM_NODE}' class='{CATEGORY_LIST_ITEM_SELECTED}'>
-                    <a href='/survey/questionbank/contents/{CATEGORY_LIST_ITEM_CATEGORY_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}'>
-                        {CATEGORY_LIST_ITEM_NAME} ({CATEGORY_LIST_ITEM_NUMQUESTIONS})
-                    </a>
-                    <!-- END category_list_item -->
-
-                    <!-- BEGIN category_list_item_end -->
-            </ul>
-            </li>
-            <!-- END category_list_item_end -->
-
-        </ul>
-    </div>
-
-    <div class="edit-category">
-        <!-- BEGIN has_edit_category -->
-        <a id="editCat" class="btn modify" href="#"><span></span>Edit Category</a>
-
-        <form action='/survey/questionbank/modify.php' method='post' id="editCatForm" title="Edit Category">
-            <input name='questionCategoryId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
-
-            <p class="clearfix no-marg">
-                <input name='name' type='text' value='{QUESTION_CATEGORY}'/>
-                <input type='submit' value='Rename Category' class="submit-btn-plain no-marg"/>
-            </p>
-        </form>
-        <!-- END has_edit_category -->
-
-        <a id="newSubCat" class="btn add" href="#"><span></span>Add Subcategory</a>
-
-        <form action='/survey/questionbank/create' method='post' id="subcategoryForm" title="Add New Subcategory">
-            <input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
-
-            <p class="clearfix no-marg">
-                <input name='name' type='text' value='' class="required"/>
-                <input type='submit' value='Add New Subcategory' class="submit-btn-plain no-marg "/>
-            </p>
-        </form>
-        <form>
-            <p class="clearfix no-marg">
-                <a href='/survey/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="btn delete"><span></span>Remove
-                    this category</a>
-            </p>
-        </form>
-    </div>
-</div>

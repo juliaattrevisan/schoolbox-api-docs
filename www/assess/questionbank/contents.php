@@ -1,4 +1,32 @@
 <?php
+use Schoolbox\Assessment\Component\OnlineAssessment;
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Breadcrumbs;
+
+try {
+    $quizMapper = new OnlineAssessmentMapper();
+    $quiz = $quizMapper->findById($this->arg[1]);
+}
+catch (\Exception $e) {
+    error(112);
+}
+
+try {
+    $folderMapper = new FolderMapper();
+    $folder = $folderMapper->findById($quiz->getCategory()->getId());
+}
+catch (\Exception $e) {
+    error(13);
+}
+
+$sectionHandler = new \Assess_Section();
+$section = $sectionHandler->getById($this->arg[2]);
+
+//if (!$section) {
+//    error(115);
+//}
+
 $this->setFile(TEMPLATE_content, 'assess/questionbank/contents.html');
 $this->setBlock(TEMPLATE_content, 'welcome', 'welcome_block');
 $this->setBlock(TEMPLATE_content, 'category_selected', 'category_selected_block');
@@ -15,7 +43,7 @@ $this->setBlock(TEMPLATE_content, 'has_edit_category', 'has_edit_category_block'
 $this->setVar(
     array(
         'QUESTIONBANK_CATEGORY_ID' => $this->arg[0],
-        'ASSESS_ID' => $this->arg[1],
+        'ASSESS_ID' => $quiz->getId(),
         'SECTION_ID' => $this->arg[2],
     )
 );
@@ -26,8 +54,7 @@ $questionBankHandler = new Assess_Question_Bank();
  */
 $questionBankCategoryHandler = new Assess_Question_Category();
 
-$questionCategoryList = new Assess_Question_Category_List($this, $this->arg[1], $this->arg[0], $questionBankCategoryHandler->getPath(
-));
+$questionCategoryList = new Assess_Question_Category_List($this, $quiz->getId(), $this->arg[0], $questionBankCategoryHandler->getPath());
 $questionCategoryList->render();
 
 /* If expanding a particular category
@@ -133,7 +160,6 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
          */
         $this->setVar(
             array(
-                'show_submit_block' => '',
                 'show_delete_block' => '',
                 'question_block' => '',
                 'welcome_block' => ''
@@ -155,3 +181,29 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
 
     $this->parse('welcome_block', 'welcome');
 }
+
+/* Render out breadcrumbs
+ */
+$trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => $folder->getName(),
+        'href' => "/homepage/{$folder->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($quiz->getTitle()),
+        'href' => "/assess/summary/{$quiz->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($section['title']),
+        'href' => "/assess/summary/{$quiz->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => 'Add from Question Bank',
+        'href' => '',
+        'class' => 'active',
+    ]
+]);
