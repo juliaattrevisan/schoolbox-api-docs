@@ -116,6 +116,7 @@ if (!empty($_POST)) {
     $this->setBlock('type_selected', 'answerInputs', 'answerInputs_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
 	$this->setBlock('type_selected', 'has_answer_configuration', 'has_answer_configuration_block');
+    $this->setBlock('type_selected', 'has_marks', 'has_marks_block');
 	$this->setBlock('has_answer_configuration', 'answer_configuration', 'answer_configuration_block');
 
 	$this->setTitle('Create Question');
@@ -240,6 +241,8 @@ if (!empty($_POST)) {
     $this->setVar(array(
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
     ));
+
+    $this->parse('has_marks_block', 'has_marks');
 
     /* Render out breadcrumbs
      */
