@@ -79,7 +79,6 @@ else {
     $this->setTitle('Modify Question');
     $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
-    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 	$this->setBlock(TEMPLATE_content, 'has_answer_configuration', 'has_answer_configuration_block');
 	$this->setBlock('has_answer_configuration', 'answer_configuration', 'answer_configuration_block');
 
@@ -161,10 +160,6 @@ else {
         error(51);
     }
 
-    /* Show this Survey' contents
-      */
-    $this->setFile('assessContentsFragment', 'assess/contents.html');
-
     /* Options for importing into the Question Bank
       */
     $this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
@@ -185,16 +180,6 @@ else {
         'MARKS'                => $question['marks'],
         'DISABLED_SELECTED'    => '',
     ));
-
-    $assessHandler->renderAssessContents($section['assess_id'], $this);
-    $this->parse('allQuestions_block', 'assessContentsFragment', true);
-
-    /* Derive and render a category list
-      */
-    $questionBankCategoryHandler = new Survey_Question_Category();
-
-    $questionCategoryList = new Survey_Question_Category_List($this, $assess['assess_id'], 0, $questionBankCategoryHandler->getPath());
-    $questionCategoryList->render();
 
     /* Render out breadcrumbs
      */

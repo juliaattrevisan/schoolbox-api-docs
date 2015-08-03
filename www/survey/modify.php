@@ -80,7 +80,6 @@ if (!empty($_POST)) {
     $this->setFile(TEMPLATE_content, 'survey/modify.html');
     $this->setBlock(TEMPLATE_content, 'startMeridiem', 'startMeridiem_block');
     $this->setBlock(TEMPLATE_content, 'finishMeridiem', 'finishMeridiem_block');
-    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'durationHour', 'durationHour_block');
     $this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
@@ -178,15 +177,6 @@ if (!empty($_POST)) {
             'MAX_ATTEMPTS_CHECKED' => $assess['max_attempts'] == 0 ? 'checked="checked"' : '',
         )
     );
-
-    /* Show this Survey's contents
-     */
-    $this->setFile('assessContentsFragment', 'assess/contents.html');
-
-    $survey = new Survey_Main();
-    $survey->renderAssessContents($this->arg[0], $this);
-
-    $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
     /* Prevent importXML form from appearing
      */

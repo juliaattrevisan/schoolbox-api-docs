@@ -68,7 +68,6 @@ if (!empty($_POST)) {
     /* Render create page
      */
     $this->setFile(TEMPLATE_content, 'survey/section/create.html');
-    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setTitle('Create Section');
 
     $sectionHandler = new Survey_Section();
@@ -85,14 +84,6 @@ if (!empty($_POST)) {
         'SECTION_ID'           => '',
         'SEQUENCE'             => $sectionHandler->getNextSequence($this->arg[0])
     ));
-
-    /* Show this Assess' contents
-     */
-    $this->setFile('assessContentsFragment', 'assess/contents.html');
-
-    $assessHandler->renderAssessContents($assess['assess_id'], $this);
-
-    $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
     /* Render out breadcrumbs
      */

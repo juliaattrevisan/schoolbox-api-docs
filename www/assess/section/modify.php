@@ -98,15 +98,6 @@ if (!empty($_POST)) {
         'POOL'                 => $section['pool'] > 0 ? $section['pool'] : ''
     ));
 
-    /* Show this Assess' contents
-     */
-    $this->setFile('assessContentsFragment', 'assess/contents.html');
-
-    $assessHandler = new Assess_Main();
-    $assessHandler->renderAssessContents($assess['assess_id'], $this);
-
-    $this->parse('allQuestions_block', 'assessContentsFragment', true);
-
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
