@@ -13,6 +13,16 @@ $(function() {
 	if ($('.evaluation-legend').length > 0) {
 		$('.information-notification.hide').removeClass('hide');
 	}
+
+    $('[data-response-item]').click(function(event) {
+        event.preventDefault();
+
+        var data = $(this).attr('data-response-item');
+        var css = 'callout panel';
+
+        $('[data-response]').removeClass(css);
+        $('[data-response="'+data+'"]').addClass(css);
+    });
 });
 </script>
 
@@ -51,12 +61,14 @@ $(function() {
                             <!-- BEGIN respondent -->
                             <tr>
                                 <!-- BEGIN respondent_name -->
-                                <td>{RESPONDENT_NAME}</td>
+                                <td>
+                                    <span data-response="{RESPONDENT_RESPONSE}">{RESPONDENT_NAME}</span>
+                                </td>
                                 <!-- END respondent_name -->
                                 <td>
-                                    <ul>
+                                    <ul class="inline-list">
                                         <li>
-                                            <a class="response-item">{RESPONDENT_RESPONSE}</a>
+                                            <a href="#" data-response-item="{RESPONDENT_RESPONSE}">{RESPONDENT_RESPONSE}</a>
                                         </li>
                                     </ul>
                                 </td>
