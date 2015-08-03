@@ -96,6 +96,9 @@ if (is_numeric($this->arg[2])) {
 /* Set up template
  */
 $this->setFile(TEMPLATE_content, 'assess/studentReview.html');
+$this->setBlock(TEMPLATE_content, 'attemptFinished', 'attemptFinished_block');
+$this->setBlock(TEMPLATE_content, 'attemptNotYetFinished', 'attemptNotYetFinished_block');
+$this->setBlock(TEMPLATE_content, 'attemptUnfinished', 'attemptUnfinished_block');
 $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
 $this->setBlock(TEMPLATE_content, 'question', 'question_block');
 $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
@@ -140,8 +143,23 @@ $this->setVar(
         'SECTION_DESCRIPTION' => Scrub::html($section['description']),
         'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
         'ASSESS_CATEGORY_ID'   => $folder->getId(),
+        'attemptFinished_block'                => '',
+        'attemptNotYetFinished_block'          => '',
+        'attemptUnfinished_block'              => '',
     )
 );
+
+// Parse finished/unfinished/not finished yet blockage
+if (!isset($attempt['finish'])) {
+    $close = new DateTime($assess['finish']);
+    if ($close->getTimestamp() < $_SERVER['REQUEST_TIME']) {
+        $this->parse('attemptUnfinished_block', 'attemptUnfinished');
+    } else {
+        $this->parse('attemptNotYetFinished_block', 'attemptNotYetFinished');
+    }
+} else {
+    $this->parse('attemptFinished_block', 'attemptFinished');
+}
 
 /* Load all the questions for this section.
  * Note: only show the randomly-selected ones
