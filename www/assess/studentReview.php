@@ -151,8 +151,7 @@ $this->setVar(
 
 // Parse finished/unfinished/not finished yet blockage
 if (!isset($attempt['finish'])) {
-    $close = new DateTime($assess['finish']);
-    if ($close->getTimestamp() < $_SERVER['REQUEST_TIME']) {
+    if ($dueDate->isPast()) {
         $this->parse('attemptUnfinished_block', 'attemptUnfinished');
     } else {
         $this->parse('attemptNotYetFinished_block', 'attemptNotYetFinished');
