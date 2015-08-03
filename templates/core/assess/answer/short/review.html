@@ -1,43 +1,45 @@
-<div>
-    <label>Answer Given</label>
+<li class="row content">
+    <h4>Answer Given</h4>
     {ANSWER}
-</div>
+</li>
 
 <!-- BEGIN answerOption -->
-<div class="highlight-panel">
-    <label>Suggested Answer</label>
+<li class="row content highlight">
+    <h4>Suggested Answer</h4>
     {CORRECT_ANSWER}
-</div>
+</li>
 <!-- END answerOption -->
 
 <!-- BEGIN writable_comment -->
-<label>
-    Enter your comments
+<li class="row content">
+    <h4>Enter your comments</h4>
     <textarea name="comment">{REVIEWED_COMMENT}</textarea>
-</label>
+</li>
 <!-- END writable_comment -->
 
 <!-- BEGIN readonly_comment -->
-<label>
+<li class="row content">
     <em>{REVIEWED_COMMENT}</em>
-</label>
+</li>
 <!-- END readonly_comment -->
 
-<div class="row">
+<li class="row content">
     <!-- BEGIN writable_mark -->
-    <div class="small-6 columns">
+    <div class="small-6 columns no-pad">
         <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" class="required number"/>
     </div>
     <div class="small-6 columns">
-        <span class="grade">/ {QUESTION_MARKS}</span>
+        <p class="grade">
+            <span> / {QUESTION_MARKS}</span>
+        </p>
     </div>
     <!-- END writable_mark -->
 
     <!-- BEGIN readonly_mark -->
-    <div class="small-12 columns">
+    <div class="small-12 columns no-pad">
         <p class="grade">
             <span>{REVIEWED_MARKS} / {QUESTION_MARKS}</span>
         </p>
     </div>
     <!-- END readonly_mark -->
-</div>
+</li>
