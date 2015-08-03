@@ -138,17 +138,16 @@ $(document).ready(function() {
 
         <h2 class="subheader">Questions</h2>
         <!-- BEGIN question -->
-        <section class="content">
-            <form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}"
-                  data-role="question-submit"
-                  name="question-submit"
-                  class='validation_{RESPONSE_ID} questionForm'
-                  method="post"
-            >
-                <h3>Q{QUESTION_SEQUENCE}) ({QUESTION_MARKS} marks)</h3>
-                <article>{QUESTION_QUESTION}</article>
-                <!-- BEGIN answerInputs -->
-                <!-- END answerInputs -->
+        <section>
+            <form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" data-role="question-submit" name="question-submit" class='validation_{RESPONSE_ID} questionForm' method="post">
+                <ul class="information-list">
+                    <li class="row content">
+                        <h3>Q{QUESTION_SEQUENCE}) ({QUESTION_MARKS} marks)</h3>
+                        <article>{QUESTION_QUESTION}</article>
+                    </li>
+                    <!-- BEGIN answerInputs -->
+                    <!-- END answerInputs -->
+                </ul>
             </form>
         </section>
         <!-- END question -->
