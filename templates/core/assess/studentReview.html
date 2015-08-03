@@ -43,11 +43,15 @@ $(function() {
 
         <h2 class="subheader">Questions</h2>
         <!-- BEGIN question -->
-        <section class="content">
-            <h3>Q{QUESTION_SEQUENCE}) ({QUESTION_MARKS} marks)</h3>
-            <article>{QUESTION_QUESTION}</article>
-            <!-- BEGIN answerInputs -->
-            <!-- END answerInputs -->
+        <section>
+            <ul class="information-list">
+                <li class="row content">
+                    <h3>Q{QUESTION_SEQUENCE}) <span class="meta">({QUESTION_MARKS} marks)</span></h3>
+                    <article>{QUESTION_QUESTION}</article>
+                </li>
+                <!-- BEGIN answerInputs -->
+                <!-- END answerInputs -->
+            </ul>
         </section>
         <!-- END question -->
     </div>
