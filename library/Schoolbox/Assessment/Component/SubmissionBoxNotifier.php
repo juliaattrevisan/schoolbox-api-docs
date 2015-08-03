@@ -253,8 +253,10 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
     {
         $folder = $this->categoryMapper->findById($submissionBox->getCategory()->getId());
 
+        // full list of students in this folder
         $userCollection = UserAccessMapper::getInstance()->findStudentsInCategory($folder);
 
+        // list of submissions to this submissions box
         $submissionCollection = $this->submissionMapper->findByColumnList(array(
             'box_id' => $submissionBox->getId()
         ));
@@ -263,10 +265,20 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $submittedCollection = new Collection($submissionCollection->getColumnValues('owner'));
         $submittedIdArray    = $submittedCollection->getColumnValues('id');
 
+        // list of returns to this submission box
+        $returnCollection = $this->returnedWorkMapper->findByColumnList(array(
+            'box_id' => $submissionBox->getId()
+        ));
+
+        // extract the student (owner) column from the return collection returned
+        $returnedCollection = new Collection($returnCollection->getColumnValues('owner'));
+        $returnedIdArray    = $returnedCollection->getColumnValues('id');
+
         $unsubmittedCollection = new Collection();
 
         foreach ($userCollection as $user) {
-            if (!in_array($user->getId(), $submittedIdArray)) {
+            // if the student in question is in neither the submission array nor the return array, add them to the list
+            if (!in_array($user->getId(), $submittedIdArray) && !in_array($user->getId(), $returnedIdArray)) {
                 $unsubmittedCollection->add($user);
             }
         }
