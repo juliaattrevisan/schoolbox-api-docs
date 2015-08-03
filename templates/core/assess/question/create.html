@@ -1,111 +1,89 @@
-<!-- BEGIN custom_head -->
+{BREADCRUMB}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{CURRENT_SECTION_TITLE}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Create Question</h2>
+        <form action="/{ASSESS_KIND_LC}/question/create" method="post">
+            <input name="section_id" type="hidden" value="{SECTION_ID}" />
+            <input name="sequence" type="hidden" value="{SEQUENCE}" />
+            <section class="content">
+                    <label>
+                        Question Type
+                        <select name="type_id" id="type_id" data-question-type-select>
+                            <option disabled {DISABLED_SELECTED} value='-1'>-- Select Type --</option>
+                            <!-- BEGIN questionType -->
+                            <option value="{QUESTIONTYPE_TYPE_ID}" {QUESTIONTYPE_SELECTED}>{QUESTIONTYPE_DESCRIPTION}</option>
+                            <!-- END questionType -->
+                        </select>
+                    </label>
+
+                    <!-- BEGIN type_selected -->
+                    <label>
+                        Question
+                        <input name="question" id="question" type="text" size="35" value="{QUESTION}" />
+                    </label>
+
+                    <!-- BEGIN has_answer_configuration -->
+                    <fieldset>
+                        <legend>Configuration Options</legend>
+                        <!-- BEGIN answer_configuration -->
+
+                        <!-- END answer_configuration -->
+                    </fieldset>
+                    <!-- END has_answer_configuration -->
+
+                    <label>
+                        Marks
+                        <input data-marks name="marks" type="text" size="3" value="{MARKS}" />
+                    </label>
+
+                    <div>
+                        <!-- BEGIN answerInputs -->
+
+                        <!-- END answerInputs -->
+                    </div>
+                <!-- END type_selected -->
+            </section>
+            <label>
+                <input class='expand' type="submit" value="Add Question" {SUBMIT_DISABLED} />
+            </label>
+        </form>
+    </div>
+</div>
+
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 
 <script type="text/javascript">
-$(function() {
-    var section_id = '{SECTION_ID}';
+    $(function() {
+        var section_id = '{SECTION_ID}';
 
-	/* For the question part itself
-	 */
-	$.fn.alaressTiny({
-		mode: 'exact',
-		elements: 'question',
-		file_browser_category_id: '{ASSESS_CATEGORY_ID}',
-		removeformat_selector: 'b,strong,em,i,span,ins',
-		width: "100%"
-	});
+        /* For the question part itself
+         */
+        $.fn.alaressTiny({
+            mode: 'exact',
+            elements: 'question',
+            file_browser_category_id: '{ASSESS_CATEGORY_ID}',
+            removeformat_selector: 'b,strong,em,i,span,ins',
+            width: "100%"
+        });
 
-	/* Set current state of dropdown
-	 * Can't get val() of a disabled option element
-	 */
-	if ($('.question-type-select :selected').text() == '-- Select Type --') {
-		$('.next-stepm,.question-holder,.marks-holder, #importQuestion').hide();
-	}
-	else {
-		if ($('#type_id').val() == 'import') {
-			$('.next-step,.question-holder,.marks-holder,#create').hide();
-			$('#importQuestion').show();
-		}
-		else {
-			$('.next-step, .question-holder, .marks-holder').show();
-			$('#importQuestion').hide();
-		}
-	}
+        /* Change state
+         */
+        $('#type_id').change(function() {
+            window.location = '/{ASSESS_KIND_LC}/question/create/' + section_id + '/' + $('#type_id').val();
+        });
 
-	/* Change state
-	 */
-	$('#type_id').change(function() {
-		var url = '/assess/question/create/' + section_id + '/' + $('#type_id').val();
-		window.location = url;
-	});
-
-	/* Enforce two decimal places
-	 */
-	$('input[name=marks]').change(function() {
-		$(this).val(parseFloat($(this).val()).toFixed(2));
-	});
-});
+        /* Enforce two decimal places
+         */
+        $('[data-marks]').change(function() {
+            $(this).val(parseFloat($(this).val()).toFixed(2));
+        });
+    });
 </script>
-
-<!-- END custom_head -->
-<h1>Create Question in {CURRENT_SECTION_TITLE}
-    <a class="btn go-back marg tiny" href="/homepage/{ASSESS_CATEGORY_ID}"><span></span>Return to Homepage</a>
-</h1>
-<div class="evaluation-content">
-	<h2>Question Details</h2>
-	<form id="createQuestionForm" action="/assess/question/create" class="clearfix" method="post">
-
-		<p class="help">
-			Now that you've created a section for the test, use the drop down below to select a question type.
-		</p>
-
-		<label class="hide">
-			<input name="section_id" type="hidden" value="{SECTION_ID}" />
-			<input name="sequence" type="hidden" value="{SEQUENCE}" />
-		</label>
-
-		<label><strong>Type</strong>
-			<select name="type_id" id="type_id" class="question-type-select">
-				<option disabled {DISABLED_SELECTED} value='-1'>-- Select Type --</option>
-				<!-- BEGIN questionType -->
-				<option value="{QUESTIONTYPE_TYPE_ID}" {QUESTIONTYPE_SELECTED}>{QUESTIONTYPE_DESCRIPTION}</option>
-				<!-- END questionType -->
-			</select>
-		</label>
-
-		<label class="question-holder">Question
-			<div class="textarea-container" id="question_container">
-				<input name="question" class="mceSimple tinyValidate" id="question" type="text" size="35" value="{QUESTION}" />
-			</div>
-		</label>
-
-		<!-- BEGIN has_answer_configuration -->
-		<label>Configuration Options
-			<!-- BEGIN answer_configuration -->
-
-			<!-- END answer_configuration -->
-		</label>
-		<!-- END has_answer_configuration -->
-
-		<label class="marks-holder">Marks
-			<input name="marks" type="text" size="3" value="{MARKS}"/>
-		</label>
-
-		<div id="answer">
-			<!-- BEGIN answerInputs -->
-
-			<!-- END answerInputs -->
-		</div>
-
-		<p class="clearfix">
-			<input type="submit" name="create" id="create" value="Add Question" class="submit-btn-plain"/>
-		</p>
-	</form>
-</div>
-
-<div class="evaluation-menu">
-<!-- BEGIN allQuestions -->
-
-<!-- END allQuestions -->
-</div>

@@ -12,6 +12,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Breadcrumbs;
 
 $assessHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
@@ -101,34 +103,51 @@ if (!empty($_POST)) {
         error(115);
     }
 
+    try {
+        $folderMapper = new FolderMapper();
+        $folder = $folderMapper->findById($assess['category_id']);
+    }
+    catch (\Exception $e) {
+        error(13);
+    }
+
+    $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
+    $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
+
     /* Render create page
      */
-    $this->setFile(TEMPLATE_content, 'survey/question/create.html');
-    $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
+    $this->setFile(TEMPLATE_content, 'assess/question/create.html');
+    $this->setBlock(TEMPLATE_content, 'type_selected', 'type_selected_block');
+    $this->setBlock('type_selected', 'answerInputs', 'answerInputs_block');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
-    $this->setBlock(TEMPLATE_content, 'has_answer_configuration', 'has_answer_configuration_block');
+    $this->setBlock('type_selected', 'has_answer_configuration', 'has_answer_configuration_block');
     $this->setBlock('has_answer_configuration', 'answer_configuration', 'answer_configuration_block');
 
     $this->setTitle('Create Question');
 
     $this->setVar(
         array(
-            'has_answer_configuration_block' => ''
+            'has_answer_configuration_block' => '',
+            'type_selected_block' => '',
         )
     );
 
     $this->setVar(
         array(
-            'ASSESS_ASSESS_ID' => $section['assess_id'],
-            'ASSESS_KIND_LC'   => 'survey',
-            'ASSESS_KIND'      => 'Survey',
-            'ASSESS_CATEGORY_ID' => $assess['category_id'],
-            'SECTION_ID' => $this->arg[0],
+            'ASSESS_ASSESS_ID'      => $section['assess_id'],
+            'ASSESS_KIND_LC'        => 'survey',
+            'ASSESS_KIND'           => 'Survey',
+            'ASSESS_START'          => $assessStartDate->getShort(),
+            'ASSESS_FINISH'         => $assessFinishDate->getShort(),
+            'ASSESS_CATEGORY_ID'    => $folder->getId(),
+            'ASSESS_CATEGORY_NAME'  => $folder->getName(),
+            'SECTION_ID'            => $this->arg[0],
             'CURRENT_SECTION_TITLE' => Scrub::text($section['title']),
-            'SEQUENCE' => $questionHandler->getNextSequence($section['section_id']),
-            'QUESTION' => '',
-            'MARKS' => '',
+            'SEQUENCE'              => $questionHandler->getNextSequence($section['section_id']),
+            'QUESTION'              => '',
+            'MARKS'                 => '',
+            'SUBMIT_DISABLED'       => '',
         )
     );
 
@@ -143,6 +162,9 @@ if (!empty($_POST)) {
                 'DISABLED_SELECTED' => '',
             )
         );
+
+        $this->parse('type_selected_block', 'type_selected');
+
     } else {
         if ($this->arg[1] == 'import') {
             $this->setVar(
@@ -156,7 +178,8 @@ if (!empty($_POST)) {
                 array(
                     'IMPORT_SELECTED' => '',
                     'DISABLED_SELECTED' => 'selected=\'selected\'',
-                    'ANSWER_INPUTS' => $answerTemplate
+                    'ANSWER_INPUTS' => $answerTemplate,
+                    'SUBMIT_DISABLED' => 'disabled="disabled"'
                 )
             );
         }
@@ -247,4 +270,30 @@ if (!empty($_POST)) {
     $survey->renderAssessContents($section['assess_id'], $this);
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => $assess['title'],
+            'href' => "/assess/summary/{$assess['assess_id']}",
+            'class' => '',
+        ],
+        [
+            'text' => $section['title'],
+            'href' => "/assess/summary/{$assess['assess_id']}",
+            'class' => '',
+        ],
+        [
+            'text' => 'New Question',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }

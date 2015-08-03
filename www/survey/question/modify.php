@@ -7,6 +7,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Breadcrumbs;
 
 $factory = new Survey_Factory();
 $assessHandler = new Survey_Main();
@@ -104,6 +106,14 @@ else {
         error(115);
     }
 
+    try {
+        $folderMapper = new FolderMapper();
+        $folder = $folderMapper->findById($assess['category_id']);
+    }
+    catch (\Exception $e) {
+        error(13);
+    }
+
     $answerHandler = $factory->createAnswerModel($question['type_id']);
 
     /* Show question type options. For the Modify, preselect whichever it was
@@ -163,16 +173,17 @@ else {
     $assess = $assessHandler->getByID($section['assess_id']);
 
     $this->setVar(array(
-        'ASSESS_ASSESS_ID' => $section['assess_id'],
-        'ASSESS_KIND_LC'   => 'survey',
-        'ASSESS_KIND'      => 'Survey',
-        'ASSESS_CATEGORY_ID' => $assess['category_id'],
-        'SECTION_ID' => $question['section_id'],
-        'SEQUENCE' => $question['sequence'],
-        'QUESTION_ID' => $question['question_id'],
-        'QUESTION' => Scrub::text($question['question']),
-        'MARKS' => $question['marks'],
-        'DISABLED_SELECTED' => '',
+        'ASSESS_SECTION_TITLE' => $section['title'],
+        'ASSESS_ASSESS_ID'     => $section['assess_id'],
+        'ASSESS_KIND_LC'       => 'survey',
+        'ASSESS_KIND'          => 'Survey',
+        'ASSESS_CATEGORY_ID'   => $assess['category_id'],
+        'SECTION_ID'           => $question['section_id'],
+        'SEQUENCE'             => $question['sequence'],
+        'QUESTION_ID'          => $question['question_id'],
+        'QUESTION'             => Scrub::text($question['question']),
+        'MARKS'                => $question['marks'],
+        'DISABLED_SELECTED'    => '',
     ));
 
     $assessHandler->renderAssessContents($section['assess_id'], $this);
@@ -184,5 +195,31 @@ else {
 
     $questionCategoryList = new Survey_Question_Category_List($this, $assess['assess_id'], 0, $questionBankCategoryHandler->getPath());
     $questionCategoryList->render();
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => $assess['title'],
+            'href' => "/assess/summary/{$assess['assess_id']}",
+            'class' => '',
+        ],
+        [
+            'text' => $section['title'],
+            'href' => "/assess/summary/{$assess['assess_id']}",
+            'class' => '',
+        ],
+        [
+            'text' => "Q{$question['sequence']}",
+            'href' => "/assess/question/modify/{$question['question_id']}",
+            'class' => 'active',
+        ]
+    ]);
 }
 
