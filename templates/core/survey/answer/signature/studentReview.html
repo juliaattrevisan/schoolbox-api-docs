@@ -2,23 +2,22 @@
 <link rel="stylesheet" href="/javascript/signature/signaturepad.css">
 
 <script type='text/javascript'>
-	$(function() {
-		$('.sigPad').signaturePad({
-			displayOnly: true
-		}).regenerate({ANSWER});
-	});
+    $(function() {
+        $('.sigPad').signaturePad({
+            displayOnly: true
+        }).regenerate({ANSWER});
+    });
 </script>
 
-<strong>Your answer:</strong>
-<div class="answer-given-container">
-	<label class="sigPad">
-		<div class="sigPadWrapper">
-			<div class="typed"></div>
-			<canvas class="pad" width="500" height="142"></canvas>
-		</div>
-	</label>
-</div>
+<li class="row content">
+    <h4>Answer Given</h4>
+    <div class="sigPad">
+        <div class="sigPadWrapper">
+            <div class="typed"></div>
+            <canvas class="pad" width="500" height="142"></canvas>
+        </div>
+    </div>
+</li>
 
 <!-- BEGIN answerOption -->
-<div class="correct-answer-container">{CORRECT_ANSWER}</div>
 <!-- END answerOption -->
