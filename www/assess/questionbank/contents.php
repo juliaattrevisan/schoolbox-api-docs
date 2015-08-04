@@ -45,6 +45,7 @@ $this->setVar(
         'QUESTIONBANK_CATEGORY_ID' => $this->arg[0],
         'ASSESS_ID' => $quiz->getId(),
         'SECTION_ID' => $this->arg[2],
+        'show_submit_block' => '',
     )
 );
 
