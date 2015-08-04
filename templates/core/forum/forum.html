@@ -22,7 +22,7 @@
                 <th>Author</th>
                 <th>Replies</th>
                 <th>Views</th>
-                <th colspan="2">Last Post</th>
+                <th>Last Post</th>
             </tr>
         </thead>
         <tbody>
@@ -35,12 +35,12 @@
             </td>
             <!-- END modify_thread -->
             <td>
-                <h2><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE} {THREAD_LOCKED}</a></h2>
+                <h3><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE} {THREAD_LOCKED}</a></h3>
             </td>
             <td>
                 <div class="avatar-card">
                     <a href="/search/user/{THREAD_AUTHOR_ID}" title="View Profile">
-                        <img src="/portrait.php?userId={THREAD_AUTHOR_EXTERNAL_ID}&size=square32"/>
+                        <img src="/portrait.php?userId={THREAD_AUTHOR_EXTERNAL_ID}&size=square64"/>
                         <p>{THREAD_AUTHOR}</p>
                     </a>
                     <p class="meta">Posted {THREAD_TIME}</p>
@@ -52,15 +52,12 @@
                 <!-- BEGIN last_post -->
                 <div class="avatar-card">
                     <a href="/search/user/{THREAD_LAST_POST_USER_ID}" title="View Profile">
-                        <img src="/portrait.php?userId={THREAD_LAST_POST_USER_EXTERNAL_ID}&size=square32"/>
+                        <img src="/portrait.php?userId={THREAD_LAST_POST_USER_EXTERNAL_ID}&size=square64"/>
                         <p>{THREAD_LAST_POST_USER}</p>
                     </a>
                     <p class="meta">Posted {THREAD_LAST_POST_TIME}</p>
                 </div>
                 <!-- END last_post -->
-            </td>
-            <td>
-                <a href="/forum/thread/{THREAD_ID}/{THREAD_LAST_PAGE}/#bottom" class="no-text icon-view" title="View Thread"></a>
             </td>
         </tr>
         <!-- END thread -->
