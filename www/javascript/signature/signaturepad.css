@@ -21,10 +21,14 @@
     -ms-user-select: none;
     -o-user-select: none;
     user-select: none;
+    /* Heights still sadly necessary for consistent sigpad */
+    height: 142px;
 }
 
 .sigPad .sigPadWrapper {
     border: 1px solid #dedede;
+    /* Heights still sadly necessary for consistent sigpad */
+    height: 142px;
 }
 
 .sigPad .signaturePadAnswer {

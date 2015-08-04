@@ -49,12 +49,9 @@
         var canvas    = sigPadElement.find('canvas[data-role="signatureCanvas"]');
         var container = canvas.parent();
         var resizeSignature = function() {
-            // Retain aspect ratio of 500x142
-            // Try to resize signature too
             var signature = sigPad.getSignature();
             var width     = container.width();
-            var height    = width * (142/500);
-            canvas.attr({ width: width, height: height});
+            canvas.attr({ width: width });
             redrawSignature(signature);
         };
         $(window).resize(resizeSignature);
@@ -71,7 +68,7 @@
     <!-- BEGIN answerOption -->
     <div class="sigPadWrapper small-12 columns no-pad">
         <!--<div class="typed"></div>-->
-        <canvas class="pad" data-role="signatureCanvas"></canvas>
+        <canvas class="pad" data-role="signatureCanvas" height="142"></canvas>
 
         <!-- opacity:0, for validator to work - it doesn't like hidden fields -->
         <input type="text" name="answer" class="signaturePadAnswer" data-role="signatureInput">
