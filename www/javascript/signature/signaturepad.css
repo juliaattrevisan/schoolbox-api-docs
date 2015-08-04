@@ -21,15 +21,17 @@
     -ms-user-select: none;
     -o-user-select: none;
     user-select: none;
+    width: 500px;
+    height: 142px;
 }
 
-.sigPadWrapper {
+.sigPad .sigPadWrapper {
     border: 1px solid #dedede;
     width: 500px;
     height: 142px;
 }
 
-.evaluation-content label input[type="text"].signaturePadAnswer {
+.sigPad .signaturePadAnswer {
     border:0;
     opacity:0;
     height:0px;
