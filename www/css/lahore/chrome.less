@@ -1,0 +1,143 @@
+@charset "utf-8";
+// =============================================================================
+// Default v2 Schoolbox skin
+// =============================================================================
+//*
+//*   Ride The Whale                         ~777IIIIIIIIIII7~_
+//*                            7I       =%#%%%%7 @ %# /========
+//*                         ]7II7I###########%%%%%%%%777777
+//*                                ~I7###########777=
+//*                                     ##7      ]/
+//*                                     #/
+//*/
+// =============================================================================
+// 1. Load dependencies
+// =============================================================================
+@import "../core/mixins.less";
+@import "../core/variables.less";
+
+// =============================================================================
+// 2. And then variables can be overridden here
+// =============================================================================
+// Dimensions
+@search-width: 					256px;
+@logo-width: 					172px;
+@logo-height: 					35px;
+@infopanel-bellsprite:			'/images/demo/bell.png';
+
+// Generic colors
+@dark-blue:                     #013A63; // Dark Schoolbox Blue
+@body-background: 				#EEEEEE; // Body, but not the content area
+@content-background: 			#FFFFFF; // Used for forms
+@dark: 							#FAFAFA; // Alternate tigerstriping color
+@border-color: 					#EEEEEE; // Bordering @dark
+@alternate-background: 			#FFFFFF; // Sections such as admin
+
+// Basic type
+@body-text: 					@black;
+@secondary-text: 				#797979;
+@link: 							#0066B0;
+@link-hover: 					#FF5A00;
+
+// Main banner & Search
+@banner-background: 			@link;
+@banner-color:      			#FFFFFF;
+@banner-links:      			@banner-color;
+@search-color:                  @banner-color;
+@banner-height:     			72px;
+
+// Modules
+@module-heading: 				#000000;
+@module-background: 			#E5EFF7;
+@admin-nav:                     @link;
+
+// Refers to the left navigation
+@navigation-width:				200px;
+@navigation-padding:			16px;
+@navigation-background:  		transparent;
+@navigation-color:  			#000000;
+@navigation-links:  			@navigation-color;
+@navigation-hover-background: 	@link;
+@navigation-hover-color:  		#FFFFFF;
+@navigation-sub-background:  	@body-background;
+@submit-btn:                    @banner-background;
+
+// Flyout Menus and Messages
+@notify-color:					@negative-color;
+@notify-text-color:				@banner-color;
+@notify-open-text-color:		@banner-background;
+@flyout-color:					@navigation-links;
+@flyout-header-color:			@navigation-color;
+@flyout-background:				@content-background;
+@flyout-hover-color:			@navigation-hover-color;
+@flyout-hover-background:		@navigation-hover-background;
+@flyout-pad-height:				2px;
+@flyout-highlight:				@dark;
+
+// Main "Tab" Navigation
+@tab-background:				transparent;
+@tab-color:						#FFFFFF;
+@tab-hover-background:		    @tab-color;
+@tab-hover-color:				@link;
+
+// Footer text
+@footer-color:					#797979;
+@footer-links:					@footer-color;
+
+// Optional features
+//@header-version: 				2;
+
+// =============================================================================
+// 3. Load core
+// =============================================================================
+@import "../core/core.less";
+
+// =============================================================================
+// 4. Any overrides for styles can be specified below
+// =============================================================================
+/*
+ * Demo Dashboards
+ */
+
+.demo-dash{
+	ul{
+		margin: 0 !important;
+		li{
+			float: left;
+			padding: 7px 4px !important;
+			margin: 0 !important;
+			height: 135px;
+			list-style: none;
+		}
+		a{ 
+			display: block;
+			float: left;
+			text-align: center;
+			padding: 92px 0 0 0;
+			font-weight: bold;
+			width: 88px;
+			.transition (opacity 0.5s);
+			&:hover{
+				cursor: pointer;
+				opacity: 0.8;
+			}
+		}
+		.admin{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+		.calendar-dash{ background: url('/images/demo/dashboard-icons.png') -88px 0px no-repeat; }
+		.due-work{ background: url('/images/demo/dashboard-icons.png') -176px 0px no-repeat; }
+		.eportfolio{ background: url('/images/demo/dashboard-icons.png') -264px 0px no-repeat; }
+		.online-forms{ background: url('/images/demo/dashboard-icons.png') -352px 0px no-repeat; }
+		.leave{ background: url('/images/demo/dashboard-icons.png') -440px 0px no-repeat; }
+		.manage-users{ background: url('/images/demo/dashboard-icons.png') -528px 0px no-repeat; }
+		.network{ background: url('/images/demo/dashboard-icons.png') -616px 0px no-repeat; }
+		.news{ background: url('/images/demo/dashboard-icons.png') -704px 0px no-repeat; }
+		.parents-friends{ background: url('/images/demo/dashboard-icons.png') -792px 0px no-repeat; }
+		.parent-dir{ background: url('/images/demo/dashboard-icons.png') -880px 0px no-repeat; }
+		.payments{ background: url('/images/demo/dashboard-icons.png') -968px 0px no-repeat; }
+		.resource-booking{ background: url('/images/demo/dashboard-icons.png') -1056px 0px no-repeat; }
+		.sport{ background: url('/images/demo/dashboard-icons.png') -1144px 0px no-repeat; }
+		.staff-dir{ background: url('/images/demo/dashboard-icons.png') -1232px 0px no-repeat; }
+		.synergetic{ background: url('/images/demo/dashboard-icons.png') -1320px 0px no-repeat; }
+		.timetable{ background: url('/images/demo/dashboard-icons.png') -1408px 0px no-repeat; }
+	}
+}
