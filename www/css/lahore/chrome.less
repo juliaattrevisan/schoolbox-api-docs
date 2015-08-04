@@ -20,14 +20,15 @@
 // 2. And then variables can be overridden here
 // =============================================================================
 // Dimensions
-@search-width: 					256px;
-@logo-width: 					172px;
-@logo-height: 					35px;
-@infopanel-bellsprite:			'/images/demo/bell.png';
+@search-width: 					195px;
+@logo-width: 					331px;
+@logo-height: 					47px;
+@infopanel-bellsprite:			'/images/lahore/bell.png';
+@infopanel-height:			32px;
 
 // Generic colors
 @dark-blue:                     #013A63; // Dark Schoolbox Blue
-@body-background: 				#EEEEEE; // Body, but not the content area
+@body-background: 				#e2e2e9; // Body, but not the content area
 @content-background: 			#FFFFFF; // Used for forms
 @dark: 							#FAFAFA; // Alternate tigerstriping color
 @border-color: 					#EEEEEE; // Bordering @dark
@@ -36,28 +37,28 @@
 // Basic type
 @body-text: 					@black;
 @secondary-text: 				#797979;
-@link: 							#0066B0;
-@link-hover: 					#FF5A00;
+@link: 							#01559d;
+@link-hover: 					lighten(@link,5%);
 
 // Main banner & Search
-@banner-background: 			@link;
+@banner-background: 			#333366;
 @banner-color:      			#FFFFFF;
 @banner-links:      			@banner-color;
-@search-color:                  @banner-color;
-@banner-height:     			72px;
+@search-color:            @banner-color;
+@banner-height:     			88px;
 
 // Modules
-@module-heading: 				#000000;
-@module-background: 			#E5EFF7;
-@admin-nav:                     @link;
+@module-heading: 					#333366;
+@module-background: 			#e2e2e9;
+@admin-nav:               #333366;
 
 // Refers to the left navigation
 @navigation-width:				200px;
 @navigation-padding:			16px;
 @navigation-background:  		transparent;
-@navigation-color:  			#000000;
+@navigation-color:  			@banner-background;
 @navigation-links:  			@navigation-color;
-@navigation-hover-background: 	@link;
+@navigation-hover-background: 	@banner-background;
 @navigation-hover-color:  		#FFFFFF;
 @navigation-sub-background:  	@body-background;
 @submit-btn:                    @banner-background;
@@ -95,6 +96,62 @@
 // =============================================================================
 // 4. Any overrides for styles can be specified below
 // =============================================================================
+html,
+body{
+	font-family: 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif;
+}
+
+#header{
+	.logo{
+		left: 18px;
+	}
+	#search-field{
+		background: rgba(255, 255, 255, 0.1);
+	}
+	#tabs{
+		position: relative;
+    top: 16px;
+    z-index: 1;
+		.current a{
+			color: @banner-background;
+		}
+	}
+}
+
+.admin-nav{
+	li a{
+		background: #79799a;
+		border: 0;
+		color: @white;
+	}
+	.current a{
+		color: @white;
+	}
+}
+
+body.login{
+	#container{
+		background: @white;
+	}
+	.logo{
+		display: block;
+		margin: 25px 0;
+	}
+	input[type="text"],
+	input[type="password"]{
+		background-color: #eee !important;
+		color: @black;
+		.placeholder(@black);
+	}
+	input[type="submmit"]{
+		font-weight: bold;
+	}
+	label,
+	.forgotten a{
+		color: @link !important;
+	}
+}
+
 /*
  * Demo Dashboards
  */
@@ -109,7 +166,7 @@
 			height: 135px;
 			list-style: none;
 		}
-		a{ 
+		a{
 			display: block;
 			float: left;
 			text-align: center;
