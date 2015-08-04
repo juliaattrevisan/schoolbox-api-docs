@@ -53,7 +53,7 @@ abstract class Evaluation_Question_Category_List
     private function getJsNodePath($category_id)
     {
         $pathArray = array();
-        $path = array('\'node_0\'');
+        $path = array();
 
         $allPaths = $this->getPathSegment($category_id, $pathArray);
 
@@ -64,6 +64,8 @@ abstract class Evaluation_Question_Category_List
                 $path[] = '\'node_' . $currentPath['question_category_id'] . '\'';
             }
         }
+        // Open the home path too
+        $path[] = '\'node_0\'';
 
         return implode(',', $path);
     }
