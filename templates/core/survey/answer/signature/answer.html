@@ -15,7 +15,7 @@
     var dm = createDelayManager();
 
     $(function() {
-        $('.sigPad').signaturePad({
+        $('[data-signature]').signaturePad({
             lineTop: 102,
             lineWidth: 0,
             lineMargin: 16,
@@ -32,7 +32,10 @@
                         id: {QUESTION_ID}
                     });
                 }, 3000);
-            }
+            },
+            sig: 'canvas[data-role="signatureCanvas"]',
+            clear: 'a[data-role="signatureClear"]',
+            output: 'input[data-role="signatureInput"]'
         }).regenerate({ANSWER});
     });
 </script>
@@ -42,18 +45,18 @@
 
 <span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
 
-<div class="sigPad row">
+<div class="sigPad row" data-signature>
     <!-- BEGIN answerOption -->
     <div class="sigPadWrapper small-12 columns no-pad">
-        <div class="typed"></div>
-        <canvas class="pad" width="500" height="142"></canvas>
+        <!--<div class="typed"></div>-->
+        <canvas class="pad" width="500" height="142" data-role="signatureCanvas"></canvas>
+
+        <!-- opacity:0, for validator to work - it doesn't like hidden fields -->
+        <input type="text" name="answer" class="signaturePadAnswer" data-role="signatureInput">
     </div>
 
-    <!-- opacity:0, for validator to work - it doesn't like hidden fields -->
-    <input type="text" name="answer" class="output signaturePadAnswer">
-
-    <p class="clearButton small-12 columns no-pad">
-        <a class="button" href="#clear">Clear Signature</a>
+    <p class="small-12 columns no-pad">
+        <a class="button" href="#" data-role="signatureClear">Clear Signature</a>
     </p>
     <!-- END answerOption -->
 </div>
