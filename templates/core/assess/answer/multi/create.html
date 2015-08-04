@@ -34,7 +34,8 @@
 <script type="text/javascript">
 $(function() {
     $('#createQuestionForm').multiRadioCreate({
-        urlPrefix: '/assess/question/create',
+        availability: 'assess',
+        questionBank: false,
         customValidationRules: function(config) {
             $.fn.addCustomRules_greaterThanZero(config);
             $.fn.addCustomRules_emptyInputs(config);

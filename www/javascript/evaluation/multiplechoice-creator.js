@@ -24,7 +24,12 @@
 
         /* Mash the validator on
          */
-        applyValidator();
+        if (config.mode == 'create') {
+            applyCreateValidator();
+        }
+        else {
+            applyModifyValidator();
+        }
 
         /**
          * Init
@@ -36,6 +41,10 @@
         function init(options, element) {
             var defaults = {
                 element: element,
+
+                /* Which validator to use
+                 */
+                mode: 'create',
 
                 /* The element which contains all the answer options to choooze from
                  */
@@ -49,9 +58,13 @@
                  */
                 maxOptions: 702,
 
-                /* POST to this url
+                /* Quiz or Survey
                  */
-                urlPrefix: '/assess/question/create',
+                availability: 'assess',
+
+                /* Whether you came from the QuestionBank
+                 */
+                questionBank: false,
 
                 /* An element containing all the available configuration options
                  */
@@ -154,7 +167,7 @@
         /**
          * Apply the validator to the form
          */
-        function applyValidator() {
+        function applyCreateValidator() {
             $(config.element).submit(function() {
                 // update underlying textarea before submit validation
                 tinyMCE.triggerSave();
@@ -192,20 +205,62 @@
                     /* Collate the usual fields containing ids.
                      * Collate the checkboxes too but append all the possibilities as well!
                      */
-                    var data = {
-                        section_id: theForm.find('input[name=section_id]').val(),
-                        sequence: theForm.find('input[name=sequence]').val(),
-                        type_id: theForm.find('select[name=type_id]').val(),
-                        question: tinyMCE.get('question').getContent(),
-                        marks: theForm.find('input[name=marks]').val(),
-                        allAnswers: JSON.stringify(answerCollection),
-                        configuration: JSON.stringify($(config.configuration).find('input, textarea, select').serializeArray())
-                    };
+                    var data = {};
+                    var redirect = '';
+
+                    /* Create in Quiz/Survey
+                     */
+                    if (config.mode == 'create') {
+                        data = {
+                            section_id: theForm.find('input[name=section_id]').val(),
+                            sequence: theForm.find('input[name=sequence]').val(),
+                            type_id: theForm.find('select[name=type_id]').val(),
+                            question: tinyMCE.get('question').getContent(),
+                            marks: theForm.find('input[name=marks]').val(),
+                            allAnswers: JSON.stringify(answerCollection),
+                            configuration: JSON.stringify($(config.configuration).find('input, textarea, select').serializeArray())
+                        };
+
+                        redirect = config.availability + '/' + data.section_id + '/create';
+                    }
+                    else {
+                        /* Modify in Quiz/Survey
+                         */
+                        if ((typeof config.questionBank == "undefined") || (config.questionBank === false)) {
+                            data = {
+                                section_id: theForm.find('input[name=section_id]').val(),
+                                question_id: theForm.find('input[name=question_id]').val(),
+                                sequence: theForm.find('input[name=sequence]').val(),
+                                type_id: theForm.find('input[name=type_id]').val(),
+                                question: tinyMCE.get('question').getContent(),
+                                marks: theForm.find('input[name=marks]').val(),
+                                allAnswers: JSON.stringify(answerCollection),
+                                configuration: JSON.stringify($('#configuration').find('input, textarea, select').serializeArray())
+                            };
+
+                            redirect = config.availability + '/modify/' + data.question_id;
+                        }
+                        /* Modify directly in the Question Bank
+                         */
+                        else {
+                            data = {
+                                question_bank_id: theForm.find('input[name=question_bank_id]').val(),
+                                sequence: theForm.find('input[name=sequence]').val(),
+                                type_id: theForm.find('input[name=type_id]').val(),
+                                question: tinyMCE.get('question').getContent(),
+                                marks: theForm.find('input[name=marks]').val(),
+                                allAnswers: JSON.stringify(answerCollection),
+                                configuration: JSON.stringify($('#configuration').find('input, textarea, select').serializeArray())
+                            };
+
+                            redirect = config.questionBank.url;
+                        }
+                    }
 
                     /* Submit via POST and redirect to question creation screen upon done
                      */
                     $.post(theForm.attr('action'), data, function(responseText) {
-                        window.location = config.urlPrefix + '/' + data.section_id;
+                        window.location = redirect;
                     });
 
                     tinyMCE.triggerSave();
