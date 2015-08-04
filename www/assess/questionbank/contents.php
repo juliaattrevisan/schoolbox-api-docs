@@ -162,7 +162,8 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
             array(
                 'show_delete_block' => '',
                 'question_block' => '',
-                'welcome_block' => ''
+                'welcome_block' => '',
+                'show_submit_block' => '',
             )
         );
 

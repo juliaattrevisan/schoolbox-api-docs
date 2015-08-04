@@ -59,25 +59,22 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
      *
 	 * @param  $questionHandler
      * @param  $questionCategoryID
-     * @param  $typeID
      * @param  $questionID
-     * @param  $answerID
-     * @param  $marks
-     * @return void
+     * @return bool
      */
-    public function addQuestion($questionHandler, $questionCategoryID, $typeID, $questionID, $answerID, $marks) {
+    public function addQuestion($questionHandler, $questionCategoryID,  $questionID) {
 
 		/* Raw questionHandler context, to get the question info
 		 */
         $question = $questionHandler->getByID($questionID);
-        $answer = $this->getAnswerHandler()->getByID($answerID);
+        $answer   = $this->getAnswerHandler()->getByQuestionID($questionID);
 
-        $this->create(array(
+         return !!$this->create(array(
             'question_category_id' => $questionCategoryID,
-            'type_id' => $typeID,
+            'type_id' => $question['type_id'],
             'question' => $question['question'],
             'answer' => $answer['answer'],
-            'marks' => $marks,
+            'marks' => $question['marks'],
 			'config' => $question['config'],
         ));
     }
@@ -122,7 +119,7 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
 	/**
 	 * Set answer handler
 	 *
-	 * @param null $answerHandler
+	 * @param Assess_Answer $answerHandler
 	 */
 	protected function setAnswerHandler($answerHandler) {
 		$this->answerHandler = $answerHandler;
@@ -131,7 +128,7 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
 	/**
 	 * Get answer handler
 	 *
-	 * @return null
+	 * @return Assess_Answer
 	 */
 	public function getAnswerHandler() {
 		return $this->answerHandler;

@@ -119,7 +119,6 @@ if (!empty($_POST)) {
     $this->setFile(TEMPLATE_content, 'assess/question/create.html');
     $this->setBlock(TEMPLATE_content, 'type_selected', 'type_selected_block');
     $this->setBlock('type_selected', 'answerInputs', 'answerInputs_block');
-    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
     $this->setBlock('type_selected', 'has_answer_configuration', 'has_answer_configuration_block');
     $this->setBlock('has_answer_configuration', 'answer_configuration', 'answer_configuration_block');
@@ -261,15 +260,6 @@ if (!empty($_POST)) {
     if (!$setTemplate) {
         $this->setVar('answerInputs_block', '');
     }
-
-    /* Show this Survey' contents
-     */
-    $this->setFile('assessContentsFragment', 'assess/contents.html');
-
-    $survey = new Survey_Main();
-    $survey->renderAssessContents($section['assess_id'], $this);
-
-    $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
     /* Render out breadcrumbs
      */

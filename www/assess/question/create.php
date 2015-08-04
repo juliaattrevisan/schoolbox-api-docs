@@ -114,7 +114,6 @@ if (!empty($_POST)) {
     $this->setFile(TEMPLATE_content, 'assess/question/create.html');
     $this->setBlock(TEMPLATE_content, 'type_selected', 'type_selected_block');
     $this->setBlock('type_selected', 'answerInputs', 'answerInputs_block');
-    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
 	$this->setBlock('type_selected', 'has_answer_configuration', 'has_answer_configuration_block');
 	$this->setBlock('has_answer_configuration', 'answer_configuration', 'answer_configuration_block');
@@ -235,20 +234,12 @@ if (!empty($_POST)) {
         $this->setVar('answerInputs_block', '');
     }
 
-    /* Show this Assess' contents
-     */
-    $this->setFile('assessContentsFragment', 'assess/contents.html');
-
     $assessHandler = new Assess_Main();
-    $assessHandler->renderAssessContents($section['assess_id'], $this);
-
     $assess = $assessHandler->getByID($section['assess_id']);
 
     $this->setVar(array(
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
     ));
-
-    $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
     /* Render out breadcrumbs
      */

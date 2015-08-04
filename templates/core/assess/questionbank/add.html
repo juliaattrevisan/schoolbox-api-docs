@@ -1,0 +1,92 @@
+<h2>Import into Question Bank</h2>
+
+<form action="/{ASSESS_KIND_LC}/questionbank/addQuestion" method="post">
+    <input name="question_id" type="hidden" value="{CATEGORY_LIST_ITEM_ASSESS_ID}" />
+    <input name="question_category" type="hidden" value="" />
+
+    <div class="row">
+        <div class="small-12 column no-pad">
+            <p class="alert-box secondary">
+                Put this question into the Question Bank so you can import it into other {ASSESS_KIND_PLURAL}.
+            </p>
+        </div>
+        <div class="small-12 island no-pad">
+            <h3>Question Category</h3>
+            <div id='category-tree' class="content">
+                <!-- BEGIN category_list_start -->
+                <ul>
+                    <!-- END category_list_start -->
+
+                    <!-- BEGIN category_list_item_start -->
+                    <ul>
+                        <!-- END category_list_item_start -->
+
+                        <!-- BEGIN category_list_item -->
+                        <li id='{CATEGORY_LIST_ITEM_NODE}' class='{CATEGORY_LIST_ITEM_SELECTED}'>
+                            <a href='#'>
+                                {CATEGORY_LIST_ITEM_NAME} ({CATEGORY_LIST_ITEM_NUMQUESTIONS})
+                            </a>
+                            <!-- END category_list_item -->
+
+                            <!-- BEGIN category_list_item_end -->
+                    </ul>
+                    </li>
+                    <!-- END category_list_item_end -->
+                </ul>
+            </div>
+        </div>
+        <div class="small-12 column no-pad">
+            <input class="expand" type="submit" value="Add To Question Bank" disabled="disabled" />
+        </div>
+    </div>
+</form>
+<a class="close-reveal-modal" aria-label="Close">&#215;</a>
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.min.js"></script>
+<script type="text/javascript">
+
+    $(function () {
+        var form = $('#question-bank').children('form'),
+            qid  = form.children('input[name=question_id]'),
+            cid  = form.children('input[name=question_category]');
+
+        // reinit foundation to account for ajax'd content
+        $(document).foundation();
+
+        $("#category-tree")
+            .on('select_node.jstree', function(event, jstree) {
+                $('#question-bank').find('input[type=submit]').prop('disabled', false);
+
+                cid.val(jstree.selected[0].replace(/^node_/, ''));
+            })
+            .on('deselect_node.jstree', function() {
+                $('#question_category').val('');
+            })
+            .jstree({
+                "animation":50,
+                "core":{
+                    force_text: true,
+                    multiple:false,
+                    "themes": {
+                        "variant" : "schoolbox",
+                        "dots" : true,
+                        "icons" : false
+                    }
+                }
+            });
+
+        form.on('submit', function (e) {
+            e.preventDefault();
+
+            var catName = $('#category-tree').data('jstree')._data.core.last_clicked.text.trim().replace(/ \([0-9]*\)/, '');
+
+            form.find('input[type=submit]').val('Adding to ' + catName).prop('disabled', true);
+
+            $.post(form[0].action, form.serialize(), function () {
+                var href = window.location.origin + '/{ASSESS_KIND_LC}/questionbank/added/' + qid.val();
+
+                $('#bank-success').foundation('reveal').foundation('reveal', 'open', href);
+            });
+        });
+    });
+
+</script>

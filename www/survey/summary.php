@@ -55,7 +55,7 @@ $this->setVar(array(
     'ASSESS_CATEGORY_NAME' => $folder->getName(),
 ));
 
-$this->setFile(TEMPLATE_content, 'survey/summary.html');
+$this->setFile(TEMPLATE_content, 'assess/summary.html');
 $this->setFile('assessContentsFragment', 'assess/contents.html');
 $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
@@ -87,7 +87,7 @@ if (is_array($allSummary) && count($allSummary)) {
 
 /* Render out breadcrumbs
  */
-$trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail = new Breadcrumbs();
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
         'text' => $folder->getName(),

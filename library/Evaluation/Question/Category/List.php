@@ -9,19 +9,29 @@
  */
 abstract class Evaluation_Question_Category_List
 {
-    private $page = null;
+    /** @var SitePage */
+    private $page;
+
+    /** @var array */
     private $allCategories = array();
+
+    /** @var int */
     private $selectedAssess = 0;
+
+    /** @var int */
     private $selectedCategory = 0;
-    private $categoryHandler = null;
+
+    /** @var Evaluation_Question_Category */
+    private $categoryHandler;
+
 
     /**
      * Constructor
      *
-     * @param $page
-     * @param $selectedAssess
-     * @param $selectedCategory
-     * @param $allCategories
+     * @param SitePage  $page
+     * @param int       $selectedAssess
+     * @param int       $selectedCategory
+     * @param array     $allCategories
      */
     public function __construct($page, $selectedAssess, $selectedCategory, $allCategories)
     {
@@ -54,6 +64,8 @@ abstract class Evaluation_Question_Category_List
                 $path[] = '\'node_' . $currentPath['question_category_id'] . '\'';
             }
         }
+        // Open the home path too
+        $path[] = '\'node_0\'';
 
         return implode(',', $path);
     }
@@ -103,7 +115,16 @@ abstract class Evaluation_Question_Category_List
      */
     public function render()
     {
-        $this->build($this->getAllCategories());
+        // Shoehorn in a root node
+        $rootNode = [
+            'question_category_id' => 0,
+            'parent_id'            => '#',
+            'name'                 => 'Home',
+            'availability'         => '',
+            'numQuestions'         => 0,
+            'children'             => $this->getAllCategories(),
+        ];
+        $this->build([$rootNode]);
 
         /* Tell javascript tree which nodes to open.
            */
@@ -156,7 +177,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Get page
      *
-     * @return null
+     * @return SitePage
      */
     private function getPage()
     {
@@ -166,7 +187,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Set page
      *
-     * @param $page
+     * @param SitePage $page
      */
     private function setPage($page)
     {
@@ -176,7 +197,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Set all categories
      *
-     * @param $allCategories
+     * @param array $allCategories
      */
     private function setAllCategories($allCategories)
     {
@@ -196,7 +217,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Set selected category
      *
-     * @param $selectedCategory
+     * @param int $selectedCategory
      */
     private function setSelectedCategory($selectedCategory)
     {
@@ -216,7 +237,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Set selected assess
      *
-     * @param $selectedAssess
+     * @param int $selectedAssess
      */
     private function setSelectedAssess($selectedAssess)
     {
@@ -236,7 +257,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Set category handler
      *
-     * @param $categoryHandler
+     * @param Assess_Question_Category $categoryHandler
      */
     private function setCategoryHandler($categoryHandler)
     {
@@ -246,7 +267,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Get category handler
      *
-     * @return Assess_Question_Category|null
+     * @return Assess_Question_Category
      */
     private function getCategoryHandler()
     {

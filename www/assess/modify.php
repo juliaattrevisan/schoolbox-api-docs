@@ -121,7 +121,6 @@ else {
     $this->setBlock('assess_timespan', 'finishMeridiem', 'finishMeridiem_block');
     $this->setBlock(TEMPLATE_content,  'importXML', 'importXML_block');
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
-	$this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
 
     $this->setVar(array(
@@ -238,15 +237,6 @@ else {
 	$widgets = new \Schoolbox\Assessment\Widgets();
 	$widgets->outputVisibilityDropdown($this, $assessment->getMarkVisibility());
 	$this->parse('marktype_block', 'marktype');
-
-	/* Show this Assess' contents
-	 */
-    $this->setFile('assessContentsFragment', 'assess/contents.html');
-
-    $assess = new Assess_Main();
-    $assess->renderAssessContents($this->arg[0], $this);
-
-    $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
     /* Prevent importXML form from appearing
      */

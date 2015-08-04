@@ -96,7 +96,7 @@
     <div class="small-12 island">
         <h2 class="subheader">Categories</h2>
         <section>
-            <div id='categoryTree' class="content">
+            <div id='category-tree' class="content">
                 <!-- BEGIN category_list_start -->
                 <ul>
                     <!-- END category_list_start -->
@@ -177,27 +177,15 @@
          */
         $('[data-delete-question]').click(function(event) {
             event.preventDefault();
-
             $(this).confirmDialog({
                 text: 'Do you want to remove this question from the Question Bank?',
-                confirmEvent: function() {
-                    // Build a hidden input with the delete button's name/val,
-                    // then submit
-                    var allQuestions = $('#questionBankForm').find('input[name="question_bank_id[]"]:checked');
-
-                    if (allQuestions.length) {
-                        $.post('/assess/questionbank/removeQuestion', $('#questionBankForm').serialize(), function (response) {
-                            alert(response);
-                            location.reload();
-                        });
-                    }
-                }
+                confirmEvent: $.confirmDialog.followHref($(this))
             });
         });
 
         /* Folder tree
          */
-        $("#categoryTree")
+        $("#category-tree")
             .on('ready.jstree', function (event, jstree) {
                 var openNodes = [
                     {SELECTED_NODES}
