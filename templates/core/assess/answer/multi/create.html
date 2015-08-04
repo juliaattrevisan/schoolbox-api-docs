@@ -142,14 +142,13 @@ $(document).ready(function() {
                 minlength: 1,
                 greaterThanZero:true
             },
+            'answer[]': {
+                somethingChecked: true
+            },
             'answerDescription[]': {
                 emptyInputs: true
-            },
-            'answer[]':{
-                nothingChecked:true
             }
-        }
-        ,
+        },
 
         errorPlacement: function(error, element) {
 
@@ -178,9 +177,15 @@ $(document).ready(function() {
         }
     });
 
+    /* Marks must be greater than zero
+     */
+    $.validator.addMethod("greaterThanZero", function(value, element) {
+        return this.optional(element) || (parseFloat(value) > 0);
+    }, "Amount must be greater than zero");
+
     /* Enforce multiple answer options
      */
-    jQuery.validator.addMethod('emptyInputs', function(value, element) {
+    $.validator.addMethod('emptyInputs', function(value, element) {
         var fieldsAreFilled = true;
 
         $.each($('#answerCollection [data-input]'), function(index, element) {
@@ -196,26 +201,23 @@ $(document).ready(function() {
         return fieldsAreFilled;
     }, 'Please fill out all answers');
 
-    /* Removed mandatory correct answer from multiple choice
+    /* Enforce mandatory correct answer from multiple choice
      */
-    jQuery.validator.addMethod('nothingChecked', function(value, element) {
+    $.validator.addMethod('somethingChecked', function(value, element) {
+        var fieldsAreFilled = true;
+
         $.each($('#answerCollection [data-input]'), function(index, element) {
+            var description = $.trim($(element).find('[data-answer-description]').val());
 
-            console.log($(element).find('[data-answer-option]'));
-
-            if ($(element).find('[data-answer-option]').is(':checked')) {
-                return true;
+            /* Ignore empty answers that weren't removed
+             */
+            if (description == '') {
+                fieldsAreFilled = false;
             }
         });
 
-        return false;
+        return fieldsAreFilled;
     }, 'Tick at least one checkbox');
-
-    /* Marks must be greater than zero
-     */
-    jQuery.validator.addMethod("greaterThanZero", function(value, element) {
-        return this.optional(element) || (parseFloat(value) > 0);
-    }, "Amount must be greater than zero");
 
     /**
      * Reindex letter index
@@ -231,7 +233,7 @@ $(document).ready(function() {
              */
             var id = 'answer-option-'+i;
 
-            $(element).find('[data-answer-code-representation]').parent('label').attr('id', id);
+            $(element).find('[data-answer-code-representation]').parent('label').attr('for', id);
             $(element).find('[data-answer-option]').attr('id', id);
 
             i++;
