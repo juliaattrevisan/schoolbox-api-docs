@@ -45,7 +45,6 @@ $this->setVar(
         'QUESTIONBANK_CATEGORY_ID' => $this->arg[0],
         'ASSESS_ID' => $quiz->getId(),
         'SECTION_ID' => $this->arg[2],
-        'show_submit_block' => '',
     )
 );
 
@@ -163,7 +162,8 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
             array(
                 'show_delete_block' => '',
                 'question_block' => '',
-                'welcome_block' => ''
+                'welcome_block' => '',
+                'show_submit_block' => '',
             )
         );
 
