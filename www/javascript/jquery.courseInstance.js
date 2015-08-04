@@ -5,8 +5,6 @@
     $.fn.setupCourseInstance = function(options) {
         var defaults = {
             course_homepage: '',
-            session_name:    '',
-            session_id:      '',
             import_base_url: '',
             readonly:        false,
             previewSelector: '[data-plugin=preview]'
@@ -14,14 +12,6 @@
         var settings  = $.extend({}, defaults, options);
         var component = $(this);
         var browser   = $('#resource-browser');
-
-        var dialog = component.find('.file_uploader');
-        dialog.ajaxUploadDialog({
-            session: {
-                name: settings.session_name,
-                id:   settings.session_id
-            }
-        });
 
         // Browser options: now based on component
         var component_id = component.attr('id');
@@ -63,8 +53,8 @@
                 event.preventDefault();
                 var element = $(this);
                 var is_collapsed = element.data('interaction-state') == "collapsed";
-                var unit_element = element.closest('.unit');
-                var task_list    = unit_element.find('.task-list');
+                var unit_element = element.closest('[data-unit]');
+                var task_list    = unit_element.find('[data-task-list]');
                 if (is_collapsed) {
                     unit_element.removeClass('collapsed').addClass('expanded');
                     task_list.slideDown('fast');
@@ -96,9 +86,23 @@
             function(event) {
                 event.preventDefault();
                 var element      = $(this);
-                var unit_element = element.closest('.unit');
+                var unit_element = element.closest('[data-unit]');
                 var container    = unit_element.find('[data-interaction="delete_unit_container"]');
-                container.slideToggle('fast');
+
+                container.toggleClass('hide');
+                component.find('[data-form-container]').not(container).addClass('hide');
+
+                ///* Hide all other forms first
+                // */
+                //var allForms = component.find('[data-form-container]');
+                //allForms.removeClass('hide').not(container).slideUp('fast');
+                //
+                //if (container.hasClass('hide')) {
+                //    container.stop().removeClass('hide').slideUp(1).slideDown('fast');
+                //}
+                //else {
+                //    container.stop().slideToggle('fast');
+                //}
             }
         );
 
@@ -111,14 +115,7 @@
                 // Submit form via Ajax
                 var form = $(this);
                 $.post(form.attr('action'), form.serialize(), function(data) {
-                    //postCallback(form, data);
-                    //container.slideToggle('fast');
-                    var unit = form.closest('.unit');
-                    unit.slideUp(
-                        'fast', function() {
-                            unit.remove();
-                        }
-                    );
+                    postCallback(form, data);
                 }, 'json');
             }
         );
@@ -130,7 +127,8 @@
             function(event) {
                 event.preventDefault();
                 var container = $(this).closest('[data-interaction="delete_unit_container"]');
-                container.slideToggle('fast');
+                //container.slideToggle('fast');
+                container.toggleClass('hide');
             }
         );
 
@@ -141,9 +139,23 @@
             function(event) {
                 event.preventDefault();
                 var element      = $(this);
-                var unit_element = element.closest('.unit-task');
+                var unit_element = element.closest('[data-unit-task]');
                 var container    = unit_element.find('[data-interaction="delete_task_container"]');
-                container.slideToggle('fast');
+
+                container.toggleClass('hide');
+                component.find('[data-form-container]').not(container).addClass('hide');
+
+                ///* Hide all other forms first
+                // */
+                //var allForms = component.find('[data-form-container]');
+                //allForms.removeClass('hide').not(container).slideUp('fast');
+                //
+                //if (container.hasClass('hide')) {
+                //    container.stop().removeClass('hide').slideUp(1).slideDown('fast');
+                //}
+                //else {
+                //    container.stop().slideToggle('fast');
+                //}
             }
         );
         // Yes
@@ -166,25 +178,32 @@
             function(event) {
                 event.preventDefault();
                 var container = $(this).closest('[data-interaction="delete_task_container"]');
-                container.slideToggle('fast');
+                //container.slideToggle('fast');
+                container.toggleClass('hide');
             }
         );
 
         // Create new tasks: show inline form if there is one.
         component.on(
             'click.courseInstance',
-            '.add_buttons .btn',
+            '[data-add-button][data-form_class="for-task"]',
             function(event) {
-                var create_forms = $(this).closest('.unit').find('.form_container');
-                var form_class   = $(this).data('form_class');
-                if (form_class) {
-                    var create_form = create_forms.filter('.'+form_class);
-                    if (create_form.length) {
-                        event.preventDefault();
-                        create_forms.not(create_form).slideUp('fast');
-                        create_form.slideToggle('fast');
-                    }
-                }
+                event.preventDefault();
+                var thisCreateForm = $(this).closest('[data-unit]').find('[data-new-task-container]');
+
+                thisCreateForm.toggleClass('hide');
+                component.find('[data-form-container]').not(thisCreateForm).addClass('hide');
+                ///* Hide all other forms first
+                // */
+                //var allForms = component.find('[data-form-container]');
+                //allForms.removeClass('hide').not(thisCreateForm).slideUp('fast');
+                //
+                //if (thisCreateForm.hasClass('hide')) {
+                //    thisCreateForm.stop().removeClass('hide').slideUp(1).slideDown('fast');
+                //}
+                //else {
+                //    thisCreateForm.stop().slideToggle('fast');
+                //}
             }
         );
 
@@ -194,11 +213,25 @@
             'a[data-interaction="open_edit_task_form"]',
             function(event) {
                 var element      = $(this);
-                var unit_element = element.closest('.unit-task');
+                var unit_element = element.closest('[data-unit-task]');
                 var container    = unit_element.find('[data-interaction="edit_task_container"]');
+
+                /* Hide all other forms first
+                 */
+                //var allForms = component.find('[data-form-container]');
+                //allForms.removeClass('hide').not(container).slideUp('fast');
+
                 if (container.length) {
                     event.preventDefault();
-                    container.slideToggle('fast');
+                    container.toggleClass('hide');
+                    component.find('[data-form-container]').not(container).addClass('hide');
+
+                    //if (container.hasClass('hide')) {
+                    //    container.stop().removeClass('hide').slideUp(1).slideDown('fast');
+                    //}
+                    //else {
+                    //    container.stop().slideToggle('fast');
+                    //}
                 }
             }
         );
@@ -219,22 +252,6 @@
                     }
                     postCallback(form, data);
                 }, 'json');
-            }
-        );
-
-        // Create/edit task upload file
-        component.on(
-            'click.courseInstance',
-            'form a[data-function="upload"]',
-            function(event) {
-                event.preventDefault();
-                // Set the form that this dialog was triggered from.
-                var source_form = $(this).closest('form');
-                dialog.ajaxUploadDialog('open', function(output) {
-                    var result = JSON.parse(output);
-                    var link   = '/storage/fetch.php?hash='+result.hash+'&save=1';
-                    source_form.find(':input[name="link"]').val(link);
-                });
             }
         );
 
@@ -261,18 +278,17 @@
          *             the contents of this component.
          */
         var postCallback = function(form, data) {
-            var container = form.closest('.form_container');
-            container.slideUp('fast', function() {
-                reloadTaskList(data);
-            });
+            var container = form.closest('[data-form-container]');
+            container.addClass('hide');
+            reloadTaskList(data);
         };
 
         // Reloads the task list, setting up drag/drop again too.
         var reloadTaskList = function(data) {
-            var unit_list = $(data.html).find('.unit');
+            var unit_list = $(data.html).find('[data-unit]');
             // Multiple task lists exist, inject the task list for each unit in
             // data into the matching task list on the page.
-            component.find('.unit').each(function() {
+            component.find('[data-unit]').each(function() {
                 var element = $(this);
                 var unit_id = element.data('unit_id');
                 if (unit_id) {
@@ -288,6 +304,7 @@
         };
 
         var initTaskList = function() {
+
             /* Apply Preview to all anchor links in the task-list for
              * this component. This is used when a new task is dynamically
              * added via ajax - this applies the preview plugin when
@@ -296,21 +313,24 @@
              * Pass it in from the course instance plugin instantiation
              */
             component.find(settings.previewSelector).preview();
+
             if (settings.readonly) {
                 return;
             }
-            var task_list = component.find('.task-list');
+            var task_list = component.find('[data-task-list]');
             task_list.sortable({
-                placeholder: "sortable-placeholder",
-                forcePlaceholderSize: true
+                placeholder:          "sortable-placeholder",
+                forcePlaceholderSize: true,
+                handle:               '.grip',
+                axis:                 'y'
             });
             task_list.bind('sortstop', function(event, ui) {
                 // Calculate ordering of all items
                 var form = component.find('form.reorder_form');
-                var unit = ui.item.closest('.unit');
+                var unit = ui.item.closest('[data-unit]');
                 form.find('input[name="unit_id"]').val(unit.data('unit_id'))
                 var params = form.serializeArray();
-                unit.find('.unit-task').each(function() {
+                unit.find('[data-unit-task]').each(function() {
                     // Switch dark on/off
                     params.push({name: 'id[]', value: $(this).data('unit_task_id')});
                 });

@@ -756,9 +756,7 @@ table{
 // Show & Hide Task List
 .task-list{
 	clear: both;
-	max-height: 0;
 	overflow: hidden;
-	margin: 0 0 0 rem-calc(($base-font-size * 2));
 	@include single-transition(max-height, 0.3s, ease-out);
 }
 
@@ -774,7 +772,7 @@ table{
 		opacity: 1;
 	}
 	.expanded .task-list{
-		max-height: 700px;
+		max-height: 100%;
 		@include single-transition(max-height, 0.3s, ease-in);
 	}
 }

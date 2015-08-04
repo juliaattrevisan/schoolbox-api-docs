@@ -160,13 +160,12 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setBlock('unit', 'unit_expand', 'unit_expand_block');
         $this->setBlock('unit', 'unit_no_expand', 'unit_no_expand_block');
         $this->setBlock('unit', 'unit_completion', 'unit_completion_block');
-        $this->setBlock('unit', 'unit_modify', 'unit_modify_block');
-        $this->setBlock('unit', 'unit_delete', 'unit_delete_block');
+        $this->setBlock('unit', 'unit_actions', 'unit_actions_block');
+        $this->setBlock('unit_actions', 'unit_modify', 'unit_modify_block');
+        $this->setBlock('unit_actions', 'unit_delete', 'unit_delete_block');
         $this->setBlock('unit', 'unit_task', 'unit_task_block');
         $this->setBlock('unit', 'unit_report_actions', 'unit_report_actions_block');
         $this->setBlock('unit', 'unit_add_task_actions', 'unit_add_task_actions_block');
-        $this->setBlock('unit_task', 'unit_task_quiz_results', 'unit_task_quiz_results_block');
-        $this->setBlock('unit_task', 'unit_task_quiz_attempts', 'unit_task_quiz_attempts_block');
         $this->setBlock('unit_task', 'unit_task_duework_results', 'unit_task_duework_results_block');
         $this->setBlock('unit_task', 'unit_task_link', 'unit_task_link_block');
         $this->setBlock('unit_task', 'unit_task_no_link', 'unit_task_no_link_block');
@@ -174,10 +173,13 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setBlock('unit_task', 'unit_task_completion', 'unit_task_completion_block');
         $this->setBlock('unit_task', 'unit_task_due_date', 'unit_task_due_date_block');
         $this->setBlock('unit_task', 'unit_task_start', 'unit_task_start_block');
-        $this->setBlock('unit_task', 'unit_task_modify', 'unit_task_modify_block');
-        $this->setBlock('unit_task', 'unit_task_delete', 'unit_task_delete_block');
         $this->setBlock('unit_task', 'unit_task_modify_form', 'unit_task_modify_form_block');
         $this->setBlock('unit_task', 'unit_task_delete_form', 'unit_task_delete_form_block');
+        $this->setBlock('unit_task', 'unit_task_actions', 'unit_task_actions_block');
+        $this->setBlock('unit_task_actions', 'unit_task_modify', 'unit_task_modify_block');
+        $this->setBlock('unit_task_actions', 'unit_task_delete', 'unit_task_delete_block');
+        $this->setBlock('unit_task_actions', 'unit_task_quiz_results', 'unit_task_quiz_results_block');
+        $this->setBlock('unit_task_actions', 'unit_task_quiz_attempts', 'unit_task_quiz_attempts_block');
 
         $this->setVar('course_selector_block', '');
         $this->setVar('course_unit_list_block', '');
@@ -280,11 +282,13 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 'UNIT_STUDENT_COUNT'          => count($this->student_list),
                 'UNIT_TASK_COMPLETE_CLASS'    => '',
                 'UNIT_EXPANDED_STATE'         => ($is_expanded ? 'expanded' : 'collapsed'),
+                'UNIT_EXPANDED_STATE_ICON'    => ($is_expanded  ? 'icon-collapse' : 'icon-add'),
                 'UNIT_LIST_CLASS'             => ($is_expanded ? '' : 'hide'),
                 'unit_task_block'             => '',
                 'unit_completion_block'       => '',
                 'unit_expand_block'           => '',
                 'unit_no_expand_block'        => '',
+                'unit_actions_block'          => '',
                 'unit_delete_block'           => '',
                 'unit_modify_block'           => '',
                 'unit_report_actions_block'   => '',
@@ -299,6 +303,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             if (!$unit->isAfterDueDate()) {
                 $this->parse('unit_add_task_actions_block', 'unit_add_task_actions');
             }
+            $this->parse('unit_actions_block', 'unit_actions');
         }
 
         // Output due date and urgency
@@ -378,18 +383,18 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $undoable         = false;
         $completable      = false;
         if ($this->readOnly) {
-            $unit_task_class = 'incomplete';
+            $unit_task_class = 'icon-countdown incomplete';
             $unit_task_title = 'Incomplete';
             $completion_item = $completion_list[$_SESSION['id']];
             if ($completion_item instanceof Task\InstanceCompletion) {
                 switch ($completion_item->getCompletionStatus()) {
                     case Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE:
-                        $unit_task_class  = 'complete';
+                        $unit_task_class  = 'icon-drop-box complete';
                         $unit_task_status = 'Approved';
                         $unit_task_title  = 'Approved';
                         break;
                     case Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
-                        $unit_task_class  = 'pending';
+                        $unit_task_class  = 'icon-rss pending';
                         $unit_task_status = 'Completed';
                         $unit_task_title  = 'Completed';
                         $undoable         = true;
@@ -437,6 +442,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 'unit_task_completion_block'      => '',
                 'unit_task_due_date_block'        => '',
                 'unit_task_start_block'           => '',
+                'unit_task_actions_block'         => '',
                 'unit_task_delete_block'          => '',
                 'unit_task_modify_block'          => '',
                 'unit_task_delete_form_block'     => '',
@@ -508,6 +514,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 $this->setVar('UNIT_QUIZ_ID', Scrub::text($task->getAssessment()->getId()));
                 $this->parse('unit_task_quiz_results_block', 'unit_task_quiz_results');
             }
+            $this->parse('unit_task_actions_block', 'unit_task_actions');
         }
 
         // Set due dates for tasks

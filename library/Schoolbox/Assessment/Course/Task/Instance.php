@@ -332,13 +332,13 @@ class Instance implements ISoftDeletable {
     public function getIconClass() {
         switch ($this->getType()) {
             case Task::TYPE_DUE_WORK:
-                return 'new';
+                return 'icon-due-work';
             case Task::TYPE_ONLINE_ASSESS:
-                return 'onlineassessment';
+                return 'icon-quiz';
             default:
                 break;
         }
-        return 'task';
+        return 'icon-task';
     }
 
     /**
