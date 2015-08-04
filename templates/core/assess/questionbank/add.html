@@ -12,7 +12,7 @@
         </div>
         <div class="small-12 island no-pad">
             <h3>Question Category</h3>
-            <div id='categoryTree' class="content">
+            <div id='category-tree' class="content">
                 <!-- BEGIN category_list_start -->
                 <ul>
                     <!-- END category_list_start -->
@@ -52,7 +52,7 @@
         // reinit foundation to account for ajax'd content
         $(document).foundation();
 
-        $("#categoryTree")
+        $("#category-tree")
             .on('select_node.jstree', function(event, jstree) {
                 $('#question-bank').find('input[type=submit]').prop('disabled', false);
 
