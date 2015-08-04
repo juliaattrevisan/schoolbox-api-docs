@@ -12,11 +12,11 @@
 
 <ul class="hide" data-clone>
     <li class="row" data-input>
-        <div class="small-1 columns">
-            <input name="answerCode[]" type="hidden" value="A)" data-answer-code />
+        <div class="small-1 columns" data-answer-code>
+            <input name="answerCode[]" type="hidden" value="A)" data-answer-code-value />
             <input id='new-answer-option' name="answer[]" type="checkbox" value="" data-correct-answer />
             <label for="new-answer-option" class="checkbox-label">
-                <span class="content">A)</span>
+                <span class="content" data-answer-code-representation>A)</span>
             </label>
         </div>
         <div class="small-10 columns">
@@ -36,9 +36,44 @@ $(document).ready(function() {
 
     /* Add initial option
      */
-    $('#answerCollection').append($('[data-clone] [data-input]:first-child').clone());
-
+    $('#answerCollection').append($('[data-clone] [data-input]').clone());
     refreshList();
+
+    /* Add a new answer option
+     */
+    $(document).on('click', '[data-add-answer]', function(e) {
+        e.preventDefault();
+
+        var maxItems = 702;
+
+        /* Obey limit
+         */
+        if ($('[data-input]').length < maxItems) {
+            var clone = $('[data-clone] [data-input]').clone();
+
+            $('#answerCollection').append(clone);
+
+            refreshList();
+        }
+
+        return false;
+    });
+
+    /* Remove an answer option
+     */
+    $(document).on('click', '[data-delete]', function(event) {
+        event.preventDefault();
+
+        /* Only remove when greater than three
+         */
+        var minOptions = 3;
+
+        if (($('#answerCollection [data-input]').length) > minOptions) {
+            $(this).parents('[data-input]').remove();
+        }
+
+        refreshList();
+    });
 
     var validator = $("#createQuestionForm").submit(function() {
         // update underlying textarea before submit validation
@@ -117,6 +152,7 @@ $(document).ready(function() {
         },
 
         errorPlacement: function(error, element) {
+
 //            error.addClass('message');  // add a class to the wrapper
 //
 //            if (element.hasClass("answerDescription")) {
@@ -161,52 +197,16 @@ $(document).ready(function() {
         return this.optional(element) || (parseFloat(value) > 0);
     }, "Amount must be greater than zero");
 
-    /* Add a new answer option
+    /**
+     * Reindex letter index
      */
-    $(document).on('click', '[data-add-answer]', function(e) {
-        e.preventDefault();
-
-        var maxItems = 702;
-
-        /* Obey limit
-         */
-        if ($('[data-input]').length < maxItems) {
-            var clone = $('[data-clone] [data-input]:first-child').clone();
-
-            $('#answerCollection').append(clone);
-
-            refreshList();
-        }
-
-        return false;
-    });
-
-    /* Remove an answer option
-     */
-    $(document).on('click', '[data-delete]', function(event) {
-        event.preventDefault();
-
-        /* Only remove when greater than three
-         */
-        var minOptions = 3;
-
-        if (($('[data-input]').length) > minOptions) {
-            $(this).parent().remove();
-        }
-
-        refreshList();
-    });
-
-    $(document).on('click', '[data-correct-answer]', function() {
-        $(this).parent().parent().toggleClass("highlight");
-    });
-
     function refreshList() {
         var i = 1;
 
         $('[data-answer-code]').each(function(index, element) {
-            $(element).children('span').html($.fn.evaluation.findLetterIndex(i) + ')');
-            $(element).children('input').val(i);
+            $(element).find('[data-answer-code-representation]').html($.fn.evaluation.findLetterIndex(i) + ')');
+            $(element).find('[data-answer-code-value]').val(i);
+
             i++;
         });
     }
