@@ -1,24 +1,32 @@
-<div class="box">
-<h2>Links <!-- BEGIN count -->({LINK_DISP_COUNT} / {LINK_COUNT})<!-- END count --></h2>
-<ul class="information-list">
-<!-- BEGIN link -->
-	<li>
-		<a href="{LINK_URL}" rel="{LINK_TARGET}">
-			<img class="thumbnail" height="60" width="60" src="images/icons/60x60/link.png" />
-			<h4>{LINK_DESCRIPTION}</h4>
-		</a>
-		<p class="meta">{LINK_BREADCRUMB}</p>
-		<p class="meta">Created by <a href="/search/user/{LINK_OWNER}">{LINK_OWNER_NAME}</a> {LINK_CREATED}</p>
-		<p>{LINK_COMMENT}</p>
-	</li>
-<!-- END link -->
-</ul>
+<div class="row">
+	<div class="small-12 island">
+	<h2 class="subheader">Links <!-- BEGIN count -->({LINK_DISP_COUNT} / {LINK_COUNT})<!-- END count --></h2>
+		<section>
+			<ul class="action-list">
+			<!-- BEGIN link -->
+				<li class="row">
+					<div class="column no-pad small-12">
+						<div class="avatar card">
+							<a href="{LINK_URL}" rel="{LINK_TARGET}">
+								<div class="icon-link icon-32"></div>
+								<h3>{LINK_DESCRIPTION}</h3>
+								<p class="meta">{LINK_BREADCRUMB}</p>
+								<p class="meta">Created by <a href="/search/user/{LINK_OWNER}">{LINK_OWNER_NAME}</a> {LINK_CREATED}</p>
+								<p>{LINK_COMMENT}</p>
+							</a>
+						</div>
+					</div>
+				</li>
+			<!-- END link -->
+			</ul>
+		</section>
+	</div>
 <!-- BEGIN see_more -->
 <p>
-	<a id="link-more" class="float-left btn more" rel="link" href="#"><span></span>See all {MORE_COUNT} results for Links</a>
+	<a id="link-more" class="float-left btn more" rel="link" href="#"><span></span>See all {MORE_COUNT} results for links</a>
 </p>
 <!-- END see_more -->
-<ul class="admin-nav foot">
+<ul class="pagination">
 	<!-- BEGIN pagination -->
 	<li><a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a></li>
 	<!-- END pagination -->

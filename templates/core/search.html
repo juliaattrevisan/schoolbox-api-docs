@@ -57,13 +57,13 @@ $(function() {
 <!-- END custom_head -->
 
 <h1>Search Results{FOR}<em>{UNESCAPED_KEYWORD}</em></h1>
-<ul id="type" class="admin-nav">
+<dl id="type" class="tabs">
     <!-- BEGIN type -->
-    <li class='{TYPE_CLASS}'>
+    <dd class='{TYPE_CLASS}'>
 		<a href='#' rel="{TYPE_TYPE}" data-count="0">{TYPE_NAME} ({TYPE_COUNT})</a>
-	</li>
+	</dd>
     <!-- END type -->
-</ul>
+</dl>
 
 <div class="results">
     <!-- BEGIN result -->

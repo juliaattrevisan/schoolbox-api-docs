@@ -1,18 +1,27 @@
-<div class="box">
-	<h2>School News <!-- BEGIN count -->({SITENEWS_DISP_COUNT} / {SITENEWS_COUNT})<!-- END count --></h2>
-	<ul class="information-list">
-	<!-- BEGIN sitenews -->
-		<li>
-			<a href="{SITENEWS_LINK}">
-				<img class="thumbnail" height="60" width="60" src="images/icons/60x60/news.png" />
-				<h4>{SITENEWS_HEADING}</h4>
-			</a>
-			<p class="meta">{SITENEWS_BREADCRUMB}</p>
-			<p class="meta">Written by <a href="/search/user/{SITENEWS_OWNER}">{SITENEWS_OWNER_NAME}</a> {SITENEWS_CREATED}</p>
-			<p>{SITENEWS_BODY}</p>
-		</li>
-	<!-- END sitenews -->
-	</ul>
+<div class="row">
+	<div class="small-12 island">
+	<h2 class="subheader">School News <!-- BEGIN count -->({SITENEWS_DISP_COUNT} / {SITENEWS_COUNT})<!-- END count --></h2>
+		<section>
+			<ul class="action-list">
+			<!-- BEGIN sitenews -->
+				<li class="row">
+					<div class="column no-pad small-12">
+						<div class="avatar card">
+							<a href="{SITENEWS_LINK}">
+								<div class="icon-news icon-32"></div>
+								<h3>{SITENEWS_HEADING}</h3>
+								<p class="meta">{SITENEWS_BREADCRUMB}</p>
+								<p class="meta">Written by <a href="/search/user/{SITENEWS_OWNER}">{SITENEWS_OWNER_NAME}</a> {SITENEWS_CREATED}</p>
+								<p>{SITENEWS_BODY}</p>
+							</a>
+						</div>
+					</div>
+				</li>
+			<!-- END sitenews -->
+			</ul>
+		</section>
+	</div>
+
 	<!-- BEGIN see_more -->
 	<p>
 		<a id="sitenews-more" class="float-left more btn" rel="sitenews" href="#"><span></span>See all {MORE_COUNT} results for School News</a>

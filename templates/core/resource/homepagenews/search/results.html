@@ -1,24 +1,32 @@
-<div class="box">
-	<h2>Homepage News <!-- BEGIN count -->({HOMEPAGENEWS_DISP_COUNT} / {HOMEPAGENEWS_COUNT})<!-- END count --></h2>
-	<ul class="information-list">
-	<!-- BEGIN homepagenews -->
-		<li>
-			<a href="{HOMEPAGENEWS_LINK}">
-				<img class="thumbnail" height="60" width="60" src="images/icons/60x60/news.png" />
-				<h4>{HOMEPAGENEWS_HEADING}</h4>
-			</a>
-			<p class="meta">{HOMEPAGENEWS_BREADCRUMB}</p>
-			<p class="meta">Written by <a href="/search/user/{HOMEPAGENEWS_OWNER}">{HOMEPAGENEWS_OWNER_NAME}</a> {HOMEPAGENEWS_CREATED}</p>
-			<p>{HOMEPAGENEWS_BODY}</p>
-		</li>
-	<!-- END homepagenews -->
-	</ul>
+<div class="row">
+	<div class="small-12 island">
+	<h2 class="subheader">Homepage News <!-- BEGIN count -->({HOMEPAGENEWS_DISP_COUNT} / {HOMEPAGENEWS_COUNT})<!-- END count --></h2>
+		<section>
+			<ul class="action-list">
+			<!-- BEGIN homepagenews -->
+				<li class="row">
+					<div class="column no-pad small-12">
+						<div class="avatar card">
+							<a href="{HOMEPAGENEWS_LINK}">
+								<div class="icon-news icon-32"></div>
+								<h3>{HOMEPAGENEWS_HEADING}</h3>
+								<p class="meta">{HOMEPAGENEWS_BREADCRUMB}</p>
+								<p class="meta">Written by <a href="/search/user/{HOMEPAGENEWS_OWNER}">{HOMEPAGENEWS_OWNER_NAME}</a> {HOMEPAGENEWS_CREATED}</p>
+								<p>{HOMEPAGENEWS_BODY}</p>
+							</a>
+						</div>
+					</div>
+				</li>
+			<!-- END homepagenews -->
+			</ul>
+		</section>
+	</div>
 	<!-- BEGIN see_more -->
 	<p>
 		<a id="homepagenews-more" class="float-left btn more" rel="homepagenews" href="#"><span></span>See all {MORE_COUNT} results for Homepage News</a>
 	</p>
 	<!-- END see_more -->
-	<ul class="admin-nav foot">
+	<ul class="pagination">
 		<!-- BEGIN pagination -->
 		<li><a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a></li>
 		<!-- END pagination -->

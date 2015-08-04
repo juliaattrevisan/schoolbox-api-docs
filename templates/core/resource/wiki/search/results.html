@@ -1,18 +1,26 @@
-<div class="box">
-<h2>Wiki <!-- BEGIN count -->({WIKI_DISP_COUNT} / {WIKI_COUNT})<!-- END count --></h2>
-<ul class="information-list">
-<!-- BEGIN wiki -->
-	<li>
-		<a href="/wiki/{WIKI_CID}/{WIKI_SLUG}">
-			<img class="thumbnail" width="60" height="60" src="/images/mime/60x60/wiki.png" />
-			<h4>{WIKI_HEADING}</h4>
-		</a>
-		<p class="meta">{WIKI_BREADCRUMB}</p>
-		<p class="meta">Revised by <a href="/search/user/{WIKI_OWNER}">{WIKI_OWNER_NAME}</a> {WIKI_CREATED}</p>
-		<p>{WIKI_BODY}</p>
-	</li>
-<!-- END wiki -->
-</ul>
+<div class="row">
+	<div class="small-12 island">
+		<h2 class="subheader">Wiki <!-- BEGIN count -->({WIKI_DISP_COUNT} / {WIKI_COUNT})<!-- END count --></h2>
+		<section>
+			<ul class="action-list">
+			<!-- BEGIN wiki -->
+				<li class="row">
+					<div class="column no-pad small-12">
+						<div class="avatar card">
+							<a href="/wiki/{WIKI_CID}/{WIKI_SLUG}">
+								<div class="icon-wiki icon-32"></div>
+								<h3>{WIKI_HEADING}</h3>
+								<p class="meta">{WIKI_BREADCRUMB}</p>
+								<p class="meta">Revised by <a href="/search/user/{WIKI_OWNER}">{WIKI_OWNER_NAME}</a> {WIKI_CREATED}</p>
+								<p>{WIKI_BODY}</p>
+							</a>
+						</div>
+					</div>
+				</li>
+			<!-- END wiki -->
+			</ul>
+		</section>
+	</div>
 <!-- BEGIN see_more -->
 <p>
 	<a rel="wiki" id="wiki-more" class="float-left btn more" href="#"><span></span>See all {MORE_COUNT} results for Wiki</a>
