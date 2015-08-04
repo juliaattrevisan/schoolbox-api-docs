@@ -37,7 +37,7 @@ $count['all'] = array_sum($count);
  */
 $result[$type] = $forumHandler->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
 
-$renderer = new \Schoolbox\Calendar\Event\Search\Renderer($page, $result, $count, 0, $keyword);
+$renderer = new \Schoolbox\Calendar\Event\Search\Renderer($page, $result, $count, $current_page, $keyword);
 $renderer->render();
 $renderer->renderPagination();
 

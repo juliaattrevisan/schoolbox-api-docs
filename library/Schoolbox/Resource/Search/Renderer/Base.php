@@ -149,7 +149,6 @@ abstract class Base
                     'PAGE_NUMBER' => $i,
                     'PAGE_CLASS' => $i == $currentPage ? 'current' : '',
                 ));
-
                 $this->getPage()->parse('pagination_block', 'pagination', true);
             }
 
