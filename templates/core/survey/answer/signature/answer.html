@@ -15,7 +15,8 @@
     var dm = createDelayManager();
 
     $(function() {
-        $('[data-signature]').signaturePad({
+        var sigPadElement = $('[data-signature]');
+        var sigPad        = sigPadElement.signaturePad({
             lineTop: 102,
             lineWidth: 0,
             lineMargin: 16,
@@ -36,7 +37,28 @@
             sig: 'canvas[data-role="signatureCanvas"]',
             clear: 'a[data-role="signatureClear"]',
             output: 'input[data-role="signatureInput"]'
-        }).regenerate({ANSWER});
+        });
+
+        // Draw the signature
+        var redrawSignature = function(signature) {
+            sigPad.regenerate(signature);
+        };
+        redrawSignature({ANSWER});
+
+        // Resize canvas
+        var canvas    = sigPadElement.find('canvas[data-role="signatureCanvas"]');
+        var container = canvas.parent();
+        var resizeSignature = function() {
+            // Retain aspect ratio of 500x142
+            // Try to resize signature too
+            var signature = sigPad.getSignature();
+            var width     = container.width();
+            var height    = width * (142/500);
+            canvas.attr({ width: width, height: height});
+            redrawSignature(signature);
+        };
+        $(window).resize(resizeSignature);
+        resizeSignature();
     });
 </script>
 
@@ -49,7 +71,7 @@
     <!-- BEGIN answerOption -->
     <div class="sigPadWrapper small-12 columns no-pad">
         <!--<div class="typed"></div>-->
-        <canvas class="pad" width="500" height="142" data-role="signatureCanvas"></canvas>
+        <canvas class="pad" data-role="signatureCanvas"></canvas>
 
         <!-- opacity:0, for validator to work - it doesn't like hidden fields -->
         <input type="text" name="answer" class="signaturePadAnswer" data-role="signatureInput">
