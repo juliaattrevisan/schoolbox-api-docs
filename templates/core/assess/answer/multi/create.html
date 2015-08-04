@@ -35,6 +35,7 @@
 $(function() {
     $('#createQuestionForm').multiRadioCreate({
         availability: 'assess',
+        mode: 'create',
         questionBank: false,
         customValidationRules: function(config) {
             $.fn.addCustomRules_greaterThanZero(config);
