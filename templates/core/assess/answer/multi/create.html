@@ -13,10 +13,11 @@
 <ul class="hide" data-clone>
     <li class="row" data-input>
         <div class="small-1 columns" data-answer-code>
-            <input name="answerCode[]" type="hidden" value="A)" data-answer-code-value />
-            <input id='new-answer-option' name="answer[]" type="checkbox" value="" data-correct-answer />
-            <label for="new-answer-option" class="checkbox-label">
-                <span class="content" data-answer-code-representation>A)</span>
+            <input name="answerCode[]" type="hidden" value="" data-answer-code-value />
+
+            <input name="answer[]" type="checkbox" value="" data-answer-option />
+            <label class="checkbox-label">
+                <span class="content" data-answer-code-representation></span>
             </label>
         </div>
         <div class="small-10 columns">
@@ -54,9 +55,7 @@ $(document).ready(function() {
         /* Obey limit
          */
         if ($('[data-input]').length < maxItems) {
-            var clone = $('[data-clone] [data-input]').clone();
-
-            $('#answerCollection').append(clone);
+            $('#answerCollection').append($('[data-clone] [data-input]').clone());
 
             refreshList();
         }
@@ -107,7 +106,7 @@ $(document).ready(function() {
                     answerCollection.push({
                         description: description,
                         value: code,
-                        correct: elem.find('[data-correct-answer]').prop('checked')
+                        correct: elem.find('[data-answer-option]').prop('checked')
                     });
                 }
             });
@@ -168,6 +167,8 @@ $(document).ready(function() {
         }
     });
 
+    /* Enforce multiple answer options
+     */
     jQuery.validator.addMethod('emptyInputs', function(value, element) {
         var fieldsAreFilled = true;
 
@@ -188,7 +189,7 @@ $(document).ready(function() {
      */
     jQuery.validator.addMethod('nothingChecked', function(value, element) {
         $.each($('[data-input]'), function(index, element) {
-            if ($(element).find('[data-correct-answer]').is(':checked')) {
+            if ($(element).find('[data-answer-option]').is(':checked')) {
                 return true;
             }
         });
@@ -196,6 +197,8 @@ $(document).ready(function() {
         return false;
     }, 'Tick at least one checkbox');
 
+    /* Marks must be greater than zero
+     */
     jQuery.validator.addMethod("greaterThanZero", function(value, element) {
         return this.optional(element) || (parseFloat(value) > 0);
     }, "Amount must be greater than zero");
@@ -209,6 +212,13 @@ $(document).ready(function() {
         $('[data-answer-code]').each(function(index, element) {
             $(element).find('[data-answer-code-representation]').html($.fn.evaluation.findLetterIndex(i) + ')');
             $(element).find('[data-answer-code-value]').val(i);
+
+            /* Update checkbox id and label target, due to custom styles
+             */
+            var id = 'answer-option-'+i;
+
+            $(element).find('[data-answer-code-representation]').parent('label').attr('id', id);
+            $(element).find('[data-answer-option]').attr('id', id);
 
             i++;
         });
