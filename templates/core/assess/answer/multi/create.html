@@ -52,11 +52,9 @@
         addNewAnswerOption();
         removeAnswerOption();
 
-        /* Custom validator rules
+        /* Add custom validation rules
          */
-        addCustomRules_greaterThanZero();
-        addCustomRules_emptyInputs();
-        addCustomRules_somethingChecked();
+        config.customValidationRules(config);
 
         /* Mash the validator on
          */
@@ -91,7 +89,12 @@
 
                 /* An element containing all the available configuration options
                  */
-                configuration: '#configuration'
+                configuration: '#configuration',
+
+                /* Custom validation rules to use
+                 */
+                customValidationRules: function() {
+                }
             }
 
             var derived = {
@@ -179,64 +182,6 @@
             });
         }
 
-        /* Custom Validation Rules
-         */
-
-        /**
-         * Greater Than Zero
-         */
-        function addCustomRules_greaterThanZero() {
-            $.validator.addMethod("greaterThanZero", function(value, element) {
-                return this.optional(element) || (parseFloat(value) > 0);
-            }, "Amount must be greater than zero");
-        }
-
-        /**
-         * Empty Inputs
-         *
-         * You must provide a description for each answer option
-         */
-        function addCustomRules_emptyInputs() {
-            $.validator.addMethod('emptyInputs', function(value, element) {
-                var fieldsAreFilled = true;
-
-                $.each($(config.answerCollectionList).find('[data-input]'), function(index, element) {
-                    var description = $.trim($(element).find('[data-answer-description]').val());
-
-                    /* Ignore empty answers that weren't removed
-                     */
-                    if (description == '') {
-                        fieldsAreFilled = false;
-                    }
-                });
-
-                return fieldsAreFilled;
-            }, 'Please fill out all answers');
-        }
-
-        /**
-         * Something Checked
-         *
-         * At least one of the answer options must be marked as "correct"
-         */
-        function addCustomRules_somethingChecked() {
-            $.validator.addMethod('somethingChecked', function(value, element) {
-                var fieldsAreFilled = true;
-
-                $.each($(config.answerCollectionList).find('[data-input]'), function(index, element) {
-                    var description = $.trim($(element).find('[data-answer-description]').val());
-
-                    /* Ignore empty answers that weren't removed
-                     */
-                    if (description == '') {
-                        fieldsAreFilled = false;
-                    }
-                });
-
-                return fieldsAreFilled;
-            }, 'Tick at least one checkbox');
-        }
-
         /* Validator
          */
 
@@ -261,11 +206,11 @@
 
                     /* Collate possible answers and their correctness status
                      */
-                    $.each($('[data-input]'), function(index, element) {
+                    $.each($(config.answerCollectionList).find('[data-input]'), function(index, element) {
                         var elem = $(element);
 
                         var description = $.trim(elem.find('[data-answer-description]').val());
-                        var code = $.trim(elem.find('[data-answer-code]').val());
+                        var code = $.trim(elem.find('[data-answer-code-value]').val());
 
                         /* Ignore empty answers that weren't removed
                          */
@@ -350,9 +295,74 @@
     }
 }(jQuery));
 
+
+/* Custom Validation Rules
+ */
+(function() {
+    /**
+     * Greater Than Zero
+     */
+    $.fn.addCustomRules_greaterThanZero = function(config) {
+        $.validator.addMethod("greaterThanZero", function(value, element) {
+            return this.optional(element) || (parseFloat(value) > 0);
+        }, "Amount must be greater than zero");
+    }
+
+    /**
+     * Empty Inputs
+     *
+     * You must provide a description for each answer option
+     */
+    $.fn.addCustomRules_emptyInputs = function(config) {
+        $.validator.addMethod('emptyInputs', function(value, element) {
+            var fieldsAreFilled = true;
+
+            $.each($(config.answerCollectionList).find('[data-input]'), function(index, element) {
+                var description = $.trim($(element).find('[data-answer-description]').val());
+
+                /* Ignore empty answers that weren't removed
+                 */
+                if (description == '') {
+                    fieldsAreFilled = false;
+                }
+            });
+
+            return fieldsAreFilled;
+        }, 'Please fill out all answers');
+    }
+
+    /**
+     * Something Checked
+     *
+     * At least one of the answer options must be marked as "correct"
+     */
+    $.fn.addCustomRules_somethingChecked = function(config) {
+        $.validator.addMethod('somethingChecked', function(value, element) {
+            var fieldsAreFilled = true;
+
+            $.each($(config.answerCollectionList).find('[data-input]'), function(index, element) {
+                var description = $.trim($(element).find('[data-answer-description]').val());
+
+                /* Ignore empty answers that weren't removed
+                 */
+                if (description == '') {
+                    fieldsAreFilled = false;
+                }
+            });
+
+            return fieldsAreFilled;
+        }, 'Tick at least one checkbox');
+    }
+}(jQuery));
+
 $(function() {
     $('#createQuestionForm').multiRadioCreate({
-        urlPrefix: '/assess/question/create'
+        urlPrefix: '/assess/question/create',
+        customValidationRules: function(config) {
+            $.fn.addCustomRules_greaterThanZero(config);
+            $.fn.addCustomRules_emptyInputs(config);
+            $.fn.addCustomRules_somethingChecked(config);
+        }
     });
 });
 
