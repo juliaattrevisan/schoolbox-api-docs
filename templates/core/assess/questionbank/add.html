@@ -12,18 +12,27 @@
         </div>
         <div class="small-12 island no-pad">
             <h3>Question Category</h3>
-            <div id="category-tree" class="content">
-                <!-- BEGIN category_list_start --><ul><!-- END category_list_start -->
-                <!-- BEGIN category_list_item_start --><li><ul><!-- END category_list_item_start -->
-                    <!-- BEGIN category_list_item -->
-                    <li id="{CATEGORY_LIST_ITEM_NODE}" class="{CATEGORY_LIST_ITEM_SELECTED}">
-                        <a href="#">
-                            {CATEGORY_LIST_ITEM_NAME} ({CATEGORY_LIST_ITEM_NUMQUESTIONS})
-                        </a>
+            <div id='categoryTree' class="content">
+                <!-- BEGIN category_list_start -->
+                <ul>
+                    <!-- END category_list_start -->
+
+                    <!-- BEGIN category_list_item_start -->
+                    <ul>
+                        <!-- END category_list_item_start -->
+
+                        <!-- BEGIN category_list_item -->
+                        <li id='{CATEGORY_LIST_ITEM_NODE}' class='{CATEGORY_LIST_ITEM_SELECTED}'>
+                            <a href='#'>
+                                {CATEGORY_LIST_ITEM_NAME} ({CATEGORY_LIST_ITEM_NUMQUESTIONS})
+                            </a>
+                            <!-- END category_list_item -->
+
+                            <!-- BEGIN category_list_item_end -->
+                    </ul>
                     </li>
-                    <!-- END category_list_item -->
-                    <!-- BEGIN category_list_item_end --></ul></li><!-- END category_list_item_end -->
-            </ul>
+                    <!-- END category_list_item_end -->
+                </ul>
             </div>
         </div>
         <div class="small-12 column no-pad">
@@ -43,7 +52,7 @@
         // reinit foundation to account for ajax'd content
         $(document).foundation();
 
-        $("#category-tree")
+        $("#categoryTree")
             .on('select_node.jstree', function(event, jstree) {
                 $('#question-bank').find('input[type=submit]').prop('disabled', false);
 
