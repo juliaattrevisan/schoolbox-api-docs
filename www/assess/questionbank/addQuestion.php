@@ -47,12 +47,12 @@ if (!empty($_POST)) {
 
     $questionBankCategoryHandler = new Assess_Question_Category();
 
-    $this->setFile(TEMPLATE_body, 'assess/questionbank/add.html');
+    $this->setFile(TEMPLATE_content, 'assess/questionbank/add.html');
     $this->setVar('ASSESS_KIND_LC', 'assess');
     $this->setVar('ASSESS_KIND_PLURAL', 'quizzes');
     $questionCategoryList = new Assess_Question_Category_List($this, $assessId, 0, $questionBankCategoryHandler->getPath());
     $questionCategoryList->render();
-    $this->template->pparse('finaloutput', TEMPLATE_body);
+    $this->template->pparse('finaloutput', TEMPLATE_content);
 
 } else {
     error(2);
