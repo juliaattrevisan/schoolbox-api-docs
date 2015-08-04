@@ -94,10 +94,10 @@ abstract class Evaluation_Question_Category_List
      */
     private function setup()
     {
-        $this->getPage()->setBlock(TEMPLATE_body, 'category_list_start', 'category_list_start_block');
-        $this->getPage()->setBlock(TEMPLATE_body, 'category_list_item_start', 'category_list_item_start_block');
-        $this->getPage()->setBlock(TEMPLATE_body, 'category_list_item', 'category_list_item_block');
-        $this->getPage()->setBlock(TEMPLATE_body, 'category_list_item_end', 'category_list_item_end_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'category_list_start', 'category_list_start_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'category_list_item_start', 'category_list_item_start_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'category_list_item', 'category_list_item_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'category_list_item_end', 'category_list_item_end_block');
 
         $this->getPage()->parse('category_list_start_block', 'category_list_start', true);
 
