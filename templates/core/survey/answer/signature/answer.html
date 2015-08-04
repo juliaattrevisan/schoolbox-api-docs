@@ -1,59 +1,59 @@
 <script type='text/javascript'>
 
-	/* Timeout closure
-	 * http://stackoverflow.com/questions/5420776/how-do-i-reuse-this-javascript-timeout-closure
-	 */
+    /* Timeout closure
+     * http://stackoverflow.com/questions/5420776/how-do-i-reuse-this-javascript-timeout-closure
+     */
     var signatureTimer = 0;
 
-	var createDelayManager = function() {
-		return function(callback, ms) {
-			clearTimeout(signatureTimer);
+    var createDelayManager = function() {
+        return function(callback, ms) {
+            clearTimeout(signatureTimer);
             signatureTimer = setTimeout(callback, ms);
-		};
-	}
+        };
+    };
 
-	var dm = createDelayManager();
+    var dm = createDelayManager();
 
-	$(function() {
-		$('.sigPad').signaturePad({
+    $(function() {
+        $('.sigPad').signaturePad({
             lineTop: 102,
             lineWidth: 0,
             lineMargin: 16,
-			drawOnly: true,
-			onDrawEnd: function() {
+            drawOnly: true,
+            onDrawEnd: function() {
 
-				/* Apply delay to auto-save, so the signature
-				 * process remains fluid
-				 *
-				 * http://stackoverflow.com/questions/5420776/how-do-i-reuse-this-javascript-timeout-closure
-				 */
-				dm(function() {
-					$('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
-						id: {QUESTION_ID}
-					});
-				}, 3000);
-			}
-		}).regenerate({ANSWER});
-	});
+                /* Apply delay to auto-save, so the signature
+                 * process remains fluid
+                 *
+                 * http://stackoverflow.com/questions/5420776/how-do-i-reuse-this-javascript-timeout-closure
+                 */
+                dm(function() {
+                    $('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+                        id: {QUESTION_ID}
+                    });
+                }, 3000);
+            }
+        }).regenerate({ANSWER});
+    });
 </script>
 
 <script src="/javascript/signature/jquery.signaturepad.min.js"></script>
 <link rel="stylesheet" href="/javascript/signature/signaturepad.css">
 
 <span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
-<label class="sigPad">
 
+<div class="sigPad row">
     <!-- BEGIN answerOption -->
-	<div class="sigPadWrapper">
-		<div class="typed"></div>
-		<canvas class="pad" width="500" height="142"></canvas>
-	</div>
+    <div class="sigPadWrapper small-12 columns no-pad">
+        <div class="typed"></div>
+        <canvas class="pad" width="500" height="142"></canvas>
+    </div>
 
     <!-- opacity:0, for validator to work - it doesn't like hidden fields -->
     <input type="text" name="answer" class="output signaturePadAnswer">
 
-	<p class="clearButton">
-		<a href="#clear">Clear Signature</a>
-	</p>
+    <p class="clearButton small-12 columns no-pad">
+        <a class="button" href="#clear">Clear Signature</a>
+    </p>
     <!-- END answerOption -->
-</label>
+</div>
