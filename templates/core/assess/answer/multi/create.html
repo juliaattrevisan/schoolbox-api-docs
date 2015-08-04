@@ -34,9 +34,14 @@
 <script type="text/javascript">
 $(document).ready(function() {
 
-    /* Add initial option
+    /* Add initial options
      */
-    $('#answerCollection').append($('[data-clone] [data-input]').clone());
+    var minOptions = 2;
+
+    for (var i = 0; i < minOptions; i++) {
+        $('#answerCollection').append($('[data-clone] [data-input]').clone());
+    }
+
     refreshList();
 
     /* Add a new answer option
@@ -66,8 +71,6 @@ $(document).ready(function() {
 
         /* Only remove when greater than three
          */
-        var minOptions = 3;
-
         if (($('#answerCollection [data-input]').length) > minOptions) {
             $(this).parents('[data-input]').remove();
         }
