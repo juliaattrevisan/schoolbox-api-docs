@@ -57,10 +57,15 @@
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript">
     $(function() {
+
+        /* For the question part itself
+         */
         $.fn.alaressTiny({
             mode: 'exact',
             elements: 'question',
-            file_browser_category_id: '{ASSESS_CATEGORY_ID}'
+            file_browser_category_id: '{ASSESS_CATEGORY_ID}',
+            removeformat_selector: 'b,strong,em,i,span,ins',
+            width: "100%"
         });
 
         /* Enforce two decimal places
