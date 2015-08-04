@@ -53,7 +53,7 @@ abstract class Evaluation_Question_Category_List
     private function getJsNodePath($category_id)
     {
         $pathArray = array();
-        $path = array();
+        $path = array('\'node_0\'');
 
         $allPaths = $this->getPathSegment($category_id, $pathArray);
 
@@ -113,7 +113,16 @@ abstract class Evaluation_Question_Category_List
      */
     public function render()
     {
-        $this->build($this->getAllCategories());
+        // Shoehorn in a root node
+        $rootNode = [
+            'question_category_id' => 0,
+            'parent_id'            => '#',
+            'name'                 => 'Home',
+            'availability'         => '',
+            'numQuestions'         => 0,
+            'children'             => $this->getAllCategories(),
+        ];
+        $this->build([$rootNode]);
 
         /* Tell javascript tree which nodes to open.
            */
