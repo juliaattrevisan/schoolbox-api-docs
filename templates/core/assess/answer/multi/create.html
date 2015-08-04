@@ -5,9 +5,6 @@
     </ul>
 
     <a class="button icon-add" href="#" data-add-answer>Add answer option</a>
-
-    <label class="alert label">Please fill out all answers</label>
-    <label class="alert label">Tick at least one checkbox</label>
 </fieldset>
 
 <ul class="hide" data-clone>
@@ -97,7 +94,7 @@ $(document).ready(function() {
             $.each($('[data-input]'), function(index, element) {
                 var elem = $(element);
 
-                var description = $.trim(elem.find('[data-answer-description').val());
+                var description = $.trim(elem.find('[data-answer-description]').val());
                 var code = $.trim(elem.find('[data-answer-code]').val());
 
                 /* Ignore empty answers that weren't removed
@@ -151,19 +148,33 @@ $(document).ready(function() {
             'answer[]':{
                 nothingChecked:true
             }
-        },
+        }
+        ,
 
         errorPlacement: function(error, element) {
 
-//            error.addClass('message');  // add a class to the wrapper
-//
-//            if (element.hasClass("answerDescription")) {
-//                error.insertAfter(element.closest('#answerCollection'))
-//            } else if (element.hasClass("answerCorrect") ) {
-//                error.insertAfter(element.closest('#answerCollection'))
-//            } else {
-//                error.insertAfter(element.parent().children(':last-child'))
-//            }
+            /* If the error has to do with the entire list,
+             * spawn the error at the bottom
+             * http://stackoverflow.com/questions/1318076/jquery-hasattr-checking-to-see-if-there-is-an-attribute-on-an-element
+             */
+            var hasCorrectAnswer = $(element).attr('data-correct-answer');
+            var hasAllDescriptors = $(element).attr('data-answer-description');
+
+            if ((typeof hasCorrectAnswer !== typeof undefined) && (hasCorrectAnswer !== false)) {
+                error.insertAfter(element.closest('#answerCollection'));
+            }
+            else if ((typeof hasAllDescriptors !== typeof undefined) && (hasAllDescriptors !== false)) {
+                error.insertAfter(element.closest('#answerCollection'));
+            }
+            /* If the error was found on the Marks field, just leave it
+             * to spawn naturally
+             *
+             * If the error was found on one of the answer options,
+             * spawn it naturally
+             */
+            else {
+                error.insertAfter(element);
+            }
         }
     });
 
@@ -172,7 +183,7 @@ $(document).ready(function() {
     jQuery.validator.addMethod('emptyInputs', function(value, element) {
         var fieldsAreFilled = true;
 
-        $.each($('[data-input]'), function(index, element) {
+        $.each($('#answerCollection [data-input]'), function(index, element) {
             var description = $.trim($(element).find('[data-answer-description]').val());
 
             /* Ignore empty answers that weren't removed
@@ -188,7 +199,10 @@ $(document).ready(function() {
     /* Removed mandatory correct answer from multiple choice
      */
     jQuery.validator.addMethod('nothingChecked', function(value, element) {
-        $.each($('[data-input]'), function(index, element) {
+        $.each($('#answerCollection [data-input]'), function(index, element) {
+
+            console.log($(element).find('[data-answer-option]'));
+
             if ($(element).find('[data-answer-option]').is(':checked')) {
                 return true;
             }
