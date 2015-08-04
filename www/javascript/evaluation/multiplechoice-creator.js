@@ -203,7 +203,6 @@
                      * Common data
                      */
                     var data = {
-                        type_id: theForm.find('select[name=type_id]').val(),
                         question: content,
                         sequence: theForm.find('input[name=sequence]').val(),
                         allAnswers: JSON.stringify(answerCollection),
@@ -223,6 +222,7 @@
                     /* Create in Quiz/Survey
                      */
                     if (config.mode == 'create') {
+                        data.type_id = theForm.find('select[name=type_id]').val(),
                         data.section_id = theForm.find('input[name=section_id]').val();
 
                         redirect = config.availability + '/' + data.section_id + '/create';
@@ -231,6 +231,7 @@
                         /* Modify in Quiz/Survey
                          */
                         if ((typeof config.questionBank == "undefined") || (config.questionBank === false)) {
+                            data.type_id = theForm.find('input[name=type_id]').val(),
                             data.section_id = theForm.find('input[name=section_id]').val(),
                             data.question_id = theForm.find('input[name=question_id]').val(),
 
@@ -239,6 +240,7 @@
                         /* Modify directly in the Question Bank
                          */
                         else {
+                            data.type_id = theForm.find('input[name=type_id]').val(),
                             data.question_bank_id = theForm.find('input[name=question_bank_id]').val();
 
                             redirect = config.questionBank.url;
