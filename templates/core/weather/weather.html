@@ -6,39 +6,12 @@
     </div>
 </div>
 <!-- END weather_unavailable -->
-
-<div class="row">
-    <!-- BEGIN current -->
-    <div class="small-12 medium-6 island">
-        <h2 class="subheader">Currently</h2>
-        <section>
-            <img src="{C_IMAGE}" alt="{C_PRECIS}" title="{C_PRECIS}" width="50" height="50"/>
-            <ul>
-                <li><strong>Temperature:</strong> {TEMP}&deg; (feels like {TEMP_FL}&deg;)</li>
-                <li><strong>Wind: </strong>{WIND}</li>
-                <li><strong>Humidity: </strong>{HUMIDITY}</li>
-                <li class="fade">Last updated {PERIOD}</li>
-            </ul>
-        </section>
-    </div>
-    <!-- END current -->
-    <div class="small-12 medium-6 island">
-        	<h2 class="subheader">Weather around Australia</h2>
-            <section>
-        	<ul class="information-list">
-            	<!-- BEGIN regions -->
-            	<li class="{ON_OFF}"><a href="/weather/{LOCATION_VALUE}"><h4>{LOCATION_NAME}</h4></a></li>
-	            <!-- END regions -->
-    	    </ul>
-            </section>
-    </div>
-</div>
 <!-- BEGIN forecast -->
 <div class="row">
-    <div class="small-12 medium-6 island">
+    <div class="small-12 island">
         <h2 class="subheader">Forecast</h2>
         <section>
-            <table id="forecast" class="table">
+            <table id="forecast">
                         <tr>
                             <!-- BEGIN forecast_header -->
                             <th width="{FC_WIDTH}%">{FC_DAY}</th>
@@ -57,9 +30,40 @@
                             <!-- END forecast_data -->
                         </tr>
                     </table>
-                    <span class="sub_footer supplied-by"> Weather supplied by <a href="{SUPPLIED_BY_URL}" target="_blank">{SUPPLIED_BY_NAME}</a><img alt="{SUPPLIED_BY_NAME}" src="{SUPPLIED_BY_LOGO}" /></span>
+
         </section>
     </div>
 </div>
 <!-- END forecast -->
+<div class="row">
+    <!-- BEGIN current -->
+    <div class="small-12 medium-6 island">
+        <h2 class="subheader">Currently</h2>
+        <section>
+                <ul class="information-list">
+                    <li><strong>Temperature:</strong> {TEMP}&deg; (feels like {TEMP_FL}&deg;)</li>
+                    <li><strong>Wind: </strong>{WIND}</li>
+                    <li><strong>Humidity: </strong>{HUMIDITY}</li>
+                    <li>Last updated {PERIOD}</li>
+                </ul>
+            <div class="content">
+                <span class="sub_footer supplied-by"> Weather supplied by
+                    <a href="{SUPPLIED_BY_URL}" target="_blank"><img width="180" alt="{SUPPLIED_BY_NAME}" src="{SUPPLIED_BY_LOGO}" /></a>
+                </span>
+            </div>
+        </section>
+    </div>
+    <!-- END current -->
+    <div class="small-12 medium-6 island">
+        	<h2 class="subheader">Weather around Australia</h2>
+            <section>
+        	<ul class="information-list">
+            	<!-- BEGIN regions -->
+            	<li class="{ON_OFF}"><a href="/weather/{LOCATION_VALUE}"><h4>{LOCATION_NAME}</h4></a></li>
+	            <!-- END regions -->
+    	    </ul>
+            </section>
+    </div>
+</div>
+
 
