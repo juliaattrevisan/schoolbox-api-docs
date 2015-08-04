@@ -8,8 +8,8 @@
     <div class="small-12 columns">
         <h1>Reviewing {ASSESS_TITLE} response for {RESPONDENT_NAME}</h1>
         <ul class="meta">
-            <li class="icon-calendar"><time>{ASSESS_START}</time>
-                &ndash; <time>{ASSESS_FINISH}</time>
+            <li class="icon-calendar">
+                <time>{ASSESS_START}</time>&ndash;<time>{ASSESS_FINISH}</time>
             </li>
             <li class="icon-surveys"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a>
                 Survey, taken
@@ -32,11 +32,15 @@
 
         <h2 class="subheader">Questions</h2>
         <!-- BEGIN question -->
-        <section class="content">
-            <h3>Q{QUESTION_SEQUENCE})</h3>
-            <article>{QUESTION_QUESTION}</article>
-            <!-- BEGIN answerInputs -->
-            <!-- END answerInputs -->
+        <section>
+            <ul class="information-list">
+                <li class="row content">
+                    <h3>Q{QUESTION_SEQUENCE})</h3>
+                    <article>{QUESTION_QUESTION}</article>
+                </li>
+                <!-- BEGIN answerInputs -->
+                <!-- END answerInputs -->
+            </ul>
         </section>
         <!-- END question -->
     </div>

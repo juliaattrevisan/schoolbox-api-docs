@@ -57,5 +57,5 @@ $answerHandler->update(array(
  */
 $questionHandler->resequenceQuestionsAfterDelete($section['assess_id'], $section['section_id']);
 
-SitePage::localRedir('/survey/modify/' . $section['assess_id']);
+SitePage::localRedir('/survey/summary/' . $section['assess_id']);
 

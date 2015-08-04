@@ -121,6 +121,7 @@ if (!empty($_POST)) {
     $this->setBlock('type_selected', 'answerInputs', 'answerInputs_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
     $this->setBlock('type_selected', 'has_answer_configuration', 'has_answer_configuration_block');
+    $this->setBlock('type_selected', 'has_marks', 'has_marks_block');
     $this->setBlock('has_answer_configuration', 'answer_configuration', 'answer_configuration_block');
 
     $this->setTitle('Create Question');
@@ -129,6 +130,7 @@ if (!empty($_POST)) {
         array(
             'has_answer_configuration_block' => '',
             'type_selected_block' => '',
+            'has_marks_block' => '',
         )
     );
 
@@ -150,45 +152,17 @@ if (!empty($_POST)) {
         )
     );
 
-    /* If a particular question type has been selected; otherwise ignore it
-     */
-    if (is_numeric($this->arg[1])) {
-        $answerHandler = $factory->createAnswerModel($this->arg[1]);
-
-        $this->setVar(
-            array(
-                'IMPORT_SELECTED' => '',
-                'DISABLED_SELECTED' => '',
-            )
-        );
-
-        $this->parse('type_selected_block', 'type_selected');
-
-    } else {
-        if ($this->arg[1] == 'import') {
-            $this->setVar(
-                array(
-                    'IMPORT_SELECTED' => 'selected=\'selected\'',
-                    'ANSWER_INPUTS' => ''
-                )
-            );
-        } else {
-            $this->setVar(
-                array(
-                    'IMPORT_SELECTED' => '',
-                    'DISABLED_SELECTED' => 'selected=\'selected\'',
-                    'ANSWER_INPUTS' => $answerTemplate,
-                    'SUBMIT_DISABLED' => 'disabled="disabled"'
-                )
-            );
-        }
-    }
-
     /* Show question type options
      */
     $setTemplate = false;
 
     $questionTypes = $questionHandler->getAllQuestionTypes();
+
+    /* If a particular question type has been selected; otherwise ignore it
+     */
+    if (is_numeric($this->arg[1])) {
+        $answerHandler = $factory->createAnswerModel($this->arg[1]);
+    }
 
     foreach ($questionTypes as $currentQuestionType) {
         if (is_numeric($this->arg[1]) && ($this->arg[1] == $currentQuestionType['type_id'])) {
@@ -254,6 +228,38 @@ if (!empty($_POST)) {
         $this->parse('questionType_block', 'questionType', true);
     }
 
+    /* If a particular question type has been selected; otherwise ignore it
+     */
+    if (is_numeric($this->arg[1])) {
+        $this->setVar(
+            array(
+                'IMPORT_SELECTED' => '',
+                'DISABLED_SELECTED' => '',
+            )
+        );
+
+        $this->parse('type_selected_block', 'type_selected');
+
+    } else {
+        if ($this->arg[1] == 'import') {
+            $this->setVar(
+                array(
+                    'IMPORT_SELECTED' => 'selected=\'selected\'',
+                    'ANSWER_INPUTS' => ''
+                )
+            );
+        } else {
+            $this->setVar(
+                array(
+                    'IMPORT_SELECTED' => '',
+                    'DISABLED_SELECTED' => 'selected=\'selected\'',
+                    'ANSWER_INPUTS' => $answerTemplate,
+                    'SUBMIT_DISABLED' => 'disabled="disabled"'
+                )
+            );
+        }
+    }
+
     /* If the answer template wasn't set, then we haven't chosen an answer type
      * so hide the block that would normally contain the answer type's form.
      */
@@ -272,12 +278,12 @@ if (!empty($_POST)) {
         ],
         [
             'text' => $assess['title'],
-            'href' => "/assess/summary/{$assess['assess_id']}",
+            'href' => "/survey/summary/{$assess['assess_id']}",
             'class' => '',
         ],
         [
             'text' => $section['title'],
-            'href' => "/assess/summary/{$assess['assess_id']}",
+            'href' => "/survey/summary/{$assess['assess_id']}",
             'class' => '',
         ],
         [

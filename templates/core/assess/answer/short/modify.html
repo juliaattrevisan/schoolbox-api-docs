@@ -1,6 +1,5 @@
 <script type="text/javascript">
 $(function() {
-	
 	$(document).on('click', '#create', function() {
 		var content = tinyMCE.activeEditor.getContent(); // get the content
    		$('#question').val(content); // put it in the textarea
@@ -41,7 +40,7 @@ $(function() {
 });
 </script>
 
-
-    <label>Suggested Answer
-    <div class="textarea-container"><textarea id="answerBox" name="answer">{ANSWER}</textarea></div>
-	</label>
+<label>
+    Suggested Answer
+    <textarea name="answer">{ANSWER}</textarea>
+</label>

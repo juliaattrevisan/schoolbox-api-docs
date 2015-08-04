@@ -1,13 +1,13 @@
-
-<label class="textarea">
-    <!-- BEGIN answerOption -->
-	<script type='text/javascript'>
-		$(function() {
-			$('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
-				id: {QUESTION_ID}
-			});
-		});
-	</script>
-    <div class="textarea-container"><textarea name="answer">{ANSWER}</textarea></div>
-    <!-- END answerOption -->
+<!-- BEGIN answerOption -->
+<label>
+    <script type='text/javascript'>
+        $(function() {
+            $('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+                id: {QUESTION_ID}
+            });
+        });
+    </script>
+    <textarea name="answer">{ANSWER}</textarea>
 </label>
+<!-- END answerOption -->
+

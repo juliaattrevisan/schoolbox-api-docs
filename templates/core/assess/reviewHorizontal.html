@@ -47,7 +47,7 @@
         <h2 class="subheader">Respondents</h2>
 
         <!-- BEGIN attempt -->
-        <section class="content">
+        <section>
             <script type='text/javascript'>
                 $(function() {
                     $('questionForm-{RESPONSE_ID}').evaluationResponseReview({
@@ -55,11 +55,7 @@
                     });
                 });
             </script>
-            <form id='questionForm-{RESPONSE_ID}'
-                  action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}"
-                  class='respondent-attempt {ON_OFF} validation_{RESPONSE_ID} questionForm'
-                  method="post"
-            >
+            <form id='questionForm-{RESPONSE_ID}' action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" class='validation_{RESPONSE_ID} questionForm' method="post">
                 <div class="avatar-card">
                     <a href="#" title="View Profile">
                         <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" alt="View Profile" />
@@ -67,8 +63,10 @@
                     </a>
                 </div>
 
-                <!-- BEGIN answerInputs -->
-                <!-- END answerInputs -->
+                <ul class="information-list">
+                    <!-- BEGIN answerInputs -->
+                    <!-- END answerInputs -->
+                </ul>
             </form>
         </section>
         <!-- END attempt -->

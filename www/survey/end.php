@@ -110,8 +110,8 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         'class' => ''
     ],
     [
-        'text'  => $assess['title'],
-        'href'  => '/assess/intro/' . $assess['assess_id'],
+        'text'  => $survey['title'],
+        'href'  => '/survey/intro/' . $survey['assess_id'],
         'class' => 'active'
     ],
 ]);

@@ -94,8 +94,8 @@ $(document).ready(function() {
     <div class="small-12 columns">
         <h1>Marking {ASSESS_TITLE} quiz results for {RESPONDENT_NAME}</h1>
         <ul class="meta">
-            <li class="icon-calendar"><time>{ASSESS_START}</time>
-                &ndash; <time>{ASSESS_FINISH}</time>
+            <li class="icon-calendar">
+                <time>{ASSESS_START}</time>&ndash;<time>{ASSESS_FINISH}</time>
             </li>
             <li class="icon-due-work"><a href="/homepage/{ASSESS_CATEGORY_ID}">{ASSESS_CATEGORY_NAME}</a>
                 Quiz, attempted
@@ -138,17 +138,16 @@ $(document).ready(function() {
 
         <h2 class="subheader">Questions</h2>
         <!-- BEGIN question -->
-        <section class="content">
-            <form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}"
-                  data-role="question-submit"
-                  name="question-submit"
-                  class='validation_{RESPONSE_ID} questionForm'
-                  method="post"
-            >
-                <h3>Q{QUESTION_SEQUENCE}) ({QUESTION_MARKS} marks)</h3>
-                <article>{QUESTION_QUESTION}</article>
-                <!-- BEGIN answerInputs -->
-                <!-- END answerInputs -->
+        <section>
+            <form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" data-role="question-submit" name="question-submit" class='validation_{RESPONSE_ID} questionForm' method="post">
+                <ul class="information-list">
+                    <li class="row content">
+                        <h3>Q{QUESTION_SEQUENCE}) <span class="meta">({QUESTION_MARKS} marks)</span></h3>
+                        <article>{QUESTION_QUESTION}</article>
+                    </li>
+                    <!-- BEGIN answerInputs -->
+                    <!-- END answerInputs -->
+                </ul>
             </form>
         </section>
         <!-- END question -->
