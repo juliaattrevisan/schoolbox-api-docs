@@ -24,12 +24,7 @@
 
         /* Mash the validator on
          */
-        if (config.mode == 'create') {
-            applyCreateValidator();
-        }
-        else {
-            applyModifyValidator();
-        }
+        applyValidator();
 
         /**
          * Init
@@ -167,7 +162,7 @@
         /**
          * Apply the validator to the form
          */
-        function applyCreateValidator() {
+        function applyValidator() {
             $(config.element).submit(function() {
                 // update underlying textarea before submit validation
                 tinyMCE.triggerSave();
@@ -204,22 +199,31 @@
 
                     /* Collate the usual fields containing ids.
                      * Collate the checkboxes too but append all the possibilities as well!
+                     *
+                     * Common data
                      */
-                    var data = {};
+                    var data = {
+                        type_id: theForm.find('select[name=type_id]').val(),
+                        question: content,
+                        sequence: theForm.find('input[name=sequence]').val(),
+                        allAnswers: JSON.stringify(answerCollection),
+                        configuration: JSON.stringify($(config.configuration).find('input, textarea, select').serializeArray())
+                    };
+
+                    /* Quiz-specific data
+                     */
+                    if (config.availability == 'assess') {
+                        data.marks = theForm.find('input[name=marks]').val();
+                    }
+
+                    /* Redirect url
+                     */
                     var redirect = '';
 
                     /* Create in Quiz/Survey
                      */
                     if (config.mode == 'create') {
-                        data = {
-                            section_id: theForm.find('input[name=section_id]').val(),
-                            sequence: theForm.find('input[name=sequence]').val(),
-                            type_id: theForm.find('select[name=type_id]').val(),
-                            question: tinyMCE.get('question').getContent(),
-                            marks: theForm.find('input[name=marks]').val(),
-                            allAnswers: JSON.stringify(answerCollection),
-                            configuration: JSON.stringify($(config.configuration).find('input, textarea, select').serializeArray())
-                        };
+                        data.section_id = theForm.find('input[name=section_id]').val();
 
                         redirect = config.availability + '/' + data.section_id + '/create';
                     }
@@ -227,31 +231,15 @@
                         /* Modify in Quiz/Survey
                          */
                         if ((typeof config.questionBank == "undefined") || (config.questionBank === false)) {
-                            data = {
-                                section_id: theForm.find('input[name=section_id]').val(),
-                                question_id: theForm.find('input[name=question_id]').val(),
-                                sequence: theForm.find('input[name=sequence]').val(),
-                                type_id: theForm.find('input[name=type_id]').val(),
-                                question: tinyMCE.get('question').getContent(),
-                                marks: theForm.find('input[name=marks]').val(),
-                                allAnswers: JSON.stringify(answerCollection),
-                                configuration: JSON.stringify($('#configuration').find('input, textarea, select').serializeArray())
-                            };
+                            data.section_id = theForm.find('input[name=section_id]').val(),
+                            data.question_id = theForm.find('input[name=question_id]').val(),
 
                             redirect = config.availability + '/modify/' + data.question_id;
                         }
                         /* Modify directly in the Question Bank
                          */
                         else {
-                            data = {
-                                question_bank_id: theForm.find('input[name=question_bank_id]').val(),
-                                sequence: theForm.find('input[name=sequence]').val(),
-                                type_id: theForm.find('input[name=type_id]').val(),
-                                question: tinyMCE.get('question').getContent(),
-                                marks: theForm.find('input[name=marks]').val(),
-                                allAnswers: JSON.stringify(answerCollection),
-                                configuration: JSON.stringify($('#configuration').find('input, textarea, select').serializeArray())
-                            };
+                            data.question_bank_id = theForm.find('input[name=question_bank_id]').val();
 
                             redirect = config.questionBank.url;
                         }
