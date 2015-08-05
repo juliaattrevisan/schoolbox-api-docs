@@ -20,35 +20,36 @@
 // 2. And then variables can be overridden here
 // =============================================================================
 // Dimensions
-@search-width: 					256px;
-@logo-width: 					172px;
+@search-width: 					195px;
+@logo-width: 						172px;
 @logo-height: 					35px;
-@infopanel-bellsprite:			'/images/demo/bell.png';
+@infopanel-bellsprite:			'/images/slmp/bell.png';
+@infopanel-height:			32px;
 
 // Generic colors
 @dark-blue:                     #013A63; // Dark Schoolbox Blue
-@body-background: 				#EEEEEE; // Body, but not the content area
+@body-background: 				#e6ecf4; // Body, but not the content area
 @content-background: 			#FFFFFF; // Used for forms
-@dark: 							#FAFAFA; // Alternate tigerstriping color
+@dark: 									#FAFAFA; // Alternate tigerstriping color
 @border-color: 					#EEEEEE; // Bordering @dark
-@alternate-background: 			#FFFFFF; // Sections such as admin
+@alternate-background: 	#FFFFFF; // Sections such as admin
 
 // Basic type
-@body-text: 					@black;
+@body-text: 						@black;
 @secondary-text: 				#797979;
-@link: 							#0066B0;
-@link-hover: 					#FF5A00;
+@link: 									#3891e0;
+@link-hover: 						lighten(@link,5%);
 
 // Main banner & Search
-@banner-background: 			@link;
+@banner-background: 			#0165d5;
 @banner-color:      			#FFFFFF;
 @banner-links:      			@banner-color;
-@search-color:                  @banner-color;
-@banner-height:     			72px;
+@search-color:            #929292;
+@banner-height:     			110px;
 
 // Modules
-@module-heading: 				#000000;
-@module-background: 			#E5EFF7;
+@module-heading: 					#013592;
+@module-background: 			transparent;
 @admin-nav:                     @link;
 
 // Refers to the left navigation
@@ -56,7 +57,7 @@
 @navigation-padding:			16px;
 @navigation-background:  		transparent;
 @navigation-color:  			#000000;
-@navigation-links:  			@navigation-color;
+@navigation-links:  			@link;
 @navigation-hover-background: 	@link;
 @navigation-hover-color:  		#FFFFFF;
 @navigation-sub-background:  	@body-background;
@@ -76,12 +77,12 @@
 
 // Main "Tab" Navigation
 @tab-background:				transparent;
-@tab-color:						#FFFFFF;
-@tab-hover-background:		    @tab-color;
-@tab-hover-color:				@link;
+@tab-color:							#FFFFFF;
+@tab-hover-background:	#1a3b8f;
+@tab-hover-color:				#1a3b8f;
 
 // Footer text
-@footer-color:					#797979;
+@footer-color:					#929292;
 @footer-links:					@footer-color;
 
 // Optional features
@@ -95,6 +96,157 @@
 // =============================================================================
 // 4. Any overrides for styles can be specified below
 // =============================================================================
+h2{
+	border-bottom: 2px solid @module-heading;
+	padding: 0 16px 0 0;
+}
+
+#header{
+	#search-field{
+		.border-radius(3px);
+		.placeholder(@search-color);
+		background: @white;
+		-webkit-box-shadow: inset 0px 1px 0px 0px rgba(146,146,146,1);
+		-moz-box-shadow: inset 0px 1px 0px 0px rgba(146,146,146,1);
+		box-shadow: inset 0px 1px 0px 0px rgba(146,146,146,1);
+	}
+	#search-button{
+		background: url("/images/slmp/search-btn.png") no-repeat 0px 8px;
+	}
+	#tabs{
+		.gradient(#265daf,#1a3b8f);
+		height: 38px;
+		position: relative;
+		top: 24px;
+		z-index: 1;
+		border-top-left-radius: 3px;
+		-moz-border-top-left-radius: 3px;
+		-webkit-border-top-left-radius: 3px;
+		li a{
+			height: 38px;
+			line-height: 38px;
+		}
+		li:first-child a{
+			border-top-left-radius: 3px;
+			-moz-border-top-left-radius: 3px;
+			-webkit-border-top-left-radius: 3px;
+		}
+		.navthis a{
+			color: @white;
+			font-weight: normal;
+		}
+	}
+}
+
+.admin-nav{
+	li a{
+		.border-radius(3px);
+		.box-shadow(0, 1px, 0, #c3c3c3);
+		background: #e4e4e4;
+		border: 0;
+		color: @link;
+	}
+}
+
+body.login{
+	background: @white;
+	#container{
+		background: @white;
+		width: 100% !important;
+		padding: 0;
+		color: @link;
+
+		#login-bg {
+	    position: fixed;
+	    top: 0;
+	    left: 0;
+	    width: 100%;
+	    height: 100%;
+	    z-index: -1;
+  	}
+
+		#content{
+			background: @white;
+			float: left;
+			width: 30%;
+			height: 100%;
+			position: fixed;
+			right: 0;
+			left: auto;
+			top: 0;
+			padding: 80px 2% 0 2%;
+			box-sizing: border-box;
+			.error, .forgotten a{
+				color: @link;
+			}
+		}
+		#loginForm{
+			::-webkit-input-placeholder { color: @black; font-size: 16px; }
+			:-moz-placeholder { color: @black; font-size: 16px; }
+			::-moz-placeholder { color: @black; font-size: 16px; }
+			:-ms-input-placeholder { color: @black; font-size: 16px; }
+				input[type="text"],
+				input[type="password"]{
+				.border-radius(3px);
+				background: #eee;
+				color: @black;
+				font-size: 17px;
+				width: 100%;
+				height: 45px;
+				margin: 0 0 16px 0;
+				padding: 10px 12px;
+			}
+			input[type="submit"]{
+				.border-radius(3px);
+				.box-shadow(0, 1px, 0, #2b70ad);
+				background: @link url('/images/slmp/chevron.png') 97% 50% no-repeat;
+				color: @white;
+				width: 100%;
+				font-weight: bold;
+				font-size: 16px;
+				height: 45px;
+				&:hover{
+					background: lighten(@link, 5%) url('/images/slmp/chevron.png') 97% 50% no-repeat;
+				}
+			}
+		}
+		fieldset{
+			padding: 0;
+		}
+	}
+	#footer{
+		left: 0;
+		bottom: 0;
+		right: auto;
+		width: 64%;
+		position: fixed;
+		ul li,
+  		ul li a{
+  			color: @white;
+  		}
+	}
+}
+
+/* ---- Mobile ---- */
+@media screen and (max-width: 760px) {
+	body.login{
+	  	#container #content{
+			width: 100%;
+			box-sizing: border-box;
+			top: 15px;
+			#login-logo{ margin-bottom: 15px; }
+	  	}
+	  	#footer{
+	  		width: 90%;
+	  		ul li,
+	  		ul li a{
+	  			color: @link;
+	  		}
+	  	}
+		#login-bg{ display: none; }
+	}
+}
+
 /*
  * Demo Dashboards
  */
@@ -109,7 +261,7 @@
 			height: 135px;
 			list-style: none;
 		}
-		a{ 
+		a{
 			display: block;
 			float: left;
 			text-align: center;
