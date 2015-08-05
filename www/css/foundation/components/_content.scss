@@ -1151,6 +1151,11 @@ ul.meta {
     list-style: none;
     line-height: 1.5rem;
     margin-bottom: 1rem;
+	li {
+		// 26px = 16x16 icon + 10px padding (both hardcoded values)
+		text-indent: -26px;
+		padding-left: 26px;
+	}
 }
 
 @media #{$small-only} {
