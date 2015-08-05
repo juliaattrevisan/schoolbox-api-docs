@@ -2,16 +2,35 @@
 
 <script type="text/javascript">
     $(function() {
-        $('#sigPad{ID}').signaturePad({
-            displayOnly: true
-        }).regenerate({RESPONSE});
+        var sigPadElement = $('[data-signature="{ID}"]');
+        var sigPad        = sigPadElement.signaturePad({
+            displayOnly: true,
+            sig: 'canvas[data-role="signatureCanvas"]'
+        });
+
+        // Draw the signature
+        var redrawSignature = function(signature) {
+            sigPad.regenerate(signature);
+        };
+        redrawSignature({RESPONSE});
+
+        // Resize canvas
+        var canvas    = sigPadElement.find('canvas[data-role="signatureCanvas"]');
+        var container = canvas.parent();
+        var resizeSignature = function() {
+            var signature = sigPad.getSignature();
+            var width     = container.width();
+            canvas.attr({ width: width });
+            redrawSignature(signature);
+        };
+        $(window).resize(resizeSignature);
+        resizeSignature();
     });
 </script>
 <div class="answer-given-container">
-    <label id='sigPad{ID}' class="sigPad">
-        <div class="sigPadWrapper">
-            <div class="typed"></div>
-            <canvas class="pad" width="500" height="100"></canvas>
+    <div id='sigPad{ID}' class="sigPad row readonly" data-signature="{ID}">
+        <div class="sigPadWrapper small-12 columns no-pad">
+            <canvas class="pad" data-role="signatureCanvas" height="142"></canvas>
         </div>
-    </label>
+    </div>
 </div>
