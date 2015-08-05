@@ -1,62 +1,18 @@
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
-
+<script type="text/javascript" src="/javascript/evaluation/jquery.bargraph.js"></script>
 <script type='text/javascript'>
-$(function() {
-
-    /* The plot unfolds
-     */
-    $("#{GRAPH_ID}").highcharts({
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: ''
-        },
-        xAxis: {
-            labels: {
-                enabled: false
-            },
-
-            /* Hide useless ticketty-boo lines (you need all
-             * of these values, seemingly)
-             */
-            lineWidth: 0,
-            minorGridLineWidth: 0,
-            lineColor: 'transparent',
-            minorTickLength: 0,
-            tickLength: 0
-        },
-        yAxis: {
-            min: 0,
-            allowDecimals: false,
-            title: {
-                text: ''
-            }
-        },
-        plotOptions: {
-            column: {
-                grouping: false
-            }
-        },
-        series: [
-            <!-- BEGIN series -->
-            {
-                name: "{SERIES_LABEL}",
-                data: [[{SERIES_INDEX}, {SERIES_DATA}]],
-            }<!-- BEGIN series_separator -->,<!-- END series_separator -->
-            <!-- END series -->
-        ],
-        tooltip: {
-            formatter: function() {
-                return this.series.name + ': ' + this.y;
-            }
-        },
-        credits: {
-            enabled: false
-        }
+    $(function() {
+        $('#{GRAPH_ID}').evaluationBarchart({
+            series: [
+                <!-- BEGIN series -->
+                {
+                    name: "{SERIES_LABEL}",
+                    data: [[{SERIES_INDEX}, {SERIES_DATA}]],
+                }<!-- BEGIN series_separator -->,<!-- END series_separator -->
+                <!-- END series -->
+            ]
+        });
     });
-
-});
 </script>
 
-<div id='{GRAPH_ID}' class="graph"></div>
+<div id='{GRAPH_ID}'></div>
