@@ -83,13 +83,15 @@
          * Add the minimum number of options to choose from
          */
         function addDefaultOptions() {
-            for (var i = 0; i < config.minOptions; i++) {
-                $(config.answerCollectionList).append($('[data-clone] [data-input]').clone());
-            }
+            if (!$(config.answerCollectionList).find('[data-input]').length) {
+                for (var i = 0; i < config.minOptions; i++) {
+                    $(config.answerCollectionList).append($('[data-clone] [data-input]').clone());
+                }
 
-            /* Update letter indexes
-             */
-            refreshList();
+                /* Update letter indexes
+                 */
+                refreshList();
+            }
         }
 
         /**
