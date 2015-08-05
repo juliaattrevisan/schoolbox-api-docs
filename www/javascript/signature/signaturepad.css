@@ -1,6 +1,9 @@
 .sigPad .pad {
     position: relative;
-
+    /* Heights still sadly necessary for consistent sigpad */
+    height: 142px;
+}
+.sigPad:not(.readonly) .pad {
     /**
      * For cross browser compatibility, this should be an absolute URL
      * In IE the cursor is relative to the HTML document
@@ -21,8 +24,6 @@
     -ms-user-select: none;
     -o-user-select: none;
     user-select: none;
-    /* Heights still sadly necessary for consistent sigpad */
-    height: 142px;
 }
 
 .sigPad .sigPadWrapper {
