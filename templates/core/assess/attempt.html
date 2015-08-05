@@ -89,6 +89,7 @@ $(function() {
 
 <div class="row">
 	<div class="small-12 column">
+
 		<!-- BEGIN prevSection -->
 		<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}" class="button icon-previous" data-evaluation-navigator>Previous Section</a>
 		<!-- END prevSection -->
@@ -100,5 +101,9 @@ $(function() {
 		<!-- BEGIN endAssess -->
 		<a href="/assess/end/{ASSESS_ASSESS_ID}" class="button secondary expand" data-evaluation-finish>Finish</a>
 		<!-- END endAssess -->
+
+        <div id='evaluation-saving' class="loader text-center hide">
+            <span class="success label full-width hide" data-evaluation-progress-saved>Progress Saved</span>
+        </div>
 	</div>
 </div>

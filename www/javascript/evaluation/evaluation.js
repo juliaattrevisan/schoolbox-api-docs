@@ -55,7 +55,7 @@
 		 * Init - show loading div
 		 */
 		function init() {
-			$('#evaluation-saving').show();
+			$('#evaluation-saving').removeClass('hide');
 		}
 
 		/**
@@ -117,7 +117,9 @@
 				}
 			});
 
-			$('#evaluation-saving').text('Progress saved');
+            /* Remove loading gif; show success label
+             */
+            $('#evaluation-saving').removeClass('loader').find('[data-evaluation-progress-saved]').removeClass('hide');
 
 			/* Detect errors, prevent redirection if any were made
 			 * and hide that Saving box
@@ -126,7 +128,7 @@
 				location.href = href;
 			}
 			else {
-				$('#evaluation-saving').hide();
+				$('#evaluation-saving').addClass('loader hide').find('[data-evaluation-progress-saved]').addClass('hide');
 			}
 		}
 	}
