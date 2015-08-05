@@ -1151,6 +1151,10 @@ tr:hover{
 	font-size: $h1-font-size;
 }
 
+time {
+	white-space: nowrap;
+}
+
 ul.meta {
     list-style: none;
     line-height: 1.5rem;
