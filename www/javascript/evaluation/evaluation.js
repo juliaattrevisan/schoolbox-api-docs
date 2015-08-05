@@ -13,7 +13,7 @@
 
 		/* Submit all the questions before switching between sections
 		 */
-		$('.evaluation-navigator').click(function(event) {
+		$('[data-evaluation-navigator]').click(function(event) {
 			event.preventDefault();
 
 			$.fn.evaluation.saveAll($(this).attr('href'));
@@ -27,7 +27,7 @@
 		 * submits all the questionForm elements. This causes, in particular,
 		 * Matching Pairs to remain untouched resulting in NULL values.
 		 */
-		$('.evaluation-finish').click(function(event) {
+		$('[data-evaluation-finish]').click(function(event) {
 			event.preventDefault();
 			var href = $(this).attr('href');
 			$(this).confirmDialog({
