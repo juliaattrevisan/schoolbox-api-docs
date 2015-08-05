@@ -72,8 +72,9 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
 
         /* SVG data
          */
-        $data['responses']     = $page->getVar('renderedSignature');
-        $data['responsesData'] = '';
+        $data['responses'] = $page->getVar('renderedSignature');
+        // Signatures are never duplicated
+        $data['responsesData'] = $attempt_id;
 
         /* Append commentary
          */
