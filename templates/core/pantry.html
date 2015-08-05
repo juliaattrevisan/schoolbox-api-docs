@@ -254,11 +254,13 @@
             </div>
         </div>
     </div>
+
     <div class="row">
         <div class="small-12 island">
+            <h1>Sortable</h1>
             <h2 class="subheader">You Can Rearrange This List</h2>
             <ul class="meta">
-                <li class="icon-alert icon-16">Any kind of list will work, not just information lists with avatar cards</li>
+                <li class="icon-approve icon-16">Any kind of list will work, not just information lists with avatar cards</li>
             </ul>
             <section>
                 <ul class="information-list sortable" data-sortable>
@@ -324,10 +326,108 @@
                     </li>
                 </ul>
             </section>
+
+            <div class="callout panel">
+                <code>
+                    $('#my-sortable-ul').sortable({ handle: '.grip', axis: 'y' });
+                </code>
+            </div>
+
         </div>
     </div>
+
     <div class="row">
-        <div class="large-12 columns">
+        <div class="small-12 island">
+            <h2 class="subheader">Matching Pairs</h2>
+            <section id="equalize-me">
+                <div class="content">
+                    <h3>Question <span class="meta">(3 marks)</span></h3>
+                    <p>Align the foods to the animals that eat them.</p>
+                </div>
+                <div class="row matching-pairs" data-equalizer>
+                    <div class="column small-6">
+                        <ul class="information-list">
+                            <li class="row">
+                                <div class="small-12 column">
+                                    <div class="card wrap-down" data-equalizer-watch>
+                                        <p>Animalia Chordata Mammalia Carnivora Felidae Felinae Felis Silvestris Catus</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="row">
+                                <div class="small-12 column">
+                                    <div class="card wrap-down" data-equalizer-watch>
+                                        <p>Animalia Chordata Mammalia Carnivora Canidae Canis Lupus Familiaris</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="row">
+                                <div class="small-12 column">
+                                    <div class="card wrap-down" data-equalizer-watch>
+                                        <p>Animalia Chordata Vertebrata Mammalia Lagomorpha Leporidae Brachylagus Idahoensis</p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="column small-6">
+                        <ul class="information-list sortable" data-sortable>
+                            <li class="row">
+                                <div class="grip"></div>
+                                <div class="small-11 column no-pad">
+                                    <div class="card wrap-down" data-equalizer-watch>
+                                        <p>Cortical Mineralized Osseous Tissue</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="row">
+                                <div class="grip"></div>
+                                <div class="small-11 column no-pad">
+                                    <div class="card wrap-down" data-equalizer-watch>
+                                        <p>Plantae Angiosperms Eudicots Asterids Apiales Apiaceae Daucus Carota</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="row">
+                                <div class="grip"></div>
+                                <div class="small-11 column no-pad">
+                                    <div class="card wrap-down" data-equalizer-watch>
+                                        <p>Animalia Chordata Mammalia Rodentia Muroidea Muridae Murinae Mus Lepidoides</p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            <ul class="meta">
+                <li class="icon-alert">Important! You need a special equalizer initialization:</li>
+            </ul>
+            <section>
+                <pre class="callout panel">
+$(function () {
+    $('#equalize-me').foundation({
+        equalizer: {
+            equalize_on_stack: true
+        }
+    });
+});
+                </pre>
+            </section>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $('#equalize-me').foundation({
+                equalizer: {
+                    equalize_on_stack: true
+                }
+            });
+        });
+    </script>
+
+    <div class="row">
+        <div class="small-12 columns">
             <h2 class="subheader">Little Manc Islands</h2>
         </div>
     </div>
