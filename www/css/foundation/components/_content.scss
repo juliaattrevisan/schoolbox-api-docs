@@ -909,6 +909,7 @@ table{
     }
 
     &.info {
+        color: $black;
         ~ article, ~ .list-item-content {
             margin-left: (rem-calc($base-font-size));
         }
