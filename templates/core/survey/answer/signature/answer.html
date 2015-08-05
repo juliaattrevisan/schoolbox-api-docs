@@ -15,51 +15,33 @@
     var dm = createDelayManager();
 
     $(function() {
-        var sigPadElement = $('[data-signature]');
-        var sigPad        = sigPadElement.signaturePad({
-            lineTop: 102,
-            lineWidth: 0,
-            lineMargin: 16,
-            drawOnly: true,
-            onDrawEnd: function() {
-
-                /* Apply delay to auto-save, so the signature
-                 * process remains fluid
-                 *
-                 * http://stackoverflow.com/questions/5420776/how-do-i-reuse-this-javascript-timeout-closure
-                 */
-                dm(function() {
-                    $('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
-                        id: {QUESTION_ID}
-                    });
-                }, 3000);
-            },
-            sig: 'canvas[data-role="signatureCanvas"]',
-            clear: 'a[data-role="signatureClear"]',
-            output: 'input[data-role="signatureInput"]'
-        });
-
-        // Draw the signature
-        var redrawSignature = function(signature) {
-            sigPad.regenerate(signature);
-        };
-        redrawSignature({ANSWER});
-
-        // Resize canvas
-        var canvas    = sigPadElement.find('canvas[data-role="signatureCanvas"]');
-        var container = canvas.parent();
-        var resizeSignature = function() {
-            var signature = sigPad.getSignature();
-            var width     = container.width();
-            canvas.attr({ width: width });
-            redrawSignature(signature);
-        };
-        $(window).resize(resizeSignature);
-        resizeSignature();
+        // {RESPONSE} can be empty - function wrapper caters for that possibility.
+        // {RESPONSE} can also be a parse error, I don't know how to handle that!
+        (function (response) {
+            $('[data-signature]').alaressSignaturePad({
+                init: response,
+                rescale: false,
+                displayOnly: false,
+                onDrawEnd: function() {
+                    /* Apply delay to auto-save, so the signature
+                     * process remains fluid
+                     *
+                     * http://stackoverflow.com/questions/5420776/how-do-i-reuse-this-javascript-timeout-closure
+                     */
+                    dm(function() {
+                        $('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+                            id: {QUESTION_ID}
+                        });
+                    }, 3000);
+                }
+            });
+        })({ANSWER});
+        // What's that? I don't have a parseable output?
     });
 </script>
 
 <script src="/javascript/signature/jquery.signaturepad.min.js"></script>
+<script src="/javascript/jquery.alaressSignaturePad.js"></script>
 <link rel="stylesheet" href="/javascript/signature/signaturepad.css">
 
 <span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
