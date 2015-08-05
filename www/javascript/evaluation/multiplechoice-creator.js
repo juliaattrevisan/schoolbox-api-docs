@@ -227,7 +227,7 @@
                         data.type_id = theForm.find('select[name=type_id]').val(),
                         data.section_id = theForm.find('input[name=section_id]').val();
 
-                        redirect = '/' + config.availability + '/' + data.section_id + '/create';
+                        redirect = '/' + config.availability + '/question/create/' + data.section_id + '/create';
                     }
                     else {
                         /* Modify in Quiz/Survey
