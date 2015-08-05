@@ -72,7 +72,8 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
 
         /* SVG data
          */
-        $data['responses'] = $page->getVar('renderedSignature');
+        $data['responses']     = $page->getVar('renderedSignature');
+        $data['responsesData'] = '';
 
         /* Append commentary
          */
