@@ -1,0 +1,15 @@
+.evaluation-answer-option {
+    @extend .alert-box;
+    color: #000;
+    background-color: transparent;
+    &.evaluation-correct-answer-option {
+        span:before {
+            color: #c3e5c3;
+        }
+    }
+    &.evaluation-selected-answer-option {
+        background-color: #fff3bd;
+    }
+}
+
+
