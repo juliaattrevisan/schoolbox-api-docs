@@ -1,0 +1,55 @@
+<div id="nav">
+	<h3>{SITE_TITLE}</h3>
+	<div class="nav-wrapper"> {MCSSMENU} </div>
+
+	<!-- BEGIN has_msubject -->
+	<h3>My Subjects</h3>
+
+	<div class="nav-wrapper">
+		<ul>
+		<!-- BEGIN msubject -->
+			<!-- BEGIN msubject_classtype -->
+			<li><h4>{SUBJECT_CLASSTYPE}</h4></li>
+			<!-- END msubject_classtype -->
+
+			<!-- BEGIN msubject_item -->
+			<li>
+				<a href="{SUBJECT_URL}">{SUBJECT_NAME}</a>
+			</li>
+			<!-- END msubject_item -->
+
+			<!-- END msubject -->
+		</ul>
+		<!-- END msubject -->
+	</div>
+	<!-- END has_msubject -->
+
+	<!-- BEGIN mstudent -->
+	<h3>My Students</h3>
+	<div class="nav-wrapper">
+		<ul>
+			<!-- BEGIN mstudent_block -->
+			<li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li>
+			<!-- END mstudent_block -->
+		</ul>
+	</div>
+	<!-- END mstudent --> 
+	<!-- BEGIN mgroup -->
+	<h3>My Groups</h3>
+	<div class="nav-wrapper">
+		<ul>
+			<!-- BEGIN mgroup_block -->
+			<li><a href="/homepage/{MGID}/">{MGNAME}</a></li>
+			<!-- END mgroup_block -->
+		</ul>
+	</div>
+	<!-- END mgroup -->
+	<h3 class="my-links">My Links<a href="/cms/myLinks">Edit</a></h3>
+	<div class="nav-wrapper my-links">
+		<ul class="my-links">
+			<!-- BEGIN mlink_block -->
+			<li>{MLINK}</li>
+			<!-- END mlink_block -->
+		</ul>
+	</div>
+</div>

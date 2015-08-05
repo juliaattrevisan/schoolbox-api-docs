@@ -1,0 +1,51 @@
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/chrome.css?v={SITE_VERSION}" />
+<link rel="stylesheet" type="text/css" media="print" href="/css/core/print.css?v={SITE_VERSION}" />
+
+<link rel="Shortcut Icon" href="/images/{SITE_LOCATION}/favicon.ico" type="image/x-icon" />
+<!-- BEGIN header_css -->
+<link rel="stylesheet" type="text/css" media="{HEADER_CSS_TYPE}" href="{HEADER_CSS_LOCATION}" />
+<!-- END header_css -->
+
+<!--[if lt IE 9]>
+<script type="text/javascript">
+    // Upgrade your browser
+    window.location.href = '/upgrade.php';
+</script>
+<![endif]-->
+
+<script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="/javascript/math/jscurry-0.3.0.js"></script>
+<script type="text/javascript" src="/javascript/math/jqmath-0.4.0.js"></script>
+<script type="text/javascript">M.$mathQ = false; </script> <!-- Disables $ formula encoding -->
+<script type="text/javascript">
+  $(document).ready(function() { $('#infoPanel').find('a[data-menu]').flyout(); });
+  $(document).ready(function() {
+      $('#nav').touchMenu();
+  });
+  // Date formats (global variable)
+  var dateDisplayFormats = {
+      datepicker: {DATEPICKER_FORMAT},
+      momentJs:   {MOMENTJS_FORMAT}
+  };
+  $.datepicker.setDefaults({
+      dateFormat: dateDisplayFormats.datepicker
+  })
+</script>
+<!-- Classes on document for when IE < 11 -->
+<!--[if lt IE 10]>
+<script type="text/javascript">
+    $(function() {
+        $('html').addClass('lt-ie10');
+    })
+</script>
+<![endif]-->
+<!--[if lte IE 10]>
+<script type="text/javascript">
+    $(function() {
+        $('html').addClass('lt-ie11');
+    })
+</script>
+<![endif]-->
+<!-- BEGIN header_javascript -->
+<script type="text/javascript" src="{HEADER_SCRIPT_LOCATION}"></script>
+<!-- END header_javascript -->
