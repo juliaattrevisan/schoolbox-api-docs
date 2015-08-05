@@ -1,3 +1,48 @@
+<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $.fn.alaressTiny({
+            mode: 'exact',
+            elements: 'question',
+            file_browser_category_id: '{ASSESS_CATEGORY_ID}'
+        });
+
+        /* Category tree
+         */
+        $("#categoryTree")
+                .on('select_node.jstree', function(event, jstree) {
+                    $('#question_category').val(jstree.selected[0].replace(/^node_/, ''));
+                })
+                .on('deselect_node.jstree', function() {
+                    $('#question_category').val('');
+                })
+                .jstree({
+                    "animation":50,
+                    "core":{
+                        force_text: true,
+                        multiple:false,
+                        "themes": {
+                            "variant" : "schoolbox",
+                            "dots" : true,
+                            "icons" : false
+                        }
+                    }
+                });
+    });
+
+    /* For overriding plugin redirection destination when modifying
+     * questions inside the QuestionBank
+     *
+     * This must appear before injected html fragments
+     */
+    var questionBank = {
+        url: '{QUESTION_BANK_REDIRECT_URL}'
+    }
+</script>
+
 {BREADCRUMB}
 
 <div class="row">
@@ -45,45 +90,3 @@
     </form>
 </div>
 
-<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
-<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $.fn.alaressTiny({
-            mode: 'exact',
-            elements: 'question',
-            file_browser_category_id: '{ASSESS_CATEGORY_ID}'
-        });
-
-        /* Category tree
-         */
-        $("#categoryTree")
-                .on('select_node.jstree', function(event, jstree) {
-                    $('#question_category').val(jstree.selected[0].replace(/^node_/, ''));
-                })
-                .on('deselect_node.jstree', function() {
-                    $('#question_category').val('');
-                })
-                .jstree({
-                    "animation":50,
-                    "core":{
-                        force_text: true,
-                        multiple:false,
-                        "themes": {
-                            "variant" : "schoolbox",
-                            "dots" : true,
-                            "icons" : false
-                        }
-                    }
-                });
-    });
-
-    /* For overriding plugin redirection destination when modifying
-     * questions inside the QuestionBank
-     */
-    var questionBank = {
-        url: '{QUESTION_BANK_REDIRECT_URL}'
-    }
-</script>
