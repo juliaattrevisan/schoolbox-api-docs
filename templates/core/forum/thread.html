@@ -8,7 +8,7 @@
     <!-- END modify_thread -->
 </span>
 
-<h1>{CATEGORY} - {THREAD_TITLE} {LOCKED}</h1>
+<h1>{THREAD_TITLE} {LOCKED}</h1>
 
 <div class="row">
     <ul class="breadcrumb">
@@ -48,10 +48,11 @@
                             <!-- END modified -->
                         </div>
                     </div>
-
-                    <article>
-                        {POST_BODY}
-                    </article>
+                    <div class="row">
+                        <article class="content">
+                            {POST_BODY}
+                        </article>
+                    </div>
                 </li>
                 <!-- END post -->
             </ul>
