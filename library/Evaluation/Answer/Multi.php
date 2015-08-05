@@ -482,7 +482,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
             foreach ($allAnswers as $currentAnswer) {
                 if ($currentAnswer->correct) {
                     $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => 'correct-answer'
+                        'ACTUAL_CORRECT_VALUE' => 'icon-approve'
                     ));
                 } else {
                     $page->setVar(array(
@@ -498,39 +498,13 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                 if ($existing['response']) {
                     if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
                         $page->setVar(array(
-                            'ANSWER_CHECKED' => 'checked=\'checked\'',
+                            'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
                         ));
-
-                        /* Was this a correctly-selected response? If so apply a
-                         * special class to it. The three cases are:
-                         *
-                         * Correct response, selected
-                         * Incorrect response, selected
-                         * Unselected
-                         */
-                        if ($currentAnswer->correct && in_array($currentAnswer->value, $existingAnswer)) {
-                            $page->setVar(array(
-                                'CORRECT' => $this->getCorrectClass(),
-                            ));
-                        } elseif (in_array($currentAnswer->value, $existingAnswer)) {
-                            $page->setVar(array(
-                                'CORRECT' => $this->getIncorrectClass(),
-                            ));
-                        } else {
-                            $page->setVar(array(
-                                'CORRECT' => ''
-                            ));
-                        }
                     } else {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => '',
-                            'CORRECT' => ''
                         ));
                     }
-                } else {
-                    $page->setVar(array(
-                        'CORRECT' => ''
-                    ));
                 }
 
                 $page->parse('answerOption_block', 'answerOption', true);
