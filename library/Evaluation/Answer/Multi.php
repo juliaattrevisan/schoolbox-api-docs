@@ -654,7 +654,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
             foreach ($allAnswers as $currentAnswer) {
                 if ($currentAnswer->correct) {
                     $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => 'correct-answer'
+                        'ACTUAL_CORRECT_VALUE' => 'icon-approve'
                     ));
                 } else {
                     $page->setVar(array(
