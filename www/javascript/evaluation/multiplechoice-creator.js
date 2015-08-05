@@ -87,11 +87,11 @@
                 for (var i = 0; i < config.minOptions; i++) {
                     $(config.answerCollectionList).append($('[data-clone] [data-input]').clone());
                 }
-
-                /* Update letter indexes
-                 */
-                refreshList();
             }
+
+            /* Update letter indexes
+             */
+            refreshList();
         }
 
         /**
@@ -227,7 +227,7 @@
                         data.type_id = theForm.find('select[name=type_id]').val(),
                         data.section_id = theForm.find('input[name=section_id]').val();
 
-                        redirect = config.availability + '/' + data.section_id + '/create';
+                        redirect = '/' + config.availability + '/' + data.section_id + '/create';
                     }
                     else {
                         /* Modify in Quiz/Survey
@@ -237,7 +237,7 @@
                             data.section_id = theForm.find('input[name=section_id]').val(),
                             data.question_id = theForm.find('input[name=question_id]').val(),
 
-                            redirect = config.availability + '/modify/' + data.question_id;
+                            redirect = '/' + config.availability + '/question/modify/' + data.question_id;
                         }
                         /* Modify directly in the Question Bank
                          */
