@@ -84,4 +84,11 @@
             $(this).val(parseFloat(val).toFixed(2));
         });
     });
+
+    /* For overriding plugin redirection destination when modifying
+     * questions inside the QuestionBank
+     *
+     * This must appear before injected html fragments
+     */
+    var questionBank = false;
 </script>
