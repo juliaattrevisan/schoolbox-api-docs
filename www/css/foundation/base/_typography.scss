@@ -153,6 +153,11 @@ a{
 	margin: 0 0 rem-calc(($base-font-size - 10)) 0;
 	font-size: rem-calc(($base-font-size - 3));
 	font-style: italic;
+	&.title {
+	    color: $black !important;
+	    font-style: normal;
+	    font-weight: bold;
+	}
 }
 
 // Typically descriptive text1

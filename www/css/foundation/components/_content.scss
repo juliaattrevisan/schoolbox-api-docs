@@ -606,7 +606,7 @@ table{
             }
         }
     }
-	li{
+	> li{
 		border-bottom: 1px solid $body-bg;
 		position: relative;
 		overflow: visible;
@@ -909,6 +909,7 @@ table{
     }
 
     &.info {
+        color: $black;
         ~ article, ~ .list-item-content {
             margin-left: (rem-calc($base-font-size));
         }
@@ -1146,6 +1147,14 @@ tr:hover{
     }
 }
 
+.countdown {
+	font-weight: 100;
+	font-size: $h1-font-size;
+}
+
+time {
+	white-space: nowrap;
+}
 
 ul.meta {
     list-style: none;

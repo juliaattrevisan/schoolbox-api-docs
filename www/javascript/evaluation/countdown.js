@@ -37,6 +37,7 @@
 		 */
 		function renderCountdown() {
 			if (config.timeLeft > 0) {
+				// TODO this needs to change to use server time, not device time [SB-9094]
 				var endTime = new Date();
 				endTime.setSeconds(endTime.getSeconds()+config.timeLeft);
 				config.element.countdown(endTime)

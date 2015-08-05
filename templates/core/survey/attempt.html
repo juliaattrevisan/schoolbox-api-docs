@@ -3,21 +3,21 @@
 
 <script type="text/javascript" src="/javascript/components/jquery.countdown/dist/jquery.countdown.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type='text/javascript' src='/javascript/jquery.alphanumeric.js'></script>
+<script type="text/javascript" src="/javascript/jquery.alphanumeric.js"></script>
 
-<script type='text/javascript' src='/javascript/evaluation/evaluation.js'></script>
+<script type="text/javascript" src="/javascript/evaluation/evaluation.js"></script>
 <script type="text/javascript" src="/javascript/evaluation/countdown.js"></script>
-<script type='text/javascript' src='/javascript/evaluation/richtext.js'></script>
-<script type='text/javascript' src='/javascript/evaluation/multiplechoice.js'></script>
-<script type='text/javascript' src='/javascript/evaluation/radio.js'></script>
-<script type='text/javascript' src='/javascript/evaluation/matchingpairs.js'></script>
-<script type='text/javascript' src='/javascript/evaluation/fillgap.js'></script>
-<script type='text/javascript' src='/javascript/evaluation/short.js'></script>
-<script type='text/javascript' src='/javascript/evaluation/exact.js'></script>
-<script type='text/javascript' src='/javascript/evaluation/numeric.js'></script>
-<script type='text/javascript' src='/javascript/evaluation/multiplechoiceother.js'></script>
-<script type='text/javascript' src='/javascript/evaluation/signature.js'></script>
-<script type='text/javascript' src='/javascript/evaluation/ranking.js'></script>
+<script type="text/javascript" src="/javascript/evaluation/richtext.js"></script>
+<script type="text/javascript" src="/javascript/evaluation/multiplechoice.js"></script>
+<script type="text/javascript" src="/javascript/evaluation/radio.js"></script>
+<script type="text/javascript" src="/javascript/evaluation/matchingpairs.js"></script>
+<script type="text/javascript" src="/javascript/evaluation/fillgap.js"></script>
+<script type="text/javascript" src="/javascript/evaluation/short.js"></script>
+<script type="text/javascript" src="/javascript/evaluation/exact.js"></script>
+<script type="text/javascript" src="/javascript/evaluation/numeric.js"></script>
+<script type="text/javascript" src="/javascript/evaluation/multiplechoiceother.js"></script>
+<script type="text/javascript" src="/javascript/evaluation/signature.js"></script>
+<script type="text/javascript" src="/javascript/evaluation/ranking.js"></script>
 
 <script type="text/javascript">
 	$(function() {
@@ -26,68 +26,75 @@
 		 */
 		$.fn.evaluation.initNavigators();
 
-		/* Pass necessary values
-		 */
-		$('#evaluation-countdown').evaluationCountdown({
-			evaluationId: '{ASSESS_ASSESS_ID}',
-			timeLeft: '{ASSESS_TIME_REMAINING}'
-		});
 	});
 </script>
 <!-- END custom_head -->
 
-<h1>{ASSESS_TITLE}</h1>
-<div class="evaluation-content take-test">
-	<h2>{SECTION_TITLE}</h2>
-    <div class="wysiwyg">{SECTION_DESCRIPTION}</div>
-	<!-- BEGIN question -->
-	<form id='questionForm-{QUESTION_QUESTION_ID}' data-plugin='{QUESTION_PLUGIN}' action="/survey/saveResponse/{QUESTION_QUESTION_ID}" method="post" class="questionForm">
-        <h3><strong>Q{QUESTION_SEQUENCE}) <span class="red">{QUESTION_MANDATORY}</span></strong></h3>
-        <div class="wysiwyg">{QUESTION_QUESTION}</div>
-        <!-- error messages for radio/checkbox questions -->
-        <div data-evaluationerrors="1"></div>
-        <div class="evaluation-answer clearfix">
-        <!-- BEGIN answerInputs -->
-        <!-- END answerInputs -->
-        </div>
-	</form>
-	<!-- END question -->
-
-	<div class='evaluation-saving'>
-		<p><strong>Saving progress...</strong></p>
+<div class="row">
+	<div class="small-12 island">
+		<h1>{ASSESS_TITLE}</h1>
+		<section>
+			<ul class="information-list">
+				<!-- BEGIN sectionPercentageComplete -->
+				<li class="row" id="evaluation-percentage-bar-{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}">
+					<div class="info card">
+                        <p class="meta title">
+                            {SECTION_PERCENTAGE_COMPLETE_TITLE}
+                        </p>
+						<p class="meta">
+							<span data-perc-complete>{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}</span>% Complete
+						</p>
+					</div>
+					<div class="progress">
+						<div class="meter" data-meter style="width:{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}%"></div>
+					</div>
+				</li>
+				<!-- END sectionPercentageComplete -->
+			</ul>
+		</section>
 	</div>
+</div>
+<div class="row">
+	<div class="small-12 island">
+		<h2 class="subheader">{SECTION_TITLE}</h2>
+		<div class="content panel">{SECTION_DESCRIPTION}</div>
+		<!-- BEGIN question -->
+		<section>
+			<form id="questionForm-{QUESTION_QUESTION_ID}" data-plugin="{QUESTION_PLUGIN}" action="/assess/saveResponse/{QUESTION_QUESTION_ID}" method="post" data-question="{QUESTION_QUESTION_ID}">
+				<ul class="information-list">
+					<li class="row content">
+						<h3>Q{QUESTION_SEQUENCE}) <span class="alert">{QUESTION_MANDATORY}</span></h3>
+						<article>{QUESTION_QUESTION}</article>
+						<!-- error messages for radio/checkbox questions -->
+						<div data-evaluationerrors="1"></div>
+					</li>
+					<li class="row content">
+						<!-- BEGIN answerInputs -->
+						<!-- END answerInputs -->
+					</li>
+				</ul>
+			</form>
+		</section>
+		<!-- END question -->
+	</div>
+</div>
 
-	<p class="clearfix text-align-right">
-		<!-- BEGIN endAssess -->
-		<a href="/survey/end/{ASSESS_ASSESS_ID}" class="btn tick evaluation-finish"><span></span>Finish</a>
-		<!-- END endAssess -->
-
+<div class="row">
+	<div class="small-12 column">
 		<!-- BEGIN prevSection -->
-		<a href="/survey/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}" class="btn evaluation-navigator float-left"><span></span>Previous Section</a>
+		<a href="/survey/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}" class="button icon-previous" data-evaluation-navigator>Previous Section</a>
 		<!-- END prevSection -->
 
 		<!-- BEGIN nextSection -->
-		<a href="/survey/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}" class="btn evaluation-navigator"><span></span>Next Section</a>
+		<a href="/survey/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}" class="button icon-next" data-evaluation-navigator>Next Section</a>
 		<!-- END nextSection -->
-	</p>
-</div>
-<div class="evaluation-menu">
-	<h2>Survey Progress</h2>
-	<div class="pad-it">
 
-		<!-- BEGIN sectionPercentageComplete -->
-		<div class="evaluation-section percentage-complete">
-			<h3>{SECTION_PERCENTAGE_COMPLETE_TITLE}</h3>
-			<div class="pad-it">
+		<!-- BEGIN endAssess -->
+		<a href="/survey/end/{ASSESS_ASSESS_ID}" class="button secondary expand" data-evaluation-finish>Finish</a>
+		<!-- END endAssess -->
 
-				<div id='evaluation-percentage-bar-{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}'>
-					<div class='percentage-bar' style='width:{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}%'></div>
-					<div class='percentage-text'>
-						<em>{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}</em>% Complete
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- END sectionPercentageComplete -->
-	</div>
+        <div id='evaluation-saving' class="loader text-center hide">
+            <span class="success label full-width hide" data-evaluation-progress-saved>Progress Saved</span>
+        </div>
+    </div>
 </div>
