@@ -1,0 +1,24 @@
+// matching pairs
+.matching-pairs {
+
+    .small-6 {
+        // override guttering
+        &:first-child {
+            padding-right: 0;
+        }
+        &:last-child {
+            padding-left: 0;
+        }
+    }
+
+    p {
+        @extend .content;
+    }
+
+    .sortable {
+        background-color: $secondary-color;
+        color: $primary-color;
+        font-weight: $alert-font-weight;
+    }
+}
+
