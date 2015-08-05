@@ -55,7 +55,7 @@
 		 * Init - show loading div
 		 */
 		function init() {
-			$j('.evaluation-saving').show();
+			$j('#evaluation-saving').show();
 		}
 
 		/**
@@ -64,8 +64,8 @@
 		function saveForms() {
 			var errors = false;
 
-			$j('.questionForm').each(function(index, element) {
-				var id = $j(element).attr('id').replace('questionForm-', '');
+			$j('[data-question]').each(function(index, element) {
+				var id = $j(element).data('question');
 
 				var prefix = "$.fn." + $j(element).data('plugin');
 
@@ -117,7 +117,7 @@
 				}
 			});
 
-			$j('.evaluation-saving').html('<p><strong>Saved</p></strong>');
+			$j('#evaluation-saving').text('Progress saved');
 
 			/* Detect errors, prevent redirection if any were made
 			 * and hide that Saving box
@@ -126,7 +126,7 @@
 				location.href = href;
 			}
 			else {
-				$('.evaluation-saving').hide();
+				$('#evaluation-saving').hide();
 			}
 		}
 	}
@@ -161,13 +161,13 @@
 			for (var i = 0; i < options.result.percentageComplete.length; i++) {
 				var bar = '#evaluation-percentage-bar-' + options.result.percentageComplete[i].section_id;
 
-				var barSelector = $j(bar).find('.percentage-bar');
-				var valueSelector = $j(bar).find('.percentage-text');
+				var barSelector = $j(bar).find('[data-meter]');
+				var valueSelector = $j(bar).find('[data-perc-complete]');
 				var percentage = options.result.percentageComplete[i].percentageComplete.toString();
 
 				var element = {
 					barSelector: $j(barSelector),
-					valueSelector: $j(valueSelector).find('em'),
+					valueSelector: $j(valueSelector),
 					value: percentage
 				}
 
@@ -184,7 +184,7 @@
 		function updateBar() {
 			for (var i = 0; i < config.result.length; i++) {
 				config.result[i].barSelector.css('width', config.result[i].value + '%');
-				config.result[i].valueSelector.html(config.result[i].value);
+				config.result[i].valueSelector.text(config.result[i].value);
 			}
 		}
 	}
