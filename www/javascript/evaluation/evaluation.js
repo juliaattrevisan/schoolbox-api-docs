@@ -1,22 +1,22 @@
 /**
  * Update the percentage-complete bars for each section
  */
-(function($j) {
-	$j.fn.evaluation = function() {
+(function($) {
+	$.fn.evaluation = function() {
 
 	}
 
 	/**
 	 * Prepare some common setup activity
 	 */
-	$j.fn.evaluation.initNavigators = function() {
+	$.fn.evaluation.initNavigators = function() {
 
 		/* Submit all the questions before switching between sections
 		 */
-		$j('.evaluation-navigator').click(function(event) {
+		$('.evaluation-navigator').click(function(event) {
 			event.preventDefault();
 
-			$j.fn.evaluation.saveAll($j(this).attr('href'));
+			$.fn.evaluation.saveAll($(this).attr('href'));
 
 			return false;
 		});
@@ -27,12 +27,12 @@
 		 * submits all the questionForm elements. This causes, in particular,
 		 * Matching Pairs to remain untouched resulting in NULL values.
 		 */
-		$j('.evaluation-finish').click(function(event) {
+		$('.evaluation-finish').click(function(event) {
 			event.preventDefault();
 			var href = $(this).attr('href');
-			$j(this).confirmDialog({
+			$(this).confirmDialog({
 				confirmEvent: function() {
-					$j.fn.evaluation.saveAll(href);
+					$.fn.evaluation.saveAll(href);
 				}
 			});
 		});
@@ -41,7 +41,7 @@
 	/**
 	 * Save each individual question
 	 */
-	$j.fn.evaluation.saveAll = function(href) {
+	$.fn.evaluation.saveAll = function(href) {
 		init();
 
 		/* Allow display of saving indicator before locking browser up
@@ -55,7 +55,7 @@
 		 * Init - show loading div
 		 */
 		function init() {
-			$j('#evaluation-saving').show();
+			$('#evaluation-saving').show();
 		}
 
 		/**
@@ -64,10 +64,10 @@
 		function saveForms() {
 			var errors = false;
 
-			$j('[data-question]').each(function(index, element) {
-				var id = $j(element).data('question');
+			$('[data-question]').each(function(index, element) {
+				var id = $(element).data('question');
 
-				var prefix = "$.fn." + $j(element).data('plugin');
+				var prefix = "$.fn." + $(element).data('plugin');
 
 				/* Run saveOne() multiple times
 				 */
@@ -93,31 +93,31 @@
 						/* If a custom error location is desired
 						 */
 						if (configuration.errorContainer != undefined) {
-							$j(element).validate({
+							$(element).validate({
 								errorPlacement: function(error, inputElement) {
 									$(element).find(configuration.errorContainer).html(error);
 								}
 							});
 						}
 						else {
-							$j(element).validate();
+							$(element).validate();
 						}
 
 						/* Apply custom rules if validation is required, in accordance with
 						 * http://jquery.bassistance.de/validate/demo/
 						 */
-						$j(element).find(configuration.element).rules('add', configuration.rules);
+						$(element).find(configuration.element).rules('add', configuration.rules);
 
 						/* If any aren't valid, mark as bad
 						 */
-						if (!$j(element).valid()) {
+						if (!$(element).valid()) {
 							errors = true;
 						}
 					}
 				}
 			});
 
-			$j('#evaluation-saving').text('Progress saved');
+			$('#evaluation-saving').text('Progress saved');
 
 			/* Detect errors, prevent redirection if any were made
 			 * and hide that Saving box
@@ -136,7 +136,7 @@
 	 *
 	 * @param options
 	 */
-	$j.fn.evaluationPercentageComplete = function(options) {
+	$.fn.evaluationPercentageComplete = function(options) {
 		var config = init(options);
 
 		updateBar();
@@ -161,20 +161,20 @@
 			for (var i = 0; i < options.result.percentageComplete.length; i++) {
 				var bar = '#evaluation-percentage-bar-' + options.result.percentageComplete[i].section_id;
 
-				var barSelector = $j(bar).find('[data-meter]');
-				var valueSelector = $j(bar).find('[data-perc-complete]');
+				var barSelector = $(bar).find('[data-meter]');
+				var valueSelector = $(bar).find('[data-perc-complete]');
 				var percentage = options.result.percentageComplete[i].percentageComplete.toString();
 
 				var element = {
-					barSelector: $j(barSelector),
-					valueSelector: $j(valueSelector),
+					barSelector: $(barSelector),
+					valueSelector: $(valueSelector),
 					value: percentage
 				}
 
 				derived.result.push(element);
 			}
 
-			var merged = $j.extend(defaults, derived);
+			var merged = $.extend(defaults, derived);
 			return merged;
 		}
 
@@ -195,7 +195,7 @@
 	 * @param $num
 	 * @return string
 	 */
-	$j.fn.evaluation.findLetterIndex = function(num) {
+	$.fn.evaluation.findLetterIndex = function(num) {
 		var firstLetter = Math.floor(num / 26);
 		var lastLetter = num % 26;
 
