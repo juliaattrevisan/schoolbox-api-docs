@@ -88,9 +88,11 @@ class Survey_Answer_Radio extends Evaluation_Answer_Radio
                 ));
 
                 if ($existing['response']) {
-                    if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
+                    if (is_array($existingAnswer)
+                        && in_array($currentAnswer->value, $existingAnswer)
+                    ) {
                         $page->setVar(array(
-                            'ANSWER_CHECKED' => 'checked=\'checked\'',
+                            'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
                         ));
 
                         /* Was this a correctly-selected response? If so apply a
