@@ -112,7 +112,7 @@
                 var id = 'answer-option-'+i;
 
                 $(element).find('[data-answer-code-representation]').parent('label').attr('for', id);
-                $(element).find('[data-answer-option]').attr('id', id);
+                $(element).find('[data-answer-option]').attr('id', id).val(i);
 
                 i++;
             });
