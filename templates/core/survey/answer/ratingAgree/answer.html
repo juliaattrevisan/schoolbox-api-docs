@@ -1,16 +1,13 @@
 <script type='text/javascript'>
-	$(function() {
-		$('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
-			id: {QUESTION_ID}
-		});
-	});
+    $(function() {
+        $('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+            id: {QUESTION_ID}
+        });
+    });
 </script>
 <span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
-<fieldset class="radio-buttons evaluation-rating clearfix">
+
 <!-- BEGIN answerOption -->
-	<label>
-		<span>{ANSWER_DESCRIPTION}</span>
-        <input name="answer" class="answerCorrect checkbox" type="radio" value="{ANSWER_VALUE}" {ANSWER_CHECKED}/>
-	</label>
+<input id='questionForm-{QUESTION_ID}-{ANSWER_VALUE}' name="answer" type="radio" value="{ANSWER_VALUE}" {ANSWER_CHECKED} />
+<label for="questionForm-{QUESTION_ID}-{ANSWER_VALUE}" class="radio-label">{ANSWER_VALUE_FACADE}) {ANSWER_DESCRIPTION}</label>
 <!-- END answerOption -->
-</fieldset>
