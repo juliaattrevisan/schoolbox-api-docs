@@ -464,7 +464,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
         $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         if ($existing) {
-            $existingAnswer = unserialize($existing['response']);
+            $existingAnswer = $this->getAnswersFromResponse($existing['response']);
         }
 
         $answerGroup = $this->getByQuestionID($question_id);
@@ -528,7 +528,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
 
         if ($existing) {
-            $existingAnswer = unserialize($existing['response']);
+            $existingAnswer = $this->getAnswersFromResponse($existing['response']);
         }
 
         $answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
@@ -646,5 +646,16 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
     protected function getIncorrectClass()
     {
         return $this->incorrectClass;
+    }
+
+    /**
+     * Gets answers out of response.
+     *
+     * @param  string $answer
+     * @return array
+     */
+    protected function getAnswersFromResponse($answer)
+    {
+        return unserialize($answer);
     }
 }
