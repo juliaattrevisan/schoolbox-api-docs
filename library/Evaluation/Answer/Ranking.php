@@ -59,6 +59,20 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
     }
 
     /**
+     * Configure question/configure answer during creation/modification
+     *
+     * @param $page
+     * @param $config
+     */
+    public function configure($page, $config) {
+        $options = json_decode($config);
+
+        $page->setVar(array(
+            'CONFIGURATION_MANDATORY_CHECKED' => $options->mandatory ? 'checked="checked"' : ''
+        ));
+    }
+
+    /**
      * Updates an existing Answer.
      *
      * @param  $object
