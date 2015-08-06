@@ -8,7 +8,13 @@
 
 <span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
 <!-- BEGIN answerOption -->
-<input id='questionForm-{QUESTION_ID}-{ANSWER_VALUE}' name="answer[]" type="checkbox" value="{ANSWER_VALUE}" {ANSWER_CHECKED} />
+<input id='questionForm-{QUESTION_ID}-{ANSWER_VALUE}'
+       name="answer[]"
+       type="checkbox"
+       value="{ANSWER_VALUE}"
+       {ANSWER_CHECKED}
+       {ANSWER_DATA_ROLE}
+/>
 <label for="questionForm-{QUESTION_ID}-{ANSWER_VALUE}" class="checkbox-label">{ANSWER_VALUE_FACADE}) {ANSWER_DESCRIPTION}</label>
 <!-- END answerOption -->
-<input name="answer[other]" class="answerCorrect" type="text" value="{ANSWER_OTHER}" />
+<input data-role="other-answer" name="answer[other]" type="text" value="{ANSWER_OTHER}" />

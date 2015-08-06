@@ -8,7 +8,7 @@
 	$.fn.evaluationMultipleChoiceOther = function(options) {
 		var config = init(options);
 
-		initSelected();
+		//initSelected();
 		initChange();
 
 		/**
@@ -30,43 +30,17 @@
 		}
 
 		/**
-		 * Highlight preselected items
-		 */
-		function initSelected() {
-			config.questionForm.find('input[type=checkbox]').each(function() {
-				if ($(this).is(':checked')) {
-					$(this).parent().addClass('evaluation-selected');
-				}
-			});
-
-			/* Highlight the "Other" checkbox if an Other text value exists
-			 */
-			if (config.questionForm.find('input[value=Other]').is(':checked')) {
-				config.questionForm.find('input[type=text]').parent().addClass('evaluation-selected');
-			}
-		}
-
-		/**
 		 * Save response upon change
 		 */
 		function initChange() {
 			config.questionForm.find('input[type=checkbox]').change(function() {
-
-				if ($(this).is(':checked')) {
-					$(this).parent().addClass('evaluation-selected');
-				}
 				/* Clear Other value if unchecked
 				 */
-				else {
-					var isLabelledOther = ($(this).parent().find('span').html() == 'Other');
-					var isLast = $(this).parent().next().find('input[name="answer[other]"]').length;
-
-					if (isLabelledOther && isLast) {
-						$(this).parent().removeClass('evaluation-selected');
-						config.questionForm.find('input[type=text]').val('').parent().removeClass('evaluation-selected');
-					}
+				var element = $(this);
+				var isChecked = element.prop('checked');
+				if (!isChecked && element.data('role') == 'other-checkbox') {
+					config.questionForm.find('[data-role="other-answer"]').val('');
 				}
-
 				$.fn.evaluationMultipleChoiceOther.saveOne(config.questionForm);
 			});
 
@@ -81,20 +55,12 @@
 			/* Detect change in Other field
 			 * If the Other has content, check the Other Checkbox, and highlight
 			 */
-			config.questionForm.find('input[type=text]').change(function() {
-				if ($(this).val().length) {
-					$(this).parent().addClass('evaluation-selected');
-					config.questionForm.find('.evaluation-other').prop('checked', true).parent().addClass('evaluation-selected');
-				}
-				else {
-					$(this).parent().removeClass('evaluation-selected');
-					config.questionForm.find('.evaluation-other').prop('checked', false).parent().removeClass('evaluation-selected');
-				}
-
+			config.questionForm.find('[data-role="other-answer"]').change(function() {
+				config.questionForm.find('[data-role="other-checkbox"]').prop('checked', $(this).val().length);
 				$.fn.evaluationMultipleChoiceOther.saveOne(config.questionForm);
 			});
 		}
-	}
+	};
 
 	/**
 	 * Save individual form contents

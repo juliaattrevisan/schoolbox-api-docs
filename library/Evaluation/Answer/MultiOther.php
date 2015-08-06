@@ -225,7 +225,8 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
 			 * like excel does it.
  			 */
 			$other = new StdClass();
-			$other->description = 'Other';
+            $other->description = 'Other';
+            $other->isOther = true;
 			$other->value = count($allAnswers)+1;
 
 			$allAnswers[] = $other;
@@ -242,6 +243,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                     'ANSWER_VALUE_FACADE' => $valueFacade,
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+                    'ANSWER_DATA_ROLE' => ($currentAnswer->isOther ? 'data-role="other-checkbox"' : ''),
                 ));
 
                 if ($existingAnswer) {
