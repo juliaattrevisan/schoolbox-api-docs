@@ -482,7 +482,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
             foreach ($allAnswers as $currentAnswer) {
                 if ($currentAnswer->correct) {
                     $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => 'correct-answer'
+                        'ACTUAL_CORRECT_VALUE' => 'icon-approve'
                     ));
                 } else {
                     $page->setVar(array(
@@ -495,41 +495,16 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
-                if ($existing['response']) {
-                    if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
-                        $page->setVar(array(
-                            'ANSWER_CHECKED' => 'checked=\'checked\'',
-                        ));
-
-                        /* Was this a correctly-selected response? If so apply a
-                         * special class to it. The three cases are:
-                         *
-                         * Correct response, selected
-                         * Incorrect response, selected
-                         * Unselected
-                         */
-                        if ($currentAnswer->correct && in_array($currentAnswer->value, $existingAnswer)) {
-                            $page->setVar(array(
-                                'CORRECT' => $this->getCorrectClass(),
-                            ));
-                        } elseif (in_array($currentAnswer->value, $existingAnswer)) {
-                            $page->setVar(array(
-                                'CORRECT' => $this->getIncorrectClass(),
-                            ));
-                        } else {
-                            $page->setVar(array(
-                                'CORRECT' => ''
-                            ));
-                        }
-                    } else {
-                        $page->setVar(array(
-                            'ANSWER_CHECKED' => '',
-                            'CORRECT' => ''
-                        ));
-                    }
+                if ($existing['response']
+                    && is_array($existingAnswer)
+                    && in_array($currentAnswer->value, $existingAnswer)
+                ) {
+                    $page->setVar(array(
+                        'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
+                    ));
                 } else {
                     $page->setVar(array(
-                        'CORRECT' => ''
+                        'ANSWER_CHECKED' => '',
                     ));
                 }
 
@@ -574,7 +549,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
             foreach ($allAnswers as $currentAnswer) {
                 if ($currentAnswer->correct) {
                     $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => 'correct-answer'
+                        'ACTUAL_CORRECT_VALUE' => 'icon-approve'
                     ));
                 } else {
                     $page->setVar(array(
@@ -587,41 +562,16 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
-                if ($existing['response']) {
-                    if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
-                        $page->setVar(array(
-                            'ANSWER_CHECKED' => 'checked=\'checked\'',
-                        ));
-
-                        /* Was this a correctly-selected response? If so apply a
-                         * special class to it. The three cases are:
-                         *
-                         * Correct response, selected
-                         * Incorrect response, selected
-                         * Unselected
-						 */
-                        if ($currentAnswer->correct && in_array($currentAnswer->value, $existingAnswer)) {
-                            $page->setVar(array(
-                                'CORRECT' => $this->getCorrectClass(),
-                            ));
-                        } elseif (in_array($currentAnswer->value, $existingAnswer)) {
-                            $page->setVar(array(
-                                'CORRECT' => $this->getIncorrectClass(),
-                            ));
-                        } else {
-                            $page->setVar(array(
-                                'CORRECT' => ''
-                            ));
-                        }
-                    } else {
-                        $page->setVar(array(
-                            'ANSWER_CHECKED' => '',
-                            'CORRECT' => ''
-                        ));
-                    }
+                if ($existing['response']
+                    && is_array($existingAnswer)
+                    && in_array($currentAnswer->value, $existingAnswer)
+                ) {
+                    $page->setVar(array(
+                        'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
+                    ));
                 } else {
                     $page->setVar(array(
-                        'CORRECT' => ''
+                        'ANSWER_CHECKED' => '',
                     ));
                 }
 
@@ -654,7 +604,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
             foreach ($allAnswers as $currentAnswer) {
                 if ($currentAnswer->correct) {
                     $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => 'correct-answer'
+                        'ACTUAL_CORRECT_VALUE' => 'icon-approve'
                     ));
                 } else {
                     $page->setVar(array(
@@ -663,6 +613,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                 }
 
                 $page->setVar(array(
+                    'ANSWER_CHECKED' => '',
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));

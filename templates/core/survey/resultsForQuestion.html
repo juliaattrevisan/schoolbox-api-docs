@@ -3,6 +3,9 @@
 <script type='text/javascript' src='/javascript/components/flot/jquery.flot.pie.js'></script>
 <script type='text/javascript' src='/javascript/components/flot/jquery.flot.stack.js'></script>
 
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="/javascript/evaluation/jquery.bargraph.js"></script>
+
 <!--[if lt IE 9]><script src="/javascript/signature/assets/flashcanvas.js"></script><![endif]-->
 <script src="/javascript/signature/jquery.signaturepad.min.js"></script>
 <script src="/javascript/signature/assets/json2.min.js"></script>
@@ -10,10 +13,6 @@
 
 <script type="text/javascript">
 $(function() {
-	if ($('.evaluation-legend').length > 0) {
-		$('.information-notification.hide').removeClass('hide');
-	}
-
     $('[data-response-item]').click(function(event) {
         event.preventDefault();
 
