@@ -13,6 +13,10 @@
          */
         addDefaultOptions();
 
+        /* Update letter indexes
+         */
+        refreshList();
+
         /* Controls for each answer option
          */
         addNewAnswerOption();
@@ -53,6 +57,11 @@
                  */
                 maxOptions: 702,
 
+                /* Set to true to add a set of options on init
+                 * Set to false for predefined starting options e.g. ratingAgree
+                 */
+                addDefaults: true,
+
                 /* Quiz or Survey
                  */
                 availability: 'assess',
@@ -88,10 +97,6 @@
                     $(config.answerCollectionList).append($('[data-clone] [data-input]').clone());
                 }
             }
-
-            /* Update letter indexes
-             */
-            refreshList();
         }
 
         /**
