@@ -1,250 +1,61 @@
+<fieldset>
+    <legend>Answer</legend>
+
+    <ul id="answerCollection" class="information-list">
+        <!-- BEGIN answerOption -->
+        <li class="row" data-input>
+            <div class="small-1 columns" data-answer-code>
+                <input name="answerCode[]" type="hidden" value="{ANSWER_VALUE}" data-answer-code-value />
+
+                <input name="answer[]" type="radio" class='hide' value="" {ANSWER_CHECKED} data-answer-option />
+                <span class="content" data-answer-code-representation>{ANSWER_VALUE})</span>
+            </div>
+            <div class="small-10 columns">
+                <label class="answer-value">
+                    <input name="answerDescription[]" type="text" value="{ANSWER_DESCRIPTION}" data-answer-description />
+                </label>
+            </div>
+            <div class="small-1 columns">
+                <a class="button icon-delete no-text" data-delete></a>
+            </div>
+        </li>
+        <!-- END answerOption -->
+    </ul>
+
+    <a class="button icon-add" href="#" data-add-answer>Add answer option</a>
+</fieldset>
+
+<ul class="hide" data-clone>
+    <li class="row" data-input>
+        <div class="small-1 columns" data-answer-code>
+            <input name="answerCode[]" type="hidden" value="" data-answer-code-value />
+
+            <input name="answer[]" type="radio" class='hide' value="" data-answer-option />
+            <span class="content" data-answer-code-representation></span>
+        </div>
+        <div class="small-10 columns">
+            <label class="answer-value">
+                <input name="answerDescription[]" type="text" value="" data-answer-description />
+            </label>
+        </div>
+        <div class="small-1 columns">
+            <a class="button icon-delete no-text" data-delete></a>
+        </div>
+    </li>
+</ul>
+
+<script type='text/javascript' src="/javascript/evaluation/evaluation.js"></script>
+<script type='text/javascript' src="/javascript/evaluation/multiplechoice-creator.js"></script>
+<script type='text/javascript' src="/javascript/evaluation/validation.js"></script>
 <script type="text/javascript">
-    $(document).ready(function () {
-
-        //add in one clone to start with
-        //$j('.answerCorrect').prop('checked', false);
-        //var thing = $j('.hidden-clone li:first-child').clone();
-        //$j('ul#answerCollection').append(thing);
-        //refreshList();
-
-        var validator = $("#createQuestionForm").submit(function () {
-            // update underlying textarea before submit validation
-            tinyMCE.triggerSave();
-
-        }).validate({
-
-                    submitHandler:function () {
-                        var theForm = $('#createQuestionForm');
-                        /* Form preprocessing
-                         */
-                        var answerCollection = new Array();
-                        tinyMCE.triggerSave();
-
-                        var content = tinyMCE.activeEditor.getContent(); // get the content
-                        $('#question').val(content); // put it in the textarea
-
-                        /* Collate possible answers and their correctness status
-                         */
-                        $.each($('#answerCollection').find('li'), function (index, element) {
-                            var elem = $(element);
-
-                            var description = elem.find('.answerDescription').val();
-                            var code = elem.find('.answerCode').val();
-
-                            /* Ignore empty answers that weren't removed
-                             */
-                            if (($.trim(description) != '') && ($.trim(code) != '')) {
-                                answerCollection.push({
-                                    description:description,
-                                    value:code
-                                });
-                            }
-                        });
-
-						/* Collate the usual fields containing ids.
-						 * Collate the checkboxes too but append all the possibilities as well!
-						 */
-						if (typeof questionBank == "undefined") {
-							var data = {
-								question:tinyMCE.get('question').getContent(),
-								question_id:theForm.find('input[name=question_id]').val(),
-								section_id:theForm.find('input[name=section_id]').val(),
-								sequence:theForm.find('input[name=sequence]').val(),
-								type_id:theForm.find('input[name=type_id]').val(),
-								marks:theForm.find('input[name=marks]').val(),
-								allAnswers:JSON.stringify(answerCollection),
-								configuration:JSON.stringify($('#configuration').find('input, textarea, select').serializeArray())
-							};
-
-							/* Submit via POST and redirect to question creation screen upon done
-							 */
-							$.post(theForm.attr('action'), data, function (responseText) {
-								window.location = '/survey/question/create/' + data.section_id;
-							});
-						}
-						else {
-							var data = {
-								question_bank_id:theForm.find('input[name=question_bank_id]').val(),
-								question:tinyMCE.get('question').getContent(),
-								sequence:theForm.find('input[name=sequence]').val(),
-								type_id:theForm.find('input[name=type_id]').val(),
-								allAnswers:JSON.stringify(answerCollection),
-								configuration:JSON.stringify($('#configuration').find('input, textarea, select').serializeArray())
-							};
-
-							/* Submit via POST and redirect to question creation screen upon done
-							 */
-							$.post(theForm.attr('action'), data, function (responseText) {
-								window.location = questionBank.url;
-							});
-						}
-                        return false;
-                    },
-
-                    rules:{
-                        question:{
-                            required:true,
-                            minlength:2
-                        },
-                        'answerDescription[]':{
-                            emptyInputs:true
-                        }
-                    },
-
-                    errorPlacement:function (error, element) {
-                        error.addClass('message');  // add a class to the wrapper
-
-                        var pos = $('#answerCollection').height();
-
-                        if (element.hasClass("answerDescription")) {
-                            error.insertAfter(element.closest('#answerCollection'))
-                        } else if (element.hasClass("answerCorrect")) {
-                            error.insertAfter(element.closest('#answerCollection'))
-
-                        } else {
-                            error.insertAfter(element.parent().children(':last-child'))
-                        }
-                    }
-                });
-
-        jQuery.validator.addMethod('emptyInputs', function (value, element) {
-            var fieldsAreFilled = true;
-
-            $.each($('#answerCollection').find('li'), function (index, element) {
-                var elem = $(element);
-
-                var description = elem.find('.answerDescription').val();
-                var code = elem.find('.answerCode').val();
-
-                /* Ignore empty answers that weren't removed
-                 */
-                if ($.trim(description) == '') {
-                    fieldsAreFilled = false;
-                }
-            });
-
-            return fieldsAreFilled;
-        }, 'Please fill out all answers');
-
-        /* Removed mandatory correct answer from multiple choice
-         */
-        jQuery.validator.addMethod('nothingChecked', function (value, element) {
-            var countDracula = 0;
-
-            var oneFieldChecked = true;
-
-            $.each($('#answerCollection').find('li'), function (index, element) {
-                var elem = $(element);
-                var checkit = elem.find('.answerCorrect').is(':checked');
-
-                // if the element isn't checked add to the count
-                if (checkit == true) {
-                    countDracula++
-                }
-            });
-
-            if (countDracula == 0) {
-                oneFieldChecked = false;
+    $(function() {
+        $('#createQuestionForm').multiRadioCreate({
+            availability: 'survey',
+            mode: 'modify',
+            questionBank: questionBank,
+            customValidationRules: function(config) {
+                $.fn.addCustomRules_emptyInputs(config);
             }
-
-            return oneFieldChecked;
-
-        }, 'Tick at least one checkbox');
-
-        jQuery.validator.addMethod("greaterThanZero", function (value, element) {
-            return this.optional(element) || (parseFloat(value) > 0);
-        }, "Amount must be greater than zero");
-
-        /* Add a new answer option
-         */
-        $(document).on('click', '#makeNewAnswer', function () {
-            var thing = $('.hidden-clone li:first-child').clone();
-            $('ul#answerCollection').append(thing);
-            refreshList();
-
-            return false;
         });
-
-        /* Remove an answer option
-         */
-        $(document).on('click', '.delete', function () {
-            if ($('#answerCollection .inputs').length == 6) {
-                $(this).parent().remove();
-            }
-            refreshList();
-        });
-
-		/* Special hardcoded sixth option
-		 */
-		if ($('#answerCollection .inputs').length == 6) {
-			$('#answerCollection .inputs').last().append('<div class="delete"></div>');
-		}
-
-        $(document).on('click', '.answerCorrect', function () {
-            refreshList();
-            $(this).parent().parent().toggleClass("highlight");
-        });
-
-        function refreshList() {
-
-            var alphabetStart = 65;
-
-            $('li.inputs > .list-item').each(function () {
-                var $this = $(this);
-                $this.children('span').html('&#' + alphabetStart + ';)');
-                var convert = String.fromCharCode(alphabetStart);
-                $this.children('input').val(convert);
-                alphabetStart++;
-            });
-
-            var pos = $('#answerCollection').height();
-
-            $('#listItems').css({
-                'top':pos
-            });
-
-            $('#wrongCheckbox').css({
-                'top':pos
-            });
-        }
     });
 </script>
-<fieldset>
-    <label>Answer</label>
-
-    <div class="answer-collection">
-        <ul id="answerCollection">
-            <!-- BEGIN answerOption -->
-            <li class="inputs clearfix">
-                <label class="list-item">
-                    <input name="answerCode[]" class="answerCode text-box" type="hidden" value="{ANSWER_VALUE}"/>
-
-                    <span>{ANSWER_VALUE})</span>
-                </label>
-                <label class="check-it"><input name="answer[]" {ANSWER_CHECKED} class="answerCorrect hide" type="radio"
-                    /></label>
-                <label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box"
-                                                   type="text" value="{ANSWER_DESCRIPTION}"/></label>
-            </li>
-            <!-- END answerOption -->
-        </ul>
-    </div>
-
-    <div class="hidden-clone hide">
-        <ul>
-            <li class="inputs clearfix">
-                <label class="list-item">
-                    <input name="answerCode[]" class="answerCode text-box" type="hidden" value=""/>
-                    <span>{ANSWER_VALUE})</span>
-                </label>
-                <label class="check-it"><input name="answer[]" class="answerCorrect hide" type="checkbox"/></label>
-                <label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box"
-                                                   type="text" value=""/></label>
-
-                <div class="delete"></div>
-            </li>
-        </ul>
-        <p class="clearfix">
-            <a class="add-answer btn add float-left" id="makeNewAnswer" href="#"><span></span>Add answer option</a>
-        </p></div>
-</fieldset>
