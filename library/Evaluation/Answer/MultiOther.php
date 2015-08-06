@@ -511,7 +511,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
 
 			$other = new StdClass();
 			$other->description = 'Other';
-			$other->value = $this->otherLetterIndex($allAnswers);;
+			$other->value = count($allAnswers) + 1;
 
 			$allAnswers[] = $other;
 
