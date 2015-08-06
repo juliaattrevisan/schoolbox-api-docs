@@ -306,7 +306,10 @@
                     else {
                         error.insertAfter(element);
                     }
-                }
+                },
+
+                // Don't ignore radios and checkboxes, as these are actually hidden
+                ignore: ':hidden:not([type="radio"]):not([type="checkbox"])'
             });
         }
     }
