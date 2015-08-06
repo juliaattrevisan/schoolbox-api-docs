@@ -1,31 +1,16 @@
 <script type='text/javascript'>
-    $(function () {
-        $.plot($("#{GRAPH_ID}"), [
-            <!-- BEGIN series -->
-            { label:"{SERIES_LABEL}", data:{SERIES_DATA} }<!-- BEGIN series_separator -->,
-            <!-- END series_separator -->
-            <!-- END series -->
-        ],
+    $(function() {
+        $('#{GRAPH_ID}').evaluationBarchart({
+            series: [
+                <!-- BEGIN series -->
                 {
-                    series:{
-                        pie:{
-                            show:true,
-                            label:{
-                                show:true,
-                                radius:7 / 8,
-                                formatter:function (label, series) {
-                                    return '<div style="font-size:11px;text-align:center;padding:2px;color:#000;font-weight:bold;">' + Math.round(series.percent) + '%</div>';
-                                }
-                            }
-                        }
-                    },
-                    legend:{
-                        container:$('#legend_{GRAPH_ID}')
-                    }
-                });
+                    name: "{SERIES_LABEL}",
+                    data: [[{SERIES_INDEX}, {SERIES_DATA}]],
+                }<!-- BEGIN series_separator -->,<!-- END series_separator -->
+                <!-- END series -->
+            ]
+        });
     });
 </script>
-<div class="evaluation-graph-holder clearfix">
-    <div id='{GRAPH_ID}' class="graph"></div>
-    <div id='legend_{GRAPH_ID}' class="legend"></div>
-</div>
+
+<div id='{GRAPH_ID}'></div>
