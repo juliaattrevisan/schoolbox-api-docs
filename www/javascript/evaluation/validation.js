@@ -45,6 +45,6 @@
             return $(config.answerCollectionList)
                 .find('[data-input] [data-answer-option]:checked')
                 .length > 0;
-        }, 'Tick at least one checkbox');
+        }, 'Please select at least one correct answer');
     }
 }(jQuery));
