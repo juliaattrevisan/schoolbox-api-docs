@@ -144,16 +144,17 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
-                if ($existing['response']) {
-                    if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
-                        $page->setVar(array(
-                            'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
-                        ));
-                    } else {
-                        $page->setVar(array(
-                            'ANSWER_CHECKED' => '',
-                        ));
-                    }
+                if ($existing['response']
+                    && is_array($existingAnswer)
+                    && in_array($currentAnswer->value, $existingAnswer)
+                ) {
+                    $page->setVar(array(
+                        'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
+                    ));
+                } else {
+                    $page->setVar(array(
+                        'ANSWER_CHECKED' => '',
+                    ));
                 }
 
                 $page->parse('answerOption_block', 'answerOption', true);
