@@ -83,4 +83,16 @@ class Assess_Answer_Radio extends Assess_Answer_Multi
     {
         return $answerValue == $existingResponse;
     }
+
+    /**
+     * Overrides base implementation - answer is stored as a single value, not
+     * an array, so wrap it in an array.
+     *
+     * @param  string $answer
+     * @return array
+     */
+    protected function getAnswersFromResponse($answer)
+    {
+        return [unserialize($answer)];
+    }
 }

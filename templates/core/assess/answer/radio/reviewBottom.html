@@ -1,0 +1,48 @@
+<!-- BEGIN answerOption -->
+<li class="row content evaluation-answer-option {ANSWER_CHECKED}">
+    {ANSWER_DESCRIPTION}
+    <span class="close {ACTUAL_CORRECT_VALUE}"></span>
+</li>
+<!-- END answerOption -->
+
+<li class="row content">
+    <p class="grade">
+        <span>{REVIEWED_MARKS} / {QUESTION_MARKS}</span>
+    </p>
+
+    <em>{REVIEWED_COMMENT}</em>
+</li>
+
+<li class="row content">
+    <!-- BEGIN writable_comment -->
+    <div class="small-12 columns no-pad">
+        <h4>Enter your comments</h4>
+        <textarea name="comment">{REVIEWED_COMMENT}</textarea>
+    </div>
+    <!-- END writable_comment -->
+
+    <!-- BEGIN readonly_comment -->
+    <div class="small-12 columns no-pad">
+        <em>{REVIEWED_COMMENT}</em>
+    </div>
+    <!-- END readonly_comment -->
+
+    <!-- BEGIN writable_mark -->
+    <div class="small-6 columns no-pad">
+        <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" class="required number"/>
+    </div>
+    <div class="small-6 columns">
+        <p class="grade">
+            <span> / {QUESTION_MARKS}</span>
+        </p>
+    </div>
+    <!-- END writable_mark -->
+
+    <!-- BEGIN readonly_mark -->
+    <div class="small-12 columns no-pad">
+        <p class="grade">
+            <span>{REVIEWED_MARKS} / {QUESTION_MARKS}</span>
+        </p>
+    </div>
+    <!-- END readonly_mark -->
+</li>

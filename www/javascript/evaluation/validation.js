@@ -42,19 +42,9 @@
      */
     $.fn.addCustomRules_somethingChecked = function(config) {
         $.validator.addMethod('somethingChecked', function(value, element) {
-            var fieldsAreFilled = true;
-
-            $.each($(config.answerCollectionList).find('[data-input]'), function(index, element) {
-                var description = $.trim($(element).find('[data-answer-description]').val());
-
-                /* Ignore empty answers that weren't removed
-                 */
-                if (description == '') {
-                    fieldsAreFilled = false;
-                }
-            });
-
-            return fieldsAreFilled;
-        }, 'Tick at least one checkbox');
+            return $(config.answerCollectionList)
+                .find('[data-input] [data-answer-option]:checked')
+                .length > 0;
+        }, 'Please select at least one correct answer');
     }
 }(jQuery));

@@ -112,7 +112,7 @@
                 var id = 'answer-option-'+i;
 
                 $(element).find('[data-answer-code-representation]').parent('label').attr('for', id);
-                $(element).find('[data-answer-option]').attr('id', id);
+                $(element).find('[data-answer-option]').attr('id', id).val(i);
 
                 i++;
             });
@@ -286,11 +286,15 @@
                      */
                     var hasCorrectAnswer = $(element).attr('data-correct-answer');
                     var hasAllDescriptors = $(element).attr('data-answer-description');
+                    var isAnswerOption = $(element).attr('data-answer-option');
 
                     if ((typeof hasCorrectAnswer !== typeof undefined) && (hasCorrectAnswer !== false)) {
                         error.insertAfter(element.closest(config.answerCollectionList));
                     }
                     else if ((typeof hasAllDescriptors !== typeof undefined) && (hasAllDescriptors !== false)) {
+                        error.insertAfter(element.closest(config.answerCollectionList));
+                    }
+                    else if ((typeof isAnswerOption !== typeof undefined) && (isAnswerOption !== false)) {
                         error.insertAfter(element.closest(config.answerCollectionList));
                     }
                     /* If the error was found on the Marks field, just leave it
@@ -302,7 +306,10 @@
                     else {
                         error.insertAfter(element);
                     }
-                }
+                },
+
+                // Don't ignore radios and checkboxes, as these are actually hidden
+                ignore: ':hidden:not([type="radio"]):not([type="checkbox"])'
             });
         }
     }

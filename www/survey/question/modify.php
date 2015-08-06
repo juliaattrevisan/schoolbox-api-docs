@@ -192,17 +192,17 @@ else {
         ],
         [
             'text' => $assess['title'],
-            'href' => "/assess/summary/{$assess['assess_id']}",
+            'href' => "/survey/summary/{$assess['assess_id']}",
             'class' => '',
         ],
         [
             'text' => $section['title'],
-            'href' => "/assess/summary/{$assess['assess_id']}",
+            'href' => "/survey/summary/{$assess['assess_id']}",
             'class' => '',
         ],
         [
             'text' => "Q{$question['sequence']}",
-            'href' => "/assess/question/modify/{$question['question_id']}",
+            'href' => "/survey/question/modify/{$question['question_id']}",
             'class' => 'active',
         ]
     ]);

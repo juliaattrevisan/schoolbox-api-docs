@@ -1,18 +1,13 @@
-<div class="answer-given-container">
-	<ul class="multiple-choice-mark">
-		<!-- BEGIN answerOption -->
-		<li class="{ACTUAL_CORRECT_VALUE} {CORRECT} clearfix">
-			<input disabled="disabled" type="checkbox" {ANSWER_CHECKED} class="hide"/> {ANSWER_DESCRIPTION}
-			<span class="tick-cross"></span>
-		</li>
-		<!-- END answerOption -->
-	</ul>
-</div>
+<!-- BEGIN answerOption -->
+<li class="row content evaluation-answer-option {ANSWER_CHECKED}">
+    {ANSWER_DESCRIPTION}
+    <span class="close {ACTUAL_CORRECT_VALUE}"></span>
+</li>
+<!-- END answerOption -->
+<li class="row content">
+    <p class="grade">
+        <span>{REVIEWED_MARKS} / {QUESTION_MARKS}</span>
+    </p>
 
-<label><strong>Teacher's comments:</strong>
-	<div class="textarea-container">{REVIEWED_COMMENT}</div>
-</label>
-
-<p class="marks-amount">
-	{REVIEWED_MARKS} / {QUESTION_MARKS}
-</p>
+    <em>{REVIEWED_COMMENT}</em>
+</li>
