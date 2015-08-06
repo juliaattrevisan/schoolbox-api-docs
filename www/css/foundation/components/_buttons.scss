@@ -340,22 +340,81 @@ input[type="submit"]{
 
 // Header Actions - for when you need buttons inline with the heading
 .header-actions {
-  	float: right;
-	margin-top: -0.125rem;
-	@media #{$medium-up} {
-		margin-top: 0.25rem;
+
+	position: absolute;
+	right: 0;
+	overflow-y: visible;
+	height: 0;
+
+	@media #{$medium-only} {
+		padding-right: 2.5rem;
 	}
 	@media #{$large-up} {
-		margin-top: 0.825rem;
+		padding-right: 1rem;
 	}
-  	.button{
-  		margin-bottom: 0;
+
+	.button {
+		margin-bottom: 0;
 		padding: 0.625rem;
+		position: relative;
+
+		// no text? be subtle
+		&.no-text {
+			color: $monsoon;
+			background: transparent;
+		}
+
+		&:hover {
+			color: $primary-color;
+			background-color: tint($secondary-color, 20%);
+		}
+		&[aria-expanded=true] {
+			@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
+			background-color: $secondary-color;
+			color: $primary-color;
+		}
+
 		@media #{$large-up} {
 			padding: 0.75rem;
 		}
-  	}
+	}
 }
+
+h1, h2 {
+	&:hover + .header-actions .button {
+		background-color: $secondary-color;
+		color: $primary-color;
+	}
+}
+
+@media #{$small-up} {
+	h1 + .header-actions .button
+	{
+		bottom: 42px;
+	}
+
+	h2 + .header-actions .button {
+		bottom: 42px;
+	}
+}
+@media #{$large-up} {
+	h1 + .header-actions .button
+	{
+		bottom: 50px;
+	}
+
+	h2 + .header-actions .button {
+		bottom: 42px;
+	}
+}
+
+@media #{$xlarge-only} {
+	h1 + .header-actions .button
+	{
+		bottom: 71px;
+	}
+}
+
 
 // Dropdown
 .f-dropdown{

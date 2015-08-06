@@ -474,8 +474,9 @@ table{
 // White Islands - Custom 'Island' Columns
 .island {
   	@include grid-column();
-
 	@include responsive-sides(1, padding);
+
+	position: relative;
 	// Only sections inside islands have these styles
   	section{
 		background-color: $white;
