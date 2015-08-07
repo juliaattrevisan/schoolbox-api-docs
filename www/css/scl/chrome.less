@@ -1,0 +1,329 @@
+@charset "utf-8";
+// =============================================================================
+// Default v2 Schoolbox skin
+// =============================================================================
+//*
+//*   Ride The Whale                         ~777IIIIIIIIIII7~_
+//*                            7I       =%#%%%%7 @ %# /========
+//*                         ]7II7I###########%%%%%%%%777777
+//*                                ~I7###########777=
+//*                                     ##7      ]/
+//*                                     #/
+//*/
+// =============================================================================
+// 1. Load dependencies
+// =============================================================================
+@import "../core/mixins.less";
+@import "../core/variables.less";
+
+// =============================================================================
+// 2. And then variables can be overridden here
+// =============================================================================
+// Dimensions
+@search-width: 					195px;
+@logo-width: 						471px;
+@logo-height: 					46px;
+@infopanel-bellsprite:			'/images/scl/bell.png';
+@infopanel-height:			32px;
+
+// Generic colors
+@dark-blue:                     #013A63; // Dark Schoolbox Blue
+@body-background: 				#0b162e; // Body, but not the content area
+@content-background: 			@white; // Used for forms
+@dark: 							@content-background; // Alternate tigerstriping color
+@border-color: 					#EEEEEE; // Bordering @dark
+@alternate-background: 			#FFFFFF; // Sections such as admin
+
+// Basic type
+@body-text: 					@black;
+@secondary-text: 				#797979;
+@link: 								#008ce3;
+@link-hover: 					lighten(@link,5%);
+
+// Main banner & Search
+@banner-background: 			#101e3c;
+@banner-color:      			#FFFFFF;
+@banner-links:      			@banner-color;
+@search-color:            @banner-color;
+@banner-height:     			105px;
+
+// Modules
+@module-heading: 					@banner-background;
+@module-background: 			@white;
+@admin-nav:               @body-background;
+
+// Refers to the left navigation
+@navigation-width:				200px;
+@navigation-padding:			16px;
+@navigation-background:  		transparent;
+@navigation-color:  			@white;
+@navigation-links:  			@navigation-color;
+@navigation-hover-background: 	@link;
+@navigation-hover-color:  		#FFFFFF;
+@navigation-sub-background:  	#0b162e;
+@submit-btn:                    @link;
+
+// Flyout Menus and Messages
+@notify-color:						@negative-color;
+@notify-text-color:				@black;
+@notify-open-text-color:	@banner-background;
+@flyout-color:						@link;
+@flyout-header-color:			@black;
+@flyout-background:				@content-background;
+@flyout-hover-color:			@navigation-hover-color;
+@flyout-hover-background:		@navigation-hover-background;
+@flyout-pad-height:				2px;
+@flyout-highlight:				@dark;
+
+// Main "Tab" Navigation
+@tab-background:				transparent;
+@tab-color:						#FFFFFF;
+@tab-hover-background:	@tab-color;
+@tab-hover-color:				@link;
+
+// Footer text
+@footer-color:					#656973;
+@footer-links:					@footer-color;
+
+// Optional features
+//@header-version: 				2;
+
+// =============================================================================
+// 3. Load core
+// =============================================================================
+@import "../core/core.less";
+
+// =============================================================================
+// 4. Any overrides for styles can be specified below
+// =============================================================================
+body{
+	background: @body-background url('/images/scl/bg.jpg') top left no-repeat;
+}
+
+h2{
+	font-weight: bold;
+	font-size: 16px;
+	border-bottom: 1px solid #f0f3f5;
+}
+
+#header{
+	.logo{
+		top: 5px;
+	}
+	#search-field{
+		background: rgba(255, 255, 255, 0.1);
+	}
+	#tabs{
+		background-color: #0b162e;
+		height: 40px;
+		padding-left: 200px;
+		margin: 0;
+		position: relative;
+		top: 17px;
+		z-index: 1;
+		li a{
+			height: 40px;
+			line-height: 40px;
+			font-size: 14px;
+		}
+		.navthis a{
+			background: #f0f3f5;
+			color: #0b162e;
+			font-weight: normal;
+		}
+	}
+}
+
+#container{
+	background: #f0f3f5;
+}
+
+.information-list li{
+	background: @white;
+}
+
+.admin-nav{
+	li a{
+		border: 0;
+		background: #62bd19;
+		color: @white;
+	}
+}
+
+.ib a,
+.steinway a{
+	display: block;
+	width: 42px;
+	height: 40px;
+	float: left;
+	margin: 0 4px;
+	text-indent: -90000px;
+	position: relative;
+	top: -14px;
+}
+
+#footer ul {
+	.ib{
+		background: none;
+		a{
+			background: url('/images/scl/ib.png') top left no-repeat;
+		}
+	}
+	.steinway{
+		background: none;
+		a{
+			background: url('/images/scl/steinway.png') top left no-repeat;
+		}
+	}
+}
+
+body.login{
+	background: @banner-background;
+
+	#login-bg {
+		background: url('/images/scl/login-bg.jpg') center center no-repeat;
+    background-size: cover;
+    float: left;
+    width: 100%;
+    text-align: center;
+    position: fixed;
+    left: auto;
+    right: 400px;
+    top: 0px;
+    z-index: -1;
+    height: 100%;
+	}
+	#container{
+		width: 100% !important;
+		padding: 0;
+		color: @link;
+
+		#content{
+			background: @banner-background;
+			float: left;
+			width: 400px;
+			height: 100%;
+			position: fixed;
+			right: 0;
+			left: auto;
+			top: 0;
+			padding: 0 2% 0 2%;
+			box-sizing: border-box;
+			.logo{
+				display: block;
+    		margin: 60px 0 40px 0;
+			}
+			label, .error, .forgotten a{
+				color: @white;
+			}
+		}
+		#loginForm{
+			::-webkit-input-placeholder { color: @black; font-size: 16px; }
+			:-moz-placeholder { color: @black; font-size: 16px; }
+			::-moz-placeholder { color: @black; font-size: 16px; }
+			:-ms-input-placeholder { color: @black; font-size: 16px; }
+				input[type="text"],
+				input[type="password"]{
+				background: @white;
+				color: @black;
+				font-size: 17px;
+				width: 100%;
+				height: 45px;
+				margin: 0 0 16px 0;
+				padding: 10px 12px;
+			}
+			input[type="submit"]{
+				background: #62bd19 url('/images/scl/chevron.png') 97% 50% no-repeat;
+				color: @white;
+				width: 100%;
+				font-weight: bold;
+				font-size: 16px;
+				height: 45px;
+				&:hover{
+					background: lighten(#62bd19, 5%) url('/images/scl/chevron.png') 97% 50% no-repeat;
+				}
+			}
+		}
+		fieldset{
+			padding: 0;
+		}
+	}
+	#footer{
+		left: 0;
+		bottom: 0;
+		right: auto;
+		width: 64%;
+		position: fixed;
+		ul li,
+  		ul li a{
+  			color: @white;
+  		}
+	}
+}
+
+/* ---- Mobile ---- */
+@media screen and (max-width: 1024px) {
+	body.login{
+	  	#container #content{
+				width: 100%;
+				box-sizing: border-box;
+				top: 15px;
+				#login-logo{ margin-bottom: 15px; }
+	  	}
+	  	#footer{
+	  		width: 90%;
+	  		ul li,
+	  		ul li a{
+	  			color: @white;
+	  		}
+	  	}
+		#login-bg{ display: none; }
+	}
+}
+
+/*
+ * Demo Dashboards
+ */
+
+.demo-dash{
+	ul{
+		margin: 0 !important;
+		li{
+			float: left;
+			padding: 7px 4px !important;
+			margin: 0 !important;
+			height: 135px;
+			list-style: none;
+		}
+		a{
+			display: block;
+			float: left;
+			text-align: center;
+			padding: 92px 0 0 0;
+			font-weight: bold;
+			width: 88px;
+			.transition (opacity 0.5s);
+			&:hover{
+				cursor: pointer;
+				opacity: 0.8;
+			}
+		}
+		.admin{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+		.calendar-dash{ background: url('/images/demo/dashboard-icons.png') -88px 0px no-repeat; }
+		.due-work{ background: url('/images/demo/dashboard-icons.png') -176px 0px no-repeat; }
+		.eportfolio{ background: url('/images/demo/dashboard-icons.png') -264px 0px no-repeat; }
+		.online-forms{ background: url('/images/demo/dashboard-icons.png') -352px 0px no-repeat; }
+		.leave{ background: url('/images/demo/dashboard-icons.png') -440px 0px no-repeat; }
+		.manage-users{ background: url('/images/demo/dashboard-icons.png') -528px 0px no-repeat; }
+		.network{ background: url('/images/demo/dashboard-icons.png') -616px 0px no-repeat; }
+		.news{ background: url('/images/demo/dashboard-icons.png') -704px 0px no-repeat; }
+		.parents-friends{ background: url('/images/demo/dashboard-icons.png') -792px 0px no-repeat; }
+		.parent-dir{ background: url('/images/demo/dashboard-icons.png') -880px 0px no-repeat; }
+		.payments{ background: url('/images/demo/dashboard-icons.png') -968px 0px no-repeat; }
+		.resource-booking{ background: url('/images/demo/dashboard-icons.png') -1056px 0px no-repeat; }
+		.sport{ background: url('/images/demo/dashboard-icons.png') -1144px 0px no-repeat; }
+		.staff-dir{ background: url('/images/demo/dashboard-icons.png') -1232px 0px no-repeat; }
+		.synergetic{ background: url('/images/demo/dashboard-icons.png') -1320px 0px no-repeat; }
+		.timetable{ background: url('/images/demo/dashboard-icons.png') -1408px 0px no-repeat; }
+	}
+}
