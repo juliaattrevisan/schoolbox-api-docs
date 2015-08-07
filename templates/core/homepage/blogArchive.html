@@ -1,11 +1,10 @@
+<h1>Blog Archive for {CATEGORY_NAME}</h1>
 <span class="header-actions">
     <!-- BEGIN submit_blog -->
     <a href="/blog/modify/new/{ID}" class="button icon-add">Post Blog</a>
     <!-- END submit_blog -->
     <a href="/homepage/{ID}" class="button icon-previous">Return to Homepage</a>
 </span>
-
-<h1>Blog Archive for {CATEGORY_NAME}</h1>
 
 <div class="large-2 columns">
     <ul>
@@ -30,13 +29,13 @@
         <li>
             <a name="{BLOG_ID}"></a>
 
+            <h2>{BLOG_HEADING}</h2>
             <span class="header-actions">
                 <!-- BEGIN can_modify -->
-                <a class="button icon-modify no-text" href="/blog/modify/{BLOG_ID}"></a>
+                <a class="button icon-modify no-text" data-tooltip title="Modify" href="/blog/modify/{BLOG_ID}"></a>
                 <!-- END can_modify -->
             </span>
 
-            <h2>{BLOG_HEADING}</h2>
 
             <div class="clearfix">
                 <div class="avatar-card">

@@ -1,16 +1,15 @@
+<h1>{NEWS_TITLE}</h1>
 <span class="header-actions">
     <!-- BEGIN previous_article -->
-    <a class="button icon-previous" data-tooltip href="/news/item/{PREVIOUS_ARTICLE_ID}" title="{PREVIOUS_ARTICLE_TITLE}">Previous</a>
+    <a class="button icon-previous no-text" data-tooltip href="/news/item/{PREVIOUS_ARTICLE_ID}" title="Previous: '{PREVIOUS_ARTICLE_TITLE}'"></a>
     <!-- END previous_article -->
     <!-- BEGIN next_article -->
-    <a class="button icon-next" data-tooltip href="/news/item/{NEXT_ARTICLE_ID}" title="{NEXT_ARTICLE_TITLE}">Next</a>
+    <a class="button icon-next no-text" data-tooltip href="/news/item/{NEXT_ARTICLE_ID}" title="Next: '{NEXT_ARTICLE_TITLE}'"></a>
     <!-- END next_article -->
     <!-- BEGIN modify_news -->
-    <a class="button icon-modify" href="/news/modify/{NEWS_ID}">Modify Article</a>
+    <a class="button icon-modify no-text" data-tooltip title="Modify" href="/news/modify/{NEWS_ID}"></a>
     <!-- END modify_news -->
 </span>
-
-<h1>{NEWS_TITLE}</h1>
 
 <div class="clearfix">
     <div class="avatar-card">

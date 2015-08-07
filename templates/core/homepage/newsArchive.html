@@ -1,3 +1,4 @@
+<h1>News Archive for {CATEGORY_NAME}</h1>
 <span class="header-actions">
     <!-- BEGIN submit_news -->
     <a href="/news/homepage/new/{ID}" class="button icon-news">Post News</a>
@@ -5,19 +6,17 @@
     <a href="/homepage/{ID}" class="button icon-folder">Return to Homepage</a>
 </span>
 
-<h1>News Archive for {CATEGORY_NAME}</h1>
-
 <div class="row">
     <ul class="information-list">
         <!-- BEGIN news -->
         <li>
+            <h2>{NEWS_HEADING}</h2>
             <span class="header-actions">
                 <!-- BEGIN can_modify -->
-                <a href="/news/homepage/{NEWS_ID}" class="button icon-modify" >Modify</a>
+                <a href="/news/homepage/{NEWS_ID}" class="button icon-modify no-text" data-tooltip title="modify"></a>
                 <!-- END can_modify -->
             </span>
 
-            <h2>{NEWS_HEADING}</h2>
 
             <div class="clearfix">
                 <div class="avatar-card">
