@@ -1,14 +1,18 @@
-<strong>Your answer:</strong>
-<div class="{ANSWER_CORRECT}">{ANSWER}<span class="tick-cross"></span></div>
-<strong>The correct answer:</strong>
+<li class="row content">
+    <h4>Your answer</h4>
+    {ANSWER}
+</li>
 
-<!-- BEGIN answerOption -->
-<div class="suggestedAnswer">{CORRECT_ANSWER}</div>
-<!-- END answerOption -->
+<li class="row content highlight">
+    <h4>The correct answer</h4>
+    <!-- BEGIN answerOption -->
+    {CORRECT_ANSWER}
+    <!-- END answerOption -->
+</li>
 
-<label><strong>Teacher's comments:</strong>
-<div class="textarea-container">{REVIEWED_COMMENT}</div>
-</label>
-<p class="marks-amount">
-{REVIEWED_MARKS} / {QUESTION_MARKS}
-</p>
+<li class="row content">
+    <p class="grade">
+        <span>{REVIEWED_MARKS} / {QUESTION_MARKS}</span>
+    </p>
+    <em>{REVIEWED_COMMENT}</em>
+</li>

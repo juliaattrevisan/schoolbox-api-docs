@@ -1,52 +1,50 @@
 <script type="text/javascript">
 $(function() {
-	$(document).on('click', '#create', function() {
-		var content = tinyMCE.activeEditor.getContent(); // get the content
-   		$('#question').val(content); // put it in the textarea
-	});
+    $(document).on('click', '#create', function() {
+        var content = tinyMCE.activeEditor.getContent(); // get the content
+        $('#question').val(content); // put it in the textarea
+    });
 
-	var validator = $("#createQuestionForm").submit(function() {
-		 // update underlying textarea before submit validation
-		 tinyMCE.triggerSave();
-	}).validate({
-		rules: { 
-			question: {
-				required: true,
-				minlength: 2
-			},
-			marks: {
-				required: true,
-				minlength: 1,
-				greaterThanZero:true
-			},
-			answer: {
-				required: true,
-				minlength: 1,
-				isNumber: true
-			}
-		},
-		
-		messages: {
-			question: "Please enter a question.",
-			answer: "Please fill out an answer."
-		},
-
+    $("#createQuestionForm").submit(function() {
+         // update underlying textarea before submit validation
+         tinyMCE.triggerSave();
+    }).validate({
+        rules: {
+            question: {
+                required: true,
+                minlength: 2
+            },
+            marks: {
+                required: true,
+                minlength: 1,
+                greaterThanZero:true
+            },
+            answer: {
+                required: true,
+                minlength: 1,
+                isNumber: true
+            }
+        },
+        messages: {
+            question: "Please enter a question.",
+            answer: "Please fill out an answer."
+        },
         errorPlacement: function(error, element) {
-         	error.insertAfter(element.parent().children(':last-child'))
-		}
-	});
-	
-	jQuery.validator.addMethod("greaterThanZero", function(value, element) {
-   		return this.optional(element) || (parseFloat(value) > 0);
-	}, "Amount must be greater than zero");
+            error.insertAfter(element.parent().children(':last-child'))
+        }
+    });
 
-	jQuery.validator.addMethod("isNumber", function(value, element) {
-		return !isNaN(value);
-	}, "Amount must be a number");
+    jQuery.validator.addMethod("greaterThanZero", function(value, element) {
+        return this.optional(element) || (parseFloat(value) > 0);
+    }, "Amount must be greater than zero");
+
+    jQuery.validator.addMethod("isNumber", function(value, element) {
+        return !isNaN(value);
+    }, "Amount must be a number");
 });
 </script>
 
 <label>
-	Suggested Answer
-	<input type='text' name="answer" value='{ANSWER}' />
+    Suggested Answer
+    <input type='text' name="answer" value='{ANSWER}' />
 </label>
