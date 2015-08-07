@@ -59,6 +59,20 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
     }
 
     /**
+     * Configure question/configure answer during creation/modification
+     *
+     * @param $page
+     * @param $config
+     */
+    public function configure($page, $config) {
+        $options = json_decode($config);
+
+        $page->setVar(array(
+            'CONFIGURATION_MANDATORY_CHECKED' => $options->mandatory ? 'checked="checked"' : ''
+        ));
+    }
+
+    /**
      * Updates an existing Answer.
      *
      * @param  $object
@@ -447,6 +461,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
 
                 $page->setVar(
                     array(
+                        'ANSWER_LEFT_VALUE'             => ($i+1).')',
                         'ANSWER_RIGHT_VALUE'            => $right[$i],
                         'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
                         'CORRECT'                       => $correct,

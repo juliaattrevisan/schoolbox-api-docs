@@ -1,27 +1,43 @@
 <script type='text/javascript'>
-	$(function() {
-		$('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
-			id: {QUESTION_ID}
-		});
-	});
+    $(function() {
+        $('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+            id: {QUESTION_ID}
+        });
+    });
 </script>
 
 <span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
-<p class="information-notification">Re-order the items  by dragging them.</p>
 
-<ul class="evaluation-matchingpairs-left match-it option">
-    <!-- BEGIN answerOptionLeft -->
-    <li class="left-answer clearfix">
-        <strong>{ANSWER_LEFT_VALUE}</strong>
-    </li>
-    <!-- END answerOptionLeft -->
-</ul>
+<div class="row matching-pairs" data-equalizer>
+    <div class="small-12 columns">
+        <div class="highlight-panel">
+            <p>Re-order the items by dragging them.</p>
+        </div>
+    </div>
 
-<ul class="evaluation-matchingpairs-right match-it option">
-	<!-- BEGIN answerOptionRight -->
-	<li class="right-answer clearfix">
-        <input name="answerRight[]" class="answerRight" type="hidden" readonly="readonly" value="{ANSWER_RIGHT_VALUE}" />
-        <strong>{ANSWER_RIGHT_VALUE}</strong>
-	</li>
-	<!-- END answerOptionRight -->
-</ul>
+    <div class="small-1 columns">
+        <ul class="information-list">
+            <!-- BEGIN answerOptionLeft -->
+            <li class="row">
+                <div class="small-12 columns no-pad" data-equalizer-watch>
+                    <p>{ANSWER_LEFT_VALUE}</p>
+                </div>
+            </li>
+            <!-- END answerOptionLeft -->
+        </ul>
+    </div>
+
+    <div class="small-11 columns">
+        <ul class="information-list sortable" data-answer-list>
+            <!-- BEGIN answerOptionRight -->
+            <li class="row">
+                <div class="grip" data-equalizer-watch></div>
+                <div class="small-11 columns no-pad" data-equalizer-watch>
+                    <input name="answerRight[]" class="answerRight" type="hidden" readonly="readonly" value="{ANSWER_RIGHT_VALUE}" />
+                    <p>{ANSWER_RIGHT_VALUE}</p>
+                </div>
+            </li>
+            <!-- END answerOptionRight -->
+        </ul>
+    </div>
+</div>

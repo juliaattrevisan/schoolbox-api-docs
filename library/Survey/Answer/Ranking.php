@@ -30,6 +30,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
     protected function setup()
     {
         $this->setResponseHandler(new Survey_Response());
+        $this->setQuestionHandler(new Survey_Question());
     }
 
     /**
@@ -128,10 +129,10 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
         $ticks = array();
 
         for ($i = 1; $i <= $numTicks; $i++) {
-            $ticks[] = "[{$i}, '{$this->ordinal($i)}']";
+            $ticks[] = "$i:'{$this->ordinal($i)}'";
         }
 
-        return implode(', ', $ticks);
+        return '{'.implode(', ', $ticks).'}';
     }
 
     /**
@@ -336,6 +337,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
             for ($i = 0; $i < count($allAnswers); $i++) {
                 $page->setVar(
                     array(
+                        'ANSWER_LEFT_VALUE'  => ($i+1).')',
                         'ANSWER_RIGHT_VALUE' => $right[$i],
                     )
                 );
@@ -362,5 +364,21 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
     private function getTicks()
     {
         return $this->ticks;
+    }
+
+    /**
+     * Configure mandatoryness and other settings for this response
+     *
+     * @param $page
+     * @param $question_id
+     */
+    protected function configureResponse($page, $question_id)
+    {
+        $question = $this->getQuestionHandler()->getByID($question_id);
+        $config = json_decode($question['config']);
+
+        $page->setVar(array(
+            'CONFIGURATION_MANDATORY' => $config->mandatory ? 'required' : '',
+        ));
     }
 }
