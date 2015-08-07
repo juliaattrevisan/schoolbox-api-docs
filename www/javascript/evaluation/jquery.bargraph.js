@@ -7,16 +7,14 @@
 
         var config = init(options, $(this));
 
-        /* The plot unfolds
-         */
-        $(config.element).highcharts({
-            chart: {
-                type: 'column'
-            },
-            title: {
-                text: ''
-            },
-            xAxis: {
+        var xAxis = {};
+        if (config.categories) {
+            xAxis = {
+                categories: config.categories,
+                type: 'category'
+            };
+        } else {
+            xAxis = {
                 labels: {
                     enabled: false
                 },
@@ -29,7 +27,19 @@
                 lineColor: 'transparent',
                 minorTickLength: 0,
                 tickLength: 0
+            }
+        }
+
+        /* The plot unfolds
+         */
+        $(config.element).highcharts({
+            chart: {
+                type: 'column'
             },
+            title: {
+                text: ''
+            },
+            xAxis: xAxis,
             yAxis: {
                 min: 0,
                 allowDecimals: false,
@@ -39,7 +49,8 @@
             },
             plotOptions: {
                 column: {
-                    grouping: false
+                    grouping: false,
+                    stacking: config.stacking
                 }
             },
             series: config.series,
@@ -62,7 +73,9 @@
          */
         function init(options, element) {
             var defaults = {
-                element: element
+                element: element,
+                stacking: false,
+                categories: []
             }
 
             var derived = {
