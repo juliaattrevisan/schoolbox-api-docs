@@ -900,7 +900,7 @@ table{
             margin-bottom: 0;
         }
 
-        p {
+        p, h3 {
             margin: 0 0 0 (3 * rem-calc($base-font-size));
             @media #{$medium-up} {
                 margin: 0 0 0 (4 * rem-calc($base-font-size));
@@ -915,6 +915,13 @@ table{
         }
         ~ .progress {
             margin-bottom: 0;
+        }
+    }
+
+    &.wrap-down {
+        h3, p, .meta {
+            overflow-x: visible;
+            white-space: normal;
         }
     }
 
@@ -972,9 +979,7 @@ table{
 	p{
         margin: 0;
 		&.spaced {
-			@media #{$small-up} {
-				padding-bottom: (0.2 * rem-calc($base-font-size));
-			}
+            padding-bottom: (0.2 * rem-calc($base-font-size));
 			@media #{$medium-up} {
 				padding-bottom: (0.5 * rem-calc($base-font-size));
 			}
@@ -1160,6 +1165,11 @@ ul.meta {
     list-style: none;
     line-height: 1.5rem;
     margin-bottom: 1rem;
+	li {
+		// 26px = 16x16 icon + 10px padding (both hardcoded values)
+		text-indent: -26px;
+		padding-left: 26px;
+	}
 }
 
 @media #{$small-only} {

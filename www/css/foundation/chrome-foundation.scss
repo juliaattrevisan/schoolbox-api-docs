@@ -36,6 +36,9 @@
 // EOTC
 @import "components/eotc/eotc";
 
+// Quiz
+@import "components/quiz";
+
 // Needs to be included outside of container in order to work
 @import "../../javascript/components/foundation/scss/foundation/components/tooltips";
 //@import "../../javascript/components/foundation/scss/foundation/components/reveal";
