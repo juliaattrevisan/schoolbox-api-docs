@@ -11,6 +11,7 @@
     <li class="row" data-input>
         <div class="small-1 columns" data-answer-code>
             <input name="answerCode[]" type="hidden" value="" data-answer-code-value />
+            <input name="answer[]" type="checkbox" class="hide" value="" data-answer-option />
             <span class="content" data-answer-code-representation></span>
         </div>
         <div class="small-10 columns">
@@ -34,6 +35,15 @@
             mode: 'create',
             questionBank: false,
             answerName: 'answerRight',
+            rules: {
+                question: {
+                    required: true,
+                    minlength: 2
+                },
+                'answerDescription[]': {
+                    emptyInputs: true
+                }
+            },
             customValidationRules: function(config) {
                 $.fn.addCustomRules_greaterThanZero(config);
                 $.fn.addCustomRules_emptyInputs(config);
