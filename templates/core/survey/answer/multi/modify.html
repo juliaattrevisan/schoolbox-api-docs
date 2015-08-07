@@ -53,10 +53,8 @@
             availability: 'survey',
             mode: 'modify',
             questionBank: questionBank,
+            rules: {},
             customValidationRules: function(config) {
-                $.fn.addCustomRules_greaterThanZero(config);
-                $.fn.addCustomRules_emptyInputs(config);
-                $.fn.addCustomRules_somethingChecked(config);
             }
         });
     });
