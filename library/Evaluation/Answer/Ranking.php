@@ -461,6 +461,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
 
                 $page->setVar(
                     array(
+                        'ANSWER_LEFT_VALUE'             => ($i+1).')',
                         'ANSWER_RIGHT_VALUE'            => $right[$i],
                         'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
                         'CORRECT'                       => $correct,

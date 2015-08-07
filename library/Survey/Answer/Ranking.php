@@ -337,6 +337,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
             for ($i = 0; $i < count($allAnswers); $i++) {
                 $page->setVar(
                     array(
+                        'ANSWER_LEFT_VALUE'  => ($i+1).')',
                         'ANSWER_RIGHT_VALUE' => $right[$i],
                     )
                 );
