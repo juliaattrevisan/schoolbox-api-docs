@@ -64,8 +64,8 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
         $page->setFile('signaturePad', 'survey/answer/signature/rendered.html');
 
         $page->setVar(array(
-            'ID' => $attempt_id,
-            'RESPONSE' => $response['response']
+            'ID'       => $attempt_id,
+            'RESPONSE' => $this->makeResponseValid($response['response']),
         ));
 
         $page->parse('renderedSignature', 'signaturePad');
@@ -73,6 +73,8 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
         /* SVG data
          */
         $data['responses'] = $page->getVar('renderedSignature');
+        // Signatures are never duplicated
+        $data['responsesData'] = $attempt_id;
 
         /* Append commentary
          */
@@ -144,7 +146,7 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
                     'QUESTION_ID' => $question_id,
                     'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $currentAnswer['answer_id'],
-                    'ANSWER' => $existing['response'],
+                    'ANSWER' => $this->makeResponseValid($existing['response']),
                 )
             );
         } else {
@@ -258,5 +260,29 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
                 'CONFIGURATION_MANDATORY' => $config->mandatory ? 'required' : '',
             )
         );
+    }
+
+    /**
+     * Ensures that $response is either valid JSON or an empty string.
+     *
+     * @param string $response
+     * @return string
+     */
+    protected function makeResponseValid($response)
+    {
+        // Response might not fit as a JSON string
+        if ($response) {
+            if (!json_decode($response)) {
+                return '';
+//                // keep trying until it's valid
+//                while (strlen($response) > 0) {
+//                    $response = substr($response, 0, -1);
+//                    if (json_decode($response.']')) {
+//                        return $response . ']';
+//                    }
+//                }
+            }
+        }
+        return $response;
     }
 }

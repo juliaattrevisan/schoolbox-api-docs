@@ -113,6 +113,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
                     array(
                         'RESPONDENT_NAME'            => Scrub::text($currentAttempt['name']),
                         'RESPONDENT_RESPONSE'        => $currentAttempt['responses'],
+                        'RESPONDENT_RESPONSE_DATA'   => $currentAttempt['responsesData'],
                         'RESPONDENT_START_DATETIME'  => $start->getShort(),
                         'RESPONDENT_FINISH_DATETIME' => $finish->getShort(),
                     )

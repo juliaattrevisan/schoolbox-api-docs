@@ -1,6 +1,9 @@
-.pad {
+.sigPad .pad {
     position: relative;
-
+    /* Heights still sadly necessary for consistent sigpad */
+    height: 142px;
+}
+.sigPad:not(.readonly) .pad {
     /**
      * For cross browser compatibility, this should be an absolute URL
      * In IE the cursor is relative to the HTML document
@@ -23,13 +26,13 @@
     user-select: none;
 }
 
-.sigPadWrapper {
+.sigPad .sigPadWrapper {
     border: 1px solid #dedede;
-    width: 500px;
+    /* Heights still sadly necessary for consistent sigpad */
     height: 142px;
 }
 
-.evaluation-content label input[type="text"].signaturePadAnswer {
+.sigPad .signaturePadAnswer {
     border:0;
     opacity:0;
     height:0px;

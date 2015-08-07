@@ -1,17 +1,20 @@
 <!-- injectable for rendering signature vector data into signaturePad -->
-
 <script type="text/javascript">
     $(function() {
-        $('#sigPad{ID}').signaturePad({
-            displayOnly: true
-        }).regenerate({RESPONSE});
+        // {RESPONSE} can be empty - function wrapper caters for that possibility.
+        (function (response) {
+            $('[data-signature="{ID}"]').alaressSignaturePad({
+                displayOnly: true,
+                rescale: true,
+                init: response
+            });
+        })({RESPONSE});
     });
 </script>
 <div class="answer-given-container">
-    <label id='sigPad{ID}' class="sigPad">
-        <div class="sigPadWrapper">
-            <div class="typed"></div>
-            <canvas class="pad" width="500" height="100"></canvas>
+    <div class="sigPad row readonly" data-signature="{ID}">
+        <div class="sigPadWrapper small-12 columns no-pad">
+            <canvas class="pad" data-role="signatureCanvas" height="142"></canvas>
         </div>
-    </label>
+    </div>
 </div>
