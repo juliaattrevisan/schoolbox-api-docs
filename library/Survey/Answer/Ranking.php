@@ -129,10 +129,10 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
         $ticks = array();
 
         for ($i = 1; $i <= $numTicks; $i++) {
-            $ticks[] = "[{$i}, '{$this->ordinal($i)}']";
+            $ticks[] = "$i:'{$this->ordinal($i)}'";
         }
 
-        return implode(', ', $ticks);
+        return '{'.implode(', ', $ticks).'}';
     }
 
     /**
