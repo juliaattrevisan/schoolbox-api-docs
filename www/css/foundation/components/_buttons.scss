@@ -316,6 +316,9 @@ $tabs-content-padding: rem-calc(($base-font-size - 8));
 		padding: 1rem;
 		font-weight: 700;
 	}
+	&:empty {
+		@extend .no-text;
+	}
 }
 
 input[type="submit"]{
