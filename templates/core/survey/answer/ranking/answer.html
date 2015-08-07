@@ -8,36 +8,22 @@
 
 <span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
 
-<div class="row" data-equalizer>
-    <div class="small-12 columns no-pad">
-        <div class="highlight-panel">
-            <p>Re-order the items by dragging them.</p>
-        </div>
-    </div>
-
-    <div class="small-1 columns no-pad">
-        <ul class="information-list">
-            <!-- BEGIN answerOptionLeft -->
-            <li class="row">
-                <div class="small-12 columns no-pad" data-equalizer-watch>
-                    <strong>{ANSWER_LEFT_VALUE}</strong>
-                </div>
-            </li>
-            <!-- END answerOptionLeft -->
-        </ul>
-    </div>
-
-    <div class="small-11 columns no-pad">
-        <ul class="information-list sortable" data-answer-list>
-            <!-- BEGIN answerOptionRight -->
-            <li class="row">
-                <div class="grip" data-equalizer-watch></div>
-                <div class="small-11 columns no-pad" data-equalizer-watch>
-                    <input name="answerRight[]" class="answerRight" type="hidden" readonly="readonly" value="{ANSWER_RIGHT_VALUE}" />
-                    <strong>{ANSWER_RIGHT_VALUE}</strong>
-                </div>
-            </li>
-            <!-- END answerOptionRight -->
-        </ul>
-    </div>
+<div class="highlight-panel">
+    <p>Re-order the items by dragging them (highest to lowest).</p>
 </div>
+
+<!-- BEGIN answerOptionLeft -->
+
+<!-- END answerOptionLeft -->
+
+<ul class="information-list sortable" data-answer-list>
+    <!-- BEGIN answerOptionRight -->
+    <li class="row">
+        <div class="grip"></div>
+        <div class="small-11 columns">
+            <input name="answerRight[]" class="answerRight" type="hidden" readonly="readonly" value="{ANSWER_RIGHT_VALUE}" />
+            <p>{ANSWER_RIGHT_VALUE}</p>
+        </div>
+    </li>
+    <!-- END answerOptionRight -->
+</ul>
