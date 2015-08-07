@@ -74,6 +74,10 @@
                  */
                 configuration: '#configuration',
 
+                /* What POST var are answers stored in?
+                 */
+                answerName: 'description',
+
                 /* Setup of custom validation rules to use
                  * Call $.fn.addCustomRules_* here.
                  */
@@ -218,11 +222,11 @@
                         /* Ignore empty answers that weren't removed
                          */
                         if ((description != '') && (code != '')) {
-                            answerCollection.push({
-                                description: description,
-                                value: code,
-                                correct: elem.find('[data-answer-option]').prop('checked')
-                            });
+                            var answer = {};
+                            answer[config.answerName] = description;
+                            answer.value              = code;
+                            answer.correct            = elem.find('[data-answer-option]').prop('checked');
+                            answerCollection.push(answer);
                         }
                     });
 
