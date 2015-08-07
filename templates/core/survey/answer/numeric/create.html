@@ -1,77 +1,14 @@
+<script type='text/javascript' src="/javascript/evaluation/evaluation.js"></script>
+<script type='text/javascript' src="/javascript/evaluation/multiplechoice-creator.js"></script>
+<script type='text/javascript' src="/javascript/evaluation/validation.js"></script>
 <script type="text/javascript">
-$(function() {
-	$("#createQuestionForm").submit(function() {
-		// update underlying textarea before submit validation
-		tinyMCE.triggerSave();
-	}).validate({
-		submitHandler:function () {
-			var theForm = $('#createQuestionForm');
-			/* Form preprocessing
-			 */
-			var answerCollection = new Array();
-			tinyMCE.triggerSave();
-
-			var content = tinyMCE.activeEditor.getContent(); // get the content
-			$('#question').val(content); // put it in the textarea
-
-			/* Collate possible answers and their correctness status
-			 */
-			$.each($('#answerCollection').find('li'), function (index, element) {
-				var elem = $(element);
-
-				var description = elem.find('.answerDescription').val();
-				var code = elem.find('.answerCode').val();
-
-				/* Ignore empty answers that weren't removed
-				 */
-				if (($.trim(description) != '') && ($.trim(code) != '')) {
-					answerCollection.push({
-						description: description,
-						value: code
-					});
-				}
-			});
-
-			/* Collate the usual fields containing ids.
-			 * Collate the checkboxes too but append all the possibilities as well!
-			 */
-			var data = {
-				section_id: theForm.find('input[name=section_id]').val(),
-				sequence: theForm.find('input[name=sequence]').val(),
-				type_id: theForm.find('select[name=type_id]').val(),
-				question: tinyMCE.get('question').getContent(),
-				marks: theForm.find('input[name=marks]').val(),
-				allAnswers: JSON.stringify(answerCollection),
-				configuration: JSON.stringify($('#configuration').find('input, textarea, select').serializeArray())
-			};
-
-			/* Submit via POST and redirect to question creation screen upon done
-			 */
-			$.post(theForm.attr('action'), data, function (responseText) {
-				window.location = '/survey/question/create/' + data.section_id;
-			});
-
-			tinyMCE.triggerSave();
-
-			return false;
-		},
-		rules: { 
-			question: {
-				required: true,
-				minlength: 1
-			}
-		},
-		messages: {
-			question: "Please enter a question.",
-			answer: "Please fill out an answer."
-		},
-        errorPlacement: function(error, element) {
-            error.insertAfter(element.parent().children(':last-child'))
-            error.addClass('message');  // add a class to the wrapper
-		}
-	});
-	jQuery.validator.addMethod("greaterThanZero", function(value, element) {
-   		return this.optional(element) || (parseFloat(value) > 0);
-	}, "Amount must be greater than zero");
-});
+    $(function() {
+        $('#createQuestionForm').multiRadioCreate({
+            availability: 'survey',
+            mode: 'create',
+            questionBank: false,
+            customValidationRules: function(config) {
+            }
+        });
+    });
 </script>
