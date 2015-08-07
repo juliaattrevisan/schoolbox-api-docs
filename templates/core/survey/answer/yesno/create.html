@@ -84,6 +84,15 @@
             mode: 'create',
             questionBank: false,
             addDefaults: false,
+            rules: {
+                question: {
+                    required: true,
+                    minlength: 2
+                },
+                'answerDescription[]': {
+                    emptyInputs: true
+                }
+            },
             customValidationRules: function(config) {
                 $.fn.addCustomRules_emptyInputs(config);
             }
