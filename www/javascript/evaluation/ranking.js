@@ -10,6 +10,13 @@
 
         initChange();
 
+        // Set up equalization
+        $(config.questionForm).foundation({
+            equalizer: {
+                equalize_on_stack: true
+            }
+        });
+
         /**
          * Set up options
          *
