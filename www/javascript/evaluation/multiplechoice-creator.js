@@ -74,9 +74,31 @@
                  */
                 configuration: '#configuration',
 
-                /* Custom validation rules to use
+                /* Setup of custom validation rules to use
+                 * Call $.fn.addCustomRules_* here.
                  */
                 customValidationRules: function() {
+                },
+
+                /* Actual validation rules
+                 * Defaults to the full set.
+                 */
+                rules: {
+                    question: {
+                        required: true,
+                        minlength: 2
+                    },
+                    marks: {
+                        required: true,
+                        minlength: 1,
+                        greaterThanZero:true
+                    },
+                    'answer[]': {
+                        somethingChecked: true
+                    },
+                    'answerDescription[]': {
+                        emptyInputs: true
+                    }
                 }
             }
 
@@ -265,23 +287,7 @@
                     return false;
                 },
 
-                rules: {
-                    question: {
-                        required: true,
-                        minlength: 2
-                    },
-                    marks: {
-                        required: true,
-                        minlength: 1,
-                        greaterThanZero:true
-                    },
-                    'answer[]': {
-                        somethingChecked: true
-                    },
-                    'answerDescription[]': {
-                        emptyInputs: true
-                    }
-                },
+                rules: config.rules,
 
                 errorPlacement: function(error, element) {
 
