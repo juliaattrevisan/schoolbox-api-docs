@@ -32,12 +32,13 @@
          * Save response upon change
          */
         function initChange() {
-            var rightList = $(config.questionForm).find('.evaluation-matchingpairs-right');
-
-            rightList.disableSelection();
+            var rightList = $(config.questionForm).find('[data-answer-list]');
+            //rightList.disableSelection();
             rightList.sortable({
-                placeholder: "sortable-placeholder",
+                placeholder:          "sortable-placeholder",
                 forcePlaceholderSize: true,
+                handle:               '.grip',
+                axis:                 'y',
                 stop: function() {
                     $.fn.evaluationRanking.saveOne(config.questionForm);
                 }
