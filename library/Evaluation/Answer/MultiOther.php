@@ -225,7 +225,8 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
 			 * like excel does it.
  			 */
 			$other = new StdClass();
-			$other->description = 'Other';
+            $other->description = 'Other';
+            $other->isOther = true;
 			$other->value = count($allAnswers)+1;
 
 			$allAnswers[] = $other;
@@ -242,6 +243,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                     'ANSWER_VALUE_FACADE' => $valueFacade,
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+                    'ANSWER_DATA_ROLE' => ($currentAnswer->isOther ? 'data-role="other-checkbox"' : ''),
                 ));
 
                 if ($existingAnswer) {
@@ -509,7 +511,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
 
 			$other = new StdClass();
 			$other->description = 'Other';
-			$other->value = $this->otherLetterIndex($allAnswers);;
+			$other->value = count($allAnswers) + 1;
 
 			$allAnswers[] = $other;
 
@@ -539,7 +541,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                 if ($existing['response']) {
                     if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
                         $page->setVar(array(
-                            'ANSWER_CHECKED' => 'checked=\'checked\'',
+                            'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
                         ));
 
                         /* Was this a correctly-selected response? If so apply a
