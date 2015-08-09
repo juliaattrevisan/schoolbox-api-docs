@@ -44,7 +44,7 @@ if (is_numeric($_GET['id'])) {
             LogMapper::getInstance()->logRead($file, $_SESSION['user']);
         }
         catch ( Schoolbox\Mapper\Exception\Deleted $e)  {
-            error(41    );
+            error(41);
         }
     }
 
