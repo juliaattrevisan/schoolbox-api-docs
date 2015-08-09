@@ -180,7 +180,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
                 } elseif ($key == 'before') {
                     if ($date = strtotime($value)) {
                         $date = date('Y-m-d H:i:s', $date);
-                        $sqlFilter[] = "`date` >= :before";
+                        $sqlFilter[] = "`date` <= :before";
                         $params['before'] = $date;
                     }
                 } else {
