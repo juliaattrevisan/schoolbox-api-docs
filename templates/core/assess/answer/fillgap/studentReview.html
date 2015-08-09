@@ -1,20 +1,19 @@
-<strong>Answer given:</strong>
-<div class="answer-given-container">
+<li class="row content">
+    <h4>Your answer</h4>
+    {ANSWER}
+</li>
 
-	<!-- BEGIN answerOption -->
-	{ANSWER}
-	<!-- END answerOption -->
-</div>
-<strong>Correct Answer:</strong>
-<div class="correct-answer-container">
-	{CORRECT_ANSWER}
-</div>
+<li class="row content highlight">
+    <h4>The correct answer</h4>
+    <!-- BEGIN answerOption -->
+    {CORRECT_ANSWER}
+    <!-- END answerOption -->
+</li>
 
-<label><strong>Teacher's comments:</strong>
-    <div class="textarea-container">{REVIEWED_COMMENT}</div>
-</label>
-    <p class="marks-amount">
-        {REVIEWED_MARKS} / {QUESTION_MARKS}
+<li class="row content">
+    <p class="grade">
+        <span>{REVIEWED_MARKS} / {QUESTION_MARKS}</span>
     </p>
 
-
+    <em>{REVIEWED_COMMENT}</em>
+</li>
