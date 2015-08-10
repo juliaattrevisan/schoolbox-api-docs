@@ -18,7 +18,7 @@
     </div>
 
     <!-- copy to show for small screens -->
-    <div class="hide small-6 small-offset-6 columns success" data-collapsable="true" data-collapse-state="collapsed">
+    <div class="hide show-for-small-only evaluation-matching-pairs-answer small-6 small-offset-6 columns sortable" data-fillgap-answer data-collapsable="true" data-collapse-state="collapsed">
         <p>
             {ANSWER_CORRECT_RESPONSE_VALUE}
             <span class="close no-text {ANSWER_ICON}"></span>
@@ -45,5 +45,7 @@
         $('[data-response-id="{RESPONSE_ID}"]').find('[data-collapser="true"]').collapsable({
             container: '[data-response-id="{RESPONSE_ID}"]'
         });
+
+        $(window).resize
     });
 </script>

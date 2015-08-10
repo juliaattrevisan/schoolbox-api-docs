@@ -17,7 +17,6 @@
 /* Quiz: Matching Pairs
  */
 .matching-pairs {
-
     .small-6 {
         // override guttering
         &:first-child {
@@ -37,6 +36,13 @@
         color: $primary-color;
         font-weight: $alert-font-weight;
     }
+}
+
+/* Hide display of answers when resizing from small to >= medium dimensins
+ * This removes the reserved space given by display: inherit !important;
+ */
+.evaluation-matching-pairs-answer {
+    display: auto !important;
 }
 
 /* Quiz: Fillgap/Cloze Exercises
