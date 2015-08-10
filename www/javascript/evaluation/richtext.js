@@ -34,8 +34,8 @@
 		 */
 		function initChange() {
 			$.fn.alaressTiny({
-				mode : "specific_textareas",
-				editor_selector: config.editorSelector,
+				mode : "exact",
+                elements: config.editorSelector,
 				disable_toolbars: [2, 3, 4],
 				setup : function(ed) {
 					ed.onInit.add(function(ed) {
