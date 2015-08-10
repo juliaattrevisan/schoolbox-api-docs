@@ -16,7 +16,7 @@
 
 /* Quiz: Matching Pairs
  */
-.evaluation-matching-pairs {
+.matching-pairs {
     .small-6 {
         // override guttering
         &:first-child {
@@ -35,16 +35,6 @@
         background-color: $secondary-color;
         color: $primary-color;
         font-weight: $alert-font-weight;
-    }
-}
-
-/* Hide display of answers when resizing from small to >= medium dimensins
- * This removes the reserved space given by display: inherit !important;
- * Seen in student review/review
- */
-.evaluation-matching-pairs-answer {
-    &.show-for-small-only {
-        display: auto !important;
     }
 }
 
