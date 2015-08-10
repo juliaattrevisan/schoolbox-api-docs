@@ -112,6 +112,7 @@ foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
             'text'  => $currentStudent->formatName('{lastname}, {firstname}'),
             'value' => "/submission/inlineGrading/view/{$submissionBox->getId()}/{$currentStudent->getId()}",
             'html'  => $this->getVar('USER_HTML'),
+            'unsubmitted' => $submit ? false : true,
         ];
 
 		/* Augment navigation data
