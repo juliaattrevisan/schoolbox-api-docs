@@ -2,7 +2,7 @@
 <script type="text/javascript">
 $(function() {
 	$.fn.alaressTiny({
-		mode: 'textareas',
+		mode: 'exact',
 		elements: 'richtext-answer',
 		file_browser_category_id: '{ASSESS_CATEGORY_ID}',
 		removeformat_selector: 'b,strong,em,i,span,ins',
@@ -41,6 +41,7 @@ $(function() {
 	}, "Amount must be greater than zero");
 });
 </script>
-<label>Suggested Answer
-	<div class="textarea-container"><textarea class="richtext-answer" name="answer">{ANSWER}</textarea></div>
+<label>
+    Suggested Answer
+    <textarea name="answer" id="richtext-answer">{ANSWER}</textarea>
 </label>
