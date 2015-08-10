@@ -46,9 +46,11 @@ class External_Denbigh2_Class implements External_ClassInterface {
 
                     /* Find out more about each student
                      */
-                    $api = new External_Denbigh2_Api('Students', array(
-                        'Student ID' => $currentStudent->{'Student ID'}
-                    ));
+                    $api = new External_Denbigh2_Api(
+                        'Students',
+                        array('Student ID' => $currentStudent->{'Student ID'}),
+                        array('RFMmax' => 0)
+                    );
 
                     if (!$api->hasErrors()) {
                         $allStudentData = $api->getResult()->data;
@@ -89,9 +91,11 @@ class External_Denbigh2_Class implements External_ClassInterface {
     {
         $ids = array();
 
-        $api = new External_Denbigh2_Api('Classes', array(
-            'Class' => $classCode
-        ));
+        $api = new External_Denbigh2_Api(
+            'Classes',
+            array('Class' => $classCode),
+            array('RFMmax' => 0)
+        );
 
         if (!$api->hasErrors()) {
             $allClasses = $api->getResult()->data;

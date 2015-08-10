@@ -301,7 +301,11 @@ class External_Denbigh2_User implements External_UserInterface
 
         /* Proceed
          */
-        $api = new External_Denbigh2_Api('Students', array($pregName, $pattern, $allNameSources));
+        $api = new External_Denbigh2_Api(
+            'Students',
+            array($pregName, $pattern, $allNameSources),
+            array('RFMmax' => 0)
+        );
 
         if (!$api->hasErrors()) {
             $allStudents = $api->getResult()->data;
@@ -541,9 +545,11 @@ class External_Denbigh2_User implements External_UserInterface
         if (is_array($externalUserId)) {
 
             foreach($externalUserId as $current) {
-                $api = new External_Denbigh2_Api('Family', array(
-                    'Family Code' => $current
-                ));
+                $api = new External_Denbigh2_Api(
+                    'Family',
+                    array('Family Code' => $current),
+                    array('RFMmax' => 0)
+                );
 
                 if (!$api->hasErrors()) {
                     if (count($api->getResult()->data)) {
@@ -618,7 +624,11 @@ class External_Denbigh2_User implements External_UserInterface
     {
         $allParents = array();
 
-        $api = new External_Denbigh2_Api('Students', array());
+        $api = new External_Denbigh2_Api(
+            'Students',
+            array(),
+            array('RFMmax' => 0)
+        );
 
         if (!$api->hasErrors()) {
             $allStudents = $api->getResult()->data;
@@ -944,9 +954,11 @@ class External_Denbigh2_User implements External_UserInterface
 
         // TODO: Made an assumption that the Family Code can get us there
 
-        $api = new External_Denbigh2_Api('Students', array(
-            'Family Code' => $externalUserId
-        ));
+        $api = new External_Denbigh2_Api(
+            'Students',
+            array('Family Code' => $externalUserId),
+            array('RFMmax' => 0)
+        );
 
         if (!$api->hasErrors()) {
             $allStudents = $api->getResult()->data;
