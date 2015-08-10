@@ -1,49 +1,55 @@
-<div class='column'>
-	<p class="information-notification"> A green row indicates a correctly matched answer, the red indicates an incorrectly matched one.</p>
-	<div class="answer-given-container clearfix">
-		<ul class="matchPairs match-left">
-			<!-- BEGIN answerOptionLeft -->
-			<li class="left-columns {CORRECT} clearfix">
-				<strong>{ANSWER_LEFT_VALUE}</strong>
-				<div class="arrow"><span></span></div>
-			</li>
-			<!-- END answerOptionLeft -->
-		</ul>
-
-		<ul class="matchPairs match-right">
-			<!-- BEGIN answerOptionRight -->
-			<li class="right-columns {CORRECT} clearfix">
-				<strong>{ANSWER_RIGHT_VALUE}</strong>
-				<div class="tick-cross"><span></span></div>
-			</li>
-			<!-- END answerOptionRight -->
-		</ul>
-		<!-- BEGIN answerOptionCorrectResponse -->
-
-		<!-- END answerOptionCorrectResponse -->
-	</div>
-</div>
-<!-- BEGIN writable_comment -->
-<div class='column'>
-    <div class="textarea-container">
-        <textarea name="comment" cols="30" rows="2">{REVIEWED_COMMENT}</textarea>
+<!-- BEGIN answerOption -->
+<li class="row content evaluation-answer-option matching-pairs no-pad">
+    <div class="small-6 columns">
+        <p>{ANSWER_LEFT_VALUE}</p>
     </div>
-</div>
-<!-- END writable_comment -->
-<!-- BEGIN readonly_comment -->
-<div class='column'>
-    <div class="textarea-container">
-        <p>{REVIEWED_COMMENT}</p>
+    <div class="small-6 columns sortable">
+        <p>
+            {ANSWER_RIGHT_VALUE}
+            <span class="close no-text {ANSWER_ICON}"></span>
+        </p>
     </div>
-</div>
-<!-- END readonly_comment -->
-<div class='column'>
-	<p class="marks-amount">
-		<!-- BEGIN writable_mark -->
-		<input name="reviewedMarks" type="text" size="4" value="{REVIEWED_MARKS}" class="required number"/> / {QUESTION_MARKS}
-		<!-- END writable_mark -->
-		<!-- BEGIN readonly_mark -->
-		{REVIEWED_MARKS} / {QUESTION_MARKS}
-		<!-- END readonly_mark -->
-	</p>
-</div>
+</li>
+<!-- END answerOption -->
+
+<li class="row content">
+    <p class="grade">
+        <span>{REVIEWED_MARKS} / {QUESTION_MARKS}</span>
+    </p>
+
+    <em>{REVIEWED_COMMENT}</em>
+</li>
+
+<li class="row content">
+    <!-- BEGIN writable_comment -->
+    <div class="small-12 columns no-pad">
+        <h4>Enter your comments</h4>
+        <textarea name="comment">{REVIEWED_COMMENT}</textarea>
+    </div>
+    <!-- END writable_comment -->
+
+    <!-- BEGIN readonly_comment -->
+    <div class="small-12 columns no-pad">
+        <em>{REVIEWED_COMMENT}</em>
+    </div>
+    <!-- END readonly_comment -->
+
+    <!-- BEGIN writable_mark -->
+    <div class="small-6 columns no-pad">
+        <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" class="required number"/>
+    </div>
+    <div class="small-6 columns">
+        <p class="grade">
+            <span> / {QUESTION_MARKS}</span>
+        </p>
+    </div>
+    <!-- END writable_mark -->
+
+    <!-- BEGIN readonly_mark -->
+    <div class="small-12 columns no-pad">
+        <p class="grade">
+            <span>{REVIEWED_MARKS} / {QUESTION_MARKS}</span>
+        </p>
+    </div>
+    <!-- END readonly_mark -->
+</li>

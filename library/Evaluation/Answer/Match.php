@@ -475,12 +475,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
             $right = unserialize($existing['response']);
         }
 
-        /* Define special blocks to handle this special answerOptions scenario,
-           * because we have three columns to parse per iteration.
-           */
-        $page->setBlock('answerFormFragment', 'answerOptionLeft', 'answerOptionLeft_block');
-        $page->setBlock('answerFormFragment', 'answerOptionRight', 'answerOptionRight_block');
-        $page->setBlock('answerFormFragment', 'answerOptionCorrectResponse', 'answerOptionCorrectResponse_block');
+        $page->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
         $answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
 
@@ -504,8 +499,10 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
 
                 if ($right[$i] == $currentAnswer->answerRight) {
                     $correct = $this->getCorrectClass();
+                    $isCorrect = true;
                 } else {
                     $correct = $this->getIncorrectClass();
+                    $isCorrect = false;
                 }
 
                 $page->setVar(
@@ -514,12 +511,11 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                         'ANSWER_RIGHT_VALUE'            => $right[$i],
                         'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
                         'CORRECT'                       => $correct,
+                        'ANSWER_ICON'                   => ($isCorrect ? 'icon-tick' : 'icon-x'),
                     )
                 );
 
-                $page->parse('answerOptionLeft_block', 'answerOptionLeft', true);
-                $page->parse('answerOptionRight_block', 'answerOptionRight', true);
-                $page->parse('answerOptionCorrectResponse_block', 'answerOptionCorrectResponse', true);
+                $page->parse('answerOption_block', 'answerOption', true);
             }
         }
     }
