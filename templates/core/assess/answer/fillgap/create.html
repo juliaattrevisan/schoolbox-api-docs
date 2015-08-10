@@ -1,70 +1,62 @@
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<fieldset>
+    <legend>Answer</legend>
+    <textarea id="answerBox" name="answer">{ANSWER}</textarea>
+</fieldset>
 
+<script type='text/javascript' src="/javascript/evaluation/validation.js"></script>
 <script type="text/javascript">
-	$(function() {
-		$.fn.alaressTiny({
-			mode: 'exact',
-			elements: 'answerBox',
-			theme_advanced_buttons1: "addSpans,removeformat",
-			file_browser_category_id: '{ASSESS_CATEGORY_ID}',
-			removeformat_selector: 'b,strong,em,i,span,ins',
-			width: "100%",
-			disable_toolbars: [2, 3, 4],
-			setup: function(ed) {
-				ed.addButton('addSpans', {
-					title : 'wraps selected text with custom tag',
-					image : '/javascript/tiny_mce/themes/advanced/img/icons.gif',
-					class : 'make-blank',
-					onclick : (function() {
-						var sel = ed.selection.getContent();
-						if (sel !== '') {
-							ed.selection.setContent('<span class="selected-word">' + sel + '</span>');
-						};
-					})
-				});
-			}
-		});
+$(function() {
+    $.fn.alaressTiny({
+        mode: 'exact',
+        elements: 'answerBox',
+        theme_advanced_buttons1: "addSpans,removeformat",
+        file_browser_category_id: '{ASSESS_CATEGORY_ID}',
+        removeformat_selector: 'b,strong,em,i,span,ins',
+        width: "100%",
+        disable_toolbars: [2, 3, 4],
+        setup: function(ed) {
+            ed.addButton('addSpans', {
+                title : 'wraps selected text with custom tag',
+                image : '/javascript/tiny_mce/themes/advanced/img/icons.gif',
+                class : 'make-blank',
+                onclick : (function() {
+                    var sel = ed.selection.getContent();
+                    if (sel !== '') {
+                        ed.selection.setContent('<span class="selected-word">' + sel + '</span>');
+                    }
+                })
+            });
+        }
+    });
 
-		var validator = $("#createQuestionForm").submit(function() {
-			// update underlying textarea before submit validation
-			tinyMCE.triggerSave();
-		}).validate({
-			rules: {
-				question: {
-					required: true,
-					minlength: 2
-				},
-				marks: {
-					required: true,
-					minlength: 1,
-					greaterThanZero:true
-				},
-				answer: {
-					required: true,
-					minlength: 1
-				}
-			},
-
-			messages: {
-				question: "Please enter a question.",
-				answer: "Please fill out an answer."
-			},
-
-			errorPlacement: function(error, element) {
-				offset = element.offset();
-				error.insertAfter(element.parent().children(':last-child'))
-				error.addClass('message');  // add a class to the wrapper
-			}
-
-		});
-
-		jQuery.validator.addMethod("greaterThanZero", function(value, element) {
-			return this.optional(element) || (parseFloat(value) > 0);
-		}, "Amount must be greater than zero");
-	});
+    $("#createQuestionForm").submit(function() {
+        // update underlying textarea before submit validation
+        tinyMCE.triggerSave();
+    }).validate({
+        rules: {
+            question: {
+                required: true,
+                minlength: 2
+            },
+            marks: {
+                required: true,
+                minlength: 1,
+                greaterThanZero:true
+            },
+            answer: {
+                required: true,
+                minlength: 1
+            }
+        },
+        messages: {
+            question: "Please enter a question.",
+            answer: "Please fill out an answer."
+        },
+        errorPlacement: function(error, element) {
+            error.insertAfter(element.parent().children(':last-child'));
+            error.addClass('message');  // add a class to the wrapper
+        }
+    });
+    $.fn.addCustomRules_greaterThanZero();
+});
 </script>
-
-<label>Answer
-	<div class="textarea-container" id="answerBox_parent"><textarea id="answerBox" name="answer" class="tinyValidate2">{ANSWER}</textarea></div>
-</label>
