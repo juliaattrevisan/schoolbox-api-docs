@@ -1,3 +1,4 @@
+<script type='text/javascript' src="/javascript/evaluation/validation.js"></script>
 <script type="text/javascript">
 $(function() {
 	
@@ -9,7 +10,7 @@ $(function() {
 	var validator = $("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
 		 tinyMCE.triggerSave();
-	 }).validate({
+	}).validate({
 		rules: { 
 			question: {
 				required: true,
@@ -33,15 +34,12 @@ $(function() {
 		}
 	
 	});
-	
-	jQuery.validator.addMethod("greaterThanZero", function(value, element) {
-   		return this.optional(element) || (parseFloat(value) > 0);
-	}, "Amount must be greater than zero");
 
+    $.fn.addCustomRules_greaterThanZero({});
 });
 </script>
 
-
-    <label>Suggested Answer
-    <input name="answer" value="{ANSWER}" />
-	</label>
+<label>
+    Suggested Answer
+    <input name="answer" type='text' value="{ANSWER}" />
+</label>
