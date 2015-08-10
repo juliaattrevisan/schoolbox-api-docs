@@ -128,7 +128,7 @@ break;
 
 <html>
 <head>
-<title>Redirecting to <? echo $to ?></title>
+<title>Redirecting to <?php echo $to ?></title>
 
 </head>
 
