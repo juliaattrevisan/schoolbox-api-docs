@@ -342,7 +342,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 		/* Remember where the answers were, so we can compare between the
 		   * student's reponse and the actual answer
 		   */
-		$replace = " <span class='fillgapCorrect'>$1</span> ";
+		$replace = " <span class='fillgap correct'>$1</span> ";
 		$correctResponse = preg_replace($pattern, $replace, $currentAnswer['answer']);
 
 		if ($existing['response']) {
@@ -362,9 +362,9 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 				/* Indicate matching/non-matching responses to answers
 					 */
 				if (strtolower(trim($actualAnswers[$i])) == strtolower(trim($existingAnswer[$i]))) {
-					$replace = " <span class='fillgapCorrect'>$val</span> ";
+					$replace = " <span class='fillgap correct'>$val</span> ";
 				} else {
-					$replace = " <span class='fillgapIncorrect'>$val</span> ";
+					$replace = " <span class='fillgap incorrect'>$val</span> ";
 				}
 
 				$ans = preg_replace($pattern, $replace, $ans, 1, $x);
@@ -384,7 +384,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 				* %%token%% tokens with inputs.
 				*/
 			$pattern = '#<span class="selected-word">([^<]+)</span>#ms';
-			$replace = " <span class='fillgapIncorrect'>&nbsp;</span> ";
+			$replace = " <span class='fillgap incorrect'>&nbsp;</span> ";
 
 			$page->setVar(array(
 				'ANSWER_ID' => $currentAnswer['answer_id'],
@@ -429,7 +429,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 		/* Remember where the answers were, so we can compare between the
 		 * student's reponse and the actual answer
 		 */
-		$replace = " <span class='fillgapCorrect'>$1</span> ";
+		$replace = " <span class='fillgap correct'>$1</span> ";
 		$correctResponse = preg_replace($pattern, $replace, $currentAnswer['answer']);
 
 		$page->setVar(array(
@@ -456,9 +456,9 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 				/* Indicate matching/non-matching responses to answers
 					 */
 				if (strtolower(trim($actualAnswers[$i])) == strtolower(trim($existingAnswer[$i]))) {
-					$replace = " <span class='fillgapCorrect'>$val</span> ";
+					$replace = " <span class='fillgap correct'>$val</span> ";
 				} else {
-					$replace = " <span class='fillgapIncorrect'>$val</span> ";
+					$replace = " <span class='fillgap incorrect'>$val</span> ";
 				}
 
 				$ans = preg_replace($pattern, $replace, $ans, 1, $x);
@@ -478,7 +478,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 			 * %%token%% tokens with inputs.
 			 */
 			$pattern = '#<span class="selected-word">([^<]+)</span>#ms';
-			$replace = " <span class='fillgapIncorrect'>&nbsp;</span> ";
+			$replace = " <span class='submitted-late label'>&nbsp;</span> ";
 
 			$page->setVar(array(
 				'ANSWER' => preg_replace($pattern, $replace, Scrub::text($currentAnswer['answer'])),
