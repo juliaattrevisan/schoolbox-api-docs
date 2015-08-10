@@ -1,26 +1,23 @@
-<ul class="information-list matching-pairs">
-    <!-- BEGIN answerOptionRight -->
-    <li class="row">
-        <div class="small-12 medium-4 columns no-pad {CORRECT}">
-            <p>{ANSWER_LEFT_VALUE}</p>
-        </div>
-        <div class="small-12 medium-4 columns sortable no-pad {CORRECT}">
-            <p>{ANSWER_RIGHT_VALUE}</p>
-        </div>
-        <div class="small-12 medium-4 columns no-pad">
-            <p>{ANSWER_CORRECT_RESPONSE_VALUE}</p>
-        </div>
-    </li>
-    <!-- END answerOptionRight -->
-</ul>
-
-<!-- BEGIN answerOptionCorrectResponse -->
-
-<!-- END answerOptionCorrectResponse -->
-
-<!-- BEGIN answerOptionLeft -->
-
-<!-- END answerOptionLeft -->
+<!-- BEGIN answerOption -->
+<li class="row content evaluation-answer-option matching-pairs no-pad">
+    <div class="small-6 medium-4 columns">
+        <p>{ANSWER_LEFT_VALUE}</p>
+    </div>
+    <div class="small-6 medium-4 columns sortable">
+        <p>
+            {ANSWER_RIGHT_VALUE}
+            <span class="hide-for-medium-up close {ANSWER_ICON}"></span>
+        </p>
+    </div>
+    <!-- correct response is too small to show for small screens -->
+    <div class="hide-for-small medium-4 columns sortable">
+        <p>
+            {ANSWER_CORRECT_RESPONSE_VALUE}
+            <span class="close {ANSWER_ICON}"></span>
+        </p>
+    </div>
+</li>
+<!-- END answerOption -->
 
 <li class="row content">
     <p class="grade">
