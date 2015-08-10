@@ -73,7 +73,7 @@ class Lister extends Renderer
                     $eventEndTime = clone $endTime;
                 }
 
-                for($i=0; $eventStartTime->lte($eventEndTime); $i++)  {
+                for($i=0; $eventStartTime->lt($eventEndTime); $i++)  {
                     $clone      = clone($currentEvent);
                     $clone->setStartTime(clone $eventStartTime);
                     $clone->setEndTime(clone $eventStartTime);
