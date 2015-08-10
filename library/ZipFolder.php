@@ -20,6 +20,10 @@ class ZipFolder
         $this->maxSize = 1073741824; //1GB
 
         $this->groupHandler = new Group;
+        $this->folderMapper = new \Schoolbox\Resource\Folder\Mapper();
+        $this->fileMapper = new \Schoolbox\Resource\File\Mapper();
+
+
 
         $this->folderDetails = $this->getFolderDetails($folder);
 
@@ -35,14 +39,12 @@ class ZipFolder
 
     function getResources($folder)
     {
-        $query = "SELECT f.id, CONCAT_WS('.', f.realname, s.ext) realname, s.filesize FROM `file` f LEFT JOIN `storage` s ON f.hash = s.hash WHERE category = {$folder} AND deleted = 0";
-        return $this->db->getAll($query);
+        return $this->fileMapper->findForFolders(array($folder));
     }
 
     function getFolders($folder)
     {
-        $query = "SELECT id, name FROM category WHERE parent = {$folder}";
-        return $this->db->getAll($query);
+        return $this->folderMapper->findByParent($folder);
     }
 
     function cleanName($name)
@@ -81,34 +83,32 @@ class ZipFolder
         }
     }
 
-    function createDirectory($currentDir, $folderID, $depth = 0)
+    function createDirectory($currentDir, $parentFolder, $depth = 0)
     {
         //populate dir with files
-        $fileList = $this->getResources($folderID);
+        $fileList = $this->getResources($parentFolder->getId());
 
-        if (is_array($fileList)) {
-            foreach ($fileList as $file) {
-                $fileLocation = $this->getFilePath($file['id']);
-                if (is_file($fileLocation)) {
-                    $this->size = $this->size + $file['file_size'];
-                    $fileName = $this->getTargetPath($currentDir, $file);
-                    copy($fileLocation, $fileName);
-                }
+        foreach ($fileList as $file) {
+            if ($file->getStorage()->exists()) {
+                $this->size = $this->size + $file->getSize();
+                $fileName = $this->getTargetPath($currentDir, $file->getBasename());
+                $fp = fopen($fileName, 'wb');
+                stream_copy_to_stream($file->getStorage()->readStream(), $fp);
+                fclose($fp);
             }
         }
 
+
         //dont recurse deeper than max depth or max size
         if ($this->maxDepth > $depth && $this->maxSize > $this->size) {
-//get subfolders and recurse through them
-            $folderList = $this->getFolders($folderID);
-            if (is_array($folderList)) {
-                foreach ($folderList as $folder) {
-                    if ($this->getPermission($folder['id']) > DENY_ACCESS) {
-                        $folderName = $this->cleanName($folder['name']);
-                        $folderLocation = $currentDir . '/' . $folderName;
-                        mkdir($folderLocation);
-                        $this->createDirectory($folderLocation, $folder['id'], $depth+1);
-                    }
+            //get subfolders and recurse through them
+            $folderList = $this->getFolders($parentFolder->getId());
+            foreach ($folderList as $folder) {
+                if ($this->getPermission($folder->getId()) > DENY_ACCESS) {
+                    $folderName = $this->cleanName($folder->getName());
+                    $folderLocation = $currentDir . '/' . $folderName;
+                    mkdir($folderLocation);
+                    $this->createDirectory($folderLocation, $folder, $depth+1);
                 }
             }
         }
@@ -119,7 +119,7 @@ class ZipFolder
         $archive = new ZipArchive();
         $archive->open($this->tmpZip, ZipArchive::CREATE);
         mkdir($this->tmpFolder);
-        $this->createDirectory($this->tmpFolder, $this->folder);
+        $this->createDirectory($this->tmpFolder, $this->folderDetails);
         $dir = new RecursiveDirectoryIterator($this->tmpFolder, FilesystemIterator::SKIP_DOTS);
 
         $i      = 0;
@@ -183,9 +183,7 @@ class ZipFolder
     protected function getFolderDetails($folder_id)
     {
         try {
-            $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-            $category = $categoryMapper->findById($folder_id);
-
+            $category = $this->folderMapper->findById($folder_id);
             return $category;
         } catch (\Exception $e) {
         }
@@ -202,27 +200,17 @@ class ZipFolder
         return $this->groupHandler->getPermission($folder_id);
     }
 
-    /**
-     * Gets the current path of the file on disk
-     *
-     * @param $file_id Id of the file in the database
-     * @return string
-     */
-    protected function getFilePath($file_id)
-    {
-        return Cfg::get('file_dir') . '/' . $file_id . '.dat';
-    }
 
     /**
      * Gets a target path the file should be copied to
      *
      * @param string $currentDir Parent directory the file should be copied to
-     * @param array $file File row from the database
+     * @param string $file Real full filename
      * @return string
      */
     protected function getTargetPath($currentDir, $file)
     {
-        $fileName = $currentDir . '/' . $file['realname'];
+        $fileName = $currentDir . '/' . $file;
         return $this->uniqueFileName($fileName); //ensure filename is unique else puts numbers in filename
     }
 }
