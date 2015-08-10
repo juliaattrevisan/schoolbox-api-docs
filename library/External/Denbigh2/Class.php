@@ -29,9 +29,14 @@ class External_Denbigh2_Class implements External_ClassInterface {
     {
         $students = array();
 
-        $api = new External_Denbigh2_Api('Enrolments', array(
-            'Class' => $classCode
-        ));
+        $api = new External_Denbigh2_Api('Enrolments',
+            array(
+                'Class' => $classCode
+            ),
+            array(
+              'RFMmax' => 0
+            )
+        );
 
         if (!$api->hasErrors()) {
             $allStudents = $api->getResult()->data;

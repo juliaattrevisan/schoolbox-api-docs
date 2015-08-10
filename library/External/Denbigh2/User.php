@@ -159,9 +159,9 @@ class External_Denbigh2_User implements External_UserInterface
 
         /* Gotta get the famiry code out of the Student result set
          */
-        $api = new External_Denbigh2_Api('Students', array(
-            'Student ID' => $externalUserId,
-        ));
+        $api = new External_Denbigh2_Api('Students',
+            array('Student ID' => $externalUserId)
+        );
 
         if (!$api->hasErrors()) {
             $result = $api->getResult()->data[0];
@@ -362,7 +362,7 @@ class External_Denbigh2_User implements External_UserInterface
     {
         $allStudents = array();
 
-        $api = new External_Denbigh2_Api('Students', array());
+        $api = new External_Denbigh2_Api('Students', array(), array('RFMmax' => 0));
 
         if (!$api->hasErrors()) {
             if (count($api->getResult()->data)) {
@@ -674,9 +674,10 @@ class External_Denbigh2_User implements External_UserInterface
     {
         $staff = array();
 
-        $api = new External_Denbigh2_Api('Staff', array(
-            'Staff Code' => $externalUserId
-        ));
+        $api = new External_Denbigh2_Api('Staff',
+            array('Staff Code' => $externalUserId),
+            array('RFMmax' => 0)
+        );
 
         if (!$api->hasErrors()) {
             $currentStaff = $api->getResult()->data[0];
@@ -724,7 +725,7 @@ class External_Denbigh2_User implements External_UserInterface
     {
         $staff = array();
 
-        $api = new External_Denbigh2_Api('Staff', array());
+        $api = new External_Denbigh2_Api('Staff', array(), array('RFMmax' => 0));
 
         if (!$api->hasErrors()) {
             if (count($api->getResult()->data)) {
@@ -780,7 +781,7 @@ class External_Denbigh2_User implements External_UserInterface
     {
         $staff = array();
 
-        $api = new External_Denbigh2_Api('Staff', array());
+        $api = new External_Denbigh2_Api('Staff', array(), array('RFMmax' => 0));
 
         if (!$api->hasErrors()) {
             if (count($api->getResult()->data)) {
@@ -855,9 +856,10 @@ class External_Denbigh2_User implements External_UserInterface
         $class = array();
 
         if ($this->getGroupHandler()->isStudent($userId)) {
-            $api = new External_Denbigh2_Api('Enrolments', array(
-                'Student ID' => $externalUserId
-            ));
+            $api = new External_Denbigh2_Api('Enrolments',
+                array('Student ID' => $externalUserId),
+                array('RFMmax' => 0)
+            );
 
             /* Calling userMapper->findById() for user 689 causes Avondale
              * to time out with Error code: ERR_EMPTY_RESPONSE
@@ -894,12 +896,8 @@ class External_Denbigh2_User implements External_UserInterface
         }
         else if ($this->getGroupHandler()->isStaff($userId)) {
             $api = new External_Denbigh2_Api('Classes',
-                array(
-                    'Teacher Code' => $externalUserId
-                ),
-                array(
-                    'RFMmax' => 0
-                )
+                array('Teacher Code' => $externalUserId),
+                array('RFMmax' => 0)
             );
 
             /* Calling userMapper->findById() for user 689 causes Avondale
