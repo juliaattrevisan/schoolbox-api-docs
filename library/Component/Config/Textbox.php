@@ -38,24 +38,23 @@ class Component_Config_Textbox extends Component_Config_Abstract
         $page->setBlock($keyblock, 'textbox_select', 'textbox_select_block');
         $page->setVar('textbox_select_block', '');
 
-        if (is_array($allTextboxes)) {
-            foreach ($allTextboxes as $currentTextbox) {
-                $page->setVar(
-                    array(
-                    'COMPONENT_CONFIG_BOXSELECT_NAME'       => Scrub::text($currentTextbox->getHeading()),
-                    'COMPONENT_CONFIG_BOXSELECT_VALUE' 	    => $currentTextbox->getId(),
-                    'COMPONENT_CONFIG_BOXSELECT_SELECTED'   => $currentTextbox->getId() == $configValue ? 'selected="selected"' : '',
-                    )
-                );
 
-                $page->parse("textbox_select_block", "textbox_select", true);
-            }
-        } else {
+        $page->setVar(
+            array(
+            'COMPONENT_CONFIG_BOXSELECT_NAME'       => Scrub::text(' (Create New) '),
+            'COMPONENT_CONFIG_BOXSELECT_VALUE'      => '0',
+            'COMPONENT_CONFIG_BOXSELECT_SELECTED'   => '',
+            )
+        );
+
+        $page->parse("textbox_select_block", "textbox_select", true);
+
+        foreach ($allTextboxes as $currentTextbox) {
             $page->setVar(
                 array(
-                'COMPONENT_CONFIG_BOXSELECT_NAME'       => Scrub::text(' (none) '),
-                'COMPONENT_CONFIG_BOXSELECT_VALUE'      => '0',
-                'COMPONENT_CONFIG_BOXSELECT_SELECTED'   => 'disabled="disabled"',
+                'COMPONENT_CONFIG_BOXSELECT_NAME'       => Scrub::text($currentTextbox->getHeading()),
+                'COMPONENT_CONFIG_BOXSELECT_VALUE' 	    => $currentTextbox->getId(),
+                'COMPONENT_CONFIG_BOXSELECT_SELECTED'   => $currentTextbox->getId() == $configValue ? 'selected="selected"' : '',
                 )
             );
 
