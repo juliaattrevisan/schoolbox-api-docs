@@ -1,12 +1,14 @@
 <!-- BEGIN answerOption -->
-<li class="row content evaluation-answer-option matching-pairs no-pad">
+<li class="row content evaluation-answer-option matching-pairs no-pad"
+    data-response-id="{RESPONSE_ID}"
+        >
     <div class="small-6 medium-4 columns">
         <p>{ANSWER_LEFT_VALUE}</p>
     </div>
     <div class="small-6 medium-4 columns sortable">
         <p>
             {ANSWER_RIGHT_VALUE}
-            <span class="hide-for-medium-up close {ANSWER_ICON}"></span>
+            <a href="#" class="hide-for-medium-up close no-text icon-add" data-collapser="true"></a>
         </p>
     </div>
     <!-- correct response is too small to show for small screens -->
@@ -16,13 +18,18 @@
             <span class="close {ANSWER_ICON}"></span>
         </p>
     </div>
-</li>
 
-<li class="hide row content evaluation-answer-option matching-pairs no-pad">
     <!-- copy to show for small screens -->
-    <div class="small-6 small-offset-6 columns sortable">
-        <p>{ANSWER_CORRECT_RESPONSE_VALUE}</p>
+    <div class="hide small-6 small-offset-6 columns sortable"
+         data-collapsable="true"
+         data-collapse-state="collapsed"
+    >
+        <p>
+            {ANSWER_CORRECT_RESPONSE_VALUE}
+            <span class="close no-text {ANSWER_ICON}"></span>
+        </p>
     </div>
+
     <!-- required because there's a last-child style on columns -->
     <div class="hide small-6 columns"></div>
 </li>
@@ -69,3 +76,13 @@
     </div>
     <!-- END readonly_mark -->
 </li>
+
+<script type="text/javascript" src="/javascript/jquery.collapsable.js"></script>
+<script type="text/javascript">
+    $(function() {
+        // Collapse incorrect responses on small screens
+        $('[data-response-id="{RESPONSE_ID}"]').find('[data-collapser="true"]').collapsable({
+            container: '[data-response-id="{RESPONSE_ID}"]'
+        });
+    });
+</script>
