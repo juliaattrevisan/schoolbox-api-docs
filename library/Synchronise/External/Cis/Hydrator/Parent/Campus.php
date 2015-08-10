@@ -22,12 +22,20 @@ class Synchronise_External_Cis_Hydrator_Parent_Campus implements Synchronise_Bas
     protected $campusMap = [];
 
     /**
+     * Order of preference for default campus
+     *
+     * @var array
+     */
+    protected $campusOrder = [];
+
+    /**
      * Constructor - loads the campus mapping for this object.
      *
      * @param array $campusList a list of campus codes that are able to be hydrated
      */
     public function __construct($campusList)
     {
+        $this->campusOrder = $campusList;
         // Load the campus map
         foreach (
             CampusMapper::getInstance()->findByColumn(
@@ -65,8 +73,13 @@ class Synchronise_External_Cis_Hydrator_Parent_Campus implements Synchronise_Bas
         if (empty($campusList)) {
             throw new Exception('Parents without a campus are not imported');
         }
-        $newUser['campus']        = $campusList;
-        $newUser['defaultCampus'] = array_shift($campusList);
+        $newUser['campus'] = $campusList;
+        foreach ($this->campusOrder as $campusCode) {
+            if (in_array($campusCode, $campusList)) {
+                $newUser['defaultCampus'] = $campusCode;
+                break;
+            }
+        }
         return $newUser;
     }
 }
