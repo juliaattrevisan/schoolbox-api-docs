@@ -1,14 +1,49 @@
+<li class="row content">
+    <div class="small-6 medium-4 columns">
+        <span class="meta">Match</span>
+    </div>
+
+    <div class="small-6 medium-4 columns sortable">
+        <span class="meta">Response</span>
+    </div>
+
+    <div class="hide-for-small small-6 medium-4 columns">
+        <span class="meta">Correct Answer</span>
+    </div>
+</li>
+
 <!-- BEGIN answerOption -->
-<li class="row content evaluation-answer-option matching-pairs no-pad">
-    <div class="small-6 columns">
+<li class="row content evaluation-answer-option matching-pairs no-pad" data-response-id="{RESPONSE_ID}" data-evaluation-matching-pairs data-equalizer>
+    <div class="small-6 medium-4 columns" data-equalizer-watch>
         <p>{ANSWER_LEFT_VALUE}</p>
     </div>
-    <div class="small-6 columns sortable">
+    <div class="small-6 medium-4 columns sortable" data-equalizer-watch>
         <p>
             {ANSWER_RIGHT_VALUE}
-            <span class="close no-text {ANSWER_ICON}"></span>
+            <span class="hide-for-medium-up button close no-text {ANSWER_ICON}" data-collapser="true"></span>
         </p>
     </div>
+
+    <!-- correct response is too small to show for small screens -->
+    <div class="hide-for-small medium-4 columns sortable" data-equalizer-watch>
+        <p>
+            {ANSWER_CORRECT_RESPONSE_VALUE}
+            <span class="close {ANSWER_ICON}"></span>
+        </p>
+    </div>
+
+    <!-- copy to show for small screens -->
+    <div class='hide' data-collapsable="true" data-collapse-state="collapsed">
+        <div class="show-for-small-only small-6 small-offset-6 columns">
+            <p>
+                <span class="meta">Correct Answer</span><br />
+                {ANSWER_CORRECT_RESPONSE_VALUE}
+            </p>
+        </div>
+    </div>
+
+    <!-- required because there's a last-child style on columns -->
+    <div class="hide small-6 columns"></div>
 </li>
 <!-- END answerOption -->
 
@@ -53,3 +88,19 @@
     </div>
     <!-- END readonly_mark -->
 </li>
+
+<script type="text/javascript" src="/javascript/jquery.collapsable.js"></script>
+<script type="text/javascript">
+    $(function() {
+        // Collapse incorrect responses on small screens
+        $('[data-response-id="{RESPONSE_ID}"]').find('[data-collapser="true"]').collapsable({
+            container: '[data-response-id="{RESPONSE_ID}"]'
+        });
+
+        $('[data-evaluation-matching-pairs]').parent('ul').foundation({
+            equalizer: {
+                equalize_on_stack: true
+            }
+        });
+    });
+</script>
