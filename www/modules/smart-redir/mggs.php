@@ -90,6 +90,15 @@ switch($to)
         //$formArray['login_attempt_id'] = '1312519491';
     break;
 
+    case "magpies":
+        $form="form";
+        $action="https://www.magpies.net.au/wp-login.php";
+        $method="POST";
+	    $formArray['log'] = 'mggs';
+        $formArray['pwd'] = 'girls';
+        $formArray['redirect_to'] = "https://www.magpies.net.au/the-source/";
+        break;
+
 
     case "ebsco":
         $form="Form1";
@@ -119,7 +128,7 @@ break;
 
 <html>
 <head>
-<title>Redirecting to <? echo $to ?></title>
+<title>Redirecting to <?php echo $to ?></title>
 
 </head>
 
