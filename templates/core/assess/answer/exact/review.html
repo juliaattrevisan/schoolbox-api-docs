@@ -1,31 +1,45 @@
-<strong>Answer given:</strong>
-<div class="{ANSWER_CORRECT}">{ANSWER}<span class="tick-cross"></span></div>
-<strong>The suggested answer:</strong>
+<li class="row content">
+    <h4>Answer Given</h4>
+    {ANSWER}
+</li>
 
 <!-- BEGIN answerOption -->
-	<div class="suggestedAnswer">{CORRECT_ANSWER}</div>
+<li class="row content highlight">
+    <h4>Suggested Answer</h4>
+    {CORRECT_ANSWER}
+</li>
 <!-- END answerOption -->
 
-<!-- BEGIN writable_comment -->
-<label><strong>Enter your comments:</strong>
-    <div class="textarea-container">
+<li class="row content">
+    <!-- BEGIN writable_comment -->
+    <div class="small-12 columns no-pad">
+        <h4>Enter your comments</h4>
         <textarea name="comment">{REVIEWED_COMMENT}</textarea>
     </div>
-</label>
-<!-- END writable_comment -->
-<!-- BEGIN readonly_comment -->
-<label><strong>Comments:</strong>
-    <div class="textarea-container">
-        <p>{REVIEWED_COMMENT}</p>
-    </div>
-</label>
-<!-- END readonly_comment -->
+    <!-- END writable_comment -->
 
-<p class="marks-amount">
+    <!-- BEGIN readonly_comment -->
+    <div class="small-12 columns no-pad">
+        <em>{REVIEWED_COMMENT}</em>
+    </div>
+    <!-- END readonly_comment -->
+
     <!-- BEGIN writable_mark -->
-    <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" class="required number"/> / {QUESTION_MARKS}
+    <div class="small-6 columns no-pad">
+        <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" class="required number"/>
+    </div>
+    <div class="small-6 columns">
+        <p class="grade">
+            <span> / {QUESTION_MARKS}</span>
+        </p>
+    </div>
     <!-- END writable_mark -->
+
     <!-- BEGIN readonly_mark -->
-    {REVIEWED_MARKS} / {QUESTION_MARKS}
+    <div class="small-12 columns no-pad">
+        <p class="grade">
+            <span>{REVIEWED_MARKS} / {QUESTION_MARKS}</span>
+        </p>
+    </div>
     <!-- END readonly_mark -->
-</p>
+</li>
