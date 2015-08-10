@@ -34,13 +34,18 @@ if (is_numeric($_GET['id'])) {
         $file = $fileMapper->findForFolders([ $_GET['id'] ], $config)->first();
 
     } else {
-        $file = $fileMapper->findById($_GET['id']);
+        try {
+            $file = $fileMapper->findById($_GET['id']);
 
-        if ($groupHandler->getPermission($file->getFolder()->getId()) < READ_ACCESS) {
-            error(5);
+            if ($groupHandler->getPermission($file->getFolder()->getId()) < READ_ACCESS) {
+                error(5);
+            }
+
+            LogMapper::getInstance()->logRead($file, $_SESSION['user']);
         }
-
-        LogMapper::getInstance()->logRead($file, $_SESSION['user']);
+        catch ( Schoolbox\Mapper\Exception\Deleted $e)  {
+            error(41);
+        }
     }
 
     if ($_GET['save'])
