@@ -64,3 +64,12 @@
         color: $alert-color;
     }
 }
+
+/* Target input fields
+ */
+.fillgap-content {
+    input {
+        width: auto;
+        display: inline;
+    }
+}
