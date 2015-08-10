@@ -1,6 +1,5 @@
 <!-- This is the 'Pantry', a place where developers come to pick their 'Ingredients' -->
 
-<div class="scroll-container" role="main">
     <div class="row">
         <div class="small-12 columns">
             <h1>Files List</h1>
@@ -420,8 +419,7 @@ $(function () {
         </div>
     </div>
     <div class="row">
-        <div class="large-6 island">
-            <section>
+        <div class="small-12 large-6 island">
                 <table>
                     <thead>
                     <tr>
@@ -452,10 +450,8 @@ $(function () {
                     </tr>
                     </tbody>
                 </table>
-            </section>
         </div>
-        <div class="large-6 island">
-            <section>
+        <div class="small-12 large-6 island">
                 <table>
                     <thead>
                     <tr>
@@ -486,7 +482,6 @@ $(function () {
                     </tr>
                     </tbody>
                 </table>
-            </section>
         </div>
     </div>
 
@@ -1239,31 +1234,30 @@ $(function () {
     </div>
     <hr>
 
+<div class="row">
+<div class="small-12 island">
     <h1>Avatar Card</h1>
-    <div>
+    <section>
         <div class="avatar-card">
             <a href="#" title="View Profile">
                 <img src="https://placekitten.com/g/64/64" alt="Moggy">
                 <p>Karl Pilkington</p>
             </a>
             <p class="meta">Friday April 12th 2015 11:11am</p>
-            <p class="meta">Edited five days ago</p>
+            <p class="meta hide-for-small-only">Edited five days ago</p>
         </div>
-    </div>
-    <hr>
-    <h1 id="buttons">Buttons</h1>
-    <!--<a href="#" class="tiny button">.tiny.button</a>-->
-    <!--<a href="#" class="small button">.small.button</a>-->
-    <!--<a href="#" class="tiny button secondary">.tiny.secondary</a><br>-->
-    <!--<a href="#" class="small button success radius">.small.success.radius</a><br>-->
-    <!--<a href="#" class="button alert round disabled">.round.disabled</a><br>-->
-    <a href="#" class="button">Regular button</a>
-    <a href="#" class="button secondary">Special Button (.secondary)</a>
-    <a href="#" class="button disabled">Disabled</a><br>
-    <a href="#" class="button expand">Expand Full</a>
+    </section>
+</div>
+</div>
     <hr>
 
+<div class="row">
+<div class="small-12 island">
+
     <h1 id="labels">Labels</h1>
+
+    <section class="content">
+
     <p>
         <span class="submitted label">Submitted</span>
         <span class="submitted-late label">Submitted Late</span>
@@ -1281,9 +1275,15 @@ $(function () {
         <span class="neutral label">Neutral Label</span>
     </p>
 
-    <hr>
+    </section>
+</div>
+</div>
 
+    <hr>
+<div class="row">
+    <div class="small-12 island">
     <h1 id="gradients">Grade-ients</h1>
+    <section class="content">
     <ul>
         <li><span class="gradient-10">.gradient-10</span></li>
         <li><span class="gradient-9">.gradient-9</span></li>
@@ -1297,16 +1297,19 @@ $(function () {
         <li><span class="gradient-1">.gradient-1</span></li>
         <li><span class="gradient-0">.gradient-0</span></li>
     </ul>
+    </section>
+    </div>
+</div>
 
     <hr/>
-    <h1>Icons</h1>
     <div class="row">
       <div class="small-12 island">
-        <h2 class="subheader">Actions</h2>
+          <h1>Icons</h1>
       </div>
     </div>
     <div class="row">
       <div class="small-12 island">
+          <h2 class="subheader">Actions</h2>
         <section>
           <div class="content">
             <a href="#" class="button icon-add">Add (icon-add)</a>
@@ -1518,8 +1521,11 @@ $(function () {
     </div>
     <hr>
 
+<div class="row">
+    <div class="small-12 island">
     <h1>Icons</h1>
-    <h2>Standalone</h2>
+    <h2 class="subheader">Standalone</h2>
+    <section class="content">
     <ul class="inline-list">
         <li>
             <a href="#" title="Download">
@@ -1552,7 +1558,10 @@ $(function () {
             </a>
         </li>
     </ul>
-    <h2>Progress report</h2>
+    </section>
+
+    <h2 class="subheader">Progress report</h2>
+    <section class="content">
     <ul class="inline-list" id="progress-icon" style="padding:1rem 0;">
         <li>
             <a href="#" class="progress-tick no-text"></a>
@@ -1564,6 +1573,9 @@ $(function () {
             <a href="#" class="progress-tick complete no-text"></a>
         </li>
     </ul>
+    </section>
+    </div>
+</div>
     <hr>
 
     <div class="row">
@@ -1594,55 +1606,79 @@ $(function () {
     </div>
     <hr/>
 
+<div class="row">
+<div class="small-12 island">
     <h1>Preloader .gif</h1>
     <div class="loader"></div>
+</div>
+</div>
     <hr>
+<div class="row">
+    <div class="small-12 island">
+        <h1 id="breadcrumbs">Breadcrumbs</h1>
+        <ul class="breadcrumb">
+            <li><a href="#">Home</a></li>
+            <li class="active"><a href="#">Features</a></li>
+            <li class="unavailable"><a href="#">Gene Splicing</a></li>
+            <li><a href="#">Cloning</a></li>
+        </ul>
+    </div>
+</div>
 
-    <h1 id="button-groups">Button Groups</h1>
+<hr>
+
+<div class="row">
+<div class="small-12 island">
+    <h1 id="buttons">Buttons</h1>
+
+    <h2 class="subheader">Vanilla</h2>
+    <section class="content">
+        <a href="#" class="button">Regular button</a>
+        <a href="#" class="button secondary">Special Button (.secondary)</a>
+        <a href="#" class="button disabled">Disabled</a>
+    </section>
+    <a href="#" class="button expand">Expand Full</a>
+
+
+    <h2 class="subheader">Button Groups</h2>
+    <section class="content">
     <ul class="button-group">
         <li><a href="#" class="button secondary">Button 1</a></li>
         <li><a href="#" class="button secondary">Button 2</a></li>
         <li><a href="#" class="button secondary">Button 3</a></li>
         <li><a href="#" class="button secondary">Button 4</a></li>
     </ul>
-    <ul class="button-group even-3">
+    <ul class="button-group even-2">
         <li><a href="#" class="button primary">Button 1</a></li>
         <li><a href="#" class="button primary">Button 2</a></li>
-        <li><a href="#" class="button primary">Button 3</a></li>
     </ul>
-    <hr>
-
-    <h1 id="breadcrumbs">Breadcrumbs</h1>
-    <!--<ul class="breadcrumbs">-->
-        <!--<li><a href="#">Home</a></li>-->
-        <!--<li><a href="#">Features</a></li>-->
-        <!--<li class="unavailable"><a href="#">Gene Splicing</a></li>-->
-        <!--<li class="current"><a href="#">Cloning</a></li>-->
-    <!--</ul>-->
-    <ul class="breadcrumb">
-        <li><a href="#">Home</a></li>
-        <li class="active"><a href="#">Features</a></li>
-        <li class="unavailable"><a href="#">Gene Splicing</a></li>
-        <li><a href="#">Cloning</a></li>
+    </section>
+    <ul class="button-group even-3 stack-for-small">
+        <li><a href="#" class="button icon-previous">Back</a></li>
+        <li><a href="#" class="button icon-next">Next</a></li>
+        <li><a href="#" class="button secondary">Finish</a></li>
     </ul>
+</div>
 
-    <hr>
-
-    <h1 id="dropdown-buttons">Dropdown Buttons</h1>
+<div class="small-12 island">
+    <h2 class="subheader" id="dropdown-buttons">Dropdown Buttons</h2>
+<section class="content">
     <ul id="drop" class="f-dropdown" data-dropdown-content>
         <li><a href="#">This is a link</a></li>
         <li><a href="#">This is another</a></li>
         <li><a href="#">Yet another</a></li>
     </ul>
     <a href="#" data-dropdown="drop" class="button primary dropdown">Dropdown Button</a>
-
-    <hr>
-
-    <h1 id="split-buttons">Split Buttons</h1>
+</section>
+</div>
+<div class="small-12 island">
+    <h2 class="subheader" id="split-buttons">Split Buttons</h2>
+<section class="content">
     <a href="#" class="button split">Split Button <span data-dropdown="drop"></span></a>
-    <hr>
+</section>
 
-    <h1 id="dropdowns">Dropdowns</h1>
+    <h2 class="subheader" id="dropdowns">Dropdowns</h2>
+<section class="content">
     <a class="button" data-dropdown="tinyDrop" href="#">Link Dropdown &raquo;</a>
     <a class="button" data-dropdown="contentDrop12345" href="#">Content Dropdown &raquo;</a>
     <!-- Dropdowns -->
@@ -1653,16 +1689,23 @@ $(function () {
 
         <li><a href="#">Yet another</a></li>
     </ul>
-
-    <hr>
     <div class="f-dropdown content content-drop medium" data-dropdown-content="" id="contentDrop12345">
         <h1>Title</h1>
         <p>Some text that people will think is awesome! Some text that people will
-           think is awesome! Some text that people will think is awesome!</p><img src="http://foundation.zurb.com/docs/assets/img/examples/launch.jpg" alt="">
+            think is awesome! Some text that people will think is awesome!</p><img src="http://foundation.zurb.com/docs/assets/img/examples/launch.jpg" alt="">
         <p>Launching a Discovery Mission</p><a class="button" href="#">Button</a>
     </div>
+</section>
+</div>
+</div>
 
+    <hr>
+<div class="row">
+<div class="small-12 island">
     <h1 id="pagination">Pagination</h1>
+    <section class="content">
+        <p>Here's a <code>&lt;section&gt;</code> you could paginate.</p>
+    </section>
     <ul class="pagination">
         <li class="arrow unavailable"><a href="">&lsaquo;</a></li>
         <li class="active"><a href="">1</a></li>
@@ -1674,9 +1717,14 @@ $(function () {
         <li><a href="">13</a></li>
         <li class="arrow"><a href="">&rsaquo;</a></li>
     </ul>
+</div>
+</div>
     <hr>
 
+<div class="row">
+<div class="small-12 island">
     <h1 id="inline-lists">Inline Lists</h1>
+    <section class="content">
     <ul class="inline-list">
         <li><a href="#">Link 1</a></li>
         <li><a href="#">Link 2</a></li>
@@ -1684,17 +1732,23 @@ $(function () {
         <li><a href="#">Link 4</a></li>
         <li><a href="#">Link 5</a></li>
     </ul>
+    </section>
+</div>
+</div>
     <hr>
-
+<div class="row">
+<div class="small-12 island">
     <h1 id="switches">Switches</h1>
+    <h2 class="subheader">Checkbox</h2>
+
+<section class="content">
     <div class="switch">
-        <p>Checkbox</p>
         <input id="exampleCheckboxSwitch" type="checkbox">
         <label for="exampleCheckboxSwitch"></label>
     </div>
-    
-    <div>
-        <h3>Checkbox Switch with Text</h3>
+</section>
+    <h2 class="subheader">Checkbox Switch with Text</h2>
+    <section class="content">
         <input id="textCheckboxToggle" type="checkbox">
         <label for="textCheckboxToggle" class="checkbox-toggle">V</label>
         <input id="textCheckboxToggle2" type="checkbox">
@@ -1713,9 +1767,15 @@ $(function () {
         <label for="textCheckboxToggle8" class="checkbox-toggle">V</label>
         <input id="textCheckboxToggle9" type="checkbox">
         <label for="textCheckboxToggle9" class="checkbox-toggle">E</label>
-    </div>
+    </section>
+</div>
+</div>
 
     <hr>
+
+<div class="row">
+<div class="small-12 island">
+
     <h1 id="alert-boxes">Alert Boxes</h1>
     <div data-alert class="alert-box">
         This is a standard alert (div.alert-box).
@@ -1741,59 +1801,67 @@ $(function () {
         This is a danger alert (div.alert-box.alert.round).
         <a href="" class="close">&times;</a>
     </div>
+</div>
+</div>
 
     <hr>
-    <h1 id="forms">Forms</h1>
-    <form data-abide>
-        <div class="row">
-            <fieldset>
-                <legend>Legend</legend>
-                <label>Input Label
-                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
-                    <input type="text" placeholder="large-12.columns" />
-                </label>
-                <div class="row">
-                    <label>Input Label</label>
-                    <div class="small-9 columns">
-                        <input type="text" placeholder="small-9.columns" />
+<form class="top" data-abide>
+    <div class="row">
+        <div class="small-12 island">
+            <h1 id="forms">Forms</h1>
+            <section>
+                <fieldset>
+                    <legend>Legend</legend>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label>Input Label
+                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
+                                <input type="text" placeholder="large-12.columns" />
+                            </label>
+                        </div>
                     </div>
-                    <div class="small-3 columns">
-                        <span class="postfix">.com</span>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label>Input Label</label>
+                        </div>
+                        <div class="small-9 columns">
+                            <input type="text" placeholder="small-9.columns" />
+                        </div>
+                        <div class="small-3 columns">
+                            <span class="postfix">.com</span>
+                        </div>
                     </div>
-                </div>
-                <label>Select Box
-                    <select>
-                        <option value="husker">Husker</option>
-                        <option value="starbuck">Starbuck</option>
-                        <option value="hotdog">Hot Dog</option>
-                        <option value="apollo">Apollo</option>
-                    </select>
-                </label>
-                <label>Textarea Label
-                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
-                    <textarea placeholder="small-12.columns"></textarea>
-                </label>
-            </fieldset>
-        </div>
-        <div class="row">
-            <fieldset>
-                <legend>Fancy</legend>
-                <div class="large-6 columns">
-                    <label>Choose Your Favorite</label>
-                    <input type="radio" name="pokemon" value="Red" id="pokemonRed" checked><label class="radio-label" for="pokemonRed">Red</label>
-                    <input type="radio" name="pokemon" value="Blue" id="pokemonBlue"><label class="radio-label" for="pokemonBlue">Blue</label>
-                </div>
-                <div class="large-6 columns">
-                    <label>Check these out</label>
-                    <input id="checkbox1" type="checkbox"><label for="checkbox1" class="checkbox-label">Checkbox 1</label>
-                    <input id="checkbox2" type="checkbox"><label for="checkbox2" class="checkbox-label">Checkbox 2</label>
-                </div>
-                <div class="column small-12">
-                    <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-                    <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-                    <script type="text/javascript">
-                        $(function() {
-                            $('[data-selectizeuser]')
+                    <label>Select Box
+                        <select>
+                            <option value="husker">Husker</option>
+                            <option value="starbuck">Starbuck</option>
+                            <option value="hotdog">Hot Dog</option>
+                            <option value="apollo">Apollo</option>
+                        </select>
+                    </label>
+                    <label>Textarea Label
+                        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
+                        <textarea placeholder="small-12.columns"></textarea>
+                    </label>
+                </fieldset>
+                <fieldset>
+                    <legend>Fancy</legend>
+                    <div class="large-6 columns">
+                        <label>Choose Your Favorite</label>
+                        <input type="radio" name="pokemon" value="Red" id="pokemonRed" checked><label class="radio-label" for="pokemonRed">Red</label>
+                        <input type="radio" name="pokemon" value="Blue" id="pokemonBlue"><label class="radio-label" for="pokemonBlue">Blue</label>
+                    </div>
+                    <div class="large-6 columns">
+                        <label>Check these out</label>
+                        <input id="checkbox1" type="checkbox"><label for="checkbox1" class="checkbox-label">Checkbox 1</label>
+                        <input id="checkbox2" type="checkbox"><label for="checkbox2" class="checkbox-label">Checkbox 2</label>
+                    </div>
+                    <div class="column small-12">
+                        <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+                        <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+                        <script type="text/javascript">
+                            $(function() {
+                                $('[data-selectizeuser]')
                                     .selectizeSelector({
                                         ajax: {
                                             url:      '/ajax/user.php',
@@ -1802,72 +1870,116 @@ $(function () {
                                             dataType: 'json'
                                         }
                                     })
-                            ;
-                        });
-                    </script>
-                    <label>AutoSuggest / Selectize</label>
-                    <input id='userId' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
-                </div>
-            </fieldset>
+                                ;
+                            });
+                        </script>
+                        <label>AutoSuggest / Selectize</label>
+                        <input id='userId' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>Dates and Times</legend>
+                    <div class="column small-12">
+                        <p>
+                            When invoking <code>$.timepicker()</code>, use the <code>appendTo</code> option to attach to the parent of the <code>label</code>.
+                            That way, the picker dropdown can adopt a width to match the input, which will be 100% of its container&mdash;ignore the "too wide" issue for now.
+                        </p>
+                    </div>
+                    <div class="column small-4">
+                        <label>Date:
+                            <input type="text" class="datepicker">
+                        </label>
+                    </div>
+                    <div class="column small-4">
+                        <label>Select start:
+                            <input class="timepicker" type="text" autocomplete="off" />
+                        </label>
+                    </div>
+                    <div class="column small-4">
+                        <label>Select end:
+                            <input class="timepicker" type="text" autocomplete="off" />
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
 
+            <input type="submit" name='submit' value="Send" />
         </div>
-        <div class="row">
-            <fieldset>
-                <legend>Dates and Times</legend>
-                <div class="column small-12">
-                    <p>
-                        When invoking <code>$.timepicker()</code>, use the <code>appendTo</code> option to attach to the parent of the <code>label</code>.
-                        That way, the picker dropdown can adopt a width to match the input, which will be 100% of its container&mdash;ignore the "too wide" issue for now.
-                    </p>
-                </div>
-                <div class="column small-4">
-                    <label>Date:
-                        <input type="text" class="datepicker">
-                    </label>
-                </div>
-                <div class="column small-4">
-                    <label>Select start:
-                        <input class="timepicker" type="text" autocomplete="off" />
-                    </label>
-                </div>
-                <div class="column small-4">
-                    <label>Select end:
-                        <input class="timepicker" type="text" autocomplete="off" />
-                    </label>
-                </div>
-            </fieldset>
+    </div>
+</form>
+    <hr>
+<div class="row">
+    <div class="small-12 island">
+        <h1>Dropzone</h1>
+        <div class="content">
+            <form class="dropzone" id="myAwesomeDropzone" action="/cms/myFileForm.php?ajax=1"></form>
         </div>
-        <input type="submit" name='submit' value="Send" />
-    </form>
+    </div>
+</div>
     <hr>
 
-    <h1>Dropzone</h1>
-    <form class="dropzone" id="myAwesomeDropzone" action="/cms/myFileForm.php?ajax=1"></form>
-    <hr>
-
+<div class="row">
+<div class="small-12 island">
     <h1>WYSIWYG / Article</h1>
+    <ul class="meta">
+        <li class="icon-settings">Use the <code>&lt;article /&gt;</code> tag force WYSIWYG styles</li>
+    </ul>
+    <section class="content">
     <article>
+        <h1>The main title of this WYSIWYG content</h1>
+        <p>
+            <img style="float:right;margin-left:8px;" src="https://placeimg.com/80/80/animals" alt="Enimerlz!">
+            Here's some paragraph text for you. Dreamcatcher artisan kale chips, Marfa 3 wolf moon biodiesel skateboard Tumblr
+            8-bit master cleanse American Apparel kitsch fashion axe. Tousled tattooed fashion axe occupy cray fap, you probably
+            haven't heard of them pickled put a bird on it meh slow-carb lo-fi Vice. Food truck next level mustache, heirloom
+            mumblecore mixtape High Life locavore messenger bag.
+        </p>
+        <h2>Boarding Leave Rules</h2>
         <ul>
-            <li>An email will automatically be sent to the email address your parents/guardian have supplied the school. Your parents/guardian then need to contact your Housemaster (e.g. phone/fax/email) to confirm they are aware of your leave request and approve of it.</li>
-            <li>If you are staying at a host other than family, then the host parent/guardian will need to contact your Housemaster (e.g. phone/fax/email) to confirm they are aware of your leave request and approve of it.  You can forward your email copy of your leave request to them.</li>
-            <li>You and your parents/guardian will receive notification by email of the status of your leave - approved, modified or rejected.</li>
-            <li>Confirmation from your parents/guardian and/or hosts must be received by your Housemaster by 8:00pm on the Thursday prior to your leave request.</li>
+            <li>
+                An email will automatically be sent to the email address your parents/guardian have supplied the school. Your
+                parents/guardian then need to contact your Housemaster (e.g. phone/fax/email) to confirm they are aware of your
+                leave request and approve of it.
+            </li>
+            <li>
+                If you are staying at a host other than family, then the host parent/guardian will need to contact your Housemaster
+                (e.g. phone/fax/email) to confirm they are aware of your leave request and approve of it.  You can forward your
+                email copy of your leave request to them.
+            </li>
+            <li>
+                You and your parents/guardian will receive notification by email of the status of your leave - approved, modified
+                or rejected.
+            </li>
+            <li>
+                Confirmation from your parents/guardian and/or hosts must be received by your Housemaster by 8:00pm on the Thursday
+                prior to your leave request.
+            </li>
             <li>You should advise your Housemaster as soon as possible if your leave arrangements change.</li>
             <li>This application is a request for leave and the School reserves the right to approve/deny leave.</li>
         </ul>
     </article>
+    </section>
+</div>
+</div>
     <hr>
+<div class="row">
+    <div class="small-12 island">
     <h1 id="block-grid">Block Grid</h1>
+    <section class="content">
     <ul class="small-block-grid-2 large-block-grid-4">
         <li><img class="th" src="https://placeimg.com/300/300/animals" alt=""></li>
         <li><img class="th" src="https://placeimg.com/300/300/animals" alt=""></li>
         <li><img class="th" src="https://placeimg.com/300/300/animals" alt=""></li>
         <li><img class="th" src="https://placeimg.com/300/300/animals" alt=""></li>
     </ul>
+    </section>
+    </div>
+</div>
     <hr>
-
+<div class="row">
+    <div class="small-12 island">
     <h1 id="clearing">Clearing</h1>
-    <div>
+    <section class="content">
         <ul class="clearing-thumbs" data-clearing>
             <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/comet.jpg"><img data-caption="Nulla vitae elit libero, a pharetra augue. Cras mattis consectetur purus sit amet fermentum." src="http://foundation.zurb.com/docs/assets/img/examples/comet-th-sm.jpg" alt=""></a></li>
             <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/earth.jpg"><img src="http://foundation.zurb.com/docs/assets/img/examples/earth-th-sm.jpg" alt=""></a></li>
@@ -1875,13 +1987,19 @@ $(function () {
             <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/satelite.jpg"><img src="http://foundation.zurb.com/docs/assets/img/examples/satelite-th-sm.jpg" alt=""></a></li>
             <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/space.jpg"><img data-caption="Integer posuere erat a ante venenatis dapibus posuere velit aliquet." src="http://foundation.zurb.com/docs/assets/img/examples/space-th-sm.jpg" alt=""></a></li>
         </ul>
+    </section>
     </div>
+</div>
     <hr>
+<div class="row">
+    <div class="small-12 island">
 
     <h1 id="flex-video">Flex Video</h1>
     <div class="flex-video">
         <iframe width="560" height="315" src="https://www.youtube.com/embed/mqy98hcMV9w?list=PL07CD71F1ABDD9785" frameborder="0" allowfullscreen></iframe>
     </div>
+    </div>
+</div>
 
     <hr>
     <!-- <h1 id="joyride">Joyride</h1> -->
@@ -1932,7 +2050,11 @@ $(function () {
     <p>To make something pretty, press and hold <kbd>cmd + alt + shift + w + a + !</kbd></p>
     <hr> -->
 
+<div class="row">
+    <div class="small-12 island">
     <h1 id="magellan">Magellan (Sticky Nav)</h1>
+    </div>
+</div>
     <div class="magellan-container" data-magellan-expedition="fixed">
         <ul class="sub-nav inline-list">
             <li data-magellan-arrival="build"><a href="#build">Build with HTML</a></li>
@@ -1940,29 +2062,35 @@ $(function () {
         </ul>
     </div>
 
+<div class="row">
+    <div class="small-12 island">
+        <div class="content">
+
     <a name="build"></a>
     <h5 data-magellan-destination="build">Build With Predefined HTML Structure</h5>
 
     <a name="js"></a>
     <h5 data-magellan-destination="js">Awesome JS Goodness</h5>
 
+        </div>
+    </div>
+</div>
     <hr>
+<div class="row">
+    <div class="small-12 island">
     <h1 id="image-slider">Image Slider</h1>
         <!-- Custom javascript -->
         <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
         <script type="text/javascript">
             $(function(){
-              $('[data-imageslider]').anyslider({
+              $('[data-imageslider]').AnySlider({
                     interval: 2000,
                     prevLabel: '',
                     nextLabel: ''
                 });
             });
         </script>
-        <div class="row">
-            <div class="small-12 island imageslider-container">
-              <section>
-                <div class="content">
+            <div class="imageslider-container">
                   <div data-imageslider class="imageslider">
                       <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
                       <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
@@ -1970,39 +2098,42 @@ $(function () {
                       <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
                       <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
                   </div>
-                </div>
-              </section>
-            </div>
-        </div>
+    </div>
+</div>
+</div>
 
     <hr>
+<div class="row">
+<div class="small-12 island">
     <h1 id="panels">Panels</h1>
+</div>
+</div>
     <div class="row">
-        <div class="large-6 columns">
+        <div class="small-6 columns">
             <div class="panel">
                 <h5>This is a regular panel.</h5>
                 <p>It has an easy to override visual style, and is appropriately subdued.</p>
             </div>
         </div>
-        <div class="large-6 columns">
+        <div class="small-6 columns">
             <div class="panel callout radius">
                 <h5>This is a callout panel.</h5>
                 <p>It&#39;s a little ostentatious, but useful for important content.</p>
             </div>
         </div>
-        <div class="large-6 columns">
+        <div class="small-6 columns">
             <div class="highlight-panel">
                 <h5>This is a callout panel.</h5>
                 <p>It&#39;s a little ostentatious, but useful for important content.</p>
             </div>
         </div>
-        <div class="large-6 columns">
+        <div class="small-6 columns">
             <div class="alert-panel">
                 <h5>This is a callout panel.</h5>
                 <p>It&#39;s a little ostentatious, but useful for important content.</p>
             </div>
         </div>
-        <div class="large-6 columns">
+        <div class="small-6 columns">
             <div class="transparent-panel">
                 <h5>This is a transparent panel.</h5>
                 <p>It&#39;s a little ostentatious, but useful for important content.</p>
@@ -2226,13 +2357,27 @@ $(function () {
     </table>
 
     <hr>
+<div class="row">
+<div class="small-12 island">
     <h1 id="thumbnails">Thumbnails</h1>
+    <section class="content">
     <p><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/earth-th-sm.jpg" alt=""><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/space-th-sm.jpg" alt=""></p>
+    </section>
+</div>
+</div>
     <hr>
+<div class="row">
+<div class="small-12 island">
     <h1 id="tooltips">Tooltips</h1>
+    <section class="content">
     <p>The tooltips can be positioned on the <span data-tooltip class="has-tip" data-width="400" title="I'm on bottom and the default position.">&quot;tip-bottom&quot;</span>, which is the default position, <span data-tooltip class="has-tip tip-top noradius" data-width="210" title="I'm on the top and I'm not rounded!">&quot;tip-top&quot; (hehe)</span>, <span data-tooltip="left" class="has-tip tip-left" data-width="90" title="I'm on the left!">&quot;tip-left&quot;</span>, or <span data-tooltip="right" class="has-tip tip-right" data-width="520" title="I'm on the right!">&quot;tip-right&quot;</span> of the target element by adding the appropriate class to them. You can even add your own custom class to style each tip differently. On a small device, the tooltips are full width and bottom aligned.</p>
+    </section>
+</div>
+</div>
 
     <hr>
+<div class="row">
+<div class="small-12 island">
     <h1 id="top-bar">Top Bar</h1>
     <nav class="top-bar" data-topbar>
         <ul class="title-area">
@@ -2292,13 +2437,17 @@ $(function () {
         </section>
     </nav>
     <!-- End Top Bar -->
+</div>
+</div>
     <hr>
 
+<div class="row">
+<div class="small-12 island">
     <h1>Heading with Actions</h1>
     <span class="header-actions">
-        <a href='#' class='button icon-folder'>Primary Action</a>
-        <a href='#' class='button icon-previous'>Return to Homepage</a>
-        <a href="#" class="button icon-more" data-dropdown="header-options">Options</a>
+        <a href='#' class='button icon-folder' data-tooltip title="Primary Action"></a>
+        <a href='#' class='button icon-previous' data-tooltip title="Return to Homepage"></a>
+        <a href="#" class="button icon-more" data-dropdown="header-options"></a>
     </span>
     <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
         <li class="separator">Quiz</li>
@@ -2311,32 +2460,51 @@ $(function () {
         <li><a href="#" class="icon-modify">Modify</a></li>
         <li><a href="#" class="icon-delete">Delete</a></li>
     </ul>
+</div>
+</div>
 
     <hr>
 
-    <h1 id="type">Typopgraphy</h1>
+<div class="row">
+<div class="small-12 island">
+    <h1 id="type">Typography</h1>
     <h1>h1. This is a very large header.</h1>
+    <section class="content">
     <h2>h2. This is a large header.</h2>
     <h3>h3. This is a medium header.</h3>
     <h4>h4. This is a moderate header.</h4>
     <h5>h5. This is a small header.</h5>
     <h6>h6. This is a tiny header.</h6>
+    </section>
 
     <h1 class="subheader">h1.subheader</h1>
     <h2 class="subheader">h2.subheader</h2>
+    <section class="content">
     <h3 class="subheader">h3.subheader</h3>
     <h4 class="subheader">h4.subheader</h4>
     <h5 class="subheader">h5.subheader</h5>
     <h6 class="subheader">h6.subheader</h6>
+    </section>
+</div>
+</div>
 
     <hr>
 
+<div class="row">
+<div class="small-12 island">
     <h1 id="blockquote">Blockquote</h1>
+    <section class="content">
     <blockquote>Just because everything else is square, doesn't mean the switch can't be round.<cite>Matthew Sambell</cite></blockquote>
+    </section>
+</div>
+</div>
 
     <hr>
+<div class="row">
+    <div class="small-12 island">
     <h1 id="visibility-classes">Visibility Classes</h1>
-    <h5 id="screen-size-visibility-control-show-">Screen Size Visibility Control (Show)</h5>
+    <h2 class="subheader" id="screen-size-visibility-control-show-">Screen Size Visibility Control (Show)</h2>
+    <section class="content">
     <p>The following text should describe the screen size you&#39;re using:</p>
     <p class="panel">
         <strong class="show-for-small">You are on a small screen.</strong>
@@ -2348,8 +2516,9 @@ $(function () {
         <strong class="show-for-large-down">You are on a large, medium or small screen.</strong>
         <strong class="show-for-xlarge">You are on a xlarge screen.</strong>
     </p>
-
-    <h5 id="screen-size-visibility-control-hide-">Screen Size Visibility Control (Hide)</h5>
+    </section>
+    <h2 class="subheader" id="screen-size-visibility-control-hide-">Screen Size Visibility Control (Hide)</h2>
+    <section class="content">
     <p>The following text should describe the screen size you aren&#39;t using:</p>
     <p class="panel">
         <strong class="hide-for-small">You are <em>not</em> on a small screen.</strong>
@@ -2361,20 +2530,25 @@ $(function () {
         <strong class="hide-for-large-down">You are <em>not</em> on a large, medium or small screen.</strong>
         <strong class="hide-for-xlarge">You are <em>not</em> on a xlarge screen.</strong>
     </p>
-
-    <h5 id="orientation-detection">Orientation Detection</h5>
+    </section>
+    <h2 class="subheader" id="orientation-detection">Orientation Detection</h2>
+    <section class="content">
     <p>The following text should describe the device orientation you&#39;re using:</p>
     <p class="panel">
         <strong class="show-for-landscape">You are in landscape orientation.</strong>
         <strong class="show-for-portrait">You are in portrait orientation.</strong>
     </p>
+    </section>
 
-    <h5 id="touch-detection">Touch Detection</h5>
+    <h2 class="subheader" id="touch-detection">Touch Detection</h2>
+    <section class="content">
     <p>The following text should describe if you&#39;re using a touch device:</p>
     <p class="panel">
         <strong class="show-for-touch">You are on a touch-enabled device.</strong>
         <strong class="hide-for-touch">You are not on a touch-enabled device.</strong>
     </p>
+    </section>
+</div>
 </div>
 
 <!-- DataTables CSS -->
