@@ -531,13 +531,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      */
     public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion)
     {
-
-        /* Define special blocks to handle this special answerOptions scenario,
-         * because we have three columns to parse per iteration.
-         */
-        $page->setBlock('answerFormFragmentTop', 'answerOptionTopLeft', 'answerOptionTopLeft_block');
-        $page->setBlock('answerFormFragmentTop', 'answerOptionTopRight', 'answerOptionTopRight_block');
-        $page->setBlock('answerFormFragmentTop', 'answerOptionTopCorrectResponse', 'answerOptionTopCorrectResponse_block');
+        $page->setBlock('answerFormFragmentTop', 'answerOption', 'answerOption_block');
 
         $answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
 
@@ -555,10 +549,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                         'CORRECT'                       => $this->getCorrectClass(),
                     )
                 );
-
-                $page->parse('answerOptionTopLeft_block', 'answerOptionTopLeft', true);
-                $page->parse('answerOptionTopRight_block', 'answerOptionTopRight', true);
-                $page->parse('answerOptionTopCorrectResponse_block', 'answerOptionTopCorrectResponse', true);
+                $page->parse('answerOption_block', 'answerOption', true);
             }
         }
     }
