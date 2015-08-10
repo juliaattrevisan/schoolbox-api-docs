@@ -78,6 +78,12 @@
                  */
                 answerName: 'description',
 
+                /* Custom method for generating an answer from this form.
+                 * Accepts configuration object as a parameter,
+                 * returns whatever answer should be passed to the form submit handler.
+                 */
+                generateAnswer: null,
+
                 /* Setup of custom validation rules to use
                  * Call $.fn.addCustomRules_* here.
                  */
@@ -205,7 +211,6 @@
 
                     /* Form preprocessing
                      */
-                    var answerCollection = [];
                     tinyMCE.triggerSave();
 
                     var content = tinyMCE.activeEditor.getContent(); // get the content
@@ -213,22 +218,27 @@
 
                     /* Collate possible answers and their correctness status
                      */
-                    $.each($(config.answerCollectionList).find('[data-input]'), function(index, element) {
-                        var elem = $(element);
+                    var answerCollection = [];
+                    if (typeof config.generateAnswer === 'function') {
+                        answerCollection = config.generateAnswer(config);
+                    } else {
+                        $.each($(config.answerCollectionList).find('[data-input]'), function(index, element) {
+                            var elem = $(element);
 
-                        var description = $.trim(elem.find('[data-answer-description]').val());
-                        var code = $.trim(elem.find('[data-answer-code-value]').val());
+                            var description = $.trim(elem.find('[data-answer-description]').val());
+                            var code = $.trim(elem.find('[data-answer-code-value]').val());
 
-                        /* Ignore empty answers that weren't removed
-                         */
-                        if ((description != '') && (code != '')) {
-                            var answer = {};
-                            answer[config.answerName] = description;
-                            answer.value              = code;
-                            answer.correct            = elem.find('[data-answer-option]').prop('checked');
-                            answerCollection.push(answer);
-                        }
-                    });
+                            /* Ignore empty answers that weren't removed
+                             */
+                            if ((description != '') && (code != '')) {
+                                var answer = {};
+                                answer[config.answerName] = description;
+                                answer.value              = code;
+                                answer.correct            = elem.find('[data-answer-option]').prop('checked');
+                                answerCollection.push(answer);
+                            }
+                        });
+                    }
 
                     /* Collate the usual fields containing ids.
                      * Collate the checkboxes too but append all the possibilities as well!
