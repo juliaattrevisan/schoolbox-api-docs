@@ -68,4 +68,15 @@
             return fieldsAreFilled;
         }, "Please fill out answer");
     }
+
+    /**
+     * Number
+     *
+     * @param config
+     */
+    $.fn.addCustomRules_isNumber = function(config) {
+        $.validator.addMethod("isNumber", function(value, element) {
+            return !isNaN(value);
+        }, "Amount must be a number");
+    }
 }(jQuery));
