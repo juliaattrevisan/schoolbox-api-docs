@@ -1,3 +1,17 @@
+<li class="row content">
+    <div class="small-6 medium-4 columns">
+        <span class="meta">Match</span>
+    </div>
+
+    <div class="small-6 medium-4 columns sortable">
+        <span class="meta">Response</span>
+    </div>
+
+    <div class="hide-for-small small-6 medium-4 columns">
+        <span class="meta">Correct Answer</span>
+    </div>
+</li>
+
 <!-- BEGIN answerOption -->
 <li class="row content evaluation-answer-option matching-pairs no-pad" data-response-id="{RESPONSE_ID}" data-evaluation-matching-pairs data-equalizer>
     <div class="small-6 medium-4 columns" data-equalizer-watch>
@@ -7,7 +21,6 @@
         <p>
             {ANSWER_RIGHT_VALUE}
             <span class="hide-for-medium-up button close no-text {ANSWER_ICON}" data-collapser="true"></span>
-
         </p>
     </div>
     <!-- correct response is too small to show for small screens -->
@@ -19,10 +32,10 @@
     </div>
 
     <!-- copy to show for small screens -->
-
     <div class='hide' data-collapsable="true" data-collapse-state="collapsed">
-        <div class="show-for-small-only small-6 small-offset-6 columns sortable">
+        <div class="show-for-small-only small-6 small-offset-6 columns">
             <p>
+                <span class="meta">Correct Answer</span><br />
                 {ANSWER_CORRECT_RESPONSE_VALUE}
             </p>
         </div>
