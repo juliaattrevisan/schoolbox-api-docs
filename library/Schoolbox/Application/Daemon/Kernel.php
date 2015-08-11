@@ -154,7 +154,9 @@ EOL;
 				throw new ErrorException($errStr, 0, $errNum, $errFile, $errLine);
 
 			case E_NOTICE:
+			case E_USER_NOTICE:
 			case E_WARNING:
+			case E_USER_WARNING:
 				// this will throw an exception if it needs to
 				$this->onWarning($errNum, $errStr, $errFile, $errLine);
 				return true;
