@@ -72,6 +72,16 @@
                 messages: {
                     question: "Please enter a question.",
                     answer: "Please fill out an answer."
+                },
+
+                errorPlacement: function(label, element) {
+                    console.log(label, element);
+                    // position error label after generated textarea
+                    if (element.is("textarea")) {
+                        label.insertAfter(element.next());
+                    } else {
+                        label.insertAfter(element)
+                    }
                 }
             }
 
@@ -97,12 +107,22 @@
                 rules: config.rules,
                 messages: config.messages,
 
+                // Don't ignore radios and checkboxes, as these are actually hidden
+                ignore: '',
+
                 errorPlacement: function(error, element) {
 
                     /* If the error was found on the Marks field, just leave it
                      * to spawn naturally
+                     *
+                     * Position error label after generated textarea
                      */
-                    error.insertAfter(element);
+                    if (element.is("textarea")) {
+                        error.insertAfter(element.next());
+                    }
+                    else {
+                        error.insertAfter(element)
+                    }
                 }
             });
         }
