@@ -10,18 +10,21 @@
             <section>
                 <fieldset class="content">
                     <legend>In Most Cases, Single Column Works Best</legend>
+
                         <div class="small-12 columns">
                             <p>
                                 The <code>&lt;fieldset/&gt;</code> has been given the same styles as <code>.row</code>. The implication of this is that you should put
                                 <code>.columns</code> directly into fieldsets (after the <code>&lt;fieldset/&gt;</code>, if you're using one.)
                             </p>
                         </div>
+
                         <div class="small-12 columns">
                             <label>Input Label
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
                                 <input type="text" />
                             </label>
                         </div>
+
                         <div class="small-12 columns">
                             <label>Select Box
                                 <select>
@@ -32,6 +35,7 @@
                                 </select>
                             </label>
                         </div>
+
                         <div class="small-12 columns">
                             <label>Textarea Label
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
@@ -45,12 +49,15 @@
                                 });
                             </script>
                         </div>
+
                 </fieldset>
                 <fieldset class="content">
                     <legend>Use Two Columns Judiciously (and make sure they fall down into fewer columns on small displays)</legend>
+
                     <div class="small-12 columns">
                         <p>You may notice that the <code>&lt;legend/&gt;</code> of this fieldset has the same styling as an <code>&lt;h3/&gt;</code>.</p>
                     </div>
+
                     <div class="small-12 medium-6 columns">
                         <fieldset>
                             <legend>Which Pok&eacute;mon did you play first?</legend>
@@ -62,6 +69,7 @@
                             </p>
                         </fieldset>
                     </div>
+
                     <div class="small-12 medium-6 columns">
                         <fieldset>
                             <legend>
@@ -72,6 +80,7 @@
                             <input id="checkbox2" type="checkbox"><label for="checkbox2" class="checkbox-label">Checkbox 2</label>
                         </fieldset>
                     </div>
+
                     <div class="small-12 columns">
                         <label for="exampleCheckboxSwitch">If you <em>reeeeeally</em> need a switch on your form...</label>
                         <div class="switch">
@@ -79,44 +88,48 @@
                             <label for="exampleCheckboxSwitch"></label>
                         </div>
                     </div>
+
                 </fieldset>
                 <fieldset class="content">
                     <legend>
                         Group your forms into logical sections with fieldsets&hellip;
                         <span data-tooltip class="hint has-tip tip-top" data-width="200" title="&hellip;for example, this section contains examples of heavily-custom elements">?</span>
                     </legend>
+
                     <div class="column small-12">
                         <label>Single Selectize AutoSuggest</label>
                         <input id='user' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
                     </div>
+
                     <div class="column small-12">
                         <label>Multi-Select Selectize</label>
                         <input id='users' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
-                    </div>
-                    <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-                    <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-                    <script type="text/javascript">
-                        $(function() {
-                            $('#user').selectizeSelector({
-                                ajax: {
-                                    url:      '/ajax/user.php',
-                                    type:     'GET',
-                                    data:     {showCampus: true},
-                                    dataType: 'json'
-                                }
-                            });
+                        <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+                        <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+                        <script type="text/javascript">
+                            $(function() {
+                                $('#user').selectizeSelector({
+                                    ajax: {
+                                        url:      '/ajax/user.php',
+                                        type:     'GET',
+                                        data:     {showCampus: true},
+                                        dataType: 'json'
+                                    }
+                                });
 
-                            $('#users').selectizeSelector({
-                                ajax: {
-                                    url:      '/ajax/user.php',
-                                    type:     'GET',
-                                    data:     {showCampus: true},
-                                    dataType: 'json'
-                                },
-                                multiple: true
+                                $('#users').selectizeSelector({
+                                    ajax: {
+                                        url:      '/ajax/user.php',
+                                        type:     'GET',
+                                        data:     {showCampus: true},
+                                        dataType: 'json'
+                                    },
+                                    multiple: true
+                                });
                             });
-                        });
-                    </script>
+                        </script>
+                    </div>
+
                     <div class="column small-12">
                         <label>Attachments</label>
                         <div class="attachzone s64" id="news-feature-zone">
@@ -161,9 +174,11 @@
                             </script>
                         </div>
                     </div>
+
                 </fieldset>
                 <fieldset class="content">
                     <legend>Dates and Times</legend>
+
                     <div class="column small-12">
                         <p>
                             When invoking <code>$.timepicker()</code>, use the <code>appendTo</code> option to attach to the parent of the <code>&lt;label/&gt;</code>
@@ -171,11 +186,13 @@
                             will be 100% of its container.
                         </p>
                     </div>
+
                     <div class="column small-12 medium-4">
                         <label>Date:
                             <input type="text" data-datepicker>
                         </label>
                     </div>
+
                     <div class="column small-6 medium-4">
                         <div class="timepick">
                             <label>Select start:
@@ -183,6 +200,7 @@
                             </label>
                         </div>
                     </div>
+
                     <div class="column small-6 medium-4">
                         <div class="timepick">
                             <label>Select end:
@@ -206,6 +224,7 @@
                 </fieldset>
             </section>
             <div class="row">
+
                 <div class="small-12 column">
                     <ul class="meta">
                         <li class="icon-alert">The submit button lives out here in the ocean, inside its own row and column.
@@ -214,6 +233,7 @@
                     </ul>
                     <input type="submit" name="submit" value="Send" />
                 </div>
+
             </div>
         </form>
     </div>
