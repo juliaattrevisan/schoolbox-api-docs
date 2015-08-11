@@ -74,13 +74,13 @@
                     answer: "Please fill out an answer."
                 },
 
-                errorPlacement: function(label, element) {
-                    console.log(label, element);
+                errorPlacement: function(error, element) {
+
                     // position error label after generated textarea
                     if (element.is("textarea")) {
-                        label.insertAfter(element.next());
+                        error.insertAfter(element.next());
                     } else {
-                        label.insertAfter(element)
+                        error.insertAfter(element)
                     }
                 }
             }
@@ -236,6 +236,12 @@
                     'answerDescription[]': {
                         emptyInputs: true
                     }
+                },
+
+                /* Error messages
+                 */
+                messages: {
+                    question: "Please enter a question."
                 }
             }
 
@@ -429,6 +435,7 @@
                 },
 
                 rules: config.rules,
+                messages: config.messages,
 
                 errorPlacement: function(error, element) {
 
@@ -455,13 +462,16 @@
                      * If the error was found on one of the answer options,
                      * spawn it naturally
                      */
+                    else if (element.is("textarea")) {
+                        error.insertAfter(element.next());
+                    }
                     else {
-                        error.insertAfter(element);
+                        error.insertAfter(element)
                     }
                 },
 
                 // Don't ignore radios and checkboxes, as these are actually hidden
-                ignore: ':hidden:not([type="radio"]):not([type="checkbox"])'
+                ignore: ':hidden:not(textarea.tinymce):not([type="radio"]):not([type="checkbox"])'
             });
         }
     }
