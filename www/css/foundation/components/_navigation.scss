@@ -328,12 +328,18 @@ $menu-slide: "transform 500ms ease";
 		margin: 0;
 	}
 	a{
+		width: 5rem;
+		height: 5rem;
 		padding: rem-calc(($base-font-size / 2)) rem-calc(($base-font-size));
 		text-align: center;
 		@extend .icon-32;
 		@extend .no-text;
 		&:hover{
-			background-color: $white;
+			background-color: $primary-color;
+			color: $body-bg;
+			label {
+				color: $body-bg;
+			}
 		}
 		&:before{
 			text-align: center;
