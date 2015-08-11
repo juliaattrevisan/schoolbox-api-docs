@@ -153,9 +153,10 @@ abstract class Evaluation_Main extends DeprecatedModel
 
                 $page->setVar(
                     array(
-                        'SECTION_TITLE'      => Scrub::text($allQuestions[$i - 1]['title']),
-                        'SECTION_SEQUENCE'   => $allQuestions[$i - 1]['sectionSequence'],
-                        'SECTION_SECTION_ID' => $allQuestions[$i - 1]['section_id'],
+                        'SECTION_TITLE'       => Scrub::text($allQuestions[$i - 1]['title']),
+                        'SECTION_DESCRIPTION' => Scrub::html($allQuestions[$i - 1]['description']),
+                        'SECTION_SEQUENCE'    => $allQuestions[$i - 1]['sectionSequence'],
+                        'SECTION_SECTION_ID'  => $allQuestions[$i - 1]['section_id'],
                     )
                 );
 
@@ -212,9 +213,10 @@ abstract class Evaluation_Main extends DeprecatedModel
         if (is_numeric($currentQuestion['section_id'])) {
             $page->setVar(
                 array(
-                    'SECTION_TITLE'      => Scrub::text($currentQuestion['title']),
-                    'SECTION_SEQUENCE'   => $currentQuestion['sectionSequence'],
-                    'SECTION_SECTION_ID' => $currentQuestion['section_id'],
+                    'SECTION_TITLE'       => Scrub::text($currentQuestion['title']),
+                    'SECTION_DESCRIPTION' => Scrub::html($currentQuestion['description']),
+                    'SECTION_SEQUENCE'    => $currentQuestion['sectionSequence'],
+                    'SECTION_SECTION_ID'  => $currentQuestion['section_id'],
                 )
             );
 
@@ -237,6 +239,7 @@ abstract class Evaluation_Main extends DeprecatedModel
         $query = "SELECT assess_id,
                          assess_section.section_id,
                          assess_section.title,
+                         assess_section.description,
                          assess_section.sequence AS sectionSequence,
                          question_id,
                          question,
