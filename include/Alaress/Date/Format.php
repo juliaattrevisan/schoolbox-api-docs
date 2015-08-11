@@ -120,6 +120,31 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
+     * Static constructor: creates a new date, with the format based on
+     * URL_FORMAT.
+     *
+     * @param string                        $dateTime
+     * @param DateTimeZone                  $timezone Optional timezone
+     * @param Alaress_Date_Locale_Interface $locale   Optional locale, falls back to
+     *                                                new Alaress_Date_Locale_Config()
+     *
+     * @return static
+     */
+    public static function newUrlDate(
+        $dateTime,
+        DateTimeZone $timezone = null,
+        Alaress_Date_Locale_Interface $locale = null
+    ) {
+        if (!$locale instanceof Alaress_Date_Locale_Interface) {
+            // @codeCoverageIgnoreStart
+            $locale = new Alaress_Date_Locale_Config();
+            // @codeCoverageIgnoreEnd
+        }
+        // Zero out unset parts - IMO that's the least surprising behavior.
+        return new static($dateTime, static::URL_FORMAT.'|', $timezone, $locale);
+    }
+
+    /**
      * Set up datetime data for processing. Choose your strategy here!
      * Choose your locale as well; this would probably come from the Config
      * table rather than have a concrete instantiation
