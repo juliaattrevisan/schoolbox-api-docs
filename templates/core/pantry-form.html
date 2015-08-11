@@ -1,0 +1,221 @@
+<div class="row">
+    <div class="small-12 island">
+        <h1 id="forms">Sample Form</h1>
+        <ul class="meta">
+            <li class="icon-star">Yes, this form looks really cramped and cluttered, but that's because I've thrown description text
+                and a variety of elements all through it. Real forms will hopefully be more straightforward and easier on the eye.
+            </li>
+        </ul>
+        <form class="top" action="#">
+            <section>
+                <fieldset class="content">
+                    <legend>In Most Cases, Single Column Works Best</legend>
+                        <div class="small-12 columns">
+                            <p>
+                                The <code>&lt;fieldset/&gt;</code> has been given the same styles as <code>.row</code>. The implication of this is that you should put
+                                <code>.columns</code> directly into fieldsets (after the <code>&lt;fieldset/&gt;</code>, if you're using one.)
+                            </p>
+                        </div>
+                        <div class="small-12 columns">
+                            <label>Input Label
+                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
+                                <input type="text" />
+                            </label>
+                        </div>
+                        <div class="small-12 columns">
+                            <label>Select Box
+                                <select>
+                                    <option value="husker">Husker</option>
+                                    <option value="starbuck">Starbuck</option>
+                                    <option value="hotdog">Hot Dog</option>
+                                    <option value="apollo">Apollo</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="small-12 columns">
+                            <label>Textarea Label
+                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
+                                <textarea>Hey look! <b>WYSIWYG</b> content.</textarea>
+                            </label>
+                            <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+                            <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+                            <script type="text/javascript">
+                                $(function () {
+                                    $.fn.alaressTiny();
+                                });
+                            </script>
+                        </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Use Two Columns Judiciously (and make sure they fall down into fewer columns on small displays)</legend>
+                    <div class="small-12 columns">
+                        <p>You may notice that the <code>&lt;legend/&gt;</code> of this fieldset has the same styling as an <code>&lt;h3/&gt;</code>.</p>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <fieldset>
+                            <legend>Which Pok&eacute;mon did you play first?</legend>
+                            <input type="radio" name="pokemon" value="Red" id="pokemonRed" checked><label class="radio-label" for="pokemonRed">Red</label>
+                            <input type="radio" name="pokemon" value="Blue" id="pokemonBlue"><label class="radio-label" for="pokemonBlue">Blue</label>
+                            <p>
+                                Did you realise you're inside a double-nested <code>&lt;fieldset/&gt;</code> here? (yes, that is perfectly acceptable!)
+                                The inner fieldset is used for grouping radio or checklists, like this example suggests.
+                            </p>
+                        </fieldset>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <fieldset>
+                            <legend>
+                                Check These Out
+                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="If you want a tooltip for your checkbox list, put the tooltip in the legend, like this.">?</span>
+                            </legend>
+                            <input id="checkbox1" type="checkbox"><label for="checkbox1" class="checkbox-label">Checkbox 1</label>
+                            <input id="checkbox2" type="checkbox"><label for="checkbox2" class="checkbox-label">Checkbox 2</label>
+                        </fieldset>
+                    </div>
+                    <div class="small-12 columns">
+                        <label for="exampleCheckboxSwitch">If you <em>reeeeeally</em> need a switch on your form...</label>
+                        <div class="switch">
+                            <input id="exampleCheckboxSwitch" type="checkbox">
+                            <label for="exampleCheckboxSwitch"></label>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>
+                        Group your forms into logical sections with fieldsets&hellip;
+                        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="&hellip;for example, this section contains examples of heavily-custom elements">?</span>
+                    </legend>
+                    <div class="column small-12">
+                        <label>Single Selectize AutoSuggest</label>
+                        <input id='user' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
+                    </div>
+                    <div class="column small-12">
+                        <label>Multi-Select Selectize</label>
+                        <input id='users' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
+                    </div>
+                    <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+                    <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+                    <script type="text/javascript">
+                        $(function() {
+                            $('#user').selectizeSelector({
+                                ajax: {
+                                    url:      '/ajax/user.php',
+                                    type:     'GET',
+                                    data:     {showCampus: true},
+                                    dataType: 'json'
+                                }
+                            });
+
+                            $('#users').selectizeSelector({
+                                ajax: {
+                                    url:      '/ajax/user.php',
+                                    type:     'GET',
+                                    data:     {showCampus: true},
+                                    dataType: 'json'
+                                },
+                                multiple: true
+                            });
+                        });
+                    </script>
+                    <div class="column small-12">
+                        <label>Attachments</label>
+                        <div class="attachzone s64" id="news-feature-zone">
+                            <span class="az-label"></span>
+                            <ul class="az-list">
+                            </ul>
+                            <div class="dzone" id="NewsFeatureZone">
+                                <ul data-template>
+                                    <li>
+                                        <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+                                        <p class="actions">
+                                            <a title="Detach" data-dz-remove class="button no-text icon-delete"></a>
+                                        </p>
+                                        <img data-dz-thumbnail src="/images/emails/spacer.gif" />
+                                        <p class="filename" data-dz-name></p>
+                                        <input type="hidden" data-az-attachment name="attachment[]" value="" />
+                                    </li>
+                                </ul>
+                            </div>
+                            <ul class="az-error-list"></ul>
+
+                            <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+                            <script type="text/javascript">
+                                $(function () {
+                                    $('#news-feature-zone').resourceAttach({
+                                        url: '/storage/asyncUpload',
+                                        paramName: 'upload',
+                                        trigger: 'div.dzone',
+                                        dropzoneSelector: 'div.dzone',
+                                        dictDefaultMessage: 'Attach feature image',
+                                        allowedFiles: 'image/*',
+                                        multi: false,
+                                        title: 'Select feature image',
+                                        thumbnailSize: '64',
+                                        fallbackButtonSelector: 'a[data-attach-fallback]',
+                                        onSelect: function (attachments) {
+                                            /* `this` will refer to $(element_that_was_clicked) */
+                                            /* multi or not, you will ALWAYS receive a [LIST] of documents to parse for attachment */
+                                        }
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Dates and Times</legend>
+                    <div class="column small-12">
+                        <p>
+                            When invoking <code>$.timepicker()</code>, use the <code>appendTo</code> option to attach to the parent of the <code>&lt;label/&gt;</code>
+                            which should have a class of <code>.timepick</code>. That way, the picker dropdown can adopt a width to match the input, which
+                            will be 100% of its container.
+                        </p>
+                    </div>
+                    <div class="column small-12 medium-4">
+                        <label>Date:
+                            <input type="text" data-datepicker>
+                        </label>
+                    </div>
+                    <div class="column small-6 medium-4">
+                        <div class="timepick">
+                            <label>Select start:
+                                <input data-timepicker type="text" autocomplete="off" />
+                            </label>
+                        </div>
+                    </div>
+                    <div class="column small-6 medium-4">
+                        <div class="timepick">
+                            <label>Select end:
+                                <input data-timepicker type="text" autocomplete="off" />
+                            </label>
+                        </div>
+                    </div>
+                    <script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+                    <script type="text/javascript">
+                        $(function () {
+                            $('[data-datepicker]').datepicker();
+
+                            $('[data-timepicker]').timepicker({
+                                appendTo: function ($input) {
+                                    return $input.closest('.timepick');
+                                }
+                            });
+                        });
+                    </script>
+
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 column">
+                    <ul class="meta">
+                        <li class="icon-alert">The submit button lives out here in the ocean, inside its own row and column.
+                            It doesn't need the <code>.expand</code> class anymore, but don't get too hung up about its width: styles can and will be revised later.
+                        </li>
+                    </ul>
+                    <input type="submit" name="submit" value="Send" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
