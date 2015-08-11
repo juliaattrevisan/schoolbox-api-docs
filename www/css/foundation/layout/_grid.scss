@@ -68,42 +68,60 @@ $block-grid-default-spacing: rem-calc(16);
 	padding: rem-calc(($base-font-size - 8)) !important;
 }
 
-#content > .row {
+%mobile-padding {
 
-    > .small-12,
-    > .medium-12 {
+    > .button {
+        // loop in expand by default
+        @extend .expand;
+    }
 
-        @media #{$small-only} {
-            padding: 0 !important;
+    @media #{$small-only} {
+        padding: 0 !important;
 
-            > h1,
-            > h2.subheader,
-            > ul.meta {
-                // on small screens, full width is FULL width, so indent floating content
-                margin-left: 2rem;
-                margin-right: 2rem;
-            }
-            > .header-actions {
-                margin-right: 2rem;
-                margin-left: 0.5rem;
-            }
+        > h1,
+        > h2.subheader,
+        > ul.meta,
+        > .pagination,
+        > .alert-box {
+            // on small screens, full width is FULL width, so indent floating content
+            margin-left: 2rem;
+            margin-right: 2rem;
+        }
+        > .header-actions {
+            margin-right: 2rem;
+            margin-left: 0.5rem;
+        }
 
-            .content {
+        .content {
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        table {
+            td:first-child, th:first-child {
                 padding-left: 2rem;
+            }
+            td:last-child, th:last-child {
                 padding-right: 2rem;
             }
-
-            table {
-                td:first-child, th:first-child {
-                    padding-left: 2rem;
-                }
-                td:last-child, th:last-child {
-                    padding-right: 2rem;
-                }
-            }
         }
+    }
+}
+
+// yes, these are really really really specific, but it's for the greater good
+#content, .top {
+    > .row > .small-12,
+    > .row > .medium-12 {
+        @extend %mobile-padding;
+    }
+}
+
+#content > .row {
+    > .small-12, > .medium-12 {
+
         @media #{$medium-only} {
             padding: 0 2.5rem !important;
         }
+
     }
 }
