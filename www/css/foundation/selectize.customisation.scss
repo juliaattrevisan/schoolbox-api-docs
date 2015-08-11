@@ -30,7 +30,7 @@ $selectize-shadow-input-focus: none;
 $selectize-border: 2px solid $selectize-color-border;
 $selectize-border-radius: 0px;
 
-$selectize-width-item-border: 0 !default;
+$selectize-width-item-border: 1px !default;
 $selectize-max-height-dropdown: 200px !default;
 
 $selectize-padding-x: 7px;
@@ -45,6 +45,7 @@ $selectize-padding-item-y: 7px;
 	border: 1px solid $gainsboro;
 	a{
 		padding: 0.5rem !important;
+		width: 1.5rem !important;
 	}
 }
 
