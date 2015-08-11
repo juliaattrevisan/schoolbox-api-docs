@@ -1,4 +1,6 @@
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type='text/javascript' src="/javascript/evaluation/evaluation-creator.js"></script>
+<script type='text/javascript' src="/javascript/evaluation/validation.js"></script>
 <script type="text/javascript">
 $(function() {
 	$.fn.alaressTiny({
@@ -10,38 +12,15 @@ $(function() {
 		disable_toolbars: [2, 3, 4]
 	});
 
-	var validator = $("#createQuestionForm").submit(function() {
-		 // update underlying textarea before submit validation
-		 tinyMCE.triggerSave(); 
-	}).validate({
-		rules: { 
-			question: {
-				required: true,
-				minlength: 1
-			},
-			marks: {
-				required: true,
-				minlength: 1,
-				greaterThanZero:true
-			}
-		},
-		messages: {
-			question: "Please enter a question.",
-			answer: "Please fill out an answer."
-		},
-        errorPlacement: function(error, element) {
-            offset = element.offset();
-            error.insertAfter(element.parent().children(':last-child'))
-            error.addClass('message');  // add a class to the wrapper
-		}
-	});
-	
-	jQuery.validator.addMethod("greaterThanZero", function(value, element) {
-   		return this.optional(element) || (parseFloat(value) > 0);
-	}, "Amount must be greater than zero");
+    $('#createQuestionForm').shortCreate({
+        customValidationRules: function(config) {
+            $.fn.addCustomRules_greaterThanZero(config);
+            $.fn.addCustomRules_emptyAnswer(config);
+        }
+    });
 });
 </script>
 <label>
     Suggested Answer
-    <textarea name="answer" id="richtext-answer">{ANSWER}</textarea>
+    <textarea name="answer" id="richtext-answer" data-answer-description>{ANSWER}</textarea>
 </label>
