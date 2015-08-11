@@ -1,8 +1,5 @@
 <!-- BEGIN section -->
 <h2 class="subheader">{SECTION_TITLE}</h2>
-<section class="content">
-    <article>{SECTION_DESCRIPTION}</article>
-</section>
 <span class="header-actions">
     <a href="#" class="icon-more button" data-dropdown="section{SECTION_SECTION_ID}-options"></a>
 </span>
@@ -14,6 +11,9 @@
     <li><a class="icon-add" href="/{ASSESS_KIND_LC}/question/create/{SECTION_SECTION_ID}">New Question</a></li>
     <li><a class="icon-download" href="/{ASSESS_KIND_LC}/questionbank/contents/0/{ASSESS_ASSESS_ID}/{SECTION_SECTION_ID}">Add from Question Bank</a></li>
 </ul>
+<section class="content">
+    <article>{SECTION_DESCRIPTION}</article>
+</section>
 <section>
     <ul class="action-list sortable" id="section{SECTION_SECTION_ID}" data-question-list>
         <!-- BEGIN question -->
