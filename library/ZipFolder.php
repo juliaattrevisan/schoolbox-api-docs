@@ -37,9 +37,12 @@ class ZipFolder
     }
 
 
-    function getResources($folder)
+    function getResources($folder, $permission)
     {
-        return $this->fileMapper->findForFolders(array($folder));
+        return $this->fileMapper->findForFolders(
+            array($folder),
+            array('getHidden' => ($permission >= WRITE_ACCESS))
+        );
     }
 
     function getFolders($folder)
@@ -83,10 +86,10 @@ class ZipFolder
         }
     }
 
-    function createDirectory($currentDir, $parentFolder, $depth = 0)
+    function createDirectory($currentDir, $parentFolder, $permission, $depth = 0)
     {
         //populate dir with files
-        $fileList = $this->getResources($parentFolder->getId());
+        $fileList = $this->getResources($parentFolder->getId(), $permission);
 
         foreach ($fileList as $file) {
             if ($file->getStorage()->exists()) {
@@ -104,11 +107,12 @@ class ZipFolder
             //get subfolders and recurse through them
             $folderList = $this->getFolders($parentFolder->getId());
             foreach ($folderList as $folder) {
-                if ($this->getPermission($folder->getId()) > DENY_ACCESS) {
+                $permission = $this->getPermission($folder->getId());
+                if ($permission > DENY_ACCESS) {
                     $folderName = $this->cleanName($folder->getName());
                     $folderLocation = $currentDir . '/' . $folderName;
                     mkdir($folderLocation);
-                    $this->createDirectory($folderLocation, $folder, $depth+1);
+                    $this->createDirectory($folderLocation, $folder, $permission, $depth+1);
                 }
             }
         }
@@ -119,7 +123,11 @@ class ZipFolder
         $archive = new ZipArchive();
         $archive->open($this->tmpZip, ZipArchive::CREATE);
         mkdir($this->tmpFolder);
-        $this->createDirectory($this->tmpFolder, $this->folderDetails);
+        $this->createDirectory(
+            $this->tmpFolder,
+            $this->folderDetails,
+            $this->getPermission($this->folderDetails->getId())
+        );
         $dir = new RecursiveDirectoryIterator($this->tmpFolder, FilesystemIterator::SKIP_DOTS);
 
         $i      = 0;
