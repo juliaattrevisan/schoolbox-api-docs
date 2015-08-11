@@ -162,6 +162,8 @@ EOL;
 				return true;
 
             case E_STRICT:
+            case E_DEPRECATED:
+            case E_USER_DEPRECATED:
                 $this->logger()->warning("Warning: $errStr");
                 return true;
 
