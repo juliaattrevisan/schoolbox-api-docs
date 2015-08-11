@@ -1809,9 +1809,9 @@ $(function () {
     <div class="row">
         <div class="small-12 island">
             <h1 id="forms">Forms</h1>
-            <section>
+            <section class="content">
                 <fieldset>
-                    <legend>Legend</legend>
+                    <legend>One Column</legend>
                     <div class="row">
                         <div class="small-12 columns">
                             <label>Input Label
@@ -1845,13 +1845,13 @@ $(function () {
                     </label>
                 </fieldset>
                 <fieldset>
-                    <legend>Fancy</legend>
-                    <div class="large-6 columns">
+                    <legend>Two Columns (When There's Room)</legend>
+                    <div class="small-12 large-6 columns">
                         <label>Choose Your Favorite</label>
                         <input type="radio" name="pokemon" value="Red" id="pokemonRed" checked><label class="radio-label" for="pokemonRed">Red</label>
                         <input type="radio" name="pokemon" value="Blue" id="pokemonBlue"><label class="radio-label" for="pokemonBlue">Blue</label>
                     </div>
-                    <div class="large-6 columns">
+                    <div class="small-12 large-6 columns">
                         <label>Check these out</label>
                         <input id="checkbox1" type="checkbox"><label for="checkbox1" class="checkbox-label">Checkbox 1</label>
                         <input id="checkbox2" type="checkbox"><label for="checkbox2" class="checkbox-label">Checkbox 2</label>
@@ -1879,12 +1879,15 @@ $(function () {
                 </fieldset>
                 <fieldset>
                     <legend>Dates and Times</legend>
+                    <div class="row">
                     <div class="column small-12">
                         <p>
                             When invoking <code>$.timepicker()</code>, use the <code>appendTo</code> option to attach to the parent of the <code>label</code>.
                             That way, the picker dropdown can adopt a width to match the input, which will be 100% of its container&mdash;ignore the "too wide" issue for now.
                         </p>
                     </div>
+                    </div>
+                    <div class="row">
                     <div class="column small-4">
                         <label>Date:
                             <input type="text" class="datepicker">
@@ -1899,6 +1902,7 @@ $(function () {
                         <label>Select end:
                             <input class="timepicker" type="text" autocomplete="off" />
                         </label>
+                    </div>
                     </div>
                 </fieldset>
             </section>
