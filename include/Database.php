@@ -128,6 +128,21 @@ class Database implements Serializable {
 	}
 
     /**
+     * Attempt to set the connection's timezone.
+     *
+     * @param string $timezone A valid timezone.
+     * @return bool
+     * @throws PDOException if the timezone can't be set
+     */
+    public function setTimezone($timezone)
+    {
+        return $this->connection
+            ->prepare("SET time_zone = ?")
+            ->execute([$timezone])
+        ;
+    }
+
+    /**
      * Retrieves the query collector from this connection.
      *
      * Will fail if $this->options[debug] is off.
