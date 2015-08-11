@@ -49,8 +49,8 @@ class Lister extends Renderer
      */
     private function detonate()
     {
-        $startTime = new \Alaress_Date_Format($this->getStartTimestamp(), 'U');
-        $endTime = new \Alaress_Date_Format($this->getEndTimestamp(), 'U');
+        $startTime = new \Alaress_Date_Format($this->getStartTimestamp(), \Alaress_Date_Format::TIMESTAMP);
+        $endTime   = new \Alaress_Date_Format($this->getEndTimestamp(), \Alaress_Date_Format::TIMESTAMP);
 
         $newCollection = new Collection;
 
