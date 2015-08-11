@@ -218,7 +218,7 @@ $f-dropdown-triangle-size: 0px;
 // We use these to control styles for the list elements.
 // $f-dropdown-list-style: none;
 $f-dropdown-font-color: $primary-color;
-$f-dropdown-font-size: rem-calc(($base-font-size - 2));
+$f-dropdown-font-size: rem-calc(($base-font-size));
 $f-dropdown-list-padding: rem-calc(($base-font-size - 8));
 // $f-dropdown-line-height: rem-calc(18);
 $f-dropdown-list-hover-bg: tint($f-dropdown-bg, 32%);
@@ -367,7 +367,7 @@ input[type="submit"]{
 
 		// no text? be subtle
 		&.no-text {
-			color: $monsoon;
+			@include contrast-bg();
 			background: transparent;
 		}
 
@@ -394,33 +394,17 @@ h1, h2 {
 	}
 }
 
-@media #{$small-up} {
-	h1 + .header-actions .button
-	{
-		bottom: 42px;
-	}
-
-	h2 + .header-actions .button {
-		bottom: 42px;
-	}
-}
-@media #{$large-up} {
-	h1 + .header-actions .button
-	{
-		bottom: 50px;
-	}
-
-	h2 + .header-actions .button {
-		bottom: 42px;
+// make this more concise
+@mixin header-action-button($mq, $h1, $h2) {
+	@media #{$mq} {
+		h1 + .header-actions .button { bottom: $h1; }
+		h2 + .header-actions .button { bottom: $h2; }
 	}
 }
 
-@media #{$xlarge-only} {
-	h1 + .header-actions .button
-	{
-		bottom: 71px;
-	}
-}
+@include header-action-button($small-up,    42px, 42px);
+@include header-action-button($large-up,    50px, 42px);
+@include header-action-button($xlarge-only, 71px, 42px);
 
 
 // Dropdown
