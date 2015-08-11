@@ -471,7 +471,7 @@
                 },
 
                 // Don't ignore radios and checkboxes, as these are actually hidden
-                ignore: ':hidden:not(textarea.tinymce):not([type="radio"]):not([type="checkbox"])'
+                ignore: ''
             });
         }
     }
