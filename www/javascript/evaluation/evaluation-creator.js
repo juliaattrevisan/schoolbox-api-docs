@@ -77,7 +77,7 @@
                 errorPlacement: function(error, element) {
 
                     // position error label after generated textarea
-                    if (element.is("textarea")) {
+                    if (element.is("textarea") && element.next().hasClass('mceEditor')) {
                         error.insertAfter(element.next());
                     } else {
                         error.insertAfter(element)
@@ -117,7 +117,7 @@
                      *
                      * Position error label after generated textarea
                      */
-                    if (element.is("textarea")) {
+                    if (element.is("textarea") && element.next().hasClass('mceEditor')) {
                         error.insertAfter(element.next());
                     }
                     else {
@@ -462,7 +462,7 @@
                      * If the error was found on one of the answer options,
                      * spawn it naturally
                      */
-                    else if (element.is("textarea")) {
+                    else if (element.is("textarea") && element.next().hasClass('mceEditor')) {
                         error.insertAfter(element.next());
                     }
                     else {
