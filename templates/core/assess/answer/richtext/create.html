@@ -2,24 +2,25 @@
 <script type='text/javascript' src="/javascript/evaluation/evaluation-creator.js"></script>
 <script type='text/javascript' src="/javascript/evaluation/validation.js"></script>
 <script type="text/javascript">
-$(function() {
-	$.fn.alaressTiny({
-		mode: 'exact',
-		elements: 'richtext-answer',
-		file_browser_category_id: '{ASSESS_CATEGORY_ID}',
-		removeformat_selector: 'b,strong,em,i,span,ins',
-		width: "100%",
-		disable_toolbars: [2, 3, 4]
-	});
+    $(function() {
+        $.fn.alaressTiny({
+            mode: 'exact',
+            elements: 'richtext-answer',
+            file_browser_category_id: '{ASSESS_CATEGORY_ID}',
+            removeformat_selector: 'b,strong,em,i,span,ins',
+            width: "100%",
+            disable_toolbars: [2, 3, 4]
+        });
 
-    $('#createQuestionForm').shortCreate({
-        customValidationRules: function(config) {
-            $.fn.addCustomRules_greaterThanZero(config);
-            $.fn.addCustomRules_emptyAnswer(config);
-        }
+        $('#createQuestionForm').shortCreate({
+            customValidationRules: function(config) {
+                $.fn.addCustomRules_greaterThanZero(config);
+                $.fn.addCustomRules_emptyAnswer(config);
+            }
+        });
     });
-});
 </script>
+
 <label>
     Suggested Answer
     <textarea name="answer" id="richtext-answer" data-answer-description>{ANSWER}</textarea>
