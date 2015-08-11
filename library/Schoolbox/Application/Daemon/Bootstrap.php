@@ -115,6 +115,7 @@ class Bootstrap implements BootstrapInterface {
 
 		// MySQL connection configuration
 		Database::getInstance()->connect(SQL_dsn, SQL_user, SQL_passwd, array('throw' => true));
+		Database::getInstance()->setTimezone(ConfigMapper::getInstance()->get('date_timezone'));
 
 		// Redis connection configuration
 		Redis::getInstance()->connect(ConfigMapper::getInstance()->get('redis_url'));

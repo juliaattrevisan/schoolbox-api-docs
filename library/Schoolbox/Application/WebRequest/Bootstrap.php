@@ -25,6 +25,7 @@ use Config;
 use Database;
 use DeprecatedDatabase;
 use PDO;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
 use Scrub;
 use Twig_Extension_Debug;
@@ -143,6 +144,7 @@ class Bootstrap implements BootstrapInterface {
 	public function initialiseExternalConnections() {
 		$database = Database::getInstance();
 		$database->connect(SQL_dsn, SQL_user, SQL_passwd, array('debug' => $this->debugEnabled));
+		$database->setTimezone(ConfigMapper::getInstance()->get('date_timezone'));
 		if($this->debugEnabled) {
 			$debug_bar = DebugBar::getInstance();
 			$debug_bar->addCollector($database->getCollector());
@@ -153,7 +155,7 @@ class Bootstrap implements BootstrapInterface {
 		}
 
 		// Redis connection configuration
-		Redis::getInstance()->connect(Config::get('redis_url'));
+		Redis::getInstance()->connect(ConfigMapper::getInstance()->get('redis_url'));
 	}
 
 

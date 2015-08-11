@@ -361,5 +361,6 @@ class Database implements Serializable {
 	 */
 	public function unserialize($serialized) {
 		$this->connect(SQL_dsn, SQL_user, SQL_passwd, array('debug' => DebugBar::isEnabled()));
+		$this->setTimezone(\Schoolbox\Config\ConfigMapper::getInstance()->get('date_timezone'));
 	}
 }
