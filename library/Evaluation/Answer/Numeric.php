@@ -132,7 +132,7 @@ abstract class Evaluation_Answer_Numeric extends Evaluation_Answer {
 					'QUESTION_ID' => $question_id,
 					'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $currentAnswer['answer_id'],
-                    'ANSWER_VALUE' => Scrub::text($existing['response']),
+                    'ANSWER' => Scrub::text($existing['response']),
                 )
             );
         } else {
@@ -141,7 +141,7 @@ abstract class Evaluation_Answer_Numeric extends Evaluation_Answer {
 					'QUESTION_ID' => $question_id,
 					'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $currentAnswer['answer_id'],
-                    'ANSWER_VALUE' => '',
+                    'ANSWER' => '',
                 )
             );
         }
