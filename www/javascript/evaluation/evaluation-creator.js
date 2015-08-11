@@ -1,8 +1,135 @@
 (function() {
 
     /**
-     * Multiple Choice/Radio
-     * Create
+     * Short Answer Creator
+     *
+     * @param options
+     */
+    $.fn.shortCreate = function(options) {
+        options = options || {};
+
+        var config = init(options, $(this));
+
+        /* Add custom validation rules
+         */
+        config.customValidationRules(config);
+
+        /* Mash the validator on
+         */
+        applyValidator();
+
+        /**
+         * Init
+         *
+         * @param options
+         * @param element
+         * @returns {*}
+         */
+        function init(options, element) {
+            var defaults = {
+                element: element,
+
+                /* Which validator to use
+                 */
+                mode: 'create',
+
+                /* Whether you came from the QuestionBank
+                 */
+                questionBank: false,
+
+                /* An element containing all the available configuration options
+                 */
+                configuration: '#configuration',
+
+                /* Setup of custom validation rules to use
+                 * Call $.fn.addCustomRules_* here.
+                 */
+                customValidationRules: function() {
+                },
+
+                /* Actual validation rules
+                 * Defaults to the full set.
+                 */
+                rules: {
+                    question: {
+                        required: true,
+                        minlength: 2
+                    },
+                    marks: {
+                        required: true,
+                        minlength: 1,
+                        greaterThanZero:true
+                    },
+                    answer: {
+                        required: true,
+                        minlength: 2,
+                        emptyAnswer:true
+                    }
+                },
+
+                /* Error messages
+                 */
+                messages: {
+                    question: "Please enter a question.",
+                    answer: "Please fill out an answer."
+                },
+
+                errorPlacement: function(error, element) {
+
+                    // position error label after generated textarea
+                    if (element.is("textarea") && element.next().hasClass('mceEditor')) {
+                        error.insertAfter(element.next());
+                    } else {
+                        error.insertAfter(element)
+                    }
+                }
+            }
+
+            var derived = {
+            }
+
+            var merged = $.extend(defaults, derived, options);
+
+            return merged;
+        }
+
+        /* Validator
+         */
+
+        /**
+         * Apply the validator to the form
+         */
+        function applyValidator() {
+            $(config.element).submit(function() {
+                // update underlying textarea before submit validation
+                tinyMCE.triggerSave();
+            }).validate({
+                rules: config.rules,
+                messages: config.messages,
+
+                // Don't ignore radios and checkboxes, as these are actually hidden
+                ignore: '',
+
+                errorPlacement: function(error, element) {
+
+                    /* If the error was found on the Marks field, just leave it
+                     * to spawn naturally
+                     *
+                     * Position error label after generated textarea
+                     */
+                    if (element.is("textarea") && element.next().hasClass('mceEditor')) {
+                        error.insertAfter(element.next());
+                    }
+                    else {
+                        error.insertAfter(element)
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Multiple Choice/Radio Creator
      */
     $.fn.multiRadioCreate = function(options) {
         options = options || {};
@@ -109,6 +236,12 @@
                     'answerDescription[]': {
                         emptyInputs: true
                     }
+                },
+
+                /* Error messages
+                 */
+                messages: {
+                    question: "Please enter a question."
                 }
             }
 
@@ -302,6 +435,7 @@
                 },
 
                 rules: config.rules,
+                messages: config.messages,
 
                 errorPlacement: function(error, element) {
 
@@ -328,13 +462,16 @@
                      * If the error was found on one of the answer options,
                      * spawn it naturally
                      */
+                    else if (element.is("textarea") && element.next().hasClass('mceEditor')) {
+                        error.insertAfter(element.next());
+                    }
                     else {
-                        error.insertAfter(element);
+                        error.insertAfter(element)
                     }
                 },
 
                 // Don't ignore radios and checkboxes, as these are actually hidden
-                ignore: ':hidden:not([type="radio"]):not([type="checkbox"])'
+                ignore: ''
             });
         }
     }

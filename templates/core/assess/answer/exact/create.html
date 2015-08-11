@@ -1,46 +1,17 @@
+<script type='text/javascript' src="/javascript/evaluation/evaluation-creator.js"></script>
+<script type='text/javascript' src="/javascript/evaluation/validation.js"></script>
 <script type="text/javascript">
-$(function() {
-	
-	var validator = $("#createQuestionForm").submit(function() {
-		 // update underlying textarea before submit validation
-		 tinyMCE.triggerSave(); 
-		 
-	 }).validate({
-		rules: { 
-			question: {
-				required: true,
-				minlength: 1
-			},
-			marks: {
-				required: true,
-				minlength: 1,
-				greaterThanZero:true
-			}
-		},
-		
-		messages: {
-			question: "Please enter a question.",
-			answer: "Please fill out an answer."
-		},
-		
-        errorPlacement: function(error, element) {
-            offset = element.offset();
-            error.insertAfter(element.parent().children(':last-child'))
-            error.addClass('message');  // add a class to the wrapper
-           
-		}
-	
-	});
-	
-	jQuery.validator.addMethod("greaterThanZero", function(value, element) {
-   		return this.optional(element) || (parseFloat(value) > 0);
-	}, "Amount must be greater than zero");
-	
-});
+    $(function() {
+        $('#createQuestionForm').shortCreate({
+            customValidationRules: function(config) {
+                $.fn.addCustomRules_greaterThanZero(config);
+                $.fn.addCustomRules_emptyAnswer(config);
+            }
+        });
+    });
 </script>
 
-<label>Suggested Answer
-	<div class="textarea-container">
-		<input id="answer" name="answer" value="{ANSWER}" />
-	</div>
+<label>
+    Suggested Answer
+    <input name="answer" type='text' value="{ANSWER}" data-answer-description />
 </label>

@@ -123,7 +123,7 @@
 </ul>
 
 <script type='text/javascript' src="/javascript/evaluation/evaluation.js"></script>
-<script type='text/javascript' src="/javascript/evaluation/multiplechoice-creator.js"></script>
+<script type='text/javascript' src="/javascript/evaluation/evaluation-creator.js"></script>
 <script type='text/javascript' src="/javascript/evaluation/validation.js"></script>
 <script type="text/javascript">
     $(function() {
@@ -132,6 +132,15 @@
             mode: 'create',
             questionBank: false,
             addDefaults: false,
+            rules: {
+                question: {
+                    required: true,
+                    minlength: 2
+                },
+                'answerDescription[]': {
+                    emptyInputs: true
+                }
+            },
             customValidationRules: function(config) {
                 $.fn.addCustomRules_emptyInputs(config);
             }

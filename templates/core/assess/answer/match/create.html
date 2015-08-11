@@ -12,7 +12,7 @@
         <div class="small-5 columns" data-answer-code>
             <input name="answerCode[]" type="hidden" value="" data-answer-code-value />
             <label class="answer-value">
-                <input name="answerLeft[]" type="text" value="" data-answer-field="answerLeft" />
+                <input name="answerLeft[]" type="text" value="" data-answer-field="answerLeft" data-answer-description />
             </label>
         </div>
         <div class="small-1 columns">
@@ -30,7 +30,7 @@
 </ul>
 
 <script type='text/javascript' src="/javascript/evaluation/evaluation.js"></script>
-<script type='text/javascript' src="/javascript/evaluation/multiplechoice-creator.js"></script>
+<script type='text/javascript' src="/javascript/evaluation/evaluation-creator.js"></script>
 <script type='text/javascript' src="/javascript/evaluation/validation.js"></script>
 <script type="text/javascript">
     $(function() {
@@ -50,9 +50,13 @@
                     greaterThanZero:true
                 },
                 'answerLeft[]': {
+                    required: true,
+                    minlength: 1,
                     emptyInputs: true
                 },
                 'answerRight[]': {
+                    required: true,
+                    minlength: 1,
                     emptyInputs: true
                 }
             },
