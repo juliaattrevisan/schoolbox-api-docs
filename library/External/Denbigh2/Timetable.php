@@ -207,9 +207,10 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
          */
         if ($this->getGroupHandler()->isStudent($userId)) {
 
-            $api = new External_Denbigh2_Api('StudentTimetable', array(
-                'Student ID' => $externalUserId
-            ));
+            $api = new External_Denbigh2_Api('StudentTimetable',
+                array('Student ID' => $externalUserId),
+                array('RFMmax' => 0)
+            );
 
             if (!$api->hasErrors()) {
 
@@ -262,12 +263,8 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         elseif ($this->getGroupHandler()->isStaff($userId)) {
 
             $api = new External_Denbigh2_Api('TimetableLessons',
-                array(
-                    'Teacher Code' => $externalUserId
-                ),
-                array(
-                    'RFMmax' => 0
-                )
+                array('Teacher Code' => $externalUserId),
+                array('RFMmax' => 0)
             );
 
             if (!$api->hasErrors()) {
@@ -406,9 +403,10 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
          */
         if ($this->getGroupHandler()->isStudent($userId)) {
 
-            $api = new External_Denbigh2_Api('StudentTimetable', array(
-                'Student ID' => $externalUserId,
-            ));
+            $api = new External_Denbigh2_Api('StudentTimetable',
+                array('Student ID' => $externalUserId),
+                array('RFMmax' => 0)
+            );
 
             if (!$api->hasErrors()) {
                 $allPeriods = $api->getResult()->data;
@@ -457,12 +455,8 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         else if ($this->getGroupHandler()->isStaff($userId)) {
 
             $api = new External_Denbigh2_Api('TimetableLessons',
-                array(
-                    'Teacher Code' => $externalUserId
-                ),
-                array(
-                    'RFMmax' => 0
-                )
+                array('Teacher Code' => $externalUserId),
+                array('RFMmax' => 0)
             );
 
             if (!$api->hasErrors()) {
