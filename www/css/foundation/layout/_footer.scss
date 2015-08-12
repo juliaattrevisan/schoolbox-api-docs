@@ -1,8 +1,6 @@
 #footer {
     margin: 1rem 2.5rem 0;
-    font-size: 0.875rem;
-    color: $base;
-
+    @include contrast-bg();
     ul {
         margin: 0 auto 1rem;
         list-style: none;

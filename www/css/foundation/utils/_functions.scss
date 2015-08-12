@@ -7,3 +7,18 @@
 @function shade($color, $percent){
 	@return mix(black, $color, $percent);
 }
+
+@function calc-text-color($bg, $light: $white, $dark: $black) {
+	@if (lightness($bg) > 50) {
+		@return $dark; // Lighter backgorund, return dark color
+	} @else {
+		@return $light; // Darker background, return light color
+	}
+}
+
+@function flatten-alpha($color, $background) {
+	$percent: alpha($color) * 100%;
+	$opaque: opacify($color, 1);
+	$solid-color: mix($opaque, $background, $percent);
+	@return $solid-color;
+}

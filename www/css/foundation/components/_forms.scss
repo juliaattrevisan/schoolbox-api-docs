@@ -27,15 +27,15 @@ $input-hover-bg-color: tint($tertiary, 87%);
 $input-hover-color: $black;
 $input-border-style: solid;
 $input-border-width: 2px;
-// $input-border-radius: $global-radius;
+$input-border-radius: $global-radius;
 $input-disabled-bg: rgba($primary-color, 0.04);
 // $input-disabled-cursor: $cursor-default-value;
 $input-box-shadow: none;
 
 // We use these to style the fieldset border and spacing.
-// $fieldset-border-style: solid;
-// $fieldset-border-width: 1px;
-// $fieldset-border-color: $gainsboro;
+$fieldset-border-style: solid;
+$fieldset-border-width: 2px;
+$fieldset-border-color: $body-bg;
 $fieldset-padding: rem-calc(($base-font-size - 8));
 $fieldset-margin: rem-calc(($base-font-size - 8, 0));
 
@@ -289,698 +289,87 @@ input[type=checkbox]:checked + label.checkbox-toggle{
 	}
 }
 
-$overlay-duration: 800ms;
+section > fieldset {
 
-.dragging {
-    .dropzone.overlay {
-        opacity: 1;
-        z-index: 2;
+	border: none;
+	@extend .row;
 
-        transition: opacity $overlay-duration cubic-bezier(0.14, 1.11, 0.07, 0.99);
-    }
-}
-
-.dropzone-wrap {
-    position: relative;
-}
-
-.dropzone {
-    &.overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        opacity: 0;
-        display: block;
-        z-index: -1;
-
-        transition: opacity $overlay-duration cubic-bezier(0.14, 1.11, 0.07, 0.99),
-                    z-index 0s $overlay-duration linear;
-
-    }
-}
-
-.explorer .file-browser {
-	overflow-y: auto;
-	height: 'calc(100% - 26px)';
-}
-
-// Attach Browser
-#attachment-browser {
-	margin: -0.2em -1em;
-	h3 {
-		width: 20%;
-		a {
-			display: block;
-			padding: 8px 12px;
-			border-radius: 4px;
-		}
+	@media #{$small-only} {
+		padding: 0;
 	}
-	.explorer {
-		position: absolute;
-		top: 0;
-		left: 0;
-		height: 100%;
-		width: 80%;
-		margin-left: 20%;
-		display: none;
-		padding: 4px;
-		box-sizing: border-box;
-        font-size: 0.91em; // undo parent .ui-widget 1.1em nonsense
-		&.preload {
-			background: transparent url("/images/loading-bar.gif") no-repeat 50%;
-		}
-		iframe {
-			width: 100%;
-			height: 100%;
-		}
+	@media #{$medium-only} {
+		padding: 0 0.25rem;
 	}
-	li[data-source].browsing {
-		h3 a {
-			color: $white;
-			background: $warning-color;
-			&:hover {
-				text-decoration: none;
-			}
-		}
-		.explorer {
-			display: block;
+
+	// second sibling onwards
+	~ fieldset {
+		border-top: solid $fieldset-border-width $body-bg;
+	}
+
+	> legend {
+		@extend %h3;
+		@extend .column;
+		margin: 0.2rem 0 0.5rem;
+		font-weight: $header-font-weight;
+	}
+
+	fieldset {
+		border: none;
+		padding: 0.5rem 0;
+		legend {
+			@extend %h4;
+			font-weight: $header-font-weight;
 		}
 	}
 }
 
-// Attachzone
-ul.az-list,
-ul.az-error-list {
+.content > fieldset {
+	@media #{$small-only} {
+		padding: 0;
+	}
+}
+
+.timepick {
 	position: relative;
-	margin: 0;
-	> li {
-		clear: none;
-		//background-color: $monsoon;
-		@include transition( (
-			opacity 100ms ease-in,
-			height 150ms ease-out 50ms,
-			padding 150ms ease-out 50ms,
-			background-color 500ms ease-out
-			)
-		);
-		&:nth-child(2n) {
-			background-color: fade($monsoon, 5%);
+}
+
+@media #{$small-only} {
+	table.mceLayout, textarea.tinyMCE {
+		width: 100% !important;
+	}
+	td.mceToolbar {
+		padding: 0 !important;
+		td {
+			display: table-row;
+			float: left;
 		}
-		&.detach {
-			opacity: 0;
-			height: 0;
-			padding-top: 0;
-			padding-bottom: 0;
-			.actions {
-				display: none;
-			}
-		}
-		.actions {
-			float: right;
-			margin: 0;
+		td:nth-of-type(11) {
+			//clear: left;
 		}
 	}
-	img {
-		position: absolute;
-	}
-	p {
-		margin-bottom: 0;
-		clear: none;
-	}
-	.filename {
-		overflow-x: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+}
+
+.mceEditor {
+	table tr {
+		background: transparent;
 	}
 }
 
-ul.az-error-list {
-    background: #fee;
-    margin-top: rem-calc(($base-font-size - 12));
-    .dz-error {
-        height: 24px;
-    }
-    .filename {
-        line-height: 24px;
-        height: 24px;
-        text-decoration: underline;
-        font-style: italic;
-        cursor: pointer;
-    }
-    .actions .btn {
-        margin-top: 0;
-    }
+table.mceLayout tr td {
+	background-color: transparent;
 }
 
-/* 64px version */
-.s64 {
-	li {
-		height: 64px;
-	}
-	img {
-		width: 64px;
-		height: 64px;
-	}
-	.dzone {
-		height: 72px;
-	}
-	.filename {
-		line-height: 64px;
-		margin-left: 72px;
-	}
-	.dzone {
-		background-image: url("/images/core/files/paperclip-64.png");
-		background-size: 38px;
-		background-position: 10px;
-		padding-left: 58px;
-	}
-	.dz-upload {
-		height: 72px;
-	}
-	.button{
-		float: right;
-	}
-}
-
-.attachzone {
-	min-width: 40px;
-	&.dz-unsupported,
-	&.dz-max-files-reached {
-		.dzone {
-			border-color: transparent;
-			background-color: transparent;
-			background-image: none;
-			color: $black;
-			padding-left: 0;
-			span {
-				padding: 0;
-			}
-		}
-	}
-	&.dz-unsupported {
-		.dzone {
-			height: auto;
-		}
-	}
-	&.dz-max-files-reached .dzone {
-		height: 0;
-		//.transition(none);
-		border-width: 0;
-	}
-	&.dz-drag-hover .dzone {
-		border-color: $success-color;
-		background-color: $vapor;
-	}
-	img[data-dz-thumbnail] {
-		background: url('/images/resources/ajax.gif') no-repeat 50%;
-		@include single-transition(opacity, 0.15s, ease-in);
-	}
-	ul.az-list > li {
-		position: relative;
-	}
-	.dzone {
-		position: relative;
-		overflow: hidden;
-		background-color: rgba($success-color, 0.3);
-		border: 2px dashed $success-color;
-		background-repeat: no-repeat;
-		display: block;
-		color: $success-color;
-		text-shadow: 0 1px 0 $white;
-		width: 100%;
-		@include transition( (
-			background-color 150ms ease-out,
-			border-color 150ms ease-out,
-			color 150ms ease-out,
-			height 150ms ease-out 150ms
-			)
-		);
-		//@include single-transition(all, 0.15s, ease-out);
-		&:hover {
-			background-color: rgba($success-color, 0.2);
-			cursor: pointer;
-			span {
-				text-decoration: underline;
-			}
-		}
-		span {
-			display: inline-block;
-			vertical-align: middle;
-			padding: 4px;
-			position: absolute;
-			top: 50%;
-			@include transform( translateY(-50%) );
-		}
-	}
-	.dz-error {
-		img[data-dz-thumbnail] {
-			opacity: 0;
-		}
-		.dz-upload {
-			background-color: $alert-color;
-		}
-	}
-	.dz-success {
-		img[data-dz-thumbnail] {
-			background: none;
-		}
-		.dz-upload {
-			background-color: transparent;
-		}
-		.filename {
-			opacity: 1;
-		}
-	}
-	div.dz-progress {
-		margin: 0;
-	}
-	.dz-upload {
-		background-color: $vapor;
-		top: 0;
-		left: 0;
-	}
-	.filename {
-		opacity: 0.4;
-		@include single-transition(opacity, 0.15s, ease-out);
-	}
-}
-
-// Attach-browser upload
-#ab-upload {
-	.dzone {
-		min-height: 100%;
-		overflow: hidden;
-		background-color: rgba($success-color, 0.3);
-		border: 2px dashed $success-color;
-		box-sizing: border-box;
-		margin-right: 4px;
-		@include single-transition(all, 0.15s, ease-out);
-		&.dz-started, &.dz-browser-not-supported {
-			border-color: transparent;
-			background-color: transparent;
-		}
-		&.dz-browser-not-supported .dz-message {
-			display: none;
-		}
-		&.dz-started .dz-default {
-			display: none;
-		}
-		.dz-fallback {
-			margin-top: 25%;
-			text-align: center;
-			p {
-				font-size: 1em;
-				padding: rem-calc(($base-font-size - 6));
-				text-align: center;
-			}
-		}
-	}
-	form.dzone.dz-drag-hover {
-		background-color: rgba($success-color, 0.2);
-	}
-	.dz-error-mark, .dz-success-mark {
-		display: none;
-		position: absolute;
-		top: 23px;
-		left: 9px;
-	}
-	.dz-error-mark {
-		color: $alert-color;
-	}
-	.dz-success-mark {
-		color: $success-color;
-	}
-	.dz-preview {
-		&.dz-error {
-			@extend .dz-error-mark;
-		}
-		&.dz-success {
-			@extend .dz-success-mark;
-		}
-	}
-	.dz-error .dz-error-message {
-		position: absolute;
-		top: 37px;
-		left: 0;
-		width: 100px;
-		height: 100px;
-		margin: rem-calc(($base-font-size - 8));
-		background: $alert-color;
-		padding: rem-calc(($base-font-size - 6));
-		box-sizing: border-box;
-		text-align: center;
-	}
-	.dz-remove {
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		width: 100%;
-		text-align: center;
-	}
-	.dz-error .dz-error-mark,
-	.dz-success .dz-success-mark {
-		display: block;
-	}
-	.dz-preview {
-		background-color: $white;
-		position: relative;
-		width: 120px;
-		height: 180px;
-		border: solid 1px $monsoon;
-		box-sizing: border-box;
-		float: left;
-	}
-	img[data-dz-thumbnail] {
-		margin: 9px;
-		max-width: 100px;
-	}
-	.dz-filename {
-		position: static;
-		span {
-			display: block;
-			width: 100%;
-			white-space: nowrap;
-			text-overflow: ellipsis;
-			overflow: hidden;
-			padding: rem-calc(($base-font-size - 12));
-			box-sizing: border-box;
-		}
-	}
-	.dz-size {
-		text-align: right;
-		padding: 0 9px;
-	}
-	.dz-default {
-		width: 100%;
-		height: 100%;
-		span {
-			position: absolute;
-			top: 45%;
-			left: 50%;
-			@include transform(translate(-50%, -50%));
-			color: $monsoon;
-			text-shadow: 0 1px 0 $white;
-		}
-	}
-	.dz-progress [data-dz-uploadprogress] {
-		height: 100%;
-		display: block;
-		background: $jumbo;
-		position: absolute;
-		top: 0;
-		left: 0;
-		@include single-transition(all, 0.15s, ease-out);
-	}
-
-	.dz-success .dz-progress [data-dz-uploadprogress] {
-		opacity: 0;
+.cirkuitSkin a.mceButton {
+	@include border-radius(0);
+	background-image: none;
+	background-color: $body-bg;
+	padding: 4px 5px;
+	width: 2rem;
+	height: 2rem;
+	&.mceButtonActive {
+		background-color: $secondary-color !important;
 	}
 }
 
 
-// Default Dropzone
-.dropzone{
-	background-color: rgba(193, 234, 193, 0.8); // TODO make a function of $success-color
-	border: 2px dashed $success-color;
-	padding: rem-calc(($base-font-size - 6));
-	position: relative;
-	min-height: 72px;
-	margin-bottom: rem-calc(($base-font-size - 2));
-
-	&.dz-drag-hover {
-		border-color: $success-color;
-		background: $ocean-sunset;
-	}
-
-	.dz-default.dz-message {
-		background-image: url('/images/foundation/dropzone.png');
-		background-repeat: no-repeat;
-		background-position: 0 0;
-		@include single-transition(opacity, 0.3s, ease-in-out);
-		opacity: 1;
-		-ms-filter: none;
-		filter: none;
-	  	height: 48px;
-	  	position: absolute;
-	}
-
-	.dz-preview,
-	.dropzone-previews .dz-preview {
-		background: $white;
-		position: relative;
-		display: inline-block;
-		margin: rem-calc(($base-font-size)) rem-calc(($base-font-size - 2));
-		vertical-align: top;
-		border: 2px solid tint($tertiary, 66%);
-		padding: 0.4rem;
-	}
-
-	.dz-preview.dz-error .dz-error-mark,
-	.dropzone-previews .dz-preview.dz-error .dz-error-mark,
-	.dz-preview.dz-success .dz-success-mark,
-	.dropzone-previews .dz-preview.dz-success .dz-success-mark,
-	.dz-preview:hover.dz-error .dz-error-message,
-	.dropzone-previews .dz-preview:hover.dz-error .dz-error-message {
-		display: block;
-	}
-
-	.dz-preview .dz-error-mark span,
-	.dropzone-previews .dz-preview .dz-error-mark span,
-	.dz-preview .dz-success-mark span,
-	.dropzone-previews .dz-preview .dz-success-mark span,
-	.dz-preview.dz-file-preview [data-dz-thumbnail],
-	.dropzone-previews .dz-preview.dz-file-preview [data-dz-thumbnail],
-	.dz-preview:hover .dz-details img,
-	.dropzone-previews .dz-preview:hover .dz-details img {
-		display: none;
-	}
-
-	.dz-preview .dz-error-mark,
-	.dropzone-previews .dz-preview .dz-error-mark {
-		background-position: 0 -72px;
-	}
-
-	.dz-preview .dz-success-mark,
-	.dropzone-previews .dz-preview .dz-success-mark {
-		background-position: 0 -48px;
-	}
-
-	.dz-preview .dz-error-mark,
-	.dropzone-previews .dz-preview .dz-error-mark,
-	.dz-preview .dz-success-mark,
-	.dropzone-previews .dz-preview .dz-success-mark {
-		background-image: url('/images/foundation/dropzone.png');
-		background-repeat: no-repeat;
-		display: block;
-		opacity: 0;
-		-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-		filter: alpha(opacity=0);
-		@include single-transition(opacity, 0.4s, ease-in-out);
-	}
-
-	.dz-preview .dz-success-mark,
-	.dropzone-previews .dz-preview .dz-success-mark,
-	.dz-preview .dz-error-mark,
-	.dropzone-previews .dz-preview .dz-error-mark {
-		display: none;
-		position: absolute;
-		width: 24px;
-		height: 24px;
-		font-size: 1rem;
-		text-align: center;
-		right: -10px;
-		top: -10px;
-	}
-
-	.dropzone a.dz-remove,
-	.dropzone-previews a.dz-remove {
-		text-decoration: none;
-		display: block;
-		padding: 4px 5px;
-		text-align: center;
-		color: $primary-color;
-	}
-}
-
-.dz-preview .dz-details,
-.dropzone-previews .dz-preview .dz-details {
-	width: 100px;
-	height: 100px;
-	position: relative;
-	background: #ebebeb;
-	padding: 5px;
-	margin-bottom: 22px;
-}
-.dz-preview .dz-details .dz-filename,
-.dropzone-previews .dz-preview .dz-details .dz-filename {
-	overflow: hidden;
-	height: 100%;
-}
-.dz-preview .dz-details img,
-.dropzone-previews .dz-preview .dz-details img {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100px;
-	height: 100px;
-}
-.dz-preview .dz-details .dz-size,
-.dropzone-previews .dz-preview .dz-details .dz-size {
-	position: absolute;
-	bottom: -28px;
-	left: 3px;
-	height: 28px;
-	line-height: 28px;
-}
-
-.dz-preview .dz-success-mark,
-.dropzone-previews .dz-preview .dz-success-mark,
-.dz-preview .dz-error-mark,
-.dropzone-previews .dz-preview .dz-error-mark {
-	display: none;
-	position: absolute;
-	width: 24px;
-	height: 24px;
-	font-size: 30px;
-	text-align: center;
-	right: -10px;
-	top: -10px;
-}
-.dz-preview .dz-success-mark,
-.dropzone-previews .dz-preview .dz-success-mark {
-	color: $success-color;
-}
-.dz-preview .dz-error-mark,
-.dropzone-previews .dz-preview .dz-error-mark {
-	color: $alert-color;
-}
-.dz-preview .dz-progress,
-.dropzone-previews .dz-preview .dz-progress {
-	position: absolute;
-	top: 100px;
-	left: 6px;
-	right: 6px;
-	height: 6px;
-	background: $body-grey;
-	display: none;
-}
-.dz-preview .dz-progress .dz-upload,
-.dropzone-previews .dz-preview .dz-progress .dz-upload {
-	display: block;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	width: 0%;
-	background-color: $success-color;
-}
-.dz-preview.dz-processing .dz-progress,
-.dropzone-previews .dz-preview.dz-processing .dz-progress {
-	display: block;
-}
-.dz-preview .dz-error-message,
-.dropzone-previews .dz-preview .dz-error-message {
-	display: none;
-	position: absolute;
-	top: -5px;
-	left: -20px;
-	background: rgba($white, 0.8);
-	padding: 8px 10px;
-	color: $alert-color;
-	min-width: 140px;
-	max-width: 500px;
-	z-index: 500;
-}
-
-.dz-default.dz-message span {
-	color: $success-color;
-	font-weight: 700;
-	margin-left: 170px;
-	position: relative;
-  	top: 35%;
-}
-.dropzone.dz-square .dz-default.dz-message {
-	background-position: 0 -123px;
-	width: 268px;
-	margin-left: -134px;
-	height: 174px;
-	margin-top: -87px;
-}
-.dropzone.dz-drag-hover .dz-message {
-	opacity: 0.15;
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=15)";
-	filter: alpha(opacity=15);
-}
-.dropzone.dz-started .dz-message {
-	display: block;
-	opacity: 0;
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-	filter: alpha(opacity=0);
-}
-.dz-preview.dz-image-preview:hover .dz-details img,
-.dropzone-previews .dz-preview.dz-image-preview:hover .dz-details img {
-	display: block;
-	opacity: 0.1;
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=10)";
-	filter: alpha(opacity=10);
-}
-.dz-preview.dz-success .dz-success-mark,
-.dropzone-previews .dz-preview.dz-success .dz-success-mark {
-	opacity: 1;
-	-ms-filter: none;
-	filter: none;
-}
-.dz-preview.dz-error .dz-error-mark,
-.dropzone-previews .dz-preview.dz-error .dz-error-mark {
-	opacity: 1;
-	-ms-filter: none;
-	filter: none;
-}
-.dz-preview.dz-error .dz-progress .dz-upload,
-.dropzone-previews .dz-preview.dz-error .dz-progress .dz-upload {
-	background: $alert-color;
-}
-
-.dz-preview.dz-success .dz-progress,
-.dropzone-previews .dz-preview.dz-success .dz-progress {
-	display: block;
-	opacity: 0;
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-	filter: alpha(opacity=0);
-	@include single-transition(opacity, 0.4s, ease-in-out);
-}
-
-.dz-preview .dz-error-message,
-.dropzone-previews .dz-preview .dz-error-message {
-	display: block;
-	opacity: 0;
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-	filter: alpha(opacity=0);
-	@include single-transition(opacity, 0.3s, ease-in-out);
-}
-
-.dz-preview:hover.dz-error .dz-error-message,
-.dropzone-previews .dz-preview:hover.dz-error .dz-error-message {
-	opacity: 1;
-	-ms-filter: none;
-	filter: none;
-}
-
-.dz-preview .dz-progress .dz-upload,
-.dropzone-previews .dz-preview .dz-progress .dz-upload {
-	@include animation(loading 0.4s linear infinite);
-	@include single-transition(width, 0.3s, ease-in-out);
-	-webkit-border-radius: 2px;
-	border-radius: 2px;
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 0%;
-	height: 100%;
-	background-image: url('/images/foundation/dropzone.png');
-	background-repeat: repeat-x;
-	background-position: 0px -400px;
-}
+@import 'forms/dropzone';

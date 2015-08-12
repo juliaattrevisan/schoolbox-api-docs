@@ -6,7 +6,7 @@
 
 // We use these to control header font styles
 // $header-font-family: $body-font-family;
-// $header-font-weight: $font-weight-normal;
+$header-font-weight: $font-weight-normal;
 // $header-font-style: normal;
 // $header-font-color: $jet;
 // $header-line-height: 1.4;
@@ -33,7 +33,7 @@ $h6-font-reduction: 0 !default;
 // These control how subheaders are styled.
 // $subheader-line-height: 1.4;
 // $subheader-font-color: scale-color($header-font-color, $lightness: 35%);
-// $subheader-font-weight: $font-weight-normal;
+$subheader-font-weight: $header-font-weight;
 // $subheader-top-margin: .2rem;
 // $subheader-bottom-margin: .5rem;
 
@@ -124,24 +124,74 @@ $paragraph-aside-font-size: rem-calc(($base-font-size - 4));
 
 @import "../../../javascript/components/foundation/scss/foundation/components/type";
 
+@mixin scale-font-size($scale, $base: $base-font-size) {
+	@media #{$small-only} {
+		font-size: rem-calc($base * nth($scale, 1));
+	}
+	@media #{$medium-only} {
+		font-size: rem-calc(($base * nth($scale, 2)));
+	}
+	@media #{$large-up} {
+		font-size: rem-calc(($base * nth($scale, 3)));
+	}
+}
+
+             //  s,     m,      l+
+$h1-font-scale: (2, 2.25, 3);			// 32, 36, 48
+$h2-font-scale: (1.375, 1.625, 2);		// 22, 26, 32
+$h3-font-scale: (1.125, 1.25, 1.375);	// 18, 20, 22
+$h4-font-scale: (1.0625 1.125 1.25);	// 17, 18, 20
+$h5-font-scale: (1, 1.0625, 1.125);		// 16, 17, 18
+$h6-font-scale: (0.9375, 1, 1.0625);	// 15, 16, 17
+$p-font-scale:  (0.875, 0.9375, 1);		// 14, 15, 16
+
+// implement
+%h1 { @include scale-font-size($h1-font-scale); }
+%h2 { @include scale-font-size($h2-font-scale); }
+%h3 { @include scale-font-size($h3-font-scale); }
+%h4 { @include scale-font-size($h4-font-scale); }
+%h5 { @include scale-font-size($h5-font-scale); }
+%h6 { @include scale-font-size($h6-font-scale); }
+%p  { @include scale-font-size($p-font-scale);  }
+
+h1 { @extend %h1; }
+h2 { @extend %h2; }
+h3 { @extend %h3; }
+h4 { @extend %h4; }
+h5 { @extend %h5; }
+h6 { @extend %h6; }
+p  { @extend %p;  }
+
 // Heading 1
 h1{
-	font-weight: $font-weight-bold;
+	font-weight: $font-weight-bold; // override
+	color: calc-text-color($body-bg);
 }
 
-@media #{$large-down} {
-	h1{ font-size: 1.875rem; }
-}
+//@media #{$large-down} {
+//	h1{ font-size: 1.875rem; }
+//}
 
-@media #{$small-only} {
-	h1{ font-size: 1.375rem; }
-}
+//@media #{$small-only} {
+//	h1{ font-size: 1.375rem; }
+//}
 
 // Heading 2
 h2.subheader{
-	color: $monsoon;
 	font-weight: 100;
 	text-transform: uppercase;
+}
+
+h1, h2 {
+	&.subheader {
+		@include contrast-bg();
+	}
+}
+
+h3, h4, h5, h6 {
+	.subheader {
+		@include contrast-bg(0.5, $white);
+	}
 }
 
 a{
@@ -149,9 +199,9 @@ a{
 }
 
 .meta{
-	color: $steel !important;
+	@include contrast-bg();
 	margin: 0 0 rem-calc(($base-font-size - 10)) 0;
-	font-size: rem-calc(($base-font-size - 3));
+	//font-size: rem-calc(($base-font-size - 3));
 	font-style: italic;
 	&.title {
 	    color: $black !important;
@@ -162,7 +212,7 @@ a{
 
 // Typically descriptive text1
 .desc{
-	font-size: rem-calc(($base-font-size - 3));
+	//font-size: rem-calc(($base-font-size - 3));
 	margin-bottom: rem-calc(($base-font-size - 3));
 }
 
