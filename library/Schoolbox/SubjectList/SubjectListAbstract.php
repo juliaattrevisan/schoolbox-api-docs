@@ -78,6 +78,7 @@ abstract class SubjectListAbstract
 		 * "Subjects" array element, otherwise use their provided
 		 * classTypes instead
 		 */
+        $splitSubjects = \Config::get('mysubjects_split');
         if (is_array($this->getAllSubjects()) && count($this->getAllSubjects())) {
             foreach ($this->getAllSubjects() as $currentSubject) {
                 /* If the homepage doesn't exist or can't be found, don't
@@ -93,7 +94,7 @@ abstract class SubjectListAbstract
                 /* Subjects without a parent just get thrown together into
                  * a generic container
                  */
-                if (!strlen($currentSubject['classType'])) {
+                if (!$splitSubjects || !strlen($currentSubject['classType'])) {
                     $allSubjectLists['Subjects'][] = $childElement;
                 } else {
                     $allSubjectLists[$currentSubject['classType']][] = $childElement;
