@@ -539,7 +539,7 @@ class API extends Generic\API
             if ($user->getId() != $currentUser->getId()) {
                 // visibility check
                 $gHandler = new \Group();
-                if ($gHandler->isStudent() && $user->getId() != $_SESSION['user']) {
+                if ($gHandler->isStudent()) {
                     throw new \Exception_Schoolbox_AccessDenied();
                 }
                 if ($gHandler->isParent() && !$gHandler->isParentOfChild($user->getId())) {
