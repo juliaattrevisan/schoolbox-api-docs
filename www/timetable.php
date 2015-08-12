@@ -92,6 +92,7 @@ if ($groupHandler->isParent()) {
         foreach ($userObject->getCampusCollection() as $campusObj) {
             $campus_code = $campusObj->getExtTimetableCode();
             if (!isset($checked_campus_list[$campus_code])) {
+                $checked_campus_list[$campus_code] = true;
                 $user['campus']     = $campusObj;
                 $user['campusName'] = $campusObj->getName();
                 $outputList[]       = $user;
