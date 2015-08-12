@@ -49,8 +49,8 @@ class Lister extends Renderer
      */
     private function detonate()
     {
-        $startTime = new \Alaress_Date_Format($this->getStartTimestamp(), 'U');
-        $endTime = new \Alaress_Date_Format($this->getEndTimestamp(), 'U');
+        $startTime = new \Alaress_Date_Format($this->getStartTimestamp(), \Alaress_Date_Format::TIMESTAMP);
+        $endTime   = new \Alaress_Date_Format($this->getEndTimestamp(), \Alaress_Date_Format::TIMESTAMP);
 
         $newCollection = new Collection;
 
@@ -73,8 +73,12 @@ class Lister extends Renderer
                     $eventEndTime = clone $endTime;
                 }
 
-                for($i=0; $eventStartTime->lte($eventEndTime); $i++)  {
-                    $clone      = clone($currentEvent);
+                for ($i=0; $eventStartTime->lte($eventEndTime); $i++) {
+                    // Don't show events past the end time
+                    if ($eventStartTime->gte($endTime)) {
+                        break;
+                    }
+                    $clone = clone($currentEvent);
                     $clone->setStartTime(clone $eventStartTime);
                     $clone->setEndTime(clone $eventStartTime);
 

@@ -31,12 +31,13 @@ if (count($this->arg) >= 2) {
 
     /* Take them on a date
      */
-    $start = new \Alaress_Date_Format($this->arg[1], 'd-m-Y');
+    $start = \Alaress_Date_Format::newUrlDate($this->arg[1]);
 
     if (isset($this->arg[2])) {
-        $finish = new \Alaress_Date_Format($this->arg[2], 'd-m-Y');
+        $finish = \Alaress_Date_Format::newUrlDate($this->arg[2]);
     } else {
-        $finish = new \Alaress_Date_Format(strtotime('+1 month', $start->getUnixTimestamp()), 'U');
+        $finish = clone $start;
+        $finish->addMonths(1);
     }
 }
 /* Viewing your own calendar:
@@ -47,8 +48,9 @@ else {
 
     /* Take them on a date
      */
-    $start  = new \Alaress_Date_Format($this->arg[0], 'd-m-Y');
-    $finish = new \Alaress_Date_Format(strtotime('+1 month', $start->getUnixTimestamp()), 'U');
+    $start  = \Alaress_Date_Format::newUrlDate($this->arg[0]);
+    $finish = clone $start;
+    $finish->addMonths(1);
 }
 
 
