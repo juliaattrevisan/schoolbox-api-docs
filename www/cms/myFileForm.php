@@ -14,11 +14,21 @@ if ($ajax) {
 $page = new SitePage();
 $page->setAjax($ajax);
 
-$userId = isset($_POST['user']) ? $_POST['user'] : $_SESSION['id'];
+/** @var \Schoolbox\User $user */
+if (isset($_POST['user'])) {
+    try {
+        $user = \Schoolbox\UserMapper::getInstance()->findById($_POST['user']);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(41);
+        exit; // shut UP, storm.
+    }
+} else {
+    $user = $_SESSION['user'];
+}
 
 // PERMISSION: have to be session user or staff
 $groupHandler = new Group();
-if (!($groupHandler->isStaff() || $_SESSION['id'] == $userId)) {
+if (!($groupHandler->isStaff() || $_SESSION['user']->getId() == $user->getId())) {
     if ($ajax) {
         header(':', true, 400);
         die(json_encode('You do not have write permission to this ePortfolio.'));
@@ -74,7 +84,7 @@ if (isset($_POST['description'])) {
     }
 
     $file->setCreatedAt(Alaress_Date_Format::now());
-    $file->setOwner($_SESSION['user']);
+    $file->setOwner($user);
     $file->setTitle($_POST['description']);
     $file->setFolder(\Schoolbox\Resource\My\Folder\Mapper::getInstance()->createModel()->setId($_POST['parent']));
 
