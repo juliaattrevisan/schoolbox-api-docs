@@ -1,0 +1,74 @@
+
+@media #{$small-only} {
+    table.mceLayout, textarea.tinyMCE {
+        width: 100% !important;
+    }
+    td.mceToolbar {
+        padding: 0 !important;
+        td {
+            display: table-row;
+            float: left;
+        }
+        td:nth-of-type(11) {
+            //clear: left;
+        }
+    }
+}
+
+.mceEditor {
+    table tr {
+        background: transparent;
+    }
+}
+
+table.mceLayout tr td {
+    background-color: transparent;
+}
+
+.mceEditor.cirkuitSkin {
+
+    table.mceLayout {
+        border: none;
+        .mceToolbar {
+            height: 32px;
+            padding: 0 !important;
+            background-color: $input-border-color;
+            border: none;
+            margin: 0;
+            .mceToolbarStartButton {
+                display: none;
+            }
+        }
+        tr.mceLast td.mceStatusbar {
+            background: none;
+            border: none;
+            padding: 0 !important;
+            @extend .meta;
+            span, a {
+                @extend .meta;
+            }
+        }
+    }
+
+    .mceIframeContainer {
+        border: $input-border-style $input-border-width $input-border-color;
+        padding: 0 !important;
+    }
+
+    a.mceButton {
+        @include border-radius(0);
+        margin: 0;
+        border-color: transparent !important;
+        background-color: transparent;
+        background-image: none;
+        padding: 4px 5px;
+        width: 2rem;
+        height: 2rem;
+        &.mceButtonActive {
+            background-color: $secondary-color !important;
+        }
+        &:hover {
+            background-color: tint($secondary-color, 40%) !important;
+        }
+    }
+}

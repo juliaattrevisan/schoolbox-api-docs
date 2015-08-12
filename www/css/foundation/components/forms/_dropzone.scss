@@ -34,7 +34,7 @@ $overlay-duration: 800ms;
 
 .explorer .file-browser {
     overflow-y: auto;
-    height: 'calc(100% - 26px)';
+    height: calc(100% - 26px);
 }
 
 // Attach Browser
@@ -147,25 +147,26 @@ ul.az-error-list {
 
 /* 64px version */
 .s64 {
-    li {
-        height: 64px;
-    }
-    img {
-        width: 64px;
-        height: 64px;
-    }
-    .dzone {
-        height: 72px;
-    }
     .filename {
-        line-height: 64px;
-        margin-left: 72px;
+        line-height: 2.5rem;
+        @media #{$medium-up} {
+            line-height: 3rem;
+        }
     }
     .dzone {
         background-image: url("/images/core/files/paperclip-64.png");
-        background-size: 38px;
-        background-position: 10px;
-        padding-left: 58px;
+        @media #{$small-only} {
+            background-size: 1.5rem;
+            height: 3rem;
+            padding-left: 3.5rem;
+            background-position: 0.75rem;
+        }
+        @media #{$medium-up} {
+            background-size: 2rem;
+            height: 4rem;
+            background-position: 0.875rem;
+            padding-left: 4.5rem;
+        }
     }
     .dz-upload {
         height: 72px;
@@ -219,7 +220,7 @@ ul.az-error-list {
         background-repeat: no-repeat;
         display: block;
         color: $success-color;
-        text-shadow: 0 1px 0 $white;
+        font-weight: bold;
         width: 100%;
         @include transition( (
                 background-color 150ms ease-out,
@@ -252,6 +253,9 @@ ul.az-error-list {
         .dz-upload {
             background-color: $alert-color;
         }
+        .progress {
+            height: 0;
+        }
     }
     .dz-success {
         img[data-dz-thumbnail] {
@@ -262,6 +266,9 @@ ul.az-error-list {
         }
         .filename {
             opacity: 1;
+        }
+        .progress {
+            height: 0;
         }
     }
     div.dz-progress {

@@ -1,0 +1,162 @@
+//  DATEPICKER
+
+$datepicker-cell-width: (2.125rem, 2.5rem);
+$datepicker-cell-color: $black;
+$datepicker-background: $secondary-color;
+$datepicker-hover-background: tint($tertiary, 87%);
+$datepicker-selected-background: $white;
+$datepicker-header-color: $primary-color;
+$timepicker-item-visible-count: 5;
+
+@mixin datepicker-cell($sizing: $datepicker-cell-width) {
+    text-align: center;
+
+    @include datepicker-header($sizing);
+    @media #{$small-only} {
+        width: nth($sizing, 1);
+    }
+    @media #{$medium-up} {
+        width: nth($sizing, 2);
+    }
+}
+
+@mixin datepicker-header($sizing: $datepicker-cell-width) {
+    @media #{$small-only} {
+        height: nth($sizing, 1);
+        line-height: nth($sizing, 1);
+    }
+    @media #{$medium-up} {
+        height: nth($sizing, 2);
+        line-height: nth($sizing, 2);
+    }
+}
+
+// Date & Time fields
+.date-time{
+    width: 22% !important;
+    float: left;
+    margin: 0 rem-calc(($base-font-size - 10)) 0 0 !important;
+}
+
+.time-separator{
+    float: left;
+    padding: 0.5rem 0;
+    margin: 0 rem-calc(($base-font-size - 10)) 0 0;
+}
+
+.ui-datepicker{
+    @include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
+}
+
+.ui-datepicker-calendar{
+    margin: 0;
+
+    thead,
+    tr.even,
+    tr.alt,
+    tr,
+    td,
+    th {
+        background-color: $datepicker-background !important;
+        border-width: 0 !important;
+        text-align: center;
+        padding: 0;
+    }
+    .ui-datepicker-today {
+        background-color: $datepicker-hover-background !important;
+    }
+    tr td:hover, td.ui-datepicker-current-day {
+        background-color: $datepicker-selected-background !important;
+    }
+    thead tr th {
+        border-bottom-width: 0;
+        @include datepicker-cell();
+    }
+    td {
+        @include contrast-bg(1, $datepicker-background);
+        &.ui-datepicker-other-month {
+            @include contrast-bg(0.4, $datepicker-background);
+        }
+        a {
+            @include datepicker-cell();
+            display: block;
+            color: inherit;
+        }
+    }
+}
+
+.ui-datepicker-header{
+    background-color: $datepicker-background;
+    color: $datepicker-header-color;
+    font-weight: $font-weight-bold;
+
+    @include datepicker-header();
+
+    .ui-datepicker-prev, .ui-datepicker-next {
+        @include datepicker-cell();
+        display: block;
+        &:hover {
+            background: $datepicker-hover-background;
+        }
+    }
+
+}
+
+.ui-datepicker-title{
+    text-align: center;
+}
+
+.ui-datepicker-prev{
+    float: left;
+}
+
+.ui-datepicker-next{
+    float: right;
+}
+
+
+//  TIMEPICKER
+
+.timepick {
+    position: relative;
+}
+
+.ui-timepicker-wrapper {
+    z-index: 1;
+    width: 100%;
+    overflow-y: scroll;
+    background: $datepicker-background;
+    outline: none;
+
+    @include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
+
+    @media #{$small-only} {
+        max-height: $timepicker-item-visible-count * nth($datepicker-cell-width, 1);
+    }
+
+    @media #{$medium-up} {
+        max-height: $timepicker-item-visible-count * nth($datepicker-cell-width, 2);
+    }
+
+    .ui-timepicker-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        li {
+            cursor: pointer;
+            padding: 0 0 0 0.625rem;
+
+            @include datepicker-header();
+
+            &:hover {
+                background: $datepicker-hover-background;
+                @include contrast-bg(1, $datepicker-background);
+            }
+
+            &.ui-timepicker-selected {
+                background: $datepicker-selected-background;
+            }
+        }
+    }
+}
