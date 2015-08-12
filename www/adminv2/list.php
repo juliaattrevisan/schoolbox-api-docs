@@ -259,6 +259,9 @@ if ($table) {
                 if ($keys == $selectedTable['index']) {
                     $this->setVar('TYPE', 'hidden');
                     $this->setVar('READONLY', 'readonly="readonly"');
+                    $this->setVar('newInput_null_block', '');
+                    $this->setVar('VALUE', '');
+                    $this->setVar('NULLABLE_CLASS', '');
                     $this->parse('newInput_block', 'newInput', true);
                 } // fields specified as readonly are also...readonly.
                 else {
@@ -288,7 +291,9 @@ if ($table) {
                             $this->setVar('TYPE', 'text');
                             $this->setVar('READONLY', '');
                             $this->setVar('VALUE', '');
+                            $this->setVar('NULLABLE_CLASS', '');
                             if ($currentColumn['nullable']) {
+                                $this->setVar('NULLABLE_CLASS', 'nullable');
                                 $this->parse('newInput_null_block', 'newInput_null');
                             } else {
                                 $this->setVar('newInput_null_block', '');
