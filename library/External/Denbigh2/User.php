@@ -77,13 +77,11 @@ class External_Denbigh2_User implements External_UserInterface
         if (!$api->hasErrors()) {
             $result = $api->getResult()->data[0];
 
-            $dobby = new \Alaress_Date_Format($result->{'Date of Birth'}, 'm/d/y');
-
             $data = array(
                 'StudentID' => $result->{'Student ID'},
                 'StudentGiven1' => $result->{'Given Names'},
                 'StudentSurname' => $result->{'Surname'},
-                'StudentBirthDate' => $dobby->getUnixTimestamp(),
+                'StudentBirthDate' => strtotime($result->{'Date of Birth'}),
                 'StudentHouseDescription' => $result->{'House'},
                 'StudentHouse' => $result->{'House'},
                 'HeadOfHouseID' => '',
