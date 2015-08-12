@@ -220,7 +220,12 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
      */
     public function findByFolderId($nodeId)
     {
-        return $this->findByColumn($this->getFolderFieldname(), $nodeId);
+        // Sort by title
+        return $this->findByColumn(
+            $this->getFolderFieldname(),
+            $nodeId,
+            ['order' => ['description' => 'asc',],]
+        );
     }
 
 
