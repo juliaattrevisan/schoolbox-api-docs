@@ -1,5 +1,12 @@
 <!-- This is the 'Pantry', a place where developers come to pick their 'Ingredients' -->
 
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript">
+    Dropzone.autoDiscover = false;
+</script>
+<!-- END custom_head -->
+
     <div class="row">
         <div class="small-12 columns">
             <h1>Files List</h1>
@@ -1608,10 +1615,52 @@ $(function () {
     <hr>
 <div class="row">
     <div class="small-12 island">
-        <h1>Dropzone</h1>
-        <div class="content">
+        <h1>Dropzones</h1>
+    </div>
+    <div class="small-12 island">
+        <h2 class="subheader">Vanilla Dropzone</h2>
+        <section class="content">
             <form class="dropzone" id="myAwesomeDropzone" action="/cms/myFileForm.php?ajax=1"></form>
-        </div>
+        </section>
+    </div>
+
+    <div class="small-12 island">
+        <h2 class="subheader">PHPlib Attachzone</h2>
+        <section class="content">
+            <form>
+                {AFFIX_LIB_LABEL_HERE}
+            </form>
+        </section>
+    </div>
+
+    <div class="small-12 island">
+        <h2 class="subheader">Twig Attachzone</h2>
+        <section>
+            <p class="meta content">(This should be identical to the one above)</p>
+            <form>
+                {AFFIX_TWIG_LABEL_HERE}
+            </form>
+        </section>
+    </div>
+
+    <div class="small-12 island">
+        <h2 class="subheader">fileDrop</h2>
+        <section>
+            <div class="dropzone-wrap">
+                <form class="dropzone overlay top"></form>
+                <ul data-dz-container class="information-list">
+                    <li class="row">
+                        <div class="info card"><h3>You can drop&hellip;</h3><p class="meta">(you really can)</p></div>
+                    </li>
+                    <li class="row">
+                        <div class="info card"><h3>&hellip;files&hellip;</h3><p class="meta">(they're the awesome)</p></div>
+                    </li>
+                    <li class="row">
+                        <div class="info card"><h3>&hellip;anywhere here.</h3><p class="meta">(like&mdash;for real)</p></div>
+                    </li>
+                </ul>
+            </div>
+        </section>
     </div>
 </div>
     <hr>
@@ -1781,7 +1830,7 @@ $(function () {
         <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
         <script type="text/javascript">
             $(function(){
-              $('[data-imageslider]').AnySlider({
+              $('[data-imageslider]').anyslider({
                     interval: 2000,
                     prevLabel: '',
                     nextLabel: ''
@@ -2209,6 +2258,8 @@ $(function () {
         Dropzone.options.myAwesomeDropzone = {
             addRemoveLinks: true
         };
+
+        $('#myAwesomeDropzone').dropzone();
 
         $('[data-target="delete-it"]').on('click', function(){
             $('.delete-it').toggleClass('show');
