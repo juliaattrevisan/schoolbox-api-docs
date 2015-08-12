@@ -50,7 +50,7 @@ abstract class Kernel {
         $this->boot->registerExceptionHandling();
         $this->boot->registerShutdownHandling();
         $this->boot->initialiseExternalConnections();
-        $this->boot->installDependencies($this);
+        $this->boot->installDependencies();
 
 		return true;
 	}
