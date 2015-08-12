@@ -173,25 +173,33 @@
     </ul>
 
     <dl id="awards-info">
-        <dt>Awards and Prizes</dt>
-        {% for award in report.tutorGroupReport.activities.awards %}
-            <dd>{{ award.act_desc }}</dd>
-        {% endfor %}
+        {% if not report.tutorGroupReport.activities.awards is empty %}
+            <dt>Awards and Prizes</dt>
+            {% for award in report.tutorGroupReport.activities.awards %}
+                <dd>{{ award.act_desc }}</dd>
+            {% endfor %}
+        {% endif %}
 
-        <dt>Co-curricular Activities</dt>
-        {% for activity in report.tutorGroupReport.activities.cocurricular %}
-            <dd>{{ activity.act_desc }}</dd>
-        {% endfor %}
+        {% if not report.tutorGroupReport.activities.cocurricular is empty %}
+            <dt>Co-curricular Activities</dt>
+            {% for activity in report.tutorGroupReport.activities.cocurricular %}
+                <dd>{{ activity.act_desc }}</dd>
+            {% endfor %}
+        {% endif %}
 
-        <dt>Community Service</dt>
-        {% for service in report.tutorGroupReport.activities.service %}
-            <dd>{{ service.act_desc }}</dd>
-        {% endfor %}
+        {% if not report.tutorGroupReport.activities.service is empty %}
+            <dt>Community Service</dt>
+            {% for service in report.tutorGroupReport.activities.service %}
+                <dd>{{ service.act_desc }}</dd>
+            {% endfor %}
+        {% endif %}
 
-        <dt>Positions of Office</dt>
-        {% for position in report.tutorGroupReport.activities.positions %}
-            <dd>{{ position.act_desc }}</dd>
-        {% endfor %}
+        {% if not report.tutorGroupReport.activities.positions is empty %}
+            <dt>Positions of Office</dt>
+            {% for position in report.tutorGroupReport.activities.positions %}
+                <dd>{{ position.act_desc }}</dd>
+            {% endfor %}
+        {% endif %}
     </dl>
 
     {##
@@ -209,7 +217,13 @@
                 {% set reportHalf = (report.subjectList|length / 2)|round(0, 'ceil') %}
                 <ul>
                     {% for subject in report.subjectList|slice(0, reportHalf) %}
-                        {% include '@customMeridenPastoral/sub/subject.twig' with {subject: subject, showEmail: false, showPortrait: false} %}
+                        {% include '@customMeridenPastoral/sub/subject.twig' with {
+                            student: report.student,
+                            year: report.tutorGroupReport.year,
+                            subject: subject,
+                            showEmail: false,
+                            showPortrait: false
+                        } %}
                     {% endfor %}
                 </ul>
                 {##
@@ -219,7 +233,13 @@
                  #}
                 {% for subject in report.subjectList|slice(reportHalf) %}
                     <ul>
-                        {% include '@customMeridenPastoral/sub/subject.twig' with {subject: subject, showEmail: false, showPortrait: false} %}
+                        {% include '@customMeridenPastoral/sub/subject.twig' with {
+                            student: report.student,
+                            year: report.tutorGroupReport.year,
+                            subject: subject,
+                            showEmail: false,
+                            showPortrait: false}
+                        %}
                     </ul>
                 {% endfor %}
             </div>

@@ -154,16 +154,33 @@ class Factory
             ->setGrades($this->augmentGradesWithAssessment($folderWithGrades['grades'], $student))
             ->moveToNamedGrade('courseGrade', 'Course Grade')
             ->moveToNamedGrade('endeavourGrades', 'Endeavour Grades')
+            ->moveToNamedGrade('endeavourGrade1', 'Endeavour Grade Term 1')
+            ->moveToNamedGrade('endeavourGrade2', 'Endeavour Grade Term 2')
+            ->moveToNamedGrade('endeavourGrade3', 'Endeavour Grade Term 3')
+            ->moveToNamedGrade('endeavourGrade4', 'Endeavour Grade Term 4')
             ->moveToNamedGrade('learningApproaches', 'Approaches to Learning')
         ;
 
+        // Add grade distributions
+        $newGrades = array();
+        foreach ($subject->getGrades() as $key => $grade) {
+            $grade['distribution'] = $this->buildDistribution(
+                $grade,
+                $subject->getCohortFolders()
+            );
+            $newGrades[$key] = $grade;
+        }
+        $subject->setGrades($newGrades);
+
         // What are the other grade distributions?
         $courseGrade = $subject->getNamedGrade('courseGrade');
-        $courseGrade['distribution'] = $this->buildDistribution(
-            $courseGrade,
-            $subject->getCohortFolders()
-        );
-        $subject->setNamedGrade('courseGrade', $courseGrade);
+        if (!empty($courseGrade)) {
+            $courseGrade['distribution'] = $this->buildDistribution(
+                $courseGrade,
+                $subject->getCohortFolders()
+            );
+            $subject->setNamedGrade('courseGrade', $courseGrade);
+        }
 
         return $subject;
     }
@@ -407,7 +424,13 @@ class Factory
             }
 
         }
-        foreach (SubmissionBoxMapper::getInstance()->findByColumn('id', $assessKeys) as $assess) {
+
+        // Fetch only assessment tasks
+        $assessments = SubmissionBoxMapper::getInstance()->findByColumnList([
+            'id'   => $assessKeys,
+            'type' => SubmissionBox\WorkType::TYPE_ASSESSMENT_TASK,
+        ]);
+        foreach ($assessments as $assess) {
             /** @var SubmissionBox $assess */
             $assessId = $assess->getId();
             $gradeKey = 'a'.$assessId;
@@ -421,10 +444,11 @@ class Factory
                 $grades[$gradeKey]['rubric'] = $rubricMark->toArray();
             }
         }
-        foreach (OnlineAssessmentMapper::getInstance()->findByColumn('assess_id', $quizKeys) as $quiz) {
-            /** @var OnlineAssessment $quiz */
-            $grades['q'.$quiz->getId()]['quiz'] = $quiz;
-        }
+        // No quizzes anymore
+//        foreach (OnlineAssessmentMapper::getInstance()->findByColumn('assess_id', $quizKeys) as $quiz) {
+//            /** @var OnlineAssessment $quiz */
+//            $grades['q'.$quiz->getId()]['quiz'] = $quiz;
+//        }
         return $grades;
     }
 
@@ -469,11 +493,17 @@ class Factory
             array(
                 'name'     => $assessmentName,
                 'category' => $cohortFolderIds,
+                'type'     => SubmissionBox\WorkType::TYPE_ASSESSMENT_TASK,
             )
         );
         $assessments->add($grade['assessment']);
 
-        $groupedDistribution = array();
+        $distribution = array(
+            'grouped'    => array(),
+            'continuous' => array(
+                'marks' => array(),
+            ),
+        );
         foreach ($assessments as $assessment) {
             // Get everyone who has submitted to this assessment
             $returnStudents = array();
@@ -484,43 +514,98 @@ class Factory
 
             // Slurp out all student marks for this folder, and put back the one we
             // actually want if it's there.
-            $distribution = array();
+            $studentMarks = array();
             foreach ($returnStudents as $studentId) {
                 $marks = $returnedWorkMapper->getStudentMarks(
                     $assessment->getCategory()->getId(),
                     $studentId
                 );
                 if (array_key_exists($assessment->getId(), $marks)) {
-                    $distribution[$studentId] = $marks[$assessment->getId()];
+                    $studentMarks[$studentId] = $marks[$assessment->getId()];
                 }
             }
 
             // What are the possible pretty marks for this assessment?
-            $levels = SubmissionBox\GradeLevel\Mapper::getInstance()
-                ->findByColumn(
-                    'submission_grade_group_id',
-                    $assessment->getGradeGroup()->getId(),
-                    array(
-                        'order' => array('raw_grade' => 'desc')
-                    )
-                );
+            // Assume all assessments use the same assessment type, otherwise chaos occurs!
+            if ($assessment->getMarkType()->getId() == SubmissionBox\MarkType::TYPE_LETTER) {
+                $levels = SubmissionBox\GradeLevel\Mapper::getInstance()
+                    ->findByColumn(
+                        'submission_grade_group_id',
+                        $assessment->getGradeGroup()->getId(),
+                        array(
+                            'order' => array('raw_grade' => 'desc')
+                        )
+                    );
 
-            // For now, assume that distributions are only calculated for
-            // letter grade assessments.
-            foreach ($levels as $level) {
-                $caption = $level->getCaption();
-                if (!empty($caption) && empty($groupedDistribution[$caption])) {
-                    $groupedDistribution[$caption] = array();
+                // For now, assume that distributions are only calculated for
+                // letter grade assessments.
+                foreach ($levels as $level) {
+                    $caption = $level->getCaption();
+                    if (!empty($caption) && empty($distribution['grouped'][$caption])) {
+                        $distribution['grouped'][$caption] = array();
+                    }
                 }
-            }
-            foreach ($distribution as $item) {
-                $key = $item['pretty_mark'];
-                if (array_key_exists($key, $groupedDistribution)) {
-                    $groupedDistribution[$key][] = $item;
+                foreach ($studentMarks as $item) {
+                    $caption = $item['pretty_mark'];
+                    if (array_key_exists($caption, $distribution['grouped'])) {
+                        $distribution['grouped'][$caption][] = $item;
+                    }
                 }
+            } else {
+                // Pretty marks are continuous and hence not to be grouped
+                $distribution['continuous']['marks'] = array_merge(
+                    $distribution['continuous']['marks'],
+                    $studentMarks
+                );
             }
         }
-        return $groupedDistribution;
+
+        // Calculate mean and SD for continuous distributions
+        if (!empty($distribution['continuous']['marks'])) {
+            $marks = array_map(
+                function ($v) {
+                    return $v['mark'];
+                },
+                $distribution['continuous']['marks']
+            );
+            $count = count($marks);
+            $mean  = array_sum($marks) / $count;
+            $sd    = sqrt(
+                array_sum(
+                    array_map(
+                        function ($v) use ($mean) {
+                            return pow($v - $mean, 2);
+                        },
+                        $marks
+                    )
+                ) / $count
+            );
+
+            // Convert mean and SD to pretty mark
+            $markType  = SubmissionBox\MarkTypeMapper::getInstance()->findById(
+                $grade['assessment']->getMarkType()->getId()
+            );
+            $converter = \Marksheet_Factory::build(
+                $markType->getSlug(),
+                $grade['assessment']
+            );
+            $maxMark    = $grade['assessment']->getMaxMark();
+            $prettyMean = $converter->convertRawMark($mean, $maxMark);
+            $prettySd   = $converter->convertRawMark($sd, $maxMark);
+            $distribution['continuous']['mean'] = array(
+                'mark'        => round($mean, 1),
+                'pretty_mark' => is_numeric($prettyMean)
+                    ? sprintf('%.1f', $prettyMean)
+                    : $prettyMean
+            );
+            $distribution['continuous']['sd'] = array(
+                'mark'        => round($sd, 1),
+                'pretty_mark' => is_numeric($prettySd)
+                    ? sprintf('%.1f', $prettySd)
+                    : $prettySd
+            );
+        }
+        return $distribution;
     }
 
     /**

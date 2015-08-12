@@ -480,7 +480,20 @@ class Gateway
                 AND studsub.yr_study = tchsub.year_num
                 AND studsub.class = tchsub.class
             WHERE studsub.stud_code = :externalId
-            AND subtab.sub_code NOT IN ('9994','9995','9996','9997','9998','9999')
+            AND subtab.sub_code NOT IN (
+                '9994',
+                '9995',
+                '9996',
+                '9997',
+                '9998',
+                '9999',
+                '0107',
+                '0074',
+                '4099',
+                '0087',
+                '0093',
+                '0103'
+            )
             AND studsub.cmpy_code = '01'
             AND studsub.yr_study = :year
             ORDER BY

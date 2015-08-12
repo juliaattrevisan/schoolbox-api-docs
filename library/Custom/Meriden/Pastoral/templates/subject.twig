@@ -35,19 +35,18 @@
 
     <dl id="course-info">
         {# course grade - derived from grade for this class #}
+        {% if report.subjectReport.namedGrades.courseGrade
+           and report.subjectReport.namedGrades.courseGrade.assessment.isMarkShownToRole(user.role)
+        %}
         <dt>
             Course Grade
             <div class="description-link">[<a href="/homepage/3403">Grade Description</a>]</div>
         </dt>
         <dd class="course-grade">
-            {% if report.subjectReport.namedGrades.courseGrade %}
-                {%
-                    include '@customMeridenPastoral/sub/assessmentResult.twig'
-                    with {grade: report.subjectReport.namedGrades.courseGrade}
-                %}
-            {% else %}
-                Unknown
-            {% endif %}
+            {%
+                include '@customMeridenPastoral/sub/assessmentResult.twig'
+                with {grade: report.subjectReport.namedGrades.courseGrade}
+            %}
         </dd>
 
         {# grade distribution - other student's values for course grade #}
@@ -56,85 +55,50 @@
             <table>
                 <thead>
                 <tr>
-                    {% for gradeLevel,_ in report.subjectReport.namedGrades.courseGrade.distribution %}
+                    {% for gradeLevel,_ in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
                         <th>{{ gradeLevel }}</th>
                     {% endfor %}
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
-                    {% for _,results in report.subjectReport.namedGrades.courseGrade.distribution %}
+                    {% for _,results in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
                         <td>{{ results|length }}</td>
                     {% endfor %}
                 </tr>
                 </tbody>
             </table>
         </dd>
+        {% endif %}
 
-        {# Endeavor Grades - a rubric #}
-        <dt class="fullwidth">
-            Endeavour Grades
-            <div class="description-link">[<a href="/homepage/3461">Grade Description</a>]</div>
-        </dt>
-        <dd class="fullwidth">
-            <table>
-                <thead>
-                <tr>
-                    {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
-                        <th>{{ criterion.label }}</th>
-                    {% else %}
-                        {# fill all with N/A #}
-                        <th>Term 1</th>
-                        <th>Term 2</th>
-                        <th>Term 3</th>
-                        <th>Term 4</th>
-                    {% endfor %}
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
-                        <td>{{ criterion.results[criterion.value]|default('N/A') }}</td>
-                    {% else %}
-                        <td>N/A</td>
-                        <td>N/A</td>
-                        <td>N/A</td>
-                        <td>N/A</td>
-                    {% endfor %}
-                </tr>
-                </tbody>
-            </table>
-        </dd>
+        {# Endeavor Grades - complicated enough to be its own template #}
+        {% include '@customMeridenPastoral/sub/endeavourGrades.twig' %}
 
         {# Approaches to learning - another rubric #}
+        {% if report.subjectReport.namedGrades.learningApproaches
+           and report.subjectReport.namedGrades.learningApproaches.assessment.isMarkShownToRole(user.role)
+        %}
         <dt class="fullwidth">
             Approaches to Learning
             <div class="description-link">[<a href="/homepage/3462">Grade Description</a>]</div>
         </dt>
         <dd class="fullwidth">
-            {% if report.subjectReport.namedGrades.learningApproaches %}
-                <table class="learning-approaches">
-                {% for criterion in report.subjectReport.namedGrades.learningApproaches.rubric.criteria %}
-                    <tr>
-                        <td>{{ criterion.label }}:</td>
-                        <td><strong>{{ criterion.results[criterion.value] }}</strong></td>
-                    </tr>
-                {% endfor %}
-                </table>
-            {% else %}
-                Unknown
-            {% endif %}
+            <table class="learning-approaches">
+            {% for criterion in report.subjectReport.namedGrades.learningApproaches.rubric.criteria %}
+                <tr>
+                    <td>{{ criterion.label }}:</td>
+                    <td><strong>{{ criterion.results[criterion.value] }}</strong></td>
+                </tr>
+            {% endfor %}
+            </table>
         </dd>
+        {% endif %}
     </dl>
 
-    <div id="assessment-info">
-        <h2>
-            Assessments
-            <span class="feedback">(Feedback is provided with the marked task)</span>
-        </h2>
+    {% if report.subjectReport.grades %}
         {%
             include '@customMeridenPastoral/sub/assessments.twig'
             with {work: report.subjectReport.grades, student: report.student}
         %}
-    </div>
+    {% endif %}
 </div>

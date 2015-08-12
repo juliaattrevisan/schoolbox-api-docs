@@ -124,6 +124,10 @@ class Controller extends Base
      */
     protected function buildReportData($year, User $student, $subjectCode = null)
     {
+        // Reports are only for year 7's for now
+        if ($student->getYear() != 7) {
+            throw new \RangeException("Reports are only for year 7 students for now");
+        }
         $tutorGroup     = null;
         $tutorGroupList = $this->getStudentInvolvementFactory()->buildTutorGroupList($student);
         $subject        = null;

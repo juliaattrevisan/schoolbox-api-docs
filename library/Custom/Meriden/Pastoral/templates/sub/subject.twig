@@ -6,7 +6,11 @@
 {% endif %}
 <li>
     <div class="subject">
-        <a class="to-subject" href="/homepage/code/{{ subject.subjectCode }}">
+        <a class="to-subject" href="{{ routeLookup(
+            'customMeridenPastoral.subject',
+            {year: year, id: student.id, subjectCode: subject.subjectCode}
+        )}}"
+        >
             {{ subject.name }}
             <span class="icon"></span>
         </a>
