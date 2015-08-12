@@ -128,8 +128,17 @@
 
             $('div.checkboxes').greenerize();
 
-            $('input[data-timepicker="hour"]').hourpicker({ hours: 24 });
-            $('input[data-timepicker="minute"]').minutepicker();
+            $('input[data-timepicker="hour"]').hourpicker({
+                hours: 24,
+                appendTo: function ($input) {
+                    return $input.closest('.timepick');
+                }
+            });
+            $('input[data-timepicker="minute"]').minutepicker({
+                appendTo: function ($input) {
+                    return $input.closest('.timepick');
+                }
+            });
         })
     })(jQuery);
 </script>
@@ -256,8 +265,18 @@
             <td>
                 {% set isEmpty = item.minLeadTime.secondTotal == 0 %}
                 <label class="interval-input"><input type="text" value="{{ isEmpty ? '' : item.minLeadTime.dayTotal        }}" name="min_lead_time[day]"> days,</label>
-                <label class="interval-input"><input type="text" value="{{ isEmpty ? '' : item.minLeadTime.hourRemainder   }}" name="min_lead_time[hour]" data-timepicker="hour"> hours,</label>
-                <label class="interval-input"><input type="text" value="{{ isEmpty ? '' : item.minLeadTime.minuteRemainder }}" name="min_lead_time[minute]" data-timepicker="minute"> minutes</label>
+                <label class="interval-input">
+                    <div class="timepick">
+                        <input type="text" value="{{ isEmpty ? '' : item.minLeadTime.hourRemainder   }}" name="min_lead_time[hour]" data-timepicker="hour">
+                    </div>
+                    hours,
+                </label>
+                <label class="interval-input">
+                    <div class="timepick">
+                        <input type="text" value="{{ isEmpty ? '' : item.minLeadTime.minuteRemainder }}" name="min_lead_time[minute]" data-timepicker="minute">
+                    </div>
+                    minutes
+                </label>
             </td>
         </tr>
         <tr>
@@ -268,8 +287,18 @@
             <td>
                 {% set isEmpty = item.minReservationTime.secondTotal == 0 %}
                 <label class="interval-input"><input type="text" value="{{ isEmpty ? '' : item.minReservationTime.dayTotal        }}" name="min_reservation_time[day]"> days,</label>
-                <label class="interval-input"><input type="text" value="{{ isEmpty ? '' : item.minReservationTime.hourRemainder   }}" name="min_reservation_time[hour]" data-timepicker="hour"> hours,</label>
-                <label class="interval-input"><input type="text" value="{{ isEmpty ? '' : item.minReservationTime.minuteRemainder }}" name="min_reservation_time[minute]" data-timepicker="minute"> minutes</label>
+                <label class="interval-input">
+                    <div class="timepick">
+                        <input type="text" value="{{ isEmpty ? '' : item.minReservationTime.hourRemainder   }}" name="min_reservation_time[hour]" data-timepicker="hour">
+                    </div>
+                    hours,
+                </label>
+                <label class="interval-input">
+                    <div class="timepick">
+                        <input type="text" value="{{ isEmpty ? '' : item.minReservationTime.minuteRemainder }}" name="min_reservation_time[minute]" data-timepicker="minute">
+                    </div>
+                    minutes
+                </label>
             </td>
         </tr>
         <tr>
