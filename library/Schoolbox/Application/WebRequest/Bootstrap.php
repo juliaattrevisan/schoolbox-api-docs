@@ -144,7 +144,6 @@ class Bootstrap implements BootstrapInterface {
 	public function initialiseExternalConnections() {
 		$database = Database::getInstance();
 		$database->connect(SQL_dsn, SQL_user, SQL_passwd, array('debug' => $this->debugEnabled));
-		$database->setTimezone(ConfigMapper::getInstance()->get('date_timezone'));
 		if($this->debugEnabled) {
 			$debug_bar = DebugBar::getInstance();
 			$debug_bar->addCollector($database->getCollector());
@@ -166,7 +165,11 @@ class Bootstrap implements BootstrapInterface {
 	 */
 	public function installDependencies() {
 		// Set correct timezone
-		date_default_timezone_set(Config::get('date_timezone'));
+		date_default_timezone_set($timezone = Config::get('date_timezone'));
+
+		// Set up DB timezones here too
+		Database::getInstance()->setTimezone($timezone);
+		DeprecatedDatabase::getInstance()->setTimezone($timezone);
 
 		// Set up the dependency injector
 

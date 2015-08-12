@@ -115,7 +115,6 @@ class Bootstrap implements BootstrapInterface {
 
 		// MySQL connection configuration
 		Database::getInstance()->connect(SQL_dsn, SQL_user, SQL_passwd, array('throw' => true));
-		Database::getInstance()->setTimezone(ConfigMapper::getInstance()->get('date_timezone'));
 
 		// Redis connection configuration
 		Redis::getInstance()->connect(ConfigMapper::getInstance()->get('redis_url'));
@@ -136,7 +135,10 @@ class Bootstrap implements BootstrapInterface {
 		$di->set('config', $di->lazyNew('Schoolbox\\Config\\ConfigMapper'));
 
         // Set correct timezone
-        date_default_timezone_set($di->get('config')->get('date_timezone'));
+        date_default_timezone_set($timezone = $di->get('config')->get('date_timezone'));
+
+        // Set up DB timezones here too. DeprecatedDatabase does not exist here!
+        Database::getInstance()->setTimezone($timezone);
 
         // All modules relate to web requests, not daemons.
         // Therefore, no modules need to be set up.
