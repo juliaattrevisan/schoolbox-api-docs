@@ -109,6 +109,17 @@ function connect()
 		print "Unable to access ".$this->db.", check the permissions";
 }
 
+	/**
+	 * Attempt to set the connection's timezone.
+	 *
+	 * @param string $timezone A valid timezone.
+	 * @return bool
+	 */
+	public function setTimezone($timezone)
+	{
+		return $this->query("SET time_zone = '{$this->quote($timezone)}'");
+	}
+
 /**
  * Closes the connection to the database
  *
