@@ -273,7 +273,8 @@ class UserMapper extends Mapper
              * still occupy slots in the user's campus collection stack
              */
             if ($campus->getId()) {
-                $users[$userId]->getCampusCollection()->add($campus);
+                // Don't double add
+                $users[$userId]->getCampusCollection()->setOffset($campus->getId(), $campus);
 
                 if ($row['uc.defaultCampus'] == 1) {
                     $users[$userId]->setDefaultCampus($campus);
@@ -283,7 +284,8 @@ class UserMapper extends Mapper
             $linkedUser = $this->hydrate($row, 'lu');
 
             if ($linkedUser->getId()) {
-                $users[$userId]->getLinkedUser()->add($linkedUser);
+                // Don't double add
+                $users[$userId]->getLinkedUser()->setOffset($linkedUser->getId(), $linkedUser);
             }
         }
 
