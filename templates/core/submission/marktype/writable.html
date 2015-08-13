@@ -47,23 +47,26 @@
         <!-- END mark_type_none -->
 
         <!-- BEGIN mark_type_rubric -->
-        <label>
-            <select id="rubricmark" name="mark[{OWNER_ID}]" data-mark-input>
-                <!-- BEGIN rubric_marked -->
-                <option value="{MARK} / {MAX_MARK}">{MARK}&nbsp;/&nbsp;{MAX_MARK}</option>
-                <!-- END rubric_marked -->
+        <div class="row">
+            <div class="small-11 large-8 columns">
+                <select id="rubricmark" name="mark[{OWNER_ID}]" data-mark-input>
+                    <!-- BEGIN rubric_marked -->
+                    <option value="{MARK} / {MAX_MARK}">{MARK}&nbsp;/&nbsp;{MAX_MARK}</option>
+                    <!-- END rubric_marked -->
 
-                <!-- BEGIN rubric_unmarked -->
-                <option value="-1">(none)</option>
-                <!-- END rubric_unmarked -->
+                    <!-- BEGIN rubric_unmarked -->
+                    <option value="-1">(none)</option>
+                    <!-- END rubric_unmarked -->
 
-                <!-- BEGIN rubric_grade_drop -->
-                <option value="{RUBRIC_GRADE_VALUE}" {RUBRIC_GRADE_VALUE_SELECTED}>{RUBRIC_GRADE_TEXT}</option>
-                <!-- END rubric_grade_drop -->
-            </select>
-        </label>
-
-        <a class="button icon-modify" title="Mark Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}"></a>
+                    <!-- BEGIN rubric_grade_drop -->
+                    <option value="{RUBRIC_GRADE_VALUE}" {RUBRIC_GRADE_VALUE_SELECTED}>{RUBRIC_GRADE_TEXT}</option>
+                    <!-- END rubric_grade_drop -->
+                </select>
+            </div>
+            <div class="small-1 large-4 columns">
+                <a class="icon-modify no-text" title="Mark Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}"></a>
+            </div>
+        </div>
         <!-- END mark_type_rubric -->
     </div>
     <div class="small-12 large-8 columns">
