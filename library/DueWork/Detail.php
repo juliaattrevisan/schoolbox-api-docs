@@ -166,6 +166,7 @@ class DueWork_Detail
         $page->setBlock('submission_row', 'download_action', 'download_action_block');
         $page->setBlock('submission_row', 'delete_action', 'delete_action_block');
         $page->setBlock('submission_row', 'plag_enabled', 'plag_enabled_block');
+        $page->setBlock('submission_row', 'plag_pending', 'plag_pending_block');
         $page->setBlock('submission_row', 'plag_deleted', 'plag_deleted_block');
 
         $page->setVar('plag_deleted_block', '');
@@ -322,10 +323,11 @@ class DueWork_Detail
                         } // not complete? is this even a plagiarism document?
                         elseif ($plagScan->getPlagscanId()) {
                             // it's a plag doc, but is being checked and still pending, so tell the user
-                            $page->setVar(
-                                'plag_enabled_block',
-                                '<span title="Plagiarism results pending" class="plag-score regular">(pending)</span>'
-                            );
+                            $page->parse('plag_pending_block', 'plag_pending');
+
+                            $page->setVar(array(
+                                'plag_enabled_block' => ''
+                            ));
                         }
                         else {
                             $page->setVar('plag_enabled_block', '');
@@ -351,7 +353,8 @@ class DueWork_Detail
              */
             $page->setVar(
                 array(
-                    'submission_after_mark_block' => ''
+                    'submission_after_mark_block' => '',
+                    'plag_pending_block' => '',
                 )
             );
         }

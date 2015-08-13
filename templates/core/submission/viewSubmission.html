@@ -35,79 +35,62 @@
     </div>
 </div>
 
+<div class="row">
 
-
-
-
-
-
-
-
-
-<span class="header_option">
-
-</span>
-
-<div class="view-submission">
-    <form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" id="returnWorkForm">
-        <table class="table ruler">
-            <colgroup>
-                <col width="200px"/>
-                <col />
-				<col width="185px"/>
-            </colgroup>
-            <tbody>
-				<!-- BEGIN student_row -->
-				<tr class="user_{OWNER_ID} user">
-					<td class="nowrap student">
-						<img class="student-icon" src="{OWNER_IMG}" alt="{OWNER_NAME}"/>
-
-						<div>
-							<a href="/search/user/{OWNER_ID}">{OWNER_NAME}</a>
-
-							<div class="student-status {OWNER_CLASS}" >
-                                <span title="{OWNER_TIME}">{OWNER_STATUS}</span><br />
-
+    <div class="small-12 island">
+        <section>
+            <form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data">
+                <ul class="action-list">
+                    <!-- BEGIN student_row -->
+                    <li class="row">
+                        <div class="small-12 large-4 columns no-pad">
+                            <div class="avatar card">
+                                <a href="/search/user/{OWNER_ID}" title="View Profile">
+                                    <img src="{OWNER_IMG}" alt="View Profile" />
+                                    <p>{OWNER_NAME}</p>
+                                </a>
+                                <p class="meta">{OWNER_TIME}</p>
+                                <p class="meta">{OWNER_STATUS}</p>
                                 <!-- BEGIN submission_after_mark -->
-                                <span class="alert" title="Work has been resubmitted after grading"></span>
+                                <span class="label alert" title="Work has been resubmitted after grading"></span>
                                 <!-- END submission_after_mark -->
                             </div>
+                        </div>
+                        <div class="small-12 large-6 columns content">
+                            {OWNER_MARKING}
 
-							<!-- BEGIN submission_row -->
-							<!-- BEGIN plag_enabled -->
-							<!-- END plag_enabled -->
+                            <!-- BEGIN submission_row -->
+                            <!-- BEGIN plag_enabled -->
+                            <!-- END plag_enabled -->
+                            <!-- BEGIN plag_pending -->
+                            <span class="label warning full-width" title="Plagiarism results pending" >Plagscan Pending</span>
+                            <!-- END plag_pending -->
                             <!-- BEGIN plag_deleted -->
                             <!-- END plag_deleted -->
-							<!-- BEGIN delete_action -->
-							<!-- END delete_action -->
-							<!-- END submission_row -->
-						</div>
-					</td>
-					<td class="marking">
-						<div>
-							{OWNER_MARKING}
-						</div>
-					</td>
-					<td>
-                        <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>View Submission</a>
-                        <a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="btn clock no-text" title="View Submission History"><span></span></a>
-					</td>
-				</tr>
 
-				<!-- END student_row -->
-			</tbody>
-        </table>
-    </form>
+                            <!-- BEGIN delete_action -->
+                            <!-- END delete_action -->
+                            <!-- END submission_row -->
+                        </div>
+                        <div class="two actions">
+                            <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}" class="icon-view no-text" title="View Submission"></a>
+                            <a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="icon-history no-text" title="View Submission History"></a>
+                         </div>
+                    </li>
+                    <!-- END student_row -->
+                </ul>
+            </form>
+        </section>
+    </div>
 </div>
 
+<!--<script src="/javascript/jquery.marksheet.js" type="text/javascript"></script>-->
+<!--<script type="text/javascript">-->
+    <!--$(function() {-->
+        <!--$('#returnWorkForm').marksheet({-->
+            <!--submitOnChange: true-->
+        <!--});-->
 
-<script src="/javascript/jquery.marksheet.js" type="text/javascript"></script>
-<script type="text/javascript">
-    $(function() {
-        $('#returnWorkForm').marksheet({
-            submitOnChange: true
-        });
-
-        $('.combobox').combobox({COMBO_OPTIONS});
-    });
-</script>
+        <!--$('.combobox').combobox({COMBO_OPTIONS});-->
+    <!--});-->
+<!--</script>-->
