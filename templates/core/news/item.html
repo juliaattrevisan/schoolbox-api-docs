@@ -1,23 +1,40 @@
-<h1>{NEWS_TITLE}</h1>
-<span class="header-actions">
-    <!-- BEGIN previous_article -->
-    <a class="button icon-previous no-text" data-tooltip href="/news/item/{PREVIOUS_ARTICLE_ID}" title="Previous: '{PREVIOUS_ARTICLE_TITLE}'"></a>
-    <!-- END previous_article -->
-    <!-- BEGIN next_article -->
-    <a class="button icon-next no-text" data-tooltip href="/news/item/{NEXT_ARTICLE_ID}" title="Next: '{NEXT_ARTICLE_TITLE}'"></a>
-    <!-- END next_article -->
-    <!-- BEGIN modify_news -->
-    <a class="button icon-modify no-text" data-tooltip title="Modify" href="/news/modify/{NEWS_ID}"></a>
-    <!-- END modify_news -->
-</span>
-
-<div class="clearfix">
-    <div class="avatar-card">
-        <a href="/search/user/{POSTER_ID}" title="View Profile">
-            <img src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square32" alt="View Profile">
-            <p>{POSTER}</p>
-        </a>
-        <p class="meta">{DATETIME}</p>
+<div class="row">
+    <div class="small-12 island">
+        <h1>{NEWS_TITLE}</h1>
+        <span class="header-actions">
+            <!-- BEGIN previous_article -->
+            <a class="button icon-previous no-text" data-tooltip href="/news/item/{PREVIOUS_ARTICLE_ID}" title="Previous: '{PREVIOUS_ARTICLE_TITLE}'"></a>
+            <!-- END previous_article -->
+            <!-- BEGIN next_article -->
+            <a class="button icon-next no-text" data-tooltip href="/news/item/{NEXT_ARTICLE_ID}" title="Next: '{NEXT_ARTICLE_TITLE}'"></a>
+            <!-- END next_article -->
+            <!-- BEGIN modify_news -->
+            <a class="button icon-modify no-text" data-tooltip title="Modify" href="/news/modify/{NEWS_ID}"></a>
+            <!-- END modify_news -->
+        </span>
+        <section>
+            <div class="avatar card">
+                <a href="/search/user/{POSTER_ID}" title="View Profile">
+                    <img src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square32" alt="View Profile">
+                    <p>{POSTER}</p>
+                </a>
+                <p class="meta">{DATETIME}</p>
+            </div>
+            </section>
+        <section>
+            <div class="row content">
+                <!-- BEGIN featured_image -->
+                <div class="large-3 columns">
+                    <img src="/storage/image.php?hash={NEWS_IMAGE}&size=constrain200"/>
+                </div>
+                <!-- END featured_image -->
+                <div class="large-9 columns">
+                    <article>
+                        {NEWS_BODY}
+                    </article>
+                </div>
+            </div>
+        </section>
     </div>
 </div>
 
@@ -28,15 +45,4 @@
     <!-- BEGIN allnews_button -->
     <!-- END allnews_button -->
 
-<div class="row">
-    <div class="large-2 columns">
-        <!-- BEGIN featured_image -->
-        <img src="/storage/image.php?hash={NEWS_IMAGE}&size=constrain200"/>
-        <!-- END featured_image -->
-    </div>
-    <div class="large-10 columns">
-        <div class="wysiwyg">
-            {NEWS_BODY}
-        </div>
-    </div>
-</div>
+
