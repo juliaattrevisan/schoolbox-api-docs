@@ -67,7 +67,7 @@ foreach ($topicList as $sidebarTopic) {
     $output = array(
         'LIST_TOPIC_NAME' => Scrub::text($sidebarTopic->getName()),
         'LIST_TOPIC_CLEAN' => $sidebarTopic->getSlug(),
-        'LIST_TOPIC_SELECTED' => $selectedTopic == $sidebarTopic->getSlug() ? 'current' : '',
+        'LIST_TOPIC_SELECTED' => $selectedTopic == $sidebarTopic->getSlug() ? 'active' : '',
     );
     $this->setVar($output);
 

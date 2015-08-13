@@ -99,7 +99,7 @@ foreach ($topicList as $sidebarTopic) {
     $output = array(
         'LIST_TOPIC_NAME' => Scrub::text($sidebarTopic['name']),
         'LIST_TOPIC_CLEAN' => $topicUrl->getSlug(),
-        'LIST_TOPIC_SELECTED' => $topicUrl->getSlug() == $url->getSlug() ? 'current' : '',
+        'LIST_TOPIC_SELECTED' => $topicUrl->getSlug() == $url->getSlug() ? 'active' : '',
     );
     $this->setVar($output);
     $this->parse('topic_list_block', 'topic_list', true);
