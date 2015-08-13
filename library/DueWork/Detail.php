@@ -404,6 +404,7 @@ class DueWork_Detail
     public function renderMarking(SitePage $page, $handle, $htmlFormID, $markArray)
     {
         $templateFile = $this->isReadOnly() ? 'readonly' : 'writable';
+        $templateFile = 'readonly';
         $page->setFile('markTpl', "submission/marktype/$templateFile.html");
         $page->setVar('UFID', $htmlFormID);
 

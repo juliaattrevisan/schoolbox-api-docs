@@ -1,30 +1,51 @@
-<div class="markForm clearfix">
-<!-- BEGIN mark_type_percent -->
-<span class="mark-input percent">{MARK}%</span>
-<!-- END mark_type_percent -->
-<!-- BEGIN mark_type_letter -->
-<select id="mark" class="mark-input" name="mark[{OWNER_ID}]" disabled>
-	<!-- BEGIN grade_drop -->
-	<option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED}>{GRADE_TEXT}</option>
-	<!-- END grade_drop -->
-</select>
-<!-- END mark_type_letter -->
-<!-- BEGIN mark_type_raw -->
-<span class="mark-input out-of">{MARK}&nbsp;/&nbsp;{MAX_MARK}</span>
-<!-- END mark_type_raw -->
-<!-- BEGIN mark_type_free -->
-<span class="mark-input free">{MARK}</span>
-<!-- END mark_type_free -->
-<!-- BEGIN mark_type_none -->
-<!-- END mark_type_none -->
-<!-- BEGIN mark_type_rubric -->
-    <!-- BEGIN rubric_marked -->
-    <a class="mark-input view" title="View Rubric" href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}">{MARK}&nbsp;/&nbsp;{MAX_MARK}</a>
-    <!-- END rubric_marked -->
-    <!-- BEGIN rubric_unmarked -->
-    <!-- END rubric_unmarked -->
-    <!-- BEGIN rubric_grade_drop -->
-    <!-- END rubric_grade_drop -->
-<!-- END mark_type_rubric -->
-<span class="mark-comment">{COMMENT}</span>
+<div class="row">
+    <div class="small-12 large-4 columns text-center">
+        <!-- BEGIN mark_type_percent -->
+        <p class="grade">
+            <span>{MARK}%</span>
+        </p>
+        <!-- END mark_type_percent -->
+
+        <!-- BEGIN mark_type_letter -->
+        <select id="mark" name="mark[{OWNER_ID}]" disabled>
+            <!-- BEGIN grade_drop -->
+            <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED}>{GRADE_TEXT}</option>
+            <!-- END grade_drop -->
+        </select>
+        <!-- END mark_type_letter -->
+
+        <!-- BEGIN mark_type_raw -->
+        <p class="grade">
+            <span>{MARK}/{MAX_MARK}</span>
+        </p>
+        <!-- END mark_type_raw -->
+
+        <!-- BEGIN mark_type_free -->
+        <p class="grade">
+            <span>{MARK}</span>
+        </p>
+        <!-- END mark_type_free -->
+
+        <!-- BEGIN mark_type_none -->
+        <!-- END mark_type_none -->
+
+        <!-- BEGIN mark_type_rubric -->
+            <!-- BEGIN rubric_marked -->
+            <p class="grade">
+                <span><a title="View Rubric" href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}">{MARK}/{MAX_MARK}</a></span>
+            </p>
+            <!-- END rubric_marked -->
+            <!-- BEGIN rubric_unmarked -->
+            <!-- END rubric_unmarked -->
+            <!-- BEGIN rubric_grade_drop -->
+            <!-- END rubric_grade_drop -->
+        <!-- END mark_type_rubric -->
+    </div>
+    <div class="small-12 large-8 columns">
+        {COMMENT}
+    </div>
 </div>
+
+
+
+
