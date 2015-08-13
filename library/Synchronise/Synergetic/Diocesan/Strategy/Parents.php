@@ -15,9 +15,9 @@ use Schoolbox\UserMapper;
 use Synchronise_Base_Hydrator_Clear;
 use Synchronise_Base_Hydrator_Default;
 use Synchronise_Base_Hydrator_MailHandler;
+use Synchronise_Base_Hydrator_NoWebmail;
 use Synchronise_Base_Hydrator_Parent;
 use Synchronise_Base_Hydrator_Spouse;
-use Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate;
 use Synchronise_Base_Strategy_Parent;
 
 use Synchronise\Synergetic\Diocesan;
@@ -41,6 +41,7 @@ class Parents extends Synchronise_Base_Strategy_Parent
             ->addHydrator(new Diocesan\Hydrator\Parents(new Synchronise_Base_Hydrator_Parent(), new External_User(), UserMapper::getInstance()))
             ->addSpouseHydrator(new Diocesan\Hydrator\Parents(new Synchronise_Base_Hydrator_Spouse(), new External_User(), UserMapper::getInstance()))
             ->addHydrator(new Synchronise_Base_Hydrator_MailHandler())
+            ->addHydrator(new Synchronise_Base_Hydrator_NoWebmail())
             ->addHydrator(new Diocesan\Hydrator\UnsetOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear());
     }
