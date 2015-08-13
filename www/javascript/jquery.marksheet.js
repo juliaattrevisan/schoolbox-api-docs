@@ -59,7 +59,7 @@
 
 			// the validator doesn't seem to be able to handle two inputs with the same name, so they need to be
 			// uniqu-ified, then ajax submitted
-			var inputs = config.element.find('input.mark-input');
+			var inputs = config.element.find('input[data-mark-input]');
 			inputs.each(function() {
 				var self = $(this);
 				var pInline = self.closest('[data-inlineform]');
@@ -78,7 +78,7 @@
 			 */
 			if (config.submitOnChange === true) {
 				var allInlineForms = config.element.find('[data-inlineform]');
-				$('.mark-input, .comment').change(function(){
+				$('[data-mark-input], .comment').change(function(){
 					var thisInlineForm = $(this).closest('[data-inlineform]');
 					allInlineForms.not(thisInlineForm).removeClass('inline-submit');
 					thisInlineForm.addClass('inline-submit');
@@ -173,7 +173,7 @@
 		}
 
 		function selectGrouping() {
-			$('#content select.mark-input').each(function() {
+			$('#content select[data-mark-input]').each(function() {
 				// if the select doesn't contain a separator for the error codes, slot it in
 				var self = $(this);
 				if (self.find('optgroup').length == 0) {

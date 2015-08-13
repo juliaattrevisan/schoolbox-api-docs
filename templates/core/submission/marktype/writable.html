@@ -7,7 +7,7 @@
         <!-- BEGIN mark_type_percent -->
         <div class="row">
             <div class="small-11 large-8 columns">
-                <input name="mark[{OWNER_ID}]" class="mark-input percent" type="text" value="{MARK}" data-combobox />
+                <input name="mark[{OWNER_ID}]" type="text" value="{MARK}" data-mark-input data-combobox />
             </div>
             <div class="small-1 large-4 columns">
                 %
@@ -16,7 +16,7 @@
         <!-- END mark_type_percent -->
 
         <!-- BEGIN mark_type_letter -->
-        <select id="mark" class="mark-input" name="mark[{OWNER_ID}]" data-marktype="letter">
+        <select id="mark" name="mark[{OWNER_ID}]" data-mark-input data-marktype="letter">
             <!-- BEGIN grade_drop -->
             <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED} data-groupId="{GRADE_GROUP_ID}">{GRADE_TEXT}</option>
             <!-- END grade_drop -->
@@ -27,7 +27,7 @@
         <div class="row">
             <div class="small-10 large-6 columns">
                 <label>
-                    <input name="mark[{OWNER_ID}]" class="mark-input out-of" type="text" maxlength="15" value="{MARK}" data-combobox />
+                    <input name="mark[{OWNER_ID}]" type="text" maxlength="15" value="{MARK}" data-mark-input data-combobox />
                 </label>
             </div>
             <div class="small-2 large-6 columns">
@@ -37,7 +37,7 @@
         <!-- END mark_type_raw -->
 
         <!-- BEGIN mark_type_free -->
-        <input name="mark[{OWNER_ID}]" class="mark-input free" type="text" size="4" maxlength="15" value="{MARK}" />
+        <input name="mark[{OWNER_ID}]" type="text" size="4" maxlength="15" value="{MARK}" data-mark-input />
         <!-- END mark_type_free -->
 
         <!-- BEGIN mark_type_none -->
@@ -48,7 +48,7 @@
 
         <!-- BEGIN mark_type_rubric -->
         <label>
-            <select id="rubricmark" class="mark-input" name="mark[{OWNER_ID}]">
+            <select id="rubricmark" name="mark[{OWNER_ID}]" data-mark-input>
                 <!-- BEGIN rubric_marked -->
                 <option value="{MARK} / {MAX_MARK}">{MARK}&nbsp;/&nbsp;{MAX_MARK}</option>
                 <!-- END rubric_marked -->
