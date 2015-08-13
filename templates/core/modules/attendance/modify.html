@@ -8,8 +8,10 @@
             'scrollDefaultNow': true,
             'step':5,
             'minTime': '{ATTENDANCE_START}',
-            'maxTime': '{ATTENDANCE_END}'
-
+            'maxTime': '{ATTENDANCE_END}',
+            appendTo: function ($input) {
+                return $input.closest('.timepick');
+            }
         });
 	});
 
@@ -57,8 +59,16 @@
 		<td><a href='/search/user/{STUDENT_UID}'>{STUDENT_NAME}</a></td>
         <td><p style="font-size:12pt;white-space: nowrap;">{STUDENT_ATTENDANCESTRING}</p></td>
         <td><em>{STUDENT_NONATTENDREASON}</em></td>
-        <td><input type='text' maxlength='10' size="8" name='LateArrivalTime[]' class="timepicker ui-timepicker-input" value="{STUDENT_ARRIVAL_TIME}" /></td>
-		<td><input type='text' maxlength='10' size="8" name='EarlyDepartureTime[]' class="timepicker ui-timepicker-input"  value="{STUDENT_DEPT_TIME}" /></td>
+        <td>
+            <div class="timepick">
+                <input type='text' maxlength='10' size="8" name='LateArrivalTime[]' class="timepicker ui-timepicker-input" value="{STUDENT_ARRIVAL_TIME}" />
+            </div>
+        </td>
+		<td>
+            <div class="timepick">
+                <input type='text' maxlength='10' size="8" name='EarlyDepartureTime[]' class="timepicker ui-timepicker-input"  value="{STUDENT_DEPT_TIME}" />
+            </div>
+        </td>
         <td>
             <select name='PossibleAbsenceCode[]'>
                 <!-- BEGIN absence_options -->

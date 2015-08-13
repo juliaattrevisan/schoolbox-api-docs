@@ -3,8 +3,13 @@
     $(function() {
         $('#component{COMPONENT_INSTANCE_ID}-countdownTime').timepicker({
             'timeFormat':'H:i',
-            'step':15
+            'step':15,
+            appendTo: function ($input) {
+                return $input.closest('.timepick');
+            }
         });
     });
 </script>
-<input id='component{COMPONENT_INSTANCE_ID}-countdownTime' name='time' type='text' value='{COMPONENT_CONFIG_TIME}' />
+<div class="timepick">
+    <input id='component{COMPONENT_INSTANCE_ID}-countdownTime' name='time' type='text' value='{COMPONENT_CONFIG_TIME}' />
+</div>
