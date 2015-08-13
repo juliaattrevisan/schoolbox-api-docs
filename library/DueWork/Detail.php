@@ -179,17 +179,18 @@ class DueWork_Detail
 
         $page->setVar(
             array(
-                'DUEWORK_DESCRIPTION' => Scrub::text($this->submissionBox->getName()),
-                'DUEWORK_YEAR'        => $this->submissionBox->getDueDate()->getYear(),
-                'DUEWORK_SEMESTER'    => $this->submissionBox->getDueDate()->getYearHalf(),
-                'CATEGORY_NAME'       => Scrub::text($this->submissionBox->getCategory()->getName()),
-                'DUEWORK_TYPE'        => $this->submissionBox->getWorkType()->getName(),
-                'DUEWORK_DUEDATE'     => $closeString,
+                'DUEWORK_DESCRIPTION'   => Scrub::text($this->submissionBox->getName()),
+                'DUEWORK_YEAR'          => $this->submissionBox->getDueDate()->getYear(),
+                'DUEWORK_SEMESTER'      => $this->submissionBox->getDueDate()->getYearHalf(),
+                'CATEGORY_NAME'         => Scrub::text($this->submissionBox->getCategory()->getName()),
+                'DUEWORK_TYPE'          => $this->submissionBox->getWorkType()->getName(),
+                'DUEWORK_DUEDATE'       => $closeString,
                 'GRADE_VISIBILITY'      => $this->submissionBox->getMarkVisibilityDescription(),
                 'GRADE_VISIBILITY_CODE' => $this->submissionBox->getMarkVisibility(),
-                'CATEGORY_ID'         => $this->submissionBox->getCategory()->getId(),
-                'BOX_ID'              => $this->submissionBox->getId(),
-                'SITE_ROOT'           => $page->conType() . $_SERVER['HTTP_HOST'],
+                'GRADE_VISIBILITY_CSS'  => \Schoolbox\Assessment\Widgets::getCss($this->submissionBox->getMarkVisibility()),
+                'CATEGORY_ID'           => $this->submissionBox->getCategory()->getId(),
+                'BOX_ID'                => $this->submissionBox->getId(),
+                'SITE_ROOT'             => $page->conType() . $_SERVER['HTTP_HOST'],
             )
         );
 
