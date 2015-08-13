@@ -69,17 +69,37 @@ class Widgets {
             array(
                 'id'   => SubmissionBox::MARK_VISIBILITY_PRIVATE,
                 'name' => 'Staff Only',
+                'css' => 'icon-locked',
             ),
             array(
                 'id'   => SubmissionBox::MARK_VISIBILITY_STUDENT,
                 'name' => 'Staff and Students',
+                'css' => 'icon-staff-students',
             ),
             array(
                 'id'   => SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
                 'name' => 'Staff, Students and their Parents',
+                'css' => 'icon-staff',
             ),
         );
+
         return $options;
+    }
+
+    /**
+     * Gets css style for a particular visiblity
+     *
+     * @param $id
+     * @return mixed
+     */
+    static public function getCss($id) {
+        $options = self::getOptions();
+
+        foreach ($options as $vis) {
+            if ($vis['id'] == $id) {
+                return $vis['css'];
+            }
+        }
     }
 
     static public function getName($id) {

@@ -256,6 +256,7 @@ if (!empty($subList) && is_array($subList)) {
                 'ASSESS_ATTEMPTS' => $attemptHandler->numAttempted($sub['id']),
                 'ASSESS_REVIEWED' => $attemptHandler->numReviewed($sub['id']),
                 'ASSESS_VISIBILITY_ID' => $sub['mark_visibility'],
+                'ASSESS_VISIBILITY_CSS' => \Schoolbox\Assessment\Widgets::getCss($sub['mark_visibility']),
                 'ASSESS_VISIBILITY' => \Schoolbox\Assessment\Widgets::getName($sub['mark_visibility'])
             ));
 
@@ -290,6 +291,7 @@ if (!empty($subList) && is_array($subList)) {
                 'MARKED' => (int)$totals['marked'],
                 'TOTAL' => $sub['accept_submission'] ? $totals['total'] : 'N/A',
                 'ASSESS_VISIBILITY_ID' => $sub['mark_visibility'],
+                'ASSESS_VISIBILITY_CSS' => \Schoolbox\Assessment\Widgets::getCss($sub['mark_visibility']),
                 'ASSESS_VISIBILITY' => \Schoolbox\Assessment\Widgets::getName($sub['mark_visibility']),
             ));
 
