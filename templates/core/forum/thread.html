@@ -1,15 +1,3 @@
-<span class="header-actions">
-    <!-- BEGIN reply -->
-    <a class="button icon-reply" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}">Post Reply</a>
-    <!-- END reply -->
-    <!-- BEGIN modify_thread -->
-    <a class="button icon-locked" href="/forum/modifyForm.php?toggleLock={THREAD_ID}">{LOCK_UNLOCK} Thread</a>
-    <a class="button icon-delete" href="/forum/modifyForm.php?deleteThread={THREAD_ID}" data-action="delete" data-relation="thread">Delete Thread</a>
-    <!-- END modify_thread -->
-</span>
-
-<h1>{THREAD_TITLE} {LOCKED}</h1>
-
 <div class="row">
     <ul class="breadcrumb">
         <li><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a></li>
@@ -18,8 +6,22 @@
     </ul>
 </div>
 
+
+
 <div class="row">
-    <div class="small-12 island no-pad">
+    <div class="small-12 island">
+        <span class="header-actions">
+            <!-- BEGIN reply -->
+            <a class="button icon-reply" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}">Post Reply</a>
+            <!-- END reply -->
+            <!-- BEGIN modify_thread -->
+            <a class="button icon-locked" href="/forum/modifyForm.php?toggleLock={THREAD_ID}">{LOCK_UNLOCK} Thread</a>
+            <a class="button icon-delete" href="/forum/modifyForm.php?deleteThread={THREAD_ID}" data-action="delete" data-relation="thread">Delete Thread</a>
+            <!-- END modify_thread -->
+        </span>
+
+        <h1>{THREAD_TITLE} {LOCKED}</h1>
+
         <section>
             <ul class="information-list">
                 <!-- BEGIN post -->

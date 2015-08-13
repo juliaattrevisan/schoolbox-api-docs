@@ -1,5 +1,3 @@
-<h1>{ACTION} {THREAD_POST}</h1>
-
 <ul class="breadcrumb">
     <li><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a></li>
     <li><a href="/forum/{CATEGORY_ID}/">Forum</a></li>
@@ -9,37 +7,48 @@
 </ul>
 
 <div class="row">
-    <form data-validatable method="post" enctype="multipart/form-data" action="/forum/modifyForm.php">
-    <div class="small-12 island no-pad">
-    <section>
-        <div class="content">
-                <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-                <input type="hidden" name="threadID" value="{THREAD_ID}" />
-                <input type="hidden" name="postID" value="{POST_ID}" />
-                <input type="hidden" name="quoteID" value="{QUOTE_ID}" />
+    <div class="small-12 island">
+        <h1>{ACTION} {THREAD_POST}</h1>
 
-                <!-- BEGIN title -->
-                <label for="forumTitle">Title</label>
-                <input type="text" name="title" id="forumTitle" maxlength="100" value="{THREAD_TITLE}" required />
-                <!-- END title -->
+        <form data-validatable method="post" enctype="multipart/form-data" action="/forum/modifyForm.php" class="top">
+            <section>
+                <fieldset class="content">
+                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                    <input type="hidden" name="threadID" value="{THREAD_ID}" />
+                    <input type="hidden" name="postID" value="{POST_ID}" />
+                    <input type="hidden" name="quoteID" value="{QUOTE_ID}" />
 
-                <label for="forumBody">
-                    <textarea id="forumBody" name="body">
-                        <!-- BEGIN quote -->
-                        <blockquote class="mceNonEditable">
-                            {QUOTE_BODY}
-                            <cite data-author="{QUOTE_AUTHOR_ID}">{QUOTE_AUTHOR}</cite>
-                        </blockquote>
-                        <p></p>
-                        <!-- END quote -->
-                        {BODY}
-                    </textarea>
-                </label>
-        </div>
-    </section>
+                    <!-- BEGIN title -->
+                    <div class="small-12 columns">
+                        <label for="forumTitle">Title
+                            <input type="text" name="title" id="forumTitle" maxlength="100" value="{THREAD_TITLE}" required />
+                        </label>
+                    </div>
+                    <!-- END title -->
+
+                    <div class="small-12 columns">
+                        <label for="forumBody">Message
+                            <textarea id="forumBody" name="body">
+                                <!-- BEGIN quote -->
+                                <blockquote class="mceNonEditable">
+                                    {QUOTE_BODY}
+                                    <cite data-author="{QUOTE_AUTHOR_ID}">{QUOTE_AUTHOR}</cite>
+                                </blockquote>
+                                <p></p>
+                                <!-- END quote -->
+                                {BODY}
+                            </textarea>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" name="submit" value="{ACTION}" />
+                </div>
+            </div>
+        </form>
     </div>
-    <input type="submit" name="submit" class="expand" value="{ACTION}" />
-    </form>
 </div>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
