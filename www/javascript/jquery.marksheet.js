@@ -62,7 +62,7 @@
 			var inputs = config.element.find('input.mark-input');
 			inputs.each(function() {
 				var self = $(this);
-				var pInline = self.closest('.inlineform');
+				var pInline = self.closest('[data-inlineform]');
 				var uid = pInline.find('input.uid');
 
 				/* wat?
@@ -77,12 +77,12 @@
 			/* Only ajax submit on change if this setting is on
 			 */
 			if (config.submitOnChange === true) {
-				var allInlineForms = config.element.find('.inlineform');
+				var allInlineForms = config.element.find('[data-inlineform]');
 				$('.mark-input, .comment').change(function(){
-					var thisInlineForm = $(this).closest('.inlineform');
+					var thisInlineForm = $(this).closest('[data-inlineform]');
 					allInlineForms.not(thisInlineForm).removeClass('inline-submit');
 					thisInlineForm.addClass('inline-submit');
-					$(this).closest('.inlineform').submit();
+					$(this).closest('[data-inlineform]').submit();
 				});
 			}
 
@@ -106,7 +106,7 @@
 						return true;
 					}
 				}
-				var markLimit = parseInt($(element).closest('.inlineform').find('.validation-limit').text());
+				var markLimit = parseInt($(element).closest('[data-inlineform]').find('[data-validation-limit]').text());
 				if (value !== "") {
 					var v = parseInt(value);
 					return v <= markLimit && v >= 0;
@@ -131,7 +131,7 @@
                     focusInvalid: false,
                     errorPlacement: function(error, element) {
                         // Attach to a table row if there is one there
-                        var markingElement = element.closest('.inlineform');
+                        var markingElement = element.closest('[data-inlineform]');
                         if (markingElement.length) {
                             error.appendTo(markingElement);
                         } else {
