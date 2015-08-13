@@ -60,6 +60,7 @@
 			// the validator doesn't seem to be able to handle two inputs with the same name, so they need to be
 			// uniqu-ified, then ajax submitted
 			var inputs = config.element.find('input[data-mark-input]');
+
 			inputs.each(function() {
 				var self = $(this);
 				var pInline = self.closest('[data-inlineform]');
@@ -78,11 +79,13 @@
 			 */
 			if (config.submitOnChange === true) {
 				var allInlineForms = config.element.find('[data-inlineform]');
-				$('[data-mark-input], .comment').change(function(){
+
+				$('[data-mark-input], [data-comment]').change(function(){
 					var thisInlineForm = $(this).closest('[data-inlineform]');
+
 					allInlineForms.not(thisInlineForm).removeClass('inline-submit');
 					thisInlineForm.addClass('inline-submit');
-					$(this).closest('[data-inlineform]').submit();
+                    thisInlineForm.submit();
 				});
 			}
 
@@ -143,11 +146,13 @@
 						// focused on a form element.) Use them if so.
 						// (Thankfully, the change event triggers before blur
 						//  in all browsers.)
+
 						if ($(form).find('div.inline-submit').length) {
 							// perform ajax update of work, no file upload
 							var submitDiv = $(form).find('div.inline-submit');
 
 							var notification = submitDiv.find('input, select, textarea');
+
 
 							$.post(config.submitUrl, submitDiv.find('input, select, textarea').serialize(), function(data) {
 
