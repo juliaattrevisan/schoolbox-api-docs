@@ -161,6 +161,7 @@ class DueWork_Detail
         $page->setBlock(TEMPLATE_content, 'download_btn', 'download_btn_block');
         $page->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
         $page->setBlock(TEMPLATE_content, 'report_btn', 'report_btn_block');
+        $page->setBlock(TEMPLATE_content, 'is_archived', 'is_archived_block');
 
         $page->setBlock('submission_row', 'download_action', 'download_action_block');
         $page->setBlock('submission_row', 'delete_action', 'delete_action_block');
@@ -379,7 +380,15 @@ class DueWork_Detail
         }
 
         // show or hide the archived warning, based on end date
-        $page->setVar('DUEWORK_ARCHIVED', $this->isArchived() ? '<b class="warning">Archived</b>' : '');
+
+        if ($this->isArchived()) {
+            $page->parse('is_archived_block', 'is_archived');
+        }
+        else {
+            $page->setVar(array(
+                'is_archived_block' => ''
+            ));
+        }
     }
 
 
