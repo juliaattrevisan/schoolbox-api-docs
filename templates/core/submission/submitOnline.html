@@ -12,33 +12,42 @@
 </div>
 
 <div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Submit Online</h2>
-        <section>
-            <div class="row">
-                <div class="small-8 columns">
-                    <div class="highlight-panel">
-                        <p>
-                            You can attach files and/or edit online for your submission.
-                            Content you edit online will automatically save drafts, but your work will <strong>not be submitted</strong> until you Submit for Assessment.
-                        </p>
-                    </div>
-                    <textarea id="editor-body" name="body" rows="20">{TEXTBOX_BODY}</textarea>
-                </div>
-                <div class="small-4 columns content">
-                    <h3>Attachments</h3>
-                    {ATTACH_ZONE}
-                </div>
-            </div>
-        </section>
+    <div class="small-12 columns">
+        <div class="panel content">
+            <p>
+                You can attach files and/or edit online for your submission.
+                Content you edit online will automatically save drafts, but your work will <strong>not be submitted</strong> until you Submit for Assessment.
+            </p>
+        </div>
     </div>
 </div>
 
-<div id="submission-history">
-    <form id="editor-form" method="post" action="/submission/submitWorkForm.php" enctype="multipart/form-data">
-        <input type="hidden" name="box_id" value="{BOX_ID}" />
-        <input type="hidden" name="submission_id" value="{SUBMISSION_ID}" />
+<form id="editor-form" class="top" method="post" action="/submission/submitWorkForm.php" enctype="multipart/form-data">
+    <input type="hidden" name="box_id" value="{BOX_ID}" />
+    <input type="hidden" name="submission_id" value="{SUBMISSION_ID}" />
 
+    <div class="row" data-equalizer>
+        <div class="small-12 large-8 island">
+            <h2 class="subheader">Submit Online</h2>
+            <section class="content" data-equalizer-watch>
+                <textarea id="editor-body" name="body" rows="20">{TEXTBOX_BODY}</textarea>
+            </section>
+        </div>
+
+        <div class="small-12 large-4 island">
+            <h2 class="subheader">Attachments</h2>
+            <section class="content" data-equalizer-watch>
+                {ATTACH_ZONE}
+            </section>
+        </div>
+
+        <div class="small-12 columns">
+            <input type="submit" name="save" value="Submit for Assessment" />
+        </div>
+    </div>
+</form>
+
+<div id="submission-history">
         <div class="wysiwyg">
             <!-- BEGIN confirm_terms -->
             <div id="confirmDialog" title="Submit Work Terms">
@@ -47,10 +56,9 @@
             <!-- END confirm_terms -->
         </div>
         <p>
-            <input class="submit-btn-plain" type="submit" name="save" value="Submit for Assessment" />
             <label class="save-draft"></label>
         </p>
-    </form>
+
 </div>
 
 
