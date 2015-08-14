@@ -46,26 +46,24 @@
                 Class Average
             </td>
             <!-- BEGIN class_average -->
-            <td class="class-avg gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">
+            <td class="gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">
                 <a href="{WORK_PATH}/{WORK_ID}">{WORK_CLASSAVG_CLEAN}</a>
             </td>
             <!-- END class_average -->
             <td></td>
         </tr>
         <!-- BEGIN stat -->
-        <tr class="sub-table-row {WORK_STAT_CLASS}">
+        <tr class="{WORK_STAT_CLASS}" data-sub-table-row>
             <td>{WORK_STAT_TITLE}</td>
             <!-- BEGIN stat_item -->
             <td>
                 <!-- BEGIN stat_editable -->
-                <input type="text" maxlength="3" length="3" name="{WORK_STAT_CLASS}[{WORK_NS_ID}]"
-                       value="{WORK_STAT_VALUE}"/>
+                <input type="text" maxlength="3" length="3" name="{WORK_STAT_CLASS}[{WORK_NS_ID}]" value="{WORK_STAT_VALUE}"/>
                 <!-- END stat_editable -->
                 <!-- BEGIN stat_visible -->
                 <a href="#" data-menu="visibility_menu_{WORK_ID}">
-                    <div class="visibility-drop">
-                        <span class="visibility-btn visibility_{WORK_STAT_VALUE}"></span><span class="down-arrow"></span>
-                    </div>
+                    <span class="visibility-btn visibility_{WORK_STAT_VALUE}"></span>
+                    <span class="down-arrow"></span>
                 </a>
                 <ul id="visibility_menu_{WORK_ID}" class="flyout-menu">
                     <!-- BEGIN stat_visibility_drop -->
@@ -108,7 +106,7 @@
 <!-- BEGIN CUSTOM_JAVASCRIPT -->
 <script>
     // Hide averages rows
-    var subTableRow = $('.sub-table-row');
+    var subTableRow = $('[data-sub-table-row]');
     subTableRow.hide();
 
     // Toggle averages rows and change arrow direction
@@ -119,14 +117,14 @@
             $(this).addClass('icon-add');
             $(this).removeClass('icon-collapse');
 
-            $('.sub-table-row').hide();
+            $('[data-sub-table-row]').hide();
         }
         else {
             $(this).removeClass('icon-add');
             $(this).addClass('icon-collapse');
 
-            $('.sub-table-row').show();
-            $('.sub-table-row').find('a[data-menu]').flyout({element : 'td'});
+            $('[data-sub-table-row]').show();
+            $('[data-sub-table-row]').find('a[data-menu]').flyout({element : 'td'});
         }
     });
 
