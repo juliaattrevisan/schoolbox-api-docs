@@ -116,14 +116,14 @@
         event.preventDefault();
 
         if (subTableRow.is(':visible')) {
-            $(this).removeClass('icon-add');
-            $(this).addClass('icon-collapse');
+            $(this).addClass('icon-add');
+            $(this).removeClass('icon-collapse');
 
             $('.sub-table-row').hide();
         }
         else {
-            $(this).addClass('icon-add');
-            $(this).removeClass('icon-collapse');
+            $(this).removeClass('icon-add');
+            $(this).addClass('icon-collapse');
 
             $('.sub-table-row').show();
             $('.sub-table-row').find('a[data-menu]').flyout({element : 'td'});
