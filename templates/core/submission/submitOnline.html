@@ -50,8 +50,11 @@
 </form>
 
 <!-- BEGIN confirm_terms -->
-<div id="confirmDialog" title="Submit Work Terms">
+<div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog" title="Submit Work Terms">
     <p>{STUDENT_SUBMIT_TERMS}</p>
+
+    <a class="button secondary" data-accept>Yes, I agree</a>
+    <a class="button" data-reject>Cancel</a>
 </div>
 <!-- END confirm_terms -->
 
@@ -146,15 +149,9 @@
             }
         });
 
-//        $( "#confirmDialog" ).dialog({
-//            autoOpen: false,
-//            modal: true,
-//            dialogClass: "no-close"
-//        });
-
         $("[data-action-save]").click(function(e) {
             var form      = $(this).closest('form'),
-                dialog    = $("#confirmDialog"),
+                dialog    = $('#confirm-dialog'),
                 submit    = form.find(':submit'),
                 inlineLen = tinyMCE.get('editor-body').getContent().length,
                 filesLen  = $('#submission-file-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
@@ -171,25 +168,27 @@
                         }
                     }
                 });
-
-            } else if (dialog.length) {
+            }
+            else if (dialog.length) {
                 // wait! display confirm modal
                 e.preventDefault();
 
-                dialog.dialog({
-                    buttons: {
-                        "Yes, I agree": function () {
-                            submit.prop('disabled', true);
-                            form.submit();
-                        },
-                        Cancel: function () {
-                            $(this).dialog("close");
-                        }
-                    }
-                });
-                dialog.dialog("open");
+                dialog.find('[data-accept]').click(function(event) {
+                    event.preventDefault();
 
-            } else {
+                    submit.prop('disabled', true);
+                    form.submit();
+                });
+
+                dialog.find('[data-reject]').click(function(event) {
+                    event.preventDefault();
+
+                    dialog.foundation('reveal', 'close');
+                });
+
+                $('#confirm-dialog').foundation('reveal').foundation('reveal', 'open');
+            }
+            else {
                 // checks pass: go for broke
                 submit.prop('disabled', true);
                 form.submit();
