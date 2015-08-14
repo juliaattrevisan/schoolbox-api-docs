@@ -128,61 +128,65 @@
         }
     });
 
-  var table = $('#content').children('[data-mark-sheet]');
+    var table = $('[data-mark-sheet]');
 
-  table.on('change', 'input', function(e) {
-    var self = $(this);
+    table.on('change', 'input', function (e) {
+        var self = $(this);
 
-    // disable self
-    this.disabled = 'disabled';
+        // disable self
+        this.disabled = 'disabled';
 
-    // set up the data variable for POSTing
-    var data = {}
-    data[this.name] = self.val();
+        // set up the data variable for POSTing
+        var data = {}
+        data[this.name] = self.val();
 
-    $.ajax({
-      type : 'POST',
-      url : '/ajax/submission/marks.php',
-      data : data,
-      // callbacks
-      success : function(data) {
-        self.addClass('ajax-response win');
-        self.prop('disabled', false);
-        self.attr('title', '');
+        $.ajax({
+            type: 'POST',
+            url: '/ajax/submission/marks.php',
+            data: data,
+            // callbacks
+            success: function (data) {
+                self.addClass('ajax-response win');
+                self.prop('disabled', false);
+                self.attr('title', '');
 
-        var tbody = table.children('tbody');
+                var tbody = table.children('tbody');
 
-        $.each(data, function(k, v) {
-          var userId   = k,
-              gradient = v['avg-int'],
-              letter   = v['avg-letter'];
+                $.each(data, function (k, v) {
+                    var userId = k,
+                            gradient = v['avg-int'],
+                            letter = v['avg-letter'];
 
-          var row = tbody.children('tr[data-id='+userId+']');
+                    var row = tbody.children('tr[data-id=' + userId + ']');
 
-          row.children('td').last()
-            .attr('class', 'gradient-'+gradient+'-bg').children('a')
-              .attr('class', 'gradient-'+gradient).text(letter);
+                    row.children('td').last()
+                            .attr('class', 'gradient-' + gradient + '-bg').children('a')
+                            .attr('class', 'gradient-' + gradient).text(letter);
 
+                });
+
+                setTimeout(function () {
+                    self.removeClass('ajax-response win')
+                }, 500);
+            },
+            error: function (xhr) {
+                self.addClass('ajax-response fail');
+                self.attr('title', 'Value failed to save.')
+                self.prop('disabled', false);
+                setTimeout(function () {
+                    self.removeClass('ajax-response fail')
+                }, 2000);
+            }
         });
-
-        setTimeout(function() { self.removeClass('ajax-response win') }, 500);
-      },
-      error : function(xhr) {
-        self.addClass('ajax-response fail');
-        self.attr('title', 'Value failed to save.')
-        self.prop('disabled', false);
-        setTimeout(function() { self.removeClass('ajax-response fail') }, 2000);
-      }
     });
-  });
 
-    $('a[href][rel=flyout-option]').click(function(event){
+    $('a[href][rel=flyout-option]').click(function (event) {
         event.preventDefault();
         var self = $(this);
         var href = $(this).attr('href');
-        var visibility = href.substr(href.length-1);
-        $.ajax({url: href}).done(function(data) {
-            self.closest('td').find('span.visibility-btn').removeClass('visibility_0 visibility_1 visibility_2').addClass('visibility_'+visibility);
+        var visibility = href.substr(href.length - 1);
+        $.ajax({url: href}).done(function (data) {
+            self.closest('td').find('span.visibility-btn').removeClass('visibility_0 visibility_1 visibility_2').addClass('visibility_' + visibility);
             self.closest('td').removeClass('open');
         });
     });
