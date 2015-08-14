@@ -120,7 +120,11 @@
          */
         function init(options, element) {
             var defaults = {
-                element: element
+                element: element,
+
+                /* The url which receives the updated values via ajax
+                 */
+                url: '/ajax/submission/marks.php'
             }
 
             var derived = {
@@ -138,16 +142,20 @@
             $(config.element).on('change', 'input', function (e) {
                 var self = $(this);
 
-                // disable self
+                /* Disable the current input until ajax transaction completes
+                 * This prevents update spamming
+                 */
                 this.disabled = 'disabled';
 
                 // set up the data variable for POSTing
                 var data = {}
                 data[this.name] = self.val();
 
+                /* Ajax new settings
+                 */
                 $.ajax({
                     type: 'POST',
-                    url: '/ajax/submission/marks.php',
+                    url: config.url,
                     data: data,
                     // callbacks
                     success: function (data) {
