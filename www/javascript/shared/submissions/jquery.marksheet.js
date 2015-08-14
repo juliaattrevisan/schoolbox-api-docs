@@ -70,7 +70,6 @@
          * Toggle averages rows and change icon
          */
         function toggleTableRows() {
-            //
             $(config.averagesRowsSelector).click(function(event){
                 event.preventDefault();
 
@@ -98,6 +97,92 @@
                 var url = $(this).val();
 
                 $.get(url);
+            });
+        }
+    }
+
+    /**
+     * Controls for Inputs
+     */
+    $.fn.marksheet.inputs = function(options) {
+        options = options || {}
+
+        var config = init(options, $(this));
+
+        everything();
+
+        /**
+         * Init
+         *
+         * @param options
+         * @param element
+         * @returns {*}
+         */
+        function init(options, element) {
+            var defaults = {
+                element: element
+            }
+
+            var derived = {
+            }
+
+            var merged = $.extend(defaults, derived, options);
+
+            return merged;
+        }
+
+        /**
+         * Everything
+         */
+        function everything() {
+            $(config.element).on('change', 'input', function (e) {
+                var self = $(this);
+
+                // disable self
+                this.disabled = 'disabled';
+
+                // set up the data variable for POSTing
+                var data = {}
+                data[this.name] = self.val();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/ajax/submission/marks.php',
+                    data: data,
+                    // callbacks
+                    success: function (data) {
+                        self.addClass('ajax-response win');
+                        self.prop('disabled', false);
+                        self.attr('1title', '');
+
+                        var tbody = $(config.element).children('tbody');
+
+                        $.each(data, function (k, v) {
+                            var userId = k,
+                                gradient = v['avg-int'],
+                                letter = v['avg-letter'];
+
+                            var row = tbody.children('tr[data-id=' + userId + ']');
+
+                            row.children('td').last()
+                                .attr('class', 'gradient-' + gradient + '-bg').children('a')
+                                .attr('class', 'gradient-' + gradient).text(letter);
+
+                        });
+
+                        setTimeout(function () {
+                            self.removeClass('ajax-response win')
+                        }, 500);
+                    },
+                    error: function (xhr) {
+                        self.addClass('ajax-response fail');
+                        self.attr('title', 'Value failed to save.')
+                        self.prop('disabled', false);
+                        setTimeout(function () {
+                            self.removeClass('ajax-response fail')
+                        }, 2000);
+                    }
+                });
             });
         }
     }
