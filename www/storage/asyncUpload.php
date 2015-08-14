@@ -116,6 +116,9 @@ function getFileAtIndex($meta, $i)
  */
 function attemptStorage($fileData)
 {
+    if ($fileData['size'] == 0) {
+        throw new Schoolbox\File\Exception("File has no content");
+    }
     if (!is_readable($fileData['tmp_name'])) {
         throw new Schoolbox\File\Exception("Filedata not readable");
     }
