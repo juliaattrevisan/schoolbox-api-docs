@@ -1,3 +1,61 @@
+{BREADCRUMB}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{BOX_NAME}</h1>
+
+        <ul class="meta">
+            <li class="icon-calendar">Due <time class="gradient-{BOX_DUEDATE_GRADIENT}">{BOX_DUEDATE}</time> on <time>{BOX_DUETIME}</time></li>
+            <li class="icon-due-work"><a href="/homepage/{FOLDER_ID}" title="{FOLDER_NAME}">{FOLDER_NAME}</a> {BOX_TYPE}</li>
+        </ul>
+    </div>
+</div>
+
+
+
+<div id="submission-history">
+    <form id="editor-form" method="post" action="/submission/submitWorkForm.php" enctype="multipart/form-data">
+        <input type="hidden" name="box_id" value="{BOX_ID}" />
+        <input type="hidden" name="submission_id" value="{SUBMISSION_ID}" />
+
+        <span class="header_option">
+            <a href="/submission/submissionHistory/{BOX_ID}/{USER_ID}" class="btn go-back"><span></span>Return to {BOX_NAME}</a>
+        </span>
+        <div class="wysiwyg">
+            <p>
+                You can attach files and/or edit online for your submission.<br/>
+                Content you edit online will automatically save drafts, but your work will <strong>not be submitted</strong> until you Submit for Assessment.
+            </p>
+
+            <!-- BEGIN confirm_terms -->
+            <div id="confirmDialog" title="Submit Work Terms">
+                <p>{STUDENT_SUBMIT_TERMS}</p>
+            </div>
+            <!-- END confirm_terms -->
+        </div>
+
+        <div class="left">
+            <div class="wysiwig">
+                <textarea rows="20" style="width: 100%;" name="body" id="textBoxBody">{TEXTBOX_BODY}</textarea>
+            </div>
+        </div>
+        <div class="right">
+            <h2>Attachments</h2>
+            <p></p>
+            {ATTACH_ZONE}
+        </div>
+
+        <p></p>
+        <p>
+            <input class="submit-btn-plain" type="submit" name="save" value="Submit for Assessment" />
+            <label class="save-draft"></label>
+        </p>
+    </form>
+</div>
+
+
+
+
 <!-- BEGIN custom_head -->
 <style type="text/css">
     .save-draft {
@@ -42,7 +100,7 @@
 
     // The autosave submit method
     var autosaveAjaxSubmit = function() {
-        var form = $('form#textBoxForm')
+        var form = $('#data-editor-form')
 
         // Change button's text, but keep its width the same.
         // Change it back once done.
@@ -142,47 +200,3 @@
 </script>
 <!-- END custom_head -->
 
-<div id="submission-history">
-    <form method="post" action="/submission/submitWorkForm.php" id="textBoxForm" enctype="multipart/form-data">
-        <input type="hidden" name="box_id" value="{BOX_ID}" />
-        <input type="hidden" name="submission_id" value="{SUBMISSION_ID}" />
-
-        <h1>{CATEGORY_NAME} - {BOX_NAME} <span>({BOX_TYPE})</span></h1>
-        <span class="header_option">
-            <a href="/submission/submissionHistory/{BOX_ID}/{USER_ID}" class="btn go-back"><span></span>Return to {BOX_NAME}</a>
-        </span>
-        <div class="wysiwyg">
-            <p>
-                <span class="gradient-{BOX_DUEDATE_GRADIENT}"><strong>Due {BOX_DUEDATE}</strong></span> on <strong>{BOX_DUETIME}</strong>
-            </p>
-            <p>
-                You can attach files and/or edit online for your submission.<br/>
-                Content you edit online will automatically save drafts, but your work will <strong>not be submitted</strong> until you Submit for Assessment.
-            </p>
-
-            <!-- BEGIN confirm_terms -->
-            <div id="confirmDialog" title="Submit Work Terms">
-                <p>{STUDENT_SUBMIT_TERMS}</p>
-            </div>
-            <!-- END confirm_terms -->
-        </div>
-
-        <div class="left">
-            <div class="wysiwig">
-                <textarea rows="20" style="width: 100%;" name="body" id="textBoxBody">{TEXTBOX_BODY}</textarea>
-            </div>
-        </div>
-        <div class="right">
-            <h2>Attachments</h2>
-            <p></p>
-            {ATTACH_ZONE}
-        </div>
-
-        <div class="clearfix"></div>
-        <p></p>
-        <p>
-            <input class="submit-btn-plain" type="submit" name="save" value="Submit for Assessment" />
-            <label class="save-draft"></label>
-        </p>
-    </form>
-</div>
