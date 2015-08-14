@@ -1,4 +1,14 @@
 (function() {
+    /**
+     * Label animator
+     *
+     * @param label
+     */
+    $.fn.labelTimeout = function(label) {
+        label.animate({opacity: 0}, 1500, function() {
+            label.addClass('hide');
+        });
+    }
 
     /**
      * Marksheet
@@ -94,9 +104,18 @@
             $(config.visibilitySelector).change(function(event) {
                 event.preventDefault();
 
-                var url = $(this).val();
+                var self = $(this);
 
-                $.get(url);
+                $.get($(this).val(), function(data) {
+                    var indicator = self.attr('data-visibility-selector');
+
+                    var label = $('[data-identifier="'+indicator+'"]');
+                    label.css({opacity: 1}).removeClass('hide');
+
+                    setTimeout(function() {
+                        $.fn.labelTimeout(label)
+                    }, 3000);
+                });
             });
         }
     }

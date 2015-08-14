@@ -59,15 +59,17 @@
             <td>
                 <!-- BEGIN stat_editable -->
                 <input type="text" maxlength="3" length="3" name="{WORK_STAT_CLASS}[{WORK_NS_ID}]" value="{WORK_STAT_VALUE}"/>
+                <span data-identifier="{WORK_STAT_CLASS}[{WORK_NS_ID}]-weight" class="label success full-width">Saved</span>
                 <!-- END stat_editable -->
                 <!-- BEGIN stat_visible -->
-                <select data-visibility-selector>
+                <select data-visibility-selector="{WORK_STAT_CLASS}[{WORK_NS_ID}]-visibility">
                     <!-- BEGIN stat_visibility_drop -->
                     <option value="{ASSESS_MODIFY_URL}&mark_visibility={MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_SELECTED}>
                         {MARK_VISIBILITY_TEXT}
                     </option>
                     <!-- END stat_visibility_drop -->
                 </select>
+                <span data-identifier="{WORK_STAT_CLASS}[{WORK_NS_ID}]-visibility" class="label success full-width hide">Saved</span>
                 <!-- END stat_visible -->
                 <!-- BEGIN stat_readonly -->
                 {WORK_STAT_VALUE}
