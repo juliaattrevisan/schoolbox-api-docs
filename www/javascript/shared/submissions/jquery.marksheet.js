@@ -110,7 +110,7 @@
                     var indicator = self.attr('data-visibility-selector');
 
                     var label = $('[data-identifier="'+indicator+'"]');
-                    label.css({opacity: 1}).removeClass('hide');
+                    label.text('Saved').css({opacity:1}).removeClass('hide');
 
                     setTimeout(function() {
                         $.fn.labelTimeout(label)
@@ -164,11 +164,16 @@
                 /* Disable the current input until ajax transaction completes
                  * This prevents update spamming
                  */
-                this.disabled = 'disabled';
+                self.prop('disabled', true);
 
                 // set up the data variable for POSTing
                 var data = {}
                 data[this.name] = self.val();
+
+                /* Label data identifier
+                 */
+                var identifier = self.attr('name') + '-weight';
+                var label = $('[data-identifier="'+identifier+'"]');
 
                 /* Ajax new settings
                  */
@@ -178,9 +183,7 @@
                     data: data,
                     // callbacks
                     success: function (data) {
-                        self.addClass('ajax-response win');
                         self.prop('disabled', false);
-                        self.attr('1title', '');
 
                         var tbody = $(config.element).children('tbody');
 
@@ -197,17 +200,32 @@
 
                         });
 
-                        setTimeout(function () {
-                            self.removeClass('ajax-response win')
-                        }, 500);
+                        /* Animate label feedback
+                         */
+                        label
+                            .css({opacity:1})
+                            .text('Saved')
+                            .removeClass('hide alert')
+                            .addClass('success');
+
+                        setTimeout(function() {
+                            $.fn.labelTimeout(label)
+                        }, 3000);
                     },
                     error: function (xhr) {
-                        self.addClass('ajax-response fail');
-                        self.attr('title', 'Value failed to save.')
                         self.prop('disabled', false);
-                        setTimeout(function () {
-                            self.removeClass('ajax-response fail')
-                        }, 2000);
+
+                        /* Animate label feedback
+                         */
+                        label
+                            .css({opacity:1})
+                            .text('Value failed to save')
+                            .removeClass('hide success')
+                            .addClass('alert');
+
+                        setTimeout(function() {
+                            $.fn.labelTimeout(label)
+                        }, 3000);
                     }
                 });
             });
