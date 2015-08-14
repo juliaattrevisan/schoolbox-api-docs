@@ -78,13 +78,14 @@
         </tr>
         <!-- END stat -->
         <!-- BEGIN student_row -->
-        <tr class="{DARK}" data-id="{STUDENT_ID}">
-            <td class="avatar">
-                <a href="/search/user/{STUDENT_ID}" class="author">
-                    <img height="32" width="32" src="/portrait.php?userId={STUDENT_EXTID}&amp;size=square32"
-                         alt="{STUDENT_NAME}"/>
-                    {STUDENT_NAME_FORMAL}
-                </a>
+        <tr data-id="{STUDENT_ID}">
+            <td>
+                <div class="avatar card">
+                    <a href="/search/user/{STUDENT_ID}" title="View Profile">
+                        <img src="/portrait.php?userId={STUDENT_EXTID}&size=square64" alt="View Profile" />
+                        <p>{STUDENT_NAME}</p>
+                    </a>
+                </div>
             </td>
             <!-- BEGIN student_work -->
             <td class="column-{WORK_TYPE}-{WORK_ID}">
@@ -92,97 +93,71 @@
             </td>
             <!-- END student_work -->
             <td class="gradient-{STUDENT_AVG_GRADIENT}-bg">
-                <a class="gradient-{STUDENT_AVG_GRADIENT}"
-                   href="/submission/allWork/{STUDENT_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{CID}">{STUDENT_AVG_CLEAN}</a>
+                <a class="gradient-{STUDENT_AVG_GRADIENT}" href="/submission/allWork/{STUDENT_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{CID}">{STUDENT_AVG_CLEAN}</a>
             </td>
         </tr>
         <!-- END student_row -->
     </tbody>
 </table>
 
-<script>
-    // Hide averages rows
-    var subTableRow = $('[data-sub-table-row]');
-    subTableRow.hide();
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
+<script type="text/javascript">
+    $(function() {
 
-    // Toggle averages rows and change arrow direction
-    $('[data-toggle-averages]').click(function(event){
-        event.preventDefault();
+        /* Controls for Averages
+         */
+        $.fn.marksheet.averages();
 
-        if (subTableRow.is(':visible')) {
-            $(this).addClass('icon-add');
-            $(this).removeClass('icon-collapse');
+        var table = $('[data-mark-sheet]');
 
-            $('[data-sub-table-row]').hide();
-        }
-        else {
-            $(this).removeClass('icon-add');
-            $(this).addClass('icon-collapse');
+        table.on('change', 'input', function (e) {
+            var self = $(this);
 
-            $('[data-sub-table-row]').show();
-        }
-    });
+            // disable self
+            this.disabled = 'disabled';
 
-    /* Change visibility
-     */
-    $('[data-visibility-selector]').change(function(event) {
-        event.preventDefault();
+            // set up the data variable for POSTing
+            var data = {}
+            data[this.name] = self.val();
 
-        var url = $(this).val();
+            $.ajax({
+                type: 'POST',
+                url: '/ajax/submission/marks.php',
+                data: data,
+                // callbacks
+                success: function (data) {
+                    self.addClass('ajax-response win');
+                    self.prop('disabled', false);
+                    self.attr('title', '');
 
-        $.get(url);
-    });
+                    var tbody = table.children('tbody');
 
+                    $.each(data, function (k, v) {
+                        var userId = k,
+                                gradient = v['avg-int'],
+                                letter = v['avg-letter'];
 
-    var table = $('[data-mark-sheet]');
+                        var row = tbody.children('tr[data-id=' + userId + ']');
 
-    table.on('change', 'input', function (e) {
-        var self = $(this);
+                        row.children('td').last()
+                                .attr('class', 'gradient-' + gradient + '-bg').children('a')
+                                .attr('class', 'gradient-' + gradient).text(letter);
 
-        // disable self
-        this.disabled = 'disabled';
+                    });
 
-        // set up the data variable for POSTing
-        var data = {}
-        data[this.name] = self.val();
-
-        $.ajax({
-            type: 'POST',
-            url: '/ajax/submission/marks.php',
-            data: data,
-            // callbacks
-            success: function (data) {
-                self.addClass('ajax-response win');
-                self.prop('disabled', false);
-                self.attr('title', '');
-
-                var tbody = table.children('tbody');
-
-                $.each(data, function (k, v) {
-                    var userId = k,
-                            gradient = v['avg-int'],
-                            letter = v['avg-letter'];
-
-                    var row = tbody.children('tr[data-id=' + userId + ']');
-
-                    row.children('td').last()
-                            .attr('class', 'gradient-' + gradient + '-bg').children('a')
-                            .attr('class', 'gradient-' + gradient).text(letter);
-
-                });
-
-                setTimeout(function () {
-                    self.removeClass('ajax-response win')
-                }, 500);
-            },
-            error: function (xhr) {
-                self.addClass('ajax-response fail');
-                self.attr('title', 'Value failed to save.')
-                self.prop('disabled', false);
-                setTimeout(function () {
-                    self.removeClass('ajax-response fail')
-                }, 2000);
-            }
+                    setTimeout(function () {
+                        self.removeClass('ajax-response win')
+                    }, 500);
+                },
+                error: function (xhr) {
+                    self.addClass('ajax-response fail');
+                    self.attr('title', 'Value failed to save.')
+                    self.prop('disabled', false);
+                    setTimeout(function () {
+                        self.removeClass('ajax-response fail')
+                    }, 2000);
+                }
+            });
         });
     });
 </script>
