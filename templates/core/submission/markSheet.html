@@ -185,15 +185,4 @@
             }
         });
     });
-
-    $('a[href][rel=flyout-option]').click(function (event) {
-        event.preventDefault();
-        var self = $(this);
-        var href = $(this).attr('href');
-        var visibility = href.substr(href.length - 1);
-        $.ajax({url: href}).done(function (data) {
-            self.closest('td').find('[data-visibility]').removeClass('visibility_0 visibility_1 visibility_2').addClass('visibility_' + visibility);
-            self.closest('td').removeClass('open');
-        });
-    });
 </script>
