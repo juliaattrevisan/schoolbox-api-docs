@@ -61,16 +61,13 @@
                 <input type="text" maxlength="3" length="3" name="{WORK_STAT_CLASS}[{WORK_NS_ID}]" value="{WORK_STAT_VALUE}"/>
                 <!-- END stat_editable -->
                 <!-- BEGIN stat_visible -->
-                <a href="#" data-menu="visibility_menu_{WORK_ID}">
-                    <span class="visibility-btn visibility_{WORK_STAT_VALUE}"></span>
-                    <span class="down-arrow"></span>
-                </a>
-                <ul id="visibility_menu_{WORK_ID}" class="flyout-menu">
+                <select data-visibility-selector>
                     <!-- BEGIN stat_visibility_drop -->
-                    <li><a href="{ASSESS_MODIFY_URL}&mark_visibility={MARK_VISIBILITY_VALUE}"
-                           rel="flyout-option"><span></span>{MARK_VISIBILITY_TEXT}</a></li>
+                    <option value="{ASSESS_MODIFY_URL}&mark_visibility={MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_SELECTED}>
+                        {MARK_VISIBILITY_TEXT}
+                    </option>
                     <!-- END stat_visibility_drop -->
-                </ul>
+                </select>
                 <!-- END stat_visible -->
                 <!-- BEGIN stat_readonly -->
                 {WORK_STAT_VALUE}
@@ -103,7 +100,6 @@
     </tbody>
 </table>
 
-<!-- BEGIN CUSTOM_JAVASCRIPT -->
 <script>
     // Hide averages rows
     var subTableRow = $('[data-sub-table-row]');
@@ -124,9 +120,19 @@
             $(this).addClass('icon-collapse');
 
             $('[data-sub-table-row]').show();
-            $('[data-sub-table-row]').find('a[data-menu]').flyout({element : 'td'});
         }
     });
+
+    /* Change visibility
+     */
+    $('[data-visibility-selector]').change(function(event) {
+        event.preventDefault();
+
+        var url = $(this).val();
+
+        $.get(url);
+    });
+
 
     var table = $('[data-mark-sheet]');
 
@@ -186,9 +192,8 @@
         var href = $(this).attr('href');
         var visibility = href.substr(href.length - 1);
         $.ajax({url: href}).done(function (data) {
-            self.closest('td').find('span.visibility-btn').removeClass('visibility_0 visibility_1 visibility_2').addClass('visibility_' + visibility);
+            self.closest('td').find('[data-visibility]').removeClass('visibility_0 visibility_1 visibility_2').addClass('visibility_' + visibility);
             self.closest('td').removeClass('open');
         });
     });
 </script>
-<!-- END CUSTOM_JAVASCRIPT -->
