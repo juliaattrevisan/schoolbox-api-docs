@@ -11,41 +11,41 @@
     </div>
 </div>
 
-
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Submit Online</h2>
+        <section>
+            <div class="row">
+                <div class="small-8 columns">
+                    <div class="highlight-panel">
+                        <p>
+                            You can attach files and/or edit online for your submission.
+                            Content you edit online will automatically save drafts, but your work will <strong>not be submitted</strong> until you Submit for Assessment.
+                        </p>
+                    </div>
+                    <textarea id="editor-body" name="body" rows="20">{TEXTBOX_BODY}</textarea>
+                </div>
+                <div class="small-4 columns content">
+                    <h3>Attachments</h3>
+                    {ATTACH_ZONE}
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
 
 <div id="submission-history">
     <form id="editor-form" method="post" action="/submission/submitWorkForm.php" enctype="multipart/form-data">
         <input type="hidden" name="box_id" value="{BOX_ID}" />
         <input type="hidden" name="submission_id" value="{SUBMISSION_ID}" />
 
-        <span class="header_option">
-            <a href="/submission/submissionHistory/{BOX_ID}/{USER_ID}" class="btn go-back"><span></span>Return to {BOX_NAME}</a>
-        </span>
         <div class="wysiwyg">
-            <p>
-                You can attach files and/or edit online for your submission.<br/>
-                Content you edit online will automatically save drafts, but your work will <strong>not be submitted</strong> until you Submit for Assessment.
-            </p>
-
             <!-- BEGIN confirm_terms -->
             <div id="confirmDialog" title="Submit Work Terms">
                 <p>{STUDENT_SUBMIT_TERMS}</p>
             </div>
             <!-- END confirm_terms -->
         </div>
-
-        <div class="left">
-            <div class="wysiwig">
-                <textarea rows="20" style="width: 100%;" name="body" id="textBoxBody">{TEXTBOX_BODY}</textarea>
-            </div>
-        </div>
-        <div class="right">
-            <h2>Attachments</h2>
-            <p></p>
-            {ATTACH_ZONE}
-        </div>
-
-        <p></p>
         <p>
             <input class="submit-btn-plain" type="submit" name="save" value="Submit for Assessment" />
             <label class="save-draft"></label>
@@ -88,7 +88,7 @@
     var autosavePresubmit = function() {
         // Has the text box changed? If not check again later
         // (re-init the autosave counter)
-        var currentContent = tinyMCE.get('textBoxBody').getContent()
+        var currentContent = tinyMCE.get('editor-body').getContent()
         if (currentContent === textBoxContent) {
             initAutosave()
         }
@@ -112,7 +112,7 @@
         // Submit form via AJAX
         var formContents = form.serializeArray()
         formContents.push({name: 'save_draft', value: '1'})
-        formContents.push({name: 'body',       value: tinyMCE.get('textBoxBody').getContent()})
+        formContents.push({name: 'body',       value: tinyMCE.get('editor-body').getContent()})
         $.ajax({
             type: "POST",
             url:  '/submission/submitOnlineForm.php',
@@ -138,7 +138,7 @@
     $(function() {
         $.fn.alaressTiny({
             mode : "exact",
-            elements: "textBoxBody",
+            elements: "editor-body",
             setup: function(ed) {
                 initAutosave()
                 ed.onChange.add(function() {
@@ -157,7 +157,7 @@
             var form      = $(this).closest('form'),
                 dialog    = $("#confirmDialog"),
                 submit    = form.find(':submit'),
-                inlineLen = tinyMCE.get('textBoxBody').getContent().length,
+                inlineLen = tinyMCE.get('editor-body').getContent().length,
                 filesLen  = $('#submission-file-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
 
             if (!inlineLen && !filesLen) {
