@@ -48,9 +48,12 @@
                 averagesRows: '[data-sub-table-row]',
 
                 /* Element containing the url for updating visibility of
-                 * a Due Work/Quiz
+                 * a Due Work/Quiz e.g. [data-visiblity-selector]
+                 *
+                 * data-visibility-selector, as an attribute, is also used
+                 * to select a corresponding ajax feedback label
                  */
-                visibilitySelector: '[data-visibility-selector]',
+                visibilitySelector: 'data-visibility-selector',
 
                 /* Icon replacement
                  * Icon to show when you can expand/collapse
@@ -101,13 +104,13 @@
          * Ajaxes the new value silently
          */
         function updateVisibility() {
-            $(config.visibilitySelector).change(function(event) {
+            $('[' + config.visibilitySelector + ']').change(function(event) {
                 event.preventDefault();
 
                 var self = $(this);
 
                 $.get($(this).val(), function(data) {
-                    var indicator = self.attr('data-visibility-selector');
+                    var indicator = self.attr(config.visibilitySelector);
 
                     var label = $('[data-identifier="'+indicator+'"]');
                     label.text('Saved').css({opacity:1}).removeClass('hide');
