@@ -42,39 +42,19 @@
         </div>
 
         <div class="small-12 columns">
-            <input type="submit" name="save" value="Submit for Assessment" />
+            <input type="submit" value="Submit for Assessment" data-action-save />
+
+            <span class="label success full-width hide" data-save-draft>Autosaving</span>
         </div>
     </div>
 </form>
 
-<div id="submission-history">
-        <div class="wysiwyg">
-            <!-- BEGIN confirm_terms -->
-            <div id="confirmDialog" title="Submit Work Terms">
-                <p>{STUDENT_SUBMIT_TERMS}</p>
-            </div>
-            <!-- END confirm_terms -->
-        </div>
-        <p>
-            <label class="save-draft"></label>
-        </p>
-
+<!-- BEGIN confirm_terms -->
+<div id="confirmDialog" title="Submit Work Terms">
+    <p>{STUDENT_SUBMIT_TERMS}</p>
 </div>
+<!-- END confirm_terms -->
 
-
-
-
-<!-- BEGIN custom_head -->
-<style type="text/css">
-    .save-draft {
-        width: 100px;
-        text-align: center;
-        float: left;
-        height: 24px;
-        line-height: 24px;
-        margin-top: 8px;
-    }
-</style>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
@@ -106,21 +86,26 @@
         }
     }
 
+    /**
+     * Label timeout effect
+     */
+    function labelTimeout() {
+        $('#editor-form').find('[data-save-draft]').animate({'opacity': 0}, 1500);
+    }
+
     // The autosave submit method
     var autosaveAjaxSubmit = function() {
-        var form = $('#data-editor-form')
+        var form = $('#editor-form')
 
         // Change button's text, but keep its width the same.
         // Change it back once done.
-        var formSaveLabel = form.find('label.save-draft')
-        var oldText        = formSaveLabel.text() || 'Draft Saved'
-
-        formSaveLabel.text('(Autosaving)')
+        var formSaveLabel = form.find('[data-save-draft]')
 
         // Submit form via AJAX
         var formContents = form.serializeArray()
         formContents.push({name: 'save_draft', value: '1'})
         formContents.push({name: 'body',       value: tinyMCE.get('editor-body').getContent()})
+
         $.ajax({
             type: "POST",
             url:  '/submission/submitOnlineForm.php',
@@ -128,16 +113,22 @@
             complete: function() {
                 // Re-init the autosave
                 initAutosave()
-                setTimeout(
-                    function() { formSaveLabel.text(oldText) },
-                    2000
-                )
+                setTimeout(function() { formSaveLabel.text('Draft Saved') }, 2000)
             },
             success: function() {
-                formSaveLabel.text(oldText)
+                formSaveLabel
+                    .css({'opacity': 1})
+                    .removeClass('hide')
+
+                setTimeout(labelTimeout, 3000);
             },
             error: function() {
-                formSaveLabel.text('Error!')
+                formSaveLabel
+                    .removeClass('success')
+                    .addClass('alert')
+                    .text('Error!');
+
+                setTimeout(labelTimeout, 3000);
             },
             dataType: 'json'
         });
@@ -155,13 +146,13 @@
             }
         });
 
-        $( "#confirmDialog" ).dialog({
-            autoOpen: false,
-            modal: true,
-            dialogClass: "no-close"
-        });
+//        $( "#confirmDialog" ).dialog({
+//            autoOpen: false,
+//            modal: true,
+//            dialogClass: "no-close"
+//        });
 
-        $("input[name='save']").click(function(e) {
+        $("[data-action-save]").click(function(e) {
             var form      = $(this).closest('form'),
                 dialog    = $("#confirmDialog"),
                 submit    = form.find(':submit'),
@@ -206,5 +197,4 @@
         });
     });
 </script>
-<!-- END custom_head -->
 
