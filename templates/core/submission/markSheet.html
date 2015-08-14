@@ -1,90 +1,108 @@
-<h1>Marksheet – <a href="/homepage/{CID}">{CATEGORY} {CATEGORY_CODE}</a></h1>
-	<span class="header_option">
-		<a href="/submission/markSheet/{CID}/{WORK_YEAR}/{WORK_SEMESTER}/export" class="btn download"><span></span>Download Spreadsheet</a>
-		<a class="btn add" href="/assess/create/{CID}/"><span></span>Create Quiz</a>
-        <a class="btn add" href="/submission/createSubmission/new/{CID}/"><span></span>Post Due Work</a>
-	</span>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Marksheet</h1>
 
-<div id="mark-sheet">
-    <div id="mark-sheet-context">
-      {CONTEXT_SELECTOR}
+        <span class='header-actions'>
+            <a href='#' class='button icon-more' data-dropdown='header-options'>Options</a>
+        </span>
+
+        <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
+            <li><a href='/submission/createSubmission/new/{CID}/' class='icon-progress'>Post Due Work</a>
+            <li><a href='/assess/create/{CID}/' class='icon-quiz'>Create Quiz</a>
+            <li><a href='/submission/markSheet/{CID}/{WORK_YEAR}/{WORK_SEMESTER}/export' class='icon-download'>Download Spreadsheet</a>
+        </ul>
+
+        <ul class="meta">
+            <li class="icon-home"><a href="/homepage/{CID}">{CATEGORY} {CATEGORY_CODE}</a></li>
+        </ul>
     </div>
 </div>
 
-<table class="mark-sheet angled table">
+<div class="row">
+    <div class="small-12 columns">
+        {CONTEXT_SELECTOR}
+    </div>
+</div>
+
+<table data-mark-sheet>
 	<thead>
-	<tr>
-		<th></th>
-    <!-- BEGIN work_header -->
-		<th scope="col" class="rotate">
-			<div><span>
-					<a href="{WORK_PATH}/{WORK_ID}">{WORK_TITLE}</a>
-					{WORK_TYPE}
-				</span></div>
-    </th>
-    <!-- END work_header -->
-		<th scope="col" class="rotate"><div><span>Student Average</span></div></th>
-	</tr>
+        <tr>
+            <th></th>
+            <!-- BEGIN work_header -->
+            <th>
+                <a href="{WORK_PATH}/{WORK_ID}">{WORK_TITLE}</a><br />
+                <span class="meta">{WORK_TYPE}</span>
+            </th>
+            <!-- END work_header -->
+		    <th>
+                Student Average
+            </th>
+	    </tr>
 	</thead>
-	<tbody>
-	<tr>
-		<th scope="row">
-			<a href="#" class="toggle-averages submission-dropdown" title="Show additional metrics">&#x25BC;</a>
-			Class Average
-    </th>
-    <!-- BEGIN class_average -->
-		<td class="class-avg gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">
-      <a href="{WORK_PATH}/{WORK_ID}">{WORK_CLASSAVG_CLEAN}</a>
-    </td>
-    <!-- END class_average -->
-    <td></td>
-	</tr>
-  <!-- BEGIN stat -->
-	<tr class="sub-table-row {WORK_STAT_CLASS}">
-		<th scope="row">{WORK_STAT_TITLE}</th>
-    <!-- BEGIN stat_item -->
-    <td>
-		  <!-- BEGIN stat_editable -->
-      <input type="text" maxlength="3" length="3" name="{WORK_STAT_CLASS}[{WORK_NS_ID}]" value="{WORK_STAT_VALUE}" />
-		  <!-- END stat_editable -->
-        <!-- BEGIN stat_visible -->
-        <a href="#" data-menu="visibility_menu_{WORK_ID}">
-        <div class="visibility-drop">
-        <span class="visibility-btn visibility_{WORK_STAT_VALUE}"></span><span class="down-arrow"></span>
-        </div></a>
-        <ul id="visibility_menu_{WORK_ID}" class="flyout-menu">
-            <!-- BEGIN stat_visibility_drop -->
-            <li><a href="{ASSESS_MODIFY_URL}&mark_visibility={MARK_VISIBILITY_VALUE}" rel="flyout-option"><span></span>{MARK_VISIBILITY_TEXT}</a></li>
-            <!-- END stat_visibility_drop -->
-        </ul>
-        <!-- END stat_visible -->
-      <!-- BEGIN stat_readonly -->
-      {WORK_STAT_VALUE}
-    <!-- END stat_readonly -->
-    </td>
-    <!-- END stat_item -->
-		<td></td>
-	</tr>
-  <!-- END stat -->
-  <!-- BEGIN student_row -->
-	<tr class="{DARK}" data-id="{STUDENT_ID}">
-		<th class="avatar" scope="row">
-			<a href="/search/user/{STUDENT_ID}" class="author">
-				<img height="32" width="32" src="/portrait.php?userId={STUDENT_EXTID}&amp;size=square32" alt="{STUDENT_NAME}" />
-				{STUDENT_NAME_FORMAL}
-			</a>
-		</th>
-    <!-- BEGIN student_work -->
-		<td class="column-{WORK_TYPE}-{WORK_ID}">
-			<a href="{STUDENT_WORK_PATH}" title="{STUDENT_WORK_COMMENT}">{STUDENT_WORK_MARK}</a>
-		</td>
-    <!-- END student_work -->
-		<td class="gradient-{STUDENT_AVG_GRADIENT}-bg">
-      <a class="gradient-{STUDENT_AVG_GRADIENT}" href="/submission/allWork/{STUDENT_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{CID}">{STUDENT_AVG_CLEAN}</a>
-    </td>
-	</tr>
-  <!-- END student_row -->
-	</tbody>
+    <tbody>
+        <tr>
+            <td>
+                <a href="#" class='icon-add' title="Show additional metrics" data-toggle-averages></a>
+                Class Average
+            </td>
+            <!-- BEGIN class_average -->
+            <td class="class-avg gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">
+                <a href="{WORK_PATH}/{WORK_ID}">{WORK_CLASSAVG_CLEAN}</a>
+            </td>
+            <!-- END class_average -->
+            <td></td>
+        </tr>
+        <!-- BEGIN stat -->
+        <tr class="sub-table-row {WORK_STAT_CLASS}">
+            <td>{WORK_STAT_TITLE}</td>
+            <!-- BEGIN stat_item -->
+            <td>
+                <!-- BEGIN stat_editable -->
+                <input type="text" maxlength="3" length="3" name="{WORK_STAT_CLASS}[{WORK_NS_ID}]"
+                       value="{WORK_STAT_VALUE}"/>
+                <!-- END stat_editable -->
+                <!-- BEGIN stat_visible -->
+                <a href="#" data-menu="visibility_menu_{WORK_ID}">
+                    <div class="visibility-drop">
+                        <span class="visibility-btn visibility_{WORK_STAT_VALUE}"></span><span class="down-arrow"></span>
+                    </div>
+                </a>
+                <ul id="visibility_menu_{WORK_ID}" class="flyout-menu">
+                    <!-- BEGIN stat_visibility_drop -->
+                    <li><a href="{ASSESS_MODIFY_URL}&mark_visibility={MARK_VISIBILITY_VALUE}"
+                           rel="flyout-option"><span></span>{MARK_VISIBILITY_TEXT}</a></li>
+                    <!-- END stat_visibility_drop -->
+                </ul>
+                <!-- END stat_visible -->
+                <!-- BEGIN stat_readonly -->
+                {WORK_STAT_VALUE}
+                <!-- END stat_readonly -->
+            </td>
+            <!-- END stat_item -->
+            <td></td>
+        </tr>
+        <!-- END stat -->
+        <!-- BEGIN student_row -->
+        <tr class="{DARK}" data-id="{STUDENT_ID}">
+            <td class="avatar">
+                <a href="/search/user/{STUDENT_ID}" class="author">
+                    <img height="32" width="32" src="/portrait.php?userId={STUDENT_EXTID}&amp;size=square32"
+                         alt="{STUDENT_NAME}"/>
+                    {STUDENT_NAME_FORMAL}
+                </a>
+            </td>
+            <!-- BEGIN student_work -->
+            <td class="column-{WORK_TYPE}-{WORK_ID}">
+                <a href="{STUDENT_WORK_PATH}" title="{STUDENT_WORK_COMMENT}">{STUDENT_WORK_MARK}</a>
+            </td>
+            <!-- END student_work -->
+            <td class="gradient-{STUDENT_AVG_GRADIENT}-bg">
+                <a class="gradient-{STUDENT_AVG_GRADIENT}"
+                   href="/submission/allWork/{STUDENT_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{CID}">{STUDENT_AVG_CLEAN}</a>
+            </td>
+        </tr>
+        <!-- END student_row -->
+    </tbody>
 </table>
 
 <!-- BEGIN CUSTOM_JAVASCRIPT -->
@@ -94,22 +112,25 @@
     subTableRow.hide();
 
     // Toggle averages rows and change arrow direction
-    $('.toggle-averages').click(function(event){
+    $('[data-toggle-averages]').click(function(event){
         event.preventDefault();
+
         if (subTableRow.is(':visible')) {
-            $(this).html('&#x25BC;');
+            $(this).removeClass('icon-add');
+            $(this).addClass('icon-collapse');
+
             $('.sub-table-row').hide();
         }
         else {
-            $(this).html('&#x25B2;');
+            $(this).addClass('icon-add');
+            $(this).removeClass('icon-collapse');
+
             $('.sub-table-row').show();
-
             $('.sub-table-row').find('a[data-menu]').flyout({element : 'td'});
-
         }
     });
 
-  var table = $('#content').children('table.mark-sheet');
+  var table = $('#content').children('[data-mark-sheet]');
 
   table.on('change', 'input', function(e) {
     var self = $(this);
