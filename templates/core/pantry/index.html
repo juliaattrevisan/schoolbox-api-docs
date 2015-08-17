@@ -3,6 +3,25 @@
     <div class="row">
         <div class="small-12 columns">
             <h1>Files List</h1>
+            <ul class="meta">
+                <li class="icon-wolfram-alpha"><strong>Things to Note</strong>
+                    <ul style="margin:0;text-indent:0;">
+                        <li>
+                            <code>.information-list > li</code> no longer requires <code>.row</code> on its list items.
+                        </li>
+                        <li>
+                            <code>.card</code> class now extends <code>.column</code> so you don't need to wrap it
+                        </li>
+                        <li>
+                            List-item actions are now contained by <code>&lt;nav/&gt;</code>. If you do include row actions,
+                            you need to indicate this on the <code>&lt;li/&gt;</code> with <code>.actions-{size}-{action-count}</code>
+                            (see markup for examples). These stack in the same way as column sizings, so you can have different
+                            numbers of actions on different viewports.
+                        </li>
+                    </ul>
+
+                </li>
+            </ul>
             <nav class="top-bar" data-topbar>
                 <ul class="title-area">
                     <!-- Title Area -->
@@ -27,10 +46,10 @@
                 <div class="row">
                     <div class="small-12 island">
                         <section>
-                            <ul class="action-list">
-                                <li class="row" data-equalizer>
-                                    <div class="column no-pad small-11" data-equalizer-watch>
-                                        <div class="avatar card">
+                            <ul class="information-list">
+                                <li class="actions-small-1" data-equalizer>
+                                    <div class="list-item">
+                                        <div class="avatar card small-12" data-equalizer-watch>
                                             <a href="#">
                                                 <img src="/portrait.php?userId=8&size=square64" />
                                                 <h3>Class Cancelled - 21st June</h3>
@@ -51,13 +70,13 @@
                                             <p>Of course tours are available at any time. Please&nbsp;<a href="http://www.schoolbox.com.au" target="_self">contact us</a>&nbsp;to arrange an appointment.</p>
                                         </article>
                                     </div>
-                                    <div class="one actions">
-                                        <a data-equalizer-watch data-tooltip class="icon-modify no-text" href="#" title="Modify"></a>
-                                    </div>
+                                    <nav>
+                                        <a data-equalizer-watch class="icon-modify no-text" href="#" title="Modify"></a>
+                                    </nav>
                                 </li>
-                                <li class="row" data-equalizer>
-                                    <div class="column no-pad small-11" data-equalizer-watch>
-                                        <div class="avatar card">
+                                <li class="actions-small-1" data-equalizer>
+                                    <div class="list-item">
+                                        <div class="avatar card small-12" data-equalizer-watch>
                                             <a href='#'>
                                                 <img src="/portrait.php?userId=135&size=square64" width="48" />
                                                 <h3>Shakespeare IV</h3>
@@ -67,13 +86,13 @@
                                             </p>
                                         </div>
                                     </div>
-                                    <div class="one actions">
-                                        <a data-equalizer-watch data-tooltip class="icon-modify no-text" href="#" title="Modify"></a>
-                                    </div>
+                                    <nav>
+                                        <a data-equalizer-watch class="icon-modify no-text" href="#" title="Modify"></a>
+                                    </nav>
                                 </li>
-                                <li class="row" data-equalizer>
-                                    <div class="column no-pad small-11" data-equalizer-watch>
-                                        <div class="avatar card">
+                                <li class="actions-small-1" data-equalizer>
+                                    <div class="list-item">
+                                        <div class="avatar card small-12" data-equalizer-watch>
                                             <a href='#'>
                                                 <img src="/portrait.php?userId=134&size=square64" width="48" />
                                                 <h3>Shakespeare Assignment I</h3>
@@ -86,35 +105,35 @@
                                             500 Word essay, topic located in Assignment document.
                                         </p>
                                     </div>
-                                    <div class="one actions">
-                                        <a data-equalizer-watch data-tooltip class="icon-modify no-text" href="#" title="Modify"></a>
-                                    </div>
+                                    <nav>
+                                        <a data-equalizer-watch class="icon-modify no-text" href="#" title="Modify"></a>
+                                    </nav>
                                 </li>
-                                <li class="row" data-equalizer>
-                                    <div class="column no-pad small-11" data-equalizer-watch>
-                                        <div class="avatar card">
+                                <li class="actions-small-1" data-equalizer>
+                                    <div class="list-item">
+                                        <div class="avatar card small-12" data-equalizer-watch>
                                             <a href='#'>
                                                 <img src="/portrait.php?userId=136&size=square64" />
                                                 <h3>The Iron Lady (with link)</h3>
                                             </a>
                                         </div>
                                     </div>
-                                    <div class="one actions">
-                                        <a data-equalizer-watch data-tooltip class="icon-modify no-text" href="#" title="Modify"></a>
-                                    </div>
+                                    <nav>
+                                        <a data-equalizer-watch class="icon-modify no-text" href="#" title="Modify"></a>
+                                    </nav>
                                 </li>
-                                <li class="row" data-equalizer>
-                                    <div class="column no-pad small-11" data-equalizer-watch>
-                                        <div class="avatar card">
+                                <li class="actions-small-1" data-equalizer>
+                                    <div class="list-item">
+                                        <div class="avatar card small-12" data-equalizer-watch>
                                             <img src="/portrait.php?userId=137&size=square64" />
                                             <h3>The Short Man (no link)</h3>
                                         </div>
                                     </div>
-                                    <div class="one actions">
-                                        <a data-equalizer-watch data-tooltip class="icon-modify no-text" href="#" title="Modify"></a>
-                                    </div>
+                                    <nav>
+                                        <a data-equalizer-watch class="icon-modify no-text" href="#" title="Modify"></a>
+                                    </nav>
                                 </li>
-                                <li class="row">
+                                <li>
                                     <div class="column no-pad small-12">
                                         <div class="avatar card">
                                             <img src="/portrait.php?userId={EXTERNAL_ID}&size=square64" />
@@ -122,9 +141,9 @@
                                         </div>
                                     </div>
                                 </li>
-                                <li class="row" data-equalizer>
-                                    <div class="column no-pad small-12" data-equalizer-watch>
-                                        <div class="avatar card">
+                                <li data-equalizer>
+                                    <div class="list-item">
+                                        <div class="avatar card small-12" data-equalizer-watch>
                                             <a href='#'>
                                                 <img src="/portrait.php?userId=8&size=square64" width="48" />
                                                 <h3>
@@ -135,9 +154,9 @@
                                         </div>
                                     </div>
                                 </li>
-                                <li class="row" data-equalizer>
-                                    <div class="column no-pad small-11" data-equalizer-watch>
-                                        <div class="avatar card">
+                                <li class="actions-small-1" data-equalizer>
+                                    <div class="list-item">
+                                        <div class="avatar card small-12" data-equalizer-watch>
                                             <a href='#'>
                                                 <img src="/images/mime/60x60/msword_doc.png" class="content" />
                                                 <h3>Shakespeare in Love</h3>
@@ -147,13 +166,13 @@
                                             </p>
                                         </div>
                                     </div>
-                                    <div class="one actions">
-                                        <a data-equalizer-watch data-tooltip class="icon-modify no-text" href="#" title="Modify"></a>
-                                    </div>
+                                    <nav>
+                                        <a data-equalizer-watch class="icon-modify no-text" href="#" title="Modify"></a>
+                                    </nav>
                                 </li>
-                                <li class="row" data-equalizer>
-                                    <div class="column no-pad small-10" data-equalizer-watch>
-                                        <div class="info card">
+                                <li class="actions-small-2" data-equalizer>
+                                    <div class="list-item">
+                                        <div class="info card small-12" data-equalizer-watch>
                                             <a href="#">
                                                 <h3>Shakespeare Assignment 1</h3>
                                                 <p class="meta">
@@ -162,15 +181,14 @@
                                             </a>
                                         </div>
                                     </div>
-                                    <div class="two actions">
-                                        <a data-equalizer-watch href="#" class="icon-poll no-text" data-tooltip title="View Results"></a>
-                                        <a data-equalizer-watch href="#" class="icon-modify no-text" data-tooltip title="Modify"></a>
-                                    </div>
+                                    <nav>
+                                        <a data-equalizer-watch href="#" class="icon-poll no-text" title="View Results"></a>
+                                        <a data-equalizer-watch href="#" class="icon-modify no-text" title="Modify"></a>
+                                    </nav>
                                 </li>
-
-                                <li class="row" data-equalizer>
-                                    <div class="column no-pad small-10" data-equalizer-watch>
-                                        <div class="info card">
+                                <li class="actions-small-2" data-equalizer>
+                                    <div class="list-item">
+                                        <div class="info card small-12" data-equalizer-watch>
                                             <a href="#">
                                                 <h3>Info card with content</h3>
                                             </a>
@@ -188,14 +206,14 @@
                                             </p>
                                         </article>
                                     </div>
-                                    <div class="two actions">
-                                        <a data-equalizer-watch href="#" class="icon-poll no-text" data-tooltip title="View Results"></a>
-                                        <a data-equalizer-watch href="#" class="icon-modify no-text" data-tooltip title="Modify"></a>
-                                    </div>
+                                    <nav>
+                                        <a data-equalizer-watch href="#" class="icon-poll no-text" title="View Results"></a>
+                                        <a data-equalizer-watch href="#" class="icon-modify no-text" title="Modify"></a>
+                                    </nav>
                                 </li>
-                                <li class="row" data-equalizer>
-                                    <div class="column no-pad small-12" data-equalizer-watch>
-                                        <div class="avatar card">
+                                <li data-equalizer>
+                                    <div class="list-item">
+                                        <div class="avatar card small-12" data-equalizer-watch>
                                             <a href="#">
                                                 <img src="/portrait.php?userId=130&size=square64" />
                                                 <h3>Anita Wit</h3>
@@ -208,10 +226,9 @@
                                         </article>
                                     </div>
                                 </li>
-
-                                <li class="row" data-equalizer>
-                                    <div class="column no-pad small-12" data-equalizer-watch>
-                                        <div class="avatar card">
+                                <li data-equalizer>
+                                    <div class="list-item">
+                                        <div class="avatar card small-12" data-equalizer-watch>
                                             <a href='#'>
                                                 <img src="/portrait.php?userId=8&size=square64" width="48" />
                                                 <h3>
@@ -225,10 +242,9 @@
                                         </div>
                                     </div>
                                 </li>
-
-                                <li class="row" data-equalizer>
-                                    <div class="column no-pad small-9" data-equalizer-watch>
-                                        <div class="avatar card">
+                                <li class="actions-small-1 actions-medium-2 actions-large-3" data-equalizer>
+                                    <div class="list-item">
+                                        <div class="avatar card small-12">
                                             <a href="#">
                                                 <div class="icon-surveys icon-32"></div>
                                                 <h3>What did you learn from today's reading?</h3>
@@ -236,13 +252,24 @@
                                             </a>
                                         </div>
                                     </div>
-                                    <div class="three actions">
-                                        <a data-equalizer-watch href="#" class="icon-poll    no-text" data-tooltip title="View Results"></a>
-                                        <a data-equalizer-watch href="#" class="icon-modify  no-text" data-tooltip title="Modify"></a>
-                                        <a data-equalizer-watch href="#" class="icon-approve no-text" data-tooltip title="Review"></a>
-                                    </div>
-                                </li>
+                                    <nav>
 
+                                        <span class="show-for-medium-up">
+                                            <a href="#" class="icon-poll" title="View Results"></a>
+                                        </span>
+
+                                        <span class="show-for-large-up">
+                                            <a href="#" class="icon-modify" title="Modify"></a>
+                                            <a href="#" class="icon-approve" title="Review"></a>
+                                        </span>
+
+                                        <span class="hide-for-large-up">
+                                            <a href="#" class="icon-overflow"></a>
+                                        </span>
+
+
+                                    </nav>
+                                </li>
                             </ul>
                         </section>
                     </div>
