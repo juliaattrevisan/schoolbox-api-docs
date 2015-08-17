@@ -434,14 +434,6 @@ if (count($submission_history)) {
             }
         }
 
-        /* Alternating row color
-         */
-        $this->setVar(
-            array(
-                'ROW_COLOR' => !($j % 2) ? 'dark' : ''
-            )
-        );
-
         $this->parse('work_block', 'work', true);
 
         $this->setVar('status_due_block', '');
