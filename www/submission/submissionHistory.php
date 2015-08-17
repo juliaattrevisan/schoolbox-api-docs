@@ -209,6 +209,7 @@ $gradient = $box->getGradientIndex();
 $this->setVar(
     array(
         'CATEGORY_NAME'        => Scrub::text($box->getCategory()->getName()),
+        'CATEGORY_CODE'        => $classCode,
         'CATEGORY_ID'          => $box->getCategory()->getId(),
         'CATEGORY_THUMB'       => '',
         'BOX_DUEDATE'          => $dueDate->getRelativeTime(),

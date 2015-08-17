@@ -167,8 +167,8 @@
                         <li class="row">
                             <div class="small-11 columns">
                                 <div class="info card">
-                                    <p><a href="/homepage/{CATEGORY_ID}" title="{CATEGORY_NAME}">{CATEGORY_NAME}</a></p>
-                                    <p class="meta"><a href="/homepage/{CATEGORY_ID}" title="{CATEGORY_NAME}">CH123</a></p>
+                                    <p><a href="/homepage/{CATEGORY_ID}" title="Class">{CATEGORY_NAME}</a></p>
+                                    <p class="meta"><a href="/homepage/{CATEGORY_ID}" title="Class Code">{CATEGORY_CODE}</a></p>
                                 </div>
                             </div>
                             <div class="one actions">
@@ -197,50 +197,53 @@
         </div>
 
 
+        <div id='history-wrap' class="row hide">
+            <div class="small-12 columns">
+                <h2>History</h2>
 
-        <div class="hide" id="history-wrap">
-            <h3 class="clear">History</h3>
-            <ul id="history" class="activity-list">
-                <!-- BEGIN work -->
-                <li class="{HISTORY_CLASS} {ROW_COLOR} {HAS_GRADE}">
-                    <span class="icon {HISTORY_ICON}"><span></span></span>
-                    <span class="avatar"><img width="32" height="32" src="{HISTORY_USER_THUMB}" alt="{HISTORY_USER_NAME}"/></span>
+                <ul id="history" class="information-list">
+                    <!-- BEGIN work -->
+                    <li class="{HISTORY_CLASS} {ROW_COLOR} {HAS_GRADE}">
+                        <span class="icon {HISTORY_ICON}"><span></span></span>
+                        <span class="avatar"><img width="32" height="32" src="{HISTORY_USER_THUMB}" alt="{HISTORY_USER_NAME}"/></span>
 
-                    <p>
-                        <a href="/search/user/{HISTORY_USER_ID}">{HISTORY_USER_NAME}</a>
-                        <!-- BEGIN history_submitted -->
-                        submitted <a href="/submission/send.php?id={HISTORY_SUBMISSION_FILE_ID}&save=1">{HISTORY_SUBMISSION_FILE_NAME}</a>
-                        <!-- END history_submitted -->
-                        <!-- BEGIN history_returned -->
-                        returned
-                        <a href="/submission/send.php?id={HISTORY_RETURN_FILE_ID}&return=1">{HISTORY_RETURN_FILE_NAME}</a>
-                        <!-- END history_returned -->
-                        <!-- BEGIN history_marked -->
-                        graded your work<!-- BEGIN history_marked_hascomment -->: <span class="return-comment">{HISTORY_COMMENT}</span><!-- END history_marked_hascomment -->
-                        <!-- END history_marked -->
-                        <!-- BEGIN history_extended -->
-                        extended the due date to {HISTORY_EXTENSION}
-                        <!-- END history_extended -->
-                        <span class="time">{HISTORY_DATETIME}</span>
-                    </p>
+                        <p>
+                            <a href="/search/user/{HISTORY_USER_ID}">{HISTORY_USER_NAME}</a>
+                            <!-- BEGIN history_submitted -->
+                            submitted <a href="/submission/send.php?id={HISTORY_SUBMISSION_FILE_ID}&save=1">{HISTORY_SUBMISSION_FILE_NAME}</a>
+                            <!-- END history_submitted -->
+                            <!-- BEGIN history_returned -->
+                            returned
+                            <a href="/submission/send.php?id={HISTORY_RETURN_FILE_ID}&return=1">{HISTORY_RETURN_FILE_NAME}</a>
+                            <!-- END history_returned -->
+                            <!-- BEGIN history_marked -->
+                            graded your work<!-- BEGIN history_marked_hascomment -->: <span class="return-comment">{HISTORY_COMMENT}</span><!-- END history_marked_hascomment -->
+                            <!-- END history_marked -->
+                            <!-- BEGIN history_extended -->
+                            extended the due date to {HISTORY_EXTENSION}
+                            <!-- END history_extended -->
+                            <span class="time">{HISTORY_DATETIME}</span>
+                        </p>
 
-                    <!-- BEGIN work_grade -->
+                        <!-- BEGIN work_grade -->
                 <span class="grade">
                     <span class="gradient-{HISTORY_GRADIENT}">{HISTORY_MARK}</span>
                 </span>
-                    <!-- END work_grade -->
-                </li>
-                <!-- END work -->
-                <li class="create">
-                    <span class="icon pin"><span></span></span>
-                    <span class="avatar"><img width="32" height="32" src="{OWNER_THUMB}" alt="{OWNER_NAME}"/></span>
-                    <p>
-                        <a href="/search/user/{OWNER_ID}">{OWNER_NAME}</a> posted <a href="/submission/submissionHistory/{BOX_ID}/{USER_ID}">{BOX_NAME}</a>
-                        <span class="time">{BOX_CREATED}</span>
-                    </p>
-                </li>
-            </ul>
-            <a href="#" class="btn no-icon" id="history-more" style="display: none;">Show more</a>
+                        <!-- END work_grade -->
+                    </li>
+                    <!-- END work -->
+                    <li class="create">
+                        <span class="icon pin"><span></span></span>
+                        <span class="avatar"><img width="32" height="32" src="{OWNER_THUMB}" alt="{OWNER_NAME}"/></span>
+                        <p>
+                            <a href="/search/user/{OWNER_ID}">{OWNER_NAME}</a> posted <a href="/submission/submissionHistory/{BOX_ID}/{USER_ID}">{BOX_NAME}</a>
+                            <span class="time">{BOX_CREATED}</span>
+                        </p>
+                    </li>
+                </ul>
+
+                <a href="#" class="button" id="history-more">Show more</a>
+            </div>
         </div>
         <!-- END subject -->
     </div>
@@ -259,14 +262,6 @@
 
 
 
-<div id="submission-history">
-    <div class="right">
-
-
-    </div>
-    <div class="clearfix" style="margin-bottom: 8px;"></div>
-</div>
-
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
 <script type="text/javascript" src="/javascript/components/flot/jquery.flot.js"></script>
 <script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.highlighter.js"></script>
@@ -274,50 +269,50 @@
 <script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.rubric.js"></script>
 <script language="JavaScript" type="text/javascript">
     $(function () {
-        var x = 5, i = x - 1,
-                $historyMore = $('#history-more'),
-                $viewHistory = $('#view-history'),
-                $history     = $('#history');
-
-        $history.find('li:gt(' + i + ')').hide();
-
-        if ($history.find('li:hidden').length) {
-            $historyMore.show();
-        }
-
-        $historyMore.click(function (e) {
-            e.preventDefault();
-            i += 2 * x + 1;
-            $history.find('li:lt(' + i + ')').slideDown(100);
-            if (!$history.find('li:hidden').length) {
-                $historyMore.hide();
-            }
-        });
-
-        $viewHistory.on('click', function (e) {
-            e.preventDefault();
-            $('#history-wrap')
-                    .removeClass('hide')
-                    .dialog({
-                        modal: true,
-                        resizable: false,
-                        width: 450,
-                        maxHeight: 600,
-                        title: "Submission History",
-                        buttons: [
-                            {
-                                text: "Close",
-                                click: function () {
-                                    $(this).dialog("close");
-                                }
-                            }
-                        ]
-                    });
-            if (!$history.find('li:hidden').length) {
-                $historyMore.hide();
-            }
-        });
-
-        $('#closebox').remove();
+//        var x = 5, i = x - 1,
+//                $historyMore = $('#history-more'),
+//                $viewHistory = $('#view-history'),
+//                $history     = $('#history');
+//
+//        $history.find('li:gt(' + i + ')').hide();
+//
+//        if ($history.find('li:hidden').length) {
+//            $historyMore.show();
+//        }
+//
+//        $historyMore.click(function (e) {
+//            e.preventDefault();
+//            i += 2 * x + 1;
+//            $history.find('li:lt(' + i + ')').slideDown(100);
+//            if (!$history.find('li:hidden').length) {
+//                $historyMore.hide();
+//            }
+//        });
+//
+//        $viewHistory.on('click', function (e) {
+//            e.preventDefault();
+//            $('#history-wrap')
+//                    .removeClass('hide')
+//                    .dialog({
+//                        modal: true,
+//                        resizable: false,
+//                        width: 450,
+//                        maxHeight: 600,
+//                        title: "Submission History",
+//                        buttons: [
+//                            {
+//                                text: "Close",
+//                                click: function () {
+//                                    $(this).dialog("close");
+//                                }
+//                            }
+//                        ]
+//                    });
+//            if (!$history.find('li:hidden').length) {
+//                $historyMore.hide();
+//            }
+//        });
+//
+//        $('#closebox').remove();
     });
 </script>
