@@ -30,10 +30,7 @@ try {
         $sessionHandler = new Session();
         if ($sessionHandler->create($samlResponse->getNameId())) {
             $page = '/';
-            if (isset($_GET['page']) && preg_match('|^/|', $_GET['page']) && substr($_GET['page'], 0, 6) != '/login') {
-                $page = $_GET['page'];
-            }
-            else if (isset($_POST['RelayState']) && preg_match('|^/|', $_POST['RelayState']) && substr($_POST['RelayState'], 0, 6) != '/login') {
+            if (isset($_POST['RelayState']) && preg_match('|^/|', $_POST['RelayState']) && substr($_POST['RelayState'], 0, 6) != '/login') {
                 $page = $_POST['RelayState'];
             }
 
