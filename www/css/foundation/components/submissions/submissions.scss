@@ -1,0 +1,13 @@
+/* Plagscan
+ */
+.plagscan-ok {
+    @include label;
+}
+
+.plagscan-warning {
+    @include label;
+}
+
+.plagscan-critical {
+    @include label;
+}

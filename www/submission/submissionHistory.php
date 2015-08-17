@@ -514,13 +514,13 @@ if (isset($recent_activity)) {
             if ($plagDoc->getId() && $plagDoc->getStatus() == Plagscan_Document::STATUS_COMPLETE) {
                 // what colour should the plagiarism text be, and what should the tooltip say?
                 if ($plagDoc->getScore() > 0) {
-                    $status  = 'gradient-0';
+                    $status  = 'plagscan-critical';
                     $tooltip = 'Your submission is extremely similar to other documents scanned.';
                 } elseif ($plagDoc->getScore() > 20) {
-                    $status  = 'gradient-4';
+                    $status  = 'plagscan-warning';
                     $tooltip = 'Your submission is somewhat similar to other documents scanned.';
                 } else {
-                    $status  = 'gradient-10';
+                    $status  = 'plagscan-ok';
                     $tooltip = 'Your submission is quite different to other documents scanned.';
                 }
 
