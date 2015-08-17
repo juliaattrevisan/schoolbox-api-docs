@@ -1,0 +1,90 @@
+<!-- <h1>Schoolbox</h1> -->
+
+<!-- top nav -->
+
+<nav>
+    <ul> <!-- breadcrumbs: #content > nav ul -->
+        <li><a href="/submission/listSubmission">Submissions</a></li>
+        <li><a href="/submission/listSubmission/2015/02/42">Chemistry 32</a></li>
+        <li class="active"><a href="#">REDOX Prac Report</a></li>
+    </ul>
+</nav>
+
+<h2>Modify Due Work</h2>
+<h3>REDOX Prac Report</h3>
+<nav> <!-- header-actions: h2 + nav -->
+    <a class="icon-more" data-dropdown="header-options"></a>
+    <ul class="fadeInDown" data-dropdown-content id="header-options">
+        <!-- BEGIN report_btn -->
+        <li><a href="/submission/overview/42" class="icon-progress">View Report</a></li>
+        <!-- END report_btn -->
+        <!-- BEGIN download_btn -->
+        <li><a href="/submission/downloadAll.php?id=42" class="icon-download">Download All Submissions</a></li>
+        <!-- END download_btn -->
+        <!-- BEGIN modify_btn -->
+        <li><a href="/submission/createSubmission/modify/42" class="icon-modify">Modify</a></li>
+        <!-- END modify_btn -->
+    </ul>
+</nav>
+
+<ul> <!-- meta: h2 ~ ul -->
+    <li class="icon-teacher" title="{GRADE_VISIBILITY}">Visible to teachers only</li>
+    <li class="icon-due-work">Assessment</li>
+    <li class="icon-calendar">Due <span class="gradient-1">tomorrow</span></li>
+    <li class="icon-locked">Archived</li>
+</ul>
+
+<h4>Is this an h2? Nope, it's an h4!</h4>
+<section>
+    <p>Hey, dump yo content here!</p>
+</section>
+
+<!-- left sidebar -->
+
+<!-- right sidebar -->
+
+<!-- footer -->
+
+<style type="text/scss">
+
+    #content > nav {
+        ul {
+            @extend .breadcrumb;
+        }
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: "Open Sans", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+    }
+
+    h2 {
+        font-size: 0.875rem;
+        font-weight: 100;
+        text-transform: uppercase;
+    }
+    h3 {
+        font-weight: 700;
+        + nav {
+            @extend .header-actions;
+
+            a {
+                @extend .button;
+            }
+
+            ul {
+                @extend .f-dropdown;
+            }
+
+        }
+        ~ ul {
+
+            @extend ul.meta;
+            @extend .meta;
+        }
+    }
+    h4 {
+        @extend h2.subheader;
+        @extend .subheader;
+    }
+
+</style>

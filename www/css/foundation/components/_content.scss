@@ -55,7 +55,7 @@ $panel-padding: rem-calc(16);
 // $include-html-label-classes: $include-html-classes;
 
 // We use these to style the labels
-$label-padding: rem-calc(($base-font-size - 9)) rem-calc(($base-font-size - 2));
+$label-padding: rem-calc(($base-font-size - 10)) rem-calc(($base-font-size - 2));
 // $label-radius: $global-radius;
 
 // We use these to style the label text
@@ -612,6 +612,7 @@ td, th{
         }
     }
 	> li{
+		@extend .row; // there is no scenario in which .information-list > li will operate as anything other than a row
 		border-bottom: 1px solid $body-bg;
 		position: relative;
 		overflow: visible;
@@ -771,10 +772,10 @@ td, th{
 	> li{
 		&:hover{
 			background-color: $ocean-sunset;
+			.actions > a, nav a {
+				opacity: 1;
+			}
 		}
-	}
-	> li:hover .actions > a{
-		opacity: 1;
 	}
 	.expanded .task-list{
 		max-height: 100%;
@@ -1008,6 +1009,23 @@ td, th{
     }
 }
 
+.list-item > .card {
+	// cards directly inside list items replicate column functionality
+	// you still need to specify sizing (ie. small-12)
+	@extend .column;
+
+	&.avatar {
+		img {
+			@media #{$small-only} {
+				margin-left: -0.5rem;
+			}
+			@media #{$medium-only} {
+				margin-left: -0.75rem;
+			}
+		}
+	}
+}
+
 p{
   @media #{$small-up} {
     margin-bottom: rem-calc(($base-font-size - 8));
@@ -1175,7 +1193,7 @@ ul.meta {
     list-style: none;
     line-height: 1.5rem;
     margin-bottom: 1rem;
-	li {
+	> li {
 		// 26px = 16x16 icon + 10px padding (both hardcoded values)
 		text-indent: -26px;
 		padding-left: 26px;
