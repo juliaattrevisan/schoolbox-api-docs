@@ -86,7 +86,7 @@
                                     <input type='hidden' name='userId' value='{PUBLISH_USER_ID}' />
                                     <input type='hidden' name='{PUBLISH_TYPE}' value='{PUBLISH_ID}' />
 
-                                    <input type='submit' value='{PUBLISH_BUTTON}' />
+                                    <input type='submit' class='button' value='{PUBLISH_BUTTON}' />
                                 </form>
                                 <!-- END action_publish -->
                             </div>
@@ -104,6 +104,10 @@
                     </ul>
                     <!-- END recent_submission -->
                 </section>
+
+                <!-- BEGIN action_submit -->
+                <a href="/submission/submitOnline/{BOX_ID}" class="button secondary full-width">{SUBMIT_LABEL}</a>
+                <!-- END action_submit -->
             </div>
         </div>
     </div>
@@ -160,9 +164,6 @@
 
 
 
-        <!-- BEGIN action_submit -->
-        <a href="/submission/submitOnline/{BOX_ID}" class="clearfix submit-btn-plain">{SUBMIT_LABEL}</a>
-        <!-- END action_submit -->
 
         <a href="#" class="submit-btn-plain float-right" id="view-history">View History</a>
 
