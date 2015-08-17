@@ -223,7 +223,7 @@ class DueWork_Detail
                     'OWNER_STATUS'  => $record['user']['status'],
                     'OWNER_CLASS'   => $record['user']['class'],
                     'OWNER_TIME'    => $record['user']['time'] instanceof Alaress_Date_Format ? $record['user']['time']->getShort() : '',
-                    'OWNER_IMG'     => sprintf('/portrait.php?userId=%s&size=square32', $record['user']['instance']->getexternalId())
+                    'OWNER_IMG'     => sprintf('/portrait.php?userId=%s&size=square64', $record['user']['instance']->getexternalId())
                 )
             );
 
