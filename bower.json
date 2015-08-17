@@ -37,6 +37,7 @@
     "jstree": "3.0.4",
     "zeroclipboard": "2.2.0",
     "foundation": "5.5.0",
+    "datatables": "1.10.8",
     "highcharts": "4.1.1"
   },
   "ignore": [
