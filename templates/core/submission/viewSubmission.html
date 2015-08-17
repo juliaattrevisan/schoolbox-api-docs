@@ -9,7 +9,7 @@
         <h1>{CATEGORY_NAME}: {DUEWORK_DESCRIPTION}</h1>
 
         <span class='header-actions'>
-            <a href='#' class='button icon-more' data-dropdown='header-options'>Options</a>
+            <a href='#' class='button icon-more' data-dropdown='header-options'></a>
         </span>
         <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
             <!-- BEGIN report_btn -->
@@ -41,9 +41,9 @@
             <form id="returnWorkForm" action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data">
                 <ul class="action-list">
                     <!-- BEGIN student_row -->
-                    <li class="row">
-                        <div class="small-12 large-4 columns no-pad">
-                            <div class="avatar card">
+                    <li class="actions-small-2">
+                        <div class="list-item">
+                            <div class="avatar card small-12 large-4">
                                 <a href="/search/user/{OWNER_ID}" title="View Profile">
                                     <img src="{OWNER_IMG}" alt="View Profile" />
                                     <p>{OWNER_NAME}</p>
@@ -55,27 +55,28 @@
                                 <span class="label alert" title="Work has been resubmitted after grading"></span>
                                 <!-- END submission_after_mark -->
                             </div>
-                        </div>
-                        <div class="small-12 large-6 columns content">
-                            {OWNER_MARKING}
+                            <div class="small-12 large-6 columns content">
+                                {OWNER_MARKING}
 
-                            <!-- BEGIN submission_row -->
-                            <!-- BEGIN plag_enabled -->
-                            <!-- END plag_enabled -->
-                            <!-- BEGIN plag_pending -->
-                            <!--<span class="label neutral full-width" title="Plagiarism results pending" >Plagscan Pending</span>-->
-                            <!-- END plag_pending -->
-                            <!-- BEGIN plag_deleted -->
-                            <!-- END plag_deleted -->
+                                <!-- BEGIN submission_row -->
+                                <!-- BEGIN plag_enabled -->
+                                <!-- END plag_enabled -->
+                                <!-- BEGIN plag_pending -->
+                                <!--<span class="label neutral full-width" title="Plagiarism results pending" >Plagscan Pending</span>-->
+                                <!-- END plag_pending -->
+                                <!-- BEGIN plag_deleted -->
+                                <!-- END plag_deleted -->
 
-                            <!-- BEGIN delete_action -->
-                            <!-- END delete_action -->
-                            <!-- END submission_row -->
+                                <!-- BEGIN delete_action -->
+                                <!-- END delete_action -->
+                                <!-- END submission_row -->
+                            </div>
                         </div>
-                        <div class="two actions">
-                            <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}" class="icon-view no-text" title="View Submission"></a>
-                            <a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="icon-history no-text" title="View Submission History"></a>
-                         </div>
+
+                        <nav>
+                            <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}" class="icon-view" title="View Submission"></a>
+                            <a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="icon-history" title="View Submission History"></a>
+                         </nav>
                     </li>
                     <!-- END student_row -->
                 </ul>
