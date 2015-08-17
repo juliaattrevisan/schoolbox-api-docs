@@ -40,28 +40,22 @@
                     </td>
                     <!-- END modify_thread -->
                     <td>
-                        <h3><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE} {THREAD_LOCKED}</a></h3>
+                        <a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE} {THREAD_LOCKED}</a>
                     </td>
                     <td>
-                        <div class="avatar-card">
-                            <a href="/search/user/{THREAD_AUTHOR_ID}" title="View Profile">
-                                <img class="hide-for-small-down" src="/portrait.php?userId={THREAD_AUTHOR_EXTERNAL_ID}&size=square64"/>
-                                <p>{THREAD_AUTHOR}</p>
-                            </a>
-                            <p class="meta">Posted {THREAD_TIME}</p>
-                        </div>
+                        <a href="/search/user/{THREAD_AUTHOR_ID}" title="View Profile">
+                            {THREAD_AUTHOR}
+                        </a>
+                        <p class="meta">Posted {THREAD_TIME}</p>
                     </td>
                     <td>{THREAD_REPLIES}</td>
                     <td>{THREAD_VIEWS}</td>
                     <td>
                         <!-- BEGIN last_post -->
-                        <div class="avatar-card">
                             <a href="/search/user/{THREAD_LAST_POST_USER_ID}" title="View Profile">
-                                <img class="hide-for-small-down" src="/portrait.php?userId={THREAD_LAST_POST_USER_EXTERNAL_ID}&size=square64"/>
-                                <p>{THREAD_LAST_POST_USER}</p>
+                                {THREAD_LAST_POST_USER}
                             </a>
                             <p class="meta">Posted {THREAD_LAST_POST_TIME}</p>
-                        </div>
                         <!-- END last_post -->
                     </td>
                 </tr>
