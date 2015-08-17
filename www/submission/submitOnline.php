@@ -4,6 +4,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Breadcrumbs;
 
 // not in sitepage context, redirect
 if(!isset($this)) {
@@ -125,15 +126,34 @@ $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 
 $this->setVar(array(
-    'CATEGORY_NAME' => Scrub::text($submission_box->getCategory()->getName()),
-
+    'FOLDER_NAME'          => Scrub::text($submission_box->getCategory()->getName()),
+    'FOLDER_ID'            => $submission_box->getCategory()->getId(),
     'BOX_DUEDATE'          => $dueDate->getRelativeTime(),
-    'BOX_DUETIME'          => $dueDate->isAtEndOfDay() ? $dueDate->getDateOnly() : $dueDate->getShort(),    'BOX_DUEDATE_GRADIENT' => $gradient,
-
-    'BOX_ID'        => $submission_box->getId(),
-    'SUBMISSION_ID' => null,
-    'BOX_NAME'      => Scrub::text($submission_box->getName()),
-    'BOX_TYPE'      => $submission_box->getWorkType()->getName(),
-    'BOX_CREATED'   => $createdDate->getRelativeTime(),
-    'TEXTBOX_BODY'  => $body,
+    'BOX_DUETIME'          => $dueDate->isAtEndOfDay() ? $dueDate->getDateOnly() : $dueDate->getShort(),
+    'BOX_DUEDATE_GRADIENT' => $gradient,
+    'BOX_ID'               => $submission_box->getId(),
+    'SUBMISSION_ID'        => null,
+    'BOX_NAME'             => Scrub::text($submission_box->getName()),
+    'BOX_TYPE'             => $submission_box->getWorkType()->getName(),
+    'BOX_CREATED'          => $createdDate->getRelativeTime(),
+    'TEXTBOX_BODY'         => $body,
 ));
+
+$trail = new Breadcrumbs();
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text'  => 'Submissions',
+        'href'  => '/submission/dueWork',
+        'class' => ''
+    ],
+    [
+        'text'  => $submission_box->getCategory()->getName(),
+        'href'  => "/homepage/{$submission_box->getCategory()->getId()}",
+        'class' => ''
+    ],
+    [
+        'text'  => $submission_box->getName(),
+        'href'  => '#',
+        'class' => 'active'
+    ],
+]);
