@@ -470,11 +470,14 @@ class Marksheet
         $page->setTab('submission');
 
         // set global vars
+        $codeString = $this->category->getCodeString();
         $page->setVar(
             array(
                 'CATEGORY'      => $this->category->getName(),
                 'CID'           => $this->category->getId(),
-                'CATEGORY_CODE' => $this->category->getCodeString(),
+                'CATEGORY_CODE' => strlen($codeString) > 0
+                    ? ('('.\Scrub::text($codeString).')')
+                    : '',
                 'WORK_YEAR'     => $this->year,
                 'WORK_SEMESTER' => $this->semester
             )
