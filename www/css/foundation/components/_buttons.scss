@@ -509,3 +509,62 @@ ul.pagination .active a{
 	background-color: $pagination-link-current-background;
 	color: $pagination-link-current-font-color;
 }
+
+
+@mixin action-html-classes($size, $button-size: 3rem) {
+
+	@for $i from 1 through $total-columns {
+
+		.actions-#{$size}-#{$i} {
+
+			> .list-item {
+				padding-right: 0.5 + ($i * $button-size);
+			}
+
+			> nav {
+
+				list-style: none;
+				margin: 0;
+				padding: 0 !important;
+				position: absolute;
+				top: 0;
+				right: 0;
+				height: $button-size;
+
+				> *, a {
+					height: 100%;
+				}
+
+				a {
+					display: inline-block;
+					opacity: 0.3;
+					text-align: center;
+					width: $button-size;
+					line-height: $button-size;
+
+					&:before {
+						padding-right: 0;
+					}
+
+					&:hover {
+						background-color: darken($ocean-sunset, 7%);
+					}
+
+				}
+
+			}
+
+		}
+	}
+
+}
+
+
+@media #{$small-up}  { @include action-html-classes($size:small);  }
+@media #{$medium-up} { @include action-html-classes($size:medium); }
+@media #{$large-up}  { @include action-html-classes($size:large);  }
+
+@if $include-xl-html-grid-classes {
+	@media #{$xlarge-up}  { @include action-html-classes($size:xlarge);  }
+	@media #{$xxlarge-up} { @include action-html-classes($size:xxlarge); }
+}

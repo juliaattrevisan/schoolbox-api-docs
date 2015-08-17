@@ -55,7 +55,7 @@ $panel-padding: rem-calc(16);
 // $include-html-label-classes: $include-html-classes;
 
 // We use these to style the labels
-$label-padding: rem-calc(($base-font-size - 9)) rem-calc(($base-font-size - 2));
+$label-padding: rem-calc(($base-font-size - 10)) rem-calc(($base-font-size - 2));
 // $label-radius: $global-radius;
 
 // We use these to style the label text
@@ -612,6 +612,7 @@ td, th{
         }
     }
 	> li{
+		@extend .row; // there is no scenario in which .information-list > li will operate as anything other than a row
 		border-bottom: 1px solid $body-bg;
 		position: relative;
 		overflow: visible;
@@ -1006,6 +1007,12 @@ td, th{
 			}
 		}
     }
+}
+
+.list-item > .card {
+	// cards directly inside list items replicate column functionality
+	// you still need to specify sizing (ie. small-12)
+	@extend .column;
 }
 
 p{
