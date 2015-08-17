@@ -475,7 +475,7 @@ if (isset($recent_activity)) {
         $this->setVar([
             'STATUS_HEALTH' => 'submitted-late',
             'STATUS_LABEL'  => 'Submitted Late',
-            'OVERDUE'       => 'overdue'
+            'OVERDUE'       => 'alert'
         ]);
 
         $this->parse('overdue_block', 'overdue');
