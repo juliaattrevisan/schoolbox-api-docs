@@ -27,7 +27,6 @@ $this->setBlock(TEMPLATE_content, 'attachments', 'attachments_block');
 $this->setBlock('returned_work', 'return_file', 'return_file_block');
 $this->setBlock('returned_work', 'return_file_uuid', 'return_file_uuid_block');
 $this->setBlock('recent_submission', 'plag_score', 'plag_score_block');
-$this->setBlock('recent_submission', 'overdue', 'overdue_block');
 $this->setBlock('recent_submission', 'recent_submission_download', 'recent_submission_download_block');
 $this->setBlock('subject', 'work', 'work_block');
 $this->setBlock('subject', 'teacher', 'teacher_block');
@@ -475,18 +474,12 @@ if (isset($recent_activity)) {
         $this->setVar([
             'STATUS_HEALTH' => 'submitted-late',
             'STATUS_LABEL'  => 'Submitted Late',
-            'OVERDUE'       => 'alert'
         ]);
-
-        $this->parse('overdue_block', 'overdue');
     } else {
-
         $this->setVar([
             'STATUS_HEALTH' => 'submitted',
             'STATUS_LABEL'  => 'Submitted on Time',
-            'OVERDUE'       => ''
         ]);
-        $this->setVar('overdue_block', '');
     }
 
     $recentSubmissionDate = new Alaress_Date_Format($recent_activity->getDate(), 'U');
@@ -510,23 +503,24 @@ if (isset($recent_activity)) {
     $this->setVar($output);
 
     // if we are the owning student, display plagiarism details if they are available
-    if ($userID == $currentUserId && $conf->get('plagscan_student_visible')) {
+    if (($userID == $currentUserId && $conf->get('plagscan_student_visible')) || $_SESSION['user']->isSuperuser()) {
         // retrieve plagiarism score, if available
         $docMapper = Plagscan_DocumentMapper::getInstance();
         $plagDoc   = null;
         try {
             /* @var $plagDoc Plagscan_Document */
             $plagDoc = $docMapper->findOneByColumn('file_id', $recent_activity->getSubmission()->getId());
+
             if ($plagDoc->getId() && $plagDoc->getStatus() == Plagscan_Document::STATUS_COMPLETE) {
                 // what colour should the plagiarism text be, and what should the tooltip say?
-                if ($plagDoc->getScore() > 60) {
-                    $status  = 'critical';
+                if ($plagDoc->getScore() > 0) {
+                    $status  = 'gradient-0';
                     $tooltip = 'Your submission is extremely similar to other documents scanned.';
                 } elseif ($plagDoc->getScore() > 20) {
-                    $status  = 'warn';
+                    $status  = 'gradient-4';
                     $tooltip = 'Your submission is somewhat similar to other documents scanned.';
                 } else {
-                    $status  = 'ok';
+                    $status  = 'gradient-10';
                     $tooltip = 'Your submission is quite different to other documents scanned.';
                 }
 

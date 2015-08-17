@@ -70,9 +70,6 @@
 
                                     <p class="meta">
                                         Submitted <time>{MOST_RECENT_SUBMISSION_FILE_DATE}</time>
-                                        <!-- BEGIN overdue -->
-                                        <span class="{OVERDUE}">Overdue</span>
-                                        <!-- END overdue -->
                                     </p>
 
                                     <p class="meta">
@@ -80,10 +77,13 @@
                                     </p>
 
                                     <!-- BEGIN plag_score -->
-                                    <p class="meta">
-                                        <span class="plag-score {MOST_RECENT_SUBMISSION_FILE_PLAG_CLASS}" title="{MOST_RECENT_SUBMISSION_FILE_PLAG_TITLE}">
-                                            {MOST_RECENT_SUBMISSION_FILE_PLAGSCORE}%
-                                        </span>
+                                    <p>
+                                        <span class="grade">
+                                            <span class="{MOST_RECENT_SUBMISSION_FILE_PLAG_CLASS}" title="{MOST_RECENT_SUBMISSION_FILE_PLAG_TITLE}">
+                                                {MOST_RECENT_SUBMISSION_FILE_PLAGSCORE}%
+                                            </span>
+                                        </span><br />
+                                        <span class="meta">Plagiarism Check</span>
                                     </p>
                                     <!-- END plag_score -->
                                 </div>
