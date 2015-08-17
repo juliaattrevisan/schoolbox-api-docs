@@ -1013,6 +1013,17 @@ td, th{
 	// cards directly inside list items replicate column functionality
 	// you still need to specify sizing (ie. small-12)
 	@extend .column;
+
+	&.avatar {
+		img {
+			@media #{$small-only} {
+				margin-left: -0.5rem;
+			}
+			@media #{$medium-only} {
+				margin-left: -0.75rem;
+			}
+		}
+	}
 }
 
 p{
