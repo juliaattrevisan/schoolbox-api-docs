@@ -196,12 +196,11 @@
             </div>
         </div>
 
-
-        <div id='history-wrap' class="row hide">
+        <div id='history-wrap' class="reveal-modal" data-reveal>
             <div class="small-12 columns">
                 <h2>History</h2>
 
-                <ul id="history" class="information-list">
+                <ul id="history" class="information-list  no-pad">
                     <!-- BEGIN work -->
                     <li class="row {HISTORY_CLASS}">
                         <div class="small-10 columns no-pad">
@@ -260,25 +259,13 @@
                     </li>
                 </ul>
 
-                <a href="#" class="button" id="history-more">Show more</a>
+                <a href="#" class="button icon-add" id="history-more">Show More</a>
+                <a href="#" class="close-reveal-modal" id="history-close">&#215;</a>
             </div>
         </div>
         <!-- END subject -->
     </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
 <script type="text/javascript" src="/javascript/components/flot/jquery.flot.js"></script>
@@ -287,10 +274,11 @@
 <script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.rubric.js"></script>
 <script language="JavaScript" type="text/javascript">
     $(function () {
-        var x = 5, i = x - 1,
+        var x = 1, i = x - 1,
                 $historyMore = $('#history-more'),
+                $historyClose = $('#history-close'),
                 $viewHistory = $('#view-history'),
-                $history     = $('#history');
+                $history = $('#history');
 
         $history.find('li:gt(' + i + ')').hide();
 
@@ -307,30 +295,26 @@
             }
         });
 
-        $viewHistory.on('click', function (e) {
-            e.preventDefault();
-            $('#history-wrap')
-                    .removeClass('hide')
-                    .dialog({
-                        modal: true,
-                        resizable: false,
-                        width: 450,
-                        maxHeight: 600,
-                        title: "Submission History",
-                        buttons: [
-                            {
-                                text: "Close",
-                                click: function () {
-                                    $(this).dialog("close");
-                                }
-                            }
-                        ]
-                    });
+        /* Modal
+         */
+        $viewHistory.on('click', function(event) {
+            var modal = $('#history-wrap');
+
+            modal.foundation('reveal', 'open');
+
+            $historyClose.click(function(event) {
+                modal.foundation('reveal', 'close');
+            });
+
+            /* Execute modal, then stop
+             */
+            event.preventDefault();
+
+            /* Hide "Show More" if nothing to show
+             */
             if (!$history.find('li:hidden').length) {
                 $historyMore.hide();
             }
         });
-
-        $('#closebox').remove();
     });
 </script>
