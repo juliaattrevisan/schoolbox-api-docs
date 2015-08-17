@@ -455,7 +455,7 @@ if (count($submission_history)) {
 } else {
     $this->setVar([
         'work_block'    => '',
-        'STATUS_HEALTH' => 'regular',
+        'STATUS_HEALTH' => 'unsubmitted',
         'STATUS_LABEL'  => 'Not Submitted'
     ]);
     $this->parse('subject_block', 'subject');
@@ -473,7 +473,7 @@ if (isset($recent_activity)) {
 
     if ($recent_activity->getDate()->getUnixTimestamp() > $box->getDueDate()->getUnixTimestamp()) {
         $this->setVar([
-            'STATUS_HEALTH' => 'critical',
+            'STATUS_HEALTH' => 'submitted-late',
             'STATUS_LABEL'  => 'Submitted Late',
             'OVERDUE'       => 'overdue'
         ]);
@@ -482,7 +482,7 @@ if (isset($recent_activity)) {
     } else {
 
         $this->setVar([
-            'STATUS_HEALTH' => 'ok',
+            'STATUS_HEALTH' => 'submitted',
             'STATUS_LABEL'  => 'Submitted on Time',
             'OVERDUE'       => ''
         ]);

@@ -1,103 +1,77 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
-<script type="text/javascript" src="/javascript/components/flot/jquery.flot.js"></script>
-<script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.highlighter.js"></script>
-<script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.spider.js"></script>
-<script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.rubric.js"></script>
-<script language="JavaScript" type="text/javascript">
-    $(function () {
-        var x = 5, i = x - 1,
-            $historyMore = $('#history-more'),
-            $viewHistory = $('#view-history'),
-            $history     = $('#history');
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{BOX_NAME}</h1>
 
-        $history.find('li:gt(' + i + ')').hide();
-
-        if ($history.find('li:hidden').length) {
-            $historyMore.show();
-        }
-
-        $historyMore.click(function (e) {
-            e.preventDefault();
-            i += 2 * x + 1;
-            $history.find('li:lt(' + i + ')').slideDown(100);
-            if (!$history.find('li:hidden').length) {
-                $historyMore.hide();
-            }
-        });
-
-        $viewHistory.on('click', function (e) {
-            e.preventDefault();
-            $('#history-wrap')
-                .removeClass('hide')
-                .dialog({
-                    modal: true,
-                    resizable: false,
-                    width: 450,
-                    maxHeight: 600,
-                    title: "Submission History",
-                    buttons: [
-                        {
-                            text: "Close",
-                            click: function () {
-                                $(this).dialog("close");
-                            }
-                        }
-                    ]
-                });
-            if (!$history.find('li:hidden').length) {
-                $historyMore.hide();
-            }
-        });
-
-        $('#closebox').remove();
-    });
-</script>
-<!-- END custom_head -->
-<div id="submission-history">
-    <h1>{BOX_NAME} <span>({BOX_TYPE})</span>
-        <!-- BEGIN show_owner -->
-        <span class="owner"> - {BOX_OWNER}</span>
-        <!-- END show_owner -->
-    </h1>
-    <div class="left">
-        <div class="wysiwyg">{BOX_DESCRIPTION}</div>
-
-        <!-- BEGIN attachments -->
-        <h3>Attachments</h3>
-        <ul class="file-list">
-            <!-- BEGIN download -->
-            <li>
-                <a href="/storage/fetch.php?hash={FILE_HASH}&save=1">
-                    <img width="32" height="32" src="/images/mime/60x60/{FILE_THUMB}"/>
-                    <span class="name">{FILE_NAME}</span> ({FILE_SIZE})
-                    <span class="time">{FILE_DATE}</span>
-                    <span class="icon"></span>
-                </a>
-            </li>
-            <!-- END download -->
+        <ul class="meta">
+            <li class="icon-calendar">Due  <span class="gradient-{BOX_DUEDATE_GRADIENT}">{BOX_DUEDATE}</span></li>
+            <!-- BEGIN show_owner -->
+            <li class="icon-staff-students">{BOX_OWNER}</li>
+            <!-- END show_owner -->
+            <li class="icon-due-work">{BOX_TYPE}</li>
         </ul>
-        <!-- END attachments -->
+    </div>
+</div>
 
-        <div>
-            <!-- BEGIN rubric -->
-            <p><em>No rubric data available</em></p>
-            <!-- END rubric -->
+<div class="row">
+    <div class="small-12 large-6 columns no-pad">
+        <div class="row">
+            <div class="small-12 island">
+                <div class="small-12 island">
+                    <h2 class="subheader">Description</h2>
+                    <section class="content">
+                        <article>{BOX_DESCRIPTION}</article>
+
+                        <!-- BEGIN attachments -->
+                        <h3>Attachments</h3>
+                        <ul class="action-list">
+                            <!-- BEGIN download -->
+                            <li class="row">
+                                <div class="small-12 columns no-pad">
+                                    <div class="avatar card">
+                                        <a href="/storage/fetch.php?hash={FILE_HASH}&save=1" title="{FILE_NAME}">
+                                            <img src="/images/mime/60x60/{FILE_THUMB}" class="content">
+                                            <h4>{FILE_NAME}</h4>
+                                        </a>
+                                        <p class="meta">{FILE_DATE}</p>
+                                        <p class="meta">{FILE_SIZE}</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <!-- END download -->
+                        </ul>
+                        <!-- END attachments -->
+
+                        <!-- BEGIN rubric -->
+                        <p>No rubric data available.</p>
+                        <!-- END rubric -->
+                    </section>
+                </div>
+            </div>
         </div>
     </div>
 
+    <div class="small-12 large-6 columns no-pad">
+        <span class="label {STATUS_HEALTH} full-width">{STATUS_LABEL}</span>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="submission-history">
     <div class="right">
-        <div class="wysiwyg">
-            <span class="gradient-{BOX_DUEDATE_GRADIENT}"><strong>Due {BOX_DUEDATE}</strong></span> on <strong>{BOX_DUETIME}</strong>
-        </div>
-        <div class="view-submission">
-            <div class="student-status submit-{STATUS_HEALTH}">
-                <span>{STATUS_LABEL}</span><br>
-            </div>
-        </div>
 
         <!-- BEGIN returned_work -->
-
         <ul class="activity-list no-borders">
             <li class="grade">
                 <p class="return-comment">{RETURNED_WORK_COMMENT}</p>
@@ -151,6 +125,8 @@
             </li>
             <!-- END recent_submission_download -->
         </ul>
+
+        
         <!-- BEGIN action_publish -->
         <form action='/eportfolio/showcase/modifyForm.php' method='post' class="clearfix">
             <input type='hidden' name='action' value='{PUBLISH_ACTION}' />
@@ -237,3 +213,58 @@
     </div>
     <div class="clearfix" style="margin-bottom: 8px;"></div>
 </div>
+
+<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<script type="text/javascript" src="/javascript/components/flot/jquery.flot.js"></script>
+<script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.highlighter.js"></script>
+<script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.spider.js"></script>
+<script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.rubric.js"></script>
+<script language="JavaScript" type="text/javascript">
+    $(function () {
+        var x = 5, i = x - 1,
+                $historyMore = $('#history-more'),
+                $viewHistory = $('#view-history'),
+                $history     = $('#history');
+
+        $history.find('li:gt(' + i + ')').hide();
+
+        if ($history.find('li:hidden').length) {
+            $historyMore.show();
+        }
+
+        $historyMore.click(function (e) {
+            e.preventDefault();
+            i += 2 * x + 1;
+            $history.find('li:lt(' + i + ')').slideDown(100);
+            if (!$history.find('li:hidden').length) {
+                $historyMore.hide();
+            }
+        });
+
+        $viewHistory.on('click', function (e) {
+            e.preventDefault();
+            $('#history-wrap')
+                    .removeClass('hide')
+                    .dialog({
+                        modal: true,
+                        resizable: false,
+                        width: 450,
+                        maxHeight: 600,
+                        title: "Submission History",
+                        buttons: [
+                            {
+                                text: "Close",
+                                click: function () {
+                                    $(this).dialog("close");
+                                }
+                            }
+                        ]
+                    });
+            if (!$history.find('li:hidden').length) {
+                $historyMore.hide();
+            }
+        });
+
+        $('#closebox').remove();
+    });
+</script>
