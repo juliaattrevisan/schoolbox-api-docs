@@ -13,12 +13,12 @@ error_reporting(E_ALL);
 /** @var OneLogin_Saml_Settings $settings */
 $settings = NULL;
 require 'settings.php';
-// Include page as local URL (if it's set)
-if (isset($_GET['page']) && preg_match('|^/|', $_GET['page'])) {
-    $settings->spReturnUrl .= '?page='.urlencode($_GET['page']);
-}
-
 $authRequest = new OneLogin_Saml_AuthRequest($settings);
 $url = $authRequest->getRedirectUrl();
+
+// Include page as local URL (if it's set)
+if (isset($_GET['page']) && preg_match('|^/|', $_GET['page'])) {
+    $url .= '&RelayState='.urlencode($_GET['page']);
+}
 
 header("Location: $url");
