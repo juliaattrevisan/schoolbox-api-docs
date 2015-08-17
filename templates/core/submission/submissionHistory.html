@@ -102,6 +102,18 @@
                     <a href='#' class='button icon-more' data-dropdown='submission-options'>Options</a>
                 </span>
                 <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='submission-options'>
+                    <!-- BEGIN action_publish -->
+                    <li>
+                        <form action='/eportfolio/showcase/modifyForm.php' method='post'>
+                            <input type='hidden' name='action' value='{PUBLISH_ACTION}' />
+                            <input type='hidden' name='userId' value='{PUBLISH_USER_ID}' />
+                            <input type='hidden' name='{PUBLISH_TYPE}' value='{PUBLISH_ID}' />
+
+                            <input type='submit' class='button' value='{PUBLISH_BUTTON}' />
+                        </form>
+                    </li>
+                    <!-- END action_publish -->
+
                     <li><a class="icon-view" id="view-history">View History</a></li>
                 </ul>
 
@@ -109,7 +121,7 @@
                     <ul class="action-list">
                         <!-- BEGIN recent_submission_download -->
                         <li class="row">
-                            <div class="small-11 columns">
+                            <div class="small-12 columns">
                                 <div class="avatar card">
                                     <a href="/submission/send.php?id={MOST_RECENT_SUBMISSION_FILE_ID}&save=1" title="{MOST_RECENT_SUBMISSION_FILE_NAME}">
                                         <img src="/images/mime/60x60/{MOST_RECENT_SUBMISSION_FILE_THUMB}" alt="{MOST_RECENT_SUBMISSION_FILE_NAME}" class="content" />
@@ -125,18 +137,6 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="one actions">
-                                <!-- BEGIN action_publish -->
-                                <form action='/eportfolio/showcase/modifyForm.php' method='post'>
-                                    <input type='hidden' name='action' value='{PUBLISH_ACTION}' />
-                                    <input type='hidden' name='userId' value='{PUBLISH_USER_ID}' />
-                                    <input type='hidden' name='{PUBLISH_TYPE}' value='{PUBLISH_ID}' />
-
-                                    <input type='submit' class='button' value='{PUBLISH_BUTTON}' />
-                                </form>
-                                <!-- END action_publish -->
-                            </div>
-
                             <!-- BEGIN plag_score -->
                             <div class="small-12 columns no-pad">
                                 <p class="grade {MOST_RECENT_SUBMISSION_FILE_PLAG_CLASS} full-width" title="{MOST_RECENT_SUBMISSION_FILE_PLAG_TITLE}">
@@ -148,14 +148,16 @@
                         </li>
                         <!-- END recent_submission_download -->
                     </ul>
-                    <!-- END recent_submission -->
                 </section>
-
-                <!-- BEGIN action_submit -->
-                <a href="/submission/submitOnline/{BOX_ID}" class="button secondary full-width">{SUBMIT_LABEL}</a>
-                <!-- END action_submit -->
             </div>
         </div>
+        <!-- END recent_submission -->
+
+        <!-- BEGIN action_submit -->
+        <div class="small-12 columns no-pad">
+            <a href="/submission/submitOnline/{BOX_ID}" class="button secondary full-width">{SUBMIT_LABEL}</a>
+        </div>
+        <!-- END action_submit -->
     </div>
 </div>
 
