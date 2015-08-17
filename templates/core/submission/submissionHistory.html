@@ -115,22 +115,22 @@
                 <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='submission-options'>
                     <!-- BEGIN action_publish -->
                     <li>
-                        <form action='/eportfolio/showcase/modifyForm.php' method='post'>
+                        <form action='/eportfolio/showcase/modifyForm.php' method='post' id="publish-to-eportfolio-form">
                             <input type='hidden' name='action' value='{PUBLISH_ACTION}' />
                             <input type='hidden' name='userId' value='{PUBLISH_USER_ID}' />
                             <input type='hidden' name='{PUBLISH_TYPE}' value='{PUBLISH_ID}' />
-
-                            <input type='submit' class='button' value='{PUBLISH_BUTTON}' />
                         </form>
+
+                        <a class="icon-showcase" id="publish-to-eportfolio">{PUBLISH_BUTTON}</a>
                     </li>
                     <!-- END action_publish -->
 
                     <li><a class="icon-view" id="view-history">View History</a></li>
                 </ul>
 
-                <section>
-                    <span class="label success full-width">Published</span>
+                <span class="label success full-width hide" id="publish-to-eportfolio-status"></span>
 
+                <section>
                     <ul class="action-list">
                         <!-- BEGIN recent_submission_download -->
                         <li class="row">
@@ -213,7 +213,7 @@
             <div class="small-12 columns">
                 <h2>History</h2>
 
-                <ul id="history" class="information-list  no-pad">
+                <ul id="history" class="information-list no-pad">
                     <!-- BEGIN work -->
                     <li class="row {HISTORY_CLASS}">
                         <div class="small-10 columns no-pad">
@@ -285,8 +285,22 @@
 <script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.highlighter.js"></script>
 <script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.spider.js"></script>
 <script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.rubric.js"></script>
+<script type="text/javascript" src="/javascript/shared/eportfolio/jquery.eportfolio.js"></script>
 <script language="JavaScript" type="text/javascript">
     $(function () {
+
+        /* Publish To Eportfolio
+         */
+        $('#publish-to-eportfolio').click(function(event) {
+            event.preventDefault();
+
+            $('#publish-to-eportfolio-form').eportfolio.publish({
+                label: '#publish-to-eportfolio-status'
+            });
+
+            $('#publish-to-eportfolio-form').submit();
+        });
+
         var x = 1, i = x - 1,
                 $historyMore = $('#history-more'),
                 $historyClose = $('#history-close'),
