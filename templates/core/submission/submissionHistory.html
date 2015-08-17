@@ -54,10 +54,56 @@
 
     <div class="small-12 large-6 columns no-pad">
 
+        <!-- BEGIN returned_work -->
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">Return</h2>
+                <section>
+                    <div class="content">
+                        <p class="grade">
+                            <span class="gradient-{RETURNED_WORK_GRADIENT}" title="{RETURNED_WORK_MARK_TIP}">{RETURNED_WORK_MARK}</span><br/>
+                        </p>
+                        <p>
+                            {RETURNED_WORK_COMMENT}
+                        </p>
+                    </div>
+
+                    <ul class="action-list">
+                        <!-- BEGIN return_file -->
+                        <li class="row">
+                            <div class="small-11 columns no-pad">
+                                <div class="avatar card">
+                                    <a href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1" title="{RETURNED_WORK_FILE_NAME}">
+                                        <img src="/images/mime/60x60/{RETURNED_WORK_FILE_THUMB}" class="content" alt="{RETURNED_WORK_FILE_NAME}">
+                                        <h3>{RETURNED_WORK_FILE_NAME}</h3>
+                                    </a>
+                                    <p class="meta">{RETURNED_WORK_FILE_DATE}</p>
+                                    <p class="meta">{RETURNED_WORK_FILE_SIZE}</p>
+                                </div>
+                            </div>
+                            <div class="one actions">
+                                <!-- BEGIN return_file_uuid -->
+                                <a class='icon-view no-text' href="/submission/inlineGrading/viewStudent/{RETURNED_WORK_SUBMISSION_ID}"></a>
+                                <!-- END return_file_uuid -->
+                            </div>
+                        </li>
+                        <!-- END return_file -->
+                    </ul>
+                </section>
+            </div>
+        </div>
+        <!-- END returned_work -->
+
         <!-- BEGIN recent_submission -->
         <div class="row">
             <div class="small-12 island">
                 <h2 class="subheader">Most Recent Submission</h2>
+                <span class='header-actions'>
+                    <a href='#' class='button icon-more' data-dropdown='submission-options'>Options</a>
+                </span>
+                <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='submission-options'>
+                    <li><a class="icon-view" id="view-history">View History</a></li>
+                </ul>
 
                 <section>
                     <ul class="action-list">
@@ -128,44 +174,6 @@
 
 <div id="submission-history">
     <div class="right">
-
-        <!-- BEGIN returned_work -->
-        <ul class="activity-list no-borders">
-            <li class="grade">
-                <p class="return-comment">{RETURNED_WORK_COMMENT}</p>
-                <span class="grade">
-                    <span class="gradient-{RETURNED_WORK_GRADIENT}" title="{RETURNED_WORK_MARK_TIP}">{RETURNED_WORK_MARK}</span>
-                </span>
-            </li>
-        </ul>
-
-        <ul class="file-list">
-            <!-- BEGIN return_file -->
-            <li>
-                <a class="" data-icon="download" href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1">
-                    <img width="32" height="32" alt="{RETURNED_WORK_FILE_NAME}" src="/images/mime/60x60/{RETURNED_WORK_FILE_THUMB}"/>
-                    <span class="name">{RETURNED_WORK_FILE_NAME}</span> ({RETURNED_WORK_FILE_SIZE})
-                    <span class="time">{RETURNED_WORK_FILE_DATE}</span>
-                    <span class="icon"></span>
-                </a>
-            </li>
-            <!-- END return_file -->
-            <!-- BEGIN return_file_uuid -->
-            <li>
-                <a data-icon='download' href="/submission/inlineGrading/viewStudent/{RETURNED_WORK_SUBMISSION_ID}">
-                    <img width="32" height="32" alt="{RETURNED_WORK_FILE_NAME}" src="/images/mime/60x60/notepaper_homework.png"/>
-                    <span>View Online</span>
-                    <span class="icon"></span>
-                </a>
-            </li>
-            <!-- END return_file_uuid -->
-        </ul>
-        <!-- END returned_work -->
-
-
-
-
-        <a href="#" class="submit-btn-plain float-right" id="view-history">View History</a>
 
         <!-- BEGIN subject -->
         <div class="directory listing">
