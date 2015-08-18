@@ -464,7 +464,7 @@ class StudentReportCard
         // if permission to see class average, include the data series
         if ($this->checkPermission(self::CAN_VIEW_CLASS_AVERAGE)) {
             $graph[] = array(
-                'label' => 'Class',
+                'name' => 'Class',
                 'data'  => $averageSeries
             );
         } // otherwise, remove the colour from the map (so the graph doesn't get confused)
@@ -473,7 +473,7 @@ class StudentReportCard
         }
         // add the user to the graph second, so it appears on top
         $graph[] = array(
-            'label' => 'You',
+            'name' => 'You',
             'data'  => $userSeries
         );
         // display the graph for the semester
