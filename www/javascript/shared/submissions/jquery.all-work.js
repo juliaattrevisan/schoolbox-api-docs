@@ -33,11 +33,30 @@
                  */
                 comment: {
                     newForm: {
+
+                        /* The form for creating new comments
+                         */
                         id: '#create-comment',
+
+                        /* The submit button in the create form for new comments
+                         */
                         button: '[data-comment-post=new]'
                     },
                     oldForm: {
+
+                        /* The submit button in the modify form for existing comments
+                         */
                         button: '[data-comment-post=update]'
+                    },
+                    control: {
+
+                        /* The action button which makes the modify form appear
+                         */
+                        modify: '[data-comment-modify]',
+
+                        /* The action button which lets you delete comments
+                         */
+                        delete: '[data-comment-delete]'
                     }
                 },
 
@@ -136,7 +155,7 @@
          * Listener for adding a comment
          */
         function setupModifyComment() {
-            $(document).on('click', '[data-comment-modify]', function(event) {
+            $(document).on('click', config.comment.control.modify, function(event) {
                 event.preventDefault();
 
                 var btn = $(this);
@@ -208,7 +227,7 @@
          * Listener for deleting a comment
          */
         function setupDeleteComment() {
-            $(document).on('click', '[data-comment-delete]', function(event) {
+            $(document).on('click', config.comment.control.delete, function(event) {
                 event.preventDefault();
 
                 var btn = $(this);
