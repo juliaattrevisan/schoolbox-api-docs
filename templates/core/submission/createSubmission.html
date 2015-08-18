@@ -510,12 +510,33 @@
 
 {BREADCRUMB}
 
-<h1>{HEADING} Due Work</h1>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{HEADING} Due Work</h1>
+    </div>
+</div>
+
 <form action="/submission/submissionForm.php" method="post" name="form" class="clearfix" id="createSubmissionForm"
       enctype="multipart/form-data">
-<input type="hidden" name="category" value="{CATEGORY}"/>
-<input type="hidden" name="unit_id" value="{UNIT_ID}"/>
-<input name="is_task" type="hidden" value="{IS_TASK}" />
+    <input type="hidden" name="category" value="{CATEGORY}"/>
+    <input type="hidden" name="unit_id" value="{UNIT_ID}"/>
+    <input name="is_task" type="hidden" value="{IS_TASK}" />
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div class="content">
+                <label>
+                    Title
+                    <input class="required" name="name" type="text" value="{NAME}" />
+                </label>
+            </div>
+
+            <!-- Dates can go here -->
+        </section>
+    </div>
+</div>
+
 <table class="standardForm table">
     <tr>
         <td class="formLabelWidth"><h4>Title</h4></td>
