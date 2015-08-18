@@ -1,4 +1,4 @@
-<fieldset>
+<fieldset data-role="rubric-criterion-selector">
     <!-- BEGIN rubric_type_label -->
     <legend>{LABEL}</legend>
     <!-- END rubric_type_label -->
@@ -11,20 +11,27 @@
     <!-- END no_crit_group -->
 
     <!-- BEGIN crit_group -->
-    <div class="crit-group">
+    <div class="small-12 columns" data-role="criterion-group">
         <h5>{CRIT_GROUP}</h5>
         <!-- BEGIN criterion -->
-        <div class="crit">
+        <div data-role="criterion">
             <input type="hidden" value="0" name="{CRIT_SLUG}"/>
-            <input id="c-{CRIT_ID}" type="checkbox" value="1" name="{CRIT_SLUG}"{CRIT_CHECKED} />
-            <label for="c-{CRIT_ID}">{CRIT_NAME}</label>
-            <table class="descs">
+            <input id="c-{CRIT_ID}" type="checkbox" value="1" name="{CRIT_SLUG}" {CRIT_CHECKED} />
+            <label for="c-{CRIT_ID}" class="checkbox-label">{CRIT_NAME}</label>
+            <table data-role="criterion-descriptors">
                 <tr>
                     <!-- BEGIN crit_input -->
-                    <td class="desc" style="display:none;">
-                        <textarea name="des[{CRIT_ID}][]" readonly="readonly">{CRIT_INPUT_VALUE}</textarea>
-                        <label class="crit-pts">
-                            <input type="text" size="3" name="value[{CRIT_ID}][]" value="{CRIT_INPUT_WEIGHT}" readonly="readonly" />
+                    <td data-role="criterion-descriptor" class="hide">
+                        <textarea name="des[{CRIT_ID}][]"
+                                  data-role="criterion-description"
+                                  readonly>{CRIT_INPUT_VALUE}</textarea>
+                        <label>
+                            <input name="value[{CRIT_ID}][]"
+                                   type="text"
+                                   size="3"
+                                   data-role="criterion-value"
+                                   value="{CRIT_INPUT_WEIGHT}"
+                                   readonly />
                         </label>
                     </td>
                     <!-- END crit_input -->
