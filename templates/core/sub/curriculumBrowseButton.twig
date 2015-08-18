@@ -1,0 +1,4 @@
+{# Can this user manage curriculum? #}
+{% if isRouteAuthorized('curriculum.browse') %}
+    <a href="{{ routeLookup('curriculum.browse') }}" class="btn modify inline-block" ><span></span>Manage Curriculum</a>
+{% endif %}

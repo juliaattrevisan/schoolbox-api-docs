@@ -23,7 +23,4 @@
    data-interaction="open-search"
         ><span></span>Search for codes</a>
 #}
-{# Can this user manage curriculum? #}
-{% if isRouteAuthorized('curriculum.browse') %}
-    <a href="{{ routeLookup('curriculum.browse') }}" class="btn modify inline-block" ><span></span>Manage Curriculum</a>
-{% endif %}
+{% include 'sub/curriculumBrowseButton.twig' %}
