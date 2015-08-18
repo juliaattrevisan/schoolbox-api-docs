@@ -132,7 +132,7 @@
         }
 
         /**
-         * Listenenr for adding a comment
+         * Listener for adding a comment
          */
         function setupModifyComment() {
             $(document).on('click', '[data-comment-modify]', function(event) {
