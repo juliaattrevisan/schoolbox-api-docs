@@ -434,6 +434,21 @@ function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount =
     $page->setVar('RS_0_CHECKED', $checkedIndex == 0 ? 'checked="checked"' : '');
 }
 
+/* Render out breadcrumbs
+ */
+$trail = new \Schoolbox\Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text'  => $category->getName(),
+        'href'  => "/homepage/{$category->getId()}",
+        'class' => '',
+    ],
+    [
+        'text'  => $submission->getId() ? $submission->getName() : 'Post Due Work',
+        'href'  => '',
+        'class' => 'active',
+    ]
+]);
 
 /**
  * @param SitePage $page
