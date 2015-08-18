@@ -416,7 +416,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      * * Edumate appears to have no concept of campuses
      * * getTimetableDefinition() returns DateTime objects
      *
-     * @param  array $roomCodes
+     * @param  array|string $roomCodes
      * @return array
      */
     public function getRoomTimetable($roomCodes)

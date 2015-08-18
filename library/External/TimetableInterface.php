@@ -179,7 +179,7 @@ interface External_TimetableInterface
 	/**
 	 * Gets the timetable for the given room.
 	 *
-	 * @param  array $roomCodes
+	 * @param  array|string $roomCodes
 	 * @return array
 	 */
 	public function getRoomTimetable($roomCodes);

@@ -355,7 +355,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     /**
      * TODO: No stored proc
      *
-     * @param  array $roomCodes
+     * @param  array|string $roomCodes
      * @return array
      */
     public function getRoomTimetable($roomCodes)
