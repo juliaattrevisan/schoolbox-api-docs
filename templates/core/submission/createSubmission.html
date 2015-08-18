@@ -66,6 +66,19 @@
             }
         });
 
+        // Show/hide elements depending on whether a checkbox is checked
+        $('[data-hide-watch]').each(function() {
+            var element  = $(this);
+            var checkbox = $('#'+element.data('hide-watch'));
+            if (checkbox.length) {
+                checkbox.on('change.hideWatch', function() {
+                    element.toggleClass('hide');
+                });
+                // Apply now
+                element.toggleClass('hide', !checkbox.prop('checked'))
+            }
+        });
+
         var marktype = {
             total:$('#marktype-total'),
             rubric:$('tr.marktype-rubric'),
@@ -577,15 +590,25 @@
 
                     <div class="small-6 columns">
                         <input type="hidden" name="accept_submission" value="0" />
-                        <input id="accept_submission" name="accept_submission" type="checkbox" value="true" {ACCEPT_SUBMISSION} />
+                        <input id="accept_submission"
+                               name="accept_submission"
+                               type="checkbox"
+                               value="true"
+                               {ACCEPT_SUBMISSION}
+                        />
                         <label for="accept_submission" class="checkbox-label">
                             Accept Submissions Online?
                         </label>
                     </div>
 
-                    <div class="small-6 columns">
+                    <div class="small-6 columns" data-hide-watch="accept_submission">
                         <input type="hidden" name="multi_submission" value="0" />
-                        <input id="multi_submission" name="multi_submission" type="checkbox" value="true" {MULTI_SUBMISSION} />
+                        <input id="multi_submission"
+                               name="multi_submission"
+                               type="checkbox"
+                               value="true"
+                               {MULTI_SUBMISSION}
+                        />
                         <label for="multi_submission" class="checkbox-label">
                             Accept Multiple Submissions?
                         </label>
@@ -645,7 +668,7 @@
                     </div>
 
                     <div class="small-12 columns">
-                        <fieldset class="content no-pad">
+                        <fieldset class="content no-pad" data-hide-watch="accept_submission">
                             <div class="small-12 large-6 columns">
                                 <label>
                                     Open Date
@@ -749,7 +772,7 @@
                     </div>
 
                     <div class="small-12 columns">
-                        <fieldset class="content no-pad">
+                        <fieldset class="content no-pad" data-hide-watch="accept_submission">
                             <div class="small-12 large-6 columns">
                                 <label>
                                     Late Date
