@@ -48,7 +48,7 @@ class External_Offline_Timetable implements External_TimetableInterface
         throw new Schoolbox\External\Exception("Timetable is unavailable.");
     }
 
-    public function getRoomTimetable($roomCode)
+    public function getRoomTimetable($roomCodes)
     {
         // Noop
     }

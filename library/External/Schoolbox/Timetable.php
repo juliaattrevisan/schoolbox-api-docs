@@ -306,7 +306,13 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         return $this->getDayTimetable($externalUserId, $userId, $campus, $this->getDayNumber($campus, $date->getUnixTimeStamp()));
     }
 
-    public function getRoomTimetable($roomCode)
+    /**
+     * Gets the timetable for the given room.
+     *
+     * @param  array $roomCodes
+     * @return array
+     */
+    public function getRoomTimetable($roomCodes)
     {
         $query = "
             SELECT
@@ -342,7 +348,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 timetable_period.sequence ASC
         ";
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array('room' => $roomCode,));
+        $statement->execute(array('room' => $roomCodes,));
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 

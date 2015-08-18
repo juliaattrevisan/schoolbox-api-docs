@@ -333,7 +333,13 @@ class External_Tass_Timetable implements External_TimetableInterface
         return $timetable;
     }
 
-    public function getRoomTimetable($roomCode)
+    /**
+     * Gets the timetable for the given room.
+     *
+     * @param  array $roomCodes
+     * @return array
+     */
+    public function getRoomTimetable($roomCodes)
     {
         $query = "
             SELECT
@@ -380,7 +386,7 @@ class External_Tass_Timetable implements External_TimetableInterface
             array(
                 ':semester' => "'" . $this->database->quote($this->externalUser->getCurrentSemester()) . "'",
                 ':year'     => "'" . $this->database->quote($this->externalUser->getCurrentYear()) . "'",
-                ':room'     => "'" . $this->database->quote($roomCode) . "'",
+                ':room'     => "'" . $this->database->quote($roomCodes) . "'",
             )
         );
         return $this->database->trimAll($this->database->getAll($query));

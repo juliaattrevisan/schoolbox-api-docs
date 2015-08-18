@@ -416,10 +416,10 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      * * Edumate appears to have no concept of campuses
      * * getTimetableDefinition() returns DateTime objects
      *
-     * @param  string $roomCode
+     * @param  array $roomCodes
      * @return array
      */
-    public function getRoomTimetable($roomCode)
+    public function getRoomTimetable($roomCodes)
     {
         $statement = $this->getDatabase()->prepare('
             SELECT
@@ -443,7 +443,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
                 t.DAY_NUMBER ASC,
                 t.PERIOD_NUMBER ASC
         ');
-        $statement->execute(array('room' => $roomCode));
+        $statement->execute(array('room' => $roomCodes));
 
         // Join with Edumate's (currently hardcoded and campusless) timetable.
         $campus = new \Schoolbox\Campus;

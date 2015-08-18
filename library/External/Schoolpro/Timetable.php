@@ -355,11 +355,10 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     /**
      * TODO: No stored proc
      *
-     * @param  string $roomCode
-     *
+     * @param  array $roomCodes
      * @return array
      */
-    public function getRoomTimetable($roomCode)
+    public function getRoomTimetable($roomCodes)
     {
         return array();
     }
