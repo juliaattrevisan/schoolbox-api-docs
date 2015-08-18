@@ -343,7 +343,7 @@ class Mapper extends BaseMapper
             $fromTimestamp,
             $toTimestamp,
             $statusIds,
-            array('resource_id' => array($resourceId))
+            array('resource_id' => is_array($resourceId) ? $resourceId : [$resourceId])
         );
     }
 

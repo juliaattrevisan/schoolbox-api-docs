@@ -47,7 +47,7 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForItem extends Calendar_Ap
     }
 
     /**
-     * @param  int   $resourceId
+     * @param  int|array $resourceId
      * @return $this
      */
     public function setResourceId($resourceId) {
