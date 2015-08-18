@@ -886,29 +886,33 @@
                     </div>
                     <!-- END marktype -->
                 </fieldset>
+
+                <!-- BEGIN curriculum_code_input -->
+                <fieldset class="content">
+                    <legend>Curriculum</legend>
+                    <div class="small-12 columns">
+                        <label>
+                            Codes
+                            <span class="hint has-tip tip-top"
+                                  data-tooltip
+                                  title="If you want to associate curriculum codes with this submission, enter them here.
+                                         (By default, it will be associated with the same codes that its folder is.)">?</span>
+                        </label>
+                        {CURRICULUM_CODE_INPUT}
+                    </div>
+                </fieldset>
+                <!-- END curriculum_code_input -->
+
             </section>
 
-            <table class="standardForm table">
-    <!-- BEGIN curriculum_code_input -->
-    <tr>
-        <td><h4>Curriculum Codes</h4>
-            <em>If you want to associate curriculum codes with this submission, enter them here.</em>
-            <em>(By default, it will be associated with the same codes that its folder is.)</em>
-        </td>
-        <td>{CURRICULUM_CODE_INPUT}</td>
-    </tr>
-    <!-- END curriculum_code_input -->
-</table>
-<input type="hidden" name='fileId' value="{FILEID}"/>
-<input type="hidden" name="id" value="{ID}"/></td>
-<input type="submit" name="Submit" value="{HEADING}" class="submit-btn-plain"/>
+            <input type="hidden" name='fileId' value="{FILEID}"/>
+            <input type="hidden" name="id" value="{ID}"/></td>
+            <input type="submit" name="Submit" value="{HEADING}" class="submit-btn-plain"/>
 
-<!-- BEGIN delete_button -->
-<input id='deleteBox' type="button" class="submit-btn-plain"  value="Delete" />
-<!-- END delete_button -->
-
-</form>
-
+            <!-- BEGIN delete_button -->
+            <input id='deleteBox' type="button" class="submit-btn-plain"  value="Delete" />
+            <!-- END delete_button -->
+        </form>
     </div>
 </div>
 
