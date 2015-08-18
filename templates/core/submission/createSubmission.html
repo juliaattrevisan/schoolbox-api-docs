@@ -32,23 +32,39 @@
         });
 
         // setup datepickers
-        var publishDate = $('#publish_date');
-        var openDate    = $('#open_date');
-        var dueDate     = $('#due_date');
-        var lateDate    = $('#late_date');
-        openDate.add(dueDate).add(lateDate).add(publishDate).datepicker({
+        $('[data-datepicker]').datepicker({
             constrainInput: false,
             onClose:function (string) {
                 var input = $(this);
-
                 $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
                     input.val(data.time).blur();
                 })
             }
         });
-        publishDate.syncDates({endDate: openDate});
-        openDate.syncDates({endDate: dueDate});
-        dueDate.syncDates({endDate: lateDate});
+
+        // Generic setup for date syncs
+        $('[data-datepicker-sync]').each(function() {
+            var element = $(this);
+            var options = {};
+
+            var startElement = element.data('datepicker-sync-startdate');
+            if (startElement) {
+                var start = $('#'+startElement);
+                if (start.length) {
+                    options.startDate = start;
+                }
+            }
+            var endElement = element.data('datepicker-sync-enddate');
+            if (endElement) {
+                var end = $('#'+endElement);
+                if (end.length) {
+                    options.endDate = end;
+                }
+            }
+            if (options.startDate || options.endDate) {
+                element.syncDates(options)
+            }
+        });
 
         var marktype = {
             total:$('#marktype-total'),
@@ -590,7 +606,8 @@
                                            type="text"
                                            value="{PUBLISH_DATE}"
                                            data-datepicker
-                                           data-datepicker-sync-to="open_date"
+                                           data-datepicker-sync
+                                           data-datepicker-sync-enddate="open_date"
                                            data-default_time="00:00"
                                     />
                                 </label>
@@ -641,7 +658,8 @@
                                            type="text"
                                            value="{OPEN_DATE}"
                                            data-datepicker
-                                           data-datepicker-sync-to="due_date"
+                                           data-datepicker-sync
+                                           data-datepicker-sync-enddate="due_date"
                                            data-default_time="00:00"
                                     />
                                 </label>
@@ -692,7 +710,8 @@
                                            type="text"
                                            value="{DUE_DATE}"
                                            data-datepicker
-                                           data-datepicker-sync-to="late_date"
+                                           data-datepicker-sync
+                                           data-datepicker-sync-enddate="late_date"
                                            data-default_time="23:59"
                                     />
                                 </label>
