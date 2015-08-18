@@ -44,9 +44,13 @@
                  */
                 element: element,
 
+                /* The button which activates the Publishing
+                 */
+                activator: '#publish-to-eportfolio',
+
                 /* The label to hide/show when publishing
                  */
-                label: ''
+                label: '#publish-to-eportfolio-status'
             }
 
             var derived = {
@@ -62,6 +66,17 @@
          * Ajaxes the new value silently
          */
         function publishToEportfolio() {
+
+            /* Event listener
+             */
+            $(config.activator).click(function(event) {
+                event.preventDefault();
+
+                $(config.element).submit();
+            });
+
+            /* Ajax the Publish action
+             */
             $(config.element).submit(function(event) {
                 event.preventDefault();
 
@@ -80,6 +95,7 @@
                     }
                 });
             });
+
         }
     }
 }(jQuery));

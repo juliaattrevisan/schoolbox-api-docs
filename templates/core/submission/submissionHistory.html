@@ -291,15 +291,7 @@
 
         /* Publish To Eportfolio
          */
-        $('#publish-to-eportfolio').click(function(event) {
-            event.preventDefault();
-
-            $('#publish-to-eportfolio-form').eportfolio.publish({
-                label: '#publish-to-eportfolio-status'
-            });
-
-            $('#publish-to-eportfolio-form').submit();
-        });
+        $('#publish-to-eportfolio-form').eportfolio.publish();
 
         var x = 1, i = x - 1,
                 $historyMore = $('#history-more'),
