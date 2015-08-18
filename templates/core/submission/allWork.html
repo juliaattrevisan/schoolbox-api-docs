@@ -355,42 +355,18 @@
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.all-work.js"></script>
 <script type="text/javascript">
 //var displayGraph = {GRAPH_IS_DISPLAYED};
-//var options = {
-//	series: {
-//		points: {
-//			show: true,
-//			fill: true,
-//			lineWidth: 6
-//		},
-//		lines: {
-//			show: true,
-//			lineWidth: 4
-//		}
-//	},
-//	colors: {GRAPH_COLOURS},
-//	xaxis: {
-//		mode: "time",
-//		min: {GRAPH_XMIN},
-//		max: {GRAPH_XMAX}
-//	},
-//	yaxis: {
-//		min: 0,
-//		max: 100
-//	},
-//	grid: {
-//		borderWidth: 0,
-//		show: true
-//	}
-//};
 
 $(function () {
 
+    /* Graph (to be replaced one day, hence not plugin'd)
+     */
     $('#subject-graph').highcharts({
         title: {
-            text: 'Smartness over time'
+            text: ''
         },
         colors: {GRAPH_COLOURS},
         xAxis: {
+            title: '',
             min: {GRAPH_XMIN},
             max: {GRAPH_XMAX},
             type: 'datetime'
