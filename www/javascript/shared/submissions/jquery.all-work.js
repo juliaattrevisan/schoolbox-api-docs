@@ -60,6 +60,11 @@
                     }
                 },
 
+                /* The url where comments to go live, and the url
+                 * from which comments emerge
+                 */
+                url: '/ajax/comment.php',
+
                 /* Metadata required by backend
                  */
                 data: {
@@ -139,7 +144,7 @@
                 // submit the form
                 $.ajax({
                     type: 'POST',
-                    url: '/ajax/comment.php',
+                    url: config.url,
                     data: data,
                     success: function (data, responseText, xhr) {
                         // later this will be a nice ajax visual update, but for now just reload the page
@@ -165,7 +170,7 @@
                 // retrieve comment
                 $.ajax({
                     type: 'GET',
-                    url: '/ajax/comment.php',
+                    url: config.url,
                     data: {
                         commentId: commentId
                     },
@@ -239,7 +244,7 @@
                     confirmEvent: function() {
                         $.ajax({
                             type: 'POST',
-                            url: '/ajax/comment.php',
+                            url: config.url,
                             data: {
                                 commentId: commentId,
                                 deleteComment: true
