@@ -66,16 +66,28 @@
             }
         });
 
-        // Show/hide elements depending on whether a checkbox is checked
+        // Show/hide elements depending on whether a checkbox is checked,
+        // or the select box has a particular value.
         $('[data-hide-watch]').each(function() {
-            var element  = $(this);
-            var checkbox = $('#'+element.data('hide-watch'));
-            if (checkbox.length) {
-                checkbox.on('change.hideWatch', function() {
-                    element.toggleClass('hide');
+            var element = $(this);
+            var watch   = $('#'+element.data('hide-watch'));
+            if (watch.length) {
+                var toggleCallback = function() { return true; };
+                if (watch.is(':checkbox')) {
+                    toggleCallback = function() {
+                        return !watch.prop('checked');
+                    };
+                } else {
+                    // Watch on a value
+                    toggleCallback = function() {
+                        return watch.val() != element.data('hide-watch-value');
+                    }
+                }
+                watch.on('change.hideWatch', function() {
+                    element.toggleClass('hide', toggleCallback);
                 });
                 // Apply now
-                element.toggleClass('hide', !checkbox.prop('checked'))
+                element.toggleClass('hide', toggleCallback)
             }
         });
 
@@ -107,24 +119,6 @@
         $('#marktype').change(function () {
             showHideMarktype(500);
         });
-
-
-        // cache lookups
-        var submission_form = $('#createSubmissionForm');
-        var acceptSubmit = $('input:checkbox[name=accept_submission]');
-        var acceptHide = $('.accept-hide');
-
-        acceptSubmit.change(function () {
-            if ($(this).is(':checked')) {
-                acceptHide.show(500);
-            } else {
-                acceptHide.hide(500);
-            }
-        });
-
-        if (!(acceptSubmit.prop('checked'))) {
-            acceptHide.hide();
-        }
 
 //        // validation rules
 //        $.validator.addMethod("markTypeTotalCheck", function(value, element) {
@@ -854,7 +848,7 @@
                     <div class="small-12 columns">
                         <label>
                             Type
-                            <select name="marktype">
+                            <select name="marktype" id="marktype">
                                 <!-- BEGIN marktype_drop -->
                                 <option data-slug="{MARKTYPE_SLUG}"
                                         value="{MARKTYPE_VALUE}"
@@ -864,7 +858,7 @@
                         </label>
                     </div>
 
-                    <div class="small-12 columns" data-marktype="letter">
+                    <div class="small-12 columns" data-hide-watch="marktype" data-hide-watch-value="letter">
                         <label>
                             Grade Group
                             <select name="gradegroup" class="formfield" id="gradegroup">
@@ -890,14 +884,14 @@
                         </div>
                     </div>
 
-                    <div class="small-12 columns" data-marktype="total">
+                    <div class="small-12 columns" data-hide-watch="marktype" data-hide-watch-value="total">
                         <label>
                             Total Mark
                             <input name="markvalue" type="text" value="{TOTAL_MARK}" />
                         </label>
                     </div>
 
-                    <div class="small-12 columns" data-marktype="rubric">
+                    <div class="small-12 columns" data-hide-watch="marktype" data-hide-watch-value="rubric">
                         <!-- BEGIN existing_marks_warning -->
                         <div class="alert-panel">
                             <strong>Warning:</strong>
@@ -943,7 +937,7 @@
                         </p>
                     </div>
 
-                    <div class="small-12 columns" data-marktype="rubric">
+                    <div class="small-12 columns" data-hide-watch="marktype" data-hide-watch-value="rubric">
                         <label>
                             Assessment Specific Descriptors
                         </label>
