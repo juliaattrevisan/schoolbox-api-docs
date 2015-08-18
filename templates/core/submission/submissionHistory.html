@@ -20,23 +20,30 @@
             <div class="small-12 island">
                 <div class="small-12 island">
                     <h2 class="subheader">Description</h2>
-                    <section class="content">
-                        <article>{BOX_DESCRIPTION}</article>
+                    <section>
+                        <div class="content">
+                            <article>{BOX_DESCRIPTION}</article>
+                        </div>
 
                         <!-- BEGIN attachments -->
-                        <h3>Attachments</h3>
+                        <div class="content">
+                            <h3>Attachments</h3>
+                        </div>
                         <ul class="action-list">
                             <!-- BEGIN download -->
                             <li class="row">
-                                <div class="small-12 columns no-pad">
+                                <div class="small-11 columns no-pad">
                                     <div class="avatar card">
-                                        <a href="/storage/fetch.php?hash={FILE_HASH}&save=1" title="{FILE_NAME}">
-                                            <img src="/images/mime/60x60/{FILE_THUMB}" class="content">
+                                        <a href="/storage/fetch.php?hash={FILE_HASH}&save=1" title="Filename">
+                                            <img src="/images/mime/60x60/{FILE_THUMB}" class="content" alt="{FILE_NAME}">
                                             <h4>{FILE_NAME}</h4>
                                         </a>
                                         <p class="meta">{FILE_DATE}</p>
                                         <p class="meta">{FILE_SIZE}</p>
                                     </div>
+                                </div>
+                                <div class="one actions">
+                                    <a href="/storage/fetch.php?hash={FILE_HASH}&save=1" class="icon-download" title="Download"></a>
                                 </div>
                             </li>
                             <!-- END download -->
@@ -82,9 +89,9 @@
                     <ul class="action-list">
                         <!-- BEGIN return_file -->
                         <li class="row">
-                            <div class="small-11 columns no-pad">
+                            <div class="small-10 columns no-pad">
                                 <div class="avatar card">
-                                    <a href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1" title="{RETURNED_WORK_FILE_NAME}">
+                                    <a href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1" title="Filename">
                                         <img src="/images/mime/60x60/{RETURNED_WORK_FILE_THUMB}" class="content" alt="{RETURNED_WORK_FILE_NAME}">
                                         <h3>{RETURNED_WORK_FILE_NAME}</h3>
                                     </a>
@@ -92,7 +99,8 @@
                                     <p class="meta">{RETURNED_WORK_FILE_SIZE}</p>
                                 </div>
                             </div>
-                            <div class="one actions">
+                            <div class="two actions">
+                                <a href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1" class='icon-download' title="Filename"></a>
                                 <!-- BEGIN return_file_uuid -->
                                 <a class='icon-view no-text' href="/submission/inlineGrading/viewStudent/{RETURNED_WORK_SUBMISSION_ID}"></a>
                                 <!-- END return_file_uuid -->
