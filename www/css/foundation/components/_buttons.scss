@@ -517,6 +517,8 @@ ul.pagination .active a{
 
 		.actions-#{$size}-#{$i} {
 
+			position: relative;
+
 			> .list-item {
 				padding-right: 0.5 + ($i * $button-size);
 			}
@@ -530,9 +532,9 @@ ul.pagination .active a{
 				right: 0;
 				height: $button-size;
 
-				> *, a {
-					height: 100%;
-				}
+				//> *, a {
+				//	height: 100%;
+				//}
 
 				a {
 					display: inline-block;

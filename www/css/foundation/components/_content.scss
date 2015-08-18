@@ -592,6 +592,16 @@ $rotate-th-width: $square-grid-td-size;
 	}
 }
 
+.list-item-content {
+	@media #{$small-only} {
+		padding: 0.75rem 0 0 3rem;
+	}
+	@media #{$medium-up} {
+		padding: 0.75rem 0 0 0.75rem;
+	}
+}
+
+
 // Labels
 .label{
 	text-transform: uppercase;
@@ -810,6 +820,9 @@ $rotate-th-width: $square-grid-td-size;
             clear: both;
         }
     }
+	form {
+		margin: 0;
+	}
 }
 
 // Activity list
@@ -964,6 +977,7 @@ $rotate-th-width: $square-grid-td-size;
 
 .card {
 
+	position: relative;
     min-height: (3 * rem-calc($base-font-size));
     padding: 0.25rem 0.5rem 0 1rem;
     @media #{$medium-up} {
@@ -1121,15 +1135,19 @@ $rotate-th-width: $square-grid-td-size;
 .list-item > .card {
 	// cards directly inside list items replicate column functionality
 	// you still need to specify sizing (ie. small-12)
-	@extend .column;
+	padding-left: 1rem;
+	padding-right: 1rem;
+	// same definition as .column, minus the width:100%;
+	float: left;
+	position: relative;
 
 	&.avatar {
 		img {
 			@media #{$small-only} {
-				margin-left: -0.5rem;
+				//margin-left: -0.5rem;
 			}
 			@media #{$medium-only} {
-				margin-left: -0.75rem;
+				//margin-left: -0.75rem;
 			}
 		}
 	}
@@ -1303,9 +1321,15 @@ ul.meta {
     line-height: 1.5rem;
     margin-bottom: 1rem;
 	> li {
-		// 26px = 16x16 icon + 10px padding (both hardcoded values)
-		text-indent: -26px;
-		padding-left: 26px;
+		$meta-icon-margin: 1.125rem;
+		$meta-indent: 1rem + $meta-icon-margin;
+
+		text-indent: -1 * $meta-indent;
+		padding-left: $meta-indent;
+
+		&[class^=icon-]:before {
+			padding-right: $meta-icon-margin;
+		}
 	}
 }
 

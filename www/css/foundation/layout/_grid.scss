@@ -41,8 +41,11 @@ $block-grid-default-spacing: rem-calc(16);
     }
 }
 #content form .row .row {
-    // dear sass: I will choose my own margins THANKS VERY MUCH
     @include responsive-sides(-1, margin);
+    .column, .columns {
+        // dear foundation: I will use my own dimensions THANKS VERY MUCH
+        @include responsive-sides(1, padding);
+    }
 }
 
 // Responsive Column Padding
@@ -61,6 +64,9 @@ $block-grid-default-spacing: rem-calc(16);
 // For when you dont want padding
 .no-pad{
 	padding: 0 !important;
+}
+.no-margin{
+    margin: 0 !important;
 }
 
 // For when you want minimal padding (8px)
@@ -96,6 +102,7 @@ $block-grid-default-spacing: rem-calc(16);
             padding-left: 2rem;
             padding-right: 2rem;
         }
+
 
         table {
             td:first-child, th:first-child {
