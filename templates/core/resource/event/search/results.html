@@ -1,27 +1,35 @@
-<div class="box">
-<h2>Calendar <!-- BEGIN count -->({EVENT_DISP_COUNT} / {EVENT_COUNT})<!-- END count --></h2>
-<ul class="information-list">
-<!-- BEGIN event -->
-	<li>
-		<a href="/calendar/full/{EVENT_DATE_RAW}#day">
-        	<img class="thumbnail" height="64" width="64" src="images/icons/60x60/event.png" />
-			<h4>{EVENT_TITLE}</h4>
-		</a>
-		<p class="meta">{EVENT_DATE} {EVENT_TIME} <br />
-            {EVENT_TYPE} <br />
-            {EVENT_LOCATION}</p>
-		<p>{EVENT_DETAIL}</p>
-	</li>
-<!-- END event -->
-</ul>
+<div class="row">
+	<div class="small-12 island">
+	<h2 class="subheader">Calendar <!-- BEGIN count -->({EVENT_DISP_COUNT} / {EVENT_COUNT})<!-- END count --></h2>
+		<section>
+			<ul class="action-list">
+			<!-- BEGIN event -->
+				<li class="row">
+					<div class="column no-pad small-12">
+						<div class="avatar card">
+							<a href="/calendar/full/{EVENT_DATE_RAW}#day">
+								<div class="icon-calendar icon-32"></div>
+								<h3>{EVENT_TITLE}</h3>
+								<p class="meta">{EVENT_DATE} {EVENT_TIME} <br />
+									{EVENT_TYPE} <br />
+									{EVENT_LOCATION}</p>
+								<p>{EVENT_DETAIL}</p>
+							</a>
+						</div>
+					</div>
+				</li>
+			<!-- END event -->
+			</ul>
+		</section>
+	</div>
 <!-- BEGIN see_more -->
 <p>
 	<a rel="event" id="event-more" class="float-left btn more" href="#"><span></span>See all {MORE_COUNT} results for Events</a>
 </p>
 <!-- END see_more -->
-<ul class="admin-nav foot">
-	<!-- BEGIN pagination -->
-	<li><a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a></li>
-	<!-- END pagination -->
-</ul>
+	<ul class="pagination">
+		<!-- BEGIN pagination -->
+		<li class="{PAGE_CLASS}"><a href="#" rel="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
+		<!-- END pagination -->
+	</ul>
 </div>

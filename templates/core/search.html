@@ -57,13 +57,13 @@ $(function() {
 <!-- END custom_head -->
 
 <h1>Search Results{FOR}<em>{UNESCAPED_KEYWORD}</em></h1>
-<ul id="type" class="admin-nav">
+<dl id="type" class="sub-nav">
     <!-- BEGIN type -->
-    <li class='{TYPE_CLASS}'>
+    <dd class='{TYPE_CLASS}'>
 		<a href='#' rel="{TYPE_TYPE}" data-count="0">{TYPE_NAME} ({TYPE_COUNT})</a>
-	</li>
+	</dd>
     <!-- END type -->
-</ul>
+</dl>
 
 <div class="results">
     <!-- BEGIN result -->
@@ -73,19 +73,25 @@ $(function() {
     <!-- END result -->
 </div>
 <!-- BEGIN no_result -->
-<div class="no_results">
-    <p>Sorry, but your search{FOR}<em>{UNESCAPED_KEYWORD}</em> didn't return any results{NO_RESULTS_BECAUSE}.</p>
-    <p>Here are some tips for improving your search:</p>
-    <ul>
-        <li>Ensure your search is 3 or more letters long. If you need to search for something less than 3 letters long, "quote" it.</li>
-        <li>You can also use "quotes" to search for an exact string, for example "dog and cat".</li>
-    </ul>
+<div class="row">
     <form method="get" action="/search" _lpchecked="1" id="inline_search">
-        <label for="inline_search_field">
-            Search again:
-        </label>
-        <input id="inline_search_field" type="text" value="{ENCODED_KEYWORD}" name="keyword" placeholder="search" class="default" />
-        <input type="submit" class="submit-btn-plain" value="Search" />
+    <div class="large-12 island">
+        <section>
+            <div class="content">
+                <p class="alert-box warning">Sorry, but your search{FOR}<em>{UNESCAPED_KEYWORD}</em> did not return any results{NO_RESULTS_BECAUSE}.</p>
+                <p>Here are some tips for improving your search:</p>
+                <ul>
+                    <li>Ensure your search is 3 or more letters long. If you need to search for something less than 3 letters long, "quote" it.</li>
+                    <li>You can also use "quotes" to search for an exact string, for example "dog and cat".</li>
+                </ul>
+            <label for="inline_search_field">
+                Try Again
+            </label>
+            <input id="inline_search_field" type="text" value="{ENCODED_KEYWORD}" name="keyword" placeholder="search" />
+            <input type="submit" value="Search" />
+            </div>
+        </section>
+    </div>
     </form>
 </div>
 <!-- END no_result -->

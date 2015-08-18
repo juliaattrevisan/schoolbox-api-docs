@@ -1,28 +1,37 @@
-<div class="box">
-<h2>Folders <!-- BEGIN count -->({FOLDER_DISP_COUNT} / {FOLDER_COUNT})<!-- END count --></h2>
-<ul class="information-list">
-<!-- BEGIN folder -->
-	<li>
-		<span class="actions">
-			<!-- BEGIN modify --><a href="/cms/category/{FOLDER_ID}" class="btn no-text modify" title="Modify Folder"><span></span></a><!-- END modify -->
-		</span>
-		<a href="/homepage/{FOLDER_ID}">
-			<img class="thumbnail" height="60" width="60" src="/images/icons/60x60/{FOLDER_TYPE}.png" />
-			<h4>{FOLDER_NAME}</h4>
-		</a>
-		<p class="meta">{FOLDER_BREADCRUMB}</p>
-		<a class="btn folder" href="/resources/{FOLDER_ID}"><span></span>Resources</a>
-	</li>
-<!-- END folder -->
-</ul>
+<div class="row">
+	<div class="small-12 island no-pad">
+		<h2 class="subheader">Folders <!-- BEGIN count -->({FOLDER_DISP_COUNT} / {FOLDER_COUNT})<!-- END count --></h2>
+		<section>
+			<ul class="action-list">
+			<!-- BEGIN folder -->
+				<li class="row" data-equalizer>
+					<div class="column no-pad small-11" data-equalizer-watch>
+						<div class="avatar card">
+							<a href="/homepage/{FOLDER_ID}">
+								<div class="icon-folder icon-32"></div>
+								<h3>{FOLDER_NAME}</h3>
+								<p class="meta">{FOLDER_BREADCRUMB}</p>
+							</a>
+						</div>
+					</div>
+					<!-- BEGIN modify -->
+					<div class="one actions">
+						<a data-equalizer-watch data-tooltip class="icon-modify no-text" href="/cms/category/{FOLDER_ID}" title="Modify"></a>
+					</div>
+					<!-- END modify -->
+				</li>
+			<!-- END folder -->
+			</ul>
+		</section>
+	</div>
 <!-- BEGIN see_more -->
 <p>
-	<a id="category-more" class="float-left btn more" rel="folder" href="#"><span></span>See all {MORE_COUNT} results for Folders</a>
+	<a id="category-more" class="float-left btn more" rel="folder" href="#"><span></span>See all {MORE_COUNT} results for folders</a>
 </p>
 <!-- END see_more -->
-<ul class="admin-nav foot">
-	<!-- BEGIN pagination -->
-	<li><a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a></li>
-	<!-- END pagination -->
-</ul>
+	<ul class="pagination">
+		<!-- BEGIN pagination -->
+		<li class="{PAGE_CLASS}"><a href="#" rel="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
+		<!-- END pagination -->
+	</ul>
 </div>

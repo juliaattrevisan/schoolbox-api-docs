@@ -90,7 +90,7 @@ search = {
 	 * Add pagination events to all the <a> links
 	 */
 	paginate: function(){
-		$('.admin-nav.foot li > a').bind('click', function(event) {
+		$('.pagination li > a').bind('click', function(event) {
 			event.preventDefault();
 
 			/* Set the page number
@@ -117,10 +117,10 @@ search = {
          * but only for non-all portions
          */
         if (search.getSection() == 'all') {
-            $('.admin-nav.foot').hide();
+            $('.pagination').hide();
         }
         else {
-            $('.admin-nav.foot').show();
+            $('.pagination').show();
         }
 	},
 
@@ -188,23 +188,20 @@ search = {
 	 * @param sectionElement
 	 */
 	updateStyles: function() {
-		/* Alternating row colours when data is loaded
-		 */
-		$('.information-list li:nth-child(even)').addClass('dark');
 
 		/* Remove all selected classes
 		 */
-		$('#type a').removeClass('current');
+		$('#type dd').removeClass('active');
 
 		/* Select only the current section
 		 */
-		this.getSectionElement().addClass('current');
+		this.getSectionElement().closest('dd').addClass('active');
 
 		/* If this was in section "all", then hide pagination. We don't paginate
 		 * through this particular section
 		 */
 		if (this.getSection() == 'all') {
-			$('.admin-nav.foot').hide();
+			$('.pagination').hide();
 		}
 	},
 

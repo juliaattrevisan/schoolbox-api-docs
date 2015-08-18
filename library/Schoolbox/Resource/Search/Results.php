@@ -162,7 +162,7 @@ class Results implements Searchable
             if (($this->getType() == 'all') || ($currentDefinition->getType() == $this->getType())) {
                 $searcher = $this->getResult()->getOffset($currentDefinition->getType());
 
-                $currentDefinition->getRenderer()->renderPagination($searcher, $this->getType(), $currentPage);
+                $currentDefinition->getRenderer()->renderPagination($searcher, $currentPage);
 
                 break;
             }
