@@ -367,14 +367,18 @@ class User extends DeprecatedModel
                         Cfg::get('external_vendor_password')
                     );
                     $is_changed = $api->changeCommunityLoginPassword($user['synergy_id'], $oldPassword, $newPassword);
+
+                    if (!$is_changed) {
+                        //
+                        // Should throw a different error message if the remote pwd doesn't get changed.
+                        $this->setPasswordInternal($userID, $oldPassword);
+                        $this->logUserPasswordChange($username, 'change_pwd_syn_fail', 'warn', $api->getLastError());
+                        $this->sendPasswordChangeFailureEmail($userID, true);
+                        return false;
+                    }
+
                 } catch (SoapFault $ex) {
                     $this->logUserPasswordChange($username, 'change_pwd_syn_broken', 'warn', $ex);
-                }
-                if (!$is_changed) {
-                    //
-                    // Should throw a different error message if the remote pwd doesn't get changed.
-                    $this->setPasswordInternal($userID, $oldPassword);
-                    $this->logUserPasswordChange($username, 'change_pwd_syn_fail', 'warn', $api->getLastError());
                     $this->sendPasswordChangeFailureEmail($userID, true);
                     return false;
                 }
