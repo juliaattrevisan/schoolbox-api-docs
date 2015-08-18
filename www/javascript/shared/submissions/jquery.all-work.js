@@ -16,6 +16,7 @@
 
         setupSaveComment();
         setupModifyComment();
+        setupDeleteComment();
 
         /**
          * Init
@@ -198,6 +199,43 @@
 //                        // on failure, indicate failure
 //                        row.removeClass('locked');
 //                        alert.log(xhr.responseText);
+                    }
+                });
+            });
+        }
+
+        /**
+         * Listener for deleting a comment
+         */
+        function setupDeleteComment() {
+            $(document).on('click', '[data-comment-delete]', function(event) {
+                event.preventDefault();
+
+                var btn = $(this);
+                var row = btn.closest('li');
+                var commentId = row.attr('data-id');
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this comment?',
+                    confirmEvent: function() {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/ajax/comment.php',
+                            data: {
+                                commentId: commentId,
+                                deleteComment: true
+                            },
+                            success: function () {
+                                row.hide(500, function() {
+                                    row.remove();
+                                });
+                            },
+                            error: function (xhr) {
+//                                // inform the user that it failed
+//                                alert(xhr.responseText);
+//                                row.removeClass('locked');
+                            }
+                        });
                     }
                 });
             });
