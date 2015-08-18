@@ -585,7 +585,14 @@
                                           data-tooltip
                                           title="This due work will not show on your student's calendar until this date.
                                                  To publish at the start of the day, leave the time fields blank.">?</span>
-                                            <input name="publish_date" id="publish_date" type="text" value="{PUBLISH_DATE}" size="20" data-default_time="00:00" />
+                                    <input name="publish_date"
+                                           id="publish_date"
+                                           type="text"
+                                           value="{PUBLISH_DATE}"
+                                           data-datepicker
+                                           data-datepicker-sync-to="open_date"
+                                           data-default_time="00:00"
+                                    />
                                 </label>
                             </div>
                             <div class="small-4 large-2 columns">
@@ -629,7 +636,14 @@
                                           data-tooltip
                                           title="The date from when the due work will be available for submission.
                                                  To allow submissions from the start of the day, leave the time fields blank.">?</span>
-                                    <input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20" data-default_time="00:00" />
+                                    <input name="open_date"
+                                           id="open_date"
+                                           type="text"
+                                           value="{OPEN_DATE}"
+                                           data-datepicker
+                                           data-datepicker-sync-to="due_date"
+                                           data-default_time="00:00"
+                                    />
                                 </label>
                             </div>
                             <div class="small-4 large-2 columns">
@@ -673,7 +687,14 @@
                                           data-tooltip
                                           title="Actual date the work is due. This is the date that will be published.
                                                  To allow submissions until the end of the day, leave the time fields blank.">?</span>
-                                    <input name="due_date" id="due_date" type="text" value="{DUE_DATE}" size="20" data-default_time="23:59" />
+                                    <input name="due_date"
+                                           id="due_date"
+                                           type="text"
+                                           value="{DUE_DATE}"
+                                           data-datepicker
+                                           data-datepicker-sync-to="late_date"
+                                           data-default_time="23:59"
+                                    />
                                 </label>
                             </div>
                             <div class="small-4 large-2 columns">
@@ -717,7 +738,13 @@
                                           data-tooltip
                                           title="Students will not be able to submit after this date.
                                                  To allow submissions until the end of the day, leave the time fields blank.">?</span>
-                                    <input name="late_date" id="late_date" type="text" value="{LATE_DATE}" size="20" data-default_time="23:59" />
+                                    <input name="late_date"
+                                           id="late_date"
+                                           type="text"
+                                           value="{LATE_DATE}"
+                                           data-datepicker
+                                           data-default_time="23:59"
+                                    />
                                 </label>
                             </div>
                             <div class="small-4 large-2 columns">
