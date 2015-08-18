@@ -314,8 +314,17 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
      */
     public function getRoomTimetable($roomCodes)
     {
+        // Array? Get each room code recursively
+        if (is_array($roomCodes)) {
+            $result = [];
+            foreach ($roomCodes as $roomCode) {
+                $result = array_merge($result, $this->getRoomTimetable($roomCode));
+            }
+            return $result;
+        }
         $query = "
             SELECT
+                class_period.room AS RoomCode,
                 class.description AS Description,
                 timetable_period.day AS DayNumber,
                 timetable_period.sequence AS PeriodNumber,
