@@ -950,22 +950,29 @@
                                              By default descriptors are ordered lowest to highest, you may rearrange if you wish.">?</span>
                             </legend>
                             <!-- BEGIN resultset -->
-                            <input id="rs-{RS_ID}" type="radio" name="resultset" value="{RS_ID}"{RS_CHECKED} />
-                            <label for="rs-{RS_ID}" class="radio-label">
-                                <!-- BEGIN result -->
-                                <span class="result">{RS_RESULT_LABEL}</span>
-                                <!-- END result -->
-                            </label>
+                            <div class="small-12 columns no-pad">
+                                <input id="rs-{RS_ID}" type="radio" name="resultset" value="{RS_ID}"{RS_CHECKED} />
+                                <label for="rs-{RS_ID}" class="radio-label">
+                                    <!-- BEGIN result -->
+                                    {RS_RESULT_LABEL}
+                                    <!-- END result -->
+                                </label>
+                            </div>
                             <!-- END resultset -->
-                            <input id="rs-0" type="radio" name="resultset" value="0"{RS_0_CHECKED} />
-                            <label for="rs-0" class="radio-label">
-                                Assessment specific descriptors:
+                            <div class="small-12 medium-4 columns no-pad">
+                                <input id="rs-0" type="radio" name="resultset" value="0"{RS_0_CHECKED} />
+                                <label for="rs-0" class="radio-label">
+                                    Assessment specific descriptors:
+                                </label>
+                            </div>
+
+                            <div class="small-12 medium-8 columns no-pad">
                                 <select id="descriptor-count" name="descrip-count">
                                     <!-- BEGIN des_count -->
-                                    <option value="{DES_COUNT_VALUE}" {DES_COUNT_VALUE_SELECTED}>{DES_COUNT_VALUE}</option>
+                                    <option value="{DES_COUNT_VALUE}" {DES_COUNT_VALUE_SELECTED}>{DES_COUNT_VALUE} levels</option>
                                     <!-- END des_count -->
-                                </select> levels
-                            </label>
+                                </select>
+                            </div>
                         </fieldset>
                     </div>
 
