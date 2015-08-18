@@ -9,15 +9,13 @@
  
 namespace Schoolbox\ResourceBooking\Report;
 
-use Alaress\Module\Module as BaseModule;
-use Alaress\Authorizer\Rule;
 use Calendar_Api_Composite;
 use Calendar_Api_EventType_Interface;
 use External_TimetableInterface;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\User;
 
-class CalendarApiFactory extends BaseModule
+class CalendarApiFactory
 {
     /**
      * @var User
