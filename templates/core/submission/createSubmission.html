@@ -530,6 +530,7 @@
                 </label>
 
                 <!-- Dates can go here -->
+                <!-- BEGIN duework_timespan -->
                 <div class="row">
                     <div class="small-12 large-6 columns">
                         <label>
@@ -565,8 +566,139 @@
                                 <option value="pm" {PUBLISH_PM}>PM</option>
                             </select>
                         </label>
+                        <a data-interaction="selectTimetableDate"
+                           data-relation="publish"
+                           class="button icon-timetable"
+                           href="#"></a>
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="small-12 large-6 columns">
+                        <label>
+                            Open Date
+                            <span class="hint has-tip tip-top"
+                                  data-tooltip
+                                  title="The date from when the due work will be available for submission.
+                                         To allow submissions from the start of the day, leave the time fields blank.">?</span>
+                            <input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20" data-default_time="00:00" />
+                        </label>
+                    </div>
+                    <div class="small-4 large-2 columns">
+                        <div class="timepick">
+                            <label>
+                                Hour
+                                <input name="open_hour" type="text" maxlength="2" value="{OPEN_HOUR}" />
+                            </label>
+                        </div>
+                    </div>
+                    <div class="small-4 large-2 columns">
+                        <div class="timepick">
+                            <label>
+                                Minute
+                                <input name="open_minute" type="text" maxlength="2" value="{OPEN_MIN}" />
+                            </label>
+                        </div>
+                    </div>
+                    <div class="small-4 large-2 columns">
+                        <label>
+                            Period
+                            <select name="open_period" class="short">
+                                <option value="am">AM</option>
+                                <option value="pm" {OPEN_PM}>PM</option>
+                            </select>
+                        </label>
+                        <a data-interaction="selectTimetableDate"
+                           data-relation="open"
+                           class="button icon-timetable"
+                           href="#"></a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="small-12 large-6 columns">
+                        <label>
+                            Due Date
+                            <span class="hint has-tip tip-top"
+                                  data-tooltip
+                                  title="Actual date the work is due. This is the date that will be published.
+                                         To allow submissions until the end of the day, leave the time fields blank.">?</span>
+                            <input name="due_date" id="due_date" type="text" value="{DUE_DATE}" size="20" data-default_time="23:59" />
+                        </label>
+                    </div>
+                    <div class="small-4 large-2 columns">
+                        <div class="timepick">
+                            <label>
+                                Hour
+                                <input name="due_hour" type="text" maxlength="2" value="{DUE_HOUR}" />
+                            </label>
+                        </div>
+                    </div>
+                    <div class="small-4 large-2 columns">
+                        <div class="timepick">
+                            <label>
+                                Minute
+                                <input name="due_minute" type="text" maxlength="2" value="{DUE_MIN}" />
+                            </label>
+                        </div>
+                    </div>
+                    <div class="small-4 large-2 columns">
+                        <label>
+                            Period
+                            <select name="due_period" class="short">
+                                <option value="am">AM</option>
+                                <option value="pm" {DUE_PM}>PM</option>
+                            </select>
+                        </label>
+                        <a data-interaction="selectTimetableDate"
+                           data-relation="due"
+                           class="button icon-timetable"
+                           href="#"></a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="small-12 large-6 columns">
+                        <label>
+                            Late Date
+                            <span class="hint has-tip tip-top"
+                                  data-tooltip
+                                  title="Students will not be able to submit after this date.
+                                         To allow submissions until the end of the day, leave the time fields blank.">?</span>
+                            <input name="late_date" id="late_date" type="text" value="{LATE_DATE}" size="20" data-default_time="23:59" />
+                        </label>
+                    </div>
+                    <div class="small-4 large-2 columns">
+                        <div class="timepick">
+                            <label>
+                                Hour
+                                <input name="late_hour" type="text" maxlength="2" value="{LATE_HOUR}" />
+                            </label>
+                        </div>
+                    </div>
+                    <div class="small-4 large-2 columns">
+                        <div class="timepick">
+                            <label>
+                                Minute
+                                <input name="late_minute" type="text" maxlength="2" value="{LATE_MIN}" />
+                            </label>
+                        </div>
+                    </div>
+                    <div class="small-4 large-2 columns">
+                        <label>
+                            Period
+                            <select name="late_period" class="short">
+                                <option value="am">AM</option>
+                                <option value="pm" {LATE_PM}>PM</option>
+                            </select>
+                        </label>
+                        <a data-interaction="selectTimetableDate"
+                           data-relation="late"
+                           class="button icon-timetable"
+                           href="#"></a>
+                    </div>
+                </div>
+                <!-- END duework_timespan -->
             </div>
         </section>
     </div>
@@ -754,90 +886,6 @@
         <td><input name="multi_submission" type="checkbox" value="true" {MULTI_SUBMISSION}></td>
     </tr>
 
-    <!-- BEGIN duework_timespan -->
-    <tr class="dark">
-        <td class="formLabelWidth"><h4>Publish Date</h4>
-            <em>This due work will not show on your student's calendar until this date.
-                To publish at the start of the day, leave the time fields blank.</em>
-        </td>
-        <td>
-            <input name="publish_date" id="publish_date" type="text" value="{PUBLISH_DATE}" size="20" data-default_time="00:00" />
-            <input name="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" class="timeField"/>
-            <span>:</span>
-            <input name="publish_minute" type="text" maxlength="2" value="{PUBLISH_MIN}" class="timeField"/>
-            <select name="publish_period" class="short">
-                <option value="am">AM</option>
-                <option value="pm"
-                {PUBLISH_PM}>PM</option>
-            </select>
-            <a data-interaction="selectTimetableDate"
-               data-relation="publish"
-               class="btn calendar inline-block"
-               href="#"><span></span> Select from timetable</a>
-        </td>
-    </tr>
-    <tr class="dark accept-hide">
-        <td class="formLabelWidth"><h4>Open Date</h4>
-            <em>The date from when the due work will be available for submission.
-                To allow submissions from the start of the day, leave the time fields blank.</em>
-        </td>
-        <td>
-            <input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20" data-default_time="00:00" />
-            <input name="open_hour" type="text" maxlength="2" value="{OPEN_HOUR}" class="timeField"/>
-            <span>:</span>
-            <input name="open_minute" type="text" maxlength="2" value="{OPEN_MIN}" class="timeField"/>
-            <select name="open_period" class="short">
-                <option value="am">AM</option>
-                <option value="pm"
-                {OPEN_PM}>PM</option>
-            </select>
-            <a data-interaction="selectTimetableDate"
-               data-relation="open"
-               class="btn calendar inline-block"
-               href="#"><span></span> Select from timetable</a>
-        </td>
-    </tr>
-    <tr>
-        <td><h4>Due Date</h4>
-            <em>Actual date the work is due. This is the date that will be published.
-                To allow submissions until the end of the day, leave the time fields blank.</em></td>
-        <td>
-            <input name="due_date" id="due_date" type="text" value="{DUE_DATE}" size="20" data-default_time="23:59" />
-            <input name="due_hour" type="text" maxlength="2" value="{DUE_HOUR}" class="timeField">
-            <span>:</span>
-            <input name="due_minute" type="text" maxlength="2" value="{DUE_MIN}" class="timeField">
-            <select name="due_period" class="short">
-                <option value="am">AM</option>
-                <option value="pm"
-                {DUE_PM}>PM</option>
-            </select>
-            <a data-interaction="selectTimetableDate"
-               data-relation="due"
-               class="btn calendar inline-block"
-               href="#"><span></span> Select from timetable</a>
-        </td>
-    </tr>
-    <tr class="accept-hide dark">
-        <td><h4>Late Date</h4>
-            <em>Students will not be able to submit after this date.
-                To allow submissions until the end of the day, leave the time fields blank.</em></td>
-        <td>
-            <input name="late_date" id="late_date" type="text" value="{LATE_DATE}" size="20" data-default_time="23:59" />
-            <input name="late_hour" type="text" maxlength="2" value="{LATE_HOUR}" class="timeField">
-            <span>:</span>
-            <input name="late_minute" type="text" maxlength="2" value="{LATE_MIN}" class="timeField">
-            <select name="late_period" class="short">
-                <option value="am">AM</option>
-                <option value="pm"
-                {LATE_PM}>PM</option>
-            </select>
-            <a data-interaction="selectTimetableDate"
-               data-relation="late"
-               class="btn calendar inline-block"
-               href="#"><span></span> Select from timetable</a>
-        </td>
-    </tr>
-    <!-- END duework_timespan -->
     <!-- BEGIN curriculum_code_input -->
     <tr>
         <td><h4>Curriculum Codes</h4>
