@@ -23,4 +23,6 @@
    data-interaction="open-search"
         ><span></span>Search for codes</a>
 #}
-{% include 'sub/curriculumBrowseButton.twig' %}
+{% if renderButton or renderButton is not defined %}
+    {% include 'sub/curriculumBrowseButton.twig' %}
+{% endif %}

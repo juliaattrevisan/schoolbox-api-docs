@@ -372,8 +372,11 @@ $output = array(
     'TASK_INSTANCE_ID'  => $task_instance_id,
     'CURRICULUM_CODE_INPUT' => $this->getTwig()->render(
         'sub/curriculumCodeSelector.twig',
-        ['codeList' => $submission->getCurriculumNodes()]
-    )
+        ['codeList' => $submission->getCurriculumNodes(), 'renderButton' => false,]
+    ),
+    'CURRICULUM_BROWSE_BUTTON' => $this->getTwig()->render(
+        'sub/curriculumBrowseButton.twig'
+    ),
 );
 
 /** @var Schoolbox\User $user */
