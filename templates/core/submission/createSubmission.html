@@ -759,145 +759,136 @@
 
                 <fieldset class="content">
                     <legend>Grading</legend>
+
+                    <!-- BEGIN marktype -->
+                    <div class="small-12 columns">
+                        <label>
+                            Mark Weight
+                            <span class="hint has-tip tip-top"
+                                  data-tooltip
+                                  title="What is the weighting of this due work towards the student's overall grade average? (Default is 0).">?</span>
+                            <input name="weight" type="text" value="{SUBMISSION_WEIGHT}" maxlength="3" />
+                        </label>
+                    </div>
+                    
+                    <div class="small-12 columns">
+                        <label>
+                            Mark Visibility
+                            <span class="hint has-tip tip-top"
+                                  data-tooltip
+                                  title="Who will be able to view marks for this assessment?">?</span>
+                            <select name="mark_visibility" class="formfield">
+                                <!-- BEGIN mark_visibility_drop -->
+                                <option value="{MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_VALUE_SELECTED}>{MARK_VISIBILITY_TEXT}</option>
+                                <!-- END mark_visibility_drop -->
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="small-12 columns">
+                        <label>
+                            Type
+                            <select name="marktype">
+                                <!-- BEGIN marktype_drop -->
+                                <option data-slug="{MARKTYPE_SLUG}"
+                                        value="{MARKTYPE_VALUE}"
+                                        {MARKTYPE_VALUE_SELECTED}>{MARKTYPE_TEXT}</option>
+                                <!-- END marktype_drop -->
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="small-12 columns" data-marktype="letter">
+                        <label>
+                            Grade Group
+                            <select name="gradegroup" class="formfield" id="gradegroup">
+                                <!-- BEGIN gradegroup_drop -->
+                                <option value="{GRADEGROUP_VALUE}" {GRADEGROUP_VALUE_SELECTED}>{GRADEGROUP_TEXT}</option>
+                                <!-- END gradegroup_drop -->
+                            </select>
+                        </label>
+
+                        <div data-role="gradegroup_explanation">
+                            <!-- BEGIN gradegroup_explanation -->
+                            <table data-grade-group="{GRADEGROUP_ID}">
+                                <tbody>
+                                <!-- BEGIN gradegroup_explanation_level -->
+                                <tr>
+                                    <td>{GRADEGROUP_LEVEL_LOWER_BOUND}+</td>
+                                    <td>{GRADEGROUP_LEVEL_CAPTION}</td>
+                                    <!-- END gradegroup_explanation_level -->
+                                </tr>
+                                </tbody>
+                            </table>
+                            <!-- END gradegroup_explanation -->
+                        </div>
+                    </div>
+
+                    <div class="small-12 columns" data-marktype="total">
+                        <label>
+                            Total Mark
+                            <input name="markvalue" type="text" value="{TOTAL_MARK}" />
+                        </label>
+                    </div>
+
+                    <div class="small-12 columns" data-marktype="rubric">
+                        <!-- BEGIN existing_marks_warning -->
+                        <div class="alert-panel">
+                            <strong>Warning:</strong>
+                            you have already marked some students' work.
+                            <ul>
+                                <li>Changing the number of descriptors&mdash;or the result set&mdash;will invalidate
+                                    any existing marks given;
+                                </li>
+                                <li>If you add/remove criteria, students who have been marked will be automatically remarked;</li>
+                                <li>You can safely change wordings and orders of descriptors.</li>
+                            </ul>
+                        </div>
+                        <!-- END existing_marks_warning -->
+
+                        <label>
+                            Result Set
+                            <span class="hint has-tip tip-top"
+                                  data-tooltip
+                                  title="Select at least one criterion to be assessed, and possible results.
+                                         By default descriptors are ordered lowest to highest, you may rearrange if you wish.">?</span>
+                        </label>
+
+                        <!-- BEGIN resultset -->
+                        <p>
+                            <input id="rs-{RS_ID}" type="radio" name="resultset" value="{RS_ID}"{RS_CHECKED} />
+                            <label for="rs-{RS_ID}">
+                                <!-- BEGIN result -->
+                                <span class="result">{RS_RESULT_LABEL}</span>
+                                <!-- END result -->
+                            </label>
+                        </p>
+                        <!-- END resultset -->
+                        <p>
+                            <input id="rs-0" type="radio" name="resultset" value="0"{RS_0_CHECKED} />
+                            <label for="rs-0" class="result">Assessment specific descriptors:
+                                <select id="descriptor-count" name="descrip-count">
+                                    <!-- BEGIN des_count -->
+                                    <option value="{DES_COUNT_VALUE}"
+                                            {DES_COUNT_VALUE_SELECTED}>{DES_COUNT_VALUE}</option>
+                                    <!-- END des_count -->
+                                </select> levels
+                            </label>
+                        </p>
+                    </div>
+
+                    <div class="small-12 columns" data-marktype="rubric">
+                        <label>
+                            Assessment Specific Descriptors
+                        </label>
+                        {COURSE_CRITERIA}
+                        {CLASS_CRITERIA}
+                    </div>
+                    <!-- END marktype -->
                 </fieldset>
             </section>
 
-<table class="standardForm table">
-    <!-- BEGIN marktype -->
-    <tr>
-        <td><h4>Mark Type</h4>
-            <em>How this assessment will be graded.</em></td>
-        <td>
-            <select name="marktype" class="formfield" id="marktype">
-                <!-- BEGIN marktype_drop -->
-                <option data-slug="{MARKTYPE_SLUG}" value="{MARKTYPE_VALUE}"
-                {MARKTYPE_VALUE_SELECTED}>{MARKTYPE_TEXT}</option>
-                <!-- END marktype_drop -->
-            </select>
-        </td>
-    </tr>
-    <tr id="marktype-letter" class="marks-hide dark">
-        <td>
-            <h4>Grade Group</h4>
-            <em>The grouping that is used for this type.</em></td>
-        <td>
-            <select name="gradegroup" class="formfield" id="gradegroup">
-                <!-- BEGIN gradegroup_drop -->
-                <option value="{GRADEGROUP_VALUE}" {GRADEGROUP_VALUE_SELECTED}>{GRADEGROUP_TEXT}</option>
-                <!-- END gradegroup_drop -->
-            </select>
-            <a href="#" id="show-grade">Show Grade Scale</a>
-
-            <div id="gradegroup_explanation">
-            <!-- BEGIN gradegroup_explanation -->
-            <table class="table gradegroup_explanation" id="gradegroup_explanation-{GRADEGROUP_ID}">
-                <tbody>
-                <!-- BEGIN gradegroup_explanation_level -->
-                <tr>
-                    <td>{GRADEGROUP_LEVEL_LOWER_BOUND}+</td>
-                    <td>{GRADEGROUP_LEVEL_CAPTION}</td>
-                <!-- END gradegroup_explanation_level -->
-                </tr>
-                </tbody>
-            </table>
-            <!-- END gradegroup_explanation -->
-            </div>
-        </td>
-    </tr>
-    <tr id="marktype-total" class="marks-hide dark">
-        <td>
-            <h4>Total Mark</h4>
-            <em>The maximum mark for this assessment.</em></td>
-        <td>
-            <label>
-                <input name="markvalue" type="text" value="{TOTAL_MARK}" size="4"/>
-            </label>
-        </td>
-    </tr>
-    <tr id="marktype-rubric" class="noline marks-hide dark marktype-rubric">
-        <td>
-            <h4>Rubric</h4>
-            <em>Select <i>at least one</i> criterion to be assessed, and possible results.<br/>
-               By default descriptors are ordered lowest to highest, you may rearrange if you wish.
-            </em>
-            <!-- BEGIN existing_marks_warning -->
-            <div class="warning"><b>Warning:</b> you have already marked some students' work.
-                <ul>
-                    <li class="warning">Changing the number of descriptors&mdash;or the result set&mdash;will invalidate
-                        any existing marks given;
-                    </li>
-                    <li>If you add/remove criteria, students who have been marked will be automatically remarked;</li>
-                    <li>You can safely change wordings and orders of descriptors.</li>
-                </ul>
-            </div>
-            <!-- END existing_marks_warning -->
-        </td>
-        <td id="rubric">
-
-            <div id="rubric-results">
-                <em>Result set</em>
-                <!-- BEGIN resultset -->
-                <p>
-                    <input id="rs-{RS_ID}" type="radio" name="resultset" value="{RS_ID}"{RS_CHECKED} />
-                    <label for="rs-{RS_ID}">
-                        <!-- BEGIN result -->
-                        <span class="result">{RS_RESULT_LABEL}</span>
-                        <!-- END result -->
-                    </label>
-                </p>
-                <!-- END resultset -->
-                <p>
-                    <input id="rs-0" type="radio" name="resultset" value="0"{RS_0_CHECKED} />
-                    <label for="rs-0" class="result">Assessment specific descriptors:
-                        <select id="descriptor-count" name="descrip-count">
-                            <!-- BEGIN des_count -->
-                            <option value="{DES_COUNT_VALUE}"
-                            {DES_COUNT_VALUE_SELECTED}>{DES_COUNT_VALUE}</option>
-                            <!-- END des_count -->
-                        </select> levels
-                    </label>
-                </p>
-
-                <!-- Invisible input required for jQuery validate, because it doesn't validate hidden or display:none input -->
-                <input type="text" style="visibility: hidden; height: 0" name="result_set" />
-            </div>
-            <div class="clearfix"></div>
-
-        </td>
-    </tr>
-    <tr class="marks-hide dark marktype-rubric">
-        <td colspan="2">
-            <div id="rubric-criteria" class="rubrics">
-
-                {COURSE_CRITERIA}
-                {CLASS_CRITERIA}
-
-                <!-- Invisible input required for jQuery validate, because it doesn't validate hidden or display:none input -->
-                <input type="text" style="visibility: hidden; height: 0" name="criteria" />
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td><h4>Mark Visibility</h4>
-            <em>Who will be able to view marks for this assessment?</em></td>
-        <td>
-            <select name="mark_visibility" class="formfield">
-                <!-- BEGIN mark_visibility_drop -->
-                <option value="{MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_VALUE_SELECTED}>{MARK_VISIBILITY_TEXT}</option>
-                <!-- END mark_visibility_drop -->
-            </select>
-        </td>
-    </tr>
-    <!-- END marktype -->
-    <!-- BEGIN mark_weight -->
-    <tr>
-      <td><h4>Mark Weight</h4>
-        <em>What is the weighting of this due work towards the student's overall grade average? (Default is 0).</em>
-      </td>
-      <td><input name="weight" type="text" value="{SUBMISSION_WEIGHT}" maxlength="3" /></td>
-    </tr>
-    <!-- END mark_weight -->
-
+            <table class="standardForm table">
     <!-- BEGIN curriculum_code_input -->
     <tr>
         <td><h4>Curriculum Codes</h4>

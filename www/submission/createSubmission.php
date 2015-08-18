@@ -34,7 +34,7 @@ $this->setBlock('marktype', 'des_count', 'des_count_block');
 $this->setBlock('marktype', 'existing_marks_warning', 'existing_marks_warning_block');
 $this->setBlock('marktype', 'gradegroup_explanation', 'gradegroup_explanation_block');
 $this->setBlock('gradegroup_explanation', 'gradegroup_explanation_level', 'gradegroup_explanation_level_block');
-$this->setBlock(TEMPLATE_content, 'mark_weight', 'mark_weight_block');
+//$this->setBlock(TEMPLATE_content, 'mark_weight', 'mark_weight_block');
 $this->setBlock(TEMPLATE_content, 'duework_timespan', 'duework_timespan_block');
 $this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
 
@@ -292,7 +292,7 @@ if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
 }
 
 // this block exists so that if a config variable needs to be introduced, this can be blanked out
-$this->parse('mark_weight_block', 'mark_weight');
+//$this->parse('mark_weight_block', 'mark_weight');
 
 // Is this a task? If so, output the timespan block.
 if (!$is_task) {
