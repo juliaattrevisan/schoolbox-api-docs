@@ -483,12 +483,12 @@
                         <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
                     </div>
 
-                    <a class="button icon-upload">Post</a>
+                    <a class="button icon-upload" data-comment-post>Post</a>
                 </form>
             </div>
             <!-- END create_comment -->
 
-            <div class="comment-table">
+            <div>
                 <ul class="action-list">
                     <!-- BEGIN comment -->
                     <li class="actions-small-4" data-id="{COMMENT_ID}">
@@ -510,8 +510,8 @@
                             <span class="visibility student {COMMENT_VIS_STUDENT}" title="{COMMENT_VIS_STUDENT_TITLE}"></span>
                             <span class="visibility parent {COMMENT_VIS_PARENT}" title="{COMMENT_VIS_PARENT_TITLE}"></span>
                             <!-- BEGIN comment_modify -->
-                            <a class="icon-delete delete" title="Delete"></a>
-                            <a class="icon-modify" title="Modify"></a>
+                            <a class="icon-delete" title="Delete" data-comment-delete></a>
+                            <a class="icon-modify" title="Modify" data-comment-modify></a>
                             <!-- END comment_modify -->
                         </nav>
                     </li>
@@ -541,49 +541,54 @@
 
 
 
-
+<script type="text/javascript" src="/javascript/shared/submissions/all-work.js"></script>
 <script type="text/javascript">
-var displayGraph = {GRAPH_IS_DISPLAYED};
-var options = {
-	series: {
-		points: {
-			show: true,
-			fill: true,
-			lineWidth: 6
-		},
-		lines: {
-			show: true,
-			lineWidth: 4
-		}
-	},
-	colors: {GRAPH_COLOURS},
-	xaxis: {
-		mode: "time",
-		min: {GRAPH_XMIN},
-		max: {GRAPH_XMAX}
-	},
-	yaxis: {
-		min: 0,
-		max: 100
-	},
-	grid: {
-		borderWidth: 0,
-		show: true
-	}
-};
+//var displayGraph = {GRAPH_IS_DISPLAYED};
+//var options = {
+//	series: {
+//		points: {
+//			show: true,
+//			fill: true,
+//			lineWidth: 6
+//		},
+//		lines: {
+//			show: true,
+//			lineWidth: 4
+//		}
+//	},
+//	colors: {GRAPH_COLOURS},
+//	xaxis: {
+//		mode: "time",
+//		min: {GRAPH_XMIN},
+//		max: {GRAPH_XMAX}
+//	},
+//	yaxis: {
+//		min: 0,
+//		max: 100
+//	},
+//	grid: {
+//		borderWidth: 0,
+//		show: true
+//	}
+//};
 
 $(function () {
 
-	// ensure there's a graph to plot
-	var graphElement = $('#subject-graph');
-	if (graphElement.length) {
-		if (displayGraph) {
-			$.plot(graphElement, {GRAPH_JSON}, options);
-		}
-		else {
-			graphElement.hide();
-		}
-	}
+    /* Set up comment abilities: post
+     */
+    $.fn.allWork.commentSetup();
+
+
+//	// ensure there's a graph to plot
+//	var graphElement = $('#subject-graph');
+//	if (graphElement.length) {
+//		if (displayGraph) {
+//			$.plot(graphElement, {GRAPH_JSON}, options);
+//		}
+//		else {
+//			graphElement.hide();
+//		}
+//	}
 
 	$('#enrolled-subjects').bind('change', function () {
 		var url = $(this).val();
@@ -601,7 +606,13 @@ $(function () {
 		return false;
 	})
 
-	$('#comment-table').on('click', 'a.btn.no-text', function () {
+
+
+
+
+
+	$(document).on('click', '[data-comment-delete]', function () {
+
 		// if a button on the table is clicked, find out its context and function, and execute
 		var btn = $(this);
 		var row = btn.closest('tr');
@@ -610,57 +621,7 @@ $(function () {
 		if (btn.hasClass('modify')) {
 			row.addClass('locked');
 
-			// retrieve comment
-			$.ajax({
-				type: 'GET',
-				url: '/ajax/comment.php',
-				data: { commentId: commentId },
-				success: function (data) {
 
-					// on success, replace row elements with form inputs
-					var editForm = $('#create-comment').clone();
-					editForm.removeAttr('id');
-					editForm.addClass('edit-comment');
-					editForm.find('a.submit-this').html('<span></span>Update');
-					editForm.find('textarea').text(data.body);
-					$.each(['vis-student', 'vis-parent'], function (k, v) {
-						editForm.find('#' + v).attr('id', v + '-' + commentId);
-						editForm.find('label[for=' + v + ']').attr('for', v + '-' + commentId);
-					});
-					editForm.prepend(
-						$('<input type="hidden" />').attr('name', 'commentId').val(commentId)
-					);
-
-					// safety check
-					if (data.visibility) {
-						var svis = editForm.find('input[name=visibility\\[student\\]]');
-						var pvis = editForm.find('input[name=visibility\\[parent\\]]');
-
-						if (data.visibility.student) {
-							svis.prop('checked', true);
-						}
-						else {
-							svis.prop('checked', false);
-						}
-
-						if (data.visibility.parent) {
-							pvis.prop('checked', true);
-						}
-						else {
-							pvis.prop('checked', false);
-						}
-					}
-
-					row.find('td.actions').remove();
-					row.find('td').last().attr('colspan', '2').html(editForm);
-					row.removeClass('locked');
-				},
-				error: function (xhr) {
-					// on failure, indicate failure
-					row.removeClass('locked');
-					alert.log(xhr.responseText);
-				}
-			});
 		}
 		else if (btn.hasClass('delete')) {
 			row.addClass('locked');
