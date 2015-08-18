@@ -117,7 +117,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 // It also has a category.
                 $event->setType(Event::CAMPUS_ACCESS);
                 $event->setAllday(false);
-                $event->setLocation($this->roomCode);
+                $event->setLocation($room['RoomCode']);
                 $event->setStartTime(new Alaress_Date_Format($classStartTime));
                 $event->setEndTime(new Alaress_Date_Format($classEndTime));
                 // Let's say the event doesn't have a publish date,
