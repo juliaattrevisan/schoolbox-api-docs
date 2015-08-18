@@ -99,7 +99,7 @@ class DueWork_Detail
                     $insertion['submissions']    = array();
                     $insertion['user']['status'] = self::UNSUBMITTED;
                     $insertion['user']['class']  = self::CLASS_UNSUBMITTED;
-                    $insertion['user']['time']   = new Alaress_Date_Format(0, 'U');
+                    $insertion['user']['time']   = null;
                     $submissions                 = array();
                 }
                 else {
@@ -186,6 +186,7 @@ class DueWork_Detail
                 'DUEWORK_SEMESTER'      => $this->submissionBox->getDueDate()->getYearHalf(),
                 'CATEGORY_NAME'         => Scrub::text($this->submissionBox->getCategory()->getName()),
                 'DUEWORK_TYPE'          => $this->submissionBox->getWorkType()->getName(),
+                'DUEWORK_MARKTYPE'      => $this->submissionBox->getMarkType()->getName(),
                 'DUEWORK_DUEDATE'       => $closeString,
                 'GRADE_VISIBILITY'      => $this->submissionBox->getMarkVisibilityDescription(),
                 'GRADE_VISIBILITY_CODE' => $this->submissionBox->getMarkVisibility(),
