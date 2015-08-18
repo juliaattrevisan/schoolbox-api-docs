@@ -1,10 +1,13 @@
-<!-- BEGIN rubric_type_label -->
-<em>{LABEL}:</em>
-<!-- END rubric_type_label -->
+<fieldset>
+    <!-- BEGIN rubric_type_label -->
+    <legend>{LABEL}</legend>
+    <!-- END rubric_type_label -->
 
-<!-- BEGIN criteria_allowed -->
+    <!-- BEGIN criteria_allowed -->
     <!-- BEGIN no_crit_group -->
-    No criteria available.
+    <div class="small-12 columns">
+        <p>No criteria available.</p>
+    </div>
     <!-- END no_crit_group -->
 
     <!-- BEGIN crit_group -->
@@ -32,8 +35,11 @@
     </div>
     <!-- END crit_group -->
     <a href="/submission/rubricCriteria/{RUBRIC_CAT_ID}" class="button icon-criteria">{MANAGE_CRITERIA_LABEL}</a>
-<!-- END criteria_allowed -->
+    <!-- END criteria_allowed -->
 
-<!-- BEGIN no_criteria_allowed -->
-    <p>Course-level criteria are not available for this category, because it is not part of a course.</p>
-<!-- END no_criteria_allowed -->
+    <!-- BEGIN no_criteria_allowed -->
+    <div class="small-12 columns">
+        <p>Course-level criteria are not available for this category, because it is not part of a course.</p>
+    </div>
+    <!-- END no_criteria_allowed -->
+</fieldset>
