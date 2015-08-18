@@ -72,6 +72,49 @@ class CalendarApiFactory
     }
 
     /**
+     * Creates a calendar API for a list of resource items.
+     *
+     * @param  Item\Model[] $resourceCollection
+     * @return Calendar_Api_EventType_Interface
+     */
+    public function buildFromResourceCollection($resourceCollection)
+    {
+        // Get the list of resource IDs and room codes
+        $resourceIds = [];
+        $roomCodes   = [];
+        foreach ($resourceCollection as $resource) {
+            if (!$resource instanceof Item\Model) {
+                continue;
+            }
+            $resourceIds[] = $resource->getId();
+            $roomCode      = trim($resource->getRoomCode());
+            if (strlen($roomCode) > 0) {
+                $roomCodes[] = $roomCode;
+            }
+        }
+
+        // Get the list of resource IDs and room codes
+        $api = new Calendar_Api_Composite();
+        if (!empty($resourceIds)) {
+            $resourceApi = new \Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
+                $this->getUser(),
+                array()
+            );
+            $resourceApi->setResourceId($resourceIds);
+            $api->add($resourceApi);
+        }
+        if (!empty($roomCodes)) {
+            $timetableApi = new \Calendar_Api_EventType_Timetable_Room(
+                $this->getUser(),
+                array()
+            );
+            $timetableApi->setRoomCodes($roomCodes)->setExternalTimetable($this->getTimetable());
+            $api->add($timetableApi);
+        }
+        return $api;
+    }
+
+    /**
      * @return User
      */
     protected function getUser()
