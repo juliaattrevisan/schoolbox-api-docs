@@ -341,8 +341,15 @@ class External_Tass_Timetable implements External_TimetableInterface
      */
     public function getRoomTimetable($roomCodes)
     {
+        if (!is_array($roomCodes)) {
+            $roomCodes = [$roomCodes];
+        }
+        if (empty($roomCodes)) {
+            return [];
+        }
         $query = "
             SELECT
+                room_code,
                 subtab.sub_desc AS Description,
                 ttmast.day_code AS DayNumber,
                 RTRIM(CAST(ttmast.cmpy_code AS VARCHAR(20)))
@@ -376,7 +383,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                 ttperiod.tt_id=ttmast.tt_id
             WHERE year_num  = :year
             AND   semester  = :semester
-            AND   room_code = :room
+            AND   room_code IN (:rooms)
             ORDER BY
                 ttmast.day_code ASC,
                 ttmast.prd_code ASC
@@ -386,7 +393,7 @@ class External_Tass_Timetable implements External_TimetableInterface
             array(
                 ':semester' => "'" . $this->database->quote($this->externalUser->getCurrentSemester()) . "'",
                 ':year'     => "'" . $this->database->quote($this->externalUser->getCurrentYear()) . "'",
-                ':room'     => "'" . $this->database->quote($roomCodes) . "'",
+                ':rooms'    => implode(',', array_map([$this->database, 'smartQuote'], $roomCodes)),
             )
         );
         return $this->database->trimAll($this->database->getAll($query));
