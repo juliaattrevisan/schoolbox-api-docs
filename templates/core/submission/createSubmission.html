@@ -433,22 +433,27 @@
             });
         }
 
-        $( "#gradegroup_explanation" ).dialog({
-            autoOpen: false,
-            modal: true
+        // Set up the gradegroup thing
+        $('a[data-role="showGradeScale"]').click(function() {
+            var gradeScale = $('#gradegroup').val();
+            $('#gradegroup-'+gradeScale).foundation('reveal', 'open');
         });
-
-        // Grade group selector
-        $('select#gradegroup').on('change', function() {
-            $('.gradegroup_explanation').hide();
-            $('#gradegroup_explanation-'+this.value).show();
-            $('#gradegroup_explanation').dialog({'title':$(this).find(':selected').text()});
-        }).change();
-
-        $('#show-grade').click(function(event) {
-            event.preventDefault();
-            $( '#gradegroup_explanation').dialog("open");
-        });
+//        $( "#gradegroup_explanation" ).dialog({
+//            autoOpen: false,
+//            modal: true
+//        });
+//
+//        // Grade group selector
+//        $('select#gradegroup').on('change', function() {
+//            $('.gradegroup_explanation').hide();
+//            $('#gradegroup_explanation-'+this.value).show();
+//            $('#gradegroup_explanation').dialog({'title':$(this).find(':selected').text()});
+//        }).change();
+//
+//        $('#show-grade').click(function(event) {
+//            event.preventDefault();
+//            $( '#gradegroup_explanation').dialog("open");
+//        });
 
 
         $('#deleteBox').click(function() {
@@ -858,7 +863,7 @@
                         </label>
                     </div>
 
-                    <div class="small-12 columns" data-hide-watch="marktype" data-hide-watch-value="letter">
+                    <div class="small-11 columns" data-hide-watch="marktype" data-hide-watch-value="letter">
                         <label>
                             Grade Group
                             <select name="gradegroup" class="formfield" id="gradegroup">
@@ -867,22 +872,26 @@
                                 <!-- END gradegroup_drop -->
                             </select>
                         </label>
-
-                        <div data-role="gradegroup_explanation">
-                            <!-- BEGIN gradegroup_explanation -->
-                            <table data-grade-group="{GRADEGROUP_ID}">
-                                <tbody>
-                                <!-- BEGIN gradegroup_explanation_level -->
-                                <tr>
-                                    <td>{GRADEGROUP_LEVEL_LOWER_BOUND}+</td>
-                                    <td>{GRADEGROUP_LEVEL_CAPTION}</td>
-                                    <!-- END gradegroup_explanation_level -->
-                                </tr>
-                                </tbody>
-                            </table>
-                            <!-- END gradegroup_explanation -->
-                        </div>
                     </div>
+                    <div class="small-1 columns" data-hide-watch="marktype" data-hide-watch-value="letter">
+                        <a href="#" data-role="showGradeScale" class="button icon-list" title="Show Grade Scale"></a>
+                    </div>
+
+                    <!-- BEGIN gradegroup_explanation -->
+                    <div id="gradegroup-{GRADEGROUP_ID}" class="reveal-modal" data-reveal>
+                        <h2>{GRADEGROUP_NAME}</h2>
+                        <table>
+                            <tbody>
+                            <!-- BEGIN gradegroup_explanation_level -->
+                            <tr>
+                                <td>{GRADEGROUP_LEVEL_LOWER_BOUND}+</td>
+                                <td>{GRADEGROUP_LEVEL_CAPTION}</td>
+                                <!-- END gradegroup_explanation_level -->
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- END gradegroup_explanation -->
 
                     <div class="small-12 columns" data-hide-watch="marktype" data-hide-watch-value="total">
                         <label>
