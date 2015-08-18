@@ -34,6 +34,9 @@
                     newForm: {
                         id: '#create-comment',
                         button: '[data-comment-post=new]'
+                    },
+                    oldForm: {
+                        button: '[data-comment-post=update]'
                     }
                 },
 
@@ -59,13 +62,9 @@
          * Event listeners for saving new/modified comments
          */
         function setupSaveComment() {
-            $(document).on('click', config.comment.newForm.button, function(event) {
-                event.preventDefault();
+            var buttons = config.comment.newForm.button + ', ' + config.comment.oldForm.button;
 
-                saveComment($(config.comment.newForm.id));
-            });
-
-            $(document).on('click', '[data-comment-post=update]', function(event) {
+            $(document).on('click', buttons, function(event) {
                 event.preventDefault();
 
                 saveComment($(this).closest('[data-comment-form]'));
