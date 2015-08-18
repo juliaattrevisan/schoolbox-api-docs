@@ -218,6 +218,7 @@ $this->setVar(
         'BOX_ID'               => $box->getId(),
         'BOX_NAME'             => Scrub::text($box->getName()),
         'BOX_OWNER'            => $userHandler->formatName($user),
+        'BOX_OWNER_ID'         => $userID,
         'BOX_DESCRIPTION'      => Scrub::html($box->getDescription()),
         'BOX_TYPE'             => $work_mapper->getNameFromId($box->getWorkType()->getId()),
         'BOX_CREATED'          => $createdDate->getRelativeTime()
