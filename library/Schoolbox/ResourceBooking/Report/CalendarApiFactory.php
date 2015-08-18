@@ -67,7 +67,7 @@ class CalendarApiFactory extends BaseModule
                 $this->getUser(),
                 array()
             );
-            $timetableApi->setRoomCode($roomCode)->setExternalTimetable($this->getTimetable());
+            $timetableApi->setRoomCodes($roomCode)->setExternalTimetable($this->getTimetable());
             $api->add($timetableApi);
         }
         return $api;
