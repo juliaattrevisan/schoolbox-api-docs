@@ -349,7 +349,7 @@ class External_Tass_Timetable implements External_TimetableInterface
         }
         $query = "
             SELECT
-                room_code,
+                room_code AS RoomCode,
                 subtab.sub_desc AS Description,
                 ttmast.day_code AS DayNumber,
                 RTRIM(CAST(ttmast.cmpy_code AS VARCHAR(20)))

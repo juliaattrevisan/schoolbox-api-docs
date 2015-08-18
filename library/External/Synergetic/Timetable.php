@@ -743,7 +743,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $query = "
 			SELECT
 				SubjectClasses.Description,
-				Timetable.Room,
+				Timetable.Room AS RoomCode,
 				Timetable.DayNumber,
 				Timetable.PeriodNumber,
 				Timetable.TimetableGroup,
