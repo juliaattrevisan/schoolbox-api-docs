@@ -91,17 +91,17 @@
             }
         });
 
-        var marktype = {
-            total:$('#marktype-total'),
-            rubric:$('tr.marktype-rubric'),
-            letter:$('#marktype-letter')
-        };
+//        var marktype = {
+//            total:$('#marktype-total'),
+//            rubric:$('tr.marktype-rubric'),
+//            letter:$('#marktype-letter')
+//        };
 
-        var rubric = {
-            resultset:$('#rubric-results :checked')
-        };
+//        var rubric = {
+//            resultset:$('#rubric-results :checked')
+//        };
 
-        showHideMarktype(0);
+//        showHideMarktype(0);
 
         // Do assessment-specific descriptors get shown?
         var isRubricAssessmentSpecificDescriptors = function() {
@@ -116,9 +116,9 @@
             });
         }
 
-        $('#marktype').change(function () {
-            showHideMarktype(500);
-        });
+//        $('#marktype').change(function () {
+//            showHideMarktype(500);
+//        });
 
 //        // validation rules
 //        $.validator.addMethod("markTypeTotalCheck", function(value, element) {
@@ -393,32 +393,32 @@
                 .attr('placeholder', placeholderText);
         });
 
-        function showHideMarktype(timeout) {
-            var v = $('#marktype option:selected').first().data('slug');
-            if (v == 'raw') {
-                marktype.letter.hide(timeout);
-                marktype.rubric.hide(timeout, function () {
-                    marktype.total.show(timeout);
-                });
-            }
-            else if (v == 'rubric') {
-                marktype.letter.hide(timeout);
-                marktype.total.hide(timeout, function () {
-                    marktype.rubric.show(timeout);
-                });
-            }
-            else if (v == 'letter') {
-                marktype.rubric.hide(timeout);
-                marktype.total.hide(timeout, function () {
-                    marktype.letter.show(timeout);
-                });
-            }
-            else {
-                marktype.letter.hide(timeout);
-                marktype.rubric.hide(timeout);
-                marktype.total.hide(timeout);
-            }
-        }
+//        function showHideMarktype(timeout) {
+//            var v = $('#marktype option:selected').first().data('slug');
+//            if (v == 'raw') {
+//                marktype.letter.hide(timeout);
+//                marktype.rubric.hide(timeout, function () {
+//                    marktype.total.show(timeout);
+//                });
+//            }
+//            else if (v == 'rubric') {
+//                marktype.letter.hide(timeout);
+//                marktype.total.hide(timeout, function () {
+//                    marktype.rubric.show(timeout);
+//                });
+//            }
+//            else if (v == 'letter') {
+//                marktype.rubric.hide(timeout);
+//                marktype.total.hide(timeout, function () {
+//                    marktype.letter.show(timeout);
+//                });
+//            }
+//            else {
+//                marktype.letter.hide(timeout);
+//                marktype.rubric.hide(timeout);
+//                marktype.total.hide(timeout);
+//            }
+//        }
 
         function descriptor(action, element, timeout) {
             $(element).find(':input:not(:checkbox)').parent('td').each(function () {
