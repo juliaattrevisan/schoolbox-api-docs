@@ -33,7 +33,7 @@ $this->setFile(TEMPLATE_content, 'submission/listSubmission.html');
 $this->setTitle('Submissions');
 $this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'submission_listing', 'submission_block');
-$this->setBlock(TEMPLATE_content, 'category_listing', 'category_block');
+$this->setBlock(TEMPLATE_content, 'category_listing', 'category_listing_block');
 
 $this->setBlock('submission_listing', 'onlineAssessment', 'onlineAssessment_block');
 $this->setBlock('onlineAssessment', 'readonly_assess', 'readonly_assess_block');
@@ -50,6 +50,7 @@ $this->setBlock('normalSubmission', 'writable_open', 'writable_open_block');
 $this->setBlock('normalSubmission', 'writable_close', 'writable_close_block');
 
 $this->setBlock('category_listing', 'learning_analytics', 'learning_analytics_block');
+$this->setBlock(TEMPLATE_content, 'no_category_listing', 'no_category_listing_block');
 
 $this->setVar('SEM_SLUG', $semesterSlug);
 
@@ -133,7 +134,7 @@ if (Cfg::get('external_enable')) {
     $synHandler = new External_Class();
 }
 
-$this->setVar(array('category_block' => ''));
+$this->setVar(array('category_listing_block' => ''));
 
 
 
@@ -209,7 +210,7 @@ if (!empty($subList) && is_array($subList)) {
                     }
                 }
 
-                $this->parse('category_block', 'category_listing', true);
+                $this->parse('category_listing_block', 'category_listing', true);
                 $this->setVar('submission_block', '');
 
                 $i = 0;
@@ -256,6 +257,7 @@ if (!empty($subList) && is_array($subList)) {
                 'ASSESS_ATTEMPTS' => $attemptHandler->numAttempted($sub['id']),
                 'ASSESS_REVIEWED' => $attemptHandler->numReviewed($sub['id']),
                 'ASSESS_VISIBILITY_ID' => $sub['mark_visibility'],
+                'ASSESS_VISIBILITY_CSS' => \Schoolbox\Assessment\Widgets::getCss($sub['mark_visibility']),
                 'ASSESS_VISIBILITY' => \Schoolbox\Assessment\Widgets::getName($sub['mark_visibility'])
             ));
 
@@ -290,6 +292,7 @@ if (!empty($subList) && is_array($subList)) {
                 'MARKED' => (int)$totals['marked'],
                 'TOTAL' => $sub['accept_submission'] ? $totals['total'] : 'N/A',
                 'ASSESS_VISIBILITY_ID' => $sub['mark_visibility'],
+                'ASSESS_VISIBILITY_CSS' => \Schoolbox\Assessment\Widgets::getCss($sub['mark_visibility']),
                 'ASSESS_VISIBILITY' => \Schoolbox\Assessment\Widgets::getName($sub['mark_visibility']),
             ));
 
@@ -372,7 +375,7 @@ if (!empty($subList) && is_array($subList)) {
             }
         }
 
-        $this->parse("category_block", "category_listing", true);
+        $this->parse("category_listing_block", "category_listing", true);
 
         /* Clear children after parsing out the parent
          */
@@ -383,15 +386,18 @@ if (!empty($subList) && is_array($subList)) {
     catch (Exception $e) {
         // Couldn't find category, probably as it wasn't set.
     }
+
+    $this->setVar(array(
+        'no_category_listing_block' => ''
+    ));
 }
 else {
     // pre-emptively clear the blocks that might not get rendered
     $this->setVar(array(
-		'category_block' => 'No submissions found.',
+		'category_listing_block' => '',
         'writable_assess_block' => '',
         'writable_duework_block' => '',
     ));
 
-    //$this->parse('readonly_assess_block', 'readonly_assess');
-    //$this->parse('readonly_duework_block', 'readonly_duework');
+    $this->parse('no_category_listing_block', 'no_category_listing');
 }

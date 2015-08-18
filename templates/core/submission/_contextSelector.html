@@ -1,45 +1,49 @@
 <!-- BEGIN semester_context -->
-<form class="context ctx-semesters">
-  <a class="sem-back" {SEMESTER_BACK_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_BACK}{SEMESTER_CONTEXT_CATEGORY_ID}">&lsaquo;</a>
-  <select id="semester">
-    <!-- BEGIN semester_option -->
-    <option value="{SUBJECT_PART}{SEMESTER_SLUG}" {SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
-    <!-- END semester_option -->
-  </select>
-  <a class="sem-fwd" {SEMESTER_FWD_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_FWD}{SEMESTER_CONTEXT_CATEGORY_ID}">&rsaquo;</a>
+<form>
+    <div class="row">
+        <div class="small-1 columns">
+            <a class="button icon-previous no-text" {SEMESTER_BACK_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_BACK}{SEMESTER_CONTEXT_CATEGORY_ID}"></a>
+        </div>
+        <div class="small-10 columns">
+            <select id="context-selector-semester">
+                <!-- BEGIN semester_option -->
+                <option value="{SUBJECT_PART}{SEMESTER_SLUG}" {SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
+                <!-- END semester_option -->
+            </select>
+        </div>
+        <div class="small-1 columns">
+            <a class="button icon-next no-text" {SEMESTER_FWD_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_FWD}{SEMESTER_CONTEXT_CATEGORY_ID}"></a>
+        </div>
+    </div>
 </form>
 <!-- END semester_context -->
+
 <!-- BEGIN subject_context -->
-<form class="context ctx-subjects">
-  <span class="elbow">&#9492;</span>
-  <select id="enrolled-subjects">
-    <option disabled="disabled" selected="selected">Select a subject</option>
-    <!-- BEGIN subject_option -->
-    <option data-id="{SUBJECT_ID}" value="{SUBJECT_HREF}" {SUBJECT_SELECTED}>{SUBJECT_NAME}</option>
-    <!-- END subject_option -->
-  </select>
+<form>
+    <div class="row">
+        <div class="small-1 columns">
+            <a class="button icon-previous no-text" {SEMESTER_BACK_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_BACK}{SEMESTER_CONTEXT_CATEGORY_ID}"></a>
+        </div>
+        <div class="small-10 columns">
+            <select id="context-selector-enrolled-subjects">
+                <option disabled="disabled" selected="selected">Select a subject</option>
+                <!-- BEGIN subject_option -->
+                <option data-id="{SUBJECT_ID}" value="{SUBJECT_HREF}" {SUBJECT_SELECTED}>{SUBJECT_NAME}</option>
+                <!-- END subject_option -->
+            </select>
+        </div>
+        <div class="small-1 columns">
+            <a class="button icon-next no-text" {SEMESTER_FWD_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_FWD}{SEMESTER_CONTEXT_CATEGORY_ID}"></a>
+        </div>
+    </div>
 </form>
 <!-- END subject_context -->
+
+<script type="text/javascript" src="/javascript/shared/jquery.context-selector.js"></script>
 <script type="text/javascript">
-  $(function() {
-
-    // bind changes to semester selector
-    $('#semester').bind('change', function() {
-      var url = $(this).val();
-      if(url) {
-        window.location = '/{PAGE_HREF}/' + url;
-      }
-      return false;
+    $(function () {
+        $.fn.contextSelector({
+            href: '{PAGE_HREF}'
+        });
     });
-
-    // bind changes to subject selector
-    $('#enrolled-subjects').bind('change', function () {
-      var url = $(this).val();
-      if (url) {
-        window.location = '/{PAGE_HREF}/' + url;
-      }
-      return false;
-    });
-
-  });
 </script>
