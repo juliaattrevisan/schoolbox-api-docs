@@ -191,69 +191,74 @@
 <script type="text/javascript" src="/javascript/components/flot/jquery.flot.js"></script>
 <script type="text/javascript" src="/javascript/components/flot/jquery.flot.time.js"></script>
 <!-- END custom_head -->
-<div id="all-work">
-	<h1>Grades &ndash; {RC_TITLE}</h1>
 
-	<div id="context">
-		<div id="student">
-			<a class="bar large button" href="/search/user/{WORK_USER_ID}">
-				<img src="/portrait.php?userId={WORK_USER_EXT_ID}&amp;size=square64">
-				<span class="name">{WORK_USER_NAME}</span>
-				<span class="group">{WORK_USER_BYLINE} Student</span>
-			</a>
-		</div>
-		<div id="enrolment">
-			<form id="semesters">
-				<a class="sem-back" {SEMESTER_BACK_DISABLED} href="/submission/allWork/{WORK_USER_ID}/{SEMESTER_BACK}">&lsaquo;</a>
-				<select id="semester">
-					<!-- BEGIN semester_option -->
-					<option value="{SEMESTER_SLUG}"
-					{SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
-					<!-- END semester_option -->
-				</select>
-				<a class="sem-fwd" {SEMESTER_FWD_DISABLED} href="/submission/allWork/{WORK_USER_ID}/{SEMESTER_FWD}">&rsaquo;</a>
-			</form>
-			<form id="subjects" action="/submission/allWork/" method="get">
-				<span class="elbow">&#9492;</span>
-				<select id="enrolled-subjects">
-					<option disabled="disabled" selected="selected">Select a subject</option>
-					<!-- BEGIN subject_selector -->
-					<option data-id="{ENR_SUBJ_ID}" title="{ENR_SUBJ_CODE}"
-							value="{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ENR_SUBJ_ID}"
-					{ENR_SUBJ_SELECTED}>
-					{ENR_SUBJ_NAME}
-					</option>
-					<!-- END subject_selector -->
-				</select>
-			</form>
-		</div>
-	</div>
-	<div id="subject-main">
-		<!-- BEGIN subject -->
-		<div class="current-grade-avg gradient-{SUBJ_GRADEIENT} gradient-{SUBJ_GRADEIENT}-bg clearfix">
-			<ul class="subject-teachers">
-				<!-- BEGIN subject_teacher -->
-				<li>
-					<a class="bar button" href="/search/user/{SUBJ_TCH_ID}">
-						<img src="/portrait.php?userId={SUBJ_TCH_EXTID}&amp;size=square32">
-						<span class="name">{SUBJ_TCH_NAME}</span>
-						<span class="group">Teacher</span>
-					</a>
-				</li>
-				<!-- END subject_teacher -->
-			</ul>
-			<!-- BEGIN grade_average -->
-			<span>Current Grade Average:</span>
-			<span class="grade">{SUBJ_GRADE_AVG}</span>
-			<span class="trend">{SUBJ_GRADE_TREND}</span>
-			<!-- END grade_average -->
-		</div>
 
-		<div id="subject-graph">&nbsp;</div>
 
+
+
+
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Grades for {RC_TITLE}</h1>
+
+        <ul class="action-list">
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="small-12 avatar card">
+                        <a href="/search/user/{WORK_USER_ID}" title="View Profile">
+                            <img src="/portrait.php?userId={WORK_USER_EXT_ID}&amp;size=square64" class="content" alt="{WORK_USER_NAME}" />
+                            <p>{WORK_USER_NAME}</p>
+                        </a>
+                        <p class="meta">{WORK_USER_BYLINE} Student</p>
+                    </div>
+                </div>
+                <nav>
+                    <a href="" class="icon-download" title="Download"></a>
+                </nav>
+            </li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="small-12 columns">
+        <!-- BEGIN subject -->
+        <ul class="action-list">
+            <!-- BEGIN subject_teacher -->
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="small-12 avatar card">
+                        <a href="/search/user/{SUBJ_TCH_ID}" title="View Profile">
+                            <img src="/portrait.php?userId={SUBJ_TCH_EXTID}&amp;size=square32" class="content" alt="{SUBJ_TCH_NAME}" />
+                            <p>{SUBJ_TCH_NAME}</p>
+                        </a>
+                        <p class="meta">Teacher</p>
+                    </div>
+                </div>
+                <nav>
+                    <a href="" class="icon-download" title="Download"></a>
+                </nav>
+            </li>
+            <!-- END subject_teacher -->
+        </ul>
+
+        <!-- BEGIN grade_average -->
+        <div class=" gradient-{SUBJ_GRADEIENT}-bg">
+            <h2>Current Grade Average:</h2>
+
+            <p class="grade">
+                <span class="gradient-{SUBJ_GRADEIENT}">{SUBJ_GRADE_AVG}</span>
+            </p>
+
+            <span class="trend">{SUBJ_GRADE_TREND}</span>
+        </div>
+        <!-- END grade_average -->
+
+        <div id="subject-graph"></div>
 
         <!-- BEGIN subject_rubric -->
-        <h2>Criteria</h2>
         <script type="text/javascript">
             $(function () {
                 var $tbl = $('#rubric-table');
@@ -261,8 +266,8 @@
                 $('#rubric-showhide-opts').on('change', 'input', function () {
 
                     var val  = $(this).val(),
-                        $tds = $tbl.find('td[data-box='+val+']'),
-                        $ths = $tbl.find('th[data-box='+val+']');
+                            $tds = $tbl.find('td[data-box='+val+']'),
+                            $ths = $tbl.find('th[data-box='+val+']');
 
                     // show/hide columns as required
                     if ($(this).prop('checked')) {
@@ -274,16 +279,16 @@
                     }
 
                     // recompute the number of cols and set the grouping colwidths to match
-                    $('#rubric-tbody').find('td[colspan]').attr('colspan', $('#rubric-showhide-opts').find('input:checked').length + 1);
+                    $('#rubric').find('tbody').find('td[colspan]').attr('colspan', $('#rubric-showhide-opts').find('input:checked').length + 1);
                 });
 
                 $tbl.on('click', 'td[data-interaction="collapse"]', function (e) {
                     e.preventDefault();
 
                     var $td   = $(this),
-                        $a    = $td.find('a.btn'),
-                        group = $td.data('group'),
-                        $rows = $tbl.find('tr[data-group="'+group+'"]');
+                            $a    = $td.find('a.btn'),
+                            group = $td.data('group'),
+                            $rows = $tbl.find('tr[data-group="'+group+'"]');
 
                     if ($a.hasClass('minus')) {
                         // has cross: hide things
@@ -298,166 +303,176 @@
             });
         </script>
 
-        <div id="rubric-showhide-opts" style="display:none;">
+        <h2>Criteria</h2>
+
+        <div id="rubric-showhide-opts">
             <!-- BEGIN subject_rubric_box_checklist -->
-            <label>
-                <input type="checkbox" value="{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}" checked="checked" /> {SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}
-            </label>
+            <div>
+                <input type="checkbox" id="rubric-{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}" value="{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}" checked="checked" />
+                <label for="rubric-{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}" class="checkbox-label">{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}</label>
+            </div>
             <!-- END subject_rubric_box_checklist -->
         </div>
 
-        <table id="rubric-table" class="rubric table">
-            <tbody id="rubric-tbody">
-                <!-- BEGIN subject_rubric_group -->
-                <tr>
-                    <td data-interaction="collapse" data-group="{SUBJECT_RUBRIC_GROUP_NAME}" class="criterion-label pad span">
-                        <strong>{SUBJECT_RUBRIC_GROUP_NAME}</strong>
-                        <div class="actions">
-                            <a class="btn no-icon plus hide" title="Hide {SUBJECT_RUBRIC_GROUP_NAME}" data-group="{SUBJECT_RUBRIC_GROUP_NAME}">+</a>
-                        </div>
-                    </td>
-                </tr>
-                <!-- BEGIN subject_rubric_criterion -->
-                <tr data-group="{SUBJECT_RUBRIC_GROUP_NAME}" class="hide">
-                    <td class="criterion-value pad">
-                        <ul>
-                            <li>
-                                <strong>{SUBJECT_RUBRIC_CRITERION_NAME}</strong>
-                            </li>
-                            <li>
-                                <ul>
-                                    <!-- BEGIN subject_rubric_criterion_mark -->
-                                    <li>
-                                        <a href="/submission/submissionHistory/{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}/{WORK_USER_ID}">{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}</a>: <em>{SUBJECT_RUBRIC_CRITERION_MARK}</em></li>
-                                    <!-- END subject_rubric_criterion_mark -->
-                                </ul>
-                            </li>
-                        </ul>
-                    </td>
-                </tr>
-                <!-- END subject_rubric_criterion -->
-                <!-- END subject_rubric_group -->
+        <table id="rubric-table" class="">
+            <tbody>
+            <!-- BEGIN subject_rubric_group -->
+            <tr>
+                <td data-interaction="collapse" data-group="{SUBJECT_RUBRIC_GROUP_NAME}">
+                    {SUBJECT_RUBRIC_GROUP_NAME}
+                    <div class="actions">
+                        <a class="btn no-icon plus hide" title="Hide {SUBJECT_RUBRIC_GROUP_NAME}" data-group="{SUBJECT_RUBRIC_GROUP_NAME}">+</a>
+                    </div>
+                </td>
+            </tr>
+            <!-- BEGIN subject_rubric_criterion -->
+            <tr data-group="{SUBJECT_RUBRIC_GROUP_NAME}" class="hide">
+                <td class="criterion-value pad">
+                    <ul>
+                        <li>
+                            <strong>{SUBJECT_RUBRIC_CRITERION_NAME}</strong>
+                        </li>
+                        <li>
+                            <ul>
+                                <!-- BEGIN subject_rubric_criterion_mark -->
+                                <li>
+                                    <a href="/submission/submissionHistory/{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}/{WORK_USER_ID}">{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}</a>: <em>{SUBJECT_RUBRIC_CRITERION_MARK}</em></li>
+                                <!-- END subject_rubric_criterion_mark -->
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+            <!-- END subject_rubric_criterion -->
+            <!-- END subject_rubric_group -->
             </tbody>
         </table>
         <!-- END subject_rubric -->
 
-		<div class="subject-assessments">
-			<h2>Assessments<a href="/eportfolio/{WORK_USER_ID}/showcase" class="btn eportfolio"><span></span>ePortfolio Showcase</a></h2>
+        <div class="small-12 island">
+            <h2 class="subheader">Assessments</h2>
 
-			<div class="listing">
-				<table class="upcoming-work table ruler">
-					<colgroup>
-						<col/>
-						<col/>
-						<col/>
-						<col width="33%"/>
-						<col width="100"/>
-					</colgroup>
-					<thead>
-					<th>Title</th>
-					<th>Grade</th>
-					<th>Date</th>
-					<th>Comments</th>
-					<th>Actions</th>
-					</thead>
-					<tbody>
-					<!-- BEGIN work -->
-					<tr class="{ON_OFF}">
-						<td>
-                            <!-- BEGIN work_clickable -->
-							<a class="title" href="/{WORK_HREF}{WORK_ID}/{WORK_USER_ID}">{WORK_TITLE}</a>
-                            <!-- END work_clickable -->
-                            <!-- BEGIN work_unclickable -->
-                            <span class="title">{WORK_TITLE}</span>
-                            <!-- END work_unclickable -->
-							<br/>
-							<a href="/homepage/{SUBJ_ID}">{SUBJ_NAME}</a> {WORK_TYPE}
-						</td>
-						<td class="grade">
-							<span class="gradient-{WORK_GRADIENT}">{WORK_GRADE}</span>
-						</td>
-						<td>
-							<span class="gradient-{WORK_URGENCY}">Due {WORK_DATE}</span> on {WORK_TIME}
-						</td>
-						<td>{WORK_COMMENT}</td>
-						<td>
-							<span class="actions three-buttons">
-								<!-- BEGIN work_actionable -->
-								<a href="/{WORK_BTN_HREF}" class="btn no-text {WORK_BTN_ICON} float-left" alt="{WORK_BTN_LABEL}" title="{WORK_BTN_LABEL}"><span></span></a>
-								<!-- END work_actionable -->
-							</span>
+            <ul class="meta">
+                <li class="icon-showcase">
+                    <a href="/eportfolio/{WORK_USER_ID}/showcase">ePortfolio Showcase</a>
+                </li>
+            </ul>
 
-							<!-- BEGIN work_publishable -->
-							<form action='/eportfolio/showcase/modifyForm.php' method='post'>
-								<input type='hidden' name='action' value='{WORK_PUBLISH_ACTION}'/>
-								<input type='hidden' name='userId' value='{WORK_USER_ID}'/>
-								<input type='hidden' name='{WORK_PUBLISH_TYPE}' value='{WORK_PUBLISH_ID}'/>
-								<input type='submit' class="btn no-icon" value='{WORK_PUBLISH_BTN_LABEL}'/>
-							</form>
-							<!-- <a href="/{WORK_PUBLISH_HREF}{WORK_ID}" class="btn {WORK_PUBLISH_BTN_ICON}"><span></span> {WORK_PUBLISH_BTN_LABEL}</a> -->
-							<!-- END work_publishable -->
-						</td>
-					</tr>
-					<!-- END work -->
-					</tbody>
-				</table>
-			</div>
-		</div>
 
-		<!-- BEGIN subject_comments -->
-		<div class="subject-comments">
-			<h2>Comments</h2>
+            <section>
+                <ul class="action-list">
+                    <!-- BEGIN work -->
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="small-4 columns">
+                                <!-- BEGIN work_clickable -->
+                                <div class="small-12 info card" data-equalizer-watch>
+                                    <a href="/{WORK_HREF}{WORK_ID}/{WORK_USER_ID}">
+                                        <p>{WORK_TITLE}</p>
+                                        <p class="meta">
+                                            <a href="/homepage/{SUBJ_ID}">{SUBJ_NAME}</a> {WORK_TYPE}
+                                        </p>
+                                    </a>
+                                </div>
+                                <!-- END work_clickable -->
 
-			<div class="listing">
-				<table class="comments table" id="comment-table">
-					<colgroup>
-						<col width="1%"/>
-						<col width="10%"/>
-						<col width="80%"/>
-						<col width="9%"/>
-					</colgroup>
-					<tbody>
-					<!-- BEGIN create_comment -->
-					<tr>
-						<td><img class="thumb" src="/portrait.php?userId={SESSION_USER_EXTID}&amp;size=square32"></td>
-						<td>
-							<span class="name">{SESSION_USER_NAME}</span>
-							<span class="group">{SESSION_USER_BYLINE}</span>
-						</td>
-						<td colspan="2">
-							<form id="create-comment" class="comment-form" action="/ajax/comment.php" method="post">
-								<input type="hidden" name="year" value="{WORK_YEAR}"/>
-								<input type="hidden" name="semester" value="{WORK_SEMESTER}"/>
-								<input type="hidden" name="studentId" value="{WORK_USER_ID}"/>
-								<input type="hidden" name="categoryId" value="{SUBJ_ID}"/>
-								<textarea name="comment"></textarea>
+                                <!-- BEGIN work_unclickable -->
+                                <div class="info card small-12" data-equalizer-watch>
+                                    <p>{WORK_TITLE}</p>
+                                    <p class="meta">
+                                        <a href="/homepage/{SUBJ_ID}">{SUBJ_NAME}</a> {WORK_TYPE}
+                                    </p>
+                                </div>
+                                <!-- END work_unclickable -->
+                            </div>
 
-								<div>
-									<span>Visible to: </span>
-									<input id="vis-student" type="checkbox" name="visibility[student]" value="1"
-									{COMMENT_VIS_STUDENT_CHECKED} />
-									<label for="vis-student">Student</label>
-									<input id="vis-parent" type="checkbox" name="visibility[parent]" value="1"
-									{COMMENT_VIS_PARENT_CHECKED} />
-									<label for="vis-parent">Parent</label>
-									<a class="submit-this btn up-arrow"><span></span>Post</a>
-								</div>
-							</form>
-						</td>
-					</tr>
-					<!-- END create_comment -->
-					<!-- BEGIN comment -->
-					<tr data-id="{COMMENT_ID}">
-						<td><img class="thumb" src="/portrait.php?userId={COMMENT_USER_EXTID}&amp;size=square32"></td>
-						<td>
-							<span class="name">{COMMENT_USER_NAME}</span>
-							<span class="group">{COMMENT_USER_BYLINE}</span>
-							<span class="group" title="{COMMENT_DATETIME}">{COMMENT_DATE}</span>
-						</td>
-						<td>
-							<p>{COMMENT_BODY}</p>
-						</td>
-						<td>
+                            <div class="small-2 columns grade" data-equalizer-watch>
+                                <span class="gradient-{WORK_GRADIENT}">{WORK_GRADE}</span>
+                            </div>
+
+                            <div class="small-3 columns" data-equalizer-watch>
+                                <span class="gradient-{WORK_URGENCY}">Due {WORK_DATE}</span>
+                                on {WORK_TIME}
+                            </div>
+
+                            <div class="small-3 columns" data-equalizer-watch>{WORK_COMMENT}</div>
+                        </div>
+                        <nav>
+                            <!-- BEGIN work_actionable -->
+                            <a href="/{WORK_BTN_HREF}" class="button no-text {WORK_BTN_ICON}" title="{WORK_BTN_LABEL}"></a>
+                            <!-- END work_actionable -->
+
+                            <!-- BEGIN work_publishable -->
+                            <a class="icon-showcase"></a>
+
+                            <form action='/eportfolio/showcase/modifyForm.php' method='post'>
+                                <input type='hidden' name='action' value='{WORK_PUBLISH_ACTION}'/>
+                                <input type='hidden' name='userId' value='{WORK_USER_ID}'/>
+                                <input type='hidden' name='{WORK_PUBLISH_TYPE}' value='{WORK_PUBLISH_ID}'/>
+                            </form>
+                            <!-- END work_publishable -->
+                        </nav>
+                    </li>
+                    <!-- END work -->
+                </ul>
+            </section>
+        </div>
+
+
+        <!-- BEGIN subject_comments -->
+        <div class="subject-comments">
+            <h2>Comments</h2>
+
+            <div class="listing">
+                <table class="comments table" id="comment-table">
+                    <colgroup>
+                        <col width="1%"/>
+                        <col width="10%"/>
+                        <col width="80%"/>
+                        <col width="9%"/>
+                    </colgroup>
+                    <tbody>
+                    <!-- BEGIN create_comment -->
+                    <tr>
+                        <td><img class="thumb" src="/portrait.php?userId={SESSION_USER_EXTID}&amp;size=square32"></td>
+                        <td>
+                            <span class="name">{SESSION_USER_NAME}</span>
+                            <span class="group">{SESSION_USER_BYLINE}</span>
+                        </td>
+                        <td colspan="2">
+                            <form id="create-comment" class="comment-form" action="/ajax/comment.php" method="post">
+                                <input type="hidden" name="year" value="{WORK_YEAR}"/>
+                                <input type="hidden" name="semester" value="{WORK_SEMESTER}"/>
+                                <input type="hidden" name="studentId" value="{WORK_USER_ID}"/>
+                                <input type="hidden" name="categoryId" value="{SUBJ_ID}"/>
+                                <textarea name="comment"></textarea>
+
+                                <div>
+                                    <span>Visible to: </span>
+                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1"
+                                    {COMMENT_VIS_STUDENT_CHECKED} />
+                                    <label for="vis-student">Student</label>
+                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1"
+                                    {COMMENT_VIS_PARENT_CHECKED} />
+                                    <label for="vis-parent">Parent</label>
+                                    <a class="submit-this btn up-arrow"><span></span>Post</a>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                    <!-- END create_comment -->
+                    <!-- BEGIN comment -->
+                    <tr data-id="{COMMENT_ID}">
+                        <td><img class="thumb" src="/portrait.php?userId={COMMENT_USER_EXTID}&amp;size=square32"></td>
+                        <td>
+                            <span class="name">{COMMENT_USER_NAME}</span>
+                            <span class="group">{COMMENT_USER_BYLINE}</span>
+                            <span class="group" title="{COMMENT_DATETIME}">{COMMENT_DATE}</span>
+                        </td>
+                        <td>
+                            <p>{COMMENT_BODY}</p>
+                        </td>
+                        <td>
 							<span class="actions">
 								<span class="visibility student {COMMENT_VIS_STUDENT}" title="{COMMENT_VIS_STUDENT_TITLE}"></span>
 								<span class="visibility parent {COMMENT_VIS_PARENT}" title="{COMMENT_VIS_PARENT_TITLE}"></span>
@@ -466,17 +481,64 @@
 								<a class="btn modify no-text" title="Modify"><span></span></a>
 								<!-- END comment_modify -->
 							</span>
-						</td>
-					</tr>
-					<!-- END comment -->
-					</tbody>
-				</table>
-			</div>
-		</div>
-		<!-- END subject_comments -->
+                        </td>
+                    </tr>
+                    <!-- END comment -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- END subject_comments -->
+        <!-- END subject -->
+    </div>
+</div>
 
-		<!-- END subject -->
-	</div>
+
+
+
+
+<div id="context">
+    <div id="enrolment">
+        <form id="semesters">
+            <a class="sem-back" {SEMESTER_BACK_DISABLED} href="/submission/allWork/{WORK_USER_ID}/{SEMESTER_BACK}">&lsaquo;</a>
+            <select id="semester">
+                <!-- BEGIN semester_option -->
+                <option value="{SEMESTER_SLUG}"
+                {SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
+                <!-- END semester_option -->
+            </select>
+            <a class="sem-fwd" {SEMESTER_FWD_DISABLED} href="/submission/allWork/{WORK_USER_ID}/{SEMESTER_FWD}">&rsaquo;</a>
+        </form>
+        <form id="subjects" action="/submission/allWork/" method="get">
+            <span class="elbow">&#9492;</span>
+            <select id="enrolled-subjects">
+                <option disabled="disabled" selected="selected">Select a subject</option>
+                <!-- BEGIN subject_selector -->
+                <option data-id="{ENR_SUBJ_ID}" title="{ENR_SUBJ_CODE}"
+                        value="{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ENR_SUBJ_ID}"
+                {ENR_SUBJ_SELECTED}>
+                {ENR_SUBJ_NAME}
+                </option>
+                <!-- END subject_selector -->
+            </select>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    end subject
 </div>
 
 <script type="text/javascript">

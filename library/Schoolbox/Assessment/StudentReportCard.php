@@ -505,7 +505,8 @@ class StudentReportCard
             'subject_rubric_block' => '',
             'subject_rubric_group_block' => '',
             'subject_rubric_criterion_block' => '',
-            'subject_rubric_criterion_mark_block' => ''
+            'subject_rubric_criterion_mark_block' => '',
+            'subject_rubric_box_checklist_block' => '',
         ));
 
         $submissionBoxMapper = $this->submissionMapper;
