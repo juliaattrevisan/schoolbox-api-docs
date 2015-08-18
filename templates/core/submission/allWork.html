@@ -354,32 +354,40 @@
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.all-work.js"></script>
 <script type="text/javascript">
-//var displayGraph = {GRAPH_IS_DISPLAYED};
-
 $(function () {
 
     /* Graph (to be replaced one day, hence not plugin'd)
      */
-    $('#subject-graph').highcharts({
-        title: {
-            text: ''
-        },
-        colors: {GRAPH_COLOURS},
-        xAxis: {
-            title: '',
-            min: {GRAPH_XMIN},
-            max: {GRAPH_XMAX},
-            type: 'datetime'
-        },
-        yAxis: {
-            min: 0,
-            max: 100
-        },
-        series: {GRAPH_JSON},
-        credits: {
-            enabled: false
-        }
-    });
+    var graphElement = $('#subject-graph');
+    var displayGraph = {GRAPH_IS_DISPLAYED}
+
+    if (graphElement.length) {
+		if (displayGraph) {
+            $('#subject-graph').highcharts({
+                title: {
+                    text: ''
+                },
+                colors: {GRAPH_COLOURS},
+                xAxis: {
+                    title: '',
+                    min: {GRAPH_XMIN},
+                    max: {GRAPH_XMAX},
+                    type: 'datetime'
+                },
+                yAxis: {
+                    min: 0,
+                    max: 100
+                },
+                series: {GRAPH_JSON},
+                credits: {
+                    enabled: false
+                }
+            });
+		}
+		else {
+			graphElement.hide();
+		}
+	}
 
     /* Set up comment abilities: post
      */
@@ -391,18 +399,6 @@ $(function () {
             folderId: '{SUBJ_ID}'
         }
     });
-
-
-//	// ensure there's a graph to plot
-//	var graphElement = $('#subject-graph');
-//	if (graphElement.length) {
-//		if (displayGraph) {
-//			$.plot(graphElement, {GRAPH_JSON}, options);
-//		}
-//		else {
-//			graphElement.hide();
-//		}
-//	}
 
 //	$('#enrolled-subjects').bind('change', function () {
 //		var url = $(this).val();
