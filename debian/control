@@ -10,7 +10,7 @@ Vcs-Browser: https://github.com/alaress/schoolbox
 
 Package: schoolbox
 Architecture: all
-Depends: apache2-mpm-prefork, libapache2-mod-php5,
+Depends: apache2, libapache2-mod-php5,
  php5-cli, php5-imap, php5-gd, php5-curl, php5-mysql, php5-sybase, php5-ldap,
  php-pear, php-apc, php5-imagick, php5-json,
  mysql-client, mysql-server,
@@ -36,7 +36,7 @@ Description: Schoolbox LMS by Alaress Pty. Ltd.
 
 Package: schoolbox-dr
 Architecture: all
-Depends: apache2-mpm-prefork, libapache2-mod-php5,
+Depends: apache2, libapache2-mod-php5,
  php5-cli, php5-imap, php5-gd, php5-curl, php5-mysql, php5-sybase, php5-ldap,
  php-pear, php-apc, php5-imagick, php5-json,
  mysql-client, mysql-server,
