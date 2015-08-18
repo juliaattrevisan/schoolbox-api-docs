@@ -14,7 +14,7 @@
 
         var config = init(options, $(this));
 
-        postComment();
+        setupSaveComment();
 
         /**
          * Init
@@ -30,7 +30,19 @@
                 /* The button which submits the form when adding a new comment
                  */
                 comment: {
-                    post: '[data-comment-post]'
+                    newForm: {
+                        id: '#create-comment',
+                        button: '[data-comment-post]'
+                    }
+                },
+
+                /* Metadata required by backend
+                 */
+                data: {
+                    year: '',
+                    semester: '',
+                    studentId: '',
+                    folderId: ''
                 }
             }
 
@@ -43,11 +55,88 @@
         }
 
         /**
+         * Event listeners for saving new/modified comments
+         */
+        function setupSaveComment() {
+            $(document).on('click', config.comment.newForm.button, function(event) {
+                event.preventDefault();
+
+                saveComment($(config.comment.newForm.id));
+            });
+
+            // set up other inline forms
+        }
+
+        /**
+         * Save a new comment
+         *
+         * @param target
+         * @returns {boolean}
+         */
+        function saveComment(target) {
+
+            /* Don't use submitHandler in here, because that forces you to double-click
+             * to actually perform an action - so do it programatically
+             */
+            $(target).validate({
+                rules: {
+                    comment: 'required'
+                }
+            });
+
+            if ($(target).valid()) {
+
+                /* Will be empty if creating (nonexistent)
+                 */
+                var commentId = $(target).find('input[name=commentId]').val();
+
+                var data = {
+                    commentId: commentId,
+                    commentBody: $(target).find('textarea').val(),
+                    studentVisibility: $('#vis-student-' + commentId).is(':checked') ? 1 : 0,
+                    parentVisibility: $('#vis-parent-' + commentId).is(':checked') ? 1 : 0
+                };
+
+                /* Additional stuff needed when creating
+                 */
+                if (commentId == undefined) {
+                    var create = {
+                        studentVisibility: $('#vis-student').is(':checked') ? 1 : 0,
+                        parentVisibility: $('#vis-parent').is(':checked') ? 1 : 0,
+                        year: config.data.year,
+                        semester: config.data.semester,
+                        studentId: config.data.studentId,
+                        categoryId: config.data.folderId
+                    }
+
+                    data = $.extend(data, create);
+                }
+
+                // submit the form
+                $.ajax({
+                    type: 'POST',
+                    url: '/ajax/comment.php',
+                    data: data,
+                    success: function (data, responseText, xhr) {
+                        // later this will be a nice ajax visual update, but for now just reload the page
+                        window.location.reload();
+
+                        // Perform loadComment();
+                    }
+                });
+            }
+
+            return false;
+        }
+
+        /**
          * Listenenr for adding a comment
          */
-        function postComment() {
+        function loadComment() {
             $(document).on('click', config.comment.post, function(event) {
                 event.preventDefault();
+
+                saveComment(event.target);
 
                 var btn = $(this);
                 var row = btn.closest('li');
