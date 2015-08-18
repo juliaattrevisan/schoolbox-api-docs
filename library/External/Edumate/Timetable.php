@@ -421,8 +421,16 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     public function getRoomTimetable($roomCodes)
     {
+        if (is_array($roomCodes)) {
+            $result = [];
+            foreach ($roomCodes as $roomCode) {
+                $result = array_merge($result, $this->getRoomTimetable($roomCode));
+            }
+            return $result;
+        }
         $statement = $this->getDatabase()->prepare('
             SELECT
+                t.ROOM AS "RoomCode",
                 cl.CLASS AS "Description",
                 t.DAY_NUMBER AS "DayNumber",
                 t.PERIOD_NUMBER AS "PeriodNumber",
