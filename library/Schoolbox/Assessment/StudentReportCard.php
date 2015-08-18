@@ -346,13 +346,12 @@ class StudentReportCard
                 $this->$m($page);
             }
         }
-        $page->parse('subject_block', 'subject');
     }
 
     protected function renderTeachers(\SitePage $page)
     {
         // output teachers
-        $page->setBlock('subject', 'subject_teacher', 'subject_teacher_block');
+        $page->setBlock(TEMPLATE_content, 'subject_teacher', 'subject_teacher_block');
         $teachers = $this->subjectData->getTeachers();
         if (count($teachers)) {
             foreach ($teachers as $teacher) {
@@ -374,7 +373,7 @@ class StudentReportCard
 
     protected function renderGradeAverage(\SitePage $page)
     {
-        $page->setBlock('subject', 'grade_average', 'grade_average_block');
+        $page->setBlock(TEMPLATE_content, 'grade_average', 'grade_average_block');
         // if you can't see the grade average...you, well, can't see the grade average
         if (!$this->checkPermission(self::CAN_VIEW_OVERALL_GRADE)) {
             $page->setVar('grade_average_block', '');
@@ -494,7 +493,7 @@ class StudentReportCard
 
     protected function renderCriteria(\SitePage $page)
     {
-        $page->setBlock('subject', 'subject_rubric', 'subject_rubric_block');
+        $page->setBlock(TEMPLATE_content, 'subject_rubric', 'subject_rubric_block');
         $page->setBlock('subject_rubric', 'subject_rubric_group', 'subject_rubric_group_block');
         $page->setBlock('subject_rubric', 'subject_rubric_submissionbox', 'subject_rubric_submissionbox_block');
         $page->setBlock('subject_rubric', 'subject_rubric_box_checklist', 'subject_rubric_box_checklist_block');
@@ -651,7 +650,7 @@ class StudentReportCard
     protected function renderAssessments(\SitePage $page)
     {
         // output assessments
-        $page->setBlock('subject', 'work', 'work_block');
+        $page->setBlock(TEMPLATE_content, 'work', 'work_block');
         $page->setBlock('work', 'work_actionable', 'work_actionable_block');
         $page->setBlock('work', 'work_publishable', 'work_publishable_block');
         $page->setBlock('work', 'work_clickable', 'work_clickable_block');
@@ -892,7 +891,7 @@ class StudentReportCard
 
     protected function renderComments(\SitePage $page)
     {
-        $page->setBlock('subject', 'subject_comments', 'subject_comments_block');
+        $page->setBlock(TEMPLATE_content, 'subject_comments', 'subject_comments_block');
         $page->setBlock('subject_comments', 'comment', 'comment_block');
         $page->setBlock('subject_comments', 'create_comment', 'create_comment_block');
         $page->setBlock('comment', 'comment_modify', 'comment_modify_block');
