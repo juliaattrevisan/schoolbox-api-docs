@@ -561,9 +561,26 @@
 
                 <fieldset class="content">
                     <legend>Submissions</legend>
+
+                    <div class="small-6 columns">
+                        <input type="hidden" name="accept_submission" value="0" />
+                        <input id="accept_submission" name="accept_submission" type="checkbox" value="true" {ACCEPT_SUBMISSION} />
+                        <label for="accept_submission" class="checkbox-label">
+                            Accept Submissions Online?
+                        </label>
+                    </div>
+
+                    <div class="small-6 columns">
+                        <input type="hidden" name="multi_submission" value="0" />
+                        <input id="multi_submission" name="multi_submission" type="checkbox" value="true" {MULTI_SUBMISSION} />
+                        <label for="multi_submission" class="checkbox-label">
+                            Accept Multiple Submissions?
+                        </label>
+                    </div>
+
                     <!-- BEGIN duework_timespan -->
-                    <fieldset class="content">
-                        <div class="row">
+                    <div class="small-12 columns">
+                        <fieldset class="content no-pad">
                             <div class="small-12 large-6 columns">
                                 <label>
                                     Publish Date
@@ -603,11 +620,11 @@
                                    class="button icon-timetable"
                                    href="#"></a>
                             </div>
-                        </div>
-                    </fieldset>
+                        </fieldset>
+                    </div>
 
-                    <fieldset class="content">
-                        <div class="row">
+                    <div class="small-12 columns">
+                        <fieldset class="content no-pad">
                             <div class="small-12 large-6 columns">
                                 <label>
                                     Open Date
@@ -647,11 +664,11 @@
                                    class="button icon-timetable"
                                    href="#"></a>
                             </div>
-                        </div>
-                    </fieldset>
+                        </fieldset>
+                    </div>
 
-                    <fieldset class="content">
-                        <div class="row">
+                    <div class="small-12 columns">
+                        <fieldset class="content no-pad">
                             <div class="small-12 large-6 columns">
                                 <label>
                                     Due Date
@@ -691,11 +708,11 @@
                                    class="button icon-timetable"
                                    href="#"></a>
                             </div>
-                        </div>
-                    </fieldset>
+                        </fieldset>
+                    </div>
 
-                    <fieldset class="content">
-                        <div class="row">
+                    <div class="small-12 columns">
+                        <fieldset class="content no-pad">
                             <div class="small-12 large-6 columns">
                                 <label>
                                     Late Date
@@ -735,9 +752,13 @@
                                    class="button icon-timetable"
                                    href="#"></a>
                             </div>
-                        </div>
-                    </fieldset>
+                        </fieldset>
+                    </div>
                     <!-- END duework_timespan -->
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Grading</legend>
                 </fieldset>
             </section>
 
@@ -876,16 +897,6 @@
       <td><input name="weight" type="text" value="{SUBMISSION_WEIGHT}" maxlength="3" /></td>
     </tr>
     <!-- END mark_weight -->
-    <tr>
-        <td><h4>Accept Submissions</h4>
-            <em>Will this work be submitted electronically?</em></td>
-        <td><input name="accept_submission" type="checkbox" value="true" {ACCEPT_SUBMISSION}></td>
-    </tr>
-    <tr class="accept-hide dark">
-        <td><h4>Multiple Submissions</h4>
-            <em>Should multiple submissions be accepted?</em></td>
-        <td><input name="multi_submission" type="checkbox" value="true" {MULTI_SUBMISSION}></td>
-    </tr>
 
     <!-- BEGIN curriculum_code_input -->
     <tr>
