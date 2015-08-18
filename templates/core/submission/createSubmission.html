@@ -94,10 +94,10 @@
                     }
                 }
                 watch.on('change.hideWatch', function() {
-                    element.toggleClass('hide', toggleCallback);
+                    element.toggleClass('hide', toggleCallback());
                 });
                 // Apply now
-                element.toggleClass('hide', toggleCallback)
+                element.toggleClass('hide', toggleCallback())
             }
         });
 
