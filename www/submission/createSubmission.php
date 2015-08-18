@@ -409,11 +409,13 @@ function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount =
     if (count($rs)) {
         foreach ($rs as $i => $set) {
             $page->setVar('result_block', '');
+            $j = 1;
             foreach ($set as $item) {
                 $page->setVar(
                     array(
                         'RS_ID'           => $i,
                         'RS_RESULT_LABEL' => $item,
+                        'RS_RESULT_COMMA' => ($j++) < count($set) ? ', ' : '',
                         'RS_CHECKED'      => $i == $checkedIndex ? 'checked="checked"' : ''
                     )
                 );
