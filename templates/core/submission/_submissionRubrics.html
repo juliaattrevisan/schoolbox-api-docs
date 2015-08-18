@@ -1,3 +1,150 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+    $(function(){
+
+        var criterionSelector = $('[data-role="rubric-criterion-selector]');
+        var form              = criterionSelector.closest('form');
+
+        // Do assessment-specific descriptors get shown?
+        var isRubricAssessmentSpecificDescriptors = function() {
+            return form.find('[data-relation="rubric-use-assessment-specific"]').prop('checked');
+        };
+        if (isRubricAssessmentSpecificDescriptors()) {
+            criterionSelector.find('[data-role="criterion"]').each(function () {
+                if ($(this).find(':checked').length) {
+                    descriptor('show', this, 0);
+                }
+            });
+        }
+
+        // trigger show or hide of descriptors when radio off
+        criterionSelector.on('change', 'input', function () {
+            // hide the descriptors
+            if (!isRubricAssessmentSpecificDescriptors()) {
+                descriptor('hide', $('#rubric-criteria div'), 100);
+            }
+            // show them if checked
+            else {
+                $('#rubric-criteria div').each(function () {
+                    var checked = $(this).children(':checkbox').prop('checked');
+                    descriptor(checked ? 'show' : 'hide', this, 100)
+                });
+            }
+        });
+
+        criterionSelector.on('change', ':checkbox', function () {
+            var act = 'hide';
+
+            // show if and only if both the descriptors radio and myself are checked
+            if (isRubricAssessmentSpecificDescriptors() && this.checked) {
+                act = 'show';
+            }
+            descriptor(act, $(this).parent('div'), 100);
+        });
+
+        // trigger change of descriptor count when dropdown changed
+        form.on('change', '[data-relation="rubric-descriptor-count"]', function () {
+            var target = $('#descriptor-count option:selected').first().val();
+
+            $('#rubric-criteria tr').each(function () {
+                var i,
+                    inputCount = $(this).find('td').length,
+                    diff = target - inputCount;
+
+                if (diff < 0) {
+                    for (i = 0; i < 0 - diff; ++i) {
+                        // remove trailing li's
+                        $(this).find('td:last-child').detach();
+                    }
+                }
+                else if (diff > 0) {
+                    var insertList = '',
+                        last = $(this).children('td').last(),
+                        newItem;
+
+                    for (i = 0; i < diff; ++i) {
+                        // duplicate li's
+                        newItem = last.clone(true);
+
+                        // clear the descriptor value
+                        newItem.find('textarea').val('');
+                        newItem.find('input').val( parseInt(newItem.find('input').val()) + (i+1) );
+                        $(this).append( newItem );
+                    }
+                }
+            });
+        });
+
+        var critSelector       = 'div.crit',
+            inputSelector      = 'textarea, input[type=text]',
+            descriptorSelector = '.desc',
+            editingClass       = 'editing',
+            placeholderText    = 'Enter descriptor';
+
+
+        criterionSelector.on('focus', inputSelector, function () {
+            var input = $(this);
+
+            criterionSelector.find(critSelector + ', ' + descriptorSelector)
+                .removeClass(editingClass)
+                .find(inputSelector)
+                .attr('readonly', 'readonly')
+                .removeAttr('placeholder');
+
+            input
+                .closest(critSelector)
+                .addClass(editingClass);
+
+            input
+                .closest(descriptorSelector)
+                .addClass(editingClass)
+                .find(inputSelector)
+                .removeAttr('readonly')
+                .attr('placeholder', placeholderText);
+        });
+
+//        function showHideMarktype(timeout) {
+//            var v = $('#marktype option:selected').first().data('slug');
+//            if (v == 'raw') {
+//                marktype.letter.hide(timeout);
+//                marktype.rubric.hide(timeout, function () {
+//                    marktype.total.show(timeout);
+//                });
+//            }
+//            else if (v == 'rubric') {
+//                marktype.letter.hide(timeout);
+//                marktype.total.hide(timeout, function () {
+//                    marktype.rubric.show(timeout);
+//                });
+//            }
+//            else if (v == 'letter') {
+//                marktype.rubric.hide(timeout);
+//                marktype.total.hide(timeout, function () {
+//                    marktype.letter.show(timeout);
+//                });
+//            }
+//            else {
+//                marktype.letter.hide(timeout);
+//                marktype.rubric.hide(timeout);
+//                marktype.total.hide(timeout);
+//            }
+//        }
+
+        function descriptor(action, element, timeout) {
+            $(element).find(':input:not(:checkbox)').parent('td').each(function () {
+                if (action == 'show') {
+                    $(this).show();
+                    $(element).addClass('highlight').find(inputSelector).first().trigger('click');
+                }
+                else if (action == 'hide') {
+                    $(element).removeClass('highlight');
+                    $(this).hide();
+                }
+            });
+        }
+    })
+</script>
+<!-- END custom_head -->
 <fieldset data-role="rubric-criterion-selector">
     <!-- BEGIN rubric_type_label -->
     <legend>{LABEL}</legend>
