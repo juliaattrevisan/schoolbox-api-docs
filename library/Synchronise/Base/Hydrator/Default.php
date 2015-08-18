@@ -42,7 +42,6 @@ class Synchronise_Base_Hydrator_Default implements Synchronise_Base_IHydrator {
         $newUser['residential_house_id'] = 0;
         $newUser['eportfolio_enabled']   = true;
         $newUser['enabled']              = null;
-        $newUser['mail_handler']         = 0;
         return $newUser;
     }
 }
