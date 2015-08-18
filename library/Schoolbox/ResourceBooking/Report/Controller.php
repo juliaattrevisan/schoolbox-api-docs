@@ -113,8 +113,12 @@ class Controller extends Base
         }
 
         // Build the list of events (slowly)
+        $showClasses = $this->getRequest()->query->getBool('classes', true);
         $this->getApi()->add(
-            $this->getApiFactory()->buildFromResourceCollection($resources)
+            $this->getApiFactory()->buildFromResourceCollection(
+                $resources,
+                $showClasses
+            )
         );
 
         $this->getResponse()->content->set([
@@ -126,6 +130,7 @@ class Controller extends Base
                     'start'    => $start,
                     'end'      => $end,
                     'category' => $selectedCategories,
+                    'classes'  => $showClasses,
                 ],
             ],
         ]);
