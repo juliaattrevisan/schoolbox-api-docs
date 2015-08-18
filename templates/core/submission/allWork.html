@@ -462,7 +462,7 @@
             </div>
 
             <div class="content">
-                <form id="create-comment" action="/ajax/comment.php" method="post">
+                <form id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
                     <input type="hidden" name="year" value="{WORK_YEAR}"/>
                     <input type="hidden" name="semester" value="{WORK_SEMESTER}"/>
                     <input type="hidden" name="studentId" value="{WORK_USER_ID}"/>
@@ -483,13 +483,13 @@
                         <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
                     </div>
 
-                    <a class="button icon-upload" data-comment-post>Post</a>
+                    <a class="button icon-upload" data-comment-post="new">Post</a>
                 </form>
             </div>
             <!-- END create_comment -->
 
             <div>
-                <ul class="action-list">
+                <ul class="action-list" data-comment-list>
                     <!-- BEGIN comment -->
                     <li class="actions-small-4" data-id="{COMMENT_ID}">
                         <div class="list-item">

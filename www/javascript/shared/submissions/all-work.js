@@ -15,6 +15,7 @@
         var config = init(options, $(this));
 
         setupSaveComment();
+        setupModifyComment();
 
         /**
          * Init
@@ -32,7 +33,7 @@
                 comment: {
                     newForm: {
                         id: '#create-comment',
-                        button: '[data-comment-post]'
+                        button: '[data-comment-post=new]'
                     }
                 },
 
@@ -64,7 +65,11 @@
                 saveComment($(config.comment.newForm.id));
             });
 
-            // set up other inline forms
+            $(document).on('click', '[data-comment-post=update]', function(event) {
+                event.preventDefault();
+
+                saveComment($(this).closest('[data-comment-form]'));
+            });
         }
 
         /**
@@ -120,8 +125,6 @@
                     success: function (data, responseText, xhr) {
                         // later this will be a nice ajax visual update, but for now just reload the page
                         window.location.reload();
-
-                        // Perform loadComment();
                     }
                 });
             }
@@ -132,11 +135,9 @@
         /**
          * Listenenr for adding a comment
          */
-        function loadComment() {
-            $(document).on('click', config.comment.post, function(event) {
+        function setupModifyComment() {
+            $(document).on('click', '[data-comment-modify]', function(event) {
                 event.preventDefault();
-
-                saveComment(event.target);
 
                 var btn = $(this);
                 var row = btn.closest('li');
@@ -153,45 +154,46 @@
 
                         /* Set up modify forms
                          */
-//                        // on success, replace row elements with form inputs
-//                        var editForm = $('#create-comment').clone();
-//                        editForm.removeAttr('id');
-//                        editForm.addClass('edit-comment');
-//                        editForm.find('[data-post-comment]').html('Update');
-//                        editForm.find('textarea').text(data.body);
-//
-//                        $.each(['vis-student', 'vis-parent'], function (k, v) {
-//                            editForm.find('#' + v).attr('id', v + '-' + commentId);
-//                            editForm.find('label[for=' + v + ']').attr('for', v + '-' + commentId);
-//                        });
-//
-//                        editForm.prepend(
-//                            $('<input type="hidden" />').attr('name', 'commentId').val(commentId)
-//                        );
-//
-//                        // safety check
-//                        if (data.visibility) {
-//                            var svis = editForm.find('input[name=visibility\\[student\\]]');
-//                            var pvis = editForm.find('input[name=visibility\\[parent\\]]');
-//
-//                            if (data.visibility.student) {
-//                                svis.prop('checked', true);
-//                            }
-//                            else {
-//                                svis.prop('checked', false);
-//                            }
-//
-//                            if (data.visibility.parent) {
-//                                pvis.prop('checked', true);
-//                            }
-//                            else {
-//                                pvis.prop('checked', false);
-//                            }
-//                        }
-//
-//                        row.find('td.actions').remove();
-//                        row.find('td').last().attr('colspan', '2').html(editForm);
-//                        row.removeClass('locked');
+                        var editForm = $('#create-comment').clone();
+
+                        editForm.prepend($('<input type="hidden" />').attr('name', 'commentId').val(commentId));
+                        editForm.removeAttr('id');
+                        editForm.find('textarea').text(data.body);
+
+                        var button = editForm.find('[data-comment-post]');
+                        button.html('Update');
+                        button.attr('data-comment-post', 'update');
+
+                        $.each(['vis-student', 'vis-parent'], function (k, v) {
+                            editForm.find('#' + v).attr('id', v + '-' + commentId);
+                            editForm.find('label[for=' + v + ']').attr('for', v + '-' + commentId);
+                        });
+
+                        if (data.visibility) {
+                            var svis = editForm.find('input[name=visibility\\[student\\]]');
+                            var pvis = editForm.find('input[name=visibility\\[parent\\]]');
+
+                            if (data.visibility.student) {
+                                svis.prop('checked', true);
+                            }
+                            else {
+                                svis.prop('checked', false);
+                            }
+
+                            if (data.visibility.parent) {
+                                pvis.prop('checked', true);
+                            }
+                            else {
+                                pvis.prop('checked', false);
+                            }
+                        }
+
+                        /* Remove existing modify forms
+                         * Show all articles
+                         */
+                        $('[data-comment-list]').find('[data-comment-form]').remove();
+                        $('[data-comment-list]').find('article').removeClass('hide');
+                        row.find('article').append(editForm);
                     },
                     error: function (xhr) {
 //                        // on failure, indicate failure
