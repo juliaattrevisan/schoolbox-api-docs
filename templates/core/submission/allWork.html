@@ -452,62 +452,72 @@
     <div class="small-12 island">
         <h2 class="subheader">Comments</h2>
         <section>
-            <table id="comment-table">
-                <tbody>
-                <!-- BEGIN create_comment -->
-                <tr>
-                    <td><img class="thumb" src="/portrait.php?userId={SESSION_USER_EXTID}&amp;size=square32"></td>
-                    <td>
-                        <span class="name">{SESSION_USER_NAME}</span>
-                        <span class="group">{SESSION_USER_BYLINE}</span>
-                    </td>
-                    <td colspan="2">
-                        <form id="create-comment" class="comment-form" action="/ajax/comment.php" method="post">
-                            <input type="hidden" name="year" value="{WORK_YEAR}"/>
-                            <input type="hidden" name="semester" value="{WORK_SEMESTER}"/>
-                            <input type="hidden" name="studentId" value="{WORK_USER_ID}"/>
-                            <input type="hidden" name="categoryId" value="{SUBJ_ID}"/>
-                            <textarea name="comment"></textarea>
+            <!-- BEGIN create_comment -->
+            <div class="small-12 avatar card">
+                <a href="#" title="">
+                    <img src="/portrait.php?userId={SESSION_USER_EXTID}&amp;size=square64" alt="{SESSION_USER_NAME}" />
+                    <p>{SESSION_USER_NAME}</p>
+                </a>
+                <p class="meta">{SESSION_USER_BYLINE}</p>
+            </div>
 
-                            <div>
-                                <span>Visible to: </span>
-                                <input id="vis-student" type="checkbox" name="visibility[student]" value="1"
-                                {COMMENT_VIS_STUDENT_CHECKED} />
-                                <label for="vis-student">Student</label>
-                                <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1"
-                                {COMMENT_VIS_PARENT_CHECKED} />
-                                <label for="vis-parent">Parent</label>
-                                <a class="submit-this btn up-arrow"><span></span>Post</a>
+            <div class="content">
+                <form id="create-comment" action="/ajax/comment.php" method="post">
+                    <input type="hidden" name="year" value="{WORK_YEAR}"/>
+                    <input type="hidden" name="semester" value="{WORK_SEMESTER}"/>
+                    <input type="hidden" name="studentId" value="{WORK_USER_ID}"/>
+                    <input type="hidden" name="categoryId" value="{SUBJ_ID}"/>
+
+                    <label>
+                        Comment
+                        <textarea name="comment"></textarea>
+                    </label>
+
+                    <div>
+                        <input id="vis-student" type="checkbox" name="visibility[student]" value="1" {COMMENT_VIS_STUDENT_CHECKED} />
+                        <label for="vis-student" class="checkbox-label">Visible To Students</label>
+                    </div>
+
+                    <div>
+                        <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" {COMMENT_VIS_PARENT_CHECKED} />
+                        <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
+                    </div>
+
+                    <a class="button icon-upload">Post</a>
+                </form>
+            </div>
+            <!-- END create_comment -->
+
+            <div class="comment-table">
+                <ul class="action-list">
+                    <!-- BEGIN comment -->
+                    <li class="actions-small-4" data-id="{COMMENT_ID}">
+                        <div class="list-item">
+                            <div class="small-12 avatar card">
+                                <a href="#" title="">
+                                    <img src="/portrait.php?userId={COMMENT_USER_EXTID}&amp;size=square32" class="content" alt="{COMMENT_USER_NAME}" />
+                                    <p>{COMMENT_USER_NAME}</p>
+                                </a>
+                                <p class="meta">{COMMENT_USER_BYLINE}</p>
+                                <p class="meta">{COMMENT_DATE}</p>
                             </div>
-                        </form>
-                    </td>
-                </tr>
-                <!-- END create_comment -->
-                <!-- BEGIN comment -->
-                <tr data-id="{COMMENT_ID}">
-                    <td><img class="thumb" src="/portrait.php?userId={COMMENT_USER_EXTID}&amp;size=square32"></td>
-                    <td>
-                        <span class="name">{COMMENT_USER_NAME}</span>
-                        <span class="group">{COMMENT_USER_BYLINE}</span>
-                        <span class="group" title="{COMMENT_DATETIME}">{COMMENT_DATE}</span>
-                    </td>
-                    <td>
-                        <p>{COMMENT_BODY}</p>
-                    </td>
-                    <td>
-                    <span class="actions">
-                        <span class="visibility student {COMMENT_VIS_STUDENT}" title="{COMMENT_VIS_STUDENT_TITLE}"></span>
-                        <span class="visibility parent {COMMENT_VIS_PARENT}" title="{COMMENT_VIS_PARENT_TITLE}"></span>
-                        <!-- BEGIN comment_modify -->
-                        <a class="btn delete no-text" title="Delete"><span></span></a>
-                        <a class="btn modify no-text" title="Modify"><span></span></a>
-                        <!-- END comment_modify -->
-                    </span>
-                    </td>
-                </tr>
-                <!-- END comment -->
-                </tbody>
-            </table>
+
+                            <article>
+                                {COMMENT_BODY}
+                            </article>
+                        </div>
+                        <nav>
+                            <span class="visibility student {COMMENT_VIS_STUDENT}" title="{COMMENT_VIS_STUDENT_TITLE}"></span>
+                            <span class="visibility parent {COMMENT_VIS_PARENT}" title="{COMMENT_VIS_PARENT_TITLE}"></span>
+                            <!-- BEGIN comment_modify -->
+                            <a class="icon-delete delete" title="Delete"></a>
+                            <a class="icon-modify" title="Modify"></a>
+                            <!-- END comment_modify -->
+                        </nav>
+                    </li>
+                    <!-- END comment -->
+                </ul>
+            </div>
         </section>
     </div>
 </div>
