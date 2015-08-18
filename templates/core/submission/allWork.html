@@ -454,7 +454,7 @@
         <section>
             <!-- BEGIN create_comment -->
             <div class="small-12 avatar card">
-                <a href="#" title="">
+                <a href="/search/user/{SESSION_USER_ID}" title="View Profile">
                     <img src="/portrait.php?userId={SESSION_USER_EXTID}&amp;size=square64" alt="{SESSION_USER_NAME}" />
                     <p>{SESSION_USER_NAME}</p>
                 </a>
@@ -494,16 +494,20 @@
                     <li class="actions-small-4" data-id="{COMMENT_ID}">
                         <div class="list-item">
                             <div class="small-12 avatar card">
-                                <a href="#" title="">
+                                <a href="/search/user/{COMMENT_USER_ID}" title="View Profile">
                                     <img src="/portrait.php?userId={COMMENT_USER_EXTID}&amp;size=square64" alt="{COMMENT_USER_NAME}" />
                                     <p>{COMMENT_USER_NAME}</p>
                                 </a>
                                 <p class="meta">{COMMENT_USER_BYLINE}</p>
                                 <p class="meta">{COMMENT_DATE}</p>
+                                <p class="meta icon-staff-students">{COMMENT_VIS_STUDENT_TITLE}</p>
+                                <p class="meta icon-staff">{COMMENT_VIS_PARENT_TITLE}</p>
                             </div>
 
                             <article>
-                                {COMMENT_BODY}
+                                <p>
+                                    {COMMENT_BODY}
+                                </p>
                             </article>
                         </div>
                         <nav>

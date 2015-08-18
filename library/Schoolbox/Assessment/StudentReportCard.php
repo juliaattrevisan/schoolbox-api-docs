@@ -968,6 +968,7 @@ class StudentReportCard
                     'USER_NAME'   => $comment->getCommenter()->formatName(),
                     'USER_BYLINE' => $comment->getCommenter()->getRole()->getName(),
                     'USER_EXTID'  => $comment->getCommenter()->getExternalId(),
+                    'USER_ID'     => $comment->getCommenter()->getId(),
                     'DATE'        => $date,
                     'DATETIME'    => $comment->getCreated()->getDatabase(),
                     'BODY'        => $comment->getBody(),
