@@ -128,13 +128,8 @@
                     number: true,
                     min: 1
                 },
-                result_set: {
+                resultset: {
                     required: true
-                    //{
-                    //    depends: function() {
-                    //        return marktype.rubric.is(':visible');
-                    //    }
-                    //}
                 },
                 criteria: {
                     markTypeRubricCriteriaExists: true,
@@ -158,7 +153,7 @@
                 late_period: late_date_valid
             },
             messages: {
-                result_set:  {required: 'Please select a result set'},
+                resultset:   {required: 'Please select a result set'},
                 open_date:   {dateNotBefore: open_date_valid.dateNotBefore.message},
                 open_hour:   {dateNotBefore: open_date_valid.dateNotBefore.message},
                 open_minute: {dateNotBefore: open_date_valid.dateNotBefore.message},
@@ -189,7 +184,23 @@
             },
             // By default all hidden fields are ignored.
             // I don't want to ignore rubric values
-            ignore: ':hidden:not([data-role="criterion-value"])'
+            ignore: function(element) {
+                var $element = $(element);
+                if ($element.is(':hidden')) {
+                    // Foundated labels:
+                    // Don't ignore checkboxes or radios with visible labels
+                    if ($element.closest('label:not(:hidden)').length) {
+                        return false;
+                    }
+                    var id = element.id;
+                    if (id && $('label[for="'+id+'"]:not(:hidden)').length) {
+                        return false;
+                    }
+                    // return true;
+                    return $element.not('[data-role="criterion-value"]');
+                }
+                return false;
+            }
         });
 
         // Rubric values validation - add dynamically
