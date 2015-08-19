@@ -496,7 +496,6 @@ class StudentReportCard
         $page->setBlock(TEMPLATE_content, 'subject_rubric', 'subject_rubric_block');
         $page->setBlock('subject_rubric', 'subject_rubric_group', 'subject_rubric_group_block');
         $page->setBlock('subject_rubric', 'subject_rubric_submissionbox', 'subject_rubric_submissionbox_block');
-//        $page->setBlock('subject_rubric', 'subject_rubric_box_checklist', 'subject_rubric_box_checklist_block');
         $page->setBlock('subject_rubric_group', 'subject_rubric_criterion', 'subject_rubric_criterion_block');
         $page->setBlock('subject_rubric_criterion', 'subject_rubric_criterion_mark', 'subject_rubric_criterion_mark_block');
 
@@ -505,7 +504,6 @@ class StudentReportCard
             'subject_rubric_group_block' => '',
             'subject_rubric_criterion_block' => '',
             'subject_rubric_criterion_mark_block' => '',
-//            'subject_rubric_box_checklist_block' => '',
         ));
 
         $submissionBoxMapper = $this->submissionMapper;
@@ -588,20 +586,6 @@ class StudentReportCard
                     unset($allStructures[$group]);
                 }
             }
-
-//                $page->setVar([ 'SUBJECT_RUBRIC_COLSPAN'    => count($allSubmissionBoxes) + 1 ]);
-
-            /* Render out all the submission box headings
-             */
-//                foreach($allSubmissionBoxes as $currentSubmissionBox) {
-//                    $page->setVar(array(
-//                        'SUBJECT_RUBRIC_SUBMISSIONBOX_NAME' => $currentSubmissionBox['box']->getName(),
-//                        'SUBJECT_RUBRIC_SUBMISSIONBOX_ID' => $currentSubmissionBox['box']->getId(),
-//                    ));
-//
-//                    $page->parse('subject_rubric_submissionbox_block', 'subject_rubric_submissionbox', true);
-//                    $page->parse('subject_rubric_box_checklist_block', 'subject_rubric_box_checklist', true);
-//                }
 
             /* Render that all out in the land of phpliberty
              */

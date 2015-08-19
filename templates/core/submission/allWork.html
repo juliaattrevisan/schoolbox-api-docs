@@ -99,25 +99,6 @@
     $(function () {
         var $tbl = $('#rubric-table');
 
-//        $('#rubric-showhide-opts').on('change', 'input', function () {
-//
-//            var val  = $(this).val(),
-//                    $tds = $tbl.find('td[data-box='+val+']'),
-//                    $ths = $tbl.find('th[data-box='+val+']');
-//
-//            // show/hide columns as required
-//            if ($(this).prop('checked')) {
-//                $tds.removeClass('hide');
-//                $ths.removeClass('hide');
-//            } else {
-//                $tds.addClass('hide');
-//                $ths.addClass('hide');
-//            }
-//
-//            // recompute the number of cols and set the grouping colwidths to match
-//            $('#rubric').find('tbody').find('td[colspan]').attr('colspan', $('#rubric-showhide-opts').find('input:checked').length + 1);
-//        });
-
         $tbl.on('click', 'td[data-interaction="collapse"]', function (e) {
             e.preventDefault();
 
@@ -142,17 +123,6 @@
     <div class="small-12 island">
         <h2 class="subheader">Criteria</h2>
         <section>
-            <!--<div class="content">-->
-                <!--<div id="rubric-showhide-opts">-->
-                    <!--&lt;!&ndash; BEGIN subject_rubric_box_checklist &ndash;&gt;-->
-                    <!--<div>-->
-                        <!--<input type="checkbox" id="rubric-{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}" value="{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}" checked="checked" />-->
-                        <!--<label for="rubric-{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}" class="checkbox-label">{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}</label>-->
-                    <!--</div>-->
-                    <!--&lt;!&ndash; END subject_rubric_box_checklist &ndash;&gt;-->
-                <!--</div>-->
-            <!--</div>-->
-
             <table id="rubric-table">
                 <tbody>
                     <!-- BEGIN subject_rubric_group -->
