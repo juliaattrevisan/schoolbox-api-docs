@@ -212,12 +212,17 @@
                             }
                         }
 
-                        /* Remove existing modify forms
+                        /* Remove existing modify forms contained in article wrappers
                          * Show all articles
                          */
-                        $('[data-comment-list]').find('[data-comment-form]').remove();
+                        $('[data-comment-list]').find('[data-comment-form]').parent('article').remove();
                         $('[data-comment-list]').find('article').removeClass('hide');
+
+                        /* Append the selected editform
+                         * Wrap it in article, for styles
+                         */
                         row.find('article').addClass('hide').after(editForm);
+                        row.find('[data-comment-form]').wrap('<article></article>');
                     },
                     error: function (xhr) {
 //                        // on failure, indicate failure
