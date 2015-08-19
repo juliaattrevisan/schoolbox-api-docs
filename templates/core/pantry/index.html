@@ -278,6 +278,76 @@
 
                                     </nav>
                                 </li>
+
+                                <li data-student="234">
+                                    <div class="actions-small-1 actions-medium-2">
+                                        <div class="list-item">
+                                            <div class="small-12 medium-6 xlarge-4 columns">
+                                                <div class="row">
+                                                    <div class="avatar card small-12">
+                                                        <a href="#" title="View Profile">
+                                                            <img src="/portrait.php?userId=135&amp;size=square64" alt="View Profile">
+                                                            <p>Rhodes, David</p>
+                                                        </a>
+                                                        <p>
+                                                            <span class="label neutral full-width">Complicated Example</span>
+                                                        </p>
+                                                    </div>
+                                                    <div class="small-12 columns no-pad">
+                                                        <div class="actions-small-1">
+                                                            <div class="list-item row">
+                                                                <div class="column small-12">
+                                                                    <div class="list-item-content">
+                                                                        <select class="no-margin">
+                                                                            <option value="Absent" selected="selected">Absent</option>
+                                                                            <option value="Not Assessed">Not Assessed</option>
+                                                                            <option value="Not Submitted">Not Submitted</option>
+                                                                            <option value="Submitted">Submitted</option>
+                                                                            <option value="Pending">Pending</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <nav>
+                                                                <a class="icon-modify no-text" title="Mark Rubric" href="#"></a>
+                                                            </nav>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="small-12 medium-6 xlarge-8 columns">
+                                                <div class="row">
+                                                    <label class="list-item-content">
+                                                        <textarea class="comment valid" name="comment" rows="4">Student was not in attendance. Naughty, naughty student.</textarea>
+                                                    </label>
+
+                                                    <input type="hidden" class="uid" name="uid" value="234">
+                                                    <input type="hidden" class="box_id" name="box_id" value="42">
+                                                    <input type="hidden" class="mark-update" name="markUpdate" value="true">
+
+                                                </div>
+                                            </div>
+
+
+
+                                        </div>
+                                        <nav>
+                                            <span class="show-for-medium-up">
+                                                <a href="#" class="icon-view" title="View Submission"></a>
+                                                <a href="#" class="icon-history" title="View Submission History"></a>
+                                            </span>
+                                            <span class="show-for-small-only">
+                                                <a href="#" class="icon-more" data-dropdown="row-options-234"></a>
+                                            </span>
+                                        </nav>
+                                        <ul class="f-dropdown" data-dropdown-content="" id="row-options-234">
+                                            <li><a href="#" class="icon-view">View Submission</a></li>
+                                            <li><a href="#" class="icon-history">View History</a></li>
+                                        </ul>
+                                    </div>
+
+                                </li>
+
                             </ul>
                         </section>
                     </div>
@@ -2708,6 +2778,10 @@ $(function () {
 
             $('.off-canvas-wrap').removeClass('move-left');
 
+        });
+
+        $('a[href=#]').on('click', function (e) {
+            e.preventDefault();
         });
 
     });
