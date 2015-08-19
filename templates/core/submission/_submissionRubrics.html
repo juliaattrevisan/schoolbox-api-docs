@@ -150,7 +150,8 @@
                                    size="3"
                                    data-role="criterion-value"
                                    value="{CRIT_INPUT_WEIGHT}"
-                                   readonly />
+                                   readonly
+                                   data-validate-always />
                         </label>
                     </td>
                     <!-- END crit_input -->
@@ -168,4 +169,7 @@
         <p>Course-level criteria are not available for this category, because it is not part of a course.</p>
     </div>
     <!-- END no_criteria_allowed -->
+
+    <!-- Blahg -->
+    <input type="text" class="hide" name="criteria" data-validate-always />
 </fieldset>

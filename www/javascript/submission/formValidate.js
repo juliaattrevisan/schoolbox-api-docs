@@ -32,20 +32,22 @@
 
         // Rubric validator: do any exist?
         $.validator.addMethod('markTypeRubricCriteriaExists', function() {
-            if (marktype.rubric.is(':visible')) {
-                return rubricCriteria.find('input[type="checkbox"]').length >= 1;
-            } else {
-                return true;
-            }
+            return rubricCriteria.find('input[type="checkbox"]').length >= 1;
+            //if (marktype.rubric.is(':visible')) {
+            //    return rubricCriteria.find('input[type="checkbox"]').length >= 1;
+            //} else {
+            //    return true;
+            //}
         }, 'Please ensure at least one criterion exists');
 
         // Rubric criteria: is at least one selected?
         $.validator.addMethod('markTypeRubricCriteriaCheck', function() {
-            if (marktype.rubric.is(':visible')) {
-                return rubricCriteria.find('input:checked').length >= 1;
-            } else {
-                return true;
-            }
+            return rubricCriteria.find('input:checked').length >= 1;
+            //if (marktype.rubric.is(':visible')) {
+            //    return rubricCriteria.find('input:checked').length >= 1;
+            //} else {
+            //    return true;
+            //}
         }, 'Please select at least one criterion');
 
         //// Rubric result set: is one selected?
@@ -196,8 +198,7 @@
                     if (id && $('label[for="'+id+'"]:not(:hidden)').length) {
                         return false;
                     }
-                    // return true;
-                    return $element.not('[data-role="criterion-value"]');
+                    return $element.not('[data-validate-always]');
                 }
                 return false;
             }
