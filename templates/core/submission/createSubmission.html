@@ -314,54 +314,11 @@
 //                }
 //            );
 
-//        function showHideMarktype(timeout) {
-//            var v = $('#marktype option:selected').first().data('slug');
-//            if (v == 'raw') {
-//                marktype.letter.hide(timeout);
-//                marktype.rubric.hide(timeout, function () {
-//                    marktype.total.show(timeout);
-//                });
-//            }
-//            else if (v == 'rubric') {
-//                marktype.letter.hide(timeout);
-//                marktype.total.hide(timeout, function () {
-//                    marktype.rubric.show(timeout);
-//                });
-//            }
-//            else if (v == 'letter') {
-//                marktype.rubric.hide(timeout);
-//                marktype.total.hide(timeout, function () {
-//                    marktype.letter.show(timeout);
-//                });
-//            }
-//            else {
-//                marktype.letter.hide(timeout);
-//                marktype.rubric.hide(timeout);
-//                marktype.total.hide(timeout);
-//            }
-//        }
-
         // Set up the gradegroup thing
         $('a[data-role="showGradeScale"]').click(function() {
             var gradeScale = $('#gradegroup').val();
             $('#gradegroup-'+gradeScale).foundation('reveal', 'open');
         });
-//        $( "#gradegroup_explanation" ).dialog({
-//            autoOpen: false,
-//            modal: true
-//        });
-//
-//        // Grade group selector
-//        $('select#gradegroup').on('change', function() {
-//            $('.gradegroup_explanation').hide();
-//            $('#gradegroup_explanation-'+this.value).show();
-//            $('#gradegroup_explanation').dialog({'title':$(this).find(':selected').text()});
-//        }).change();
-//
-//        $('#show-grade').click(function(event) {
-//            event.preventDefault();
-//            $( '#gradegroup_explanation').dialog("open");
-//        });
 
 
         $('#deleteBox').click(function() {
