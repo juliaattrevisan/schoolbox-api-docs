@@ -5,8 +5,9 @@
     "use strict";
     $.fn.submissionFormValidate = function() {
         // Load the form and that
-        var form         = $(this);
-        var acceptSubmit = form.find('input:checkbox[name="accept_submission"]');
+        var form           = $(this);
+        var acceptSubmit   = form.find('input:checkbox[name="accept_submission"]');
+        var rubricCriteria = form.find('[data-role="rubric-criterion-selector"]');
 
         // Do assessment-specific descriptors get shown?
         var isRubricAssessmentSpecificDescriptors = function() {
@@ -19,39 +20,44 @@
             rubric: form.find('[data-hide-watch-value="rubric"]'),
             letter: form.find('[data-hide-watch-value="letter"]')
         };
-        $.validator.addMethod("markTypeTotalCheck", function(value) {
-            if (marktype.total.is(':visible')) {
-                return value > 0;
+
+        //// Total mark validator
+        //$.validator.addMethod("markTypeTotalCheck", function(value) {
+        //    if (marktype.total.is(':visible')) {
+        //        return value > 0;
+        //    } else {
+        //        return true;
+        //    }
+        //}, "Please enter a numeric mark amount");
+
+        // Rubric validator: do any exist?
+        $.validator.addMethod('markTypeRubricCriteriaExists', function() {
+            if (marktype.rubric.is(':visible')) {
+                return rubricCriteria.find('input[type="checkbox"]').length >= 1;
             } else {
                 return true;
             }
-        }, "Please enter a numeric mark amount");
-
-        $.validator.addMethod('markTypeRubricCriteriaExists', function() {
-            if(marktype.rubric.is(':visible')) {
-                return $('#rubric-criteria').find('input[type="checkbox"]').length >= 1;
-            }
-            else {
-                return true;
-            }
         }, 'Please ensure at least one criterion exists');
+
+        // Rubric criteria: is at least one selected?
         $.validator.addMethod('markTypeRubricCriteriaCheck', function() {
-            if(marktype.rubric.is(':visible')) {
-                return $('#rubric-criteria').find('input:checked').length >= 1;
-            }
-            else {
+            if (marktype.rubric.is(':visible')) {
+                return rubricCriteria.find('input:checked').length >= 1;
+            } else {
                 return true;
             }
         }, 'Please select at least one criterion');
 
-        $.validator.addMethod('markTypeRubricResultsetCheck', function() {
-            if(marktype.rubric.is(':visible')) {
-                return $('#rubric-results').find('input:checked').length == 1;
-            }
-            else {
-                return true;
-            }
-        }, 'Please select a result set');
+        //// Rubric result set: is one selected?
+        //// (Simplify to required: resultset, depends: rubric is visible)
+        //$.validator.addMethod('markTypeRubricResultsetCheck', function() {
+        //    if(marktype.rubric.is(':visible')) {
+        //        return $('#rubric-results').find('input:checked').length == 1;
+        //    }
+        //    else {
+        //        return true;
+        //    }
+        //}, 'Please select a result set');
 
         // Are rubric values checked?
         var isRubricValueChecked = function(element) {
@@ -62,16 +68,18 @@
                 return false;
             }
             // Is this rubric selected? Validate if so
-            return $(element).closest('.crit')
-                    .find(':checkbox[name^="crit"]')
+            return $(element).closest('[data-role="criterion"]')
+                    .find('[data-role="criterion-selector"]')
                     .prop('checked') === true;
         };
-        // Validator for rubric values - they cannot be the same
+
+        // Validator for rubric values - they cannot be the same in the same criterion
         $.validator.addMethod(
             'markTypeRubricValuesCheck',
             function (value, element) {
                 // All value inputs that aren't the currently validated one
-                var duplicateValues = form.find('input[name^="value"]').not(element).filter(
+                var criterion       = element.closest('[data-role="criterion"]');
+                var duplicateValues = criterion.find('[data-role="criterion-value"]').not(element).filter(
                     function() {
                         // Filter out inputs that aren't in the same criterion,
                         // and don't have the same value
@@ -116,11 +124,17 @@
         form.validate({
             rules: {
                 markvalue: {
-                    markTypeTotalCheck: true,
-                    number: true
+                    required: true,
+                    number: true,
+                    min: 1
                 },
                 result_set: {
-                    markTypeRubricResultsetCheck: true
+                    required: true
+                    //{
+                    //    depends: function() {
+                    //        return marktype.rubric.is(':visible');
+                    //    }
+                    //}
                 },
                 criteria: {
                     markTypeRubricCriteriaExists: true,
@@ -144,6 +158,7 @@
                 late_period: late_date_valid
             },
             messages: {
+                result_set:  {required: 'Please select a result set'},
                 open_date:   {dateNotBefore: open_date_valid.dateNotBefore.message},
                 open_hour:   {dateNotBefore: open_date_valid.dateNotBefore.message},
                 open_minute: {dateNotBefore: open_date_valid.dateNotBefore.message},
@@ -163,6 +178,8 @@
                 late_date: 'late_date late_hour late_minute late_period'
             },
             errorPlacement: function(label, element) {
+                // Is this inside a table?
+                // Put it at the bottom of the cell, otherwise usual insertAfter
                 var cell = element.closest('td');
                 if (cell.length > 0) {
                     label.appendTo(cell);
@@ -172,11 +189,11 @@
             },
             // By default all hidden fields are ignored.
             // I don't want to ignore rubric values
-            ignore: ':hidden:not(input[name^="value"])'
+            ignore: ':hidden:not([data-role="criterion-value"])'
         });
 
-        // Rubric values validation
-        form.find('input[name^="value"]').each(function() {
+        // Rubric values validation - add dynamically
+        form.find('[data-role="criterion-value"]').each(function() {
             $(this).rules(
                 'add',
                 {
