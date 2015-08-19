@@ -223,6 +223,8 @@ class StudentReportCard
         $page->setTab($tab);
         // global blocks
         $page->setBlock(TEMPLATE_content, 'subject_container', 'subject_container_block');
+        $page->setBlock(TEMPLATE_content, 'no_subjects', 'no_subjects_block');
+
         // global vars
         /** @var $target User */
         $target = UserMapper::getInstance()->findById($this->targetUserId);
@@ -1124,13 +1126,20 @@ class StudentReportCard
             // $this->parse('icon_block', 'icon');
             $page->parse('SUBJECT_LIST', 'subjectTpl', true);
         }
+
         if (count($this->categoriesInSemester)) {
             $page->parse('subject_container_block', 'subjectListTpl');
+
+            $page->setVar(array(
+                'no_subjects_block' => ''
+            ));
         }
         else {
             $page->setVar(array(
-                'subject_container_block' => '<h2>No subjects</h2>'
+                'subject_container_block' => ''
             ));
+
+            $page->parse('no_subjects_block', 'no_subjects');
         }
     }
 
