@@ -303,6 +303,11 @@ class StudentReportCard
                 $this->$m($page);
             }
         }
+
+        $page->parse('subject_container_block', 'subject_container');
+        $page->setVar(array(
+            'no_subjects_block' => ''
+        ));
     }
 
     protected function renderTeachers(\SitePage $page)
