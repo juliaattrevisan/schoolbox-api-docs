@@ -111,21 +111,10 @@
             $('[data-relation="rubric-use-assessment-specific"]').prop('checked', true).trigger('change');
         });
 
-
-//        var rubric = {
-//            resultset:$('#rubric-results :checked')
-//        };
-
-//        showHideMarktype(0);
-
         // Do assessment-specific descriptors get shown?
         var isRubricAssessmentSpecificDescriptors = function() {
             return document.getElementById('rs-0').checked;
         };
-
-//        $('#marktype').change(function () {
-//            showHideMarktype(500);
-//        });
 
         // validation rules
         var marktype = {
