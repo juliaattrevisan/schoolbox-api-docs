@@ -44,10 +44,9 @@
             <select id="enrolled-subjects">
                 <option disabled="disabled" selected="selected">Select a subject</option>
                 <!-- BEGIN subject_selector -->
-                <option data-id="{ENR_SUBJ_ID}" title="{ENR_SUBJ_CODE}"
-                        value="{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ENR_SUBJ_ID}"
-                {ENR_SUBJ_SELECTED}>
-                {ENR_SUBJ_NAME}
+                <option data-id="{ENR_SUBJ_ID}" title="{ENR_SUBJ_CODE}" value="{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ENR_SUBJ_ID}"
+                    {ENR_SUBJ_SELECTED}>
+                    {ENR_SUBJ_NAME}
                 </option>
                 <!-- END subject_selector -->
             </select>
@@ -147,7 +146,7 @@
                                     </ul>
                                 </div>
                                 <nav>
-                                    <a data-collapser="true" class="button icon-add" title="{SUBJECT_RUBRIC_GROUP_NAME}"></a>
+                                    <a data-collapser="true" class="icon-add" title="{SUBJECT_RUBRIC_GROUP_NAME}"></a>
                                 </nav>
                             </li>
                         </ul>
@@ -211,7 +210,7 @@
                 </div>
                 <nav>
                     <!-- BEGIN work_actionable -->
-                    <a href="/{WORK_BTN_HREF}" class="button no-text {WORK_BTN_ICON}" title="{WORK_BTN_LABEL}"></a>
+                    <a href="/{WORK_BTN_HREF}" class="{WORK_BTN_ICON}" title="{WORK_BTN_LABEL}"></a>
                     <!-- END work_actionable -->
 
                     <!-- BEGIN work_publishable -->

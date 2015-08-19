@@ -826,7 +826,7 @@ class StudentReportCard
         );
         $buttonSeePreviousAttempts = array(
             'WORK_BTN_HREF'  => 'assess/attempts/' . $oa->getId() . '/' . $this->targetUserId,
-            'WORK_BTN_ICON'  => 'list',
+            'WORK_BTN_ICON'  => 'icon-quiz',
             'WORK_BTN_LABEL' => 'View all attempts'
         );
 
