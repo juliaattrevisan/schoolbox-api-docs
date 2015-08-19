@@ -76,9 +76,9 @@
 //            });
 //        });
 
-        var critSelector       = 'div.crit',
-            inputSelector      = 'textarea, input[type=text]',
-            descriptorSelector = '.desc',
+        var critSelector       = '[data-role="criterion"]',
+            inputSelector      = '[data-role="criterion-description"], [data-role="criterion-value"]',
+            descriptorSelector = '[data-role="criterion-descriptor"]',
             editingClass       = 'editing',
             placeholderText    = 'Enter descriptor';
 
