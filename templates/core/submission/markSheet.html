@@ -24,83 +24,95 @@
     </div>
 </div>
 
-<table data-mark-sheet>
-	<thead>
-        <tr>
-            <th></th>
-            <!-- BEGIN work_header -->
-            <th>
-                <a href="{WORK_PATH}/{WORK_ID}">{WORK_TITLE}</a><br />
-                <span class="meta">{WORK_TYPE}</span>
-            </th>
-            <!-- END work_header -->
-		    <th>
-                Student Average
-            </th>
-	    </tr>
-	</thead>
-    <tbody>
-        <tr>
-            <td>
-                <a href="#" class='icon-add' title="Show additional metrics" data-toggle-averages></a>
-                Class Average
-            </td>
-            <!-- BEGIN class_average -->
-            <td class="gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">
-                <a href="{WORK_PATH}/{WORK_ID}">{WORK_CLASSAVG_CLEAN}</a>
-            </td>
-            <!-- END class_average -->
-            <td></td>
-        </tr>
-        <!-- BEGIN stat -->
-        <tr class="{WORK_STAT_CLASS}" data-sub-table-row>
-            <td>{WORK_STAT_TITLE}</td>
-            <!-- BEGIN stat_item -->
-            <td>
-                <!-- BEGIN stat_editable -->
-                <input type="text" maxlength="3" length="3" name="{WORK_STAT_CLASS}[{WORK_NS_ID}]" value="{WORK_STAT_VALUE}"/>
-                <span data-identifier="{WORK_STAT_CLASS}[{WORK_NS_ID}]-weight" class="label success full-width hide"></span>
-                <!-- END stat_editable -->
-                <!-- BEGIN stat_visible -->
-                <select data-visibility-selector="{WORK_STAT_CLASS}[{WORK_NS_ID}]-visibility">
-                    <!-- BEGIN stat_visibility_drop -->
-                    <option value="{ASSESS_MODIFY_URL}&mark_visibility={MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_SELECTED}>
-                        {MARK_VISIBILITY_TEXT}
-                    </option>
-                    <!-- END stat_visibility_drop -->
-                </select>
-                <span data-identifier="{WORK_STAT_CLASS}[{WORK_NS_ID}]-visibility" class="label success full-width hide"></span>
-                <!-- END stat_visible -->
-                <!-- BEGIN stat_readonly -->
-                {WORK_STAT_VALUE}
-                <!-- END stat_readonly -->
-            </td>
-            <!-- END stat_item -->
-            <td></td>
-        </tr>
-        <!-- END stat -->
-        <!-- BEGIN student_row -->
-        <tr data-id="{STUDENT_ID}">
-            <td class="no-pad">
-                <div class="avatar card">
-                    <a href="/search/user/{STUDENT_ID}" title="View Profile">
-                        <img src="/portrait.php?userId={STUDENT_EXTID}&size=square64" alt="View Profile" />
-                        <p>{STUDENT_NAME}</p>
-                    </a>
-                </div>
-            </td>
-            <!-- BEGIN student_work -->
-            <td class="column-{WORK_TYPE}-{WORK_ID}">
-                <a href="{STUDENT_WORK_PATH}" title="{STUDENT_WORK_COMMENT}">{STUDENT_WORK_MARK}</a>
-            </td>
-            <!-- END student_work -->
-            <td class="gradient-{STUDENT_AVG_GRADIENT}-bg">
-                <a class="gradient-{STUDENT_AVG_GRADIENT}" href="/submission/allWork/{STUDENT_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{CID}">{STUDENT_AVG_CLEAN}</a>
-            </td>
-        </tr>
-        <!-- END student_row -->
-    </tbody>
-</table>
+<div class="row">
+    <div class="small-12 island">
+        <div class="scrollable">
+            <table data-mark-sheet>
+                <thead>
+                    <tr class="rotate-headers">
+                        <th></th>
+                        <!-- BEGIN work_header -->
+                        <th>
+                            <div>
+                                <span>
+                                    <a href="{WORK_PATH}/{WORK_ID}">{WORK_TITLE}</a><br />
+                                    <span class="meta">{WORK_TYPE}</span>
+                                </span>
+                            </div>
+                        </th>
+                        <!-- END work_header -->
+                        <th>
+                            <div>
+                                <span>Student Average</span>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>
+                            <a href="#" class='icon-add' title="Show additional metrics" data-toggle-averages></a>
+                            Class Average
+                        </th>
+                        <!-- BEGIN class_average -->
+                        <td class="gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">
+                            <a href="{WORK_PATH}/{WORK_ID}">{WORK_CLASSAVG_CLEAN}</a>
+                        </td>
+                        <!-- END class_average -->
+                        <td></td>
+                    </tr>
+                    <!-- BEGIN stat -->
+                    <tr class="sub-row {WORK_STAT_CLASS}" data-sub-table-row>
+                        <th>{WORK_STAT_TITLE}</th>
+                        <!-- BEGIN stat_item -->
+                        <td>
+                            <!-- BEGIN stat_editable -->
+                            <input type="text" maxlength="3" length="3" name="{WORK_STAT_CLASS}[{WORK_NS_ID}]" value="{WORK_STAT_VALUE}"/>
+                            <span data-identifier="{WORK_STAT_CLASS}[{WORK_NS_ID}]-weight" class="label success full-width hide"></span>
+                            <!-- END stat_editable -->
+                            <!-- BEGIN stat_visible -->
+                            <select data-visibility-selector="{WORK_STAT_CLASS}[{WORK_NS_ID}]-visibility">
+                                <!-- BEGIN stat_visibility_drop -->
+                                <option value="{ASSESS_MODIFY_URL}&mark_visibility={MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_SELECTED}>
+                                    {MARK_VISIBILITY_TEXT}
+                                </option>
+                                <!-- END stat_visibility_drop -->
+                            </select>
+                            <span data-identifier="{WORK_STAT_CLASS}[{WORK_NS_ID}]-visibility" class="label success full-width hide"></span>
+                            <!-- END stat_visible -->
+                            <!-- BEGIN stat_readonly -->
+                            {WORK_STAT_VALUE}
+                            <!-- END stat_readonly -->
+                        </td>
+                        <!-- END stat_item -->
+                        <td></td>
+                    </tr>
+                    <!-- END stat -->
+                    <!-- BEGIN student_row -->
+                    <tr data-id="{STUDENT_ID}">
+                        <th class="no-pad">
+                            <div class="avatar card">
+                                <a href="/search/user/{STUDENT_ID}" title="View Profile">
+                                    <img src="/portrait.php?userId={STUDENT_EXTID}&size=square64" alt="View Profile" />
+                                    <p>{STUDENT_NAME}</p>
+                                </a>
+                            </div>
+                        </th>
+                        <!-- BEGIN student_work -->
+                        <td class="column-{WORK_TYPE}-{WORK_ID}">
+                            <a href="{STUDENT_WORK_PATH}" title="{STUDENT_WORK_COMMENT}">{STUDENT_WORK_MARK}</a>
+                        </td>
+                        <!-- END student_work -->
+                        <td class="gradient-{STUDENT_AVG_GRADIENT}-bg">
+                            <a class="gradient-{STUDENT_AVG_GRADIENT}" href="/submission/allWork/{STUDENT_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{CID}">{STUDENT_AVG_CLEAN}</a>
+                        </td>
+                    </tr>
+                    <!-- END student_row -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
 <script type="text/javascript">
