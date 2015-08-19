@@ -222,7 +222,7 @@ class StudentReportCard
         $page->setFile(TEMPLATE_content, $template);
         $page->setTab($tab);
         // global blocks
-        $page->setBlock(TEMPLATE_content, 'subject', 'subject_block');
+        $page->setBlock(TEMPLATE_content, 'subject_container', 'subject_container_block');
         // global vars
         /** @var $target User */
         $target = UserMapper::getInstance()->findById($this->targetUserId);
@@ -306,7 +306,7 @@ class StudentReportCard
     protected function renderTeachers(\SitePage $page)
     {
         // output teachers
-        $page->setBlock(TEMPLATE_content, 'subject_teacher', 'subject_teacher_block');
+        $page->setBlock('subject_container', 'subject_teacher', 'subject_teacher_block');
         $teachers = $this->subjectData->getTeachers();
         if (count($teachers)) {
             foreach ($teachers as $teacher) {
@@ -328,7 +328,7 @@ class StudentReportCard
 
     protected function renderGradeAverage(\SitePage $page)
     {
-        $page->setBlock(TEMPLATE_content, 'grade_average', 'grade_average_block');
+        $page->setBlock('subject_container', 'grade_average', 'grade_average_block');
         // if you can't see the grade average...you, well, can't see the grade average
         if (!$this->checkPermission(self::CAN_VIEW_OVERALL_GRADE)) {
             $page->setVar('grade_average_block', '');
@@ -448,7 +448,7 @@ class StudentReportCard
 
     protected function renderCriteria(\SitePage $page)
     {
-        $page->setBlock(TEMPLATE_content, 'subject_rubric', 'subject_rubric_block');
+        $page->setBlock('subject_container', 'subject_rubric', 'subject_rubric_block');
         $page->setBlock('subject_rubric', 'subject_rubric_group', 'subject_rubric_group_block');
         $page->setBlock('subject_rubric', 'subject_rubric_submissionbox', 'subject_rubric_submissionbox_block');
         $page->setBlock('subject_rubric_group', 'subject_rubric_criterion', 'subject_rubric_criterion_block');
@@ -589,8 +589,8 @@ class StudentReportCard
     protected function renderAssessments(\SitePage $page)
     {
         // output assessments
-        $page->setBlock(TEMPLATE_content, 'no_work', 'no_work_block');
-        $page->setBlock(TEMPLATE_content, 'has_work', 'has_work_block');
+        $page->setBlock('subject_container', 'no_work', 'no_work_block');
+        $page->setBlock('subject_container', 'has_work', 'has_work_block');
         $page->setBlock('has_work', 'work', 'work_block');
         $page->setBlock('work', 'work_actionable', 'work_actionable_block');
         $page->setBlock('work', 'work_publishable', 'work_publishable_block');
@@ -844,7 +844,7 @@ class StudentReportCard
 
     protected function renderComments(\SitePage $page)
     {
-        $page->setBlock(TEMPLATE_content, 'subject_comments', 'subject_comments_block');
+        $page->setBlock('subject_container', 'subject_comments', 'subject_comments_block');
         $page->setBlock('subject_comments', 'comment', 'comment_block');
         $page->setBlock('subject_comments', 'create_comment', 'create_comment_block');
         $page->setBlock('comment', 'comment_modify', 'comment_modify_block');
@@ -970,7 +970,7 @@ class StudentReportCard
     protected function renderOverview(\SitePage $page)
     {
         $page->setVar('RC_TITLE', "Semester {$this->targetSemester}, {$this->targetYear}");
-        // we need to inject content into subject_block rather than use its template
+        // we need to inject content into subject_container_block rather than use its template
         $page->setFile('subjectListTpl', 'submission/allWorkOverview.html');
         $page->setFile('subjectTpl', 'activity/subjectlist.html');
         $page->setBlock('subjectTpl', 'teacher', 'teacher_block');
@@ -1125,9 +1125,12 @@ class StudentReportCard
             $page->parse('SUBJECT_LIST', 'subjectTpl', true);
         }
         if (count($this->categoriesInSemester)) {
-            $page->parse('subject_block', 'subjectListTpl');
-        } else {
-            $page->setVar('subject_block', '<h2>No subjects</h2>');
+            $page->parse('subject_container_block', 'subjectListTpl');
+        }
+        else {
+            $page->setVar(array(
+                'subject_container_block' => '<h2>No subjects</h2>'
+            ));
         }
     }
 
