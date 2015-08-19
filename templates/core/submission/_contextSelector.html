@@ -18,19 +18,13 @@
 
 <!-- BEGIN subject_context -->
 <div class="row">
-    <div class="small-1 large-2 columns">
-        <a class="button icon-previous no-text" {SEMESTER_BACK_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_BACK}{SEMESTER_CONTEXT_CATEGORY_ID}"></a>
-    </div>
-    <div class="small-10 large-8 columns text-center">
+    <div class="small-12 large-8 columns text-center">
         <select id="context-selector-enrolled-subjects">
             <option disabled="disabled" selected="selected">Select a subject</option>
             <!-- BEGIN subject_option -->
             <option data-id="{SUBJECT_ID}" value="{SUBJECT_HREF}" {SUBJECT_SELECTED}>{SUBJECT_NAME}</option>
             <!-- END subject_option -->
         </select>
-    </div>
-    <div class="small-1 large-2 columns">
-        <a class="button icon-next no-text" {SEMESTER_FWD_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_FWD}{SEMESTER_CONTEXT_CATEGORY_ID}"></a>
     </div>
 </div>
 <!-- END subject_context -->
