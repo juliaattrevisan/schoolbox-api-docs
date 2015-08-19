@@ -462,6 +462,91 @@ td, th{
 		margin: 0 rem-calc(($base-font-size)) 0 0;
 	}
 }
+tr.sub-row {
+	th, td {
+		background-color: $gainsboro;
+	}
+
+}
+
+$square-grid-td-size: 4rem;
+
+$rotate-width: 4.5rem;
+$rotate-angle: 45;
+$rotate-th-width: $square-grid-td-size;
+
+
+.square-grid {
+	td, thead th {
+		width: $square-grid-td-size;
+		white-space: nowrap;
+	}
+}
+
+.rotate-headers {
+
+	background-color: $body-bg;
+
+	th {
+		&:empty {
+			&:first-child {
+				width: 50%;
+			}
+			&:last-child {
+				width: 100%;
+			}
+		}
+
+		@extend %p;
+		border-color: $vapor;
+		height: $rotate-width * 2 + 1;
+		min-width: $rotate-th-width;
+		max-width: $rotate-th-width;
+		position: relative;
+		vertical-align: bottom;
+		padding: 0 !important;
+		letter-spacing: 0.1ex;
+
+		> div {
+			@include transform( skew(-#{$rotate-angle}deg, 0deg) );
+			overflow: hidden;
+			border: 0 solid #eeeeee;
+			border-left-width: 1px;
+			z-index: 1;
+			position: relative;
+			height: 100%;
+			top: 0;
+			left: $rotate-width + 0.5;
+			filter: none !important;
+			background-color: $white;
+
+			> span {
+
+				$rotate-angle-complement: 360 - $rotate-angle;
+
+				@include transform( skew(#{$rotate-angle}deg, 0deg) rotate(#{$rotate-angle-complement}deg) );
+				filter: none !important;
+				position: absolute;
+				top: auto;
+				bottom: 3.75rem;
+				left: -3.75rem;
+				display: inline-block;
+				width: 11rem;
+				text-align: left;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				font-weight: normal;
+			}
+		}
+
+		.meta {
+			font-style: normal;
+		}
+
+	}
+
+}
 
 // Panels
 .island-panel {
