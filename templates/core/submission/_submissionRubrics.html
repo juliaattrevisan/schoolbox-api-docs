@@ -12,7 +12,7 @@
         if (isRubricAssessmentSpecificDescriptors()) {
             criterionSelector.find('[data-role="criterion"]').each(function () {
                 if ($(this).find(':checked').length) {
-                    descriptor('show', this, 0);
+                    descriptor('show', $(this).find('[data-role="criterion"]'), 0);
                 }
             });
         }
@@ -21,17 +21,18 @@
         criterionSelector.on('change', 'input', function () {
             // hide the descriptors
             if (!isRubricAssessmentSpecificDescriptors()) {
-                descriptor('hide', $('#rubric-criteria div'), 100);
+                descriptor('hide', criterionSelector.find('[data-role="criterion"]'), 100);
             }
             // show them if checked
             else {
                 $('#rubric-criteria div').each(function () {
                     var checked = $(this).children(':checkbox').prop('checked');
-                    descriptor(checked ? 'show' : 'hide', this, 100)
+                    descriptor(checked ? 'show' : 'hide', criterionSelector.find('[data-role="criterion"]'), 100)
                 });
             }
         });
 
+        // Did I check/uncheck a criterion selector?
         criterionSelector.on('change', ':checkbox', function () {
             var act = 'hide';
 
@@ -39,41 +40,41 @@
             if (isRubricAssessmentSpecificDescriptors() && this.checked) {
                 act = 'show';
             }
-            descriptor(act, $(this).parent('div'), 100);
+            descriptor(act, $(this).closest('[data-role="criterion"]'), 100);
         });
 
-        // trigger change of descriptor count when dropdown changed
-        form.on('change', '[data-relation="rubric-descriptor-count"]', function () {
-            var target = $('#descriptor-count option:selected').first().val();
-
-            $('#rubric-criteria tr').each(function () {
-                var i,
-                    inputCount = $(this).find('td').length,
-                    diff = target - inputCount;
-
-                if (diff < 0) {
-                    for (i = 0; i < 0 - diff; ++i) {
-                        // remove trailing li's
-                        $(this).find('td:last-child').detach();
-                    }
-                }
-                else if (diff > 0) {
-                    var insertList = '',
-                        last = $(this).children('td').last(),
-                        newItem;
-
-                    for (i = 0; i < diff; ++i) {
-                        // duplicate li's
-                        newItem = last.clone(true);
-
-                        // clear the descriptor value
-                        newItem.find('textarea').val('');
-                        newItem.find('input').val( parseInt(newItem.find('input').val()) + (i+1) );
-                        $(this).append( newItem );
-                    }
-                }
-            });
-        });
+//        // trigger change of descriptor count when dropdown changed
+//        form.on('change', '[data-relation="rubric-descriptor-count"]', function () {
+//            var target = $('#descriptor-count option:selected').first().val();
+//
+//            $('#rubric-criteria tr').each(function () {
+//                var i,
+//                    inputCount = $(this).find('td').length,
+//                    diff = target - inputCount;
+//
+//                if (diff < 0) {
+//                    for (i = 0; i < 0 - diff; ++i) {
+//                        // remove trailing li's
+//                        $(this).find('td:last-child').detach();
+//                    }
+//                }
+//                else if (diff > 0) {
+//                    var insertList = '',
+//                        last = $(this).children('td').last(),
+//                        newItem;
+//
+//                    for (i = 0; i < diff; ++i) {
+//                        // duplicate li's
+//                        newItem = last.clone(true);
+//
+//                        // clear the descriptor value
+//                        newItem.find('textarea').val('');
+//                        newItem.find('input').val( parseInt(newItem.find('input').val()) + (i+1) );
+//                        $(this).append( newItem );
+//                    }
+//                }
+//            });
+//        });
 
         var critSelector       = 'div.crit',
             inputSelector      = 'textarea, input[type=text]',
@@ -103,44 +104,18 @@
                 .attr('placeholder', placeholderText);
         });
 
-//        function showHideMarktype(timeout) {
-//            var v = $('#marktype option:selected').first().data('slug');
-//            if (v == 'raw') {
-//                marktype.letter.hide(timeout);
-//                marktype.rubric.hide(timeout, function () {
-//                    marktype.total.show(timeout);
-//                });
-//            }
-//            else if (v == 'rubric') {
-//                marktype.letter.hide(timeout);
-//                marktype.total.hide(timeout, function () {
-//                    marktype.rubric.show(timeout);
-//                });
-//            }
-//            else if (v == 'letter') {
-//                marktype.rubric.hide(timeout);
-//                marktype.total.hide(timeout, function () {
-//                    marktype.letter.show(timeout);
-//                });
-//            }
-//            else {
-//                marktype.letter.hide(timeout);
-//                marktype.rubric.hide(timeout);
-//                marktype.total.hide(timeout);
-//            }
-//        }
-
         function descriptor(action, element, timeout) {
-            $(element).find(':input:not(:checkbox)').parent('td').each(function () {
-                if (action == 'show') {
-                    $(this).show();
-                    $(element).addClass('highlight').find(inputSelector).first().trigger('click');
-                }
-                else if (action == 'hide') {
-                    $(element).removeClass('highlight');
-                    $(this).hide();
-                }
-            });
+            $(element).find('[data-role="criterion-descriptor"]').toggleClass('hide', (action == 'hide'));
+//            $(element).find(':input:not(:checkbox)').parent('td').each(function () {
+//                if (action == 'show') {
+//                    $(this).show();
+//                    $(element).addClass('highlight').find(inputSelector).first().trigger('click');
+//                }
+//                else if (action == 'hide') {
+//                    $(element).removeClass('highlight');
+//                    $(this).hide();
+//                }
+//            });
         }
     })
 </script>
