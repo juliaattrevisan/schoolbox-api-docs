@@ -469,6 +469,17 @@ tr.sub-row {
 
 }
 
+.scrollable {
+
+	@extend .overflow;
+	margin-bottom: 0.875rem; // put the margin on the div, not the table inside it
+
+	table {
+		margin-bottom: 0;
+	}
+
+}
+
 $square-grid-td-size: 4rem;
 
 $rotate-width: 4.5rem;
