@@ -260,7 +260,7 @@ class StudentReportCard
         $years = range($this->currentYear, $earliestYear);
 
         $contextSelector->setYears($years);
-        $contextSelector->setCategoryFirst(true);
+        $contextSelector->setCategoryFirst(false);
 
         try {
             $contextSelector->setCategories($this->categoriesInSemester);
@@ -272,7 +272,7 @@ class StudentReportCard
             $page, 'CONTEXT_SELECTOR', array(
                 'year'     => $this->targetYear,
                 'semester' => $this->targetSemester,
-                'category' => $this->targetCategoryId
+                'category' => ''
             )
         );
     }

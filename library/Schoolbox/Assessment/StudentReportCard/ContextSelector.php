@@ -118,7 +118,7 @@ class ContextSelector {
 		$page->setBlock($tpl, 'semester_context', 'semester_context_block');
 		$page->setBlock($tpl, 'subject_context', 'subject_context_block');
 		$page->setVar('PAGE_HREF',    $this->basePath);
-		$page->setVar('SUBJECT_PART', isset($selectedValues['category']) ? ($selectedValues['category'].'/') : '');
+		$page->setVar('SUBJECT_PART', is_numeric($selectedValues['category']) ? ($selectedValues['category'].'/') : '');
         $page->setVar('SEMESTER_CONTEXT_CATEGORY_ID', isset($selectedValues['list']) ? '/'.($selectedValues['list']) : '');
 
 		// parse the semesters, if there are any
