@@ -589,7 +589,9 @@ class StudentReportCard
     protected function renderAssessments(\SitePage $page)
     {
         // output assessments
-        $page->setBlock(TEMPLATE_content, 'work', 'work_block');
+        $page->setBlock(TEMPLATE_content, 'no_work', 'no_work_block');
+        $page->setBlock(TEMPLATE_content, 'has_work', 'has_work_block');
+        $page->setBlock('has_work', 'work', 'work_block');
         $page->setBlock('work', 'work_actionable', 'work_actionable_block');
         $page->setBlock('work', 'work_publishable', 'work_publishable_block');
         $page->setBlock('work', 'work_clickable', 'work_clickable_block');
@@ -707,8 +709,20 @@ class StudentReportCard
                     )
                 );
             }
-        } else {
-            $page->setVar('work_block', '<td colspan="5">No assessments for this subject</td>');
+
+            $page->parse('has_work_block', 'has_work');
+
+            $page->setVar(array(
+                'no_work_block' => ''
+            ));
+        }
+        else {
+            $page->setVar(array(
+                'has_work_block' => '',
+                'work_block' => ''
+            ));
+
+            $page->parse('no_work_block', 'no_work');
         }
     }
 
