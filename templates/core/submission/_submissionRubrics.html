@@ -66,16 +66,14 @@
                 }
                 else if (diff > 0) {
                     // Add descriptors to end
-                    var last = $(this).find('[data-role="criterion-descriptor"]').last(),
-                        newItem;
-
-                    for (i = 0; i < diff; ++i) {
-                        newItem = last.clone(true);
+                    for (i = 0; i < diff; i++) {
+                        var last    = $(this).find('[data-role="criterion-descriptor"]').last();
+                        var newItem = last.clone(true);
 
                         // clear the descriptor value
                         newItem.find('[data-role="criterion-description"]').val('');
                         newItem.find('[data-role="criterion-value"]').val(
-                            parseInt(newItem.find('[data-role="criterion-value"]').val()) + (i+1)
+                            parseInt(newItem.find('[data-role="criterion-value"]').val()) + 1
                         );
                         newItem.insertAfter(last);
                     }
