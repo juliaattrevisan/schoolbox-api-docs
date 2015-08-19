@@ -1,23 +1,29 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>Grades for {RC_TITLE}</h1>
+    </div>
+</div>
 
-        <ul class="action-list">
-            <li class="actions-small-1">
-                <div class="list-item">
-                    <div class="small-12 avatar card">
-                        <a href="/search/user/{WORK_USER_ID}" title="View Profile">
-                            <img src="/portrait.php?userId={WORK_USER_EXT_ID}&amp;size=square64" class="content" alt="{WORK_USER_NAME}" />
-                            <p>{WORK_USER_NAME}</p>
-                        </a>
-                        <p class="meta">{WORK_USER_BYLINE} Student</p>
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <ul class="action-list">
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
+                            <a href="/search/user/{WORK_USER_ID}" title="View Profile">
+                                <img src="/portrait.php?userId={WORK_USER_EXT_ID}&amp;size=square64" alt="{WORK_USER_NAME}" />
+                                <p>{WORK_USER_NAME}</p>
+                            </a>
+                            <p class="meta">{WORK_USER_BYLINE} Student</p>
+                        </div>
                     </div>
-                </div>
-                <nav>
-                    <a href="/search/user/{WORK_USER_ID}" class="icon-next" title="View Profile"></a>
-                </nav>
-            </li>
-        </ul>
+                    <nav>
+                        <a href="/search/user/{WORK_USER_ID}" class="icon-next" title="View Profile"></a>
+                    </nav>
+                </li>
+            </ul>
+        </section>
     </div>
 </div>
 
@@ -50,25 +56,27 @@
 </div>
 
 <div class="row">
-    <div class="small-12 columns">
-        <ul class="action-list">
-            <!-- BEGIN subject_teacher -->
-            <li class="actions-small-1">
-                <div class="list-item">
-                    <div class="small-12 avatar card">
-                        <a href="/search/user/{SUBJ_TCH_ID}" title="View Profile">
-                            <img src="/portrait.php?userId={SUBJ_TCH_EXTID}&amp;size=square64" class="content" alt="{SUBJ_TCH_NAME}" />
-                            <p>{SUBJ_TCH_NAME}</p>
-                        </a>
-                        <p class="meta">Teacher</p>
+    <div class="small-12 island">
+        <section>
+            <ul class="action-list">
+                <!-- BEGIN subject_teacher -->
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
+                            <a href="/search/user/{SUBJ_TCH_ID}" title="View Profile">
+                                <img src="/portrait.php?userId={SUBJ_TCH_EXTID}&amp;size=square64" alt="{SUBJ_TCH_NAME}" />
+                                <p>{SUBJ_TCH_NAME}</p>
+                            </a>
+                            <p class="meta">Teacher</p>
+                        </div>
                     </div>
-                </div>
-                <nav>
-                    <a href="/search/user/{SUBJ_TCH_ID}" class="icon-next" title="View Profile"></a>
-                </nav>
-            </li>
-            <!-- END subject_teacher -->
-        </ul>
+                    <nav>
+                        <a href="/search/user/{SUBJ_TCH_ID}" class="icon-next" title="View Profile"></a>
+                    </nav>
+                </li>
+                <!-- END subject_teacher -->
+            </ul>
+        </section>
     </div>
 </div>
 
