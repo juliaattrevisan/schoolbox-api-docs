@@ -5,7 +5,7 @@
 </div>
 
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12 large-6 island">
         <section>
             <ul class="action-list">
                 <li class="actions-small-1">
@@ -24,17 +24,7 @@
                 </li>
             </ul>
         </section>
-    </div>
-</div>
 
-<div class="row">
-    <div class="small-12 island">
-        {CONTEXT_SELECTOR}
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
         <section>
             <ul class="action-list">
                 <!-- BEGIN subject_teacher -->
@@ -56,13 +46,12 @@
             </ul>
         </section>
     </div>
-</div>
+    <div class="small-12 large-6 island">
+        <section class="content">
+        {CONTEXT_SELECTOR}
+        </section>
 
-<!-- BEGIN grade_average -->
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Current Grade Average</h2>
-
+        <!-- BEGIN grade_average -->
         <section class="content gradient-{SUBJ_GRADEIENT}-bg">
             <p class="grade">
                 <span class="gradient-{SUBJ_GRADEIENT}">{SUBJ_GRADE_AVG}</span>
@@ -70,9 +59,9 @@
 
             {SUBJ_GRADE_TREND}
         </section>
+        <!-- END grade_average -->
     </div>
 </div>
-<!-- END grade_average -->
 
 <div class="row">
     <div class="small-12 island">
