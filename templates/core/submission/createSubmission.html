@@ -3,6 +3,9 @@
 <script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 <script type="text/javascript" src="/javascript/jquery.timetableDaySelector.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.hourpicker.js"></script>
+<script type="text/javascript" src="/javascript/jquery.minutepicker.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
@@ -307,6 +310,10 @@
                 }
             );
 
+        // Add hour and minute picker
+        $('input[data-timepicker="hour"]').hourpicker({ hours: 12 });
+        $('input[data-timepicker="minute"]').minutepicker();
+
         // Set up the gradegroup thing
         $('a[data-role="showGradeScale"]').click(function() {
             var gradeScale = $('#gradegroup').val();
@@ -486,7 +493,9 @@
                                 <div class="timepick">
                                     <label>
                                         Hour
-                                        <input name="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" />
+                                        <div class="timepick">
+                                            <input name="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" data-timepicker="hour" />
+                                        </div>
                                     </label>
                                 </div>
                             </div>
@@ -494,7 +503,9 @@
                                 <div class="timepick">
                                     <label>
                                         Minute
-                                        <input name="publish_minute" type="text" maxlength="2" value="{PUBLISH_MIN}" />
+                                        <div class="timepick">
+                                            <input name="publish_minute" type="text" maxlength="2" value="{PUBLISH_MIN}" data-timepicker="minute" />
+                                        </div>
                                     </label>
                                 </div>
                             </div>
@@ -538,7 +549,9 @@
                                 <div class="timepick">
                                     <label>
                                         Hour
-                                        <input name="open_hour" type="text" maxlength="2" value="{OPEN_HOUR}" />
+                                        <div class="timepick">
+                                            <input name="open_hour" type="text" maxlength="2" value="{OPEN_HOUR}" data-timepicker="hour" />
+                                        </div>
                                     </label>
                                 </div>
                             </div>
@@ -546,7 +559,9 @@
                                 <div class="timepick">
                                     <label>
                                         Minute
-                                        <input name="open_minute" type="text" maxlength="2" value="{OPEN_MIN}" />
+                                        <div class="timepick">
+                                            <input name="open_minute" type="text" maxlength="2" value="{OPEN_MIN}" data-timepicker="minute" />
+                                        </div>
                                     </label>
                                 </div>
                             </div>
@@ -590,7 +605,9 @@
                                 <div class="timepick">
                                     <label>
                                         Hour
-                                        <input name="due_hour" type="text" maxlength="2" value="{DUE_HOUR}" />
+                                        <div class="timepick">
+                                            <input name="due_hour" type="text" maxlength="2" value="{DUE_HOUR}" data-timepicker="hour" />
+                                        </div>
                                     </label>
                                 </div>
                             </div>
@@ -598,7 +615,9 @@
                                 <div class="timepick">
                                     <label>
                                         Minute
-                                        <input name="due_minute" type="text" maxlength="2" value="{DUE_MIN}" />
+                                        <div class="timepick">
+                                            <input name="due_minute" type="text" maxlength="2" value="{DUE_MIN}" data-timepicker="minute" />
+                                        </div>
                                     </label>
                                 </div>
                             </div>
@@ -640,7 +659,9 @@
                                 <div class="timepick">
                                     <label>
                                         Hour
-                                        <input name="late_hour" type="text" maxlength="2" value="{LATE_HOUR}" />
+                                        <div class="timepick">
+                                            <input name="late_hour" type="text" maxlength="2" value="{LATE_HOUR}" data-timepicker="hour" />
+                                        </div>
                                     </label>
                                 </div>
                             </div>
@@ -648,7 +669,9 @@
                                 <div class="timepick">
                                     <label>
                                         Minute
-                                        <input name="late_minute" type="text" maxlength="2" value="{LATE_MIN}" />
+                                        <div class="timepick">
+                                            <input name="late_minute" type="text" maxlength="2" value="{LATE_MIN}" data-timepicker="minute" />
+                                        </div>
                                     </label>
                                 </div>
                             </div>
