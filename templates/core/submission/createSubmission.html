@@ -26,6 +26,10 @@
 //    };
 
     $(function () {
+
+        var form         = $('#createSubmissionForm');
+        var acceptSubmit = form.find('input:checkbox[name="accept_submission"]');
+
         $.fn.alaressTiny({
             mode: 'exact',
             elements: 'description-box'
@@ -125,7 +129,7 @@
 
         // validation rules
         var marktype = {
-            total:  $('[data-hide-watch-value="total"]'),
+            total:  $('[data-hide-watch-value="raw"]'),
             rubric: $('[data-hide-watch-value="rubric"]'),
             letter: $('[data-hide-watch-value="letter"]')
         };
@@ -182,7 +186,7 @@
             'markTypeRubricValuesCheck',
             function (value, element) {
                 // All value inputs that aren't the currently validated one
-                var duplicateValues = submission_form.find('input[name^="value"]').not(element).filter(
+                var duplicateValues = form.find('input[name^="value"]').not(element).filter(
                     function() {
                         // Filter out inputs that aren't in the same criterion,
                         // and don't have the same value
@@ -222,7 +226,7 @@
         };
         var hourValid = { '12hour': true };
         var minuteValid = { minute: true };
-        submission_form.validate({
+        form.validate({
             rules: {
                 markvalue: {
                     markTypeTotalCheck: true,
@@ -285,7 +289,7 @@
         });
 
         // Rubric values validation
-        submission_form.find('input[name^="value"]').each(function() {
+        form.find('input[name^="value"]').each(function() {
             $(this).rules(
                 'add',
                 {
@@ -304,13 +308,13 @@
 
         //
         // Open/due/late date change triggers validation on other date fields.
-        submission_form.find('input')
+        form.find('input')
             .filter('[name^="open_"], [name^="due_"], [name^="late_"]')
             .blur(
                 function() {
-                    submission_form.find('input[name="open_date"]').valid();
-                    submission_form.find('input[name="due_date"]').valid();
-                    submission_form.find('input[name="late_date"]').valid();
+                    form.find('input[name="open_date"]').valid();
+                    form.find('input[name="due_date"]').valid();
+                    form.find('input[name="late_date"]').valid();
                 }
             );
 
@@ -330,7 +334,6 @@
         // Timetable reveal modal
         var timetableModal = $('[data-role="timetable-selector"]');
         var timeToUpdate   = '';
-        var form           = $('form');
         form.on('click', 'a[data-interaction="selectTimetableDate"]', function(event) {
             event.preventDefault();
             // Keep track of the button I clicked to open this
@@ -759,7 +762,7 @@
 
                     <div class="small-12 columns"
                          data-hide-watch="marktype"
-                         data-hide-watch-value="total"
+                         data-hide-watch-value="raw"
                          data-hide-watch-option-attribute="data-slug"
                     >
                         <label>
