@@ -9,10 +9,16 @@
         var isRubricAssessmentSpecificDescriptors = function() {
             return form.find('[data-relation="rubric-use-assessment-specific"]').prop('checked');
         };
+
+        // Switch descriptors on/off
+        var toggleDescriptors = function(action, element, timeout) {
+            $(element).find('[data-role="criterion-descriptor"]').toggleClass('hide', (action == 'hide'));
+        };
+
         if (isRubricAssessmentSpecificDescriptors()) {
             criterionSelector.find('[data-role="criterion"]').each(function () {
                 if ($(this).find(':checked').length) {
-                    descriptor('show', $(this).find('[data-role="criterion"]'), 0);
+                    toggleDescriptors('show', $(this).find('[data-role="criterion"]'), 0);
                 }
             });
         }
@@ -21,13 +27,13 @@
         form.on('change', 'input[name="resultset"]', function () {
             // hide the descriptors
             if (!isRubricAssessmentSpecificDescriptors()) {
-                descriptor('hide', criterionSelector.find('[data-role="criterion"]'), 100);
+                toggleDescriptors('hide', criterionSelector.find('[data-role="criterion"]'), 100);
             }
             // show them if checked
             else {
                 criterionSelector.find('[data-role="criterion"]').each(function () {
                     var checked = $(this).children(':checkbox').prop('checked');
-                    descriptor(checked ? 'show' : 'hide', $(this), 100)
+                    toggleDescriptors(checked ? 'show' : 'hide', $(this), 100)
                 });
             }
         });
@@ -40,7 +46,7 @@
             if (isRubricAssessmentSpecificDescriptors() && this.checked) {
                 act = 'show';
             }
-            descriptor(act, $(this).closest('[data-role="criterion"]'), 100);
+            toggleDescriptors(act, $(this).closest('[data-role="criterion"]'), 100);
         });
 
         // trigger change of descriptor count when dropdown changed
@@ -64,7 +70,6 @@
                         newItem;
 
                     for (i = 0; i < diff; ++i) {
-                        // duplicate li's
                         newItem = last.clone(true);
 
                         // clear the descriptor value
@@ -105,20 +110,6 @@
                 .removeAttr('readonly')
                 .attr('placeholder', placeholderText);
         });
-
-        function descriptor(action, element, timeout) {
-            $(element).find('[data-role="criterion-descriptor"]').toggleClass('hide', (action == 'hide'));
-//            $(element).find(':input:not(:checkbox)').parent('td').each(function () {
-//                if (action == 'show') {
-//                    $(this).show();
-//                    $(element).addClass('highlight').find(inputSelector).first().trigger('click');
-//                }
-//                else if (action == 'hide') {
-//                    $(element).removeClass('highlight');
-//                    $(this).hide();
-//                }
-//            });
-        }
     })
 </script>
 <!-- END custom_head -->
