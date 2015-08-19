@@ -18,16 +18,16 @@
         }
 
         // trigger show or hide of descriptors when radio off
-        criterionSelector.on('change', 'input', function () {
+        form.on('change', 'input[name="resultset"]', function () {
             // hide the descriptors
             if (!isRubricAssessmentSpecificDescriptors()) {
                 descriptor('hide', criterionSelector.find('[data-role="criterion"]'), 100);
             }
             // show them if checked
             else {
-                $('#rubric-criteria div').each(function () {
+                criterionSelector.find('[data-role="criterion"]').each(function () {
                     var checked = $(this).children(':checkbox').prop('checked');
-                    descriptor(checked ? 'show' : 'hide', criterionSelector.find('[data-role="criterion"]'), 100)
+                    descriptor(checked ? 'show' : 'hide', $(this), 100)
                 });
             }
         });
