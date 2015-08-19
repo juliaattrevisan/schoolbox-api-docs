@@ -315,7 +315,8 @@
         $('input[data-timepicker="minute"]').minutepicker();
 
         // Set up the gradegroup thing
-        $('a[data-role="showGradeScale"]').click(function() {
+        $('a[data-role="showGradeScale"]').click(function(event) {
+            event.preventDefault();
             var gradeScale = $('#gradegroup').val();
             $('#gradegroup-'+gradeScale).foundation('reveal', 'open');
         });
