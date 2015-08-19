@@ -101,6 +101,12 @@
             }
         });
 
+        // When I change the number of assessment levels,
+        // that means I want to use assessment specific descriptors.
+        $('[data-relation="rubric-descriptor-count"]').on('change', function(){
+            $('[data-relation="rubric-use-assessment-specific"]').prop('checked', true).trigger('change');
+        });
+
 //        var marktype = {
 //            total:$('#marktype-total'),
 //            rubric:$('tr.marktype-rubric'),
