@@ -217,7 +217,7 @@
                          */
                         $('[data-comment-list]').find('[data-comment-form]').remove();
                         $('[data-comment-list]').find('article').removeClass('hide');
-                        row.find('article').append(editForm);
+                        row.find('article').addClass('hide').after(editForm);
                     },
                     error: function (xhr) {
 //                        // on failure, indicate failure
