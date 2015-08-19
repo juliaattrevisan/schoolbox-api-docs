@@ -43,38 +43,40 @@
             descriptor(act, $(this).closest('[data-role="criterion"]'), 100);
         });
 
-//        // trigger change of descriptor count when dropdown changed
-//        form.on('change', '[data-relation="rubric-descriptor-count"]', function () {
-//            var target = $('#descriptor-count option:selected').first().val();
-//
-//            $('#rubric-criteria tr').each(function () {
-//                var i,
-//                    inputCount = $(this).find('td').length,
-//                    diff = target - inputCount;
-//
-//                if (diff < 0) {
-//                    for (i = 0; i < 0 - diff; ++i) {
-//                        // remove trailing li's
-//                        $(this).find('td:last-child').detach();
-//                    }
-//                }
-//                else if (diff > 0) {
-//                    var insertList = '',
-//                        last = $(this).children('td').last(),
-//                        newItem;
-//
-//                    for (i = 0; i < diff; ++i) {
-//                        // duplicate li's
-//                        newItem = last.clone(true);
-//
-//                        // clear the descriptor value
-//                        newItem.find('textarea').val('');
-//                        newItem.find('input').val( parseInt(newItem.find('input').val()) + (i+1) );
-//                        $(this).append( newItem );
-//                    }
-//                }
-//            });
-//        });
+        // trigger change of descriptor count when dropdown changed
+        form.on('change', '[data-relation="rubric-descriptor-count"]', function () {
+            var count = this.value;
+
+            criterionSelector.find('[data-role="criterion-descriptors"]').each(function () {
+                var i,
+                    inputCount = $(this).find('[data-role="criterion-descriptor"]').length,
+                    diff       = count - inputCount;
+
+                if (diff < 0) {
+                    // Remove trailing descriptors
+                    for (i = 0; i < 0 - diff; ++i) {
+                        $(this).find('[data-role="criterion-descriptor"]').last().detach();
+                    }
+                }
+                else if (diff > 0) {
+                    // Add descriptors to end
+                    var last = $(this).find('[data-role="criterion-descriptor"]').last(),
+                        newItem;
+
+                    for (i = 0; i < diff; ++i) {
+                        // duplicate li's
+                        newItem = last.clone(true);
+
+                        // clear the descriptor value
+                        newItem.find('[data-role="criterion-description"]').val('');
+                        newItem.find('[data-role="criterion-value"]').val(
+                            parseInt(newItem.find('[data-role="criterion-value"]').val()) + (i+1)
+                        );
+                        newItem.insertAfter(last);
+                    }
+                }
+            });
+        });
 
         var critSelector       = '[data-role="criterion"]',
             inputSelector      = '[data-role="criterion-description"], [data-role="criterion-value"]',
