@@ -3,7 +3,25 @@
 
 // The rubric criterion selector
 .rubric-criterion-selector {
-    textarea, input {
-        margin: 0;
+    // Styles for a non-selected criterion
+    .criterion {
+        textarea, input {
+            margin: 0;
+            width: 100%;
+            min-width: 10%;
+        }
+
+        // Styles for a selected criterion
+        &.editing {
+            // Unselected descriptor within a selected criterion
+            textarea, input {
+                &[readonly] {
+                    min-width: 0;
+                    overflow: hidden;
+                }
+            }
+
+            // Selected descriptor within a selected criterion
+        }
     }
 }
