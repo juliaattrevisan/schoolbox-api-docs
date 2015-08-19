@@ -94,7 +94,7 @@
             criterionSelector.find(critSelector + ', ' + descriptorSelector)
                 .removeClass(editingClass)
                 .find(inputSelector)
-                .attr('readonly', 'readonly')
+                .prop('readonly', true)
                 .removeAttr('placeholder');
 
             input
@@ -105,7 +105,7 @@
                 .closest(descriptorSelector)
                 .addClass(editingClass)
                 .find(inputSelector)
-                .removeAttr('readonly')
+                .prop('readonly', false)
                 .attr('placeholder', placeholderText);
         });
     })
