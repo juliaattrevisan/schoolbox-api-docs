@@ -129,7 +129,13 @@
         <!-- BEGIN criterion -->
         <div data-role="criterion">
             <input type="hidden" value="0" name="{CRIT_SLUG}"/>
-            <input id="c-{CRIT_ID}" type="checkbox" value="1" name="{CRIT_SLUG}" {CRIT_CHECKED} />
+            <input id="c-{CRIT_ID}"
+                   type="checkbox"
+                   value="1"
+                   name="{CRIT_SLUG}"
+                   {CRIT_CHECKED}
+                   data-role="criterion-selector"
+            />
             <label for="c-{CRIT_ID}" class="checkbox-label">{CRIT_NAME}</label>
             <table data-role="criterion-descriptors">
                 <tr>
