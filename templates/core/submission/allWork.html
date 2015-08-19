@@ -27,30 +27,9 @@
     </div>
 </div>
 
-<div id="context">
-    <div id="enrolment">
-        <form id="semesters">
-            <a class="sem-back" {SEMESTER_BACK_DISABLED} href="/submission/allWork/{WORK_USER_ID}/{SEMESTER_BACK}">&lsaquo;</a>
-            <select id="semester">
-                <!-- BEGIN semester_option -->
-                <option value="{SEMESTER_SLUG}"
-                {SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
-                <!-- END semester_option -->
-            </select>
-            <a class="sem-fwd" {SEMESTER_FWD_DISABLED} href="/submission/allWork/{WORK_USER_ID}/{SEMESTER_FWD}">&rsaquo;</a>
-        </form>
-        <form id="subjects" action="/submission/allWork/" method="get">
-            <span class="elbow">&#9492;</span>
-            <select id="enrolled-subjects">
-                <option disabled="disabled" selected="selected">Select a subject</option>
-                <!-- BEGIN subject_selector -->
-                <option data-id="{ENR_SUBJ_ID}" title="{ENR_SUBJ_CODE}" value="{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ENR_SUBJ_ID}"
-                    {ENR_SUBJ_SELECTED}>
-                    {ENR_SUBJ_NAME}
-                </option>
-                <!-- END subject_selector -->
-            </select>
-        </form>
+<div class="row">
+    <div class="small-12 island">
+        {CONTEXT_SELECTOR}
     </div>
 </div>
 

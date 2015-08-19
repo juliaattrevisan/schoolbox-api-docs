@@ -20,6 +20,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 
 class StudentReportCard
 {
@@ -54,7 +55,9 @@ class StudentReportCard
 
     // populated data
     /**
-     * @var Folder\Model[]
+     * A collection of Folder models
+     * 
+     * @var \Schoolbox\Collection
      */
     protected $categoriesInSemester = array();
 
@@ -232,7 +235,7 @@ class StudentReportCard
             )
         );
         $this->renderSemesterSelectors($page);
-        $this->renderSubjectSelectors($page);
+
         // only attempt to render a subject's details if a subject has actually been selected
         if ($this->hasSubjectSelected()) {
             $this->renderSubject($page);
@@ -248,78 +251,30 @@ class StudentReportCard
      */
     protected function renderSemesterSelectors(\SitePage $page)
     {
-        $page->setBlock(TEMPLATE_content, 'semester_option', 'semester_option_block');
-        $page->setBlock(TEMPLATE_content, 'year_option', 'year_option_block');
+        $contextSelector = new ContextSelector("submission/allWork/{$this->targetUserId}");
+
         // Years is tricksy, because we first need to find out all the years in which the student in question has submitted work
         // also, merging in this current year is a tad unfortunate
         $submitYears  = $this->submissionMapper->getAllYearsByUser($this->targetUserId);
-        $earliestYear = empty($submitYears)
-            ? $this->currentYear
-            : min($submitYears);
+        $earliestYear = empty($submitYears) ? $this->currentYear : min($submitYears);
         $years = range($this->currentYear, $earliestYear);
 
-        foreach ($years as $y) {
-            // Semesters can be hardcoded, no need to look anything up (may change if a school wants Term breakdowns rather than Semester)
-            $semesters = array(2, 1);
-            foreach ($semesters as $sem) {
-                $selected = $y == $this->targetYear && $sem == $this->targetSemester;
-                $page->setVar(
-                    array(
-                        'SEMESTER_SELECTED' => $selected ? ' selected="selected"' : '',
-                        'SEMESTER_SLUG'     => "{$this->targetUserId}/$y/$sem",
-                        'SEMESTER_VALUE'    => "Semester $sem, $y"
-                    )
-                );
-                $page->parse('semester_option_block', 'semester_option', true);
-            }
+        $contextSelector->setYears($years);
+        $contextSelector->setCategoryFirst(true);
+
+        try {
+            $contextSelector->setCategories($this->categoriesInSemester);
         }
-        // Disable back and forward buttons if I can't go back or forward
-        $disabledBack = $this->targetSemester == 1 && $this->targetYear == min($years);
-        $disabledFwd  = $this->targetSemester == 2 && $this->targetYear == max($years);
-        $page->setVar(
-            array(
-                'WORK_YEAR'              => $this->targetYear,
-                'WORK_SEMESTER'          => $this->targetSemester,
-                'SEMESTER_BACK'          => $this->targetYear - ($this->targetSemester == 1 ? 1 : 0) . '/' . ($this->targetSemester == 1 ? 2 : 1),
-                'SEMESTER_FWD'           => $this->targetYear + ($this->targetSemester == 2 ? 1 : 0) . '/' . ($this->targetSemester == 1 ? 2 : 1),
-                'SEMESTER_BACK_DISABLED' => $disabledBack ? 'disabled' : '',
-                'SEMESTER_FWD_DISABLED'  => $disabledFwd ? 'disabled' : '',
+        catch (\Exception $e) {
+        }
+
+        $contextSelector->render(
+            $page, 'CONTEXT_SELECTOR', array(
+                'year'     => $this->targetYear,
+                'semester' => $this->targetSemester,
+                'category' => $this->targetCategoryId
             )
         );
-    }
-
-    /**
-     * Renders the selectors for the subjects
-     *
-     * @param \SitePage $page
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected function renderSubjectSelectors(\SitePage $page)
-    {
-        if (!$this->targetYear || !$this->targetSemester) {
-            throw new \InvalidArgumentException("Select a semester to display");
-        }
-        $page->setBlock(TEMPLATE_content, 'subject_selector', 'subject_selector_block');
-        if (!count($this->categoriesInSemester)) {
-            $page->setVar('subject_selector_block', "No subjects");
-            return;
-        }
-        foreach ($this->categoriesInSemester as $folder) {
-            // <li data-id="{ENR_SUBJ_ID}" class="{ENR_SUBJ_SELECTED}" title="{ENR_SUBJ_CODE}">{ENR_SUBJ_NAME}</li>
-            $catId = $folder->getId();
-            $code  = $folder->getCodeString();
-            $name  = $folder->getName();
-            $page->setVar(
-                array(
-                    'ENR_SUBJ_ID'       => $catId,
-                    'ENR_SUBJ_SELECTED' => $catId == $this->targetCategoryId ? ' selected="selected"' : '',
-                    'ENR_SUBJ_CODE'     => $code ?: $name,
-                    'ENR_SUBJ_NAME'     => $name,
-                )
-            );
-            $page->parse('subject_selector_block', 'subject_selector', true);
-        }
     }
 
     protected function renderSubject(\SitePage $page, $components = array())
