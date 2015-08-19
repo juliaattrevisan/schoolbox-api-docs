@@ -9,17 +9,16 @@
         var acceptSubmit   = form.find('input:checkbox[name="accept_submission"]');
         var rubricCriteria = form.find('[data-role="rubric-criterion-selector"]');
 
-        //// Do assessment-specific descriptors get shown?
-        //var isRubricAssessmentSpecificDescriptors = function() {
-        //    return document.getElementById('rs-0').checked;
-        //};
-
-        //// validation rules
-        //var marktype = {
-        //    total:  form.find('[data-hide-watch-value="raw"]'),
-        //    rubric: form.find('[data-hide-watch-value="rubric"]'),
-        //    letter: form.find('[data-hide-watch-value="letter"]')
-        //};
+        // Options for whether form options are validatable.
+        var isAcceptSubmit = function() {
+            return acceptSubmit.is(':checked');
+        };
+        var isMarkTypeRubric = function() {
+            return form.find('[name="marktype"] :selected').data('slug') == 'rubric';
+        };
+        var isMarkTypeTotal = function() {
+            return form.find('[name="marktype"] :selected').data('slug') == 'raw';
+        };
 
         // Rubric validator: do any exist?
         $.validator.addMethod('markTypeRubricCriteriaExists', function() {
@@ -33,6 +32,9 @@
 
         // Are rubric form values checked?
         var isRubricValueChecked = function(element) {
+            if (!isMarkTypeRubric()) {
+                return false;
+            }
             // Only check if using assess specific descriptors
             if (!form.find('[data-relation="rubric-use-assessment-specific"]').prop('checked')) {
                 return false;
@@ -61,9 +63,7 @@
             'Rubric values cannot be the same'
         );
 
-        var isAcceptSubmit  = function() {
-            return acceptSubmit.is(':checked');
-        };
+        // Depend options
         var publish_date_valid = { dateValid: true };
         var open_date_valid = {
             dateValid: true,
@@ -94,16 +94,29 @@
         form.validate({
             rules: {
                 markvalue: {
-                    required: true,
-                    number: true,
-                    min: 1
+                    required: {
+                        depends: isMarkTypeTotal
+                    },
+                    number: {
+                        depends: isMarkTypeTotal
+                    },
+                    min: {
+                        param: 1,
+                        depends: isMarkTypeTotal
+                    }
                 },
                 resultset: {
-                    required: true
+                    required: {
+                        depends: isMarkTypeRubric
+                    }
                 },
                 criteria: {
-                    markTypeRubricCriteriaExists: true,
-                    markTypeRubricCriteriaCheck: true
+                    markTypeRubricCriteriaExists: {
+                        depends: isMarkTypeRubric
+                    },
+                    markTypeRubricCriteriaCheck: {
+                        depends: isMarkTypeRubric
+                    }
                 },
                 publish_date:   publish_date_valid,
                 publish_hour:   $.extend({}, hourValid, publish_date_valid),
@@ -190,17 +203,13 @@
             );
         });
 
-        //
         // Open/due/late date change triggers validation on other date fields.
-        form.find('input')
-            .filter('[name^="open_"], [name^="due_"], [name^="late_"]')
-            .blur(
-            function() {
-                form.find('input[name="open_date"]').valid();
-                form.find('input[name="due_date"]').valid();
-                form.find('input[name="late_date"]').valid();
-            }
-        );
+        var dateInputs = form.find('input').filter('[name^="publish_"], [name^="open_"], [name^="due_"], [name^="late_"]');
+        dateInputs.on('blur', function() {
+            dateInputs.each(function() {
+                $(this).valid();
+            })
+        });
 
         return form;
     };
