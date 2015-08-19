@@ -1,80 +1,91 @@
-<div id="inlineform{UFID}" class="row" data-inlineform>
-    <div class="small-12 large-4 columns">
-        <!-- BEGIN mark_type_percent -->
-        <div class="row">
-            <div class="small-11 large-8 columns">
-                <input name="mark[{OWNER_ID}]" type="text" value="{MARK}" data-mark-input data-combobox />
+        <div class="small-12 columns no-pad">
+
+            <!-- BEGIN mark_type_percent -->
+            <div class="row">
+                <div class="list-item-content">
+                    <div class="small-11 medium-8 columns">
+                        <input class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" value="{MARK}" data-mark-input data-combobox />
+                    </div>
+                    <div class="small-1 medium-4 columns ">
+                        <label for="mark-{OWNER_ID}" class="inline no-margin">%</label>
+                    </div>
+                </div>
             </div>
-            <div class="small-1 large-4 columns">
-                %
-            </div>
-        </div>
-        <!-- END mark_type_percent -->
+            <!-- END mark_type_percent -->
 
-        <!-- BEGIN mark_type_letter -->
-        <select id="mark" name="mark[{OWNER_ID}]" data-mark-input data-marktype="letter">
-            <!-- BEGIN grade_drop -->
-            <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED} data-groupId="{GRADE_GROUP_ID}">{GRADE_TEXT}</option>
-            <!-- END grade_drop -->
-        </select>
-        <!-- END mark_type_letter -->
-
-        <!-- BEGIN mark_type_raw -->
-        <div class="row">
-            <div class="small-10 large-6 columns">
-                <label>
-                    <input name="mark[{OWNER_ID}]" type="text" maxlength="15" value="{MARK}" data-mark-input data-combobox />
-                </label>
-            </div>
-            <div class="small-2 large-6 columns">
-                / <span data-validation-limit>{MAX_MARK}</span>
-            </div>
-        </div>
-        <!-- END mark_type_raw -->
-
-        <!-- BEGIN mark_type_free -->
-        <input name="mark[{OWNER_ID}]" type="text" size="4" maxlength="15" value="{MARK}" data-mark-input />
-        <!-- END mark_type_free -->
-
-        <!-- BEGIN mark_type_none -->
-        <label class="text-center">
-            N/A
-        </label>
-        <!-- END mark_type_none -->
-
-        <!-- BEGIN mark_type_rubric -->
-        <div class="row">
-            <div class="small-11 large-8 columns">
-                <select id="rubricmark" name="mark[{OWNER_ID}]" data-mark-input>
-                    <!-- BEGIN rubric_marked -->
-                    <option value="{MARK} / {MAX_MARK}">{MARK}&nbsp;/&nbsp;{MAX_MARK}</option>
-                    <!-- END rubric_marked -->
-
-                    <!-- BEGIN rubric_unmarked -->
-                    <option value="-1">(none)</option>
-                    <!-- END rubric_unmarked -->
-
-                    <!-- BEGIN rubric_grade_drop -->
-                    <option value="{RUBRIC_GRADE_VALUE}" {RUBRIC_GRADE_VALUE_SELECTED}>{RUBRIC_GRADE_TEXT}</option>
-                    <!-- END rubric_grade_drop -->
+            <!-- BEGIN mark_type_letter -->
+            <div class="list-item-content">
+                <select class="no-margin" id="mark" name="mark[{OWNER_ID}]" data-mark-input data-marktype="letter">
+                    <!-- BEGIN grade_drop -->
+                    <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED} data-groupId="{GRADE_GROUP_ID}">{GRADE_TEXT}</option>
+                    <!-- END grade_drop -->
                 </select>
             </div>
-            <div class="small-1 large-4 columns actions">
-                <a class="icon-modify no-text" title="Mark Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}"></a>
+            <!-- END mark_type_letter -->
+
+            <!-- BEGIN mark_type_raw -->
+            <div class="row">
+                <div class="list-item-content">
+                    <div class="small-10 medium-7 columns">
+                        <input class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" maxlength="15" value="{MARK}" data-mark-input data-combobox />
+                    </div>
+                    <div class="small-2 medium-5 columns">
+                        <label for="mark-{OWNER_ID}" class="inline no-margin">
+                            / <span data-validation-limit>{MAX_MARK}</span>
+                        </label>
+                    </div>
+                </div>
             </div>
+            <!-- END mark_type_raw -->
+
+            <!-- BEGIN mark_type_free -->
+            <div class="list-item-content">
+                <input class="no-margin" name="mark[{OWNER_ID}]" type="text" size="4" maxlength="15" value="{MARK}" data-mark-input />
+            </div>
+            <!-- END mark_type_free -->
+
+            <!-- BEGIN mark_type_none -->
+            <!--
+            <div class="list-item-content">
+                <label class="inline no-margin">N/A</label>
+            </div>
+            -->
+            <!-- END mark_type_none -->
+
+            <!-- BEGIN mark_type_rubric -->
+            <div class="actions-small-1">
+                <div class="list-item row">
+                    <div class="column small-12">
+                        <div class="list-item-content">
+                            <select class="no-margin" id="rubricmark" name="mark[{OWNER_ID}]" data-mark-input>
+                                <!-- BEGIN rubric_marked -->
+                                <option value="{MARK} / {MAX_MARK}">{MARK}&nbsp;/&nbsp;{MAX_MARK}</option>
+                                <!-- END rubric_marked -->
+
+                                <!-- BEGIN rubric_unmarked -->
+                                <option value="-1">(none)</option>
+                                <!-- END rubric_unmarked -->
+
+                                <!-- BEGIN rubric_grade_drop -->
+                                <option value="{RUBRIC_GRADE_VALUE}" {RUBRIC_GRADE_VALUE_SELECTED}>{RUBRIC_GRADE_TEXT}</option>
+                                <!-- END rubric_grade_drop -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <nav>
+                    <a class="icon-modify no-text" title="Mark Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}"></a>
+                </nav>
+            </div>
+            <!-- END mark_type_rubric -->
         </div>
-        <!-- END mark_type_rubric -->
     </div>
-    <div class="small-12 large-8 columns">
-        <label>
-	        <textarea class="comment" name="comment" rows="1" data-comment>{COMMENT}</textarea>
-        </label>
-    </div>
-
-    <input type="hidden" class="uid" name="uid" value="{OWNER_ID}" />
-    <input type="hidden" class="box_id" name="box_id" value="{BOX_ID}" />
-    <input type="hidden" class="mark-update" name="markUpdate" value="true" />
 </div>
-
-
-
+<div class="small-12 medium-6 xlarge-8 columns">
+    <div class="row">
+        <label class="list-item-content">
+	        <textarea class="comment" name="comment" rows="4" data-comment>{COMMENT}</textarea>
+        </label>
+        <input type="hidden" class="uid" name="uid" value="{OWNER_ID}" />
+        <input type="hidden" class="box_id" name="box_id" value="{BOX_ID}" />
+        <input type="hidden" class="mark-update" name="markUpdate" value="true" />
