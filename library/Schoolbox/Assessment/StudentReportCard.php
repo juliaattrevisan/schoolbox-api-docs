@@ -496,7 +496,7 @@ class StudentReportCard
         $page->setBlock(TEMPLATE_content, 'subject_rubric', 'subject_rubric_block');
         $page->setBlock('subject_rubric', 'subject_rubric_group', 'subject_rubric_group_block');
         $page->setBlock('subject_rubric', 'subject_rubric_submissionbox', 'subject_rubric_submissionbox_block');
-        $page->setBlock('subject_rubric', 'subject_rubric_box_checklist', 'subject_rubric_box_checklist_block');
+//        $page->setBlock('subject_rubric', 'subject_rubric_box_checklist', 'subject_rubric_box_checklist_block');
         $page->setBlock('subject_rubric_group', 'subject_rubric_criterion', 'subject_rubric_criterion_block');
         $page->setBlock('subject_rubric_criterion', 'subject_rubric_criterion_mark', 'subject_rubric_criterion_mark_block');
 
@@ -505,7 +505,7 @@ class StudentReportCard
             'subject_rubric_group_block' => '',
             'subject_rubric_criterion_block' => '',
             'subject_rubric_criterion_mark_block' => '',
-            'subject_rubric_box_checklist_block' => '',
+//            'subject_rubric_box_checklist_block' => '',
         ));
 
         $submissionBoxMapper = $this->submissionMapper;

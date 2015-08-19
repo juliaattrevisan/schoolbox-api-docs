@@ -73,28 +73,50 @@
 </div>
 
 <!-- BEGIN grade_average -->
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Current Grade Average</h2>
+
+        <section class="content gradient-{SUBJ_GRADEIENT}-bg">
+            <p class="grade">
+                <span class="gradient-{SUBJ_GRADEIENT}">{SUBJ_GRADE_AVG}</span>
+            </p>
+
+            {SUBJ_GRADE_TREND}
+        </section>
+    </div>
+</div>
+<!-- END grade_average -->
+
+<div class="row">
+    <div class="small-12 columns">
+        <div id="subject-graph"></div>
+    </div>
+</div>
+
+<!-- BEGIN subject_rubric -->
 <script type="text/javascript">
     $(function () {
         var $tbl = $('#rubric-table');
 
-        $('#rubric-showhide-opts').on('change', 'input', function () {
-
-            var val  = $(this).val(),
-                    $tds = $tbl.find('td[data-box='+val+']'),
-                    $ths = $tbl.find('th[data-box='+val+']');
-
-            // show/hide columns as required
-            if ($(this).prop('checked')) {
-                $tds.removeClass('hide');
-                $ths.removeClass('hide');
-            } else {
-                $tds.addClass('hide');
-                $ths.addClass('hide');
-            }
-
-            // recompute the number of cols and set the grouping colwidths to match
-            $('#rubric').find('tbody').find('td[colspan]').attr('colspan', $('#rubric-showhide-opts').find('input:checked').length + 1);
-        });
+//        $('#rubric-showhide-opts').on('change', 'input', function () {
+//
+//            var val  = $(this).val(),
+//                    $tds = $tbl.find('td[data-box='+val+']'),
+//                    $ths = $tbl.find('th[data-box='+val+']');
+//
+//            // show/hide columns as required
+//            if ($(this).prop('checked')) {
+//                $tds.removeClass('hide');
+//                $ths.removeClass('hide');
+//            } else {
+//                $tds.addClass('hide');
+//                $ths.addClass('hide');
+//            }
+//
+//            // recompute the number of cols and set the grouping colwidths to match
+//            $('#rubric').find('tbody').find('td[colspan]').attr('colspan', $('#rubric-showhide-opts').find('input:checked').length + 1);
+//        });
 
         $tbl.on('click', 'td[data-interaction="collapse"]', function (e) {
             e.preventDefault();
@@ -118,62 +140,41 @@
 </script>
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Current Grade Average</h2>
-
-        <section class="content gradient-{SUBJ_GRADEIENT}-bg">
-            <p class="grade">
-                <span class="gradient-{SUBJ_GRADEIENT}">{SUBJ_GRADE_AVG}</span>
-            </p>
-
-            {SUBJ_GRADE_TREND}
-        </section>
-    </div>
-</div>
-<!-- END grade_average -->
-
-<div class="row">
-    <div class="small-12 columns">
-        <div id="subject-graph"></div>
-    </div>
-</div>
-
-<!-- BEGIN subject_rubric -->
-<div class="row">
-    <div class="small-12 island">
         <h2 class="subheader">Criteria</h2>
         <section>
-            <div class="content">
-                <div id="rubric-showhide-opts">
-                    <!-- BEGIN subject_rubric_box_checklist -->
-                    <div>
-                        <input type="checkbox" id="rubric-{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}" value="{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}" checked="checked" />
-                        <label for="rubric-{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}" class="checkbox-label">{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}</label>
-                    </div>
-                    <!-- END subject_rubric_box_checklist -->
-                </div>
-            </div>
+            <!--<div class="content">-->
+                <!--<div id="rubric-showhide-opts">-->
+                    <!--&lt;!&ndash; BEGIN subject_rubric_box_checklist &ndash;&gt;-->
+                    <!--<div>-->
+                        <!--<input type="checkbox" id="rubric-{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}" value="{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}" checked="checked" />-->
+                        <!--<label for="rubric-{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}" class="checkbox-label">{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}</label>-->
+                    <!--</div>-->
+                    <!--&lt;!&ndash; END subject_rubric_box_checklist &ndash;&gt;-->
+                <!--</div>-->
+            <!--</div>-->
 
             <table id="rubric-table">
                 <tbody>
                     <!-- BEGIN subject_rubric_group -->
                     <tr>
                         <td data-interaction="collapse" data-group="{SUBJECT_RUBRIC_GROUP_NAME}">
-                            {SUBJECT_RUBRIC_GROUP_NAME}
+                            <h3>{SUBJECT_RUBRIC_GROUP_NAME}</h3>
                             <a class="button icon-add" title="Hide {SUBJECT_RUBRIC_GROUP_NAME}" data-group="{SUBJECT_RUBRIC_GROUP_NAME}"></a>
                         </td>
                     </tr>
                     <!-- BEGIN subject_rubric_criterion -->
                     <tr data-group="{SUBJECT_RUBRIC_GROUP_NAME}" class="hide">
-                        <td >
+                        <td>
                             <ul>
                                 <li>
-                                    <strong>{SUBJECT_RUBRIC_CRITERION_NAME}</strong>
+                                    <h4>{SUBJECT_RUBRIC_CRITERION_NAME}</h4>
                                 </li>
                                 <li>
                                     <ul>
                                         <!-- BEGIN subject_rubric_criterion_mark -->
                                         <li>
-                                            <a href="/submission/submissionHistory/{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}/{WORK_USER_ID}">{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}</a>: <em>{SUBJECT_RUBRIC_CRITERION_MARK}</em></li>
+                                            <a href="/submission/submissionHistory/{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}/{WORK_USER_ID}">{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}</a>: <em>{SUBJECT_RUBRIC_CRITERION_MARK}</em>
+                                        </li>
                                         <!-- END subject_rubric_criterion_mark -->
                                     </ul>
                                 </li>
