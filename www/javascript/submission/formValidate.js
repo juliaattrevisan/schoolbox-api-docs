@@ -9,64 +9,32 @@
         var acceptSubmit   = form.find('input:checkbox[name="accept_submission"]');
         var rubricCriteria = form.find('[data-role="rubric-criterion-selector"]');
 
-        // Do assessment-specific descriptors get shown?
-        var isRubricAssessmentSpecificDescriptors = function() {
-            return document.getElementById('rs-0').checked;
-        };
+        //// Do assessment-specific descriptors get shown?
+        //var isRubricAssessmentSpecificDescriptors = function() {
+        //    return document.getElementById('rs-0').checked;
+        //};
 
-        // validation rules
-        var marktype = {
-            total:  form.find('[data-hide-watch-value="raw"]'),
-            rubric: form.find('[data-hide-watch-value="rubric"]'),
-            letter: form.find('[data-hide-watch-value="letter"]')
-        };
-
-        //// Total mark validator
-        //$.validator.addMethod("markTypeTotalCheck", function(value) {
-        //    if (marktype.total.is(':visible')) {
-        //        return value > 0;
-        //    } else {
-        //        return true;
-        //    }
-        //}, "Please enter a numeric mark amount");
+        //// validation rules
+        //var marktype = {
+        //    total:  form.find('[data-hide-watch-value="raw"]'),
+        //    rubric: form.find('[data-hide-watch-value="rubric"]'),
+        //    letter: form.find('[data-hide-watch-value="letter"]')
+        //};
 
         // Rubric validator: do any exist?
         $.validator.addMethod('markTypeRubricCriteriaExists', function() {
             return rubricCriteria.find('input[type="checkbox"]').length >= 1;
-            //if (marktype.rubric.is(':visible')) {
-            //    return rubricCriteria.find('input[type="checkbox"]').length >= 1;
-            //} else {
-            //    return true;
-            //}
         }, 'Please ensure at least one criterion exists');
 
         // Rubric criteria: is at least one selected?
         $.validator.addMethod('markTypeRubricCriteriaCheck', function() {
             return rubricCriteria.find('input:checked').length >= 1;
-            //if (marktype.rubric.is(':visible')) {
-            //    return rubricCriteria.find('input:checked').length >= 1;
-            //} else {
-            //    return true;
-            //}
         }, 'Please select at least one criterion');
 
-        //// Rubric result set: is one selected?
-        //// (Simplify to required: resultset, depends: rubric is visible)
-        //$.validator.addMethod('markTypeRubricResultsetCheck', function() {
-        //    if(marktype.rubric.is(':visible')) {
-        //        return $('#rubric-results').find('input:checked').length == 1;
-        //    }
-        //    else {
-        //        return true;
-        //    }
-        //}, 'Please select a result set');
-
-        // Are rubric values checked?
+        // Are rubric form values checked?
         var isRubricValueChecked = function(element) {
-            if (!marktype.rubric.is(':visible')) {
-                return false;
-            }
-            if (!isRubricAssessmentSpecificDescriptors()) {
+            // Only check if using assess specific descriptors
+            if (!form.find('[data-relation="rubric-use-assessment-specific"]').prop('checked')) {
                 return false;
             }
             // Is this rubric selected? Validate if so
@@ -80,7 +48,7 @@
             'markTypeRubricValuesCheck',
             function (value, element) {
                 // All value inputs that aren't the currently validated one
-                var criterion       = element.closest('[data-role="criterion"]');
+                var criterion       = $(element).closest('[data-role="criterion"]');
                 var duplicateValues = criterion.find('[data-role="criterion-value"]').not(element).filter(
                     function() {
                         // Filter out inputs that aren't in the same criterion,
@@ -198,7 +166,7 @@
                     if (id && $('label[for="'+id+'"]:not(:hidden)').length) {
                         return false;
                     }
-                    return $element.not('[data-validate-always]');
+                    return !$element.is('[data-validate-always]');
                 }
                 return false;
             }
