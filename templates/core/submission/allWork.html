@@ -95,66 +95,58 @@
 </div>
 
 <!-- BEGIN subject_rubric -->
+<script type="text/javascript" src="/javascript/jquery.collapsable.js"></script>
 <script type="text/javascript">
     $(function () {
-        var $tbl = $('#rubric-table');
-
-        $tbl.on('click', 'td[data-interaction="collapse"]', function (e) {
-            e.preventDefault();
-
-            var $td   = $(this),
-                    $a    = $td.find('a.btn'),
-                    group = $td.data('group'),
-                    $rows = $tbl.find('tr[data-group="'+group+'"]');
-
-            if ($a.hasClass('minus')) {
-                // has cross: hide things
-                $rows.addClass('hide');
-                $a.removeClass('minus').addClass('plus').text('+');
-            } else {
-                // has plus: show things
-                $rows.removeClass('hide');
-                $a.removeClass('plus').addClass('minus').html('&minus;');
-            }
+        $('[data-collapser="true"]').collapsable({
+            container: '[data-collapse-container]'
         });
     });
 </script>
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12 columns">
         <h2 class="subheader">Criteria</h2>
         <section>
-            <table id="rubric-table">
-                <tbody>
-                    <!-- BEGIN subject_rubric_group -->
-                    <tr>
-                        <td data-interaction="collapse" data-group="{SUBJECT_RUBRIC_GROUP_NAME}">
-                            <h3>{SUBJECT_RUBRIC_GROUP_NAME}</h3>
-                            <a class="button icon-add" title="Hide {SUBJECT_RUBRIC_GROUP_NAME}" data-group="{SUBJECT_RUBRIC_GROUP_NAME}"></a>
-                        </td>
-                    </tr>
-                    <!-- BEGIN subject_rubric_criterion -->
-                    <tr data-group="{SUBJECT_RUBRIC_GROUP_NAME}" class="hide">
-                        <td>
-                            <ul>
-                                <li>
-                                    <h4>{SUBJECT_RUBRIC_CRITERION_NAME}</h4>
-                                </li>
-                                <li>
-                                    <ul>
-                                        <!-- BEGIN subject_rubric_criterion_mark -->
+            <div class="row" id="rubric-table">
+                <!-- BEGIN subject_rubric_group -->
+                <div class="small-12 island">
+                    <section data-interaction="collapse">
+                        <ul class="information-list">
+                            <li class="actions-small-1" data-collapse-container data-equalizer>
+                                <div class="list-item">
+                                    <div class="info card small-12" data-equalizer-watch>
+                                        <h3>{SUBJECT_RUBRIC_GROUP_NAME}</h3>
+                                    </div>
+
+                                    <ul class="information-list hide" data-collapsable="true" data-collapse-state='collapsed'>
+                                        <!-- BEGIN subject_rubric_criterion -->
                                         <li>
-                                            <a href="/submission/submissionHistory/{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}/{WORK_USER_ID}">{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}</a>: <em>{SUBJECT_RUBRIC_CRITERION_MARK}</em>
+                                            <div class="list-item">
+                                                <div class="info card small-12">
+                                                    <h4>{SUBJECT_RUBRIC_CRITERION_NAME}</h4>
+                                                </div>
+
+                                                <ul class="information-list">
+                                                    <!-- BEGIN subject_rubric_criterion_mark -->
+                                                    <li class="content">
+                                                        <a href="/submission/submissionHistory/{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}/{WORK_USER_ID}">{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}</a>: <em>{SUBJECT_RUBRIC_CRITERION_MARK}</em>
+                                                    </li>
+                                                    <!-- END subject_rubric_criterion_mark -->
+                                                </ul>
+                                            </div>
                                         </li>
-                                        <!-- END subject_rubric_criterion_mark -->
+                                        <!-- END subject_rubric_criterion -->
                                     </ul>
-                                </li>
-                            </ul>
-                        </td>
-                    </tr>
-                    <!-- END subject_rubric_criterion -->
+                                </div>
+                                <nav>
+                                    <a data-collapser="true" class="button icon-add" title="{SUBJECT_RUBRIC_GROUP_NAME}"></a>
+                                </nav>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
                 <!-- END subject_rubric_group -->
-                </tbody>
-            </table>
+            </div>
         </section>
     </div>
 </div>
@@ -379,3 +371,30 @@ $(function () {
 //
 });
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
