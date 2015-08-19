@@ -320,78 +320,69 @@
             $('#gradegroup-'+gradeScale).foundation('reveal', 'open');
         });
 
-
+        // This should be a reveal modal too
         $('#deleteBox').click(function() {
             if (confirm('Are you sure you want to delete this submission box?')) {
                 window.location = '/submission/submissionForm.php?deleteBox={ID}&next=2';
             }
         });
 
-        // Set up select from timetable thing
-//        var timetableSelectorDialog = $('#timetableSelectorDialog').dialog({
-//            modal: true,
-//            autoOpen: false,
-//            buttons: [
-//                {
-//                    text: 'Use',
-//                    type: 'submit',
-//                    click: function () {
-//
-//                        var self    = timetableSelector.data('timetableDaySelector'),
-//                            radio   = $(this).find('input:checked'),
-//                            display = radio.val() + 'TimeDisplay';
-//
-//                      if (radio.length != 1) {
-//                          return;
-//                      }
-//
-//                      self.element.trigger(
-//                          'pickTime.timetableDaySelector',
-//                          [self.dateDisplay.attr('datetime'), self[display].attr('datetime')]
-//                      );
-//                    }
-//                }
-//            ],
-//            minWidth: 500
-//        });
-//
-//        var timeToUpdate = '';
-//        var form         = $('form');
-//        form.on('click', 'a[data-interaction="selectTimetableDate"]', function(event) {
-//            event.preventDefault();
-//            // Keep track of the button I clicked to open this
-//            timeToUpdate = $(this).data('relation');
-//            timetableSelectorDialog.dialog('open');
-//        });
-//
-//        var timetableSelector = $('[data-interaction="timetableSelector"]')
-//            .timetableDaySelector({
-//                dateFormat: dateDisplayFormats.momentJs,
-//                campusList: {USER_CAMPUS_LIST},
-//                getChangeDateAjax: function(campus, day, date, previous) {
-//                    return {
-//                        url:      '/timetable/dateForTimetableDay',
-//                        dataType: 'json',
-//                        data:     {
-//                            campus:   campus,
-//                            day:      day,
-//                            previous: (previous ? 1 : 0),
-//                            date:     date
-//                        }
-//                    }
-//                }
-//            })
-//            .on('pickTime.timetableDaySelector', function(event, date, time) {
-//                var dateObject = moment(date);
-//                form.find(':input[name="'+timeToUpdate+'_date"]').val(dateObject.format(dateDisplayFormats.momentJs));
-//                if (time) {
-//                    var timeObject = moment(time, 'H:mm');
-//                    form.find(':input[name="' + timeToUpdate + '_hour"]').val(timeObject.format('h'));
-//                    form.find(':input[name="' + timeToUpdate + '_minute"]').val(timeObject.format('mm'));
-//                    form.find(':input[name="' + timeToUpdate + '_period"]').val(timeObject.format('a'));
-//                }
-//                timetableSelectorDialog.dialog('close');
-//            });
+        // Timetable reveal modal
+        var timetableModal = $('[data-role="timetable-selector"]');
+        var timeToUpdate   = '';
+        var form           = $('form');
+        form.on('click', 'a[data-interaction="selectTimetableDate"]', function(event) {
+            event.preventDefault();
+            // Keep track of the button I clicked to open this
+            timeToUpdate = $(this).data('relation');
+            timetableModal.foundation('reveal', 'open');
+        });
+        timetableModal.find('[data-action="close"]').on('click', function(event) {
+            event.preventDefault();
+            timetableModal.foundation('reveal', 'close');
+        });
+        timetableModal.find('[data-action="useTime"]').on('click', function(event) {
+            event.preventDefault();
+            var self    = timetableSelector.data('timetableDaySelector'),
+                radio   = timetableSelector.find('input:checked'),
+                display = radio.val() + 'TimeDisplay';
+
+            if (radio.length != 1) {
+                return;
+            }
+            self.element.trigger(
+                'pickTime.timetableDaySelector',
+                [self.dateDisplay.attr('datetime'), self[display].attr('datetime')]
+            );
+            timetableModal.foundation('reveal', 'close');
+        });
+        var timetableSelector = $('[data-interaction="timetableSelector"]')
+            .timetableDaySelector({
+                dateFormat: dateDisplayFormats.momentJs,
+                campusList: {USER_CAMPUS_LIST},
+                getChangeDateAjax: function(campus, day, date, previous) {
+                    return {
+                        url:      '/timetable/dateForTimetableDay',
+                        dataType: 'json',
+                        data:     {
+                            campus:   campus,
+                            day:      day,
+                            previous: (previous ? 1 : 0),
+                            date:     date
+                        }
+                    }
+                }
+            })
+            .on('pickTime.timetableDaySelector', function(event, date, time) {
+                var dateObject = moment(date);
+                form.find(':input[name="'+timeToUpdate+'_date"]').val(dateObject.format(dateDisplayFormats.momentJs));
+                if (time) {
+                    var timeObject = moment(time, 'H:mm');
+                    form.find(':input[name="' + timeToUpdate + '_hour"]').val(timeObject.format('h'));
+                    form.find(':input[name="' + timeToUpdate + '_minute"]').val(timeObject.format('mm'));
+                    form.find(':input[name="' + timeToUpdate + '_period"]').val(timeObject.format('a'));
+                }
+            });
     });
 </script>
 <!-- END custom_head -->
@@ -877,6 +868,8 @@
     </div>
 </div>
 
-<div id="timetableSelectorDialog" class="hide" title="Choose a date from timetable">
+<div id="timetableSelectorDialog" data-role="timetable-selector" class="reveal-modal" data-reveal title="Choose a date from timetable">
     {TIMETABLE_SELECTOR}
+    <a href="#" data-action="useTime" class="primary button">Use</a>
+    <a href="#" data-action="close" class="button">Cancel</a>
 </div>
