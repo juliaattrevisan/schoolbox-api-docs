@@ -38,6 +38,7 @@ class External_Isams_Batch_Reader_Iterator_Student_Map extends External_Isams_Ba
                 'StudentBoarder'       => "$result->PupilType",
                 'StudentBoardingHouse' => "$result->BoardingHouse",
                 'StudentBirthDate'     => "$result->DOB",
+                'StudentForm'          => "$result->Form",
             ];
         } elseif ($current->matches('//CurrentPupilsHealth/Pupil')) {
             return [
