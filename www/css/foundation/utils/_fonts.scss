@@ -1,5 +1,9 @@
-[class^="icon-"]:before, [class*=" icon-"]:before {
+%iconify {
 	font-family: 'schoolbox';
+}
+
+[class^="icon-"]:before, [class*=" icon-"]:before {
+	@extend %iconify;
 	speak: none;
 	font-style: normal;
 	font-size: 1rem;
