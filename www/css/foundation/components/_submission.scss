@@ -18,12 +18,17 @@
                 background-color: #FFFFb2;
             }
         }
+
+        // A criterion that is being edited
         &.editing {
             .criterion-descriptor-points {
                 display: block;
             }
+            // A descriptor within this criterion
             .criterion-descriptor {
                 width: 24px;
+
+                // The criterion that is being edited
                 &.editing {
                     .criterion-descriptor-points:after {
                         display: block;
@@ -77,7 +82,9 @@
             }
         }
 
+        // A single descriptor
         .criterion-descriptor {
+            // A descriptor that is being edited right now
             &.editing {
                 background-color: #F5F5F5;
                 .criterion-descriptor-points input {
@@ -97,10 +104,7 @@
                 min-width: 150px;
                 margin: 0;
                 resize: none;
-            //    .transition(
-            //min-width 60ms ease,
-            //height 60ms ease
-            //);
+                //.transition(min-width 60ms ease, height 60ms ease);
                 &[readonly] {
                     min-width: 0;
                     overflow: hidden;
