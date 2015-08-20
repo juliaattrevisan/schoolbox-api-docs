@@ -447,8 +447,9 @@ table{
 	border-collapse: collapse;
 	width: 100%;
 }
-thead tr th {
+thead tr th, .row-header {
 	border-bottom: 2px solid $body-bg;
+	font-weight: $font-weight-bold;
 }
 tr:hover td{
 	background-color: $ocean-sunset;
@@ -654,10 +655,6 @@ td, th{
 		&:last-child{
 			border: 0;
 		}
-        &.row-header {
-          font-weight: 700;
-          border-bottom: 2px solid $body-bg;
-        }
 		[class^="icon-"]:before,
 		[class*=" icon-"]:before{
 			float: none;
