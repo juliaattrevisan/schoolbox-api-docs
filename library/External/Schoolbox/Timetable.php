@@ -226,13 +226,15 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
             foreach ($classList as $i => $class) {
                 if ($class['period_id'] == $period['id']) {
-                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['description'] = $class['name'];
-                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['code'] = $class['code'];
-                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['room'] = $class['room'];
-                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['staffCode'] = $class['synergy_id'];
-                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['staffTitle'] = $class['title'];
-                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['staffFirstname'] = $class['firstname'];
-                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['staffSurname'] = $class['lastname'];
+                    $periodListAdaption[$periodSequence]['day'][$dayNumber][$class['code']] = [
+                        'description'    => $class['name'],
+                        'code'           => $class['code'],
+                        'room'           => $class['room'],
+                        'staffCode'      => $class['synergy_id'],
+                        'staffTitle'     => $class['title'],
+                        'staffFirstname' => $class['firstname'],
+                        'staffSurname'   => $class['lastname'],
+                    ];
                     unset($classList[$i]);
                 }
             }
@@ -280,13 +282,15 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
             foreach ($classList as $i => $class) {
                 if ($class['period_id'] == $period['id']) {
-                    $periodAdaption['class'][0]['description'] = $class['name'];
-                    $periodAdaption['class'][0]['code'] = $class['code'];
-                    $periodAdaption['class'][0]['room'] = '';
-                    $periodAdaption['class'][0]['staffCode'] = $class['synergy_id'];
-                    $periodAdaption['class'][0]['staffTitle'] = $class['title'];
-                    $periodAdaption['class'][0]['staffFirstname'] = $class['firstname'];
-                    $periodAdaption['class'][0]['staffCode'] = $class['lastname'];
+                    $periodAdaption['class'][$class['code']] = [
+                        'description'    => $class['name'],
+                        'code'           => $class['code'],
+                        'room'           => '',
+                        'staffCode'      => $class['synergy_id'],
+                        'staffTitle'     => $class['title'],
+                        'staffFirstname' => $class['firstname'],
+                        'staffLastname'  => $class['lastname'],
+                    ];
                     unset($classList[$i]);
                 }
             }
