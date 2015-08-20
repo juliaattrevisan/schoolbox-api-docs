@@ -40,12 +40,11 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
             // Does this mess up my method for saving classes?
             return [
                 'RecordType'      => 'Set',
-                // Doesn't have a class ID?
                 'ID'              => $id,
                 'SubjectID'       => $id,
                 'ClassYear'       => (string)$result->attributes()->YearId,
-                'ClassCode'       => $id,
-                'ClassName'       => $id,
+                'ClassCode'       => "$result->Form",
+                'ClassName'       => "Advisory Group (HSAG)",
                 'ClassTeacherIds' => [(string)$result->attributes()->TutorId],
             ];
         } elseif ($current->matches('//TeachingManager/SetLists/SetList')) {
