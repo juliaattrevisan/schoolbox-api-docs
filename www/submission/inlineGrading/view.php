@@ -19,6 +19,7 @@ use \Schoolbox\UserMapper;
 use \Schoolbox\Collection;
 use \Crocodoc\Renderer\Factory;
 use \Rubric\Renderer\Vertical;
+use Schoolbox\Breadcrumbs;
 
 /** @var SitePage $this */
 
@@ -319,3 +320,29 @@ else {
 		'INLINE_GRADING_SUBMISSION_NAVIGATION_DISABLED' => json_encode(array()),
 	));
 }
+
+/* Render out breadcrumbs
+ */
+$trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => 'Submissions',
+        'href' => "/submission/listSubmission",
+        'class' => '',
+    ],
+    [
+        'text' => $submissionBox->getCategory()->getName(),
+        'href' => "/submission/listSubmission/{$submissionBox->getDueDate()->getYear()}/{$submissionBox->getDueDate()->getYearHalf()}/{$submissionBox->getCategory()->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($submissionBox->getName()),
+        'href' => "/submission/viewSubmission/{$submissionBox->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($user->getFullName()),
+        'href' => "/search/user/{$user->getId()}",
+        'class' => 'active',
+    ]
+]);

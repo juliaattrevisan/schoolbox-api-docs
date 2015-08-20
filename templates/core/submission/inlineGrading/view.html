@@ -1,4 +1,18 @@
-<h1>Grading {INLINE_GRADING_SUBMISSION_BOX_NAME}</h1>
+{BREADCRUMB}
+        
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Grading {INLINE_GRADING_SUBMISSION_BOX_NAME}</h1>
+        <span class='header-actions'>
+            <a href='#' class='button icon-more' data-dropdown='header-options'></a>
+        </span>
+        <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
+            <li><a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="icon-clock">View History</a>
+            <!-- BEGIN report_btn -->
+            <!-- END report_btn -->
+        </ul>
+    </div>
+</div>
 
 <ul class="meta">
     <li class="icon-calendar">Due <span class="gradient-8">{DUEWORK_DUEDATE}</span></li>
@@ -30,27 +44,6 @@
 
 
 
-
-
-
-
-
-
-        
-<span class="header_option">
-	<a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="btn clock"><span></span>View History</a>
-    <!-- BEGIN report_btn -->
-    <!-- END report_btn -->
-</span>
-
-<div class="listing">
-    <ul class="breadcrumb">
-        <li><a href="/submission/listSubmission" >Submissions</a></li>
-        <li><a href="/submission/listSubmission/{DUEWORK_YEAR}/{DUEWORK_SEMESTER}/{CATEGORY_ID}" >{CATEGORY_NAME}</a></li>
-        <li><a href="/submission/viewSubmission/{INLINE_GRADING_SUBMISSION_BOX_ID}">{INLINE_GRADING_SUBMISSION_BOX_NAME}</a></li>
-        <li class="last"><a href="/search/user/{INLINE_GRADING_STUDENT_ID}">{INLINE_GRADING_STUDENT_FULL_NAME}</a></li>
-    </ul>
-</div>
 <div class="dropdown-navigator">
   <a class="nav previous-item" href="" title="">&lsaquo;</a>
   <select name="student-select"></select>
