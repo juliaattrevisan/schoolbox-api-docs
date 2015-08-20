@@ -87,26 +87,25 @@
             editingClass       = 'editing',
             placeholderText    = 'Enter descriptor';
 
-
         criterionSelector.on('focus', inputSelector, function () {
             var input = $(this);
-
-            criterionSelector.find(critSelector + ', ' + descriptorSelector)
-                .removeClass(editingClass)
-                .find(inputSelector)
-                .prop('readonly', true)
-                .removeAttr('placeholder');
-
             input
                 .closest(critSelector)
                 .addClass(editingClass);
-
             input
                 .closest(descriptorSelector)
                 .addClass(editingClass)
                 .find(inputSelector)
                 .prop('readonly', false)
                 .attr('placeholder', placeholderText);
+        });
+
+        criterionSelector.on('blur', inputSelector, function () {
+            criterionSelector.find(critSelector + ', ' + descriptorSelector)
+                .removeClass(editingClass)
+                .find(inputSelector)
+                .prop('readonly', true)
+                .removeAttr('placeholder');
         });
     })
 </script>
