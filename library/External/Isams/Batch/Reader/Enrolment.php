@@ -26,6 +26,7 @@ class External_Isams_Batch_Reader_Enrolment extends External_Isams_Batch_Reader_
                     [
                         '//TeachingManager/Departments/Department/Subjects/Subject',
                         '//SchoolManager/Forms/Form',
+                        '//PupilManager/CurrentPupils/Pupil',
                         '//TeachingManager/Sets/Set',
                         '//TeachingManager/SetLists/SetList',
                         '//TimetableManager/PublishedTimetables/Timetable/Schedules/Schedule',
