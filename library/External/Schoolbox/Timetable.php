@@ -285,7 +285,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                     $periodAdaption['class'][$class['code']] = [
                         'description'    => $class['name'],
                         'code'           => $class['code'],
-                        'room'           => '',
+                        'room'           => $class['room'],
                         'staffCode'      => $class['synergy_id'],
                         'staffTitle'     => $class['title'],
                         'staffFirstname' => $class['firstname'],
