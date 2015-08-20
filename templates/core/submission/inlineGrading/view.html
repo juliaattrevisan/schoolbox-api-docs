@@ -27,7 +27,6 @@
                     <img src="/portrait.php?userId={INLINE_GRADING_STUDENT_EXTERNAL_ID}&size=square64" alt="View Profile" />
                     <p>{INLINE_GRADING_STUDENT_FULL_NAME}</p>
                 </a>
-                <p class="meta"></p>
             </div>
         </section>
     </div>
@@ -35,6 +34,10 @@
 
 <div class="row">
     <div class="small-12 columns" data-interaction="crocodoc-frame">
+        <div id="inline-grading-error-container" class="hide">
+            There were errors downloading document for inline grading:
+        </div>
+
         {INJECTED_INTERFACE_TEMPLATE}
     </div>
 </div>
@@ -131,9 +134,7 @@
 </div>
 
 
-<div id="inline-grading-error-container">
-	<strong>There were errors downloading document for inline grading:</strong>
-</div>
+
 
 <!-- BEGIN download_btn -->
 
