@@ -25,6 +25,7 @@ class External_Isams_Batch_Reader_Enrolment extends External_Isams_Batch_Reader_
                     $this->iterator,
                     [
                         '//TeachingManager/Departments/Department/Subjects/Subject',
+                        '//SchoolManager/Forms/Form',
                         '//TeachingManager/Sets/Set',
                         '//TeachingManager/SetLists/SetList',
                         '//TimetableManager/PublishedTimetables/Timetable/Schedules/Schedule',
