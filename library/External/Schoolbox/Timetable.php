@@ -131,7 +131,10 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     {
         // Get classes for which this user is involved, or is a teacher.
         $query = "
-            SELECT c.name, c.code, c.description, cp.period_id, cp.room, cp.teacher_id, u.synergy_id
+            SELECT
+                c.name, c.code, c.description,
+                cp.period_id, cp.room, cp.teacher_id,
+                u.synergy_id, u.title, u.firstname, u.lastname
             FROM class c
             LEFT JOIN class_user   cl ON c.id = cl.class_id
             LEFT JOIN class_period cp ON c.id = cp.class_id
@@ -227,6 +230,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                     $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['code'] = $class['code'];
                     $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['room'] = $class['room'];
                     $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['staffCode'] = $class['synergy_id'];
+                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['staffTitle'] = $class['title'];
+                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['staffFirstname'] = $class['firstname'];
+                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['staffSurname'] = $class['lastname'];
                     unset($classList[$i]);
                 }
             }
@@ -278,6 +284,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                     $periodAdaption['class'][0]['code'] = $class['code'];
                     $periodAdaption['class'][0]['room'] = '';
                     $periodAdaption['class'][0]['staffCode'] = $class['synergy_id'];
+                    $periodAdaption['class'][0]['staffTitle'] = $class['title'];
+                    $periodAdaption['class'][0]['staffFirstname'] = $class['firstname'];
+                    $periodAdaption['class'][0]['staffCode'] = $class['lastname'];
                     unset($classList[$i]);
                 }
             }
