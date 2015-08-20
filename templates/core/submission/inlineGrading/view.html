@@ -34,37 +34,33 @@
 </div>
 
 <div class="row">
-    <div class="small-12 large-8 columns" data-interaction="crocodoc-frame">
-        {INJECTED_INTERFACE_TEMPLATE}
+    <div class="small-12 columns">
+        <div class="small-12 columns" data-interaction="crocodoc-frame">
+            {INJECTED_INTERFACE_TEMPLATE}
+        </div>
     </div>
-    <div class="small-12 large-4 columns" data-interaction="mark-controls">
-        <!-- One Giant Form -->
-        <form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" id="returnWorkForm">
-            <input name="uid" type="hidden" id="uid" value="{INLINE_GRADING_STUDENT_ID}" />
-            <input name="box_id" type="hidden" id="box_id" value="{INLINE_GRADING_SUBMISSION_BOX_ID}" />
-            <input type="hidden" name="redirect" value="{INLINE_GRADING_SUBMISSION_NAVIGATION_NEXT_URL}" />
-            <input type="hidden" name="clearAttachments" value="1" />
+</div>
 
-            <div class="row">
-                <div class="small-12 island">
-                    <section>
-                        <div class="content">
-                            {INJECTED_MARK_TEMPLATE}
-                            {INJECTED_MARK_RUBRIC}
-                        </div>
-                    </section>
-                </div>
-            </div>
+<!-- One Giant Form -->
+<form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" id="returnWorkForm">
+    <input name="uid" type="hidden" id="uid" value="{INLINE_GRADING_STUDENT_ID}" />
+    <input name="box_id" type="hidden" id="box_id" value="{INLINE_GRADING_SUBMISSION_BOX_ID}" />
+    <input type="hidden" name="redirect" value="{INLINE_GRADING_SUBMISSION_NAVIGATION_NEXT_URL}" />
+    <input type="hidden" name="clearAttachments" value="1" />
 
+    <!-- what is this for? -->
+    <span class="visibility-header visibility_{GRADE_VISIBILITY_CODE}" title="{GRADE_VISIBILITY}"></span>
+
+    <div class="row">
+        <div class="small-12 large-6 columns">
+            <!-- BEGIN student_row -->
             <div class="row">
                 <div class="small-12 island">
                     <h2 class="subheader">Grade</h2>
                     <section>
-
-                        <span class="visibility-header visibility_{GRADE_VISIBILITY_CODE}" title="{GRADE_VISIBILITY}"></span>
-
-                        <!-- BEGIN student_row -->
-                        {OWNER_MARKING}
+                        <div class="content">
+                            {OWNER_MARKING}
+                        </div>
 
                         <!-- BEGIN submission_after_mark -->
                         <!-- END submission_after_mark -->
@@ -98,19 +94,23 @@
                             </li>
                             <!-- END submission_row -->
                         </ul>
-                        <!-- END student_row -->
-
-                        <div class="content">
-                            {INJECTED_INTERFACE_CONTROL}
-                        </div>
                     </section>
                 </div>
             </div>
+            <!-- END student_row -->
+        </div>
+        <div class="small-12 large-6 columns">
+            {INJECTED_MARK_TEMPLATE}
+            {INJECTED_MARK_RUBRIC}
 
-            <input type="submit" value="Save and Continue" />
-        </form>
+            {INJECTED_INTERFACE_CONTROL}
+        </div>
     </div>
-</div>
+
+    <input type="submit" value="Save and Continue" />
+</form>
+
+
 
 
 
