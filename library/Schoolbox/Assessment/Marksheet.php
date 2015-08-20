@@ -594,7 +594,7 @@ class Marksheet
 
                         $page->setVar(array(
                             'MARK_VISIBILITY_VALUE' => \Scrub::text($option['id']),
-                            'MARK_VISIBILITY_TEXT' => \Scrub::text($option['name']),
+                            'MARK_VISIBILITY_TEXT' => $option['name'],
                             'MARK_VISIBILITY_SELECTED' => $selected,
                         ));
 
