@@ -11,3 +11,9 @@
 .plagscan-critical {
     @include label;
 }
+
+table.rubric {
+
+    @extend table.stack-for-small-down;
+
+}
