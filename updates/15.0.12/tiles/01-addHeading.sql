@@ -9,6 +9,6 @@ INSERT INTO `component_config_definition` (
      WHERE class = 'Schoolbox\\Tile\\Component\\DashboardTileController'
     ),
     'componentname',
-    '',
+    'Tiles',
     'Heading'
 );
