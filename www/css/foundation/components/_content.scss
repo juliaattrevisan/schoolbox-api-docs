@@ -472,11 +472,10 @@ td, th{
 		thead {
 			display: none;
 		}
-		tr {
+		tr, th, td {
 			display: block;
 		}
 		td {
-			display: block;
 			&:before {
 				content: attr(title);
 				float: left;
