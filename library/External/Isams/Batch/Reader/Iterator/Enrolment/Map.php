@@ -29,7 +29,6 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
             return [
                 'RecordType'      => 'Set',
                 'ID'              => $id,
-                'RoomID'          => (string)$result->attributes()->RoomId,
                 'SubjectID'       => (string)$result->attributes()->SubjectId,
                 'ClassYear'       => (string)$result->attributes()->YearId,
                 'ClassCode'       => "$result->SetCode",
@@ -42,7 +41,6 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
             return [
                 'RecordType'      => 'Set',
                 'ID'              => $id,
-                'RoomID'          => (string)$result->attributes()->RoomId,
                 'SubjectID'       => $id,
                 'ClassYear'       => (string)$result->attributes()->YearId,
                 'ClassCode'       => "$result->Form",
