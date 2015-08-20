@@ -29,6 +29,7 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
             return [
                 'RecordType'      => 'Set',
                 'ID'              => $id,
+                'RoomID'          => (string)$result->attributes()->RoomId,
                 'SubjectID'       => (string)$result->attributes()->SubjectId,
                 'ClassYear'       => (string)$result->attributes()->YearId,
                 'ClassCode'       => "$result->SetCode",
@@ -41,6 +42,7 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
             return [
                 'RecordType'      => 'Set',
                 'ID'              => $id,
+                'RoomID'          => (string)$result->attributes()->RoomId,
                 'SubjectID'       => $id,
                 'ClassYear'       => (string)$result->attributes()->YearId,
                 'ClassCode'       => "$result->Form",
@@ -76,6 +78,13 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
                 'ClassCode'     => $code,
                 'ClassPeriodID' => "$result->PeriodId",
                 'ClassRoomID'   => "$result->RoomId",
+            ];
+        } elseif ($current->matches('//EstateManager/Buildings/Building/Classrooms/Classroom')) {
+            // Room - get a room name from an ID.
+            return [
+                'RecordType' => 'Room',
+                'ID'         => $id,
+                'RoomCode'   => "$result->Name",
             ];
         } else {
             return [

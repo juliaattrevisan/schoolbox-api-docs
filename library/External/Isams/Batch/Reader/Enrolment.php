@@ -18,7 +18,7 @@ class External_Isams_Batch_Reader_Enrolment extends External_Isams_Batch_Reader_
     {
         // There's no way to reduce an iterator politely
         $reducer = new External_Isams_Batch_Reader_Iterator_Enrolment_Reduce();
-        $result  = ['subjects' => [], 'classes' => [],];
+        $result  = ['subjects' => [], 'classes' => [], 'rooms' => [],];
         foreach (
             new External_Isams_Batch_Reader_Iterator_Enrolment_Map(
                 new \Alaress\Xml\Filter\Path(
@@ -30,6 +30,7 @@ class External_Isams_Batch_Reader_Enrolment extends External_Isams_Batch_Reader_
                         '//TeachingManager/Sets/Set',
                         '//TeachingManager/SetLists/SetList',
                         '//TimetableManager/PublishedTimetables/Timetable/Schedules/Schedule',
+                        '//EstateManager/Buildings/Building/Classrooms/Classroom',
                     ]
                 )
             ) as $row
@@ -42,6 +43,13 @@ class External_Isams_Batch_Reader_Enrolment extends External_Isams_Batch_Reader_
             if ($result['subjects'][$class['SubjectID']]['SubjectName']) {
                 $class['ClassName'] = $result['subjects'][$class['SubjectID']]['SubjectName'];
             }
+
+            $actualClassPeriods = [];
+            foreach ($class['ClassPeriods'] as $classPeriod) {
+                $classPeriod['ClassRoomCode'] = $result['rooms'][$classPeriod['ClassRoomID']]['RoomCode'];
+                $actualClassPeriods[]         = $classPeriod;
+            }
+            $class['ClassPeriods'] = $actualClassPeriods;
             $actualResult[] = $class;
         }
         return new ArrayIterator($actualResult);

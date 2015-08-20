@@ -16,7 +16,12 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Reduce
      */
     public function __invoke($carry, $item)
     {
-        if ($item['RecordType'] === 'Subject') {
+        if ($item['RecordType'] === 'Room') {
+            // Rooms: store in a separate array
+            $roomId                              = $item['ID'];
+            $carry['rooms'][$roomId]['RoomCode'] = $item['RoomCode'];
+        } elseif ($item['RecordType'] === 'Subject') {
+            // Subject name and code: store in a separate array
             $subjectId = $item['ID'];
             $carry['subjects'][$subjectId]['SubjectName'] = $item['SubjectName'];
             $carry['subjects'][$subjectId]['SubjectCode'] = $item['SubjectCode'];
@@ -29,6 +34,7 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Reduce
                 ];
             }
             $carry['classes'][$setId]['ID']            = $setId;
+            $carry['classes'][$setId]['RoomID']        = $item['RoomID'];
             $carry['classes'][$setId]['SubjectID']     = $item['SubjectID'];
             $carry['classes'][$setId]['ClassYear']     = $item['ClassYear'];
             $carry['classes'][$setId]['ClassName']     = $item['ClassName'];
