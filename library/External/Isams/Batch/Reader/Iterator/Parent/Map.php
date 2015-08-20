@@ -38,6 +38,7 @@ class External_Isams_Batch_Reader_Iterator_Parent_Map extends External_Isams_Bat
                 'StudentContactOccupPhone'    => "$result->Telephone",
                 'StudentContactMobilePhone'   => "$result->Mobile",
                 'StudentContactRelation'      => "$result->RelationshipRaw",
+                'StudentContactType'          => "$result->Relationship",
                 'StudentContactDefaultEmail'  => "$result->EmailAddress",
             ] + $this->parseAddress($result->Address[0]);
         } else {
