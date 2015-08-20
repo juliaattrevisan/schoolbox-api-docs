@@ -36,11 +36,12 @@ class External_Isams_Batch_Reader_Enrolment extends External_Isams_Batch_Reader_
         ) {
             $result = $reducer($result, $row);
         }
-//        return new ArrayIterator($result);
         // Merge the class name into the subject
         $actualResult = [];
         foreach ($result['classes'] as $class) {
-            $class['ClassName'] = $result['subjects'][$class['SubjectID']]['SubjectName'];
+            if ($result['subjects'][$class['SubjectID']]['SubjectName']) {
+                $class['ClassName'] = $result['subjects'][$class['SubjectID']]['SubjectName'];
+            }
             $actualResult[] = $class;
         }
         return new ArrayIterator($actualResult);
