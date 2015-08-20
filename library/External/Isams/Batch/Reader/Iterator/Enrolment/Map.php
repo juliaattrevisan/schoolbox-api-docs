@@ -59,9 +59,14 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
         } elseif ($current->matches('//TimetableManager/PublishedTimetables/Timetable/Schedules/Schedule')) {
             // Period that room is in
             // (This should have a roomId and TeacherId attribute but doesn't)
+            // Formroom classes have got "HSAG/" prefix
+            $code = "$result->Code";
+            if (preg_match('|^HSAG/(.*)|', $code, $matches)) {
+                $code = $matches[1];
+            }
             return [
                 'RecordType'    => 'Schedule',
-                'ClassCode'     => "$result->Code",
+                'ClassCode'     => $code,
                 'ClassPeriodID' => "$result->PeriodId",
                 'ClassRoomID'   => "$result->RoomId",
             ];
