@@ -113,11 +113,13 @@ class Controller extends Base
         }
 
         // Build the list of events (slowly)
-        foreach ($resources as $resource) {
-            $this->getApi()->add(
-                $this->getApiFactory()->build($resource)
-            );
-        }
+        $showClasses = $this->getRequest()->query->getBool('classes', true);
+        $this->getApi()->add(
+            $this->getApiFactory()->buildFromResourceCollection(
+                $resources,
+                $showClasses
+            )
+        );
 
         $this->getResponse()->content->set([
             'template' => '@resourceBookingReport/index.twig',
@@ -128,6 +130,7 @@ class Controller extends Base
                     'start'    => $start,
                     'end'      => $end,
                     'category' => $selectedCategories,
+                    'classes'  => $showClasses,
                 ],
             ],
         ]);

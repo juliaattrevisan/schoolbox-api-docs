@@ -603,10 +603,10 @@ class External_Maze_Timetable implements External_TimetableInterface
     /**
      * @todo Implement for MAZE connector
      *
-     * @param  string $roomCode
+     * @param  array|string $roomCodes
      * @return array
      */
-    public function getRoomTimetable($roomCode)
+    public function getRoomTimetable($roomCodes)
     {
         // I'm not even going to try navigating this MAZE
         return array();

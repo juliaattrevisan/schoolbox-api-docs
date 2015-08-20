@@ -9,15 +9,13 @@
  
 namespace Schoolbox\ResourceBooking\Report;
 
-use Alaress\Module\Module as BaseModule;
-use Alaress\Authorizer\Rule;
 use Calendar_Api_Composite;
 use Calendar_Api_EventType_Interface;
 use External_TimetableInterface;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\User;
 
-class CalendarApiFactory extends BaseModule
+class CalendarApiFactory
 {
     /**
      * @var User
@@ -67,7 +65,51 @@ class CalendarApiFactory extends BaseModule
                 $this->getUser(),
                 array()
             );
-            $timetableApi->setRoomCode($roomCode)->setExternalTimetable($this->getTimetable());
+            $timetableApi->setRoomCodes($roomCode)->setExternalTimetable($this->getTimetable());
+            $api->add($timetableApi);
+        }
+        return $api;
+    }
+
+    /**
+     * Creates a calendar API for a list of resource items.
+     *
+     * @param  Item\Model[] $resourceCollection
+     * @param  bool         $getTimetabledRooms
+     * @return Calendar_Api_EventType_Interface
+     */
+    public function buildFromResourceCollection($resourceCollection, $getTimetabledRooms = true)
+    {
+        // Get the list of resource IDs and room codes
+        $resourceIds = [];
+        $roomCodes   = [];
+        foreach ($resourceCollection as $resource) {
+            if (!$resource instanceof Item\Model) {
+                continue;
+            }
+            $resourceIds[] = $resource->getId();
+            $roomCode      = trim($resource->getRoomCode());
+            if (strlen($roomCode) > 0) {
+                $roomCodes[] = $roomCode;
+            }
+        }
+
+        // Get the list of resource IDs and room codes
+        $api = new Calendar_Api_Composite();
+        if (!empty($resourceIds)) {
+            $resourceApi = new \Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
+                $this->getUser(),
+                array()
+            );
+            $resourceApi->setResourceId($resourceIds);
+            $api->add($resourceApi);
+        }
+        if ($getTimetabledRooms && !empty($roomCodes)) {
+            $timetableApi = new \Calendar_Api_EventType_Timetable_Room(
+                $this->getUser(),
+                array()
+            );
+            $timetableApi->setRoomCodes($roomCodes)->setExternalTimetable($this->getTimetable());
             $api->add($timetableApi);
         }
         return $api;

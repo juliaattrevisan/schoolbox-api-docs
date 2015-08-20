@@ -16,6 +16,7 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Calendar_Api_Composite;
 use External_Timetable;
+use Schoolbox\Role;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 use Schoolbox\Permission\Access\UserAccess;
@@ -48,10 +49,7 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\HasServicePermission(
-                        UserAccess::SERVICE_RESOURCE_BOOKING,
-                        UserAccess::ACCESS_FULL
-                    )
+                    new Rule\HasRole(Role::STAFF)
                 )
             ))
         ;

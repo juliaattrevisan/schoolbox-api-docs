@@ -23,11 +23,11 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     protected $externalTimetable = null;
 
     /**
-     * The code for the room to show events for.
+     * The code or codes for the room to show events for.
      *
-     * @var string
+     * @var array|string
      */
-    protected $roomCode;
+    protected $roomCodes;
 
     /**
      * Constructor
@@ -52,7 +52,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     {
         $stack = new Collection();
 
-        $roomTimetable = $this->externalTimetable->getRoomTimetable($this->roomCode);
+        $roomTimetable = $this->externalTimetable->getRoomTimetable($this->roomCodes);
 
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
@@ -117,7 +117,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 // It also has a category.
                 $event->setType(Event::CAMPUS_ACCESS);
                 $event->setAllday(false);
-                $event->setLocation($this->roomCode);
+                $event->setLocation($room['RoomCode']);
                 $event->setStartTime(new Alaress_Date_Format($classStartTime));
                 $event->setEndTime(new Alaress_Date_Format($classEndTime));
                 // Let's say the event doesn't have a publish date,
@@ -202,20 +202,20 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     }
 
     /**
-     * @param  string $roomCode
+     * @param  string $roomCodes
      * @return $this
      */
-    public function setRoomCode($roomCode)
+    public function setRoomCodes($roomCodes)
     {
-        $this->roomCode = $roomCode;
+        $this->roomCodes = $roomCodes;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getRoomCode()
+    public function getRoomCodes()
     {
-        return $this->roomCode;
+        return $this->roomCodes;
     }
 }

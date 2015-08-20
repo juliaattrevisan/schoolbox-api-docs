@@ -758,7 +758,7 @@ class Controller extends Base
                 $this->getUser(),
                 array()
             );
-            $roomSource->setRoomCode($roomCode);
+            $roomSource->setRoomCodes($roomCode);
             $roomEvents = $roomSource->getEvents(
                 $startDate->getTimestamp() + 1,
                 $endDate->getTimestamp() - 1
@@ -905,7 +905,7 @@ class Controller extends Base
                 $this->getUser(),
                 array()
             );
-            $roomSource->setRoomCode($item->getRoomCode());
+            $roomSource->setRoomCodes($item->getRoomCode());
             $roomEvents   = $roomSource->getEvents(
                 $this->getRequest()->query['start'],
                 $this->getRequest()->query['end']

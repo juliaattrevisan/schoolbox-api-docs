@@ -728,15 +728,22 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     /**
      * Gets the timetable for the given room.
      *
-     * @param string $roomCode
+     * @param string $roomCodes
      *
      * @return array
      */
-    public function getRoomTimetable($roomCode)
+    public function getRoomTimetable($roomCodes)
     {
+        if (!is_array($roomCodes)) {
+            $roomCodes = [$roomCodes];
+        }
+        if (empty($roomCodes)) {
+            return [];
+        }
         $query = "
 			SELECT
 				SubjectClasses.Description,
+				Timetable.Room AS RoomCode,
 				Timetable.DayNumber,
 				Timetable.PeriodNumber,
 				Timetable.TimetableGroup,
@@ -756,7 +763,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 				Timetable.FileYear = SubjectClasses.FileYear
 			WHERE Timetable.FileSemester=:semester
 			AND   Timetable.FileYear=:year
-			AND   Timetable.Room=:room
+			AND   Timetable.Room IN (:rooms)
 			ORDER BY
 				Timetable.DayNumber ASC,
 				Timetable.PeriodNumber ASC
@@ -766,7 +773,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             array(
                 ':semester' => "'" . $this->database->quote($this->externalUser->getCurrentSemester()) . "'",
                 ':year'     => "'" . $this->database->quote($this->externalUser->getCurrentYear()) . "'",
-                ':room'     => "'" . $this->database->quote($roomCode) . "'",
+                ':rooms'    => implode(',', array_map([$this->database, 'smartQuote'], $roomCodes)),
             )
         );
 

@@ -239,10 +239,10 @@ class External_Timetable implements External_TimetableInterface
     /**
      * Gets the timetable for the given room.
      *
-     * @param  string $roomCode
+     * @param  array|string $roomCodes
      * @return array
      */
-    public function getRoomTimetable($roomCode)
+    public function getRoomTimetable($roomCodes)
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }

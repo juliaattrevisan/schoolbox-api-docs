@@ -309,10 +309,10 @@ class External_Denbigh_Timetable implements External_TimetableInterface
      * * Timetable def is in the internal Schoolbox database
      * * Timetable def doesn't ignore campuses, but Edumate doesn't have them
      *
-     * @param  string $roomCode
+     * @param  array|string $roomCodes
      * @return array
      */
-    public function getRoomTimetable($roomCode)
+    public function getRoomTimetable($roomCodes)
     {
         return array();
 //        // First: $this->getFullTimetable() and pinch its query
