@@ -470,11 +470,14 @@ class Marksheet
         $page->setTab('submission');
 
         // set global vars
+        $codeString = $this->category->getCodeString();
         $page->setVar(
             array(
                 'CATEGORY'      => $this->category->getName(),
                 'CID'           => $this->category->getId(),
-                'CATEGORY_CODE' => $this->category->getCodeString(),
+                'CATEGORY_CODE' => strlen($codeString) > 0
+                    ? ('('.\Scrub::text($codeString).')')
+                    : '',
                 'WORK_YEAR'     => $this->year,
                 'WORK_SEMESTER' => $this->semester
             )
@@ -582,8 +585,19 @@ class Marksheet
                 } elseif ($name == 'visibility') {
                     $page->setVar('stat_visibility_drop_block', '');
                     foreach (Widgets::getAvailableOptions() as $option) {
-                        $page->setVar('MARK_VISIBILITY_VALUE', \Scrub::text($option['id']));
-                        $page->setVar('MARK_VISIBILITY_TEXT', \Scrub::text($option['name']));
+                        if ($option['id'] == $transposed[$name][$workId]) {
+                            $selected = 'selected';
+                        }
+                        else {
+                            $selected = '';
+                        }
+
+                        $page->setVar(array(
+                            'MARK_VISIBILITY_VALUE' => \Scrub::text($option['id']),
+                            'MARK_VISIBILITY_TEXT' => $option['name'],
+                            'MARK_VISIBILITY_SELECTED' => $selected,
+                        ));
+
                         $page->parse('stat_visibility_drop_block', 'stat_visibility_drop', true);
                     }
                     $page->parse('stat_visible_block', 'stat_visible');
