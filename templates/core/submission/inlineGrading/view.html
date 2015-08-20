@@ -19,7 +19,6 @@
     </div>
 </div>
 
-
 <div class="row">
     <div class="small-12 island">
         <section>
@@ -34,7 +33,84 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="small-12 large-8 columns" data-interaction="crocodoc-frame">
+        {INJECTED_INTERFACE_TEMPLATE}
+    </div>
+    <div class="small-12 large-4 columns" data-interaction="mark-controls">
+        <!-- One Giant Form -->
+        <form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" id="returnWorkForm">
+            <input name="uid" type="hidden" id="uid" value="{INLINE_GRADING_STUDENT_ID}" />
+            <input name="box_id" type="hidden" id="box_id" value="{INLINE_GRADING_SUBMISSION_BOX_ID}" />
+            <input type="hidden" name="redirect" value="{INLINE_GRADING_SUBMISSION_NAVIGATION_NEXT_URL}" />
+            <input type="hidden" name="clearAttachments" value="1" />
 
+            <div class="row">
+                <div class="small-12 island">
+                    <section>
+                        <div class="content">
+                            {INJECTED_MARK_TEMPLATE}
+                            {INJECTED_MARK_RUBRIC}
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="small-12 island">
+                    <h2 class="subheader">Grade</h2>
+                    <section>
+
+                        <span class="visibility-header visibility_{GRADE_VISIBILITY_CODE}" title="{GRADE_VISIBILITY}"></span>
+
+                        <!-- BEGIN student_row -->
+                        {OWNER_MARKING}
+
+                        <!-- BEGIN submission_after_mark -->
+                        <!-- END submission_after_mark -->
+                        <ul class="action-list">
+                            <!-- BEGIN submission_row -->
+                            <li class="actions-small-3">
+                                <div class="list-item {SUBMISSION_SELECTED}">
+                                    <div class="small-12 avatar card">
+                                        <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" title="Download submission">
+                                            <img src="/images/mime/22x22/{SUBMISSION_MIMEICON}" class="content" alt="{SUBMISSION_FILENAME}" />
+                                            <p>{SUBMISSION_FILENAME}</p>
+                                        </a>
+                                        <p class="meta">{SUBMISSION_TIME}</p>
+                                        <p class="meta">{SUBMISSION_TIME_DESCRIPTION}</p>
+
+                                        <!-- BEGIN plag_enabled -->
+                                        <span class="plag-score {SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report">(<a href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a>)</span>
+                                        <!-- END plag_enabled -->
+                                        <!-- BEGIN plag_deleted -->
+                                        <span class="plag-score {SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism">({SUBMISSION_PLAG_SCORE})</span>
+                                        <!-- END plag_deleted -->
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a href="/submission/send.php?id={SUBMISSION_ID}&save=1" class="icon-download" title="Download submission"></a>
+                                    <!-- BEGIN delete_action -->
+                                    <a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" class="icon-delete" title="Delete submission" data-delete-submission></a>
+                                    <!-- END delete_action -->
+                                    <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" class="icon-view" title="View Submission"></a>
+                                </nav>
+                            </li>
+                            <!-- END submission_row -->
+                        </ul>
+                        <!-- END student_row -->
+
+                        <div class="content">
+                            {INJECTED_INTERFACE_CONTROL}
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <input type="submit" value="Save and Continue" />
+        </form>
+    </div>
+</div>
 
 
 
@@ -59,79 +135,9 @@
   </form>
 </div>
 
-<div class="clearfix"></div>
 
 <div id="inline-grading-error-container">
 	<strong>There were errors downloading document for inline grading:</strong>
-</div>
-
-<div class='left inline-grading-column' data-interaction="crocodoc-frame">
-	{INJECTED_INTERFACE_TEMPLATE}
-</div>
-<div class='right clearfix' data-interaction="mark-controls">
-
-	<!-- One Giant Form -->
-	<form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" id="returnWorkForm">
-		<input name="uid" type="hidden" id="uid" value="{INLINE_GRADING_STUDENT_ID}" />
-		<input name="box_id" type="hidden" id="box_id" value="{INLINE_GRADING_SUBMISSION_BOX_ID}" />
-		<input type="hidden" name="redirect" value="{INLINE_GRADING_SUBMISSION_NAVIGATION_NEXT_URL}" />
-		<input type="hidden" name="clearAttachments" value="1" />
-
-		{INJECTED_MARK_TEMPLATE}
-		{INJECTED_MARK_RUBRIC}
-
-		<div class="clearfix"></div>
-
-		<h2>Grade <span class="visibility-header visibility_{GRADE_VISIBILITY_CODE}" title="{GRADE_VISIBILITY}"></span></h2>
-
-		<!-- BEGIN student_row -->
-		<div class="inline-grading-marking">
-			{OWNER_MARKING}
-            <!-- BEGIN submission_after_mark -->
-            <!-- END submission_after_mark -->
-		</div>
-
-		<table class="table inline-grading-submission-list">
-			<colgroup>
-				<col width="30px" />
-				<col/>
-				<col width="105px" />
-			</colgroup>
-			<thead></thead>
-			<tbody>
-				<!-- BEGIN submission_row -->
-				<tr class="{SUBMISSION_SELECTED}">
-					<td><img src="/images/mime/22x22/{SUBMISSION_MIMEICON}" alt="{SUBMISSION_FILENAME}"/></td>
-					<td>
-						<a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" title="Download submission">{SUBMISSION_FILENAME}</a><br />
-						{SUBMISSION_TIME}<br />
-						{SUBMISSION_TIME_DESCRIPTION}
-
-						<!-- BEGIN plag_enabled -->
-						<span class="plag-score {SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report">(<a href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a>)</span>
-						<!-- END plag_enabled -->
-                        <!-- BEGIN plag_deleted -->
-                        <span class="plag-score {SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism">({SUBMISSION_PLAG_SCORE})</span>
-                        <!-- END plag_deleted -->
-					</td>
-					<td>
-						<a href="/submission/send.php?id={SUBMISSION_ID}&save=1" class="btn no-text download" title="Download submission"><span></span></a>
-						<!-- BEGIN delete_action -->
-						<a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));" class="btn no-text delete" title="Delete submission"><span></span></a>
-						<!-- END delete_action -->
-						<a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" class="btn no-text goto" title="View Submission"><span></span></a>
-					</td>
-				</tr>
-				<!-- END submission_row -->
-			</tbody>
-		</table>
-		<!-- END student_row -->
-
-		{INJECTED_INTERFACE_CONTROL}
-
-		<input type="submit" value="Save and Continue" class="submit-btn-plain"/>
-	</form>
-
 </div>
 
 <!-- BEGIN download_btn -->
@@ -141,6 +147,36 @@
 <!-- BEGIN modify_btn -->
 
 <!-- END modify_btn -->
+
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-delete-submission]').click(function(event) {
+            event.preventDefault();
+
+            var self = $(this);
+
+            $(this).confirmDialog({
+                text: "Remove {OWNER_ESCAPED}'s submission?",
+                confirmEvent: function() {
+                    window.location.href = $(this).attr('href');
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -230,3 +266,4 @@
     });
 </script>
 <!-- END custom_head -->
+
