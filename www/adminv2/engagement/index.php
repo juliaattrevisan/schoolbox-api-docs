@@ -14,7 +14,7 @@ $this->setTitle('Admin - Engagement');
 $nav = new AdminV2_Nav();
 $nav->parse($this, 'engagement');
 
-$validPages = array('dueWork','quiz');
+$validPages = array('dueWork','quiz','files');
 
 /* Setup period **/
 $start = new Alaress_Date_Format();
