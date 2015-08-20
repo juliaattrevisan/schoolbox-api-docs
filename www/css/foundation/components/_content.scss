@@ -463,6 +463,36 @@ td, th{
 	}
 }
 
+
+// stackable tables
+
+@mixin table-stack($size) {
+	table.stack-for-#{$size}-down {
+		thead {
+			display: none;
+		}
+		tr {
+			display: block;
+		}
+		td {
+			display: block;
+			&:before {
+				content: attr(title);
+				float: left;
+				margin: 0 1.125rem;
+			}
+		}
+	}
+}
+
+@media #{$small-only} { @include table-stack($size:small); }
+@media #{$medium-down} { @include table-stack($size:medium); }
+@media #{$large-down} { @include table-stack($size:large); }
+
+@if $include-xl-html-grid-classes {
+	@media #{$xlarge-down}  { @include table-stack($size:xlarge);  }
+}
+
 // Panels
 .island-panel {
   @include panel(
