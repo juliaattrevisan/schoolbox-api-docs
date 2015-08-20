@@ -90,20 +90,20 @@ foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
         }
 
         $this->setVar(array(
-            'BOX_ID'                => $submissionBox->getId(),
-            'GRADE_VISIBILITY'      => $submissionBox->getMarkVisibilityDescription(),
-            'GRADE_VISIBILITY_CODE' => $submissionBox->getMarkVisibility(),
-            'USER_ID'               => $currentStudent->getId(),
-            'USER_EXT_ID'           => $currentStudent->getExternalId(),
-            'USER_FULLNAME'         => $currentStudent->formatName('{lastname}, {firstname}'),
-            'USER_UNSUBMITTED'      => $submit ? 'false' : 'true',
-
+            'BOX_ID'                   => $submissionBox->getId(),
+            'FOLDER_ID'                => $submissionBox->getCategory()->getId(),
+            'FOLDER_NAME'              => $submissionBox->getCategory()->getName(),
+            'GRADE_VISIBILITY'         => $submissionBox->getMarkVisibilityDescription(),
+            'GRADE_VISIBILITY_CODE'    => $submissionBox->getMarkVisibility(),
+            'GRADE_VISIBILITY_CLASS'   => \Schoolbox\Assessment\Widgets::getCss($submissionBox->getMarkVisibility()),
+            'USER_ID'                  => $currentStudent->getId(),
+            'USER_EXT_ID'              => $currentStudent->getExternalId(),
+            'USER_FULLNAME'            => $currentStudent->formatName('{lastname}, {firstname}'),
+            'USER_UNSUBMITTED'         => $submit ? 'false' : 'true',
             'USER_MARKSTATUS_CLASS'    => $marked ? 'marked' : '',
             'USER_MARKSTATUS_DATETIME' => $marked ? $markTime->getLocal() : '',
-
             'USER_SUBMISSION_CLASS'    => $submit ? ($ontime ? 'on-time' : 'late') : 'un',
             'USER_SUBMISSION_TEXT'     => $submit ? ($ontime ? 'Submitted on Time' : 'Submitted Late') : 'Not Submitted',
-
         ));
 
         // parse template with PHPLib, shuck it out then put it into JSON? Whoa
@@ -267,6 +267,7 @@ $this->setVar(array(
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
 	'INLINE_GRADING_STUDENT_FULL_NAME' => Scrub::text($user->getFullName()),
 	'INLINE_GRADING_STUDENT_ID' => $user->getId(),
+    'INLINE_GRADING_STUDENT_EXTERNAL_ID' => $user->getExternalId(),
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_NEXT_URL' => $nextUrl
 ));
 
