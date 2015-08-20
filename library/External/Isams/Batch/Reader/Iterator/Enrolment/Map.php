@@ -39,7 +39,7 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
             // A form group - treat this like a class
             // Does this mess up my method for saving classes?
             return [
-                'RecordType'      => 'Form',
+                'RecordType'      => 'Set',
                 // Doesn't have a class ID?
                 'ID'              => $id,
                 'SubjectID'       => $id,

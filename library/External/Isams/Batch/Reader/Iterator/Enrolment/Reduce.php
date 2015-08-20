@@ -20,7 +20,7 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Reduce
             $subjectId = $item['ID'];
             $carry['subjects'][$subjectId]['SubjectName'] = $item['SubjectName'];
             $carry['subjects'][$subjectId]['SubjectCode'] = $item['SubjectCode'];
-        } elseif ($item['RecordType'] === 'Set' || $item['RecordType'] === 'Form') {
+        } elseif ($item['RecordType'] === 'Set') {
             $setId = $item['ID'];
             if (!array_key_exists($setId, $carry['classes'])) {
                 $carry['classes'][$setId] = [
