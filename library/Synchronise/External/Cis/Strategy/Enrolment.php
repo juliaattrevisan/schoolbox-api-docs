@@ -142,6 +142,7 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
                         ->setClass($class)
                         ->setTeacher($teacher)
                         ->setPeriod($classPeriod['ClassPeriodID'])
+                        ->setRoom($classPeriod['ClassRoomCode'])
                 );
             }
         }
