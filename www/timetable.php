@@ -212,6 +212,7 @@ if (is_array($outputList)) {
                                     switch (Cfg::get('external_type')) {
                                         case 'maze':
                                         case 'synergetic':
+                                        case 'schoolbox':
                                             $period_staff = $userHandler->formatName(
                                                 array(
                                                     'title'    => $class['staffTitle'],
@@ -220,7 +221,6 @@ if (is_array($outputList)) {
                                             );
                                             break;
                                         case 'tass':
-                                        case 'schoolbox':
                                             $period_staff = $class['staffCode'];
                                             break;
                                         case 'denbigh':
