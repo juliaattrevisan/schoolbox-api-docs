@@ -56,4 +56,19 @@ class DueWork
         $statement->execute();
         return $statement->fetchColumn(0);
     }
+
+    public function visibility(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
+        $query = "SELECT mark_visibility, COUNT(*) AS total FROM submission_box
+                  WHERE created >= :start AND created <= :end
+                  GROUP BY mark_visibility";
+
+        $statement = $this->database->prepare($query);
+        $statement->bindParam(':start', $start->getDatabaseDate());
+        $statement->bindParam(':end', $end->getDatabaseDate());
+
+        $statement->execute();
+        return $statement->fetchAll();
+
+    }
+
 }
