@@ -1,16 +1,5 @@
 (function() {
     /**
-     * Label animator
-     *
-     * @param label
-     */
-    $.fn.labelTimeout = function(label) {
-        label.animate({opacity: 0}, 1500, function() {
-            label.addClass('hide');
-        });
-    }
-
-    /**
      * Marksheet
      */
     $.fn.marksheet = function() {
