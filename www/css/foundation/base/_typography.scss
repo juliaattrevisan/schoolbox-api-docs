@@ -137,13 +137,14 @@ $paragraph-aside-font-size: rem-calc(($base-font-size - 4));
 }
 
              //  s,     m,      l+
-$h1-font-scale: (2, 2.25, 3);			// 32, 36, 48
-$h2-font-scale: (1.375, 1.625, 2);		// 22, 26, 32
-$h3-font-scale: (1.125, 1.25, 1.375);	// 18, 20, 22
-$h4-font-scale: (1.0625 1.125 1.25);	// 17, 18, 20
-$h5-font-scale: (1, 1.0625, 1.125);		// 16, 17, 18
-$h6-font-scale: (0.9375, 1, 1.0625);	// 15, 16, 17
-$p-font-scale:  (0.875, 0.9375, 1);		// 14, 15, 16
+$h1-font-scale: (1.5,    1.75,   2.25);
+$h2-font-scale: (1.25,   1.3125, 1.375);
+$h3-font-scale: (1.0625, 1.125, 1.1875);
+$h4-font-scale: (1.0625  1.125   1.1875);
+$h5-font-scale: (1,      1.0625, 1.125);
+$h6-font-scale: (0.9375, 1,      1.0625);
+$p-font-scale:  (0.875,  0.9375, 1);
+$sm-font-scale: (0.75,   0.8125, 0.875);
 
 // implement
 %h1 { @include scale-font-size($h1-font-scale); }
@@ -153,6 +154,7 @@ $p-font-scale:  (0.875, 0.9375, 1);		// 14, 15, 16
 %h5 { @include scale-font-size($h5-font-scale); }
 %h6 { @include scale-font-size($h6-font-scale); }
 %p  { @include scale-font-size($p-font-scale);  }
+%sm { @include scale-font-size($sm-font-scale); }
 
 h1 { @extend %h1; }
 h2 { @extend %h2; }
@@ -161,6 +163,9 @@ h4 { @extend %h4; }
 h5 { @extend %h5; }
 h6 { @extend %h6; }
 p  { @extend %p;  }
+ul,
+ol,
+dl { @extend %sm; }
 
 // Heading 1
 h1{
