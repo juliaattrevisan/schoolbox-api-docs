@@ -5,13 +5,7 @@ fullpath=${filepath%/*};
 
 conffile=`readlink -f $fullpath/../www/conf/conf.php`;
 
-instdir=`readlink -f $fullpath/../`;
-baselength=`echo $instdir/updates/ | wc -m`;
-package=${instdir##*/};
-
-curdir=`pwd`;
-
-echo "Auto linking tool for Staff with Parent accounts";
+echo "Auto linking tool for linking Staff and Parent accounts";
 echo "";
 
 if [ ! -f $conffile ];
