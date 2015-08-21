@@ -13,7 +13,19 @@
 }
 
 table.rubric {
-
     @extend table.stack-for-small-down;
 
+    th[colspan] {
+        background-color: $body-bg;
+        @extend %h3;
+        @extend .subheader;
+        margin-top: 0;
+        padding-left: 0;
+        font-weight: $header-font-weight;
+    }
+
+    label {
+        font-weight: $font-weight-normal;
+        margin: 0;
+    }
 }
