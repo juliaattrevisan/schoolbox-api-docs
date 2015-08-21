@@ -20,6 +20,27 @@
 </div>
 
 <div class="row">
+    <div class="small-1 columns">
+        <a class="button icon-previous" href="" title=""></a>
+    </div>
+    <div class="small-6 columns">
+        <select name="student-select"></select>
+    </div>
+    <div class="small-1 columns">
+        <a class="button icon-next" href="" title=""></a>
+    </div>
+    <div class="small-4 columns">
+        <form action="/submission/inlineGrading/configForm.php" method="post">
+            <input type="hidden" name='boxId' value="{BOX_ID}" />
+            <input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
+            <input type="hidden" name="skipUnsubmitted" value="0" />
+            <input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' />
+            <label for="skipUnsubmitted" class="checkbox-label">Skip Unsubmitted</label>
+        </form>
+    </div>
+</div>
+
+<div class="row">
     <div class="small-12 island">
         <section>
             <div class="avatar card">
@@ -107,34 +128,6 @@
         <input type="submit" class='expand' value="Save and Continue" />
     </div>
 </form>
-
-
-
-
-
-
-
-
-
-
-
-<div class="dropdown-navigator">
-  <a class="nav previous-item" href="" title="">&lsaquo;</a>
-  <select name="student-select"></select>
-  <a class="nav next-item" href="" title="">&rsaquo;</a>
-  <form action="/submission/inlineGrading/configForm.php" method="post">
-      <input type="hidden" name='boxId' value="{BOX_ID}" />
-      <input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
-      <input type="hidden" name="skipUnsubmitted" value="0" />
-      <label for="skipUnsubmitted">
-        <input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' />
-        <strong>Skip Unsubmitted</strong>
-      </label>
-  </form>
-</div>
-
-
-
 
 <!-- BEGIN download_btn -->
 
