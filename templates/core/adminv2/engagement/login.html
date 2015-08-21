@@ -1,0 +1,44 @@
+<h3>Login Totals</h3>
+
+<table class="table ruler">
+    <thead>
+    <tr>
+        <th></th>
+        <!-- BEGIN month_head -->
+        <th>{MONTH}</th>
+        <!-- END month_head -->
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN login_total -->
+    <tr>
+        <th>{USER_ROLE}</th>
+        <!-- BEGIN login_total_month -->
+        <td>{TOTAL_MONTH_COUNT}</td>
+        <!-- END login_total_month -->
+    </tr>
+    <!-- END login_total -->
+    </tbody>
+</table>
+
+<h3>Login Rates</h3>
+
+<table class="table ruler">
+    <thead>
+    <tr>
+        <th></th>
+        <!-- BEGIN month_head -->
+        <th>{MONTH}</th>
+        <!-- END month_head -->
+    </tr>
+    </thead>
+    <!-- BEGIN login_percentage -->
+    <tr>
+        <th>{USER_ROLE}</th>
+        <!-- BEGIN login_percentage_month -->
+        <td>{PERCENTAGE_MONTH_COUNT}%</td>
+        <!-- END login_percentage_month -->
+    </tr>
+    <!-- END login_percentage -->
+    </tbody>
+</table>
