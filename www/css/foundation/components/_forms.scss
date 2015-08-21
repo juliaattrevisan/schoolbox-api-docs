@@ -309,7 +309,9 @@ input[type=checkbox]:checked + label.checkbox-toggle{
 
 select.visibility {
 	@extend %iconify;
-	width: 3.125rem !important;
+	&.show-icon-only {
+		width: 3.125rem !important;
+	}
 }
 
 // Component Forms
