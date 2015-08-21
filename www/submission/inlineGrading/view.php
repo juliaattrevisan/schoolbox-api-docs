@@ -92,6 +92,7 @@ foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
 
         $this->setVar(array(
             'BOX_ID'                   => $submissionBox->getId(),
+            'BOX_GRADIENT'             => $submissionBox->getGradientIndex(),
             'FOLDER_ID'                => $submissionBox->getCategory()->getId(),
             'FOLDER_NAME'              => $submissionBox->getCategory()->getName(),
             'GRADE_VISIBILITY'         => $submissionBox->getMarkVisibilityDescription(),
