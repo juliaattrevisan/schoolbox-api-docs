@@ -243,12 +243,6 @@ $dueWorkDetail->renderDetails($this);
 
 $this->setTitle('Grading '.Scrub::text($submissionBox->getName()).' for '.Scrub::text($user->getFullName()));
 
-
-/* Rubric's Cube
- */
-$rubricsRenderer = new Vertical($this, $submissionBox, $user);
-$rubricsRenderer->render()->parseBlock();
-
 /* Determine redirect based on whether you're at the end of the list or not
  * Personally I think it'd be better to wrap back to the start, instead of
  * getting kicked out - then you can review the marks in a 'horizontal' manner
@@ -347,3 +341,39 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         'class' => 'active',
     ]
 ]);
+
+/* Rubric's Cube
+ */
+// do fun rubric things
+$this->setBlock(TEMPLATE_content, 'rubric', 'rubric_block');
+
+if ($submissionBox->isRubric()) {
+    $rb = new DueWork_Rubric_Lightbox($this);
+    $rb->render('INJECTED_MARK_RUBRIC', $submissionBox->getId(), $user->getId(), canViewRubric($submissionBox, $_SESSION['user']));
+} else {
+    $this->setVar('INJECTED_MARK_RUBRIC', '');
+}
+
+/**
+ * @param Component\SubmissionBox $box
+ * @param Schoolbox\User $user
+ * @return bool
+ */
+function canViewRubric($box, $user)
+{
+    // no rubric to view
+    if (!$box->isRubric()) {
+        return false;
+    }
+
+    switch ($user->getRole()->getType()) {
+        case \Schoolbox\Role::PARENT:
+            return $box->isMarkShownToParents();
+        case \Schoolbox\Role::STUDENT:
+            return $box->isMarkShownToStudents();
+        case \Schoolbox\Role::STAFF:
+            return true;
+        default:
+            return false;
+    }
+}
