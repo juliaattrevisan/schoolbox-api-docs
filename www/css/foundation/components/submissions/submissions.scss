@@ -29,3 +29,17 @@ table.rubric {
         margin: 0;
     }
 }
+
+.comment {
+
+    font-style: italic;
+
+    &:not(:empty) {
+
+        &:before, &:after {
+            content: "\"";
+        }
+
+    }
+
+}
