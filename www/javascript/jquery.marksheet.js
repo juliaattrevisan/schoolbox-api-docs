@@ -149,16 +149,10 @@
 						var $form = $(form);
 						$.post(config.submitUrl, $form.serialize())
 							.done(function() {
-								var msg = $form.find('[data-relation="success-message"]').removeClass('hide');
-								setTimeout(function() {
-									msg.addClass('hide');
-								}, 1000);
+								$form.find('[data-relation="success-message"]').removeClass('hide').labelTimeout();
 							})
 							.fail(function() {
-								var msg = $form.find('[data-relation="error-message"]').removeClass('hide');
-								setTimeout(function() {
-									msg.addClass('hide');
-								}, 3000);
+								$form.find('[data-relation="error-message"]').removeClass('hide').labelTimeout();
 							});
 						return false;
 					}
