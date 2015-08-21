@@ -147,12 +147,19 @@
 						// (Thankfully, the change event triggers before blur
 						//  in all browsers.)
 						var $form = $(form);
-						$.post(config.submitUrl, $form.serialize(), function(data) {
-							$form.addClass('ajax-updated');
-							setTimeout(function() {
-								$form.removeClass('ajax-updated');
-							}, 1000)
-						});
+						$.post(config.submitUrl, $form.serialize())
+							.done(function() {
+								var msg = $form.find('[data-relation="success-message"]').removeClass('hide');
+								setTimeout(function() {
+									msg.addClass('hide');
+								}, 1000);
+							})
+							.fail(function() {
+								var msg = $form.find('[data-relation="error-message"]').removeClass('hide');
+								setTimeout(function() {
+									msg.addClass('hide');
+								}, 3000);
+							});
 						return false;
 					}
 				});
