@@ -442,6 +442,14 @@ $clearing-carousel-thumb-active-border: 4px solid tint($tertiary, 26%);
 	opacity: 0.5;
 }
 
+section {
+	table tr > td,
+	table tr > th,
+	label {
+		@extend %p;
+	}
+}
+
 // Tables
 table{
 	border-collapse: collapse;
