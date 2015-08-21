@@ -45,7 +45,7 @@ $subheader-font-weight: $header-font-weight;
 // $paragraph-font-family: inherit;
 // $paragraph-font-weight: $font-weight-normal;
 $paragraph-font-size: rem-calc(($base-font-size - 2));
-$paragraph-line-height: 1.4;
+$paragraph-line-height: 1.25rem;
 $paragraph-margin-bottom: rem-calc(($base-font-size - 2));
 $paragraph-aside-font-size: rem-calc(($base-font-size - 4));
 // $paragraph-aside-line-height: 1.35;
@@ -143,8 +143,8 @@ $h3-font-scale: (1.0625, 1.125, 1.1875);
 $h4-font-scale: (1.0625  1.125   1.1875);
 $h5-font-scale: (1,      1.0625, 1.125);
 $h6-font-scale: (0.9375, 1,      1.0625);
-$p-font-scale:  (0.875,  0.9375, 1);
-$sm-font-scale: (0.75,   0.8125, 0.875);
+$p-font-scale:  (0.8125, 0.8125, 0.8125);
+$sm-font-scale: (0.75,   0.75,   0.8125);
 
 // implement
 %h1 { @include scale-font-size($h1-font-scale); }
@@ -162,7 +162,7 @@ h3 { @extend %h3; }
 h4 { @extend %h4; }
 h5 { @extend %h5; }
 h6 { @extend %h6; }
-p  { @extend %p;  }
+p, td { @extend %p;  }
 ul,
 ol,
 dl { @extend %sm; }
