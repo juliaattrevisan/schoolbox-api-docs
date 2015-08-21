@@ -4,55 +4,58 @@
 (function($) {
     "use strict";
     $.fn.submissionRubricCriterionSelector = function() {
+        // Setup
+        var element = $(this);
+        var form    = element.closest('form');
 
-        var criterionSelector = $(this);
-        var form              = criterionSelector.closest('form');
-
-        // Do assessment-specific descriptors get shown?
+        /**
+         * Do assessment-specific descriptors get shown?
+         */
         var isRubricAssessmentSpecificDescriptors = function() {
             return form.find('[data-relation="rubric-use-assessment-specific"]').prop('checked');
         };
 
-        // Switch descriptors on/off
+        /**
+         * Switch descriptors on/off
+         *
+         * @param action  "show" or "hide"
+         * @param element The element to switch
+         * @param timeout Currently unused
+         */
         var toggleDescriptors = function(action, element, timeout) {
             $(element).find('[data-role="criterion-descriptor"]').toggleClass('hide', (action == 'hide'));
         };
 
-        if (isRubricAssessmentSpecificDescriptors()) {
-            criterionSelector.find('[data-role="criterion"]').each(function () {
-                if ($(this).find(':checked').length) {
-                    toggleDescriptors('show', $(this).find('[data-role="criterion"]'), 0);
-                }
-            });
-        }
+        /**
+         * Switch descriptors on/off
+         */
+        var applyAllDescriptors = function() {
+            if (!isRubricAssessmentSpecificDescriptors()) {
+                toggleDescriptors('hide', element.find('[data-role="criterion"]'), 100);
+            } else {
+                element.find('[data-role="criterion"]').each(function () {
+                    var checked = $(this).find('[data-role="criterion-selector"]').prop('checked');
+                    toggleDescriptors(checked ? 'show' : 'hide', $(this), 100)
+                });
+            }
+        };
+        applyAllDescriptors();
+
+
+        // Events
 
         /**
          * Change result set type:
          * * if assess-specific descriptors are off, hide individual descriptors
          * * if on, show individual descriptors for selected criteria
          */
-        form.on('change', 'input[name="resultset"]', function () {
-            if (!isRubricAssessmentSpecificDescriptors()) {
-                toggleDescriptors('hide', criterionSelector.find('[data-role="criterion"]'), 100);
-            } else {
-                criterionSelector.find('[data-role="criterion"]').each(function () {
-                    var checked = $(this).find('[data-role="criterion-selector"]').prop('checked');
-                    toggleDescriptors(checked ? 'show' : 'hide', $(this), 100)
-                });
-            }
-        });
+        form.on('change', 'input[name="resultset"]', applyAllDescriptors);
 
         /**
          * Switch on/off a criterion:
          * show its individual descriptors (if assess-specific descriptors are on)
          */
-        criterionSelector.on('change', '[data-role="criterion-selector"]', function () {
-            var act = 'hide';
-            if (isRubricAssessmentSpecificDescriptors() && this.checked) {
-                act = 'show';
-            }
-            toggleDescriptors(act, $(this).closest('[data-role="criterion"]'), 100);
-        });
+        element.on('change', '[data-role="criterion-selector"]', applyAllDescriptors);
 
         /**
          * Change event on the rubric descriptor counter:
@@ -61,7 +64,7 @@
         form.on('change', '[data-relation="rubric-descriptor-count"]', function () {
             var count = this.value;
 
-            criterionSelector.find('[data-role="criterion-descriptors"]').each(function () {
+            element.find('[data-role="criterion-descriptors"]').each(function () {
                 var i,
                     inputCount = $(this).find('[data-role="criterion-descriptor"]').length,
                     diff       = count - inputCount;
@@ -99,7 +102,7 @@
          * Focus on an descriptor input - add the editing class
          * (which performs some CSS magick to resize the descriptor)
          */
-        criterionSelector.on('focus', inputSelector, function () {
+        element.on('focus', inputSelector, function () {
             var input = $(this);
             input
                 .closest(critSelector)
@@ -115,8 +118,8 @@
         /**
          * Un-focus on an descriptor input - undo resize magick
          */
-        criterionSelector.on('blur', inputSelector, function () {
-            criterionSelector.find(critSelector + ', ' + descriptorSelector)
+        element.on('blur', inputSelector, function () {
+            element.find(critSelector + ', ' + descriptorSelector)
                 .removeClass(editingClass)
                 .find(inputSelector)
                 .prop('readonly', true)
