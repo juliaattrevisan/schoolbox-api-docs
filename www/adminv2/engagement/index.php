@@ -14,7 +14,7 @@ $this->setTitle('Admin - Engagement');
 $nav = new AdminV2_Nav();
 $nav->parse($this, 'engagement');
 
-$validPages = array('dueWork','quiz','files', 'links','fileTypes','news','collaboration','login');
+$validPages = array('dueWork','quiz','files', 'links','fileTypes','news','collaboration','login','components');
 
 /* Setup period **/
 $start = new Alaress_Date_Format();
@@ -26,14 +26,15 @@ $end = $end->endOfMonth();
 
 
 if(in_array($this->arg[0],$validPages)) {
-
-    $this->setFile('REPORT_CONTENT', 'adminv2/engagement/' . $this->arg[0] . '.html');
-
-    include(dirname ( __FILE__ ) .'/'. $this->arg[0].'.php');
-
-    $this->parse('REPORT_DATA', 'REPORT_CONTENT');
-
+    $page = $this->arg[0];
 }
 else {
-    $this->setVar('REPORT_DATA','');
+    $page = 'login';
 }
+
+
+$this->setFile('REPORT_CONTENT', 'adminv2/engagement/' . $page . '.html');
+
+include(dirname ( __FILE__ ) .'/'. $page.'.php');
+
+$this->parse('REPORT_DATA', 'REPORT_CONTENT');
