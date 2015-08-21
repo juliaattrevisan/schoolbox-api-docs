@@ -54,9 +54,11 @@ class External_Isams_Batch_Reader_Iterator_Timetable_Map extends External_Isams_
         $results = [];
         if ($days instanceof SimpleXMLElement) {
             foreach ($days->children() as $day) {
+                // Can't use day shortname anymore
+                $dayNumber = $offset + (int)$day->Ordinal;
                 $results[] = [
-                    'DayName'    => "$day->ShortName",
-                    'DayNumber'  => $offset + (int)$day->Ordinal,
+                    'DayName'    => "Day $dayNumber",
+                    'DayNumber'  => $dayNumber,
                     'DayPeriods' => $this->parsePeriods($day->Periods[0]),
                 ];
             }
