@@ -24,6 +24,10 @@ table.rubric {
         font-weight: $header-font-weight;
     }
 
+    th, td {
+        vertical-align: top;
+    }
+
     label {
         font-weight: $font-weight-normal;
         margin: 0;
