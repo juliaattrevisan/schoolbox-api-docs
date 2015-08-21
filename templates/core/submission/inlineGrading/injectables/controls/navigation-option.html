@@ -1,6 +1,14 @@
-<div class="navigation-option">
-  <img width="32" height="32" src="/portrait.php?userId={USER_EXT_ID}&size=square32" alt="{USER_FULLNAME}" />
-  <span>{USER_FULLNAME}</span>
-  <span class="submitted {USER_SUBMISSION_CLASS}">{USER_SUBMISSION_TEXT}</span>
-  <span class="markstatus {USER_MARKSTATUS_CLASS}" title="Marked {USER_MARKSTATUS_DATETIME}"></span>
+<div class="row">
+    <div class="small-10 columns">
+        <div class="avatar card">
+            <a href="#" title="View Profile">
+                <img src="/portrait.php?userId={USER_EXT_ID}&size=square32" alt="View Profile" />
+                <p>{USER_FULLNAME}</p>
+            </a>
+            <span class="label {USER_SUBMISSION_CLASS}">{USER_SUBMISSION_TEXT}</span>
+        </div>
+    </div>
+    <div class="small-2 columns">
+        <span class="progress-tick no-text {USER_MARKSTATUS_CLASS}" title="Marked {USER_MARKSTATUS_DATETIME}"></span>
+    </div>
 </div>

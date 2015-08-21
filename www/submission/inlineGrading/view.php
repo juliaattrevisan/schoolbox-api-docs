@@ -102,9 +102,9 @@ foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
             'USER_EXT_ID'              => $currentStudent->getExternalId(),
             'USER_FULLNAME'            => $currentStudent->formatName('{lastname}, {firstname}'),
             'USER_UNSUBMITTED'         => $submit ? 'false' : 'true',
-            'USER_MARKSTATUS_CLASS'    => $marked ? 'marked' : '',
+            'USER_MARKSTATUS_CLASS'    => $marked ? 'complete' : 'pending',
             'USER_MARKSTATUS_DATETIME' => $marked ? $markTime->getLocal() : '',
-            'USER_SUBMISSION_CLASS'    => $submit ? ($ontime ? 'on-time' : 'late') : 'un',
+            'USER_SUBMISSION_CLASS'    => $submit ? ($ontime ? 'submitted' : 'submitted-late') : 'unsubmitted',
             'USER_SUBMISSION_TEXT'     => $submit ? ($ontime ? 'Submitted on Time' : 'Submitted Late') : 'Not Submitted',
         ));
 
