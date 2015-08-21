@@ -24,8 +24,8 @@ class DueWork_Detail
     const LATE        = ' late';
 
     const CLASS_UNSUBMITTED = 'neutral';
-    const CLASS_ON_TIME     = 'success';
-    const CLASS_LATE        = 'alert';
+    const CLASS_ON_TIME     = 'submitted';
+    const CLASS_LATE        = 'submitted-late';
 
     const CLASS_PLAG_0  = 'plag-score ok';
     const CLASS_PLAG_20 = 'plag-score warn';
