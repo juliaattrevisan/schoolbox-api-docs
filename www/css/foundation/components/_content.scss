@@ -941,6 +941,15 @@ td, th{
                 margin: 0 0 0 (4 * rem-calc($base-font-size));
             }
         }
+
+		img.mime {
+			@media #{$small-only} {
+				padding: 0.625rem !important;
+			}
+			@media #{$medium-up} {
+				padding: 0.75rem !important;
+			}
+		}
     }
 
     &.info {
