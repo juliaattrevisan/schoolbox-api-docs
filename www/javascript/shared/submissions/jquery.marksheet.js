@@ -103,10 +103,7 @@
 
                     var label = $('[data-identifier="'+indicator+'"]');
                     label.text('Saved').css({opacity:1}).removeClass('hide');
-
-                    setTimeout(function() {
-                        $.fn.labelTimeout(label)
-                    }, 3000);
+                    label.labelTimeout({duration: 3000});
                 });
             });
         }
@@ -198,11 +195,8 @@
                             .css({opacity:1})
                             .text('Saved')
                             .removeClass('hide alert')
-                            .addClass('success');
-
-                        setTimeout(function() {
-                            $.fn.labelTimeout(label)
-                        }, 3000);
+                            .addClass('success')
+                            .labelTimeout({duration: 3000});
                     },
                     error: function (xhr) {
                         self.prop('disabled', false);
@@ -213,11 +207,8 @@
                             .css({opacity:1})
                             .text('Value failed to save')
                             .removeClass('hide success')
-                            .addClass('alert');
-
-                        setTimeout(function() {
-                            $.fn.labelTimeout(label)
-                        }, 3000);
+                            .addClass('alert')
+                            .labelTimeout({duration: 3000});
                     }
                 });
             });
