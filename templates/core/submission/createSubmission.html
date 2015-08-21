@@ -11,6 +11,7 @@
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
 <script type="text/javascript" src="/javascript/submission/formValidate.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 
 <script type="text/javascript">
 //    // from http://stackoverflow.com/a/5259788
@@ -125,11 +126,13 @@
             $('#gradegroup-'+gradeScale).foundation('reveal', 'open');
         });
 
-        // This should be a reveal modal too
-        $('#deleteBox').click(function() {
-            if (confirm('Are you sure you want to delete this submission box?')) {
-                window.location = '/submission/submissionForm.php?deleteBox={ID}&next=2';
-            }
+        // Dialog box for confirming delete
+        $('a[data-action="delete"]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text:         'Are you sure you want to delete this submission box?',
+                confirmEvent: $.confirmDialog.followHref
+            });
         });
 
         // Timetable reveal modal
@@ -679,10 +682,10 @@
 
             <input type="hidden" name='fileId' value="{FILEID}"/>
             <input type="hidden" name="id" value="{ID}"/></td>
-            <input type="submit" name="Submit" value="{HEADING}" class="submit-btn-plain"/>
+            <input type="submit" name="Submit" value="{HEADING}" />
 
             <!-- BEGIN delete_button -->
-            <input id='deleteBox' type="button" class="submit-btn-plain"  value="Delete" />
+            <a href="/submission/submissionForm.php?deleteBox={ID}&next=2" data-action="delete" class="button">Delete</a>
             <!-- END delete_button -->
         </form>
     </div>
@@ -690,6 +693,12 @@
 
 <div id="timetableSelectorDialog" data-role="timetable-selector" class="reveal-modal" data-reveal title="Choose a date from timetable">
     {TIMETABLE_SELECTOR}
+    <a href="#" data-action="useTime" class="primary button">Use</a>
+    <a href="#" data-action="close" class="button">Cancel</a>
+</div>
+
+<div class="reveal-modal" data-reveal>
+    Are you sure you want to delete this submission box?
     <a href="#" data-action="useTime" class="primary button">Use</a>
     <a href="#" data-action="close" class="button">Cancel</a>
 </div>
