@@ -467,13 +467,16 @@ td, th{
 
 // stackable tables
 
-@mixin table-stack($size) {
+@mixin table-stack($size, $h-pad: 0.875rem) {
 	table.stack-for-#{$size}-down {
 		thead {
 			display: none;
 		}
 		tr, th, td {
 			display: block;
+		}
+		th, td {
+			padding: 0.875rem $h-pad;
 		}
 		td {
 			&:before {
@@ -485,7 +488,7 @@ td, th{
 	}
 }
 
-@media #{$small-only} { @include table-stack($size:small); }
+@media #{$small-only} { @include table-stack($size:small, $h-pad:2rem); }
 @media #{$medium-down} { @include table-stack($size:medium); }
 @media #{$large-down} { @include table-stack($size:large); }
 
@@ -998,9 +1001,20 @@ td, th{
 		}
 	}
 
+	// force same font size, regardless of hierarchy
+	h1,h2,h3,h4,h5,h6 {
+		@extend %p;
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+
     h3 {
       margin: 0;
     }
+
+	a{
+		display: block;
+	}
 
     h3, p, .meta {
       text-overflow: ellipsis;
