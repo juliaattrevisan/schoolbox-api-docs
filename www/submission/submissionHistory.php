@@ -181,7 +181,7 @@ if ($folder->getCodes()->count()) {
                     'TEACHER_NAME'         => $userHandler->formatName($meta),
                     'TEACHER_EXTERNAL_ID'  => $synid,
                     'TEACHER_GROUP'        => Scrub::text($meta['gname']),
-                    'TEACHER_AVATAR'       => "/portrait?userId=$synid&size=square32",
+                    'TEACHER_AVATAR'       => "/portrait?userId=$synid&size=square64",
                     'TEACHER_AVATAR_TITLE' => $userHandler->formatName($meta),
                     'TEACHER_URL'          => $_SESSION['mailhandle'] . $emailObj->formatEmailFromArray($teacher),
                 )
@@ -260,7 +260,7 @@ $teacher = $userHandler->getByID($box->getOwner()->getId());
 $teacher_details = array(
     'TEACHER_ID'    => $teacher['uid'],
     'TEACHER_NAME'  => $userHandler->formatName($teacher),
-    'TEACHER_THUMB' => "/portrait?userId={$teacher['synergy_id']}&size=square32",
+    'TEACHER_THUMB' => "/portrait?userId={$teacher['synergy_id']}&size=square64",
 );
 $this->setVar($teacher_details);
 
@@ -376,7 +376,7 @@ if (count($submission_history)) {
             array(
                 'HISTORY_USER_ID'    => $owner,
                 'HISTORY_USER_NAME'  => $userHandler->formatName($usersList[$owner]),
-                'HISTORY_USER_THUMB' => "/portrait?userId={$usersList[$owner]['synergy_id']}&size=square32"
+                'HISTORY_USER_THUMB' => "/portrait?userId={$usersList[$owner]['synergy_id']}&size=square64"
             )
         );
 
