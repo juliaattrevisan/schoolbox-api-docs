@@ -1,8 +1,8 @@
 <div id="rubric-window">
-    <h3>Marking Guide</h3>
-    <table class="rubric table">
+    <!--<h3>Marking Guide</h3>-->
+    <table class="rubric">
         <colgroup>
-            <col class="criterion-label" />
+            <col />
             <!-- BEGIN rubric_rating -->
             <col />
             <!-- END rubric_rating -->
@@ -11,14 +11,14 @@
         <!-- BEGIN rubric_crit -->
         <!-- BEGIN rubric_grouping -->
         <tr>
-            <td class="criterion-label pad span" colspan="{RUBRIC_GROUP_SPAN}">{RUBRIC_GROUP_LABEL}</td>
+            <th class="row-header" colspan="{RUBRIC_GROUP_SPAN}">{RUBRIC_GROUP_LABEL}</th>
         </tr>
         <!-- END rubric_grouping -->
         <tr>
-            <td class="criterion-label pad">{RUBRIC_CRIT_LABEL}</td>
+            <th>{RUBRIC_CRIT_LABEL}</th>
             <!-- BEGIN rubric_crit_rating -->
-            <td class="criterion-value {RUBRIC_CRIT_RATING_CLASS}">
-                <input id="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_RATING_VALUE}" class="rubric-input" type="radio"
+            <td class="{RUBRIC_CRIT_RATING_CLASS}">
+                <input id="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_RATING_VALUE}" type="radio"
                        name="rubric[{RUBRIC_CRIT_ID}]" data-index="{RUBRIC_CRIT_INDEX}" disabled="disabled"
                        value="{RUBRIC_CRIT_RATING_VALUE}" {RUBRIC_CRIT_RATING_SELECTED} />
                 <label for="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_RATING_VALUE}">
@@ -31,16 +31,18 @@
         </tbody>
     </table>
     <!-- BEGIN rubric_display -->
+    <!--
     <div class="rubric-display">
         <div class="rubric-grade">
             <span id="sum">{RUBRIC_GRADE_SUM}</span> / <span id="max">{RUBRIC_GRADE_MAX}</span>
         </div>
         <div id="rubric-chart"></div>
     </div>
+    -->
     <!-- END rubric_display -->
 
 
-    <a href="#" id="closebox" class="submit-btn-plain"><span></span>Close</a>
+    <!--<a href="#" id="closebox" class="submit-btn-plain"><span></span>Close</a>-->
 </div>
 <script type="text/javascript">
     // listener for submit

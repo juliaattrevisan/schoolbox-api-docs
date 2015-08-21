@@ -1,0 +1,49 @@
+/* Plagscan
+ */
+.plagscan-ok {
+    @include label;
+}
+
+.plagscan-warning {
+    @include label;
+}
+
+.plagscan-critical {
+    @include label;
+}
+
+table.rubric {
+    @extend table.stack-for-small-down;
+
+    th[colspan] {
+        background-color: $body-bg;
+        @extend %h3;
+        @extend .subheader;
+        margin-top: 0;
+        padding-left: 0;
+        font-weight: $header-font-weight;
+    }
+
+    th, td {
+        vertical-align: top;
+    }
+
+    label {
+        font-weight: $font-weight-normal;
+        margin: 0;
+    }
+}
+
+.comment {
+
+    font-style: italic;
+
+    &:not(:empty) {
+
+        &:before, &:after {
+            content: "\"";
+        }
+
+    }
+
+}

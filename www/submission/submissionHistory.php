@@ -25,9 +25,8 @@ $this->setBlock(TEMPLATE_content, 'rubric', 'rubric_block');
 $this->setBlock(TEMPLATE_content, 'action_submit', 'action_submit_block');
 $this->setBlock(TEMPLATE_content, 'attachments', 'attachments_block');
 $this->setBlock('returned_work', 'return_file', 'return_file_block');
-$this->setBlock('returned_work', 'return_file_uuid', 'return_file_uuid_block');
+$this->setBlock('return_file', 'return_file_uuid', 'return_file_uuid_block');
 $this->setBlock('recent_submission', 'plag_score', 'plag_score_block');
-$this->setBlock('recent_submission', 'overdue', 'overdue_block');
 $this->setBlock('recent_submission', 'recent_submission_download', 'recent_submission_download_block');
 $this->setBlock('subject', 'work', 'work_block');
 $this->setBlock('subject', 'teacher', 'teacher_block');
@@ -182,7 +181,7 @@ if ($folder->getCodes()->count()) {
                     'TEACHER_NAME'         => $userHandler->formatName($meta),
                     'TEACHER_EXTERNAL_ID'  => $synid,
                     'TEACHER_GROUP'        => Scrub::text($meta['gname']),
-                    'TEACHER_AVATAR'       => "/portrait?userId=$synid&size=square32",
+                    'TEACHER_AVATAR'       => "/portrait?userId=$synid&size=square64",
                     'TEACHER_AVATAR_TITLE' => $userHandler->formatName($meta),
                     'TEACHER_URL'          => $_SESSION['mailhandle'] . $emailObj->formatEmailFromArray($teacher),
                 )
@@ -210,6 +209,7 @@ $gradient = $box->getGradientIndex();
 $this->setVar(
     array(
         'CATEGORY_NAME'        => Scrub::text($box->getCategory()->getName()),
+        'CATEGORY_CODE'        => $classCode,
         'CATEGORY_ID'          => $box->getCategory()->getId(),
         'CATEGORY_THUMB'       => '',
         'BOX_DUEDATE'          => $dueDate->getRelativeTime(),
@@ -218,6 +218,7 @@ $this->setVar(
         'BOX_ID'               => $box->getId(),
         'BOX_NAME'             => Scrub::text($box->getName()),
         'BOX_OWNER'            => $userHandler->formatName($user),
+        'BOX_OWNER_ID'         => $userID,
         'BOX_DESCRIPTION'      => Scrub::html($box->getDescription()),
         'BOX_TYPE'             => $work_mapper->getNameFromId($box->getWorkType()->getId()),
         'BOX_CREATED'          => $createdDate->getRelativeTime()
@@ -259,7 +260,7 @@ $teacher = $userHandler->getByID($box->getOwner()->getId());
 $teacher_details = array(
     'TEACHER_ID'    => $teacher['uid'],
     'TEACHER_NAME'  => $userHandler->formatName($teacher),
-    'TEACHER_THUMB' => "/portrait?userId={$teacher['synergy_id']}&size=square32",
+    'TEACHER_THUMB' => "/portrait?userId={$teacher['synergy_id']}&size=square64",
 );
 $this->setVar($teacher_details);
 
@@ -375,7 +376,7 @@ if (count($submission_history)) {
             array(
                 'HISTORY_USER_ID'    => $owner,
                 'HISTORY_USER_NAME'  => $userHandler->formatName($usersList[$owner]),
-                'HISTORY_USER_THUMB' => "/portrait?userId={$usersList[$owner]['synergy_id']}&size=square32"
+                'HISTORY_USER_THUMB' => "/portrait?userId={$usersList[$owner]['synergy_id']}&size=square64"
             )
         );
 
@@ -434,14 +435,6 @@ if (count($submission_history)) {
             }
         }
 
-        /* Alternating row color
-         */
-        $this->setVar(
-            array(
-                'ROW_COLOR' => !($j % 2) ? 'dark' : ''
-            )
-        );
-
         $this->parse('work_block', 'work', true);
 
         $this->setVar('status_due_block', '');
@@ -455,7 +448,7 @@ if (count($submission_history)) {
 } else {
     $this->setVar([
         'work_block'    => '',
-        'STATUS_HEALTH' => 'regular',
+        'STATUS_HEALTH' => 'unsubmitted',
         'STATUS_LABEL'  => 'Not Submitted'
     ]);
     $this->parse('subject_block', 'subject');
@@ -473,20 +466,14 @@ if (isset($recent_activity)) {
 
     if ($recent_activity->getDate()->getUnixTimestamp() > $box->getDueDate()->getUnixTimestamp()) {
         $this->setVar([
-            'STATUS_HEALTH' => 'critical',
+            'STATUS_HEALTH' => 'submitted-late',
             'STATUS_LABEL'  => 'Submitted Late',
-            'OVERDUE'       => 'overdue'
         ]);
-
-        $this->parse('overdue_block', 'overdue');
     } else {
-
         $this->setVar([
-            'STATUS_HEALTH' => 'ok',
+            'STATUS_HEALTH' => 'submitted',
             'STATUS_LABEL'  => 'Submitted on Time',
-            'OVERDUE'       => ''
         ]);
-        $this->setVar('overdue_block', '');
     }
 
     $recentSubmissionDate = new Alaress_Date_Format($recent_activity->getDate(), 'U');
@@ -510,23 +497,24 @@ if (isset($recent_activity)) {
     $this->setVar($output);
 
     // if we are the owning student, display plagiarism details if they are available
-    if ($userID == $currentUserId && $conf->get('plagscan_student_visible')) {
+    if (($userID == $currentUserId && $conf->get('plagscan_student_visible')) || $_SESSION['user']->isSuperuser()) {
         // retrieve plagiarism score, if available
         $docMapper = Plagscan_DocumentMapper::getInstance();
         $plagDoc   = null;
         try {
             /* @var $plagDoc Plagscan_Document */
             $plagDoc = $docMapper->findOneByColumn('file_id', $recent_activity->getSubmission()->getId());
+
             if ($plagDoc->getId() && $plagDoc->getStatus() == Plagscan_Document::STATUS_COMPLETE) {
                 // what colour should the plagiarism text be, and what should the tooltip say?
-                if ($plagDoc->getScore() > 60) {
-                    $status  = 'critical';
+                if ($plagDoc->getScore() > 0) {
+                    $status  = 'plagscan-critical';
                     $tooltip = 'Your submission is extremely similar to other documents scanned.';
                 } elseif ($plagDoc->getScore() > 20) {
-                    $status  = 'warn';
+                    $status  = 'plagscan-warning';
                     $tooltip = 'Your submission is somewhat similar to other documents scanned.';
                 } else {
-                    $status  = 'ok';
+                    $status  = 'plagscan-ok';
                     $tooltip = 'Your submission is quite different to other documents scanned.';
                 }
 

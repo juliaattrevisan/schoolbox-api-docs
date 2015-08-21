@@ -442,13 +442,22 @@ $clearing-carousel-thumb-active-border: 4px solid tint($tertiary, 26%);
 	opacity: 0.5;
 }
 
+section {
+	table tr > td,
+	table tr > th,
+	label {
+		@extend %p;
+	}
+}
+
 // Tables
 table{
 	border-collapse: collapse;
 	width: 100%;
 }
-thead tr th {
+thead tr th, .row-header {
 	border-bottom: 2px solid $body-bg;
+	font-weight: $font-weight-bold;
 }
 tr:hover td{
 	background-color: $ocean-sunset;
@@ -557,6 +566,38 @@ $rotate-th-width: $square-grid-td-size;
 
 	}
 
+}
+
+
+// stackable tables
+
+@mixin table-stack($size, $h-pad: 0.875rem) {
+	table.stack-for-#{$size}-down {
+		thead {
+			display: none;
+		}
+		tr, th, td {
+			display: block;
+		}
+		th, td {
+			padding: 0.875rem $h-pad;
+		}
+		td {
+			&:before {
+				content: attr(title);
+				float: left;
+				margin: 0 1.125rem;
+			}
+		}
+	}
+}
+
+@media #{$small-only} { @include table-stack($size:small, $h-pad:2rem); }
+@media #{$medium-down} { @include table-stack($size:medium); }
+@media #{$large-down} { @include table-stack($size:large); }
+
+@if $include-xl-html-grid-classes {
+	@media #{$xlarge-down}  { @include table-stack($size:xlarge);  }
 }
 
 // Panels
@@ -720,10 +761,6 @@ $rotate-th-width: $square-grid-td-size;
 		&:last-child{
 			border: 0;
 		}
-        &.row-header {
-          font-weight: 700;
-          border-bottom: 2px solid $body-bg;
-        }
 		[class^="icon-"]:before,
 		[class*=" icon-"]:before{
 			float: none;
@@ -1008,6 +1045,15 @@ $rotate-th-width: $square-grid-td-size;
                 margin: 0 0 0 (4 * rem-calc($base-font-size));
             }
         }
+
+		img.mime {
+			@media #{$small-only} {
+				padding: 0.625rem !important;
+			}
+			@media #{$medium-up} {
+				padding: 0.75rem !important;
+			}
+		}
     }
 
     &.info {
@@ -1068,9 +1114,20 @@ $rotate-th-width: $square-grid-td-size;
 		}
 	}
 
+	// force same font size, regardless of hierarchy
+	h1,h2,h3,h4,h5,h6 {
+		@extend %p;
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+
     h3 {
       margin: 0;
     }
+
+	a{
+		display: block;
+	}
 
     h3, p, .meta {
       text-overflow: ellipsis;
