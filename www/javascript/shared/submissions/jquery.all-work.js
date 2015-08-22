@@ -181,6 +181,7 @@
                         var editForm = $('#create-comment').clone();
 
                         editForm.prepend($('<input type="hidden" />').attr('name', 'commentId').val(commentId));
+                        editForm.find('img').detach();
                         editForm.removeAttr('id');
                         editForm.find('textarea').text(data.body);
 

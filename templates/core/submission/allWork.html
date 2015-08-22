@@ -8,27 +8,20 @@
     <div class="small-12 large-6 island">
         <section>
             <ul class="action-list">
-                <li class="actions-small-1">
-                    <div class="list-item">
-                        <div class="small-12 avatar card">
-                            <a href="/search/user/{WORK_USER_ID}" title="View Profile">
-                                <img src="/portrait.php?userId={WORK_USER_EXT_ID}&amp;size=square64" alt="{WORK_USER_NAME}" />
-                                <p>{WORK_USER_NAME}</p>
-                            </a>
+                <li>
+                    <div class="small-12 avatar card">
+                        <a href="/search/user/{WORK_USER_ID}" title="View Profile">
+                            <img src="/portrait.php?userId={WORK_USER_EXT_ID}&amp;size=square64" alt="{WORK_USER_NAME}" />
+                            <p>{WORK_USER_NAME}</p>
                             <p class="meta">{WORK_USER_BYLINE} Student</p>
-                        </div>
+                        </a>
                     </div>
-                    <nav>
-                        <a href="/search/user/{WORK_USER_ID}" class="icon-next" title="View Profile"></a>
-                    </nav>
                 </li>
             </ul>
         </section>
     </div>
     <div class="small-12 large-6 island">
-        <section class="content">
         {CONTEXT_SELECTOR}
-        </section>
     </div>
 </div>
 
@@ -39,19 +32,14 @@
         <section>
             <ul class="action-list">
                 <!-- BEGIN subject_teacher -->
-                <li class="actions-small-1">
-                    <div class="list-item">
-                        <div class="small-12 avatar card">
-                            <a href="/search/user/{SUBJ_TCH_ID}" title="View Profile">
-                                <img src="/portrait.php?userId={SUBJ_TCH_EXTID}&amp;size=square64" alt="{SUBJ_TCH_NAME}" />
-                                <p>{SUBJ_TCH_NAME}</p>
-                            </a>
-                            <p class="meta">Teacher</p>
-                        </div>
+                <li>
+                    <div class="small-12 avatar card">
+                        <a href="/search/user/{SUBJ_TCH_ID}" title="View Profile">
+                            <img src="/portrait.php?userId={SUBJ_TCH_EXTID}&amp;size=square64" alt="{SUBJ_TCH_NAME}" />
+                            <p>{SUBJ_TCH_NAME}</p>
+                        </a>
+                        <p class="meta">Teacher</p>
                     </div>
-                    <nav>
-                        <a href="/search/user/{SUBJ_TCH_ID}" class="icon-next" title="View Profile"></a>
-                    </nav>
                 </li>
                 <!-- END subject_teacher -->
             </ul>
@@ -95,38 +83,37 @@
             <div class="row" id="rubric-table">
                 <!-- BEGIN subject_rubric_group -->
                 <div class="small-12 island">
-                    <section data-interaction="collapse">
+                    <section data-interaction="collapse" data-collapse-container>
                         <ul class="information-list">
-                            <li class="actions-small-1" data-collapse-container data-equalizer>
+                            <li class="actions-small-1" data-equalizer>
                                 <div class="list-item">
-                                    <div class="info card small-12" data-equalizer-watch>
+                                    <div class="content" data-equalizer-watch>
                                         <h3>{SUBJECT_RUBRIC_GROUP_NAME}</h3>
                                     </div>
-
-                                    <ul class="information-list hide" data-collapsable="true" data-collapse-state='collapsed'>
-                                        <!-- BEGIN subject_rubric_criterion -->
-                                        <li>
-                                            <div class="list-item">
-                                                <div class="info card small-12">
-                                                    <h4>{SUBJECT_RUBRIC_CRITERION_NAME}</h4>
-                                                </div>
-
-                                                <ul class="information-list">
-                                                    <!-- BEGIN subject_rubric_criterion_mark -->
-                                                    <li class="content">
-                                                        <a href="/submission/submissionHistory/{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}/{WORK_USER_ID}">{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}</a>: <em>{SUBJECT_RUBRIC_CRITERION_MARK}</em>
-                                                    </li>
-                                                    <!-- END subject_rubric_criterion_mark -->
-                                                </ul>
-                                            </div>
-                                        </li>
-                                        <!-- END subject_rubric_criterion -->
-                                    </ul>
                                 </div>
                                 <nav>
                                     <a data-collapser="true" class="icon-add" title="{SUBJECT_RUBRIC_GROUP_NAME}"></a>
                                 </nav>
                             </li>
+                        <!--</ul>-->
+                        <!--<ul class="information-list hide">-->
+                            <!-- BEGIN subject_rubric_criterion -->
+                            <li class="hide" data-collapsable="true" data-collapse-state='collapsed'>
+                                <div class="list-item">
+                                    <!--<div class="info card small-12">-->
+                                        <h4 class="content">{SUBJECT_RUBRIC_CRITERION_NAME}</h4>
+                                    <!--</div>-->
+
+                                    <ul class="information-list">
+                                        <!-- BEGIN subject_rubric_criterion_mark -->
+                                        <li class="content">
+                                            <a href="/submission/submissionHistory/{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}/{WORK_USER_ID}">{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}</a>: <em>{SUBJECT_RUBRIC_CRITERION_MARK}</em>
+                                        </li>
+                                        <!-- END subject_rubric_criterion_mark -->
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- END subject_rubric_criterion -->
                         </ul>
                     </section>
                 </div>
@@ -136,56 +123,50 @@
     </div>
 </div>
 <!-- END subject_rubric -->
-
+<div class="row">
 <div class="small-12 island">
     <h2 class="subheader">Assessments</h2>
 
+<!--
     <ul class="meta">
         <li class="icon-showcase">
             <a href="/eportfolio/{WORK_USER_ID}/showcase">ePortfolio Showcase</a>
         </li>
     </ul>
+-->
 
     <section>
         <!-- BEGIN has_work -->
-        <ul class="action-list no-pad">
+        <ul class="action-list">
             <!-- BEGIN work -->
             <li class="actions-small-1">
                 <div class="list-item">
-                    <div class="small-12 large-4 columns">
+                    <div class="small-12 large-5 columns content">
+                        <div class="small-12 info card no-pad" data-equalizer-watch>
                         <!-- BEGIN work_clickable -->
-                        <div class="small-12 info card" data-equalizer-watch>
                             <a href="/{WORK_HREF}{WORK_ID}/{WORK_USER_ID}">
                                 <p>{WORK_TITLE}</p>
-                                <p class="meta">
-                                    <a href="/homepage/{SUBJ_ID}">{SUBJ_NAME}</a> {WORK_TYPE}
-                                </p>
                             </a>
-                        </div>
                         <!-- END work_clickable -->
-
                         <!-- BEGIN work_unclickable -->
-                        <div class="info card small-12" data-equalizer-watch>
                             <p>{WORK_TITLE}</p>
+                        <!-- END work_unclickable -->
                             <p class="meta">
                                 <a href="/homepage/{SUBJ_ID}">{SUBJ_NAME}</a> {WORK_TYPE}
                             </p>
                         </div>
-                        <!-- END work_unclickable -->
                     </div>
 
-                    <div class="small-12 large-2 columns grade content" data-equalizer-watch>
-                        <span class="gradient-{WORK_GRADIENT}">{WORK_GRADE}</span>
+                    <div class="small-12 large-4 columns grade content" data-equalizer-watch>
+                        <p class="gradient-{WORK_GRADIENT}"><span>{WORK_GRADE}</span></p>
+                        <p class="comment" data-equalizer-watch>{WORK_COMMENT}</p>
                     </div>
 
                     <div class="small-12 large-3 columns content" data-equalizer-watch>
-                        <span class="gradient-{WORK_URGENCY}">Due {WORK_DATE}</span>
+                        Due <span class="gradient-{WORK_URGENCY}">{WORK_DATE}</span>
                         on {WORK_TIME}
                     </div>
 
-                    <div class="small-12 large-3 columns content comment" data-equalizer-watch>
-                        {WORK_COMMENT}
-                    </div>
                 </div>
                 <nav>
                     <!-- BEGIN work_actionable -->
@@ -216,80 +197,73 @@
         <!-- END no_work -->
     </section>
 </div>
-
+</div>
 <!-- BEGIN subject_comments -->
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Comments</h2>
         <section>
             <!-- BEGIN create_comment -->
-            <div class="small-12 avatar card">
-                <a href="/search/user/{SESSION_USER_ID}" title="View Profile">
+
+            <form class="no-margin clearfix" id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
+                <input type="hidden" name="year" value="{WORK_YEAR}"/>
+                <input type="hidden" name="semester" value="{WORK_SEMESTER}"/>
+                <input type="hidden" name="studentId" value="{WORK_USER_ID}"/>
+                <input type="hidden" name="categoryId" value="{SUBJ_ID}"/>
+                <div class="small-12 avatar card">
                     <img src="/portrait.php?userId={SESSION_USER_EXTID}&amp;size=square64" alt="{SESSION_USER_NAME}" />
-                    <p>{SESSION_USER_NAME}</p>
-                </a>
-                <p class="meta">{SESSION_USER_BYLINE}</p>
-            </div>
-
-            <article>
-                <form id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
-                    <input type="hidden" name="year" value="{WORK_YEAR}"/>
-                    <input type="hidden" name="semester" value="{WORK_SEMESTER}"/>
-                    <input type="hidden" name="studentId" value="{WORK_USER_ID}"/>
-                    <input type="hidden" name="categoryId" value="{SUBJ_ID}"/>
-
-                    <label>
-                        Comment
-                        <textarea name="comment"></textarea>
-                    </label>
-
-                    <div>
-                        <input id="vis-student" type="checkbox" name="visibility[student]" value="1" {COMMENT_VIS_STUDENT_CHECKED} />
-                        <label for="vis-student" class="checkbox-label">Visible To Students</label>
+                    <textarea name="comment"></textarea>
+                    <div class="row collapse">
+                        <div class="small-12 medium-6 column">
+                            <input id="vis-student" type="checkbox" name="visibility[student]" value="1" {COMMENT_VIS_STUDENT_CHECKED} />
+                            <label for="vis-student" class="checkbox-label">Visible To Student</label>
+                        </div>
+                        <div class="small-12 medium-6 column">
+                            <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" {COMMENT_VIS_PARENT_CHECKED} />
+                            <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
+                        </div>
                     </div>
-
-                    <div>
-                        <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" {COMMENT_VIS_PARENT_CHECKED} />
-                        <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
-                    </div>
-
-                    <a class="button icon-upload" data-comment-post="new">Post</a>
-                </form>
-            </article>
+                </div>
+                <div class="small-12 column">
+                    <a class="button secondary" data-comment-post="new">Post</a>
+                </div>
+            </form>
             <!-- END create_comment -->
 
-            <div>
-                <ul class="action-list" data-comment-list>
-                    <!-- BEGIN comment -->
-                    <li class="actions-small-2" data-id="{COMMENT_ID}">
-                        <div class="list-item">
-                            <div class="small-12 avatar card">
-                                <a href="/search/user/{COMMENT_USER_ID}" title="View Profile">
-                                    <img src="/portrait.php?userId={COMMENT_USER_EXTID}&amp;size=square64" alt="{COMMENT_USER_NAME}" />
-                                    <p>{COMMENT_USER_NAME}</p>
-                                </a>
-                                <p class="meta">{COMMENT_USER_BYLINE}</p>
-                                <p class="meta">{COMMENT_DATE}</p>
-                                <p class="meta icon-staff-students">{COMMENT_VIS_STUDENT_TITLE}</p>
-                                <p class="meta icon-staff">{COMMENT_VIS_PARENT_TITLE}</p>
-                            </div>
+            <ul class="action-list" data-comment-list>
+                <!-- BEGIN comment -->
+                <li class="actions-small-2" data-id="{COMMENT_ID}">
+                    <div class="list-item">
+                        <div class="small-10 avatar card">
+                            <a href="/search/user/{COMMENT_USER_ID}" title="View Profile">
+                                <img src="/portrait.php?userId={COMMENT_USER_EXTID}&amp;size=square64" alt="{COMMENT_USER_NAME}" />
+                                <p>{COMMENT_USER_NAME}</p>
+                            </a>
+                            <p class="meta">{COMMENT_USER_BYLINE}</p>
+                            <p class="meta">{COMMENT_DATE}</p>
 
-                            <article>
-                                <p>
-                                    {COMMENT_BODY}
-                                </p>
-                            </article>
                         </div>
-                        <nav>
-                            <!-- BEGIN comment_modify -->
-                            <a class="icon-delete" title="Delete" data-comment-delete></a>
-                            <a class="icon-modify" title="Modify" data-comment-modify></a>
-                            <!-- END comment_modify -->
-                        </nav>
-                    </li>
-                    <!-- END comment -->
-                </ul>
-            </div>
+                        <div class="small-2 column content">
+                            <span class="icon-staff-students {COMMENT_VIS_STUDENT}" title="{COMMENT_VIS_STUDENT_TITLE}"></span>
+                            <span class="icon-staff {COMMENT_VIS_PARENT}" title="{COMMENT_VIS_PARENT_TITLE}"></span>
+
+                        </div>
+
+                        <article>
+                            <p>
+                                {COMMENT_BODY}
+                            </p>
+                        </article>
+                    </div>
+                    <nav>
+                        <!-- BEGIN comment_modify -->
+                        <a class="icon-delete" title="Delete" data-comment-delete></a>
+                        <a class="icon-modify" title="Modify" data-comment-modify></a>
+                        <!-- END comment_modify -->
+                    </nav>
+                </li>
+                <!-- END comment -->
+            </ul>
         </section>
     </div>
 </div>
