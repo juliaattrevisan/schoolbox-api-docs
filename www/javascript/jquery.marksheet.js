@@ -59,10 +59,11 @@
 
 			// the validator doesn't seem to be able to handle two inputs with the same name, so they need to be
 			// uniqu-ified, then ajax submitted
-			var inputs = config.element.find('input.mark-input');
+			var inputs = config.element.find('input[data-mark-input]');
+
 			inputs.each(function() {
 				var self = $(this);
-				var pInline = self.closest('.inlineform');
+				var pInline = self.closest('form');
 				var uid = pInline.find('input.uid');
 
 				/* wat?
@@ -77,12 +78,14 @@
 			/* Only ajax submit on change if this setting is on
 			 */
 			if (config.submitOnChange === true) {
-				var allInlineForms = config.element.find('.inlineform');
-				$('.mark-input, .comment').change(function(){
-					var thisInlineForm = $(this).closest('.inlineform');
+				var allInlineForms = config.element.find('form');
+
+				$('[data-mark-input], [data-comment]').change(function(){
+					var thisInlineForm = $(this).closest('form');
+
 					allInlineForms.not(thisInlineForm).removeClass('inline-submit');
 					thisInlineForm.addClass('inline-submit');
-					$(this).closest('.inlineform').submit();
+                    thisInlineForm.submit();
 				});
 			}
 
@@ -106,7 +109,7 @@
 						return true;
 					}
 				}
-				var markLimit = parseInt($(element).closest('.inlineform').find('.validation-limit').text());
+				var markLimit = parseInt($(element).closest('form').find('[data-validation-limit]').text());
 				if (value !== "") {
 					var v = parseInt(value);
 					return v <= markLimit && v >= 0;
@@ -131,7 +134,7 @@
                     focusInvalid: false,
                     errorPlacement: function(error, element) {
                         // Attach to a table row if there is one there
-                        var markingElement = element.closest('.inlineform');
+                        var markingElement = element.closest('form');
                         if (markingElement.length) {
                             error.appendTo(markingElement);
                         } else {
@@ -143,29 +146,15 @@
 						// focused on a form element.) Use them if so.
 						// (Thankfully, the change event triggers before blur
 						//  in all browsers.)
-						if ($(form).find('div.inline-submit').length) {
-							// perform ajax update of work, no file upload
-							var submitDiv = $(form).find('div.inline-submit');
-
-							var notification = submitDiv.find('input, select, textarea');
-
-							$.post(config.submitUrl, submitDiv.find('input, select, textarea').serialize(), function(data) {
-
-								// Why don't I have a class for this?
-								notification.addClass('ajax-updated');
-								setTimeout(function() {
-									notification.removeClass('ajax-updated');
-								}, 1000)
+						var $form = $(form);
+						$.post(config.submitUrl, $form.serialize())
+							.done(function() {
+								$form.find('[data-relation="success-message"]').removeClass('hide').labelTimeout();
+							})
+							.fail(function() {
+								$form.find('[data-relation="error-message"]').removeClass('hide').labelTimeout();
 							});
-							return false;
-						}
-						else {
-							// perform standard form submit, will encapsulate file uploads. set the mark update fields to false
-							$('.mark-update').each(function() {
-								$(this).val('false');
-							});
-							form.submit();
-						}
+						return false;
 					}
 				});
 			});
@@ -173,7 +162,7 @@
 		}
 
 		function selectGrouping() {
-			$('#content select.mark-input').each(function() {
+			$('#content select[data-mark-input]').each(function() {
 				// if the select doesn't contain a separator for the error codes, slot it in
 				var self = $(this);
 				if (self.find('optgroup').length == 0) {

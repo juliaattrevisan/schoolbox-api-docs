@@ -1,94 +1,116 @@
-<!-- BEGIN custom_head -->
-<script src="/javascript/jquery.combobox.js" type="text/javascript"></script>
-<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
-<script type="text/javascript" src="/javascript/components/flot/jquery.flot.js"></script>
-<script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.highlighter.js"></script>
-<script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.spider.js"></script>
-<script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.rubric.js"></script>
-<script src="/javascript/jquery.marksheet.js" type="text/javascript"></script>
-<script type="text/javascript">
-	$(function() {
-		$('#returnWorkForm').marksheet({
-			submitOnChange: true
-		});
+<ul class="breadcrumb">
+    <li><a href="/submission/listSubmission" >Submissions</a></li>
+    <li><a href="/submission/listSubmission/{DUEWORK_YEAR}/{DUEWORK_SEMESTER}/{CATEGORY_ID}" >{CATEGORY_NAME}</a></li>
+    <li class="active"><a href="#">{DUEWORK_DESCRIPTION}</a></li>
+</ul>
 
-		$('.combobox').combobox({COMBO_OPTIONS});
-	});
-</script>
-<!-- END custom_head -->
-
-<h1>{CATEGORY_NAME}: {DUEWORK_DESCRIPTION}</h1>
-<span class="header_option">
-    <!-- BEGIN report_btn -->
-    <a href="/submission/overview/{BOX_ID}" class="btn report"><span></span>View Report</a>
-    <!-- END report_btn -->
-    <!-- BEGIN download_btn -->
-    <a href="/submission/downloadAll.php?id={BOX_ID}" class="btn download"><span></span>Download All Submissions</a>
-    <!-- END download_btn -->
-    <!-- BEGIN modify_btn -->
-    <a href="/submission/createSubmission/modify/{BOX_ID}" class="btn modify"><span></span>Modify</a>
-    <!-- END modify_btn -->
-    {DUEWORK_ARCHIVED}
-</span>
-<p class="sub-heading"><span class="visibility-subheader visibility_{GRADE_VISIBILITY_CODE}" title="{GRADE_VISIBILITY}"></span>{DUEWORK_TYPE} - Due: {DUEWORK_DUEDATE}</p>
-<div class="listing">
-    <ul class="breadcrumb">
-        <li><a href="/submission/listSubmission" >Submissions</a></li>
-        <li><a href="/submission/listSubmission/{DUEWORK_YEAR}/{DUEWORK_SEMESTER}/{CATEGORY_ID}" >{CATEGORY_NAME}</a></li>
-        <li class="last"><a href="#">{DUEWORK_DESCRIPTION}</a></li>
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>{DUEWORK_DESCRIPTION}</h1>
+            <ul class="meta">
+                <li class="icon-calendar">Due {DUEWORK_DUEDATE}</li>
+                <li class="icon-due-work">{DUEWORK_TYPE} ({DUEWORK_MARKTYPE})</li>
+                <!-- BEGIN is_archived -->
+                <li class="icon-locked">Archived</li>
+                <!-- END is_archived -->
+                <li class="{GRADE_VISIBILITY_CSS}" title="{GRADE_VISIBILITY}">{GRADE_VISIBILITY}</li>
+            </ul>
+        </div>
+    </div>
+    <nav>
+        <a href='#' class='button icon-more' data-dropdown='header-options'></a>
+    </nav>
+    <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
+        <!-- BEGIN report_btn -->
+        <li><a href="/submission/overview/{BOX_ID}" class="icon-progress">View Report</a></li>
+        <!-- END report_btn -->
+        <!-- BEGIN download_btn -->
+        <li><a href="/submission/downloadAll.php?id={BOX_ID}" class="icon-download">Download All Submissions</a></li>
+        <!-- END download_btn -->
+        <!-- BEGIN modify_btn -->
+        <li><a href="/submission/createSubmission/modify/{BOX_ID}" class="icon-modify">Modify</a></li>
+        <!-- END modify_btn -->
     </ul>
 </div>
-<div class="view-submission">
-    <form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" id="returnWorkForm">
-        <table class="table ruler">
-            <colgroup>
-                <col width="200px"/>
-                <col />
-				<col width="185px"/>
-            </colgroup>
-            <tbody>
-				<!-- BEGIN student_row -->
-				<tr class="user_{OWNER_ID} user">
-					<td class="nowrap student">
-						<img class="student-icon" src="{OWNER_IMG}" alt="{OWNER_NAME}"/>
 
-						<div>
-							<a href="/search/user/{OWNER_ID}">{OWNER_NAME}</a>
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <ul class="action-list">
+                <!-- BEGIN student_row -->
+                <li data-student="{OWNER_ID}">
+                    <div class="actions-small-1 actions-medium-2">
+                        <form class="list-item" data-ajax-submit action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data">
+                            <div class="small-12 medium-6 xlarge-4 columns">
+                                <div class="row">
+                                    <div class="avatar card small-12">
+                                        <a href="/search/user/{OWNER_ID}" title="View Profile">
+                                            <img src="{OWNER_IMG}" alt="View Profile" />
+                                            <p>{OWNER_NAME}</p>
+                                        </a>
+                                        <p>
+                                            <span class="label {OWNER_CLASS} full-width" title="{OWNER_TIME}">
+                                                {OWNER_STATUS}
+                                            </span>
+                                        </p>
+                                        <!-- BEGIN submission_after_mark -->
+                                        <span class="label alert" title="Work has been resubmitted after grading"></span>
+                                        <!-- END submission_after_mark -->
+                                    </div>
+                                    {OWNER_MARKING}
+                                    <!-- BEGIN submission_row -->
+                                    <!-- BEGIN plag_enabled -->
+                                    <!-- END plag_enabled -->
+                                    <!-- BEGIN plag_pending -->
+                                    <!--<span class="label neutral full-width" title="Plagiarism results pending" >Plagscan Pending</span>-->
+                                    <!-- END plag_pending -->
+                                    <!-- BEGIN plag_deleted -->
+                                    <!-- END plag_deleted -->
 
-							<div class="student-status {OWNER_CLASS}" >
-                                <span title="{OWNER_TIME}">{OWNER_STATUS}</span><br />
-
-                                <!-- BEGIN submission_after_mark -->
-                                <span class="alert" title="Work has been resubmitted after grading"></span>
-                                <!-- END submission_after_mark -->
+                                    <!-- BEGIN delete_action -->
+                                    <!-- END delete_action -->
+                                    <!-- END submission_row -->
+                                </div>
                             </div>
-
-							<!-- BEGIN submission_row -->
-							<!-- BEGIN plag_enabled -->
-							<!-- END plag_enabled -->
-                            <!-- BEGIN plag_deleted -->
-                            <!-- END plag_deleted -->
-							<!-- BEGIN delete_action -->
-							<!-- END delete_action -->
-							<!-- END submission_row -->
-						</div>
-					</td>
-					<td class="marking">
-						<div>
-							{OWNER_MARKING}
-						</div>
-					</td>
-					<td>
-                        <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>View Submission</a>
-                        <a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="btn clock no-text" title="View Submission History"><span></span></a>
-					</td>
-				</tr>
-
-				<!-- END student_row -->
-			</tbody>
-        </table>
-    </form>
+                            <div class="small-12 columns hide" data-relation="success-message">
+                                <span class="success label full-width">Saved!</span>
+                            </div>
+                            <div class="small-12 columns hide" data-relation="error-message">
+                                <span class="alert label full-width">Whoops, something went wrong!</span>
+                            </div>
+                        </form>
+                        <nav>
+                            <span class="show-for-medium-up">
+                                <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}" class="icon-view" title="View Submission"></a>
+                                <a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="icon-history" title="View Submission History"></a>
+                            </span>
+                            <span class="show-for-small-only">
+                                <a href="#" class="icon-more" data-dropdown="row-options-{OWNER_ID}"></a>
+                            </span>
+                        </nav>
+                        <ul class="f-dropdown" data-dropdown-content id="row-options-{OWNER_ID}">
+                            <li><a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}" class="icon-view">View Submission</a></li>
+                            <li><a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="icon-history">View History</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- END student_row -->
+            </ul>
+        </section>
+    </div>
 </div>
-<div id="rubric-lightbox"></div>
 
+<script type="text/javascript" src="/javascript/jquery.collapsable.js"></script>
+<script type="text/javascript" src="/javascript/jquery.labelTimeout.js"></script>
+<script src="/javascript/jquery.combobox.js" type="text/javascript"></script>
+<script src="/javascript/jquery.marksheet.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function() {
+        $('form[data-ajax-submit]').marksheet({
+            submitOnChange: true
+        });
 
+        $('.combobox').combobox({COMBO_OPTIONS});
+    });
+</script>

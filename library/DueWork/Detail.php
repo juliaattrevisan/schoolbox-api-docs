@@ -23,9 +23,9 @@ class DueWork_Detail
     const ON_TIME     = ' on time';
     const LATE        = ' late';
 
-    const CLASS_UNSUBMITTED = 'submit-regular';
-    const CLASS_ON_TIME     = 'submit-ok';
-    const CLASS_LATE        = 'submit-critical';
+    const CLASS_UNSUBMITTED = 'neutral';
+    const CLASS_ON_TIME     = 'submitted';
+    const CLASS_LATE        = 'submitted-late';
 
     const CLASS_PLAG_0  = 'plag-score ok';
     const CLASS_PLAG_20 = 'plag-score warn';
@@ -99,7 +99,7 @@ class DueWork_Detail
                     $insertion['submissions']    = array();
                     $insertion['user']['status'] = self::UNSUBMITTED;
                     $insertion['user']['class']  = self::CLASS_UNSUBMITTED;
-                    $insertion['user']['time']   = new Alaress_Date_Format(0, 'U');
+                    $insertion['user']['time']   = null;
                     $submissions                 = array();
                 }
                 else {
@@ -161,10 +161,12 @@ class DueWork_Detail
         $page->setBlock(TEMPLATE_content, 'download_btn', 'download_btn_block');
         $page->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
         $page->setBlock(TEMPLATE_content, 'report_btn', 'report_btn_block');
+        $page->setBlock(TEMPLATE_content, 'is_archived', 'is_archived_block');
 
         $page->setBlock('submission_row', 'download_action', 'download_action_block');
         $page->setBlock('submission_row', 'delete_action', 'delete_action_block');
         $page->setBlock('submission_row', 'plag_enabled', 'plag_enabled_block');
+        $page->setBlock('submission_row', 'plag_pending', 'plag_pending_block');
         $page->setBlock('submission_row', 'plag_deleted', 'plag_deleted_block');
 
         $page->setVar('plag_deleted_block', '');
@@ -179,17 +181,19 @@ class DueWork_Detail
 
         $page->setVar(
             array(
-                'DUEWORK_DESCRIPTION' => Scrub::text($this->submissionBox->getName()),
-                'DUEWORK_YEAR'        => $this->submissionBox->getDueDate()->getYear(),
-                'DUEWORK_SEMESTER'    => $this->submissionBox->getDueDate()->getYearHalf(),
-                'CATEGORY_NAME'       => Scrub::text($this->submissionBox->getCategory()->getName()),
-                'DUEWORK_TYPE'        => $this->submissionBox->getWorkType()->getName(),
-                'DUEWORK_DUEDATE'     => $closeString,
+                'DUEWORK_DESCRIPTION'   => Scrub::text($this->submissionBox->getName()),
+                'DUEWORK_YEAR'          => $this->submissionBox->getDueDate()->getYear(),
+                'DUEWORK_SEMESTER'      => $this->submissionBox->getDueDate()->getYearHalf(),
+                'CATEGORY_NAME'         => Scrub::text($this->submissionBox->getCategory()->getName()),
+                'DUEWORK_TYPE'          => $this->submissionBox->getWorkType()->getName(),
+                'DUEWORK_MARKTYPE'      => $this->submissionBox->getMarkType()->getName(),
+                'DUEWORK_DUEDATE'       => $closeString,
                 'GRADE_VISIBILITY'      => $this->submissionBox->getMarkVisibilityDescription(),
                 'GRADE_VISIBILITY_CODE' => $this->submissionBox->getMarkVisibility(),
-                'CATEGORY_ID'         => $this->submissionBox->getCategory()->getId(),
-                'BOX_ID'              => $this->submissionBox->getId(),
-                'SITE_ROOT'           => $page->conType() . $_SERVER['HTTP_HOST'],
+                'GRADE_VISIBILITY_CSS'  => \Schoolbox\Assessment\Widgets::getCss($this->submissionBox->getMarkVisibility()),
+                'CATEGORY_ID'           => $this->submissionBox->getCategory()->getId(),
+                'BOX_ID'                => $this->submissionBox->getId(),
+                'SITE_ROOT'             => $page->conType() . $_SERVER['HTTP_HOST'],
             )
         );
 
@@ -220,7 +224,7 @@ class DueWork_Detail
                     'OWNER_STATUS'  => $record['user']['status'],
                     'OWNER_CLASS'   => $record['user']['class'],
                     'OWNER_TIME'    => $record['user']['time'] instanceof Alaress_Date_Format ? $record['user']['time']->getShort() : '',
-                    'OWNER_IMG'     => sprintf('/portrait.php?userId=%s&size=square32', $record['user']['instance']->getexternalId())
+                    'OWNER_IMG'     => sprintf('/portrait.php?userId=%s&size=square64', $record['user']['instance']->getexternalId())
                 )
             );
 
@@ -320,10 +324,11 @@ class DueWork_Detail
                         } // not complete? is this even a plagiarism document?
                         elseif ($plagScan->getPlagscanId()) {
                             // it's a plag doc, but is being checked and still pending, so tell the user
-                            $page->setVar(
-                                'plag_enabled_block',
-                                '<span title="Plagiarism results pending" class="plag-score regular">(pending)</span>'
-                            );
+                            $page->parse('plag_pending_block', 'plag_pending');
+
+                            $page->setVar(array(
+                                'plag_enabled_block' => ''
+                            ));
                         }
                         else {
                             $page->setVar('plag_enabled_block', '');
@@ -349,7 +354,8 @@ class DueWork_Detail
              */
             $page->setVar(
                 array(
-                    'submission_after_mark_block' => ''
+                    'submission_after_mark_block' => '',
+                    'plag_pending_block' => '',
                 )
             );
         }
@@ -378,7 +384,15 @@ class DueWork_Detail
         }
 
         // show or hide the archived warning, based on end date
-        $page->setVar('DUEWORK_ARCHIVED', $this->isArchived() ? '<b class="warning">Archived</b>' : '');
+
+        if ($this->isArchived()) {
+            $page->parse('is_archived_block', 'is_archived');
+        }
+        else {
+            $page->setVar(array(
+                'is_archived_block' => ''
+            ));
+        }
     }
 
 
