@@ -1,6 +1,5 @@
 <?php
 
-
 $groupHandler = new Group;
 
 if(is_numeric($this->arg[0])) {
@@ -83,5 +82,3 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 }
 else
 	error(2);
-
-?>
