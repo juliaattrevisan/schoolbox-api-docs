@@ -55,6 +55,8 @@ $this->setBlock('topic', 'news', 'news_block');
 $this->setBlock('news', 'has_modify_button', 'has_modify_button_block');
 $this->setBlock('news', 'has_publish_date', 'has_publish_date_block');
 $this->setBlock('news', 'has_expiry', 'has_expiry_block');
+$this->setBlock('news', "news_image", "news_image_block");
+
 
 $this->setVar('topic_header_block', '');
 
@@ -195,7 +197,7 @@ $pageSlug = "${filter['archive']}${filter['topicSlug']}/${filter['year']}/${filt
 if ($totalPages > 1) {
     for ($j = 1; $j <= $totalPages; $j++) {
         if ($filter['page'] == $j) {
-            $this->setVar('CURRENT', ' current');
+            $this->setVar('CURRENT', 'active');
         } else {
             $this->setVar('CURRENT', '');
         }
@@ -309,6 +311,14 @@ if (is_array($items)) {
                 $this->setVar('has_expiry_block', '');
             }
 
+            if ($article['item_image']) {
+                $this->setVar('NEWS_IMAGE', $article['item_image']);
+                $this->parse('news_image_block', 'news_image');
+            } else {
+                $this->setVar('news_image_block','');
+            }
+
+
             /* The usual stuff
              */
             $fullname = $userHandler->formatName($article);
@@ -326,12 +336,11 @@ if (is_array($items)) {
                 'POSTER_ID' => $article['uid'],
                 'POSTER_EXTERNAL_ID' => $article['synid'],
                 'DATETIME' => $postDate->getLong(),
-                'NEWS_BODY' => $archive ? $article['item_body'] : Scrub::html($article['item_body']),
+                'NEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300),
                 'TOPIC_NAME' => Scrub::text($previous['topicName']),
                 'TOPIC_CLEAN' => $filter['archive'] . $url->getSlug(),
                 'ON_OFF' => ++$j % 2 ? 'dark' : ''
             );
-
 
             $this->setVar($output);
             $topicList[$article['topicName']] = 1;
