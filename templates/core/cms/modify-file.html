@@ -12,59 +12,53 @@
     });
 </script>
 <!-- END custom_head -->
-
-<h1 class="type">{ACTION} File</h1>
-<form method="post" enctype="multipart/form-data" id="fileForm" class="clearfix"  action="/cms/fileForm.php">
-  <table class="standardForm table">
-  	<colgroup>
-		<col width="250" />
-	</colgroup>
-    <tr>
-      <td><h4>Title</h4>
-        <em>One line description of the file for use as the title</em></td>
-		<td><label><input type="text" name="description" maxlength="100" size="40" class="required" value="{DESCRIPTION}" /></label></td>
-    </tr>
-    <tr>
-      <td><h4>File</h4>
-        <em>
-            Select a file to {ACTION_DESC}.<br/>
-            You can <a href="/cms/file/multi/{CATEGORY_ID}">upload multiple files</a> here.
-        </em>
-      </td>
-		<td>
-            {ATTACH_ZONE}
-		</td>
-    </tr>
-    <tr>
-      <td><h4>Description</h4>
-        <em>Any further details you wish to make about the file, useful for enhancing search results</em></td>
-		<td><textarea name="comment" cols="40" rows="4" style="width:100%">{COMMENT}</textarea></td>
-
-    </tr>
-    <tr>
-      <td><h4>Location</h4>
-        <em>The file will be located in this folder. You can <a href="/cms/file/multicat/">upload a file to multiple locations</a> here.</em>
-       </td>
-	   <td><input name="category" value="{CATEGORY_ID}" type="hidden" /><b>{CATEGORY_NAME}</b></td>
-    </tr>
-    <tr>
-      <td><h4>Hidden</h4>
-        <em>Hide this file from anyone with read-only access.</em></td>
-		<td><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
-    </tr>
-
-  </table>
-  	  <input type='hidden' name='Day' value='{DUE_DAY}' />
-        <input type='hidden' name='Month' value='{DUE_MONTH}' />
-        <input type='hidden' name='Year' value='{DUE_YEAR}' />
-        <input type='hidden' name='type' value='{FILE_TYPE}' />
-        <input type='hidden' name='fileID' value='{FILE_ID}'  />
-          <input type="submit" name="Submit" value="{ACTION} File" class="submit-btn-plain"  />
-          <!-- BEGIN delete_button -->
-          <input id='deleteFile' type="button" class="submit-btn-plain"  value="Delete File" />
-          <!-- END delete_button -->
-
-</form>
+<ul class="breadcrumb">
+    <li><a href="/homepage/{CATEGORY_ID}/">{CATEGORY_NAME}</a></li>
+    <li class="active"><a href="#">{ACTION} File</a></li>
+</ul>
+<div class="row">
+    <div class="small-12 island">
+        <h1 class="type">{ACTION} File</h1>
+        <form method="post" enctype="multipart/form-data" id="fileForm" action="/cms/fileForm.php" class="top">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>Title
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="One line description of the file, this will be used for display and search">?</span>
+                            <input type="text" name="description" maxlength="100" size="40" class="required" value="{DESCRIPTION}" />
+                        </label>
+                        <label>Attach File
+                            {ATTACH_ZONE}
+                        </label>
+                        <label>Description
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Any further details you wish to make about the file, useful for enhancing search results">?</span>
+                            <textarea name="comment" cols="40" rows="4" style="width:100%">{COMMENT}</textarea>
+                        </label>
+                        <label>Hidden
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Hide this file from anyone with read-only access">?</span>
+                            <div class="switch">
+                                <input name="hidden" id="hidden" type="checkbox" {HIDDEN_SELECTED}>
+                                <label for="hidden"></label>
+                            </div>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 column">
+                    <input type="submit" name="Submit" value="{ACTION} File" />
+                    <input type='hidden' name='fileID' value='{FILE_ID}'  />
+                    <input type='hidden' name='category' value='{CATEGORY_ID}'  />
+                </div>
+            <!-- BEGIN delete_button -->
+                <div class="small-12 column">
+                    <input id='deleteFile' type="button" class="alert icon-delete"  value="Delete File" />
+                </div>
+            <!-- END delete_button -->
+            </div>
+        </form>
+    </div>
+</div>
 
 
 
