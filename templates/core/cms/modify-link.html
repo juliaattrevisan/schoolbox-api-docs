@@ -1,16 +1,12 @@
 <!-- BEGIN custom_head -->
 <script language="javascript" type="text/javascript" src="/javascript/jquery.validate.extensions.js"></script>
 <script language="JavaScript" type="text/javascript">
-
-
     $(document).ready(function () {
-
         /*
          * Modal for URL homepage selection
          * */
 
         $('#urlForm').on('click', '.open-modal', function() {
-
             $('#resource-browser').socialstreamBrowser({
                 title: 'Choose a folder',
                 categoryId: 0,
@@ -38,50 +34,60 @@
 </script>
 <!-- END custom_head -->
 
-<h1>{ACTION} Link</h1>
-<form method="post" id="urlForm" class="clearfix" onSubmit="return(verify());" action="/cms/linkForm.php">
-    <table class="standardForm table">
-        <tr>
-            <td><h4>Title</h4>
-                <em>One line description of the URL for the title </em></td>
-            <td><label><input type="text" name="description" maxlength="100" size="40" class="required"
-                              value="{DESCRIPTION}"/></label></td>
-        </tr>
-        <tr>
-        <tr>
-            <td class="formLabelWidth"><h4>URL</h4>
-                <em>The internet address for the website, eg. http://www.google.com.</em>
-                <em>Relative URLs are allowed, and will resolve relative to this domain.</em>
-            </td>
-            <td><label><input class="required" type="text" name="url" id="url" size="40" maxlength="250" value="{URL}"/></label>
-                <p class="clearfix"><a href="#" class="btn float-left open-modal"><span></span>Browse Resources</a>
-                </p>
+<ul class="breadcrumb">
+    <li><a href="/homepage/{CATEGORY_ID}/">{CATEGORY_NAME}</a></li>
+    <li class="active"><a href="#">{ACTION} Link</a></li>
+</ul>
+<div class="row">
+    <div class="small-12 island">
+        <h1>{ACTION} Link</h1>
+        <form method="post" id="urlForm" class="top" action="/cms/linkForm.php">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>Title
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="One line description of the link, this will be used for display and search">?</span>
+                            <input type="text" name="description" maxlength="100" size="40" class="required" value="{DESCRIPTION}" />
+                        </label>
+                        <label for="url">URL
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The internet address for the website, eg. http://www.google.com. Relative URLs are allowed, and will resolve relative to this domain">?</span>
+                        </label>
+                    </div>
+                    <div class="medium-8 large-9 columns">
+                            <input class="required" type="text" name="url" id="url" size="40" maxlength="250" value="{URL}"/></label>
+                    </div>
+                    <div class="medium-4 large-3 columns">
+                        <a href="#" class="button icon-folder open-modal"><span></span>Browse Resources</a>
+                        <div id="resource-browser" class="hide"></div>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>Description
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Any further details you wish to make about the link, useful for enhancing search results">?</span>
+                            <textarea name="comment" cols="40" rows="4" style="width:100%">{COMMENT}</textarea>
+                        </label>
+                        <label>Hidden
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Hide this link from anyone with read-only access">?</span>
+                            <div class="switch">
+                                <input name="hidden" id="hidden" type="checkbox" {HIDDEN_SELECTED}>
+                                <label for="hidden"></label>
+                            </div>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 column">
+                    <input type='hidden' name='linkID' value='{LINK_ID}'/>
+                    <input type='hidden' name='category' value='{CATEGORY_ID}'/>
+                    <input type="submit" name="Submit" value="{ACTION} Link"/>
+                </div>
+                <!-- BEGIN delete_button -->
+                <div class="small-12 column">
+                    <input id='deleteLink' type="button" class="button alert icon-delete" value="Delete Link"/>
+                </div>
+                <!-- END delete_button -->
+            </div>
+        </form>
+    </div>
+</div>
 
-                <div id="resource-browser" class="hide">
-            </td>
-        </tr>
-        <td><h4>Description</h4>
-            <em>Any further details you wish to make about the URL, useful for enhancing search results</em>
-        </td>
-        <td><textarea name="comment" cols="40" rows="4" style="width:100%">{COMMENT}</textarea></td>
-        </tr>
-        <tr>
-            <td><h4>Location</h4>
-                <em>The link will be located in this folder. You can <a href="/cms/link/multicat/">upload a link to
-                    multiple locations</a> here.</em>
-            </td>
-            <td><input name="category" value="{CATEGORY_ID}" type="hidden"/><strong>{CATEGORY_NAME}</strong></div>
-            </td>
-        </tr>
-        <tr>
-            <td><h4>Hidden</h4>
-                <em>Hide this URL from anyone with read-only access.</em></td>
-            <td><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
-        </tr>
-    </table>
-    <input type='hidden' name='linkID' value='{LINK_ID}'/>
-    <input type="submit" name="Submit" value="{ACTION} Link" class="submit-btn-plain"/>
-    <!-- BEGIN delete_button -->
-    <input id='deleteLink' type="button" class="submit-btn-plain" value="Delete Link"/>
-    <!-- END delete_button -->
-</form>
