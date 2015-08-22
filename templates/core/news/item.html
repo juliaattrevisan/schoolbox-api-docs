@@ -2,12 +2,6 @@
     <div class="small-12 island">
         <h1>{NEWS_TITLE}</h1>
         <span class="header-actions">
-            <!-- BEGIN previous_article -->
-            <a class="button icon-previous no-text" data-tooltip href="/news/item/{PREVIOUS_ARTICLE_ID}" title="Previous: '{PREVIOUS_ARTICLE_TITLE}'"></a>
-            <!-- END previous_article -->
-            <!-- BEGIN next_article -->
-            <a class="button icon-next no-text" data-tooltip href="/news/item/{NEXT_ARTICLE_ID}" title="Next: '{NEXT_ARTICLE_TITLE}'"></a>
-            <!-- END next_article -->
             <!-- BEGIN modify_news -->
             <a class="button icon-modify no-text" data-tooltip title="Modify" href="/news/modify/{NEWS_ID}"></a>
             <!-- END modify_news -->
@@ -35,8 +29,22 @@
                 </div>
             </div>
         </section>
+
+        <div class="row">
+            <!-- BEGIN previous_article -->
+            <div class="small-6 columns">
+                <a class="button icon-previous expand" href="/news/item/{PREVIOUS_ARTICLE_ID}" title="Previous">{PREVIOUS_ARTICLE_TITLE}</a>
+            </div>
+            <!-- END previous_article -->
+            <!-- BEGIN next_article -->
+            <div class="small-6 columns">
+                <a class="button icon-next expand" href="/news/item/{NEXT_ARTICLE_ID}" title="Next">{NEXT_ARTICLE_TITLE}</a>
+            </div>
+            <!-- END next_article -->
+        </div>
     </div>
 </div>
+
 
     <!-- BEGIN add_news -->
     <!-- END add_news -->
