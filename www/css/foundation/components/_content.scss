@@ -903,6 +903,10 @@ $rotate-th-width: $square-grid-td-size;
 	a:hover{
 		background-color: transparent;
 	}
+	.meta {
+		text-transform: lowercase;
+		font-variant: small-caps;
+	}
 }
 
 // Show & Hide Task List
@@ -1075,7 +1079,7 @@ $rotate-th-width: $square-grid-td-size;
 
 		img.mime {
 			@media #{$small-only} {
-				padding: 0.625rem !important;
+				padding: 0.5rem !important;
 			}
 			@media #{$medium-up} {
 				padding: 0.75rem !important;
