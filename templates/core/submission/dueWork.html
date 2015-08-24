@@ -1,3 +1,507 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
+
+<!--<script type="text/javascript" src="/javascript/components/fullcalendar/dist/fullcalendar.js"></script>-->
+<script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
+<script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
+<!--<script type="text/javascript" src="/javascript/jquery.greenerize.js"></script>-->
+<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+<script type="text/javascript">
+
+    // provide page-wide access to the calendar object so the callbacks can actually use it
+    var c;
+
+    /**
+     * Update event method:
+     *
+     * * Gives event a "loading" style
+     * * Removes that style when update finishes
+     *
+     * @param event      The event to update
+     * @param data       The data to send to the update script
+     * @param revertFunc called if update failed for whatever reason.
+     *                   Sets event back to original state.
+     */
+    var updateWrapper = function(event, data, revertFunc) {
+        event.className.push('loading');
+        c.cupdate(data, function (returnData) {
+            event.className = event.className.filter(function (value) {
+                return value != 'loading';
+            });
+            if (!returnData) {
+                revertFunc();
+            }
+            c.dom.fullCalendar('rerenderEvents');
+        });
+    };
+
+    // once the DOM has loaded, punch a fancy calendar into it
+    $(document).ready(function() {
+        // Allow checking of anchor for view to display
+        var anchor = '';
+        var parts  = location.href.split('#');
+        if (parts.length > 1) {
+            anchor = parts[1];
+            switch (anchor) {
+                case 'month':
+                    anchor = 'month';
+                    break;
+                case 'week':
+                case 'agendaWeek':
+                    anchor = 'agendaWeek';
+                    break;
+                case 'day':
+                case 'agendaDay':
+                    anchor = 'agendaDay';
+                    break;
+                case 'basicWeek':
+                    anchor = 'basicWeek';
+                    break;
+                case 'basicDay':
+                    anchor = 'basicDay';
+                    break;
+                default:
+                    anchor = '';
+                    break;
+            }
+        }
+        c = new Calendar('calendar', 'calendar-bubble', {
+            userId: '{WORK_USER_ID}',
+
+            // overrides and callbacks
+//            taskTypeId: '{TASK_TYPE_ID}',
+//            crud: {
+//                c: '/calendar/ajax/create',
+//                // r: don't need it
+//                u: '/calendar/ajax/update',
+//                d: '/calendar/ajax/delete'
+//            },
+            filter: {
+                ajax: '/calendar/ajax/filter'
+            },
+            fullCalendar: {
+                defaultDate: moment('{SELECTED_DATE}'),
+                columnFormat: {
+                    month:      'ddd',
+                    week:       'ddd D/M',
+                    agendaWeek: 'ddd D/M',
+                    day:        'ddd D/M',
+                    agendaDay:  'ddd D/M',
+                    '':         'ddd D/M'
+                },
+                defaultView: anchor || 'month',
+                timeFormat: { month: 'h(:mm)a' },
+                // Event limit: could be configured from session but leave global for now
+                eventLimit: true,
+                firstDay: 1,
+//                eventLimit: Boolean('{CALENDAR_COLLAPSE_EVENTS}'),
+//                firstDay: Number('{CALENDAR_START_DAY}'),
+
+                /**
+                 * When an event is drawn on the calendar
+                 * @param calEvent
+                 * @param jsEvent
+                 * @param view
+                 */
+                eventRender: function(calEvent, jsEvent, view) {
+                    // Always render placeholders in the most basic manner
+                    if (calEvent.id === 'placeholder') {
+                        return true;
+                    }
+
+                    // Ignore the phantom event that the API puts there
+                    if (!calEvent.data) {
+                        return false;
+                    }
+
+                    // Don't render me if I'm marked as do not render
+                    if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
+                        return false;
+                    }
+                    return true;
+                },
+
+//                /**
+//                 * When you finish resizing an event, update it
+//                 * Note the difference between eventResize() and eventResizeStop()
+//                 * @param event
+//                 * @param delta
+//                 * @param revertFunc
+//                 */
+//                eventResize: function(event, delta, revertFunc) {
+//                    var data = {
+//                        eventId: event.data.meta.eventId,
+//                        resize: true,
+//                        start: event.start.format(),
+//                        end: event.end.format()
+//                    };
+//                    updateWrapper(event, data, revertFunc);
+//                },
+//
+//                /**
+//                 * When you finish dragging an event to its new home
+//                 * @param event
+//                 * @param delta
+//                 * @param revertFunc
+//                 */
+//                eventDrop: function(event, delta, revertFunc) {
+//                    var data = {
+//                        eventId: event.data.meta.eventId,
+//                        minuteDelta: delta.asMinutes(),
+//                        allDay: !event.start.hasTime()
+//                    };
+//                    updateWrapper(event, data, revertFunc);
+//                },
+//
+//                /**
+//                 * When you click on a day to add a new event
+//                 * @param date
+//                 * @param jsEvent
+//                 * @param view
+//                 */
+//                dayClick: function(date, jsEvent, view) {
+//                    var allDay = !date.hasTime();
+//                    var eventData = { allDay: allDay ? 1 : 0 };
+//                    if (allDay) {
+//                        eventData.date        = date.format('DD-MM-YYYY');
+//                        eventData.displayDate = date.format('ddd, Do MMMM')
+//                    } else {
+//                        eventData.date        = date.format('DD-MM-YYYY HH:mm');
+//                        eventData.displayDate = date.format('ddd, Do MMMM, h(:mm)a')
+//                    }
+//
+//                    c.bubble.display('create', eventData, jsEvent, this)
+//
+//                    // Apply whether the submit button is enabled or not
+//                    toggleFormState(c.getForm('createEvent'));
+//                },
+
+                /**
+                 * When the window is resized
+                 * @param view
+                 */
+                windowResize: function(view) {
+                    var wHeight = $(window).height()
+                    var calTop = c.dom.offset().top
+                    c.dom.fullCalendar('option','contentHeight',wHeight - calTop - 60)
+                },
+
+                /**
+                 * When external data is being fetched
+                 * @param isLoading
+                 * @param view
+                 */
+                loading: function(isLoading, view) {
+
+                    /* Show loading div right in the middle
+                     */
+                    if (isLoading === true) {
+                        $('#calendar-loading').css({
+                            top: ($('#calendar').height() - $('#calendar-loading').height())/2,
+                            left: ($('#calendar').width() - $('#calendar-loading').width())/2
+                        }).show();
+                    }
+                    /* Has finished loading
+                     */
+                    else {
+
+                        /* Hide loading div
+                         */
+                        $('#calendar-loading').hide();
+
+//                        // update any tasks that have been completed by strikethrough-ing them
+//                        $(this).find('input[type=checkbox]').each(function() {
+//                            var self = $(this)
+//
+//                            if(self.prop('checked')) {
+//                                self.siblings('.fc-title').addClass('strike')
+//                            }
+//                        })
+//
+//                        // reapply filters
+//                        c.filters.organise(c, ["campus", "groups", "sources"], false)
+
+                        // update datepicker
+                        var d = c.dom.fullCalendar('getDate')
+
+                        $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'))
+                    }
+                },
+
+//                /**
+//                 * Whenever the view is changes
+//                 * @param view
+//                 */
+//                viewDisplay: function(view) {
+//                    // apply filters, which will also ajax the change of view to store in the db
+//                    if(c !== undefined) {
+//                        c.filters.organise(c, ["campus", "groups", "sources"])
+//                    }
+//                },
+
+                // Stream location
+                events: function(start, end, timezone, callback) {
+                    $.ajax({
+                        dataType: 'json',
+                        url:      '/calendar/ajax/full',
+                        data: {
+                            start: Calendar.reOffsetTimestamp(start.unix()),
+                            end:   Calendar.reOffsetTimestamp(end.unix()),
+                            userId: {WORK_USER_ID}
+                        },
+                        success: function(data) {
+                            callback(data.filter(function(v) {
+                                return 'start' in v;
+                            }));
+                        },
+                        cache: false
+                    });
+                }
+            },
+
+            x: false
+        }).init();
+
+
+//        /* LISTENERS */
+//
+//        /**
+//         * Change event for create task and event title.
+//         * Prevent creation of a calendar event if the input is empty.
+//         *
+//         * @param form  jQuery wrapped form element
+//         */
+//        var toggleFormState = function(form) {
+//            var trimmedTitle = form.find('input[name="title"]').val().replace(/^\s+|\s+$/g, '');
+//            var submit       = form.find(':submit');
+//            submit.prop('disabled', trimmedTitle === '');
+//        };
+//        var toggleCreateButtonState = function(event) {
+//            toggleFormState($(this).closest('form'));
+//        };
+//        c.getForm('createEvent').find('input[name="title"]')
+//                .on('change', toggleCreateButtonState)
+//                .on('keyup', toggleCreateButtonState)
+//        ;
+//        c.getForm('createTask').find('input[name="title"]')
+//                .on('change', toggleCreateButtonState)
+//                .on('keyup', toggleCreateButtonState)
+//        ;
+//
+//        // toggle onto the create task form
+//        $('#showCreateTaskForm').click(function(e) {
+//            e.preventDefault()
+//            c.getForm('createEvent').hide()
+//            var form = c.getForm('createTask').show()
+//
+//            // copy details from event to task
+//            cp('event', 'task', ['date', 'displayDate', 'title', 'allDay'])
+//
+//            // Apply whether the submit button is enabled or not
+//            toggleFormState(form);
+//        });
+//
+//        // toggle onto the create event form
+//        $('#showCreateEventForm').click(function(e) {
+//            e.preventDefault()
+//            c.getForm('createTask').hide()
+//            var form = c.getForm('createEvent').show()
+//
+//            // copy details from event to task
+//            cp('task', 'event', ['date', 'displayDate', 'title', 'allDay'])
+//
+//            // Apply whether the submit button is enabled or not
+//            toggleFormState(form);
+//
+//        })
+//
+//        // click 'Edit Event' and push data through to main form page
+//        $('#edit-full').click(function(e) {
+//            var getstring = $(this).closest('form').serialize();
+//            window.location.href = '/calendar/modify.php?from=inline&returnTo=calendar&' + getstring
+//        })
+//
+//        // hide bubbles if any header buttons are clicked
+//        $('#calendar .fc-header').on('click', 'span.fc-button', function(e) {
+//            c.bubble.hide()
+//        })
+//
+//        // AJAX update attendance when the attendance toggle-button is clicked
+//        c.getForm('editEvent').on('click', '.attendanceRequestButton', function(e) {
+//            e.preventDefault()
+//            var postData = {
+//                event: {id: c.getForm('editEvent').find('input[name="eventId"]').val()}
+//            };
+//            c.post('/service/attendance/processToggleAttendance', postData, function (data) {
+//                var btn = c.getForm('editEvent').find('.attendanceRequestButton a')
+//                if (data.error == undefined) {
+//                    if (btn.text() == 'RSVP') {
+//                        btn.html('<span></span>Unattend')
+//                    }
+//                    else {
+//                        btn.html('<span></span>RSVP')
+//                    }
+//                }
+//            })
+//        })
+//
+//        // if a checkbox on the editTask form is interacted, update the appropriate event on the calendar
+//        c.getForm('editTask').on('change', 'input[name=completed]', function(e) {
+//            var self = $(this)
+//            var eventId = self.closest('form').find('input[name=eventId]').val()
+//            var chk = c.dom.find('#t'+eventId)
+//            chk.prop('checked', self.prop('checked'))
+//            chk.trigger('change')
+//        })
+//
+//        c.getForm('editTask').on('click', '.deleteTask', function(e) {
+//            var id = $(this).siblings('input[name=eventId]').val()
+//            c.cdelete(
+//                    {eventId: id},
+//                    function() {
+//                        // Remove this event from the calendar
+//                        c.dom.fullCalendar(
+//                                'removeEvents',
+//                                function(thisEvent) {
+//                                    try {
+//                                        return thisEvent.data.meta.eventId == id;
+//                                    } catch (e) {
+//                                        return false;
+//                                    }
+//                                    return false;
+//                                }
+//                        );
+//                    }
+//            );
+//            c.bubble.hide()
+//            e.preventDefault()
+//        })
+//
+//        // Dialog for use when clicking an item that is in a series
+//        var updateSeriesDialog = $('#dialog-booking-bulk-update')
+//        updateSeriesDialog.dialog({
+//            autoOpen:false,
+//            resizable:false,
+//            height:180,
+//            width:400,
+//            modal:true,
+//            draggable:false,
+//            close: function () {
+//                return false;
+//            }
+//        })
+//
+//
+//        $('#download-calendar-export').click(function(event) {
+//            event.preventDefault();
+//            var form = $(event.target).closest('form');
+//            window.location = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
+//        });
+//
+//        //
+//        // Form listener for exporter - brings up a dialog box that offers a URL
+//        // to click.
+//        $('#calendar-export form').submit(function(event) {
+//            event.preventDefault();
+//
+//            // Copy and paste button - show only when ready
+//            var button = $('#copy-button').hide();
+//            var client = new ZeroClipboard(button);
+//            client.on('ready', function() {
+//                button.show();
+//            });
+//
+//            var form = $(this);
+//            $('#calendar-export-dialog').dialog({
+//                open: function(event, ui) {
+//                    $(event.target).find('#calendar-export-dialog-url')
+//                            .text($.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())).select();
+//                },
+//                minWidth: 400,
+//                modal: true
+//            });
+//        });
+//
+//
+//
+//        // Copypasted code for updating booking in series
+//        $('#calendar-bubble').find('#editEvent').on(
+//                'click',
+//                'a.btn.booking-approve, a.btn.booking-reject, a.btn.booking-cancel',
+//                function(event) {
+//                    c.bubble.hide()
+//                    event.preventDefault()
+//                    var href     = this.href
+//                    var callback = function(data) {
+//                        $.ajax(href, {data: data}).done(function() {
+//                            c.dom.fullCalendar('refetchEvents')
+//                        })
+//                    }
+//                    var seriesId = $(this).data('seriesId')
+//                    if (seriesId) {
+//                        // Remove all previous change status events, and reapply to this
+//                        // dialog box.
+//                        updateSeriesDialog.find('.action-text').text($(this).text().toLowerCase())
+//                        updateSeriesDialog
+//                                .dialog('option', 'buttons', [{
+//                                    text: "Only this booking",
+//                                    click: function() {
+//                                        updateSeriesDialog.dialog('close')
+//                                        callback({efficacy: 'self'})
+//                                    }
+//                                }, {
+//                                    text: "All bookings in the series",
+//                                    click: function() {
+//                                        updateSeriesDialog.dialog('close')
+//                                        callback({efficacy: 'series', seriesId: seriesId})
+//                                    }
+//                                }])
+//                                .dialog('open')
+//                    }
+//                    else {
+//                        c.bubble.hide()
+//                        callback()
+//                    }
+//                }
+//        )
+//
+//        // if a checkbox on the calendar is interacted, ajax
+//        c.dom.on('change', 'input[type=checkbox]', function(e) {
+//
+//            var self = $(this)
+//            var ttl = self.siblings('.fc-title')
+//            if(self.prop('checked')) {
+//                ttl.addClass('strike')
+//            }
+//            else {
+//                ttl.removeClass('strike')
+//            }
+//            data = {
+//                eventId: self.attr('id').slice(1),
+//                completed: self.prop('checked') ? 1 : 0
+//            }
+//            c.cupdate(data)
+//            c.bubble.hide()
+//            c.suppressOne()
+//            e.stopPropagation()
+//            e.preventDefault()
+//            return false
+//        })
+//
+//        $('.checkboxes')
+//                .greenerize({ applyClasses: false })
+//                .on(
+//                'greenerizeChange',
+//                function(event, selectAll, checkboxes) {
+//                    checkboxes.first().change();
+//                }
+//        )
+    })
+</script>
+<!-- END custom_head -->
+
 <div class="row">
     <div class="small-12 columns">
         <h1>{WORK_USER_NAME} Work</h1>
@@ -17,6 +521,13 @@
             <!-- END child -->
         </ul>
         <!-- END is_parent -->
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="small-12 columns">
+        <div id="calendar"></div>
     </div>
 </div>
 
