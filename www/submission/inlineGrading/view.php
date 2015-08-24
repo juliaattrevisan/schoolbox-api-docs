@@ -349,7 +349,7 @@ $this->setBlock(TEMPLATE_content, 'rubric', 'rubric_block');
 
 if ($submissionBox->isRubric()) {
     $rb = new DueWork_Rubric_Lightbox($this);
-    $rb->render('INJECTED_MARK_RUBRIC', $submissionBox->getId(), $user->getId(), $submissionBox->canViewRubric($_SESSION['user']));
+    $rb->render('INJECTED_MARK_RUBRIC', $submissionBox->getId(), $user->getId(), $submissionBox->canViewRubric($_SESSION['user']), true);
 } else {
     $this->setVar('INJECTED_MARK_RUBRIC', '');
 }
