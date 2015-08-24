@@ -11,8 +11,46 @@ $(function () {
 <!-- END subject_colour -->
 <!-- END custom_head -->
 
-<h1>{WORK_USER_NAME} Work</h1>
-<div class="left">
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{WORK_USER_NAME} Work</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 medium-6 columns">
+        {UPCOMING_WORK}
+
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">Recent Activity</h2>
+                <section>
+                    <div class="content">
+                        <ul class="activity-list">
+                            {ACTIVITY_LIST}
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div class="small-12 medium-6 columns">
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">Subjects</h2>
+                <section>
+                    <div class="content">
+                        <ul class="subject-list">
+                            {SUBJECT_LIST}
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
                     <!-- BEGIN subject -->
                     <!-- END subject -->
 				<!-- BEGIN is_parent -->
@@ -28,27 +66,3 @@ $(function () {
 							<!-- END event -->
 					<!-- END day -->
 				<!-- END week -->
-
-    <div class="box component">
-        {UPCOMING_WORK}
-    </div>
-
-</div>
-<div class="right">
-	<div class="box component">
-		<h2>Subjects</h2>
-		<div class="directory listing">
-			<ul class="subject-list clearfix">
-                {SUBJECT_LIST}
-			</ul>
-		</div>
-	</div>
-	<div class="box component">
-		<h2>Recent Activity</h2>
-		<div class="listing">
-			<ul class="activity-list">
-                {ACTIVITY_LIST}
-			</ul>
-		</div>
-	</div>
-</div>
