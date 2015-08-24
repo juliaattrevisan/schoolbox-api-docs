@@ -94,10 +94,8 @@
                 defaultView: anchor || 'month',
                 timeFormat: { month: 'h(:mm)a' },
                 // Event limit: could be configured from session but leave global for now
-                eventLimit: true,
-                firstDay: 1,
-//                eventLimit: Boolean('{CALENDAR_COLLAPSE_EVENTS}'),
-//                firstDay: Number('{CALENDAR_START_DAY}'),
+                eventLimit: Boolean('{CALENDAR_COLLAPSE_EVENTS}'),
+                firstDay: Number('{CALENDAR_START_DAY}'),
 
                 /**
                  * When an event is drawn on the calendar
@@ -249,7 +247,7 @@
                         data: {
                             start: Calendar.reOffsetTimestamp(start.unix()),
                             end:   Calendar.reOffsetTimestamp(end.unix()),
-                            userId: {WORK_USER_ID}
+                            userId: Number('{WORK_USER_ID}')
                         },
                         success: function(data) {
                             callback(data.filter(function(v) {
