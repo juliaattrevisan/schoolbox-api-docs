@@ -51,7 +51,7 @@ class DueWork_Rubric_Lightbox {
 
         for($i = 0; $i < count($data['criteria']); ++$i) {
             $json[] = $data['criteria'][$i]['value'] < 0 ? 0 : $data['criteria'][$i]['value'];
-            $legs[] = array('label' => $data['criteria'][$i]['label']);
+            $legs[] = $data['criteria'][$i]['label'];
         }
 
         $page->setBlock($templateHandle, 'rubric_rating', 'rubric_rating_block');

@@ -49,39 +49,40 @@
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
 <script type="text/javascript">
     $(function() {
-        $('#rubric-chart').highcharts({
-            chart: {
-                polar: true,
-                type: 'line'
-            },
+        if ({GRAPH_DATA}.length) {
+            $('#rubric-chart').highcharts({
+                chart: {
+                    polar: true,
+                    type: 'line'
+                },
 
-            title: {
-                text: ''
-            },
+                title: {
+                    text: ''
+                },
 
-            credits: {
-                enabled: false
-            },
+                credits: {
+                    enabled: false
+                },
 
-            xAxis: {
-                categories: ['Sales', 'Marketing', 'Development', 'Customer Support',
-                    'Information Technology', 'Administration'],
-                tickmarkPlacement: 'on',
-                lineWidth: 0
-            },
+                xAxis: {
+                    categories: {GRAPH_LEGS},
+                    tickmarkPlacement: 'on',
+                    lineWidth: 0
+                },
 
-            yAxis: {
-                gridLineInterpolation: 'polygon',
-                lineWidth: 0,
-                min: 0
-            },
+                yAxis: {
+                    gridLineInterpolation: 'polygon',
+                    lineWidth: 0,
+                    min: 0
+                },
 
-            series: [{
-                name: 'Allocated Budget',
-                data: [43000, 19000, 60000, 35000, 17000, 10000],
-                pointPlacement: 'on'
-            }]
-        });
+                series: [{
+                    name: 'Allocated Budget',
+                    data: {GRAPH_DATA},
+                    pointPlacement: 'on'
+                }]
+            });
+        }
     });
 
 
