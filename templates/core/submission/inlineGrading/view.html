@@ -46,8 +46,7 @@
     <input type="hidden" name="redirect" value="{INLINE_GRADING_SUBMISSION_NAVIGATION_NEXT_URL}" />
     <input type="hidden" name="clearAttachments" value="1" />
 
-    <!-- what is this for? -->
-    <span class="visibility-header visibility_{GRADE_VISIBILITY_CODE}" title="{GRADE_VISIBILITY}"></span>
+
 
     <div class="row">
         <div class="small-12 large-6 columns">
@@ -55,6 +54,9 @@
             <div class="row">
                 <div class="small-12 island">
                     <h2 class="subheader">Grade</h2>
+                    <ul class="meta">
+                        <li class="{GRADE_VISIBILITY_CSS}">{GRADE_VISIBILITY}</li>
+                    </ul>
                     <section>
                         <div class="content">
                             {OWNER_MARKING}
@@ -75,7 +77,7 @@
                                         <p class="meta">{SUBMISSION_TIME_DESCRIPTION}</p>
 
                                         <!-- BEGIN plag_enabled -->
-                                        <span class="plag-score {SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report">(<a href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a>)</span>
+                                        <span class="plag-score" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report">(<a href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a>)</span>
                                         <!-- END plag_enabled -->
                                         <!-- BEGIN plag_deleted -->
                                         <span class="plag-score {SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism">({SUBMISSION_PLAG_SCORE})</span>
