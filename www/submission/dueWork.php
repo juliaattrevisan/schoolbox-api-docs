@@ -146,7 +146,7 @@ if (is_array($_SESSION['children'])) {
         $_SESSION['children'],
         $user['uid'],
         'is_parent',
-        array('id' => 'CHILD_ID', 'name' => 'CHILD_NAME')
+        array('id' => 'CHILD_ID', 'name' => 'CHILD_NAME', 'sid' => 'CHILD_EXTERNAL_ID',)
     );
     $this->parse('is_parent_block', 'is_parent');
 }

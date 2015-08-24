@@ -12,6 +12,22 @@ $(function () {
 <div class="row">
     <div class="small-12 columns">
         <h1>{WORK_USER_NAME} Work</h1>
+
+        <!-- BEGIN is_parent -->
+        <span class='header-actions'>
+            <a href='#' class='button icon-group' data-dropdown='header-options'></a>
+        </span>
+        <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
+            <!-- BEGIN child -->
+            <li class="avatar-card">
+                <a href="/submission/dueWork/0/{CHILD_ID}">
+                    <img src="/portrait.php?userId={CHILD_EXTERNAL_ID}&size=square64">
+                    <p>{CHILD_NAME}</p>
+                </a>
+            </li>
+            <!-- END child -->
+        </ul>
+        <!-- END is_parent -->
     </div>
 </div>
 
@@ -48,19 +64,3 @@ $(function () {
         </div>
     </div>
 </div>
-
-                    <!-- BEGIN subject -->
-                    <!-- END subject -->
-				<!-- BEGIN is_parent -->
-				<select name="child" id="childSelect">
-					<!-- BEGIN child -->
-					<option value="{CHILD_ID}" {CHILD_ID_SELECTED}>{CHILD_NAME}</option>
-					<!-- END child -->
-				</select>
-				<!-- END is_parent -->
-				<!-- BEGIN week -->
-					<!-- BEGIN day -->
-							<!-- BEGIN event -->
-							<!-- END event -->
-					<!-- END day -->
-				<!-- END week -->
