@@ -3,7 +3,7 @@
     /**
      * Marksheet
      */
-    $.fn.marksheet = function() {
+    $.fn.marksheet = function(options) {
 
         /* Optional arguments
          */
