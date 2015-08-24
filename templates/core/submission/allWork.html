@@ -124,79 +124,95 @@
 </div>
 <!-- END subject_rubric -->
 <div class="row">
-<div class="small-12 island">
-    <h2 class="subheader">Assessments</h2>
+    <div class="small-12 island">
+        <h2 class="subheader">Assessments</h2>
 
-<!--
-    <ul class="meta">
-        <li class="icon-showcase">
-            <a href="/eportfolio/{WORK_USER_ID}/showcase">ePortfolio Showcase</a>
-        </li>
-    </ul>
--->
+        <!--
+            <ul class="meta">
+                <li class="icon-showcase">
+                    <a href="/eportfolio/{WORK_USER_ID}/showcase">ePortfolio Showcase</a>
+                </li>
+            </ul>
+        -->
 
-    <section>
-        <!-- BEGIN has_work -->
-        <ul class="action-list">
-            <!-- BEGIN work -->
-            <li class="actions-small-1">
-                <div class="list-item">
-                    <div class="small-12 large-5 columns content">
-                        <div class="small-12 info card no-pad" data-equalizer-watch>
-                        <!-- BEGIN work_clickable -->
-                            <a href="/{WORK_HREF}{WORK_ID}/{WORK_USER_ID}">
+        <script type="text/javascript" src="/javascript/shared/eportfolio/jquery.eportfolio.js"></script>
+
+        <section>
+            <!-- BEGIN has_work -->
+            <ul class="action-list">
+                <!-- BEGIN work -->
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 large-5 columns content">
+                            <div class="small-12 info card no-pad" data-equalizer-watch>
+                            <!-- BEGIN work_clickable -->
+                                <a href="/{WORK_HREF}{WORK_ID}/{WORK_USER_ID}">
+                                    <p>{WORK_TITLE}</p>
+                                </a>
+                            <!-- END work_clickable -->
+                            <!-- BEGIN work_unclickable -->
                                 <p>{WORK_TITLE}</p>
-                            </a>
-                        <!-- END work_clickable -->
-                        <!-- BEGIN work_unclickable -->
-                            <p>{WORK_TITLE}</p>
-                        <!-- END work_unclickable -->
-                            <p class="meta">
-                                <a href="/homepage/{SUBJ_ID}">{SUBJ_NAME}</a> {WORK_TYPE}
-                            </p>
+                            <!-- END work_unclickable -->
+                                <p class="meta">
+                                    <a href="/homepage/{SUBJ_ID}">{SUBJ_NAME}</a> {WORK_TYPE}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="small-12 large-4 columns grade content" data-equalizer-watch>
+                            <p class="gradient-{WORK_GRADIENT}"><span>{WORK_GRADE}</span></p>
+                            <p class="comment" data-equalizer-watch>{WORK_COMMENT}</p>
+                        </div>
+
+                        <div class="small-12 large-3 columns content" data-equalizer-watch>
+                            Due <span class="gradient-{WORK_URGENCY}">{WORK_DATE}</span>
+                            on {WORK_TIME}
                         </div>
                     </div>
+                    <nav>
+                        <!-- BEGIN work_actionable -->
+                        <a href="/{WORK_BTN_HREF}" class="{WORK_BTN_ICON}" title="{WORK_BTN_LABEL}"></a>
+                        <!-- END work_actionable -->
 
-                    <div class="small-12 large-4 columns grade content" data-equalizer-watch>
-                        <p class="gradient-{WORK_GRADIENT}"><span>{WORK_GRADE}</span></p>
-                        <p class="comment" data-equalizer-watch>{WORK_COMMENT}</p>
-                    </div>
+                        <!-- BEGIN work_publishable -->
+                        <a class="icon-showcase" data-publish-to-eportfolio="publish-{WORK_PUBLISH_TYPE}-{WORK_PUBLISH_ID}"></a>
 
-                    <div class="small-12 large-3 columns content" data-equalizer-watch>
-                        Due <span class="gradient-{WORK_URGENCY}">{WORK_DATE}</span>
-                        on {WORK_TIME}
-                    </div>
+                        <form action='/eportfolio/showcase/modifyForm.php' method='post' data-publish-to-eportfolio-form="publish-{WORK_PUBLISH_TYPE}-{WORK_PUBLISH_ID}">
+                            <input type='hidden' name='action' value='{WORK_PUBLISH_ACTION}'/>
+                            <input type='hidden' name='userId' value='{WORK_USER_ID}'/>
+                            <input type='hidden' name='{WORK_PUBLISH_TYPE}' value='{WORK_PUBLISH_ID}'/>
+                        </form>
 
-                </div>
-                <nav>
-                    <!-- BEGIN work_actionable -->
-                    <a href="/{WORK_BTN_HREF}" class="{WORK_BTN_ICON}" title="{WORK_BTN_LABEL}"></a>
-                    <!-- END work_actionable -->
+                        <script type="text/javascript">
+                            $(function() {
 
-                    <!-- BEGIN work_publishable -->
-                    <a class="icon-showcase"></a>
+                                /* Publish To Eportfolio
+                                 */
+                                $('[data-publish-to-eportfolio-form="publish-{WORK_PUBLISH_TYPE}-{WORK_PUBLISH_ID}"]').eportfolio.publish({
+                                    activator: '[data-publish-to-eportfolio="publish-{WORK_PUBLISH_TYPE}-{WORK_PUBLISH_ID}"]',
+                                    label: '[data-publish-to-eportfolio-label="publish-{WORK_PUBLISH_TYPE}-{WORK_PUBLISH_ID}"]'
+                                });
+                            });
+                        </script>
+                        <!-- END work_publishable -->
+                    </nav>
+                    <!-- BEGIN work_publishable_label -->
+                    <span class="label success full-width hide" data-publish-to-eportfolio-label="publish-{WORK_PUBLISH_TYPE}-{WORK_PUBLISH_ID}">Showcase Updated</span>
+                    <!-- END work_publishable_label -->
+                </li>
+                <!-- END work -->
+            </ul>
+            <!-- END has_work -->
 
-                    <form action='/eportfolio/showcase/modifyForm.php' method='post'>
-                        <input type='hidden' name='action' value='{WORK_PUBLISH_ACTION}'/>
-                        <input type='hidden' name='userId' value='{WORK_USER_ID}'/>
-                        <input type='hidden' name='{WORK_PUBLISH_TYPE}' value='{WORK_PUBLISH_ID}'/>
-                    </form>
-                    <!-- END work_publishable -->
-                </nav>
-            </li>
-            <!-- END work -->
-        </ul>
-        <!-- END has_work -->
-
-        <!-- BEGIN no_work -->
-        <div class="content">
-            <p>
-                No assessments for this subject.
-            </p>
-        </div>
-        <!-- END no_work -->
-    </section>
-</div>
+            <!-- BEGIN no_work -->
+            <div class="content">
+                <p>
+                    No assessments for this subject.
+                </p>
+            </div>
+            <!-- END no_work -->
+        </section>
+    </div>
 </div>
 <!-- BEGIN subject_comments -->
 <div class="row">

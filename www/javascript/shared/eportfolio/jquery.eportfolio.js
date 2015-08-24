@@ -72,14 +72,8 @@
             $(config.activator).click(function(event) {
                 event.preventDefault();
 
-                $(config.element).submit();
-            });
-
-            /* Ajax the Publish action
-             */
-            $(config.element).submit(function(event) {
-                event.preventDefault();
-
+                /* Ajax the Publish action
+                 */
                 $.ajax({
                     type: "POST",
                     url: $(this).attr('action'),
@@ -95,7 +89,6 @@
                     }
                 });
             });
-
         }
     }
 }(jQuery));

@@ -601,6 +601,7 @@ class StudentReportCard
         $page->setBlock('has_work', 'work', 'work_block');
         $page->setBlock('work', 'work_actionable', 'work_actionable_block');
         $page->setBlock('work', 'work_publishable', 'work_publishable_block');
+        $page->setBlock('work', 'work_publishable_label', 'work_publishable_label_block');
         $page->setBlock('work', 'work_clickable', 'work_clickable_block');
         $page->setBlock('work', 'work_unclickable', 'work_unclickable_block');
         $work = $this->subjectData->getAssessments();
@@ -613,26 +614,27 @@ class StudentReportCard
                 // clear all template vars
                 $page->setVar(
                     array(
-                        'ON_OFF'                 => '',
-                        'WORK_ID'                => '',
-                        'WORK_TYPE'              => '',
-                        'WORK_DATE'              => '',
-                        'WORK_TIME'              => '',
-                        'WORK_TITLE'             => '',
-                        'WORK_URGENCY'           => '',
-                        'WORK_GRADIENT'          => '',
-                        'WORK_GRADE'             => '',
-                        'WORK_COMMENT'           => '',
-                        'WORK_HREF'              => '',
-                        'WORK_BTN_ICON'          => '',
-                        'WORK_BTN_LABEL'         => '',
-                        'WORK_PUBLISH_ACTION'    => '',
-                        'WORK_PUBLISH_BTN_ICON'  => '',
-                        'WORK_PUBLISH_BTN_LABEL' => '',
-                        'work_actionable_block'  => '',
-                        'work_publishable_block' => '',
-                        'work_clickable_block'   => '',
-                        'work_unclickable_block' => '',
+                        'ON_OFF'                       => '',
+                        'WORK_ID'                      => '',
+                        'WORK_TYPE'                    => '',
+                        'WORK_DATE'                    => '',
+                        'WORK_TIME'                    => '',
+                        'WORK_TITLE'                   => '',
+                        'WORK_URGENCY'                 => '',
+                        'WORK_GRADIENT'                => '',
+                        'WORK_GRADE'                   => '',
+                        'WORK_COMMENT'                 => '',
+                        'WORK_HREF'                    => '',
+                        'WORK_BTN_ICON'                => '',
+                        'WORK_BTN_LABEL'               => '',
+                        'WORK_PUBLISH_ACTION'          => '',
+                        'WORK_PUBLISH_BTN_ICON'        => '',
+                        'WORK_PUBLISH_BTN_LABEL'       => '',
+                        'work_actionable_block'        => '',
+                        'work_publishable_block'       => '',
+                        'work_publishable_label_block' => '',
+                        'work_clickable_block'         => '',
+                        'work_unclickable_block'       => '',
                     )
                 );
                 $existingShowcasedItem = null;
@@ -671,6 +673,7 @@ class StudentReportCard
                             $output['WORK_PUBLISH_BTN_LABEL'] = 'Unpublish';
                             $page->setVar($output);
                             $page->parse('work_publishable_block', 'work_publishable');
+                            $page->parse('work_publishable_label_block', 'work_publishable_label');
                         } else {
                             // not published
                             // has a mark been returned?
@@ -683,6 +686,7 @@ class StudentReportCard
                                 $output['WORK_PUBLISH_BTN_LABEL'] = 'Publish';
                                 $page->setVar($output);
                                 $page->parse('work_publishable_block', 'work_publishable');
+                                $page->parse('work_publishable_label_block', 'work_publishable_label');
                             } else {
                                 // no mark returned: do not offer any action
                                 $page->setVar('action_publish_block', '');
@@ -700,6 +704,7 @@ class StudentReportCard
                     $page->setVar('action_publish_block', '');
                 } else {
                     $page->setVar('work_publishable_block', '');
+                    $page->setVar('work_publishable_label_block', '');
                 }
                 // if work actions are available, render the block
                 $page->setVar('work_actionable_block', '');
@@ -720,13 +725,15 @@ class StudentReportCard
             $page->parse('has_work_block', 'has_work');
 
             $page->setVar(array(
-                'no_work_block' => ''
+                'no_work_block' => '',
+                'work_publishable_label_block' => '',
             ));
         }
         else {
             $page->setVar(array(
                 'has_work_block' => '',
-                'work_block' => ''
+                'work_block' => '',
+                'work_publishable_label_block' => '',
             ));
 
             $page->parse('no_work_block', 'no_work');
