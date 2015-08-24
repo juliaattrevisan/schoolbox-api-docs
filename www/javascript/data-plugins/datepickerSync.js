@@ -6,8 +6,8 @@
  * <input name="open_date" id="open_date" data-datepicker />
  *
  * Options:
- * * startdate: ensures this date isn't before a date with this ID. Will extend to use selectors
- * * enddate:   ensures this date isn't after a date with this ID. Will extend to use selectors
+ * * startdate: A selector identifying a date this date isn't before.
+ * * enddate:   A selector identifying a date this date isn't after.
  *
  * Requires:
  * * syncDates
@@ -20,14 +20,14 @@
 
             var startElement = element.data('datepicker-sync-startdate');
             if (startElement) {
-                var start = $('#'+startElement);
+                var start = $(startElement);
                 if (start.length) {
                     options.startDate = start;
                 }
             }
             var endElement = element.data('datepicker-sync-enddate');
             if (endElement) {
-                var end = $('#'+endElement);
+                var end = $(endElement);
                 if (end.length) {
                     options.endDate = end;
                 }
