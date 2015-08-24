@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $groupHandler = new Group;
 
@@ -10,6 +11,12 @@ if(is_numeric($this->arg[0])) {
 	
 	if(!$newsItem = $catNewsHandler->getByID($this->arg[0])) {
 		error(2);
+	}
+
+	try{
+		$folder = FolderMapper::getInstance()->findById($newsItem['code']);
+	} catch (\Schoolbox\Mapper\Exception $e) {
+		error(23);
 	}
 
 	if (($permission = $groupHandler->getPermission($newsItem['code'])) < WRITE_ACCESS) {
@@ -37,8 +44,9 @@ if(is_numeric($this->arg[0])) {
         'ACTION'      => 'Modify',
         'NEWS_ID'     => $newsItem['id'],
         'HEADING'     => $newsItem['heading'],
-        'BODY'        => Scrub::text($newsItem['body']),
+        'BODY'        => $newsItem['body'],
         'CATEGORY_ID' => $newsItem['code'],
+		'CATEGORY_NAME' => Scrub::text($folder->getName()),
 		'DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
 		'DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
     );
@@ -51,7 +59,12 @@ if(is_numeric($this->arg[0])) {
 else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	
 	/* Create a new news item */
-	
+	try{
+		$folder = FolderMapper::getInstance()->findById($this->arg[1]);
+	} catch (\Schoolbox\Mapper\Exception $e) {
+		error(23);
+	}
+
 	if (($permission = $groupHandler->getPermission($this->arg[1])) < WRITE_ACCESS)
 		error(23);
 
@@ -72,6 +85,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 						'BODY'					=> '',
 						'NEWS_ID'				=> '',
 						'CATEGORY_ID'			=> $this->arg[1],
+						'CATEGORY_NAME'			=> scrub::Text($folder->getName()),
 						'delete_button_block'	=> '',
 		                'DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
 		                'DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
@@ -83,5 +97,3 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 }
 else
 	error(2);
-
-?>

@@ -1,37 +1,41 @@
-<h1>News Archive for {CATEGORY_NAME}</h1>
-<span class="header-actions">
-    <!-- BEGIN submit_news -->
-    <a href="/news/homepage/new/{ID}" class="button icon-news">Post News</a>
-    <!-- END submit_news -->
-    <a href="/homepage/{ID}" class="button icon-folder">Return to Homepage</a>
-</span>
+<ul class="breadcrumb">
+    <li><a href="/homepage/{ID}/">{CATEGORY_NAME}</a></li>
+    <li class="active"><a href="#">News Archive</a></li>
+</ul>
 
 <div class="row">
-    <ul class="information-list">
-        <!-- BEGIN news -->
-        <li>
-            <h2>{NEWS_HEADING}</h2>
-            <span class="header-actions">
-                <!-- BEGIN can_modify -->
-                <a href="/news/homepage/{NEWS_ID}" class="button icon-modify no-text" data-tooltip title="modify"></a>
-                <!-- END can_modify -->
-            </span>
+    <div class="small-12 island">
+        <h1>News Archive</h1>
+        <!-- BEGIN submit_news -->
+        <!-- END submit_news -->
+        <section>
+            <ul class="information-list">
+                <!-- BEGIN news -->
+                <li class="row" data-equalizer>
+                    <div class="small-11 columns" data-equalizer-watch>
+                        <h2>{NEWS_HEADING}</h2>
+                        <div class="avatar card">
+                            <a href="/search/user/{AUTHOR_ID}" title="View Profile">
+                                <img src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square64" alt="View Profile" />
+                                <p>{AUTHOR}</p>
+                            </a>
+                            <p class="meta">Posted {POSTED_DATE}</p>
+                        </div>
+                    </div>
+                    <div class="one actions">
+                        <!-- BEGIN can_modify -->
+                        <a class="icon-modify no-text" href="/news/homepage/{NEWS_ID}" title="Modify News"></a>
+                        <!-- END can_modify -->
+                    </div>
 
-
-            <div class="clearfix">
-                <div class="avatar-card">
-                    <a href="/search/user/{AUTHOR_ID}" title="View Profile">
-                        <img src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square64" alt="View Profile">
-                        <p>{AUTHOR}</p>
-                    </a>
-                    <p class="meta">Posted {POSTED_DATE}</p>
-                </div>
-            </div>
-
-            <div>
-                {NEWS_BODY}
-            </div>
-        </li>
-        <!-- END news -->
-    </ul>
+                    <div class="small-12 columns">
+                        <article>
+                            {NEWS_BODY}
+                        </article>
+                    </div>
+                </li>
+                <!-- END news -->
+            </ul>
+        </section>
+    </div>
 </div>

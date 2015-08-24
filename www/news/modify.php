@@ -54,7 +54,7 @@ if (is_numeric($this->arg[0])) {
         'EXPIRES_HOUR'            => $expiryDate->isAtEndOfDay() ? '' : $expiryDate->get12Hour(),
         'EXPIRES_MIN'             => $expiryDate->isAtEndOfDay() ? '' : $expiryDate->getMinute(true),
         'EXPIRES_PM'              => !$expiryDate->isAtEndOfDay() && $expiryDate->isPM() ? 'selected="selected"' : '',
-        'SHOW_ADVANCED'           => '',
+        'SHOW_ADVANCED'           => ' style="display:none"',
         'OPAC_ADVANCED'           => '',
         'ADV_OFF'                 => '',
         'ADV_ON'                  => ' style="display:none"',
@@ -77,7 +77,7 @@ if (is_numeric($this->arg[0])) {
         // set the advanced options to be shown by default since there is information in there
         $this->setVar(
             array(
-                'SHOW_ADVANCED' => ' style="display: table-row;"',
+                'SHOW_ADVANCED' => ' "',
                 'OPAC_ADVANCED' => ' style="opacity: 1;"',
                 'ADV_OFF'       => ' style="display:none"',
                 'ADV_ON'        => '',
@@ -153,7 +153,7 @@ else {
 
     // set the advanced options to be hidden by default since there can't be any data in there
     $this->setVar(array(
-        'SHOW_ADVANCED' => '',
+        'SHOW_ADVANCED' => ' style="display:none"',
         'OPAC_ADVANCED' => '',
         'ADV_OFF'       => '',
         'ADV_ON'        => ' style="display:none"',
