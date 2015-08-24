@@ -13,6 +13,12 @@
 <script type="text/javascript" src="/javascript/submission/formValidate.js"></script>
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 
+<script type="text/javascript" src="/javascript/data-plugins/datepicker.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/timepicker.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/timetablepicker.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/datepickerSync.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/hideWatch.js"></script>
+
 <script type="text/javascript">
 //    // from http://stackoverflow.com/a/5259788
 //    $.fn.outerHTML = function () {
@@ -39,85 +45,11 @@
             elements: 'description-box'
         });
 
-        // setup datepickers
-        $('[data-datepicker]').datepicker({
-            constrainInput: false,
-            onClose:function (string) {
-                var input = $(this);
-                $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
-                    input.val(data.time).blur();
-                })
-            }
-        });
-
-        // Generic setup for date syncs
-        $('[data-datepicker-sync]').each(function() {
-            var element = $(this);
-            var options = {};
-
-            var startElement = element.data('datepicker-sync-startdate');
-            if (startElement) {
-                var start = $('#'+startElement);
-                if (start.length) {
-                    options.startDate = start;
-                }
-            }
-            var endElement = element.data('datepicker-sync-enddate');
-            if (endElement) {
-                var end = $('#'+endElement);
-                if (end.length) {
-                    options.endDate = end;
-                }
-            }
-            if (options.startDate || options.endDate) {
-                element.syncDates(options)
-            }
-        });
-
-        // Show/hide elements depending on whether a checkbox is checked,
-        // or the select box has a particular value.
-        $('[data-hide-watch]').each(function() {
-            var element = $(this);
-            var watch   = $('#'+element.data('hide-watch'));
-            if (watch.length) {
-                var toggleCallback = function() { return true; };
-                if (watch.is(':checkbox')) {
-                    toggleCallback = function() {
-                        return !watch.prop('checked');
-                    };
-                } else {
-                    // Watch on a value, or attribute of the selected option
-                    var watchValue = element.data('hide-watch-value');
-                    toggleCallback = function() {
-                        return watch.val() != watchValue;
-                    };
-                    if (watch.is('select')) {
-                        var watchAttribute = element.data('hide-watch-option-attribute');
-                        if (watchAttribute) {
-                            toggleCallback = function() {
-                                return watch.find('option:selected').attr(watchAttribute)
-                                        != watchValue;
-                            };
-                        }
-                    }
-                }
-                watch.on('change.hideWatch', function() {
-                    element.toggleClass('hide', toggleCallback());
-                });
-                // Apply now
-                element.toggleClass('hide', toggleCallback())
-            }
-        });
-
         // When I change the number of assessment levels,
         // that means I want to use assessment specific descriptors.
         $('[data-relation="rubric-descriptor-count"]').on('change', function(){
             $('[data-relation="rubric-use-assessment-specific"]').prop('checked', true).trigger('change');
         });
-
-        // Add hour and minute picker
-        $('input[data-timepicker="hour"]').hourpicker({ hours: 12 });
-        $('input[data-timepicker="minute"]').minutepicker();
 
         // Set up the gradegroup thing
         $('a[data-role="showGradeScale"]').click(function(event) {
@@ -135,56 +67,6 @@
             });
         });
 
-        // Timetable reveal modal
-        $('[data-timetablepicker]').on('click', function(event) {
-            event.preventDefault();
-            var form        = $(this).closest('form');
-            var data        = $(this).data();
-            var dateField   = form.find(':input[name="'+data['timetablepickerDateField']+'"]');
-            var hourField   = form.find(':input[name="'+data['timetablepickerHourField']+'"]');
-            var minuteField = form.find(':input[name="'+data['timetablepickerMinuteField']+'"]');
-            var periodField = form.find(':input[name="'+data['timetablepickerPeriodField']+'"]');
-
-            // Several timetable pickers need to use the same modal.
-            // Attach/detach events on modal open/close
-            var timetableModal = $(data['timetablepickerTimetableSelector']);
-            var closeButton    = timetableModal.find('[data-action="close"]');
-            var useButton      = timetableModal.find('[data-action="useTime"]');
-
-            var unbindEvents = function() {
-                closeButton.off('click');
-                useButton.off('click');
-            };
-
-            closeButton.on('click', function(event) {
-                event.preventDefault();
-                timetableModal.foundation('reveal', 'close');
-                unbindEvents();
-            });
-            useButton.on('click', function(event) {
-                event.preventDefault();
-                var self  = timetableSelector.data('timetableDaySelector'),
-                    radio = timetableSelector.find('input:checked');
-                dateField.val(moment(self.dateDisplay.attr('datetime')).format(dateDisplayFormats.momentJs));
-                if (radio.val()) {
-                    var timeDisplay = radio.val() + 'TimeDisplay';
-                    var time        = self[timeDisplay].attr('datetime');
-                    if (time) {
-                        var timeObject = moment(time, 'H:mm');
-                        hourField.val(timeObject.format('h'));
-                        minuteField.val(timeObject.format('mm'));
-                        periodField.val(timeObject.format('a'));
-                    }
-                }
-                timetableModal.foundation('reveal', 'close');
-                unbindEvents();
-            });
-            timetableModal
-                .foundation('reveal', 'open')
-                .on('close.fndtn.reveal', function() {
-                    unbindEvents();
-                });
-        });
         var timetableSelector = $('[data-interaction="timetableSelector"]')
             .timetableDaySelector({
                 dateFormat: dateDisplayFormats.momentJs,
