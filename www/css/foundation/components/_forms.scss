@@ -26,9 +26,9 @@ $input-focus-border-color: tint($tertiary, 66%);
 $input-hover-bg-color: tint($tertiary, 87%);
 $input-hover-color: $black;
 $input-border-style: solid;
-$input-border-width: 2px;
+$input-border-width: 0.125rem;
 $input-border-radius: $global-radius;
-$input-disabled-bg: rgba($primary-color, 0.04);
+$input-disabled-bg: rgba($primary-color, 0.05);
 // $input-disabled-cursor: $cursor-default-value;
 $input-box-shadow: none;
 
@@ -132,42 +132,168 @@ form{
 
 input,
 textarea,
-select 						{ @include single-transition(all, 0.15s, linear); font-weight: $font-weight-normal;
-	&:hover 				{ background-color: $input-hover-bg-color; color: $input-hover-color; }
-	&:focus 				{ color: $input-focus-color; outline: none; }
+select{
+	@include single-transition(all, 0.15s, linear);
+	font-weight: $font-weight-normal;
+	&:hover{
+		background-color: $input-hover-bg-color;
+		color: $input-hover-color;
+	}
+	&:focus{
+		color: $input-focus-color;
+		background-color: $input-focus-bg-color;
+		outline: none;
+	}
 }
 input, textarea 			{ padding-left: 0.75rem; }
 select option				{
 	&:hover 				{ background: $input-hover-bg-color; }
 }
-input[type=radio],
-input[type=checkbox] 		{ float: left; width: 0; height: 0; opacity: 0; }
-label.radio-label,
-label.checkbox-label		{ background-image: url('/images/foundation/form-elements.png'); }
-input[type=radio] +
-label.radio-label,
-input[type=checkbox] +
-label.checkbox-label		{ padding-left: 29px; height: 24px; display: block; line-height: 24px;
-							background-repeat: no-repeat; background-position: 0 0; font-weight: $font-weight-normal;
-							vertical-align: middle; cursor: pointer; margin: rem-calc(($base-font-size - 6));
+
+
+@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem) {
+
+    $checkbox-inner-size: $checkbox-size - (2 * $input-border-width);
+
+    $label-selector: "label";
+
+    // overwrite to append class if required
+    @if($label-class) {
+        $label-selector: "label.#{$label-class}";
+    }
+
+    float: left;
+    width: 0;
+    height: 0;
+    opacity: 0;
+
+    + #{$label-selector} {
+        // this is where the magic happens
+        position: relative;
+        display: block;
+        height: $checkbox-size;
+        line-height: $checkbox-size;
+        padding: 0 0 0 ($checkbox-size + $checkbox-margin);
+        font-weight: $font-weight-normal;
+        cursor: pointer;
+        margin: 0 0 $checkbox-margin $checkbox-margin;
+
+        &:before, &:after {
+            @include transition((color, background-color), 360ms, cubic-bezier(0.2, 1, 0, 1));
+        }
+
+        &:before {
+            display: block;
+            content: "";
+            width: $checkbox-size;
+            height: $checkbox-size;
+            background-color: $input-border-color;
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin: 0;
+        }
+
+        &:after {
+            display: block;
+            content: "\e604";
+            color: rgba($white, 0);
+            width: $checkbox-inner-size;
+            height: $checkbox-inner-size;
+            position: absolute;
+            top: $input-border-width;
+            left: $input-border-width;
+            background-color: $input-bg-color;
+            margin: 0;
+            line-height: $checkbox-size - $input-border-width;
+            text-align: center;
+        }
+
+    }
+
+    &:checked {
+        + #{$label-selector} {
+            &:before, &:after {
+                color: $success-color !important;
+                background-color: tint($success-color, 70%) !important;
+            }
+        }
+    }
+
+    &:not(:disabled) {
+        + #{$label-selector} {
+            &:hover {
+                &:before, &:after {
+                    background-color: tint($input-border-color, 50%);
+                }
+
+                &:after {
+                    color: $white;
+                }
+            }
+        }
+        &:focus {
+            + #{$label-selector} {
+                &:before, &:after {
+                    background-color: tint($input-border-color, 50%);
+                }
+
+                &:after {
+                    color: $white;
+                }
+            }
+        }
+    }
+
+    &:disabled {
+        + #{$label-selector} {
+            &:after {
+                color: $white !important;
+            }
+        }
+    }
 }
-input[type=checkbox] +
-label.checkbox-label		{ background-position: 0 -72px; }
-//	input[type=radio]:hover +
-//	label.checkbox-label:hover	{ background-position: 0 -24px; }
-input[type=radio]:checked +
-label.radio-label			{ background-position: 0 -48px; }
-input[type=checkbox]:checked +
-label.checkbox-label		{ background-position: 0 -120px; }
+
+.checklist, .radiolist {
+    input[type=radio],
+    input[type=checkbox] {
+        @include fancy-check();
+    }
+}
+
+input[type=radio]    { @include fancy-check('radio-label'); }
+input[type=checkbox] { @include fancy-check('checkbox-label'); }
+
+input[type=radio] + label {
+    &:before, &:after {
+        @include border-radius(1rem);
+    }
+}
+
+// Disabled
+input[type=checkbox]:disabled,
+input[type=radio]:disabled{
+  & + label{
+    opacity: 0.5;
+    &:after{
+      opacity: 0.5;
+    }
+  }
+}
+
+input[type=checkbox]:disabled:checked + label,
+input[type=radio]:disabled:checked + label{
+  opacity: 0.5;
+}
 
 // Toggle Checkbox
 input[type=checkbox] + label.checkbox-toggle{
 	background-color: $button-color;
 	font-weight: $font-weight-normal;
 	margin-left: 0;
-  height: 1.5rem;
+	height: 1.5rem;
 	width: 1.5rem;
-  text-align: center;
+	text-align: center;
 	@include single-transition(background-color, 0.15s, linear);
 }
 
@@ -196,14 +322,11 @@ select.visibility {
 	display: none;
 	padding: rem-calc(($base-font-size));
 
-	input[type=radio] +
-	label.radio-label,
-	input[type=checkbox] +
-	label.checkbox-label{
+	input[type=radio] + label.radio-label,
+	input[type=checkbox] + label.checkbox-label{
 		display: inline-block;
 	}
 }
-
 
 //  Show/Hide Advanced form fields
 .form-advanced{
