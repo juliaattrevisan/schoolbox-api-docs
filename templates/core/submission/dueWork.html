@@ -7,6 +7,8 @@ $(function () {
     });
 });
 </script>
+<!-- BEGIN subject_colour -->
+<!-- END subject_colour -->
 <!-- END custom_head -->
 
 <h1>{WORK_USER_NAME} Work</h1>
@@ -14,8 +16,11 @@ $(function () {
                     <!-- BEGIN subject -->
                     <!-- END subject -->
 				<!-- BEGIN is_parent -->
+				<select name="child" id="childSelect">
 					<!-- BEGIN child -->
+					<option value="{CHILD_ID}" {CHILD_ID_SELECTED}>{CHILD_NAME}</option>
 					<!-- END child -->
+				</select>
 				<!-- END is_parent -->
 				<!-- BEGIN week -->
 					<!-- BEGIN day -->
