@@ -1,5 +1,5 @@
 %iconify {
-	font-family: 'schoolbox';
+	font-family: 'schoolbox', #{$body-font-family};
 }
 
 [class^="icon-"]:before, [class*=" icon-"]:before {
