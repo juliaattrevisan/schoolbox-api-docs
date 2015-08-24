@@ -150,111 +150,123 @@ select option				{
 	&:hover 				{ background: $input-hover-bg-color; }
 }
 
-.checklist, .radiolist {
 
-    $checkbox-margin: 0.5rem;
-    $checkbox-size: 1.5rem;
+@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem) {
+
     $checkbox-inner-size: $checkbox-size - (2 * $input-border-width);
 
-    input[type=radio],
-    input[type=checkbox]{
-        float: left;
-        width: 0;
-        height: 0;
-        opacity: 0;
+    $label-selector: "label";
 
-        + label {
-            // this is where the magic happens
-            position: relative;
+    // overwrite to append class if required
+    @if($label-class) {
+        $label-selector: "label.#{$label-class}";
+    }
+
+    float: left;
+    width: 0;
+    height: 0;
+    opacity: 0;
+
+    + #{$label-selector} {
+        // this is where the magic happens
+        position: relative;
+        display: block;
+        height: $checkbox-size;
+        line-height: $checkbox-size;
+        padding: 0 0 0 ($checkbox-size + $checkbox-margin);
+        font-weight: $font-weight-normal;
+        cursor: pointer;
+        margin: 0 0 $checkbox-margin $checkbox-margin;
+
+        &:before, &:after {
+            @include transition((color, background-color), 360ms, cubic-bezier(0.2, 1, 0, 1));
+        }
+
+        &:before {
             display: block;
+            content: "";
+            width: $checkbox-size;
             height: $checkbox-size;
-            line-height: $checkbox-size;
-            padding: 0 0 0 ($checkbox-size + $checkbox-margin);
-            font-weight: $font-weight-normal;
-            cursor: pointer;
-            margin: 0 0 $checkbox-margin $checkbox-margin;
-
-            &:before, &:after {
-                @include transition((color, background-color), 360ms, cubic-bezier(0.2, 1, 0, 1));
-            }
-
-            &:before {
-                display: block;
-                content: "";
-                width: $checkbox-size;
-                height: $checkbox-size;
-                background-color: $input-border-color;
-                position: absolute;
-                top: 0;
-                left: 0;
-                margin: 0;
-            }
-
-            &:after {
-                display: block;
-                content: "\e604";
-                color: rgba($white, 0);
-                width: $checkbox-inner-size;
-                height: $checkbox-inner-size;
-                position: absolute;
-                top: $input-border-width;
-                left: $input-border-width;
-                background-color: $input-bg-color;
-                margin: 0;
-                line-height: $checkbox-size - $input-border-width;
-                text-align: center;
-            }
-
+            background-color: $input-border-color;
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin: 0;
         }
 
-        &:checked {
-            + label {
-                &:before, &:after {
-                    color: $success-color !important;
-                    background-color: tint($success-color, 70%) !important;
-                }
-            }
-        }
-
-        &:not(:disabled) {
-            + label {
-                &:hover {
-                    &:before, &:after {
-                        background-color: tint($input-border-color, 50%);
-                    }
-
-                    &:after {
-                        color: $white;
-                    }
-                }
-            }
-            &:focus {
-                + label {
-                    &:before, &:after {
-                        background-color: tint($input-border-color, 50%);
-                    }
-
-                    &:after {
-                        color: $white;
-                    }
-                }
-            }
-        }
-
-        &:disabled {
-            + label {
-                &:after {
-                    color: $white !important;
-                }
-            }
+        &:after {
+            display: block;
+            content: "\e604";
+            color: rgba($white, 0);
+            width: $checkbox-inner-size;
+            height: $checkbox-inner-size;
+            position: absolute;
+            top: $input-border-width;
+            left: $input-border-width;
+            background-color: $input-bg-color;
+            margin: 0;
+            line-height: $checkbox-size - $input-border-width;
+            text-align: center;
         }
 
     }
 
-    input[type=radio] + label {
-        &:before, &:after {
-            @include border-radius(1rem);
+    &:checked {
+        + #{$label-selector} {
+            &:before, &:after {
+                color: $success-color !important;
+                background-color: tint($success-color, 70%) !important;
+            }
         }
+    }
+
+    &:not(:disabled) {
+        + #{$label-selector} {
+            &:hover {
+                &:before, &:after {
+                    background-color: tint($input-border-color, 50%);
+                }
+
+                &:after {
+                    color: $white;
+                }
+            }
+        }
+        &:focus {
+            + #{$label-selector} {
+                &:before, &:after {
+                    background-color: tint($input-border-color, 50%);
+                }
+
+                &:after {
+                    color: $white;
+                }
+            }
+        }
+    }
+
+    &:disabled {
+        + #{$label-selector} {
+            &:after {
+                color: $white !important;
+            }
+        }
+    }
+}
+
+.checklist, .radiolist {
+    input[type=radio],
+    input[type=checkbox] {
+        @include fancy-check();
+    }
+}
+
+input[type=radio]    { @include fancy-check('radio-label'); }
+input[type=checkbox] { @include fancy-check('checkbox-label'); }
+
+input[type=radio] + label {
+    &:before, &:after {
+        @include border-radius(1rem);
     }
 }
 
