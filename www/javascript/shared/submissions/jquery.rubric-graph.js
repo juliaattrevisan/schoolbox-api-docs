@@ -11,7 +11,7 @@
         var config = init(options, $(this));
 
         graph();
-        
+
         /**
          * Init
          *
@@ -62,6 +62,10 @@
                     enabled: false
                 },
 
+                legend: {
+                    enabled: false
+                },
+                
                 xAxis: {
                     categories: config.categories,
                     tickmarkPlacement: 'on',
