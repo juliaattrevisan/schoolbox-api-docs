@@ -10,11 +10,16 @@
         };
         var settings = $.extend({}, defaults, options);
         var label    = this;
+
+        /* Reset values when triggering repeatedly
+         */
+        label.removeClass('hide').css({opacity:1});
+
         setTimeout(
             function() {
-                label.animate({opacity: 0}, settings.fadeDuration, function() {
-                    label.addClass('hide');
-                });
+                    label.animate({opacity: 0}, settings.fadeDuration, function() {
+                        label.addClass('hide');
+                    });
             },
             settings.duration
         )
