@@ -10,10 +10,10 @@
         <table>
             <thead>
             <tr>
-                <th width="200">Table Header</th>
                 <th>Table Header</th>
-                <th width="150">Table Header</th>
-                <th width="150">Table Header</th>
+                <th>Table Header</th>
+                <th>Table Header</th>
+                <th><!-- action column --></th>
             </tr>
             </thead>
             <tbody>
@@ -21,19 +21,25 @@
                 <td>Mank</td>
                 <td>This is longer content Donec id elit non mi porta gravida at eget metus.</td>
                 <td>Content Goes Here</td>
-                <td>Content Goes Here</td>
+                <td class="actions-small-1">
+                    <nav><a class="icon-calendar"></a></nav>
+                </td>
             </tr>
             <tr>
                 <td><input id="checkbox-table" type="checkbox"><label for="checkbox-table" class="checkbox-label"></label></td>
                 <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
                 <td>Content Goes Here</td>
-                <td>Content Goes Here</td>
+                <td class="actions-small-1">
+                    <nav><a class="icon-calendar"></a></nav>
+                </td>
             </tr>
             <tr>
                 <td>Faffing</td>
                 <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
                 <td>Content Goes Here</td>
-                <td>Content Goes Here</td>
+                <td class="actions-small-1">
+                    <nav><a class="icon-calendar"></a></nav>
+                </td>
             </tr>
             </tbody>
         </table>
@@ -271,7 +277,391 @@
                 </tbody>
             </table>
         </div>
-        <h2 class="subheader">Stack</h2>
+        <h2 class="subheader">Stack (Rubric)</h2>
+
+        <table class="rubric">
+            <colgroup>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+            </colgroup>
+            <tbody id="rubric-tbody">
+            <tr>
+                <th class="row-header" colspan="6">Language</th>
+            </tr>
+            <tr>
+                <th>Argumentative Language</th>
+                <td>
+                    <input id="rubricargumentativelanguage0" type="radio" name="rubric[96]" data-index="0" disabled="disabled" value="0">
+                    <label for="rubricargumentativelanguage0">
+                        <span>No argumentative phrases are used<br>(0 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricargumentativelanguage1" type="radio" name="rubric[96]" data-index="0" disabled="disabled" value="1">
+                    <label for="rubricargumentativelanguage1">
+                        <span><br>(1 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricargumentativelanguage2" type="radio" name="rubric[96]" data-index="0" disabled="disabled" value="2">
+                    <label for="rubricargumentativelanguage2">
+                        <span>Students attempt to use argumentative phrases<br>(2 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricargumentativelanguage3" type="radio" name="rubric[96]" data-index="0" disabled="disabled" value="3">
+                    <label for="rubricargumentativelanguage3">
+                        <span>Students correctly use argumentative phrases learnt in class<br>(3 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricargumentativelanguage4" type="radio" name="rubric[96]" data-index="0" disabled="disabled" value="4" checked="checked">
+                    <label for="rubricargumentativelanguage4">
+                        <span>Students correctly use argumentative phrases learnt in class as well as attempts to use some new self taught phrases<br>(4 pts)</span>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th>Comparisons between Characters</th>
+                <td>
+                    <input id="rubriccomparisonsbetweencharacters0" type="radio" name="rubric[101]" data-index="1" disabled="disabled" value="0">
+                    <label for="rubriccomparisonsbetweencharacters0">
+                        <span>Characters are not compared<br>(0 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubriccomparisonsbetweencharacters1" type="radio" name="rubric[101]" data-index="1" disabled="disabled" value="1">
+                    <label for="rubriccomparisonsbetweencharacters1">
+                        <span><br>(1 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubriccomparisonsbetweencharacters2" type="radio" name="rubric[101]" data-index="1" disabled="disabled" value="2">
+                    <label for="rubriccomparisonsbetweencharacters2">
+                        <span>Students attempt to use 'plus que' and 'moins que' with character's names and adjectives to compare characters<br>(2 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubriccomparisonsbetweencharacters3" type="radio" name="rubric[101]" data-index="1" disabled="disabled" value="3" checked="checked">
+                    <label for="rubriccomparisonsbetweencharacters3">
+                    <span>Students correctly use 'plus que'
+and 'moins que' with character's names and adjectives to compare characters<br>(3 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubriccomparisonsbetweencharacters4" type="radio" name="rubric[101]" data-index="1" disabled="disabled" value="4">
+                    <label for="rubriccomparisonsbetweencharacters4">
+                        <span>Students correctly use 'plus que' and 'moins que' with character's names and adjectives to compare characters and attempt to use other phrases to compare characters to other things. Eg. You are more smelly than the breath of a dog<br>(4 pts)</span>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th>Descriptions of Characters</th>
+                <td>
+                    <input id="rubricdescriptionsofcharacters0" type="radio" name="rubric[93]" data-index="2" disabled="disabled" value="0">
+                    <label for="rubricdescriptionsofcharacters0">
+                        <span>Characters are not described<br>(0 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricdescriptionsofcharacters1" type="radio" name="rubric[93]" data-index="2" disabled="disabled" value="1">
+                    <label for="rubricdescriptionsofcharacters1">
+                        <span>Students attempt to describe either the personality or physical appearance of characters<br>(1 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricdescriptionsofcharacters2" type="radio" name="rubric[93]" data-index="2" disabled="disabled" value="2">
+                    <label for="rubricdescriptionsofcharacters2">
+                        <span>Students correctly describe either the personality or physical appearance of characters<br>(2 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricdescriptionsofcharacters3" type="radio" name="rubric[93]" data-index="2" disabled="disabled" value="3">
+                    <label for="rubricdescriptionsofcharacters3">
+                        <span>Students correctly describe the personality and physical appearance of characters<br>(3 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricdescriptionsofcharacters4" type="radio" name="rubric[93]" data-index="2" disabled="disabled" value="4" checked="checked">
+                    <label for="rubricdescriptionsofcharacters4">
+                        <span>Students correctly describe the personality and physical appearance of characters. Students use class learnt sentence structures (eg. he has / she is) and attempt to use new, self taught adjectives to describe characters<br>(4 pts)</span>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th>Explanation of the Problem</th>
+                <td>
+                    <input id="rubricexplanationoftheproblem0" type="radio" name="rubric[92]" data-index="3" disabled="disabled" value="0">
+                    <label for="rubricexplanationoftheproblem0">
+                        <span>Problem is not explained<br>(0 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricexplanationoftheproblem1" type="radio" name="rubric[92]" data-index="3" disabled="disabled" value="1">
+                    <label for="rubricexplanationoftheproblem1">
+                        <span>Students attempt to use language taught in class to explain the problem. Students rely on other translation services<br>(1 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricexplanationoftheproblem2" type="radio" name="rubric[92]" data-index="3" disabled="disabled" value="2">
+                    <label for="rubricexplanationoftheproblem2">
+                        <span><br>(2 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricexplanationoftheproblem3" type="radio" name="rubric[92]" data-index="3" disabled="disabled" value="3" checked="checked">
+                    <label for="rubricexplanationoftheproblem3">
+                        <span>Students attempt to use simple language to explain the problem<br>(3 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricexplanationoftheproblem4" type="radio" name="rubric[92]" data-index="3" disabled="disabled" value="4">
+                    <label for="rubricexplanationoftheproblem4">
+                        <span>Students correctly explain the problem in detail, using simple language that they know<br>(4 pts)</span>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th>Language Used</th>
+                <td>
+                    <input id="rubriclanguageused0" type="radio" name="rubric[91]" data-index="4" disabled="disabled" value="0">
+                    <label for="rubriclanguageused0">
+                        <span>Students speak in English<br>(0 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubriclanguageused1" type="radio" name="rubric[91]" data-index="4" disabled="disabled" value="1">
+                    <label for="rubriclanguageused1">
+                        <span>Students use some French words<br>(1 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubriclanguageused2" type="radio" name="rubric[91]" data-index="4" disabled="disabled" value="2">
+                    <label for="rubriclanguageused2">
+                        <span>Students attempt to speak in French but revert to English for some words<br>(2 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubriclanguageused3" type="radio" name="rubric[91]" data-index="4" disabled="disabled" value="3" checked="checked">
+                    <label for="rubriclanguageused3">
+                        <span>Students speak in French<br>(3 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubriclanguageused4" type="radio" name="rubric[91]" data-index="4" disabled="disabled" value="4">
+                    <label for="rubriclanguageused4">
+                        <span><br>(4 pts)</span>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th>Negative Phrases</th>
+                <td>
+                    <input id="rubricnegativephrases0" type="radio" name="rubric[95]" data-index="5" disabled="disabled" value="0">
+                    <label for="rubricnegativephrases0">
+                        <span>Negative phrases are not used<br>(0 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricnegativephrases1" type="radio" name="rubric[95]" data-index="5" disabled="disabled" value="1">
+                    <label for="rubricnegativephrases1">
+                        <span><br>(1 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricnegativephrases2" type="radio" name="rubric[95]" data-index="5" disabled="disabled" value="2">
+                    <label for="rubricnegativephrases2">
+                        <span>Students attempt to use negative phrases to say what traits characters don't have<br>(2 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricnegativephrases3" type="radio" name="rubric[95]" data-index="5" disabled="disabled" value="3" checked="checked">
+                    <label for="rubricnegativephrases3">
+                    <span>Students demonstrate the ability
+to use negative phrases correctly to say what traits characters don't have<br>(3 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricnegativephrases4" type="radio" name="rubric[95]" data-index="5" disabled="disabled" value="4">
+                    <label for="rubricnegativephrases4">
+                        <span><br>(4 pts)</span>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th>Relationships between Characters</th>
+                <td>
+                    <input id="rubricrelationshipsbetweencharacters0" type="radio" name="rubric[94]" data-index="6" disabled="disabled" value="0">
+                    <label for="rubricrelationshipsbetweencharacters0">
+                        <span>Relationship between characters is not explained<br>(0 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricrelationshipsbetweencharacters1" type="radio" name="rubric[94]" data-index="6" disabled="disabled" value="1">
+                    <label for="rubricrelationshipsbetweencharacters1">
+                        <span><br>(1 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricrelationshipsbetweencharacters2" type="radio" name="rubric[94]" data-index="6" disabled="disabled" value="2">
+                    <label for="rubricrelationshipsbetweencharacters2">
+                        <span>Students attempt to say whether characters get along or not<br>(2 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricrelationshipsbetweencharacters3" type="radio" name="rubric[94]" data-index="6" disabled="disabled" value="3" checked="checked">
+                    <label for="rubricrelationshipsbetweencharacters3">
+                        <span>Students correctly say whether characters get along or not<br>(3 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricrelationshipsbetweencharacters4" type="radio" name="rubric[94]" data-index="6" disabled="disabled" value="4">
+                    <label for="rubricrelationshipsbetweencharacters4">
+                        <span><br>(4 pts)</span>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th class="row-header" colspan="6">Presentation</th>
+            </tr>
+            <tr>
+                <th>Participation</th>
+                <td>
+                    <input id="rubricparticipation0" type="radio" name="rubric[100]" data-index="7" disabled="disabled" value="0">
+                    <label for="rubricparticipation0">
+                        <span>No participation<br>(0 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricparticipation1" type="radio" name="rubric[100]" data-index="7" disabled="disabled" value="1" checked="checked">
+                    <label for="rubricparticipation1">
+                        <span>All group members participate in the Jerry Springer episode<br>(1 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricparticipation2" type="radio" name="rubric[100]" data-index="7" disabled="disabled" value="2">
+                    <label for="rubricparticipation2">
+                        <span><br>(2 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricparticipation3" type="radio" name="rubric[100]" data-index="7" disabled="disabled" value="3">
+                    <label for="rubricparticipation3">
+                        <span>All group members participate equally in the Jerry Springer episode<br>(3 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricparticipation4" type="radio" name="rubric[100]" data-index="7" disabled="disabled" value="4">
+                    <label for="rubricparticipation4">
+                        <span><br>(4 pts)</span>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th>Performance</th>
+                <td>
+                    <input id="rubricperformance0" type="radio" name="rubric[99]" data-index="8" disabled="disabled" value="0">
+                    <label for="rubricperformance0">
+                        <span>No evidence of presentation<br>(0 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricperformance1" type="radio" name="rubric[99]" data-index="8" disabled="disabled" value="1">
+                    <label for="rubricperformance1">
+                        <span><br>(1 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricperformance2" type="radio" name="rubric[99]" data-index="8" disabled="disabled" value="2">
+                    <label for="rubricperformance2">
+                        <span><br>(2 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricperformance3" type="radio" name="rubric[99]" data-index="8" disabled="disabled" value="3" checked="checked">
+                    <label for="rubricperformance3">
+                        <span>Students use props to make the Jerry Springer episode more realistic<br>(3 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricperformance4" type="radio" name="rubric[99]" data-index="8" disabled="disabled" value="4">
+                    <label for="rubricperformance4">
+                        <span><br>(4 pts)</span>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th>Pronunciation</th>
+                <td>
+                    <input id="rubricpronunciation0" type="radio" name="rubric[97]" data-index="9" disabled="disabled" value="0">
+                    <label for="rubricpronunciation0">
+                        <span>Pronunciation is unclear and hinders understanding<br>(0 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricpronunciation1" type="radio" name="rubric[97]" data-index="9" disabled="disabled" value="1">
+                    <label for="rubricpronunciation1">
+                        <span>Pronunciation hinders understanding in some phrases<br>(1 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricpronunciation2" type="radio" name="rubric[97]" data-index="9" disabled="disabled" value="2">
+                    <label for="rubricpronunciation2">
+                        <span>Pronunciation can be understood most of the time<br>(2 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricpronunciation3" type="radio" name="rubric[97]" data-index="9" disabled="disabled" value="3">
+                    <label for="rubricpronunciation3">
+                        <span>Pronunciation is clear<br>(3 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricpronunciation4" type="radio" name="rubric[97]" data-index="9" disabled="disabled" value="4" checked="checked">
+                    <label for="rubricpronunciation4">
+                        <span>Students demonstrate knowledge of French pronunciation (i.e. vowel sounds, silent letters, nasal sounds, 'r' sound)<br>(4 pts)</span>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th>Use of Script</th>
+                <td>
+                    <input id="rubricuseofscript0" type="radio" name="rubric[98]" data-index="10" disabled="disabled" value="0">
+                    <label for="rubricuseofscript0">
+                        <span>Script is read from<br>(0 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricuseofscript1" type="radio" name="rubric[98]" data-index="10" disabled="disabled" value="1">
+                    <label for="rubricuseofscript1">
+                        <span>Script is read. Student makes eye contact with the camera<br>(1 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricuseofscript2" type="radio" name="rubric[98]" data-index="10" disabled="disabled" value="2">
+                    <label for="rubricuseofscript2">
+                        <span><br>(2 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricuseofscript3" type="radio" name="rubric[98]" data-index="10" disabled="disabled" value="3">
+                    <label for="rubricuseofscript3">
+                        <span>Script or cue cards are sometimes referred to<br>(3 pts)</span>
+                    </label>
+                </td>
+                <td>
+                    <input id="rubricuseofscript4" type="radio" name="rubric[98]" data-index="10" disabled="disabled" value="4" checked="checked">
+                    <label for="rubricuseofscript4">
+                        <span>No script can be seen<br>(4 pts)</span>
+                    </label>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
         <h2 class="subheader">Diagonal Headers</h2>
 

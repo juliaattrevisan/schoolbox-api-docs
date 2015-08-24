@@ -28,9 +28,26 @@ table.rubric {
         vertical-align: top;
     }
 
-    label {
-        font-weight: $font-weight-normal;
-        margin: 0;
+    td {
+        padding: 0;
+
+        label {
+            line-height: inherit;
+            font-weight: $font-weight-normal;
+            margin: 0;
+            padding: 0;
+            min-width: 100%;
+            min-height: 100%;
+            box-sizing: content-box;
+            span {
+                display: block;
+                padding: $table-row-padding;
+            }
+        }
+
+        input:checked + label {
+            background-color: tint($success-color, 75%);
+        }
     }
 }
 

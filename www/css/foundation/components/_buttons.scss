@@ -518,6 +518,7 @@ ul.pagination .active a{
 		.actions-#{$size}-#{$i} {
 
 			position: relative;
+			min-width: $button-size * $i;
 
 			> .list-item {
 				padding-right: 0.5 + ($i * $button-size);
