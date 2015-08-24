@@ -182,6 +182,8 @@ $output = array(
     'WORK_SEMESTER'  => DueWork_All::getSemester(),
     'WORK_YEAR'      => date('Y'),
     'CALENDAR_VIEW'  => $_SESSION['calendar_view'] ? $_SESSION['calendar_view'] : 'month',
+    'CALENDAR_COLLAPSE_EVENTS' => Config::get('calendar_collapse_events') ? 1 : '',
+    'CALENDAR_START_DAY'       => Config::get('calendar_start_day') ?: 0,
 );
 
 $this->setVar($output);
