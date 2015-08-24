@@ -196,7 +196,7 @@
                                     <label>
                                         Hour
                                         <div class="timepick">
-                                            <input name="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" data-timepicker="hour" />
+                                            <input name="publish_hour" id="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" data-timepicker="hour" />
                                         </div>
                                     </label>
                                 </div>
@@ -206,7 +206,7 @@
                                     <label>
                                         Minute
                                         <div class="timepick">
-                                            <input name="publish_minute" type="text" maxlength="2" value="{PUBLISH_MIN}" data-timepicker="minute" />
+                                            <input name="publish_minute" id="publish_minute" type="text" maxlength="2" value="{PUBLISH_MIN}" data-timepicker="minute" />
                                         </div>
                                     </label>
                                 </div>
@@ -214,16 +214,16 @@
                             <div class="small-4 large-2 columns">
                                 <label>
                                     Period
-                                    <select name="publish_period">
+                                    <select name="publish_period" id="publish_period">
                                         <option value="am">AM</option>
                                         <option value="pm" {PUBLISH_PM}>PM</option>
                                     </select>
                                 </label>
                                 <a data-timetablepicker
-                                   data-timetablepicker-date-field="publish_date"
-                                   data-timetablepicker-hour-field="publish_hour"
-                                   data-timetablepicker-minute-field="publish_minute"
-                                   data-timetablepicker-period-field="publish_period"
+                                   data-timetablepicker-date-field="#publish_date"
+                                   data-timetablepicker-hour-field="#publish_hour"
+                                   data-timetablepicker-minute-field="#publish_minute"
+                                   data-timetablepicker-period-field="#publish_period"
                                    data-timetablepicker-timetable-selector="#timetableSelectorDialog"
                                    class="button icon-timetable"
                                    href="#"></a>
@@ -256,7 +256,7 @@
                                     <label>
                                         Hour
                                         <div class="timepick">
-                                            <input name="open_hour" type="text" maxlength="2" value="{OPEN_HOUR}" data-timepicker="hour" />
+                                            <input name="open_hour" id="open_hour" type="text" maxlength="2" value="{OPEN_HOUR}" data-timepicker="hour" />
                                         </div>
                                     </label>
                                 </div>
@@ -266,7 +266,7 @@
                                     <label>
                                         Minute
                                         <div class="timepick">
-                                            <input name="open_minute" type="text" maxlength="2" value="{OPEN_MIN}" data-timepicker="minute" />
+                                            <input name="open_minute" id="open_minute" type="text" maxlength="2" value="{OPEN_MIN}" data-timepicker="minute" />
                                         </div>
                                     </label>
                                 </div>
@@ -274,16 +274,16 @@
                             <div class="small-4 large-2 columns">
                                 <label>
                                     Period
-                                    <select name="open_period">
+                                    <select name="open_period" id="open_period">
                                         <option value="am">AM</option>
                                         <option value="pm" {OPEN_PM}>PM</option>
                                     </select>
                                 </label>
                                 <a data-timetablepicker
-                                   data-timetablepicker-date-field="open_date"
-                                   data-timetablepicker-hour-field="open_hour"
-                                   data-timetablepicker-minute-field="open_minute"
-                                   data-timetablepicker-period-field="open_period"
+                                   data-timetablepicker-date-field="#open_date"
+                                   data-timetablepicker-hour-field="#open_hour"
+                                   data-timetablepicker-minute-field="#open_minute"
+                                   data-timetablepicker-period-field="#open_period"
                                    data-timetablepicker-timetable-selector="#timetableSelectorDialog"
                                    class="button icon-timetable"
                                    href="#"></a>
@@ -316,7 +316,7 @@
                                     <label>
                                         Hour
                                         <div class="timepick">
-                                            <input name="due_hour" type="text" maxlength="2" value="{DUE_HOUR}" data-timepicker="hour" />
+                                            <input name="due_hour" id="due_hour" type="text" maxlength="2" value="{DUE_HOUR}" data-timepicker="hour" />
                                         </div>
                                     </label>
                                 </div>
@@ -326,7 +326,7 @@
                                     <label>
                                         Minute
                                         <div class="timepick">
-                                            <input name="due_minute" type="text" maxlength="2" value="{DUE_MIN}" data-timepicker="minute" />
+                                            <input name="due_minute" id="due_minute" type="text" maxlength="2" value="{DUE_MIN}" data-timepicker="minute" />
                                         </div>
                                     </label>
                                 </div>
@@ -334,16 +334,16 @@
                             <div class="small-4 large-2 columns">
                                 <label>
                                     Period
-                                    <select name="due_period">
+                                    <select name="due_period" id="due_period">
                                         <option value="am">AM</option>
                                         <option value="pm" {DUE_PM}>PM</option>
                                     </select>
                                 </label>
                                 <a data-timetablepicker
-                                   data-timetablepicker-date-field="due_date"
-                                   data-timetablepicker-hour-field="due_hour"
-                                   data-timetablepicker-minute-field="due_minute"
-                                   data-timetablepicker-period-field="due_period"
+                                   data-timetablepicker-date-field="#due_date"
+                                   data-timetablepicker-hour-field="#due_hour"
+                                   data-timetablepicker-minute-field="#due_minute"
+                                   data-timetablepicker-period-field="#due_period"
                                    data-timetablepicker-timetable-selector="#timetableSelectorDialog"
                                    class="button icon-timetable"
                                    href="#"></a>
@@ -374,7 +374,7 @@
                                     <label>
                                         Hour
                                         <div class="timepick">
-                                            <input name="late_hour" type="text" maxlength="2" value="{LATE_HOUR}" data-timepicker="hour" />
+                                            <input name="late_hour" id="late_hour" type="text" maxlength="2" value="{LATE_HOUR}" data-timepicker="hour" />
                                         </div>
                                     </label>
                                 </div>
@@ -384,7 +384,7 @@
                                     <label>
                                         Minute
                                         <div class="timepick">
-                                            <input name="late_minute" type="text" maxlength="2" value="{LATE_MIN}" data-timepicker="minute" />
+                                            <input name="late_minute" id="late_minute" type="text" maxlength="2" value="{LATE_MIN}" data-timepicker="minute" />
                                         </div>
                                     </label>
                                 </div>
@@ -392,16 +392,16 @@
                             <div class="small-4 large-2 columns">
                                 <label>
                                     Period
-                                    <select name="late_period">
+                                    <select name="late_period" id="late_period">
                                         <option value="am">AM</option>
                                         <option value="pm" {LATE_PM}>PM</option>
                                     </select>
                                 </label>
                                 <a data-timetablepicker
-                                   data-timetablepicker-date-field="late_date"
-                                   data-timetablepicker-hour-field="late_hour"
-                                   data-timetablepicker-minute-field="late_minute"
-                                   data-timetablepicker-period-field="late_period"
+                                   data-timetablepicker-date-field="#late_date"
+                                   data-timetablepicker-hour-field="#late_hour"
+                                   data-timetablepicker-minute-field="#late_minute"
+                                   data-timetablepicker-period-field="#late_period"
                                    data-timetablepicker-timetable-selector="#timetableSelectorDialog"
                                    class="button icon-timetable"
                                    href="#"></a>

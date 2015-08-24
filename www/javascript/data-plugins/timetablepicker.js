@@ -21,7 +21,7 @@
  * * timetablepicker-date-field,
  *   timetablepicker-hour-field,
  *   timetablepicker-minute-field,
- *   timetablepicker-period-field:       names of elements to update. Will replace with selectors
+ *   timetablepicker-period-field:       selectors for inputs to update
  *   timetablepicker-timetable-selector: A modal that has already been set up with a timetable selector
  *
  * Requires:
@@ -33,12 +33,11 @@
     $(function(){
         $('[data-timetablepicker]').on('click', function(event) {
             event.preventDefault();
-            var form        = $(this).closest('form');
             var data        = $(this).data();
-            var dateField   = form.find(':input[name="'+data['timetablepickerDateField']+'"]');
-            var hourField   = form.find(':input[name="'+data['timetablepickerHourField']+'"]');
-            var minuteField = form.find(':input[name="'+data['timetablepickerMinuteField']+'"]');
-            var periodField = form.find(':input[name="'+data['timetablepickerPeriodField']+'"]');
+            var dateField   = $(data['timetablepickerDateField']);
+            var hourField   = $(data['timetablepickerHourField']);
+            var minuteField = $(data['timetablepickerMinuteField']);
+            var periodField = $(data['timetablepickerPeriodField']);
 
             // Several timetable pickers need to use the same modal.
             // Attach/detach events on modal open/close
