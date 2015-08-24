@@ -148,6 +148,15 @@
                         $.post(config.submitUrl, $form.serialize())
                             .done(function() {
                                 $form.find('[data-relation="success-message"]').labelTimeout();
+
+                                /* Redirect if a redirect input exists
+                                 * (force redirect in Inline Grading)
+                                 */
+                                var redirect = $('input[name=redirect]');
+
+                                if (redirect.length) {
+                                    window.location.href = redirect.val();
+                                }
                             })
                             .fail(function() {
                                 $form.find('[data-relation="error-message"]').labelTimeout();
