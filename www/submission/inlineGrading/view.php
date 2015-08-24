@@ -349,31 +349,7 @@ $this->setBlock(TEMPLATE_content, 'rubric', 'rubric_block');
 
 if ($submissionBox->isRubric()) {
     $rb = new DueWork_Rubric_Lightbox($this);
-    $rb->render('INJECTED_MARK_RUBRIC', $submissionBox->getId(), $user->getId(), canViewRubric($submissionBox, $_SESSION['user']));
+    $rb->render('INJECTED_MARK_RUBRIC', $submissionBox->getId(), $user->getId(), $submissionBox->canViewRubric($_SESSION['user']));
 } else {
     $this->setVar('INJECTED_MARK_RUBRIC', '');
-}
-
-/**
- * @param Component\SubmissionBox $box
- * @param Schoolbox\User $user
- * @return bool
- */
-function canViewRubric($box, $user)
-{
-    // no rubric to view
-    if (!$box->isRubric()) {
-        return false;
-    }
-
-    switch ($user->getRole()->getType()) {
-        case \Schoolbox\Role::PARENT:
-            return $box->isMarkShownToParents();
-        case \Schoolbox\Role::STUDENT:
-            return $box->isMarkShownToStudents();
-        case \Schoolbox\Role::STAFF:
-            return true;
-        default:
-            return false;
-    }
 }

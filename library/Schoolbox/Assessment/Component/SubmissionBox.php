@@ -718,4 +718,30 @@ class SubmissionBox implements ISoftDeletable
         return Alaress_Date_Format::now()->between($this->getOpenDate(), $this->getLateDate());
     }
 
+    /**
+     * Determine whether a user can view the rubrics associated with
+     * this submission box
+     *
+     * @param User $user
+     * @internal param $box
+     * @return bool
+     */
+    public function canViewRubric(User $user)
+    {
+        // no rubric to view
+        if (!$this->isRubric()) {
+            return false;
+        }
+
+        switch ($user->getRole()->getType()) {
+            case Role::PARENT:
+                return $this->isMarkShownToParents();
+            case Role::STUDENT:
+                return $this->isMarkShownToStudents();
+            case Role::STAFF:
+                return true;
+            default:
+                return false;
+        }
+    }
 }
