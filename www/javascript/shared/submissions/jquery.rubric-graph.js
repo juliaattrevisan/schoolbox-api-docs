@@ -75,6 +75,8 @@
                 yAxis: {
                     gridLineInterpolation: 'polygon',
                     lineWidth: 0,
+                    allowDecimals: false,
+                    tickInterval: 1,
                     min: 0,
                     max: config.ymax
                 },
