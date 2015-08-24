@@ -1,90 +1,12 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript">
 $(function () {
-    /* Subject Filter */
-    $('#subjectFilter').change(function () {
-        $('li.event').fadeTo(0, 1);
-
-        var categoryID = $(this).val();
-        if (categoryID != '') {
-            $('li.event:not(.category-' + categoryID + ')').fadeTo(0, 0.4);
-        }
-
-    });
-
     $('#childSelect').change(function () {
-
         window.open(window.location.pathname.replace(/\/(\d+)$/, "/"+$(this).val()), '_self', '');
         return false;
     });
-
-    function movePopup (location) {
-        var annoyingHeight = ($('duework-popup.cal-bubble .middle').height() + ($('duework-popup.cal-bubble .top').height()) + ($('duework-popup.cal-bubble .bottom').height()))
-
-        $('.duework-popup.cal-bubble').css("left", (location.left - 300));
-
-        $('.duework-popup.cal-bubble').css("top", (location.top - annoyingHeight - 130));
-
-        if (($('.duework-popup.cal-bubble').css("left")) < '0px') {
-            $('.duework-popup.cal-bubble').css("left", '0');
-        }
-
-        closeBubble();
-    }
-
-    function closeBubble () {
-        $('a.bubble-close').click(function() {
-            $(this).closest('div.bubble').remove();
-            return false;
-        });
-    }
-
-    $('.datepicker').datepicker({
-        dateFormat:'yy-mm-dd',
-        showOn:'both',
-        buttonImage:'/images/core/calendar/calendar-click.png',
-        buttonImageOnly:true,
-        constrainInput:false,
-        onSelect: function(dateText, inst) {
-            var url = '/submission/dueWork/' + dateText + '/{WORK_USER_ID}';
-            window.open(url, "_self");
-        }
-    });
-
-    //
-    // Form listener for exporter - brings up a dialog box that offers a URL
-    // to click.
-    $('#calendar-export').click(function(event) {
-        event.preventDefault();
-        $('#calendar-export-dialog').dialog({
-            open: function(event, ui) {
-                $(event.target).find('#calendar-export-dialog-url')
-                    .text($.getExportCalendarLink(
-                        '{USER_TOKEN}',
-                        {'export': 'duework'}
-                    )
-                );
-            },
-            minWidth: 400,
-            modal: true
-        });
-    });
 });
 </script>
-<style type="text/css">
-#calendar-export {
-	display: inline;
-	float: none;
-}
-
-<!-- BEGIN subject_colour -->
-.category-{CATEGORY_ID} {
-    background-color: #{CATEGORY_COLOUR};
-}
-<!-- END subject_colour -->
-
-</style>
 <!-- END custom_head -->
 
 <h1>{WORK_USER_NAME} Work</h1>
