@@ -47,41 +47,14 @@
 
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.rubric-graph.js"></script>
 <script type="text/javascript">
     $(function() {
         if ({GRAPH_DATA}.length) {
-            $('#rubric-chart').highcharts({
-                chart: {
-                    polar: true,
-                    type: 'line'
-                },
-
-                title: {
-                    text: ''
-                },
-
-                credits: {
-                    enabled: false
-                },
-
-                xAxis: {
-                    categories: {GRAPH_LEGS},
-                    tickmarkPlacement: 'on',
-                    lineWidth: 0
-                },
-
-                yAxis: {
-                    gridLineInterpolation: 'polygon',
-                    lineWidth: 0,
-                    min: 0,
-                    max: {GRAPH_MAX}
-                },
-
-                series: [{
-                    name: 'Value',
-                    data: {GRAPH_DATA},
-                    pointPlacement: 'on'
-                }]
+            $('#rubric-chart').rubricGraph({
+                categories: {GRAPH_LEGS},
+                data: {GRAPH_DATA},
+                ymax: {GRAPH_MAX}
             });
         }
     });
