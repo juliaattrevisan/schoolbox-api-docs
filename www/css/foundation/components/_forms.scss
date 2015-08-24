@@ -270,58 +270,6 @@ input[type=radio] + label {
     }
 }
 
-
-
-
-
-/*
-label.radio-label,
-label.checkbox-label { 
-	background-image: url('/images/foundation/form-elements.png'); 
-}
-
-input[type=radio] + label.radio-label,
-input[type=checkbox] + label.checkbox-label { 
-}
-
-input[type=checkbox] + label.checkbox-label { 
-	background-position: 0 -72px; 
-}
-
-input[type=radio]:checked + label.radio-label { 
-	background-position: 0 -48px; 
-}
-
-input[type=checkbox]:checked + label.checkbox-label { 
-	background-position: 0 -120px; 
-}
-
-input[type=radio] + label.radio-label,
-input[type=checkbox] + label.checkbox-label{
-	padding-left: 29px;
-	height: 24px;
-	display: block;
-	line-height: 24px;
-	background-repeat: no-repeat;
-	background-position: 0 0;
-	font-weight: $font-weight-normal;
-	vertical-align: middle;
-	cursor: pointer;
-	margin: rem-calc(($base-font-size - 6));
-}
-
-input[type=checkbox] + label.checkbox-label{
-	background-position: 0 -72px;
-}
-
-input[type=radio]:checked + label.radio-label{
-	background-position: 0 -48px;
-}
-
-input[type=checkbox]:checked + label.checkbox-label{
-	background-position: 0 -120px;
-}
-*/
 // Disabled
 input[type=checkbox]:disabled,
 input[type=radio]:disabled{
