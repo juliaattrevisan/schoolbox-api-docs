@@ -1,9 +1,16 @@
 /**
  * Generic datepicker sync setup, based on data attributes
  *
+ * Usage:
+ * <input name="publish_date" id="publish_date" data-datepicker data-datepicker-sync data-datepicker-sync-enddate="open_date" />
+ * <input name="open_date" id="open_date" data-datepicker />
+ *
  * Options:
- * * startElement: sync with this start date
- * * endElement:   sync with this end date
+ * * startdate: ensures this date isn't before a date with this ID. Will extend to use selectors
+ * * enddate:   ensures this date isn't after a date with this ID. Will extend to use selectors
+ *
+ * Requires:
+ * * syncDates
  */
 (function($){
     $(function(){

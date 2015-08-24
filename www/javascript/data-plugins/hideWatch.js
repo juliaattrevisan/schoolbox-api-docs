@@ -1,5 +1,31 @@
 /**
  * Generic hide watcher setup, based on data attributes
+ *
+ * Usage (checkbox based):
+ * <div class="hide" data-hide-watch="switcher">...</div>
+ * <input type="checkbox" id="switcher" />
+ *
+ * Usage (select value based):
+ * <div class="hide" data-hide-watch="switcher" data-hide-watch-value="1">...</div>
+ * <div class="hide" data-hide-watch="switcher" data-hide-watch-value="2">...</div>
+ * <select id="switcher">
+ *     <option value="1">First</option>
+ *     <option value="2">Second</option>
+ * </select>
+ *
+ * Usage (select value based w/ option attribute):
+ * <div class="hide" data-hide-watch="switcher" data-hide-watch-value="first" data-hide-watch-option-attribute="label">...</div>
+ * <div class="hide" data-hide-watch="switcher" data-hide-watch-value="second" data-hide-watch-option-attribute="label">...</div>
+ * <select id="switcher">
+ *     <option value="1" label="first">First</option>
+ *     <option value="2" label="second">Second</option>
+ * </select>
+ *
+ * Options:
+ * * hide-watch:                  the ID of the element to watch. Will extend to use any selector
+ * * hide-watch-value:            select value based only - if the watched element is this value,
+ *                                show this element, otherwise hide
+ * * hide-watch-option-attribute: select value based only - check this attribute instead of the value
  */
 (function($){
     $(function(){

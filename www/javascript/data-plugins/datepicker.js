@@ -1,5 +1,11 @@
 /**
  * Generic datepicker setup, based on data attributes
+ *
+ * Usage:
+ * <input type="text" data-datepicker />
+ *
+ * Requires:
+ * * datepicker
  */
 (function($){
     $(function(){
