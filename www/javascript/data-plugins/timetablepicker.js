@@ -1,5 +1,33 @@
 /**
- * Generic timepicker setup, based on data attributes
+ * Generic timetable picker setup, based on data attributes
+ *
+ * Usage:
+ * <input type="text" name="date" data-datepicker />
+ * <input type="text" name="hour" data-timepicker="hour" />
+ * <input type="text" name="minute" data-timepicker="minute" />
+ * <select name="period">
+ *     <option value="am">AM</option>
+ *     <option value="pm">PM</option>
+ * </select>
+ * <a href="#"
+ *    data-timetablepicker
+ *    data-timetablepicker-date-field="publish_date"
+ *    data-timetablepicker-hour-field="publish_hour"
+ *    data-timetablepicker-minute-field="publish_minute"
+ *    data-timetablepicker-period-field="publish_period"
+ *    data-timetablepicker-timetable-selector="#timetableSelectorDialog">
+ *
+ * Options:
+ * * timetablepicker-date-field,
+ *   timetablepicker-hour-field,
+ *   timetablepicker-minute-field,
+ *   timetablepicker-period-field:       names of elements to update. Will replace with selectors
+ *   timetablepicker-timetable-selector: A modal that has already been set up with a timetable selector
+ *
+ * Requires:
+ * * timetableSelector
+ * * dateDisplayFormats
+ * * momentJS
  */
 (function($){
     $(function(){
@@ -30,6 +58,7 @@
             });
             useButton.on('click', function(event) {
                 event.preventDefault();
+                var timetableSelector = timetableModal.find('[data-interaction="timetableSelector"]');
                 var self  = timetableSelector.data('timetableDaySelector'),
                     radio = timetableSelector.find('input:checked');
                 dateField.val(moment(self.dateDisplay.attr('datetime')).format(dateDisplayFormats.momentJs));
