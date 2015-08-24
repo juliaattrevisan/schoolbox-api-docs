@@ -599,17 +599,17 @@ if (empty($feedItems)) {
     }
 }
 
-// subject drop down
-$this->dropDown(
-    'subject',
-    $summary,
-    '',
-    TEMPLATE_content,
-    array(
-        'cid'  => 'SUBJECT_ID',
-        'name' => 'SUBJECT_NAME'
-    )
-);
+//// subject drop down
+//$this->dropDown(
+//    'subject',
+//    $summary,
+//    '',
+//    TEMPLATE_content,
+//    array(
+//        'cid'  => 'SUBJECT_ID',
+//        'name' => 'SUBJECT_NAME'
+//    )
+//);
 
 /**
  * Gets activities from new mapper classes.
