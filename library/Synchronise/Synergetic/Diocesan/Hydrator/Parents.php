@@ -15,12 +15,14 @@ use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Synchronise_Base_Hydrator_Spouse;
 use Synchronise_Base_IHydrator;
 
 class Parents implements Synchronise_Base_IHydrator
 {
     const ROLE_PARENT = 16;
+    const DEFAULT_PARENT_CAMPUS = 3;
 
     /** @var Synchronise_Base_IHydrator */
     protected $base;
@@ -28,7 +30,7 @@ class Parents implements Synchronise_Base_IHydrator
     /** @var External_UserInterface */
     protected $euHandler;
 
-    /** @var Mapper */
+    /** @var UserMapper */
     protected $userMapper;
 
 
@@ -37,7 +39,7 @@ class Parents implements Synchronise_Base_IHydrator
      * @param External_UserInterface     $eu
      * @param Mapper                     $userMapper
      */
-    function __construct(Synchronise_Base_IHydrator $base, External_UserInterface $eu, Mapper $userMapper)
+    function __construct(Synchronise_Base_IHydrator $base, External_UserInterface $eu, UserMapper $userMapper)
     {
         $this->base = $base;
         $this->euHandler = $eu;
@@ -53,10 +55,11 @@ class Parents implements Synchronise_Base_IHydrator
     public function hydrate($externalUser, $newUser)
     {
         $newUser = $this->base->hydrate($externalUser, $newUser);
-        $newUser['campus'] = array();
+        $newUser['campus'] = array(self::DEFAULT_PARENT_CAMPUS);
+        $newUser['defaultCampus'] = self::DEFAULT_PARENT_CAMPUS;
         $newUser['group_id'] = self::ROLE_PARENT;
 
-        $lookup   = $this->base instanceof Synchronise_Base_Hydrator_Spouse ? 'StudentContactSpouseID' : 'StudentContactSpouseID';
+        $lookup   = $this->base instanceof Synchronise_Base_Hydrator_Spouse ? 'StudentContactSpouseID' : 'StudentContactID';
         $lookupId = $externalUser[$lookup];
 
         // BECAUSE THERE MIGHT NOT BE DATA! WHY WOULD THERE NOT BE DATA!?!?!
@@ -74,31 +77,12 @@ class Parents implements Synchronise_Base_IHydrator
         }
 
         // extract the values from array, because every element is an array with ONE IRRELEVANTLY-NAMED ELEMENT in it...
-        $childExtIds = array_map(
-            function ($v) {
-                return $v['RelatedID'];
-            }, $enrolments
-        );
-
-
-        /** @var Collection|User[] $children */
-        $childIds = $this->userMapper->findByColumn('synergy_id', $childExtIds, array(
-            'order' => array('year' => 'DESC')
-        ))->getColumnValues('id');
-
-        // BECAUSE THERE MIGHT NOT BE CHILDREN!!!!! AGAIN!!!!
-        if (!count($childIds)) {
-            return $newUser;
-        }
-
         $children = new Collection();
 
-        // this is ridiculous. truly.
-        foreach ($childIds as $id) {
+        foreach($enrolments as $child) {
             try {
-                $children->add($this->userMapper->findById($id));
-            } catch (Mapper\Exception $e) {
-                // noop
+                $children->add($this->userMapper->findByExternalId($child['RelatedID']));
+            } catch (Exception $e) {
             }
         }
 
