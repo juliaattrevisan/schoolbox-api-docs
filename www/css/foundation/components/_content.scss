@@ -459,10 +459,16 @@ thead tr th, .row-header {
 	border-bottom: 2px solid $body-bg;
 	font-weight: $font-weight-bold;
 }
-tr:hover td{
-	background-color: $ocean-sunset;
+tr:hover {
+	td {
+		background-color: $ocean-sunset;
+	}
+	nav a {
+		opacity: 1;
+	}
 }
 td, th{
+	vertical-align: top;
 	border-bottom: 1px solid $body-bg;
 	input[type=radio] +
 	label.radio-label,
