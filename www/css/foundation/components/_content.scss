@@ -903,6 +903,10 @@ $rotate-th-width: $square-grid-td-size;
 	a:hover{
 		background-color: transparent;
 	}
+	.meta {
+		text-transform: lowercase;
+		font-variant: small-caps;
+	}
 }
 
 // Show & Hide Task List
