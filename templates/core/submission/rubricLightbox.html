@@ -44,31 +44,75 @@
 
     <!--<a href="#" id="closebox" class="submit-btn-plain"><span></span>Close</a>-->
 </div>
+
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
 <script type="text/javascript">
-    // listener for submit
-    $('#closebox').click(function() {
-        $('#rubric-lightbox').dialog('close');
+    $(function() {
+        $('#rubric-chart').highcharts({
+            chart: {
+                polar: true,
+                type: 'line'
+            },
+
+            title: {
+                text: ''
+            },
+
+            credits: {
+                enabled: false
+            },
+
+            xAxis: {
+                categories: ['Sales', 'Marketing', 'Development', 'Customer Support',
+                    'Information Technology', 'Administration'],
+                tickmarkPlacement: 'on',
+                lineWidth: 0
+            },
+
+            yAxis: {
+                gridLineInterpolation: 'polygon',
+                lineWidth: 0,
+                min: 0
+            },
+
+            series: [{
+                name: 'Allocated Budget',
+                data: [43000, 19000, 60000, 35000, 17000, 10000],
+                pointPlacement: 'on'
+            }]
+        });
     });
-</script>
 
-<script type="text/javascript">
-    if ({GRAPH_DATA}.length) {
-        var rubricData = setupRubricChart({GRAPH_DATA}, {GRAPH_LEGS}, {GRAPH_MAX});
-        $(function() {
-            var plot = $.plot($('#rubric-chart'), rubricData.spidata.points, rubricData.options);
-            $(document).ready(function() {
-                plot.draw();
-            });
 
-            $(document).ready(function() {
-                var radios = $('#rubric-tbody :radio');
-                radios.removeClass('focused').parent('td').removeClass('focused');
-                $('#rubric-tbody :checked').each(function() {
-                    var self = $(this);
-                    self.addClass('focused').parent('td').addClass('focused');
-                    self.closest('tr').children('.warning').first().children('div').css('visibility', 'hidden');
-                })
-            })
-        })
-    }
+
+
+
+
+//
+//
+//
+//    if ({GRAPH_DATA}.length) {
+//        var rubricData = setupRubricChart({GRAPH_DATA}, {GRAPH_LEGS}, {GRAPH_MAX});
+//
+//
+//
+//
+//        $(function() {
+//            var plot = $.plot($('#rubric-chart'), rubricData.spidata.points, rubricData.options);
+//            $(document).ready(function() {
+//                plot.draw();
+//            });
+//
+//            $(document).ready(function() {
+//                var radios = $('#rubric-tbody :radio');
+//                radios.removeClass('focused').parent('td').removeClass('focused');
+//                $('#rubric-tbody :checked').each(function() {
+//                    var self = $(this);
+//                    self.addClass('focused').parent('td').addClass('focused');
+//                    self.closest('tr').children('.warning').first().children('div').css('visibility', 'hidden');
+//                })
+//            })
+//        })
+//    }
 </script>

@@ -50,7 +50,7 @@ class DueWork_Rubric_Lightbox {
         $legs = array();
 
         for($i = 0; $i < count($data['criteria']); ++$i) {
-            $json[] = array($i, $data['criteria'][$i]['value'] < 0 ? 0 : $data['criteria'][$i]['value']);
+            $json[] = $data['criteria'][$i]['value'] < 0 ? 0 : $data['criteria'][$i]['value'];
             $legs[] = array('label' => $data['criteria'][$i]['label']);
         }
 
