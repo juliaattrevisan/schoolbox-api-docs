@@ -175,12 +175,13 @@ $output = array(
     'TODAY_DATE'     => date('Y-m-d'),
     'NEXT_MONTH'     => date('Y-m-d', strtotime('+1 month', $targetDate->getUnixTimeStamp())),
     'PREV_MONTH'     => date('Y-m-d', strtotime('-1 month', $targetDate->getUnixTimeStamp())),
-    'SELECTED_DATE'  => $targetDate->getLocalShort(),
+    'SELECTED_DATE'  => $targetDate->getDatabaseDate(),
     'WORK_USER_ID'   => $userID,
     'WORK_USER_NAME' => $userID == $_SESSION['id'] ? 'My' : $userHandler->formatName($user) . "'s",
     'USER_TOKEN'     => ($userID == $_SESSION['id'] ? $_SESSION['key'] : $user['key']),
     'WORK_SEMESTER'  => DueWork_All::getSemester(),
-    'WORK_YEAR'      => date('Y')
+    'WORK_YEAR'      => date('Y'),
+    'CALENDAR_VIEW'  => $_SESSION['calendar_view'] ? $_SESSION['calendar_view'] : 'month',
 );
 
 $this->setVar($output);
