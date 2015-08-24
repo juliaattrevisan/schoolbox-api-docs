@@ -73,11 +73,12 @@
                 yAxis: {
                     gridLineInterpolation: 'polygon',
                     lineWidth: 0,
-                    min: 0
+                    min: 0,
+                    max: {GRAPH_MAX}
                 },
 
                 series: [{
-                    name: 'Allocated Budget',
+                    name: 'Value',
                     data: {GRAPH_DATA},
                     pointPlacement: 'on'
                 }]
