@@ -147,7 +147,7 @@
 
             // Several timetable pickers need to use the same modal.
             // Attach/detach events on modal open/close
-            var timetableModal = $('[data-role="timetable-selector"]');
+            var timetableModal = $(data['timetablepickerTimetableSelector']);
             var closeButton    = timetableModal.find('[data-action="close"]');
             var useButton      = timetableModal.find('[data-action="useTime"]');
 
@@ -342,6 +342,7 @@
                                    data-timetablepicker-hour-field="publish_hour"
                                    data-timetablepicker-minute-field="publish_minute"
                                    data-timetablepicker-period-field="publish_period"
+                                   data-timetablepicker-timetable-selector="#timetableSelectorDialog"
                                    class="button icon-timetable"
                                    href="#"></a>
                             </div>
@@ -401,6 +402,7 @@
                                    data-timetablepicker-hour-field="open_hour"
                                    data-timetablepicker-minute-field="open_minute"
                                    data-timetablepicker-period-field="open_period"
+                                   data-timetablepicker-timetable-selector="#timetableSelectorDialog"
                                    class="button icon-timetable"
                                    href="#"></a>
                             </div>
@@ -460,6 +462,7 @@
                                    data-timetablepicker-hour-field="due_hour"
                                    data-timetablepicker-minute-field="due_minute"
                                    data-timetablepicker-period-field="due_period"
+                                   data-timetablepicker-timetable-selector="#timetableSelectorDialog"
                                    class="button icon-timetable"
                                    href="#"></a>
                             </div>
@@ -517,6 +520,7 @@
                                    data-timetablepicker-hour-field="late_hour"
                                    data-timetablepicker-minute-field="late_minute"
                                    data-timetablepicker-period-field="late_period"
+                                   data-timetablepicker-timetable-selector="#timetableSelectorDialog"
                                    class="button icon-timetable"
                                    href="#"></a>
                             </div>
