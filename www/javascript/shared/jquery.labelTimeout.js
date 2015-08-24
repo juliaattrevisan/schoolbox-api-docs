@@ -1,5 +1,6 @@
 (function() {
     "use strict";
+
     /**
      * Fades out a label.
      */
