@@ -211,15 +211,23 @@ input[type=checkbox]{
                 color: $success-color !important;
                 background-color: tint($success-color, 70%) !important;
             }
-            //&:after {
-            //    content: "\e604";
-            //}
         }
 	}
 
     &:not(:disabled) {
         + label {
             &:hover {
+                &:before, &:after {
+                    background-color: tint($input-border-color, 50%);
+                }
+
+                &:after {
+                    color: $white;
+                }
+            }
+        }
+        &:focus {
+            + label {
                 &:before, &:after {
                     background-color: tint($input-border-color, 50%);
                 }
