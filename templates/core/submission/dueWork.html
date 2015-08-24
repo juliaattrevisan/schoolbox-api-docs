@@ -1,5 +1,4 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/components/doT/doT.js"></script>
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript">
 $(function () {
@@ -18,40 +17,6 @@ $(function () {
 
         window.open(window.location.pathname.replace(/\/(\d+)$/, "/"+$(this).val()), '_self', '');
         return false;
-    });
-
-    var templateAssess  = doT.template($('script#assess-popup-template').html().trim());
-    var templateDueWork = doT.template($('script#duework-popup-template').html().trim());
-
-    /* Calendar Popup */
-    $(document).on("click", '.calendarTable ul li span', function(){
-        $('.duework-popup.cal-bubble.cal-bubble').remove();
-        var position = $(this).parent().offset();
-        var node = $(this).closest('li'), ev = node.attr("id").substring(6);
-
-        var is_assess = 0;
-        if (ev.match(/^assess-/)) {
-            ev = ev.substring(7);
-            is_assess = 1;
-        }
-
-        $.post('/ajax/submission.php', { id : ev , uid : {WORK_USER_ID}, is_assess: is_assess}, function (data) {
-
-            if (data !== null) {
-                data.buttonClass = data.action == 'Submit' ? 'up-arrow' : 'eyeball';
-                var template = is_assess ? templateAssess : templateDueWork;
-                var output   = $(template(data));
-                output.appendTo('body');
-                movePopup(position);
-            }
-
-        }, "json");
-
-        return false;
-    });
-
-    $(document).on("click", '.close', function() {
-        $('.duework-popup.cal-bubble.cal-bubble').remove();
     });
 
     function movePopup (location) {
@@ -122,121 +87,20 @@ $(function () {
 </style>
 <!-- END custom_head -->
 
-<script id="duework-popup-template" type="text/x-jquery-tmpl">
-    <div class="duework-popup cal-bubble">
-        <div class="middle">
-            <div class="close">x</div>
-            <div class="js-data clearfix wysiwyg">
-                <h3>
-                    {{? (it.action||'').length}}
-                    <a href="/submission/submissionHistory/{{=it.id}}/{{=it.uid}}">
-                    {{?}}
-                        {{=it.name}}
-                    {{? (it.action||'').length}}
-                    </a>
-                    {{?}}
-                </h3>
-                <p class="bubble-name"><span><a href="/homepage/{{=it.cid}}">{{=it.category}}</a></span> - <em>{{=it.typeName}}</em></p>
-                {{? (it.description||'').length}}
-                    <p class="comment">{{=it.description}}</p>
-                {{?}}
-                {{? (it.action||'').length}}
-                <p class="details clearfix">
-                <a class="btn {{=it.buttonClass}} float-left" href="/submission/submissionHistory/{{=it.id}}/{{=it.uid}}"><span></span>{{=it.action}}</a>
-                </p>
-                {{?}}
-            </div>
-            <div class="bottom"><strong></strong></div>
-        </div>
-    </div>
-</script>
-
-
-<script id="assess-popup-template" type="text/x-jquery-tmpl">
-    <div class="duework-popup cal-bubble">
-        <div class="middle">
-            <div class="close">x</div>
-            <div class="js-data clearfix wysiwyg"><h3>{{=it.name}}</h3>
-                <p class="bubble-name"><span><a href="/homepage/{{=it.cid}}">{{=it.category}}</a></span> - <em>{{=it.typeName}}</em></p>
-                {{? (it.description||'').length}}
-                    <p class="comment">{{=it.description}}</p>
-                {{?}}
-                {{? (it.action||'').length}}
-                <p class="details clearfix">
-                    <a class="btn up-arrow float-left" href="/assess/intro/{{=it.id}}"><span></span>{{=it.action}}</a>
-                </p>
-                {{?}}
-            </div>
-            <div class="bottom"><strong></strong></div>
-        </div>
-    </div>
-</script>
-
-
 <h1>{WORK_USER_NAME} Work</h1>
 <div class="left">
-	<div id="calendar">
-        <div class="calendar-controls clearfix">
-            <div class="float-left clearfix">
-
-                <a class="back" href="/submission/dueWork/{PREV_MONTH}/{WORK_USER_ID}" title="Back one month"><strong>&lt;&lt;</strong></a>
-                <div class="datepicker-box">
-                    <input type="hidden" class="datepicker" />
-                </div>
-                <a class="forward" href="/submission/dueWork/{NEXT_MONTH}/{WORK_USER_ID}" title="Forward one month"><strong>&gt;&gt;</strong></a>
-
-            </div>
-            <div class="current-date">{CURRENT_DATE}</div>
-            <div class="float-right">
-                <select name="subject" id="subjectFilter">
-                    <option value="">Show All</option>
                     <!-- BEGIN subject -->
-                    <option value="{SUBJECT_ID}" class="category-{SUBJECT_ID}">{SUBJECT_NAME}</option>
                     <!-- END subject -->
-                </select>
 				<!-- BEGIN is_parent -->
-
-				<select name="child" id="childSelect">
 					<!-- BEGIN child -->
-					<option value="{CHILD_ID}" {CHILD_ID_SELECTED}>{CHILD_NAME}</option>
 					<!-- END child -->
-				</select>
-
 				<!-- END is_parent -->
-
-				<button id="calendar-export" class="btn export"><span></span>Export</button>
-            </div>
-        </div>
-		<table class="month-view duedates-calendar calendarTable table">
-            <thead>
-            <tr>
-                <th width="14%" class="dark">Sun</th>
-                <th width="14%" class="dark">Mon</th>
-                <th width="14%" class="dark">Tue</th>
-                <th width="14%" class="dark">Wed</th>
-                <th width="14%" class="dark">Thu</th>
-                <th width="14%" class="dark">Fri</th>
-                <th width="14%" class="dark">Sat</th>
-            </tr>
-            </thead>
-            <tbody>
 				<!-- BEGIN week -->
-				<tr>
 					<!-- BEGIN day -->
-					<td class="{PAST} {TODAY} {ACTIVE} {RIGHTY}"><div class="dayWrap">
-							<p>{DATE}</p>
-						</div>
-						<ul>
 							<!-- BEGIN event -->
-							<li id="event-{EVENT_ID}" class="event category-{EVENT_CAT_ID}"> <span class="wrapper"> <strong>{TIME}</strong> {EVENT}</span> </li>
 							<!-- END event -->
-						</ul></td>
 					<!-- END day -->
-				</tr>
 				<!-- END week -->
-			</tbody>
-		</table>
-	</div>
 
     <div class="box component">
         {UPCOMING_WORK}
