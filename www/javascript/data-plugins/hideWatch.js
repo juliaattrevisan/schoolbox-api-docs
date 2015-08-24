@@ -22,7 +22,7 @@
  * </select>
  *
  * Options:
- * * hide-watch:                  the ID of the element to watch. Will extend to use any selector
+ * * hide-watch:                  a selector that selects an element to watch
  * * hide-watch-value:            select value based only - if the watched element is this value,
  *                                show this element, otherwise hide
  * * hide-watch-option-attribute: select value based only - check this attribute instead of the value
@@ -31,7 +31,7 @@
     $(function(){
         $('[data-hide-watch]').each(function() {
             var element = $(this);
-            var watch   = $('#'+element.data('hide-watch'));
+            var watch   = $(element.data('hide-watch'));
             if (watch.length) {
                 var toggleCallback = function() { return true; };
                 if (watch.is(':checkbox')) {
