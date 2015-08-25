@@ -147,7 +147,10 @@ $(function() {
 
 <div class="row">
     <div class="small-12 island">
-        <form action="/submission/rubricCriteriaForm.php" method="POST" id="folderForm" class="rubric-settings clearfix">
+        <form action="/submission/rubricCriteriaForm.php"
+              method="POST"
+              data-role="rubric-criteria-form"
+        >
             <section>
                 <!-- BEGIN criterion_group -->
                 <fieldset>
@@ -213,7 +216,7 @@ $(function() {
                 </fieldset>
             </section>
             <input type="hidden" id="categoryID" name="categoryID" value="{CATEGORY_ID}" />
-            <input type="submit" value="Save Changes" class="submit-btn-plain"/>
+            <input type="submit" value="Save Changes" />
         </form>
     </div>
 </div>
