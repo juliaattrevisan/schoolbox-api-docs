@@ -12,18 +12,12 @@
     }
 
     /**
-     * Eportfolio
-     */
-    $.fn.eportfolio = function() {
-    }
-
-    /**
      * Publish To Eportfolio
      *
      * Ajax a form which publishes an item to one's eportfolio
      * Show and hide a label indicating status
      */
-    $.fn.eportfolio.publish = function(options) {
+    $.fn.eportfolio_publish = function(options) {
         options = options || {}
 
         var config = init(options, $(this));
