@@ -14,6 +14,20 @@
 
 <div class="row">
     <div class="small-12 island">
+        <section>
+            <div class="avatar card">
+                <a href="#" title="View Profile">
+                    <img src="/portrait.php?userId={SYN_ID}&size=square32" alt="View Profile" />
+                    <p>{NAME}</p>
+                </a>
+                <p class="meta">{ROLE}</p>
+            </div>
+        </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
         <form action="/submission/returnWorkForm.php" name="returnWorkForm" id="returnWorkForm" method="post" class="top" enctype="multipart/form-data">
             <input name="box_id" type="hidden" id="box_id" value="{BOX_ID}" />
             <input name="uid" type="hidden" id="uid" value="{UID}" />
@@ -71,38 +85,3 @@
         </form>
     </div>
 </div>
-
-
-
-
-
-
-<form action="" method="">
-    <table class="standardForm table">
-        <tr>
-            <td class="formLabelWidth"><h4>Student</h4>
-			<td>
-                <img class="student-img" alt="{NAME}" src="/portrait?userId={SYN_ID}&size=square32" /><strong>{NAME}</strong><br />{ROLE}
-            </td>
-        </tr>
-    </table>
-    <p id="errnotif" class="float-left err hide">Ensure you have selected a mark for every criterion.</p>
-</form>
-
-
-<!--<script src='/submission/inlineGrading/js/rubrics.js' type="text/javascript"></script>-->
-<!--<script type="text/javascript">-->
-    <!--$(function() {-->
-//        $('#rubric-tbody').inlineGradingRubrics({
-//            scoreElement: '#sum',
-//            formElement: '#returnWorkForm',
-//            renderGraph: true,
-//            graph: {
-//                container: '#rubric-chart',
-//                data: {GRAPH_DATA},
-//                legs: {GRAPH_LEGS},
-//                max: {GRAPH_MAX}
-//            }
-//        });
-    <!--});-->
-<!--</script>-->
