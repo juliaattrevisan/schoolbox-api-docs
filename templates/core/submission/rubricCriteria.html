@@ -2,20 +2,29 @@
 <script type="text/javascript">
 $(function() {
 
+    var form = $('form[data-role="rubric-criteria-form"]');
+
     // logic for adding new inputs
-    $('#crit-list input.new').keyup(function() {
-        if(this.value.length > 0) {
+    form.find('input').keyup(function() {
+        if (this.value.length > 0) {
             var input = $(this);
-            var li = input.parent();
+            var container = [];
+            if (input.data('rubric-critieria-new')) {
+                container = input.closest('[data-rubric-critieria-row]');
+            } else if (input.data('rubric-group-new')) {
+                container = input.closest('[data-rubric-group-row]');
+            }
+            if (container.length) {
+                var newContainer = container.clone(true, true);
+                newContainer.find('input').val('');
+                input.attr('placeholder', '');
 
-            var newli = li.clone(true, true);
-            newli.find('input').val('');
-            input.attr('placeholder', '');
-
-            newli.appendTo(li.parent());
-            input.removeClass('new');
-            li.removeClass('new');
-            input.unbind('keyup');
+                newContainer.appendTo(container.parent());
+                input.data({
+                    'rubric-critieria-new': '',
+                    'rubric-group-new': ''
+                });
+            }
         }
     });
 
@@ -29,7 +38,7 @@ $(function() {
 
     // logic for removing inputs that are currently in use
     $('#crit-list .delete.disabled').click(function(e) {
-        if(confirm('You are about to remove a criterion that is currently in use.  Removing this criterion will make it unavailable for future assessments.  It will remain visible on the existing assessments.')) {
+        if (confirm('You are about to remove a criterion that is currently in use.  Removing this criterion will make it unavailable for future assessments.  It will remain visible on the existing assessments.')) {
             var self = $(this);
             var target = self.parent('.item');
             target.remove();
@@ -39,52 +48,52 @@ $(function() {
     });
 
 
-    // logic for handling the form submit
-    $('#folderForm').submit(function(e) {
-        var data = {},
-            self = $(this),
-            fields = self.find('input[type=text]'),
-            catID = $('#categoryID').val(),
-            x = -1,
-            y = {MAX_CRIT_ID};
-
-        // validate all the input fields
-        fields.each(function() {
-            var self = $(this);
-
-            // new group
-            if(self.hasClass('new')) {
-                // skip
-            }
-            else if(self.hasClass('group')) {
-                ++x;
-                data[x] = {};
-                data[x]['name'] = self.val();
-                data[x]['items'] = {};
-            }
-            else if(self.hasClass('item')) {
-                if(self.attr('id') === undefined) {
-                    data[x]['items']['i'+y] = {};
-                    data[x]['items']['i'+y] = self.val();
-                    ++y;
-                }
-                else {
-                    data[x]['items'][self.attr('id')] = {};
-                    data[x]['items'][self.attr('id')] = self.val();
-                }
-            }
-
-        });
-
-        $('#folderForm').children('input.submit-btn-plain').attr('disabled', 'disabled').val('Saving Changes...');
-
-        $.post(self.attr('action'), {'crits': data, 'categoryID': catID}, function(data) {
-            history.back(-1);
-        });
-
-        e.preventDefault();
-
-    });
+//    // logic for handling the form submit
+//    $('#folderForm').submit(function(e) {
+//        var data = {},
+//            self = $(this),
+//            fields = self.find('input[type=text]'),
+//            catID = $('#categoryID').val(),
+//            x = -1,
+//            y = {MAX_CRIT_ID};
+//
+//        // validate all the input fields
+//        fields.each(function() {
+//            var self = $(this);
+//
+//            // new group
+//            if(self.hasClass('new')) {
+//                // skip
+//            }
+//            else if(self.hasClass('group')) {
+//                ++x;
+//                data[x] = {};
+//                data[x]['name'] = self.val();
+//                data[x]['items'] = {};
+//            }
+//            else if(self.hasClass('item')) {
+//                if(self.attr('id') === undefined) {
+//                    data[x]['items']['i'+y] = {};
+//                    data[x]['items']['i'+y] = self.val();
+//                    ++y;
+//                }
+//                else {
+//                    data[x]['items'][self.attr('id')] = {};
+//                    data[x]['items'][self.attr('id')] = self.val();
+//                }
+//            }
+//
+//        });
+//
+//        $('#folderForm').children('input.submit-btn-plain').attr('disabled', 'disabled').val('Saving Changes...');
+//
+//        $.post(self.attr('action'), {'crits': data, 'categoryID': catID}, function(data) {
+//            history.back(-1);
+//        });
+//
+//        e.preventDefault();
+//
+//    });
 
     $('[data-interaction="show-example-critieria"]').click(function(e) {
         e.preventDefault();
@@ -153,7 +162,7 @@ $(function() {
         >
             <section>
                 <!-- BEGIN criterion_group -->
-                <fieldset>
+                <fieldset data-rubric-group-row>
                     <div class="small-12 medium-6 columns">
                         <label>
                             Group
@@ -164,27 +173,34 @@ $(function() {
                         <label>
                             Criteria
                         </label>
-                        <div class="row">
-                            <!-- BEGIN criterion -->
-                            <!-- BEGIN criterion_enabled -->
+                        <!-- BEGIN criterion -->
+                        <!-- BEGIN criterion_enabled -->
+                        <div class="row" data-rubric-critieria-row>
                             <div class="small-9 columns">
                                 <input type="text" value="{CRITERION_NAME}" id="i{CRITERION_ID}" />
                             </div>
                             <div class="small-3 columns no-pad">
                                 <a title="Delete criterion" class="button icon-delete" href="#"></a>
                             </div>
-                            <!-- END criterion_enabled -->
-                            <!-- BEGIN criterion_disabled -->
+                        </div>
+                        <!-- END criterion_enabled -->
+                        <!-- BEGIN criterion_disabled -->
+                        <div class="row" data-rubric-critieria-row>
                             <div class="small-9 columns">
                                 <input type="text" value="{CRITERION_NAME}" id="i{CRITERION_ID}" disabled />
                             </div>
                             <div class="small-3 columns no-pad">
                                 <span class="button icon-delete disabled" title="This criterion is in use on {CRITERION_USAGE} assessments. It can be deleted from future use but may not be modified"></span>
                             </div>
-                            <!-- END criterion_disabled -->
-                            <!-- END criterion -->
+                        </div>
+                        <!-- END criterion_disabled -->
+                        <!-- END criterion -->
+                        <div class="row" data-rubric-critieria-row>
                             <div class="small-9 columns">
-                                <input type="text" value="" placeholder="Add Criterion to {CRITGROUP_NAME}..." />
+                                <input type="text"
+                                       value=""
+                                       data-rubric-critieria-new="1"
+                                       placeholder="Add Criterion to {CRITGROUP_NAME}..." />
                             </div>
                             <div class="small-3 columns no-pad">
                                 <a title="Delete criterion" class="button icon-delete" href="#"></a>
@@ -193,20 +209,26 @@ $(function() {
                     </div>
                 </fieldset>
                 <!-- END criterion_group -->
-                <fieldset>
+                <fieldset data-rubric-group-row>
                     <div class="small-12 medium-6 columns">
                         <label>
                             Group
-                            <input type="text" value="" placeholder="Add Group..." />
+                            <input type="text"
+                                   value=""
+                                   data-rubric-group-new="1"
+                                   placeholder="Add Group..." />
                         </label>
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
                             Criteria
                         </label>
-                        <div class="row">
+                        <div class="row" data-rubric-critieria-row>
                             <div class="small-9 columns">
-                                <input type="text" value="" placeholder="Add Criterion..." />
+                                <input type="text"
+                                       value=""
+                                       data-rubric-critieria-new="1"
+                                       placeholder="Add Criterion..." />
                             </div>
                             <div class="small-3 columns no-pad">
                                 <a title="Delete criterion" class="button icon-delete" href="#"></a>
@@ -244,12 +266,18 @@ $(function() {
                             <div class="small-12 columns">
                                 <input disabled type="text" value="Factorisation" />
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="small-12 columns">
                                 <input disabled type="text" value="Algebraic simplification using index laws" />
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="small-12 columns">
                                 <input disabled type="text" value="Fraction operations" />
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="small-12 columns">
                                 <input disabled type="text" value="Determining an unknown by substitution" />
                             </div>
@@ -272,9 +300,13 @@ $(function() {
                             <div class="small-12 columns">
                                 <input disabled type="text" value="Solving linear equations" />
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="small-12 columns">
                                 <input disabled type="text" value="Solving simultaneous equations" />
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="small-12 columns">
                                 <input disabled type="text" value="Solving simple quadratic equations" />
                             </div>
