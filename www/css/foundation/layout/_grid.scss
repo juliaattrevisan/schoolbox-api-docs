@@ -82,7 +82,7 @@ $block-grid-default-spacing: rem-calc(16);
     }
 
     @media #{$small-only} {
-        padding: 0 !important;
+        padding: 0;
 
         > h1,
         > .subheader,
@@ -113,6 +113,10 @@ $block-grid-default-spacing: rem-calc(16);
             }
         }
     }
+
+    @media #{$medium-only} {
+        padding: 0 2.5rem;
+    }
 }
 
 // yes, these are really really really specific, but it's for the greater good
@@ -120,15 +124,5 @@ $block-grid-default-spacing: rem-calc(16);
     > .row > .small-12,
     > .row > .medium-12 {
         @extend %mobile-padding;
-    }
-}
-
-#content > .row {
-    > .small-12, > .medium-12 {
-
-        @media #{$medium-only} {
-            padding: 0 2.5rem !important;
-        }
-
     }
 }
