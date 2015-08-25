@@ -33,3 +33,4 @@ echo $renderer->renderAll('javascript');
 /* Final null element to help keep IE happy
  */
 echo "{}]";
+exit;
