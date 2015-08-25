@@ -142,59 +142,66 @@ $(function() {
 </tr>
 <!-- END allow_cascade -->
 
-<form action="/submission/rubricCriteriaForm.php" method="POST" id="folderForm" class="rubric-settings clearfix">
-    <!-- BEGIN criterion_group -->
-    <fieldset>
-        <div class="small-12 medium-6 columns">
-            <label>
-                Group
-                <input class="group" type="text" value="{CRITGROUP_NAME}"{CRITGROUP_DISABLED} />
-            </label>
-        </div>
-        <div class="small-12 medium-6 columns">
-            <label>
-                Criteria
-            </label>
-            <div class="row no-pad">
-                <!-- BEGIN criterion -->
-                <div class="small-12 columns no-pad">
-                    <!-- BEGIN criterion_enabled -->
-                    <input class="item" type="text" value="{CRITERION_NAME}" id="i{CRITERION_ID}" />
-                    <a title="Delete criterion" class="btn no-text delete" href="#"><span></span></a>
-                    <!-- END criterion_enabled -->
-                    <!-- BEGIN criterion_disabled -->
-                    <input class="item" type="text" value="{CRITERION_NAME}" id="i{CRITERION_ID}" disabled="disabled" />
-                    <span class="btn no-text delete disabled" title="This criterion is in use on {CRITERION_USAGE} assessments. It can be deleted from future use but may not be modified"><span></span></span>
-                    <!-- END criterion_disabled -->
-                </div>
-                <!-- END criterion -->
-                <div class="small-12 columns no-pad">
-                    <input class="item new" type="text" value="" placeholder="Add Criterion to {CRITGROUP_NAME}..." />
-                    <a title="Delete criterion" class="btn no-text delete" href="#"><span></span></a>
-                </div>
-            </div>
-        </div>
-    </fieldset>
-    <!-- END criterion_group -->
-    <div class="small-12 medium-6 columns">
-        <label>
-            Group
-            <input class="group new" type="text" value="" placeholder="Add Group..." />
-        </label>
+<div class="row">
+    <div class="small-12 island">
+        <form action="/submission/rubricCriteriaForm.php" method="POST" id="folderForm" class="rubric-settings clearfix">
+            <section>
+                <!-- BEGIN criterion_group -->
+                <fieldset>
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Group
+                            <input class="group" type="text" value="{CRITGROUP_NAME}"{CRITGROUP_DISABLED} />
+                        </label>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Criteria
+                        </label>
+                        <div class="row">
+                            <!-- BEGIN criterion -->
+                            <div class="small-12 columns">
+                                <!-- BEGIN criterion_enabled -->
+                                <input class="item" type="text" value="{CRITERION_NAME}" id="i{CRITERION_ID}" />
+                                <a title="Delete criterion" class="btn no-text delete" href="#"><span></span></a>
+                                <!-- END criterion_enabled -->
+                                <!-- BEGIN criterion_disabled -->
+                                <input class="item" type="text" value="{CRITERION_NAME}" id="i{CRITERION_ID}" disabled="disabled" />
+                                <span class="btn no-text delete disabled" title="This criterion is in use on {CRITERION_USAGE} assessments. It can be deleted from future use but may not be modified"><span></span></span>
+                                <!-- END criterion_disabled -->
+                            </div>
+                            <!-- END criterion -->
+                            <div class="small-12 columns">
+                                <input class="item new" type="text" value="" placeholder="Add Criterion to {CRITGROUP_NAME}..." />
+                                <a title="Delete criterion" class="btn no-text delete" href="#"><span></span></a>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <!-- END criterion_group -->
+                <fieldset>
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Group
+                            <input class="group new" type="text" value="" placeholder="Add Group..." />
+                        </label>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Criteria
+                        </label>
+                        <fieldset>
+                            <input class="item new" type="text" value="" placeholder="Add Criterion..." />
+                            <a title="Delete criterion" class="btn no-text delete" href="#"><span></span></a>
+                        </fieldset>
+                    </div>
+                </fieldset>
+            </section>
+            <input type="hidden" id="categoryID" name="categoryID" value="{CATEGORY_ID}" />
+            <input type="submit" value="Save Changes" class="submit-btn-plain"/>
+        </form>
     </div>
-    <div class="small-12 medium-6 columns">
-        <label>
-            Criteria
-        </label>
-        <fieldset>
-            <input class="item new" type="text" value="" placeholder="Add Criterion..." />
-            <a title="Delete criterion" class="btn no-text delete" href="#"><span></span></a>
-        </fieldset>
-    </div>
-    <input type="hidden" id="categoryID" name="categoryID" value="{CATEGORY_ID}" />
-    <input type="submit" value="Save Changes" class="submit-btn-plain"/>
-</form>
-
+</div>
 <div data-role="example-critieria" class="reveal-modal" data-reveal>
     <p>
         Each criterion should be a word or short sentence that describes what is being assessed,
