@@ -78,6 +78,7 @@ class Audio extends Base {
 		}
 		else {
 			$this->getPage()->setVar(array(
+                'INJECTABLE_AUDIO_STATUS_SRC' => '/images/core/component/audio-thumbnail-processing.gif',
                 'INJECTABLE_AUDIO_STATUS_MSG' => 'We are currently processing this audio, if you return later it will be ready to play.',
 				'injectable_audio_player_block' => ''
 			));

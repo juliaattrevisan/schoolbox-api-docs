@@ -1,23 +1,7 @@
-<h2>Document Preview</h2>
-<section class="component-control-container">
-	<a href="#" data-interaction="toggle-width" class="btn go-to no-text" title="Toggle width"><span></span></a>
+<h2 class="subheader">Document Preview</h2>
+<section>
+    <div class="flex-video">
+        <iframe id="inline-grading" class="inline-grading-iframe" src="/submission/inlineGrading/iframe/{INJECTABLE_CONTROL_SUBMISSION_ID}"></iframe>
+    </div>
 </section>
 
-<iframe id="inline-grading" class="inline-grading-iframe" src="/submission/inlineGrading/iframe/{INJECTABLE_CONTROL_SUBMISSION_ID}"></iframe>
-
-<script type="text/javascript">
-    $(document).ready(function(){
-
-        $('a[data-interaction="toggle-width"]').on('click', function (event) {
-            $(this)
-                .toggleClass('go-to go-back')
-                .closest('[data-interaction="crocodoc-frame"]')
-                .toggleClass('fullwidth')
-                .siblings('[data-interaction="mark-controls"]')
-                .toggleClass('right');
-
-            event.preventDefault();
-        });
-
-    });
-</script>

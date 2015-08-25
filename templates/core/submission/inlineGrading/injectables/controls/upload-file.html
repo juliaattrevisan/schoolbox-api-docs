@@ -1,21 +1,26 @@
-<h2>Return Work</h2>
-<!-- BEGIN returned_work -->
-<div>
-	<ul class="file-list">
-		<li>
-			<a href="/submission/send.php?id={MOST_RECENT_RETURN_FILE_ID}&return=1">
-				<img width="32" height="32" src="/images/mime/60x60/{MOST_RECENT_RETURN_FILE_THUMB}"/>
-				<span class="name">{MOST_RECENT_RETURN_FILE_NAME}
-					<em>({MOST_RECENT_RETURN_FILE_SIZE})</em>
-				</span>
-				<span class="time">{MOST_RECENT_RETURN_FILE_DATE}</span>
-				<span class="icon"></span>
-			</a>
-		</li>
-	</ul>
+        <h2 class="subheader">Return Work</h2>
+        <section>
+            <div class="content">
+                {ATTACH_ZONE}
+            </div>
 
-	<div class="clearfix"></div>
-</div>
-<!-- END returned_work -->
-{ATTACH_ZONE}
-<div class="clearfix pad-it"></div>
+            <!-- BEGIN returned_work -->
+            <ul class="action-list">
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
+                            <a href="/submission/send.php?id={MOST_RECENT_RETURN_FILE_ID}&return=1" title="Download Returned Work">
+                                <img src="/images/mime/60x60/{MOST_RECENT_RETURN_FILE_THUMB}" class="content" alt="{MOST_RECENT_RETURN_FILE_NAME}" />
+                                <p>{MOST_RECENT_RETURN_FILE_NAME}</p>
+                            </a>
+                            <p class="meta">{MOST_RECENT_RETURN_FILE_SIZE}</p>
+                            <p class="meta">{MOST_RECENT_RETURN_FILE_DATE}</p>
+                        </div>
+                    </div>
+                    <nav>
+                        <a href="/submission/send.php?id={MOST_RECENT_RETURN_FILE_ID}&return=1" class="icon-download" title="Download"></a>
+                    </nav>
+                </li>
+            </ul>
+            <!-- END returned_work -->
+        </section>

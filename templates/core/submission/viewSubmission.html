@@ -70,14 +70,13 @@
 
                                     <!-- BEGIN delete_action -->
                                     <!-- END delete_action -->
+                                    <!-- BEGIN dropdown_delete_action -->
+                                    <!-- END dropdown_delete_action -->
                                     <!-- END submission_row -->
                                 </div>
                             </div>
-                            <div class="small-12 columns hide" data-relation="success-message">
-                                <span class="success label full-width">Saved!</span>
-                            </div>
-                            <div class="small-12 columns hide" data-relation="error-message">
-                                <span class="alert label full-width">Whoops, something went wrong!</span>
+                            <div class="small-12 columns">
+                                <span class="label full-width hide" data-relation="response-message"></span>
                             </div>
                         </form>
                         <nav>
@@ -102,9 +101,9 @@
 </div>
 
 <script type="text/javascript" src="/javascript/jquery.collapsable.js"></script>
-<script type="text/javascript" src="/javascript/jquery.labelTimeout.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script src="/javascript/jquery.combobox.js" type="text/javascript"></script>
-<script src="/javascript/jquery.marksheet.js" type="text/javascript"></script>
+<script src="/javascript/shared/submissions/jquery.marksheet.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(function() {
         $('form[data-ajax-submit]').marksheet({

@@ -1,193 +1,162 @@
-<!-- BEGIN custom_head -->
-<script src="/javascript/components/qtip2/jquery.qtip.js" type="text/javascript"></script>
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.js"></script>
-<script src="/javascript/jquery.combobox.js" type="text/javascript"></script>
-<script src="/submission/inlineGrading/js/inlineGrading.js" type="text/javascript"></script>
-<script src="/javascript/jquery.marksheet.js" type="text/javascript"></script>
-<script src="/javascript/resource/jquery.resourceAttach.js" type="text/javascript"></script>
+{BREADCRUMB}
 
-<script type='text/javascript'>
-	$(function() {
-
-    var navNext = $('.next-item');
-    var navPrev = $('.previous-item');
-
-    var tgt = $('select[name=student-select]'), ize,
-        skipUnsubmitted = $('#skipUnsubmitted'),
-        students = {STUDENTNAV_JSON},
-        selectizeOptions = {
-          preload: true,
-          closeAfterSelect: false,
-          options: students,
-          render: {
-            option: function (item) {
-              item.disabled = skipUnsubmitted.is(':checked') && item.unsubmitted;
-              return $('<div/>').html(item.html).html();
-            },
-            item: function (item) {
-              return $('<div/>').html(item.html).html();
-            }
-          }
-        };
-
-
-    ize = tgt.selectize(selectizeOptions);
-
-    // manually set the value, because selectize
-    ize[0].selectize.setValue("/submission/inlineGrading/view/{INLINE_GRADING_SUBMISSION_BOX_ID}/{INLINE_GRADING_STUDENT_ID}", true);
-
-    // add the listener AFTER we've set the value
-    ize.on('change', function (e) {
-      window.location.href = e.target.value;
-    });
-
-    $('#returnWorkForm').marksheet();
-
-		$('.combobox').combobox({COMBO_OPTIONS});
-
-    function refreshNav(nav, source) {
-      if (source.length) {
-        nav.attr('href', source.data('value'))
-            .attr('title', source.children('img').attr('alt'))
-            .removeAttr('disabled');
-      } else {
-        nav.removeAttr('href')
-           .removeAttr('title')
-           .attr('disabled', 'disabled');
-      }
-    }
-
-		/* Asynchronous update
-		 * Rerun plugin
-		 */
-		skipUnsubmitted.change(function (event) {
-
-      var ize  = tgt[0].selectize,
-          skip = $(this).is(':checked') ? 1 : 0,
-          form = $(this).closest('form');
-
-      // clear the selectize render cache
-      ize.renderCache.option = {};
-
-      ize.refreshOptions(false);
-
-      // fire an ajax to persist the "skip_unsubmitted" state for this box...because reasons...
-      $.post(form.attr('action'), { boxId: form.children('input[name=boxId]').val(), skipUnsubmitted: skip });
-
-      var val = ize.getOption(ize.getValue());
-
-      refreshNav(navNext, ize.getAdjacentOption(val, 1));
-      refreshNav(navPrev, ize.getAdjacentOption(val, -1));
-
-		}).trigger('change');
-	});
-</script>
-<!-- END custom_head -->
-<h1>Grading {INLINE_GRADING_SUBMISSION_BOX_NAME} for {INLINE_GRADING_STUDENT_FULL_NAME}</h1>
-
-<span class="header_option">
-	<a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="btn clock"><span></span>View History</a>
-    <!-- BEGIN report_btn -->
-    <!-- END report_btn -->
-</span>
-<p class="sub-heading"><span class="visibility-subheader visibility_{GRADE_VISIBILITY_CODE}" title="{GRADE_VISIBILITY}"></span>{DUEWORK_TYPE} - Due: {DUEWORK_DUEDATE}</p>
-<div class="listing">
-    <ul class="breadcrumb">
-        <li><a href="/submission/listSubmission" >Submissions</a></li>
-        <li><a href="/submission/listSubmission/{DUEWORK_YEAR}/{DUEWORK_SEMESTER}/{CATEGORY_ID}" >{CATEGORY_NAME}</a></li>
-        <li><a href="/submission/viewSubmission/{INLINE_GRADING_SUBMISSION_BOX_ID}">{INLINE_GRADING_SUBMISSION_BOX_NAME}</a></li>
-        <li class="last"><a href="/search/user/{INLINE_GRADING_STUDENT_ID}">{INLINE_GRADING_STUDENT_FULL_NAME}</a></li>
-    </ul>
-</div>
-<div class="dropdown-navigator">
-  <a class="nav previous-item" href="" title="">&lsaquo;</a>
-  <select name="student-select"></select>
-  <a class="nav next-item" href="" title="">&rsaquo;</a>
-  <form action="/submission/inlineGrading/configForm.php" method="post">
-      <input type="hidden" name='boxId' value="{BOX_ID}" />
-      <input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
-      <input type="hidden" name="skipUnsubmitted" value="0" />
-      <label for="skipUnsubmitted">
-        <input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' />
-        <strong>Skip Unsubmitted</strong>
-      </label>
-  </form>
+<div class="row actions-small-1">
+    <div class="list-item small-12 column">
+        <h1>Grading {INLINE_GRADING_SUBMISSION_BOX_NAME}</h1>
+        <ul class="meta">
+            <li class="icon-calendar">Due <span class="gradient-{BOX_GRADIENT}">{DUEWORK_DUEDATE}</span></li>
+            <li class="icon-due-work"><a href="/homepage/{FOLDER_ID}">{FOLDER_NAME}</a> {DUEWORK_TYPE}</li>
+            <li class="{GRADE_VISIBILITY_CLASS}">Grade visible to {GRADE_VISIBILITY}</li>
+        </ul>
+    </div>
+    <nav>
+        <a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="icon-history" title="View History"></a>
+        <!-- BEGIN report_btn -->
+        <!-- END report_btn -->
+    </nav>
 </div>
 
-<div class="clearfix"></div>
-
-<div id="inline-grading-error-container">
-	<strong>There were errors downloading document for inline grading:</strong>
+<div class="row collapse">
+    <div class="small-1 columns">
+        <a class="button icon-previous" href="" title=""></a>
+    </div>
+    <div class="small-10 medium-6 columns">
+        <select name="student-select"></select>
+    </div>
+    <div class="small-1 columns">
+        <a class="button icon-next" href="" title=""></a>
+    </div>
+    <div class="small-12 medium-4 columns">
+        <form action="/submission/inlineGrading/configForm.php" method="post">
+            <input type="hidden" name='boxId' value="{BOX_ID}" />
+            <input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
+            <input type="hidden" name="skipUnsubmitted" value="0" />
+            <input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' />
+            <label for="skipUnsubmitted" class="checkbox-label">Skip Unsubmitted</label>
+        </form>
+    </div>
 </div>
 
-<div class='left inline-grading-column' data-interaction="crocodoc-frame">
-	{INJECTED_INTERFACE_TEMPLATE}
+<div class="row">
+    <div class="small-12 island" data-interaction="crocodoc-frame">
+        <div id="inline-grading-error-container" class="hide">
+            There were errors downloading document for inline grading:
+        </div>
+
+        {INJECTED_INTERFACE_TEMPLATE}
+    </div>
 </div>
-<div class='right clearfix' data-interaction="mark-controls">
 
-	<!-- One Giant Form -->
-	<form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" id="returnWorkForm">
-		<input name="uid" type="hidden" id="uid" value="{INLINE_GRADING_STUDENT_ID}" />
-		<input name="box_id" type="hidden" id="box_id" value="{INLINE_GRADING_SUBMISSION_BOX_ID}" />
-		<input type="hidden" name="redirect" value="{INLINE_GRADING_SUBMISSION_NAVIGATION_NEXT_URL}" />
-		<input type="hidden" name="clearAttachments" value="1" />
+<!-- One Giant Form -->
+<form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" id="returnWorkForm" class="top">
+    <input name="uid" type="hidden" id="uid" value="{INLINE_GRADING_STUDENT_ID}" />
+    <input name="box_id" type="hidden" id="box_id" value="{INLINE_GRADING_SUBMISSION_BOX_ID}" />
+    <input type="hidden" name="redirect" value="{INLINE_GRADING_SUBMISSION_NAVIGATION_NEXT_URL}" />
+    <input type="hidden" name="clearAttachments" value="1" />
 
-		{INJECTED_MARK_TEMPLATE}
-		{INJECTED_MARK_RUBRIC}
+    <div class="row">
+        <div class="small-12 large-6 island">
+            <!-- BEGIN student_row -->
+            <h2 class="subheader">Grade</h2>
+            <section>
+                <div class="content">
+                    <div class="row">
 
-		<div class="clearfix"></div>
+                        <div class="small-12 columns">
+                            <div class="row">
+                                {OWNER_MARKING}
+                            </div>
+                        </div>
 
-		<h2>Grade <span class="visibility-header visibility_{GRADE_VISIBILITY_CODE}" title="{GRADE_VISIBILITY}"></span></h2>
+                        <div class="small-12 columns">
+                            <!-- BEGIN submission_after_mark -->
+                            <!-- END submission_after_mark -->
 
-		<!-- BEGIN student_row -->
-		<div class="inline-grading-marking">
-			{OWNER_MARKING}
-            <!-- BEGIN submission_after_mark -->
-            <!-- END submission_after_mark -->
-		</div>
+                        </div>
+                    </div>
+                </div>
+                <ul class="action-list">
+                    <!-- BEGIN submission_row -->
+                    <li class="actions-small-1 actions-medium-3">
+                        <div class="list-item {SUBMISSION_SELECTED}">
+                            <div class="small-12 avatar card">
+                                <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" title="Download submission">
+                                    <img src="/images/mime/60x60/{SUBMISSION_MIMEICON}" class="mime" alt="{SUBMISSION_FILENAME}" />
+                                    <p>{SUBMISSION_FILENAME}</p>
+                                </a>
+                                <p class="meta">{SUBMISSION_TIME} ({SUBMISSION_TIME_DESCRIPTION})</p>
+                            </div>
 
-		<table class="table inline-grading-submission-list">
-			<colgroup>
-				<col width="30px" />
-				<col/>
-				<col width="105px" />
-			</colgroup>
-			<thead></thead>
-			<tbody>
-				<!-- BEGIN submission_row -->
-				<tr class="{SUBMISSION_SELECTED}">
-					<td><img src="/images/mime/22x22/{SUBMISSION_MIMEICON}" alt="{SUBMISSION_FILENAME}"/></td>
-					<td>
-						<a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" title="Download submission">{SUBMISSION_FILENAME}</a><br />
-						{SUBMISSION_TIME}<br />
-						{SUBMISSION_TIME_DESCRIPTION}
+                            <!-- BEGIN plag_enabled -->
+                            <div class="list-item-content grade no-pad">
+                                <span class="plag-score" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report">(<a href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a>)</span>
+                                <p class="meta">Plagiarism Check</p>
+                            </div>
+                            <!-- END plag_enabled -->
 
-						<!-- BEGIN plag_enabled -->
-						<span class="plag-score {SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report">(<a href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a>)</span>
-						<!-- END plag_enabled -->
-                        <!-- BEGIN plag_deleted -->
-                        <span class="plag-score {SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism">({SUBMISSION_PLAG_SCORE})</span>
-                        <!-- END plag_deleted -->
-					</td>
-					<td>
-						<a href="/submission/send.php?id={SUBMISSION_ID}&save=1" class="btn no-text download" title="Download submission"><span></span></a>
-						<!-- BEGIN delete_action -->
-						<a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));" class="btn no-text delete" title="Delete submission"><span></span></a>
-						<!-- END delete_action -->
-						<a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" class="btn no-text goto" title="View Submission"><span></span></a>
-					</td>
-				</tr>
-				<!-- END submission_row -->
-			</tbody>
-		</table>
-		<!-- END student_row -->
+                            <!-- BEGIN plag_pending -->
+                            <div class="list-item-content grade no-pad">
+                                <span class="{SUBMISSION_PLAG_CLASS}" title="Plagscan Pending">Pending</span>
+                                <p class="meta">Plagiarism Check</p>
+                            </div>
+                            <!-- END plag_pending -->
 
-		{INJECTED_INTERFACE_CONTROL}
+                            <!-- BEGIN plag_deleted -->
+                            <div class="list-item-content grade no-pad">
+                                <span class="{SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism">{SUBMISSION_PLAG_SCORE}</span>
+                                <p class="meta">Plagiarism Check</p>
+                            </div>
+                            <!-- END plag_deleted -->
 
-		<input type="submit" value="Save and Continue" class="submit-btn-plain"/>
-	</form>
+                        </div>
+                        <nav>
+                            <span class="show-for-medium-up">
+                                <a href="/submission/send.php?id={SUBMISSION_ID}&save=1" class="icon-download" title="Download submission"></a>
+                                <!-- BEGIN delete_action -->
+                                <a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" class="icon-delete" title="Delete submission" data-delete-submission></a>
+                                <!-- END delete_action -->
+                                <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" class="icon-view" title="View Submission"></a>
+                            </span>
+                            <span class="show-for-small-only">
+                                <a href="#" class="icon-more" data-dropdown="action-buttons-{SUBMISSION_ID}"></a>
+                            </span>
+                        </nav>
+                        <ul class="f-dropdown" id="action-buttons-{SUBMISSION_ID}" data-dropdown-content>
+                            <li>
+                                <a href="/submission/send.php?id={SUBMISSION_ID}&save=1" class="icon-download">Download submission</a>
+                            </li>
+                            <!-- BEGIN dropdown_delete_action -->
+                            <li>
+                                <a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" class="icon-delete" data-delete-submission>Delete submission</a>
+                            </li>
+                            <!-- END dropdown_delete_action -->
+                            <li>
+                                <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" class="icon-view">View Submission</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- END submission_row -->
+                </ul>
 
-</div>
+            </section>
+            <!-- END student_row -->
+        </div>
+        <div class="small-12 large-6 island">
+            {INJECTED_MARK_TEMPLATE}
+        </div>
+        <div class="small-12 island">
+            {INJECTED_MARK_RUBRIC}
+
+            {INJECTED_INTERFACE_CONTROL}
+        </div>
+
+        <div class="small-12 column">
+            <input type="submit" class='expand' value="Save and Continue" />
+        </div>
+        <span class="label success full-width hide" data-relation="success-message">Saved</span>
+        <span class="label alert full-width hide" data-relation="error-message">Error</span>
+    </div>
+</form>
 
 <!-- BEGIN download_btn -->
 
@@ -196,3 +165,102 @@
 <!-- BEGIN modify_btn -->
 
 <!-- END modify_btn -->
+
+<script src="/javascript/shared/jquery.label-timeout.js" type="text/javascript"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.js"></script>
+<script src="/javascript/jquery.combobox.js" type="text/javascript"></script>
+<script src="/submission/inlineGrading/js/inlineGrading.js" type="text/javascript"></script>
+<script src="/javascript/shared/submissions/jquery.marksheet.js" type="text/javascript"></script>
+<script src="/javascript/resource/jquery.resourceAttach.js" type="text/javascript"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-delete-submission]').click(function(event) {
+            event.preventDefault();
+
+            var self = $(this);
+
+            $(this).confirmDialog({
+                text: "Remove {OWNER_ESCAPED}'s submission?",
+                confirmEvent: function() {
+                    window.location.href = self.attr('href');
+                }
+            });
+        });
+
+        var navNext = $('.next-item');
+        var navPrev = $('.previous-item');
+
+        var tgt = $('select[name=student-select]'), ize,
+                skipUnsubmitted = $('#skipUnsubmitted'),
+                students = {STUDENTNAV_JSON},
+                selectizeOptions = {
+                    preload: true,
+                    closeAfterSelect: false,
+                    options: students,
+                    render: {
+                        option: function (item) {
+                            item.disabled = skipUnsubmitted.is(':checked') && item.unsubmitted;
+                            return $('<div/>').html(item.html).html();
+                        },
+                        item: function (item) {
+                            return $('<div/>').html(item.html).html();
+                        }
+                    }
+                };
+
+
+        ize = tgt.selectize(selectizeOptions);
+
+        // hack, option not available
+        $('.selectize-input input').prop('disabled', true);
+
+        // manually set the value, because selectize
+        ize[0].selectize.setValue("/submission/inlineGrading/view/{INLINE_GRADING_SUBMISSION_BOX_ID}/{INLINE_GRADING_STUDENT_ID}", true);
+
+        // add the listener AFTER we've set the value
+        ize.on('change', function (e) {
+            window.location.href = e.target.value;
+        });
+
+        $('#returnWorkForm').marksheet();
+
+        $('.combobox').combobox({COMBO_OPTIONS});
+
+        function refreshNav(nav, source) {
+            if (source.length) {
+                nav.attr('href', source.data('value'))
+                        .attr('title', source.children('img').attr('alt'))
+                        .removeAttr('disabled');
+            } else {
+                nav.removeAttr('href')
+                        .removeAttr('title')
+                        .attr('disabled', 'disabled');
+            }
+        }
+
+        /* Asynchronous update
+         * Rerun plugin
+         */
+        skipUnsubmitted.change(function (event) {
+
+            var ize  = tgt[0].selectize,
+                    skip = $(this).is(':checked') ? 1 : 0,
+                    form = $(this).closest('form');
+
+            // clear the selectize render cache
+            ize.renderCache.option = {};
+
+            ize.refreshOptions(false);
+
+            // fire an ajax to persist the "skip_unsubmitted" state for this box...because reasons...
+            $.post(form.attr('action'), { boxId: form.children('input[name=boxId]').val(), skipUnsubmitted: skip });
+
+            var val = ize.getOption(ize.getValue());
+
+            refreshNav(navNext, ize.getAdjacentOption(val, 1));
+            refreshNav(navPrev, ize.getAdjacentOption(val, -1));
+
+        }).trigger('change');
+    });
+</script>

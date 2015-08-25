@@ -521,7 +521,7 @@ ul.pagination .active a{
 			min-width: $button-size * $i;
 
 			> .list-item {
-				padding-right: 0.5 + ($i * $button-size);
+				padding-right: 0.5 + ($i * $button-size) !important;
 			}
 
 			> nav {

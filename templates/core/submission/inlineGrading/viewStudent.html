@@ -1,30 +1,17 @@
-<!-- BEGIN custom_head -->
-<script src="/javascript/components/qtip2/jquery.qtip.js" type="text/javascript"></script>
-<script src="/javascript/jquery.combobox.js" type="text/javascript"></script>
-<script src="/submission/inlineGrading/js/inlineGrading.js" type="text/javascript"></script>
-
-<script type='text/javascript'>
-	$(function() {
-		$('#inline-grading').inlineGrading({
-			boxId: '{INLINE_GRADING_SUBMISSION_BOX_ID}',
-			submissionId: '{INLINE_GRADING_SUBMISSION_ID}',
-			errorElement: '#inline-grading-error-container'
-		});
-	});
-</script>
-<!-- END custom_head -->
-<h1>Grade: {INLINE_GRADING_SUBMISSION_BOX_NAME} for {INLINE_GRADING_STUDENT_FULL_NAME}</h1>
-
-<span class="header_option">
-	<a href="/submission/submissionHistory/{INLINE_GRADING_SUBMISSION_BOX_ID}/{INLINE_GRADING_STUDENT_ID}" class="btn clock"><span></span>View History</a>
-</span>
-
-<div class="clearfix"></div>
-
-<div id="inline-grading-error-container">
-	<strong>There were errors downloading document for inline grading:</strong>
+<div class="row actions-small-1">
+    <div class="small-12 columns list-item">
+        <h1>Grade for {INLINE_GRADING_SUBMISSION_BOX_NAME}</h1>
+        <ul class="meta">
+            <li class="icon-staff-students"><a href="/search/user/{INLINE_GRADING_STUDENT_ID}" title="View Profile">{INLINE_GRADING_STUDENT_FULL_NAME}</a></li>
+        </ul>
+    </div>
+    <nav>
+        <a href='/submission/submissionHistory/{INLINE_GRADING_SUBMISSION_BOX_ID}/{INLINE_GRADING_STUDENT_ID}' class='icon-history' title="View History"></a>
+    </nav>
 </div>
 
-<div class='left inline-grading-column fullwidth'>
-	{INJECTED_INTERFACE_TEMPLATE}
+<div class="row">
+    <div class="small-12 island">
+        {INJECTED_INTERFACE_TEMPLATE}
+    </div>
 </div>

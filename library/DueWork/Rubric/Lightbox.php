@@ -20,7 +20,7 @@ class DueWork_Rubric_Lightbox {
         $this->rubricHandler = new DueWork_Rubric_Handler();
     }
 
-    public function render($templateHandle, $submissionBoxID, $studentID, $showMarks = true) {
+    public function render($templateHandle, $submissionBoxID, $studentID, $showMarks = true, $editable = false) {
 
         // make sure it actually has permission to render
         // to see this, you have to be the student in question, a parent of the student in question, or staff
@@ -50,8 +50,8 @@ class DueWork_Rubric_Lightbox {
         $legs = array();
 
         for($i = 0; $i < count($data['criteria']); ++$i) {
-            $json[] = array($i, $data['criteria'][$i]['value'] < 0 ? 0 : $data['criteria'][$i]['value']);
-            $legs[] = array('label' => $data['criteria'][$i]['label']);
+            $json[] = $data['criteria'][$i]['value'] < 0 ? 0 : (float)$data['criteria'][$i]['value'];
+            $legs[] = $data['criteria'][$i]['label'];
         }
 
         $page->setBlock($templateHandle, 'rubric_rating', 'rubric_rating_block');
@@ -84,7 +84,8 @@ class DueWork_Rubric_Lightbox {
                 'RUBRIC_CRIT_LABEL' => $data['criteria'][$i]['label'],
                 'RUBRIC_CRIT_NAME' => preg_replace("#[^a-z0-9\-]#is", '', strtolower($data['criteria'][$i]['label'])),
                 'RUBRIC_CRIT_INDEX' => $i,
-                'RUBRIC_CRIT_ID' => $data['criteria'][$i]['id']
+                'RUBRIC_CRIT_ID' => $data['criteria'][$i]['id'],
+                'RUBRIC_CRIT_EDITABLE' => $editable ? '' : 'disabled="disabled"'
             ));
 
             foreach($data['criteria'][$i]['results'] as $value => $descriptor) {

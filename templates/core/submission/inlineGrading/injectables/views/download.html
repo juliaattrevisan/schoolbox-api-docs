@@ -1,27 +1,34 @@
-<h2>Download File</h2>
-<div>
-	<p>
-		Sorry, we are unable to preview this file. Download it below:
-	</p>
+<h2 class="subheader">Download File</h2>
+<section>
+    <div class="content">
+        <p>
+            Sorry, we are unable to preview this file. Download it below:
+        </p>
+    </div>
 
-	<ul class="file-list">
-		<li>
-			<a href="/submission/send.php?id={MOST_RECENT_SUBMISSION_FILE_ID}&save=1">
-				<img width="32" height="32" src="/images/mime/60x60/{MOST_RECENT_SUBMISSION_FILE_THUMB}" />
-				<span class="name">{MOST_RECENT_SUBMISSION_FILE_NAME}
-					<em>({MOST_RECENT_SUBMISSION_FILE_SIZE})</em>
-				</span>
-				<span class="time">{MOST_RECENT_SUBMISSION_FILE_DATE}</span>
-				<span class="icon"></span>
-			</a>
+    <ul class="action-list">
+        <li class="actions-small-1">
+            <div class="list-item">
+                <div class="small-12 avatar card">
+                    <a href="/submission/send.php?id={MOST_RECENT_SUBMISSION_FILE_ID}&save=1" title="">
+                        <img src="/images/mime/60x60/{MOST_RECENT_SUBMISSION_FILE_THUMB}" class="mime" alt="" />
+                        <p>{MOST_RECENT_SUBMISSION_FILE_NAME}</p>
+                    </a>
+                    <p class="meta">{MOST_RECENT_SUBMISSION_FILE_DATE}</p>
+                    <p class="meta">{MOST_RECENT_SUBMISSION_FILE_SIZE}</p>
+                </div>
 
-			<!-- BEGIN plag_score -->
-			<a href="{SITE_ROOT}/modules/remote/{MOST_RECENT_SUBMISSION_FILE_PLAG_HREF}" class="inline-grading-plagscan-row">
-				<span class="plag-score {MOST_RECENT_SUBMISSION_FILE_PLAG_CLASS}" title="{MOST_RECENT_SUBMISSION_FILE_PLAG_TITLE}">({MOST_RECENT_SUBMISSION_FILE_PLAGSCORE})</span>
-			</a>
-			<!-- END plag_score -->
+                <!-- BEGIN plag_score -->
+                <a href="{SITE_ROOT}/modules/remote/{MOST_RECENT_SUBMISSION_FILE_PLAG_HREF}">
+                    <span class="{MOST_RECENT_SUBMISSION_FILE_PLAG_CLASS}" title="{MOST_RECENT_SUBMISSION_FILE_PLAG_TITLE}">{MOST_RECENT_SUBMISSION_FILE_PLAGSCORE}</span>
+                </a>
+                <!-- END plag_score -->
+            </div>
+            <nav>
+                <a href="/submission/send.php?id={MOST_RECENT_SUBMISSION_FILE_ID}&save=1" class="icon-download" title="Download"></a>
+            </nav>
+        </li>
+    </ul>
+</section>
 
-			<div class="clearfix"></div>
-		</li>
-	</ul>
-</div>
+

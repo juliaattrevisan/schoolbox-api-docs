@@ -33,10 +33,10 @@ $selectize-border-radius: 0px;
 $selectize-width-item-border: 1px !default;
 $selectize-max-height-dropdown: 200px !default;
 
-$selectize-padding-x: 7px;
-$selectize-padding-y: 7px;
-$selectize-padding-item-x: 7px;
-$selectize-padding-item-y: 7px;
+$selectize-padding-x: 0;
+$selectize-padding-y: 0;
+$selectize-padding-item-x: 0;
+$selectize-padding-item-y: 0;
 
 @import "../core/selectize/src/selectize.scss";
 
@@ -51,4 +51,15 @@ $selectize-padding-item-y: 7px;
 
 .selectize-input input{
 	height: auto;
+}
+
+.selectize-dropdown .row[data-selectable] {
+	padding: 0;
+}
+
+.selectize-control .progress-tick {
+	margin-top: 0.5rem;
+}
+.row .selectize-control .row {
+	width: 100%;
 }

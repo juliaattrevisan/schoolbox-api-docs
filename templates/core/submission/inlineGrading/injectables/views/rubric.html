@@ -1,4 +1,3 @@
-<!-- BEGIN mark_type_rubric -->
 <h2>Rubric for {INLINE_GRADING_SUBMISSION_BOX_NAME}</h2>
 <script src='/submission/inlineGrading/js/rubrics.js' type="text/javascript"></script>
 <!-- Uncomment if you want to reactivate graphs -->
@@ -16,35 +15,5 @@
 	});
 </script>
 
-<table class="rubric table">
-	<!-- BEGIN rubric_rating -->
-	<!-- END rubric_rating -->
-	<tbody id="rubric-tbody">
-		<!-- BEGIN rubric_crit -->
-		<!-- BEGIN rubric_grouping -->
-		<tr>
-			<td class="criterion-label pad span">{RUBRIC_GROUP_LABEL}</td>
-		</tr>
-		<!-- END rubric_grouping -->
-		<tr>
-			<td class="criterion-label criterion-label-group pad" data-class="{RUBRIC_GROUP_CLASS}">{RUBRIC_CRIT_LABEL}</td>
-		</tr>
-		<!-- BEGIN rubric_crit_rating -->
-		<tr>
-			<td class="criterion-value" data-class="{RUBRIC_CRIT_RATING_CLASS}">
-				<input id="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_ID}-{RUBRIC_CRIT_RATING_VALUE}" class="rubric-input" type="radio" name="rubric[{RUBRIC_CRIT_ID}]" data-index="{RUBRIC_CRIT_INDEX}" value="{RUBRIC_CRIT_RATING_VALUE}" {RUBRIC_CRIT_RATING_SELECTED} />
-				<label for="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_ID}-{RUBRIC_CRIT_RATING_VALUE}"><span>{RUBRIC_CRIT_RATING_LABEL}</span></label>
-			</td>
-		</tr>
-		<!-- END rubric_crit_rating -->
-		<tr>
-			<td class="warning" data-class="{RUBRIC_CRIT_RATING_CLASS}">
-				<div title="Please select a result for this criterion"><span>!</span></div>
-			</td>
-		</tr>
-		<!-- END rubric_crit -->
-	</tbody>
-</table>
-
-<p id="errnotif" class="float-left err hide">Ensure you have selected a mark for every criterion.</p>
-<!-- END mark_type_rubric -->
+<!-- BEGIN rubric -->
+<!-- END rubric -->

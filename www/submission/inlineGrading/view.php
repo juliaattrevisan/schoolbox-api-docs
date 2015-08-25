@@ -19,6 +19,7 @@ use \Schoolbox\UserMapper;
 use \Schoolbox\Collection;
 use \Crocodoc\Renderer\Factory;
 use \Rubric\Renderer\Vertical;
+use Schoolbox\Breadcrumbs;
 
 /** @var SitePage $this */
 
@@ -90,20 +91,21 @@ foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
         }
 
         $this->setVar(array(
-            'BOX_ID'                => $submissionBox->getId(),
-            'GRADE_VISIBILITY'      => $submissionBox->getMarkVisibilityDescription(),
-            'GRADE_VISIBILITY_CODE' => $submissionBox->getMarkVisibility(),
-            'USER_ID'               => $currentStudent->getId(),
-            'USER_EXT_ID'           => $currentStudent->getExternalId(),
-            'USER_FULLNAME'         => $currentStudent->formatName('{lastname}, {firstname}'),
-            'USER_UNSUBMITTED'      => $submit ? 'false' : 'true',
-
-            'USER_MARKSTATUS_CLASS'    => $marked ? 'marked' : '',
+            'BOX_ID'                   => $submissionBox->getId(),
+            'BOX_GRADIENT'             => $submissionBox->getGradientIndex(),
+            'FOLDER_ID'                => $submissionBox->getCategory()->getId(),
+            'FOLDER_NAME'              => $submissionBox->getCategory()->getName(),
+            'GRADE_VISIBILITY'         => $submissionBox->getMarkVisibilityDescription(),
+            'GRADE_VISIBILITY_CODE'    => $submissionBox->getMarkVisibility(),
+            'GRADE_VISIBILITY_CLASS'   => \Schoolbox\Assessment\Widgets::getCss($submissionBox->getMarkVisibility()),
+            'USER_ID'                  => $currentStudent->getId(),
+            'USER_EXT_ID'              => $currentStudent->getExternalId(),
+            'USER_FULLNAME'            => $currentStudent->formatName('{lastname}, {firstname}'),
+            'USER_UNSUBMITTED'         => $submit ? 'false' : 'true',
+            'USER_MARKSTATUS_CLASS'    => $marked ? 'complete' : 'pending',
             'USER_MARKSTATUS_DATETIME' => $marked ? $markTime->getLocal() : '',
-
-            'USER_SUBMISSION_CLASS'    => $submit ? ($ontime ? 'on-time' : 'late') : 'un',
+            'USER_SUBMISSION_CLASS'    => $submit ? ($ontime ? 'submitted' : 'submitted-late') : 'unsubmitted',
             'USER_SUBMISSION_TEXT'     => $submit ? ($ontime ? 'Submitted on Time' : 'Submitted Late') : 'Not Submitted',
-
         ));
 
         // parse template with PHPLib, shuck it out then put it into JSON? Whoa
@@ -241,12 +243,6 @@ $dueWorkDetail->renderDetails($this);
 
 $this->setTitle('Grading '.Scrub::text($submissionBox->getName()).' for '.Scrub::text($user->getFullName()));
 
-
-/* Rubric's Cube
- */
-$rubricsRenderer = new Vertical($this, $submissionBox, $user);
-$rubricsRenderer->render()->parseBlock();
-
 /* Determine redirect based on whether you're at the end of the list or not
  * Personally I think it'd be better to wrap back to the start, instead of
  * getting kicked out - then you can review the marks in a 'horizontal' manner
@@ -267,6 +263,7 @@ $this->setVar(array(
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
 	'INLINE_GRADING_STUDENT_FULL_NAME' => Scrub::text($user->getFullName()),
 	'INLINE_GRADING_STUDENT_ID' => $user->getId(),
+    'INLINE_GRADING_STUDENT_EXTERNAL_ID' => $user->getExternalId(),
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_NEXT_URL' => $nextUrl
 ));
 
@@ -317,4 +314,42 @@ else {
 		'SKIP_UNSUBMITTED_CHECKED' => '',
 		'INLINE_GRADING_SUBMISSION_NAVIGATION_DISABLED' => json_encode(array()),
 	));
+}
+
+/* Render out breadcrumbs
+ */
+$trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => 'Submissions',
+        'href' => "/submission/listSubmission",
+        'class' => '',
+    ],
+    [
+        'text' => $submissionBox->getCategory()->getName(),
+        'href' => "/submission/listSubmission/{$submissionBox->getDueDate()->getYear()}/{$submissionBox->getDueDate()->getYearHalf()}/{$submissionBox->getCategory()->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($submissionBox->getName()),
+        'href' => "/submission/viewSubmission/{$submissionBox->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($user->getFullName()),
+        'href' => "/search/user/{$user->getId()}",
+        'class' => 'active',
+    ]
+]);
+
+/* Rubric's Cube
+ */
+// do fun rubric things
+$this->setBlock(TEMPLATE_content, 'rubric', 'rubric_block');
+
+if ($submissionBox->isRubric()) {
+    $rb = new DueWork_Rubric_Lightbox($this);
+    $rb->render('INJECTED_MARK_RUBRIC', $submissionBox->getId(), $user->getId(), $submissionBox->canViewRubric($_SESSION['user']), true);
+} else {
+    $this->setVar('INJECTED_MARK_RUBRIC', '');
 }

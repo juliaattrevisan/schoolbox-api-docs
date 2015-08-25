@@ -151,7 +151,7 @@ select option				{
 }
 
 
-@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem) {
+@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem) {
 
     $checkbox-inner-size: $checkbox-size - (2 * $input-border-width);
 
@@ -195,6 +195,7 @@ select option				{
         }
 
         &:after {
+            @extend %iconify;
             display: block;
             content: "\e604";
             color: rgba($white, 0);
@@ -207,6 +208,7 @@ select option				{
             margin: 0;
             line-height: $checkbox-size - $input-border-width;
             text-align: center;
+            font-size: $icon-size;
         }
 
     }

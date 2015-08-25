@@ -165,6 +165,7 @@ class DueWork_Detail
 
         $page->setBlock('submission_row', 'download_action', 'download_action_block');
         $page->setBlock('submission_row', 'delete_action', 'delete_action_block');
+        $page->setBlock('submission_row', 'dropdown_delete_action', 'dropdown_delete_action_block');
         $page->setBlock('submission_row', 'plag_enabled', 'plag_enabled_block');
         $page->setBlock('submission_row', 'plag_pending', 'plag_pending_block');
         $page->setBlock('submission_row', 'plag_deleted', 'plag_deleted_block');
@@ -340,8 +341,10 @@ class DueWork_Detail
 
                     if ($this->isReadOnly()) {
                         $page->setVar('delete_action_block', '');
+                        $page->setVar('dropdown_delete_action_block', '');
                     } else {
                         $page->parse('delete_action_block', 'delete_action');
+                        $page->parse('dropdown_delete_action_block', 'dropdown_delete_action');
                     }
 
                     $page->parse('submission_row_block', 'submission_row', true);

@@ -19,7 +19,7 @@
             <!-- BEGIN rubric_crit_rating -->
             <td class="{RUBRIC_CRIT_RATING_CLASS}">
                 <input id="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_RATING_VALUE}" type="radio"
-                       name="rubric[{RUBRIC_CRIT_ID}]" data-index="{RUBRIC_CRIT_INDEX}" disabled="disabled"
+                       name="rubric[{RUBRIC_CRIT_ID}]" data-index="{RUBRIC_CRIT_INDEX}" {RUBRIC_CRIT_EDITABLE}
                        value="{RUBRIC_CRIT_RATING_VALUE}" {RUBRIC_CRIT_RATING_SELECTED} />
                 <label for="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_RATING_VALUE}">
                     <span>{RUBRIC_CRIT_RATING_LABEL}<br />({RUBRIC_CRIT_RATING_VALUE} pts)</span>
@@ -44,31 +44,35 @@
 
     <!--<a href="#" id="closebox" class="submit-btn-plain"><span></span>Close</a>-->
 </div>
-<script type="text/javascript">
-    // listener for submit
-    $('#closebox').click(function() {
-        $('#rubric-lightbox').dialog('close');
-    });
-</script>
 
+<div class="row">
+    <div class="small-12 island">
+        <h3 class="subheader">Chart</h3>
+        <section class="content">
+            <div id="rubric-chart"></div>
+        </section>
+    </div>
+</div>
+
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.rubric-graph.js"></script>
 <script type="text/javascript">
-    if ({GRAPH_DATA}.length) {
-        var rubricData = setupRubricChart({GRAPH_DATA}, {GRAPH_LEGS}, {GRAPH_MAX});
-        $(function() {
-            var plot = $.plot($('#rubric-chart'), rubricData.spidata.points, rubricData.options);
-            $(document).ready(function() {
-                plot.draw();
+    $(function() {
+        if ({GRAPH_DATA}.length) {
+            $('#rubric-chart').rubricGraph({
+                categories: {GRAPH_LEGS},
+                data: {GRAPH_DATA},
+                ymax: {GRAPH_MAX}
             });
+        }
 
-            $(document).ready(function() {
-                var radios = $('#rubric-tbody :radio');
-                radios.removeClass('focused').parent('td').removeClass('focused');
-                $('#rubric-tbody :checked').each(function() {
-                    var self = $(this);
-                    self.addClass('focused').parent('td').addClass('focused');
-                    self.closest('tr').children('.warning').first().children('div').css('visibility', 'hidden');
-                })
-            })
-        })
-    }
+//        var radios = $('#rubric-tbody :radio');
+//        radios.removeClass('focused').parent('td').removeClass('focused');
+//        $('#rubric-tbody :checked').each(function() {
+//            var self = $(this);
+//            self.addClass('focused').parent('td').addClass('focused');
+//            self.closest('tr').children('.warning').first().children('div').css('visibility', 'hidden');
+//        })
+    });
 </script>
