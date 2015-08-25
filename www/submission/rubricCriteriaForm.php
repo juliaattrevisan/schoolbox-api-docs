@@ -27,7 +27,7 @@ $criteria = $_POST['crits'];
 $catID = $_POST['categoryID'];
 
 // this merely re-establishes the session
-new SitePage();
+$page = new SitePage();
 
 // "security to the foyer!"
 $groupHandler = new Group();
@@ -105,5 +105,8 @@ foreach($data as $critID => $critData) {
 }
 
 
-
-die('Criteria updated.');
+if ($page->detectAjax()) {
+    die('Criteria updated.');
+} else {
+    $page->backToTheFuture(2);
+}
