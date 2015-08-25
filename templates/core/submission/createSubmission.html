@@ -1,805 +1,634 @@
-<!-- BEGIN custom_head -->
+{BREADCRUMB}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{HEADING} Due Work</h1>
+    </div>
+</div>
+
+<div class="row">
+    <fieldset class="small-12 island">
+
+        <form action="/submission/submissionForm.php" method="post" name="form" class="top" id="createSubmissionForm"
+              enctype="multipart/form-data">
+            <input type="hidden" name="category" value="{CATEGORY}"/>
+            <input type="hidden" name="unit_id" value="{UNIT_ID}"/>
+            <input name="is_task" type="hidden" value="{IS_TASK}" />
+            <section>
+                <fieldset class="content">
+                    <legend>Overview</legend>
+
+                    <div class="small-12 columns">
+                        <label>
+                            Type
+                            <select name="type">
+                                <!-- BEGIN type_drop -->
+                                <option value="{TYPE_VALUE}" {TYPE_VALUE_SELECTED}>{TYPE_TEXT}</option>
+                                <!-- END type_drop -->
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="small-12 columns">
+                        <label>
+                            Title
+                            <input class="required" name="name" type="text" value="{NAME}" />
+                        </label>
+                    </div>
+
+                    <div class="small-12 columns">
+                        <label>
+                            Description
+                            <textarea id="description-box" name="description">{DESCRIPTION}</textarea>
+                        </label>
+                    </div>
+
+                    <div class="small-12 columns">
+                        <label>
+                            Attach Files
+                            {ATTACH_ZONE}
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Submissions</legend>
+
+                    <div class="small-6 columns">
+                        <input type="hidden" name="accept_submission" value="0" />
+                        <input id="accept_submission"
+                               name="accept_submission"
+                               type="checkbox"
+                               value="true"
+                               {ACCEPT_SUBMISSION}
+                        />
+                        <label for="accept_submission" class="checkbox-label">
+                            Accept Submissions Online
+                        </label>
+                    </div>
+
+                    <div class="small-6 columns" data-hide-watch="#accept_submission">
+                        <input type="hidden" name="multi_submission" value="0" />
+                        <input id="multi_submission"
+                               name="multi_submission"
+                               type="checkbox"
+                               value="true"
+                               {MULTI_SUBMISSION}
+                        />
+                        <label for="multi_submission" class="checkbox-label">
+                            Accept Multiple Submissions
+                        </label>
+                    </div>
+
+                    <!-- BEGIN duework_timespan -->
+                    <div class="small-12 columns">
+                        <fieldset class="content no-pad">
+                            <div class="small-12 large-4 columns">
+                                <label>
+                                    Publish Date
+                                    <span class="hint has-tip tip-top"
+                                          data-tooltip
+                                          title="This due work will not show on your student's calendar until this date.
+                                                 To publish at the start of the day, leave the time fields blank.">?</span>
+                                    <input name="publish_date"
+                                           id="publish_date"
+                                           type="text"
+                                           value="{PUBLISH_DATE}"
+                                           data-datepicker
+                                           data-datepicker-sync
+                                           data-datepicker-sync-enddate="#open_date"
+                                           data-default_time="00:00"
+                                    />
+                                </label>
+                            </div>
+                            <div class="small-4 large-2 columns">
+                                <div class="timepick">
+                                    <label>
+                                        Hour
+                                        <div class="timepick">
+                                            <input name="publish_hour" id="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" data-timepicker="hour" />
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="small-4 large-2 columns">
+                                <div class="timepick">
+                                    <label>
+                                        Minute
+                                        <div class="timepick">
+                                            <input name="publish_minute" id="publish_minute" type="text" maxlength="2" value="{PUBLISH_MIN}" data-timepicker="minute" />
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="small-4 large-2 columns">
+                                <label>
+                                    Period
+                                    <select name="publish_period" id="publish_period">
+                                        <option value="am">AM</option>
+                                        <option value="pm" {PUBLISH_PM}>PM</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="small-12 large-2 columns">
+                                <label>
+                                    Timetable<br />
+                                    <a data-timetablepicker
+                                       data-timetablepicker-date-field="#publish_date"
+                                       data-timetablepicker-hour-field="#publish_hour"
+                                       data-timetablepicker-minute-field="#publish_minute"
+                                       data-timetablepicker-period-field="#publish_period"
+                                       data-timetablepicker-timetable-selector="#timetableSelectorDialog"
+                                       class="button icon-timetable"
+                                       href="#"></a>
+                                </label>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <div class="small-12 columns">
+                        <fieldset class="content no-pad" data-hide-watch="#accept_submission">
+                            <div class="small-12 large-4 columns">
+                                <label>
+                                    Open Date
+                                    <span class="hint has-tip tip-top"
+                                          data-tooltip
+                                          title="The date from when the due work will be available for submission.
+                                                 To allow submissions from the start of the day, leave the time fields blank.">?</span>
+                                    <input name="open_date"
+                                           id="open_date"
+                                           type="text"
+                                           value="{OPEN_DATE}"
+                                           data-datepicker
+                                           data-datepicker-sync
+                                           data-datepicker-sync-enddate="#due_date"
+                                           data-default_time="00:00"
+                                    />
+                                </label>
+                            </div>
+                            <div class="small-4 large-2 columns">
+                                <div class="timepick">
+                                    <label>
+                                        Hour
+                                        <div class="timepick">
+                                            <input name="open_hour" id="open_hour" type="text" maxlength="2" value="{OPEN_HOUR}" data-timepicker="hour" />
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="small-4 large-2 columns">
+                                <div class="timepick">
+                                    <label>
+                                        Minute
+                                        <div class="timepick">
+                                            <input name="open_minute" id="open_minute" type="text" maxlength="2" value="{OPEN_MIN}" data-timepicker="minute" />
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="small-4 large-2 columns">
+                                <label>
+                                    Period
+                                    <select name="open_period" id="open_period">
+                                        <option value="am">AM</option>
+                                        <option value="pm" {OPEN_PM}>PM</option>
+                                    </select>
+                                </label>
+
+                            </div>
+                            <div class="small-12 large-2 columns">
+                                <label>
+                                    Timetable<br />
+                                    <a data-timetablepicker
+                                       data-timetablepicker-date-field="#open_date"
+                                       data-timetablepicker-hour-field="#open_hour"
+                                       data-timetablepicker-minute-field="#open_minute"
+                                       data-timetablepicker-period-field="#open_period"
+                                       data-timetablepicker-timetable-selector="#timetableSelectorDialog"
+                                       class="button icon-timetable"
+                                       href="#"></a>
+                                </label>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <div class="small-12 columns">
+                        <fieldset class="content no-pad">
+                            <div class="small-12 large-4 columns">
+                                <label>
+                                    Due Date
+                                    <span class="hint has-tip tip-top"
+                                          data-tooltip
+                                          title="Actual date the work is due. This is the date that will be published.
+                                                 To allow submissions until the end of the day, leave the time fields blank.">?</span>
+                                    <input name="due_date"
+                                           id="due_date"
+                                           type="text"
+                                           value="{DUE_DATE}"
+                                           data-datepicker
+                                           data-datepicker-sync
+                                           data-datepicker-sync-enddate="#late_date"
+                                           data-default_time="23:59"
+                                    />
+                                </label>
+                            </div>
+                            <div class="small-4 large-2 columns">
+                                <div class="timepick">
+                                    <label>
+                                        Hour
+                                        <div class="timepick">
+                                            <input name="due_hour" id="due_hour" type="text" maxlength="2" value="{DUE_HOUR}" data-timepicker="hour" />
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="small-4 large-2 columns">
+                                <div class="timepick">
+                                    <label>
+                                        Minute
+                                        <div class="timepick">
+                                            <input name="due_minute" id="due_minute" type="text" maxlength="2" value="{DUE_MIN}" data-timepicker="minute" />
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="small-4 large-2 columns">
+                                <label>
+                                    Period
+                                    <select name="due_period" id="due_period">
+                                        <option value="am">AM</option>
+                                        <option value="pm" {DUE_PM}>PM</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="small-12 large-2 columns">
+                                <label>
+                                    Timetable<br />
+                                    <a data-timetablepicker
+                                       data-timetablepicker-date-field="#due_date"
+                                       data-timetablepicker-hour-field="#due_hour"
+                                       data-timetablepicker-minute-field="#due_minute"
+                                       data-timetablepicker-period-field="#due_period"
+                                       data-timetablepicker-timetable-selector="#timetableSelectorDialog"
+                                       class="button icon-timetable"
+                                       href="#"></a>
+                                </label>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <div class="small-12 columns">
+                        <fieldset class="content no-pad" data-hide-watch="#accept_submission">
+                            <div class="small-12 large-4 columns">
+                                <label>
+                                    Late Date
+                                    <span class="hint has-tip tip-top"
+                                          data-tooltip
+                                          title="Students will not be able to submit after this date.
+                                                 To allow submissions until the end of the day, leave the time fields blank.">?</span>
+                                    <input name="late_date"
+                                           id="late_date"
+                                           type="text"
+                                           value="{LATE_DATE}"
+                                           data-datepicker
+                                           data-default_time="23:59"
+                                    />
+                                </label>
+                            </div>
+                            <div class="small-4 large-2 columns">
+                                <div class="timepick">
+                                    <label>
+                                        Hour
+                                        <div class="timepick">
+                                            <input name="late_hour" id="late_hour" type="text" maxlength="2" value="{LATE_HOUR}" data-timepicker="hour" />
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="small-4 large-2 columns">
+                                <div class="timepick">
+                                    <label>
+                                        Minute
+                                        <div class="timepick">
+                                            <input name="late_minute" id="late_minute" type="text" maxlength="2" value="{LATE_MIN}" data-timepicker="minute" />
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="small-4 large-2 columns">
+                                <label>
+                                    Period
+                                    <select name="late_period" id="late_period">
+                                        <option value="am">AM</option>
+                                        <option value="pm" {LATE_PM}>PM</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="small-12 large-2 columns">
+                                <label>
+                                    Timetable<br />
+                                    <a data-timetablepicker
+                                       data-timetablepicker-date-field="#late_date"
+                                       data-timetablepicker-hour-field="#late_hour"
+                                       data-timetablepicker-minute-field="#late_minute"
+                                       data-timetablepicker-period-field="#late_period"
+                                       data-timetablepicker-timetable-selector="#timetableSelectorDialog"
+                                       class="button icon-timetable"
+                                       href="#"></a>
+                                </label>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <!-- END duework_timespan -->
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Grading</legend>
+
+                    <!-- BEGIN marktype -->
+                    <div class="small-12 columns">
+                        <label>
+                            Mark Weight
+                            <span class="hint has-tip tip-top"
+                                  data-tooltip
+                                  title="What is the weighting of this due work towards the student's overall grade average? (Default is 0).">?</span>
+                            <input name="weight" type="text" value="{SUBMISSION_WEIGHT}" maxlength="3" />
+                        </label>
+                    </div>
+
+                    <div class="small-12 columns">
+                        <label>
+                            Mark Visibility
+                            <span class="hint has-tip tip-top"
+                                  data-tooltip
+                                  title="Who will be able to view marks for this assessment?">?</span>
+                            <select name="mark_visibility" class="visibility">
+                                <!-- BEGIN mark_visibility_drop -->
+                                <option value="{MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_VALUE_SELECTED}>{MARK_VISIBILITY_TEXT}</option>
+                                <!-- END mark_visibility_drop -->
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="small-12 columns">
+                        <label>
+                            Type
+                            <select name="marktype" id="marktype">
+                                <!-- BEGIN marktype_drop -->
+                                <option data-slug="{MARKTYPE_SLUG}"
+                                        value="{MARKTYPE_VALUE}"
+                                        {MARKTYPE_VALUE_SELECTED}>{MARKTYPE_TEXT}</option>
+                                <!-- END marktype_drop -->
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="small-11 columns"
+                         data-hide-watch="#marktype"
+                         data-hide-watch-value="letter"
+                         data-hide-watch-option-attribute="data-slug"
+                    >
+                        <label>
+                            Grade Group
+                            <select name="gradegroup" class="formfield" id="gradegroup">
+                                <!-- BEGIN gradegroup_drop -->
+                                <option value="{GRADEGROUP_VALUE}" {GRADEGROUP_VALUE_SELECTED}>{GRADEGROUP_TEXT}</option>
+                                <!-- END gradegroup_drop -->
+                            </select>
+                        </label>
+                    </div>
+                    <div class="small-1 columns"
+                         data-hide-watch="#marktype"
+                         data-hide-watch-value="letter"
+                         data-hide-watch-option-attribute="data-slug"
+                    >
+                        <a href="#" data-role="showGradeScale" class="button icon-list" title="Show Grade Scale"></a>
+                    </div>
+
+                    <!-- BEGIN gradegroup_explanation -->
+                    <div id="gradegroup-{GRADEGROUP_ID}" class="reveal-modal" data-reveal>
+                        <h2>{GRADEGROUP_NAME}</h2>
+                        <table>
+                            <tbody>
+                            <!-- BEGIN gradegroup_explanation_level -->
+                            <tr>
+                                <td>{GRADEGROUP_LEVEL_LOWER_BOUND}+</td>
+                                <td>{GRADEGROUP_LEVEL_CAPTION}</td>
+                                <!-- END gradegroup_explanation_level -->
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- END gradegroup_explanation -->
+
+                    <div class="small-12 columns"
+                         data-hide-watch="#marktype"
+                         data-hide-watch-value="raw"
+                         data-hide-watch-option-attribute="data-slug"
+                    >
+                        <label>
+                            Total Mark
+                            <input name="markvalue" type="text" value="{TOTAL_MARK}" />
+                        </label>
+                    </div>
+
+                    <div class="small-12 columns"
+                         data-hide-watch="#marktype"
+                         data-hide-watch-value="rubric"
+                         data-hide-watch-option-attribute="data-slug"
+                    >
+                        <!-- BEGIN existing_marks_warning -->
+                        <div class="alert-panel">
+                            <strong>Warning:</strong>
+                            you have already marked some students' work.
+                            <ul>
+                                <li>Changing the number of descriptors&mdash;or the result set&mdash;will invalidate
+                                    any existing marks given;
+                                </li>
+                                <li>If you add/remove criteria, students who have been marked will be automatically remarked;</li>
+                                <li>You can safely change wordings and orders of descriptors.</li>
+                            </ul>
+                        </div>
+                        <!-- END existing_marks_warning -->
+
+                        <fieldset>
+                            <legend>
+                                Result Set
+                                <span class="hint has-tip tip-top"
+                                      data-tooltip
+                                      title="Select at least one criterion to be assessed, and possible results.
+                                             By default descriptors are ordered lowest to highest, you may rearrange if you wish.">?</span>
+                            </legend>
+                            <!-- BEGIN resultset -->
+                            <div class="small-12 columns no-pad">
+                                <input id="rs-{RS_ID}" type="radio" name="resultset" value="{RS_ID}" {RS_CHECKED} />
+                                <label for="rs-{RS_ID}" class="radio-label">
+                                    <!-- BEGIN result -->
+                                    {RS_RESULT_LABEL}{RS_RESULT_COMMA}
+                                    <!-- END result -->
+                                </label>
+                            </div>
+                            <!-- END resultset -->
+                            <div class="small-12 medium-4 columns no-pad">
+                                <input id="rs-0" type="radio" name="resultset" value="0" {RS_0_CHECKED} data-relation="rubric-use-assessment-specific" />
+                                <label for="rs-0" class="radio-label">
+                                    Assessment specific descriptors:
+                                </label>
+                            </div>
+
+                            <div class="small-12 medium-8 columns no-pad">
+                                <select id="descriptor-count" name="descrip-count" data-relation="rubric-descriptor-count">
+                                    <!-- BEGIN des_count -->
+                                    <option value="{DES_COUNT_VALUE}" {DES_COUNT_VALUE_SELECTED}>{DES_COUNT_VALUE} levels</option>
+                                    <!-- END des_count -->
+                                </select>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <div class="small-12 columns"
+                         data-hide-watch="#marktype"
+                         data-hide-watch-value="rubric"
+                         data-hide-watch-option-attribute="data-slug"
+                    >
+                        <label>
+                            Assessment Specific Descriptors
+                        </label>
+                        {COURSE_CRITERIA}
+                        {CLASS_CRITERIA}
+                    </div>
+                    <!-- END marktype -->
+                </fieldset>
+
+                <!-- BEGIN curriculum_code_input -->
+                <fieldset class="content">
+                    <legend>Curriculum</legend>
+                    <div class="small-11 columns">
+                        <label>
+                            Codes
+                            <span class="hint has-tip tip-top"
+                                  data-tooltip
+                                  title="If you want to associate curriculum codes with this submission, enter them here.
+                                         (By default, it will be associated with the same codes that its folder is.)">?</span>
+                        </label>
+                        {CURRICULUM_CODE_INPUT}
+                    </div>
+                    <div class="small-1 columns">
+                        {CURRICULUM_BROWSE_BUTTON}
+                    </div>
+                </fieldset>
+                <!-- END curriculum_code_input -->
+
+            </section>
+
+            <input type="hidden" name='fileId' value="{FILEID}"/>
+            <input type="hidden" name="id" value="{ID}"/></td>
+
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" name="Submit" value="{HEADING}" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="timetableSelectorDialog" data-role="timetable-selector" class="reveal-modal" data-reveal title="Choose a date from timetable">
+    {TIMETABLE_SELECTOR}
+    <a href="#" data-action="useTime" class="primary button">Use</a>
+    <a href="#" data-action="close" class="button">Cancel</a>
+</div>
+
+<div class="reveal-modal" data-reveal>
+    Are you sure you want to delete this submission box?
+    <a href="#" data-action="useTime" class="primary button">Use</a>
+    <a href="#" data-action="close" class="button">Cancel</a>
+</div>
+
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
-<script type="text/javascript" src="/javascript/uploadify/swfobject.js"></script>
-<script type="text/javascript" src="/javascript/uploadify/jquery.uploadify.v2.1.4.js"></script>
 <script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 <script type="text/javascript" src="/javascript/jquery.timetableDaySelector.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.hourpicker.js"></script>
+<script type="text/javascript" src="/javascript/jquery.minutepicker.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
+<script type="text/javascript" src="/javascript/submission/formValidate.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+
+<script type="text/javascript" src="/javascript/data-plugins/datepicker.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/timepicker.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/timetablepicker.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/datepickerSync.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/hideWatch.js"></script>
 
 <script type="text/javascript">
-    // from http://stackoverflow.com/a/5259788
-    $.fn.outerHTML = function () {
-        $t = $(this);
-        if ($t[0] === undefined) {
-            return '';
-        }
-        if ('outerHTML' in $t[0]) {
-            return $t[0].outerHTML;
-        }
-        else {
-            var content = $t.wrap('<div></div>').parent().html();
-            $t.unwrap();
-            return content;
-        }
-    };
+    //    // from http://stackoverflow.com/a/5259788
+    //    $.fn.outerHTML = function () {
+    //        $t = $(this);
+    //        if ($t[0] === undefined) {
+    //            return '';
+    //        }
+    //        if ('outerHTML' in $t[0]) {
+    //            return $t[0].outerHTML;
+    //        }
+    //        else {
+    //            var content = $t.wrap('<div></div>').parent().html();
+    //            $t.unwrap();
+    //            return content;
+    //        }
+    //    };
 
     $(function () {
+        var form = $('#createSubmissionForm');
+        form.submissionFormValidate();
+
         $.fn.alaressTiny({
             mode: 'exact',
             elements: 'description-box'
         });
 
-        // setup datepickers
-        var publishDate = $('#publish_date');
-        var openDate    = $('#open_date');
-        var dueDate     = $('#due_date');
-        var lateDate    = $('#late_date');
-        openDate.add(dueDate).add(lateDate).add(publishDate).datepicker({
-            showOn:'both',
-            buttonImage:'/images/core/calendar/calendar-click.png',
-            buttonImageOnly:true,
-            onClose:function (string) {
-                var input = $(this);
-
-                $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
-                    input.val(data.time).blur();
-                })
-            }
-        });
-        publishDate.syncDates({endDate: openDate});
-        openDate.syncDates({endDate: dueDate});
-        dueDate.syncDates({endDate: lateDate});
-
-        var marktype = {
-            total:$('#marktype-total'),
-            rubric:$('tr.marktype-rubric'),
-            letter:$('#marktype-letter')
-        };
-
-        var rubric = {
-            resultset:$('#rubric-results :checked')
-        };
-
-        showHideMarktype(0);
-
-        // Do assessment-specific descriptors get shown?
-        var isRubricAssessmentSpecificDescriptors = function() {
-            return document.getElementById('rs-0').checked;
-        };
-
-        if (isRubricAssessmentSpecificDescriptors()) {
-            $('#rubric-criteria').find('.crit').each(function () {
-                if ($(this).find(':checked').length) {
-                    descriptor('show', this, 0);
-                }
-            });
-        }
-
-        $('#marktype').change(function () {
-            showHideMarktype(500);
+        // When I change the number of assessment levels,
+        // that means I want to use assessment specific descriptors.
+        $('[data-relation="rubric-descriptor-count"]').on('change', function(){
+            $('[data-relation="rubric-use-assessment-specific"]').prop('checked', true).trigger('change');
         });
 
-
-        // cache lookups
-        var submission_form = $('#createSubmissionForm');
-        var acceptSubmit = $('input:checkbox[name=accept_submission]');
-        var acceptHide = $('.accept-hide');
-
-        acceptSubmit.change(function () {
-            if ($(this).is(':checked')) {
-                acceptHide.show(500);
-            } else {
-                acceptHide.hide(500);
-            }
-        });
-
-        if (!(acceptSubmit.prop('checked'))) {
-            acceptHide.hide();
-        }
-
-        // validation rules
-        $.validator.addMethod("markTypeTotalCheck", function(value, element) {
-            if(marktype.total.is(':visible')) {
-                return value > 0;
-            }
-            else {
-                return true;
-            }
-        }, "Please enter a numeric mark amount");
-
-        $.validator.addMethod('markTypeRubricCriteriaExists', function(value, element) {
-            if(marktype.rubric.is(':visible')) {
-                return $('#rubric-criteria').find('input[type="checkbox"]').length >= 1;
-            }
-            else {
-                return true;
-            }
-        }, 'Please ensure at least one criterion exists');
-        $.validator.addMethod('markTypeRubricCriteriaCheck', function(value, element) {
-            if(marktype.rubric.is(':visible')) {
-                return $('#rubric-criteria').find('input:checked').length >= 1;
-            }
-            else {
-                return true;
-            }
-        }, 'Please select at least one criterion');
-
-        $.validator.addMethod('markTypeRubricResultsetCheck', function(value, element) {
-            if(marktype.rubric.is(':visible')) {
-                return $('#rubric-results').find('input:checked').length == 1;
-            }
-            else {
-                return true;
-            }
-        }, 'Please select a result set');
-
-        // Are rubric values checked?
-        var isRubricValueChecked = function(element) {
-            if (!marktype.rubric.is(':visible')) {
-                return false;
-            }
-            if (!isRubricAssessmentSpecificDescriptors()) {
-                return false;
-            }
-            // Is this rubric selected? Validate if so
-            return $(element).closest('.crit')
-                .find(':checkbox[name^="crit"]')
-                .prop('checked') === true;
-        };
-        // Validator for rubric values - they cannot be the same
-        $.validator.addMethod(
-            'markTypeRubricValuesCheck',
-            function (value, element) {
-                // All value inputs that aren't the currently validated one
-                var duplicateValues = submission_form.find('input[name^="value"]').not(element).filter(
-                    function() {
-                        // Filter out inputs that aren't in the same criterion,
-                        // and don't have the same value
-                        return this.name === element.name && this.value === element.value;
-                    }
-                );
-                return duplicateValues.length === 0;
-            },
-            'Rubric values cannot be the same'
-        );
-
-        var isAcceptSubmit  = function() { return acceptSubmit.is(':checked'); }
-        var publish_date_valid = { dateValid: true };
-        var open_date_valid = {
-            dateValid: true,
-            dateNotBefore: {
-                message: 'Please enter a date that is not before the publish date.',
-                param:   'publish',
-                depends: isAcceptSubmit
-            }
-        };
-        var due_date_valid  = {
-            dateValid: true,
-            dateNotBefore: {
-                message: 'Please enter a date that is not before the open date.',
-                param:   'open',
-                depends: isAcceptSubmit
-            }
-        };
-        var late_date_valid = {
-            dateValid: true,
-            dateNotBefore: {
-                message: 'Please enter a date that is not before the due date.',
-                param:   'due',
-                depends: isAcceptSubmit
-            }
-        };
-        var hourValid = { '12hour': true };
-        var minuteValid = { minute: true };
-        submission_form.validate({
-            rules: {
-                markvalue: {
-                    markTypeTotalCheck: true,
-                    number: true
-                },
-                result_set: {
-                    markTypeRubricResultsetCheck: true
-                },
-                criteria: {
-                    markTypeRubricCriteriaExists: true,
-                    markTypeRubricCriteriaCheck: true
-                },
-                publish_date:   publish_date_valid,
-                publish_hour:   $.extend({}, hourValid, publish_date_valid),
-                publish_minute: $.extend({}, minuteValid, publish_date_valid),
-                publish_period: publish_date_valid,
-                open_date:   open_date_valid,
-                open_hour:   $.extend({}, hourValid, open_date_valid),
-                open_minute: $.extend({}, minuteValid, open_date_valid),
-                open_period: open_date_valid,
-                due_date:    due_date_valid,
-                due_hour:    $.extend({}, hourValid, due_date_valid),
-                due_minute:  $.extend({}, minuteValid, due_date_valid),
-                due_period:  due_date_valid,
-                late_date:   late_date_valid,
-                late_hour:   $.extend({}, hourValid, late_date_valid),
-                late_minute: $.extend({}, minuteValid, late_date_valid),
-                late_period: late_date_valid
-            },
-            messages: {
-                open_date:   {dateNotBefore: open_date_valid.dateNotBefore.message},
-                open_hour:   {dateNotBefore: open_date_valid.dateNotBefore.message},
-                open_minute: {dateNotBefore: open_date_valid.dateNotBefore.message},
-                open_period: {dateNotBefore: open_date_valid.dateNotBefore.message},
-                due_date:    {dateNotBefore: due_date_valid.dateNotBefore.message},
-                due_hour:    {dateNotBefore: due_date_valid.dateNotBefore.message},
-                due_minute:  {dateNotBefore: due_date_valid.dateNotBefore.message},
-                due_period:  {dateNotBefore: due_date_valid.dateNotBefore.message},
-                late_date:   {dateNotBefore: late_date_valid.dateNotBefore.message},
-                late_hour:   {dateNotBefore: late_date_valid.dateNotBefore.message},
-                late_minute: {dateNotBefore: late_date_valid.dateNotBefore.message},
-                late_period: {dateNotBefore: late_date_valid.dateNotBefore.message}
-            },
-            groups: {
-                open_date: 'open_date open_hour open_minute open_period',
-                due_date:  'due_date due_hour due_minute due_period',
-                late_date: 'late_date late_hour late_minute late_period'
-            },
-            errorPlacement: function(label, element) {
-                var cell = element.closest('td');
-                if (cell.length > 0) {
-                    label.appendTo(cell);
-                } else {
-                    label.insertAfter(element);
-                }
-            },
-            // By default all hidden fields are ignored.
-            // I don't want to ignore rubric values
-            ignore: ':hidden:not(input[name^="value"])'
-        });
-
-        // Rubric values validation
-        submission_form.find('input[name^="value"]').each(function() {
-            $(this).rules(
-                'add',
-                {
-                    required: {
-                        depends: isRubricValueChecked
-                    },
-                    digits: {
-                        depends: isRubricValueChecked
-                    },
-                    markTypeRubricValuesCheck: {
-                        depends: isRubricValueChecked
-                    }
-                }
-            );
-        });
-
-        //
-        // Open/due/late date change triggers validation on other date fields.
-        submission_form.find('input')
-            .filter('[name^="open_"], [name^="due_"], [name^="late_"]')
-            .blur(
-                function() {
-                    submission_form.find('input[name="open_date"]').valid();
-                    submission_form.find('input[name="due_date"]').valid();
-                    submission_form.find('input[name="late_date"]').valid();
-                }
-            );
-
-        // trigger show or hide of descriptors when radio off
-        $('#rubric-results input').change(function () {
-            // hide the descriptors
-            if (!isRubricAssessmentSpecificDescriptors()) {
-                descriptor('hide', $('#rubric-criteria div'), 100);
-            }
-            // show them if checked
-            else {
-                $('#rubric-criteria div').each(function () {
-                    var checked = $(this).children(':checkbox').prop('checked');
-                    descriptor(checked ? 'show' : 'hide', this, 100)
-                });
-            }
-        });
-
-        $('#rubric-criteria :checkbox').change(function () {
-            var act = 'hide';
-
-            // show if and only if both the descriptors radio and myself are checked
-            if (isRubricAssessmentSpecificDescriptors() && this.checked) {
-                act = 'show';
-            }
-            descriptor(act, $(this).parent('div'), 100);
-        });
-
-        // trigger change of descriptor count when dropdown changed
-        $('#descriptor-count').change(function () {
-            var target = $('#descriptor-count option:selected').first().val();
-
-            $('#rubric-criteria tr').each(function () {
-                var i,
-                        inputCount = $(this).find('td').length,
-                        diff = target - inputCount;
-
-                if (diff < 0) {
-                    for (i = 0; i < 0 - diff; ++i) {
-                        // remove trailing li's
-                        $(this).find('td:last-child').detach();
-                    }
-                }
-                else if (diff > 0) {
-                    var insertList = '',
-                            last = $(this).children('td').last(),
-                            newItem;
-
-                    for (i = 0; i < diff; ++i) {
-                        // duplicate li's
-                        newItem = last.clone(true);
-
-                        // clear the descriptor value
-                        newItem.find('textarea').val('');
-                        newItem.find('input').val( parseInt(newItem.find('input').val()) + (i+1) );
-                        $(this).append( newItem );
-                    }
-                }
-            });
-        });
-
-        var rc                 = $('#rubric-criteria'),
-            critSelector       = 'div.crit',
-            inputSelector      = 'textarea, input[type=text]',
-            descriptorSelector = '.desc',
-            editingClass       = 'editing',
-            placeholderText    = 'Enter descriptor';
-
-
-        rc.on('focus', inputSelector, function () {
-            var input = $(this);
-
-            rc.find(critSelector + ', ' + descriptorSelector)
-                .removeClass(editingClass)
-                .find(inputSelector)
-                .attr('readonly', 'readonly')
-                .removeAttr('placeholder');
-
-            input
-                .closest(critSelector)
-                .addClass(editingClass);
-
-            input
-                .closest(descriptorSelector)
-                .addClass(editingClass)
-                .find(inputSelector)
-                .removeAttr('readonly')
-                .attr('placeholder', placeholderText);
-        });
-
-        function showHideMarktype(timeout) {
-            var v = $('#marktype option:selected').first().data('slug');
-            if (v == 'raw') {
-                marktype.letter.hide(timeout);
-                marktype.rubric.hide(timeout, function () {
-                    marktype.total.show(timeout);
-                });
-            }
-            else if (v == 'rubric') {
-                marktype.letter.hide(timeout);
-                marktype.total.hide(timeout, function () {
-                    marktype.rubric.show(timeout);
-                });
-            }
-            else if (v == 'letter') {
-                marktype.rubric.hide(timeout);
-                marktype.total.hide(timeout, function () {
-                    marktype.letter.show(timeout);
-                });
-            }
-            else {
-                marktype.letter.hide(timeout);
-                marktype.rubric.hide(timeout);
-                marktype.total.hide(timeout);
-            }
-        }
-
-        function descriptor(action, element, timeout) {
-            $(element).find(':input:not(:checkbox)').parent('td').each(function () {
-                if (action == 'show') {
-                    $(this).show();
-                    $(element).addClass('highlight').find(inputSelector).first().trigger('click');
-                }
-                else if (action == 'hide') {
-                    $(element).removeClass('highlight');
-                    $(this).hide();
-                }
-            });
-        }
-
-        $( "#gradegroup_explanation" ).dialog({
-            autoOpen: false,
-            modal: true
-        });
-
-        // Grade group selector
-        $('select#gradegroup').on('change', function() {
-            $('.gradegroup_explanation').hide();
-            $('#gradegroup_explanation-'+this.value).show();
-            $('#gradegroup_explanation').dialog({'title':$(this).find(':selected').text()});
-        }).change();
-
-        $('#show-grade').click(function(event) {
+        // Set up the gradegroup thing
+        $('a[data-role="showGradeScale"]').click(function(event) {
             event.preventDefault();
-            $( '#gradegroup_explanation').dialog("open");
+            var gradeScale = $('#gradegroup').val();
+            $('#gradegroup-'+gradeScale).foundation('reveal', 'open');
         });
 
-
-        $('#deleteBox').click(function() {
-            if (confirm('Are you sure you want to delete this submission box?')) {
-                window.location = '/submission/submissionForm.php?deleteBox={ID}&next=2';
-            }
-        });
-
-        // Set up select from timetable thing
-        var timetableSelectorDialog = $('#timetableSelectorDialog').dialog({
-            modal: true,
-            autoOpen: false,
-            buttons: [
-                {
-                    text: 'Use',
-                    type: 'submit',
-                    click: function () {
-
-                        var self    = timetableSelector.data('timetableDaySelector'),
-                            radio   = $(this).find('input:checked'),
-                            display = radio.val() + 'TimeDisplay';
-
-                      if (radio.length != 1) {
-                          return;
-                      }
-
-                      self.element.trigger(
-                          'pickTime.timetableDaySelector',
-                          [self.dateDisplay.attr('datetime'), self[display].attr('datetime')]
-                      );
-                    }
-                }
-            ],
-            minWidth: 500
-        });
-
-        var timeToUpdate = '';
-        var form         = $('form');
-        form.on('click', 'a[data-interaction="selectTimetableDate"]', function(event) {
+        // Dialog box for confirming delete
+        $('a[data-action="delete"]').click(function(event) {
             event.preventDefault();
-            // Keep track of the button I clicked to open this
-            timeToUpdate = $(this).data('relation');
-            timetableSelectorDialog.dialog('open');
+            $(this).confirmDialog({
+                text:         'Are you sure you want to delete this submission box?',
+                confirmEvent: $.confirmDialog.followHref
+            });
         });
 
         var timetableSelector = $('[data-interaction="timetableSelector"]')
-            .timetableDaySelector({
-                dateFormat: dateDisplayFormats.momentJs,
-                campusList: {USER_CAMPUS_LIST},
-                getChangeDateAjax: function(campus, day, date, previous) {
-                    return {
-                        url:      '/timetable/dateForTimetableDay',
-                        dataType: 'json',
-                        data:     {
-                            campus:   campus,
-                            day:      day,
-                            previous: (previous ? 1 : 0),
-                            date:     date
+                .timetableDaySelector({
+                    dateFormat: dateDisplayFormats.momentJs,
+                    campusList: {USER_CAMPUS_LIST},
+                    getChangeDateAjax: function(campus, day, date, previous) {
+                        return {
+                            url:      '/timetable/dateForTimetableDay',
+                            dataType: 'json',
+                            data:     {
+                                campus:   campus,
+                                day:      day,
+                                previous: (previous ? 1 : 0),
+                                date:     date
+                            }
                         }
                     }
-                }
-            })
-            .on('pickTime.timetableDaySelector', function(event, date, time) {
-                var dateObject = moment(date);
-                form.find(':input[name="'+timeToUpdate+'_date"]').val(dateObject.format(dateDisplayFormats.momentJs));
-                if (time) {
-                    var timeObject = moment(time, 'H:mm');
-                    form.find(':input[name="' + timeToUpdate + '_hour"]').val(timeObject.format('h'));
-                    form.find(':input[name="' + timeToUpdate + '_minute"]').val(timeObject.format('mm'));
-                    form.find(':input[name="' + timeToUpdate + '_period"]').val(timeObject.format('a'));
-                }
-                timetableSelectorDialog.dialog('close');
-            });
+                });
     });
 </script>
-<!-- END custom_head -->
-
-<h1>{HEADING} Due Work</h1>
-<form action="/submission/submissionForm.php" method="post" name="form" class="clearfix" id="createSubmissionForm"
-      enctype="multipart/form-data">
-<input type="hidden" name="category" value="{CATEGORY}"/>
-<input type="hidden" name="unit_id" value="{UNIT_ID}"/>
-<input name="is_task" type="hidden" value="{IS_TASK}" />
-<table class="standardForm table">
-    <tr>
-        <td class="formLabelWidth"><h4>Title</h4></td>
-        <td><label>
-            <input class="required" name="name" type="text" value="{NAME}" size="30"/>
-        </label></td>
-    </tr>
-
-    <tr>
-        <td class="formLabelWidth"><h4>Description</h4></td>
-        <td><label>
-            <textarea id="description-box" name="description" style="width:100%;height:350px">{DESCRIPTION}</textarea>
-        </label></td>
-    </tr>
-    <tr>
-        <td class="formLabelWidth">
-            <h4>Attach Files</h4>
-            <em>Select files to attach to this Due Work</em>
-        </td>
-        <td>
-            {ATTACH_ZONE}
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <h4>Due Work Type</h4>
-            <em>What kind of assessment is this?</em>
-        </td>
-        <td>
-            <select name="type" class="formfield">
-                <!-- BEGIN type_drop -->
-                <option value="{TYPE_VALUE}"
-                {TYPE_VALUE_SELECTED}>{TYPE_TEXT}</option>
-                <!-- END type_drop -->
-            </select>
-        </td>
-    </tr>
-    <!-- BEGIN marktype -->
-    <tr>
-        <td><h4>Mark Type</h4>
-            <em>How this assessment will be graded.</em></td>
-        <td>
-            <select name="marktype" class="formfield" id="marktype">
-                <!-- BEGIN marktype_drop -->
-                <option data-slug="{MARKTYPE_SLUG}" value="{MARKTYPE_VALUE}"
-                {MARKTYPE_VALUE_SELECTED}>{MARKTYPE_TEXT}</option>
-                <!-- END marktype_drop -->
-            </select>
-        </td>
-    </tr>
-    <tr id="marktype-letter" class="marks-hide dark">
-        <td>
-            <h4>Grade Group</h4>
-            <em>The grouping that is used for this type.</em></td>
-        <td>
-            <select name="gradegroup" class="formfield" id="gradegroup">
-                <!-- BEGIN gradegroup_drop -->
-                <option value="{GRADEGROUP_VALUE}" {GRADEGROUP_VALUE_SELECTED}>{GRADEGROUP_TEXT}</option>
-                <!-- END gradegroup_drop -->
-            </select>
-            <a href="#" id="show-grade">Show Grade Scale</a>
-
-            <div id="gradegroup_explanation">
-            <!-- BEGIN gradegroup_explanation -->
-            <table class="table gradegroup_explanation" id="gradegroup_explanation-{GRADEGROUP_ID}">
-                <tbody>
-                <!-- BEGIN gradegroup_explanation_level -->
-                <tr>
-                    <td>{GRADEGROUP_LEVEL_LOWER_BOUND}+</td>
-                    <td>{GRADEGROUP_LEVEL_CAPTION}</td>
-                <!-- END gradegroup_explanation_level -->
-                </tr>
-                </tbody>
-            </table>
-            <!-- END gradegroup_explanation -->
-            </div>
-        </td>
-    </tr>
-    <tr id="marktype-total" class="marks-hide dark">
-        <td>
-            <h4>Total Mark</h4>
-            <em>The maximum mark for this assessment.</em></td>
-        <td>
-            <label>
-                <input name="markvalue" type="text" value="{TOTAL_MARK}" size="4"/>
-            </label>
-        </td>
-    </tr>
-    <tr id="marktype-rubric" class="noline marks-hide dark marktype-rubric">
-        <td>
-            <h4>Rubric</h4>
-            <em>Select <i>at least one</i> criterion to be assessed, and possible results.<br/>
-               By default descriptors are ordered lowest to highest, you may rearrange if you wish.
-            </em>
-            <!-- BEGIN existing_marks_warning -->
-            <div class="warning"><b>Warning:</b> you have already marked some students' work.
-                <ul>
-                    <li class="warning">Changing the number of descriptors&mdash;or the result set&mdash;will invalidate
-                        any existing marks given;
-                    </li>
-                    <li>If you add/remove criteria, students who have been marked will be automatically remarked;</li>
-                    <li>You can safely change wordings and orders of descriptors.</li>
-                </ul>
-            </div>
-            <!-- END existing_marks_warning -->
-        </td>
-        <td id="rubric">
-
-            <div id="rubric-results">
-                <em>Result set</em>
-                <!-- BEGIN resultset -->
-                <p>
-                    <input id="rs-{RS_ID}" type="radio" name="resultset" value="{RS_ID}"{RS_CHECKED} />
-                    <label for="rs-{RS_ID}">
-                        <!-- BEGIN result -->
-                        <span class="result">{RS_RESULT_LABEL}</span>
-                        <!-- END result -->
-                    </label>
-                </p>
-                <!-- END resultset -->
-                <p>
-                    <input id="rs-0" type="radio" name="resultset" value="0"{RS_0_CHECKED} />
-                    <label for="rs-0" class="result">Assessment specific descriptors:
-                        <select id="descriptor-count" name="descrip-count">
-                            <!-- BEGIN des_count -->
-                            <option value="{DES_COUNT_VALUE}"
-                            {DES_COUNT_VALUE_SELECTED}>{DES_COUNT_VALUE}</option>
-                            <!-- END des_count -->
-                        </select> levels
-                    </label>
-                </p>
-
-                <!-- Invisible input required for jQuery validate, because it doesn't validate hidden or display:none input -->
-                <input type="text" style="visibility: hidden; height: 0" name="result_set" />
-            </div>
-            <div class="clearfix"></div>
-
-        </td>
-    </tr>
-    <tr class="marks-hide dark marktype-rubric">
-        <td colspan="2">
-            <div id="rubric-criteria" class="rubrics">
-
-                {COURSE_CRITERIA}
-                {CLASS_CRITERIA}
-
-                <!-- Invisible input required for jQuery validate, because it doesn't validate hidden or display:none input -->
-                <input type="text" style="visibility: hidden; height: 0" name="criteria" />
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td><h4>Mark Visibility</h4>
-            <em>Who will be able to view marks for this assessment?</em></td>
-        <td>
-            <select name="mark_visibility" class="formfield">
-                <!-- BEGIN mark_visibility_drop -->
-                <option value="{MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_VALUE_SELECTED}>{MARK_VISIBILITY_TEXT}</option>
-                <!-- END mark_visibility_drop -->
-            </select>
-        </td>
-    </tr>
-    <!-- END marktype -->
-    <!-- BEGIN mark_weight -->
-    <tr>
-      <td><h4>Mark Weight</h4>
-        <em>What is the weighting of this due work towards the student's overall grade average? (Default is 0).</em>
-      </td>
-      <td><input name="weight" type="text" value="{SUBMISSION_WEIGHT}" maxlength="3" /></td>
-    </tr>
-    <!-- END mark_weight -->
-    <tr>
-        <td><h4>Accept Submissions</h4>
-            <em>Will this work be submitted electronically?</em></td>
-        <td><input name="accept_submission" type="checkbox" value="true" {ACCEPT_SUBMISSION}></td>
-    </tr>
-    <tr class="accept-hide dark">
-        <td><h4>Multiple Submissions</h4>
-            <em>Should multiple submissions be accepted?</em></td>
-        <td><input name="multi_submission" type="checkbox" value="true" {MULTI_SUBMISSION}></td>
-    </tr>
-
-    <!-- BEGIN duework_timespan -->
-    <tr class="dark">
-        <td class="formLabelWidth"><h4>Publish Date</h4>
-            <em>This due work will not show on your student's calendar until this date.
-                To publish at the start of the day, leave the time fields blank.</em>
-        </td>
-        <td>
-            <input name="publish_date" id="publish_date" type="text" value="{PUBLISH_DATE}" size="20" data-default_time="00:00" />
-            <input name="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" class="timeField"/>
-            <span>:</span>
-            <input name="publish_minute" type="text" maxlength="2" value="{PUBLISH_MIN}" class="timeField"/>
-            <select name="publish_period" class="short">
-                <option value="am">AM</option>
-                <option value="pm"
-                {PUBLISH_PM}>PM</option>
-            </select>
-            <a data-interaction="selectTimetableDate"
-               data-relation="publish"
-               class="btn calendar inline-block"
-               href="#"><span></span> Select from timetable</a>
-        </td>
-    </tr>
-    <tr class="dark accept-hide">
-        <td class="formLabelWidth"><h4>Open Date</h4>
-            <em>The date from when the due work will be available for submission.
-                To allow submissions from the start of the day, leave the time fields blank.</em>
-        </td>
-        <td>
-            <input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20" data-default_time="00:00" />
-            <input name="open_hour" type="text" maxlength="2" value="{OPEN_HOUR}" class="timeField"/>
-            <span>:</span>
-            <input name="open_minute" type="text" maxlength="2" value="{OPEN_MIN}" class="timeField"/>
-            <select name="open_period" class="short">
-                <option value="am">AM</option>
-                <option value="pm"
-                {OPEN_PM}>PM</option>
-            </select>
-            <a data-interaction="selectTimetableDate"
-               data-relation="open"
-               class="btn calendar inline-block"
-               href="#"><span></span> Select from timetable</a>
-        </td>
-    </tr>
-    <tr>
-        <td><h4>Due Date</h4>
-            <em>Actual date the work is due. This is the date that will be published.
-                To allow submissions until the end of the day, leave the time fields blank.</em></td>
-        <td>
-            <input name="due_date" id="due_date" type="text" value="{DUE_DATE}" size="20" data-default_time="23:59" />
-            <input name="due_hour" type="text" maxlength="2" value="{DUE_HOUR}" class="timeField">
-            <span>:</span>
-            <input name="due_minute" type="text" maxlength="2" value="{DUE_MIN}" class="timeField">
-            <select name="due_period" class="short">
-                <option value="am">AM</option>
-                <option value="pm"
-                {DUE_PM}>PM</option>
-            </select>
-            <a data-interaction="selectTimetableDate"
-               data-relation="due"
-               class="btn calendar inline-block"
-               href="#"><span></span> Select from timetable</a>
-        </td>
-    </tr>
-    <tr class="accept-hide dark">
-        <td><h4>Late Date</h4>
-            <em>Students will not be able to submit after this date.
-                To allow submissions until the end of the day, leave the time fields blank.</em></td>
-        <td>
-            <input name="late_date" id="late_date" type="text" value="{LATE_DATE}" size="20" data-default_time="23:59" />
-            <input name="late_hour" type="text" maxlength="2" value="{LATE_HOUR}" class="timeField">
-            <span>:</span>
-            <input name="late_minute" type="text" maxlength="2" value="{LATE_MIN}" class="timeField">
-            <select name="late_period" class="short">
-                <option value="am">AM</option>
-                <option value="pm"
-                {LATE_PM}>PM</option>
-            </select>
-            <a data-interaction="selectTimetableDate"
-               data-relation="late"
-               class="btn calendar inline-block"
-               href="#"><span></span> Select from timetable</a>
-        </td>
-    </tr>
-    <!-- END duework_timespan -->
-    <!-- BEGIN curriculum_code_input -->
-    <tr>
-        <td><h4>Curriculum Codes</h4>
-            <em>If you want to associate curriculum codes with this submission, enter them here.</em>
-            <em>(By default, it will be associated with the same codes that its folder is.)</em>
-        </td>
-        <td>{CURRICULUM_CODE_INPUT}</td>
-    </tr>
-    <!-- END curriculum_code_input -->
-</table>
-<input type="hidden" name='fileId' value="{FILEID}"/>
-<input type="hidden" name="id" value="{ID}"/></td>
-<input type="submit" name="Submit" value="{HEADING}" class="submit-btn-plain"/>
-
-<!-- BEGIN delete_button -->
-<input id='deleteBox' type="button" class="submit-btn-plain"  value="Delete" />
-<!-- END delete_button -->
-
-</form>
-
-<div id="timetableSelectorDialog" class="hide" title="Choose a date from timetable">
-    {TIMETABLE_SELECTOR}
-</div>

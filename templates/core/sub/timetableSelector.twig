@@ -35,9 +35,11 @@
     <dd>
         <label>
             {% if select == 'radio' %}
-            <input type="radio" name="pickTime" value="start" disabled="disabled" />
+            <input type="radio" name="pickTime" id="pickTime-start" value="start" disabled="disabled" data-role="startTimeSelector" />
             {% endif %}
-            <time data-role="selectedTimeStart">Please select a period.</time>
+            <label for="pickTime-start" class="radio-label">
+                <time data-role="selectedTimeStart">Please select a period.</time>
+            </label>
             {% if select == 'button' %}
             <a href="#"
                class="submit-btn-plain inline-block"
@@ -49,9 +51,11 @@
     <dd>
         <label>
             {% if select == 'radio' %}
-            <input type="radio" name="pickTime" value="end" disabled="disabled" />
+            <input type="radio" name="pickTime" id="pickTime-end" value="end" disabled="disabled" data-role="endTimeSelector" />
             {% endif %}
-            <time data-role="selectedTimeEnd">Please select a period.</time>
+            <label for="pickTime-end" class="radio-label">
+                <time data-role="selectedTimeEnd">Please select a period.</time>
+            </label>
             {% if select == 'button' %}
             <a href="#"
                class="submit-btn-plain inline-block"

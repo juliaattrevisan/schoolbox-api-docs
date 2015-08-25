@@ -34,7 +34,7 @@ $this->setBlock('marktype', 'des_count', 'des_count_block');
 $this->setBlock('marktype', 'existing_marks_warning', 'existing_marks_warning_block');
 $this->setBlock('marktype', 'gradegroup_explanation', 'gradegroup_explanation_block');
 $this->setBlock('gradegroup_explanation', 'gradegroup_explanation_level', 'gradegroup_explanation_level_block');
-$this->setBlock(TEMPLATE_content, 'mark_weight', 'mark_weight_block');
+//$this->setBlock(TEMPLATE_content, 'mark_weight', 'mark_weight_block');
 $this->setBlock(TEMPLATE_content, 'duework_timespan', 'duework_timespan_block');
 $this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
 
@@ -48,9 +48,6 @@ if (Config::get('curriculum_tagging_enabled')) {
 } else {
     $this->setVar('curriculum_code_input_block', '');
 }
-
-$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
-
 
 $mapper      = new SubmissionBoxMapper();
 $cat_mapper  = new CategoryMapper();
@@ -106,18 +103,9 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $is_task          = (bool)$task_id;
     $task_instance_id = $submission->getTaskInstance()->getId();
 
-    /* Allow deletion of the submission box from modify screen
-     */
-    $this->parse('delete_button_block', 'delete_button');
-
     $zone->attachFiles($submission->getAttachments()->getColumnValues('hash'));
 
 } elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
-    $this->setVar(
-        array(
-            'delete_button_block' => ''
-        )
-    );
 
     // IF NEW
     // Args:
@@ -292,7 +280,7 @@ if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
 }
 
 // this block exists so that if a config variable needs to be introduced, this can be blanked out
-$this->parse('mark_weight_block', 'mark_weight');
+//$this->parse('mark_weight_block', 'mark_weight');
 
 // Is this a task? If so, output the timespan block.
 if (!$is_task) {
@@ -372,8 +360,11 @@ $output = array(
     'TASK_INSTANCE_ID'  => $task_instance_id,
     'CURRICULUM_CODE_INPUT' => $this->getTwig()->render(
         'sub/curriculumCodeSelector.twig',
-        ['codeList' => $submission->getCurriculumNodes()]
-    )
+        ['codeList' => $submission->getCurriculumNodes(), 'renderButton' => false,]
+    ),
+    'CURRICULUM_BROWSE_BUTTON' => $this->getTwig()->render(
+        'sub/curriculumBrowseButton.twig'
+    ),
 );
 
 /** @var Schoolbox\User $user */
@@ -406,11 +397,13 @@ function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount =
     if (count($rs)) {
         foreach ($rs as $i => $set) {
             $page->setVar('result_block', '');
+            $j = 1;
             foreach ($set as $item) {
                 $page->setVar(
                     array(
                         'RS_ID'           => $i,
                         'RS_RESULT_LABEL' => $item,
+                        'RS_RESULT_COMMA' => ($j++) < count($set) ? ', ' : '',
                         'RS_CHECKED'      => $i == $checkedIndex ? 'checked="checked"' : ''
                     )
                 );
@@ -434,6 +427,21 @@ function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount =
     $page->setVar('RS_0_CHECKED', $checkedIndex == 0 ? 'checked="checked"' : '');
 }
 
+/* Render out breadcrumbs
+ */
+$trail = new \Schoolbox\Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text'  => $category->getName(),
+        'href'  => "/homepage/{$category->getId()}",
+        'class' => '',
+    ],
+    [
+        'text'  => $submission->getId() ? $submission->getName() : 'Post Due Work',
+        'href'  => '',
+        'class' => 'active',
+    ]
+]);
 
 /**
  * @param SitePage $page

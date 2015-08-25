@@ -15,9 +15,11 @@
             campusList: {},
 
             // Selectors for campus/day/period selector
-            campusSelector: 'select[data-role="campusSelector"]',
-            daySelector:    'select[data-role="daySelector"]',
-            periodSelector: 'select[data-role="periodSelector"]',
+            campusSelector:    'select[data-role="campusSelector"]',
+            daySelector:       'select[data-role="daySelector"]',
+            periodSelector:    'select[data-role="periodSelector"]',
+            startTimeSelector: 'input[data-role="startTimeSelector"]',
+            endTimeSelector:   'input[data-role="endTimeSelector"]',
 
             // Selectors for buttons
             useDateButton:       'a[data-interaction="useDate"]',
@@ -50,6 +52,8 @@
         self.campusSelector      = element.find(self.options.campusSelector)
         self.daySelector         = element.find(self.options.daySelector)
         self.periodSelector      = element.find(self.options.periodSelector)
+        self.startTimeSelector   = element.find(self.options.startTimeSelector)
+        self.endTimeSelector     = element.find(self.options.endTimeSelector)
         self.previousDateButton  = element.find(self.options.previousDateButton)
         self.nextDateButton      = element.find(self.options.nextDateButton)
         self.useDateButton       = element.find(self.options.useDateButton)
@@ -125,28 +129,28 @@
             if (startTime.isValid()) {
                 self.startTimeDisplay
                     .attr('datetime', startTime.format('HH:mm'))
-                    .text(startTime.format('h:mm A'))
-                    .siblings('input[type=radio]').removeAttr('disabled')
+                    .text(startTime.format('h:mm A'));
+                self.startTimeSelector.prop('disabled', false);
                 self.triggerSelectDateEvent()
             }
             else {
                 self.startTimeDisplay
                     .removeAttr('datetime')
-                    .text('')
-                    .siblings('input[type=radio]').attr('disabled', 'disabled')
+                    .text('');
+                self.startTimeSelector.prop('disabled', true);
             }
             if (endTime.isValid()) {
                 self.endTimeDisplay
                     .attr('datetime', endTime.format('HH:mm'))
-                    .text(endTime.format('h:mm A'))
-                    .siblings('input[type=radio]').removeAttr('disabled')
+                    .text(endTime.format('h:mm A'));
+                self.endTimeSelector.prop('disabled', false);
                 self.triggerSelectDateEvent()
             }
             else {
                 self.endTimeDisplay
                     .removeAttr('datetime')
-                    .text('')
-                    .siblings('input[type=radio]').attr('disabled', 'disabled')
+                    .text('');
+                self.endTimeSelector.prop('disabled', true);
             }
         })
 

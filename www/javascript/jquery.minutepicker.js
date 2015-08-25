@@ -19,7 +19,10 @@
                             timeFormat: "i",
                             step: 5,
                             minTime: '12:00am',
-                            maxTime: '12:59am'
+                            maxTime: '12:59am',
+                            appendTo: function ($input) {
+                                return $input.closest('.timepick');
+                            }
                         },
                         options
                     )

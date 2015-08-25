@@ -82,9 +82,11 @@
                     <td class="text-center"></td>
                     <!-- END readonly_duework -->
                     <!-- BEGIN writable_duework -->
-                    <td>
-                        <a href="/submission/submissionForm.php?deleteBox={ID}" class="icon-delete no-text"  title="Delete" onclick='return(confirm("Remove {JAVAASSDESC}?"));'></a>
-                        <a href="/submission/createSubmission/modify/{ID}" class="icon-modify no-text" title="Modify"></a>
+                    <td class="actions-small-2">
+                        <nav>
+                            <a href="/submission/submissionForm.php?deleteBox={ID}" class="icon-delete"  title="Delete" onclick='return(confirm("Remove {JAVAASSDESC}?"));'></a>
+                            <a href="/submission/createSubmission/modify/{ID}" class="icon-modify" title="Modify"></a>
+                        </nav>
                     </td>
                     <!-- END writable_duework -->
                     <!-- END normalSubmission -->
@@ -100,9 +102,11 @@
                     <td class="text-center"></td>
                     <!-- END readonly_assess -->
                     <!-- BEGIN writable_assess -->
-                    <td>
-                        <a href="/assess/delete/{ASSESS_ASSESS_ID}" class="icon-delete no-text" title="Delete" onclick='return(confirm("Remove {JAVAASSDESC}?"));'></a>
-                        <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="icon-modify no-text" title="Modify"></a>
+                    <td class="actions-small-2">
+                        <nav>
+                            <a href="/assess/delete/{ASSESS_ASSESS_ID}" class="icon-delete" title="Delete" onclick='return(confirm("Remove {JAVAASSDESC}?"));'></a>
+                            <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="icon-modify" title="Modify"></a>
+                        </nav>
                     </td>
                     <!-- END writable_assess -->
                     <!-- END onlineAssessment -->

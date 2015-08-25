@@ -19,7 +19,10 @@
                 timeFormat: leadingZero ? "H" : "G",
                 minTime: '00:00',
                 maxTime: '23:59',
-                step: 60
+                step: 60,
+                appendTo: function ($input) {
+                    return $input.closest('.timepick');
+                }
             },
             options
         );
