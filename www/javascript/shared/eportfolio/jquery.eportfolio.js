@@ -56,7 +56,7 @@
                 event.preventDefault();
 
                 $(config.label).labelActivate({
-                    text: 'Preparing Showcase...'
+                    text: 'Preparing Showcase'
                 });
 
                 /* Ajax the Publish action
