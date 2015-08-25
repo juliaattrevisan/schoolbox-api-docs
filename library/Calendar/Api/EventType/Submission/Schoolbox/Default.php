@@ -28,6 +28,18 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
     }
 
     /**
+     * Gets the display color for an event.
+     *
+     * @param  \Schoolbox\Assessment\Activity $activity
+     * @param  string                         $eventType
+     * @return string
+     */
+    protected function getEventColor($activity, $eventType)
+    {
+        return $this->getCalendarHandler()->displayColour($eventType);
+    }
+
+    /**
      * Get day events from this data source
      *
      * @param $startTimestamp
@@ -68,7 +80,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
             $event = new Event();
             $event->setCategory($activity->getCategory());
             $event->setType($eventType);
-            $event->setColour($this->calendarHandler->displayColour($eventType));
+            $event->setColour($this->getEventColor($activity, $eventType));
             $event->setStartTime($activity->getDate());
             $event->setEndTime($activity->getDate());
 
