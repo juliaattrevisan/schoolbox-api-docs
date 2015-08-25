@@ -131,26 +131,6 @@ $(function() {
     </div>
 </div>
 
-
-<!-- BEGIN allow_cascade -->
-<!-- Cascade isn't supported, but if it is: -->
-<!--
-<tr>
-    <td class="formLabelWidth">
-        <h4>Copy to subfolders?</h4>
-        <em></em>
-    </td>
-    <td>
-        <input type="hidden" name="cascade" value="0" />
-        <label for="cascade">
-            <input id="cascade" type="checkbox" name="cascade" value="1" />
-            These criteria should be made available to this folder's subfolders
-        </label>
-    </td>
-</tr>
--->
-<!-- END allow_cascade -->
-
 <div class="row">
     <div class="small-12 island">
         <form action="/submission/rubricCriteriaForm.php"
@@ -158,6 +138,21 @@ $(function() {
               data-role="rubric-criteria-form"
         >
             <section>
+                <!-- BEGIN allow_cascade -->
+                <!-- Cascade isn't supported, but if it is: -->
+                <fieldset>
+                    <div class="small-12 columns">
+                        <input type="hidden" name="cascade" value="0" />
+                        <input id="cascade" type="checkbox" name="cascade" value="1" />
+                        <label for="cascade" class="checkbox-label">
+                            Copy to subfolders?
+                            <span class="hint has-tip"
+                                  data-tooltip
+                                  title="Should these criteria be copied to this folder's subfolders?">?</span>
+                        </label>
+                    </div>
+                </fieldset>
+                <!-- END allow_cascade -->
                 <!-- BEGIN criterion_group -->
                 <fieldset data-rubric-group-row>
                     <div class="small-12 medium-6 columns">
