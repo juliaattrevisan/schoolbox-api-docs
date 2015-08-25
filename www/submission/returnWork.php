@@ -28,21 +28,23 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
 
     $this->setVar(
         array(
-            'CATEGORY'         => \Scrub::text($submissionBox->getCategory()->getName()),
-            'ASSNAME'          => \Scrub::text($submissionBox->getName()),
-            'BOX_ID'           => $submissionBox->getId(),
-            'CAT_ID'           => $submissionBox->getCategory()->getId(),
-            'DUEWORK_YEAR'     => date('Y', strtotime($submissionBox->getDueDate())),
-            'DUEWORK_SEMESTER' => DueWork_All::getSemester(strtotime($submissionBox->getDueDate())),
-            'DUEWORK_TYPE'     => $submissionBox->getWorkType()->getName(),
-            'DUEWORK_DUEDATE'  => $submissionBox->getDueDate()->getLongDateOnly(),
+            'CATEGORY'              => \Scrub::text($submissionBox->getCategory()->getName()),
+            'ASSNAME'               => \Scrub::text($submissionBox->getName()),
+            'BOX_ID'                => $submissionBox->getId(),
+            'BOX_GRADIENT'          => $submissionBox->getGradientIndex(),
+            'CAT_ID'                => $submissionBox->getCategory()->getId(),
+            'DUEWORK_YEAR'          => date('Y', strtotime($submissionBox->getDueDate())),
+            'DUEWORK_SEMESTER'      => DueWork_All::getSemester(strtotime($submissionBox->getDueDate())),
+            'DUEWORK_TYPE'          => $submissionBox->getWorkType()->getName(),
+            'DUEWORK_DUEDATE'       => $submissionBox->getDueDate()->getLongDateOnly(),
             'GRADE_VISIBILITY'      => $submissionBox->getMarkVisibilityDescription(),
             'GRADE_VISIBILITY_CODE' => $submissionBox->getMarkVisibility(),
-            'NAME'             => Scrub::text($user->formatName()),
-            'SYN_ID'           => $user->getExternalId(),
-            'ROLE'             => Scrub::text($user->getRole()->getName()),
-            'UID'              => $user->getId(),
-            'REDIRECT'         => "/submission/viewSubmission/{$submissionBox->getId()}",
+            'GRADE_VISIBILITY_CSS'  => \Schoolbox\Assessment\Widgets::getCss($submissionBox->getMarkVisibility()),
+            'NAME'                  => Scrub::text($user->formatName()),
+            'SYN_ID'                => $user->getExternalId(),
+            'ROLE'                  => Scrub::text($user->getRole()->getName()),
+            'UID'                   => $user->getId(),
+            'REDIRECT'              => "/submission/viewSubmission/{$submissionBox->getId()}",
         )
     );
 
