@@ -10,8 +10,8 @@ $(function() {
         if (this.value.length > 0) {
             var input = $(this);
             var container = [];
-            if (input.data('rubric-critierion-new')) {
-                container = input.closest('[data-rubric-critierion-row]');
+            if (input.data('rubric-criterion-new')) {
+                container = input.closest('[data-rubric-criterion-row]');
             } else if (input.data('rubric-group-new')) {
                 container = input.closest('[data-rubric-group-row]');
             }
@@ -23,7 +23,7 @@ $(function() {
                 newContainer.appendTo(container.parent());
                 container.find('[data-role="remove-criterion"]').removeClass('hide');
                 input.data({
-                    'rubric-critierion-new': '',
+                    'rubric-criterion-new': '',
                     'rubric-group-new': ''
                 });
             }
@@ -34,7 +34,7 @@ $(function() {
     form.find('[data-role="remove-criterion"]').click(function(e) {
         e.preventDefault();
         var self      = $(this);
-        var container = self.closest('[data-rubric-critierion-row]');
+        var container = self.closest('[data-rubric-criterion-row]');
 
         if (self.is('[disabled]')) {
             self.confirmDialog({
@@ -96,9 +96,9 @@ $(function() {
 //
 //    });
 
-    $('[data-interaction="show-example-critieria"]').click(function(e) {
+    $('[data-interaction="show-example-criteria"]').click(function(e) {
         e.preventDefault();
-        $('[data-role="example-critieria"]').foundation('reveal', 'open');
+        $('[data-role="example-criteria"]').foundation('reveal', 'open');
     });
 });
 </script>
@@ -128,7 +128,7 @@ $(function() {
                     If you remove all the criteria from a group, the group will automatically be deleted.
                 </p>
                 <p>
-                    <a href="#" data-interaction="show-example-critieria">See example rubric criteria</a>
+                    <a href="#" data-interaction="show-example-criteria">See example rubric criteria</a>
                 </p>
             </div>
         </section>
@@ -179,12 +179,12 @@ $(function() {
                         </label>
                         <!-- BEGIN criterion -->
                         <!-- BEGIN criterion_enabled -->
-                        <div class="row" data-rubric-critierion-row>
+                        <div class="row" data-rubric-criterion-row>
                             <div class="small-9 columns">
                                 <input type="text"
                                        value="{CRITERION_NAME}"
                                        id="i{CRITERION_ID}"
-                                       data-rubric-critierion />
+                                       data-rubric-criterion />
                             </div>
                             <div class="small-3 columns no-pad">
                                 <a title="Delete criterion"
@@ -195,12 +195,12 @@ $(function() {
                         </div>
                         <!-- END criterion_enabled -->
                         <!-- BEGIN criterion_disabled -->
-                        <div class="row" data-rubric-critierion-row>
+                        <div class="row" data-rubric-criterion-row>
                             <div class="small-9 columns">
                                 <input type="text"
                                        value="{CRITERION_NAME}"
                                        id="i{CRITERION_ID}"
-                                       data-rubric-critierion
+                                       data-rubric-criterion
                                        disabled />
                             </div>
                             <div class="small-3 columns no-pad">
@@ -213,12 +213,12 @@ $(function() {
                         </div>
                         <!-- END criterion_disabled -->
                         <!-- END criterion -->
-                        <div class="row" data-rubric-critierion-row>
+                        <div class="row" data-rubric-criterion-row>
                             <div class="small-9 columns">
                                 <input type="text"
                                        value=""
-                                       data-rubric-critierion
-                                       data-rubric-critierion-new="1"
+                                       data-rubric-criterion
+                                       data-rubric-criterion-new="1"
                                        placeholder="Add Criterion to {CRITGROUP_NAME}..." />
                             </div>
                             <div class="small-3 columns no-pad">
@@ -246,12 +246,12 @@ $(function() {
                         <label>
                             Criteria
                         </label>
-                        <div class="row" data-rubric-critierion-row>
+                        <div class="row" data-rubric-criterion-row>
                             <div class="small-9 columns">
                                 <input type="text"
                                        value=""
-                                       data-rubric-critierion
-                                       data-rubric-critierion-new="1"
+                                       data-rubric-criterion
+                                       data-rubric-criterion-new="1"
                                        placeholder="Add Criterion..." />
                             </div>
                             <div class="small-3 columns no-pad">
@@ -264,12 +264,12 @@ $(function() {
                     </div>
                 </fieldset>
             </section>
-            <input type="hidden" id="categoryID" name="categoryID" value="{CATEGORY_ID}" />
+            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
             <input type="submit" value="Save Changes" />
         </form>
     </div>
 </div>
-<div data-role="example-critieria" class="reveal-modal" data-reveal>
+<div data-role="example-criteria" class="reveal-modal" data-reveal>
     <p>
         Each criterion should be a word or short sentence that describes what is being assessed,
         organised into logical groupings.
