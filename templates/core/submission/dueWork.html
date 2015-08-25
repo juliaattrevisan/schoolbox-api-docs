@@ -37,6 +37,9 @@
         });
     };
 
+    var calendarElement = $('#calendar');
+    var calendarLoadingElement = $('#calendar-loading');
+
     // once the DOM has loaded, punch a fancy calendar into it
     $(document).ready(function() {
         // Allow checking of anchor for view to display
@@ -100,10 +103,8 @@
                 /**
                  * When an event is drawn on the calendar
                  * @param calEvent
-                 * @param jsEvent
-                 * @param view
                  */
-                eventRender: function(calEvent, jsEvent, view) {
+                eventRender: function(calEvent) {
                     // Always render placeholders in the most basic manner
                     if (calEvent.id === 'placeholder') {
                         return true;
@@ -181,8 +182,8 @@
                  * @param view
                  */
                 windowResize: function(view) {
-                    var wHeight = $(window).height()
-                    var calTop = c.dom.offset().top
+                    var wHeight = $(window).height();
+                    var calTop = c.dom.offset().top;
                     c.dom.fullCalendar('option','contentHeight',wHeight - calTop - 60)
                 },
 
@@ -196,9 +197,9 @@
                     /* Show loading div right in the middle
                      */
                     if (isLoading === true) {
-                        $('#calendar-loading').css({
-                            top: ($('#calendar').height() - $('#calendar-loading').height())/2,
-                            left: ($('#calendar').width() - $('#calendar-loading').width())/2
+                        calendarLoadingElement.css({
+                            top: (calendarElement.height() - calendarLoadingElement.height())/2,
+                            left: (calendarElement.width() - calendarLoadingElement.width())/2
                         }).show();
                     }
                     /* Has finished loading
@@ -222,9 +223,9 @@
 //                        c.filters.organise(c, ["campus", "groups", "sources"], false)
 
                         // update datepicker
-                        var d = c.dom.fullCalendar('getDate')
+                        var d = c.dom.fullCalendar('getDate');
 
-                        $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'))
+                        $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'));
                     }
                 },
 
