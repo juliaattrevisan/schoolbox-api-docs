@@ -70,8 +70,8 @@
                  */
                 $.ajax({
                     type: "POST",
-                    url: $(this).attr('action'),
-                    data: $(this).serialize(), // serializes the form's elements.
+                    url: config.element.attr('action'),
+                    data: config.element.serialize(), // serializes the form's elements.
                     success: function(data)
                     {
                         var label = $(config.label);
