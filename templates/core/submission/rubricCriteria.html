@@ -86,21 +86,10 @@ $(function() {
 
     });
 
-    $('#disp-lightbox').click(function(e) {
+    $('[data-interaction="show-example-critieria"]').click(function(e) {
         e.preventDefault();
-        $('#crit-list-lightbox').dialog({
-            modal: true,
-            resizable: false,
-            title: 'Example Criteria',
-            width: 350
-        });
+        $('[data-role="example-critieria"]').foundation('reveal', 'open');
     });
-
-    $('#close-lightbox').click(function(e) {
-        e.preventDefault();
-        $('#crit-list-lightbox').dialog('close');
-    });
-
 });
 </script>
 <!-- END custom_head -->
@@ -110,6 +99,29 @@ $(function() {
 <div class="row">
     <div class="small-12 columns">
         <h1>{PAGE_TITLE}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Guide</h2>
+        <section>
+            <div class="content">
+                <h3>Criteria</h3>
+                <p>
+                    Criteria are used as rows in a rubric.  You must first add criteria before you can build a rubric.
+                </p>
+                <p>
+                    If you want to delete a criterion that has already been used on an assessment, you need to first
+                    remove it from the assessment, then you can delete it.
+                </p>
+                <p>
+                    If you remove all the criteria from a group, the group will automatically be deleted.
+                </p>
+                <p>
+                    <a href="#" data-interaction="show-example-critieria">See example rubric criteria</a>
+                </p>
+            </div>
+        </section>
     </div>
 </div>
 
@@ -132,13 +144,6 @@ $(function() {
         <!-- END allow_cascade -->
         <tr>
             <td class="formLabelWidth">
-                <h4>Criteria</h4>
-                <em>Criteria are used as rows in a rubric.  You must first add criteria before you can build a rubric.<br><br>
-                    If you want to delete a criterion that has already been used on an assessment, you need to first
-                    remove it from the assessment, then you can delete it.<br/><br/>
-                    If you remove all the criteria from a group, the group will automatically be deleted.<br/><br/>
-                    <a id="disp-lightbox" href="#">See example rubric criteria</a>
-                </em>
             </td>
             <td>
                 <ul id="crit-list">
@@ -184,7 +189,8 @@ $(function() {
     <input type="hidden" id="categoryID" name="categoryID" value="{CATEGORY_ID}" />
     <input type="submit" value="Save Changes" class="submit-btn-plain"/>
 </form>
-<div id="crit-list-lightbox" style="display: none;">
+
+<div data-role="example-critieria" class="reveal-modal" data-reveal>
     <p>Each criterion should be a word or short sentence that describes what is being assessed,
         organised into logical groupings.
     </p>
