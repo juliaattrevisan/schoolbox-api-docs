@@ -20,6 +20,7 @@ $(function() {
                 input.attr('placeholder', '');
 
                 newContainer.appendTo(container.parent());
+                container.find('[data-role="remove-criterion"]').removeClass('hide');
                 input.data({
                     'rubric-critieria-new': '',
                     'rubric-group-new': ''
@@ -29,24 +30,19 @@ $(function() {
     });
 
     // logic for removing inputs
-    $('#crit-list .delete:not(.disabled)').click(function(e) {
-        var self = $(this);
-        var target = self.parent('.item');
-        target.remove();
+    form.find('[data-role="remove-criterion"]').click(function(e) {
         e.preventDefault();
-    });
-
-    // logic for removing inputs that are currently in use
-    $('#crit-list .delete.disabled').click(function(e) {
-        if (confirm('You are about to remove a criterion that is currently in use.  Removing this criterion will make it unavailable for future assessments.  It will remain visible on the existing assessments.')) {
-            var self = $(this);
-            var target = self.parent('.item');
-            target.remove();
+        var self      = $(this);
+        var container = self.closest('[data-rubric-critieria-row]');
+        if (self.is('[disabled]')) {
+            if (confirm('You are about to remove a criterion that is currently in use.  Removing this criterion will make it unavailable for future assessments.  It will remain visible on the existing assessments.')) {
+                container.remove();
+            }
+        } else {
+            // Is this a new criterion?
+            container.remove();
         }
-
-        e.preventDefault();
     });
-
 
 //    // logic for handling the form submit
 //    $('#folderForm').submit(function(e) {
@@ -180,7 +176,10 @@ $(function() {
                                 <input type="text" value="{CRITERION_NAME}" id="i{CRITERION_ID}" />
                             </div>
                             <div class="small-3 columns no-pad">
-                                <a title="Delete criterion" class="button icon-delete" href="#"></a>
+                                <a title="Delete criterion"
+                                   class="button icon-delete"
+                                   data-role="remove-criterion"
+                                   href="#"></a>
                             </div>
                         </div>
                         <!-- END criterion_enabled -->
@@ -190,7 +189,11 @@ $(function() {
                                 <input type="text" value="{CRITERION_NAME}" id="i{CRITERION_ID}" disabled />
                             </div>
                             <div class="small-3 columns no-pad">
-                                <span class="button icon-delete disabled" title="This criterion is in use on {CRITERION_USAGE} assessments. It can be deleted from future use but may not be modified"></span>
+                                <a title="This criterion is in use on {CRITERION_USAGE} assessments. It can be deleted from future use but may not be modified"
+                                   class="button icon-delete"
+                                   data-role="remove-criterion"
+                                   href="#"
+                                   disabled></a>
                             </div>
                         </div>
                         <!-- END criterion_disabled -->
@@ -203,7 +206,10 @@ $(function() {
                                        placeholder="Add Criterion to {CRITGROUP_NAME}..." />
                             </div>
                             <div class="small-3 columns no-pad">
-                                <a title="Delete criterion" class="button icon-delete" href="#"></a>
+                                <a title="Delete criterion"
+                                   class="button icon-delete hide"
+                                   data-role="remove-criterion"
+                                   href="#"></a>
                             </div>
                         </div>
                     </div>
@@ -231,7 +237,10 @@ $(function() {
                                        placeholder="Add Criterion..." />
                             </div>
                             <div class="small-3 columns no-pad">
-                                <a title="Delete criterion" class="button icon-delete" href="#"></a>
+                                <a title="Delete criterion"
+                                   class="button icon-delete hide"
+                                   data-role="remove-criterion"
+                                   href="#"></a>
                             </div>
                         </div>
                     </div>
