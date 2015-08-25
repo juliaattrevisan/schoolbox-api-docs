@@ -1,4 +1,5 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
 $(function() {
 
@@ -34,10 +35,14 @@ $(function() {
         e.preventDefault();
         var self      = $(this);
         var container = self.closest('[data-rubric-critieria-row]');
+
         if (self.is('[disabled]')) {
-            if (confirm('You are about to remove a criterion that is currently in use.  Removing this criterion will make it unavailable for future assessments.  It will remain visible on the existing assessments.')) {
-                container.remove();
-            }
+            self.confirmDialog({
+                text: 'You are about to remove a criterion that is currently in use. Removing this criterion will make it unavailable for future assessments. It will remain visible on the existing assessments.',
+                confirmEvent: function() {
+                    container.remove();
+                }
+            });
         } else {
             // Is this a new criterion?
             container.remove();
