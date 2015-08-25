@@ -49,52 +49,48 @@ $(function() {
         }
     });
 
-//    // logic for handling the form submit
-//    $('#folderForm').submit(function(e) {
-//        var data = {},
-//            self = $(this),
-//            fields = self.find('input[type=text]'),
-//            catID = $('#categoryID').val(),
-//            x = -1,
-//            y = {MAX_CRIT_ID};
-//
-//        // validate all the input fields
-//        fields.each(function() {
-//            var self = $(this);
-//
-//            // new group
-//            if(self.hasClass('new')) {
-//                // skip
-//            }
-//            else if(self.hasClass('group')) {
-//                ++x;
-//                data[x] = {};
-//                data[x]['name'] = self.val();
-//                data[x]['items'] = {};
-//            }
-//            else if(self.hasClass('item')) {
-//                if(self.attr('id') === undefined) {
-//                    data[x]['items']['i'+y] = {};
-//                    data[x]['items']['i'+y] = self.val();
-//                    ++y;
-//                }
-//                else {
-//                    data[x]['items'][self.attr('id')] = {};
-//                    data[x]['items'][self.attr('id')] = self.val();
-//                }
-//            }
-//
-//        });
-//
-//        $('#folderForm').children('input.submit-btn-plain').attr('disabled', 'disabled').val('Saving Changes...');
-//
-//        $.post(self.attr('action'), {'crits': data, 'categoryID': catID}, function(data) {
-//            history.back(-1);
-//        });
-//
-//        e.preventDefault();
-//
-//    });
+    // logic for handling the form submit
+    form.submit(function(e) {
+        e.preventDefault();
+        var data = {},
+            self = $(this),
+            fields = self.find('input[type="text"]'),
+            catID = form.find('[name="categoryID"]').val(),
+            x = -1,
+            y = Number('{MAX_CRIT_ID}');
+
+        // validate all the input fields
+        fields.each(function() {
+            var self        = $(this);
+            var elementData = self.data();
+            // new group
+            if ('rubricGroupNew' in elementData || 'rubricCriterionNew' in elementData) {
+                // skip
+            } else if ('rubricGroup' in elementData) {
+                // a group
+                ++x;
+                data[x] = {};
+                data[x]['name'] = self.val();
+                data[x]['items'] = {};
+            } else if ('rubricCriterion' in elementData) {
+                // a single criterion
+                if (self.attr('id') === undefined) {
+                    data[x]['items']['i'+y] = self.val();
+                    ++y;
+                }
+                else {
+                    data[x]['items'][self.attr('id')] = self.val();
+                }
+            }
+        });
+
+        self.find(':submit').prop('disabled', true).val('Saving Changes...');
+        $.post(self.attr('action'), {'crits': data, 'categoryID': catID})
+            .done(function(data) {
+                history.back(-1);
+            })
+        ;
+    });
 
     $('[data-interaction="show-example-criteria"]').click(function(e) {
         e.preventDefault();
