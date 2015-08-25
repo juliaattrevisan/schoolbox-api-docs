@@ -21,7 +21,10 @@ $(function() {
                 input.attr('placeholder', '');
 
                 newContainer.appendTo(container.parent());
-                container.find('[data-role="remove-criterion"]').removeClass('hide');
+                container.find('[data-role="remove-criterion"]')
+                    .removeClass('hide disabled')
+                    .removeAttr('aria-disabled')
+                ;
                 input.data({
                     'rubric-criterion-new': '',
                     'rubric-group-new': ''
@@ -36,7 +39,7 @@ $(function() {
         var self      = $(this);
         var container = self.closest('[data-rubric-criterion-row]');
 
-        if (self.is('[disabled]')) {
+        if (self.is('[aria-disabled="true"]')) {
             self.confirmDialog({
                 text: 'You are about to remove a criterion that is currently in use. Removing this criterion will make it unavailable for future assessments. It will remain visible on the existing assessments.',
                 confirmEvent: function() {
@@ -196,10 +199,10 @@ $(function() {
                             </div>
                             <div class="small-3 columns no-pad">
                                 <a title="This criterion is in use on {CRITERION_USAGE} assessments. It can be deleted from future use but may not be modified"
-                                   class="button icon-delete"
+                                   class="button icon-delete disabled"
+                                   aria-disabled="true"
                                    data-role="remove-criterion"
-                                   href="#"
-                                   disabled></a>
+                                   href="#"></a>
                             </div>
                         </div>
                         <!-- END criterion_disabled -->
