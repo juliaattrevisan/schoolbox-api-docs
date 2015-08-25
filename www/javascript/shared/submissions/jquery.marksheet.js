@@ -213,7 +213,7 @@
     /**
      * Controls for Averages
      */
-    $.fn.marksheet.averages = function(options) {
+    $.fn.marksheetAverages = function(options) {
         options = options || {}
 
         var config = init(options, $(this));
@@ -317,7 +317,7 @@
     /**
      * Controls for Inputs
      */
-    $.fn.marksheet.inputs = function(options) {
+    $.fn.marksheetInputs = function(options) {
         options = options || {}
 
         var config = init(options, $(this));
