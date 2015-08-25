@@ -127,6 +127,8 @@ $(function() {
 
 
 <!-- BEGIN allow_cascade -->
+<!-- Cascade isn't supported, but if it is: -->
+<!--
 <tr>
     <td class="formLabelWidth">
         <h4>Copy to subfolders?</h4>
@@ -140,6 +142,7 @@ $(function() {
         </label>
     </td>
 </tr>
+-->
 <!-- END allow_cascade -->
 
 <div class="row">
@@ -160,20 +163,28 @@ $(function() {
                         </label>
                         <div class="row">
                             <!-- BEGIN criterion -->
-                            <div class="small-12 columns">
-                                <!-- BEGIN criterion_enabled -->
-                                <input class="item" type="text" value="{CRITERION_NAME}" id="i{CRITERION_ID}" />
-                                <a title="Delete criterion" class="btn no-text delete" href="#"><span></span></a>
-                                <!-- END criterion_enabled -->
-                                <!-- BEGIN criterion_disabled -->
-                                <input class="item" type="text" value="{CRITERION_NAME}" id="i{CRITERION_ID}" disabled="disabled" />
-                                <span class="btn no-text delete disabled" title="This criterion is in use on {CRITERION_USAGE} assessments. It can be deleted from future use but may not be modified"><span></span></span>
-                                <!-- END criterion_disabled -->
+                            <!-- BEGIN criterion_enabled -->
+                            <div class="small-9 columns">
+                                <input type="text" value="{CRITERION_NAME}" id="i{CRITERION_ID}" />
                             </div>
+                            <div class="small-3 columns no-pad">
+                                <a title="Delete criterion" class="button icon-delete" href="#"></a>
+                            </div>
+                            <!-- END criterion_enabled -->
+                            <!-- BEGIN criterion_disabled -->
+                            <div class="small-9 columns">
+                                <input type="text" value="{CRITERION_NAME}" id="i{CRITERION_ID}" disabled />
+                            </div>
+                            <div class="small-3 columns no-pad">
+                                <span class="button icon-delete disabled" title="This criterion is in use on {CRITERION_USAGE} assessments. It can be deleted from future use but may not be modified"></span>
+                            </div>
+                            <!-- END criterion_disabled -->
                             <!-- END criterion -->
-                            <div class="small-12 columns">
-                                <input class="item new" type="text" value="" placeholder="Add Criterion to {CRITGROUP_NAME}..." />
-                                <a title="Delete criterion" class="btn no-text delete" href="#"><span></span></a>
+                            <div class="small-9 columns">
+                                <input type="text" value="" placeholder="Add Criterion to {CRITGROUP_NAME}..." />
+                            </div>
+                            <div class="small-3 columns no-pad">
+                                <a title="Delete criterion" class="button icon-delete" href="#"></a>
                             </div>
                         </div>
                     </div>
@@ -183,7 +194,7 @@ $(function() {
                     <div class="small-12 medium-6 columns">
                         <label>
                             Group
-                            <input class="group new" type="text" value="" placeholder="Add Group..." />
+                            <input type="text" value="" placeholder="Add Group..." />
                         </label>
                     </div>
                     <div class="small-12 medium-6 columns">
@@ -191,9 +202,11 @@ $(function() {
                             Criteria
                         </label>
                         <div class="row">
-                            <div class="small-12 columns">
-                                <input class="item new" type="text" value="" placeholder="Add Criterion..." />
-                                <a title="Delete criterion" class="btn no-text delete" href="#"><span></span></a>
+                            <div class="small-9 columns">
+                                <input type="text" value="" placeholder="Add Criterion..." />
+                            </div>
+                            <div class="small-3 columns no-pad">
+                                <a title="Delete criterion" class="button icon-delete" href="#"></a>
                             </div>
                         </div>
                     </div>
