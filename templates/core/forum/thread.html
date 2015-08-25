@@ -4,30 +4,33 @@
     <li class="active"><a href="#">{THREAD_TITLE}</a></li>
 </ul>
 
+<div class="row actions-small-3">
+    <div class="small-12 list-item">
+        <h1>{THREAD_TITLE} {LOCKED}</h1>
+    </div>
+    <nav>
+        <!-- BEGIN reply -->
+        <a class="icon-reply" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}" data-tooltip title="Post Reply"></a>
+        <!-- END reply -->
+        <!-- BEGIN modify_thread -->
+        <a class="icon-locked" href="/forum/modifyForm.php?toggleLock={THREAD_ID}" data-tooltip title="{LOCK_UNLOCK} Thread"></a>
+        <a class="icon-delete" href="/forum/modifyForm.php?deleteThread={THREAD_ID}" data-tooltip data-action="delete" data-relation="thread" title="Delete Thread"></a>
+        <!-- END modify_thread -->
+    </nav>
+</div>
 <div class="row">
     <div class="small-12 island">
-        <h1>{THREAD_TITLE} {LOCKED}</h1>
-        <span class="header-actions">
-            <!-- BEGIN reply -->
-            <a class="button icon-reply" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}">Post Reply</a>
-            <!-- END reply -->
-            <!-- BEGIN modify_thread -->
-            <a class="button icon-locked" href="/forum/modifyForm.php?toggleLock={THREAD_ID}">{LOCK_UNLOCK} Thread</a>
-            <a class="button icon-delete" href="/forum/modifyForm.php?deleteThread={THREAD_ID}" data-action="delete" data-relation="thread">Delete Thread</a>
-            <!-- END modify_thread -->
-        </span>
-
         <section>
             <ul class="information-list">
                 <!-- BEGIN post -->
                 <li class="row" id="{POST_ID}">
                     <span class="header-actions">
                         <!-- BEGIN reply_post -->
-                        <a class="button icon-reply no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}" data-tooltip title="Reply" aria-haspopup="true"></a>
+                        <a class="button icon-reply no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}" data-tooltip title="Reply" ></a>
                         <!-- END reply_post -->
                         <!-- BEGIN modify -->
-                        <a class="button icon-modify no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}" title="Modify Post"></a>
-                        <a class="button icon-delete no-text" href="/forum/modifyForm.php?deletePost={POST_ID}" data-action="delete" data-relation="post" title="Delete Post"></a>
+                        <a class="button icon-modify no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}" data-tooltip  title="Modify Post"></a>
+                        <a class="button icon-delete no-text" href="/forum/modifyForm.php?deletePost={POST_ID}" data-tooltip  data-action="delete" data-relation="post" title="Delete Post"></a>
                         <!-- END modify -->
                     </span>
 
