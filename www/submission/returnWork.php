@@ -60,11 +60,6 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
         $this->setVar("mark_type_{$type['slug']}_block", '');
     }
 
-    /* Render rubrics
-     */
-    $renderer = new \Rubric\Renderer\Horizontal($this, $submissionBox, $user);
-    $renderer->render();
-
     /* Return
      */
     $returnedWorkMapper = new ReturnedWorkMapper();
@@ -117,3 +112,15 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         'class' => 'active',
     ]
 ]);
+
+/* Rubric's Cube
+ */
+// do fun rubric things
+//$this->setBlock(TEMPLATE_content, 'mark_type_rubric', 'mark_type_rubric_block');
+
+if ($submissionBox->isRubric()) {
+    $rb = new DueWork_Rubric_Lightbox($this);
+    $rb->render('RUBRIC', $submissionBox->getId(), $user->getId(), $submissionBox->canViewRubric($_SESSION['user']), true);
+} else {
+    $this->setVar('RUBRIC', '');
+}
