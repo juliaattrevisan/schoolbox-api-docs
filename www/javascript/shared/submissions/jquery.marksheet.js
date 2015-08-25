@@ -145,9 +145,19 @@
                         // (Thankfully, the change event triggers before blur
                         //  in all browsers.)
                         var $form = $(form);
+
+                        var label = $form.find('[data-relation="response-message"]');
+
+                        label.labelActivate({
+                            text: 'Preparing to save'
+                        });
+
                         $.post(config.submitUrl, $form.serialize())
                             .done(function() {
-                                $form.find('[data-relation="success-message"]').labelTimeout();
+                                label.labelTimeout({
+                                    text: 'Saved',
+                                    css: 'success'
+                                });
 
                                 /* Redirect if a redirect input exists
                                  * (force redirect in Inline Grading)
@@ -159,7 +169,10 @@
                                 }
                             })
                             .fail(function() {
-                                $form.find('[data-relation="error-message"]').labelTimeout();
+                                label.labelTimeout({
+                                    text: 'Error',
+                                    css: 'alert'
+                                });
                             });
                         return false;
                     }
@@ -356,6 +369,10 @@
                 var identifier = self.attr('name') + '-weight';
                 var label = $('[data-identifier="'+identifier+'"]');
 
+                label.labelActivate({
+                    text: 'Preparing to save'
+                });
+
                 /* Ajax new settings
                  */
                 $.ajax({
@@ -383,24 +400,20 @@
 
                         /* Animate label feedback
                          */
-                        label
-                            .css({opacity:1})
-                            .text('Saved')
-                            .removeClass('hide alert')
-                            .addClass('success')
-                            .labelTimeout({duration: 3000});
+                        label.labelTimeout({
+                            text: 'Saved',
+                            css: 'success'
+                        });
                     },
                     error: function (xhr) {
                         self.prop('disabled', false);
 
                         /* Animate label feedback
                          */
-                        label
-                            .css({opacity:1})
-                            .text('Value failed to save')
-                            .removeClass('hide success')
-                            .addClass('alert')
-                            .labelTimeout({duration: 3000});
+                        label.labelTimeout({
+                            text: 'Value failed to save',
+                            css: 'alert'
+                        });
                     }
                 });
             });

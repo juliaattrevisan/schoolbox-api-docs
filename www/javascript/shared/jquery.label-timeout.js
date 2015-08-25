@@ -31,7 +31,7 @@
 
                 /* The style at the end of labelActivate
                  */
-                initialCss: 'secondary'
+                css: 'secondary'
             }
 
             var derived = {
@@ -49,7 +49,7 @@
             $(config.element)
                 .text(config.text)
                 .removeClass('alert success hide')
-                .addClass(config.initialCss)
+                .addClass(config.css)
                 .css({opacity:1});
         }
     }
