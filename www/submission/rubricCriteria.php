@@ -79,9 +79,11 @@ if(count($criterionCollection)) {
         $criteriaList[$crit->getGrouping()][] = $crit;
     }
 
+    $groupCount = 0;
     foreach ($criteriaList as $grouping => $crits) {
         $this->setVar(array(
             'criterion_block' => '',
+            'CRITGROUP_COUNT' => $groupCount++,
             'CRITGROUP_NAME'  => $grouping,
             'CRITGROUP_DISABLED' => ''
         ));
