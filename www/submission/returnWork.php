@@ -3,6 +3,7 @@
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use \Schoolbox\UserMapper;
+use \Schoolbox\Breadcrumbs;
 
 $this->setFile(TEMPLATE_content, 'submission/returnWork.html');
 $this->setBlock(TEMPLATE_content, 'mark_type_percent', 'mark_type_percent_block');
@@ -89,3 +90,30 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
 } else {
     error(2);
 }
+
+
+/* Render out breadcrumbs
+ */
+$trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => 'Submissions',
+        'href' => "/submission/listSubmission",
+        'class' => '',
+    ],
+    [
+        'text' => $submissionBox->getCategory()->getName(),
+        'href' => "/submission/listSubmission/{$submissionBox->getDueDate()->getYear()}/{$submissionBox->getDueDate()->getYearHalf()}/{$submissionBox->getCategory()->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($submissionBox->getName()),
+        'href' => "/submission/viewSubmission/{$submissionBox->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($user->getFullName()),
+        'href' => "/search/user/{$user->getId()}",
+        'class' => 'active',
+    ]
+]);
