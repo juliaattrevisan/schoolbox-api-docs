@@ -16,11 +16,9 @@ $this->setFile(TEMPLATE_content, 'submission/dueWork.html');
 $this->setTab('submission');
 $this->setTitle('Due Work');
 
-$this->setBlock('custom_head', 'subject_colour', 'subject_colour_block');
-
-$this->setBlock(TEMPLATE_content, 'week', 'week_block');
-$this->setBlock('week', 'day', 'day_block');
-$this->setBlock('day', 'event', 'event_block');
+//$this->setBlock(TEMPLATE_content, 'week', 'week_block');
+//$this->setBlock('week', 'day', 'day_block');
+//$this->setBlock('day', 'event', 'event_block');
 
 $this->setBlock(TEMPLATE_content, 'activity', 'activity_block');
 $this->setBlock(TEMPLATE_content, 'is_parent', 'is_parent_block');
@@ -148,7 +146,7 @@ if (is_array($_SESSION['children'])) {
         $_SESSION['children'],
         $user['uid'],
         'is_parent',
-        array('id' => 'CHILD_ID', 'name' => 'CHILD_NAME')
+        array('id' => 'CHILD_ID', 'name' => 'CHILD_NAME', 'sid' => 'CHILD_EXTERNAL_ID',)
     );
     $this->parse('is_parent_block', 'is_parent');
 }
@@ -177,12 +175,15 @@ $output = array(
     'TODAY_DATE'     => date('Y-m-d'),
     'NEXT_MONTH'     => date('Y-m-d', strtotime('+1 month', $targetDate->getUnixTimeStamp())),
     'PREV_MONTH'     => date('Y-m-d', strtotime('-1 month', $targetDate->getUnixTimeStamp())),
-    'SELECTED_DATE'  => $targetDate->getLocalShort(),
+    'SELECTED_DATE'  => $targetDate->getDatabaseDate(),
     'WORK_USER_ID'   => $userID,
     'WORK_USER_NAME' => $userID == $_SESSION['id'] ? 'My' : $userHandler->formatName($user) . "'s",
     'USER_TOKEN'     => ($userID == $_SESSION['id'] ? $_SESSION['key'] : $user['key']),
     'WORK_SEMESTER'  => DueWork_All::getSemester(),
-    'WORK_YEAR'      => date('Y')
+    'WORK_YEAR'      => date('Y'),
+    'CALENDAR_VIEW'  => $_SESSION['calendar_view'] ? $_SESSION['calendar_view'] : 'month',
+    'CALENDAR_COLLAPSE_EVENTS' => Config::get('calendar_collapse_events') ? 1 : '',
+    'CALENDAR_START_DAY'       => Config::get('calendar_start_day') ?: 0,
 );
 
 $this->setVar($output);
@@ -192,92 +193,92 @@ $selectedYear  = $targetDate->getYear();
 
 /* calculate month layout
  */
-$firstDay       = (int)date("w", mktime(0, 0, 0, $selectedMonth, 1, $selectedYear));
-$numDaysinMonth = (int)date("d", mktime(0, 0, 0, $selectedMonth + 1, 0, $selectedYear));
-$numWeeksMonth  = ceil(($firstDay + $numDaysinMonth) / 7);
-$totalDays      = $numWeeksMonth * 7 + (6 - $firstDay);
-
-$startDay = mktime(12, 0, 0, $selectedMonth, 1, $selectedYear) - strtotime("+$firstDay day", 0);
-
-// output calendar
-$summary = array();
-
-/* Have to replace all the other $user's with this one -_-
- */
-$event_api         = new Calendar_Api_EventType_Submission_Schoolbox_Default(
-    (isset($userID) ? Schoolbox\UserMapper::getInstance()->findById($userID) : $_SESSION['user']),
-    null
-);
-/** @var Calendar_Event_Type_Submission[] $event_list */
-$event_list        = $event_api->getEvents($startDay, strtotime("+$totalDays day", $startDay));
-$event_list_by_day = array();
-foreach ($event_list as $event_object) {
-    // Filter out items not yet published, for non-staff
-    if (!$isStaff && $event_object->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
-        continue;
-    }
-    $date                       = $event_object->getStartTime()->getUsingFormat('dmY');
-    $event_list_by_day[$date][] = $event_object;
-}
-
-for ($i = 0; $i < $totalDays; $i++) {
-    $currentDay = strtotime("+$i day", $startDay);
-
-    $day = $i % 7;
-
-    if ($i >= $firstDay && $i < $numDaysinMonth + $firstDay) {
-        $this->setVar('OTHER_MONTH', '');
-    }
-
-    $this_day = date('dmY', $currentDay);
-    $output   = array(
-        'DATE'   => date("j", $currentDay),
-        'PAST'   => $i >= $firstDay && $i < $numDaysinMonth + $firstDay ? '' : 'past',
-        'ACTIVE' => $this_day == $targetDate->getUsingFormat('dmY') ? 'active' : '',
-        'TODAY'  => date('dmY') == $this_day ? 'today' : '',
-        'RIGHTY' => $day > 3 ? 'righty' : '',
-    );
-
-    $this->setVar($output);
-
-    /** @var Calendar_Event_Type_Submission[] $eventList */
-    $eventList = isset($event_list_by_day[$this_day]) ? $event_list_by_day[$this_day] : array();
-
-    foreach ($eventList as $event) {
-        $date = $event->getStartTime();
-
-        $event_id = $event->getEventId();
-        if ($event->getIsAssessment()) {
-            $event_id = 'assess-' . $event_id;
-        }
-        $category_id = $event->getCategory()->getId();
-        $output      = array(
-            'EVENT_ID'     => $event_id,
-            'TIME'         => $event->getTime(),
-            'EVENT'        => Scrub::text($event->getTitle()),
-            'EVENT_CAT_ID' => $category_id,
-        );
-
-        $this->setVar($output);
-        $this->parse('event_block', 'event', true);
-
-        /* record overview for summary box */
-        $summary[$category_id] = array(
-            'name'  => $event->getTitle(),
-            'cid'   => $category_id,
-            'total' => ++$summary[$category_id]['total'],
-            'code'  => $event->getCategory()->getCodeString(),
-        );
-    }
-
-    $this->parse('day_block', 'day', true);
-    $this->setVar('event_block', '');
-
-    if ($day == 6 && $i) {
-        $this->parse('week_block', 'week', true);
-        $this->setVar('day_block', '');
-    }
-}
+//$firstDay       = (int)date("w", mktime(0, 0, 0, $selectedMonth, 1, $selectedYear));
+//$numDaysinMonth = (int)date("d", mktime(0, 0, 0, $selectedMonth + 1, 0, $selectedYear));
+//$numWeeksMonth  = ceil(($firstDay + $numDaysinMonth) / 7);
+//$totalDays      = $numWeeksMonth * 7 + (6 - $firstDay);
+//
+//$startDay = mktime(12, 0, 0, $selectedMonth, 1, $selectedYear) - strtotime("+$firstDay day", 0);
+//
+//// output calendar
+//$summary = array();
+//
+///* Have to replace all the other $user's with this one -_-
+// */
+//$event_api         = new Calendar_Api_EventType_Submission_Schoolbox_Default(
+//    (isset($userID) ? Schoolbox\UserMapper::getInstance()->findById($userID) : $_SESSION['user']),
+//    null
+//);
+///** @var Calendar_Event_Type_Submission[] $event_list */
+//$event_list        = $event_api->getEvents($startDay, strtotime("+$totalDays day", $startDay));
+//$event_list_by_day = array();
+//foreach ($event_list as $event_object) {
+//    // Filter out items not yet published, for non-staff
+//    if (!$isStaff && $event_object->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
+//        continue;
+//    }
+//    $date                       = $event_object->getStartTime()->getUsingFormat('dmY');
+//    $event_list_by_day[$date][] = $event_object;
+//}
+//
+//for ($i = 0; $i < $totalDays; $i++) {
+//    $currentDay = strtotime("+$i day", $startDay);
+//
+//    $day = $i % 7;
+//
+//    if ($i >= $firstDay && $i < $numDaysinMonth + $firstDay) {
+//        $this->setVar('OTHER_MONTH', '');
+//    }
+//
+//    $this_day = date('dmY', $currentDay);
+//    $output   = array(
+//        'DATE'   => date("j", $currentDay),
+//        'PAST'   => $i >= $firstDay && $i < $numDaysinMonth + $firstDay ? '' : 'past',
+//        'ACTIVE' => $this_day == $targetDate->getUsingFormat('dmY') ? 'active' : '',
+//        'TODAY'  => date('dmY') == $this_day ? 'today' : '',
+//        'RIGHTY' => $day > 3 ? 'righty' : '',
+//    );
+//
+//    $this->setVar($output);
+//
+//    /** @var Calendar_Event_Type_Submission[] $eventList */
+//    $eventList = isset($event_list_by_day[$this_day]) ? $event_list_by_day[$this_day] : array();
+//
+//    foreach ($eventList as $event) {
+//        $date = $event->getStartTime();
+//
+//        $event_id = $event->getEventId();
+//        if ($event->getIsAssessment()) {
+//            $event_id = 'assess-' . $event_id;
+//        }
+//        $category_id = $event->getCategory()->getId();
+//        $output      = array(
+//            'EVENT_ID'     => $event_id,
+//            'TIME'         => $event->getTime(),
+//            'EVENT'        => Scrub::text($event->getTitle()),
+//            'EVENT_CAT_ID' => $category_id,
+//        );
+//
+//        $this->setVar($output);
+//        $this->parse('event_block', 'event', true);
+//
+//        /* record overview for summary box */
+//        $summary[$category_id] = array(
+//            'name'  => $event->getTitle(),
+//            'cid'   => $category_id,
+//            'total' => ++$summary[$category_id]['total'],
+//            'code'  => $event->getCategory()->getCodeString(),
+//        );
+//    }
+//
+//    $this->parse('day_block', 'day', true);
+//    $this->setVar('event_block', '');
+//
+//    if ($day == 6 && $i) {
+//        $this->parse('week_block', 'week', true);
+//        $this->setVar('day_block', '');
+//    }
+//}
 
 
 // create a custom instance of the upcoming work controller, and set it up for this context
@@ -418,7 +419,8 @@ foreach ($categoryList as $category) {
         'SUBJ_SUBJECT_ICON' => '/images/mime/60x60/man.png',
         'SUBJ_SUBJECT_CODE' => $categoryCode,
         'SUBJ_SUBJECT_URL'  => '/homepage/' . $categoryID,
-        'SUBJ_TOTAL'        => $summary[$category['id']]['total'],
+        // This isn't used in activity/subjectlist.html
+//        'SUBJ_TOTAL'        => $summary[$category['id']]['total'],
         'SUBJ_TREND_DIR'    => $trendDir,
         'SUBJ_TREND_AMT'    => $trendAmt,
         'SUBJ_HAS_GRADE'    => $show_grades ? 'grade' : '',
@@ -600,30 +602,17 @@ if (empty($feedItems)) {
     }
 }
 
-// subject drop down
-$this->dropDown(
-    'subject',
-    $summary,
-    '',
-    TEMPLATE_content,
-    array(
-        'cid'  => 'SUBJECT_ID',
-        'name' => 'SUBJECT_NAME'
-    )
-);
-
-// Output category colour styles
-$colourList  = Timetable_ColourMapper::getInstance()->findAll();
-$colourIndex = 0;
-foreach ($summary as $category) {
-    $this->setVar(
-        'CATEGORY_COLOUR',
-        Scrub::text($colourList->offsetGet($colourIndex % count($colourList))->getHexColour())
-    );
-    $this->setVar('CATEGORY_ID', $category['cid']);
-    $this->parse('subject_colour_block', 'subject_colour', true);
-    $colourIndex++;
-}
+//// subject drop down
+//$this->dropDown(
+//    'subject',
+//    $summary,
+//    '',
+//    TEMPLATE_content,
+//    array(
+//        'cid'  => 'SUBJECT_ID',
+//        'name' => 'SUBJECT_NAME'
+//    )
+//);
 
 /**
  * Gets activities from new mapper classes.

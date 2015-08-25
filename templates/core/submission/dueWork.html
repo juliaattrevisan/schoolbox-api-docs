@@ -1,271 +1,311 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/components/doT/doT.js"></script>
-<script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
-<script type="text/javascript">
-$(function () {
-    /* Subject Filter */
-    $('#subjectFilter').change(function () {
-        $('li.event').fadeTo(0, 1);
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{WORK_USER_NAME} Work</h1>
 
-        var categoryID = $(this).val();
-        if (categoryID != '') {
-            $('li.event:not(.category-' + categoryID + ')').fadeTo(0, 0.4);
-        }
-
-    });
-
-    $('#childSelect').change(function () {
-
-        window.open(window.location.pathname.replace(/\/(\d+)$/, "/"+$(this).val()), '_self', '');
-        return false;
-    });
-
-    var templateAssess  = doT.template($('script#assess-popup-template').html().trim());
-    var templateDueWork = doT.template($('script#duework-popup-template').html().trim());
-
-    /* Calendar Popup */
-    $(document).on("click", '.calendarTable ul li span', function(){
-        $('.duework-popup.cal-bubble.cal-bubble').remove();
-        var position = $(this).parent().offset();
-        var node = $(this).closest('li'), ev = node.attr("id").substring(6);
-
-        var is_assess = 0;
-        if (ev.match(/^assess-/)) {
-            ev = ev.substring(7);
-            is_assess = 1;
-        }
-
-        $.post('/ajax/submission.php', { id : ev , uid : {WORK_USER_ID}, is_assess: is_assess}, function (data) {
-
-            if (data !== null) {
-                data.buttonClass = data.action == 'Submit' ? 'up-arrow' : 'eyeball';
-                var template = is_assess ? templateAssess : templateDueWork;
-                var output   = $(template(data));
-                output.appendTo('body');
-                movePopup(position);
-            }
-
-        }, "json");
-
-        return false;
-    });
-
-    $(document).on("click", '.close', function() {
-        $('.duework-popup.cal-bubble.cal-bubble').remove();
-    });
-
-    function movePopup (location) {
-        var annoyingHeight = ($('duework-popup.cal-bubble .middle').height() + ($('duework-popup.cal-bubble .top').height()) + ($('duework-popup.cal-bubble .bottom').height()))
-
-        $('.duework-popup.cal-bubble').css("left", (location.left - 300));
-
-        $('.duework-popup.cal-bubble').css("top", (location.top - annoyingHeight - 130));
-
-        if (($('.duework-popup.cal-bubble').css("left")) < '0px') {
-            $('.duework-popup.cal-bubble').css("left", '0');
-        }
-
-        closeBubble();
-    }
-
-    function closeBubble () {
-        $('a.bubble-close').click(function() {
-            $(this).closest('div.bubble').remove();
-            return false;
-        });
-    }
-
-    $('.datepicker').datepicker({
-        dateFormat:'yy-mm-dd',
-        showOn:'both',
-        buttonImage:'/images/core/calendar/calendar-click.png',
-        buttonImageOnly:true,
-        constrainInput:false,
-        onSelect: function(dateText, inst) {
-            var url = '/submission/dueWork/' + dateText + '/{WORK_USER_ID}';
-            window.open(url, "_self");
-        }
-    });
-
-    //
-    // Form listener for exporter - brings up a dialog box that offers a URL
-    // to click.
-    $('#calendar-export').click(function(event) {
-        event.preventDefault();
-        $('#calendar-export-dialog').dialog({
-            open: function(event, ui) {
-                $(event.target).find('#calendar-export-dialog-url')
-                    .text($.getExportCalendarLink(
-                        '{USER_TOKEN}',
-                        {'export': 'duework'}
-                    )
-                );
-            },
-            minWidth: 400,
-            modal: true
-        });
-    });
-});
-</script>
-<style type="text/css">
-#calendar-export {
-	display: inline;
-	float: none;
-}
-
-<!-- BEGIN subject_colour -->
-.category-{CATEGORY_ID} {
-    background-color: #{CATEGORY_COLOUR};
-}
-<!-- END subject_colour -->
-
-</style>
-<!-- END custom_head -->
-
-<script id="duework-popup-template" type="text/x-jquery-tmpl">
-    <div class="duework-popup cal-bubble">
-        <div class="middle">
-            <div class="close">x</div>
-            <div class="js-data clearfix wysiwyg">
-                <h3>
-                    {{? (it.action||'').length}}
-                    <a href="/submission/submissionHistory/{{=it.id}}/{{=it.uid}}">
-                    {{?}}
-                        {{=it.name}}
-                    {{? (it.action||'').length}}
-                    </a>
-                    {{?}}
-                </h3>
-                <p class="bubble-name"><span><a href="/homepage/{{=it.cid}}">{{=it.category}}</a></span> - <em>{{=it.typeName}}</em></p>
-                {{? (it.description||'').length}}
-                    <p class="comment">{{=it.description}}</p>
-                {{?}}
-                {{? (it.action||'').length}}
-                <p class="details clearfix">
-                <a class="btn {{=it.buttonClass}} float-left" href="/submission/submissionHistory/{{=it.id}}/{{=it.uid}}"><span></span>{{=it.action}}</a>
-                </p>
-                {{?}}
-            </div>
-            <div class="bottom"><strong></strong></div>
-        </div>
+        <!-- BEGIN is_parent -->
+        <span class='header-actions'>
+            <a href='#' class='button icon-group' data-dropdown='header-options'></a>
+        </span>
+        <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
+            <!-- BEGIN child -->
+            <li class="avatar-card">
+                <a href="/submission/dueWork/0/{CHILD_ID}">
+                    <img src="/portrait.php?userId={CHILD_EXTERNAL_ID}&size=square64">
+                    <p>{CHILD_NAME}</p>
+                </a>
+            </li>
+            <!-- END child -->
+        </ul>
+        <!-- END is_parent -->
     </div>
-</script>
+</div>
 
-
-<script id="assess-popup-template" type="text/x-jquery-tmpl">
-    <div class="duework-popup cal-bubble">
-        <div class="middle">
-            <div class="close">x</div>
-            <div class="js-data clearfix wysiwyg"><h3>{{=it.name}}</h3>
-                <p class="bubble-name"><span><a href="/homepage/{{=it.cid}}">{{=it.category}}</a></span> - <em>{{=it.typeName}}</em></p>
-                {{? (it.description||'').length}}
-                    <p class="comment">{{=it.description}}</p>
-                {{?}}
-                {{? (it.action||'').length}}
-                <p class="details clearfix">
-                    <a class="btn up-arrow float-left" href="/assess/intro/{{=it.id}}"><span></span>{{=it.action}}</a>
-                </p>
-                {{?}}
-            </div>
-            <div class="bottom"><strong></strong></div>
-        </div>
+<div class="row">
+    <div class="small-12 columns">
+        <div id="calendar-loading" class="loader text-center"></div>
+        <div id="calendar"></div>
     </div>
-</script>
+</div>
 
-
-<h1>{WORK_USER_NAME} Work</h1>
-<div class="left">
-	<div id="calendar">
-        <div class="calendar-controls clearfix">
-            <div class="float-left clearfix">
-
-                <a class="back" href="/submission/dueWork/{PREV_MONTH}/{WORK_USER_ID}" title="Back one month"><strong>&lt;&lt;</strong></a>
-                <div class="datepicker-box">
-                    <input type="hidden" class="datepicker" />
-                </div>
-                <a class="forward" href="/submission/dueWork/{NEXT_MONTH}/{WORK_USER_ID}" title="Forward one month"><strong>&gt;&gt;</strong></a>
-
-            </div>
-            <div class="current-date">{CURRENT_DATE}</div>
-            <div class="float-right">
-                <select name="subject" id="subjectFilter">
-                    <option value="">Show All</option>
-                    <!-- BEGIN subject -->
-                    <option value="{SUBJECT_ID}" class="category-{SUBJECT_ID}">{SUBJECT_NAME}</option>
-                    <!-- END subject -->
-                </select>
-				<!-- BEGIN is_parent -->
-
-				<select name="child" id="childSelect">
-					<!-- BEGIN child -->
-					<option value="{CHILD_ID}" {CHILD_ID_SELECTED}>{CHILD_NAME}</option>
-					<!-- END child -->
-				</select>
-
-				<!-- END is_parent -->
-
-				<button id="calendar-export" class="btn export"><span></span>Export</button>
-            </div>
-        </div>
-		<table class="month-view duedates-calendar calendarTable table">
-            <thead>
-            <tr>
-                <th width="14%" class="dark">Sun</th>
-                <th width="14%" class="dark">Mon</th>
-                <th width="14%" class="dark">Tue</th>
-                <th width="14%" class="dark">Wed</th>
-                <th width="14%" class="dark">Thu</th>
-                <th width="14%" class="dark">Fri</th>
-                <th width="14%" class="dark">Sat</th>
-            </tr>
-            </thead>
-            <tbody>
-				<!-- BEGIN week -->
-				<tr>
-					<!-- BEGIN day -->
-					<td class="{PAST} {TODAY} {ACTIVE} {RIGHTY}"><div class="dayWrap">
-							<p>{DATE}</p>
-						</div>
-						<ul>
-							<!-- BEGIN event -->
-							<li id="event-{EVENT_ID}" class="event category-{EVENT_CAT_ID}"> <span class="wrapper"> <strong>{TIME}</strong> {EVENT}</span> </li>
-							<!-- END event -->
-						</ul></td>
-					<!-- END day -->
-				</tr>
-				<!-- END week -->
-			</tbody>
-		</table>
-	</div>
-
-    <div class="box component">
+<div class="row">
+    <div class="small-12 medium-6 columns">
         {UPCOMING_WORK}
+
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">Recent Activity</h2>
+                <section>
+                    <div class="content">
+                        <ul class="activity-list">
+                            {ACTIVITY_LIST}
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </div>
     </div>
 
-</div>
-<div class="right">
-	<div class="box component">
-		<h2>Subjects</h2>
-		<div class="directory listing">
-			<ul class="subject-list clearfix">
-                {SUBJECT_LIST}
-			</ul>
-		</div>
-	</div>
-	<div class="box component">
-		<h2>Recent Activity</h2>
-		<div class="listing">
-			<ul class="activity-list">
-                {ACTIVITY_LIST}
-			</ul>
-		</div>
-	</div>
+    <div class="small-12 medium-6 columns">
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">Subjects</h2>
+                <section>
+                    <div class="content">
+                        <ul class="subject-list">
+                            {SUBJECT_LIST}
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Dialog for export -->
-<div id="calendar-export-dialog">
-    <div id="calendar-export-dialog-text">
-        Use the following URL as the source for your feed.
+<div id="calendar-bubble" class="cal-bubble">
+    <div class="middle">
+        <div class="close">&times;</div>
+        <div class="js-data clearfix">
+            <!-- Edit Event Form -->
+            <form id="editEvent">
+                <input type="hidden" name="eventId" />
+                <dl>
+                    <dd><h3 class="note"></h3></dd>
+                    <dd><h4><span class="date"></span></h4></dd>
+                    <dd><p class="location"></p></dd>
+                    <dd><p class="detail wysiwyg" data-is-html="1"></p></dd>
+                    <dd class="post-by meta">Posted by <a class="author" href="#" data-is-user-link="1"></a></dd>
+                    <dd class="reviewed-by">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></dd>
+                </dl>
+                <ul class="relatedBookings"></ul>
+                <div class="attendance">
+                    <dl>
+                        <dd><p class="attendanceIcon"></p></dd>
+                        <dd class="rm"><p class="attendanceStatus"></p></dd>
+                    </dl>
+                </div>
+                <div class="actions">
+                    <dl>
+                        <dd>
+                            <span class="homepageLink" data-is-html="1"></span>
+                            <span class="modifyLink" data-is-html="1"></span>
+                            <span class="deleteLink" data-is-html="1"></span>
+                            <span class="attendanceListButton" data-is-html="1"></span>
+                            <span class="attendanceRequestButton" data-is-html="1"></span>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="bookingActions" data-is-html="1">
+                </div>
+            </form>
+        </div>
+        <div class="bottom"><strong></strong></div>
     </div>
-    <textarea readonly id="calendar-export-dialog-url"></textarea>
 </div>
+
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
+
+<script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
+<script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
+<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+<script type="text/javascript">
+
+    // provide page-wide access to the calendar object so the callbacks can actually use it
+    var c;
+
+    /**
+     * Update event method:
+     *
+     * * Gives event a "loading" style
+     * * Removes that style when update finishes
+     *
+     * @param event      The event to update
+     * @param data       The data to send to the update script
+     * @param revertFunc called if update failed for whatever reason.
+     *                   Sets event back to original state.
+     */
+    var updateWrapper = function(event, data, revertFunc) {
+        event.className.push('loading');
+        c.cupdate(data, function (returnData) {
+            event.className = event.className.filter(function (value) {
+                return value != 'loading';
+            });
+            if (!returnData) {
+                revertFunc();
+            }
+            c.dom.fullCalendar('rerenderEvents');
+        });
+    };
+
+    var calendarElement = $('#calendar');
+    var calendarLoadingElement = $('#calendar-loading');
+
+    // once the DOM has loaded, punch a fancy calendar into it
+    $(function() {
+        // Allow checking of anchor for view to display
+        var anchor = '';
+        var parts  = location.href.split('#');
+        if (parts.length > 1) {
+            anchor = parts[1];
+            switch (anchor) {
+                case 'month':
+                    anchor = 'month';
+                    break;
+                case 'week':
+                case 'agendaWeek':
+                    anchor = 'agendaWeek';
+                    break;
+                case 'day':
+                case 'agendaDay':
+                    anchor = 'agendaDay';
+                    break;
+                case 'basicWeek':
+                    anchor = 'basicWeek';
+                    break;
+                case 'basicDay':
+                    anchor = 'basicDay';
+                    break;
+                default:
+                    anchor = '';
+                    break;
+            }
+        }
+        c = new Calendar('calendar', 'calendar-bubble', {
+            userId: '{WORK_USER_ID}',
+
+            // overrides and callbacks
+//            taskTypeId: '{TASK_TYPE_ID}',
+//            crud: {
+//                c: '/calendar/ajax/create',
+//                // r: don't need it
+//                u: '/calendar/ajax/update',
+//                d: '/calendar/ajax/delete'
+//            },
+            filter: {
+                ajax: '/calendar/ajax/filter',
+                btnSelector: false,
+                exportButtonSelector: false,
+                checkboxSelector: false,
+                applyFiltersSelector: false,
+                listViewButton: false
+            },
+            fullCalendar: {
+                defaultDate: moment('{SELECTED_DATE}'),
+                columnFormat: {
+                    month:      'ddd',
+                    week:       'ddd D/M',
+                    agendaWeek: 'ddd D/M',
+                    day:        'ddd D/M',
+                    agendaDay:  'ddd D/M',
+                    '':         'ddd D/M'
+                },
+                defaultView: anchor || 'month',
+                timeFormat: { month: 'h(:mm)a' },
+                // Event limit: could be configured from session but leave global for now
+                eventLimit: Boolean('{CALENDAR_COLLAPSE_EVENTS}'),
+                firstDay: Number('{CALENDAR_START_DAY}'),
+
+                /**
+                 * When an event is drawn on the calendar
+                 * @param calEvent
+                 */
+                eventRender: function(calEvent) {
+                    // Always render placeholders in the most basic manner
+                    if (calEvent.id === 'placeholder') {
+                        return true;
+                    }
+
+                    // Ignore the phantom event that the API puts there
+                    if (!calEvent.data) {
+                        return false;
+                    }
+
+                    // Don't render me if I'm marked as do not render
+                    if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
+                        return false;
+                    }
+                    return true;
+                },
+
+                /**
+                 * Nothing's resizable here
+                 *
+                 * @param event
+                 * @param delta
+                 * @param revertFunc
+                 */
+                eventResize: function(event, delta, revertFunc) {
+                    revertFunc();
+                },
+
+                /**
+                 * Nothing's movable here
+                 *
+                 * @param event
+                 * @param delta
+                 * @param revertFunc
+                 */
+                eventDrop: function(event, delta, revertFunc) {
+                    revertFunc();
+                },
+
+                /**
+                 * When the window is resized
+                 * @param view
+                 */
+                windowResize: function(view) {
+                    var wHeight = $(window).height();
+                    var calTop = c.dom.offset().top;
+                    c.dom.fullCalendar('option','contentHeight',wHeight - calTop - 60)
+                },
+
+                /**
+                 * When external data is being fetched
+                 * @param isLoading
+                 * @param view
+                 */
+                loading: function(isLoading, view) {
+
+                    /* Show loading div right in the middle
+                     */
+                    if (isLoading === true) {
+                        calendarLoadingElement.css({
+                            top: (calendarElement.height() - calendarLoadingElement.height())/2,
+                            left: (calendarElement.width() - calendarLoadingElement.width())/2
+                        }).show();
+                    }
+                    /* Has finished loading
+                     */
+                    else {
+                        /* Hide loading div
+                         */
+                        calendarLoadingElement.hide();
+                        var d = c.dom.fullCalendar('getDate');
+                        $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'));
+                    }
+                },
+
+                // Stream location
+                events: function(start, end, timezone, callback) {
+                    $.ajax({
+                        dataType: 'json',
+                        url:      '/submission/ajax/events',
+                        data: {
+                            start: Calendar.reOffsetTimestamp(start.unix()),
+                            end:   Calendar.reOffsetTimestamp(end.unix()),
+                            userId: Number('{WORK_USER_ID}')
+                        },
+                        success: function(data) {
+                            callback(data.filter(function(v) {
+                                return 'start' in v;
+                            }));
+                        },
+                        cache: false
+                    });
+                }
+            },
+            x: false
+        }).init();
+    })
+</script>
