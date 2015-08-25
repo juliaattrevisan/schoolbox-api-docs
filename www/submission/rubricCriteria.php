@@ -115,3 +115,21 @@ if(count($criterionCollection)) {
     }
 }
 $this->setVar('MAX_CRIT_ID', $topID + 1);
+
+$trail = new \Schoolbox\Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage(
+    $this,
+    'BREADCRUMB',
+    [
+        [
+            'text'  => $category->getName(),
+            'href'  => "/homepage/{$category->getId()}",
+            'class' => '',
+        ],
+        [
+            'text'  => 'Manage Criteria',
+            'href'  => '',
+            'class' => 'active',
+        ]
+    ]
+);

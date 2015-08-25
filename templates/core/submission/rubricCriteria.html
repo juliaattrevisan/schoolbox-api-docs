@@ -104,7 +104,15 @@ $(function() {
 });
 </script>
 <!-- END custom_head -->
-<h1>{PAGE_TITLE}<a class="btn go-back" href="/homepage/{CATEGORY_ID}"><span></span>Return to Homepage</a></h1>
+
+{BREADCRUMB}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{PAGE_TITLE}</h1>
+    </div>
+</div>
+
 <form action="/submission/rubricCriteriaForm.php" method="POST" id="folderForm" class="rubric-settings clearfix">
     <table class="standardForm table">
         <!-- BEGIN allow_cascade -->
