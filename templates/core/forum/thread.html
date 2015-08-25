@@ -5,7 +5,7 @@
 </ul>
 
 <div class="row actions-small-3">
-    <div class="small-12 list-item">
+    <div class="small-12 column list-item">
         <h1>{THREAD_TITLE} {LOCKED}</h1>
     </div>
     <nav>
@@ -23,32 +23,33 @@
         <section>
             <ul class="information-list">
                 <!-- BEGIN post -->
-                <li class="row" id="{POST_ID}">
-                    <span class="header-actions">
+                <li class="actions-small-3" id="{POST_ID}">
+                    <div class="list-item">
+                        <div class="avatar-card small-12">
+                            <a href="/search/user/{POST_USER_ID}" title="View Profile">
+                                <img src="/portrait.php?userId={POST_AUTHOR_EXTERNAL_ID}&size=square64"/>
+                                <p>{POST_AUTHOR}</p>
+                            </a>
+                            <p class="meta">Posted {POST_TIME}</p>
+                            <!-- BEGIN modified -->
+                            <p class="meta">
+                                Edited {POST_MODIFIED} {POST_CENSORED}
+                            </p>
+                            <!-- END modified -->
+                        </div>
+                        <article>
+                            {POST_BODY}
+                        </article>
+                    </div>
+                    <nav>
                         <!-- BEGIN reply_post -->
-                        <a class="button icon-reply no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}" data-tooltip title="Reply" ></a>
+                        <a class="icon-reply no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}" data-tooltip title="Reply" ></a>
                         <!-- END reply_post -->
                         <!-- BEGIN modify -->
-                        <a class="button icon-modify no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}" data-tooltip  title="Modify Post"></a>
-                        <a class="button icon-delete no-text" href="/forum/modifyForm.php?deletePost={POST_ID}" data-tooltip  data-action="delete" data-relation="post" title="Delete Post"></a>
+                        <a class="icon-modify no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}" data-tooltip  title="Modify Post"></a>
+                        <a class="icon-delete no-text" href="/forum/modifyForm.php?deletePost={POST_ID}" data-tooltip  data-action="delete" data-relation="post" title="Delete Post"></a>
                         <!-- END modify -->
-                    </span>
-
-                    <div class="avatar-card">
-                        <a href="/search/user/{POST_USER_ID}" title="View Profile">
-                            <img src="/portrait.php?userId={POST_AUTHOR_EXTERNAL_ID}&size=square64"/>
-                            <p>{POST_AUTHOR}</p>
-                        </a>
-                        <p class="meta">Posted {POST_TIME}</p>
-                        <!-- BEGIN modified -->
-                        <p class="meta">
-                            Edited {POST_MODIFIED} {POST_CENSORED}
-                        </p>
-                        <!-- END modified -->
-                    </div>
-                    <article>
-                        {POST_BODY}
-                    </article>
+                    </nav>
                 </li>
                 <!-- END post -->
             </ul>
