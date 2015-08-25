@@ -116,6 +116,7 @@ if(count($criterionCollection)) {
         $this->parse('criterion_group_block', 'criterion_group', true);
     }
 }
+$this->setVar('MAX_CRITGROUP_ID', $groupCount);
 $this->setVar('MAX_CRIT_ID', $topID + 1);
 
 $trail = new \Schoolbox\Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());

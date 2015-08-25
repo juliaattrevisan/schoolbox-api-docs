@@ -2,18 +2,25 @@
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
 $(function() {
-
-    var form = $('form[data-role="rubric-criteria-form"]');
+    var form           = $('form[data-role="rubric-criteria-form"]');
+    var groupMaxId     = Number('{MAX_CRITGROUP_ID}');
+    var criterionMaxId = Number('{MAX_CRIT_ID}');
 
     // logic for adding new inputs
     form.find('input').keyup(function() {
         if (this.value.length > 0) {
-            var input = $(this);
-            var container = [];
+            var input       = $(this);
+            var container   = [];
+            var groupId     = 0;
+            var criterionId = 0;
             if (input.data('rubric-criterion-new')) {
-                container = input.closest('[data-rubric-criterion-row]');
+                container   = input.closest('[data-rubric-criterion-row]');
+                groupId     = input.closest('[data-rubric-group-row]').data('rubricGroupRow');
+                criterionId = criterionMaxId++;
             } else if (input.data('rubric-group-new')) {
                 container = input.closest('[data-rubric-group-row]');
+                groupId     = groupMaxId++;
+                criterionId = criterionMaxId++;
             }
             if (container.length) {
                 var newContainer = container.clone(true, true);
@@ -22,13 +29,25 @@ $(function() {
 
                 newContainer.appendTo(container.parent());
                 container.find('[data-role="remove-criterion"]')
-                    .removeClass('hide disabled')
+                    .removeClass('hide')
+                    .removeClass('disabled')
                     .removeAttr('aria-disabled')
                 ;
-                input.data({
-                    'rubric-criterion-new': '',
-                    'rubric-group-new': ''
-                });
+                container
+                    .find('input[data-rubric-group]')
+                    .attr('name', 'data['+groupId+'][name]')
+                ;
+                container
+                    .find('input[data-rubric-criterion]')
+                    .attr('name', 'data['+groupId+'][items][i'+criterionId+']')
+                ;
+                input
+                    .removeAttr('rubric-group-new')
+                    .removeAttr('rubric-criterion-new')
+                    .data({
+                        'rubric-criterion-new': '',
+                        'rubric-group-new': ''
+                    });
             }
         }
     });
@@ -157,7 +176,7 @@ $(function() {
                 </fieldset>
                 <!-- END allow_cascade -->
                 <!-- BEGIN criterion_group -->
-                <fieldset data-rubric-group-row>
+                <fieldset data-rubric-group-row="{CRITGROUP_COUNT}">
                     <div class="small-12 medium-6 columns">
                         <label>
                             Group
@@ -174,7 +193,7 @@ $(function() {
                         </label>
                         <!-- BEGIN criterion -->
                         <!-- BEGIN criterion_enabled -->
-                        <div class="row" data-rubric-criterion-row>
+                        <div class="row" data-rubric-criterion-row="{CRITGROUP_COUNT}">
                             <div class="small-9 columns">
                                 <input type="text"
                                        name="data[{CRITGROUP_COUNT}][items][i{CRITERION_ID}]"
@@ -191,7 +210,7 @@ $(function() {
                         </div>
                         <!-- END criterion_enabled -->
                         <!-- BEGIN criterion_disabled -->
-                        <div class="row" data-rubric-criterion-row>
+                        <div class="row" data-rubric-criterion-row="{CRITGROUP_COUNT}">
                             <div class="small-9 columns">
                                 <input type="text"
                                        name="data[{CRITGROUP_COUNT}][items][i{CRITERION_ID}]"
@@ -210,10 +229,11 @@ $(function() {
                         </div>
                         <!-- END criterion_disabled -->
                         <!-- END criterion -->
-                        <div class="row" data-rubric-criterion-row>
+                        <!-- New criterion within group -->
+                        <div class="row" data-rubric-criterion-row="{MAX_CRIT_ID}">
                             <div class="small-9 columns">
                                 <input type="text"
-                                       name="data[{CRITGROUP_COUNT}][items][i{CRITERION_ID}]"
+                                       name="data[{CRITGROUP_COUNT}][items][i{MAX_CRIT_ID}]"
                                        value=""
                                        data-rubric-criterion
                                        data-rubric-criterion-new="1"
@@ -229,12 +249,13 @@ $(function() {
                     </div>
                 </fieldset>
                 <!-- END criterion_group -->
-                <fieldset data-rubric-group-row>
+                <!-- New group -->
+                <fieldset data-rubric-group-row="{MAX_CRITGROUP_ID}">
                     <div class="small-12 medium-6 columns">
                         <label>
                             Group
                             <input type="text"
-                                   name="data[{CRITGROUP_COUNT}][name]"
+                                   name="data[{MAX_CRITGROUP_ID}][name]"
                                    value=""
                                    data-rubric-group
                                    data-rubric-group-new="1"
@@ -245,10 +266,10 @@ $(function() {
                         <label>
                             Criteria
                         </label>
-                        <div class="row" data-rubric-criterion-row>
+                        <div class="row" data-rubric-criterion-row="{MAX_CRIT_ID}">
                             <div class="small-9 columns">
                                 <input type="text"
-                                       name="data[{CRITGROUP_COUNT}][items][i{CRITERION_ID}]"
+                                       name="data[{MAX_CRITGROUP_ID}][items][i{MAX_CRIT_ID}]"
                                        value=""
                                        data-rubric-criterion
                                        data-rubric-criterion-new="1"
