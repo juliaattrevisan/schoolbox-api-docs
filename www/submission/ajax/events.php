@@ -1,11 +1,10 @@
 <?php
 /**
- * ${NAME}
+ * FullCalendar source for submission related events.
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2015, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
  */
 
 $user_mapper = new \Schoolbox\UserMapper();
@@ -22,7 +21,7 @@ try {
 
 // Render it
 $renderer = new \Calendar\Event\Collection\Renderer(
-    new \Calendar_Api_EventType_Submission_Schoolbox_Default($user, array()),
+    new \Calendar_Api_EventType_Submission_Schoolbox_ForDueWork($user, array()),
     $_GET['start'],
     $_GET['end'],
     $user,
