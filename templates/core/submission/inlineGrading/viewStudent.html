@@ -1,13 +1,17 @@
-<div class="row">
-    <div class="small-12 columns">
+<div class="row actions-small-1">
+    <div class="small-12 columns list-item">
         <h1>Grade for {INLINE_GRADING_SUBMISSION_BOX_NAME}</h1>
-        <span class='header-actions'>
-            <a href='/submission/submissionHistory/{INLINE_GRADING_SUBMISSION_BOX_ID}/{INLINE_GRADING_STUDENT_ID}' class='button icon-clock'>View History</a>
-        </span>
         <ul class="meta">
             <li class="icon-staff-students"><a href="/search/user/{INLINE_GRADING_STUDENT_ID}" title="View Profile">{INLINE_GRADING_STUDENT_FULL_NAME}</a></li>
         </ul>
     </div>
+    <nav>
+        <a href='/submission/submissionHistory/{INLINE_GRADING_SUBMISSION_BOX_ID}/{INLINE_GRADING_STUDENT_ID}' class='icon-history' title="View History"></a>
+    </nav>
 </div>
 
-{INJECTED_INTERFACE_TEMPLATE}
+<div class="row">
+    <div class="small-12 island">
+        {INJECTED_INTERFACE_TEMPLATE}
+    </div>
+</div>
