@@ -44,7 +44,7 @@
         <div class="small-12 columns">
             <input type="submit" value="Submit for Assessment" data-action-save />
 
-            <span class="label success full-width hide" data-save-draft>Autosaving</span>
+            <span class="label full-width hide" data-save-draft></span>
         </div>
     </div>
 </form>
@@ -61,6 +61,7 @@
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript">
 
     // Autosave
@@ -89,13 +90,6 @@
         }
     }
 
-    /**
-     * Label timeout effect
-     */
-    function labelTimeout() {
-        $('#editor-form').find('[data-save-draft]').animate({'opacity': 0}, 1500);
-    }
-
     // The autosave submit method
     var autosaveAjaxSubmit = function() {
         var form = $('#editor-form')
@@ -109,29 +103,30 @@
         formContents.push({name: 'save_draft', value: '1'})
         formContents.push({name: 'body',       value: tinyMCE.get('editor-body').getContent()})
 
+        formSaveLabel.labelActivate({
+            text: 'Autosaving'
+        });
+
         $.ajax({
             type: "POST",
             url:  '/submission/submitOnlineForm.php',
             data: formContents,
             complete: function() {
                 // Re-init the autosave
-                initAutosave()
-                setTimeout(function() { formSaveLabel.text('Draft Saved') }, 2000)
+                initAutosave();
+
             },
             success: function() {
-                formSaveLabel
-                    .css({'opacity': 1})
-                    .removeClass('hide')
-
-                setTimeout(labelTimeout, 3000);
+                formSaveLabel.labelTimeout({
+                    text: 'Draft Saved',
+                    css: 'success'
+                });
             },
             error: function() {
-                formSaveLabel
-                    .removeClass('success')
-                    .addClass('alert')
-                    .text('Error!');
-
-                setTimeout(labelTimeout, 3000);
+                formSaveLabel.labelTimeout({
+                    text: 'Error!',
+                    css: 'alert'
+                });
             },
             dataType: 'json'
         });
