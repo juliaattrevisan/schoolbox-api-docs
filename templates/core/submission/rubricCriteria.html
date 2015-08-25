@@ -196,37 +196,61 @@ $(function() {
 </form>
 
 <div data-role="example-critieria" class="reveal-modal" data-reveal>
-    <p>Each criterion should be a word or short sentence that describes what is being assessed,
+    <p>
+        Each criterion should be a word or short sentence that describes what is being assessed,
         organised into logical groupings.
     </p>
-    <ul>
-        <li class="group">
-            <input disabled="disabled" class="group" type="text" value="Algebra">
-            <ul>
-            <li class="item">
-                › <input disabled="disabled" class="item" type="text" value="Factorisation">
-            </li><li class="item">
-                › <input disabled="disabled" class="item" type="text" value="Algebraic simplification using index laws">
-            </li><li class="item">
-                › <input disabled="disabled" class="item" type="text" value="Fraction operations">
-            </li><li class="item">
-                › <input disabled="disabled" class="item" type="text" value="Determining an unknown by substitution">
-            </li>
-            </ul>
-        </li>
-        <li class="group">
-            <input disabled="disabled" class="group" type="text" value="Linear and non-linear relations">
-            <ul>
-            <li class="item">
-                › <input disabled="disabled" class="item" type="text" value="Solving linear equations">
-            </li><li class="item">
-                › <input disabled="disabled" class="item" type="text" value="Solving simultaneous equations">
-            </li><li class="item">
-                › <input disabled="disabled" class="item" type="text" value="Solving simple quadratic equations">
-            </li>
-            </ul>
-        </li>
-    </ul>
-    <br/>
-    <a href="#" id="close-lightbox" class="submit-btn-plain">Close</a>
+
+    <fieldset>
+        <div class="small-12 medium-6 columns">
+            <label>
+                Group
+                <input disabled type="text" value="Algebra" />
+            </label>
+        </div>
+        <div class="small-12 medium-6 columns">
+            <label>
+                Criteria
+            </label>
+            <div class="row no-pad">
+                <div class="small-12 columns no-pad">
+                    <input disabled type="text" value="Factorisation" />
+                </div>
+                <div class="small-12 columns no-pad">
+                    <input disabled type="text" value="Algebraic simplification using index laws" />
+                </div>
+                <div class="small-12 columns no-pad">
+                    <input disabled type="text" value="Fraction operations" />
+                </div>
+                <div class="small-12 columns no-pad">
+                    <input disabled type="text" value="Determining an unknown by substitution" />
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <div class="small-12 medium-6 columns">
+            <label>
+                Group
+                <input disabled type="text" value="Linear and non-linear relations" />
+            </label>
+        </div>
+        <div class="small-12 medium-6 columns">
+            <label>
+                Criteria
+            </label>
+            <div class="row no-pad">
+                <div class="small-12 columns no-pad">
+                    <input disabled type="text" value="Solving linear equations" />
+                </div>
+                <div class="small-12 columns no-pad">
+                    <input disabled type="text" value="Solving simultaneous equations" />
+                </div>
+                <div class="small-12 columns no-pad">
+                    <input disabled type="text" value="Solving simple quadratic equations" />
+                </div>
+            </div>
+        </div>
+    </fieldset>
 </div>
