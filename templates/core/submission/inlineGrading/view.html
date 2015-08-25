@@ -1,19 +1,19 @@
 {BREADCRUMB}
 
-<div class="row">
-    <div class="small-12 columns">
+<div class="row actions-small-1">
+    <div class="list-item small-12 column">
         <h1>Grading {INLINE_GRADING_SUBMISSION_BOX_NAME}</h1>
-        <span class='header-actions'>
-            <a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="button icon-history no-text" title="View History"></a>
-            <!-- BEGIN report_btn -->
-            <!-- END report_btn -->
-        </span>
         <ul class="meta">
             <li class="icon-calendar">Due <span class="gradient-{BOX_GRADIENT}">{DUEWORK_DUEDATE}</span></li>
             <li class="icon-due-work"><a href="/homepage/{FOLDER_ID}">{FOLDER_NAME}</a> {DUEWORK_TYPE}</li>
-            <li class="{GRADE_VISIBILITY_CLASS}">{GRADE_VISIBILITY}</li>
+            <li class="{GRADE_VISIBILITY_CLASS}">Grade visible to {GRADE_VISIBILITY}</li>
         </ul>
     </div>
+    <nav>
+        <a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="icon-history" title="View History"></a>
+        <!-- BEGIN report_btn -->
+        <!-- END report_btn -->
+    </nav>
 </div>
 
 <div class="row">
