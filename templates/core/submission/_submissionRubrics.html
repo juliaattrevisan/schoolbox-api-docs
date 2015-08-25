@@ -111,7 +111,7 @@
     })
 </script>
 <!-- END custom_head -->
-<fieldset data-role="rubric-criterion-selector">
+<fieldset data-role="rubric-criterion-selector" class="rubric-criterion-selector">
     <!-- BEGIN rubric_type_label -->
     <legend>{LABEL}</legend>
     <!-- END rubric_type_label -->
@@ -127,7 +127,7 @@
     <div class="small-12 columns" data-role="criterion-group">
         <h5>{CRIT_GROUP}</h5>
         <!-- BEGIN criterion -->
-        <div data-role="criterion">
+        <div data-role="criterion" class="criterion">
             <input type="hidden" value="0" name="{CRIT_SLUG}"/>
             <input id="c-{CRIT_ID}"
                    type="checkbox"
@@ -140,7 +140,7 @@
             <table data-role="criterion-descriptors">
                 <tr>
                     <!-- BEGIN crit_input -->
-                    <td data-role="criterion-descriptor" class="hide">
+                    <td data-role="criterion-descriptor" class="hide no-pad">
                         <textarea name="des[{CRIT_ID}][]"
                                   data-role="criterion-description"
                                   readonly>{CRIT_INPUT_VALUE}</textarea>
