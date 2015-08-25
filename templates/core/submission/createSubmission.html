@@ -99,7 +99,7 @@
 <div class="row">
     <fieldset class="small-12 island">
 
-        <form action="/submission/submissionForm.php" method="post" name="form" class="clearfix" id="createSubmissionForm"
+        <form action="/submission/submissionForm.php" method="post" name="form" class="top" id="createSubmissionForm"
               enctype="multipart/form-data">
             <input type="hidden" name="category" value="{CATEGORY}"/>
             <input type="hidden" name="unit_id" value="{UNIT_ID}"/>
@@ -613,7 +613,12 @@
 
             <input type="hidden" name='fileId' value="{FILEID}"/>
             <input type="hidden" name="id" value="{ID}"/></td>
-            <input type="submit" name="Submit" value="{HEADING}" />
+
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" name="Submit" value="{HEADING}" />
+                </div>
+            </div>
 
             <!-- BEGIN delete_button -->
             <a href="/submission/submissionForm.php?deleteBox={ID}&next=2" data-action="delete" class="button">Delete</a>
