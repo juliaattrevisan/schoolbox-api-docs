@@ -19,7 +19,7 @@ $(function() {
                 // New criterion?
                 // Set the criterion ID of this row
                 container    = input.closest('[data-rubric-criterion-row]');
-                groupId      = input.closest('[data-rubric-group-row]').data('rubricGroupRow');
+                groupId      = input.closest('[data-rubric-group-row]').data('rubric-group-row');
                 criterionId  = criterionMaxId++;
                 addCriterion = true;
             } else if (input.data('rubric-group-new')) {
@@ -37,36 +37,30 @@ $(function() {
 
                 newContainer.appendTo(container.parent());
 
-                // Modify the form input I entered into
+                // Update the new form input - make it no longer new
                 if (addCriterion) {
-                    container.data('rubricCriterionRow', criterionId);
+                    container
+                        .attr('data-rubric-criterion-row', criterionId)
+                        .data('rubric-criterion-row', criterionId)
+                    ;
                     // Restore remove button
                     container.find('[data-role="remove-criterion"]')
-                        .removeClass('hide')
-                        .removeClass('disabled')
+                        .removeClass('hide disabled')
                         .removeAttr('aria-disabled')
                     ;
-                    container
-                        .find('input[data-rubric-criterion]')
-                        .attr('name', 'crits['+groupId+'][items][i'+criterionId+']')
-                    ;
                     input
-                        .removeAttr('rubric-criterion-new')
-                        .data({
-                            'rubric-criterion-new': ''
-                        });
+                        .attr('name', 'crits['+groupId+'][items][i'+criterionId+']')
+                        .removeAttr('data-rubric-criterion-new')
+                        .removeData('rubric-criterion-new')
+                    ;
                 }
                 if (addGroup) {
-                    container.data('rubricGroupRow', groupId);
-                    container
-                        .find('input[data-rubric-group]')
-                        .attr('name', 'crits['+groupId+'][name]')
-                    ;
+                    container.data('rubric-group-row', groupId);
                     input
-                        .removeAttr('rubric-group-new')
-                        .data({
-                            'rubric-group-new': ''
-                        });
+                        .attr('name', 'crits['+groupId+'][name]')
+                        .removeAttr('data-rubric-group-new')
+                        .removeData('rubric-group-new')
+                    ;
                 }
             }
         }
