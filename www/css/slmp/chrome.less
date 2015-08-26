@@ -21,8 +21,8 @@
 // =============================================================================
 // Dimensions
 @search-width: 					195px;
-@logo-width: 						172px;
-@logo-height: 					35px;
+@logo-width: 						384px;
+@logo-height: 					109px;
 @infopanel-bellsprite:			'/images/slmp/bell.png';
 @infopanel-height:			32px;
 
@@ -104,6 +104,11 @@ h2{
 #header{
 	background-image: url("/images/slmp/header.png");
 	background-repeat: no-repeat;
+	.logo {
+		left: 0;
+		top: 0;
+		z-index: 0;
+	}
 	#search-field{
 		.border-radius(3px);
 		.placeholder(@search-color);
