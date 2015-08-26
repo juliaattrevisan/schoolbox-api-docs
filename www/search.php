@@ -41,8 +41,9 @@ $count['all'] += $mapper->countTotalResults();
 /* Global search result page
  */
 $this->setFile(TEMPLATE_content, 'search.html');
-$this->setBlock(TEMPLATE_content, 'type', 'type_block');
-$this->setBlock(TEMPLATE_content, 'result', 'result_block');
+$this->setBlock(TEMPLATE_content, 'has_options', 'has_options_block');
+$this->setBlock('has_options', 'type', 'type_block');
+$this->setBlock('has_options', 'result', 'result_block');
 $this->setBlock(TEMPLATE_content, 'no_result', 'no_result_block');
 
 /* Initialise blocks
@@ -75,6 +76,9 @@ if (!is_numeric($keyword) && (strlen($keyword) == 0)) {
     ));
 
     $this->parse('no_result_block', 'no_result');
+    $this->setVar(array(
+        'has_options_block' => ''
+    ));
 } elseif (!is_numeric($keyword) && (strlen($keyword) < MIN_KEYWORD_LENGTH)) {
     $enabled = AJAX_DISABLED;
 
@@ -84,6 +88,10 @@ if (!is_numeric($keyword) && (strlen($keyword) == 0)) {
     ));
 
     $this->parse('no_result_block', 'no_result');
+    $this->setVar(array(
+        'has_options_block' => ''
+    ));
+
 } /* Also parse the no_result block if no results were found
  * when using the default 'all' selection
  */
@@ -96,6 +104,9 @@ elseif ($count['all'] == 0) {
     ));
 
     $this->parse('no_result_block', 'no_result');
+    $this->setVar(array(
+        'has_options_block' => ''
+    ));
 }
 
 // setup default values
@@ -110,12 +121,12 @@ $this->setVar(array(
  * phpliberalise the menu tabs
  */
 if ($enabled) {
-/* Always render all tabs, hidden by default
+    /* Always render all tabs, hidden by default
      * Upon ajax completion, populate the tabs with counts and
      * phplib the result html fragment
      */
     foreach ($handle as $typeName => $config) {
-/* Render "All" tab option always
+        /* Render "All" tab option always
          * Unholy mess
          */
         if ($typeName == 'all') {
@@ -142,6 +153,8 @@ if ($enabled) {
      * positive result counts for their respective items
      */
     $mapper->renderTabs();
+
+    $this->parse('has_options_block', 'has_options');
 }
 
 /**
