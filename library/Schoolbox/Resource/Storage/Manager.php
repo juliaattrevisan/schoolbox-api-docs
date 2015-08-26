@@ -138,6 +138,13 @@ class Manager
      */
     private function reverseSymlink(Model $storage)
     {
+        $version = \Database::getInstance()->query("SELECT `value` FROM `config` WHERE `name` = 'site_version'")->fetchColumn();
+
+        // ONLY DO THIS IF YOU ARE RUNNING v14
+        if (strpos($version, '14.') !== 0) {
+            return;
+        }
+
         $stmt = \Database::getInstance()->query("SELECT storage_id FROM `storage` WHERE `hash` = ?", [ $storage->getHash() ]);
 
         $internalId = $stmt->fetchColumn();
