@@ -85,10 +85,6 @@
              */
             load();
 
-//            /* Add pagination events to links
-//             */
-//            search.paginate();
-
             /* Hide all divs, and only show the current one
              */
             hideTabs();
@@ -98,8 +94,6 @@
          * Load data in
          */
         function load() {
-            var self = this;
-
             if (!$(config.targetDiv).hasClass('loaded')) {
                 $(config.targetDiv).load(config.url, "keyword=" + config.keyword + "&type=" + config.section + "&p=" + config.pageNumber, function() {
 
