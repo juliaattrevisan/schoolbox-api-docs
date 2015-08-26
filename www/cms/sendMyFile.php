@@ -12,26 +12,32 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 if (is_numeric($_GET['id'])) {
-    $page = new SitePage;
+    // ensure session
+    new SitePage;
 
-    $myFileHandler = new MyFile;
-    $file = $myFileHandler->getByID($_GET['id']);
-//
-//	if (!is_array($file)) {
-//        error(41);
-//	}
+    $fileMapper = Schoolbox\Resource\My\File\Mapper::getInstance();
+
+    try {
+        $file = $fileMapper->findById($_GET['id']);
+    } catch (Schoolbox\Mapper\Exception\Deleted $e) {
+        error(41);
+        exit;
+    } catch (Schoolbox\Mapper\Exception $e) {
+        error(41);
+        exit;
+    }
 
 	/* Check eportfolio permissions
 	 */
-	$mapper = new \Component\Eportfolio\FileListMapper();
+	$fileListMapper = Component\Eportfolio\FileListMapper::getInstance();
 
-	$allFiles = $mapper->findByColumn('file_id', $file['id']);
+	$allFiles = $fileListMapper->findByColumn('file_id', $file->getId());
 
 	$isViewable = false;
 
 	if ($allFiles->count()) {
 		foreach ($allFiles as $currentFile) {
-			$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $file['owner'], $currentFile->getPageId());
+			$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $file->getOwner()->getId(), $currentFile->getPageId());
 
 			/* If you can view one of the pages that this file is shared on,
 			 * break out of here
@@ -47,32 +53,23 @@ if (is_numeric($_GET['id'])) {
 	/* If the file was never viewable on any eportfolio page and you aren't
 	 * the owner, get out
 	 */
-	if (!$isViewable && ($_SESSION['user']->getId() != $file['owner']) && !$_SESSION['user']->isSuperuser()) {
+	if (!$isViewable && ($_SESSION['user']->getId() != $file->getOwner()->getId()) && !$_SESSION['user']->isSuperuser()) {
 		error(5);
 	}
-
-    $filename = Cfg::get('myfile_dir') . "/" . $file['id'] . ".dat";
 
     if ($_GET['save'])
         $attach = "attachment;";
     else
         $attach = "";
 
-    $filesize = @filesize($filename);
-    if ($filesize == FALSE) //if we cannot find the file (something is wrong dont link to it)
-        error(41);
-
     //send headers
-    if ($file['mime_type'])
-        header("Content-Type: {$file['mime_type']}");
-    else
-        header("Content-Type: application/octet-stream");
-
+    header("Content-Type: {$file->getMime()}");
     header("Pragma: ");
     header("Cache-control: ");
-    header("Content-Disposition: $attach filename=\"" . $file['realname'] . "\"");
-    header("Content-Length: $filesize");
-    readfile($filename);
+    header("Content-Disposition: $attach filename=\"" . $file->getBasename() . "\"");
+    header("Content-Length: {$file->getSize()}");
+    fpassthru($file->readStream());
+    exit;
 } else
     error(2);
 
