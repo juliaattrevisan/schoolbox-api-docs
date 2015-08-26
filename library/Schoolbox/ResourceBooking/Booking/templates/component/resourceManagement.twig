@@ -1,3 +1,54 @@
+<script type="text/javascript">
+    $(function(){
+
+        var component = $('#component{{ component.instance.id }}');
+
+        var updateSeriesDialog = component.find('[data-role="bulk-update-dialog"]').dialog({
+            autoOpen:false,
+            resizable:false,
+            height:180,
+            width:400,
+            modal:true,
+            draggable:false,
+            close: function () {
+                return false;
+            }
+        });
+
+        // Series bookings
+        component.on('click', '[data-set-status]', function(event) {
+            var link     = $(this);
+            var seriesId = link.data('seriesId');
+            if (seriesId) {
+                event.preventDefault();
+                // Remove all previous change status events, and reapply to this
+                // dialog box.
+                updateSeriesDialog.find('[data-role="action-text"]')
+                    .text($(this).text().toLowerCase());
+                updateSeriesDialog
+                    .dialog(
+                        'option',
+                        'buttons',
+                        [{
+                            text: "Only this booking",
+                            click: function () {
+                                updateSeriesDialog.dialog('close');
+                                window.location.href = link.attr('href');
+                            }
+                        }, {
+                            text: "All bookings in the series",
+                            click: function () {
+                                updateSeriesDialog.dialog('close');
+                                window.location.href = link.attr('href') + '?efficacy=series';
+                            }
+                        }]
+                    )
+                    .dialog('open')
+            }
+
+        });
+    });
+</script>
 <ul class="information-list">
     {% for item in bookingsByResource %}
     <li class="row">
@@ -50,13 +101,22 @@
                                 <a href="#" data-equalizer-watch data-dropdown="resourceManagement-status-{{ event.booking.id }}" aria-controls="resourceManagement-status-{{ event.booking.id }}" aria-expanded="false" title="Set Status" data-tooltip class="icon-more no-text dropdown"></a>
                                 <ul data-dropdown-content id="resourceManagement-status-{{ event.booking.id }}" class="f-dropdown" aria-hidden="true">
                                     <li>
-                                        <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}" class="icon-approve">Approved</a>
+                                        <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
+                                           data-series-id="{{ event.booking.event.seriesId }}"
+                                           data-set-status="approved"
+                                           class="icon-approve">Approved</a>
                                     </li>
                                     <li>
-                                        <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}" class="icon-undo">Pending</a>
+                                        <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
+                                           data-series-id="{{ event.booking.event.seriesId }}"
+                                           data-set-status="pending"
+                                           class="icon-undo">Pending</a>
                                     </li>
                                     <li>
-                                        <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}" class="icon-close">Rejected</a>
+                                        <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
+                                           data-series-id="{{ event.booking.event.seriesId }}"
+                                           data-set-status="rejected"
+                                           class="icon-close">Rejected</a>
                                     </li>
                                 </ul>
                             </div>
@@ -74,3 +134,6 @@
     </li>
     {% endfor %}
 </ul>
+<div data-role="bulk-update-dialog" title="This booking is part of a series">
+    Would you like to <span data-role="action-text"></span> only this booking, or all in the series?
+</div>
