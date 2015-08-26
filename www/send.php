@@ -42,8 +42,7 @@ if (is_numeric($_GET['id'])) {
             }
 
             LogMapper::getInstance()->logRead($file, $_SESSION['user']);
-        }
-        catch ( Schoolbox\Mapper\Exception\Deleted $e)  {
+        } catch (Schoolbox\Mapper\Exception $e) {
             error(41);
         }
     }
@@ -61,6 +60,5 @@ if (is_numeric($_GET['id'])) {
     header("Content-Length: {$file->getSize()}");
     fpassthru($file->readStream());
     exit;
-} else
-    error(2);
-
+}
+error(2);
