@@ -41,7 +41,7 @@ abstract class Synchronise_Synergetic_Wenona_Strategy_Abstract extends Synchroni
 
     // ePortfolio disabled by default
     // -1 means 'leave it alone', 0 means turn off, 1 means turn on
-    const STUDENT_EPORTFOLIO = -1;
+    const STUDENT_EPORTFOLIO = 1;
     const STAFF_EPORTFOLIO   = -1;
 
     /**
