@@ -106,12 +106,12 @@
          * Load data in
          */
         function load() {
-            if (!$(config.targetDiv).hasClass('loaded')) {
+            if (!$(config.targetDiv).attr('data-loaded') === true) {
                 $(config.targetDiv).load(config.url, "keyword=" + config.keyword + "&type=" + config.section + "&p=" + config.pageNumber, function() {
 
                     /* Flag it as having loaded
                      */
-                    $(config.targetDiv).addClass('loaded');
+                    $(config.targetDiv).attr('data-loaded', true);
 
                     /* Add pagination again
                      */
