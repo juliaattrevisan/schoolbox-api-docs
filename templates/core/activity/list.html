@@ -9,17 +9,21 @@
             <img src="{ACTLIST_AVATAR}" title="{ACTLIST_AVATAR_TITLE}" alt="{ACTLIST_AVATAR_TITLE}" />
             <!-- END avatar -->
 
-            <article>
+            <p>
                 {ACTLIST_CONTENT}
-
-                <!-- BEGIN time -->
-                <p class="meta"><time>{ACTLIST_TIME}</time></p>
-                <!-- END time -->
-            </article>
-
-            <p class="grade">
-                <span class="gradient-{ACTLIST_GRADEIANT}">{ACTLIST_GRADE}</span>
             </p>
         </div>
+
+        <!-- BEGIN grade -->
+        <article class="grade">
+            <span class="gradient-{ACTLIST_GRADEIANT}">{ACTLIST_GRADE}</span>
+        </article>
+        <!-- END grade -->
+
+        <!-- BEGIN time -->
+        <article class="meta">
+            <span class="meta"><time>{ACTLIST_TIME}</time></span>
+        </article>
+        <!-- END time -->
     </div>
 </li>
