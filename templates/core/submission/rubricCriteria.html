@@ -9,18 +9,26 @@ $(function() {
     // logic for adding new inputs
     form.find('input').keyup(function() {
         if (this.value.length > 0) {
-            var input       = $(this);
-            var container   = [];
-            var groupId     = 0;
-            var criterionId = 0;
+            var input        = $(this);
+            var container    = [];
+            var groupId      = 0;
+            var criterionId  = 0;
+            var addGroup     = false;
+            var addCriterion = false;
             if (input.data('rubric-criterion-new')) {
-                container   = input.closest('[data-rubric-criterion-row]');
-                groupId     = input.closest('[data-rubric-group-row]').data('rubricGroupRow');
-                criterionId = criterionMaxId++;
+                // New criterion?
+                // Set the criterion ID of this row
+                container    = input.closest('[data-rubric-criterion-row]');
+                groupId      = input.closest('[data-rubric-group-row]').data('rubricGroupRow');
+                criterionId  = criterionMaxId++;
+                addCriterion = true;
             } else if (input.data('rubric-group-new')) {
-                container = input.closest('[data-rubric-group-row]');
+                // New group?
+                // Set the group ID of this row
+                container   = input.closest('[data-rubric-group-row]');
                 groupId     = groupMaxId++;
                 criterionId = criterionMaxId++;
+                addGroup    = true;
             }
             if (container.length) {
                 var newContainer = container.clone(true, true);
@@ -28,26 +36,38 @@ $(function() {
                 input.attr('placeholder', '');
 
                 newContainer.appendTo(container.parent());
-                container.find('[data-role="remove-criterion"]')
-                    .removeClass('hide')
-                    .removeClass('disabled')
-                    .removeAttr('aria-disabled')
-                ;
-                container
-                    .find('input[data-rubric-group]')
-                    .attr('name', 'crits['+groupId+'][name]')
-                ;
-                container
-                    .find('input[data-rubric-criterion]')
-                    .attr('name', 'crits['+groupId+'][items][i'+criterionId+']')
-                ;
-                input
-                    .removeAttr('rubric-group-new')
-                    .removeAttr('rubric-criterion-new')
-                    .data({
-                        'rubric-criterion-new': '',
-                        'rubric-group-new': ''
-                    });
+
+                // Modify the form input I entered into
+                if (addCriterion) {
+                    container.data('rubricCriterionRow', criterionId);
+                    // Restore remove button
+                    container.find('[data-role="remove-criterion"]')
+                        .removeClass('hide')
+                        .removeClass('disabled')
+                        .removeAttr('aria-disabled')
+                    ;
+                    container
+                        .find('input[data-rubric-criterion]')
+                        .attr('name', 'crits['+groupId+'][items][i'+criterionId+']')
+                    ;
+                    input
+                        .removeAttr('rubric-criterion-new')
+                        .data({
+                            'rubric-criterion-new': ''
+                        });
+                }
+                if (addGroup) {
+                    container.data('rubricGroupRow', groupId);
+                    container
+                        .find('input[data-rubric-group]')
+                        .attr('name', 'crits['+groupId+'][name]')
+                    ;
+                    input
+                        .removeAttr('rubric-group-new')
+                        .data({
+                            'rubric-group-new': ''
+                        });
+                }
             }
         }
     });
