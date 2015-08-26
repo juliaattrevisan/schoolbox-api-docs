@@ -12,12 +12,12 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
 
+require_once('../../include/Bootstrap.php');
 
 // this is a script and not to be SitePage'd
 if(isset($this)) {
     error(4);
 }
-require_once('../../include/Bootstrap.php');
 
 if(!(is_array($_POST['crits']) && count($_POST['crits']) && is_numeric($_POST['categoryID']))) {
     error(4);
