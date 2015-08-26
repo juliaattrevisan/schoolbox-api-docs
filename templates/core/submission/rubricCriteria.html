@@ -1,213 +1,369 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
 $(function() {
+    var form           = $('form[data-role="rubric-criteria-form"]');
+    var groupMaxId     = Number('{MAX_CRITGROUP_ID}');
+    var criterionMaxId = Number('{MAX_CRIT_ID}');
 
     // logic for adding new inputs
-    $('#crit-list input.new').keyup(function() {
-        if(this.value.length > 0) {
-            var input = $(this);
-            var li = input.parent();
+    form.find('input').keyup(function() {
+        if (this.value.length > 0) {
+            var input        = $(this);
+            var container    = [];
+            var groupId      = 0;
+            var criterionId  = 0;
+            var addGroup     = false;
+            var addCriterion = false;
+            if (input.data('rubric-criterion-new')) {
+                // New criterion?
+                // Set the criterion ID of this row
+                container    = input.closest('[data-rubric-criterion-row]');
+                groupId      = input.closest('[data-rubric-group-row]').data('rubric-group-row');
+                criterionId  = criterionMaxId++;
+                addCriterion = true;
+            } else if (input.data('rubric-group-new')) {
+                // New group?
+                // Set the group ID of this row
+                container   = input.closest('[data-rubric-group-row]');
+                groupId     = groupMaxId++;
+                criterionId = criterionMaxId++;
+                addGroup    = true;
+            }
+            if (container.length) {
+                var newContainer = container.clone(true, true);
+                newContainer.find('input').val('');
+                input.attr('placeholder', '');
 
-            var newli = li.clone(true, true);
-            newli.find('input').val('');
-            input.attr('placeholder', '');
+                newContainer.appendTo(container.parent());
 
-            newli.appendTo(li.parent());
-            input.removeClass('new');
-            li.removeClass('new');
-            input.unbind('keyup');
+                // Update the new form input - make it no longer new
+                if (addCriterion) {
+                    container
+                        .attr('data-rubric-criterion-row', criterionId)
+                        .data('rubric-criterion-row', criterionId)
+                    ;
+                    // Restore remove button
+                    container.find('[data-role="remove-criterion"]')
+                        .removeClass('hide disabled')
+                        .removeAttr('aria-disabled')
+                    ;
+                    input
+                        .attr('name', 'crits['+groupId+'][items][i'+criterionId+']')
+                        .removeAttr('data-rubric-criterion-new')
+                        .removeData('rubric-criterion-new')
+                    ;
+                }
+                if (addGroup) {
+                    container.data('rubric-group-row', groupId);
+                    input
+                        .attr('name', 'crits['+groupId+'][name]')
+                        .removeAttr('data-rubric-group-new')
+                        .removeData('rubric-group-new')
+                    ;
+                }
+            }
         }
     });
 
     // logic for removing inputs
-    $('#crit-list .delete:not(.disabled)').click(function(e) {
-        var self = $(this);
-        var target = self.parent('.item');
-        target.remove();
+    form.find('[data-role="remove-criterion"]').click(function(e) {
         e.preventDefault();
-    });
+        var self      = $(this);
+        var container = self.closest('[data-rubric-criterion-row]');
 
-    // logic for removing inputs that are currently in use
-    $('#crit-list .delete.disabled').click(function(e) {
-        if(confirm('You are about to remove a criterion that is currently in use.  Removing this criterion will make it unavailable for future assessments.  It will remain visible on the existing assessments.')) {
-            var self = $(this);
-            var target = self.parent('.item');
-            target.remove();
+        if (self.is('[aria-disabled="true"]')) {
+            self.confirmDialog({
+                text: 'You are about to remove a criterion that is currently in use. Removing this criterion will make it unavailable for future assessments. It will remain visible on the existing assessments.',
+                confirmEvent: function() {
+                    container.remove();
+                }
+            });
+        } else {
+            // Is this a new criterion?
+            container.remove();
         }
-
-        e.preventDefault();
     });
-
 
     // logic for handling the form submit
-    $('#folderForm').submit(function(e) {
-        var data = {},
-            self = $(this),
-            fields = self.find('input[type=text]'),
-            catID = $('#categoryID').val(),
-            x = -1,
-            y = {MAX_CRIT_ID};
-
-        // validate all the input fields
-        fields.each(function() {
-            var self = $(this);
-
-            // new group
-            if(self.hasClass('new')) {
-                // skip
-            }
-            else if(self.hasClass('group')) {
-                ++x;
-                data[x] = {};
-                data[x]['name'] = self.val();
-                data[x]['items'] = {};
-            }
-            else if(self.hasClass('item')) {
-                if(self.attr('id') === undefined) {
-                    data[x]['items']['i'+y] = {};
-                    data[x]['items']['i'+y] = self.val();
-                    ++y;
-                }
-                else {
-                    data[x]['items'][self.attr('id')] = {};
-                    data[x]['items'][self.attr('id')] = self.val();
-                }
-            }
-
-        });
-
-        $('#folderForm').children('input.submit-btn-plain').attr('disabled', 'disabled').val('Saving Changes...');
-
-        $.post(self.attr('action'), {'crits': data, 'categoryID': catID}, function(data) {
-            history.back(-1);
-        });
-
+    // Currently, just goes back in history - this is so whatever you entered
+    // in the submission you just created gets restored
+    form.submit(function(e) {
         e.preventDefault();
-
+        var submit = form.find(':submit');
+        var value  = submit.val();
+        submit.prop('disabled', true).val('Saving Changes...');
+        $.post(form.attr('action'), form.serializeArray())
+            .done(function() {
+                history.back();
+            })
+            .fail(function() {
+                // Something went wrong.
+                // We have no global fail handler, so I'll add something here.
+                submit.prop('disabled', false).val(value);
+                $('[data-role="ajax-error"]').foundation('reveal', 'open');
+            });
     });
 
-    $('#disp-lightbox').click(function(e) {
+    $('[data-interaction="show-example-criteria"]').click(function(e) {
         e.preventDefault();
-        $('#crit-list-lightbox').dialog({
-            modal: true,
-            resizable: false,
-            title: 'Example Criteria',
-            width: 350
-        });
+        $('[data-role="example-criteria"]').foundation('reveal', 'open');
     });
-
-    $('#close-lightbox').click(function(e) {
-        e.preventDefault();
-        $('#crit-list-lightbox').dialog('close');
-    });
-
 });
 </script>
 <!-- END custom_head -->
-<h1>{PAGE_TITLE}<a class="btn go-back" href="/homepage/{CATEGORY_ID}"><span></span>Return to Homepage</a></h1>
-<form action="/submission/rubricCriteriaForm.php" method="POST" id="folderForm" class="rubric-settings clearfix">
-    <table class="standardForm table">
-        <!-- BEGIN allow_cascade -->
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Subfolders</h4>
-                <em></em>
-            </td>
-            <td>
-                <input type="hidden" name="cascade" value="0" />
-                <label for="cascade">
-                    <input id="cascade" type="checkbox" name="cascade" value="1" />
-                    These criteria should be made available to this folder's subfolders
-                </label>
-            </td>
-        </tr>
-        <!-- END allow_cascade -->
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Criteria</h4>
-                <em>Criteria are used as rows in a rubric.  You must first add criteria before you can build a rubric.<br><br>
+
+{BREADCRUMB}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{PAGE_TITLE}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Guide</h2>
+        <section>
+            <div class="content">
+                <h3>Criteria</h3>
+                <p>
+                    Criteria are used as rows in a rubric.  You must first add criteria before you can build a rubric.
+                </p>
+                <p>
                     If you want to delete a criterion that has already been used on an assessment, you need to first
-                    remove it from the assessment, then you can delete it.<br/><br/>
-                    If you remove all the criteria from a group, the group will automatically be deleted.<br/><br/>
-                    <a id="disp-lightbox" href="#">See example rubric criteria</a>
-                </em>
-            </td>
-            <td>
-                <ul id="crit-list">
+                    remove it from the assessment, then you can delete it.
+                </p>
+                <p>
+                    If you remove all the criteria from a group, the group will automatically be deleted.
+                </p>
+                <p>
+                    <a href="#" data-interaction="show-example-criteria">See example rubric criteria</a>
+                </p>
+            </div>
+        </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form action="/submission/rubricCriteriaForm.php" method="POST" class='top' data-role="rubric-criteria-form">
+            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+
+            <section>
+                <!-- BEGIN allow_cascade -->
+                <!-- Cascade isn't supported, but if it is: -->
+                <fieldset class='content'>
+                    <div class="small-12 columns">
+                        <input type="hidden" name="cascade" value="0" />
+                        <input id="cascade" type="checkbox" name="cascade" value="1" />
+                        <label for="cascade" class="checkbox-label">
+                            Copy to subfolders?
+                            <span class="hint has-tip"
+                                  data-tooltip
+                                  title="Should these criteria be copied to this folder's subfolders?">?</span>
+                        </label>
+                    </div>
+                </fieldset>
+                <!-- END allow_cascade -->
                 <!-- BEGIN criterion_group -->
-                <li class="group">
-                    <input class="group" type="text" value="{CRITGROUP_NAME}"{CRITGROUP_DISABLED} />
-                    <ul>
+                <fieldset class='content' data-rubric-group-row="{CRITGROUP_COUNT}">
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Group
+                            <input type="text"
+                                   name="crits[{CRITGROUP_COUNT}][name]"
+                                   value="{CRITGROUP_NAME}"
+                                   {CRITGROUP_DISABLED}
+                                   readonly='readonly'
+                                   data-rubric-group />
+                        </label>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Criteria
+                        </label>
                         <!-- BEGIN criterion -->
-                        <li class="item">
-                            &rsaquo;
-                            <!-- BEGIN criterion_enabled -->
-                            <input class="item" type="text" value="{CRITERION_NAME}" id="i{CRITERION_ID}" />
-                            <a title="Delete criterion" class="btn no-text delete" href="#"><span></span></a>
-                            <!-- END criterion_enabled -->
-                            <!-- BEGIN criterion_disabled -->
-                            <input class="item" type="text" value="{CRITERION_NAME}" id="i{CRITERION_ID}" disabled="disabled" />
-                            <span class="btn no-text delete disabled" title="This criterion is in use on {CRITERION_USAGE} assessments. It can be deleted from future use but may not be modified"><span></span></span>
-                            <!-- END criterion_disabled -->
-                        </li>
+                        <!-- BEGIN criterion_enabled -->
+                        <div class="row" data-rubric-criterion-row="{CRITGROUP_COUNT}">
+                            <div class="small-9 columns">
+                                <input type="text"
+                                       name="crits[{CRITGROUP_COUNT}][items][i{CRITERION_ID}]"
+                                       value="{CRITERION_NAME}"
+                                       id="i{CRITERION_ID}"
+                                       data-rubric-criterion />
+                            </div>
+                            <div class="small-3 columns no-pad">
+                                <a title="Delete criterion"
+                                   class="button icon-delete"
+                                   data-role="remove-criterion"
+                                   href="#"></a>
+                            </div>
+                        </div>
+                        <!-- END criterion_enabled -->
+                        <!-- BEGIN criterion_disabled -->
+                        <div class="row" data-rubric-criterion-row="{CRITGROUP_COUNT}">
+                            <div class="small-9 columns">
+                                <input type="text"
+                                       name="crits[{CRITGROUP_COUNT}][items][i{CRITERION_ID}]"
+                                       value="{CRITERION_NAME}"
+                                       id="i{CRITERION_ID}"
+                                       data-rubric-criterion
+                                       readonly />
+                            </div>
+                            <div class="small-3 columns no-pad">
+                                <a title="This criterion is in use on {CRITERION_USAGE} assessments. It can be deleted from future use but may not be modified"
+                                   class="button icon-delete disabled"
+                                   aria-disabled="true"
+                                   data-role="remove-criterion"
+                                   href="#"></a>
+                            </div>
+                        </div>
+                        <!-- END criterion_disabled -->
                         <!-- END criterion -->
-                        <li class="item new">
-                            &rsaquo;
-                            <input class="item new" type="text" value="" placeholder="Add Criterion to {CRITGROUP_NAME}..." />
-                            <a title="Delete criterion" class="btn no-text delete" href="#"><span></span></a>
-                        </li>
-                    </ul>
-                </li>
+                        <!-- New criterion within group -->
+                        <div class="row" data-rubric-criterion-row="{MAX_CRIT_ID}">
+                            <div class="small-9 columns">
+                                <input type="text"
+                                       value=""
+                                       data-rubric-criterion
+                                       data-rubric-criterion-new="1"
+                                       placeholder="Add Criterion to {CRITGROUP_NAME}..." />
+                            </div>
+                            <div class="small-3 columns no-pad">
+                                <a title="Delete criterion"
+                                   class="button icon-delete hide"
+                                   data-role="remove-criterion"
+                                   href="#"></a>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
                 <!-- END criterion_group -->
-                <li class="group new">
-                    <input class="group new" type="text" value="" placeholder="Add Group..." />
-                    <ul>
-                        <li class="item new">
-                            &rsaquo;
-                            <input class="item new" type="text" value="" placeholder="Add Criterion..." />
-                            <a title="Delete criterion" class="btn no-text delete" href="#"><span></span></a>
-                        </li>
-                    </ul>
-                </li>
-                </ul>
-            </td>
-        </tr>
-    </table>
-    <input type="hidden" id="categoryID" name="categoryID" value="{CATEGORY_ID}" />
-    <input type="submit" value="Save Changes" class="submit-btn-plain"/>
-</form>
-<div id="crit-list-lightbox" style="display: none;">
-    <p>Each criterion should be a word or short sentence that describes what is being assessed,
+                <!-- New group -->
+                <fieldset class='content' data-rubric-group-row="{MAX_CRITGROUP_ID}">
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Group
+                            <input type="text"
+                                   value=""
+                                   data-rubric-group
+                                   data-rubric-group-new="1"
+                                   placeholder="Add Group..." />
+                        </label>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Criteria
+                        </label>
+                        <div class="row" data-rubric-criterion-row="{MAX_CRIT_ID}">
+                            <div class="small-9 columns">
+                                <input type="text"
+                                       value=""
+                                       data-rubric-criterion
+                                       data-rubric-criterion-new="1"
+                                       placeholder="Add Criterion..." />
+                            </div>
+                            <div class="small-3 columns no-pad">
+                                <a title="Delete criterion"
+                                   class="button icon-delete hide"
+                                   data-role="remove-criterion"
+                                   href="#"></a>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </section>
+
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Save Changes" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div data-role="example-criteria" class="reveal-modal" data-reveal>
+    <p>
+        Each criterion should be a word or short sentence that describes what is being assessed,
         organised into logical groupings.
     </p>
-    <ul>
-        <li class="group">
-            <input disabled="disabled" class="group" type="text" value="Algebra">
-            <ul>
-            <li class="item">
-                › <input disabled="disabled" class="item" type="text" value="Factorisation">
-            </li><li class="item">
-                › <input disabled="disabled" class="item" type="text" value="Algebraic simplification using index laws">
-            </li><li class="item">
-                › <input disabled="disabled" class="item" type="text" value="Fraction operations">
-            </li><li class="item">
-                › <input disabled="disabled" class="item" type="text" value="Determining an unknown by substitution">
-            </li>
-            </ul>
-        </li>
-        <li class="group">
-            <input disabled="disabled" class="group" type="text" value="Linear and non-linear relations">
-            <ul>
-            <li class="item">
-                › <input disabled="disabled" class="item" type="text" value="Solving linear equations">
-            </li><li class="item">
-                › <input disabled="disabled" class="item" type="text" value="Solving simultaneous equations">
-            </li><li class="item">
-                › <input disabled="disabled" class="item" type="text" value="Solving simple quadratic equations">
-            </li>
-            </ul>
-        </li>
-    </ul>
-    <br/>
-    <a href="#" id="close-lightbox" class="submit-btn-plain">Close</a>
+
+    <div class="row">
+        <div class="small-12 island">
+            <section>
+                <fieldset>
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Group
+                            <input readonly type="text" value="Algebra" />
+                        </label>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Criteria
+                        </label>
+                        <div class="row">
+                            <div class="small-12 columns">
+                                <input readonly type="text" value="Factorisation" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="small-12 columns">
+                                <input readonly type="text" value="Algebraic simplification using index laws" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="small-12 columns">
+                                <input readonly type="text" value="Fraction operations" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="small-12 columns">
+                                <input readonly type="text" value="Determining an unknown by substitution" />
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Group
+                            <input readonly type="text" value="Linear and non-linear relations" />
+                        </label>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Criteria
+                        </label>
+                        <div class="row">
+                            <div class="small-12 columns">
+                                <input readonly type="text" value="Solving linear equations" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="small-12 columns">
+                                <input readonly type="text" value="Solving simultaneous equations" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="small-12 columns">
+                                <input readonly type="text" value="Solving simple quadratic equations" />
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </section>
+        </div>
+    </div>
+
+    <a href="#" class="close-reveal-modal">&#215;</a>
+</div>
+
+<div data-role="ajax-error" class="reveal-modal" data-reveal>
+    <div class="alert-panel">
+        <h5>Something went wrong while saving</h5>
+        <p>You may try pressing the "Save Changes" button. If this persists, please contact your IT support.</p>
+    </div>
 </div>

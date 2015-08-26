@@ -79,9 +79,11 @@ if(count($criterionCollection)) {
         $criteriaList[$crit->getGrouping()][] = $crit;
     }
 
+    $groupCount = 0;
     foreach ($criteriaList as $grouping => $crits) {
         $this->setVar(array(
             'criterion_block' => '',
+            'CRITGROUP_COUNT' => $groupCount++,
             'CRITGROUP_NAME'  => $grouping,
             'CRITGROUP_DISABLED' => ''
         ));
@@ -114,4 +116,23 @@ if(count($criterionCollection)) {
         $this->parse('criterion_group_block', 'criterion_group', true);
     }
 }
+$this->setVar('MAX_CRITGROUP_ID', $groupCount);
 $this->setVar('MAX_CRIT_ID', $topID + 1);
+
+$trail = new \Schoolbox\Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage(
+    $this,
+    'BREADCRUMB',
+    [
+        [
+            'text'  => $category->getName(),
+            'href'  => "/homepage/{$category->getId()}",
+            'class' => '',
+        ],
+        [
+            'text'  => 'Manage Criteria',
+            'href'  => '',
+            'class' => 'active',
+        ]
+    ]
+);

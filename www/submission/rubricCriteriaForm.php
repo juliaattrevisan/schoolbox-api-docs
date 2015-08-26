@@ -12,12 +12,12 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
 
+require_once('../../include/Bootstrap.php');
 
 // this is a script and not to be SitePage'd
 if(isset($this)) {
     error(4);
 }
-require_once('../../include/Bootstrap.php');
 
 if(!(is_array($_POST['crits']) && count($_POST['crits']) && is_numeric($_POST['categoryID']))) {
     error(4);
@@ -27,7 +27,7 @@ $criteria = $_POST['crits'];
 $catID = $_POST['categoryID'];
 
 // this merely re-establishes the session
-new SitePage();
+$page = new SitePage();
 
 // "security to the foyer!"
 $groupHandler = new Group();
@@ -105,5 +105,8 @@ foreach($data as $critID => $critData) {
 }
 
 
-
-die('Criteria updated.');
+if ($page->detectAjax()) {
+    die('Criteria updated.');
+} else {
+    $page->backToTheFuture(2);
+}
