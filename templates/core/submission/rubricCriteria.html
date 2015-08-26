@@ -146,10 +146,9 @@ $(function() {
 
 <div class="row">
     <div class="small-12 island">
-        <form action="/submission/rubricCriteriaForm.php"
-              method="POST"
-              data-role="rubric-criteria-form"
-        >
+        <form action="/submission/rubricCriteriaForm.php" method="POST" class='top' data-role="rubric-criteria-form">
+            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+
             <section>
                 <!-- BEGIN allow_cascade -->
                 <!-- Cascade isn't supported, but if it is: -->
@@ -273,11 +272,16 @@ $(function() {
                     </div>
                 </fieldset>
             </section>
-            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-            <input type="submit" value="Save Changes" />
+
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Save Changes" />
+                </div>
+            </div>
         </form>
     </div>
 </div>
+
 <div data-role="example-criteria" class="reveal-modal" data-reveal>
     <p>
         Each criterion should be a word or short sentence that describes what is being assessed,
