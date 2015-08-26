@@ -29,17 +29,6 @@
             }
         }
 
-        /* Seymour
-         */
-        $('#content div.results').on('click', 'a.more', function(event) {
-            event.preventDefault();
-
-            var type = $(this).attr('rel');
-
-            window.location.hash = '#' + type + ',1';
-            window.location.reload(true);
-        });
-
         $('[data-results]').research({
             keyword: keyword,
             section: section,

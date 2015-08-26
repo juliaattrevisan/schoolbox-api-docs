@@ -12,6 +12,8 @@
 
         runOnce(config.keyword, config.section, config.sectionElement, config.pageNumber);
 
+        setupMore();
+
         /**
          * Init
          *
@@ -36,7 +38,11 @@
                  * This is used to parameterise the search method. This interface is now
                  * expected each time a search is run.
                  */
-                hash: ''
+                hash: '',
+
+                /* "See More" elements. These trigger a dynamic hash page reload
+                 */
+                more: 'data-more'
             }
 
             var derived = {
@@ -205,6 +211,20 @@
         function hideTabs() {
             $(config.resultsTabs).hide();
             $(config.targetDiv).show();
+        }
+
+        /**
+         * Set up seymour links
+         */
+        function setupMore() {
+            $(config.element).on('click', '[' + config.more + ']', function(event) {
+                event.preventDefault();
+
+                var type = $(this).attr(config.more);
+
+                window.location.hash = '#' + type + ',1';
+                window.location.reload(true);
+            });
         }
     }
 
