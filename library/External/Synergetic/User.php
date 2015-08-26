@@ -531,19 +531,6 @@ class External_Synergetic_User implements External_UserInterface
     }
 
     /**
-     * is triggered when invoking inaccessible methods in an object context.
-     *
-     * @param $name string
-     * @param $arguments array
-     * @return mixed
-     * @link http://php.net/manual/en/language.oop5.overloading.php#language.oop5.overloading.methods
-     */
-    function __call($name, $arguments)
-    {
-        // TODO: Implement __call() method.
-    }
-
-    /**
      * Gets a list of Contacts for all Student Boarders.
      *
      * Used in reporting.
