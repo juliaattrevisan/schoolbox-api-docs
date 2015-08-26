@@ -107,7 +107,9 @@
          */
         function load() {
             if (!$(config.targetDiv).attr('data-loaded') === true) {
-                $(config.targetDiv).load(config.url, "keyword=" + config.keyword + "&type=" + config.section + "&p=" + config.pageNumber, function() {
+                var params = "keyword=" + config.keyword + "&type=" + config.section + "&p=" + config.pageNumber;
+
+                $(config.targetDiv).load(config.url, params, function() {
 
                     /* Flag it as having loaded
                      */
