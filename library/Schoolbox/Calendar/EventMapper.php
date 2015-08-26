@@ -536,8 +536,8 @@ class EventMapper extends Schoolbox\External\Mapper
 			FROM `{$this->table}` e
 			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-			WHERE startDate >= :startDate
-			AND endDate <= :endDate
+			WHERE DATE(start_datetime) >= :startDate
+			AND DATE(end_datetime) <= :endDate
 			GROUP BY e.id
 		";
 
