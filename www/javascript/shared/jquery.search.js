@@ -5,7 +5,7 @@
      *
      * @param options
      */
-    $.fn.research = function(options) {
+    $.fn.search = function(options) {
         options = options || {};
 
         var config = init(options, $(this));
