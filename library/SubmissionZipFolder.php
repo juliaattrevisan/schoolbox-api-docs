@@ -64,15 +64,18 @@ class SubmissionZipFolder
      */
     function createDirectory($currentDir, $fileList, $depth = 0) {
         foreach ($fileList as $file) {
-            $fileName = sprintf("%s-%s_%s_%s",
-                $file->getOwner()->getLastname(), $file->getOwner()->getFirstname(), // student name
-                $file->getCreatedAt()->getUsingFormat('md-Hi'),   // datetime
-                $file->getBasename()                               // filename
-            );
-            $this->size = $this->size + $file->getStorage()->getSize();
-            $fp = fopen($this->uniqueFileName($currentDir . '/' . $fileName), 'wb');
-            stream_copy_to_stream($file->getStorage()->readStream(), $fp);
-            fclose($fp);
+            if ($file->getStorage()->exists()) {
+                $fileName = sprintf("%s-%s_%s_%s",
+                    $file->getOwner()->getLastname(),
+                    $file->getOwner()->getFirstname(), // student name
+                    $file->getCreatedAt()->getUsingFormat('md-Hi'),   // datetime
+                    $file->getBasename()                               // filename
+                );
+                $this->size = $this->size + $file->getStorage()->getSize();
+                $fp = fopen($this->uniqueFileName($currentDir . '/' . $fileName), 'wb');
+                stream_copy_to_stream($file->getStorage()->readStream(), $fp);
+                fclose($fp);
+            }
         }
     }
 
