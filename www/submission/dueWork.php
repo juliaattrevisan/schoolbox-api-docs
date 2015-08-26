@@ -353,7 +353,7 @@ foreach ($categoryList as $category) {
     }
 
     $categoryIDs[] = $categoryID;
-    $categoryCode  = $category['code'] ? '(' . $category['code'] . ')' : '';
+    $categoryCode  = $category['code'] ? $category['code'] : '';
 
     //
     // retrieve subject grades.
@@ -450,7 +450,7 @@ foreach ($categoryList as $category) {
                     'SUBJ_TEACHER_NAME'         => $teacher['name'],
                     'SUBJ_TEACHER_URL'          => $teacher['email'],
                     'SUBJ_TEACHER_ROLE'         => 'Teacher',
-                    'SUBJ_TEACHER_AVATAR'       => "/portrait?userId={$teacher['synid']}&size=square32",
+                    'SUBJ_TEACHER_AVATAR'       => "/portrait?userId={$teacher['synid']}&size=square64",
                     'SUBJ_TEACHER_AVATAR_TITLE' => $teacher['name']
                 );
                 $this->setVar($tOutput);

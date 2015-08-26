@@ -5,7 +5,7 @@
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="small-12 avatar card">
-                            <a href="#" title="">
+                            <a href="/homepage/{SUBJ_CAT_ID}" title="Visit Homepage">
                                 <!-- BEGIN icon -->
                                 <!--
                                 <span class="avatar">
@@ -23,9 +23,9 @@
                         <!-- BEGIN subject_grade -->
                         <p class="grade gradient-{SUBJ_GRADEIANT}-bg">
                             <a href="/submission/allWork/{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{SUBJ_CAT_ID}">
-                    <span class="gradient-{SUBJ_GRADEIANT}">
-                        {SUBJ_GRADE}
-                    </span>
+                                <span class="gradient-{SUBJ_GRADEIANT}">
+                                    {SUBJ_GRADE}
+                                </span>
                                 {SUBJ_TREND_AMT} {SUBJ_TREND_DIR}
                             </a>
                         </p>
@@ -37,7 +37,7 @@
                     <div class="list-item">
                         <div class="small-12 avatar card">
                             <a href="/search/user/{SUBJ_TEACHER_ID}" title="">
-                                <img src="{SUBJ_TEACHER_AVATAR}" class="content" alt="{SUBJ_TEACHER_AVATAR_TITLE}" />
+                                <img src="{SUBJ_TEACHER_AVATAR}" alt="{SUBJ_TEACHER_AVATAR_TITLE}" />
                                 <p>{SUBJ_TEACHER_NAME}</p>
                             </a>
                             <p class="meta">Teacher</p>
