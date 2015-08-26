@@ -108,7 +108,7 @@ class Feed {
 
             $file[] = array(
                 'date' => $row['submitted'],
-                'type' => 'file',
+                'type' => 'icon-files',
                 'message' => $userHandler->formatName($row) . ' uploaded the file ' . Scrub::text($row['name']),
                 'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
                     $row
@@ -156,7 +156,7 @@ class Feed {
 
             $link[] = array(
                 'date' => $row['submitted'],
-                'type' => 'link',
+                'type' => 'icon-link',
                 'message' => $userHandler->formatName($row) . ' submitted the link ' . Scrub::text($row['name']),
                 'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
                     $row
@@ -210,7 +210,7 @@ class Feed {
         while ($row = $this->db->getNextArray()) {
             $onlineAssessments[] = array(
                 'date' => $row['start'],
-                'type' => 'onlineassessment',
+                'type' => 'icon-quiz',
                 'message' => $userHandler->formatName($row)
                     . ' opened the quiz '
                     . Scrub::text( $row['heading']),
@@ -264,7 +264,7 @@ class Feed {
         while ($row = $this->db->getNextArray()) {
             $surveys[] = array(
                 'date' => $row['start'],
-                'type' => 'survey',
+                'type' => 'icon-surveys',
                 'message' => $userHandler->formatName($row)
                     . ' opened the survey '
                     . Scrub::text($row['heading']),
@@ -311,7 +311,7 @@ class Feed {
 
             $news[] = array(
                 'date' => $row['submitted'],
-                'type' => 'news',
+                'type' => 'icon-news',
                 'message' => $userHandler->formatName($row) . ' posted the news ' . Scrub::text($row['heading']),
                 'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName( $row ) .
                                  '</a> posted the news '. Scrub::text( $row['heading'] ),
@@ -347,7 +347,7 @@ class Feed {
         while ($row = $this->db->getNextArray()) {
             $folder[] = array(
                 'date' => $row['submitted'],
-                'type' => 'folder',
+                'type' => 'icon-folder',
                 'message' => $userHandler->formatName($row) . ' created the folder ' . Scrub::text($row['name']),
                 'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
                     $row
@@ -387,7 +387,7 @@ class Feed {
 
             $forum[] = array(
                 'date' => $row['submitted'],
-                'type' => 'forum',
+                'type' => 'icon-forum',
                 'message' => $userHandler->formatName($row) . ' started the thread ' . Scrub::text($row['heading']),
                 'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
                     $row
@@ -437,7 +437,7 @@ class Feed {
         while ($row = $this->db->getNextArray()) {
             $wiki[] = array(
                 'date' => $row['submitted'],
-                'type' => 'wiki',
+                'type' => 'icon-wiki',
                 'message' => $userHandler->formatName($row) . ' updated the wiki ' . Scrub::text($row['heading']),
                 'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
                     $row
@@ -486,7 +486,7 @@ class Feed {
         while ($row = $this->db->getNextArray()) {
             $blog[] = array(
                 'date' => $row['submitted'],
-                'type' => 'blog',
+                'type' => 'icon-blog',
                 'message' => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
                 'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
                     $row
@@ -535,7 +535,7 @@ class Feed {
         while ($row = $this->db->getNextArray()) {
             $blogComments[] = array(
                 'date' => $row['submitted'],
-                'type' => 'blog',
+                'type' => 'icon-blog',
                 'message' => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
                 'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
                     $row
