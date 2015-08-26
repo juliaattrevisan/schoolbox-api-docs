@@ -56,6 +56,7 @@
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.rubric-graph.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.fraction-display.js"></script>
 <script type="text/javascript">
     $(function() {
         if ({GRAPH_DATA}.length) {
@@ -66,6 +67,9 @@
                 inputs: '#rubric-window'
             });
         }
+        $('#rubric-window').fractionDisplay({
+            displaySelector: '#sum'
+        });
 
 //        var radios = $('#rubric-tbody :radio');
 //        radios.removeClass('focused').parent('td').removeClass('focused');
