@@ -1,7 +1,9 @@
 (function() {
 
     /**
-     * Plugin
+     * Search Plugin
+     *
+     * Loads a list of search results upon every instantiation
      *
      * @param options
      */
@@ -33,6 +35,13 @@
                  */
                 keyword: '',
 
+                /* Default page number
+                 */
+                pageNumber: 1
+            }
+
+            var derived = {
+
                 /* A comma-separated string/int tuple, e.g. all,1 / user,1 / user,2
                  *
                  * This is used to parameterise the search method. This interface is now
@@ -42,10 +51,7 @@
 
                 /* "See More" elements. These trigger a dynamic hash page reload
                  */
-                more: 'data-more'
-            }
-
-            var derived = {
+                more: 'data-more',
 
                 /* The actual section's HTML element that was selected
                  */
@@ -191,7 +197,7 @@
              * through this particular section
              */
             if (config.section == 'all') {
-                $('.pagination').hide();
+                $('[data-search-pagination]').hide();
             }
         }
 
