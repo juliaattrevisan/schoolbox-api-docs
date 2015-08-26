@@ -399,7 +399,7 @@ class External_Synergetic_User implements External_UserInterface
                 StudentContactLegalFullName,
                 StudentContactSurname,
                 StudentContactDefaultEmail,
-                ValidAddressFlag,
+                vStudentContactAllAddress.ValidAddressFlag,
                 StudentContactAddress1,
                 StudentContactAddress2,
                 StudentContactAddress3,
@@ -429,9 +429,11 @@ class External_Synergetic_User implements External_UserInterface
                 StudentContactSilentPhoneFlag,
                 Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
                 Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
+                ContactAddress.SilentHomeAddressFlag SilentHomeAddressFlag,
                 StudentParentsSeparatedFlag
             FROM SynergyOne.dbo.vStudentContactAllAddress
             LEFT JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
+            LEFT JOIN SynergyOne.dbo.Addresses ContactAddress ON Contact.AddressID = ContactAddress.AddressID
             LEFT JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
             LEFT JOIN SynergyOne.dbo.luHouse House ON StudentCampus = House.Campus
                 AND StudentHouse = House.Code
@@ -501,9 +503,10 @@ class External_Synergetic_User implements External_UserInterface
         $query .= "
             ORDER BY StudentSurname, StudentID, StudentContactType
         ";
+
         $contactList = $this->getDatabase()->getAll($query) ?: array();
         foreach ($contactList as &$row) {
-            if ($row['ValidAddressFlag'] == 0) {
+            if ($row['ValidAddressFlag'] == 0 || $row['SilentHomeAddressFlag'] == 1) {
                 $row['StudentContactAddress1']        = '';
                 $row['StudentContactAddress2']        = '';
                 $row['StudentContactAddress3']        = '';
@@ -525,6 +528,19 @@ class External_Synergetic_User implements External_UserInterface
                 = $row['StudentContactCountryCode'] == 'Not Selected' ? '' : $row['StudentContactCountryCode'];
         }
         return $contactList;
+    }
+
+    /**
+     * is triggered when invoking inaccessible methods in an object context.
+     *
+     * @param $name string
+     * @param $arguments array
+     * @return mixed
+     * @link http://php.net/manual/en/language.oop5.overloading.php#language.oop5.overloading.methods
+     */
+    function __call($name, $arguments)
+    {
+        // TODO: Implement __call() method.
     }
 
     /**
@@ -598,7 +614,8 @@ class External_Synergetic_User implements External_UserInterface
                 StudentContactPreferred,
                 StudentContactSurname,
                 StudentContactDefaultEmail,
-                ValidAddressFlag,StudentContactAddress1,
+                ValidAddressFlag,
+                StudentContactAddress1,
                 StudentContactAddress2,
                 StudentContactAddress3,
                 StudentContactSuburb,
