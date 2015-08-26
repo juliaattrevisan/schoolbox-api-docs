@@ -165,6 +165,34 @@ class Activity {
 		return $this->event;
 	}
 
+    /**
+     * Translate "event" strings into class representation
+     * since these icons no longer actually exist
+     *
+     * @return string
+     */
+    public function getEventIcon() {
+        switch ($this->getEvent()) {
+            case 'new' :
+                return 'icon-due-work';
+
+            case 'overdue' :
+                return 'icon-countdown';
+
+            case 'closed' :
+                return 'icon-timetable';
+
+            case 'submitted' :
+                return 'icon-upload';
+
+            case 'returned':
+                return 'icon-download';
+
+            default:
+                return 'icon-view';
+        }
+    }
+
 	/**
 	 * @param  Resource\Folder\Model $category
 	 *

@@ -585,7 +585,7 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
     $feedItems[] = array(
         'content'   => $stringDesc,
         'time'      => $activityTime->getRelativeTime(),
-        'icon'      => $activity->getEvent(),
+        'icon'      => $activity->getEventIcon(),
         'grade'     => isset($mark) ? $mark : null,
         'gradeiant' => isset($mark) ? (int)($rtn['norm_mark'] / 10) : '',
         'has_grade' => isset($mark) ? 'grade' : 'no-grade',
