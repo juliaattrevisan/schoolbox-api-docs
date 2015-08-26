@@ -55,12 +55,7 @@ class Synchronise_Synergetic_Wenona_Strategy_Student extends Synchronise_Synerge
         if (self::STUDENT_EPORTFOLIO != -1) {
             $newUser['eportfolio_enabled'] = self::STUDENT_EPORTFOLIO;
         }
-
-        if ($newUser['year'] == 7) {
-            //Turn on ePortfolios for year 7 automatically
-            $newUser['eportfolio_enabled'] = 1;
-        }
-
+        
         // students aren't superusers
         //$newUser['su'] = false;
 
