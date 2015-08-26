@@ -57,7 +57,7 @@
             $(config.element).highcharts({
                 chart: {
                     polar: true,
-                    type: 'line'
+                    type: 'area'
                 },
 
                 title: {
@@ -90,7 +90,8 @@
                 series: [{
                     name: 'Value',
                     data: config.data,
-                    pointPlacement: 'on'
+                    pointPlacement: 'on',
+                    fillOpacity: 0.2
                 }]
             });
         }
