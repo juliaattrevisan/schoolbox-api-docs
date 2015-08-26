@@ -1,5 +1,5 @@
 <div class="row">
-	<div class="small-12 island no-pad">
+	<div class="small-12 island">
 		<h2 class="subheader">Files <!-- BEGIN count -->({FILE_DISP_COUNT} / {FILE_COUNT})<!-- END count --></h2>
 		<section>
 			<ul class="action-list">
@@ -13,8 +13,9 @@
 							</a>
 							<p class="meta">{FILE_BREADCRUMB}</p>
 							<p class="meta">{FILE_SIZE} | Uploaded by <a href="/search/user/{FILE_OWNER}">{FILE_OWNER_NAME}</a> {FILE_CREATED}</p>
-							<p class="meta">{FILE_COMMENT}</p>
 						</div>
+						<article>{FILE_COMMENT}</article>
+
 					</div>
 					<!-- BEGIN modify -->
 					<div class="one actions">

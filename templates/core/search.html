@@ -55,22 +55,25 @@ $(function() {
 });
 </script>
 <!-- END custom_head -->
+<div class="row">
+    <div class="small-12 island">
+        <h1>Search Results{FOR}<em>{UNESCAPED_KEYWORD}</em></h1>
+        <dl id="type" class="sub-nav">
+            <!-- BEGIN type -->
+            <dd class='{TYPE_CLASS}'>
+                <a href='#' rel="{TYPE_TYPE}" data-count="0">{TYPE_NAME} ({TYPE_COUNT})</a>
+            </dd>
+            <!-- END type -->
+        </dl>
 
-<h1>Search Results{FOR}<em>{UNESCAPED_KEYWORD}</em></h1>
-<dl id="type" class="sub-nav">
-    <!-- BEGIN type -->
-    <dd class='{TYPE_CLASS}'>
-		<a href='#' rel="{TYPE_TYPE}" data-count="0">{TYPE_NAME} ({TYPE_COUNT})</a>
-	</dd>
-    <!-- END type -->
-</dl>
-
-<div class="results">
-    <!-- BEGIN result -->
-    <div data-type="{RESULT_TYPE}" data-container="resultType" class="search-resultType">
-		{RESULT}
-	</div>
-    <!-- END result -->
+        <div class="results">
+            <!-- BEGIN result -->
+            <div data-type="{RESULT_TYPE}" data-container="resultType" class="search-resultType">
+                {RESULT}
+            </div>
+            <!-- END result -->
+        </div>
+    </div>
 </div>
 <!-- BEGIN no_result -->
 <div class="row">
