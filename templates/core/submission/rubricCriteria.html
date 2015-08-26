@@ -85,48 +85,17 @@ $(function() {
         }
     });
 
-//    // logic for handling the form submit
-//    form.submit(function(e) {
-//        e.preventDefault();
-//        var data = {},
-//            self = $(this),
-//            fields = self.find('input[type="text"]'),
-//            catID = form.find('[name="categoryID"]').val(),
-//            x = -1,
-//            y = Number('{MAX_CRIT_ID}');
-//
-//        // validate all the input fields
-//        fields.each(function() {
-//            var self        = $(this);
-//            var elementData = self.data();
-//            // new group
-//            if ('rubricGroupNew' in elementData || 'rubricCriterionNew' in elementData) {
-//                // skip
-//            } else if ('rubricGroup' in elementData) {
-//                // a group
-//                ++x;
-//                crits[x] = {};
-//                crits[x]['name'] = self.val();
-//                crits[x]['items'] = {};
-//            } else if ('rubricCriterion' in elementData) {
-//                // a single criterion
-//                if (self.attr('id') === undefined) {
-//                    crits[x]['items']['i'+y] = self.val();
-//                    ++y;
-//                }
-//                else {
-//                    crits[x]['items'][self.attr('id')] = self.val();
-//                }
-//            }
-//        });
-//
-//        self.find(':submit').prop('disabled', true).val('Saving Changes...');
-//        $.post(self.attr('action'), {'crits': data, 'categoryID': catID})
-//            .done(function(data) {
-//                history.back(-1);
-//            })
-//        ;
-//    });
+    // logic for handling the form submit
+    // Currently, just goes back in history - this is so whatever you entered
+    // in the submission you just created gets restored
+    form.submit(function(e) {
+        e.preventDefault();
+        form.find(':submit').prop('disabled', true).val('Saving Changes...');
+        $.post(form.attr('action'), form.serializeArray())
+            .done(function() {
+                history.back();
+            });
+    });
 
     $('[data-interaction="show-example-criteria"]').click(function(e) {
         e.preventDefault();
