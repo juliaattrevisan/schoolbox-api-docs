@@ -42,6 +42,12 @@
 
             var derived = {
 
+                /* Navigation elements which you can use to see results for different items
+                 * These elements contain data about which "section" you're viewing ie. the
+                 * kind of item for which you are viewing search results - e.g. blog, news
+                 */
+                navElements: '#type dd',
+
                 /* A comma-separated string/int tuple, e.g. all,1 / user,1 / user,2
                  *
                  * This is used to parameterise the search method. This interface is now
@@ -187,7 +193,7 @@
 
             /* Remove all selected classes
              */
-            $('#type dd').removeClass('active');
+            $(config.navElements).removeClass('active');
 
             /* Add active class to the thing you clicked on
              */
