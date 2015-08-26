@@ -49,8 +49,6 @@ foreach($criteria as $group) {
     }
 }
 
-var_dump($data);exit;
-
 $criterionMapper = CriterionMapper::getInstance();
 
 
