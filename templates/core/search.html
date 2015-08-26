@@ -56,26 +56,38 @@
         </div>
     </div>
 </div>
+
 <!-- BEGIN no_result -->
 <div class="row">
-    <form method="get" action="/search" _lpchecked="1" id="inline_search">
-    <div class="large-12 island">
-        <section>
-            <div class="content">
-                <p class="alert-box warning">Sorry, but your search{FOR}<em>{UNESCAPED_KEYWORD}</em> did not return any results{NO_RESULTS_BECAUSE}.</p>
-                <p>Here are some tips for improving your search:</p>
-                <ul>
-                    <li>Ensure your search is 3 or more letters long. If you need to search for something less than 3 letters long, "quote" it.</li>
-                    <li>You can also use "quotes" to search for an exact string, for example "dog and cat".</li>
-                </ul>
-            <label for="inline_search_field">
-                Try Again
-            </label>
-            <input id="inline_search_field" type="text" value="{ENCODED_KEYWORD}" name="keyword" placeholder="search" />
-            <input type="submit" value="Search" />
+    <div class="small-12 island">
+        <form method="get" action="/search" class="top" id="inline_search">
+            <section>
+                <div class="content">
+                    <p class="alert-box warning">
+                        Sorry, but your search{FOR}
+                        <em>{UNESCAPED_KEYWORD}</em>
+                        did not return any results{NO_RESULTS_BECAUSE}.
+                    </p>
+
+                    <p>Here are some tips for improving your search:</p>
+
+                    <ul>
+                        <li>Ensure your search is 3 or more letters long. If you need to search for something less than 3 letters long, "quote" it.</li>
+                        <li>You can also use "quotes" to search for an exact string, for example "dog and cat".</li>
+                    </ul>
+
+                    <label>
+                        Try Again
+                        <input type="text" value="{ENCODED_KEYWORD}" name="keyword" placeholder="search" />
+                    </label>
+                </div>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Search" />
+                </div>
             </div>
-        </section>
+        </form>
     </div>
-    </form>
 </div>
 <!-- END no_result -->
