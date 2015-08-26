@@ -3,9 +3,7 @@
 <script type="text/javascript" src="/javascript/shared/jquery.research.js"></script>
 <script type="text/javascript">
 
-
-
-$(function() {
+    $(function() {
 
     /* Disable under certain conditions
      */
@@ -31,16 +29,16 @@ $(function() {
             }
         }
 
-//        /* Seymour
-//         */
-//        $('#content div.results').on('click', 'a.more', function(event) {
-//            event.preventDefault();
-//
-//            var type = $(this).attr('rel');
-//
-//            window.location.hash = '#' + type + ',1';
-//            window.location.reload(true);
-//        });
+        /* Seymour
+         */
+        $('#content div.results').on('click', 'a.more', function(event) {
+            event.preventDefault();
+
+            var type = $(this).attr('rel');
+
+            window.location.hash = '#' + type + ',1';
+            window.location.reload(true);
+        });
 
         $('[data-results]').research({
             keyword: keyword,

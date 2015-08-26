@@ -43,7 +43,7 @@
 
                 /* The actual section's HTML element that was selected
                  */
-                sectionElement: $('#type a[rel=' + options.section + ']'),
+                sectionElement: $('#type [data-more=' + options.section + ']'),
 
                 /* A set of results tabs. These are denoted by data-container=resultType,
                  * caching the selection here allows you to switch tabs faster
@@ -103,7 +103,7 @@
 
                     /* Flag it as having loaded
                      */
-                    $(self.getTargetDiv()).addClass('loaded');
+                    $(config.targetDiv).addClass('loaded');
 
                     /* Add pagination again
                      */
@@ -130,7 +130,7 @@
 
                 /* Set the page number
                  */
-                config.pageNumber = $(this).attr('rel');
+                config.pageNumber = $(this).attr('data-more');
 
                 /* Update hash configuration
                  */
@@ -151,7 +151,7 @@
             /* Show the pagination div again
              * but only for non-all portions
              */
-            if (search.getSection() == 'all') {
+            if (config.section == 'all') {
                 $('.pagination').hide();
             }
             else {
