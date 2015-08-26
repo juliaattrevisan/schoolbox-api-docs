@@ -55,7 +55,7 @@
 
                 /* The actual section's HTML element that was selected
                  */
-                sectionElement: $('[data-more=' + options.section + ']'),
+                sectionElement: $('[data-section=' + options.section + ']'),
 
                 /* A set of results tabs. These are denoted by data-container=resultType,
                  * caching the selection here allows you to switch tabs faster
@@ -189,16 +189,9 @@
              */
             $('#type dd').removeClass('active');
 
-            /* Select only the current section
+            /* Add active class to the thing you clicked on
              */
-            config.sectionElement.closest('dd').addClass('active');
-
-            /* If this was in section "all", then hide pagination. We don't paginate
-             * through this particular section
-             */
-            if (config.section == 'all') {
-                $('[data-search-pagination]').hide();
-            }
+            config.sectionElement.parent().addClass('active');
         }
 
         /**
