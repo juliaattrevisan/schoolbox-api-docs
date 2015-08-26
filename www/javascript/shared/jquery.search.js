@@ -10,7 +10,7 @@
 
         var config = init(options, $(this));
 
-        runOnce(config.keyword, config.section, config.sectionElement, config.pageNumber);
+        runOnce();
 
         setupMore();
 
@@ -73,16 +73,12 @@
         /**
          * Perform a search using the keyword, section and pageNumber to organise
          * results.
-         *
-         * @param keyword
-         * @param section
-         * @param pageNumber
          */
-        function runOnce(keyword, section, sectionElement, pageNumber) {
+        function runOnce() {
 
             /* Set up hash configuration
              */
-            deriveHash(section, pageNumber);
+            deriveHash(config.section, config.pageNumber);
             applyHash(config.hash);
 
             /* Load result set via ajax into target div
