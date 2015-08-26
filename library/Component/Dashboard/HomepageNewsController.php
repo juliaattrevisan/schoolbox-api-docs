@@ -68,7 +68,7 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
         $this->setVar('SUBJ_HAS_GRADE', 'no-grade');
 
         $alist = new Activity_ListArray($this->feedList);
-        $alist->setShowAvatars(true);
+        $alist->setShowAvatars(false);
         $alist->setShowTrends(false);
         $alist->setTarget($this->sitepage, 'ACTIVITY_LIST');
         foreach ($alist as $a) {
