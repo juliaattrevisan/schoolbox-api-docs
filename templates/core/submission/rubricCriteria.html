@@ -152,7 +152,7 @@ $(function() {
             <section>
                 <!-- BEGIN allow_cascade -->
                 <!-- Cascade isn't supported, but if it is: -->
-                <fieldset>
+                <fieldset class='content'>
                     <div class="small-12 columns">
                         <input type="hidden" name="cascade" value="0" />
                         <input id="cascade" type="checkbox" name="cascade" value="1" />
@@ -166,7 +166,7 @@ $(function() {
                 </fieldset>
                 <!-- END allow_cascade -->
                 <!-- BEGIN criterion_group -->
-                <fieldset data-rubric-group-row="{CRITGROUP_COUNT}">
+                <fieldset class='content' data-rubric-group-row="{CRITGROUP_COUNT}">
                     <div class="small-12 medium-6 columns">
                         <label>
                             Group
@@ -239,7 +239,7 @@ $(function() {
                 </fieldset>
                 <!-- END criterion_group -->
                 <!-- New group -->
-                <fieldset data-rubric-group-row="{MAX_CRITGROUP_ID}">
+                <fieldset class='content' data-rubric-group-row="{MAX_CRITGROUP_ID}">
                     <div class="small-12 medium-6 columns">
                         <label>
                             Group
