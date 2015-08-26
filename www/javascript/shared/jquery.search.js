@@ -49,7 +49,7 @@
 
                 /* The actual section's HTML element that was selected
                  */
-                sectionElement: $('#type [data-more=' + options.section + ']'),
+                sectionElement: $('[data-more=' + options.section + ']'),
 
                 /* A set of results tabs. These are denoted by data-container=resultType,
                  * caching the selection here allows you to switch tabs faster
