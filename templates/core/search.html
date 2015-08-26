@@ -32,6 +32,18 @@
             section: section,
             pageNumber: pageNumber
         });
+
+        /* Runs when you change sections
+         */
+        $('#type [data-section]').click(function(event) {
+            event.preventDefault();
+
+            $('[data-results]').research({
+                keyword: keyword,
+                section: $(this).attr('data-section'),
+                pageNumber: 1
+            });
+        });
     }
 });
 </script>
@@ -44,7 +56,7 @@
         <dl id="type" class="sub-nav">
             <!-- BEGIN type -->
             <dd class='{TYPE_CLASS}'>
-                <a href='#' rel="{TYPE_TYPE}" data-count="0">{TYPE_NAME} ({TYPE_COUNT})</a>
+                <a href='#' data-section="{TYPE_TYPE}" data-count="0">{TYPE_NAME} ({TYPE_COUNT})</a>
             </dd>
             <!-- END type -->
         </dl>
