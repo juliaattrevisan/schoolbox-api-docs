@@ -1,7 +1,9 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
-<script type="text/javascript" src="/javascript/jquery.search.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.research.js"></script>
 <script type="text/javascript">
+
+
 
 $(function() {
 
@@ -18,7 +20,7 @@ $(function() {
         var pageNumber = 1;
 
         if (window.location.hash.length > 1) {
-            var params = search.fetchHash();
+            var params = $.fn.fetchHash();
 
             if (params.length) {
                 section = params[0];
@@ -29,28 +31,34 @@ $(function() {
             }
         }
 
-        /* Seymour
-         */
-        $('#content div.results').on('click', 'a.more', function(event) {
-            event.preventDefault();
+//        /* Seymour
+//         */
+//        $('#content div.results').on('click', 'a.more', function(event) {
+//            event.preventDefault();
+//
+//            var type = $(this).attr('rel');
+//
+//            window.location.hash = '#' + type + ',1';
+//            window.location.reload(true);
+//        });
 
-            var type = $(this).attr('rel');
-
-            window.location.hash = '#' + type + ',1';
-            window.location.reload(true);
+        $('[data-results]').research({
+            keyword: keyword,
+            section: section,
+            pageNumber: pageNumber
         });
 
-        /* Run Once by default
-         */
-        search.runOnce(keyword, section, $('#type a[rel=' + section + ']'), pageNumber);
-
-        /* Runs when you change sections
-         */
-        $('#type a[class!=disabled]').click(function(event) {
-            event.preventDefault();
-
-            search.runOnce(keyword, $(this).attr('rel'), $(this), 1);
-        });
+//        /* Run Once by default
+//         */
+//        search.runOnce(keyword, section, $('#type a[rel=' + section + ']'), pageNumber);
+//
+//        /* Runs when you change sections
+//         */
+//        $('#type a[class!=disabled]').click(function(event) {
+//            event.preventDefault();
+//
+//            search.runOnce(keyword, $(this).attr('rel'), $(this), 1);
+//        });
     }
 });
 </script>
@@ -66,9 +74,9 @@ $(function() {
             <!-- END type -->
         </dl>
 
-        <div class="results">
+        <div data-results>
             <!-- BEGIN result -->
-            <div data-type="{RESULT_TYPE}" data-container="resultType" class="search-resultType">
+            <div data-type="{RESULT_TYPE}" class="search-resultType" data-result-container>
                 {RESULT}
             </div>
             <!-- END result -->
