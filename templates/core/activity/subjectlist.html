@@ -2,9 +2,9 @@
     <div class="small-12 island">
         <section>
             <ul class="information-list">
-                <li class="actions-small-1">
+                <li>
                     <div class="list-item">
-                        <div class="small-12 avatar card">
+                        <div class="small-8 avatar card">
                             <a href="/homepage/{SUBJ_CAT_ID}" title="Visit Homepage">
                                 <!-- BEGIN icon -->
                                 <!--
@@ -18,19 +18,19 @@
                             </a>
                             <p class="meta">{SUBJ_SUBJECT_CODE}</p>
                         </div>
+                        <div class="small-4 columns no-pad">
+                            <!-- BEGIN subject_grade -->
+                            <div class="grade gradient-{SUBJ_GRADEIANT}-bg content">
+                                <a href="/submission/allWork/{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{SUBJ_CAT_ID}">
+                                    <span class="gradient-{SUBJ_GRADEIANT}">
+                                        {SUBJ_GRADE}
+                                    </span>
+                                    {SUBJ_TREND_AMT} {SUBJ_TREND_DIR}
+                                </a>
+                            </div>
+                            <!-- END subject_grade -->
+                        </div>
                     </div>
-                    <nav>
-                        <!-- BEGIN subject_grade -->
-                        <p class="grade gradient-{SUBJ_GRADEIANT}-bg">
-                            <a href="/submission/allWork/{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{SUBJ_CAT_ID}">
-                                <span class="gradient-{SUBJ_GRADEIANT}">
-                                    {SUBJ_GRADE}
-                                </span>
-                                {SUBJ_TREND_AMT} {SUBJ_TREND_DIR}
-                            </a>
-                        </p>
-                        <!-- END subject_grade -->
-                    </nav>
                 </li>
                 <!-- BEGIN teacher -->
                 <li class="actions-small-1">
