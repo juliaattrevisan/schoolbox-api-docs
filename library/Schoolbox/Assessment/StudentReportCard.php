@@ -20,6 +20,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 
 class StudentReportCard
 {
@@ -54,7 +55,9 @@ class StudentReportCard
 
     // populated data
     /**
-     * @var Folder\Model[]
+     * A collection of Folder models
+     * 
+     * @var \Schoolbox\Collection
      */
     protected $categoriesInSemester = array();
 
@@ -219,7 +222,9 @@ class StudentReportCard
         $page->setFile(TEMPLATE_content, $template);
         $page->setTab($tab);
         // global blocks
-        $page->setBlock(TEMPLATE_content, 'subject', 'subject_block');
+        $page->setBlock(TEMPLATE_content, 'subject_container', 'subject_container_block');
+        $page->setBlock(TEMPLATE_content, 'no_subjects', 'no_subjects_block');
+
         // global vars
         /** @var $target User */
         $target = UserMapper::getInstance()->findById($this->targetUserId);
@@ -232,7 +237,7 @@ class StudentReportCard
             )
         );
         $this->renderSemesterSelectors($page);
-        $this->renderSubjectSelectors($page);
+
         // only attempt to render a subject's details if a subject has actually been selected
         if ($this->hasSubjectSelected()) {
             $this->renderSubject($page);
@@ -248,78 +253,30 @@ class StudentReportCard
      */
     protected function renderSemesterSelectors(\SitePage $page)
     {
-        $page->setBlock(TEMPLATE_content, 'semester_option', 'semester_option_block');
-        $page->setBlock(TEMPLATE_content, 'year_option', 'year_option_block');
+        $contextSelector = new ContextSelector("submission/allWork/{$this->targetUserId}");
+
         // Years is tricksy, because we first need to find out all the years in which the student in question has submitted work
         // also, merging in this current year is a tad unfortunate
         $submitYears  = $this->submissionMapper->getAllYearsByUser($this->targetUserId);
-        $earliestYear = empty($submitYears)
-            ? $this->currentYear
-            : min($submitYears);
+        $earliestYear = empty($submitYears) ? $this->currentYear : min($submitYears);
         $years = range($this->currentYear, $earliestYear);
 
-        foreach ($years as $y) {
-            // Semesters can be hardcoded, no need to look anything up (may change if a school wants Term breakdowns rather than Semester)
-            $semesters = array(2, 1);
-            foreach ($semesters as $sem) {
-                $selected = $y == $this->targetYear && $sem == $this->targetSemester;
-                $page->setVar(
-                    array(
-                        'SEMESTER_SELECTED' => $selected ? ' selected="selected"' : '',
-                        'SEMESTER_SLUG'     => "{$this->targetUserId}/$y/$sem",
-                        'SEMESTER_VALUE'    => "Semester $sem, $y"
-                    )
-                );
-                $page->parse('semester_option_block', 'semester_option', true);
-            }
+        $contextSelector->setYears($years);
+        $contextSelector->setCategoryFirst(false);
+
+        try {
+            $contextSelector->setCategories($this->categoriesInSemester);
         }
-        // Disable back and forward buttons if I can't go back or forward
-        $disabledBack = $this->targetSemester == 1 && $this->targetYear == min($years);
-        $disabledFwd  = $this->targetSemester == 2 && $this->targetYear == max($years);
-        $page->setVar(
-            array(
-                'WORK_YEAR'              => $this->targetYear,
-                'WORK_SEMESTER'          => $this->targetSemester,
-                'SEMESTER_BACK'          => $this->targetYear - ($this->targetSemester == 1 ? 1 : 0) . '/' . ($this->targetSemester == 1 ? 2 : 1),
-                'SEMESTER_FWD'           => $this->targetYear + ($this->targetSemester == 2 ? 1 : 0) . '/' . ($this->targetSemester == 1 ? 2 : 1),
-                'SEMESTER_BACK_DISABLED' => $disabledBack ? 'disabled' : '',
-                'SEMESTER_FWD_DISABLED'  => $disabledFwd ? 'disabled' : '',
+        catch (\Exception $e) {
+        }
+
+        $contextSelector->render(
+            $page, 'CONTEXT_SELECTOR', array(
+                'year'     => $this->targetYear,
+                'semester' => $this->targetSemester,
+                'category' => ''
             )
         );
-    }
-
-    /**
-     * Renders the selectors for the subjects
-     *
-     * @param \SitePage $page
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected function renderSubjectSelectors(\SitePage $page)
-    {
-        if (!$this->targetYear || !$this->targetSemester) {
-            throw new \InvalidArgumentException("Select a semester to display");
-        }
-        $page->setBlock(TEMPLATE_content, 'subject_selector', 'subject_selector_block');
-        if (!count($this->categoriesInSemester)) {
-            $page->setVar('subject_selector_block', "No subjects");
-            return;
-        }
-        foreach ($this->categoriesInSemester as $folder) {
-            // <li data-id="{ENR_SUBJ_ID}" class="{ENR_SUBJ_SELECTED}" title="{ENR_SUBJ_CODE}">{ENR_SUBJ_NAME}</li>
-            $catId = $folder->getId();
-            $code  = $folder->getCodeString();
-            $name  = $folder->getName();
-            $page->setVar(
-                array(
-                    'ENR_SUBJ_ID'       => $catId,
-                    'ENR_SUBJ_SELECTED' => $catId == $this->targetCategoryId ? ' selected="selected"' : '',
-                    'ENR_SUBJ_CODE'     => $code ?: $name,
-                    'ENR_SUBJ_NAME'     => $name,
-                )
-            );
-            $page->parse('subject_selector_block', 'subject_selector', true);
-        }
     }
 
     protected function renderSubject(\SitePage $page, $components = array())
@@ -346,13 +303,17 @@ class StudentReportCard
                 $this->$m($page);
             }
         }
-        $page->parse('subject_block', 'subject');
+
+        $page->parse('subject_container_block', 'subject_container');
+        $page->setVar(array(
+            'no_subjects_block' => ''
+        ));
     }
 
     protected function renderTeachers(\SitePage $page)
     {
         // output teachers
-        $page->setBlock('subject', 'subject_teacher', 'subject_teacher_block');
+        $page->setBlock('subject_container', 'subject_teacher', 'subject_teacher_block');
         $teachers = $this->subjectData->getTeachers();
         if (count($teachers)) {
             foreach ($teachers as $teacher) {
@@ -374,7 +335,7 @@ class StudentReportCard
 
     protected function renderGradeAverage(\SitePage $page)
     {
-        $page->setBlock('subject', 'grade_average', 'grade_average_block');
+        $page->setBlock('subject_container', 'grade_average', 'grade_average_block');
         // if you can't see the grade average...you, well, can't see the grade average
         if (!$this->checkPermission(self::CAN_VIEW_OVERALL_GRADE)) {
             $page->setVar('grade_average_block', '');
@@ -465,7 +426,7 @@ class StudentReportCard
         // if permission to see class average, include the data series
         if ($this->checkPermission(self::CAN_VIEW_CLASS_AVERAGE)) {
             $graph[] = array(
-                'label' => 'Class',
+                'name' => 'Class',
                 'data'  => $averageSeries
             );
         } // otherwise, remove the colour from the map (so the graph doesn't get confused)
@@ -474,7 +435,7 @@ class StudentReportCard
         }
         // add the user to the graph second, so it appears on top
         $graph[] = array(
-            'label' => 'You',
+            'name' => 'You',
             'data'  => $userSeries
         );
         // display the graph for the semester
@@ -494,10 +455,9 @@ class StudentReportCard
 
     protected function renderCriteria(\SitePage $page)
     {
-        $page->setBlock('subject', 'subject_rubric', 'subject_rubric_block');
+        $page->setBlock('subject_container', 'subject_rubric', 'subject_rubric_block');
         $page->setBlock('subject_rubric', 'subject_rubric_group', 'subject_rubric_group_block');
         $page->setBlock('subject_rubric', 'subject_rubric_submissionbox', 'subject_rubric_submissionbox_block');
-        $page->setBlock('subject_rubric', 'subject_rubric_box_checklist', 'subject_rubric_box_checklist_block');
         $page->setBlock('subject_rubric_group', 'subject_rubric_criterion', 'subject_rubric_criterion_block');
         $page->setBlock('subject_rubric_criterion', 'subject_rubric_criterion_mark', 'subject_rubric_criterion_mark_block');
 
@@ -505,7 +465,7 @@ class StudentReportCard
             'subject_rubric_block' => '',
             'subject_rubric_group_block' => '',
             'subject_rubric_criterion_block' => '',
-            'subject_rubric_criterion_mark_block' => ''
+            'subject_rubric_criterion_mark_block' => '',
         ));
 
         $submissionBoxMapper = $this->submissionMapper;
@@ -589,20 +549,6 @@ class StudentReportCard
                 }
             }
 
-//                $page->setVar([ 'SUBJECT_RUBRIC_COLSPAN'    => count($allSubmissionBoxes) + 1 ]);
-
-            /* Render out all the submission box headings
-             */
-//                foreach($allSubmissionBoxes as $currentSubmissionBox) {
-//                    $page->setVar(array(
-//                        'SUBJECT_RUBRIC_SUBMISSIONBOX_NAME' => $currentSubmissionBox['box']->getName(),
-//                        'SUBJECT_RUBRIC_SUBMISSIONBOX_ID' => $currentSubmissionBox['box']->getId(),
-//                    ));
-//
-//                    $page->parse('subject_rubric_submissionbox_block', 'subject_rubric_submissionbox', true);
-//                    $page->parse('subject_rubric_box_checklist_block', 'subject_rubric_box_checklist', true);
-//                }
-
             /* Render that all out in the land of phpliberty
              */
             foreach ($allStructures as $group => $currentStructure) {
@@ -650,9 +596,12 @@ class StudentReportCard
     protected function renderAssessments(\SitePage $page)
     {
         // output assessments
-        $page->setBlock('subject', 'work', 'work_block');
+        $page->setBlock('subject_container', 'no_work', 'no_work_block');
+        $page->setBlock('subject_container', 'has_work', 'has_work_block');
+        $page->setBlock('has_work', 'work', 'work_block');
         $page->setBlock('work', 'work_actionable', 'work_actionable_block');
         $page->setBlock('work', 'work_publishable', 'work_publishable_block');
+        $page->setBlock('work', 'work_publishable_label', 'work_publishable_label_block');
         $page->setBlock('work', 'work_clickable', 'work_clickable_block');
         $page->setBlock('work', 'work_unclickable', 'work_unclickable_block');
         $work = $this->subjectData->getAssessments();
@@ -665,26 +614,27 @@ class StudentReportCard
                 // clear all template vars
                 $page->setVar(
                     array(
-                        'ON_OFF'                 => '',
-                        'WORK_ID'                => '',
-                        'WORK_TYPE'              => '',
-                        'WORK_DATE'              => '',
-                        'WORK_TIME'              => '',
-                        'WORK_TITLE'             => '',
-                        'WORK_URGENCY'           => '',
-                        'WORK_GRADIENT'          => '',
-                        'WORK_GRADE'             => '',
-                        'WORK_COMMENT'           => '',
-                        'WORK_HREF'              => '',
-                        'WORK_BTN_ICON'          => '',
-                        'WORK_BTN_LABEL'         => '',
-                        'WORK_PUBLISH_ACTION'    => '',
-                        'WORK_PUBLISH_BTN_ICON'  => '',
-                        'WORK_PUBLISH_BTN_LABEL' => '',
-                        'work_actionable_block'  => '',
-                        'work_publishable_block' => '',
-                        'work_clickable_block'   => '',
-                        'work_unclickable_block' => '',
+                        'ON_OFF'                       => '',
+                        'WORK_ID'                      => '',
+                        'WORK_TYPE'                    => '',
+                        'WORK_DATE'                    => '',
+                        'WORK_TIME'                    => '',
+                        'WORK_TITLE'                   => '',
+                        'WORK_URGENCY'                 => '',
+                        'WORK_GRADIENT'                => '',
+                        'WORK_GRADE'                   => '',
+                        'WORK_COMMENT'                 => '',
+                        'WORK_HREF'                    => '',
+                        'WORK_BTN_ICON'                => '',
+                        'WORK_BTN_LABEL'               => '',
+                        'WORK_PUBLISH_ACTION'          => '',
+                        'WORK_PUBLISH_BTN_ICON'        => '',
+                        'WORK_PUBLISH_BTN_LABEL'       => '',
+                        'work_actionable_block'        => '',
+                        'work_publishable_block'       => '',
+                        'work_publishable_label_block' => '',
+                        'work_clickable_block'         => '',
+                        'work_unclickable_block'       => '',
                     )
                 );
                 $existingShowcasedItem = null;
@@ -723,6 +673,7 @@ class StudentReportCard
                             $output['WORK_PUBLISH_BTN_LABEL'] = 'Unpublish';
                             $page->setVar($output);
                             $page->parse('work_publishable_block', 'work_publishable');
+                            $page->parse('work_publishable_label_block', 'work_publishable_label');
                         } else {
                             // not published
                             // has a mark been returned?
@@ -735,6 +686,7 @@ class StudentReportCard
                                 $output['WORK_PUBLISH_BTN_LABEL'] = 'Publish';
                                 $page->setVar($output);
                                 $page->parse('work_publishable_block', 'work_publishable');
+                                $page->parse('work_publishable_label_block', 'work_publishable_label');
                             } else {
                                 // no mark returned: do not offer any action
                                 $page->setVar('action_publish_block', '');
@@ -752,6 +704,7 @@ class StudentReportCard
                     $page->setVar('action_publish_block', '');
                 } else {
                     $page->setVar('work_publishable_block', '');
+                    $page->setVar('work_publishable_label_block', '');
                 }
                 // if work actions are available, render the block
                 $page->setVar('work_actionable_block', '');
@@ -768,8 +721,22 @@ class StudentReportCard
                     )
                 );
             }
-        } else {
-            $page->setVar('work_block', '<td colspan="5">No assessments for this subject</td>');
+
+            $page->parse('has_work_block', 'has_work');
+
+            $page->setVar(array(
+                'no_work_block' => '',
+                'work_publishable_label_block' => '',
+            ));
+        }
+        else {
+            $page->setVar(array(
+                'has_work_block' => '',
+                'work_block' => '',
+                'work_publishable_label_block' => '',
+            ));
+
+            $page->parse('no_work_block', 'no_work');
         }
     }
 
@@ -842,7 +809,7 @@ class StudentReportCard
         );
         $buttonSeePreviousAttempts = array(
             'WORK_BTN_HREF'  => 'assess/attempts/' . $oa->getId() . '/' . $this->targetUserId,
-            'WORK_BTN_ICON'  => 'list',
+            'WORK_BTN_ICON'  => 'icon-quiz',
             'WORK_BTN_LABEL' => 'View all attempts'
         );
 
@@ -891,7 +858,7 @@ class StudentReportCard
 
     protected function renderComments(\SitePage $page)
     {
-        $page->setBlock('subject', 'subject_comments', 'subject_comments_block');
+        $page->setBlock('subject_container', 'subject_comments', 'subject_comments_block');
         $page->setBlock('subject_comments', 'comment', 'comment_block');
         $page->setBlock('subject_comments', 'create_comment', 'create_comment_block');
         $page->setBlock('comment', 'comment_modify', 'comment_modify_block');
@@ -968,6 +935,7 @@ class StudentReportCard
                     'USER_NAME'   => $comment->getCommenter()->formatName(),
                     'USER_BYLINE' => $comment->getCommenter()->getRole()->getName(),
                     'USER_EXTID'  => $comment->getCommenter()->getExternalId(),
+                    'USER_ID'     => $comment->getCommenter()->getId(),
                     'DATE'        => $date,
                     'DATETIME'    => $comment->getCreated()->getDatabase(),
                     'BODY'        => $comment->getBody(),
@@ -1016,7 +984,7 @@ class StudentReportCard
     protected function renderOverview(\SitePage $page)
     {
         $page->setVar('RC_TITLE', "Semester {$this->targetSemester}, {$this->targetYear}");
-        // we need to inject content into subject_block rather than use its template
+        // we need to inject content into subject_container_block rather than use its template
         $page->setFile('subjectListTpl', 'submission/allWorkOverview.html');
         $page->setFile('subjectTpl', 'activity/subjectlist.html');
         $page->setBlock('subjectTpl', 'teacher', 'teacher_block');
@@ -1170,10 +1138,20 @@ class StudentReportCard
             // $this->parse('icon_block', 'icon');
             $page->parse('SUBJECT_LIST', 'subjectTpl', true);
         }
+
         if (count($this->categoriesInSemester)) {
-            $page->parse('subject_block', 'subjectListTpl');
-        } else {
-            $page->setVar('subject_block', '<h2>No subjects</h2>');
+            $page->parse('subject_container_block', 'subjectListTpl');
+
+            $page->setVar(array(
+                'no_subjects_block' => ''
+            ));
+        }
+        else {
+            $page->setVar(array(
+                'subject_container_block' => ''
+            ));
+
+            $page->parse('no_subjects_block', 'no_subjects');
         }
     }
 

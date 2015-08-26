@@ -44,10 +44,11 @@
             // bind changes to semester selector
             $(config.selector.semester).bind('change', function () {
                 var url = $(this).val();
-                var prefix = '/' + config.href + '/';
+                var elems = [config.href, url];
+                var redirect = elems.join('/');
 
                 if (url) {
-                    window.location = prefix + url;
+                    window.location = '/' + redirect;
                 }
 
                 return false;
@@ -56,9 +57,11 @@
             // bind changes to subject selector
             $(config.selector.subject).bind('change', function () {
                 var url = $(this).val();
+                var elems = [config.href, url];
+                var redirect = elems.join('/');
 
                 if (url) {
-                    window.location = prefix + url;
+                    window.location = '/' + redirect;
                 }
 
                 return false;

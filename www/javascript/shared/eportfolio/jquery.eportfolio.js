@@ -1,29 +1,12 @@
 (function() {
 
     /**
-     * Label animator
-     *
-     * @param label
-     */
-    $.fn.labelTimeout = function(label) {
-        label.animate({opacity: 0}, 1500, function() {
-            label.addClass('hide');
-        });
-    }
-
-    /**
-     * Eportfolio
-     */
-    $.fn.eportfolio = function() {
-    }
-
-    /**
      * Publish To Eportfolio
      *
      * Ajax a form which publishes an item to one's eportfolio
      * Show and hide a label indicating status
      */
-    $.fn.eportfolio.publish = function(options) {
+    $.fn.eportfolio_publish = function(options) {
         options = options || {}
 
         var config = init(options, $(this));
@@ -72,30 +55,23 @@
             $(config.activator).click(function(event) {
                 event.preventDefault();
 
-                $(config.element).submit();
-            });
+                $(config.label).labelActivate({
+                    text: 'Preparing Showcase'
+                });
 
-            /* Ajax the Publish action
-             */
-            $(config.element).submit(function(event) {
-                event.preventDefault();
-
+                /* Ajax the Publish action
+                 */
                 $.ajax({
                     type: "POST",
-                    url: $(this).attr('action'),
-                    data: $(this).serialize(), // serializes the form's elements.
-                    success: function(data)
-                    {
-                        var label = $(config.label);
-                        label.text('Showcase Updated').css({opacity:1}).removeClass('hide');
-
-                        setTimeout(function() {
-                            $.fn.labelTimeout(label)
-                        }, 3000);
+                    url: config.element.attr('action'),
+                    data: config.element.serialize(), // serializes the form's elements.
+                    success: function(data) {
+                        $(config.label).labelTimeout({
+                            text: 'Showcase Updated'
+                        });
                     }
                 });
             });
-
         }
     }
 }(jQuery));

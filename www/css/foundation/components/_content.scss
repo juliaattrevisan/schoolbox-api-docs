@@ -924,10 +924,15 @@ $rotate-th-width: $square-grid-td-size;
 }
 
 .grade{
-	min-height: 3rem;
+	//min-height: 3rem;
 	font-size: rem-calc(($base-font-size - 4));
-	span{
+	span {
+		display: block;
+		white-space: nowrap;
+		overflow-x: hidden;
+		text-overflow: ellipsis;
 		font-size: rem-calc(($base-font-size + 8));
+		line-height: 1.8rem;
 	}
 	a:hover{
 		background-color: transparent;

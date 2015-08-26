@@ -144,7 +144,7 @@ else if(isset($_REQUEST['commentId']) && is_numeric($_REQUEST['commentId'])) {
 		if(isset($_POST['commentBody']) && strlen($_POST['commentBody'])) {
 			// update the comment body and set the modified timestamp
 			$comment->setBody($_POST['commentBody']);
-			$comment->setModified(new Alaress_Date_Format(time()));
+			$comment->setModified(new Alaress_Date_Format(time(), 'U'));
 		}
 		else {
 			respond('400 Bad Request', 'Comment cannot be blank.');
