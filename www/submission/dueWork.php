@@ -595,6 +595,7 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
 $activityList = new Activity_ListArray($feedItems);
 $activityList->setShowAvatars(false);
 $activityList->setShowIcons(true);
+$activityList->setShowGrade(true);
 
 if (empty($feedItems)) {
     $this->setVar('ACTIVITY_LIST', '<li>You have no recent activity.</li>');

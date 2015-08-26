@@ -23,6 +23,10 @@ abstract class Activity_ListAbstract implements Iterator {
     protected $showAvatars = true;
     protected $showTimes = true;
     protected $showTrends = true;
+
+    /* Show the grade someone got
+     */
+    protected $showGrade = false;
     protected $asHTML = true;
 
     /**
@@ -87,7 +91,7 @@ abstract class Activity_ListAbstract implements Iterator {
 
         $page->setVar('DARK', ++$this->j % 2 ? '' : 'dark');
 
-        $blocks = array('icon', 'avatar', 'time', 'trend');
+        $blocks = array('icon', 'avatar', 'time', 'trend', 'grade');
 
         foreach($blocks as $blk) {
             $page->setBlock('activityTpl', $blk, $blk.'_block');
@@ -143,6 +147,10 @@ abstract class Activity_ListAbstract implements Iterator {
         return $this->showTrends ? true : false;
     }
 
+    public function willShowGrade() {
+        return $this->showGrade ? true : false;
+    }
+
     /**
      * @return bool
      */
@@ -192,4 +200,14 @@ abstract class Activity_ListAbstract implements Iterator {
         }
     }
 
+    /**
+     * Set show grade
+     *
+     * @param $bool
+     */
+    public function setShowGrade($bool) {
+        if(is_bool($bool)) {
+            $this->showGrade = $bool;
+        }
+    }
 }
