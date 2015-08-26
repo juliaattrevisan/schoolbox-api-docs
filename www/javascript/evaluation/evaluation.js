@@ -96,11 +96,14 @@
 							$(element).validate({
 								errorPlacement: function(error, inputElement) {
 									$(element).find(configuration.errorContainer).html(error);
-								}
+								},
+								ignore: ':hidden:not(:checkbox):not(:radio)'
 							});
 						}
 						else {
-							$(element).validate();
+							$(element).validate({
+								ignore: ':hidden:not(:checkbox):not(:radio)'
+							});
 						}
 
 						/* Apply custom rules if validation is required, in accordance with
