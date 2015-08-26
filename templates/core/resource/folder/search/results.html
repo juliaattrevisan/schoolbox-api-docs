@@ -3,7 +3,7 @@
 		<h2 class="subheader">Folders <!-- BEGIN count -->({FOLDER_DISP_COUNT} / {FOLDER_COUNT})<!-- END count --></h2>
 		<section>
 			<ul class="action-list">
-			<!-- BEGIN folder -->
+			    <!-- BEGIN folder -->
 				<li class="row" data-equalizer>
 					<div class="column no-pad small-11" data-equalizer-watch>
 						<div class="avatar card">
@@ -20,18 +20,20 @@
 					</div>
 					<!-- END modify -->
 				</li>
-			<!-- END folder -->
+			    <!-- END folder -->
 			</ul>
-		</section>
+
+            <!-- BEGIN see_more -->
+            <div class="content">
+                <a id="category-more" class="button icon-view" rel="folder" href="#">See all {MORE_COUNT} results for folders</a>
+            </div>
+            <!-- END see_more -->
+        </section>
 	</div>
-<!-- BEGIN see_more -->
-<p>
-	<a id="category-more" class="float-left btn more" rel="folder" href="#"><span></span>See all {MORE_COUNT} results for folders</a>
-</p>
-<!-- END see_more -->
 	<ul class="pagination">
 		<!-- BEGIN pagination -->
 		<li class="{PAGE_CLASS}"><a href="#" rel="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
 		<!-- END pagination -->
 	</ul>
 </div>
+

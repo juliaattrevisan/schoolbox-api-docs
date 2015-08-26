@@ -3,7 +3,7 @@
 	<h2 class="subheader">School News <!-- BEGIN count -->({SITENEWS_DISP_COUNT} / {SITENEWS_COUNT})<!-- END count --></h2>
 		<section>
 			<ul class="action-list">
-			<!-- BEGIN sitenews -->
+    			<!-- BEGIN sitenews -->
 				<li class="row">
 					<div class="column no-pad small-12">
 						<div class="avatar card">
@@ -17,19 +17,20 @@
 						<article>{SITENEWS_BODY}</article>
 					</div>
 				</li>
-			<!-- END sitenews -->
+			    <!-- END sitenews -->
 			</ul>
+
+            <!-- BEGIN see_more -->
+            <div class="content">
+                <a id="sitenews-more" rel="sitenews" class="button icon-view" href="#">See all {MORE_COUNT} results for School News</a>
+            </div>
+            <!-- END see_more -->
 		</section>
 	</div>
-
-	<!-- BEGIN see_more -->
-	<p>
-		<a id="sitenews-more" class="float-left more btn" rel="sitenews" href="#"><span></span>See all {MORE_COUNT} results for School News</a>
-	</p>
-	<!-- END see_more -->
 	<ul class="pagination">
 		<!-- BEGIN pagination -->
 		<li class="{PAGE_CLASS}"><a href="#" rel="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
 		<!-- END pagination -->
 	</ul>
 </div>
+

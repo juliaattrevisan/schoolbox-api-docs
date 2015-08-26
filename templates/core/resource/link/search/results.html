@@ -3,7 +3,7 @@
 	<h2 class="subheader">Links <!-- BEGIN count -->({LINK_DISP_COUNT} / {LINK_COUNT})<!-- END count --></h2>
 		<section>
 			<ul class="action-list">
-			<!-- BEGIN link -->
+			    <!-- BEGIN link -->
 				<li class="row">
 					<div class="column no-pad small-12">
 						<div class="avatar card">
@@ -17,15 +17,16 @@
 						<article>{LINK_COMMENT}</article>
 					</div>
 				</li>
-			<!-- END link -->
+			    <!-- END link -->
 			</ul>
+
+            <!-- BEGIN see_more -->
+            <div class="content">
+                <a id="link-more" rel="link" class="button icon-view" href="#">See all {MORE_COUNT} results for links</a>
+            </div>
+            <!-- END see_more -->
 		</section>
 	</div>
-<!-- BEGIN see_more -->
-<p>
-	<a id="link-more" class="float-left btn more" rel="link" href="#"><span></span>See all {MORE_COUNT} results for links</a>
-</p>
-<!-- END see_more -->
 	<ul class="pagination">
 		<!-- BEGIN pagination -->
 		<li class="{PAGE_CLASS}"><a href="#" rel="{PAGE_NUMBER}">{PAGE_NAME}</a></li>

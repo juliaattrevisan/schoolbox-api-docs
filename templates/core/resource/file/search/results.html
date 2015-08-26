@@ -3,7 +3,7 @@
 		<h2 class="subheader">Files <!-- BEGIN count -->({FILE_DISP_COUNT} / {FILE_COUNT})<!-- END count --></h2>
 		<section>
 			<ul class="action-list">
-			<!-- BEGIN file -->
+			    <!-- BEGIN file -->
 				<li class="row" data-equalizer>
 					<div class="column no-pad small-11" data-equalizer-watch>
 						<div class="avatar card">
@@ -23,18 +23,20 @@
 					</div>
 					<!-- END modify -->
 				</li>
-			<!-- END file -->
+    			<!-- END file -->
 			</ul>
+
+            <!-- BEGIN see_more -->
+            <div class="content">
+                <a id="file-more" rel="file" class="button icon-view" href="#">See all {MORE_COUNT} results for files</a>
+            </div>
+            <!-- END see_more -->
 		</section>
 	</div>
-	<!-- BEGIN see_more -->
-	<p>
-		<a id="file-more" class="float-left btn more" rel="file" href="#"><span></span>See all {MORE_COUNT} results for files</a>
-	</p>
-	<!-- END see_more -->
 	<ul class="pagination">
 		<!-- BEGIN pagination -->
 		<li class="{PAGE_CLASS}"><a href="#" rel="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
 		<!-- END pagination -->
 	</ul>
 </div>
+

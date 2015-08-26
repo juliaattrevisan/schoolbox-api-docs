@@ -3,7 +3,7 @@
 	<h2 class="subheader">Forums <!-- BEGIN count -->({FORUM_DISP_COUNT} / {FORUM_COUNT})<!-- END count --></h2>
 		<section>
 			<ul class="action-list">
-			<!-- BEGIN forum -->
+	    		<!-- BEGIN forum -->
 				<li class="row">
 					<div class="column no-pad small-12">
 						<div class="avatar card">
@@ -17,18 +17,20 @@
 						<article>{FORUM_BODY}</article>
 					</div>
 				</li>
-			<!-- END forum -->
+    			<!-- END forum -->
 			</ul>
+
+            <!-- BEGIN see_more -->
+            <div class="content">
+                <a id="forum-more" rel="forum" class="button icon-view" href="#">See all {MORE_COUNT} results for Forums</a>
+            </div>
+            <!-- END see_more -->
 		</section>
 	</div>
-<!-- BEGIN see_more -->
-<p>
-	<a rel="forum" id="forum-more" class="float-left btn more" href="#"><span></span>See all {MORE_COUNT} results for Forums</a>
-</p>
-<!-- END see_more -->
 	<ul class="pagination">
 		<!-- BEGIN pagination -->
 		<li class="{PAGE_CLASS}"><a href="#" rel="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
 		<!-- END pagination -->
 	</ul>
 </div>
+

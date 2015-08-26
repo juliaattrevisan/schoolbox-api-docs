@@ -3,7 +3,7 @@
 	<h2 class="subheader">Blogs <!-- BEGIN count -->({BLOG_DISP_COUNT} / {BLOG_COUNT})<!-- END count --></h2>
 		<section>
 			<ul class="action-list">
-			<!-- BEGIN blog -->
+	    		<!-- BEGIN blog -->
 				<li class="row">
 					<div class="column no-pad small-12">
 						<div class="avatar card">
@@ -17,18 +17,21 @@
 						<article>{BLOG_BODY}</article>
 					</div>
 				</li>
-			<!-- END blog -->
+    			<!-- END blog -->
 			</ul>
+
+            <!-- BEGIN see_more -->
+            <div class="content">
+                <a id="blog-more" rel="blog" class="button icon-view" href="#">See all {MORE_COUNT} results for Blogs</a>
+            </div>
+            <!-- END see_more -->
 		</section>
 	</div>
-<!-- BEGIN see_more -->
-<p>
-	<a rel="blog" id="blog-more" class="float-left btn more" href="#"><span></span>See all {MORE_COUNT} results for Blogs</a>
-</p>
-<!-- END see_more -->
 	<ul class="pagination">
 		<!-- BEGIN pagination -->
 		<li class="{PAGE_CLASS}"><a href="#" rel="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
 		<!-- END pagination -->
 	</ul>
 </div>
+
+
