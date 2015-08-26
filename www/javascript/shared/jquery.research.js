@@ -131,12 +131,12 @@
          * Add pagination events to all the <a> links
          */
         function paginate() {
-            $('.pagination li > a').bind('click', function(event) {
+            $('.pagination [data-page]').bind('click', function(event) {
                 event.preventDefault();
 
                 /* Set the page number
                  */
-                config.pageNumber = $(this).attr('data-more');
+                config.pageNumber = $(this).attr('data-page');
 
                 /* Update hash configuration
                  */
