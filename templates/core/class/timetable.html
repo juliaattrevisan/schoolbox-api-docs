@@ -1,43 +1,46 @@
 <!-- BEGIN timetable -->
 <h1>Timetable for {PERSON}{YEAR}</h1>
-<table>
-    <thead>
-        <tr>
-            <th></th>
-            <!-- BEGIN day_header -->
-            <th class="{TIMETABLE_CLASS}" style="width:{TIMETABLE_FIELD_WIDTH}%;">{DAY_NAME}</th>
-            <!-- END day_header -->
-        </tr>
-    </thead>
-    <tbody>
-        <!-- BEGIN period -->
-        <tr>
-            <th class="{PERIOD_CLASS}">
-                {PERIOD_NAME}
-                <time>{PERIOD_START}&ndash;{PERIOD_END}</time>
-            </th>
-            <!-- BEGIN day -->
-            <td class="{TIMETABLE_CLASS}" style="background-color: {PERIOD_COLOUR};">
-                <!-- BEGIN period_class_link -->
-                <a href="{PERIOD_URL}" >
+
+<div class="overflow">
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <!-- BEGIN day_header -->
+                <th class="{TIMETABLE_CLASS}" style="width:{TIMETABLE_FIELD_WIDTH}%;">{DAY_NAME}</th>
+                <!-- END day_header -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- BEGIN period -->
+            <tr>
+                <th class="{PERIOD_CLASS}">
+                    {PERIOD_NAME}
+                    <time>{PERIOD_START}&ndash;{PERIOD_END}</time>
+                </th>
+                <!-- BEGIN day -->
+                <td class="{TIMETABLE_CLASS}" style="background-color: {PERIOD_COLOUR};">
+                    <!-- BEGIN period_class_link -->
+                    <a href="{PERIOD_URL}" >
+                        {PERIOD_DESC}
+                        <p class="meta">
+                            {PERIOD_CODE}<br />
+                            {PERIOD_ROOM} {PERIOD_STAFF}
+                        </p>
+                    </a>
+                    <!-- END period_class_link -->
+                    <!-- BEGIN period_class -->
                     {PERIOD_DESC}
                     <p class="meta">
                         {PERIOD_CODE}<br />
                         {PERIOD_ROOM} {PERIOD_STAFF}
                     </p>
-                </a>
-                <!-- END period_class_link -->
-                <!-- BEGIN period_class -->
-                {PERIOD_DESC}
-                <p class="meta">
-                    {PERIOD_CODE}<br />
-                    {PERIOD_ROOM} {PERIOD_STAFF}
-                </p>
-                <!-- END period_class -->
-            </td>
-            <!-- END day -->
-        </tr>
-        <!-- END period -->
-    </tbody>
-</table>
+                    <!-- END period_class -->
+                </td>
+                <!-- END day -->
+            </tr>
+            <!-- END period -->
+        </tbody>
+    </table>
+</div>
 <!-- END timetable -->
