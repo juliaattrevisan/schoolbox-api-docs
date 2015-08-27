@@ -37,7 +37,7 @@ if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
     /* Render out breadcrumbs
      */
-    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+    $trail = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text' => Scrub::text($folder->getName()),
@@ -79,7 +79,7 @@ if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
     /* Render out breadcrumbs
      */
-    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+    $trail = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text' => Scrub::text($blog->getCategory()->getName()),
