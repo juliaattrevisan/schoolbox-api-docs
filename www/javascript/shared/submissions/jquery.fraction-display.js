@@ -1,4 +1,5 @@
 (function() {
+    "use strict";
     /**
      * Update a fraction display, based on the value of selected radio buttons within a form.
      *
@@ -7,7 +8,7 @@
      * @param options
      */
     $.fn.fractionDisplay = function(options) {
-        options = options || {}
+        options = options || {};
 
         var config = init(options, $(this));
 
