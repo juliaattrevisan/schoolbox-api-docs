@@ -1,43 +1,38 @@
-<script type="text/javascript">
-    $(function() {
-        $('#container').css('width', $('.timetable').outerWidth());
-    });
-</script>
 <!-- BEGIN timetable -->
 <h1>Timetable for {PERSON}{YEAR}</h1>
-<table class="timetable table" style="display:table">
+<table>
     <thead>
-    <tr>
-        <th style="width:{TIMETABLE_FIELD_WIDTH}%;">&nbsp;</th>
-        <!-- BEGIN day_header -->
-        <th scope="col" class="{TIMETABLE_CLASS}" style="width:{TIMETABLE_FIELD_WIDTH}%;">{DAY_NAME}</th>
-        <!-- END day_header -->
-    </tr>
+        <tr>
+            <th style="width:{TIMETABLE_FIELD_WIDTH}%;">&nbsp;</th>
+            <!-- BEGIN day_header -->
+            <th scope="col" class="{TIMETABLE_CLASS}" style="width:{TIMETABLE_FIELD_WIDTH}%;">{DAY_NAME}</th>
+            <!-- END day_header -->
+        </tr>
     </thead>
     <tbody>
-    <!-- BEGIN period -->
-    <tr>
-        <th scope="row" class="{PERIOD_CLASS}">{PERIOD_NAME}
-            <span class="time">{PERIOD_START}&ndash;{PERIOD_END}</span>
-        </th>
-        <!-- BEGIN day -->
-        <td class="{TIMETABLE_CLASS}">
-            <!-- BEGIN period_class_link -->
-            <a class="class" href="{PERIOD_URL}" style="background-color: {PERIOD_COLOUR};">
-                <span class="title">{PERIOD_DESC}</span>
-				{PERIOD_CODE}<br/>{PERIOD_ROOM} {PERIOD_STAFF}
-            </a>
-            <!-- END period_class_link -->
-            <!-- BEGIN period_class -->
-            <span class="class" style="background-color: {PERIOD_COLOUR};">
-                <span class="title">{PERIOD_DESC}</span>
-                {PERIOD_CODE}<br/>{PERIOD_ROOM} {PERIOD_STAFF}
-            </span>
-            <!-- END period_class -->
-        </td>
-        <!-- END day -->
-    </tr>
-    <!-- END period -->
+        <!-- BEGIN period -->
+        <tr>
+            <th scope="row" class="{PERIOD_CLASS}">{PERIOD_NAME}
+                <span class="time">{PERIOD_START}&ndash;{PERIOD_END}</span>
+            </th>
+            <!-- BEGIN day -->
+            <td class="{TIMETABLE_CLASS}">
+                <!-- BEGIN period_class_link -->
+                <a class="class" href="{PERIOD_URL}" style="background-color: {PERIOD_COLOUR};">
+                    <span class="title">{PERIOD_DESC}</span>
+                    {PERIOD_CODE}<br/>{PERIOD_ROOM} {PERIOD_STAFF}
+                </a>
+                <!-- END period_class_link -->
+                <!-- BEGIN period_class -->
+                <span class="class" style="background-color: {PERIOD_COLOUR};">
+                    <span class="title">{PERIOD_DESC}</span>
+                    {PERIOD_CODE}<br/>{PERIOD_ROOM} {PERIOD_STAFF}
+                </span>
+                <!-- END period_class -->
+            </td>
+            <!-- END day -->
+        </tr>
+        <!-- END period -->
     </tbody>
 </table>
 <!-- END timetable -->
