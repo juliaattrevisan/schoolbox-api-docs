@@ -1,3 +1,4 @@
+<strong class="show-for-small-only">This text is shown only on a small screen.</strong>
 <style type="text/css">
     .timetable td,
     .timetable th,
@@ -72,6 +73,8 @@
 <script type="text/javascript" src="/javascript/shared/jquery.timetable.js"></script>
 <script type="text/javascript">
     $(function() {
-        $('[data-timetable]').timetable();
+        $('[data-timetable]').timetable({
+            target: '[data-smaller]'
+        });
     });
 </script>
