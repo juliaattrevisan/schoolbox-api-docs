@@ -1,5 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <!--  Copyright 2013 Alaress Pty Ltd, Schoolbox -->
 <!--  Visit us at www.schoolbox.com.au -->
 <head>
@@ -13,6 +13,7 @@
 <meta name="msapplication-square150x150logo" content="/images/{SITE_LOCATION}/mediumtile.png" />
 <meta name="msapplication-wide310x150logo" content="/images/{SITE_LOCATION}/widetile.png" />
 <meta name="msapplication-square310x310logo" content="/images/{SITE_LOCATION}/largetile.png" />
+<meta name="viewport" content="initial-scale=1, maximum-scale=1">
 <link rel="apple-touch-icon" sizes="57x57" href="/images/{SITE_LOCATION}/apple-touch-icon-57x57.png">
 <link rel="apple-touch-icon" sizes="60x60" href="/images/{SITE_LOCATION}/apple-touch-icon-60x60.png">
 <link rel="apple-touch-icon" sizes="72x72" href="/images/{SITE_LOCATION}/apple-touch-icon-72x72.png">
@@ -24,6 +25,14 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/images/{SITE_LOCATION}/apple-touch-icon-180x180.png">
 <link rel="Shortcut Icon" href="/images/{SITE_LOCATION}/favicon.ico" type="image/x-icon" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/chrome.css?v={SITE_VERSION}" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/foundation/chrome.css" />
+<style type="text/css">
+    body.login {
+        background-image: url({LOGIN_BG});
+    }
+</style>
+<script type="text/javascript" src="/javascript/components/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-validation/jquery.validate.js"></script>
 <script type="text/javascript">
 window.onload = init;
 function init(){
@@ -37,43 +46,102 @@ function init(){
 </script>
 <![endif]-->
 </head>
-<body class="login">
-<div id="container" class=" login">
-	<div id="content" class="clearfix">
-        <a href="/" class="logo"><img src="/images/{SITE_LOCATION}/logo.png" height="67" width="344" alt="{SITE_NAME}" /></a>
-		<p class="error">{ERROR}</p>
-		<form id="loginForm" method="post" class="clearfix" action="/loginForm.php?{GET_PARAMS}">
-			<fieldset>
-                <!--[if lt IE 10]>Username:<![endif]-->
-				<input type="text" name="username" id="username" placeholder="Username" />
-			</fieldset>
-			<fieldset>
-                <!--[if lt IE 10]>Password:<![endif]-->
-				<input type="password" name="password" id="password" placeholder="Password" />
-			</fieldset>
+<body class="login side">
+<div id="container">
+	<div id="content">
+		<form id="login" method="post" action="/loginForm.php?{GET_PARAMS}">
             <input type="hidden" name="page" value="{HIDDEN}" />
-			<input class="login submit-btn-plain" type="submit" name="Submit" value="Sign in" alt="Sign in" />
-            <!-- BEGIN remember_me -->
-            <label><input type="checkbox" name="rememberme" value="1" />Remember me</label>
-            <!-- END remember_me -->
+            <div class="row collapse">
+                <div class="small-12 column">
+                    <a href="/" class="logo">
+                        <img src="/images/{SITE_LOCATION}/logo.png" alt="{SITE_NAME}" />
+                    </a>
+                </div>
+                <div class="small-12 column">
+                    <!-- BEGIN terms --><!--
+                    <p>Use of {SITE_TITLE} is governed by School policy which is deemed to be accepted at login time. A summary of the policy can be found <a href="/policy.php">here</a>. Staff and Students are expected to keep themselves informed of the full policy requirements which are available in {SITE_TITLE}.</p>
+                    --><!-- END terms -->
+                    <p id="error-msg" class="alert-box alert">{ERROR}</p>
+                </div>
+                <div class="small-12 column">
+                    <!--[if lt IE 10]>
+                    <label for="username">Username</label>
+                    <![endif]-->
+                    <input type="text" name="username" id="username" placeholder="Username" />
+                </div>
+                <div class="small-12 column">
+                    <!--[if lt IE 10]>
+                    <label for="password">Password</label>
+                    <![endif]-->
+                    <input type="password" name="password" id="password" placeholder="Password" />
+                </div>
+            </div>
+            <div class="row collapse">
+                <div class="small-7 medium-12 column">
+                    <!-- BEGIN remember_me -->
+                    <input id="rememberme" type="checkbox" name="rememberme" value="1" />
+                    <label for="rememberme">Remember me</label>
+                    <!-- END remember_me -->
+                </div>
+                <div class="small-5 medium-12 column">
+                    <input type="submit" name="Submit" value="Sign in" alt="Sign in" />
+                </div>
+                <!-- BEGIN terms_acceptance --><!--
+                <div class="small-12 column">
+                    <input required class="required" id="tandc" name="tandc" type="checkbox" title="You must agree to the Terms and Conditions before proceeding" />
+                    <label for="tandc" class="tandc">
+                        I agree to be legally bound by the <a href="/policy.php"> Terms and Conditions</a> of use for this website.
+                    </label>
+                </div>
+                <script type="text/javascript">
+                    $(function () {
+                        $('#login').validate({
+                            errorPlacement: function(error, element) {
+                                if (element.attr("name") == "tandc") {
+                                    error.appendTo("#error-msg");
+                                } else {
+                                    error.appendTo(element);
+                                }
+                            }
+                        });
+                    });
+                </script>
+                --><!-- END terms_acceptance -->
+            </div>
+            <div class="row collapse">
+                <div class="small-12 column">
+                    <a href="/forgotten-password.php">Parents, forgotten your password?</a>
+                </div>
+            </div>
         </form>
-		<p class="forgotten"><a href="/forgotten-password.php">Parents, forgotten your password?</a></p>
-	</div>
+    </div>
+    <div id="footer">
+        <ul>
+            <li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SCHOOL_ADDRESS}">{SITE_NAME}</a></li>
+            <li><a href="/policy.php">Terms of Use and Privacy Policy</a></li>
+            <li>Powered by <a href="http://www.schoolbox.com.au" title="Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a></li>
+            <!-- BEGIN mobile_switch -->
+            <!-- END mobile_switch -->
+            <li><a href="/feedback.php" title="Web Designers">Feedback and Support</a></li>
+        </ul>
+    </div>
 </div>
-<div id="footer" class="login">
-	<ul>
-		<li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SCHOOL_ADDRESS}">{SITE_NAME}</a></li>
-		<li><a href="/policy.php">Guidelines of Use and Privacy Policy</a></li>
-        <li>Powered by <a href="http://www.schoolbox.com.au" title="Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a></li>
-        <!-- BEGIN mobile_switch -->
-		<li><a href="/switch.php?v=mobile">Switch to Mobile</a></li>
-		<!-- END mobile_switch -->
-        <li><a href="http://alaress.com.au" title="Web Development Melbourne">Web Development</a> by <a href="http://alaress.com.au">Alaress</a></li>
-		<li class="last"><a href="/feedback.php" title="Web Designers">Feedback and Support</a></li>
-	</ul>
-</div>
-<div id="login-bg">
-    <img src="/images/{SITE_LOCATION}/login-bg.jpg" alt="">
-</div>
+<script type="text/javascript">
+
+    var l, fy;
+
+    $(function () {
+
+        l = $('#login');
+
+        fy = $('#footer').height();
+
+        $(window).on('resize', function () {
+            l.css('top', Math.max(0, ($(window).height() - l.height() - fy) / 2));
+        }).trigger('resize');
+
+    });
+
+</script>
 </body>
 </html>
