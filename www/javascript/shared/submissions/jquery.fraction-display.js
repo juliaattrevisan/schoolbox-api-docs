@@ -79,7 +79,7 @@
                     }
                 };
                 redraw();
-                inputs.change(redraw);
+                inputs.on('change.fractionDisplay', redraw);
             }
         }
     }
