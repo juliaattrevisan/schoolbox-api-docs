@@ -82,6 +82,7 @@ $removeUnsetAttachments = !empty($_POST['clearAttachments']);
 
 /* Crocodoc uuid, to view return independently of submission
  */
+$crocodoc = null;
 if (isset($_POST['crocodoc'])) {
     try {
         $submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
@@ -90,8 +91,6 @@ if (isset($_POST['crocodoc'])) {
     } catch(\Schoolbox\Mapper\Exception $e) {
         //weird, no submission found, but we can continue
     }
-} else {
-    $crocodoc = null;
 }
 
 /* A url to visit after submitting
