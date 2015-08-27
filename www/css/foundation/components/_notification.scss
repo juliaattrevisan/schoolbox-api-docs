@@ -35,7 +35,7 @@
     &[data-unread="0"] {
         ul.off-canvas-list {
             label {
-                background: $white-smoke;
+                background: $body-bg;
                 color: inherit;
             }
             .mark-all-read {
@@ -70,9 +70,15 @@
         }
     }
     .status-read {
-        background: $white-smoke;
+        background: $body-bg;
         b {
             font-weight: normal;
+        }
+        .list-item {
+            padding-right: 0 !important;
+        }
+        nav {
+            display: none;
         }
     }
 }
