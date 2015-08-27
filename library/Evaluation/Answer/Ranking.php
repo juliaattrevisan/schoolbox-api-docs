@@ -322,7 +322,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
             /* Set up data object in accordance with $this->create();
              */
 
-            $answer['answerRight'] = html_entity_decode(trim((string)$currentAnswer->answer), ENT_IGNORE | ENT_QUOTES);
+            $answer['answerRight'] = html_entity_decode(trim((string)$currentAnswer->text), ENT_IGNORE | ENT_QUOTES);
 
             $allAnswers[] = $answer;
         }
