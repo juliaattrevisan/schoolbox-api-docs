@@ -1,8 +1,20 @@
+<style type="text/css">
+    .timetable th,
+    .timetable td {
+        border: 1px solid #eee;
+    }
+
+    .timetable-small table th,
+    .timetable-small table td {
+        width: 50%;
+    }
+</style>
+
 <!-- BEGIN timetable -->
 <h1>Timetable for {PERSON}{YEAR}</h1>
 
 <div class="overflow">
-    <table>
+    <table class="timetable" data-timetable>
         <thead>
             <tr>
                 <th></th>
@@ -44,3 +56,35 @@
     </table>
 </div>
 <!-- END timetable -->
+
+
+
+<div class="timetable-small" data-smaller>
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        var periodNames = $('[data-timetable] tbody th');
+        var numDays = $('[data-timetable] thead th').length;
+
+        for (var i = 1; i < numDays; i++) {
+            var table = $('<table>');
+            var header = $('<tr></tr>');
+
+            header.append('<th></th>');
+            header.append($('[data-timetable] thead tr:first() th:nth-child('+i+')').first().clone());
+
+            table.append(header);
+
+            $.each(periodNames, function(index, element) {
+                var tr = $('<tr></tr>');
+                tr.append($(element).clone());
+                tr.append($('[data-timetable] tbody tr:nth-child('+(index+1)+') td:nth-child('+i+')').first().clone());
+
+                table.append(tr);
+            });
+
+            $('[data-smaller]').append(table);
+        }
+    });
+</script>
