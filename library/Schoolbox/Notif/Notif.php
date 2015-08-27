@@ -34,6 +34,7 @@ use Schoolbox\Realtime\Schedule\Persistence\QueueItem;
 use Schoolbox\Realtime\Schedule\Persistence\QueueItemMapper;
 use Swift_Mailer;
 use Swift_Message;
+use Swift_RfcComplianceException;
 
 /**
  * This class is intentionally not a Singleton. It should be instantiated once only, yes, but then DI'd around.
@@ -151,16 +152,30 @@ class Notif implements NotifInterface {
 	 * @return SwiftMailerHandler
 	 */
 	protected function createMailHandler($title, $to, $from, $severity, $bubble = false) {
+
 		$mail = new Swift_Message($title, null, 'text/plain', 'utf-8');
-		$mail->setTo($to);
-		if(is_array($from)) {
-			$mail->setFrom($from[0], $from[1]);
+
+		try {
+			$mail->setTo($to);
 		}
-		else {
-			$mail->setFrom($from);
+		catch (Swift_RfcComplianceException $e) {
+			$mail->setTo('notif@alaress.com.au');
 		}
-		return new SwiftMailerHandler(new Swift_Mailer(
-			Mailer::getConfiguredSwiftTransport($this->conf, true)), $mail, $severity, $bubble
+
+		try {
+			if (is_array($from)) {
+				$mail->setFrom($from[0], $from[1]);
+			} else {
+				$mail->setFrom($from);
+			}
+		} catch (Swift_RfcComplianceException $e) {
+			$mail->setFrom('notif@alaress.com.au');
+		}
+
+		return new SwiftMailerHandler(
+			new Swift_Mailer(
+				Mailer::getConfiguredSwiftTransport($this->conf, true)
+			), $mail, $severity, $bubble
 		);
 	}
 

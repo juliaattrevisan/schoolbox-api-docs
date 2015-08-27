@@ -118,6 +118,10 @@ class Session
                 $this->setSynergyInfo($userHandler);
             }
 
+            // add mobile session data
+            $sbmAuth = new Authenticator();
+            $result = $sbmAuth->appendSession($user['uid']);
+
             if ($this->getUseLoginLog()) {
                 $notif = new Notif(Notif::TOPIC_AUTH);
                 $notif->notice("Login success for $username", array(
@@ -127,9 +131,7 @@ class Session
                 ));
             }
 
-            // add mobile session data
-            $sbmAuth = new Authenticator();
-            return $sbmAuth->appendSession($user['uid']);
+            return $result;
 
         } else {
             return false;
