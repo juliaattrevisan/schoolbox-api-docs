@@ -1,5 +1,7 @@
+$footer-margin-bottom: 1rem;
+
 #footer {
-    margin: 1rem 2.5rem 0;
+    margin: $footer-margin-bottom 2.5rem 0;
     @include contrast-bg();
     ul {
         margin: 0 auto 1rem;
