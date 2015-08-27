@@ -26,7 +26,7 @@
 				<div class="small-12 column">
                     <input type="submit" name="submit" value="{ACTION} Blog" />
 					<!-- BEGIN delete -->
-					<input type="submit" name="delete" value="Delete Blog" class="alert" />
+					<input type="submit" name="delete" value="Delete Blog" class="alert" data-delete />
 					<!-- END delete -->
 				</div>
 			</div>
@@ -36,6 +36,7 @@
 
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
     $(function() {
         $.fn.alaressTiny({
@@ -44,5 +45,16 @@
         });
 
         $('#blogForm').validate();
+
+        $('[data-delete]').click(function(event) {
+            event.preventDefault();
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this Blog?',
+                confirmEvent: function() {
+                    $('[data-delete]').unbind().click();
+                }
+            });
+        });
     })
 </script>
