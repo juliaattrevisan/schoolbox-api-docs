@@ -1,10 +1,21 @@
-<h1>Image Gallery for {FOLDER_NAME}</h1>
-<span class="header_option"><a href="/homepage/{RETURN_CATEGORY_ID}" class="btn go-back"><span></span>Return to Homepage</a></span>
-<br />
-<!-- BEGIN image_gallery -->
-<div class="float-left image-thumbnail"  >
-	<a class="thumb" href="/cms/image.php?id={THUMBNAIL_ID}&height=600&width=800" style="height:{IMAGE_HEIGHT}px;" rel="lightbox[image-gallery]" alt="{THUMBNAIL_DESCRIPTION}" title="{THUMBNAIL_DESCRIPTION}">
-		<img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0" alt="{THUMBNAIL_DESCRIPTION}" border="0" />
-	</a>
+<ul class="breadcrumb">
+	<li><a href="/homepage/{RETURN_CATEGORY_ID}/">{FOLDER_NAME}</a></li>
+	<li class="active"><a href="#">Image Gallery</a></li>
+</ul>
+
+<div class="row">
+	<div class="small-12 island">
+		<h1>Image Gallery for {FOLDER_NAME}</h1>
+		<section class="content">
+			<ul class="clearing-thumbs">
+				<!-- BEGIN image_gallery -->
+				<li>
+					<a class="thumb" href="/cms/image.php?id={THUMBNAIL_ID}&height=600&width=800" style="height:{IMAGE_HEIGHT}px;" rel="lightbox[image-gallery]" alt="{THUMBNAIL_DESCRIPTION}" title="{THUMBNAIL_DESCRIPTION}">
+						<img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0" alt="{THUMBNAIL_DESCRIPTION}" border="0" />
+					</a>
+				</li>
+				<!-- END image_gallery -->
+			</ul>
+		</section>
+	</div>
 </div>
-<!-- END image_gallery -->
