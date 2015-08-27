@@ -3,6 +3,7 @@
 <div class="row">
 	<div class="small-12 island">
 		<h1>{ACTION} Blog Entry</h1>
+
 		<form method="post" enctype="multipart/form-data" id="blogForm" action="/blog/modifyForm.php" class="top">
             <input type="hidden" name="cid" value="{CID}" />
             <input type="hidden" name="blogID" value="{ID}" />
@@ -10,8 +11,10 @@
 			<section>
 				<fieldset class="content">
 					<div class="small-12 columns">
-						<label>Title
-    						<input type="text" name="heading" size="35" maxlength="100" class="required" value="{ENTRY_HEADING}" /></label>
+						<label>
+                            Title
+    						<input type="text" name="heading" size="35" maxlength="100" class="required" value="{ENTRY_HEADING}" />
+                        </label>
 						<label>
                             Body
 							<textarea id="body" name="body">{ENTRY_BODY}</textarea>
