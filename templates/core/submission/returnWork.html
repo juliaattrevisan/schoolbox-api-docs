@@ -1,52 +1,38 @@
-<!-- BEGIN custom_head -->
-<script src='/submission/inlineGrading/js/rubrics.js' type="text/javascript"></script>
-<script type="text/javascript" src="/javascript/components/flot/jquery.flot.js"></script>
-<script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.highlighter.js"></script>
-<script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.spider.js"></script>
-<script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.rubric.js"></script>
-<script type="text/javascript">
-	$(function() {
-		$('#rubric-tbody').inlineGradingRubrics({
-			scoreElement: '#sum',
-			formElement: '#returnWorkForm',
-			renderGraph: true,
-			graph: {
-				container: '#rubric-chart',
-				data: {GRAPH_DATA},
-				legs: {GRAPH_LEGS},
-				max: {GRAPH_MAX}
-			}
-		});
-	});
-</script>
-<!-- END custom_head -->
+{BREADCRUMB}
 
-<h1>Grading {ASSNAME} for {NAME}</h1>
-<p class="sub-heading"><span class="visibility-subheader visibility_{GRADE_VISIBILITY_CODE}" title="{GRADE_VISIBILITY}"></span>{DUEWORK_TYPE} - Due: {DUEWORK_DUEDATE}</p>
-<div class="listing">
-    <ul class="breadcrumb">
-        <li><a href="/submission/listSubmission" >Submissions</a></li>
-        <li><a href="/submission/listSubmission/{DUEWORK_YEAR}/{DUEWORK_SEMESTER}/{CAT_ID}" >{CATEGORY}</a></li>
-        <li><a href="/submission/viewSubmission/{BOX_ID}">{ASSNAME}</a></li>
-        <li class="last"><a href="/search/user/{UID}">{NAME}</a></li>
-    </ul>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Grading {ASSNAME} </h1>
+        <ul class="meta">
+            <li class="icon-calendar">Due <span class="{BOX_GRADIENT}">{DUEWORK_DUEDATE}</span></li>
+            <li class="icon-due-work"><a href="/homepage/{CAT_ID}">{CATEGORY}</a> {DUEWORK_TYPE}</li>
+            <li class="{GRADE_VISIBILITY_CSS}">Grade visible to {GRADE_VISIBILITY}</li>
+        </ul>
+    </div>
 </div>
-<form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" class="clearfix" name="returnWorkForm" id="returnWorkForm" >
-    <input name="box_id" type="hidden" id="box_id" value="{BOX_ID}" />
-    <input name="uid" type="hidden" id="uid" value="{UID}" />
-	<input name="redirect" type="hidden" value="{REDIRECT}" />
-	
-    <table class="standardForm table">
-        <tr>
-            <td class="formLabelWidth"><h4>Student</h4>
-			<td>
-                <img class="student-img" alt="{NAME}" src="/portrait?userId={SYN_ID}&size=square32" /><strong>{NAME}</strong><br />{ROLE}
-            </td>
-        </tr>
-        <tr>
-            <td><h4>Mark</h4>
-                <em>{MARK_TYPE_COMMENT}</em></td>
-            <td>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div class="avatar card">
+                <a href="#" title="View Profile">
+                    <img src="/portrait.php?userId={SYN_ID}&size=square32" alt="View Profile" />
+                    <p>{NAME}</p>
+                </a>
+                <p class="meta">{ROLE}</p>
+            </div>
+        </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form action="/submission/returnWorkForm.php" name="returnWorkForm" id="returnWorkForm" method="post" class="top" enctype="multipart/form-data">
+            <input name="box_id" type="hidden" id="box_id" value="{BOX_ID}" />
+            <input name="uid" type="hidden" id="uid" value="{UID}" />
+            <input name="redirect" type="hidden" value="{REDIRECT}" />
+
+            <section>
                 <!-- BEGIN mark_type_percent -->
                 <!-- END mark_type_percent -->
                 <!-- BEGIN mark_type_letter -->
@@ -61,61 +47,31 @@
                 <!-- END mark_type_none -->
 
                 <!-- BEGIN mark_type_rubric -->
-                <table class="rubric table">
-                <colgroup>
-                    <col class="criterion-label" />
-                    <!-- BEGIN rubric_rating -->
-                    <col />
-                    <!-- END rubric_rating -->
-                    <col width="32px" />
-                </colgroup>
-                <tbody id="rubric-tbody">
-                	<!-- BEGIN rubric_crit -->
-                    <!-- BEGIN rubric_grouping -->
-                    <tr>
-                        <td class="criterion-label pad span" colspan="{RUBRIC_GROUP_SPAN}">{RUBRIC_GROUP_LABEL}</td>
-                        <td class="warning" data-class="{RUBRIC_CRIT_RATING_CLASS}"></td>
-                    </tr>
-                    <!-- END rubric_grouping -->
-                    <tr>
-                        <td class="criterion-label criterion-label-group pad" data-class="{RUBRIC_GROUP_CLASS}">{RUBRIC_CRIT_LABEL}</td>
-                        <!-- BEGIN rubric_crit_rating -->
-                        <td class="criterion-value {RUBRIC_CRIT_RATING_CLASS}" data-class="{RUBRIC_GROUP_CLASS}">
-                            <input id="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_ID}-{RUBRIC_CRIT_RATING_VALUE}" class="rubric-input" type="radio" name="rubric[{RUBRIC_CRIT_ID}]" data-index="{RUBRIC_CRIT_INDEX}" value="{RUBRIC_CRIT_RATING_VALUE}" {RUBRIC_CRIT_RATING_SELECTED} />
-                            <label for="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_ID}-{RUBRIC_CRIT_RATING_VALUE}"><span>{RUBRIC_CRIT_RATING_LABEL}<br />({RUBRIC_CRIT_RATING_VALUE} pts)</span></label>
-                        </td>
-                        <!-- END rubric_crit_rating -->
-                        <td class="warning" data-class="{RUBRIC_CRIT_RATING_CLASS}">
-                            <div title="Please select a result for this criterion"><span>!</span></div>
-                        </td>
-                    </tr>
-               		<!-- END rubric_crit -->
-                </tbody>
-                </table>
                 <!-- END mark_type_rubric -->
-            </td>
-        </tr>
-		<tr>
-			<td>
-				<h4>Comment</h4>
-			</td>
-			<td>
-				<textarea name="comment" style="width:100%;" rows="5">{COMMENT}</textarea>
-			</td>
-		</tr>
-        <tr>
-            <td>
-                <h4>Overall Grade</h4>
-                <em>The Rubric Grade is automatically generated by the set criteria.</em>
-            </td>
-            <td>
-                <div class="rubric-grade">
-                    <span id="sum">{RUBRIC_GRADE_SUM}</span> / <span id="max">{RUBRIC_GRADE_MAX}</span>
+
+                {RUBRIC}
+
+                <fieldset class="content">
+                    <legend>Comment</legend>
+                    <div class="small-12 columns">
+                        <textarea name="comment" rows="5">{COMMENT}</textarea>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Overall Grade <span class="hint has-tip tip-top" data-tooltip title="The Rubric Grade is automatically generated by the set criteria.">?</span></legend>
+                    <div class="small-12 columns">
+                        <p class="grade">
+                            <span data-role="rubric-sum" class="gradient-{RUBRIC_GRADIENT}">{RUBRIC_GRADE_SUM} / {RUBRIC_GRADE_MAX}</span>
+                        </p>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Submit" />
                 </div>
-                <div id="rubric-chart"></div>
-            </td>
-        </tr>
-    </table>
-	<input name="Submit" type="submit" id="Submit" value="Submit" class="submit-btn-plain" />
-    <p id="errnotif" class="float-left err hide">Ensure you have selected a mark for every criterion.</p>
-</form>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,4 +1,4 @@
-<div id="rubric-window">
+<div data-role="rubric-window">
     <!--<h3>Marking Guide</h3>-->
     <table class="rubric">
         <colgroup>
@@ -47,9 +47,8 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h3 class="subheader">Chart</h3>
         <section class="content">
-            <div id="rubric-chart"></div>
+            <div data-role="rubric-chart"></div>
         </section>
     </div>
 </div>
@@ -57,15 +56,20 @@
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.rubric-graph.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.fraction-display.js"></script>
 <script type="text/javascript">
     $(function() {
         if ({GRAPH_DATA}.length) {
-            $('#rubric-chart').rubricGraph({
+            $('[data-role="rubric-chart"]').rubricGraph({
                 categories: {GRAPH_LEGS},
                 data: {GRAPH_DATA},
-                ymax: {GRAPH_MAX}
+                ymax: {GRAPH_MAX},
+                inputs: '[data-role="rubric-window"]'
             });
         }
+        $('[data-role="rubric-sum"]').fractionDisplay({
+            inputs: '[data-role="rubric-window"] :radio'
+        });
 
 //        var radios = $('#rubric-tbody :radio');
 //        radios.removeClass('focused').parent('td').removeClass('focused');

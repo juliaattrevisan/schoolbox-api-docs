@@ -3,6 +3,7 @@
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use \Schoolbox\UserMapper;
+use \Schoolbox\Breadcrumbs;
 
 $this->setFile(TEMPLATE_content, 'submission/returnWork.html');
 $this->setBlock(TEMPLATE_content, 'mark_type_percent', 'mark_type_percent_block');
@@ -28,21 +29,23 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
 
     $this->setVar(
         array(
-            'CATEGORY'         => \Scrub::text($submissionBox->getCategory()->getName()),
-            'ASSNAME'          => \Scrub::text($submissionBox->getName()),
-            'BOX_ID'           => $submissionBox->getId(),
-            'CAT_ID'           => $submissionBox->getCategory()->getId(),
-            'DUEWORK_YEAR'     => date('Y', strtotime($submissionBox->getDueDate())),
-            'DUEWORK_SEMESTER' => DueWork_All::getSemester(strtotime($submissionBox->getDueDate())),
-            'DUEWORK_TYPE'     => $submissionBox->getWorkType()->getName(),
-            'DUEWORK_DUEDATE'  => $submissionBox->getDueDate()->getLongDateOnly(),
+            'CATEGORY'              => \Scrub::text($submissionBox->getCategory()->getName()),
+            'ASSNAME'               => \Scrub::text($submissionBox->getName()),
+            'BOX_ID'                => $submissionBox->getId(),
+            'BOX_GRADIENT'          => $submissionBox->getGradientIndex(),
+            'CAT_ID'                => $submissionBox->getCategory()->getId(),
+            'DUEWORK_YEAR'          => date('Y', strtotime($submissionBox->getDueDate())),
+            'DUEWORK_SEMESTER'      => DueWork_All::getSemester(strtotime($submissionBox->getDueDate())),
+            'DUEWORK_TYPE'          => $submissionBox->getWorkType()->getName(),
+            'DUEWORK_DUEDATE'       => $submissionBox->getDueDate()->getLongDateOnly(),
             'GRADE_VISIBILITY'      => $submissionBox->getMarkVisibilityDescription(),
             'GRADE_VISIBILITY_CODE' => $submissionBox->getMarkVisibility(),
-            'NAME'             => Scrub::text($user->formatName()),
-            'SYN_ID'           => $user->getExternalId(),
-            'ROLE'             => Scrub::text($user->getRole()->getName()),
-            'UID'              => $user->getId(),
-            'REDIRECT'         => "/submission/viewSubmission/{$submissionBox->getId()}",
+            'GRADE_VISIBILITY_CSS'  => \Schoolbox\Assessment\Widgets::getCss($submissionBox->getMarkVisibility()),
+            'NAME'                  => Scrub::text($user->formatName()),
+            'SYN_ID'                => $user->getExternalId(),
+            'ROLE'                  => Scrub::text($user->getRole()->getName()),
+            'UID'                   => $user->getId(),
+            'REDIRECT'              => "/submission/viewSubmission/{$submissionBox->getId()}",
         )
     );
 
@@ -56,11 +59,6 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
         $this->setBlock(TEMPLATE_content, "mark_type_{$type['slug']}", "mark_type_{$type['slug']}_block");
         $this->setVar("mark_type_{$type['slug']}_block", '');
     }
-
-    /* Render rubrics
-     */
-    $renderer = new \Rubric\Renderer\Horizontal($this, $submissionBox, $user);
-    $renderer->render();
 
     /* Return
      */
@@ -86,4 +84,43 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
     $this->parse("mark_type_{$slug}_block", "mark_type_{$slug}");
 } else {
     error(2);
+}
+
+
+/* Render out breadcrumbs
+ */
+$trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => 'Submissions',
+        'href' => "/submission/listSubmission",
+        'class' => '',
+    ],
+    [
+        'text' => $submissionBox->getCategory()->getName(),
+        'href' => "/submission/listSubmission/{$submissionBox->getDueDate()->getYear()}/{$submissionBox->getDueDate()->getYearHalf()}/{$submissionBox->getCategory()->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($submissionBox->getName()),
+        'href' => "/submission/viewSubmission/{$submissionBox->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($user->getFullName()),
+        'href' => "/search/user/{$user->getId()}",
+        'class' => 'active',
+    ]
+]);
+
+/* Rubric's Cube
+ */
+// do fun rubric things
+//$this->setBlock(TEMPLATE_content, 'mark_type_rubric', 'mark_type_rubric_block');
+
+if ($submissionBox->isRubric()) {
+    $rb = new DueWork_Rubric_Lightbox($this);
+    $rb->render('RUBRIC', $submissionBox->getId(), $user->getId(), $submissionBox->canViewRubric($_SESSION['user']), true);
+} else {
+    $this->setVar('RUBRIC', '');
 }

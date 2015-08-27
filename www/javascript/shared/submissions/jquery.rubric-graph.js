@@ -11,6 +11,7 @@
         var config = init(options, $(this));
 
         graph();
+        setupRedraw();
 
         /**
          * Init
@@ -33,7 +34,12 @@
 
                 /* Maximum y value
                  */
-                ymax: 0
+                ymax: 0,
+
+                /* All the rubric inputs which can cause graph to update
+                 * are contained in this element
+                 */
+                inputs: ''
             }
 
             var derived = {
@@ -51,7 +57,7 @@
             $(config.element).highcharts({
                 chart: {
                     polar: true,
-                    type: 'line'
+                    type: 'area'
                 },
 
                 title: {
@@ -84,9 +90,36 @@
                 series: [{
                     name: 'Value',
                     data: config.data,
-                    pointPlacement: 'on'
+                    pointPlacement: 'on',
+                    fillOpacity: 0.2
                 }]
             });
+        }
+
+        /**
+         * Set up redraw activators
+         */
+        function setupRedraw() {
+            $(config.inputs).find('input').change(function(event) {
+                var data = [];
+
+                $.each($(config.inputs).find('input:checked'), function(index, element) {
+                    data.push(parseFloat($(element).val()));
+                });
+
+                redraw(0, data);
+            });
+
+            /**
+             * Execute redraw
+             *
+             * @param data
+             */
+            function redraw(series, data) {
+                var chart = $(config.element).highcharts();
+                chart.series[series].setData(data,true);
+                chart.redraw();
+            }
         }
     }
 }(jQuery));

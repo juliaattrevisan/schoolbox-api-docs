@@ -20,6 +20,34 @@ class DueWork_Rubric_Lightbox {
         $this->rubricHandler = new DueWork_Rubric_Handler();
     }
 
+    /**
+     * Get index of gradient from a percentage value
+     *
+     * @param $top
+     * @param $bottom
+     * @return int
+     */
+    private function getGradientIndex($top, $bottom)
+    {
+        if (!$bottom) {
+            $urgency = 0;
+        }
+        else {
+            $urgency = ceil(10 * $top/$bottom);
+        }
+
+        return max(0, min(10, $urgency));
+    }
+
+    /**
+     * Render
+     *
+     * @param $templateHandle
+     * @param $submissionBoxID
+     * @param $studentID
+     * @param bool $showMarks
+     * @param bool $editable
+     */
     public function render($templateHandle, $submissionBoxID, $studentID, $showMarks = true, $editable = false) {
 
         // make sure it actually has permission to render
@@ -109,6 +137,8 @@ class DueWork_Rubric_Lightbox {
             $max += count($data['criteria'][0]['results']) - 1;
         }
 
+        $gradientIndex = $this->getGradientIndex($sum, $max);
+
         if ($showMarks) {
             $page->setVar(array(
                 'GRAPH_DATA' => json_encode($json),
@@ -116,6 +146,7 @@ class DueWork_Rubric_Lightbox {
                 'GRAPH_MAX'  => count($data['criteria'][0]['results']) - 1,
                 'RUBRIC_GRADE_SUM' => $sum,
                 'RUBRIC_GRADE_MAX' => $max,
+                'RUBRIC_GRADIENT' => $gradientIndex,
             ));
             $page->parse('rubric_display_block', 'rubric_display');
         } else {
@@ -125,10 +156,9 @@ class DueWork_Rubric_Lightbox {
                 'GRAPH_MAX'  => 0,
                 'RUBRIC_GRADE_SUM' => 0,
                 'RUBRIC_GRADE_MAX' => 0,
+                'RUBRIC_GRADIENT' => $gradientIndex,
             ));
             $page->setVar('rubric_display_block', '');
         }
-
-
     }
 }
