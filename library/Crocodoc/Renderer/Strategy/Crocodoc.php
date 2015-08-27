@@ -73,7 +73,6 @@ class Crocodoc extends Base
                 'INJECTABLE_CONTROL_URL'           => $downloadUrl,
                 'INJECTABLE_CONTROL_NEXT_URL'      => $this->getNextUrl(),
                 'INJECTABLE_CONTROL_SUBMISSION_ID' => $this->getSubmission()->getId(),
-                'INJECTABLE_CONTROL_UUID'          => $this->getSubmission()->getUuid(),
             )
         );
 
