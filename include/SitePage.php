@@ -1179,6 +1179,14 @@ class SitePage extends Page
             $this->setVar('LOGIN_BG', '');
         }
 
+        // is the login page sidebar-style?
+        // TODO config this, for now just always on
+        if (true) {
+            $this->setVar('SIDE', 'side');
+        } else {
+            $this->setVar('SIDE', '');
+        }
+
         // is SAML enabled?
         // don't show the login page, redirect to the SAML login page.
         // (unless ?samlLogin=0 is set)
