@@ -87,7 +87,7 @@ if (isset($_POST['crocodoc'])) {
         $submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
         $studentSubmission = $submissionMapper->findById($_POST['crocodoc']);
         $crocodoc = $studentSubmission->getUuid();
-    } catch(\Schoolbox\MapperException $e) {
+    } catch(\Schoolbox\Mapper\Exception $e) {
         //weird, no submission found, but we can continue
     }
 } else {
