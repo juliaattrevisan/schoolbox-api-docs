@@ -24,11 +24,16 @@ if (($isSuperuser || $isAllowedTeacher) && is_numeric($this->arg[0])) {
     /* Set up permissions options
 	 */
     $roleMapper = new \Schoolbox\RoleMapper();
-
-    $folderParent = new \Schoolbox\Resource\Category();
-    $folderParent->setId(0);
-
     $allRoles = $roleMapper->findAll();
+
+    $zone = new \Schoolbox\Resource\Attachment\Zone('news-feature');
+    $zone->setThumbnailSize(64);
+    $zone->setAttachPrompt('Upload zip file');
+    $zone->setAttachmentsLabel('');
+    $zone->setMimeFilter('application/x-zip-compressed');
+    $zone->setModalTitle('Select zip file');
+
+    $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
     if ($allRoles->count()) {
         foreach ($allRoles as $currentRole) {
