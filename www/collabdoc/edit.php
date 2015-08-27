@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
 /* Check if the currently logged in user can participate
  */
 $authenticator = new \Etherpad\Authenticator();
@@ -19,6 +21,7 @@ $padMapper = new \Etherpad\PadMapper();
 
 try {
 	$pad = $padMapper->findById($this->arg[0]);
+	$folder = FolderMapper::getInstance()->findById($pad->getHomepageId());
 }
 catch (\Exception $e) {
 	error(19);
@@ -55,8 +58,9 @@ if ($authenticator->isParticipator($pad->getHomepageId(), $_SESSION['user']->get
 	 */
 	$this->setVar(array(
 		'HOMEPAGE_ID' => $this->arg[1],
+		'FOLDER_NAME' => Scrub::text($folder->getName()),
 		'ETHERPAD_PAD_ID' => $pad->getId(),
-		'ETHERPAD_NAME' => $pad->getDisplayName(),
+		'ETHERPAD_NAME' => Scrub::text($pad->getDisplayName()),
 		'ETHERPAD_URL' => "/collabdoc/load/{$pad->getId()}"
 	));
 }

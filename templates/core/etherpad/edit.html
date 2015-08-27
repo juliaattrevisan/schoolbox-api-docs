@@ -1,20 +1,26 @@
-<h1>{ETHERPAD_NAME}</h1>
-<span class='header-actions'>
-    <a href='/homepage/{HOMEPAGE_ID}' class='button icon-previous'>Return to Homepage</a>
-    <a href='#' class='button icon-more' data-dropdown='header-options'>Options</a>
-</span>
-<ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
-    <!-- BEGIN etherpad_lock -->
-    <li><a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='icon-locked'>Lock</a>
-    <!-- END etherpad_lock -->
-
-    <!-- BEGIN etherpad_unlock -->
-    <li><a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='icon-locked'>Unlock</a>
-    <!-- END etherpad_unlock -->
+<ul class="breadcrumb">
+    <li><a href="/homepage/{HOMEPAGE_ID}/">{FOLDER_NAME}</a></li>
+    <li class="active"><a href="#">Collab Doc</a></li>
 </ul>
 
-<div>
-    <iframe data-collabdoc src='{ETHERPAD_URL}'></iframe>
+<div class="row actions-small-1">
+    <div class="small-12 column list-item">
+        <h1>{ETHERPAD_NAME}</h1>
+    </div>
+    <nav>
+            <!-- BEGIN etherpad_lock -->
+        <a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='icon-unlocked' data-tooltip title="Lock"></a>
+            <!-- END etherpad_lock -->
+
+            <!-- BEGIN etherpad_unlock -->
+        <a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='icon-locked' data-tooltip title="Unlock"></a>
+            <!-- END etherpad_unlock -->
+    </nav>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <iframe data-collabdoc src='{ETHERPAD_URL}'></iframe>
+    </div>
 </div>
 
 <script type="text/javascript" src="/javascript/etherpad/jquery.etherpad.js"></script>
