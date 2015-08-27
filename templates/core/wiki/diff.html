@@ -1,26 +1,44 @@
-<h1>{HEADING} {LOCKED} (Comparing Revision {FROM_ID} to {TO_ID})</h1>
-<span class="header_option"> <a href="/wiki/{CATEGORY_ID}/{SLUG}" class="btn go-back"><span></span>Return to latest</a> </span>
+<ul class="breadcrumb">
+	<li><a href="/homepage/{CATEGORY_ID}/">{FOLDER_NAME}</a></li>
+	<li><a href="/wiki/{CATEGORY_ID}/{SLUG}">Wiki</a></li>
+	<li class="active"><a href="#">Compare</a></li>
+</ul>
 
-<div class="left">
-	<div class="wysiwyg revision-box">
-	{DIFF}
+<div class="row">
+	<div class="small-12">
+		<h1>{HEADING} {LOCKED} (Comparing Revision {FROM_ID} to {TO_ID})</h1>
 	</div>
-	<p>Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</p>
 </div>
 
-<div class="right">
-	<h2>Revisions</h2>
-	<table width="100%" class="table">
-		<tr>
-			<th>Date</th>
-			<th>Author</th>
-		</tr>
-		<!-- BEGIN revision_list -->
-		<tr class="{REVISION_CURRENT}">
-			<td><a href="/wiki/revision/{WIKI_ID}/{REVISION_COMPARE}" >{REVISION_DATE}</a></td>
-			<td>{REVISION_AUTHOR}</td>
-			<td><!-- BEGIN revision_comparison --><a href="/wiki/diff/{WIKI_ID}/{REVISION_ID}/{REVISION_COMPARE}">Compare</a><!-- END revision_comparison --></td>
-		</tr>
-		<!-- END revision_list -->
-	</table>
+<div class="row">
+	<div class="small-12 large-8 island">
+		<h2 class="subheader">Wiki</h2>
+		<section class="content">
+			<article class="revision-box">
+				{DIFF}
+			</article>
+			<p class="meta">Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</p>
+		</section>
+	</div>
+	<div class="small-12 large-4 island">
+		<h2 class="subheader">Revisions</h2>
+		<table>
+			<thead>
+			<tr>
+				<th>Date</th>
+				<th>Author</th>
+				<th>Compare</th>
+			</tr>
+			</thead>
+			<tbody>
+			<!-- BEGIN revision_list -->
+			<tr class="{REVISION_CURRENT}">
+				<td><a href="/wiki/revision/{WIKI_ID}/{REVISION_COMPARE}">{REVISION_DATE}</a></td>
+				<td>{REVISION_AUTHOR}</td>
+				<td><!-- BEGIN revision_comparison --><a href="/wiki/diff/{WIKI_ID}/{REVISION_ID}/{REVISION_COMPARE}" class="icon-view" data-tooltip title="Compare"></a><!-- END revision_comparison --></td>
+			</tr>
+			<!-- END revision_list -->
+			</tbody>
+		</table>
+	</div>
 </div>

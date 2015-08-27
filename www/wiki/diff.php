@@ -1,5 +1,7 @@
 <?php
 
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
 $wiki  = new Wiki;
 $group = new Group(HOMEPAGE_SERVICE);
 $userHandler = new User();
@@ -19,6 +21,12 @@ if (is_numeric($this->arg[0])) {
 	if (!isset($from['wikiID']) || !isset($to['wikiID']))
 		error(101);
 
+	try{
+		$folder = FolderMapper::getInstance()->findById($from['categoryID']);
+	} catch (\Schoolbox\Mapper\Exception $e) {
+		error(2);
+	}
+
 	// check permission
 	if (($permission = $group->getPermission($from['categoryID'])) < READ_ACCESS)
 		error(19);
@@ -35,6 +43,7 @@ if (is_numeric($this->arg[0])) {
 	$this->setVar(array(
 			'WIKI_ID'          => $from['wikiID'],
 			'CATEGORY_ID'      => $from['categoryID'],
+			'FOLDER_NAME'	   => Scrub::text($folder->getName()),
 			'FROM_ID'          => $from['revisionID'],
 			'TO_ID'            => $to['revisionID'],
 			'HEADING'          => Scrub::text($from['heading']),
