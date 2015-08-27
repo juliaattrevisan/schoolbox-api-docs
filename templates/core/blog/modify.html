@@ -12,26 +12,36 @@
 	})
 </script>
 <!-- END custom_head -->
+<ul class="breadcrumb">
+	<li><a href="/homepage/{CID}/">{CATEGORY_NAME}</a></li>
+	<li class="active"><a href="#">Blog</a></li>
+</ul>
 
-<h1>{ACTION} Blog Entry</h1>
-<form method="post" enctype="multipart/form-data" id="blogForm"  action="/blog/modifyForm.php" class="clearfix" onSubmit="return(verify());">
-	<table class="standardForm table">
-		<tr>
-			<td class="formLabelWidth"><h4>Title</h4></td>
-			<td><label><input type="text" name="heading" size="35" maxlength="100" class="required" value="{ENTRY_HEADING}" /></label></td>
-		</tr>
-		<tr>
-			<td><h4>Body</h4></td>
-			<td>
-				<textarea id="body" name="body" style="width:100%;height:350px">{ENTRY_BODY}</textarea>
-				<input type="hidden" name="cid" value="{CID}" />
-				<input type="hidden" name="blogID" value="{ID}" />
-			</td>
-		</tr>
-	</table>
-
-	<input type="submit" name="submit" value="{ACTION} Entry" class="submit-btn-plain"/>
-	<!-- BEGIN delete -->
-	<input type="submit" name="delete" value="Delete Entry" class="submit-btn-plain">
-	<!-- END delete -->
-</form>
+<div class="row">
+	<div class="small-12 island">
+		<h1>{ACTION} Blog Entry</h1>
+		<form method="post" enctype="multipart/form-data" id="blogForm"  action="/blog/modifyForm.php" class="top">
+			<section>
+				<fieldset class="content">
+					<div class="small-12 content">
+						<label>Title
+						<input type="text" name="heading" size="35" maxlength="100" class="required" value="{ENTRY_HEADING}" /></label>
+						<label>Body
+							<textarea id="body" name="body" style="width:100%;height:350px">{ENTRY_BODY}</textarea>
+						</label>
+					</div>
+				</fieldset>
+			</section>
+			<div class="row">
+				<div class="small-12 column">
+					<input type="hidden" name="cid" value="{CID}" />
+					<input type="hidden" name="blogID" value="{ID}" />
+					<input type="submit" name="submit" value="{ACTION} Entry" />
+					<!-- BEGIN delete -->
+					<input type="submit" name="delete" value="Delete Entry" class="alert" />
+					<!-- END delete -->
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
