@@ -57,10 +57,7 @@
 </div>
 <!-- END timetable -->
 
-
-
-<div class="timetable-small" data-smaller>
-</div>
+<div class="row timetable-small" data-smaller></div>
 
 <script type="text/javascript">
     (function() {
@@ -70,10 +67,12 @@
          *
          * @param options
          */
-        $.fn.plugin = function(options) {
+        $.fn.timetable = function(options) {
             options = options || {};
 
             var config = init(options, $(this));
+
+            assemble();
 
             /**
              * Init
@@ -84,48 +83,86 @@
              */
             function init(options, element) {
                 var defaults = {
-                    element: element
+                    element: element,
+
+                    /* Reforged timetables end up inside this element
+                     */
+                    target: '[data-smaller]'
                 }
 
                 var derived = {
+
+                    /* Island html
+                     * Sorry, Doctor
+                     */
+                    header: '<h2 class="subheader"></h2>',
+                    island: '<div class="small-12 island"></div>',
+                    section: '<section></section>'
                 }
 
                 var merged = $.extend(defaults, derived, options);
 
                 return merged;
             }
+
+            /**
+             * Assemble a timetable
+             */
+            function assemble() {
+                var periodNames = $(config.element).find('tbody th');
+                var numDays = $(config.element).find('thead th').length;
+                var i;
+
+                /* For every day, assemble a two column timetable
+                 */
+                for (i = 1; i < numDays; i++) {
+                    var table = $('<table>');
+
+                    /* Generate table rows
+                     */
+                    $.each(periodNames, function(index, element) {
+                        var tr = $('<tr></tr>');
+                        tr.append($(element).clone());
+                        tr.append(dataCellSelector(index+1, i+1).clone());
+
+                        table.append(tr);
+                    });
+
+                    /* Assemble island
+                     */
+                    var header = $(config.header).append(headerCellSelector(i+1).html());
+                    var section = $(config.section).append(table);
+                    var island = $(config.island).append(header).append(section)
+
+                    /* Inject
+                     */
+                    $(config.target).append(island);
+                }
+            }
+
+            /**
+             * Select a cell in main timetable
+             *
+             * @param row
+             * @param column
+             */
+            function dataCellSelector(row, column) {
+                return $(config.element).find('tbody tr:nth-child('+row+') td:nth-child('+column+')').first();
+            }
+
+            /**
+             * Select a header column
+             *
+             * @param column
+             * @returns {*|jQuery}
+             */
+            function headerCellSelector(column) {
+                return $(config.element).find('thead tr:first() th:nth-child('+column+')').first();
+            }
         }
     }(jQuery));
 
     $(function() {
-        var periodNames = $('[data-timetable] tbody th');
-        var numDays = $('[data-timetable] thead th').length;
-
-        /* For every day, assemble a two column timetable
-         */
-        for (var i = 1; i < numDays; i++) {
-            var table = $('<table>');
-
-            /* Generate table rows
-             */
-            $.each(periodNames, function(index, element) {
-                var tr = $('<tr></tr>');
-                tr.append($(element).clone());
-                tr.append($('[data-timetable] tbody tr:nth-child('+(index+1)+') td:nth-child('+i+')').first().clone());
-
-                table.append(tr);
-            });
-
-            /* Assemble island
-             */
-            var header = $('<h2 class="subheader"></h2>');
-            header.append($('[data-timetable] thead tr:first() th:nth-child('+i+')').first().html());
-
-            var html = $('<div></div>').append(header);
-
-            html.append(table);
-
-            $('[data-smaller]').append(html);
-        }
+        $('[data-timetable]').timetable();
     });
 </script>
