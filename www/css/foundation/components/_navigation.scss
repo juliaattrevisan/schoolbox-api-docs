@@ -432,7 +432,7 @@ $menu-slide: "transform 500ms ease";
 		margin: 0;
 		opacity: 0;
 	}
-	&:hover{
+	&:hover, &.focus {
 		width: 100%;
 		padding-left: 22rem;
 		@include placeholder-color($black, $font-weight-normal);
