@@ -30,7 +30,7 @@ if (($isSuperuser || $isAllowedTeacher) && is_numeric($this->arg[0])) {
     $zone->setThumbnailSize(64);
     $zone->setAttachPrompt('Upload zip file');
     $zone->setAttachmentsLabel('');
-    $zone->setMimeFilter('application/x-zip-compressed');
+    $zone->setMimeFilter('application/zip,application/x-zip-compressed');
     $zone->setModalTitle('Select zip file');
 
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
