@@ -3,30 +3,37 @@
 <table>
     <thead>
         <tr>
-            <th style="width:{TIMETABLE_FIELD_WIDTH}%;">&nbsp;</th>
+            <th></th>
             <!-- BEGIN day_header -->
-            <th scope="col" class="{TIMETABLE_CLASS}" style="width:{TIMETABLE_FIELD_WIDTH}%;">{DAY_NAME}</th>
+            <th class="{TIMETABLE_CLASS}" style="width:{TIMETABLE_FIELD_WIDTH}%;">{DAY_NAME}</th>
             <!-- END day_header -->
         </tr>
     </thead>
     <tbody>
         <!-- BEGIN period -->
         <tr>
-            <th scope="row" class="{PERIOD_CLASS}">{PERIOD_NAME}
-                <span class="time">{PERIOD_START}&ndash;{PERIOD_END}</span>
+            <th class="{PERIOD_CLASS}">
+                {PERIOD_NAME}
+                <time>{PERIOD_START}&ndash;{PERIOD_END}</time>
             </th>
             <!-- BEGIN day -->
-            <td class="{TIMETABLE_CLASS}">
+            <td class="{TIMETABLE_CLASS}" style="background-color: {PERIOD_COLOUR};">
                 <!-- BEGIN period_class_link -->
-                <a class="class" href="{PERIOD_URL}" style="background-color: {PERIOD_COLOUR};">
-                    <span class="title">{PERIOD_DESC}</span>
-                    {PERIOD_CODE}<br/>{PERIOD_ROOM} {PERIOD_STAFF}
+                <a href="{PERIOD_URL}" >
+                    {PERIOD_DESC}
+                    <p class="meta">
+                        {PERIOD_CODE}<br />
+                        {PERIOD_ROOM} {PERIOD_STAFF}
+                    </p>
                 </a>
                 <!-- END period_class_link -->
                 <!-- BEGIN period_class -->
-                <span class="class" style="background-color: {PERIOD_COLOUR};">
-                    <span class="title">{PERIOD_DESC}</span>
-                    {PERIOD_CODE}<br/>{PERIOD_ROOM} {PERIOD_STAFF}
+                <span>
+                    {PERIOD_DESC}
+                    <p class="meta">
+                        {PERIOD_CODE}<br />
+                        {PERIOD_ROOM} {PERIOD_STAFF}
+                    </p>
                 </span>
                 <!-- END period_class -->
             </td>
