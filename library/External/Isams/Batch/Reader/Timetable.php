@@ -16,11 +16,18 @@ class External_Isams_Batch_Reader_Timetable extends External_Isams_Batch_Reader_
      */
     public function getAccountInfo()
     {
-        return new External_Isams_Batch_Reader_Iterator_Timetable_Map(
-            new \Alaress\Xml\Filter\Path(
-                $this->iterator,
-                '//TimetableManager/Structure/Week'
-            )
-        );
+        $reducer = new External_Isams_Batch_Reader_Iterator_Timetable_Reduce();
+        $result  = [];
+        foreach (
+            new External_Isams_Batch_Reader_Iterator_Timetable_Map(
+                new \Alaress\Xml\Filter\Path(
+                    $this->iterator,
+                    '//TimetableManager/Structure/Week'
+                )
+            ) as $row
+        ) {
+            $result = $reducer($result, $row);
+        }
+        return $result;
     }
 }

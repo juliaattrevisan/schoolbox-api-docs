@@ -70,7 +70,6 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
         $classMapper = ClassEntryMapper::getInstance();
         $className   = $new_item['ClassName'];
         $classCode   = $new_item['ClassCode'];
-        $classId     = $new_item['ID'];
         if (empty($classCode)) {
             printf("Skipping class without code \"%s\"\n", $className);
             return 1;
@@ -80,14 +79,14 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
         // I am setting the ID of the class directly, instead of auto-increment
         /** @var ClassEntry $class */
         try {
-            $class = $classMapper->findById($classId);
+            $class = $classMapper->findOneByColumn('code', $classCode);
             if ($this->perform_update) {
                 printf("Updating class \"%s\"\n", $classCode);
             } else {
                 printf("Planning update of class \"%s\"\n", $classCode);
             }
         } catch (Exception $e) {
-            $class = $classMapper->createModel($classId);
+            $class = $classMapper->createModel();
             if ($this->perform_update) {
                 printf("Creating class \"%s\"\n", $classCode);
             } else {
@@ -143,6 +142,7 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
                         ->setClass($class)
                         ->setTeacher($teacher)
                         ->setPeriod($classPeriod['ClassPeriodID'])
+                        ->setRoom($classPeriod['ClassRoomCode'])
                 );
             }
         }

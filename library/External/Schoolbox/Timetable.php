@@ -131,7 +131,10 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     {
         // Get classes for which this user is involved, or is a teacher.
         $query = "
-            SELECT c.name, c.code, c.description, cp.period_id, cp.room, cp.teacher_id, u.synergy_id
+            SELECT
+                c.name, c.code, c.description,
+                cp.period_id, cp.room, cp.teacher_id,
+                u.synergy_id, u.title, u.firstname, u.lastname
             FROM class c
             LEFT JOIN class_user   cl ON c.id = cl.class_id
             LEFT JOIN class_period cp ON c.id = cp.class_id
@@ -223,10 +226,15 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
             foreach ($classList as $i => $class) {
                 if ($class['period_id'] == $period['id']) {
-                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['description'] = $class['name'];
-                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['code'] = $class['code'];
-                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['room'] = $class['room'];
-                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['staffCode'] = $class['synergy_id'];
+                    $periodListAdaption[$periodSequence]['day'][$dayNumber][$class['code']] = [
+                        'description'    => $class['name'],
+                        'code'           => $class['code'],
+                        'room'           => $class['room'],
+                        'staffCode'      => $class['synergy_id'],
+                        'staffTitle'     => $class['title'],
+                        'staffFirstname' => $class['firstname'],
+                        'staffSurname'   => $class['lastname'],
+                    ];
                     unset($classList[$i]);
                 }
             }
@@ -263,6 +271,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
         $periodListAdaption = array();
 
+        $timetableDefinition = $this->getTimetableDefinition($externalUserId, $campus);
+        $periodCount         = $timetableDefinition['dayCount'];
         foreach ($periodList as $period) {
             $periodAdaption = array(
                 'periodNumber'   => $period['sequence'],
@@ -270,14 +280,20 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 'periodStart'    => $period['start'],
                 'periodEnd'      => $period['finish'],
                 'periodSequence' => 1,
+                'class'          => array_fill(1, $periodCount, array()),
             );
 
             foreach ($classList as $i => $class) {
                 if ($class['period_id'] == $period['id']) {
-                    $periodAdaption['class'][0]['description'] = $class['name'];
-                    $periodAdaption['class'][0]['code'] = $class['code'];
-                    $periodAdaption['class'][0]['room'] = '';
-                    $periodAdaption['class'][0]['staffCode'] = $class['synergy_id'];
+                    $periodAdaption['class'][$class['code']] = [
+                        'description'    => $class['name'],
+                        'code'           => $class['code'],
+                        'room'           => $class['room'],
+                        'staffCode'      => $class['synergy_id'],
+                        'staffTitle'     => $class['title'],
+                        'staffFirstname' => $class['firstname'],
+                        'staffLastname'  => $class['lastname'],
+                    ];
                     unset($classList[$i]);
                 }
             }

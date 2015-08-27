@@ -35,6 +35,18 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
                 'ClassName'       => "$result->Name",
                 'ClassTeacherIds' => $this->parseTeachers($result->Teachers[0]),
             ];
+        } elseif ($current->matches('//SchoolManager/Forms/Form')) {
+            // A form group - treat this like a class
+            // Does this mess up my method for saving classes?
+            return [
+                'RecordType'      => 'Set',
+                'ID'              => $id,
+                'SubjectID'       => $id,
+                'ClassYear'       => (string)$result->attributes()->YearId,
+                'ClassCode'       => "$result->Form",
+                'ClassName'       => "Advisory Group (HSAG)",
+                'ClassTeacherIds' => [(string)$result->attributes()->TutorId],
+            ];
         } elseif ($current->matches('//TeachingManager/SetLists/SetList')) {
             // Students for this class
             return [
@@ -43,14 +55,34 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
                 'SetID'           => (string)$result->attributes()->SetId,
                 'StudentID'       => (string)$result->attributes()->PupilId,
             ];
+        } elseif ($current->matches('//PupilManager/CurrentPupils/Pupil')) {
+            // Students for a form class - treat as a set list
+            return [
+                'RecordType'      => 'SetList',
+                'ID'              => $id,
+                'SetID'           => (string)$result->Form,
+                'StudentID'       => $id,
+            ];
         } elseif ($current->matches('//TimetableManager/PublishedTimetables/Timetable/Schedules/Schedule')) {
             // Period that room is in
             // (This should have a roomId and TeacherId attribute but doesn't)
+            // Formroom classes have got "HSAG/" prefix
+            $code = "$result->Code";
+            if (preg_match('|^HSAG/(.*)|', $code, $matches)) {
+                $code = $matches[1];
+            }
             return [
                 'RecordType'    => 'Schedule',
-                'ClassCode'     => "$result->Code",
+                'ClassCode'     => $code,
                 'ClassPeriodID' => "$result->PeriodId",
                 'ClassRoomID'   => "$result->RoomId",
+            ];
+        } elseif ($current->matches('//EstateManager/Buildings/Building/Classrooms/Classroom')) {
+            // Room - get a room name from an ID.
+            return [
+                'RecordType' => 'Room',
+                'ID'         => $id,
+                'RoomCode'   => "$result->Name",
             ];
         } else {
             return [

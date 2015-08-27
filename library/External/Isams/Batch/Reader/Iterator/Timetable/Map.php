@@ -18,10 +18,21 @@ class External_Isams_Batch_Reader_Iterator_Timetable_Map extends External_Isams_
         $result  = new SimpleXMLElement($current->getReader()->readOuterXml());
         $id      = (string)$result->attributes()->id;
         if ($current->matches('//TimetableManager/Structure/Week')) {
+            // Assume that campus is first initials in name
+            $campusCode = preg_replace('|^(\\S+).*|', '$1', "$result->Name");
+            // Assume that every week has the same number of days
+            // Offsets:
+            // Week 1: offset by 0 days
+            // Week 2: offset by $numberOfDays days
+            // Week 3: offset by $numberOfDays * 2 days
+            // etc.
+            $days       = $result->Days[0];
+            $weekNumber = (int)$result->Ordinal;
+            $offset     = ($weekNumber - 1) * $days->children()->count();
             return [
                 'RecordType'          => 'Week',
-                'TimetableCampusName' => "$result->ShortName",
-                'TimetableDays'       => $this->parseDays($result->Days[0]),
+                'TimetableCampusName' => $campusCode,
+                'TimetableDays'       => $this->parseDays($days, $offset),
             ];
         } else {
             return [
@@ -35,16 +46,19 @@ class External_Isams_Batch_Reader_Iterator_Timetable_Map extends External_Isams_
      * Parses the day list into a list of day arrays.
      *
      * @param  SimpleXMLElement $days
+     * @param  int              $offset Days to offset the day number by
      * @return array
      */
-    protected function parseDays($days)
+    protected function parseDays($days, $offset)
     {
         $results = [];
         if ($days instanceof SimpleXMLElement) {
             foreach ($days->children() as $day) {
+                // Can't use day shortname anymore
+                $dayNumber = $offset + (int)$day->Ordinal;
                 $results[] = [
-                    'DayName'    => "$day->ShortName",
-                    'DayNumber'  => (int)$day->Ordinal,
+                    'DayName'    => "Day $dayNumber",
+                    'DayNumber'  => $dayNumber,
                     'DayPeriods' => $this->parsePeriods($day->Periods[0]),
                 ];
             }
