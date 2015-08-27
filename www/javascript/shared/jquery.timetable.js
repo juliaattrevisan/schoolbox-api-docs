@@ -37,7 +37,7 @@
                  * Sorry, Doctor
                  */
                 header: '<h2 class="subheader"></h2>',
-                island: '<div class="small-12 island"></div>',
+                island: '<div class="small-12 island no-pad"></div>',
                 section: '<section></section>'
             }
 
