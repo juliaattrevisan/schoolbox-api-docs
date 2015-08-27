@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
 /* Check that you have write permissions
  */
 $authenticator = new \Etherpad\Authenticator();
@@ -15,6 +17,9 @@ $authenticator = new \Etherpad\Authenticator();
 try {
 	$etherpadMapper = new \Etherpad\PadMapper();
 	$etherpad = $etherpadMapper->findById($this->arg[0]);
+
+	$folder = FolderMapper::getInstance()->findById($etherpad->getHomepageId());
+
 }
 catch (\Exception $e) {
 	error(164);
@@ -26,6 +31,7 @@ if ($authenticator->canCreate($etherpad->getHomepageId())) {
 
 	$this->setVar(array(
 		'HOMEPAGE_ID' => $etherpad->getHomepageId(),
+		'FOLDER_NAME' => Scrub::text($folder->getName()),
 		'ETHERPAD_PAD_ID' => $etherpad->getId(),
 		'ETHERPAD_PAD_NAME' => $etherpad->getName()
 	));

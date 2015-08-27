@@ -1,21 +1,37 @@
-<h1>Modify Collab Doc</h1>
+<ul class="breadcrumb">
+    <li><a href="/homepage/{HOMEPAGE_ID}/">{FOLDER_NAME}</a></li>
+    <li class="active"><a href="#">Modify Collab Doc</a></li>
+</ul>
 
-<form data-form='modify' action="/collabdoc/modifyForm" method="post">
-    <input type="hidden" name='padId' value="{ETHERPAD_PAD_ID}" />
-	<input type="hidden" name="homepageId" value="{HOMEPAGE_ID}"  />
-	<input type="hidden" name="type" value="update" />
+<div class="row">
+    <div class="small-12 island">
+        <h1>Modify Collab Doc</h1>
 
-    <label>
-        Name
-        <input type="text" maxlength='255' name='name' class='required' value="{ETHERPAD_PAD_NAME}" placeholder="The name of the Collab Doc" />
-    </label>
-
-    <input type="submit" name='update' value="Update Collab Doc" />
-
-    <!-- BEGIN etherpad_delete -->
-    <input type="submit" name='delete' value="Delete Collab Doc" />
-    <!-- END etherpad_delete -->
-</form>
+        <form data-form='edit' action="/collabdoc/editForm" method="post" class="top">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 column">
+                        <label>
+                            Name
+                            <input type="text" maxlength='255' name='name' class='required' value="{ETHERPAD_PAD_NAME}" />
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 column">
+                    <input type="hidden" name='padId' value="{ETHERPAD_PAD_ID}" />
+                    <input type="hidden" name="homepageId" value="{HOMEPAGE_ID}"  />
+                    <input type="hidden" name="type" value="update" />
+                    <input type="submit" name='submit' value="Create Collab Doc" />
+                    <!-- BEGIN etherpad_delete -->
+                    <input type="submit" class="alert" name='delete' value="Delete Collab Doc" />
+                    <!-- END etherpad_delete -->
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">

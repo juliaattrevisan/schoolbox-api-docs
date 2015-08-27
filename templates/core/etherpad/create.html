@@ -1,15 +1,32 @@
-<h1>Create Collab Doc</h1>
+<ul class="breadcrumb">
+    <li><a href="/homepage/{HOMEPAGE_ID}/">{FOLDER_NAME}</a></li>
+    <li class="active"><a href="#">Create Collab Doc</a></li>
+</ul>
 
-<form data-form='edit' action="/collabdoc/editForm" method="post">
-    <input type="hidden" name='homepageId' value="{HOMEPAGE_ID}" />
+<div class="row">
+    <div class="small-12 island">
+        <h1>Create Collab Doc</h1>
 
-    <label>
-        Name
-        <input type="text" maxlength='255' name='name' class='required' value="" placeholder="The name of the Collab Doc" />
-    </label>
-
-    <input type="submit" name='submit' value="Create Collab Doc" />
-</form>
+        <form data-form='edit' action="/collabdoc/editForm" method="post" class="top">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 column">
+                        <label>
+                            Name
+                            <input type="text" maxlength='255' name='name' class='required' value="" />
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 column">
+                    <input type="hidden" name='homepageId' value="{HOMEPAGE_ID}" />
+                    <input type="submit" name='submit' value="Create Collab Doc" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 <script type="text/javascript">
     $(function() {
