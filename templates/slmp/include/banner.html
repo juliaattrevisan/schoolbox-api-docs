@@ -1,0 +1,48 @@
+<!-- BEGIN banner_logged_in -->
+<ul id="infoPanel">
+  <li class="user first avatar">
+    <a href="/search/user/{USER_ID}" title="View Profile" data-menu="account-menu">
+      <span>{SITE_LOGINNAME}</span>
+      <img height="32" width="32" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square32"/>
+    </a>
+    <ul id="account-menu" class="flyout-menu">
+      <li>
+        <a href="/search/user/{USER_ID}">Profile</a>
+      </li>
+      <li>
+        <a href="/settings/messages">Settings</a>
+      </li>
+      <li>
+        <a href="/logout.php">Logout</a>
+      </li>
+      <!-- BEGIN switch_user -->
+      <li class="switch-user">
+        <a href="/user/switch/{MENU_SWITCH_USERID}" title="Switch to">
+            <img height="32" width="32" src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square32">
+            {MENU_SWITCH_USER_FULLNAME}<br />
+            <span class="meta">{MENU_SWITCH_USER_ROLE}</span>
+        </a>
+      </li>
+      <!-- END switch_user -->
+      <!-- BEGIN recover_user -->
+      <li class="switch-user">
+        <a href="/user/recoverSession" title="Return to">
+            <img height="32" width="32" src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square32">
+            {MENU_SWITCH_USER_FULLNAME}<br />
+            <span class="meta">{MENU_SWITCH_USER_ROLE}</span>
+        </a>
+      </li>
+      <!-- END recover_user -->
+    </ul>
+  </li>
+  {INSTANTMESSAGE_BLOCK}
+</ul>
+<form id="search" action="/search" method="get">
+    <fieldset>
+        <input id="search-field" type="text" name="keyword" placeholder="Search"/>
+        <input id="search-button" type="submit" value="Search"/>
+    </fieldset>
+</form>
+<!-- END banner_logged_in -->
+<a href="/" class="logo"><img src="/images/{SITE_LOCATION}/logo.png" alt="{SITE_NAME}"/></a>
+

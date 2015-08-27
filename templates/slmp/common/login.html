@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!--  Copyright 2013 Alaress Pty Ltd, Schoolbox -->
+<!--  Visit us at www.schoolbox.com.au -->
+<head>
+<title>{TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="Alaress Pty Ltd"/>
+<meta name="application-name" content="St Louis de Montforte" />
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/mstile-144x144.png">
+<link rel="apple-touch-icon" sizes="57x57" href="/images/{SITE_LOCATION}/apple-touch-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/images/{SITE_LOCATION}/apple-touch-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/images/{SITE_LOCATION}/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/images/{SITE_LOCATION}/apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/images/{SITE_LOCATION}/apple-touch-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/images/{SITE_LOCATION}/apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/images/{SITE_LOCATION}/apple-touch-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/images/{SITE_LOCATION}/apple-touch-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/{SITE_LOCATION}/apple-touch-icon-180x180.png">
+<link rel="Shortcut Icon" href="/images/{SITE_LOCATION}/favicon.ico" type="image/x-icon" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/chrome.css" />
+<script type="text/javascript">
+window.onload = init;
+function init(){
+	document.getElementById('username').focus();
+}
+</script>
+<!--[if lt IE 9]>
+<script type="text/javascript">
+    // Upgrade your browser
+    window.location.href = "/upgrade.php";
+</script>
+<![endif]-->
+</head>
+<body class="login">
+<div id="container" class=" login">
+	<div id="content" class="clearfix">
+        <a href="/" class="logo"><img src="/images/{SITE_LOCATION}/login-logo.png" height="120" width="304" alt="{SITE_NAME}" /></a>
+		<p class="error">{ERROR}</p>
+		<form id="loginForm" method="post" class="clearfix" action="/loginForm.php?{GET_PARAMS}">
+			<fieldset>
+                <!--[if lt IE 10]>Username:<![endif]-->
+				<input type="text" name="username" id="username" placeholder="Username" />
+			</fieldset>
+			<fieldset>
+                <!--[if lt IE 10]>Password:<![endif]-->
+				<input type="password" name="password" id="password" placeholder="Password" />
+			</fieldset>
+            <input type="hidden" name="page" value="{HIDDEN}" />
+			<input class="login submit-btn-plain" type="submit" name="Submit" value="Log in" alt="Log in" />
+            <!-- BEGIN remember_me -->
+            <label><input type="checkbox" name="rememberme" value="1" />Remember me</label>
+            <!-- END remember_me -->
+        </form>
+		<p class="forgotten"><a href="/forgotten-password.php">Parents, forgotten your password?</a></p>
+	</div>
+</div>
+<div id="footer" class="login">
+	<ul>
+		<li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SCHOOL_ADDRESS}">{SITE_NAME}</a></li>
+		<li><a href="/policy.php">Guidelines of Use and Privacy Policy</a></li>
+        <li>Powered by <a href="http://www.schoolbox.com.au" title="Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a></li>
+        <!-- BEGIN mobile_switch -->
+		<li><a href="/switch.php?v=mobile">Switch to Mobile</a></li>
+		<!-- END mobile_switch -->
+        <li><a href="http://alaress.com.au" title="Web Development Melbourne">Web Development</a> by <a href="http://alaress.com.au">Alaress</a></li>
+		<li class="last"><a href="/feedback.php" title="Web Designers">Feedback and Support</a></li>
+	</ul>
+</div>
+<div id="login-bg">
+    <img src="/images/{SITE_LOCATION}/login-bg.jpg" alt="">
+</div>
+</body>
+</html>
