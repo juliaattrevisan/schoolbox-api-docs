@@ -75,10 +75,12 @@
                 var section = $(config.section).append(table);
                 var island = $(config.island).append(header).append(section)
 
-                /* Inject
+                /* Inject and add a separator in case you have multiple timetables
                  */
                 $(config.target).append(island);
             }
+
+            $(config.target).append('<hr />');
         }
 
         /**
