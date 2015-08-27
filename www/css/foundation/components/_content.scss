@@ -1445,3 +1445,6 @@ ul.meta {
     }
 }
 
+.alert-box:empty {
+	display: none;
+}

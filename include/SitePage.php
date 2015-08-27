@@ -1159,6 +1159,34 @@ class SitePage extends Page
             }
         }
 
+        // choose a background picture
+        $options = glob(WEB_root . "/images/{$this->site}/login-*.jpg");
+
+        if (count($options)) {
+
+            // rip out any options that contain "logo", because a consistent naming convention is apparently too much to ask (sigh)
+            foreach ($options as $i => $opt) {
+                if (strpos($opt, 'logo')) {
+                    unset($options[$i]);
+                }
+            }
+            $options = array_values($options);
+
+            $bg = $options[array_rand($options)];
+
+            $this->setVar('LOGIN_BG', substr($bg, strpos($bg, '/images/')));
+        } else {
+            $this->setVar('LOGIN_BG', '');
+        }
+
+        // is the login page sidebar-style?
+        // TODO config this, for now just always on
+        if (true) {
+            $this->setVar('SIDE', 'side');
+        } else {
+            $this->setVar('SIDE', '');
+        }
+
         // is SAML enabled?
         // don't show the login page, redirect to the SAML login page.
         // (unless ?samlLogin=0 is set)
