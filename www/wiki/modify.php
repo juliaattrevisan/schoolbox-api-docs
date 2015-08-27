@@ -1,5 +1,7 @@
 <?php
 
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
 $wikiHandler  = new Wiki;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
@@ -12,6 +14,12 @@ if (is_numeric($this->arg[0])) {
 
     if (!isset($wiki['wikiID'])) {
         error(101);
+    }
+
+    try{
+        $folder = FolderMapper::getInstance()->findById($wiki['categoryID']);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(2);
     }
 
     // check permission
@@ -29,6 +37,7 @@ if (is_numeric($this->arg[0])) {
         'WIKI_ID'     => $wiki['wikiID'],
         'SLUG'        => $wiki['slug'],
         'CATEGORY_ID' => $wiki['categoryID'],
+        'FOLDER_NAME' => Scrub::text($folder->getName()),
         'HEADING'     => Scrub::text($wiki['heading']),
         'BODY'        => Scrub::text($wiki['body']),
         'REVISION'    => $wiki['latestRevision'],
@@ -43,6 +52,12 @@ if (is_numeric($this->arg[0])) {
      */
     $value = \Component_ConfigMapper::getInstance()->findValue('allowCreate', $this->arg[2]);
 
+    try{
+        $folder = FolderMapper::getInstance()->findById($this->arg[1]);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(2);
+    }
+
     if (((int)$value === 0) && ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS)) {
         error(19);
     }
@@ -56,6 +71,7 @@ if (is_numeric($this->arg[0])) {
             'ACTION'      => 'Add',
             'WIKI_ID'     => '',
             'CATEGORY_ID' => $this->arg[1],
+            'FOLDER_NAME' => Scrub::text($folder->getName()),
             'HEADING'     => $title,
             'BODY'        => '',
             'REVISION'    => '',

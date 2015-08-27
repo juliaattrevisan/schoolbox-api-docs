@@ -13,47 +13,54 @@ $(function() {
 
 </script>
 <!-- END custom_head -->
+<ul class="breadcrumb">
+	<li><a href="/homepage/{CATEGORY_ID}/">{FOLDER_NAME}</a></li>
+	<li class="active"><a href="#">Wiki</a></li>
+</ul>
+<div class="row">
+	<div class="small-12 island">
+		<h1>{ACTION} Wiki</h1>
+		<form action="/wiki/modifyForm.php" method="post" id="wikiForm" class="top">
+			<section>
+				<fieldset class="content">
+					<div class="small-12 columns">
+						<label>
+							Title
+							<input type="text" class="required" name="heading" size="60" maxlength="200" value="{HEADING}"/>
+						</label>
+						<label>
+							Body
+							<span data-reveal-id="tipModal" class="hint">?</span>
+							<div id="tipModal" class="reveal-modal" data-reveal  aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+								<p><em>Wikis allow you to create a document and track all changes to the document.  Once created all users with read access to the page can edit the document.</em></p>
+								<p><strong>Creating New Stub Pages</strong><br />
+									To create a new wiki document you may use the link function to automatically create new pages.</p>
+								<ol>
+									<li>Highlight the word you wish to link</li>
+									<li>Click the link button in the top</li>
+									<li>Leave the 'Link URL' empty</li>
+									<li>Type in the 'Title' field the name of the new document</li>
+								</ol>
+								<p>The system will automatically link this document to the new stub document. Links will remain in red until the content has been updated in the new document.</p>
+							</div>
 
-<h1>{ACTION} Wiki</h1>
-<span class="header_option"><a href="/homepage/{CATEGORY_ID}" class="btn go-back"><span></span>Return to Homepage</a></span>
-<form action="/wiki/modifyForm.php" method="post" id="wikiForm" class="clearfix">
-	<input type="hidden" name="wikiID" value="{WIKI_ID}"/>
-	<input type="hidden" name="categoryID" value="{CATEGORY_ID}"/>
-	<table width="100%" class="standardForm table">
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Title</h4>
-			</td>
-			<td>
-				<label>
-					<input type="text" class="required" name="heading" size="60" maxlength="200" value="{HEADING}"/>
-				</label>
-				<label class="hide-it">
-					<input type="text" name="slug" size="60" value="{SLUG}" />
-				</label>
-			</td>
+							<textarea name="body">{BODY}</textarea>
+						</label>
+					</div>
+				</fieldset>
+			</section>
+			<input type="hidden" name="wikiID" value="{WIKI_ID}"/>
+			<input type="hidden" name="categoryID" value="{CATEGORY_ID}"/>
+			<input type="hidden" name="slug" size="60" value="{SLUG}" />
+			<input type="hidden" name="revision" value="{REVISION}"/>
+			<input type="hidden" name="instanceId" value="{INSTANCE_ID}"/>
+			<div class="row">
+				<div class="small-12 column">
+					<input type="submit" value="{ACTION} Wiki"/>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
 
-		</tr>
-		<tr>
-			<td>
-				<h4>Body</h4>
-                <p><em>Wikis allow you to create a document and track all changes to the document.  Once created all users with read access to the page can edit the document.</em></p>
-                <p><strong>Creating New Stub Pages</strong><br />
-                To create a new wiki document you may use the link function to automatically create new pages.</p>
-                    <ol>
-                        <li>Highlight the word you wish to link</li>
-                        <li>Click the link button in the top</li>
-                        <li>Leave the 'Link URL' empty</li>
-                        <li>Type in the 'Title' field the name of the new document</li>
-                     </ol>
-                <p>The system will automatically link this document to the new stub document. Links will remain in red until the content has been updated in the new document.</p>
-			</td>
-			<td>
-				<textarea name="body" style="width:100%;height:350px">{BODY}</textarea>
-			</td>
-		</tr>
-	</table>
-	<input type="hidden" name="revision" value="{REVISION}"/>
-    <input type="hidden" name="instanceId" value="{INSTANCE_ID}"/>
-	<input type="submit" class="submit-btn-plain" value="Save"/>
-</form>
+
