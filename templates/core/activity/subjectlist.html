@@ -1,29 +1,52 @@
-<li class="{DARK} {SUBJ_HAS_GRADE}">
-    <!-- BEGIN subject_grade -->
-    <a class="grade gradient-{SUBJ_GRADEIANT}-bg" href="/submission/allWork/{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{SUBJ_CAT_ID}">
-        <span class="gradient-{SUBJ_GRADEIANT}">{SUBJ_GRADE}</span>
-        {SUBJ_TREND_AMT} {SUBJ_TREND_DIR}
-    </a>
-    <!-- END subject_grade -->
-    <a class="listlink subject to-subject left-bar" href="{SUBJ_SUBJECT_URL}">
-        <!-- BEGIN icon -->
-<!--
-        <span class="avatar">
-            <img src="{SUBJ_SUBJECT_ICON}" title="{SUBJ_SUBJECT_NAME}" alt="{SUBJ_SUBJECT_NAME}">
-        </span>
--->
-        <!-- END icon -->
-        {SUBJ_SUBJECT_NAME} {SUBJ_SUBJECT_CODE}
-        <span class="icon"></span>
-    </a>
-    <!-- BEGIN teacher -->
-    <div class="profile teacher left-bar">
-      <a href="/search/user/{SUBJ_TEACHER_ID}" class="listlink teacher-profile">
-        <img src="{SUBJ_TEACHER_AVATAR}" title="{SUBJ_TEACHER_AVATAR_TITLE}" alt="{SUBJ_TEACHER_AVATAR_TITLE}" />
-        <span class="name">{SUBJ_TEACHER_NAME}</span>
-        <span class="role">Teacher</span>
-      </a>
-      <a class="listlink mail-teacher" href="{SUBJ_TEACHER_URL}">Mail</a>
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <ul class="information-list">
+                <li>
+                    <div class="list-item" data-equalizer>
+                        <div class="small-8 avatar card" data-equalizer-watch>
+                            <a href="/homepage/{SUBJ_CAT_ID}" title="Visit Homepage">
+                                <!-- BEGIN icon -->
+                                <span class="icon-folder icon-32" title="{SUBJ_SUBJECT_NAME}"></span>
+                                <!-- END icon -->
+
+                                <p>{SUBJ_SUBJECT_NAME}</p>
+                            </a>
+                            <p class="meta">{SUBJ_SUBJECT_CODE}</p>
+                        </div>
+                        <div class="small-4 columns no-pad">
+                            <!-- BEGIN subject_grade -->
+                            <div class="grade gradient-{SUBJ_GRADEIANT}-bg content" data-equalizer-watch>
+                                <a href="/submission/allWork/{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{SUBJ_CAT_ID}">
+                                    <span class="gradient-{SUBJ_GRADEIANT}">
+                                        {SUBJ_GRADE}
+                                    </span>
+                                    {SUBJ_TREND_AMT} {SUBJ_TREND_DIR}
+                                </a>
+                            </div>
+                            <!-- END subject_grade -->
+                        </div>
+                    </div>
+                </li>
+                <!-- BEGIN teacher -->
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
+                            <a href="/search/user/{SUBJ_TEACHER_ID}" title="">
+                                <img src="{SUBJ_TEACHER_AVATAR}" alt="{SUBJ_TEACHER_AVATAR_TITLE}" />
+                                <p>{SUBJ_TEACHER_NAME}</p>
+                            </a>
+                            <p class="meta">Teacher</p>
+                        </div>
+
+                    </div>
+                    <nav>
+                        <a href="{SUBJ_TEACHER_URL}" class="icon-email" title="Mail"></a>
+                    </nav>
+                </li>
+                <!-- END teacher -->
+            </ul>
+        </section>
     </div>
-    <!-- END teacher -->
-</li>
+</div>
+

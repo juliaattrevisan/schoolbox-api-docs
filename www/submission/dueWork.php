@@ -353,7 +353,7 @@ foreach ($categoryList as $category) {
     }
 
     $categoryIDs[] = $categoryID;
-    $categoryCode  = $category['code'] ? '(' . $category['code'] . ')' : '';
+    $categoryCode  = $category['code'] ? $category['code'] : '';
 
     //
     // retrieve subject grades.
@@ -450,7 +450,7 @@ foreach ($categoryList as $category) {
                     'SUBJ_TEACHER_NAME'         => $teacher['name'],
                     'SUBJ_TEACHER_URL'          => $teacher['email'],
                     'SUBJ_TEACHER_ROLE'         => 'Teacher',
-                    'SUBJ_TEACHER_AVATAR'       => "/portrait?userId={$teacher['synid']}&size=square32",
+                    'SUBJ_TEACHER_AVATAR'       => "/portrait?userId={$teacher['synid']}&size=square64",
                     'SUBJ_TEACHER_AVATAR_TITLE' => $teacher['name']
                 );
                 $this->setVar($tOutput);
@@ -585,7 +585,7 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
     $feedItems[] = array(
         'content'   => $stringDesc,
         'time'      => $activityTime->getRelativeTime(),
-        'icon'      => $activity->getEvent(),
+        'icon'      => $activity->getEventIcon(),
         'grade'     => isset($mark) ? $mark : null,
         'gradeiant' => isset($mark) ? (int)($rtn['norm_mark'] / 10) : '',
         'has_grade' => isset($mark) ? 'grade' : 'no-grade',
@@ -593,6 +593,10 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
 }
 
 $activityList = new Activity_ListArray($feedItems);
+$activityList->setShowAvatars(false);
+$activityList->setShowIcons(true);
+$activityList->setShowGrade(true);
+
 if (empty($feedItems)) {
     $this->setVar('ACTIVITY_LIST', '<li>You have no recent activity.</li>');
 } else {

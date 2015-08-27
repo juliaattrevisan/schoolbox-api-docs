@@ -40,7 +40,7 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
                         'icon' => $f['type'],
                         'content' => $f['messageHTML'] . (empty($f['cat_name']) ? '' : ' in <a href="/homepage/' . $f['cat_id'] . '">' . $f['cat_name'] . '</a>'),
                         'time' => $feedTime->getRelativeTime(),
-                        'avatar' => $f['external_id'] != false ? '/portrait.php?userId=' . $f['external_id'] . '&size=square32' : '',
+                        'avatar' => $f['external_id'] != false ? '/portrait.php?userId=' . $f['external_id'] . '&size=square64' : '',
                         'avatar_title' => $f['user_name'] != false ? $f['user_name'] : '',
                         'has_grade' => 'no-grade',
                         'gradeiant' => '',
@@ -68,7 +68,7 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
         $this->setVar('SUBJ_HAS_GRADE', 'no-grade');
 
         $alist = new Activity_ListArray($this->feedList);
-        $alist->setShowAvatars(true);
+        $alist->setShowAvatars(false);
         $alist->setShowTrends(false);
         $alist->setTarget($this->sitepage, 'ACTIVITY_LIST');
         foreach ($alist as $a) {
