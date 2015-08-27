@@ -1,15 +1,12 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
-<script type="text/javascript" src="/javascript/jquery.search.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.search.js"></script>
 <script type="text/javascript">
 
-$(function() {
+    $(function() {
 
     /* Disable under certain conditions
      */
-    var enabled = '{ENABLED}';
-
-    if (enabled === '1') {
+    if ('{ENABLED}' === '1') {
 
         /* Set initial conditions
          */
@@ -18,7 +15,7 @@ $(function() {
         var pageNumber = 1;
 
         if (window.location.hash.length > 1) {
-            var params = search.fetchHash();
+            var params = $.fn.fetchHash();
 
             if (params.length) {
                 section = params[0];
@@ -29,69 +26,83 @@ $(function() {
             }
         }
 
-        /* Seymour
-         */
-        $('#content div.results').on('click', 'a.more', function(event) {
-            event.preventDefault();
-
-            var type = $(this).attr('rel');
-
-            window.location.hash = '#' + type + ',1';
-            window.location.reload(true);
+        $('[data-results]').search({
+            keyword: keyword,
+            section: section,
+            pageNumber: pageNumber
         });
-
-        /* Run Once by default
-         */
-        search.runOnce(keyword, section, $('#type a[rel=' + section + ']'), pageNumber);
 
         /* Runs when you change sections
          */
-        $('#type a[class!=disabled]').click(function(event) {
+        $('#type [data-section]').click(function(event) {
             event.preventDefault();
 
-            search.runOnce(keyword, $(this).attr('rel'), $(this), 1);
+            $('[data-results]').search({
+                keyword: keyword,
+                section: $(this).attr('data-section'),
+                pageNumber: 1
+            });
         });
     }
 });
 </script>
 <!-- END custom_head -->
+<div class="row">
+    <div class="small-12 island">
+        <h1>Search Results{FOR}<em>{UNESCAPED_KEYWORD}</em></h1>
 
-<h1>Search Results{FOR}<em>{UNESCAPED_KEYWORD}</em></h1>
-<dl id="type" class="sub-nav">
-    <!-- BEGIN type -->
-    <dd class='{TYPE_CLASS}'>
-		<a href='#' rel="{TYPE_TYPE}" data-count="0">{TYPE_NAME} ({TYPE_COUNT})</a>
-	</dd>
-    <!-- END type -->
-</dl>
+        <!-- BEGIN has_options -->
+        <dl id="type" class="sub-nav">
+            <!-- BEGIN type -->
+            <dd class='{TYPE_CLASS}'>
+                <a href='#' data-section="{TYPE_TYPE}" data-count="0">{TYPE_NAME} ({TYPE_COUNT})</a>
+            </dd>
+            <!-- END type -->
+        </dl>
 
-<div class="results">
-    <!-- BEGIN result -->
-    <div data-type="{RESULT_TYPE}" data-container="resultType" class="search-resultType">
-		{RESULT}
-	</div>
-    <!-- END result -->
+        <div data-results>
+            <!-- BEGIN result -->
+            <div data-type="{RESULT_TYPE}" data-result-container>
+                <div class='loader'></div>
+                {RESULT}
+            </div>
+            <!-- END result -->
+        </div>
+        <!-- END has_options -->
+    </div>
 </div>
+
 <!-- BEGIN no_result -->
 <div class="row">
-    <form method="get" action="/search" _lpchecked="1" id="inline_search">
-    <div class="large-12 island">
-        <section>
-            <div class="content">
-                <p class="alert-box warning">Sorry, but your search{FOR}<em>{UNESCAPED_KEYWORD}</em> did not return any results{NO_RESULTS_BECAUSE}.</p>
-                <p>Here are some tips for improving your search:</p>
-                <ul>
-                    <li>Ensure your search is 3 or more letters long. If you need to search for something less than 3 letters long, "quote" it.</li>
-                    <li>You can also use "quotes" to search for an exact string, for example "dog and cat".</li>
-                </ul>
-            <label for="inline_search_field">
-                Try Again
-            </label>
-            <input id="inline_search_field" type="text" value="{ENCODED_KEYWORD}" name="keyword" placeholder="search" />
-            <input type="submit" value="Search" />
+    <div class="small-12 island">
+        <form method="get" action="/search" class="top">
+            <section>
+                <div class="content">
+                    <p class="alert-box warning">
+                        Sorry, but your search{FOR}
+                        <em>{UNESCAPED_KEYWORD}</em>
+                        did not return any results{NO_RESULTS_BECAUSE}.
+                    </p>
+
+                    <p>Here are some tips for improving your search:</p>
+
+                    <ul>
+                        <li>Ensure your search is 3 or more letters long. If you need to search for something less than 3 letters long, "quote" it.</li>
+                        <li>You can also use "quotes" to search for an exact string, for example "dog and cat".</li>
+                    </ul>
+
+                    <label>
+                        Try Again
+                        <input type="text" value="{ENCODED_KEYWORD}" name="keyword" placeholder="search" />
+                    </label>
+                </div>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Search" />
+                </div>
             </div>
-        </section>
+        </form>
     </div>
-    </form>
 </div>
 <!-- END no_result -->
