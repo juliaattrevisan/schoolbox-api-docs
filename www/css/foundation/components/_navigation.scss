@@ -345,9 +345,11 @@ $menu-slide: "transform 500ms ease";
 			text-align: center;
 			float: none;
 		}
-		label{
+		span {
 			font-weight: $font-weight-normal;
 			color: $primary-color;
+			display: block;
+			line-height: 1.5rem;
 		}
 	}
 }
@@ -384,6 +386,10 @@ $menu-slide: "transform 500ms ease";
 		li:nth-child(n+7){
 			@extend .show-for-xlarge-up;
 		}
+		a {
+			padding: 1.25rem 0;
+		}
+
 	}
 }
 
@@ -481,21 +487,15 @@ $menu-slide: "transform 500ms ease";
 // Left Side Menu
 .left-off-canvas-menu{
 	// Sidebar Main Nav
-	.icon-nav{
-		margin: $base-font-size 0;
+	.second-nav{
 		@extend .hide-for-xlarge-up;
-		li{
-			width: 33.33%;
-		}
+
 		li:nth-child(-n+6){
 			@extend .hide-for-large-only;
 		}
         li:nth-child(-n+4){
             @extend .hide-for-medium-down;
         }
-		a{
-			padding: rem-calc(($base-font-size / 2));
-		}
 	}
 	// Profile
 	.account-menu{
@@ -554,11 +554,6 @@ $menu-slide: "transform 500ms ease";
   }
 	.tab-bar-section.middle{
 		padding-right: 20.625rem;
-	}
-	.icon-nav{
-  	a{
-			padding: 0.5rem 1rem;
-		}
 	}
 }
 
