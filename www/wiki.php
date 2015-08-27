@@ -1,5 +1,7 @@
 <?php
 
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
 $wikiHandler = new Wiki();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
@@ -23,6 +25,12 @@ if ($this->arg[0] == 'revision') {
         error(101);
     }
 
+    try{
+        $folder = FolderMapper::getInstance()->findById($wiki['categoryID']);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(2);
+    }
+
     // check permission
     if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
         error(19);
@@ -41,6 +49,7 @@ if ($this->arg[0] == 'revision') {
     $output = array(
         'WIKI_ID' => $wiki['wikiID'],
         'CATEGORY_ID' => $wiki['categoryID'],
+        'FOLDER_NAME' => Scrub::text($folder->getName()),
         'HEADING' => Scrub::text($wiki['heading']),
         'BODY' => Scrub::html($wikiHandler->activateStubLinks($wiki['body'])),
         'MODIFIED' => $modifiedDate->getLong(),
@@ -151,6 +160,12 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
             error(101);
         }
 
+        try{
+            $folder = FolderMapper::getInstance()->findById($wiki['categoryID']);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            error(2);
+        }
+
         // check permission
         if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
             error(19);
@@ -169,6 +184,7 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         $output = array(
             'WIKI_ID' => $wiki['wikiID'],
             'CATEGORY_ID' => $wiki['categoryID'],
+            'FOLDER_NAME' => Scrub::text($folder->getName()),
             'HEADING' => Scrub::text($wiki['heading']),
             'BODY' => Scrub::html($wikiHandler->activateStubLinks($wiki['body'])),
             'MODIFIED' => $modifiedDate->getLong(),
