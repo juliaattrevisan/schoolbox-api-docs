@@ -1,21 +1,4 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
-<script type="text/javascript">
-	$(function() {
-		$.fn.alaressTiny({
-			mode: 'textareas',
-			file_browser_category_id : {CID}
-		});
-
-		$('#blogForm').validate();
-	})
-</script>
-<!-- END custom_head -->
-<ul class="breadcrumb">
-	<li><a href="/homepage/{CID}/">{CATEGORY_NAME}</a></li>
-	<li class="active"><a href="#">Blog</a></li>
-</ul>
+{BREADCRUMB}
 
 <div class="row">
 	<div class="small-12 island">
@@ -45,3 +28,16 @@
 		</form>
 	</div>
 </div>
+
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $.fn.alaressTiny({
+            mode: 'textareas',
+            file_browser_category_id : {CID}
+        });
+
+        $('#blogForm').validate();
+    })
+</script>

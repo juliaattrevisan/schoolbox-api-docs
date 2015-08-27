@@ -2,6 +2,7 @@
 
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Blog\BlogMapper;
+use Schoolbox\Breadcrumbs;
 
 $groupHandle = new Group();
 $blogHandle = new Blog();
@@ -34,6 +35,22 @@ if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         )
     );
 
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => Scrub::text($folder->getName()),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Post New Blog',
+            'href' => "#",
+            'class' => 'active',
+        ]
+    ]);
+
 } elseif (is_numeric($this->arg[0])) {
 
     try {
@@ -59,4 +76,21 @@ if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
             'ID'            => $blog->getId(),
         )
     );
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => Scrub::text($blog->getCategory()->getName()),
+            'href' => "/homepage/{$blog->getCategory()->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Modify Blog',
+            'href' => "#",
+            'class' => 'active',
+        ]
+    ]);
 }
+
