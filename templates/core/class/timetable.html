@@ -63,19 +63,51 @@
 </div>
 
 <script type="text/javascript">
+    (function() {
+
+        /**
+         * Plugin
+         *
+         * @param options
+         */
+        $.fn.plugin = function(options) {
+            options = options || {};
+
+            var config = init(options, $(this));
+
+            /**
+             * Init
+             *
+             * @param options
+             * @param element
+             * @returns {*}
+             */
+            function init(options, element) {
+                var defaults = {
+                    element: element
+                }
+
+                var derived = {
+                }
+
+                var merged = $.extend(defaults, derived, options);
+
+                return merged;
+            }
+        }
+    }(jQuery));
+
     $(function() {
         var periodNames = $('[data-timetable] tbody th');
         var numDays = $('[data-timetable] thead th').length;
 
+        /* For every day, assemble a two column timetable
+         */
         for (var i = 1; i < numDays; i++) {
             var table = $('<table>');
-            var header = $('<tr></tr>');
 
-            header.append('<th></th>');
-            header.append($('[data-timetable] thead tr:first() th:nth-child('+i+')').first().clone());
-
-            table.append(header);
-
+            /* Generate table rows
+             */
             $.each(periodNames, function(index, element) {
                 var tr = $('<tr></tr>');
                 tr.append($(element).clone());
@@ -84,7 +116,16 @@
                 table.append(tr);
             });
 
-            $('[data-smaller]').append(table);
+            /* Assemble island
+             */
+            var header = $('<h2 class="subheader"></h2>');
+            header.append($('[data-timetable] thead tr:first() th:nth-child('+i+')').first().html());
+
+            var html = $('<div></div>').append(header);
+
+            html.append(table);
+
+            $('[data-smaller]').append(html);
         }
     });
 </script>
