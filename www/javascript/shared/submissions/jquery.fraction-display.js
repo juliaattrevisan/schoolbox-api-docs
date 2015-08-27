@@ -27,11 +27,7 @@
 
                 /* Selector for inputs
                  */
-                inputs: ':radio',
-
-                /* Selector to put the value in
-                 */
-                displaySelector: false,
+                inputs: false,
 
                 /* Does the gradient get updated too?
                  */
@@ -44,8 +40,7 @@
          * Set up redraw activators
          */
         function setupRedraw() {
-            var display = $(config.displaySelector);
-            if (display.length) {
+            if (config.element.length) {
                 var max         = 0;
                 var inputs      = $(config.inputs);
                 var inputValues = {};
@@ -74,11 +69,11 @@
                             total += val;
                         }
                     });
-                    display.text(String(total) + ' / ' + String(max));
+                    config.element.text(String(total) + ' / ' + String(max));
 
                     // Change the gradient style too
                     if (config.updateGradient) {
-                        display
+                        config.element
                             .removeClass('gradient-0 gradient-1 gradient-2 gradient-3 gradient-4 gradient-5 gradient-6 gradient-7 gradient-8 gradient-9 gradient-10')
                             .addClass('gradient-'+String(Math.ceil(10*total/max)));
                     }

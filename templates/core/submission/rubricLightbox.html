@@ -67,8 +67,8 @@
                 inputs: '#rubric-window'
             });
         }
-        $('#rubric-window').fractionDisplay({
-            displaySelector: '[data-role="rubric-sum"]'
+        $('[data-role="rubric-sum"]').fractionDisplay({
+            inputs: '#rubric-window :radio'
         });
 
 //        var radios = $('#rubric-tbody :radio');
