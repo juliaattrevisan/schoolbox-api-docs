@@ -45,7 +45,7 @@ if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
             'class' => '',
         ],
         [
-            'text' => 'Post New Blog',
+            'text' => 'Post Blog',
             'href' => "#",
             'class' => 'active',
         ]
