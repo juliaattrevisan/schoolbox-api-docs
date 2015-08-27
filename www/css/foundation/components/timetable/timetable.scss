@@ -2,6 +2,12 @@
     td, th {
         border: 1px solid $smoke;
     }
+
+    time {
+        clear: both;
+        display: block;
+        font-weight: normal;
+    }
 }
 
 .timetable-small {
