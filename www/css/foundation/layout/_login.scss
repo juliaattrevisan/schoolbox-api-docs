@@ -1,0 +1,131 @@
+// do we use SASS for our login? (the alernative is the old LESS version)
+$login-html-styles: true;
+
+$login-background-position: top right;
+$login-overlay: $primary-color;
+$login-overlay-opacity: 0;
+
+$login-form-background-color: rgba($black, 0.4);
+
+$login-form-width: 20rem;    // 320px: this is the functional min-width of Schoolbox
+$login-form-height: 32rem;
+$login-form-padding: 2rem;
+
+$login-img-max-height: 12rem; // 192px
+
+
+@if ($login-html-styles) {
+
+
+    $login-footer-height: (1.5 * 4 * 1rem) + (2 * $footer-margin-bottom); // 4 lines, 1.5 line height
+
+    body.login {
+
+        margin: 0;
+        padding: 0;
+
+        @include contrast-bg(1, $login-overlay);
+
+        // background-image is set inline by the random-image selector
+        background-color: $body-bg;
+        background-position: $login-background-position;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        @include cover-image;
+
+        #container {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            background-color: rgba($login-overlay, $login-overlay-opacity);
+            position: relative;
+        }
+
+        #content {
+
+            @media #{$small-only} {
+                max-width: 360px;
+            }
+            @media #{$medium-up} {
+                max-width: 480px;
+            }
+
+            padding: 0 0 $login-footer-height;
+            margin: 0 auto;
+            @extend %p;
+
+            form {
+                margin: 0;
+                padding: $login-form-padding;
+                background-color: $login-form-background-color;
+                @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
+                position: relative;
+            }
+        }
+
+        #footer {
+            @extend %sm;
+            margin: 0 auto 0;
+            text-align: center; // but why...?
+            height: $login-footer-height;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            ul {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+            }
+        }
+
+        input[type=submit] {
+            @extend .expand;
+        }
+
+        input[type=checkbox] + label {
+            @extend label.checkbox-label;
+        }
+
+        .logo {
+            display: block;
+            text-align: center;
+            margin-bottom: $login-form-padding;
+            img {
+                max-height: $login-img-max-height;
+            }
+        }
+
+        a, label, #footer {
+            color: inherit;
+            font-size: inherit;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        &.side {
+            @media #{$small-only} {
+                max-width: 100%;
+                form {
+                    max-width: 360px;
+                }
+            }
+            @media #{$medium-up} {
+                #container {
+                    height: 100%;
+                }
+                #content {
+                    min-height: 100%;
+                    max-width: 360px;
+                    margin: 0 0 0 auto;
+                    background: $login-form-background-color;
+                    form {
+                        background: transparent;
+                    }
+                }
+            }
+        }
+    }
+}
