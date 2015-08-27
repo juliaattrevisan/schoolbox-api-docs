@@ -60,5 +60,3 @@ if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         )
     );
 }
-
-?>
