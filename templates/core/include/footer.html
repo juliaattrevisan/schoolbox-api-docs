@@ -13,4 +13,16 @@
 <script type="text/javascript">
 	Foundation.global.namespace = '';
 	$(document).foundation();
+
+	$(function () {
+		var s = $('#search');
+
+		s.on('focus blur', 'input', function (e) {
+			if (e.type == 'focusin') {
+				s.addClass('focus');
+			} else {
+				s.removeClass('focus');
+			}
+		});
+	});
 </script>
