@@ -25,18 +25,20 @@
                         <time class="meta">{PERIOD_START}&ndash;{PERIOD_END}</time>
                     </th>
                     <!-- BEGIN day -->
-                    <td class="{TIMETABLE_CLASS}" style="background-color: {PERIOD_COLOUR};">
+                    <td class="{TIMETABLE_CLASS}">
                         <!-- BEGIN period_class_link -->
-                        <a href="{PERIOD_URL}" >
+                        <a href="{PERIOD_URL}" style="background-color: {PERIOD_COLOUR};">
                             {PERIOD_DESC}
                             <p class="meta">{PERIOD_CODE}</p>
                             <p class="meta">{PERIOD_ROOM} {PERIOD_STAFF}</p>
                         </a>
                         <!-- END period_class_link -->
                         <!-- BEGIN period_class -->
-                        {PERIOD_DESC}
-                        <p class="meta">{PERIOD_CODE}</p>
-                        <p class="meta">{PERIOD_ROOM} {PERIOD_STAFF}</p>
+                        <div style="background-color: {PERIOD_COLOUR};">
+                            {PERIOD_DESC}
+                            <p class="meta">{PERIOD_CODE}</p>
+                            <p class="meta">{PERIOD_ROOM} {PERIOD_STAFF}</p>
+                        </div>
                         <!-- END period_class -->
                     </td>
                     <!-- END day -->
