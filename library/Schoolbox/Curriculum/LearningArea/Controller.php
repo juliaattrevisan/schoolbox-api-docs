@@ -45,9 +45,15 @@ class Controller extends Base
         $post = $this->getRequest()->post;
         $code = 200;
 
+        /** @var Source\Model $source */
+        $source = $this->getSourceMapper()->findOneByColumn('class', '');
         $item
             ->setName($post['name'])
-            ->setSource($this->getSourceMapper()->findOneByColumn('class', ''));
+            ->setSource($source)
+            ->setReference('')
+            ->setDescription('')
+            ->setOrder($this->getMapper()->countByColumn('curriculum_source_id', $source->getId()))
+        ;
 
         // Save the item
         if (!$this->getMapper()->save($item)) {
