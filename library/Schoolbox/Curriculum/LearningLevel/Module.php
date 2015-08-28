@@ -57,7 +57,7 @@ class Module extends BaseModule
         $injector->params[Controller::class]['sourceMapper']
             = $injector->lazyNew(Source\Mapper::class);
         $injector->set(
-            'controller:curriculumLearningArea',
+            'controller:curriculumLearningLevel',
             $injector->lazyNew(Controller::class)
         );
     }
