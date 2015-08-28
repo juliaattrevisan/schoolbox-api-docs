@@ -269,6 +269,45 @@
                 event.preventDefault();
                 buildForm({ save: createUri }, {});
             });
+
+            // Create new area submit event
+            areaDialog.on('submit', 'form', function(event) {
+                event.preventDefault();
+                formPanel.addClass('loading');
+                var form   = $(this);
+                var submit = form.find(':submit').prop('disabled', true);
+                var ajax   = $.ajax({
+                    method: this.method,
+                    url:    this.action,
+                    data:   form.serializeArray()
+                });
+                ajax
+                    .done(function(data) {
+                        // Update what gets chosen
+                        formPanel.addClass('loaded');
+                        var nameInput = form.find('input[name="name"]');
+                        var name      = nameInput.val();
+                        nameInput.val('');
+                        formPanel.find('#node-form select[name="learningArea"]').append(
+                            $('<option />')
+                                .attr('value', data.item.id)
+                                .attr('label', name)
+                                .prop('selected', true)
+                                .text(name)
+                        );
+                        areaDialog.dialog('close');
+                    })
+                    .fail(function() {
+                        // Not sure?
+                        formPanel.addClass('failed');
+                    })
+                    .always(function() {
+                        // Re-enable submit button no matter what
+                        formPanel.removeClass('loading');
+                        submit.prop('disabled', false);
+                    })
+                ;
+            });
         })
     })(jQuery);
 </script>
