@@ -30,6 +30,9 @@
                 return row;
             });
 
+            var areaDialog  = $('[data-role="add-area-dialog"]').dialog({autoOpen: false});
+            var levelDialog = $('[data-role="add-level-dialog"]').dialog({autoOpen: false});
+
             /**
              * Builds a readonly view of the curriculum node
              *
@@ -403,4 +406,26 @@
         <div class="pane curriculum-editor">
         </div>
     </div>
+</div>
+
+<div data-role="add-level-dialog" title="Create New Learning Level">
+    <dl>
+        <dt>Source</dt>
+        <dd>All user created learning areas will be created in the "Custom" source.</dd>
+        <dt>Learning Level Name</dt>
+        <dd>
+            <input name="name" type="text" value="" />
+        </dd>
+    </dl>
+</div>
+
+<div data-role="add-area-dialog" title="Create New Learning Area">
+    <dl>
+        <dt>Source</dt>
+        <dd>All user created learning levels will be created in the "Custom" source.</dd>
+        <dt>Learning Area Name</dt>
+        <dd>
+            <input name="name" type="text" value="" />
+        </dd>
+    </dl>
 </div>
