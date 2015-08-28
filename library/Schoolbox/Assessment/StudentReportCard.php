@@ -934,9 +934,11 @@ class StudentReportCard
             foreach ($comments as $comment) {
                 /** @var Comment $comment */
                 $date = $comment->getCreated()->getRelativeTime();
-                if ($comment->getModified()) {
+
+                if ($comment->getModified()->getUnixTimeStamp() > $comment->getCreated()->getUnixTimeStamp()) {
                     $date .= " &ndash; edited";
                 }
+                
                 $commentData = array(
                     'ID'          => $comment->getId(),
                     'USER_NAME'   => $comment->getCommenter()->formatName(),
