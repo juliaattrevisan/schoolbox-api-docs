@@ -256,9 +256,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 $assessmentRemote['ClassCode'],
                 $assessmentRemote['MarkBookSeq'],
                 $student->getExternalId())
-              ) {
-
-                $query = "UPDATE StudentAssessmentMarkBook SET
+            ) {
+                if (isset($mark)) {
+                    $query = "UPDATE StudentAssessmentMarkBook SET
                             Result = '".round($mark)."',
                             TopicComment = '".$this->getDatabase()->quote($comment)."'
                           WHERE
@@ -270,10 +270,21 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                               ID = '" . $student->getExternalId() . "' AND
                               MarkBookSeq = '{$assessmentRemote['MarkBookSeq']}'
                          ";
-            }
-            else {
-
-                $query = "INSERT INTO StudentAssessmentMarkBook (
+                } else {
+                    $query = "DELETE FROM StudentAssessmentMarkBook
+                          WHERE
+                              FileType = '{$assessmentRemote['FileType']}' AND
+                              FileYear = '{$assessmentRemote['FileYear']}' AND
+                              FileSemester = '{$assessmentRemote['FileSemester']}' AND
+                              ClassCampus = '{$assessmentRemote['ClassCampus']}' AND
+                              ClassCode = '{$assessmentRemote['ClassCode']}' AND
+                              ID = '" . $student->getExternalId() . "' AND
+                              MarkBookSeq = '{$assessmentRemote['MarkBookSeq']}'
+                         ";
+                }
+            } else {
+                if (isset($mark)) {
+                    $query = "INSERT INTO StudentAssessmentMarkBook (
                                   FileType,
                                   FileYear,
                                   FileSemester,
@@ -302,7 +313,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                                     '".$marker->getExternalId()."',
                                     CURRENT_TIMESTAMP
                                   )
-              ";
+                    ";
+                }
             }
 
           $success = $this->getDatabase()->query($query);
