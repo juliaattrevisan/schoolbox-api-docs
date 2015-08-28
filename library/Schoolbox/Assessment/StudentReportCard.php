@@ -938,7 +938,7 @@ class StudentReportCard
                 if ($comment->getModified()->getUnixTimeStamp() > $comment->getCreated()->getUnixTimeStamp()) {
                     $date .= " &ndash; edited";
                 }
-                
+
                 $commentData = array(
                     'ID'          => $comment->getId(),
                     'USER_NAME'   => $comment->getCommenter()->formatName(),
