@@ -30,6 +30,8 @@ class Module extends BaseModule
         $importModule->init($basePath.'/import');
         $areaModule = new LearningArea\Module($injector);
         $areaModule->init($basePath.'/area');
+        $levelModule = new LearningLevel\Module($injector);
+        $levelModule->init($basePath.'/level');
     }
 
     /**
