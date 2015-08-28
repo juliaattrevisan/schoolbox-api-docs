@@ -277,6 +277,13 @@ class StudentReportCard
                 'category' => ''
             )
         );
+
+        /* Additional phplibs not in contextSelector instance
+         */
+        $page->setVar(array(
+            'WORK_YEAR'     => $this->targetYear,
+            'WORK_SEMESTER' => $this->targetSemester,
+        ));
     }
 
     protected function renderSubject(\SitePage $page, $components = array())
