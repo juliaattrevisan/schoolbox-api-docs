@@ -681,7 +681,7 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
 // do fun rubric things
 if ($box->isRubric()) {
     $rb = new DueWork_Rubric_Lightbox($this);
-    $rb->render('rubric_block', $box->getId(), $user['uid'], $box->canViewRubric($_SESSION['user']), true);
+    $rb->render('rubric_block', $box->getId(), $user['uid'], $box->canViewRubric($_SESSION['user']), false);
 } else {
     $this->setVar('rubric_block', '');
 }
