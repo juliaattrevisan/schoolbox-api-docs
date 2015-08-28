@@ -81,16 +81,16 @@
                         </form>
                         <nav>
                             <span class="show-for-medium-up">
+                                <a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="icon-history" title="View History"></a>
                                 <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}" class="icon-view" title="View Submission"></a>
-                                <a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="icon-history" title="View Submission History"></a>
                             </span>
                             <span class="show-for-small-only">
                                 <a href="#" class="icon-more" data-dropdown="row-options-{OWNER_ID}"></a>
                             </span>
                         </nav>
                         <ul class="f-dropdown" data-dropdown-content id="row-options-{OWNER_ID}">
-                            <li><a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}" class="icon-view">View Submission</a></li>
-                            <li><a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="icon-history">View History</a></li>
+                            <li><a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="icon-history" title="View History">View History</a></li>
+                            <li><a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}" class="icon-view" title="View Submission">View Submission</a></li>
                         </ul>
                     </div>
                 </li>
