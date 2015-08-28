@@ -30,8 +30,9 @@
                 return row;
             });
 
-            var areaDialog  = $('[data-role="add-area-dialog"]').dialog({autoOpen: false});
-            var levelDialog = $('[data-role="add-level-dialog"]').dialog({autoOpen: false});
+            var dialogOptions = {autoOpen: false, modal: true};
+            var areaDialog    = $('[data-role="add-area-dialog"]').dialog(dialogOptions);
+            var levelDialog   = $('[data-role="add-level-dialog"]').dialog(dialogOptions);
 
             /**
              * Builds a readonly view of the curriculum node
@@ -170,6 +171,24 @@
             };
             resizePanels();
             $(window).resize(resizePanels);
+
+            // Triggers for adding new levels or areas
+            formPanel.on('change', '#node-form select', function(event) {
+                var option      = $(this).find(':selected');
+                var interaction = option.data('interaction');
+                switch (interaction) {
+                    case 'add-level-dialog-open':
+                        event.preventDefault();
+                        levelDialog.dialog('open');
+                        break;
+                    case 'add-area-dialog-open':
+                        event.preventDefault();
+                        areaDialog.dialog('open');
+                        break;
+                    default:
+                        break;
+                }
+            });
 
             // Node save form submission
             formPanel.on('submit', '#node-form', function(event) {
@@ -320,6 +339,7 @@
                         {{~ }}
                     </optgroup>
                     {{~}}
+                    <option value="" data-interaction="add-level-dialog-open">Add New Level...</option>
                 </select>
                 <select name="learningArea">
                     <option value="">-- select an area --</option>
@@ -330,6 +350,7 @@
                         {{~ }}
                     </optgroup>
                     {{~}}
+                    <option value="" data-interaction="add-area-dialog-open">Add New Area...</option>
                 </select>
             </dd>
         </dl>
@@ -408,18 +429,14 @@
     </div>
 </div>
 
-<div data-role="add-level-dialog" title="Create New Learning Level">
-    <dl>
-        <dt>Source</dt>
-        <dd>All user created learning areas will be created in the "Custom" source.</dd>
-        <dt>Learning Level Name</dt>
-        <dd>
-            <input name="name" type="text" value="" />
-        </dd>
-    </dl>
+<div data-role="add-area-dialog" title="Create New Learning Area">
+    <form action="{{ routeLookup('curriculumLearningArea.create') }}" method="post">
+        <input name="name" type="text" value="" />
+        <input type="submit" class="submit-btn-plain float-right" value="Create" />
+    </form>
 </div>
 
-<div data-role="add-area-dialog" title="Create New Learning Area">
+<div data-role="add-level-dialog" title="Create New Learning Level">
     <dl>
         <dt>Source</dt>
         <dd>All user created learning levels will be created in the "Custom" source.</dd>
