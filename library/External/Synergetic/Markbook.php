@@ -215,7 +215,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $box = SubmissionBoxMapper::getInstance()->findById($result->getSubmissionBox()->getId());
             $activity->setSubmissionBox($box);
             $activity->setCategory($box->getCategory());
-            $marker = UserMapper::getInstance()->findById($result->getMarker());
+            $marker = UserMapper::getInstance()->findById($result->getMarker()->getId());
             $student = UserMapper::getInstance()->findById($result->getOwner()->getId());
             $mark = $result->getNormalizedMark();
             $comment = $result->getComment();

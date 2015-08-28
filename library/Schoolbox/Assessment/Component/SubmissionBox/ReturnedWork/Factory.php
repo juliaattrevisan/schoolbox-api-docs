@@ -351,7 +351,7 @@ class Factory
         /* Update the existing Returned Work record with new data
          */
         $returnedWork->setComment($this->getComment());
-        $returnedWork->setMarker($_SESSION['user']->getId());
+        $returnedWork->setMarker($_SESSION['user']);
         $returnedWork->setUuid($this->getUuid());
 
         return $returnedWork;
