@@ -358,7 +358,8 @@ function Calendar(id, bubbleId, opts) {
                     }
                 });
                 // disabled until filters are fully fixed
-                // event.is_rendered = is_rendered;
+                 //event.is_rendered = is_rendered;
+                event.is_rendered = true;
             });
 
             //
