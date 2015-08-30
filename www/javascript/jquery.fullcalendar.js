@@ -236,10 +236,10 @@ function Calendar(id, bubbleId, opts) {
             // show the filter 'dialog' when the button is clicked
             cal.dom.on('click', cal.options.filter.btnSelector, function() {
                 cal.bubble.hide()
-                calendarControls.find(cal.options.filter.boxSelector).toggle()
-                exportControls.find(cal.options.filter.boxSelector).hide()
-                exportButtons.removeClass('engaged')
-                calendarButtons.toggleClass('engaged')
+                //calendarControls.find(cal.options.filter.boxSelector).toggle()
+                //exportControls.find(cal.options.filter.boxSelector).hide()
+                //exportButtons.removeClass('engaged')
+                //calendarButtons.toggleClass('engaged')
                 return false
             })
 
@@ -247,10 +247,10 @@ function Calendar(id, bubbleId, opts) {
             if (cal.options.filter.exportButtonSelector) {
                 cal.dom.on('click', cal.options.filter.exportButtonSelector, function() {
                     cal.bubble.hide()
-                    calendarControls.find(cal.options.filter.boxSelector).hide()
-                    exportControls.find(cal.options.filter.boxSelector).toggle()
-                    calendarButtons.removeClass('engaged')
-                    exportButtons.toggleClass('engaged')
+                    //calendarControls.find(cal.options.filter.boxSelector).hide()
+                    //exportControls.find(cal.options.filter.boxSelector).toggle()
+                    //calendarButtons.removeClass('engaged')
+                    //exportButtons.toggleClass('engaged')
                     return false
                 })
             }
@@ -447,8 +447,9 @@ Calendar.prototype.init = function() {
                 baseButton.clone()
                     .html('filters')
                     .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
-                    .addClass('fc-button-filter fc-corner-left fc-corner-right btn')
+                    .addClass('fc-button-filter fc-corner-left fc-corner-right button')
                     .attr('id','fc-button-filter')
+                    .attr('data-dropdown',this.options.filter.parentSelector.substr(1))
             );
         }
         if (this.options.filter.exportButtonSelector) {
@@ -456,8 +457,9 @@ Calendar.prototype.init = function() {
                 baseButton.clone()
                     .html('export')
                     .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
-                    .addClass('fc-button-filter fc-corner-left fc-corner-right btn reply')
+                    .addClass('fc-button-filter fc-corner-left fc-corner-right button reply')
                     .attr('id','fc-button-export')
+                    .attr('data-dropdown',this.options.filter.exportSelector.substr(1))
             );
         }
     }
@@ -555,6 +557,10 @@ Calendar.prototype.init = function() {
     // Allow datepicker options to be set in options, too.
     // (Get default date out of full calendar.)
     $('#datepicker').datepicker(c.options.datepicker);
+
+    //Reflow foundation to allow its functions to work
+    this.dom.foundation('reveal', 'reflow');
+    this.dom.foundation('dropdown', 'reflow');
 
     return this
 }

@@ -432,7 +432,7 @@
         //
         // Form listener for exporter - brings up a dialog box that offers a URL
         // to click.
-        $('#calendar-export form').submit(function(event) {
+        $('#calendar-export-form').submit(function(event) {
             event.preventDefault();
 
             // Copy and paste button - show only when ready
@@ -442,15 +442,9 @@
                 button.show();
             });
 
-            var form = $(this);
-            $('#calendar-export-dialog').dialog({
-                open: function(event, ui) {
-                    $(event.target).find('#calendar-export-dialog-url')
-                        .text($.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())).select();
-                },
-                minWidth: 400,
-                modal: true
-            });
+            var url = $.getExportCalendarLink('{USER_TOKEN}',$(this).serializeArray());
+            $('#calendar-export-dialog-url').text(url).select();
+            $('#calendar-export-dialog').foundation('reveal', 'open');
         });
 
 
@@ -530,12 +524,7 @@
     })
 </script>
 <!-- END custom_head -->
-
-<div id="calendar-loading">
-	<p><strong>Loading events...</strong></p>
-</div>
-
-<div id="calendar-bubble" class="cal-bubble">
+<div class="f-dropdown" data-dropdown-content aria-hidden="true" id="calendar-bubble" class="cal-bubble">
     <div class="middle">
         <div class="close">&times;</div>
         <div class="js-data clearfix">
@@ -626,136 +615,109 @@
     </div>
 </div>
 
-<div id="calendar-controls" class="calendar-controls no-height clearfix">
-    <div class="link-case">
-        <div class="filter-drop clearfix">
-            <div class="filter-list">
-                <form class="clearfix">
-                    <div class="filter-cat sources clearfix checkboxes"><span class="filter-title">Sources</span>
-                        <label>
-                            <input type="checkbox" class="select_all checkbox applyFilters"/>Select all
-                        </label>
-                        <!-- BEGIN filter_source -->
-                        <label title="{SOURCE_NAME}">
-                            <input type="checkbox" name="source" id="{SOURCE_ID}" value="source{SOURCE_ID}" {SOURCE_ID_SELECTED} class="checkbox applyFilters"/>
-                            {SOURCE_NAME}
-                        </label>
-                        <!-- END filter_source -->
-                    </div>
-                    <div class="filter-cat groups clearfix checkboxes"><span class="filter-title">Groups</span>
-                        <label>
-                            <input type="checkbox" class="select_all checkbox" checked />Select all
-                        </label>
-                        <!-- BEGIN filter_group -->
-                        <label title="{GROUP_NAME}">
-                            <input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="checkbox applyFilters"/>
-                            {GROUP_NAME}
-                        </label>
-                        <!-- END filter_group -->
-                    </div>
-                    <div class="filter-cat campus checkboxes"><span class="filter-title">Campus</span>
-                        <label>
-                            <input type="checkbox" class="select_all checkbox" checked />Select all
-                        </label>
-                        <!-- BEGIN filter_campus -->
-                        <label title="{CAMPUS_NAME}">
-                            <input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="checkbox applyFilters"/>
-                            {CAMPUS_NAME}
-                        </label>
-                        <!-- END filter_campus -->
-                    </div>
-                    <div class="filter-cat events checkboxes last"><span class="filter-title">Event</span>
-                        <label>
-                            <input type="checkbox" class="select_all checkbox" checked />Select all
-                        </label>
-                        <!-- BEGIN filter_event_type -->
-                        <label title="{EVENT_TYPE_NAME}">
-                            <input type="checkbox" name="events" id="{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED} value="type{EVENT_TYPE_ID}" class="checkbox applyFilters"/>
-                            <span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
-                        </label>
-                        <!-- END filter_event_type -->
 
-                    </div>
-                    <!--/filter-list-->
-                </form>
-                <p class="clearfix">
-                    <a href="#" id="applyFilters" class="btn float-right"><span></span>Apply Filters</a>
-                </p>
-                <!--/filter-drop-->
-            </div>
-        </div>
-    </div>
-</div>
-<div id="calendar-export" class="calendar-controls no-height clearfix">
-	<div class="link-case">
-		<div class="filter-drop clearfix">
-			<div class="filter-list">
-				<form class="clearfix">
-					<div class="export-cat all-events">
-						<label title="All events" for="export-all">
-							<input type="radio" name="export" value="all" id="export-all" checked />
-							All events
-						</label>
-					</div>
-					<div class="export-cat personal-events">
-						<label title="Personal events only" for="export-personal">
-							<input type="radio" name="export" value="personal" id="export-personal" />
-							Personal events only
-						</label>
-					</div>
-					<div class="export-cat group-events">
-						<label title="Events for group" for="export-group">
-							<input type="radio" name="export" value="group" id="export-group" />
-							Events for group:
-							<select name="group">
-								<option value="">-- select --</option>
-								<!-- BEGIN export_group -->
-								<option label="{EXPORT_GROUP_NAME}" value="{EXPORT_GROUP_ID}">{EXPORT_GROUP_NAME}</option>
-								<!-- END export_group -->
-							</select>
-						</label>
-					</div>
-					<div class="export-cat campus-events">
-						<label title="Events for campus" for="export-campus">
-							<input type="radio" name="export" value="campus" id="export-campus" />
-							Events for campus:
-							<select name="campus">
-								<option value="">-- select --</option>
-								<!-- BEGIN export_campus -->
-								<option label="{EXPORT_CAMPUS_NAME}" value="{EXPORT_CAMPUS_ID}">{EXPORT_CAMPUS_NAME}</option>
-								<!-- END export_campus -->
-							</select>
-						</label>
-					</div>
-                    <div class="export-cat timetable-events">
-                        <label title="Timetable Classes" for="export-timetable">
-                            <input type="radio" name="export" value="timetable" id="export-timetable" />
-                            Timetable Classes
-                        </label>
-                    </div>
-                    <div class="export-cat timetableday-events">
-                        <label title="Timetable days" for="export-timetableday">
-                            <input type="radio" name="export" value="timetabledays" id="export-timetableday" />
-                            Timetable Days
-                        </label>
-                    </div>
-                    <div class="export-cat duework-events">
-                        <label title="Due Work" for="export-duework">
-                            <input type="radio" name="export" value="duework" id="export-duework" />
-                            Due Work
-                        </label>
-                    </div>
-                    <input type="submit" id="open-calendar-export-dialog" value="Generate URL" class="submit-btn-plain" />
-                    <input type="submit" id="download-calendar-export" value="Download CSV" class="submit-btn-plain" />
-				</form>
-			</div>
-		</div>
-	</div>
-</div>
 <h1>Calendar for {USER_FULLNAME}</h1>
 
+<div id="calendar-loading">
+    <p><strong>Loading events...</strong></p>
+</div>
+
 <div id="calendar"></div>
-<div id="calendar-export-dialog">
+<div id="calendar-controls" class="f-dropdown content" data-dropdown-content>
+    <form class="clearfix">
+        <div class="filter-cat sources clearfix checkboxes"><span class="filter-title">Sources</span>
+            <label>
+                <input type="checkbox" class="select_all checkbox applyFilters"/>Select all
+            </label>
+            <!-- BEGIN filter_source -->
+            <label title="{SOURCE_NAME}">
+                <input type="checkbox" name="source" id="{SOURCE_ID}" value="source{SOURCE_ID}" {SOURCE_ID_SELECTED} class="checkbox applyFilters"/>
+                {SOURCE_NAME}
+            </label>
+            <!-- END filter_source -->
+        </div>
+        <div class="filter-cat groups clearfix checkboxes"><span class="filter-title">Groups</span>
+            <label>
+                <input type="checkbox" class="select_all checkbox" checked />Select all
+            </label>
+            <!-- BEGIN filter_group -->
+            <label title="{GROUP_NAME}">
+                <input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="checkbox applyFilters"/>
+                {GROUP_NAME}
+            </label>
+            <!-- END filter_group -->
+        </div>
+        <div class="filter-cat campus checkboxes"><span class="filter-title">Campus</span>
+            <label>
+                <input type="checkbox" class="select_all checkbox" checked />Select all
+            </label>
+            <!-- BEGIN filter_campus -->
+            <label title="{CAMPUS_NAME}">
+                <input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="checkbox applyFilters"/>
+                {CAMPUS_NAME}
+            </label>
+            <!-- END filter_campus -->
+        </div>
+        <div class="filter-cat events checkboxes last"><span class="filter-title">Event</span>
+            <label>
+                <input type="checkbox" class="select_all checkbox" checked />Select all
+            </label>
+            <!-- BEGIN filter_event_type -->
+            <label title="{EVENT_TYPE_NAME}">
+                <input type="checkbox" name="events" id="{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED} value="type{EVENT_TYPE_ID}" class="checkbox applyFilters"/>
+                <span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
+            </label>
+            <!-- END filter_event_type -->
+
+        </div>
+        <!--/filter-list-->
+    </form>
+    <p class="clearfix">
+        <a href="#" id="applyFilters" class="btn float-right"><span></span>Apply Filters</a>
+    </p>
+    <!--/filter-drop-->
+</div>
+<div id="calendar-export" class="f-dropdown content" data-dropdown-content aria-hidden="true">
+    <form class="top" action="#" id="calendar-export-form">
+        <section>
+            <fieldset class="content radiolist">
+                <input type="radio" name="export" value="all" id="export-all" checked />
+                <label for="export-all" class="c">All events</label>
+                <input type="radio" name="export" value="personal" id="export-personal" />
+                <label for="export-personal">Personal events only</label>
+                <input type="radio" name="export" value="timetable" id="export-timetable" />
+                <label for="export-timetable">Timetable Classes</label>
+                <input type="radio" name="export" value="timetabledays" id="export-timetableday" />
+                <label for="export-timetableday">Timetable Days</label>
+                <input type="radio" name="export" value="duework" id="export-duework" />
+                <label for="export-duework">Due Work</label>
+                <input type="radio" name="export" value="campus" id="export-campus" />
+                <label for="export-campus">Events for campus:
+                    <select name="campus">
+                        <option value="">-- select --</option>
+                        <!-- BEGIN export_campus -->
+                        <option label="{EXPORT_CAMPUS_NAME}" value="{EXPORT_CAMPUS_ID}">{EXPORT_CAMPUS_NAME}</option>
+                        <!-- END export_campus -->
+                    </select>
+                </label>
+                <input type="radio" name="export" value="group" id="export-group" />
+                <label for="export-group">Events for group:
+                    <select name="group">
+                        <option value="">-- select --</option>
+                        <!-- BEGIN export_group -->
+                        <option label="{EXPORT_GROUP_NAME}" value="{EXPORT_GROUP_ID}">{EXPORT_GROUP_NAME}</option>
+                        <!-- END export_group -->
+                    </select>
+                </label>
+            </fieldset>
+        </section>
+        <input type="submit" id="open-calendar-export-dialog" value="Generate URL"  />
+        <input type="submit" id="download-calendar-export" value="Download CSV"/>
+    </form>
+</div>
+
+
+<div class="reveal-modal" data-reveal aria-labelledby="firstModalTitle" aria-hidden="true" role="dialog" id="calendar-export-dialog">
 	<div id="calendar-export-dialog-text">
         Use the following address to subscribe your favourite calendar application to a live feed.
 	</div>
@@ -763,6 +725,6 @@
     <button class="btn no-icon" id="copy-button" data-clipboard-target="calendar-export-dialog-url" title="Click to copy me.">Copy to Clipboard</button>
 </div>
 
-<div id="dialog-booking-bulk-update" title="This booking is part of a series">
+<div class="reveal-modal" data-reveal aria-labelledby="firstModalTitle" aria-hidden="true" role="dialog" id="dialog-booking-bulk-update" title="This booking is part of a series">
     Would you like to <span class="action-text"></span> only this booking, or all in the series?
 </div>
