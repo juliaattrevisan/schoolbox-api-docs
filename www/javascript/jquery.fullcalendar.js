@@ -265,7 +265,7 @@ function Calendar(id, bubbleId, opts) {
             if (cal.options.filter.applyFiltersSelector) {
                 calendarControls.on('click', cal.options.filter.applyFiltersSelector, function() {
                     cal.filters.organise(cal, ["campus", "groups", "sources"])
-                    calendarControls.find(cal.options.filter.boxSelector).hide()
+                    calendarControls.foundation('reveal', 'close');
                     $(cal.options.filter.btnSelector).removeClass('engaged')
                     return false
                 })
@@ -428,14 +428,14 @@ Calendar.prototype.init = function() {
     this.dom.fullCalendar(this.options.fullCalendar)
     /* Button for list view
      */
-    var headerRight = this.dom.find('.fc-toolbar .fc-right');
+    var headerRight = this.dom.find('.fc-toolbar .fc-right .fc-button-group');
     var baseButton  = headerRight.find('.fc-button').first();
     if (this.options.filter.listViewButton) {
         headerRight.prepend(
             baseButton.clone()
                 .html('list')
                 .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active no-icon')
-                .addClass(' fc-corner-left no-icon')
+                .addClass(' fc-corner-left')
                 .attr('id','fc-button-list')
         );
     }
@@ -447,9 +447,9 @@ Calendar.prototype.init = function() {
                 baseButton.clone()
                     .html('filters')
                     .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
-                    .addClass('fc-button-filter fc-corner-left fc-corner-right button')
+                    .addClass('fc-button-filter fc-corner-left fc-corner-right')
                     .attr('id','fc-button-filter')
-                    .attr('data-dropdown',this.options.filter.parentSelector.substr(1))
+                    .attr('data-reveal-id',this.options.filter.parentSelector.substr(1))
             );
         }
         if (this.options.filter.exportButtonSelector) {
@@ -457,9 +457,9 @@ Calendar.prototype.init = function() {
                 baseButton.clone()
                     .html('export')
                     .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
-                    .addClass('fc-button-filter fc-corner-left fc-corner-right button reply')
+                    .addClass('fc-button-filter fc-corner-left fc-corner-right')
                     .attr('id','fc-button-export')
-                    .attr('data-dropdown',this.options.filter.exportSelector.substr(1))
+                    .attr('data-reveal-id',this.options.filter.exportSelector.substr(1))
             );
         }
     }
@@ -559,8 +559,6 @@ Calendar.prototype.init = function() {
     $('#datepicker').datepicker(c.options.datepicker);
 
     //Reflow foundation to allow its functions to work
-    this.dom.foundation('reveal', 'reflow');
-    this.dom.foundation('dropdown', 'reflow');
 
     return this
 }

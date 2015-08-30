@@ -5,7 +5,6 @@
 
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
-<script type="text/javascript" src="/javascript/jquery.greenerize.js"></script>
 <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
 <script type="text/javascript">
 
@@ -513,16 +512,19 @@
             return false
         })
 
-        $('.checkboxes')
-            .greenerize({ applyClasses: false })
-            .on(
-                'greenerizeChange',
-                function(event, selectAll, checkboxes) {
-                    checkboxes.first().change();
-                }
-            )
+        //select all clicked
+        $('#calendar-controls').on('change','.select_all', function(e) {
+            $(this).parent().find(':checkbox').prop('checked', $(this).prop('checked'));
+        })
+
+        //$('#calendar').foundation('reveal','reflow'); this should work but foundation is buggy
+        $('#fc-button-filter').click(function() { $('#calendar-controls').foundation('reveal','open') });
+        $('#fc-button-export').click(function() { $('#calendar-export').foundation('reveal','open') });
+
+
     })
 </script>
+
 <!-- END custom_head -->
 <div class="f-dropdown" data-dropdown-content aria-hidden="true" id="calendar-bubble" class="cal-bubble">
     <div class="middle">
@@ -623,61 +625,62 @@
 </div>
 
 <div id="calendar"></div>
-<div id="calendar-controls" class="f-dropdown content" data-dropdown-content>
+<div id="calendar-controls" class="reveal-modal large" data-reveal aria-hidden="true" role="dialog">
     <form class="clearfix">
-        <div class="filter-cat sources clearfix checkboxes"><span class="filter-title">Sources</span>
-            <label>
-                <input type="checkbox" class="select_all checkbox applyFilters"/>Select all
-            </label>
-            <!-- BEGIN filter_source -->
-            <label title="{SOURCE_NAME}">
-                <input type="checkbox" name="source" id="{SOURCE_ID}" value="source{SOURCE_ID}" {SOURCE_ID_SELECTED} class="checkbox applyFilters"/>
-                {SOURCE_NAME}
-            </label>
-            <!-- END filter_source -->
-        </div>
-        <div class="filter-cat groups clearfix checkboxes"><span class="filter-title">Groups</span>
-            <label>
-                <input type="checkbox" class="select_all checkbox" checked />Select all
-            </label>
-            <!-- BEGIN filter_group -->
-            <label title="{GROUP_NAME}">
-                <input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="checkbox applyFilters"/>
-                {GROUP_NAME}
-            </label>
-            <!-- END filter_group -->
-        </div>
-        <div class="filter-cat campus checkboxes"><span class="filter-title">Campus</span>
-            <label>
-                <input type="checkbox" class="select_all checkbox" checked />Select all
-            </label>
-            <!-- BEGIN filter_campus -->
-            <label title="{CAMPUS_NAME}">
-                <input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="checkbox applyFilters"/>
-                {CAMPUS_NAME}
-            </label>
-            <!-- END filter_campus -->
-        </div>
-        <div class="filter-cat events checkboxes last"><span class="filter-title">Event</span>
-            <label>
-                <input type="checkbox" class="select_all checkbox" checked />Select all
-            </label>
-            <!-- BEGIN filter_event_type -->
-            <label title="{EVENT_TYPE_NAME}">
-                <input type="checkbox" name="events" id="{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED} value="type{EVENT_TYPE_ID}" class="checkbox applyFilters"/>
-                <span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
-            </label>
-            <!-- END filter_event_type -->
-
-        </div>
-        <!--/filter-list-->
+        <section>
+            <fieldset class="content">
+                <div class="small-6 large-3 columns">
+                    <fieldset class="checklist">
+                        <legend>Sources</legend>
+                        <input type="checkbox" class="select_all" id="sourceSelectAll"/>
+                        <label for="sourceSelectAll">Select all</label>
+                        <!-- BEGIN filter_source -->
+                        <input type="checkbox" name="source" id="source{SOURCE_ID}" value="source{SOURCE_ID}" {SOURCE_ID_SELECTED} class="applyFilters"/>
+                        <label for="source{SOURCE_ID}">{SOURCE_NAME}</label>
+                        <!-- END filter_source -->
+                    </fieldset>
+                </div>
+                <div class="small-6 large-3 columns">
+                    <fieldset class="checklist">
+                        <legend>Groups</legend>
+                        <input type="checkbox" class="select_all" id="groupsSelectAll" checked />
+                        <label for="groupsSelectAll">Select all</label>
+                        <!-- BEGIN filter_group -->
+                        <input type="checkbox" name="group" id="group{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="applyFilters"/>
+                        <label for="group{GROUP_ID}">{GROUP_NAME}</label>
+                        <!-- END filter_group -->
+                    </fieldset>
+                </div>
+                <div class="small-6 large-3 columns">
+                    <fieldset class="checklist">
+                        <legend>Campus</legend>
+                        <input type="checkbox" class="select_all"  id="campusSelectAll" checked />
+                        <label for="campusSelectAll">Select all</label>
+                        <!-- BEGIN filter_campus -->
+                        <input type="checkbox" name="campus" id="campus{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="applyFilters"/>
+                        <label title="campus{CAMPUS_NAME}">{CAMPUS_NAME}</label>
+                        <!-- END filter_campus -->
+                    </fieldset>
+                </div>
+                <div class="small-6 large-3 columns">
+                    <fieldset class="checklist">
+                        <legend>Event</legend>
+                        <input type="checkbox" id="eventTypeSelectAll" class="select_all" checked />
+                        <label for="eventTypeSelectAll">Select all</label>
+                        <!-- BEGIN filter_event_type -->
+                        <input type="checkbox" name="events" id="eventType{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED} value="type{EVENT_TYPE_ID}" class="applyFilters"/>
+                        <label for="eventType{EVENT_TYPE_ID}"><span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span></label>
+                        <!-- END filter_event_type -->
+                    </fieldset>
+                </div>
+            </fieldset>
+        </section>
     </form>
-    <p class="clearfix">
-        <a href="#" id="applyFilters" class="btn float-right"><span></span>Apply Filters</a>
-    </p>
+    <a href="#" id="applyFilters" class="button icon-search">Apply Filters</a>
     <!--/filter-drop-->
 </div>
-<div id="calendar-export" class="f-dropdown content" data-dropdown-content aria-hidden="true">
+
+<div id="calendar-export" class="reveal-modal small" data-reveal aria-hidden="true" role="dialog">
     <form class="top" action="#" id="calendar-export-form">
         <section>
             <fieldset class="content radiolist">
