@@ -226,20 +226,13 @@ function Calendar(id, bubbleId, opts) {
 
         interaction: function(cal) {
 
-            // Only set up interactions that actually exist.
-            var calendarButtons = $(cal.options.filter.btnSelector)
-            var exportButtons   = $(cal.options.filter.exportButtonSelector)
-
+            // Only set up interactions that actually exist
             var calendarControls = $(cal.options.filter.parentSelector)
             var exportControls   = $(cal.options.filter.exportSelector)
 
             // show the filter 'dialog' when the button is clicked
             cal.dom.on('click', cal.options.filter.btnSelector, function() {
                 cal.bubble.hide()
-                //calendarControls.find(cal.options.filter.boxSelector).toggle()
-                //exportControls.find(cal.options.filter.boxSelector).hide()
-                //exportButtons.removeClass('engaged')
-                //calendarButtons.toggleClass('engaged')
                 return false
             })
 
@@ -247,10 +240,6 @@ function Calendar(id, bubbleId, opts) {
             if (cal.options.filter.exportButtonSelector) {
                 cal.dom.on('click', cal.options.filter.exportButtonSelector, function() {
                     cal.bubble.hide()
-                    //calendarControls.find(cal.options.filter.boxSelector).hide()
-                    //exportControls.find(cal.options.filter.boxSelector).toggle()
-                    //calendarButtons.removeClass('engaged')
-                    //exportButtons.toggleClass('engaged')
                     return false
                 })
             }
@@ -266,15 +255,9 @@ function Calendar(id, bubbleId, opts) {
                 calendarControls.on('click', cal.options.filter.applyFiltersSelector, function() {
                     cal.filters.organise(cal, ["campus", "groups", "sources"])
                     calendarControls.foundation('reveal', 'close');
-                    $(cal.options.filter.btnSelector).removeClass('engaged')
                     return false
                 })
             }
-
-            $('body').click(function() {
-                $(cal.options.filter.boxSelector).hide()
-                $(cal.options.filter.btnSelector).removeClass('engaged')
-            })
 
             if (cal.options.filter.boxSelector) {
                 calendarControls.add(exportControls).on('click', cal.options.filter.boxSelector, function(e) {
@@ -374,7 +357,8 @@ function Calendar(id, bubbleId, opts) {
                         return false;
                     }
                 });
-                event.is_rendered = is_rendered;
+                // disabled until filters are fully fixed
+                // event.is_rendered = is_rendered;
             });
 
             //
@@ -557,8 +541,6 @@ Calendar.prototype.init = function() {
     // Allow datepicker options to be set in options, too.
     // (Get default date out of full calendar.)
     $('#datepicker').datepicker(c.options.datepicker);
-
-    //Reflow foundation to allow its functions to work
 
     return this
 }
@@ -785,14 +767,6 @@ Bubble.prototype.showForm = function(id, x, y) {
 
     // hide the bubble, but keep it displayed
     this.dom.css({visibility:'hidden', display:'block'})
-    $.each(this.forms, function(i, elem) {
-        if(i == id) {
-            this.css({display:'block'})
-        }
-        else {
-            this.css({display:'none'})
-        }
-    })
 
     // now that the correct form is filling the bubble, position appropriately
     // position the popup in the right spot!!
