@@ -1,6 +1,7 @@
 <?php
 
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Breadcrumbs;
 
 $wiki  = new Wiki;
 $group = new Group(HOMEPAGE_SERVICE);
@@ -40,6 +41,8 @@ if (is_numeric($this->arg[0])) {
 
 	$modifiedDate = new Alaress_Date_Format($from['modified'], 'U');
 
+    $slug = Scrub::text($from['slug']);
+
 	$this->setVar(array(
 			'WIKI_ID'          => $from['wikiID'],
 			'CATEGORY_ID'      => $from['categoryID'],
@@ -47,7 +50,7 @@ if (is_numeric($this->arg[0])) {
 			'FROM_ID'          => $from['revisionID'],
 			'TO_ID'            => $to['revisionID'],
 			'HEADING'          => Scrub::text($from['heading']),
-            'SLUG'             => Scrub::text($from['slug']),
+            'SLUG'             => $slug,
 			'DIFF'             => $diff->getDifference(),
 			'MODIFIED'         => $modifiedDate->getLong(),
 			'AUTHOR'           => $userHandler->formatName($from),
@@ -97,10 +100,32 @@ if (is_numeric($this->arg[0])) {
 			if ($i == 1)
 				$finalRevision = $revision['revisionID'];
 		}
-	} else
+	}
+    else {
 		$this->setVar('revision_list_block', '');
-} else {
+    }
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Wiki',
+            'href' => "/wiki/{$folder->getId()}/$slug",
+            'class' => '',
+        ],
+        [
+            'text' => 'Compare',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
+}
+else {
 	error(2);
 }
-
-?>
