@@ -1,5 +1,8 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
+require_once __DIR__ . '/../../include/Bootstrap.php';
+
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Storage;
 
 $page = new SitePage();
 $groupHandler = new Group();
@@ -14,25 +17,32 @@ if ($isSuperuser || $isAllowedTeacher) {
 
 	/* Check if a file was selected!
 	 */
-	if (!strlen($_FILES['file']['tmp_name'])) {
+	$filename = '';
+	if (isset($_POST['attachment'])) {
+		$factory = new CollectorFactory();
+		try {
+			/** @var Storage\Model $result */
+			$result = $factory->build($_POST['attachment'])->getFirst();
+		} catch (\Schoolbox\Resource\Exception $e) {
+			error(2);
+			exit;
+		}
+		// Ensure the file is available locally
+		$filename = tempnam(sys_get_temp_dir(), 'zip');
+		$fp       = fopen($filename, 'wb');
+		stream_copy_to_stream($result->readStream(), $fp);
+		fclose($fp);
+	} elseif (strlen($_FILES['file']['tmp_name']) > 0) {
+		$filename = $_FILES['file']['tmp_name'];
+	} else {
 		error(2);
-	}
-
-	/* Force session usage due to flash uploader
-	 * http://www.uploadify.com/forums/discussion/43/using-sessions-tricking-basic-authentication/p1
-	 */
-	if (isset($_POST[session_name()])) {
-		session_id($_POST[session_name()]);
-	}
-
-	if (isset($_GET[session_name()])) {
-		session_id($_GET[session_name()]);
+		exit;
 	}
 
 	/* Extract files
 	 */
 	$archive = new ZipArchive();
-	$archive->open($_FILES['file']['tmp_name']);
+	$archive->open($filename);
 
 	$zipFileUploadHandler = new ZipFileUpload();
 	$zipFileUploadHandler->extract($archive);
