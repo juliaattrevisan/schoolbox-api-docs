@@ -1,79 +1,92 @@
-<div class="profile">
-
-    <div class="profile-info">
+<div class="row">
+    <div class="small-12 column">
         <h1>{NAME}</h1>
-        <div class="profile-img">
-            <!-- BEGIN portrait -->
-            <img src="/portrait.php?userId={SYNERGY_ID}&size=profile"/>
-            <!-- END portrait -->
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 medium-6 column">
+        <!-- BEGIN portrait -->
+        <img src="/portrait.php?userId={SYNERGY_ID}&size=profile"/>
+        <!-- END portrait -->
+    </div>
+    <div class="small-12 medium-6 island">
+        <section>
+            <div class="content">
+                <dl>
+                    <dt>Email:</dt>
+                    <dd>{EMAIL}</dd>
+                </dl>
+                <!-- BEGIN student_synergy_form -->
+                <dl>
+                    <dt>Student ID:</dt>
+                    <dd>{SYNERGY_ID}</dd>
+
+                    <dt>Date of Birth:</dt>
+                    <dd>{BIRTHDATE}</dd>
+
+                    <dt>Class Teacher:</dt>
+                    <dd>{FORM_STAFF}</dd>
+
+                    <dt>Year Level:</dt>
+                    <dd>{YEAR_LEVEL}</dd>
+
+                    <dt>House:</dt>
+                    <dd>{HOUSE}</dd>
+
+                    <dt>Class:</dt>
+                    <dd>{FORM}</dd>
+
+                    <dt>Student Type:</dt>
+                    <dd>{STUDENT_TYPE}</dd>
+                </dl>
+                <!-- END student_synergy_form -->
+
+                <!-- BEGIN student_synergy_tutor -->
+                <dl>
+                    <dt>Student ID:</dt>
+                    <dd>{SYNERGY_ID}</dd>
+
+                    <dt>Date of Birth:</dt>
+                    <dd>{BIRTHDATE}</dd>
+
+                    <dt>Class Teacher:</dt>
+                    <dd>{FORM_STAFF}</dd>
+
+                    <dt>Tutor:</dt>
+                    <dd>{TUTOR}</dd>
+
+                    <dt>Year Level:</dt>
+                    <dd>{YEAR_LEVEL}</dd>
+
+                    <dt>House:</dt>
+                    <dd>{HOUSE}</dd>
+
+                    <dt>Tutor Group:</dt>
+                    <dd>{TUTOR_GROUP}</dd>
+
+                    <dt>Head of House:</dt>
+                    <dd>{HOH}</dd>
+
+                    <dt>Student Type:</dt>
+                    <dd>{STUDENT_TYPE}</dd>
+                </dl>
+            </div>
+        </section>
+        <!-- END student_synergy_tutor -->
+    </div>
+    <!-- BEGIN medical -->
+    <div class="small-12 column">
+        <div class="alert-box alert icon-alert">
+            Medical Note: {MEDICAL_NOTE}
         </div>
+    </div>
+    <!-- END medical -->
+</div>
+
+<div class="profile">
+    <div class="profile-info">
         <div class="profile-detail">
-            <dl>
-                <dt>Email:</dt>
-                <dd class="mail-profile">{EMAIL}</dd>
-            </dl>
-            <!-- BEGIN student_synergy_form -->
-            <dl>
-                <dt class="dark">Student ID:</dt>
-                <dd class="dark">{SYNERGY_ID}</dd>
-
-                <dt>Date of Birth:</dt>
-                <dd>{BIRTHDATE}</dd>
-
-                <dt class="dark">Class Teacher:</dt>
-                <dd class="dark">{FORM_STAFF}</dd>
-
-                <dt>Year Level:</dt>
-                <dd>{YEAR_LEVEL}</dd>
-
-                <dt class="dark">House:</dt>
-                <dd class="dark">{HOUSE}</dd>
-
-                <dt>Class:</dt>
-                <dd>{FORM}</dd>
-
-                <dt class="dark">Student Type:</dt>
-                <dd class="dark">{STUDENT_TYPE}</dd>
-            </dl>
-            <!-- END student_synergy_form -->
-
-            <!-- BEGIN student_synergy_tutor -->
-            <dl>
-                <dt class="dark">Student ID:</dt>
-                <dd class="dark">{SYNERGY_ID}</dd>
-
-                <dt>Date of Birth:</dt>
-                <dd>{BIRTHDATE}</dd>
-
-                <dt class="dark">Class Teacher:</dt>
-                <dd class="dark">{FORM_STAFF}</dd>
-
-                <dt>Tutor:</dt>
-                <dd>{TUTOR}</dd>
-
-                <dt class="dark">Year Level:</dt>
-                <dd class="dark">{YEAR_LEVEL}</dd>
-
-                <dt>House:</dt>
-                <dd>{HOUSE}</dd>
-
-                <dt class="dark">Tutor Group:</dt>
-                <dd class="dark">{TUTOR_GROUP}</dd>
-
-                <dt>Head of House:</dt>
-                <dd>{HOH}</dd>
-
-                <dt class="dark">Student Type:</dt>
-                <dd class="dark">{STUDENT_TYPE}</dd>
-            </dl>
-            <!-- END student_synergy_tutor -->
-
-            <!-- BEGIN medical -->
-            <dl class="profile-med">
-                <dt><img src="/images/famicons/exclamation.png" title="important"/>Medical Note:</dt>
-                <dd>{MEDICAL_NOTE}</dd>
-            </dl>
-            <!-- END medical -->
             <p class="school-info">
                 <!-- BEGIN due_work -->
                 <a href="/submission/dueWork/0/{ID}" class="btn due-work float-left"><span></span>Due Work</a>
