@@ -49,15 +49,31 @@ $alert-transition-ease: ease-out;
 // Custom overrides
 //
 
-.alert-box 						{ background-color: tint($primary-color, 74%); color: $primary-color;
-	&.secondary 				{ background-color: tint($secondary-color, 74%); }
-	&.success 					{ background-color: tint($success-color, 74%); color: $success-color;
-		.close 					{ color: $success-color; }
-	}
-	&.warning 					{ background-color: tint($warning-color, 74%); color: $warning-color;
-		.close 					{ color: $warning-color; }
-	}
-	&.alert 					{ background-color: tint($alert-color, 74%); color: $alert-color;
-		.close 					{ color: $alert-color; }
-	}
+.alert-box {
+  background-color: tint($primary-color, 95%);
+  color: $primary-color;
+  border-width: rem-calc($base-font-size / 12);
+  border-color: transparentize($primary-color, .7);
+  &.secondary {
+    background-color: tint($secondary-color, 74%);
+    border-color: $secondary-color;
+  }
+  &.success {
+    background-color: tint($success-color, 95%);
+    color: $success-color;
+    border-color: transparentize($success-color, .7);
+    .close { color: $success-color; }
+  }
+  &.warning {
+    background-color: tint($warning-color, 95%);
+    color: $warning-color;
+    border-color: transparentize($warning-color, .7);
+    .close { color: $warning-color; }
+  }
+  &.alert {
+    background-color: tint($alert-color, 95%);
+    color: $alert-color;
+    border-color: transparentize($alert-color, .7);
+    .close { color: $alert-color; }
+  }
 }
