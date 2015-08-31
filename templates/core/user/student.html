@@ -169,38 +169,55 @@
 </div>
 <!-- END subject -->
 
+<!-- BEGIN group -->
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Groups</h2>
+        <section>
+            <div class="content">
+                <!-- BEGIN group_row -->
+                <ul class="subject-list">
+                    <!-- BEGIN group_item -->
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="avatar-card">
+                                <a href="{GROUP_URL}">
+                                    <span class="icon-home icon-64"></span>
+                                    {GROUP_NAME}
+                                </a>
+                            </div>
+                        </div>
+                        <nav>
+                            <a class="icon-next" href="{GROUP_URL}" title="Visit {GROUP_NAME} Homepage"></a>
+                        </nav>
+                    </li>
+                    <!-- BEGIN group_teacher -->
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="avatar-card">
+                                <a href="/search/user/{SUBJECT_TEACHER_ID}">
+                                    <img src="/portrait.php?userId={SUBJECT_TEACHER_EXTERNAL_ID}&size=square64" />
+                                    {SUBJECT_TEACHER_NAME}
+                                </a>
+                                <p class="meta">Teacher</p>
+                            </div>
+                        </div>
+                        <nav>
+                            <a class="icon-email" href="{SUBJECT_TEACHER_EMAIL}" title="Email {SUBJECT_TEACHER_NAME}"></a>
+                        </nav>
+                    </li>
+                    <!-- END group_teacher -->
+                    <!-- END group_item -->
+                </ul>
+                <!-- END group_row -->
+            </div>
+        </section>
+    </div>
+</div>
+<!-- END group -->
+
 <div class="directory">
     <div class="subjects">
-        <!-- BEGIN group -->
-        <div class="profile-groups">
-            <h2>Groups</h2>
-
-            <!-- BEGIN group_row -->
-            <ul>
-                <!-- BEGIN group_item -->
-                <li>
-                    <div class="subject">
-                        <a class="to-subject" href="{GROUP_URL}">
-                            {GROUP_NAME}
-                            <span class="icon"></span>
-                        </a>
-                    </div>
-                    <!-- BEGIN group_teacher -->
-                    <div class="profile">
-                        <a href="/search/user/{SUBJECT_TEACHER_ID}" class="teacher-profile">
-                            <img src="/portrait.php?userId={SUBJECT_TEACHER_EXTERNAL_ID}&size=square32" />
-                            <span class="name">{SUBJECT_TEACHER_NAME}</span>
-                            <span class="role">Group Admin</span>
-                        </a>
-                        <a class="mail-teacher" href="{SUBJECT_TEACHER_EMAIL}">Mail</a>
-                    </div>
-                    <!-- END group_teacher -->
-                </li>
-                <!-- END group_item -->
-            </ul>
-            <!-- END group_row -->
-            <!-- END group -->
-        </div>
     </div>
 
 
