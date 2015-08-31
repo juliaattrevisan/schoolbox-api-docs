@@ -216,102 +216,101 @@
 </div>
 <!-- END group -->
 
-<div class="directory">
-    <div class="subjects">
-    </div>
+<!-- BEGIN contact_synergy -->
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Contact Information</h2>
+        <section>
+            <div class="content">
+                <!-- BEGIN contact_alert -->
+                <ul class="contact-alert">
+                    <li><img src="/images/famicons/exclamation.png" title="important"/><span>{CONTACT_ALERT_MESSAGE}</span></li>
+                </ul>
+                <!-- END contact_alert -->
 
+                <!-- BEGIN contact_details -->
+                <ul class="contact-phone">
+                    <li>
+                        <div class="profile">
+                            <a href="{CONTACT_LINK}" class="teacher-profile">
+                                <span class="name">{CONTACT_NAME}</span>
+                                <span class="role">{CONTACT_ROLE}</span>
+                                <span class="icon"></span>
+                            </a>
+                            <!-- BEGIN contact_email -->
+                            <a class="mail-teacher" href="{CONTACT_EMAIL}">Mail</a>
+                            <!-- END contact_email -->
+                            <!-- BEGIN contact_mobile -->
+                            <span class="mobile">{CONTACT_MOBILE_PHONE}</span>
+                            <!-- END contact_mobile -->
+                            <!-- BEGIN contact_phone -->
+                            <span class="phone">{CONTACT_OCCUP_PHONE}</span>
+                            <!-- END contact_phone -->
+                        </div>
+                    </li>
+                </ul>
 
+                <!-- BEGIN spouse_details -->
+                <ul class="contact-phone">
+                    <li>
+                        <div class="profile">
+                            <a href="{SPOUSE_LINK}" class="teacher-profile">
+                                <span class="name">{SPOUSE_NAME}</span>
+                                <span class="role">{SPOUSE_ROLE}</span>
+                                <span class="icon"></span>
+                            </a>
 
-    <!-- BEGIN contact_synergy -->
-    <div class="contact-info">
-        <div class="contact-information">
-            <h2>Contact Information</h2>
+                            <!-- BEGIN spouse_email -->
+                            <a class="mail-teacher" href="{SPOUSE_EMAIL}">Mail</a>
+                            <!-- END spouse_email -->
+                            <!-- BEGIN spouse_mobile -->
+                            <span class="mobile">{SPOUSE_MOBILE_PHONE}</span>
+                            <!-- END spouse_mobile -->
+                            <!-- BEGIN spouse_phone -->
+                            <span class="phone">{SPOUSE_OCCUP_PHONE}</span>
+                            <!-- END spouse_phone -->
+                        </div>
+                    </li>
+                </ul>
+                <!-- END spouse_details -->
 
-            <!-- BEGIN contact_alert -->
-            <ul class="contact-alert">
-                <li><img src="/images/famicons/exclamation.png" title="important"/><span>{CONTACT_ALERT_MESSAGE}</span></li>
-            </ul>
-            <!-- END contact_alert -->
+                <ul class="contact-details">
+                    <li class="address">
+                        <b>Address:</b> <br />
+                        {CONTACT_ADDRESS}
+                    </li>
+                    <li class="contact-phone">
+                        <b>Home Phone:</b> <br />
+                        {CONTACT_HOME_PHONE}
+                    </li>
+                </ul>
+                <!-- END contact_details -->
+            </div>
+        </section>
 
-            <!-- BEGIN contact_details -->
-            <ul class="contact-phone">
-                <li>
-                    <div class="profile">
-                        <a href="{CONTACT_LINK}" class="teacher-profile">
-                            <span class="name">{CONTACT_NAME}</span>
-                            <span class="role">{CONTACT_ROLE}</span>
-                            <span class="icon"></span>
-                        </a>
-                        <!-- BEGIN contact_email -->
-                        <a class="mail-teacher" href="{CONTACT_EMAIL}">Mail</a>
-                        <!-- END contact_email -->
-                        <!-- BEGIN contact_mobile -->
-                        <span class="mobile">{CONTACT_MOBILE_PHONE}</span>
-                        <!-- END contact_mobile -->
-                        <!-- BEGIN contact_phone -->
-                        <span class="phone">{CONTACT_OCCUP_PHONE}</span>
-                        <!-- END contact_phone -->
-                    </div>
-                </li>
-            </ul>
-
-            <!-- BEGIN spouse_details -->
-            <ul class="contact-phone">
-                <li>
-                    <div class="profile">
-                        <a href="{SPOUSE_LINK}" class="teacher-profile">
-                            <span class="name">{SPOUSE_NAME}</span>
-                            <span class="role">{SPOUSE_ROLE}</span>
-                            <span class="icon"></span>
-                        </a>
-
-                        <!-- BEGIN spouse_email -->
-                        <a class="mail-teacher" href="{SPOUSE_EMAIL}">Mail</a>
-                        <!-- END spouse_email -->
-                        <!-- BEGIN spouse_mobile -->
-                        <span class="mobile">{SPOUSE_MOBILE_PHONE}</span>
-                        <!-- END spouse_mobile -->
-                        <!-- BEGIN spouse_phone -->
-                        <span class="phone">{SPOUSE_OCCUP_PHONE}</span>
-                        <!-- END spouse_phone -->
-                    </div>
-                </li>
-            </ul>
-            <!-- END spouse_details -->
-
-            <ul class="contact-details">
-                <li class="address">
-                    <b>Address:</b> <br />
-                    {CONTACT_ADDRESS}
-                </li>
-                <li class="contact-phone">
-                    <b>Home Phone:</b> <br />
-                    {CONTACT_HOME_PHONE}
-                </li>
-            </ul>
-            <!-- END contact_details -->
-        </div>
         <!-- BEGIN emergency -->
-        <div class="emergency-contact">
-            <h2>Emergency Contact Information</h2>
-            <!-- BEGIN edit_emergency -->
-            <!-- END edit_emergency -->
+        <h2 class="subheader">Emergency Contact Information</h2>
+        <section>
+            <div class="content">
+                <h2>Emergency Contact Information</h2>
+                <!-- BEGIN edit_emergency -->
+                <!-- END edit_emergency -->
 
-            <!-- BEGIN emergency_contact -->
-            <dl>
-                <dt><b>Name:</b></dt>
-                <dd>{EMERGENCY_NAME}</dd>
+                <!-- BEGIN emergency_contact -->
+                <dl>
+                    <dt><b>Name:</b></dt>
+                    <dd>{EMERGENCY_NAME}</dd>
 
-                <dt class="dark"><b>Phone:</b></dt>
-                <dd class="dark">{EMERGENCY_PHONE}</dd>
+                    <dt class="dark"><b>Phone:</b></dt>
+                    <dd class="dark">{EMERGENCY_PHONE}</dd>
 
-                <dt><b>Alt. Phone:</b></dt>
-                <dd>{EMERGENCY_ALT_PHONE}</dd>
-            </dl>
-            <!-- END emergency_contact -->
-
-        </div>
-        <!-- END emergency -->
-        <!-- END contact_synergy -->
+                    <dt><b>Alt. Phone:</b></dt>
+                    <dd>{EMERGENCY_ALT_PHONE}</dd>
+                </dl>
+                <!-- END emergency_contact -->
+            </div>
+            <!-- END emergency -->
+        </section>
     </div>
 </div>
+<!-- END contact_synergy -->
