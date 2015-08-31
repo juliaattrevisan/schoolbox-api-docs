@@ -127,7 +127,8 @@ if ($this->arg[0] == 'revision') {
     if ($permission >= READ_ACCESS) {
         $this->parse('export_link_block', 'export_link');
     }
-} /* Load an existing wiki by its category id and slug
+}
+/* Load an existing wiki by its category id and slug
  */
 elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
     $wiki = $wikiHandler->getByCategoryAndSlug($this->arg[0], $this->arg[1]);
@@ -286,7 +287,31 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         if ($permission >= READ_ACCESS) {
             $this->parse('export_link_block', 'export_link');
         }
+
+        $slug = Scrub::text($wiki['slug']);
+
+        /* Render out breadcrumbs
+         */
+        $trail = new Breadcrumbs();
+        $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+            [
+                'text' => $folder->getName(),
+                'href' => "/homepage/{$folder->getId()}",
+                'class' => '',
+            ],
+            [
+                'text' => 'Wiki',
+                'href' => "/wiki/{$folder->getId()}/$slug",
+                'class' => '',
+            ],
+            [
+                'text' => 'View',
+                'href' => '',
+                'class' => 'active',
+            ]
+        ]);
     }
-} else {
+}
+else {
     error(2);
 }

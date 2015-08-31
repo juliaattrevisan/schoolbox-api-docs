@@ -402,7 +402,7 @@ class Wiki extends DeprecatedModel
 	 */
 	public function getByCategoryAndSlug($categoryID, $slug, $revisionID = 0) {
 		$query = "SELECT r.*,
-					w.categoryID, w.locked, UNIX_TIMESTAMP(w.created) created,
+					w.categoryID, w.locked, UNIX_TIMESTAMP(w.created) created, w.slug,
 				  	UNIX_TIMESTAMP(r.created) modified, latestRevision, r.userID authorID,
 				  	u.title, u.firstname, u.lastname
 				  FROM {$this->_revisionTable} r
