@@ -228,10 +228,7 @@
 					/* Show loading div right in the middle
 					 */
 					if (isLoading === true) {
-						$('#calendar-loading').css({
-							top: ($('#calendar').height() - $('#calendar-loading').height())/2,
-							left: ($('#calendar').width() - $('#calendar-loading').width())/2
-						}).show();
+						$('#calendar-loading').foundation('reveal','open')
 					}
 					/* Has finished loading
 					 */
@@ -239,7 +236,7 @@
 
 						/* Hide loading div
 						 */
-						$('#calendar-loading').hide();
+                        $('#calendar-loading').foundation('reveal','close')
 
                         // update any tasks that have been completed by strikethrough-ing them
                         $(this).find('input[type=checkbox]').each(function() {
@@ -614,8 +611,9 @@
 
 <h1>Calendar for {USER_FULLNAME}</h1>
 
-<div id="calendar-loading">
+<div id="calendar-loading" class="reveal-modal tiny" data-reveal aria-hidden="true" role="dialog">
     <div class='loader'></div>
+    <p>Loading events</p>
 </div>
 
 <div id="calendar"></div>

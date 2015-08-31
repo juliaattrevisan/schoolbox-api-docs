@@ -32,6 +32,9 @@
 .fc-state-default{
     text-shadow: none;
     box-shadow: none;
+    background-image: none;
+    background-color: #bdd7ea;
+    text-transform: capitalize;
 }
 
 .fc-state-down, .fc-state-active {
@@ -68,4 +71,11 @@
 
 .fc table tr:hover td {
     background-color: transparent;
+}
+
+.fc-row .fc-content-skeleton td {
+    border-color: inherit;
+}
+.fc-toolbar {
+    margin-bottom: 0;
 }
