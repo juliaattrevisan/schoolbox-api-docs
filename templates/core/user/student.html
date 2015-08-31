@@ -228,7 +228,54 @@
                 </div>
                 <!-- END contact_alert -->
 
-                <!-- BEGIN contact_details -->
+                <ul class="information-list">
+                    <!-- BEGIN contact_details -->
+                    <li class="actions-small-1 actions-medium-3">
+                        <div class="list-item">
+                            <div class="avatar-card">
+                                <a href="{CONTACT_LINK}">
+                                    <span class="icon-home icon-64"></span>
+                                    {CONTACT_NAME}
+                                </a>
+                                <p class="meta">{CONTACT_ROLE}</p>
+                            </div>
+                        </div>
+                        <nav>
+                            <span class="show-for-medium-up">
+                                <!-- BEGIN contact_email -->
+                                <a class="icon-email" href="{CONTACT_EMAIL_HREF}" title="Email {CONTACT_EMAIL}"></a>
+                                <!-- END contact_email -->
+                                <!-- BEGIN contact_mobile -->
+                                <a class="icon-mobile" href="tel:{CONTACT_MOBILE_PHONE}" title="Call {CONTACT_MOBILE_PHONE}"></a>
+                                <!-- END contact_mobile -->
+                                <!-- BEGIN contact_phone -->
+                                <a class="icon-mobile" href="tel:{CONTACT_OCCUP_PHONE}" title="Call {CONTACT_OCCUP_PHONE}"></a>
+                                <!-- END contact_phone -->
+                            </span>
+                            <span class="show-for-small-only">
+                                <a href="#" class="icon-more" data-dropdown="row-options-contact"></a>
+                            </span>
+                            <ul class="f-dropdown" data-dropdown-content id="row-options-contact">
+                                <li>
+                                    <!-- BEGIN contact_email -->
+                                    <a class="icon-email" href="{CONTACT_EMAIL_HREF}">{CONTACT_EMAIL}</a>
+                                    <!-- END contact_email -->
+                                </li>
+                                <li>
+                                    <!-- BEGIN contact_mobile -->
+                                    <a class="icon-mobile" href="tel:{CONTACT_MOBILE_PHONE}">{CONTACT_MOBILE_PHONE}</a>
+                                    <!-- END contact_mobile -->
+                                </li>
+                                <li>
+                                    <!-- BEGIN contact_phone -->
+                                    <a class="icon-mobile" href="tel:{CONTACT_OCCUP_PHONE}">{CONTACT_OCCUP_PHONE}</a>
+                                    <!-- END contact_phone -->
+                                </li>
+                            </ul>
+                        </nav>
+                    </li>
+
+
                 <ul class="contact-phone">
                     <li>
                         <div class="profile">
@@ -237,15 +284,6 @@
                                 <span class="role">{CONTACT_ROLE}</span>
                                 <span class="icon"></span>
                             </a>
-                            <!-- BEGIN contact_email -->
-                            <a class="mail-teacher" href="{CONTACT_EMAIL}">Mail</a>
-                            <!-- END contact_email -->
-                            <!-- BEGIN contact_mobile -->
-                            <span class="mobile">{CONTACT_MOBILE_PHONE}</span>
-                            <!-- END contact_mobile -->
-                            <!-- BEGIN contact_phone -->
-                            <span class="phone">{CONTACT_OCCUP_PHONE}</span>
-                            <!-- END contact_phone -->
                         </div>
                     </li>
                 </ul>
@@ -285,6 +323,7 @@
                     </li>
                 </ul>
                 <!-- END contact_details -->
+                </ul>
             </div>
         </section>
 

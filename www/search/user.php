@@ -454,10 +454,11 @@ if (is_numeric($this->arg[0])) {
                                             ) . '<br>' . Scrub::text(
                                                 $studentContact['StudentContactSuburb'] . ', ' . $studentContact['StudentContactState'] . ' ' . $studentContact['StudentContactPostCode']
                                             ) : '',
-                                        'CONTACT_HOME_PHONE' => '<a href="tel:' . Scrub::text($studentContact['StudentContactPhoneActual']) . '">' . Scrub::text($studentContact['StudentContactPhoneActual']) . '</a>',
-                                        'CONTACT_MOBILE_PHONE' => '<a href="tel:' . Scrub::text($studentContact['StudentContactMobilePhone']) . '">' . Scrub::text($studentContact['StudentContactMobilePhone']) . '</a>',
-                                        'CONTACT_OCCUP_PHONE' => '<a href="tel:' . Scrub::text($studentContact['StudentContactOccupPhone']) . '">' . Scrub::text($studentContact['StudentContactOccupPhone']) . '</a>',
-                                        'CONTACT_EMAIL' => $contactEmail,
+                                        'CONTACT_HOME_PHONE' => Scrub::text($studentContact['StudentContactPhoneActual']),
+                                        'CONTACT_MOBILE_PHONE' => Scrub::text($studentContact['StudentContactMobilePhone']),
+                                        'CONTACT_OCCUP_PHONE' => Scrub::text($studentContact['StudentContactOccupPhone']),
+                                        'CONTACT_EMAIL' => Scrub::text($studentContact['StudentContactDefaultEmail']),
+                                        'CONTACT_EMAIL_HREF' => $contactEmail,
                                         'CONTACT_NAME_EMAIL' => $contactName,
                                         'SPOUSE_NAME' => Scrub::text(
                                             $studentContact['StudentContactSpouseTitle'] . ' ' . $studentContact['StudentContactSpousePreferred'] . ' ' . $studentContact['StudentContactSpouseSurname']
