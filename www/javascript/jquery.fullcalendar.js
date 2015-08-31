@@ -130,10 +130,10 @@ function Calendar(id, bubbleId, opts) {
                     else {
                         url = '/calendar/modify.php?eventID=' + calEvent.data.meta.eventId + '&returnTo=calendar';
                         deleteUrl = '/calendar/modifyForm.php?action=Delete&id=' + calEvent.data.meta.eventId + '&returnTo=calendar';
-                        data.deleteLink = '<a class="btn delete float-left" href="' + deleteUrl + '"><span></span>Delete</a>';
+                        data.deleteLink = '<a class="button icon-delete" href="' + deleteUrl + '"><span></span>Delete</a>';
                     }
 
-                    data.modifyLink = '<a class="btn modify float-left" href="' + url + '"><span></span>Modify</a>';
+                    data.modifyLink = '<a class="button icon-modify" href="' + url + '"><span></span>Modify</a>';
                 }
                 else {
                     data.modifyLink = '';
@@ -196,8 +196,9 @@ function Calendar(id, bubbleId, opts) {
                     data.relatedBookings = calEvent.data.booking.related;
                 }
 
-
                 self.bubble.display('edit', data, jsEvent, this)
+                $('#calendar-bubble').foundation('reveal','open');
+
             }
         },
         datepicker: {
@@ -232,14 +233,12 @@ function Calendar(id, bubbleId, opts) {
 
             // show the filter 'dialog' when the button is clicked
             cal.dom.on('click', cal.options.filter.btnSelector, function() {
-                cal.bubble.hide()
                 return false
             })
 
             // Show the export filter, if it exists
             if (cal.options.filter.exportButtonSelector) {
                 cal.dom.on('click', cal.options.filter.exportButtonSelector, function() {
-                    cal.bubble.hide()
                     return false
                 })
             }
@@ -505,7 +504,6 @@ Calendar.prototype.init = function() {
                         }
                     })
                     c.clearForms()
-                    c.bubble.hide()
                 })
             }
             else {
@@ -533,7 +531,6 @@ Calendar.prototype.init = function() {
                             c.dom.fullCalendar('renderEvent', newEvent);
                         }
                     })
-                    c.bubble.hide()
                 })
             }
         }
@@ -676,15 +673,15 @@ function Bubble(calendar, bubbleDomId) {
     this.calendar = calendar
     this.forms = {}
     this.dom = $('#'+bubbleDomId)
-    this.initForms(bubbleDomId)
+    this.initForms()
 }
 
 /**
  * Go through the bubble's DOM and cache all its forms
  * @param bubbleDomId
  */
-Bubble.prototype.initForms = function(bubbleDomId) {
-    var bbl = $('#'+bubbleDomId)
+Bubble.prototype.initForms = function() {
+    var bbl = $(document)
 
     // define a way for the each loop to reach the parent
     var self = this
@@ -749,64 +746,9 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
     }
     delete eventData.relatedBookings;
 
-    var xPos = mouseEvent.pageX
-    var yPos = mouseEvent.pageY + 5
     this.fillForm(id, eventData)
-    this.showForm(id, xPos, yPos)
 }
 
-/**
- * Display a form in a particular location - does not perform data loading
- * @param id
- * @param x horizontal position of the bubble speech point
- * @param y vertical position of the bubble speech point
- */
-Bubble.prototype.showForm = function(id, x, y) {
-
-    var minEdgeDistance = 5
-    var navWidth = $('#nav').width()
-
-    // hide the bubble, but keep it displayed
-    this.dom.css({visibility:'hidden', display:'block'})
-
-    // now that the correct form is filling the bubble, position appropriately
-    // position the popup in the right spot!!
-    var mid = this.dom.find('.middle')
-
-    // unfortunately dimension-related things don't work when elements are not displayed
-    this.dom.css('visibility', 'hidden')
-    this.dom.show()
-
-    var bubbleHeight = mid.outerHeight() + mid.find('.bottom').outerHeight()
-    // don't allow the bubble to fall off the top of the page
-    var topEdge = Math.max(minEdgeDistance, y - bubbleHeight)
-
-    var bubbleWidth = mid.outerWidth()
-    var desiredX  = x - bubbleWidth + 25
-
-    // don't allow the bubble to overlap the left nav (z-index issues)
-    var leftEdge = Math.max(desiredX, minEdgeDistance + navWidth)
-
-    // don't allow the bubble to fall off the right edge of the page
-//    console.log($j(window).width(), bubbleWidth, minEdgeDistance)
-    leftEdge = Math.min(x, leftEdge, $(window).width() - bubbleWidth - minEdgeDistance)
-
-    var talkMarkX = Math.min(22 + leftEdge - desiredX, mid.width())
-
-    var pos = {top: topEdge, left: leftEdge}
-
-    this.dom.offset(pos)
-    this.dom.find('.bottom').css('right', talkMarkX)
-    this.dom.css('visibility', 'visible')
-
-}
-
-/**
- * Make the bubble go away
- */
-Bubble.prototype.hide = function() {
-    this.dom.css({visibility:'visible', display:'none'})
-}
 
 /**
  * Populate the nominated form with the data supplied

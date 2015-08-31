@@ -199,7 +199,10 @@
                         eventData.displayDate = date.format('ddd, Do MMMM, h(:mm)a')
                     }
 
-                    c.bubble.display('create', eventData, jsEvent, this)
+                    $('#calendar-create').foundation('reveal','open');
+
+
+                    //c.bubble.display('create', eventData, jsEvent, this)
 
                     // Apply whether the submit button is enabled or not
                     toggleFormState(c.getForm('createEvent'));
@@ -516,7 +519,7 @@
     })
 </script>
 <!-- END custom_head -->
-<div class="reveal-modal small" aria-hidden="true" role="dialog" id="calendar-bubble" >
+<div class="reveal-modal small" aria-hidden="true" role="dialog" id="calendar-create" >
     <!-- Create Event Form-->
     <dl class="tabs" data-tab>
         <dd><a href="#createEventPanel" class="active">Event</a></dd>
@@ -556,53 +559,57 @@
             </form>
         </div>
     </div>
-
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+<div class="reveal-modal large" aria-hidden="true" role="dialog" id="calendar-bubble" >
     <!-- Edit Event Form -->
-    <div class="reveal-modal large" data-reveal aria-hidden="true" role="dialog">
-        <form id="editEvent">
-            <input type="hidden" name="eventId" />
-            <dl>
-                <dd><h3 class="note"></h3></dd>
-                <dd><h4><span class="date"></span></h4></dd>
-                <dd><p class="location"></p></dd>
-                <dd><p class="detail wysiwyg" data-is-html="1"></p></dd>
-                <dd class="post-by meta">Posted by <a class="author" href="#" data-is-user-link="1"></a></dd>
-                <dd class="reviewed-by">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></dd>
-            </dl>
-            <ul class="relatedBookings"></ul>
-            <div class="attendance">
-                <dl>
-                    <dd><p class="attendanceIcon"></p></dd>
-                    <dd class="rm"><p class="attendanceStatus"></p></dd>
-                </dl>
+    <form id="editEvent">
+        <input type="hidden" name="eventId" />
+        <div class="row">
+            <div class="small-12">
+                <h3 class="note"></h3>
+                <p class="meta"><span class="date"></span></p>
+                <p class="location meta"></p>
+                <article class="detail" data-is-html="1"></article>
+                <p class="post-by meta">Posted by <a class="author" href="#" data-is-user-link="1"></a></p>
+                <p class="reviewed-by">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></p>
+                <ul class="relatedBookings"></ul>
+                <div class="attendance">
+                    <dl>
+                        <dd><p class="attendanceIcon"></p></dd>
+                        <dd class="rm"><p class="attendanceStatus"></p></dd>
+                    </dl>
+                </div>
+                <div class="actions">
+                    <dl>
+                        <dd>
+                            <span class="homepageLink" data-is-html="1"></span>
+                            <span class="modifyLink" data-is-html="1"></span>
+                            <span class="deleteLink" data-is-html="1"></span>
+                            <span class="attendanceListButton" data-is-html="1"></span>
+                            <span class="attendanceRequestButton" data-is-html="1"></span>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="bookingActions" data-is-html="1"></div>
             </div>
-            <div class="actions">
-                <dl>
-                    <dd>
-                        <span class="homepageLink" data-is-html="1"></span>
-                        <span class="modifyLink" data-is-html="1"></span>
-                        <span class="deleteLink" data-is-html="1"></span>
-                        <span class="attendanceListButton" data-is-html="1"></span>
-                        <span class="attendanceRequestButton" data-is-html="1"></span>
-                    </dd>
-                </dl>
-            </div>
-            <div class="bookingActions" data-is-html="1">
-            </div>
-        </form>
+        </div>
+    </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
 
-        <!-- Modify Task Form -->
-        <form id="editTask">
-            <h3>Task</h3>
-            <input type="hidden" name="eventId" />
-            <label style="font-weight: bold;">Due Date<span class="date"><!-- Date gets shoved in here --></span></label>
-            <label>Complete<input id="modifyTaskBubbleCompleted" name="completed" type="checkbox" value="1" /></label>
-            <label>Task<input id="modifyTaskBubbleNote" name="title" type="text" value="" /></label>
-            <label class="detail">Note<textarea id="modifyTaskBubbleDetail" name="detail"></textarea></label>
-            <input type="submit" class="btn float-right no-icon" value="Update Task" />
-            <a href="#" class="deleteTask btn no-icon float-right">Delete</a>
-        </form>
-    </div>
+<div class="reveal-modal large" aria-hidden="true" role="dialog" id="modify-task" >
+<!-- Modify Task Form -->
+    <form id="editTask">
+        <h3>Task</h3>
+        <input type="hidden" name="eventId" />
+        <label style="font-weight: bold;">Due Date<span class="date"><!-- Date gets shoved in here --></span></label>
+        <label>Complete<input id="modifyTaskBubbleCompleted" name="completed" type="checkbox" value="1" /></label>
+        <label>Task<input id="modifyTaskBubbleNote" name="title" type="text" value="" /></label>
+        <label class="detail">Note<textarea id="modifyTaskBubbleDetail" name="detail"></textarea></label>
+        <input type="submit" value="Update Task" />
+        <a href="#" class="deleteTask">Delete</a>
+    </form>
 </div>
 
 <h1>Calendar for {USER_FULLNAME}</h1>
@@ -665,6 +672,7 @@
     </form>
     <a href="#" id="applyFilters" class="button icon-search">Apply Filters</a>
     <!--/filter-drop-->
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
 <div id="calendar-export" class="reveal-modal small" data-reveal aria-hidden="true" role="dialog">
@@ -704,6 +712,7 @@
         <input type="submit" id="open-calendar-export-dialog" value="Generate URL"  />
         <input type="submit" id="download-calendar-export" value="Download CSV"/>
     </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
 
@@ -712,7 +721,8 @@
         Use the following address to subscribe your favourite calendar application to a live feed.
 	</div>
 	<textarea readonly id="calendar-export-dialog-url" rows="6"></textarea>
-    <button class="btn no-icon" id="copy-button" data-clipboard-target="calendar-export-dialog-url" title="Click to copy me.">Copy to Clipboard</button>
+    <button id="copy-button" data-clipboard-target="calendar-export-dialog-url" title="Click to copy me.">Copy to Clipboard</button>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
 <div class="reveal-modal" data-reveal aria-labelledby="firstModalTitle" aria-hidden="true" role="dialog" id="dialog-booking-bulk-update" title="This booking is part of a series">
