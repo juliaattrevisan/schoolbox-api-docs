@@ -1,6 +1,7 @@
 <?php
 
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Breadcrumbs;
 
 $wikiHandler = new Wiki();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
@@ -142,6 +143,30 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
             'WIKI_SLUG' => $this->arg[1],
             'WIKI_COMPONENT_ID' => 0,
         ));
+
+        try {
+            $folderMapper = new FolderMapper();
+            $folder = $folderMapper->findById($this->arg[0]);
+        }
+        catch (\Schoolbox\Mapper\Exception $e) {
+            error(2);
+        }
+
+        /* Render out breadcrumbs
+         */
+        $trail = new Breadcrumbs();
+        $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+            [
+                'text' => $folder->getName(),
+                'href' => "/homepage/{$folder->getId()}",
+                'class' => '',
+            ],
+            [
+                'text' => 'New Wiki',
+                'href' => '',
+                'class' => 'active',
+            ]
+        ]);
     } /* Otherwise load it
 	 */
     else {
