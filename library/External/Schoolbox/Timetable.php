@@ -271,8 +271,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
         $periodListAdaption = array();
 
-        $timetableDefinition = $this->getTimetableDefinition($externalUserId, $campus);
-        $periodCount         = $timetableDefinition['dayCount'];
         foreach ($periodList as $period) {
             $periodAdaption = array(
                 'periodNumber'   => $period['sequence'],
@@ -280,7 +278,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 'periodStart'    => $period['start'],
                 'periodEnd'      => $period['finish'],
                 'periodSequence' => 1,
-                'class'          => array_fill(1, $periodCount, array()),
+                'class'          => [],
             );
 
             foreach ($classList as $i => $class) {
