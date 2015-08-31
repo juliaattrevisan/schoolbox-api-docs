@@ -114,45 +114,63 @@
     </div>
 </div>
 
+<!-- BEGIN subject -->
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">{SUBJECT_CLASSTYPE}</h2>
+        <section>
+            <div class="content">
+                <!-- BEGIN subject_row -->
+                <ul class="subject-list">
+                    <!-- BEGIN subject_item -->
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="avatar-card">
+                                <a href="{SUBJECT_URL}">
+                                    <span class="icon-home icon-64"></span>
+                                    {SUBJECT_NAME}
+                                </a>
+                            </div>
+                        </div>
+                        <nav>
+                            <a class="icon-next" href="{SUBJECT_URL}" title="Visit {SUBJECT_NAME} Homepage"></a>
+                        </nav>
+                    </li>
+                    <!-- BEGIN subject_teacher -->
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="avatar-card">
+                                <a href="/search/user/{SUBJECT_TEACHER_ID}">
+                                    <img src="/portrait.php?userId={SUBJECT_TEACHER_EXTERNAL_ID}&size=square64" />
+                                    {SUBJECT_TEACHER_NAME}
+                                </a>
+                                <p class="meta">Teacher</p>
+                            </div>
+                        </div>
+                        <nav>
+                            <a class="icon-email" href="{SUBJECT_TEACHER_EMAIL}" title="Email {SUBJECT_TEACHER_NAME}"></a>
+                        </nav>
+                    </li>
+                    <!-- END subject_teacher -->
+                    <!-- END subject_item -->
+                </ul>
+                <!-- END subject_row -->
+
+                <!-- BEGIN subject_mail -->
+                <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
+                    <input type="hidden" name="replyto" value="{REPLYTO}"/>
+                    <input type="hidden" name="bcc" value="{EMAILALL}"/>
+                    <input type="submit" value="Email All" class="icon-email" />
+                </form>
+                <!-- END subject_mail -->
+            </div>
+        </section>
+    </div>
+</div>
+<!-- END subject -->
+
 <div class="directory">
     <div class="subjects">
-        <!-- BEGIN subject -->
-        <h2>{SUBJECT_CLASSTYPE}</h2>
-
-        <!-- BEGIN subject_row -->
-        <ul>
-            <!-- BEGIN subject_item -->
-            <li>
-                <div class="subject">
-                    <a class="to-subject" href="{SUBJECT_URL}">
-                        {SUBJECT_NAME}
-                        <span class="icon"></span>
-                    </a>
-                </div>
-                <!-- BEGIN subject_teacher -->
-                <div class="profile">
-                    <a href="/search/user/{SUBJECT_TEACHER_ID}" class="teacher-profile">
-                        <img src="/portrait.php?userId={SUBJECT_TEACHER_EXTERNAL_ID}&size=square32" />
-                        <span class="name">{SUBJECT_TEACHER_NAME}</span>
-                        <span class="role">Teacher</span>
-                    </a>
-                    <a class="mail-teacher" href="{SUBJECT_TEACHER_EMAIL}">Mail</a>
-                </div>
-                <!-- END subject_teacher -->
-            </li>
-            <!-- END subject_item -->
-        </ul>
-        <!-- END subject_row -->
-
-        <!-- BEGIN subject_mail -->
-        <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
-            <input type="hidden" name="replyto" value="{REPLYTO}"/>
-            <input type="hidden" name="bcc" value="{EMAILALL}"/>
-            <a href="#" class="btn submit-this float-right email "><span></span>Email All</a>
-        </form>
-        <!-- END subject_mail -->
-        <!-- END subject -->
-
         <!-- BEGIN group -->
         <div class="profile-groups">
             <h2>Groups</h2>
