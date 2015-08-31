@@ -15,53 +15,56 @@
         </div>
 	</div>
 </div>
-<div class="row" data-equalizer>
-	<div class="small-12 large-6 island">
-        <h2 class="subheader">Current Version</h2>
-		<form action="/wiki/modifyForm.php" method="post" class="top">
+<form action="/wiki/modifyForm.php" method="post" class="top">
+    <input type="hidden" name="wikiID" value="{WIKI_ID}" />
+    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+    <input type="hidden" name="revision" value="{REVISION}" />
+    <input type="hidden" name="slug" value="{SLUG}" />
+
+    <div class="row" data-equalizer>
+        <div class="small-12 large-6 island">
+            <h2 class="subheader">Current Version</h2>
             <section>
-				<fieldset class="content" data-equalizer-watch>
-					<input type="hidden" name="wikiID" value="{WIKI_ID}" />
-					<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-					<input type="hidden" name="revision" value="{REVISION}" />
-					<input type="hidden" name="slug" value="{SLUG}" />
-					<div class="small-12 columns">
-						<label>
-							Title
-							<input type="text" name="heading" size="60" value="{HEADING}" />
-						</label>
-						<label>
-							Body
-							<textarea name="body">{BODY}</textarea>
-						</label>
-					</div>
-				</fieldset>
-			</section>
-			<div class="row">
-				<div class="small-12 column">
-					<input type="submit" value="Save" />
-				</div>
-			</div>
-		</form>
-	</div>
-	<div class="small-12 large-6 island">
-		<h2 class="subheader">Your Version</h2>
-        <section class="content" data-equalizer-watch>
-            <label>
-                Title
-                <p>
-                    {YOURS_HEADING}
-                </p>
-            </label>
-            <label>
-                Body
-                <article>
-                    {YOURS_BODY}
-                </article>
-            </label>
-        </section>
+                <fieldset class="content" data-equalizer-watch>
+                    <div class="small-12 columns">
+                        <label>
+                            Title
+                            <input type="text" name="heading" size="60" value="{HEADING}" />
+                        </label>
+                        <label>
+                            Body
+                            <textarea name="body">{BODY}</textarea>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+        </div>
+        <div class="small-12 large-6 island">
+            <h2 class="subheader">Your Version</h2>
+            <section class="content" data-equalizer-watch>
+                <label>
+                    Title
+                    <p>
+                        {YOURS_HEADING}
+                    </p>
+                </label>
+                <label>
+                    Body
+                    <article>
+                        {YOURS_BODY}
+                    </article>
+                </label>
+            </section>
+        </div>
     </div>
-</div>
+
+    <div class="row">
+        <div class="small-12 column">
+            <input type="submit" value="Save" />
+        </div>
+    </div>
+</form>
+
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript">
