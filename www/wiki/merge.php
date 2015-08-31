@@ -69,14 +69,39 @@ if (is_numeric($this->arg[0])) {
 	if ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS)
 		error(19);
 
-	$output = array('ACTION'		=> 'Add',
-					'WIKI_ID'		=> '',
-					'CATEGORY_ID'	=> $this->arg[1],
-					'HEADING'		=> Scrub::text($wiki['heading']),
-					'BODY'			=> $wiki['body']
-					);
-	$this->setVar($output);
+    try{
+        $folder = FolderMapper::getInstance()->findById($this->arg[1]);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(2);
+    }
 
+    $output = array(
+        'ACTION'        => 'Add',
+        'WIKI_ID'       => '',
+        'CATEGORY_ID'   => $this->arg[1],
+        'HEADING'       => Scrub::text($wiki['heading']),
+        'BODY'          => $wiki['body'],
+        'YOURS_HEADING' => '',
+        'YOURS_BODY'    => '',
+    );
+
+    $this->setVar($output);
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Add Wiki',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 
 } else
 	error(2);
