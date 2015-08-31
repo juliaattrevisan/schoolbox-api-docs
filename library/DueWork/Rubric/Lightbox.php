@@ -95,6 +95,8 @@ class DueWork_Rubric_Lightbox {
 
         $colCount = count($data['criteria'][0]['results']);
 
+        $page->setVar('rubric_rating_block', '');
+        $page->setVar('rubric_crit_block', '');
         for($i = 0; $i < $colCount; ++$i) {
             $page->parse('rubric_rating_block', 'rubric_rating', true);
         }
