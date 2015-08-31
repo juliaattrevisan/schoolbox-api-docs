@@ -14,7 +14,7 @@
 	<div class="small-12 large-8 island">
 		<h2 class="subheader">Wiki</h2>
 		<section class="content">
-			<article class="revision-box">
+			<article>
 				{DIFF}
 			</article>
 			<p class="meta">Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</p>
@@ -24,20 +24,20 @@
 		<h2 class="subheader">Revisions</h2>
 		<table>
 			<thead>
-			<tr>
-				<th>Date</th>
-				<th>Author</th>
-				<th>Compare</th>
-			</tr>
+                <tr>
+                    <th>Date</th>
+                    <th>Author</th>
+                    <th>Compare</th>
+                </tr>
 			</thead>
 			<tbody>
-			<!-- BEGIN revision_list -->
-			<tr class="{REVISION_CURRENT}">
-				<td><a href="/wiki/revision/{WIKI_ID}/{REVISION_COMPARE}">{REVISION_DATE}</a></td>
-				<td>{REVISION_AUTHOR}</td>
-				<td><!-- BEGIN revision_comparison --><a href="/wiki/diff/{WIKI_ID}/{REVISION_ID}/{REVISION_COMPARE}" class="icon-view" data-tooltip title="Compare"></a><!-- END revision_comparison --></td>
-			</tr>
-			<!-- END revision_list -->
+                <!-- BEGIN revision_list -->
+                <tr>
+                    <td><a href="/wiki/revision/{WIKI_ID}/{REVISION_COMPARE}">{REVISION_DATE}</a></td>
+                    <td>{REVISION_AUTHOR}</td>
+                    <td><!-- BEGIN revision_comparison --><a href="/wiki/diff/{WIKI_ID}/{REVISION_ID}/{REVISION_COMPARE}" class="icon-view" data-tooltip title="Compare"></a><!-- END revision_comparison --></td>
+                </tr>
+                <!-- END revision_list -->
 			</tbody>
 		</table>
 	</div>
