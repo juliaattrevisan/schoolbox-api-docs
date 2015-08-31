@@ -97,6 +97,22 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this-
             'SLUG'        => '',
         )
     );
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'New Wiki',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 } else {
     error(2);
 }
