@@ -345,18 +345,35 @@
                 <!-- BEGIN edit_emergency -->
                 <!-- END edit_emergency -->
 
-                <!-- BEGIN emergency_contact -->
-                <dl>
-                    <dt><b>Name:</b></dt>
-                    <dd>{EMERGENCY_NAME}</dd>
-
-                    <dt class="dark"><b>Phone:</b></dt>
-                    <dd class="dark">{EMERGENCY_PHONE}</dd>
-
-                    <dt><b>Alt. Phone:</b></dt>
-                    <dd>{EMERGENCY_ALT_PHONE}</dd>
-                </dl>
-                <!-- END emergency_contact -->
+                <ul class="information-list">
+                    <!-- BEGIN emergency_contact -->
+                    <li class="actions-small-1 actions-medium-2">
+                        <div class="list-item">
+                            <div class="avatar-card">
+                                <span class="icon-alert icon-64"></span>
+                                {EMERGENCY_NAME}
+                            </div>
+                        </div>
+                        <nav>
+                            <span class="show-for-medium-up">
+                                <a class="icon-mobile" href="tel:{EMERGENCY_PHONE}" title="Call {EMERGENCY_PHONE}"></a>
+                                <a class="icon-mobile" href="tel:{EMERGENCY_ALT_PHONE}" title="Call {EMERGENCY_ALT_PHONE}"></a>
+                            </span>
+                            <span class="show-for-small-only">
+                                <a href="#" class="icon-more" data-dropdown="row-options-emergency-{EMERGENCY_COUNT}"></a>
+                            </span>
+                            <ul class="f-dropdown" data-dropdown-content id="row-options-emergency-{EMERGENCY_COUNT}">
+                                <li class="full-width">
+                                    <a class="icon-mobile" href="tel:{EMERGENCY_PHONE}">{EMERGENCY_PHONE}</a>
+                                </li>
+                                <li class="full-width">
+                                    <a class="icon-mobile" href="tel:{EMERGENCY_ALT_PHONE}">{EMERGENCY_ALT_PHONE}</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </li>
+                    <!-- END emergency_contact -->
+                </ul>
             </div>
             <!-- END emergency -->
         </section>

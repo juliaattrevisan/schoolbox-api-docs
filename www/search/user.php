@@ -560,9 +560,10 @@ if (is_numeric($this->arg[0])) {
                             if ($synInfo['StudentEmergency' . $index . 'Name']) {
                                 $this->setVar(
                                     array(
+                                        'EMERGENCY_COUNT' => $x,
                                         'EMERGENCY_NAME' => Scrub::text($synInfo['StudentEmergency' . $index . 'Name']),
-                                        'EMERGENCY_PHONE' => '<a href="tel:' . Scrub::text($synInfo['StudentEmergency' . $index . 'Phone']) . '">' . Scrub::text($synInfo['StudentEmergency' . $index . 'Phone']) . '</a>',
-                                        'EMERGENCY_ALT_PHONE' => '<a href="tel:' . Scrub::text($synInfo['StudentEmergency' . $index . 'PhoneAlt']) . '">' . Scrub::text($synInfo['StudentEmergency' . $index . 'PhoneAlt']) . '</a>',
+                                        'EMERGENCY_PHONE' => Scrub::text($synInfo['StudentEmergency' . $index . 'Phone']),
+                                        'EMERGENCY_ALT_PHONE' => Scrub::text($synInfo['StudentEmergency' . $index . 'PhoneAlt']),
                                     )
                                 );
                                 $this->parse('emergency_contact_block', 'emergency_contact', true);
