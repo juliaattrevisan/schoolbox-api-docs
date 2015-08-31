@@ -453,6 +453,7 @@ if (is_numeric($this->arg[0])) {
                                             $studentContact['StudentContactTitle'] . ' ' . $studentContact['StudentContactPreferred'] . ' ' . $studentContact['StudentContactSurname']
                                         ),
                                         'CONTACT_ID' => $parent['uid'],
+                                        'CONTACT_EXTERNAL_ID' => Scrub::text($studentContact['StudentContactID']),
                                         'CONTACT_ROLE' => Scrub::text($studentContact['StudentContactRelation']),
                                         'CONTACT_ADDRESS' => count($address_fields) ? Scrub::text(
                                                 implode(' ', $address_fields)
@@ -469,6 +470,7 @@ if (is_numeric($this->arg[0])) {
                                             $studentContact['StudentContactSpouseTitle'] . ' ' . $studentContact['StudentContactSpousePreferred'] . ' ' . $studentContact['StudentContactSpouseSurname']
                                         ),
                                         'SPOUSE_ID' => $spouse['uid'],
+                                        'SPOUSE_EXTERNAL_ID' => Scrub::text($studentContact['StudentContactSpouseID']),
                                         'SPOUSE_ROLE' => Scrub::text($studentContact['StudentContactSpouseRelation']),
                                         'SPOUSE_MOBILE_PHONE' => Scrub::text($studentContact['StudentContactSpouseMobilePhone']),
                                         'SPOUSE_OCCUP_PHONE' => Scrub::text($studentContact['StudentContactSpouseOccupPhone']),
