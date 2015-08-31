@@ -53,6 +53,13 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             $date = time();
         }
 
+        // Is this a Saturday or Sunday?
+        // I assume because we don't count non business days, then this is
+        // outside the timetable.
+        if (date('N', $date) >= 6) {
+            return 0;
+        }
+
         if (empty($definition['reset']) || $definition['reset'] == '0000-00-00') {
             $start = strtotime($definition['start']);
         } else {
@@ -81,6 +88,11 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         }
 
         $currentDay = $businessDays % $definition['cycle_length'];
+
+        // Last day of cycle? Show last day, instead of 0
+        if ($currentDay == 0) {
+            $currentDay = $definition['cycle_length'];
+        }
 
         return $currentDay;
     }
