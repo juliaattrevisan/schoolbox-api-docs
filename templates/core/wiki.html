@@ -6,8 +6,10 @@
 <div class="row actions-small-3">
 	<div class="small-12 column list-item">
 		<h1>{HEADING} {LOCKED}</h1>
+        <ul class="meta">
+            <li class="icon-modify">Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</li>
+        </ul>
 	</div>
-
 	<nav>
 		<!-- BEGIN lock_link -->
 		<a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}" class="icon-locked" data-tooltip title="{LOCK_UNLOCK}"></a>
@@ -28,7 +30,6 @@
 		<li><a href="/wiki/exportForm.php?wikiID={WIKI_ID}" class="icon-download"><span></span>{EXPORT}</a></li>
 		<!-- END export_link -->
 	</ul>
-
 </div>
 
 <div class="row">
@@ -38,7 +39,6 @@
 			<article>
 				{BODY}
 			</article>
-			<p class="meta">Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</p>
 		</section>
 	</div>
 	<div class="small-12 large-4 island">
