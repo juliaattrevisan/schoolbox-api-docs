@@ -1,6 +1,7 @@
 <?php
 
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Breadcrumbs;
 
 $wikiHandler = new Wiki;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
@@ -46,6 +47,22 @@ if (is_numeric($this->arg[0])) {
         'YOURS_HEADING' => $wiki['heading'],
         'YOURS_BODY' => $wiki['body'],
     ));
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Merge Wiki',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 } elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
 	// check permission
@@ -63,5 +80,3 @@ if (is_numeric($this->arg[0])) {
 
 } else
 	error(2);
-
-?>

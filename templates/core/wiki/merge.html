@@ -1,19 +1,5 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
-<script type="text/javascript">
-	$(function() {
-		$.fn.alaressTiny({
-			mode: 'textareas',
-			file_browser_category_id : {CATEGORY_ID}
-		});
-	});
-</script>
-<!-- END custom_head -->
-<ul class="breadcrumb">
-	<li><a href="/homepage/{CATEGORY_ID}/">{FOLDER_NAME}</a></li>
-	<li class="active"><a href="#">Wiki</a></li>
-</ul>
+{BREADCRUMB}
+
 <div class="row">
 	<div class="small-12 island">
 		<h1>{ACTION} Wiki</h1>
@@ -83,3 +69,13 @@
 		</div>
     </div>
 </div>
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $.fn.alaressTiny({
+            mode: 'textareas',
+            file_browser_category_id : {CATEGORY_ID}
+        });
+    });
+</script>
