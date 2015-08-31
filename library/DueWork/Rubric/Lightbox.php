@@ -67,12 +67,17 @@ class DueWork_Rubric_Lightbox {
         $page = $this->page;
         $page->setFile($templateHandle, 'submission/rubricLightbox.html');
 
-        $rubric = $this->rubricHandler->getRubric($submissionBoxID);
+        // If this fails, show nothing at all
+        try {
+            $rubric = $this->rubricHandler->getRubric($submissionBoxID);
 
-        $rubricMark = new DueWork_Rubric_Mark($rubric);
-        $rubricMark->populateMarks($studentID);
+            $rubricMark = new DueWork_Rubric_Mark($rubric);
+            $rubricMark->populateMarks($studentID);
 
-        $data = $rubricMark->toArray();
+            $data = $rubricMark->toArray();
+        } catch (Exception $e) {
+            $data = ['criteria' => []];
+        }
 
         $json = array();
         $legs = array();
