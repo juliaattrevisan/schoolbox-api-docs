@@ -5,12 +5,12 @@
 </div>
 
 <div class="row">
-    <div class="small-12 medium-6 column">
+    <div class="small-12 medium-6 large-4 column">
         <!-- BEGIN portrait -->
         <img src="/portrait.php?userId={SYNERGY_ID}&size=profile"/>
         <!-- END portrait -->
     </div>
-    <div class="small-12 medium-6 island">
+    <div class="small-12 medium-6 large-8 island">
         <section>
             <div class="content">
                 <dl>
@@ -71,23 +71,8 @@
                     <dt>Student Type:</dt>
                     <dd>{STUDENT_TYPE}</dd>
                 </dl>
-            </div>
-        </section>
-        <!-- END student_synergy_tutor -->
-    </div>
-    <!-- BEGIN medical -->
-    <div class="small-12 column">
-        <div class="alert-box alert icon-alert">
-            Medical Note: {MEDICAL_NOTE}
-        </div>
-    </div>
-    <!-- END medical -->
-</div>
+                <!-- END student_synergy_tutor -->
 
-<div class="profile">
-    <div class="profile-info">
-        <div class="profile-detail">
-            <p class="school-info">
                 <!-- BEGIN due_work -->
                 <a href="/submission/dueWork/0/{ID}" class="button icon-due-work">Due Work</a>
                 <!-- END due_work -->
@@ -119,13 +104,19 @@
                 <!-- BEGIN modify -->
                 <a href="/adminv2/modify-user/{ID}" class="button icon-modify">Modify User</a>
                 <!-- END modify -->
-            </p>
+            </div>
+        </section>
+    </div>
+    <!-- BEGIN medical -->
+    <div class="small-12 column">
+        <div class="alert-box alert icon-alert">
+            Medical Note: {MEDICAL_NOTE}
         </div>
     </div>
+    <!-- END medical -->
 </div>
 
 <div class="directory">
-
     <div class="subjects">
         <!-- BEGIN subject -->
         <h2>{SUBJECT_CLASSTYPE}</h2>
