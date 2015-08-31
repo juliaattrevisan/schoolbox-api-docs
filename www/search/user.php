@@ -45,6 +45,9 @@ if (is_numeric($this->arg[0])) {
         $this->setBlock('spouse_details', 'spouse_email', 'spouse_email_block');
         $this->setBlock('spouse_details', 'spouse_mobile', 'spouse_mobile_block');
         $this->setBlock('spouse_details', 'spouse_phone', 'spouse_phone_block');
+        $this->setBlock('spouse_details', 'spouse_email_small', 'spouse_email_small_block');
+        $this->setBlock('spouse_details', 'spouse_mobile_small', 'spouse_mobile_small_block');
+        $this->setBlock('spouse_details', 'spouse_phone_small', 'spouse_phone_small_block');
         $this->setBlock(TEMPLATE_content, 'medical', 'medical_block');
         $this->setBlock(TEMPLATE_content, 'group', 'group_block');
         $this->setBlock('group', 'group_row', 'group_row_block');
@@ -467,9 +470,10 @@ if (is_numeric($this->arg[0])) {
                                         ),
                                         'SPOUSE_ID' => $spouse['uid'],
                                         'SPOUSE_ROLE' => Scrub::text($studentContact['StudentContactSpouseRelation']),
-                                        'SPOUSE_MOBILE_PHONE' => '<a href="tel:' . Scrub::text($studentContact['StudentContactSpouseMobilePhone']) . '">' . Scrub::text($studentContact['StudentContactSpouseMobilePhone']) . '</a>',
-                                        'SPOUSE_OCCUP_PHONE' => '<a href="tel:' . Scrub::text($studentContact['StudentContactSpouseOccupPhone']) . '">' . Scrub::text($studentContact['StudentContactSpouseOccupPhone']) . '</a>',
-                                        'SPOUSE_EMAIL' => $spouseEmail,
+                                        'SPOUSE_MOBILE_PHONE' => Scrub::text($studentContact['StudentContactSpouseMobilePhone']),
+                                        'SPOUSE_OCCUP_PHONE' => Scrub::text($studentContact['StudentContactSpouseOccupPhone']),
+                                        'SPOUSE_EMAIL' => Scrub::text($studentContact['StudentContactSpouseDefaultEmail']),
+                                        'SPOUSE_EMAIL_HREF' => $spouseEmail,
                                     );
                                     //
                                     // Links to /search/user page (if this user has one)
@@ -508,20 +512,26 @@ if (is_numeric($this->arg[0])) {
                                         /* Output each of the block for contact details */
                                         if ($spouseEmail) {
                                             $this->parse('spouse_email_block', 'spouse_email');
+                                            $this->parse('spouse_email_small_block', 'spouse_email_small');
                                         } else {
                                             $this->setVar('spouse_email_block', '');
+                                            $this->setVar('spouse_email_small_block', '');
                                         }
 
                                         if ($studentContact['StudentContactSpouseMobilePhone']) {
                                             $this->parse('spouse_mobile_block', 'spouse_mobile');
+                                            $this->parse('spouse_mobile_small_block', 'spouse_mobile_small');
                                         } else {
                                             $this->setVar('spouse_mobile_block', '');
+                                            $this->setVar('spouse_mobile_small_block', '');
                                         }
 
                                         if ($studentContact['StudentContactSpouseOccupPhone']) {
                                             $this->parse('spouse_phone_block', 'spouse_phone');
+                                            $this->parse('spouse_phone_small_block', 'spouse_phone_small');
                                         } else {
                                             $this->setVar('spouse_phone_block', '');
+                                            $this->setVar('spouse_phone_small_block', '');
                                         }
 
 

@@ -275,42 +275,52 @@
                         </nav>
                     </li>
 
-
-                <ul class="contact-phone">
-                    <li>
-                        <div class="profile">
-                            <a href="{CONTACT_LINK}" class="teacher-profile">
-                                <span class="name">{CONTACT_NAME}</span>
-                                <span class="role">{CONTACT_ROLE}</span>
-                                <span class="icon"></span>
-                            </a>
+                    <!-- BEGIN spouse_details -->
+                    <li class="actions-small-1 actions-medium-3">
+                        <div class="list-item">
+                            <div class="avatar-card">
+                                <a href="{SPOUSE_LINK}">
+                                    <span class="icon-home icon-64"></span>
+                                    {SPOUSE_NAME}
+                                </a>
+                                <p class="meta">{SPOUSE_ROLE}</p>
+                            </div>
                         </div>
+                        <nav>
+                            <span class="show-for-medium-up">
+                                <!-- BEGIN spouse_email -->
+                                <a class="icon-email" href="{SPOUSE_EMAIL_HREF}" title="Email {SPOUSE_EMAIL}"></a>
+                                <!-- END spouse_email -->
+                                <!-- BEGIN spouse_mobile -->
+                                <a class="icon-mobile" href="tel:{SPOUSE_MOBILE_PHONE}" title="Call {SPOUSE_MOBILE_PHONE}"></a>
+                                <!-- END spouse_mobile -->
+                                <!-- BEGIN spouse_phone -->
+                                <a class="icon-mobile" href="tel:{SPOUSE_OCCUP_PHONE}" title="Call {SPOUSE_OCCUP_PHONE}"></a>
+                                <!-- END spouse_phone -->
+                            </span>
+                            <span class="show-for-small-only">
+                                <a href="#" class="icon-more" data-dropdown="row-options-spouse"></a>
+                            </span>
+                            <ul class="f-dropdown" data-dropdown-content id="row-options-spouse">
+                                <!-- BEGIN spouse_email_small -->
+                                <li class="full-width">
+                                    <a class="icon-email" href="{SPOUSE_EMAIL_HREF}">{SPOUSE_EMAIL}</a>
+                                </li>
+                                <!-- END spouse_email_small -->
+                                <!-- BEGIN spouse_mobile_small -->
+                                <li class="full-width">
+                                    <a class="icon-mobile" href="tel:{SPOUSE_MOBILE_PHONE}">{SPOUSE_MOBILE_PHONE}</a>
+                                </li>
+                                <!-- END spouse_mobile_small -->
+                                <!-- BEGIN spouse_phone_small -->
+                                <li class="full-width">
+                                    <a class="icon-mobile" href="tel:{SPOUSE_OCCUP_PHONE}">{SPOUSE_OCCUP_PHONE}</a>
+                                </li>
+                                <!-- END spouse_phone_small -->
+                            </ul>
+                        </nav>
                     </li>
-                </ul>
-
-                <!-- BEGIN spouse_details -->
-                <ul class="contact-phone">
-                    <li>
-                        <div class="profile">
-                            <a href="{SPOUSE_LINK}" class="teacher-profile">
-                                <span class="name">{SPOUSE_NAME}</span>
-                                <span class="role">{SPOUSE_ROLE}</span>
-                                <span class="icon"></span>
-                            </a>
-
-                            <!-- BEGIN spouse_email -->
-                            <a class="mail-teacher" href="{SPOUSE_EMAIL}">Mail</a>
-                            <!-- END spouse_email -->
-                            <!-- BEGIN spouse_mobile -->
-                            <span class="mobile">{SPOUSE_MOBILE_PHONE}</span>
-                            <!-- END spouse_mobile -->
-                            <!-- BEGIN spouse_phone -->
-                            <span class="phone">{SPOUSE_OCCUP_PHONE}</span>
-                            <!-- END spouse_phone -->
-                        </div>
-                    </li>
-                </ul>
-                <!-- END spouse_details -->
+                    <!-- END spouse_details -->
 
                 <ul class="contact-details">
                     <li class="address">
