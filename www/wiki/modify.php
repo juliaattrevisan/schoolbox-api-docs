@@ -1,6 +1,7 @@
 <?php
 
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Breadcrumbs;
 
 $wikiHandler  = new Wiki;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
@@ -44,7 +45,24 @@ if (is_numeric($this->arg[0])) {
     );
 
     $this->setVar($output);
-} elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this->arg[2])) {
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Modify Wiki',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
+}
+elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this->arg[2])) {
     /* Check permission
      *
      * First check that Allow Create is active. If it is, continue;
