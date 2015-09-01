@@ -104,58 +104,58 @@
         }
     }
 
-    /**
-     * Set up timetable subject resizer
-     */
-    $.fn.timetableSetupResize = function(options) {
-        options = options || {};
-
-        var config = init(options, $(this));
-
-        setup();
-
-        /**
-         * Init
-         *
-         * @param options
-         * @param element
-         * @returns {*}
-         */
-        function init(options, element) {
-            var defaults = {
-                element: element,
-
-                /* A timetable table element
-                 */
-                timetable: '[data-timetable]',
-
-                /* Subject elements
-                 */
-                subject: '[data-timetable-subject]'
-            }
-
-            var derived = {
-            }
-
-            var merged = $.extend(defaults, derived, options);
-
-            return merged;
-        }
-
-        /**
-         * Set up event listeners
-         *
-         * Wait till resizing actually stops before resizing everything as the
-         * resizing process takes a little while
-         */
-        function setup() {
-            /* Run it once to start with
-             */
-            $.fn.timetableResize({
-                timetable: config.timetable,
-                subject: config.subject
-            });
-
+//    /**
+//     * Set up timetable subject resizer
+//     */
+//    $.fn.timetableSetupResize = function(options) {
+//        options = options || {};
+//
+//        var config = init(options, $(this));
+//
+//        setup();
+//
+//        /**
+//         * Init
+//         *
+//         * @param options
+//         * @param element
+//         * @returns {*}
+//         */
+//        function init(options, element) {
+//            var defaults = {
+//                element: element,
+//
+//                /* A timetable table element
+//                 */
+//                timetable: '[data-timetable]',
+//
+//                /* Subject elements
+//                 */
+//                subject: '[data-timetable-subject]'
+//            }
+//
+//            var derived = {
+//            }
+//
+//            var merged = $.extend(defaults, derived, options);
+//
+//            return merged;
+//        }
+//
+//        /**
+//         * Set up event listeners
+//         *
+//         * Wait till resizing actually stops before resizing everything as the
+//         * resizing process takes a little while
+//         */
+//        function setup() {
+//            /* Run it once to start with
+//             */
+//            $.fn.timetableResize({
+//                timetable: config.timetable,
+//                subject: config.subject
+//            });
+//
 //            /* Set up event listener for resizeEnd
 //             */
 //            $(window).resize(function() {
@@ -176,8 +176,8 @@
 //                    subject: config.subject
 //                });
 //            });
-        }
-    }
+//        }
+//    }
 
     /**
      * Resize all subject elements in a particular timetable
@@ -200,11 +200,10 @@
          */
         function init(options, element) {
             var defaults = {
-                element: element,
 
-                /* A timetable table element
+                /* A timetable table element, typically denoted by '[data-timetable]'
                  */
-                timetable: '[data-timetable]',
+                element: element,
 
                 /* Subject elements
                  */
@@ -223,7 +222,7 @@
          * Resize all subject elements
          */
         function resize() {
-            $.each($(config.timetable).find('tr'), function(index, row) {
+            $.each($(config.element).find('tr'), function(index, row) {
                 var rowHeight = $(row).height();
 
                 $.each($(row).find('td'), function(index, cell) {

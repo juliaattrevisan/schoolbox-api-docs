@@ -101,9 +101,7 @@
 
             /* Adjust heights
              */
-            $.fn.timetableResize({
-                timetable: $('[data-timetable-wrapper='+selected+']').find('[data-timetable]')
-            });
+            $('[data-timetable-wrapper='+selected+']').find('[data-timetable]').timetableResize();
         });
     });
 </script>
