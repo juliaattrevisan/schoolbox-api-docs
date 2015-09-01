@@ -6,7 +6,7 @@
         var config = init(options, $(this));
 
         showFirstTimetable();
-        assemble();
+        showSelectedTimetable();
 
         /**
          * Init
@@ -55,7 +55,7 @@
         /**
          * Assemble the timetable for the selected person
          */
-        function assemble() {
+        function showSelectedTimetable() {
 
             /* When selecting a menu item from the person selector
              */
