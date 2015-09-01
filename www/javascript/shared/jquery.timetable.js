@@ -293,10 +293,15 @@
          * Resize all subject elements
          */
         function resize() {
+
+            /* Reflow all subjects first
+             */
+            $('td').find(config.subject).css({
+                height: 'auto'
+            });
+
             $.each($(config.element).find('tr'), function(index, row) {
                 var rowHeight = $(row).height();
-
-                console.log(rowHeight);
 
                 $.each($(row).find('td'), function(index, cell) {
                     var allSubjects = $(cell).find(config.subject);
@@ -305,6 +310,12 @@
                      */
                     if (allSubjects.length == 1) {
                         allSubjects.css({
+                            minHeight: rowHeight + 'px',
+                            height: rowHeight + 'px'
+                        });
+
+                        allSubjects.css({
+                            minHeight: rowHeight + 'px',
                             height: rowHeight + 'px'
                         });
                     }
