@@ -59,8 +59,9 @@ class Marksheet_Percent extends Marksheet_Abstract
     public function outputUI(SitePage $page, $mark)
     {
         $output = array(
-            'MARK' => Scrub::text($mark['mark']),
-            'COMMENT'  => Scrub::text($mark['comment'])
+            'MARK'        => Scrub::text($mark['mark']),
+            'COMMENT'     => Scrub::text($mark['comment']),
+            'MARK_SYMBOL' => (is_numeric($mark['mark']) ? '%' : ''),
         );
         $page->setVar($output);
     }
