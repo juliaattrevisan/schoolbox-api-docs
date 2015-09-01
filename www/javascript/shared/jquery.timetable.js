@@ -1,5 +1,122 @@
 (function() {
 
+    $.fn.timetableStart = function(options) {
+        options = options || {};
+
+        var config = init(options, $(this));
+
+        showFirstTimetable();
+        assemble();
+
+        /**
+         * Init
+         *
+         * @param options
+         * @param element
+         * @returns {*}
+         */
+        function init(options, element) {
+            var defaults = {
+                element: element,
+
+                /* Reforged timetables end up inside this element
+                 */
+                target: '[data-smaller]',
+
+                /* The menu items when you have multiple timetables
+                 * to chooze from
+                 */
+                selectors: {
+                    data: '[data-timetable-selector]',
+                    attr: 'data-timetable-selector'
+                },
+
+                /* Timetable wrapper element containing the heading
+                 * and the timetable itself (they are separate elements)
+                 */
+                wrapper: {
+                    data: '[data-timetable-wrapper]',
+                    attr: 'data-timetable-wrapper'
+                },
+
+                /* This indicates the timetable table itself
+                 */
+                timetable: '[data-timetable]'
+            }
+
+            var derived = {
+            }
+
+            var merged = $.extend(defaults, derived, options);
+
+            return merged;
+        }
+
+        /**
+         * Assemble the timetable for the selected person
+         */
+        function assemble() {
+
+            /* When selecting a menu item from the person selector
+             */
+            $(config.selectors.data).click(function(event) {
+                event.preventDefault();
+
+                updateMenu();
+
+                /* Show selected large timetable
+                 * Show selected small timetable
+                 */
+                var selected = $(this).attr(config.selectors.attr);
+                var wrapper = $('['+config.wrapper.attr+'='+selected+']');
+                var timetable = wrapper.find(config.timetable);
+
+                wrapper.removeClass('hide').timetable({
+                    target: config.target
+                });
+
+                /* Adjust heights
+                 */
+                timetable.timetableResize();
+            });
+        }
+
+        /**
+         * Show first timetable
+         */
+        function showFirstTimetable() {
+            $(config.selectors.data).parent().removeClass('active');
+            $(config.selectors.data).first().parent().addClass('active');
+
+            var firstTimetable = $(config.wrapper.data).first();
+            firstTimetable.removeClass('hide');
+
+            firstTimetable.find(config.timetable).timetable({
+                target: config.target
+            });
+
+            firstTimetable.timetableResize();
+        }
+
+        /**
+         * Update person selector
+         */
+        function updateMenu() {
+
+            /* Unselect all menu items
+             * Reselect this one
+             */
+            $(config.selectors.data).parent().removeClass('active');
+            $(this).parent().addClass('active');
+
+            /* Hide all large timetables
+             * Clear existing small timetables
+             */
+            $(config.wrapper.data).addClass('hide');
+            $(config.target).html('')
+        }
+    }
+
     /**
      * Timetable
      *
