@@ -5,16 +5,14 @@
 </dl>
 
 <!-- BEGIN timetable -->
-<div class="row" data-timetable-header="{USER_ID}">
+<div class="row hide" data-timetable-wrapper="{USER_ID}">
     <div class="small-12 columns">
         <h1>Timetable for {PERSON}{YEAR}</h1>
     </div>
-</div>
 
-<div class="row">
     <div class="small-12 columns no-pad">
         <div class="overflow show-for-medium-up">
-            <table class="timetable" data-timetable="{USER_ID}">
+            <table class="timetable" data-timetable>
                 <thead>
                     <tr>
                         <th></th>
@@ -62,8 +60,32 @@
 <script type="text/javascript" src="/javascript/shared/jquery.timetable.js"></script>
 <script type="text/javascript">
     $(function() {
-        $('[data-timetable]').timetable({
+
+        /* Show first timetable
+         */
+        var firstTimetable = $('[data-timetable-wrapper]').first();
+        firstTimetable.removeClass('hide');
+        firstTimetable.find('[data-timetable]').timetable({
             target: '[data-smaller]'
+        });
+
+        $('[data-timetable-selector]').click(function(event) {
+            event.preventDefault();
+
+            /* Hide all large timetables
+             * Clear existing small timetables
+             */
+            $('[data-timetable-wrapper]').addClass('hide');
+            $('[data-smaller]').html('')
+
+            /* Show selected large timetable
+             * Show selected small timetable
+             */
+            var selected = $(this).attr('data-timetable-selector');
+
+            $('[data-timetable-wrapper='+selected+']').removeClass('hide').timetable({
+                target: '[data-smaller]'
+            });
         });
     });
 </script>
