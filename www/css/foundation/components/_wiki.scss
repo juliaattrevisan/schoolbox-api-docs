@@ -1,0 +1,12 @@
+/* Wiki styles - make ins/del green/red
+ */
+ins.diffins,
+ins.diffmod {
+    background-color: tint($success-color, 90%);
+    text-decoration: underline;
+}
+del.diffmod,
+del.diffdel {
+    background-color: tint($alert-color, 90%);
+    text-decoration: line-through;
+}
