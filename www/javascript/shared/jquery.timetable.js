@@ -24,6 +24,10 @@
             var defaults = {
                 element: element,
 
+                /* Reforged timetables end up inside this element
+                 */
+                target: '[data-smaller]',
+
                 /* The menu items when you have multiple timetables
                  * to chooze from. A unique identifier, typically a
                  * user id
