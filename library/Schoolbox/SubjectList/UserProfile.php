@@ -116,6 +116,7 @@ class UserProfile extends SubjectListAbstract
                         // (It gets decoded twice in /homepage/index.php)
                         $this->getPage()->setVar(array(
                             'SUBJECT_NAME' => \Scrub::text($currentSubject['categoryName']),
+                            'SUBJECT_CODE' => \Scrub::text($code),
                             'SUBJECT_URL'  => is_array($currentSubject['category'])
                                 && $this->getGroupHandler()->getPermission($currentSubject['category']['id']) >= READ_ACCESS
                                     ? \Scrub::text("/homepage/code/".urlencode(urlencode($currentSubject['category']['code']->getCode())))
