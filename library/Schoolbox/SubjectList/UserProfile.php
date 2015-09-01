@@ -100,10 +100,6 @@ class UserProfile extends SubjectListAbstract
                 }
 
                 $currentSubjectList = $finalSubjectList;
-
-                $listItems = count($currentSubjectList)>1 ? ceil(count($currentSubjectList)/2) : 1;
-                $i = 1;
-
                 if (is_array($currentSubjectList) && count($currentSubjectList)) {
                     foreach ($currentSubjectList as $currentSubject) {
                         $this->getPage()->setVar(array(
@@ -159,21 +155,15 @@ class UserProfile extends SubjectListAbstract
                             'subject_teacher_block' => ''
                         ));
 
-                        /* Distribute half n' half
+                        /* Distribute half n' half no longer
                          */
-                        if ($i % $listItems == 0) {
-                            $this->getPage()->parse('subject_row_block', 'subject_row', true);
+                        $this->getPage()->parse('subject_row_block', 'subject_row', true);
 
-                            /* Clear children after parsing out the parent
-                             */
-                            $this->getPage()->setVar(array(
-                                'subject_item_block' => ''
-                            ));
-
-                            $i = 0;
-                        } else {
-                            $i++;
-                        }
+                        /* Clear children after parsing out the parent
+                         */
+                        $this->getPage()->setVar(array(
+                            'subject_item_block' => ''
+                        ));
                     }
 
                     /* Output email all subject teachers */
