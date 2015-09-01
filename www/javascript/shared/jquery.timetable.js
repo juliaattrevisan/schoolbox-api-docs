@@ -1,5 +1,10 @@
 (function() {
 
+    /**
+     * A facade method for spawning timetables
+     *
+     * @param options
+     */
     $.fn.timetableStart = function(options) {
         options = options || {};
 
@@ -19,12 +24,9 @@
             var defaults = {
                 element: element,
 
-                /* Reforged timetables end up inside this element
-                 */
-                target: '[data-smaller]',
-
                 /* The menu items when you have multiple timetables
-                 * to chooze from
+                 * to chooze from. A unique identifier, typically a
+                 * user id
                  */
                 selectors: {
                     data: '[data-timetable-selector]',
@@ -53,35 +55,6 @@
         }
 
         /**
-         * Assemble the timetable for the selected person
-         */
-        function showSelectedTimetable() {
-
-            /* When selecting a menu item from the person selector
-             */
-            $(config.selectors.data).click(function(event) {
-                event.preventDefault();
-
-                updateMenu($(this));
-
-                /* Show selected large timetable
-                 * Show selected small timetable
-                 */
-                var selected = $(this).attr(config.selectors.attr);
-                var wrapper = $('['+config.wrapper.attr+'='+selected+']');
-                var timetable = wrapper.find(config.timetable);
-
-                wrapper.removeClass('hide').timetable({
-                    target: config.target
-                });
-
-                /* Adjust heights
-                 */
-                timetable.timetableResize();
-            });
-        }
-
-        /**
          * Show first timetable
          */
         function showFirstTimetable() {
@@ -89,13 +62,36 @@
 
             updateMenu(selectedItem);
 
-            var selected = selectedItem.attr(config.selectors.attr);
+            showTimetable(selectedItem.attr(config.selectors.attr));
+        }
+
+        /**
+         * Assemble the timetable for the selected person
+         * Occurs when selecting a menu item from the person selector
+         */
+        function showSelectedTimetable() {
+            $(config.selectors.data).click(function(event) {
+                event.preventDefault();
+
+                updateMenu($(this));
+
+                showTimetable($(this).attr(config.selectors.attr));
+            });
+        }
+
+        /**
+         * Show the timetable associated with the chosen selector
+         *
+         * Show selected large timetable
+         * Show selected small timetable
+         *
+         * @param selected
+         */
+        function showTimetable(selected) {
             var wrapper = $('['+config.wrapper.attr+'='+selected+']');
             var timetable = wrapper.find(config.timetable);
 
-            wrapper.removeClass('hide').timetable({
-                target: config.target
-            });
+            wrapper.removeClass('hide').timetable();
 
             /* Adjust heights
              */
