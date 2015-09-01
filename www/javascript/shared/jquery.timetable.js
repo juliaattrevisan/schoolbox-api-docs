@@ -171,6 +171,12 @@
             var numDays = $(config.element).find('thead th').length;
             var i;
 
+            /* The timetable belongs to this person
+             */
+            var person = config.element.find('data-timetable-title');
+
+            $(config.target).append(person);
+
             /* For every day, assemble a two column timetable
              */
             for (i = 1; i < numDays; i++) {
