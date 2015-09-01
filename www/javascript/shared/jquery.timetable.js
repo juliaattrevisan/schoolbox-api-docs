@@ -89,14 +89,26 @@
 
             updateMenu(selectedItem);
 
-            var firstTimetable = $(config.wrapper.data).first();
-            firstTimetable.removeClass('hide');
+            var selected = selectedItem.attr(config.selectors.attr);
+            var wrapper = $('['+config.wrapper.attr+'='+selected+']');
+            var timetable = wrapper.find(config.timetable);
 
-            firstTimetable.find(config.timetable).timetable({
+            wrapper.removeClass('hide').timetable({
                 target: config.target
             });
 
-            firstTimetable.timetableResize();
+            /* Adjust heights
+             */
+            timetable.timetableResize();
+            
+//            var firstTimetable = $(config.wrapper.data).first();
+//            firstTimetable.removeClass('hide');
+//
+//            firstTimetable.find(config.timetable).timetable({
+//                target: config.target
+//            });
+//
+//            firstTimetable.timetableResize();
         }
 
         /**
