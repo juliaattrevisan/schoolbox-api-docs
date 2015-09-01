@@ -36,18 +36,12 @@ if (is_numeric($this->arg[0])) {
         $this->setBlock('contact_details', 'contact_email', 'contact_email_block');
         $this->setBlock('contact_details', 'contact_mobile', 'contact_mobile_block');
         $this->setBlock('contact_details', 'contact_phone', 'contact_phone_block');
-        $this->setBlock('contact_details', 'contact_email_small', 'contact_email_small_block');
-        $this->setBlock('contact_details', 'contact_mobile_small', 'contact_mobile_small_block');
-        $this->setBlock('contact_details', 'contact_phone_small', 'contact_phone_small_block');
         $this->setBlock('contact_details', 'spouse_details', 'spouse_details_block');
         $this->setBlock('contact_synergy', 'emergency', 'emergency_block');
         $this->setBlock('emergency', 'emergency_contact', 'emergency_contact_block');
         $this->setBlock('spouse_details', 'spouse_email', 'spouse_email_block');
         $this->setBlock('spouse_details', 'spouse_mobile', 'spouse_mobile_block');
         $this->setBlock('spouse_details', 'spouse_phone', 'spouse_phone_block');
-        $this->setBlock('spouse_details', 'spouse_email_small', 'spouse_email_small_block');
-        $this->setBlock('spouse_details', 'spouse_mobile_small', 'spouse_mobile_small_block');
-        $this->setBlock('spouse_details', 'spouse_phone_small', 'spouse_phone_small_block');
         $this->setBlock(TEMPLATE_content, 'medical', 'medical_block');
         $this->setBlock(TEMPLATE_content, 'group', 'group_block');
         $this->setBlock('group', 'group_row', 'group_row_block');
@@ -486,26 +480,20 @@ if (is_numeric($this->arg[0])) {
                                     /* Output each of the block for contact details */
                                     if ($contactEmail) {
                                         $this->parse('contact_email_block', 'contact_email');
-                                        $this->parse('contact_email_small_block', 'contact_email_small');
                                     } else {
                                         $this->setVar('contact_email_block', '');
-                                        $this->setVar('contact_email_small_block', '');
                                     }
 
                                     if ($studentContact['StudentContactMobilePhone']) {
                                         $this->parse('contact_mobile_block', 'contact_mobile');
-                                        $this->parse('contact_mobile_small_block', 'contact_mobile_small');
                                     } else {
                                         $this->setVar('contact_mobile_block', '');
-                                        $this->setVar('contact_mobile_small_block', '');
                                     }
 
                                     if ($studentContact['StudentContactOccupPhone']) {
                                         $this->parse('contact_phone_block', 'contact_phone');
-                                        $this->parse('contact_phone_small_block', 'contact_phone_small');
                                     } else {
                                         $this->setVar('contact_phone_block', '');
-                                        $this->setVar('contact_phone_small_block', '');
                                     }
 
 
@@ -514,26 +502,20 @@ if (is_numeric($this->arg[0])) {
                                         /* Output each of the block for contact details */
                                         if ($spouseEmail) {
                                             $this->parse('spouse_email_block', 'spouse_email');
-                                            $this->parse('spouse_email_small_block', 'spouse_email_small');
                                         } else {
                                             $this->setVar('spouse_email_block', '');
-                                            $this->setVar('spouse_email_small_block', '');
                                         }
 
                                         if ($studentContact['StudentContactSpouseMobilePhone']) {
                                             $this->parse('spouse_mobile_block', 'spouse_mobile');
-                                            $this->parse('spouse_mobile_small_block', 'spouse_mobile_small');
                                         } else {
                                             $this->setVar('spouse_mobile_block', '');
-                                            $this->setVar('spouse_mobile_small_block', '');
                                         }
 
                                         if ($studentContact['StudentContactSpouseOccupPhone']) {
                                             $this->parse('spouse_phone_block', 'spouse_phone');
-                                            $this->parse('spouse_phone_small_block', 'spouse_phone_small');
                                         } else {
                                             $this->setVar('spouse_phone_block', '');
-                                            $this->setVar('spouse_phone_small_block', '');
                                         }
 
 
