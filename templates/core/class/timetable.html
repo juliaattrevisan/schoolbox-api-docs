@@ -65,11 +65,11 @@
 
         /* Show first timetable
          */
-        var firstTimetable = $('[data-timetable-wrapper]').first();
-        firstTimetable.removeClass('hide');
-
         $('[data-timetable-selector]').parent().removeClass('active');
         $('[data-timetable-selector]').first().parent().addClass('active');
+
+        var firstTimetable = $('[data-timetable-wrapper]').first();
+        firstTimetable.removeClass('hide');
 
         firstTimetable.find('[data-timetable]').timetable({
             target: '[data-smaller]'
@@ -94,14 +94,16 @@
              * Show selected small timetable
              */
             var selected = $(this).attr('data-timetable-selector');
+            var wrapper = $('[data-timetable-wrapper='+selected+']');
+            var timetable = wrapper.find('[data-timetable]');
 
-            $('[data-timetable-wrapper='+selected+']').removeClass('hide').timetable({
+            wrapper.removeClass('hide').timetable({
                 target: '[data-smaller]'
             });
 
             /* Adjust heights
              */
-            $('[data-timetable-wrapper='+selected+']').find('[data-timetable]').timetableResize();
+            timetable.timetableResize();
         });
     });
 </script>
