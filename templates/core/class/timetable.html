@@ -65,12 +65,22 @@
          */
         var firstTimetable = $('[data-timetable-wrapper]').first();
         firstTimetable.removeClass('hide');
+
+        $('[data-timetable-selector]').parent().removeClass('active');
+        $('[data-timetable-selector]').first().parent().addClass('active');
+
         firstTimetable.find('[data-timetable]').timetable({
             target: '[data-smaller]'
         });
 
         $('[data-timetable-selector]').click(function(event) {
             event.preventDefault();
+
+            /* Unselect all menu items
+             * Reselect this one
+             */
+            $('[data-timetable-selector]').parent().removeClass('active');
+            $(this).parent().addClass('active');
 
             /* Hide all large timetables
              * Clear existing small timetables
