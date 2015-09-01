@@ -149,24 +149,33 @@
          * resizing process takes a little while
          */
         function setup() {
-            $(window).resize(function() {
-                if (this.resizeTimeout) {
-                    clearTimeout(this.resizeTimeout);
-                }
-
-                this.resizeTimeout = setTimeout(function () {
-                    $(this).trigger('resizeEnd');
-                }, 500);
-            });
-
-            /* Wait till resizing actually stops before resizing everything
+            /* Run it once to start with
              */
-            $(window).bind('resizeEnd', function() {
-                $.fn.timetableResize({
-                    timetable: config.timetable,
-                    subject: config.subject
-                });
+            $.fn.timetableResize({
+                timetable: config.timetable,
+                subject: config.subject
             });
+
+//            /* Set up event listener for resizeEnd
+//             */
+//            $(window).resize(function() {
+//                if (this.resizeTimeout) {
+//                    clearTimeout(this.resizeTimeout);
+//                }
+//
+//                this.resizeTimeout = setTimeout(function () {
+//                    $(this).trigger('resizeEnd');
+//                }, 1000);
+//            });
+//
+//            /* Wait till resizing actually stops before resizing everything
+//             */
+//            $(window).bind('resizeEnd', function() {
+//                $.fn.timetableResize({
+//                    timetable: config.timetable,
+//                    subject: config.subject
+//                });
+//            });
         }
     }
 

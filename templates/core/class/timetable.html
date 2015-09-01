@@ -12,7 +12,7 @@
 
     <div class="small-12 columns no-pad">
         <div class="overflow show-for-medium-up">
-            <table class="timetable" data-timetable>
+            <table class="timetable" data-timetable="{USER_ID}">
                 <thead>
                     <tr>
                         <th></th>
@@ -98,10 +98,12 @@
             $('[data-timetable-wrapper='+selected+']').removeClass('hide').timetable({
                 target: '[data-smaller]'
             });
-        });
 
-        /* Adjust heights
-         */
-        $.fn.timetableSetupResize();
+            /* Adjust heights
+             */
+            $.fn.timetableResize({
+                timetable: $('[data-timetable-wrapper='+selected+']').find('[data-timetable]')
+            });
+        });
     });
 </script>
