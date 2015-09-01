@@ -1,5 +1,11 @@
+<dl class="sub-nav">
+    <!-- BEGIN timetable_selector -->
+    <dd><a data-timetable-selector="{USER_ID}">{PERSON}</a></dd>
+    <!-- END timetable_selector -->
+</dl>
+
 <!-- BEGIN timetable -->
-<div class="row">
+<div class="row" data-timetable-header="{USER_ID}">
     <div class="small-12 columns">
         <h1>Timetable for {PERSON}{YEAR}</h1>
     </div>
@@ -8,42 +14,42 @@
 <div class="row">
     <div class="small-12 columns no-pad">
         <div class="overflow show-for-medium-up">
-            <table class="timetable" data-timetable>
+            <table class="timetable" data-timetable="{USER_ID}">
                 <thead>
-                <tr>
-                    <th></th>
-                    <!-- BEGIN day_header -->
-                    <th class="{TIMETABLE_CLASS}" style="width:{TIMETABLE_FIELD_WIDTH}%;">{DAY_NAME}</th>
-                    <!-- END day_header -->
-                </tr>
+                    <tr>
+                        <th></th>
+                        <!-- BEGIN day_header -->
+                        <th class="{TIMETABLE_CLASS}" style="width:{TIMETABLE_FIELD_WIDTH}%;">{DAY_NAME}</th>
+                        <!-- END day_header -->
+                    </tr>
                 </thead>
                 <tbody>
-                <!-- BEGIN period -->
-                <tr>
-                    <th class="{PERIOD_CLASS}">
-                        {PERIOD_NAME}
-                        <time class="meta">{PERIOD_START}&ndash;{PERIOD_END}</time>
-                    </th>
-                    <!-- BEGIN day -->
-                    <td class="{TIMETABLE_CLASS}">
-                        <!-- BEGIN period_class_link -->
-                        <a href="{PERIOD_URL}" style="background-color: {PERIOD_COLOUR};">
-                            {PERIOD_DESC}
-                            <p class="meta">{PERIOD_CODE}</p>
-                            <p class="meta">{PERIOD_ROOM} {PERIOD_STAFF}</p>
-                        </a>
-                        <!-- END period_class_link -->
-                        <!-- BEGIN period_class -->
-                        <div class='timetable-subject' style="background-color: {PERIOD_COLOUR};">
-                            {PERIOD_DESC}
-                            <p class="meta">{PERIOD_CODE}</p>
-                            <p class="meta">{PERIOD_ROOM} {PERIOD_STAFF}</p>
-                        </div>
-                        <!-- END period_class -->
-                    </td>
-                    <!-- END day -->
-                </tr>
-                <!-- END period -->
+                    <!-- BEGIN period -->
+                    <tr>
+                        <th class="{PERIOD_CLASS}">
+                            {PERIOD_NAME}
+                            <time class="meta">{PERIOD_START}&ndash;{PERIOD_END}</time>
+                        </th>
+                        <!-- BEGIN day -->
+                        <td class="{TIMETABLE_CLASS}">
+                            <!-- BEGIN period_class_link -->
+                            <a href="{PERIOD_URL}" style="background-color: {PERIOD_COLOUR};">
+                                {PERIOD_DESC}
+                                <p class="meta">{PERIOD_CODE}</p>
+                                <p class="meta">{PERIOD_ROOM} {PERIOD_STAFF}</p>
+                            </a>
+                            <!-- END period_class_link -->
+                            <!-- BEGIN period_class -->
+                            <div class='timetable-subject' style="background-color: {PERIOD_COLOUR};">
+                                {PERIOD_DESC}
+                                <p class="meta">{PERIOD_CODE}</p>
+                                <p class="meta">{PERIOD_ROOM} {PERIOD_STAFF}</p>
+                            </div>
+                            <!-- END period_class -->
+                        </td>
+                        <!-- END day -->
+                    </tr>
+                    <!-- END period -->
                 </tbody>
             </table>
         </div>

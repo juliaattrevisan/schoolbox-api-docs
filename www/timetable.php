@@ -26,6 +26,7 @@ $this->setTitle('Timetable');
 $this->setTab('timetable');
 
 $this->setBlock(TEMPLATE_content, "timetable", "timetable_listing");
+$this->setBlock(TEMPLATE_content, 'timetable_selector', 'timetable_selector_block');
 $this->setBlock("timetable", "period", "period_listing");
 $this->setBlock("period", "day", "day_listing");
 $this->setBlock('day', 'period_class', 'period_class_block');
@@ -111,8 +112,11 @@ if (is_array($outputList)) {
         $outputUser = array(
             'PERSON' => $userHandler->formatName($user),
             'YEAR'   => $user['year'] ? ', Year ' . $user['year'] : '',
+            'USER_ID' => $user['uid'],
         );
+
         $this->setVar($outputUser);
+        $this->parse('timetable_selector_block', 'timetable_selector', true);
 
         $staffFlag = $groupHandler->isStaff($user['uid']);
 
