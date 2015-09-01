@@ -127,6 +127,26 @@ if ($this->arg[0] == 'revision') {
     if ($permission >= READ_ACCESS) {
         $this->parse('export_link_block', 'export_link');
     }
+
+    $slug  = Scrub::text($wiki['slug']);
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Wiki',
+            'href' => "/wiki/{$folder->getId()}/$slug",
+            'class' => '',
+        ],
+        [
+            'text' => 'View Revisions',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }
 /* Load an existing wiki by its category id and slug
  */
