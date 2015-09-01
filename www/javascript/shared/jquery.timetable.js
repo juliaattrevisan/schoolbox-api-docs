@@ -88,8 +88,6 @@
             var selectedItem = $(config.selectors.data).first();
 
             updateMenu(selectedItem);
-//            $(config.selectors.data).parent().removeClass('active');
-//            $(config.selectors.data).first().parent().addClass('active');
 
             var firstTimetable = $(config.wrapper.data).first();
             firstTimetable.removeClass('hide');
