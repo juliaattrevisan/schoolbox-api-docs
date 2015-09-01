@@ -62,7 +62,7 @@
             $(config.selectors.data).click(function(event) {
                 event.preventDefault();
 
-                updateMenu();
+                updateMenu($(this));
 
                 /* Show selected large timetable
                  * Show selected small timetable
@@ -85,8 +85,11 @@
          * Show first timetable
          */
         function showFirstTimetable() {
-            $(config.selectors.data).parent().removeClass('active');
-            $(config.selectors.data).first().parent().addClass('active');
+            var selectedItem = $(config.selectors.data).first();
+
+            updateMenu(selectedItem);
+//            $(config.selectors.data).parent().removeClass('active');
+//            $(config.selectors.data).first().parent().addClass('active');
 
             var firstTimetable = $(config.wrapper.data).first();
             firstTimetable.removeClass('hide');
@@ -101,13 +104,13 @@
         /**
          * Update person selector
          */
-        function updateMenu() {
+        function updateMenu(selectedItem) {
 
             /* Unselect all menu items
              * Reselect this one
              */
             $(config.selectors.data).parent().removeClass('active');
-            $(this).parent().addClass('active');
+            $(selectedItem).parent().addClass('active');
 
             /* Hide all large timetables
              * Clear existing small timetables
