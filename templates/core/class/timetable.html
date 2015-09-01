@@ -31,14 +31,16 @@
                         <!-- BEGIN day -->
                         <td class="{TIMETABLE_CLASS}">
                             <!-- BEGIN period_class_link -->
-                            <a class='timetable-subject' href="{PERIOD_URL}" style="background-color: {PERIOD_COLOUR};">
-                                {PERIOD_DESC}
-                                <p class="meta">{PERIOD_CODE}</p>
-                                <p class="meta">{PERIOD_ROOM} {PERIOD_STAFF}</p>
-                            </a>
+                            <div class='timetable-subject' style="background-color: {PERIOD_COLOUR};" data-timetable-subject>
+                                <a href="{PERIOD_URL}">
+                                    {PERIOD_DESC}
+                                    <p class="meta">{PERIOD_CODE}</p>
+                                    <p class="meta">{PERIOD_ROOM} {PERIOD_STAFF}</p>
+                                </a>
+                            </div>
                             <!-- END period_class_link -->
                             <!-- BEGIN period_class -->
-                            <div class='timetable-subject' style="background-color: {PERIOD_COLOUR};">
+                            <div class='timetable-subject' style="background-color: {PERIOD_COLOUR};" data-timetable-subject>
                                 {PERIOD_DESC}
                                 <p class="meta">{PERIOD_CODE}</p>
                                 <p class="meta">{PERIOD_ROOM} {PERIOD_STAFF}</p>
@@ -71,6 +73,18 @@
 
         firstTimetable.find('[data-timetable]').timetable({
             target: '[data-smaller]'
+        });
+
+        /* Adjust heights
+         */
+        $.each(firstTimetable.find('td'), function(index, element) {
+            var count = $(element).find('[data-timetable-subject]').length;
+
+            if (count == 1) {
+                $(element).css({
+                    height:'100%'
+                });
+            }
         });
 
         $('[data-timetable-selector]').click(function(event) {
