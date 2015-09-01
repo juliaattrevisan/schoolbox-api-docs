@@ -3,13 +3,30 @@
         border: 1px solid $smoke;
     }
 
+    /* Remove padding on cells containing classes
+     */
+    td {
+        padding: 0px;
+    }
+
+    /* For subtext under period names to sit correctly
+     * on all size displays
+     */
     time {
         clear: both;
         display: block;
         font-weight: normal;
     }
+
+    /* For coloured blocks
+     */
+    .timetable-subject {
+        padding: 1rem;
+    }
 }
 
+/* Fifty-fifty split on small devices
+ */
 .timetable-small {
     th, th {
         width: 50%;
