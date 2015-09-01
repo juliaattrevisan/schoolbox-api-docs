@@ -647,6 +647,15 @@ $rotate-th-width: $square-grid-td-size;
 	margin-bottom: rem-calc(($base-font-size));
 }
 
+%content {
+	@media #{$small-up} {
+		padding: rem-calc(($base-font-size - 4));
+	}
+	@media #{$large-up} {
+		padding: rem-calc(($base-font-size));
+	}
+}
+
 // White Islands - Custom 'Island' Columns
 .island {
   	@include grid-column();
@@ -658,12 +667,7 @@ $rotate-th-width: $square-grid-td-size;
 		@extend %container;
 	}
 	.content{
-		@media #{$small-up} {
-			padding: rem-calc(($base-font-size - 4));
-		}
-		@media #{$large-up} {
-			padding: rem-calc(($base-font-size));
-		}
+		@extend %content;
 	}
 }
 
@@ -1470,6 +1474,13 @@ tr:hover{
 .minw-3  { min-width: 3rem; }
 .minw-4  { min-width: 4rem; }
 
+.three-panels {
+	.property-panel {
+		.information-list > li {
+			@extend %content;
+		}
+	}
+}
 
 .progress-tick {
     width: 32px; // 2rem
