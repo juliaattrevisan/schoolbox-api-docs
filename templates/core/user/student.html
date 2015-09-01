@@ -252,24 +252,18 @@
                                 <nav>
                                     <a class="icon-next" href="/search/user/{CONTACT_ID}" title="View {CONTACT_NAME}'s Profile"></a>
                                     <a href="#" class="icon-more" data-dropdown="row-options-contact-{CONTACT_ID}"></a>
-                                    <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{CONTACT_ID}">
-                                        <!-- BEGIN contact_email -->
-                                        <li class="full-width">
-                                            <a class="icon-email" href="{CONTACT_EMAIL_HREF}">{CONTACT_EMAIL}</a>
-                                        </li>
-                                        <!-- END contact_email -->
-                                        <!-- BEGIN contact_mobile -->
-                                        <li class="full-width">
-                                            <a class="icon-mobile" href="tel:{CONTACT_MOBILE_PHONE}">{CONTACT_MOBILE_PHONE}</a>
-                                        </li>
-                                        <!-- END contact_mobile -->
-                                        <!-- BEGIN contact_phone -->
-                                        <li class="full-width">
-                                            <a class="icon-mobile" href="tel:{CONTACT_OCCUP_PHONE}">{CONTACT_OCCUP_PHONE}</a>
-                                        </li>
-                                        <!-- END contact_phone -->
-                                    </ul>
                                 </nav>
+                                <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{CONTACT_ID}">
+                                    <!-- BEGIN contact_email -->
+                                    <li><a class="icon-email" href="{CONTACT_EMAIL_HREF}">{CONTACT_EMAIL}</a></li>
+                                    <!-- END contact_email -->
+                                    <!-- BEGIN contact_mobile -->
+                                    <li><a class="icon-mobile" href="tel:{CONTACT_MOBILE_PHONE}">{CONTACT_MOBILE_PHONE}</a></li>
+                                    <!-- END contact_mobile -->
+                                    <!-- BEGIN contact_phone -->
+                                    <li><a class="icon-mobile" href="tel:{CONTACT_OCCUP_PHONE}">{CONTACT_OCCUP_PHONE}</a></li>
+                                    <!-- END contact_phone -->
+                                </ul>
                             </li>
 
                             <!-- BEGIN spouse_details -->
@@ -286,24 +280,18 @@
                                 <nav>
                                     <a class="icon-next" href="/search/user/{SPOUSE_ID}" title="View {SPOUSE_NAME}'s Profile"></a>
                                     <a href="#" class="icon-more" data-dropdown="row-options-spouse-{SPOUSE_ID}"></a>
-                                    <ul class="f-dropdown" data-dropdown-content id="row-options-spouse-{SPOUSE_ID}">
-                                        <!-- BEGIN spouse_email -->
-                                        <li class="full-width">
-                                            <a class="icon-email" href="{SPOUSE_EMAIL_HREF}">{SPOUSE_EMAIL}</a>
-                                        </li>
-                                        <!-- END spouse_email -->
-                                        <!-- BEGIN spouse_mobile -->
-                                        <li class="full-width">
-                                            <a class="icon-mobile" href="tel:{SPOUSE_MOBILE_PHONE}">{SPOUSE_MOBILE_PHONE}</a>
-                                        </li>
-                                        <!-- END spouse_mobile -->
-                                        <!-- BEGIN spouse_phone -->
-                                        <li class="full-width">
-                                            <a class="icon-mobile" href="tel:{SPOUSE_OCCUP_PHONE}">{SPOUSE_OCCUP_PHONE}</a>
-                                        </li>
-                                        <!-- END spouse_phone -->
-                                    </ul>
                                 </nav>
+                                <ul class="f-dropdown" data-dropdown-content id="row-options-spouse-{SPOUSE_ID}">
+                                    <!-- BEGIN spouse_email -->
+                                    <li><a class="icon-email" href="{SPOUSE_EMAIL_HREF}">{SPOUSE_EMAIL}</a></li>
+                                    <!-- END spouse_email -->
+                                    <!-- BEGIN spouse_mobile -->
+                                    <li><a class="icon-mobile" href="tel:{SPOUSE_MOBILE_PHONE}">{SPOUSE_MOBILE_PHONE}</a></li>
+                                    <!-- END spouse_mobile -->
+                                    <!-- BEGIN spouse_phone -->
+                                    <li><a class="icon-mobile" href="tel:{SPOUSE_OCCUP_PHONE}">{SPOUSE_OCCUP_PHONE}</a></li>
+                                    <!-- END spouse_phone -->
+                                </ul>
                             </li>
                             <!-- END spouse_details -->
 
