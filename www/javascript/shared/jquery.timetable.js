@@ -225,8 +225,6 @@
                  */
                 $(config.target).append(island);
             }
-
-            $(config.target).append('<hr />');
         }
 
         /**
