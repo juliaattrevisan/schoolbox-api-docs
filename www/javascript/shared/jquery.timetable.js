@@ -105,6 +105,72 @@
     }
 
     /**
+     * Set up timetable subject resizer
+     */
+    $.fn.timetableSetupResize = function(options) {
+        options = options || {};
+
+        var config = init(options, $(this));
+
+        setup();
+
+        /**
+         * Init
+         *
+         * @param options
+         * @param element
+         * @returns {*}
+         */
+        function init(options, element) {
+            var defaults = {
+                element: element,
+
+                /* A timetable table element
+                 */
+                timetable: '[data-timetable]',
+
+                /* Subject elements
+                 */
+                subject: '[data-timetable-subject]'
+            }
+
+            var derived = {
+            }
+
+            var merged = $.extend(defaults, derived, options);
+
+            return merged;
+        }
+
+        /**
+         * Set up event listeners
+         *
+         * Wait till resizing actually stops before resizing everything as the
+         * resizing process takes a little while
+         */
+        function setup() {
+            $(window).resize(function() {
+                if (this.resizeTimeout) {
+                    clearTimeout(this.resizeTimeout);
+                }
+
+                this.resizeTimeout = setTimeout(function () {
+                    $(this).trigger('resizeEnd');
+                }, 500);
+            });
+
+            /* Wait till resizing actually stops before resizing everything
+             */
+            $(window).bind('resizeEnd', function() {
+                $.fn.timetableResize({
+                    timetable: config.timetable,
+                    subject: config.subject
+                });
+            });
+        }
+    }
+
+    /**
      * Resize all subject elements in a particular timetable
      *
      * @param options

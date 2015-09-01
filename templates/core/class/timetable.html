@@ -75,10 +75,6 @@
             target: '[data-smaller]'
         });
 
-        /* Adjust heights
-         */
-        $.fn.timetableResize();
-
         $('[data-timetable-selector]').click(function(event) {
             event.preventDefault();
 
@@ -103,5 +99,9 @@
                 target: '[data-smaller]'
             });
         });
+
+        /* Adjust heights
+         */
+        $.fn.timetableSetupResize();
     });
 </script>
