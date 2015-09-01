@@ -141,7 +141,7 @@ then
 			echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Creating data directory for rsync backup" >> $logfile;
 			mkdir -vp $targetdir/data >> $logfile 2>&1;
 			echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup via rsync" >> $logfile;
-			nice rsync -rt --exclude-".*" --exclude=*:* --exclude=*.lock --exclude=*_lock* --exclude=cache/zip/* --exclude=cache/submission_upload/* --exclude=cache/stream/* --delete-after `readlink -f $data_dir`/ $targetdir/data/ >> $logfile 2>&1;
+			nice rsync -rt --exclude=".*" --exclude=*:* --exclude=*.lock --exclude=*_lock* --exclude=cache/zip/* --exclude=cache/submission_upload/* --exclude=cache/stream/* --delete-after `readlink -f $data_dir`/ $targetdir/data/ >> $logfile 2>&1;
 			if [ $? -ne 0 ];
 			then
 				echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Rsync run had errors, umounting share for safety" >> $logfile;
