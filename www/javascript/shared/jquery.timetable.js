@@ -100,15 +100,6 @@
             /* Adjust heights
              */
             timetable.timetableResize();
-            
-//            var firstTimetable = $(config.wrapper.data).first();
-//            firstTimetable.removeClass('hide');
-//
-//            firstTimetable.find(config.timetable).timetable({
-//                target: config.target
-//            });
-//
-//            firstTimetable.timetableResize();
         }
 
         /**
