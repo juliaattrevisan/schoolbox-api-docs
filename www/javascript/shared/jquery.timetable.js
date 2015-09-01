@@ -103,4 +103,85 @@
             return $(config.element).find('thead tr:first() th:nth-child('+column+')').first();
         }
     }
+
+    /**
+     * Resize all subject elements in a particular timetable
+     *
+     * @param options
+     */
+    $.fn.timetableResize = function(options) {
+        options = options || {};
+
+        var config = init(options, $(this));
+
+        resize();
+
+        /**
+         * Init
+         *
+         * @param options
+         * @param element
+         * @returns {*}
+         */
+        function init(options, element) {
+            var defaults = {
+                element: element,
+
+                /* A timetable table element
+                 */
+                timetable: '[data-timetable]',
+
+                /* Subject elements
+                 */
+                subject: '[data-timetable-subject]'
+            }
+
+            var derived = {
+            }
+
+            var merged = $.extend(defaults, derived, options);
+
+            return merged;
+        }
+
+        /**
+         * Resize all subject elements
+         */
+        function resize() {
+            $.each($(config.timetable).find('tr'), function(index, row) {
+                var rowHeight = $(row).height();
+
+                $.each($(row).find('td'), function(index, cell) {
+                    var allSubjects = $(cell).find(config.subject);
+
+                    /* Only one subject - make it fill available space
+                     */
+                    if (allSubjects.length == 1) {
+                        allSubjects.css({
+                            height: rowHeight + 'px'
+                        });
+                    }
+                    /* Distribute difference equally
+                     */
+                    else {
+                        var subjectHeight = 0;
+
+                        $.each(allSubjects, function(index, subject) {
+                            subjectHeight += $(subject).height();
+                        });
+
+                        /* How much to add per subject
+                         */
+                        var diff = (rowHeight - subjectHeight)/allSubjects.length;
+
+                        $.each(allSubjects, function(index, subject) {
+                            $(subject).css({
+                                height: $(subject).height() + diff + 'px'
+                            });
+                        });
+                    }
+                });
+            });
+        }
+    }
 }(jQuery));
