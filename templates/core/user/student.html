@@ -120,11 +120,11 @@
         <div class="row">
             <div class="small-12 island">
                 <h2 class="subheader">{SUBJECT_CLASSTYPE}</h2>
+                <!-- BEGIN subject_row -->
+                <!-- BEGIN subject_item -->
                 <section>
                     <div class="content">
                         <ul class="subject-list">
-                        <!-- BEGIN subject_row -->
-                            <!-- BEGIN subject_item -->
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="avatar-card">
@@ -154,19 +154,23 @@
                                 </nav>
                             </li>
                             <!-- END subject_teacher -->
-                            <!-- END subject_item -->
-                        <!-- END subject_row -->
                         </ul>
-
-                        <!-- BEGIN subject_mail -->
-                        <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
-                            <input type="hidden" name="replyto" value="{REPLYTO}"/>
-                            <input type="hidden" name="bcc" value="{EMAILALL}"/>
-                            <input type="submit" value="Email All" class="icon-email" />
-                        </form>
-                        <!-- END subject_mail -->
                     </div>
                 </section>
+                <!-- END subject_item -->
+                <!-- END subject_row -->
+
+                <!-- BEGIN subject_mail -->
+                <form action="/mail/createMail.php" method="post">
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <input type="hidden" name="replyto" value="{REPLYTO}"/>
+                            <input type="hidden" name="bcc" value="{EMAILALL}"/>
+                            <input type="submit" value="Email All {SUBJECT_CLASSTYPE} Teachers" />
+                        </div>
+                    </div>
+                </form>
+                <!-- END subject_mail -->
             </div>
         </div>
         <!-- END subject -->
@@ -175,11 +179,11 @@
         <div class="row">
             <div class="small-12 island">
                 <h2 class="subheader">Groups</h2>
+                <!-- BEGIN group_row -->
+                <!-- BEGIN group_item -->
                 <section>
                     <div class="content">
-                        <!-- BEGIN group_row -->
                         <ul class="subject-list">
-                            <!-- BEGIN group_item -->
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="avatar-card">
@@ -209,11 +213,11 @@
                                 </nav>
                             </li>
                             <!-- END group_teacher -->
-                            <!-- END group_item -->
                         </ul>
-                        <!-- END group_row -->
                     </div>
                 </section>
+                <!-- END group_item -->
+                <!-- END group_row -->
             </div>
         </div>
         <!-- END group -->
