@@ -13,6 +13,18 @@
         showFirstTimetable();
         showSelectedTimetable();
 
+        /* Set up event listener for resizeEnd
+         */
+        $(window).resize(function() {
+            if (this.resizeTimeout) {
+                clearTimeout(this.resizeTimeout);
+            }
+
+            this.resizeTimeout = setTimeout(function () {
+                $(this).trigger('resizeEnd');
+            }, 400);
+        });
+
         /**
          * Init
          *
@@ -100,6 +112,13 @@
             /* Adjust heights
              */
             timetable.timetableResize();
+
+            /* Wait till resizing actually stops before resizing everything
+             */
+            $(window).bind('resizeEnd', function() {
+                timetable.timetableResize();
+                console.log('test');
+            });
         }
 
         /**
@@ -231,81 +250,6 @@
         }
     }
 
-//    /**
-//     * Set up timetable subject resizer
-//     */
-//    $.fn.timetableSetupResize = function(options) {
-//        options = options || {};
-//
-//        var config = init(options, $(this));
-//
-//        setup();
-//
-//        /**
-//         * Init
-//         *
-//         * @param options
-//         * @param element
-//         * @returns {*}
-//         */
-//        function init(options, element) {
-//            var defaults = {
-//                element: element,
-//
-//                /* A timetable table element
-//                 */
-//                timetable: '[data-timetable]',
-//
-//                /* Subject elements
-//                 */
-//                subject: '[data-timetable-subject]'
-//            }
-//
-//            var derived = {
-//            }
-//
-//            var merged = $.extend(defaults, derived, options);
-//
-//            return merged;
-//        }
-//
-//        /**
-//         * Set up event listeners
-//         *
-//         * Wait till resizing actually stops before resizing everything as the
-//         * resizing process takes a little while
-//         */
-//        function setup() {
-//            /* Run it once to start with
-//             */
-//            $.fn.timetableResize({
-//                timetable: config.timetable,
-//                subject: config.subject
-//            });
-//
-//            /* Set up event listener for resizeEnd
-//             */
-//            $(window).resize(function() {
-//                if (this.resizeTimeout) {
-//                    clearTimeout(this.resizeTimeout);
-//                }
-//
-//                this.resizeTimeout = setTimeout(function () {
-//                    $(this).trigger('resizeEnd');
-//                }, 1000);
-//            });
-//
-//            /* Wait till resizing actually stops before resizing everything
-//             */
-//            $(window).bind('resizeEnd', function() {
-//                $.fn.timetableResize({
-//                    timetable: config.timetable,
-//                    subject: config.subject
-//                });
-//            });
-//        }
-//    }
-
     /**
      * Resize all subject elements in a particular timetable
      *
@@ -351,6 +295,8 @@
         function resize() {
             $.each($(config.element).find('tr'), function(index, row) {
                 var rowHeight = $(row).height();
+
+                console.log(rowHeight);
 
                 $.each($(row).find('td'), function(index, cell) {
                     var allSubjects = $(cell).find(config.subject);
