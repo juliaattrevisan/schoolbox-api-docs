@@ -77,14 +77,39 @@
 
         /* Adjust heights
          */
-        $.each(firstTimetable.find('td'), function(index, element) {
-            var count = $(element).find('[data-timetable-subject]').length;
+        $.each(firstTimetable.find('tr'), function(index, row) {
+            var rowHeight = $(row).height();
 
-            if (count == 1) {
-                $(element).css({
-                    height:'100%'
-                });
-            }
+            $.each($(row).find('td'), function(index, cell) {
+                var allSubjects = $(cell).find('[data-timetable-subject]');
+
+                /* Only one subject - make it fill available space
+                 */
+                if (allSubjects.length == 1) {
+                    allSubjects.css({
+                        height: rowHeight + 'px'
+                    });
+                }
+                /* Distribute difference equally
+                 */
+                else {
+                    var subjectHeight = 0;
+
+                    $.each(allSubjects, function(index, subject) {
+                        subjectHeight += $(subject).height();
+                    });
+
+                    /* How much to add per subject
+                     */
+                    var diff = (rowHeight - subjectHeight)/allSubjects.length;
+
+                    $.each(allSubjects, function(index, subject) {
+                        $(subject).css({
+                            height: $(subject).height() + diff + 'px'
+                        });
+                    });
+                }
+            });
         });
 
         $('[data-timetable-selector]').click(function(event) {
