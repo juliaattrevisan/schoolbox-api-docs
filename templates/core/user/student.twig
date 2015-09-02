@@ -32,57 +32,41 @@
                                 <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
                             </dd>
 
-                            <!-- BEGIN student_synergy_form -->
                             <dt class="no-margin small-6 medium-3">Student ID:</dt>
-                            <dd class="no-margin small-6 medium-9">{SYNERGY_ID}</dd>
+                            <dd class="no-margin small-6 medium-9">{{ user.getExternalId() }}</dd>
 
                             <dt class="no-margin small-6 medium-3">Date of Birth:</dt>
-                            <dd class="no-margin small-6 medium-9">{BIRTHDATE}</dd>
+                            <dd class="no-margin small-6 medium-9">{{ externalUser.StudentBirthDate }}</dd>
 
+                            {# This can be a separate external user #}
                             <dt class="no-margin small-6 medium-3">Class Teacher:</dt>
                             <dd class="no-margin small-6 medium-9">{FORM_STAFF}</dd>
 
                             <dt class="no-margin small-6 medium-3">Year Level:</dt>
-                            <dd class="no-margin small-6 medium-9">{YEAR_LEVEL}</dd>
+                            <dd class="no-margin small-6 medium-9">{{ externalUser.StudentYearLevel }}</dd>
 
-                            <dt class="no-margin small-6 medium-3">House:</dt>
-                            <dd class="no-margin small-6 medium-9">{HOUSE}</dd>
-
-                            <dt class="no-margin small-6 medium-3">Class:</dt>
-                            <dd class="no-margin small-6 medium-9">{FORM}</dd>
-
-                            <dt class="no-margin small-6 medium-3">Student Type:</dt>
-                            <dd class="no-margin small-6 medium-9">{STUDENT_TYPE}</dd>
-                            <!-- END student_synergy_form -->
-
-                            <!-- BEGIN student_synergy_tutor -->
-                            <dt class="no-margin small-6 medium-3">Student ID:</dt>
-                            <dd class="no-margin small-6 medium-9">{SYNERGY_ID}</dd>
-
-                            <dt class="no-margin small-6 medium-3">Date of Birth:</dt>
-                            <dd class="no-margin small-6 medium-9">{BIRTHDATE}</dd>
-
-                            <dt class="no-margin small-6 medium-3">Class Teacher:</dt>
-                            <dd class="no-margin small-6 medium-9">{FORM_STAFF}</dd>
-
+                            {% if externalUser.StudentForm|trim %}
                             <dt class="no-margin small-6 medium-3">Tutor:</dt>
                             <dd class="no-margin small-6 medium-9">{TUTOR}</dd>
-
-                            <dt class="no-margin small-6 medium-3">Year Level:</dt>
-                            <dd class="no-margin small-6 medium-9">{YEAR_LEVEL}</dd>
+                            {% endif %}
 
                             <dt class="no-margin small-6 medium-3">House:</dt>
-                            <dd class="no-margin small-6 medium-9">{HOUSE}</dd>
+                            <dd class="no-margin small-6 medium-9">{{ externalUser.StudentHouseDescription }}</dd>
 
+                            {% if externalUser.StudentForm|trim %}
                             <dt class="no-margin small-6 medium-3">Tutor Group:</dt>
-                            <dd class="no-margin small-6 medium-9">{TUTOR_GROUP}</dd>
+                            <dd class="no-margin small-6 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
 
                             <dt class="no-margin small-6 medium-3">Head of House:</dt>
                             <dd class="no-margin small-6 medium-9">{HOH}</dd>
 
+                            {% else %}
+                            <dt class="no-margin small-6 medium-3">Class:</dt>
+                            <dd class="no-margin small-6 medium-9">{{ externalUser.StudentForm }}</dd>
+                            {% endif %}
+
                             <dt class="no-margin small-6 medium-3">Student Type:</dt>
                             <dd class="no-margin small-6 medium-9">{STUDENT_TYPE}</dd>
-                            <!-- END student_synergy_tutor -->
                         </dl>
                     </div>
                 </div>
