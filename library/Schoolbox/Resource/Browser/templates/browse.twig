@@ -4,19 +4,12 @@
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <style type="text/css">
     /* STYLES I NEED */
-    #file-list li {
-        line-height: 32px;
-        background-position: 0 4px;
-        background-repeat: no-repeat;
-    }
-    }
+
     .jstree-default .jstree-node {
         min-height: 32px;
         line-height: 32px;
     }
-    #file-list li a {
-        margin-left: 24px;
-    }
+
     .row > div.columns:not(:last-of-type) {
         border-right: solid 1px #eee;
     }
@@ -52,11 +45,20 @@
         content: "Loading...";
         z-index: 1;
     }
-    .p128 {
-        display: block;
-        min-height: 128px;
+
+    #file-list {
+        margin: 0;
     }
-    #file-list a {
+    #file-list li {
+        line-height: 2rem;
+        background-position: 0.375rem 0.75rem;
+        background-repeat: no-repeat;
+        border-radius: 0;
+        box-shadow: none;
+     }
+    #file-list li a {
+        margin-left: 2rem;
+        padding: 0.5rem;
         overflow-x: hidden;
         display: block;
         white-space: nowrap;
@@ -86,13 +88,9 @@
     }
     .jstree-default .selected {
         background: #beebff;
-        border-radius: 2px;
-        box-shadow: inset 0 0 1px #999;
     }
     #file-list.jstree-default li:hover {
         background-color: #ffffe5;
-        border-radius: 2px;
-        box-shadow: inset 0 0 1px #ccc;
     }
 
     .folder-panel .icon-folder:before {
@@ -368,7 +366,7 @@
     </div>
     <div class="small-12 large-5 xxlarge-4 island file-panel">
         {#<h2 class="subheader">Files</h2>#}
-        <section class="content">
+        <section>
             <!--
             <form class="dropzone" action="/cms/fileForm.php?ajax=1" id="drop-center" method="post" >
                 <div class="dz-default dz-message">
