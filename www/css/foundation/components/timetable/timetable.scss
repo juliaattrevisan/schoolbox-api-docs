@@ -17,11 +17,6 @@
      */
     td {
         padding: 0px;
-
-        &.timetable-subject-active {
-            padding: 6px;
-            background-color: #ffd100;
-        }
     }
 
     /* For subtext under period names to sit correctly
@@ -38,6 +33,11 @@
     .timetable-subject {
         padding: 1rem;
     }
+}
+
+.timetable-subject-active {
+    border: 6px solid #ffd100;
+    box-sizing: border-box;
 }
 
 /* Fifty-fifty split on small devices
