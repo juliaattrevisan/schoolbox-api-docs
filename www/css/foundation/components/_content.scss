@@ -1013,6 +1013,67 @@ nav {
 
 
 
+@mixin hide-n($size, $media-down, $media-up, $count: $total-columns) {
+	@for $i from 1 through $count {
+		&.#{$size}-#{$i} {
+			> li {
+
+				@media #{$media-down} {
+					&:nth-child(n+#{$i + 1}) {
+						@content;
+					}
+				}
+
+				@media #{$media-up} {
+					&.overflow > ul.f-dropdown {
+						li:nth-child(-n+#{$i}) {
+							@content;
+						}
+					}
+				}
+
+			}
+		}
+	}
+}
+
+// this is like inline list, but it flexes to full width. Basically a more flexible version of the button bar
+ul.flex-list {
+	width: 100%;
+	display: table;
+	margin: 0;
+	> li {
+		display: table-cell;
+		margin: 0;
+		padding-right: 1px;
+		width: 1000px; // hack that makes them as evenly sized as possible
+		&:last-child {
+			padding-right: 0;
+		}
+		&.overflow, &.more {
+			width: 3rem;
+			display: table-cell !important; // override flex hiding
+		}
+		> a {
+			width: 100%;
+			&.button {
+				height: 3rem;
+				line-height: 2rem;
+			}
+			&:empty:before {
+				float: none;
+			}
+		}
+	}
+
+	@include hide-n(small, $small-only, $small-up) { display: none };
+	@include hide-n(medium, $medium-down, $medium-up) { display: none };
+	@include hide-n(large, $large-down, $large-up) { display: none };
+	@if $include-xl-html-grid-classes {
+		@include hide-n(xlarge, $xlarge-down, $xlarge-up) { display: none };
+	}
+}
+
 .grade{
 	//min-height: 3rem;
 	font-size: rem-calc(($base-font-size - 4));
