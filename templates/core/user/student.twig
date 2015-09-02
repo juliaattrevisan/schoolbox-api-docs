@@ -230,11 +230,13 @@
                                 <div class="list-item">
                                     <div class="avatar-card">
                                         <span class="icon-home icon-32"></span>
-                                        {CONTACT_ADDRESS}
+                                        {{ contact.StudentContactSuburb }}
+                                        {{ contact.StudentContactState }}
+                                        {{ contact.StudentContactPostCode }}
                                     </div>
                                 </div>
                                 <nav>
-                                    <a class="icon-mobile" href="tel:{CONTACT_HOME_PHONE}" title="Call {CONTACT_HOME_PHONE}"></a>
+                                    <a class="icon-mobile" href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}"></a>
                                 </nav>
                             </li>
                             {% endfor %}
