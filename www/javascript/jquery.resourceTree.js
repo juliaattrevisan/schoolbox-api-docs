@@ -71,7 +71,7 @@
                         responsive: false
                     }
                 },
-                plugins : ['dnd', 'sort', 'types'],
+                plugins : ['dnd', 'sort', 'types', 'wholerow'],
                 dnd: {
                     copy: false,
                     is_draggable: function(nodes) {
@@ -88,19 +88,19 @@
                 },
                 types: {
                     root: {
-                        icon: '/images/tree/server.gif'
+                        icon: 'icon-folder'
                     },
                     'default': {
-                        icon: '/images/icons/22x22/folder.png'
+                        icon: 'icon-folder'
                     },
                     folder: {
-                        icon: '/images/icons/22x22/folder.png'
+                        icon: 'icon-folder'
                     },
                     homepage: {
-                        icon: '/images/icons/22x22/home.png'
+                        icon: 'icon-home'
                     },
                     course: {
-                        icon: '/images/famicons/chart_curve.png'
+                        icon: 'icon-course-builder'
                     }
                 }
             }
