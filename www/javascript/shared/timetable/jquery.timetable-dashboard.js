@@ -14,15 +14,7 @@
 
         /* Set up event listener for resizeEnd
          */
-        $(window).resize(function() {
-            if (this.resizeTimeout) {
-                clearTimeout(this.resizeTimeout);
-            }
-
-            this.resizeTimeout = setTimeout(function () {
-                $(this).trigger('resizeEnd');
-            }, 400);
-        });
+        $.fn.timetableTimeout();
 
         /**
          * Init

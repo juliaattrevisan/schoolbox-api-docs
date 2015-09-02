@@ -1,6 +1,21 @@
 (function() {
 
     /**
+     * Timeout on resize end
+     */
+    $.fn.timetableTimeout = function() {
+        $(window).resize(function() {
+            if (this.resizeTimeout) {
+                clearTimeout(this.resizeTimeout);
+            }
+
+            this.resizeTimeout = setTimeout(function () {
+                $(this).trigger('resizeEnd');
+            }, 400);
+        });
+    }
+
+    /**
      * Resize all subject elements in a particular timetable
      *
      * @param options
