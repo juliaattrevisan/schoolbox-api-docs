@@ -1,18 +1,3 @@
-<strong class="show-for-small-only">This text is shown only on a small screen.</strong>
-<style type="text/css">
-    .timetable td,
-    .timetable th,
-    .timetable-small td,
-    .timetable-small th {
-        border: 1px solid #eee;
-    }
-
-    .timetable-small table th,
-    .timetable-small table td {
-        width: 50%;
-    }
-</style>
-
 <!-- BEGIN timetable -->
 <div class="row">
     <div class="small-12 columns">
@@ -44,18 +29,14 @@
                         <!-- BEGIN period_class_link -->
                         <a href="{PERIOD_URL}" >
                             {PERIOD_DESC}
-                            <p class="meta">
-                                {PERIOD_CODE}<br />
-                                {PERIOD_ROOM} {PERIOD_STAFF}
-                            </p>
+                            <p class="meta">{PERIOD_CODE}</p>
+                            <p class="meta">{PERIOD_ROOM} {PERIOD_STAFF}</p>
                         </a>
                         <!-- END period_class_link -->
                         <!-- BEGIN period_class -->
                         {PERIOD_DESC}
-                        <p class="meta">
-                            {PERIOD_CODE}<br />
-                            {PERIOD_ROOM} {PERIOD_STAFF}
-                        </p>
+                        <p class="meta">{PERIOD_CODE}</p>
+                        <p class="meta">{PERIOD_ROOM} {PERIOD_STAFF}</p>
                         <!-- END period_class -->
                     </td>
                     <!-- END day -->

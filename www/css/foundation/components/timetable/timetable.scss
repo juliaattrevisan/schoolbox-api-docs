@@ -1,0 +1,11 @@
+.timetable, .timetable-small {
+    td, th {
+        border: 1px solid $smoke;
+    }
+}
+
+.timetable-small {
+    th, th {
+        width: 50%;
+    }
+}
