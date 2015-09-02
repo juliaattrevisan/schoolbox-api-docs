@@ -74,7 +74,7 @@ if (is_numeric($_GET['eventID'])) {
     $page->setVar(
         array(
             'FUNCTION'       => 'Update',
-            'SHOW_ADVANCED'  => '',
+            'SHOW_ADVANCED'  => 'none',
             'ADVANCED_SHOW'  => '',
             'ADVANCED_CLOSE' => 'hidden',
         )
@@ -165,7 +165,7 @@ if (is_numeric($_GET['eventID'])) {
     $page->setVar(
         array(
             'FUNCTION'       => 'Add',
-            'SHOW_ADVANCED'  => '',
+            'SHOW_ADVANCED'  => 'none',
             'ADVANCED_SHOW'  => '',
             'ADVANCED_CLOSE' => 'hidden',
         )

@@ -28,7 +28,7 @@
 		/* All Day checkbox should hide the time fields
 		 */
 		setupAllDay();
-
+		setupSelectAll();
 		/* Show/hide advanced options
 		 */
 		setupAdvancedOptions();
@@ -37,10 +37,6 @@
 		 */
 		setupRepeat();
 
-		/* Checkbox behaviours
-		 */
-		setupCheckboxStyles();
-		setupSelectAll();
 		setupOptionVariance();
 
 		/* Form validator
@@ -127,12 +123,14 @@
 		 * Allow All Day checkbox to toggle visibility of time fields
 		 */
 		function setupAllDay() {
+			config.element.find('[data-timeinputs]').hide();
+
 			config.element.find('input[name=allday]').change(function() {
 				if ($(this).is(':checked')) {
-					config.element.find('.timeInputs, [data-timeinputs]').hide();
+					config.element.find('[data-timeinputs]').hide();
 				}
 				else {
-					config.element.find('.timeInputs, [data-timeinputs]').show();
+					config.element.find('[data-timeinputs]').show();
 				}
 			});
 		}
@@ -141,7 +139,7 @@
 		 * Set up Advanced Option toggle
 		 */
 		function setupAdvancedOptions() {
-			$('.customise, [data-customise]').click(function(event) {
+			$('[data-customise]').click(function(event) {
 				event.preventDefault();
 
 				/* Alternate between button texts
@@ -150,14 +148,8 @@
 
 				/* Alternate between option visibility
 				 */
-				$('.advanced').toggle();
+				$('[data-advanced]').toggle();
 
-                if ($('[data-advanced]').hasClass('hide')) {
-                    $('[data-advanced]').removeClass('hide');
-                }
-                else {
-                    $('[data-advanced]').addClass('hide');
-                }
 			});
 		}
 
@@ -183,37 +175,14 @@
 		 * Add "select all" capability to checkboxes
 		 */
 		function setupSelectAll() {
-//			config.element.find('[data-selectall="true"]').change(function(){
-//				if ($(this).is(':checked')) {
-//					$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
-//				}
-//				else {
-//					$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
-//				}
-//			});
-		}
-
-		/**
-		 * Set up checkbox styles upon click
-		 */
-		function setupCheckboxStyles() {
-//			$(':checkbox').each(function () {
-//				if ($(this).is(':checked')) {
-//					$(this).parent().addClass('active-checkbox');
-//				}
-//			});
-//
-//			$(':checkbox').click(function () {
-//				if ($(this).parent().hasClass('active-checkbox')) {
-//					$(this).parent().removeClass('active-checkbox')
-//					if($(this).closest('.checkboxes').find('.select_all').is(':checked')){
-//						$(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
-//					}
-//				}
-//				else {
-//					$(this).parent().addClass('active-checkbox');
-//				}
-//			});
+			config.element.find('[data-selectall]').change(function(){
+				if ($(this).is(':checked')) {
+					$(this).closest('fieldset').find(':checkbox').not('[data-selectall]').prop('checked', true);
+				}
+				else {
+					$(this).closest('fieldset').find(':checkbox').not('[data-selectall]').prop('checked', false);
+				}
+			});
 		}
 
 		/**
@@ -417,9 +386,9 @@
 
 					// series
 					if (multi) {
-						$('.bulk-update, [data-message=bulk-update]').css('display', act === 'Update' ? 'inline' : 'none');
-						$('.bulk-delete, [data-message=bulk-delete]').css('display', act === 'Delete' ? 'inline' : 'none');
-						$("#dialog-bulk, [data-dialog=bulk]").dialog({
+						$('[data-message=bulk-update]').css('display', act === 'Update' ? 'inline' : 'none');
+						$('[data-message=bulk-delete]').css('display', act === 'Delete' ? 'inline' : 'none');
+						$("[data-dialog=bulk]").dialog({
 							resizable: false,
 							height: 180,
 							width: 500,
@@ -449,7 +418,7 @@
 							form.submit();
 						} else if (act == 'Delete') {
 							// dialog time
-							$("#dialog-delete, [data-dialog=bulk]").dialog({
+							$("[data-dialog=bulk]").dialog({
 								resizable: false,
 									height: 180,
 									width: 500,

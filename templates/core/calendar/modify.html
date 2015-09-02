@@ -22,9 +22,9 @@
     <div class="small-12 island">
         <h1>{FUNCTION} Event</h1>
         <span class="header-actions">
-            <a class="button icon-advanced-list customise" href="#" data-tooltip title="Advanced Options">
-                <span {ADV_OFF}>Show</span>
-                <span {ADV_ON}>Hide</span>
+            <a class="button icon-advanced-list" data-customise href="#" title="Advanced Options">
+                <span {ADVANCED_SHOW}>Show</span>
+                <span {ADVANCED_CLOSE}>Hide</span>
             </a>
         </span>
 
@@ -46,61 +46,76 @@
                             <input name="title" class="required" type="text" maxlength="100" value="{EVENT_TITLE}" />
                         </label>
                     </div>
-                    <div class="small-12 large-6 columns">
+                    <div class="small-6 columns">
                         <label for="startDate">When
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a date for when this item will expire">?</span>
                         </label>
                         <input name="startDate" id="startDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
                     </div>
-                    <div class="small-4 large-2 columns">
-                        <label>Hour
-                            <input name="startHour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" />
-                        </label>
+                    <div class="small-12 large-6 columns" data-timeinputs style="display:none">
+                        <div class="row">
+                            <div class="small-4 columns">
+                                <label>Hour
+                                    <input name="startHour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" />
+                                </label>
+                            </div>
+                            <div class="small-4 columns">
+                                <label>Minute
+                                    <input name="startMinute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
+                                </label>
+                            </div>
+                            <div class="small-4 columns">
+                                <label>Period
+                                    <select name="startPeriod">
+                                        <option value="am" {EVENT_START_AM}>AM</option>
+                                        <option value="pm" {EVENT_START_PM}>PM</option>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="small-4 large-2 columns">
-                        <label>Minute
-                            <input name="startMinute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
-                        </label>
-                    </div>
-                    <div class="small-4 large-2 columns">
-                        <label>Period
-                            <select name="startPeriod">
-                                <option value="am" {EVENT_START_AM}>AM</option>
-                                <option value="pm" {EVENT_START_PM}>PM</option>
-                            </select>
-                        </label>
-                    </div>
-
-                    <div class="small-12 large-6 columns">
+                    <div class="small-6 columns">
                         <label for="endDate">Till
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a date for when this item will expire">?</span>
                         </label>
                         <input name="endDate" id="endDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
                     </div>
-                    <div class="small-4 large-2 columns">
-                        <label>Hour
-                            <input name="endHour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" />
-                        </label>
+                    <div class="small-12 large-6 columns" data-timeinputs style="display:none">
+                        <div class="row">
+                            <div class="small-4 columns" >
+                                <label>Hour
+                                    <input name="endHour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" />
+                                </label>
+                            </div>
+                            <div class="small-4 columns" >
+                                <label>Minute
+                                    <input name="endMinute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
+                                </label>
+                            </div>
+                            <div class="small-4 columns" >
+                                <label>Period
+                                    <select name="endPeriod">
+                                        <option value="am" {EVENT_END_AM}>AM</option>
+                                        <option value="pm" {EVENT_END_PM}>PM</option>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="small-4 large-2 columns">
-                        <label>Minute
-                            <input name="endMinute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
-                        </label>
+                    <div class="small-12 columns">
+                        <fieldset class="checklist">
+                            <input id="allday" name="allday" type="checkbox" value="1" checked="checked">
+                            <label for="allday">All Day</label>
+                        </fieldset>
                     </div>
-                    <div class="small-4 large-2 columns">
-                        <label>Period
-                            <select name="endPeriod">
-                                <option value="am" {EVENT_END_AM}>AM</option>
-                                <option value="pm" {EVENT_END_PM}>PM</option>
-                            </select>
-                        </label>
-                    </div>git
-                    <div class="small-12 columns advanced {SHOW_ADVANCED}">
+                    <div class="small-12 columns" data-advanced style="display:{SHOW_ADVANCED}">
                         <label>Publish Date
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This event will only be visible to the public after this date">?</span>
                             <input id="publishDate" name="publishDate" data-datepicker="true" type="text" size="15" maxlength="30" value="{EVENT_PUBLISH_DATE}"/>
                         </label>
-        			<!-- BEGIN recurring_dates -->
+                    </div>
+                    <!-- BEGIN recurring_dates -->
+                    <div class="small-6 columns" data-advanced style="display:{SHOW_ADVANCED}">
                         <label>Repeat
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The frequency with which this event recurs, if at all">?</span>
         					<select name="repeat">
@@ -111,18 +126,24 @@
         						<option value="monthly">Monthly</option>
         					</select>
                         </label>
-                        <label id="repeatUntil" class="advanced hidden">
+                    </div>
+                    <div id="repeatUntil" class="small-6 columns" data-repeat-until style="display:{SHOW_ADVANCED}">
+                        <label>
                             Repeat Until
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The date at which recurrence should cease">?</span>
                             <input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
                         </label>
+                    </div>
         			<!-- END recurring_dates -->
         			<!-- BEGIN recurring_reminder -->
-                        <div id="repeat-reminder" class="highlight-panel advanced">
+                    <div id="repeat-reminder" class="small-6 columns" data-advanced >
+                        <div class="highlight-panel">
                             <h5>This event is part of a recurring series</h5>
                             <p>{EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong></p>
                         </div>
+                    </div>
         			<!-- END recurring_reminder -->
+                    <div class="small-12 columns">
         			    <label>
                             Location
                             <input name="location" type="text" value="{EVENT_LOCATION}"/>
@@ -152,41 +173,46 @@
         					</select>
         				</label>
                     </div>
-                    <div id="groupDrop" class="small-12 column hide">
-        			    <label>
-                            Group
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the group which will be able to view this event">?</span>
+                    <div id="groupDrop" class="small-12 column" style="display: none">
+                        <fieldset class="checklist">
+                            <legend>
+                                Groups
+                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the group which will be able to view this event">?</span>
+                            </legend>
         					<!-- BEGIN event_group_drop -->
-        					<label>
-        						<input type="checkbox" name="group[]" value="{EVENT_GROUP_ID}" {EVENT_GROUP_ID_SELECTED} />{EVENT_GROUP_NAME}
-        					</label>
+                            <input type="checkbox" name="group[]" value="{EVENT_GROUP_ID}" id="group{EVENT_GROUP_ID}" {EVENT_GROUP_ID_SELECTED} />
+                            <label for="group{EVENT_GROUP_ID}" class="checkbox">{EVENT_GROUP_NAME}</label>
         					<!-- END event_group_drop -->
-        				</label>
+        				</fieldset>
         			</div>
-        			<div id="roleList" class="small-12 large-6 column hide">
-                        <label>
-                            Roles
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the roles which will be able to view this event">?</span>
+        			<div id="roleList" class="small-12 large-6 column" style="display: none">
+                        <fieldset class="checklist">
+                            <legend>
+                                Roles
+                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the roles which will be able to view this event">?</span>
+                            </legend>
                             <!-- BEGIN event_role_list -->
                             <input type="checkbox" name="roles[]" id="role{EVENT_ROLE_ID}" value="{EVENT_ROLE_ID}" {EVENT_ROLE_ID_SELECTED} />
                             <label for="role{EVENT_ROLE_ID}">{EVENT_ROLE_NAME}</label>
                             <!-- END event_role_list -->
                             <input type="checkbox" data-selectall="true" id="roleSelectAll"/>
                             <label for="roleSelectAll">Select all</label>
-                        </label>
+                        </fieldset>
                     </div>
 
-        			<div id="campusList" class="small-12 large-6 column hide">
-        				<label>
+        			<div id="campusList" class="small-12 large-6 column" style="display: none">
+                        <fieldset class="checklist">
+                        <legend>
                             Campus
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the campus' which will be able to view this event">?</span>
+                        </legend>
                             <!-- BEGIN event_campus_list -->
                             <input type="checkbox" class="campusCheck" name="campus[]" id="campus{EVENT_CAMPUS_ID}" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} />
                             <label for="campus{EVENT_CAMPUS_ID}">{EVENT_CAMPUS_NAME}</label>
                             <!-- END event_campus_list -->
                             <input type="checkbox" data-selectall='true' id="campusSelectAll" />
                             <label for="campusSelectAll">Select all</label>
-                        </label>
+                        </fieldset>
                     </div>
 
 
@@ -218,14 +244,14 @@
                   		<!-- END delete_button -->
                 </div>
             </div>
-            <div id="dialog-bulk" title="This event is part of a series">
+            <div class='hide' id="dialog-bulk" data-dialog="bulk"  title="This event is part of a series">
                 <p>
                     <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-                    <span class="bulk-update">Would you like to update only this event, or all in the series? If any events in the series have been modified, the changes will be overridden.</span>
-                    <span class="bulk-delete">Would you like to delete only this event, or all in the series?</span>
+                    <span data-message="bulk-update">Would you like to update only this event, or all in the series? If any events in the series have been modified, the changes will be overridden.</span>
+                    <span data-message="bulk-delete">Would you like to delete only this event, or all in the series?</span>
                 </p>
             </div>
-            <div id="dialog-delete" title="Delete Event">
+            <div class='hide' id="dialog-delete" data-dialog="bulk" title="Delete Event">
                 <p>
                     <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
                     Are you sure you want to delete this event?
