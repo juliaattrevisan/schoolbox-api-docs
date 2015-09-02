@@ -1,0 +1,67 @@
+/*!
+ * Combobox Plugin for jQuery, version 0.5.0
+ *
+ * Copyright 2012, Dell Sala
+ * http://dellsala.com/
+ * https://github.com/dellsala/Combo-Box-jQuery-Plugin
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ *
+ * Date: 2012-01-15
+ */
+.combobox {
+}
+.combobox_arrow {
+    background: transparent;
+    display: block;
+    height: 100%;
+    width: 100%;
+    font-size: 9px;
+    text-align: center;
+    vertical-align: middle;
+    color: $selectize-arrow-color;
+}
+.combobox_button {
+    background: $selectize-color-dropdown;
+    position: absolute;
+    // No border, so make this fit inside a bordered input
+    right: 1px;
+    top: 1px;
+    display: block;
+    height: 100%;
+    width: 18px;
+}
+
+.combobox_button:hover {
+    text-decoration: none;
+}
+
+.combobox_button {
+    *top: 1px !important;
+}
+
+.combobox_selector {
+    background: $selectize-color-dropdown;
+    font-size: 12px;
+    z-index: 1000;
+    max-height: 200px;
+    overflow: auto;
+}
+
+.combobox_selector ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    border:1px solid $selectize-color-dropdown-border;
+}
+
+.combobox_selector li {
+    padding: 2px 3px;
+    margin: 0 !important;
+}
+
+.combobox_selector li:hover,
+.combobox_selector li.selected {
+    background-color: $selectize-color-dropdown-item-active;
+    color: $selectize-color-dropdown-item-active-text;
+}
