@@ -1,75 +1,72 @@
-<ul class="information-list">
+{#<ul class="information-list">#}
 {% if access > 0 %}
-<li class="center">
-    <span class="p128">
-    {% if file.mimetype.isImage %}
-        <img class="icon" src="/cms/image.php?width=128&height=128&id={{ file.id }}" alt="{{ file.description }}"/>
-    {% else %}
-        <img class="icon" src="/images/mime/128x128/{{ file.mimetype.iconFile }}" alt="{{ file.description }}"/>
-    {% endif %}
-    </span>
-    <h3 class="meta-title">{{ file.description }}</h3>
-</li>
-<li>
-    <h4>Actions</h4>
-    <a class="button secondary icon-document" data-action="open"     href="/send.php?id={{ file.id }}" target="_blank">Open</a>
-    <a class="button secondary icon-download" data-action="download" href="/send.php?id={{ file.id }}&save=1">Download</a>
-    {% if access >= 2 %}
-    <a class="button secondary icon-modify"   data-action="modify"   href="/cms/file/{{ file.id }}">Modify</a>
-    <a class="button secondary icon-delete"   data-action="delete"   href="#">Delete</a>
-    {% endif %}
-</li>
-<li>
-    <h4>Details</h4>
-    <ul>
-        <li>
-            <h5 class="subheader">Uploaded by</h5>
-            <img src="/portrait.php?size=square48&userId={{ file.owner.externalId }}" alt="{{ file.owner.formatName }}" />
-            <h3 class="subheader">
-                <a href="/search/user/{{ file.owner.id }}">{{ file.owner.formatName }}</a>
-            </h3>
-            <p class="meta">{{ file.owner.role.name }}</p>
-        </li>
-        <li>
-            <h5 class="subheader">Filesize</h5>
-            <p>{{ file.filesize | bytes }}</p>
-        </li>
-        <li>
-            <h5 class="subheader">Created</h5>
-            <p>{{ file.submitted.dateOnly }}</p>
-        </li>
-        {% if file.submitted.unixTimestamp != file.modified.unixTimestamp %}
-        <li>
-            <h5 class="subheader">Last modified</h5>
-            <p>{{ file.modified.dateOnly }}</p>
-        </li>
+<div class="row">
+    <div class="small-4 column text-center">
+        {% if file.mimetype.isImage %}
+            <img class="icon" src="/cms/image.php?width=128&height=128&id={{ file.id }}" alt="{{ file.description }}"/>
+        {% else %}
+            <img class="icon" src="/images/mime/128x128/{{ file.mimetype.iconFile }}" alt="{{ file.description }}"/>
         {% endif %}
-        {% if file.comment %}
-        <li>
-            <h5 class="subheader">Description</h5>
-            <p>{{ file.comment }}</p>
-        </li>
-        {% endif %}
-        <li>
-            <h5 class="subheader">Original File</h5>
-            <p>{{ file.filename }} ({{ file.mime }})</p>
-        </li>
-        <li>
-            <h5 class="subheader">Hidden</h5>
-            <p>
+    </div>
+    <div class="small-8 column">
+        <h3>{{ file.title }}</h3>
+        <p>{{ file.description }}</p>
+
+        {% set fileActionList %}
+
+            <li><a class="icon-document" data-action="open"     href="/send.php?id={{ file.id }}" target="_blank">Open</a></li>
+            <li><a class="icon-download" data-action="download" href="/send.php?id={{ file.id }}&save=1">Download</a></li>
+            {% if access >= 2 %}
+                <li><a class="icon-modify"   data-action="modify"   href="/cms/file/{{ file.id }}">Modify</a></li>
+                <li><a class="icon-delete"   data-action="delete"   href="#">Delete</a></li>
+            {% endif %}
+
+        {% endset %}
+
+        {% include '@resourceBrowser/actionBar.twig' with { id: 'file-actions', list: fileActionList, sizing: { small: 1, medium: 2, large: 2, xlarge: 4, xxlarge: 2 } } %}
+
+        <dl class="inline-dl">
+            <dt class="small-12 medium-4">Uploaded by</dt>
+            <dd class="small-12 medium-8">
+                <div class="avatar card tiny">
+                    <a href="/search/user/{{ file.owner.id }}">
+                        <img src="/portrait.php?size=square48&userId={{ file.owner.externalId }}" alt="{{ file.owner.formatName }}" />
+                        <p>{{ file.owner.formatName }}</p>
+                    </a>
+                </div>
+            </dd>
+
+            <dt class="small-12 medium-4">Filesize</dt>
+            <dd class="small-12 medium-8">{{ file.size | bytes }}</dd>
+
+            <dt class="small-12 medium-4">Created</dt>
+            <dd class="small-12 medium-8">{{ file.createdAt.dateOnly }}</dd>
+
+            {% if file.createdAt.unixTimestamp != file.modifiedAt.unixTimestamp %}
+                <dt class="small-12 medium-4">Last modified</dt>
+                <dd class="small-12 medium-8">{{ file.modifiedAt.dateOnly }}</dd>
+            {% endif %}
+
+            <dt class="small-12 medium-4">Original File</dt>
+            <dd class="small-12 medium-8">{{ file.filename }} ({{ file.mime }})</dd>
+
+            <dt class="small-12 medium-4">Hidden</dt>
+            <dd class="small-12 medium-8">
                 <span data-tooltip aria-haspopup="true" class="has-tip" title="Visible to users with {{ file.hidden ? 'write' : 'read' }} access to the folder">{{ file.hidden ? 'Yes' : 'No' }}</span>
-            </p>
-        </li>
-        <li>
-            <h5 class="subheader">Direct Link</h5>
-            <p><a href="/send.php?id={{ file.id }}">{{ 'schoolbox:/' }}/send.php?id={{ file.id }}</a></p>
-        </li>
-    </ul>
-</li>
+            </dd>
+
+            <dt class="small-12 medium-4">Direct Link</dt>
+            <dd class="small-12 medium-8">
+                <a href="/send.php?id={{ file.id }}">{{ 'schoolbox:/' }}/send.php?id={{ file.id }}</a>
+            </dd>
+        </dl>
+
+    </div>
+</div>
 {% else %}
 <li>
     <img class="icon" src="/images/core/icons/error-icon.png" alt="No access"/>
     <h3>No access</h3>
 </li>
 {% endif %}
-</ul>
+{#</ul>#}

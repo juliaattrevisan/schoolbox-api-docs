@@ -1,7 +1,7 @@
 {% for file in files %}
 <li style="background-image: url(/images/mime/22x22/{{ file.mimetype.iconFile }})">
     <a data-id="{{ file.id }}" href="/send.php?id={{ file.id }}" title="{{ file.filename }}">
-        {{ file.description }}
+        {{ file.title }}
     </a>
 </li>
 {% else %}

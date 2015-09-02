@@ -1,114 +1,144 @@
-<ul class="information-list">
+{#<ul class="information-list">#}
 {% if access > 0 or user.isSuperuser %}
-<li class="center">
-    <img class="icon" src="/images/icons/128x128/{{ folder.folderType }}.png" alt="{{ folder.name }}"/>
-    <h3 class="meta-title">
-        {{ folder.name }}
-        {% if folder.codeString %}
-            ({{ folder.codeString }})
-        {% endif %}
-    </h3>
-</li>
 
-<li>
-    <h4>Actions</h4>
-    {% if folder.id == 0 %}
-            <a class="button secondary icon-folder"   data-action="folder"   href="/cms/category/new/{{ folder.id }}">Add Folder</a>
-    {% else %}
-        {% if folder.hasHomepage %}
-            <a class="button secondary icon-homepage" data-action="homepage" href="/homepage/{{ folder.id }}">View Homepage</a>
-        {% endif %}
-        {% if access >= 2 or user.isSuperuser %}
-            <a class="button secondary icon-modify"   data-action="modify"   href="/cms/category/{{ folder.id }}">Modify</a>
-            <a class="button secondary icon-delete"   data-action="delete"   href="#">Delete</a>
-            <a class="button secondary icon-download" data-action="download" href="#">Download</a>
-            <a class="button secondary icon-folder"   data-action="folder"   href="/cms/category/new/{{ folder.id }}">Add Folder</a>
-            <a class="button secondary icon-drop-box" data-action="file"     href="/cms/file/new/{{ folder.id }}">Post File</a>
-            <a class="button secondary icon-link"     data-action="link"     href="/cms/link/new/{{ folder.id }}">Add Link</a>
-        {% endif %}
-        {% if access >= 3 or user.isSuperuser %}
-            <a class="button secondary icon-upload"   data-action="multi"    href="/cms/file/multi/{{ folder.id }}">Upload Multiple Files</a>
-        {% endif %}
-        {% if user.isSuperuser or (access >= 2 and conf.enable_teacher_zip_upload) %}
-            <a class="button secondary icon-upload"   data-action="zip"      href="/cms/zipFile/{{ folder.id }}">Upload ZIP</a>
-        {% endif %}
-    {% endif %}
-</li>
-
-{% if folder.group.category %}
-<li>
-    <h4>Group</h4>
-    <ul>
-        <li>
-            <h5 class="subheader">Administrator</h5>
-            <img src="/portrait.php?size=square48&userId={{ admin.externalId }}" alt="{{ admin.formatName }}" />
-            <h3 class="subheader">
-                <a href="/search/user/{{ admin.id }}">{{ admin.formatName }}</a>
+<div class="row">
+    <div class="small-4 column text-center">
+        <a{% if folder.hasHomepage %} title="View Homepage" href="/homepage/{{ folder.id }}"{% endif %}>
+        <img class="icon" src="/images/icons/128x128/{{ folder.folderType }}.png" alt="{{ folder.name }}"/>
+        </a>
+    </div>
+    <div class="small-8 column">
+        <a{% if folder.hasHomepage %} title="View Homepage" href="/homepage/{{ folder.id }}"{% endif %}>
+            <h3>
+                {{ folder.name }}
+                {% if folder.codeString %}
+                    ({{ folder.codeString }})
+                {% endif %}
             </h3>
-            <p class="meta">{{ admin.role.name }}</p>
-        </li>
-        <li>
-            <h5 class="subheader">Access Type</h5>
-            <p>
-                {% if folder.group.private   %}<span data-tooltip aria-haspopup="true" class="has-tip" title="Users cannot see or join this group unless added by an admin">Private</span>{% endif %}
-                {% if folder.group.moderated %}<span data-tooltip aria-haspopup="true" class="has-tip" title="Users can join, but only once access is approved by an admin">Moderated</span>{% endif %}
-                {% if folder.group.free      %}<span data-tooltip aria-haspopup="true" class="has-tip" title="Can be joined or left by anyone at any time">Open</span>{% endif %}
-            </p>
-        {% if access >= 3 or user.isSuperuser %}
-            <a class="button secondary icon-group-managers" data-action="manage" href="/group/modify/{{ folder.id }}">Manage Group</a>
+        </a>
+        <ul class="inline-list">
+
+        {% if folder.group.category %}
+
+            {% if folder.codeString and folder.teachers|length > 0 %}
+                {% set type = 'class' %}
+            {% else %}
+                {% set type = 'group' %}
+            {% endif %}
+
+            {#<h4>Group</h4>#}
+            {#<h5 class="subheader">Administrator</h5>#}
+            <li>
+                {% if folder.group.private   %}<span data-tooltip aria-haspopup="true" class="has-tip" title="Users cannot see or join this {{ type }} unless added by an admin">Private {{ type | capitalize }}</span>{% endif %}
+                {% if folder.group.moderated %}<span data-tooltip aria-haspopup="true" class="has-tip" title="Users can join, but only once access is approved by an admin">Moderated {{ type | capitalize }}</span>{% endif %}
+                {% if folder.group.free      %}<span data-tooltip aria-haspopup="true" class="has-tip" title="Can be joined or left by anyone at any time">Open {{ type | capitalize }}</span>{% endif %}
+            </li>
+
+        {% elseif folder.codeString and folder.teachers|length > 0 %}
+            <li>Class</li>
+        {% endif %}
+        </ul>
+
+        {% set actionBarList %}
+
+            {% if folder.id == 0 %}
+                <li><a class="icon-folder"   data-action="folder"   href="/cms/category/new/{{ folder.id }}">Add Folder</a></li>
+            {% else %}
+                {% if access >= 2 or user.isSuperuser %}
+                    <li><a class="icon-modify"   data-action="modify"   href="/cms/category/{{ folder.id }}">Modify</a></li>
+                    <li><a class="icon-drop-box" data-action="file"     href="/cms/file/new/{{ folder.id }}">Post File</a></li>
+                    <li><a class="icon-folder"   data-action="folder"   href="/cms/category/new/{{ folder.id }}">Add Folder</a></li>
+                    <li><a class="icon-link"     data-action="link"     href="/cms/link/new/{{ folder.id }}">Add Link</a></li>
+                    <li><a class="icon-download" data-action="download" href="#">Download</a></li>
+                {% endif %}
+                {% if access >= 3 or user.isSuperuser %}
+                    <li><a class="icon-upload"   data-action="multi"    href="/cms/file/multi/{{ folder.id }}">Upload Multiple Files</a></li>
+                {% endif %}
+                {% if user.isSuperuser or (access >= 2 and conf.enable_teacher_zip_upload) %}
+                    <li><a class="icon-upload"   data-action="zip"      href="/cms/zipFile/{{ folder.id }}">Upload ZIP</a></li>
+                {% endif %}
+                {% if access >= 2 or user.isSuperuser %}
+                    <li><a class="icon-delete"   data-action="delete"   href="#">Delete</a></li>
+                {% endif %}
         {% endif %}
 
-        {% if access > 0 and access < 3 %}
-            <a class="button secondary icon-logout" data-action="leave" href="/group/joinForm.php?leave={{ folder.id }}">Leave Group</a>
-        {% elseif access is null %}
-            <a class="button secondary icon-group"  data-action="join" href="/group/joinForm.php?join={{ folder.id }}">Join Group</a>
-        {% elseif access == 0 and folder.group.moderated %}
-            <span>Membership request pending</span>
+            {% if folder.group.category %}
+                <li>
+
+                    {#<h5 class="subheader">Access Type</h5>#}
+                    {% if access >= 3 or user.isSuperuser %}
+                        <a class="icon-group-managers" data-action="manage" href="/group/modify/{{ folder.id }}">Manage Group</a>
+                    {% endif %}
+
+                    {% if access > 0 and access < 3 %}
+                        <a class="icon-logout" data-action="leave" href="/group/joinForm.php?leave={{ folder.id }}">Leave Group</a>
+                    {% elseif access is null %}
+                        <a class="icon-group"  data-action="join" href="/group/joinForm.php?join={{ folder.id }}">Join Group</a>
+                    {% elseif access == 0 and folder.group.moderated %}
+                        <span>Membership request pending</span>
+                    {% endif %}
+                    {# notably, if you are the admin, you can't leave the group #}
+
+                </li>
+            {% endif %}
+
+        {% endset %}
+
+        {% include '@resourceBrowser/actionBar.twig' with { id: 'folder-actions', list: actionBarList, sizing: { small: 1, medium: 2, large: 2, xlarge: 4, xxlarge: 2 } } %}
+
+
+
+
+    {% if (folder.codeString and folder.teachers|length > 0) or folder.group.category %}
+        <ul class="inline-list">
+        {% if folder.group.category %}
+            <li class="avatar card tiny">
+                <a {% if admin.id %}href="/search/user/{{ admin.id }}"{% endif %}>
+                    <img src="/portrait.php?size=square64&userId={{ admin.externalId }}" alt="{{ admin.formatName }}" />
+                    <p>{{ admin.formatName }} (Admin)</p>
+                </a>
+            </li>
         {% endif %}
-        {# notably, if you are the admin, you can't leave the group #}
-        </li>
-    </ul>
-</li>
-{% endif %}
-{% if folder.codeString and folder.teachers|length > 0 %}
-<li>
-    <h4>Class</h4>
-    <h5 class="subheader">{{ folder.teachers|length == 1 ? 'Teacher' : 'Teachers' }}</h5>
-    <ul>
         {% for teacher in folder.teachers %}
-        <li>
-            <img src="/portrait.php?size=square48&userId={{ teacher.externalId }}" alt="{{ teacher.formatName }}" />
-            <h3 class="subheader">
-                <a href="/search/user/{{ teacher.id }}">{{ teacher.formatName }}</a>
-            </h3>
-            <p class="meta">{{ teacher.role.name }}</p>
-        </li>
+            <li class="avatar card tiny">
+                <a href="/search/user/{{ teacher.id }}">
+                    <img src="/portrait.php?size=square48&userId={{ teacher.externalId }}" alt="{{ teacher.formatName }}" />
+                    <p>{{ teacher.formatName }}</p>
+                </a>
+            </li>
         {% endfor %}
-    </ul>
-</li>
-{% endif %}
-{% if user.role.type == 'staff' and folder.id > 0 %}
-<li>
-    <h4>Permissions</h4>
-    <ul>
-    {% for access in roles %}
-    <li>
-        <h5 class="subheader">{{ access.role.name }}</h5>
-        <p>
-            {% if access.type == 0 %}None{% endif %}
-            {% if access.type == 1 %}Read{% endif %}
-            {% if access.type == 2 %}Write{% endif %}
-        </p>
-    </li>
-    {% endfor %}
-    </ul>
-</li>
-{% endif %}
+        </ul>
+    {% endif %}
+
+    {% if user.role.type == 'staff' and folder.id > 0 %}
+        <dl class="inline-dl">
+        {% for access in roles %}
+            <dt class="small-8">{{ access.role.name }}</dt>
+            <dd class="small-4">
+                {%- if access.type == 0 %}None{% endif -%}
+                {%- if access.type == 1 %}Read{% endif -%}
+                {%- if access.type == 2 %}Write{% endif -%}
+            </dd>
+        {% endfor %}
+        </dl>
+    {% endif %}
+
+
+
+
+
+
+
+    </div>
+</div>
+
+
 {% else %}
 <li>
     <img class="icon" src="/images/core/icons/error-icon.png" alt="No access"/>
     <h3>No access</h3>
 </li>
 {% endif %}
-</ul>
+{#</ul>#}
 {#{{ dump(admin) | raw }}#}
+
