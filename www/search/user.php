@@ -10,19 +10,13 @@
  * @param $user
  * @param $synUserHandler
  * @param $userHandler
- * @param $prevContact
- * @param $j
- * @param $contactName
  */
 function renderStudent(
-    $page,
+    SitePage $page,
     $groupHandler,
     $user,
     $synUserHandler,
-    $userHandler,
-    $prevContact,
-    $j,
-    $contactName
+    $userHandler
 ) {
     //If student photo protected don't show other students
     $page->parse("portrait_block", "portrait");
@@ -211,6 +205,8 @@ function renderStudent(
             $page->parse('group_block', 'group');
         }
 
+        $j           = 0;
+        $prevContact = [];
         if ($_SESSION['id'] != $user['uid']) {
             $studentContactList = $synUserHandler->getStudentContactList($user['synergy_id']);
             if (is_array($studentContactList)) {
@@ -269,7 +265,6 @@ function renderStudent(
                             'CONTACT_OCCUP_PHONE'  => Scrub::text($studentContact['StudentContactOccupPhone']),
                             'CONTACT_EMAIL'        => Scrub::text($studentContact['StudentContactDefaultEmail']),
                             'CONTACT_EMAIL_HREF'   => $contactEmail,
-                            'CONTACT_NAME_EMAIL'   => $contactName,
                             'SPOUSE_NAME'          => Scrub::text(
                                 $studentContact['StudentContactSpouseTitle'] . ' ' . $studentContact['StudentContactSpousePreferred'] . ' ' . $studentContact['StudentContactSpouseSurname']
                             ),
@@ -631,10 +626,7 @@ if (is_numeric($this->arg[0])) {
                     $groupHandler,
                     $user,
                     $synUserHandler,
-                    $userHandler,
-                    $prevContact,
-                    $j,
-                    $contactName
+                    $userHandler
                 );
             } elseif ($groupHandler->isStaff($user['uid']) && $groupHandler->isStaff()) {
                 $this->parse("timetable_link_block", "timetable_link");
