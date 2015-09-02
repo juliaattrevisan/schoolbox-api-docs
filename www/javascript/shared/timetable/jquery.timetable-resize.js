@@ -75,12 +75,6 @@
                      */
                     if (allSubjects.length == 1) {
                         allSubjects.css({
-                            minHeight: rowHeight + 'px',
-                            height: rowHeight + 'px'
-                        });
-
-                        allSubjects.css({
-                            minHeight: rowHeight + 'px',
                             height: rowHeight + 'px'
                         });
                     }
