@@ -1,5 +1,8 @@
 <?php
 
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Breadcrumbs;
+
 $wikiHandler = new Wiki();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
@@ -23,6 +26,12 @@ if ($this->arg[0] == 'revision') {
         error(101);
     }
 
+    try{
+        $folder = FolderMapper::getInstance()->findById($wiki['categoryID']);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(2);
+    }
+
     // check permission
     if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
         error(19);
@@ -41,6 +50,7 @@ if ($this->arg[0] == 'revision') {
     $output = array(
         'WIKI_ID' => $wiki['wikiID'],
         'CATEGORY_ID' => $wiki['categoryID'],
+        'FOLDER_NAME' => Scrub::text($folder->getName()),
         'HEADING' => Scrub::text($wiki['heading']),
         'BODY' => Scrub::html($wikiHandler->activateStubLinks($wiki['body'])),
         'MODIFIED' => $modifiedDate->getLong(),
@@ -117,7 +127,28 @@ if ($this->arg[0] == 'revision') {
     if ($permission >= READ_ACCESS) {
         $this->parse('export_link_block', 'export_link');
     }
-} /* Load an existing wiki by its category id and slug
+
+    $slug  = Scrub::text($wiki['slug']);
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Wiki',
+            'href' => "/wiki/{$folder->getId()}/$slug",
+            'class' => '',
+        ],
+        [
+            'text' => 'View Revisions',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
+}
+/* Load an existing wiki by its category id and slug
  */
 elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
     $wiki = $wikiHandler->getByCategoryAndSlug($this->arg[0], $this->arg[1]);
@@ -133,6 +164,30 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
             'WIKI_SLUG' => $this->arg[1],
             'WIKI_COMPONENT_ID' => 0,
         ));
+
+        try {
+            $folderMapper = new FolderMapper();
+            $folder = $folderMapper->findById($this->arg[0]);
+        }
+        catch (\Schoolbox\Mapper\Exception $e) {
+            error(2);
+        }
+
+        /* Render out breadcrumbs
+         */
+        $trail = new Breadcrumbs();
+        $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+            [
+                'text' => $folder->getName(),
+                'href' => "/homepage/{$folder->getId()}",
+                'class' => '',
+            ],
+            [
+                'text' => 'New Wiki',
+                'href' => '',
+                'class' => 'active',
+            ]
+        ]);
     } /* Otherwise load it
 	 */
     else {
@@ -149,6 +204,12 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
            */
         if (!isset($wiki['wikiID'])) {
             error(101);
+        }
+
+        try{
+            $folder = FolderMapper::getInstance()->findById($wiki['categoryID']);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            error(2);
         }
 
         // check permission
@@ -169,6 +230,7 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         $output = array(
             'WIKI_ID' => $wiki['wikiID'],
             'CATEGORY_ID' => $wiki['categoryID'],
+            'FOLDER_NAME' => Scrub::text($folder->getName()),
             'HEADING' => Scrub::text($wiki['heading']),
             'BODY' => Scrub::html($wikiHandler->activateStubLinks($wiki['body'])),
             'MODIFIED' => $modifiedDate->getLong(),
@@ -245,7 +307,31 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         if ($permission >= READ_ACCESS) {
             $this->parse('export_link_block', 'export_link');
         }
+
+        $slug = Scrub::text($wiki['slug']);
+
+        /* Render out breadcrumbs
+         */
+        $trail = new Breadcrumbs();
+        $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+            [
+                'text' => $folder->getName(),
+                'href' => "/homepage/{$folder->getId()}",
+                'class' => '',
+            ],
+            [
+                'text' => 'Wiki',
+                'href' => "/wiki/{$folder->getId()}/$slug",
+                'class' => '',
+            ],
+            [
+                'text' => 'View',
+                'href' => '',
+                'class' => 'active',
+            ]
+        ]);
     }
-} else {
+}
+else {
     error(2);
 }

@@ -1,79 +1,62 @@
-<!-- BEGIN custom_head -->
+{BREADCRUMB}
 
-<script type="text/javascript">
-
-$(function() {
-    $('.left').css('width','100%');
-    $('.right').hide();
-
-    $('.update').click(function(evt) {
-
-        if (!$(this).hasClass('open')) {
-            $(this).addClass('open');
-            $('.left').stop().animate({'width':"69.5%"},function() {
-                $('.right').stop().fadeIn();
-                $('.update').html('<span></span>Hide Revisions');
-            });
-
-        } else {
-            $(this).removeClass('open');
-            $('.right').stop().fadeOut(function() {
-                $('.left').stop().animate({'width':"100%"});
-                $('.update').html('<span></span>View Revisions');
-            });
-
-        }
-
-        evt.preventDefault();
-    });
-
-});
-
-</script>
-
-<!-- END custom_head -->
-
-<h1>{HEADING} {LOCKED}</h1>
-
-<span class="header_option">
-	  <!-- BEGIN modify_link -->
-	  <a href="/wiki/modify/{WIKI_ID}" class="btn modify"><span></span>Modify</a>
-	   <!-- END modify_link -->
-	  <!-- BEGIN delete_link -->
-	  <a href="/wiki/modifyForm.php?delete={WIKI_ID}" onclick="return confirm('Are you sure you want to delete the entire wiki?');" class="btn delete"><span></span>Delete</a><!-- END delete_link -->
-	  <!-- BEGIN revert_link -->
-	  <a href="/wiki/modifyForm.php?wikiID={WIKI_ID}&revert={CURRENT_REVISION}" onclick="return confirm('Revert to this revision?');" class="btn refresh"><span></span>Revert to this revision</a><!-- END revert_link -->
-	  <!-- BEGIN lock_link -->
-	  <a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}" class="btn tick"><span></span>{LOCK_UNLOCK}</a><!-- END lock_link -->
-	  <!-- BEGIN export_link -->
-	  <a href="/wiki/exportForm.php?wikiID={WIKI_ID}" class="btn up-arrow"><span></span>{EXPORT}</a><!-- END export_link -->
-
-	  <a href="/homepage/{CATEGORY_ID}" class="btn go-back"><span></span>Return to homepage</a>
-  </span>
-
-<div class="left">
-	<div class="wysiwyg revision-box">
-		{BODY}
-
-        <p><a href="#" class="btn float-left update"><span></span>View Revisions</a></p>
-
+<div class="row actions-small-3">
+	<div class="small-12 column list-item">
+		<h1>{HEADING} {LOCKED}</h1>
+        <ul class="meta">
+            <li class="icon-modify">Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</li>
+        </ul>
 	</div>
-	<p>Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</p>
+	<nav>
+		<!-- BEGIN lock_link -->
+		<a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}" class="icon-locked" data-tooltip title="{LOCK_UNLOCK}"></a>
+		<!-- END lock_link -->
+        <!-- BEGIN modify_link -->
+        <a href="/wiki/modify/{WIKI_ID}" class="icon-modify" data-tooltip title="Modify"></a>
+        <!-- END modify_link -->
+        <a href="#" class="icon-more" data-dropdown="more-options"></a>
+	</nav>
+	<ul class="f-dropdown" data-dropdown-content="" id="more-options">
+		<!-- BEGIN delete_link -->
+		<li><a href="/wiki/modifyForm.php?delete={WIKI_ID}" onclick="return confirm('Are you sure you want to delete the entire wiki?');" class="icon-delete">Delete</a></li>
+		<!-- END delete_link -->
+		<!-- BEGIN revert_link -->
+		<li><a href="/wiki/modifyForm.php?wikiID={WIKI_ID}&revert={CURRENT_REVISION}" onclick="return confirm('Revert to this revision?');" class="icon-refresh"><span></span>Revert to this revision</a></li>
+		<!-- END revert_link -->
+		<!-- BEGIN export_link -->
+		<li><a href="/wiki/exportForm.php?wikiID={WIKI_ID}" class="icon-download"><span></span>{EXPORT}</a></li>
+		<!-- END export_link -->
+	</ul>
 </div>
 
-<div class="right">
-	<h2>Revisions</h2>
-	<table width="100%" class="table">
-		<tr>
-			<th>Date</th>
-			<th>Author</th>
-		</tr>
-		<!-- BEGIN revision_list -->
-		<tr class="{REVISION_CURRENT}">
-			<td><a href="/wiki/revision/{WIKI_ID}/{REVISION_COMPARE}">{REVISION_DATE}</a></td>
-			<td>{REVISION_AUTHOR}</td>
-			<td><!-- BEGIN revision_comparison --><a href="/wiki/diff/{WIKI_ID}/{REVISION_ID}/{REVISION_COMPARE}">Compare</a><!-- END revision_comparison --></td>
-		</tr>
-		<!-- END revision_list -->
-	</table>
+<div class="row">
+	<div class="small-12 large-8 island">
+		<h2 class="subheader">Wiki</h2>
+		<section class="content">
+			<article>
+				{BODY}
+			</article>
+		</section>
+	</div>
+	<div class="small-12 large-4 island">
+		<h2 class="subheader">Revisions</h2>
+		<table>
+			<thead>
+				<tr>
+					<th>Date</th>
+					<th>Author</th>
+					<th>Compare</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- BEGIN revision_list -->
+				<tr class="{REVISION_CURRENT}">
+					<td><a href="/wiki/revision/{WIKI_ID}/{REVISION_COMPARE}">{REVISION_DATE}</a></td>
+					<td>{REVISION_AUTHOR}</td>
+					<td><!-- BEGIN revision_comparison --><a href="/wiki/diff/{WIKI_ID}/{REVISION_ID}/{REVISION_COMPARE}" class="icon-view" data-tooltip title="Compare"></a><!-- END revision_comparison --></td>
+				</tr>
+				<!-- END revision_list -->
+			</tbody>
+		</table>
+	</div>
 </div>

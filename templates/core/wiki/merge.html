@@ -1,62 +1,77 @@
-<!-- BEGIN custom_head -->
+{BREADCRUMB}
+
+<div class="row">
+	<div class="small-12 columns">
+		<h1>{ACTION} Wiki</h1>
+        <div class="alert-box warning">
+            <h3>Conflict Detected</h3>
+
+            <p>
+                A more recent version of the document has been saved since you
+                opened it. This is the latest revision of the document. The version
+                you created is shown as well. Please merge your changes into this
+                version and try saving again.
+            </p>
+        </div>
+	</div>
+</div>
+<form action="/wiki/modifyForm.php" method="post" class="top">
+    <input type="hidden" name="wikiID" value="{WIKI_ID}" />
+    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+    <input type="hidden" name="revision" value="{REVISION}" />
+    <input type="hidden" name="slug" value="{SLUG}" />
+
+    <div class="row" data-equalizer>
+        <div class="small-12 large-6 island">
+            <h2 class="subheader">Current Version</h2>
+            <section>
+                <fieldset class="content" data-equalizer-watch>
+                    <div class="small-12 columns">
+                        <label>
+                            Title
+                            <input type="text" name="heading" size="60" value="{HEADING}" />
+                        </label>
+                        <label>
+                            Body
+                            <textarea name="body">{BODY}</textarea>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+        </div>
+        <div class="small-12 large-6 island">
+            <h2 class="subheader">Your Version</h2>
+            <section class="content" data-equalizer-watch>
+                <label>
+                    Title
+                    <p>
+                        {YOURS_HEADING}
+                    </p>
+                </label>
+                <label>
+                    Body
+                    <article>
+                        {YOURS_BODY}
+                    </article>
+                </label>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 column">
+            <input type="submit" value="Save" />
+        </div>
+    </div>
+</form>
+
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript">
-	$(function() {
-		$.fn.alaressTiny({
-			mode: 'exact',
-			elements: 'textBoxBody',
-			file_browser_category_id : {ID}
-		});
-	});
-});
+    $(function() {
+        $.fn.alaressTiny({
+            mode: 'textareas',
+            file_browser_category_id : {CATEGORY_ID}
+        });
+    });
 </script>
-<!-- END custom_head -->
-
-<h1>{ACTION} Wiki</h1>
-<span class="header_option"><a href="/homepage/{CATEGORY_ID}">Return to Homepage</a></span>
-<div class="highlightedMessage">
-	<div>
-		<p><span>Conflict detected.</span><br />
-			A more recent version of the document has been saved since you
-			opened it. This is the latest revision of the document. The version
-			you created is shown below. Please merge your changes into this
-			version and try saving again. </p>
-	</div>
-</div>
-<form action="/wiki/modifyForm.php" method="post" class="clearfix">
-	<input type="hidden" name="wikiID" value="{WIKI_ID}" />
-	<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-	<input type="hidden" name="revision" value="{REVISION}" />
-	<input type="hidden" name="slug" value="{SLUG}" />
-	<table width="100%" class="standardForm table">
-		<tr>
-			<td class="formLabelWidth"><h4>Title</h4></td>
-			<td><input type="text" name="heading" size="60" value="{HEADING}" /></td>
-		</tr>
-		<tr>
-			<td><h4>Body</h4></td>
-			<td><textarea name="body" style="width:100%;height:350px" >{BODY}</textarea></td>
-		</tr>
-	</table>
-	<input type="submit" class="submit-btn-plain" value="Save" />
-
-</form>
-<div class="highlightedMessage">
-	<div>
-		<p> This is your version of the document. Please merge these changes into
-			the version above. </p>
-	</div>
-</div>
-<form class="" action="#" method="post">
-	<table width="100%" class="standardForm table">
-		<tr>
-			<td class="formLabelWidth"><h4>Title</h4></td>
-			<td><input type="text" name="heading" size="60" value="{YOURS_HEADING}" /></td>
-		</tr>
-		<tr>
-			<td><h4>Body</h4></td>
-			<td><textarea name="body" style="width:100%;height:350px" >{YOURS_BODY}</textarea></td>
-		</tr>
-	</table>
-</form>
