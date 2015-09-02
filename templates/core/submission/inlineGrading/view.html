@@ -6,6 +6,9 @@
         <ul class="meta">
             <li class="icon-calendar">Due <span class="gradient-{BOX_GRADIENT}">{DUEWORK_DUEDATE}</span></li>
             <li class="icon-due-work"><a href="/homepage/{FOLDER_ID}">{FOLDER_NAME}</a> {DUEWORK_TYPE}</li>
+            <!-- BEGIN is_archived -->
+            <li class="icon-locked">Archived</li>
+            <!-- END is_archived -->
             <li class="{GRADE_VISIBILITY_CLASS}">Grade visible to {GRADE_VISIBILITY}</li>
         </ul>
     </div>
@@ -89,7 +92,7 @@
 
                             <!-- BEGIN plag_enabled -->
                             <div class="list-item-content grade no-pad">
-                                <span class="plag-score" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report">(<a href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a>)</span>
+                                <span class="plag-score" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report"><a href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a></span>
                                 <p class="meta">Plagiarism Check</p>
                             </div>
                             <!-- END plag_enabled -->

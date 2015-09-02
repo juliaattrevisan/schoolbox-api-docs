@@ -277,6 +277,13 @@ class StudentReportCard
                 'category' => ''
             )
         );
+
+        /* Additional phplibs not in contextSelector instance
+         */
+        $page->setVar(array(
+            'WORK_YEAR'     => $this->targetYear,
+            'WORK_SEMESTER' => $this->targetSemester,
+        ));
     }
 
     protected function renderSubject(\SitePage $page, $components = array())
@@ -927,9 +934,11 @@ class StudentReportCard
             foreach ($comments as $comment) {
                 /** @var Comment $comment */
                 $date = $comment->getCreated()->getRelativeTime();
-                if ($comment->getModified()) {
+
+                if ($comment->getModified()->getUnixTimeStamp() > $comment->getCreated()->getUnixTimeStamp()) {
                     $date .= " &ndash; edited";
                 }
+
                 $commentData = array(
                     'ID'          => $comment->getId(),
                     'USER_NAME'   => $comment->getCommenter()->formatName(),

@@ -274,8 +274,10 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             return false;
         }
 
-        $this->setBlock($templateHandle, 'upcoming_work', 'upcoming_work_block');
         $this->setBlock($templateHandle, 'view_all_due_work', 'view_all_due_work_block');
+        $this->setBlock($templateHandle, 'no_upcoming_work', 'no_upcoming_work_block');
+        $this->setBlock($templateHandle, 'has_upcoming_work', 'has_upcoming_work_block');
+        $this->setBlock('has_upcoming_work', 'upcoming_work', 'upcoming_work_block');
         $this->setBlock('upcoming_work', 'upcoming_work_actionable', 'upcoming_work_actionable_block');
         $this->setBlock('upcoming_work', 'upcoming_work_link', 'upcoming_work_link_block');
         $this->setBlock('upcoming_work', 'upcoming_work_nolink', 'upcoming_work_nolink_block');
@@ -304,12 +306,24 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
                 }
                 $this->parse('upcoming_work_block', 'upcoming_work', true);
             }
+
+            $this->parse('has_upcoming_work_block', 'has_upcoming_work');
+            $this->setVar(array(
+                'no_upcoming_work_block' => ''
+            ));
         } else {
             $userHandler = new User();
             $pronoun = ($this->userID == $_SESSION['id'])
                 ? 'You have'
                 : ($userHandler->formatName($userHandler->getByID($this->userID), '{firstname} has'));
-            $this->setVar('upcoming_work_block', "<ul><li>$pronoun no upcoming work.</li></ul>");
+
+            $this->setVar(array(
+                'has_upcoming_work_block' => '',
+                'upcoming_work_block' => '',
+                'PRONOUN' => $pronoun
+            ));
+
+            $this->parse('no_upcoming_work_block', 'no_upcoming_work');
         }
 
         return true;
