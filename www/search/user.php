@@ -534,7 +534,9 @@ if (is_numeric($this->arg[0])) {
             )
         );
 
-        $this->parse('user_calendar_block', 'user_calendar');
+        if (!$groupHandler->isStudent($user['uid'])) {
+            $this->parse('user_calendar_block', 'user_calendar');
+        }
     }
 
     //Format email address link
@@ -582,7 +584,7 @@ if (is_numeric($this->arg[0])) {
 
     $this->setVar($outputUser);
 
-    if ($_SESSION['su']) {
+    if ($_SESSION['su'] && !$groupHandler->isStudent($user['uid'])) {
         $this->parse('modify_block', 'modify');
     }
 
@@ -672,12 +674,13 @@ if (is_numeric($this->arg[0])) {
 
     /* ePortfolio link
     */
-    $authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $user['uid'], 'profile');
-
-    if ($authenticator->canView()) {
-        $this->parse('eportfolio_block', 'eportfolio');
-    } else {
-        $this->setVar('eportfolio_block', '');
+    if (!$groupHandler->isStudent($user['uid'])) {
+        $authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $user['uid'], 'profile');
+        if ($authenticator->canView()) {
+            $this->parse('eportfolio_block', 'eportfolio');
+        } else {
+            $this->setVar('eportfolio_block', '');
+        }
     }
 
 } else {
