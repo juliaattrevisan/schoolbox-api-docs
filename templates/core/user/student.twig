@@ -152,15 +152,26 @@
 
 <div class="row">
     <div class="small-12 xlarge-6 xlarge-push-6 columns">
-        <!-- BEGIN contact_synergy -->
+        {% if isParentOfChild
+           or session.user.isSuperUser()
+           or session.user.getRole().isStaff()
+           or session.user.getId() == user.getId()
+        %}
         <div class="row">
             <div class="small-12 medium-6 xlarge-12 island">
                 <h2 class="subheader">Contact Information</h2>
-                <!-- BEGIN contact_alert -->
+                {% if externalUser.AlertMessage %}
                 <div class="alert-box alert icon-alert no-margin">
-                    {CONTACT_ALERT_MESSAGE}
+                    {#
+                    'CONTACT_ALERT_MESSAGE' => preg_replace(
+                        '/[\\n\\r]+/',
+                        '<hr/>',
+                        Scrub::text($synInfo['AlertMessage'])
+                    ),
+                    #}
+                    {{ externalUser.AlertMessage }}
                 </div>
-                <!-- END contact_alert -->
+                {% endif %}
                 <section>
                     <div class="content no-pad">
                         <ul class="information-list">
@@ -272,7 +283,7 @@
                 </section>
             </div>
         </div>
-        <!-- END contact_synergy -->
+        {% endif %}
     </div>
 
     <div class="small-12 xlarge-6 xlarge-pull-6 columns">

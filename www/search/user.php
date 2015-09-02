@@ -38,6 +38,7 @@ function renderStudent(
                 'isParentOfChild' => $isParentOfChild,
                 'now'             => Alaress_Date_Format::now(),
                 'boarderType'     => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
+                'contacts'        => $synUserHandler->getStudentContactList($user['synergy_id']),
             ]
         )
     );
