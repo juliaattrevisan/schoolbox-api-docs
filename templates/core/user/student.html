@@ -121,7 +121,131 @@
 </div>
 
 <div class="row">
-    <div class="small-12 medium-6 columns">
+    <div class="small-12 xlarge-6 xlarge-push-6 columns">
+        <!-- BEGIN contact_synergy -->
+        <div class="row">
+            <div class="small-12 medium-6 xlarge-12 island">
+                <h2 class="subheader">Contact Information</h2>
+                <!-- BEGIN contact_alert -->
+                <div class="alert-box alert icon-alert no-margin">
+                    {CONTACT_ALERT_MESSAGE}
+                </div>
+                <!-- END contact_alert -->
+                <section>
+                    <div class="content no-pad">
+                        <ul class="information-list">
+                            <!-- BEGIN contact_details -->
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="avatar-card">
+                                        <a href="{CONTACT_LINK}">
+                                            <img src="/portrait.php?userId={CONTACT_EXTERNAL_ID}&size=square64" />
+                                            {CONTACT_NAME}
+                                        </a>
+                                        <p class="meta">{CONTACT_ROLE}</p>
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a href="#" class="icon-more" data-dropdown="row-options-contact-{CONTACT_ID}"></a>
+                                </nav>
+                                <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{CONTACT_ID}">
+                                    <!-- BEGIN contact_email -->
+                                    <li><a class="icon-email" href="{CONTACT_EMAIL_HREF}">{CONTACT_EMAIL}</a></li>
+                                    <!-- END contact_email -->
+                                    <!-- BEGIN contact_mobile -->
+                                    <li><a class="icon-mobile" href="tel:{CONTACT_MOBILE_PHONE}">{CONTACT_MOBILE_PHONE}</a></li>
+                                    <!-- END contact_mobile -->
+                                    <!-- BEGIN contact_phone -->
+                                    <li><a class="icon-mobile" href="tel:{CONTACT_OCCUP_PHONE}">{CONTACT_OCCUP_PHONE}</a></li>
+                                    <!-- END contact_phone -->
+                                </ul>
+                            </li>
+
+                            <!-- BEGIN spouse_details -->
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="avatar-card">
+                                        <a href="{SPOUSE_LINK}">
+                                            <img src="/portrait.php?userId={SPOUSE_EXTERNAL_ID}&size=square64" />
+                                            {SPOUSE_NAME}
+                                        </a>
+                                        <p class="meta">{SPOUSE_ROLE}</p>
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a href="#" class="icon-more" data-dropdown="row-options-spouse-{SPOUSE_ID}"></a>
+                                </nav>
+                                <ul class="f-dropdown" data-dropdown-content id="row-options-spouse-{SPOUSE_ID}">
+                                    <!-- BEGIN spouse_email -->
+                                    <li><a class="icon-email" href="{SPOUSE_EMAIL_HREF}">{SPOUSE_EMAIL}</a></li>
+                                    <!-- END spouse_email -->
+                                    <!-- BEGIN spouse_mobile -->
+                                    <li><a class="icon-mobile" href="tel:{SPOUSE_MOBILE_PHONE}">{SPOUSE_MOBILE_PHONE}</a></li>
+                                    <!-- END spouse_mobile -->
+                                    <!-- BEGIN spouse_phone -->
+                                    <li><a class="icon-mobile" href="tel:{SPOUSE_OCCUP_PHONE}">{SPOUSE_OCCUP_PHONE}</a></li>
+                                    <!-- END spouse_phone -->
+                                </ul>
+                            </li>
+                            <!-- END spouse_details -->
+
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="avatar-card">
+                                        <span class="icon-home icon-32"></span>
+                                        {CONTACT_ADDRESS}
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a class="icon-mobile" href="tel:{CONTACT_HOME_PHONE}" title="Call {CONTACT_HOME_PHONE}"></a>
+                                </nav>
+                            </li>
+                            <!-- END contact_details -->
+                        </ul>
+                    </div>
+                </section>
+            </div>
+
+            <div class="small-12 medium-6 xlarge-12 island">
+                <!-- BEGIN emergency -->
+                <h2 class="subheader">Emergency Contact Information</h2>
+                <section>
+                    <div class="content no-pad">
+                        <!-- BEGIN edit_emergency -->
+                        <!-- END edit_emergency -->
+
+                        <ul class="information-list">
+                            <!-- BEGIN emergency_contact -->
+                            <li class="actions-small-1 actions-medium-2">
+                                <div class="list-item">
+                                    <div class="avatar-card">
+                                        <span class="icon-alert icon-32"></span>
+                                        {EMERGENCY_NAME}
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a href="#" class="icon-more" data-dropdown="row-options-emergency-{EMERGENCY_COUNT}"></a>
+                                </nav>
+                                <ul class="f-dropdown" data-dropdown-content id="row-options-emergency-{EMERGENCY_COUNT}">
+                                    <li class="full-width">
+                                        <a class="icon-mobile" href="tel:{EMERGENCY_PHONE}">{EMERGENCY_PHONE}</a>
+                                    </li>
+                                    <li class="full-width">
+                                        <a class="icon-mobile" href="tel:{EMERGENCY_ALT_PHONE}">{EMERGENCY_ALT_PHONE}</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <!-- END emergency_contact -->
+                        </ul>
+                    </div>
+                    <!-- END emergency -->
+                </section>
+            </div>
+        </div>
+        <!-- END contact_synergy -->
+    </div>
+
+    <div class="small-12 xlarge-6 xlarge-pull-6 columns">
         <!-- BEGIN subject -->
         <div class="row">
             <div class="small-12 island">
@@ -222,127 +346,5 @@
             </div>
         </div>
         <!-- END group -->
-    </div>
-
-    <div class="small-12 medium-6 columns">
-        <!-- BEGIN contact_synergy -->
-        <div class="row">
-            <div class="small-12 island">
-                <h2 class="subheader">Contact Information</h2>
-                <!-- BEGIN contact_alert -->
-                <div class="alert-box alert icon-alert no-margin">
-                    {CONTACT_ALERT_MESSAGE}
-                </div>
-                <!-- END contact_alert -->
-                <section>
-                    <div class="content no-pad">
-                        <ul class="information-list">
-                            <!-- BEGIN contact_details -->
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="avatar-card">
-                                        <a href="{CONTACT_LINK}">
-                                            <img src="/portrait.php?userId={CONTACT_EXTERNAL_ID}&size=square64" />
-                                            {CONTACT_NAME}
-                                        </a>
-                                        <p class="meta">{CONTACT_ROLE}</p>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a href="#" class="icon-more" data-dropdown="row-options-contact-{CONTACT_ID}"></a>
-                                </nav>
-                                <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{CONTACT_ID}">
-                                    <!-- BEGIN contact_email -->
-                                    <li><a class="icon-email" href="{CONTACT_EMAIL_HREF}">{CONTACT_EMAIL}</a></li>
-                                    <!-- END contact_email -->
-                                    <!-- BEGIN contact_mobile -->
-                                    <li><a class="icon-mobile" href="tel:{CONTACT_MOBILE_PHONE}">{CONTACT_MOBILE_PHONE}</a></li>
-                                    <!-- END contact_mobile -->
-                                    <!-- BEGIN contact_phone -->
-                                    <li><a class="icon-mobile" href="tel:{CONTACT_OCCUP_PHONE}">{CONTACT_OCCUP_PHONE}</a></li>
-                                    <!-- END contact_phone -->
-                                </ul>
-                            </li>
-
-                            <!-- BEGIN spouse_details -->
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="avatar-card">
-                                        <a href="{SPOUSE_LINK}">
-                                            <img src="/portrait.php?userId={SPOUSE_EXTERNAL_ID}&size=square64" />
-                                            {SPOUSE_NAME}
-                                        </a>
-                                        <p class="meta">{SPOUSE_ROLE}</p>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a href="#" class="icon-more" data-dropdown="row-options-spouse-{SPOUSE_ID}"></a>
-                                </nav>
-                                <ul class="f-dropdown" data-dropdown-content id="row-options-spouse-{SPOUSE_ID}">
-                                    <!-- BEGIN spouse_email -->
-                                    <li><a class="icon-email" href="{SPOUSE_EMAIL_HREF}">{SPOUSE_EMAIL}</a></li>
-                                    <!-- END spouse_email -->
-                                    <!-- BEGIN spouse_mobile -->
-                                    <li><a class="icon-mobile" href="tel:{SPOUSE_MOBILE_PHONE}">{SPOUSE_MOBILE_PHONE}</a></li>
-                                    <!-- END spouse_mobile -->
-                                    <!-- BEGIN spouse_phone -->
-                                    <li><a class="icon-mobile" href="tel:{SPOUSE_OCCUP_PHONE}">{SPOUSE_OCCUP_PHONE}</a></li>
-                                    <!-- END spouse_phone -->
-                                </ul>
-                            </li>
-                            <!-- END spouse_details -->
-
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="avatar-card">
-                                        <span class="icon-home icon-32"></span>
-                                        {CONTACT_ADDRESS}
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a class="icon-mobile" href="tel:{CONTACT_HOME_PHONE}" title="Call {CONTACT_HOME_PHONE}"></a>
-                                </nav>
-                            </li>
-                            <!-- END contact_details -->
-                        </ul>
-                    </div>
-                </section>
-
-                <!-- BEGIN emergency -->
-                <h2 class="subheader">Emergency Contact Information</h2>
-                <section>
-                    <div class="content no-pad">
-                        <!-- BEGIN edit_emergency -->
-                        <!-- END edit_emergency -->
-
-                        <ul class="information-list">
-                            <!-- BEGIN emergency_contact -->
-                            <li class="actions-small-1 actions-medium-2">
-                                <div class="list-item">
-                                    <div class="avatar-card">
-                                        <span class="icon-alert icon-32"></span>
-                                        {EMERGENCY_NAME}
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a href="#" class="icon-more" data-dropdown="row-options-emergency-{EMERGENCY_COUNT}"></a>
-                                </nav>
-                                <ul class="f-dropdown" data-dropdown-content id="row-options-emergency-{EMERGENCY_COUNT}">
-                                    <li class="full-width">
-                                        <a class="icon-mobile" href="tel:{EMERGENCY_PHONE}">{EMERGENCY_PHONE}</a>
-                                    </li>
-                                    <li class="full-width">
-                                        <a class="icon-mobile" href="tel:{EMERGENCY_ALT_PHONE}">{EMERGENCY_ALT_PHONE}</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <!-- END emergency_contact -->
-                        </ul>
-                    </div>
-                    <!-- END emergency -->
-                </section>
-            </div>
-        </div>
-        <!-- END contact_synergy -->
     </div>
 </div>
