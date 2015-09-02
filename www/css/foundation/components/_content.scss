@@ -1042,6 +1042,11 @@ ul.flex-list {
 	width: 100%;
 	display: table;
 	margin: 0;
+	&.buttons {
+		> li > a {
+			@extend .button;
+		}
+	}
 	> li {
 		display: table-cell;
 		margin: 0;
@@ -1050,18 +1055,19 @@ ul.flex-list {
 		&:last-child {
 			padding-right: 0;
 		}
-		&.overflow, &.more {
+		&.overflow {
 			width: 3rem;
 			display: table-cell !important; // override flex hiding
 		}
 		> a {
 			width: 100%;
+			white-space: nowrap;
 			&.button {
 				height: 3rem;
 				line-height: 2rem;
 			}
 			&:empty:before {
-				float: none;
+				float: none !important; // grrrr :(
 			}
 		}
 	}
@@ -1071,6 +1077,7 @@ ul.flex-list {
 	@include hide-n(large, $large-down, $large-up) { display: none };
 	@if $include-xl-html-grid-classes {
 		@include hide-n(xlarge, $xlarge-down, $xlarge-up) { display: none };
+		@include hide-n(xxlarge, $xxlarge-down, $xxlarge-up) { display: none };
 	}
 }
 
