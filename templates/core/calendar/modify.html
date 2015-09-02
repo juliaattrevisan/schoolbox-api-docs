@@ -26,6 +26,14 @@
                 <span {ADVANCED_SHOW}>Show</span>
                 <span {ADVANCED_CLOSE}>Hide</span>
             </a>
+            <!-- BEGIN delete_button -->
+            <a href="#" class="icon-overflow" data-dropdown="overflow"></a>
+            <ul class="f-dropdown" data-dropdown-content id="overflow">
+                <li>
+                    <a href="/calendar/modifyForm.php?action=Delete&id={EVENT_ID}" class="icon-delete">Delete Event</a>
+                </li>
+            </ul>
+            <!-- END delete_button -->
         </span>
 
         <form id="eventForm" method="post" action="/calendar/modifyForm.php" class="top">
@@ -237,11 +245,7 @@
             </section>
             <div class="row">
                 <div class="small-12 column">
-                    <input id="b{FUNCTION}" type="submit" name="{FUNCTION}" value="{FUNCTION} Event" class="submit-btn-plain"/>
-
-                  		<!-- BEGIN delete_button -->
-                  		<input id="bDelete" type="submit" name="Delete" value="Delete Event" class="submit-btn-plain cancel"/>
-                  		<!-- END delete_button -->
+                    <input id="b{FUNCTION}" type="submit" name="{FUNCTION}" value="{FUNCTION} Event" />
                 </div>
             </div>
             <div class='hide' id="dialog-bulk" data-dialog="bulk"  title="This event is part of a series">
