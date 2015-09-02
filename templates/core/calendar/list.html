@@ -15,8 +15,13 @@
 			exportContainer: exportForm
 		})
 
+
+
         /* Calendar controls
          */
+        $('[data-filters]').click(function() { $('#calendar-controls').foundation('reveal','open') });
+        $('[data-export]').click(function() { $('#calendar-export').foundation('reveal','open') });
+
         $('[data-type=calendar-controls]').submit(function(event) {
             event.preventDefault();
 
@@ -59,13 +64,6 @@
 			endDate: $('#finish_date')
 		});
 
-		$('.btn.export').click(function(event) {
-			event.preventDefault();
-			$('.filter-drop').not(exportForm).hide();
-			exportForm.toggle();
-		});
-
-//		exportControls.find(cal.options.filter.boxSelector).toggle()
 		//
 		// Form listener for exporter - brings up a dialog box that offers a URL
 		// to click.
@@ -87,48 +85,16 @@
             });
 
             var form = $(this);
-			$('#calendar-export-dialog').dialog({
-				open: function(event, ui) {
-					$(event.target).find('#calendar-export-dialog-url')
-							.text($.getExportCalendarLink('{USER_TOKEN}', form.serializeArray()));
-				},
-				minWidth: 400,
-				modal: true
-			});
+            var url = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray());
+            $('#calendar-export-dialog-url').text(url).select();
+            $('#calendar-export-dialog').foundation('reveal', 'open');
 		});
 
+        //select all clicked
+        $('#calendar-controls').on('change','.select_all', function(e) {
+            $(this).parent().find(':checkbox').prop('checked', $(this).prop('checked'));
+        })
 
-		$('.filter-cat.sources').selectAll({
-			key: 'selectallsources',
-			checkboxName: 'source',
-			change: function() {
-				$('input[name=source]').change();
-			}
-		});
-
-		$('.filter-cat.groups').selectAll({
-			key: 'selectallgroups',
-			checkboxName: 'group',
-			change: function() {
-				$('input[name=group]').change();
-			}
-		});
-
-		$('.filter-cat.campus').selectAll({
-			key: 'selectallcampuses',
-			checkboxName: 'campus',
-			change: function() {
-				$('input[name=campus]').change();
-			}
-		});
-
-		$('.filter-cat.events').selectAll({
-			key: 'selectalleventtypes',
-			checkboxName: 'events',
-			change: function() {
-				$('input[name=events]').change();
-			}
-		});
 
         $(document).on('click', 'a.attendance-request', function (event) {
             event.preventDefault();
@@ -276,12 +242,12 @@
             <input type="submit" value="Update" />
         </div>
         <div class="small-12 large-6 columns">
-            <a href="#" class="button icon-filter" data-filters="true"><span></span>Filters</a>
+            <a href="#" class="button icon-filter" data-filters><span></span>Filters</a>
             <a href="#" class='button active'><span></span>List</a>
             <a href="/calendar/full/{CALENDAR_PARAMS}#month" class='button'>Month</a>
             <a href="/calendar/full/{CALENDAR_PARAMS}#agendaWeek" class='button'>Week</a>
             <a href="/calendar/full/{CALENDAR_PARAMS}#agendaDay" class='button'>Day</a>
-            <a href="#" class='button icon-export'>Export</a>
+            <a href="#" class='button icon-export' data-export>Export</a>
         </div>
     </div>
 </form>
