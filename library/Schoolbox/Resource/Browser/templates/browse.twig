@@ -1,24 +1,9 @@
 {# TODO PUT THIS IN THE HEAD SOMEHOW #}
 <link rel="stylesheet" type="text/css" media="screen" href="/css/foundation/chrome.css?v={SITE_VERSION}" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css" />
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <style type="text/css">
     /* STYLES I NEED */
 
-    .jstree-default .jstree-node {
-        min-height: 32px;
-        line-height: 32px;
-    }
-
-    .row > div.columns:not(:last-of-type) {
-        border-right: solid 1px #eee;
-    }
-    .row > div.columns {
-        overflow-x: hidden;
-    }
-    #container.foundation ul.jstree-container-ul {
-        margin-left: 0;
-    }
     #tree > ul > li > i {
         visibility: hidden;
     }
@@ -64,9 +49,6 @@
         white-space: nowrap;
         text-overflow: ellipsis;
     }
-    .jstree-node {
-        overflow-x: hidden;
-    }
     .meta-title {
         font-weight: bold !important;
         clear: both;
@@ -75,10 +57,6 @@
         text-overflow: ellipsis;
     }
 
-    #meta .information-list > li.center img.icon { {# I should not need to be this specific :/ #}
-        float: none;
-        margin: 0 0 1.125em 0;
-    }
     #three-panel form.dropzone {
         position: absolute !important;
         top: 0;
@@ -86,42 +64,8 @@
         width: 100%;
         height: 100%;
     }
-    .jstree-default .selected {
-        background: #beebff;
-    }
-    #file-list.jstree-default li:hover {
-        background-color: #ffffe5;
-    }
-
-    .folder-panel .icon-folder:before {
-        color: #0066b0
-    }
-    .folder-panel .icon-home:before {
-        color: darkorange;
-    }
-    .folder-panel .icon-course-builder:before {
-        color: #008600;
-    }
     #tree {
         overflow-x: hidden;
-    }
-
-    .jstree-default .jstree-wholerow {
-        height: 48px;
-        line-height: 48px;
-    }
-
-    .jstree-default .jstree-anchor {
-        line-height: 48px;
-        height: 48px;
-    }
-
-    .jstree-default .jstree-icon:empty {
-        line-height: 48px;
-    }
-    .jstree-ocl {
-        top: 0.75rem;
-        padding: 0 1rem !important;
     }
 
     @media only screen and (min-width:64.0625em) and (max-width:120em) {

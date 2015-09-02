@@ -1,0 +1,79 @@
+
+$tree-node-height: 3rem;
+
+$tree-node-hover-background: tint($secondary-color, 30%);
+$tree-node-hover-color: calc-text-color($tree-node-hover-background);
+
+$tree-node-selected-background: $secondary-color;
+$tree-node-selected-color: calc-text-color($tree-node-selected-background);
+
+$tree-folder-icon-color: $primary-color;
+$tree-homepage-icon-color: darkorange;
+$tree-course-icon-color: #008600;
+
+
+// a whole bushel of jstree overrides.....
+
+div.jstree-default, ul.jstree-default {
+
+    .jstree-node {
+        min-height: $tree-node-height;
+        line-height: $tree-node-height;
+        overflow-x: hidden;
+
+        .jstree-wholerow {
+            &.jstree-wholerow-hovered {
+                color: $tree-node-hover-color;
+                background: $tree-node-hover-background;
+            }
+
+            &.jstree-wholerow-clicked {
+                color: $tree-node-selected-color;
+                background: $tree-node-selected-background;
+            }
+        }
+    }
+
+    li:hover {
+        color: $tree-node-hover-color;
+        background: $tree-node-hover-background;
+    }
+
+    li.selected, li.jstree-wholerow-clicked {
+        color: $tree-node-selected-color;
+        background: $tree-node-selected-background;
+    }
+
+
+    .jstree-wholerow, .jstree-anchor {
+        height: $tree-node-height;
+    }
+
+    .jstree-wholerow, .jstree-anchor, .jstree-default, .jstree-icon:empty {
+        line-height: $tree-node-height;
+    }
+
+    .jstree-ocl {
+        top: 0.75rem;
+        padding: 0 1rem !important;
+    }
+
+    .icon-folder:before {
+        color: $tree-folder-icon-color;
+    }
+
+    .icon-home:before {
+        color: $tree-homepage-icon-color;
+    }
+
+    .icon-course:before {
+        color: $tree-course-icon-color;
+    }
+
+    .jstree-hovered {
+        [class*=icon-]:before {
+            //color: $tree-node-hover-color;
+        }
+    }
+
+}
