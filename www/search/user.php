@@ -25,7 +25,10 @@ function renderStudent(
         'OUTPUT',
         $page->getTwig()->render(
             'user/student.twig',
-            ['user' => \Schoolbox\UserMapper::getInstance()->findById($user['uid'])]
+            [
+                'session' => ['user' => $_SESSION['user'],],
+                'user'    => \Schoolbox\UserMapper::getInstance()->findById($user['uid']),
+            ]
         )
     );
     return;
