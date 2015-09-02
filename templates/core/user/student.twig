@@ -73,17 +73,29 @@
             </div>
         </section>
         <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8" data-equalizer>
-            <!-- BEGIN due_work -->
-            <li class="no-pad"><a href="/submission/dueWork/0/{ID}" class="no-margin fat button icon-fat icon-32 icon-due-work" data-equalizer-watch>Due Work</a></li>
-            <!-- END due_work -->
+            {% if not (config.restrict_parent_duework_access and session.user.isParent()) %}
+            <li class="no-pad">
+                <a href="/submission/dueWork/0/{{ user.getId() }}"
+                   class="no-margin fat button icon-fat icon-32 icon-due-work"
+                   data-equalizer-watch>Due Work</a>
+            </li>
+            {% endif %}
 
-            <!-- BEGIN grades_button -->
-            <li class="no-pad"><a href="/submission/allWork/{ID}" class="no-margin fat button icon-fat icon-32 icon-tick" data-equalizer-watch>Grades</a></li>
-            <!-- END grades_button -->
+            {% if not (config.restrict_parent_grades and session.user.isParent()) %}
+            <li class="no-pad">
+                <a href="/submission/allWork/{{ user.getId() }}"
+                   class="no-margin fat button icon-fat icon-32 icon-tick"
+                   data-equalizer-watch>Grades</a>
+            </li>
+            {% endif %}
 
-            <!-- BEGIN eportfolio -->
-            <li class="no-pad"><a href="/eportfolio/{ID}/profile" class="no-margin fat button icon-fat icon-32 icon-eportfolio" data-equalizer-watch>ePortfolio</a></li>
-            <!-- END eportfolio -->
+            {% if eportfolioAuth %}
+            <li class="no-pad">
+                <a href="/eportfolio/{ID}/profile"
+                   class="no-margin fat button icon-fat icon-32 icon-eportfolio"
+                   data-equalizer-watch>ePortfolio</a>
+            </li>
+            {% endif %}
 
             <!-- BEGIN user_calendar -->
             <li class="no-pad"><a href='/calendar/full/{USER_CALENDAR_CURRENTDATE}/{ID}' class="no-margin fat button icon-fat icon-32 icon-calendar" data-equalizer-watch>Calendar</a></li>

@@ -20,15 +20,19 @@ function renderStudent(
     External_User $synUserHandler,
     User $userHandler
 ) {
+    // Handle eportfolio auth here for now
+
+    $authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $user['uid'], 'profile');
     $page->setFile(TEMPLATE_content, 'output.html');
     $page->setVar(
         'OUTPUT',
         $page->getTwig()->render(
             'user/student.twig',
             [
-                'session'      => $_SESSION,
-                'user'         => \Schoolbox\UserMapper::getInstance()->findById($user['uid']),
-                'externalUser' => $synUserHandler->getStudent($user['synergy_id']),
+                'session'        => $_SESSION,
+                'user'           => \Schoolbox\UserMapper::getInstance()->findById($user['uid']),
+                'externalUser'   => $synUserHandler->getStudent($user['synergy_id']),
+                'eportfolioAuth' => $authenticator->canView(),
             ]
         )
     );
