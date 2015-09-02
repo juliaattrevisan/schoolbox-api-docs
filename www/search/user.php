@@ -46,6 +46,8 @@ function renderStudent(
                 'now'             => Alaress_Date_Format::now(),
                 'boarderType'     => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
                 'contacts'        => $synUserHandler->getStudentContactList($user['synergy_id']),
+                'subjects'        => $synUserHandler->getSubjectList($user['synergy_id'], $user['uid']),
+                'groups'          => $groupHandler->involvedInCategoryList($user['uid'], false),
             ]
         )
     );

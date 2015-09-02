@@ -356,48 +356,48 @@
         </div>
         <!-- END subject -->
 
-        <!-- BEGIN group -->
+        {% if groups is not empty %}
         <div class="row">
             <div class="small-12 island">
                 <h2 class="subheader">Groups</h2>
-                <!-- BEGIN group_row -->
-                <!-- BEGIN group_item -->
+                {% for group in groups %}
                 <section>
                     <div class="content no-pad">
                         <ul class="subject-list">
                             <li>
                                 <div class="list-item">
                                     <div class="small-12 avatar card">
-                                        <a href="{GROUP_URL}">
+                                        <a href="/homepage/{{ group.id }}">
                                             <span class="icon-folder icon-32"></span>
-                                            {GROUP_NAME}
+                                            {{ group.name }}
                                         </a>
                                     </div>
                                 </div>
                             </li>
-                            <!-- BEGIN group_teacher -->
+                            {% if group.owner %}
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="avatar-card">
-                                        <a href="/search/user/{SUBJECT_TEACHER_ID}">
-                                            <img src="/portrait.php?userId={SUBJECT_TEACHER_EXTERNAL_ID}&size=square64" />
-                                            {SUBJECT_TEACHER_NAME}
+                                        <a href="/search/user/{{ group.owner.id }}">
+                                            <img src="/portrait.php?userId={{ group.owner.externalId }}&size=square64" />
+                                            {{ group.owner.name }}
                                         </a>
-                                        <p class="meta">Teacher</p>
+                                        <p class="meta">{{ group.owner.role }}</p>
                                     </div>
                                 </div>
                                 <nav>
-                                    <a class="icon-email" href="{SUBJECT_TEACHER_EMAIL}" title="Email {SUBJECT_TEACHER_NAME}"></a>
+                                    <a class="icon-email"
+                                       href="{{ session.mailhandle }}{{ group.owner.email }}"
+                                       title="Email {{ group.owner.name }}"></a>
                                 </nav>
                             </li>
-                            <!-- END group_teacher -->
+                            {% endif %}
                         </ul>
                     </div>
                 </section>
-                <!-- END group_item -->
-                <!-- END group_row -->
+                {% endfor %}
             </div>
         </div>
-        <!-- END group -->
+        {% endif %}
     </div>
 </div>
