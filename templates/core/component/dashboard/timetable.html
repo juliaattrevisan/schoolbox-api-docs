@@ -1,6 +1,10 @@
 <div id='component{COMPONENT_INSTANCE_ID}' data-component>
-    <!-- Custom javascript -->
-
+    <script type="text/javascript" src="/javascript/shared/jquery.timetable-dashboard.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('[data-timetable]').timetableDashboard();
+        });
+    </script>
     <!-- Probably doesn't have a configuration -->
     {CONFIGURATION}
 
@@ -16,55 +20,59 @@
                 </a>
             </h2>
             <section>
-                <table class="timetable">
-                    <thead>
-                        <tr>
-                            <!-- BEGIN timetable_header -->
-                            <th style='width:{TIMETABLE_FIELD_WIDTH}%'>
-                                {PERIOD_NAME}
-                                <time class="meta">{PERIOD_START}&ndash;{PERIOD_END}</time>
-                            </th>
-                            <!-- END timetable_header -->
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <!-- BEGIN timetable_period -->
-                            <td style="width:{TIMETABLE_FIELD_WIDTH}%">
-                                <!-- BEGIN period_class_link -->
-                                <!-- BEGIN period_class_link_attendance -->
-                                <a class="attendance-link {ATTENDANCE_ICON} no-text"
-                                   href='/modules/attendance/modify/{ATTENDANCE_CLASS_CODE}/{ATTENDANCE_ATTENDANCE_DATE}/{ATTENDANCE_ATTENDANCE_PERIOD}'
-                                   title="Mark Attendance"></a>
-                                <!-- END period_class_link_attendance -->
-                                <div class="timetable-subject" style="background:{PERIOD_COLOUR};" data-timetable-subject>
-                                    <a href="{PERIOD_URL}">
+                <div class="show-for-medium-up">
+                    <table class="timetable" data-timetable>
+                        <thead>
+                            <tr>
+                                <!-- BEGIN timetable_header -->
+                                <th style='width:{TIMETABLE_FIELD_WIDTH}%'>
+                                    {PERIOD_NAME}
+                                    <time class="meta">{PERIOD_START}&ndash;{PERIOD_END}</time>
+                                </th>
+                                <!-- END timetable_header -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <!-- BEGIN timetable_period -->
+                                <td style="width:{TIMETABLE_FIELD_WIDTH}%">
+                                    <!-- BEGIN period_class_link -->
+                                    <!-- BEGIN period_class_link_attendance -->
+                                    <a class="attendance-link {ATTENDANCE_ICON} no-text"
+                                       href='/modules/attendance/modify/{ATTENDANCE_CLASS_CODE}/{ATTENDANCE_ATTENDANCE_DATE}/{ATTENDANCE_ATTENDANCE_PERIOD}'
+                                       title="Mark Attendance"></a>
+                                    <!-- END period_class_link_attendance -->
+                                    <div class="timetable-subject" style="background:{PERIOD_COLOUR};" data-timetable-subject>
+                                        <a href="{PERIOD_URL}">
+                                            {PERIOD_DESC}
+                                            <p class="meta">{PERIOD_CODE}</p>
+                                            <p class="meta">{PERIOD_ROOM}</p>
+                                        </a>
+                                    </div>
+                                    <!-- END period_class_link -->
+
+                                    <!-- BEGIN period_class -->
+                                    <!-- BEGIN period_class_attendance -->
+                                    <a class="attendance-link {ATTENDANCE_ICON} no-text"
+                                       href='/modules/attendance/modify/{ATTENDANCE_CLASS_CODE}/{ATTENDANCE_ATTENDANCE_DATE}/{ATTENDANCE_ATTENDANCE_PERIOD}'
+                                       title="Mark Attendance"></a>
+                                    <!-- END period_class_attendance -->
+                                    <div class="timetable-subject" style="background:{PERIOD_COLOUR};" data-timetable-subject>
                                         {PERIOD_DESC}
                                         <p class="meta">{PERIOD_CODE}</p>
                                         <p class="meta">{PERIOD_ROOM}</p>
-                                    </a>
-                                </div>
-                                <!-- END period_class_link -->
-
-                                <!-- BEGIN period_class -->
-                                <!-- BEGIN period_class_attendance -->
-                                <a class="attendance-link {ATTENDANCE_ICON} no-text"
-                                   href='/modules/attendance/modify/{ATTENDANCE_CLASS_CODE}/{ATTENDANCE_ATTENDANCE_DATE}/{ATTENDANCE_ATTENDANCE_PERIOD}'
-                                   title="Mark Attendance"></a>
-                                <!-- END period_class_attendance -->
-                                <div class="timetable-subject" style="background:{PERIOD_COLOUR};" data-timetable-subject>
-                                    {PERIOD_DESC}
-                                    <p class="meta">{PERIOD_CODE}</p>
-                                    <p class="meta">{PERIOD_ROOM}</p>
-                                </div>
-                                <!-- END period_class -->
-                            </td>
-                            <!-- END timetable_period -->
-                        </tr>
-                    </tbody>
-                </table>
+                                    </div>
+                                    <!-- END period_class -->
+                                </td>
+                                <!-- END timetable_period -->
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </section>
             <!-- END campus_timetable -->
+
+            <div class="row timetable-small show-for-small-only" data-smaller></div>
         </div>
     </div>
 </div>
