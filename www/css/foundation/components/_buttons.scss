@@ -319,6 +319,11 @@ $tabs-content-padding: rem-calc(($base-font-size - 8));
 	&:empty {
 		@extend .no-text;
 	}
+	// Fat button - for when you need a button larger than Steve's mama
+	// Like Steve's mama, fits best in a block-grid
+	&.fat {
+		display: block;
+	}
 }
 
 input[type="submit"]{
