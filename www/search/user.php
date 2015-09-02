@@ -5,18 +5,20 @@
 //display user description page
 
 /**
- * @param $page
- * @param $groupHandler
- * @param $user
- * @param $synUserHandler
- * @param $userHandler
+ * Student rendering, extracted to a method.
+ *
+ * @param SitePage      $page
+ * @param Group         $groupHandler
+ * @param array         $user
+ * @param External_User $synUserHandler
+ * @param User          $userHandler
  */
 function renderStudent(
     SitePage $page,
-    $groupHandler,
+    Group $groupHandler,
     $user,
-    $synUserHandler,
-    $userHandler
+    External_User $synUserHandler,
+    User $userHandler
 ) {
     //If student photo protected don't show other students
     $page->parse("portrait_block", "portrait");
