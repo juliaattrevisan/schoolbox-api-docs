@@ -163,7 +163,7 @@ if (is_array($outputList)) {
                         'PERIOD_NAME'  => $row['periodName'],
                         'PERIOD_START' => $row['periodStart'],
                         'PERIOD_END'   => $row['periodEnd'],
-                        'PERIOD_CLASS' => ($is_current_period ? 'dayCurrent' : 'normal'),
+                        'PERIOD_CLASS' => ($is_current_period ? 'timetable-active' : ''),
                     );
                     $this->setVar($outputPeriodDefinition);
 
@@ -174,23 +174,23 @@ if (is_array($outputList)) {
                         if ($periodCount == 1) {
                             //output day header
                             if ($dayCount == $dayCurrent) {
-                                $this->setVar('TIMETABLE_CLASS', 'dayCurrent');
+                                $this->setVar('DAY_CLASS', 'timetable-active');
                             } else {
-                                $this->setVar('TIMETABLE_CLASS', 'normal');
+                                $this->setVar('DAY_CLASS', '');
                             }
                             $this->setVar('DAY_NAME', $timetableHandler->getDayName($dayCount));
                             $this->parse('day_header_listing', 'day_header', true);
                         }
 
                         $outputPeriod = array(
-                            'PERIOD_DESC'     => '',
-                            'PERIOD_CODE'     => '',
-                            'PERIOD_ROOM'     => '',
-                            'PERIOD_ONCLICK'  => '',
-                            'PERIOD_STAFF'    => '',
-                            'PERIOD_COLOUR'   => '',
-                            'PERIOD_URL'      => '',
-                            'TIMETABLE_CLASS' => '',
+                            'PERIOD_DESC'    => '',
+                            'PERIOD_CODE'    => '',
+                            'PERIOD_ROOM'    => '',
+                            'PERIOD_ONCLICK' => '',
+                            'PERIOD_STAFF'   => '',
+                            'PERIOD_COLOUR'  => '',
+                            'PERIOD_URL'     => '',
+                            'DAY_CLASS'      => '',
                         );
 
                         $this->setVar('period_class_link_block', '');
@@ -278,18 +278,18 @@ if (is_array($outputList)) {
                         if ($is_current_period) {
                             if ($dayCount == $dayCurrent) {
                                 // current period, also current day: intersection
-                                $this->setVar('TIMETABLE_CLASS', 'dayCurrent current');
+                                $this->setVar('DAY_CLASS', 'timetable-active');
                             } else {
                                 // current period, not current day: display row
-                                $this->setVar('TIMETABLE_CLASS', 'dayCurrent');
+                                $this->setVar('DAY_CLASS', 'timetable-active');
                             }
                         } else {
                             if ($dayCount == $dayCurrent) {
                                 // not current period, but is current day: display column
-                                $this->setVar('TIMETABLE_CLASS', 'dayCurrent');
+                                $this->setVar('DAY_CLASS', 'timetable-active');
                             } else {
                                 // neither current period nor current day
-                                $this->setVar('TIMETABLE_CLASS', 'normal');
+                                $this->setVar('DAY_CLASS', '');
                             }
                         }
 
