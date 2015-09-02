@@ -1,0 +1,16 @@
+{#
+    requires:
+        sizing (array)  { .. media: count .. }
+        id     (string) used as the element ID
+        list   (string; html) the block content that will be injected
+#}
+
+<ul class="flex-list buttons{% for size, count in sizing %} {{ size }}-{{ count }}{% endfor %}">
+    {{- list -}}
+    <li class="overflow">
+        <a class="icon-more" data-dropdown="{{ id }}"></a>
+        <ul class="f-dropdown" id="{{ id }}" data-dropdown-content>
+            {{- list -}}
+        </ul>
+    </li>
+</ul>
