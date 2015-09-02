@@ -25,7 +25,12 @@ function renderStudent(
     // Handle parent/child relations here for now
     $isParentOfChild = $groupHandler->isParentOfChild($user['uid']);
     $externalUser = $synUserHandler->getStudent($user['synergy_id']);
-    $externalUser['AlertMessages'] = preg_split('/[\\n\\r]+/', $externalUser['AlertMessage']);
+    $externalUser['AlertMessages'] = preg_split(
+        '/[\\n\\r]+/',
+        $externalUser['AlertMessage'],
+        -1,
+        PREG_SPLIT_NO_EMPTY
+    );
     $page->setFile(TEMPLATE_content, 'output.html');
     // TODO make preg_replace available to Twig
     $page->setVar(
