@@ -1,8 +1,9 @@
 <div id='component{COMPONENT_INSTANCE_ID}' data-component>
+    <script type="text/javascript" src="/javascript/shared/timetable/jquery.timetable-resize.js"></script>
     <script type="text/javascript" src="/javascript/shared/timetable/jquery.timetable-dashboard.js"></script>
     <script type="text/javascript">
         $(function() {
-            $('[data-timetable]').timetableRow();
+            $.fn.timetableStart();
         });
     </script>
     <!-- Probably doesn't have a configuration -->

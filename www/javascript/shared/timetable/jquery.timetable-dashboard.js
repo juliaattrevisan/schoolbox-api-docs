@@ -1,6 +1,77 @@
 (function() {
 
     /**
+     * A facade method for spawning timetables
+     *
+     * @param options
+     */
+    $.fn.timetableStart = function(options) {
+        options = options || {};
+
+        var config = init(options, $(this));
+
+        showTimetable();
+
+        /* Set up event listener for resizeEnd
+         */
+        $(window).resize(function() {
+            if (this.resizeTimeout) {
+                clearTimeout(this.resizeTimeout);
+            }
+
+            this.resizeTimeout = setTimeout(function () {
+                $(this).trigger('resizeEnd');
+            }, 400);
+        });
+
+        /**
+         * Init
+         *
+         * @param options
+         * @param element
+         * @returns {*}
+         */
+        function init(options, element) {
+            var defaults = {
+                element: element,
+
+                /* This indicates the timetable table itself
+                 */
+                timetable: '[data-timetable]'
+            }
+
+            var derived = {
+            }
+
+            var merged = $.extend(defaults, derived, options);
+
+            return merged;
+        }
+
+        /**
+         * Show the timetable
+         *
+         * Show selected large timetable
+         * Show selected small timetable
+         */
+        function showTimetable() {
+            var timetable = $(config.timetable);
+
+            timetable.timetableRow();
+
+            /* Adjust heights
+             */
+            timetable.timetableResize();
+
+            /* Wait till resizing actually stops before resizing everything
+             */
+            $(window).bind('resizeEnd', function() {
+                timetable.timetableResize();
+            });
+        }
+    }
+
+    /**
      * Timetable
      *
      * Takes a Day row grid and crunches it down into
