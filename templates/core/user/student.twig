@@ -168,60 +168,63 @@
                 <section>
                     <div class="content no-pad">
                         <ul class="information-list">
-                            <!-- BEGIN contact_details -->
+                            {% for contact in contacts %}
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="avatar-card">
+                                        {# need to know user's schoolbox info here #}
                                         <a href="{CONTACT_LINK}">
-                                            <img src="/portrait.php?userId={CONTACT_EXTERNAL_ID}&size=square64" />
-                                            {CONTACT_NAME}
+                                            <img src="/portrait.php?userId={{ contact.StudentContactID }}&size=square64" />
+                                            {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
                                         </a>
-                                        <p class="meta">{CONTACT_ROLE}</p>
+                                        <p class="meta">{{ contact.StudentContactRelation }}</p>
                                     </div>
                                 </div>
                                 <nav>
-                                    <a href="#" class="icon-more" data-dropdown="row-options-contact-{CONTACT_ID}"></a>
+                                    <a href="#" class="icon-more" data-dropdown="row-options-contact-{{ contact.StudentContactID }}"></a>
                                 </nav>
-                                <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{CONTACT_ID}">
-                                    <!-- BEGIN contact_email -->
-                                    <li><a class="icon-email" href="{CONTACT_EMAIL_HREF}">{CONTACT_EMAIL}</a></li>
-                                    <!-- END contact_email -->
-                                    <!-- BEGIN contact_mobile -->
-                                    <li><a class="icon-mobile" href="tel:{CONTACT_MOBILE_PHONE}">{CONTACT_MOBILE_PHONE}</a></li>
-                                    <!-- END contact_mobile -->
-                                    <!-- BEGIN contact_phone -->
-                                    <li><a class="icon-mobile" href="tel:{CONTACT_OCCUP_PHONE}">{CONTACT_OCCUP_PHONE}</a></li>
-                                    <!-- END contact_phone -->
+                                <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ contact.StudentContactID }}">
+                                    {% if contact.StudentContactDefaultEmail %}
+                                    <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></li>
+                                    {% endif %}
+                                    {% if contact.StudentContactMobilePhone %}
+                                    <li><a class="icon-mobile" href="tel:{{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a></li>
+                                    {% endif %}
+                                    {% if contact.StudentContactOccupPhone %}
+                                    <li><a class="icon-mobile" href="tel:{{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a></li>
+                                    {% endif %}
                                 </ul>
                             </li>
 
-                            <!-- BEGIN spouse_details -->
+                            {# is there a spouse? #}
+                            {% if contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred %}
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="avatar-card">
+                                        {# need to know user's schoolbox info here #}
                                         <a href="{SPOUSE_LINK}">
-                                            <img src="/portrait.php?userId={SPOUSE_EXTERNAL_ID}&size=square64" />
-                                            {SPOUSE_NAME}
+                                            <img src="/portrait.php?userId={{ contact.StudentSpouseID }}&size=square64" />
+                                            {{ contact.StudentSpouseTitle }} {{ contact.StudentSpousePreferred }} {{ contact.StudentSpouseSurname }}
                                         </a>
-                                        <p class="meta">{SPOUSE_ROLE}</p>
+                                        <p class="meta">{{ contact.StudentSpouseRelation }}</p>
                                     </div>
                                 </div>
                                 <nav>
-                                    <a href="#" class="icon-more" data-dropdown="row-options-spouse-{SPOUSE_ID}"></a>
+                                    <a href="#" class="icon-more" data-dropdown="row-options-contact-{{ contact.StudentSpouseID }}"></a>
                                 </nav>
-                                <ul class="f-dropdown" data-dropdown-content id="row-options-spouse-{SPOUSE_ID}">
-                                    <!-- BEGIN spouse_email -->
-                                    <li><a class="icon-email" href="{SPOUSE_EMAIL_HREF}">{SPOUSE_EMAIL}</a></li>
-                                    <!-- END spouse_email -->
-                                    <!-- BEGIN spouse_mobile -->
-                                    <li><a class="icon-mobile" href="tel:{SPOUSE_MOBILE_PHONE}">{SPOUSE_MOBILE_PHONE}</a></li>
-                                    <!-- END spouse_mobile -->
-                                    <!-- BEGIN spouse_phone -->
-                                    <li><a class="icon-mobile" href="tel:{SPOUSE_OCCUP_PHONE}">{SPOUSE_OCCUP_PHONE}</a></li>
-                                    <!-- END spouse_phone -->
+                                <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ contact.StudentSpouseID }}">
+                                    {% if contact.StudentSpouseDefaultEmail %}
+                                        <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentSpouseDefaultEmail }}">{{ contact.StudentSpouseDefaultEmail }}</a></li>
+                                    {% endif %}
+                                    {% if contact.StudentSpouseMobilePhone %}
+                                        <li><a class="icon-mobile" href="tel:{{ contact.StudentSpouseMobilePhone }}">{{ contact.StudentSpouseMobilePhone }}</a></li>
+                                    {% endif %}
+                                    {% if contact.StudentSpouseOccupPhone %}
+                                        <li><a class="icon-mobile" href="tel:{{ contact.StudentSpouseOccupPhone }}">{{ contact.StudentSpouseOccupPhone }}</a></li>
+                                    {% endif %}
                                 </ul>
                             </li>
-                            <!-- END spouse_details -->
+                            {% endif %}
 
                             <li class="actions-small-1">
                                 <div class="list-item">
@@ -234,7 +237,7 @@
                                     <a class="icon-mobile" href="tel:{CONTACT_HOME_PHONE}" title="Call {CONTACT_HOME_PHONE}"></a>
                                 </nav>
                             </li>
-                            <!-- END contact_details -->
+                            {% endfor %}
                         </ul>
                     </div>
                 </section>
