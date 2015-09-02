@@ -16,19 +16,21 @@
                 <div class="row no-margin">
                     <div class="small-12 medium-6 large-4 columns no-pad">
                         <!-- BEGIN portrait -->
-                        <img src="/portrait.php?userId={SYNERGY_ID}&amp;size=profile" class="full-width"/>
+                        <img src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=profile" class="full-width"/>
                         <!-- END portrait -->
                     </div>
 
                     <div class="small-12 medium-6 large-8 columns no-pad">
-                        <!-- BEGIN medical -->
+                        {% if externalUser.StudentMedicalAlert %}
                         <div class="alert-box alert icon-alert no-margin">
-                            Medical Note: {MEDICAL_NOTE}
+                            Medical Note: {{ externalUser.StudentMedicalAlert }}
                         </div>
-                        <!-- END medical -->
+                        {% endif %}
                         <dl class="inline-dl no-margin">
                             <dt class="no-margin small-6 medium-3">Email:</dt>
-                            <dd class="no-margin small-6 medium-9">{EMAIL}</dd>
+                            <dd class="no-margin small-6 medium-9">
+                                <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
+                            </dd>
 
                             <!-- BEGIN student_synergy_form -->
                             <dt class="no-margin small-6 medium-3">Student ID:</dt>

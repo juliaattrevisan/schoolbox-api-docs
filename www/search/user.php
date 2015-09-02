@@ -26,8 +26,9 @@ function renderStudent(
         $page->getTwig()->render(
             'user/student.twig',
             [
-                'session' => ['user' => $_SESSION['user'],],
-                'user'    => \Schoolbox\UserMapper::getInstance()->findById($user['uid']),
+                'session'      => $_SESSION,
+                'user'         => \Schoolbox\UserMapper::getInstance()->findById($user['uid']),
+                'externalUser' => $synUserHandler->getStudent($user['synergy_id']),
             ]
         )
     );
