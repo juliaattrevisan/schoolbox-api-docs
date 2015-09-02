@@ -482,6 +482,11 @@ class StudentReportCard
 
         foreach ($allDueWork as $currentDueWork) {
 
+            // Check visibility
+            if (!$this->canViewMark($currentDueWork['mark_visibility'])) {
+                continue;
+            }
+
             /* Submission box info
              */
             $box = new \Schoolbox\Assessment\Component\SubmissionBox();
