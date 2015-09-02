@@ -230,9 +230,13 @@
                                 <div class="list-item">
                                     <div class="avatar-card">
                                         <span class="icon-home icon-32"></span>
-                                        {{ contact.StudentContactSuburb }}
-                                        {{ contact.StudentContactState }}
-                                        {{ contact.StudentContactPostCode }}
+                                        {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
+                                        <p>{{ contact.StudentContactAddress1 }}</p>
+                                        <p>{{ contact.StudentContactAddress2 }}</p>
+                                        <p>{{ contact.StudentContactAddress3 }}</p>
+                                        <p>{{ contact.StudentContactSuburb }},</p>
+                                        <p>{{ contact.StudentContactState }} {{ contact.StudentContactPostCode }}</p>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <nav>
