@@ -203,24 +203,24 @@
                                     <div class="avatar-card">
                                         {# need to know user's schoolbox info here #}
                                         <a href="{SPOUSE_LINK}">
-                                            <img src="/portrait.php?userId={{ contact.StudentSpouseID }}&size=square64" />
-                                            {{ contact.StudentSpouseTitle }} {{ contact.StudentSpousePreferred }} {{ contact.StudentSpouseSurname }}
+                                            <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&size=square64" />
+                                            {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
                                         </a>
-                                        <p class="meta">{{ contact.StudentSpouseRelation }}</p>
+                                        <p class="meta">{{ contact.StudentContactSpouseRelation }}</p>
                                     </div>
                                 </div>
                                 <nav>
-                                    <a href="#" class="icon-more" data-dropdown="row-options-contact-{{ contact.StudentSpouseID }}"></a>
+                                    <a href="#" class="icon-more" data-dropdown="row-options-contact-{{ contact.StudentContactSpouseID }}"></a>
                                 </nav>
-                                <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ contact.StudentSpouseID }}">
-                                    {% if contact.StudentSpouseDefaultEmail %}
-                                        <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentSpouseDefaultEmail }}">{{ contact.StudentSpouseDefaultEmail }}</a></li>
+                                <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ contact.StudentContactSpouseID }}">
+                                    {% if contact.StudentContactSpouseDefaultEmail %}
+                                        <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a></li>
                                     {% endif %}
-                                    {% if contact.StudentSpouseMobilePhone %}
-                                        <li><a class="icon-mobile" href="tel:{{ contact.StudentSpouseMobilePhone }}">{{ contact.StudentSpouseMobilePhone }}</a></li>
+                                    {% if contact.StudentContactSpouseMobilePhone %}
+                                        <li><a class="icon-mobile" href="tel:{{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a></li>
                                     {% endif %}
-                                    {% if contact.StudentSpouseOccupPhone %}
-                                        <li><a class="icon-mobile" href="tel:{{ contact.StudentSpouseOccupPhone }}">{{ contact.StudentSpouseOccupPhone }}</a></li>
+                                    {% if contact.StudentContactSpouseOccupPhone %}
+                                        <li><a class="icon-mobile" href="tel:{{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a></li>
                                     {% endif %}
                                 </ul>
                             </li>
