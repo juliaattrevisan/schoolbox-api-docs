@@ -1,10 +1,10 @@
 <div class="row">
     <div class="small-12 column">
-        <h1>{NAME}</h1>
+        <h1>{{ user.formatName() }}</h1>
         <span class='header-actions'>
-            <!-- BEGIN modify -->
-            <a href="/adminv2/modify-user/{ID}" class="button icon-modify" title="Modify User"></a>
-            <!-- END modify -->
+            {% if session.user.isSuperuser() %}
+            <a href="/adminv2/modify-user/{{ user.getId() }}" class="button icon-modify" title="Modify User"></a>
+            {% endif %}
         </span>
     </div>
 </div>
