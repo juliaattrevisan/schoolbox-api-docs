@@ -210,7 +210,7 @@ if (is_array($outputList)) {
                                 $this->setVar('DAY_CLASS', '');
                             }
                         }
-                        
+
                         $this->setVar('period_class_link_block', '');
                         $this->setVar('period_class_block', '');
 
