@@ -26,7 +26,7 @@
                         <thead>
                             <tr>
                                 <!-- BEGIN timetable_header -->
-                                <th style='width:{TIMETABLE_FIELD_WIDTH}%'>
+                                <th class='{PERIOD_TH_CLASS}' style='width:{TIMETABLE_FIELD_WIDTH}%'>
                                     {PERIOD_NAME}
                                     <time class="meta">{PERIOD_START}&ndash;{PERIOD_END}</time>
                                 </th>
@@ -36,7 +36,7 @@
                         <tbody>
                             <tr>
                                 <!-- BEGIN timetable_period -->
-                                <td style="width:{TIMETABLE_FIELD_WIDTH}%">
+                                <td class='{PERIOD_CLASS}' style="width:{TIMETABLE_FIELD_WIDTH}%">
                                     <!-- BEGIN period_class_link -->
                                     <!-- BEGIN period_class_link_attendance -->
                                     <a class="attendance-link {ATTENDANCE_ICON} no-text"

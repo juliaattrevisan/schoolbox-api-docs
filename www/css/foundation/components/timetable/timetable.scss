@@ -3,10 +3,25 @@
         border: 1px solid $smoke;
     }
 
+    th {
+        &.timetable-day-active {
+            background-color: #ffd100;
+        }
+
+        &.timetable-period-active {
+            background-color: #ffd100;
+        }
+    }
+
     /* Remove padding on cells containing classes
      */
     td {
         padding: 0px;
+
+        &.timetable-subject-active {
+            padding: 6px;
+            background-color: #ffd100;
+        }
     }
 
     /* For subtext under period names to sit correctly
@@ -33,8 +48,3 @@
     }
 }
 
-/* Highlight to indicate current period/day
- * I don't think we can actually do it this way, though
- */
-.timetable-active {
-}

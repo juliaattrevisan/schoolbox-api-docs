@@ -163,7 +163,7 @@ if (is_array($outputList)) {
                         'PERIOD_NAME'  => $row['periodName'],
                         'PERIOD_START' => $row['periodStart'],
                         'PERIOD_END'   => $row['periodEnd'],
-                        'PERIOD_CLASS' => ($is_current_period ? 'timetable-active' : ''),
+                        'PERIOD_CLASS' => ($is_current_period ? 'timetable-period-active' : ''),
                     );
                     $this->setVar($outputPeriodDefinition);
 
@@ -174,7 +174,7 @@ if (is_array($outputList)) {
                         if ($periodCount == 1) {
                             //output day header
                             if ($dayCount == $dayCurrent) {
-                                $this->setVar('DAY_CLASS', 'timetable-active');
+                                $this->setVar('DAY_CLASS', 'timetable-day-active');
                             } else {
                                 $this->setVar('DAY_CLASS', '');
                             }
@@ -278,15 +278,15 @@ if (is_array($outputList)) {
                         if ($is_current_period) {
                             if ($dayCount == $dayCurrent) {
                                 // current period, also current day: intersection
-                                $this->setVar('DAY_CLASS', 'timetable-active');
+                                $this->setVar('DAY_CLASS', 'timetable-subject-active');
                             } else {
                                 // current period, not current day: display row
-                                $this->setVar('DAY_CLASS', 'timetable-active');
+                                $this->setVar('DAY_CLASS', '');
                             }
                         } else {
                             if ($dayCount == $dayCurrent) {
                                 // not current period, but is current day: display column
-                                $this->setVar('DAY_CLASS', 'timetable-active');
+                                $this->setVar('DAY_CLASS', '');
                             } else {
                                 // neither current period nor current day
                                 $this->setVar('DAY_CLASS', '');
