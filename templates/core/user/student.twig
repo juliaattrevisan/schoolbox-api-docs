@@ -250,39 +250,49 @@
             </div>
 
             <div class="small-12 medium-6 xlarge-12 island">
-                <!-- BEGIN emergency -->
+                {# up to 3 emergency contact blocks
+                 # show no header if no emergencies
+                 #}
+                {% if externalUser.StudentEmergencyName
+                   or externalUser.StudentEmergency2Name
+                   or externalUser.StudentEmergency3Name
+                %}
                 <h2 class="subheader">Emergency Contact Information</h2>
                 <section>
                     <div class="content no-pad">
-                        <!-- BEGIN edit_emergency -->
-                        <!-- END edit_emergency -->
-
                         <ul class="information-list">
-                            <!-- BEGIN emergency_contact -->
-                            <li class="actions-small-1 actions-medium-2">
-                                <div class="list-item">
-                                    <div class="avatar-card">
-                                        <span class="icon-alert icon-32"></span>
-                                        {EMERGENCY_NAME}
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a href="#" class="icon-more" data-dropdown="row-options-emergency-{EMERGENCY_COUNT}"></a>
-                                </nav>
-                                <ul class="f-dropdown" data-dropdown-content id="row-options-emergency-{EMERGENCY_COUNT}">
-                                    <li class="full-width">
-                                        <a class="icon-mobile" href="tel:{EMERGENCY_PHONE}">{EMERGENCY_PHONE}</a>
+                            {% for i in 1..3 %}
+                                {% set index = (i == 1 ? '' : i) %}
+                                {% if externalUser["StudentEmergency#{index}Name"] %}
+                                    <li class="actions-small-1 actions-medium-2">
+                                        <div class="list-item">
+                                            <div class="avatar-card">
+                                                <span class="icon-alert icon-32"></span>
+                                                {{ externalUser["StudentEmergency#{index}Name"] }}
+                                            </div>
+                                        </div>
+                                        <nav>
+                                            <a href="#" class="icon-more" data-dropdown="row-options-emergency-{{ i }}"></a>
+                                        </nav>
+                                        <ul class="f-dropdown" data-dropdown-content id="row-options-emergency-{{ i }}">
+                                            <li class="full-width">
+                                                <a class="icon-mobile" href="tel:{{ externalUser["StudentEmergency#{index}Phone"] }}">
+                                                    {{ externalUser["StudentEmergency#{index}Phone"] }}
+                                                </a>
+                                            </li>
+                                            <li class="full-width">
+                                                <a class="icon-mobile" href="tel:{{ externalUser["StudentEmergency#{index}PhoneAlt"] }}">
+                                                    {{ externalUser["StudentEmergency#{index}PhoneAlt"] }}
+                                                </a>
+                                            </li>
+                                        </ul>
                                     </li>
-                                    <li class="full-width">
-                                        <a class="icon-mobile" href="tel:{EMERGENCY_ALT_PHONE}">{EMERGENCY_ALT_PHONE}</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <!-- END emergency_contact -->
+                                {% endif %}
+                            {% endfor %}
                         </ul>
                     </div>
-                    <!-- END emergency -->
                 </section>
+                {% endif %}
             </div>
         </div>
         {% endif %}
