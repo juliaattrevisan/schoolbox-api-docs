@@ -5,11 +5,11 @@
 
     th {
         &.timetable-day-active {
-            background-color: #ffd100;
+            // background-color: #ffd100;
         }
 
         &.timetable-period-active {
-            background-color: #ffd100;
+            // background-color: #ffd100;
         }
     }
 
@@ -35,8 +35,10 @@
     }
 }
 
+/* Active subject(s) decoration
+ */
 .timetable-subject-active {
-    border: 6px solid #ffd100;
+    border: 0.5rem solid #ffd100;
     box-sizing: border-box;
 }
 
