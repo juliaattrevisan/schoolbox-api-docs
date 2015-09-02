@@ -24,6 +24,7 @@ function renderStudent(
     $authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $user['uid'], 'profile');
     // Handle parent/child relations here for now
     $isParentOfChild = $groupHandler->isParentOfChild($user['uid']);
+    $externalUser = $synUserHandler->getStudent($user['synergy_id']);
     $page->setFile(TEMPLATE_content, 'output.html');
     $page->setVar(
         'OUTPUT',
@@ -32,10 +33,11 @@ function renderStudent(
             [
                 'session'         => $_SESSION,
                 'user'            => \Schoolbox\UserMapper::getInstance()->findById($user['uid']),
-                'externalUser'    => $synUserHandler->getStudent($user['synergy_id']),
+                'externalUser'    => $externalUser,
                 'eportfolioAuth'  => $authenticator->canView(),
                 'isParentOfChild' => $isParentOfChild,
                 'now'             => Alaress_Date_Format::now(),
+                'boarderType'     => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
             ]
         )
     );
