@@ -91,27 +91,61 @@
 
             {% if eportfolioAuth %}
             <li class="no-pad">
-                <a href="/eportfolio/{ID}/profile"
+                <a href="/eportfolio/{{ user.getId() }}/profile"
                    class="no-margin fat button icon-fat icon-32 icon-eportfolio"
                    data-equalizer-watch>ePortfolio</a>
             </li>
             {% endif %}
 
-            <!-- BEGIN user_calendar -->
-            <li class="no-pad"><a href='/calendar/full/{USER_CALENDAR_CURRENTDATE}/{ID}' class="no-margin fat button icon-fat icon-32 icon-calendar" data-equalizer-watch>Calendar</a></li>
-            <!-- END user_calendar -->
+            {% if isParentOfChild
+               or session.user.isSuperUser()
+               or session.user.getRole().isStaff()
+               or session.user.getId() == user.getId()
+            %}
+            <li class="no-pad">
+                <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
+                   class="no-margin fat button icon-fat icon-32 icon-calendar"
+                   data-equalizer-watch>Calendar</a>
+            </li>
+            {% endif %}
 
-            <!-- BEGIN timetable_link -->
-            <li class="no-pad"><a href="/timetable/{ID}" class="no-margin fat button icon-fat icon-32 icon-timetable" data-equalizer-watch>Timetable</a></li>
-            <!-- END timetable_link -->
+            {% if isParentOfChild
+               or session.user.isSuperUser()
+               or session.user.getRole().isStaff()
+               or session.user.getId() == user.getId()
+            %}
+            <li class="no-pad">
+                <a href="/timetable/{{ user.getId() }}"
+                   class="no-margin fat button icon-fat icon-32 icon-timetable"
+                   data-equalizer-watch>Timetable</a>
+            </li>
+            {% endif %}
 
-            <!-- BEGIN boarder_leave -->
-            <li class="no-pad"><a href="/modules/leave/student/{ID}" class="no-margin fat button icon-fat icon-32 icon-boarder-leave" data-equalizer-watch>Boarder Leave</a></li>
-            <!-- END boarder_leave -->
+            {% if  config.boarder_leave_enabled
+               and user.getResidentialHouse()
+               and (isParentOfChild
+                    or session.user.isSuperUser()
+                    or session.user.getRole().isStaff()
+                    or session.user.getId() == user.getId())
+            %}
+            <li class="no-pad">
+                <a href="/modules/leave/student/{{ user.getId() }}"
+                   class="no-margin fat button icon-fat icon-32 icon-boarder-leave"
+                   data-equalizer-watch>Boarder Leave</a>
+            </li>
+            {% endif %}
 
-            <!-- BEGIN pastoral_care -->
-            <li class="no-pad"><a href="{SYNWEB_URL}/stud.aspx?id={SYNERGY_ID}" class="no-margin fat button icon-fat icon-32 icon-modify" target="_blank" data-equalizer-watch>Pastoral Care</a></li>
-            <!-- END pastoral_care -->
+            {% if  (session.user.isSuperUser() or session.user.getRole().isStaff())
+               and config.external_type == 'synergetic'
+               and config.external_staff_portal
+            %}
+            <li class="no-pad">
+                <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.getExternalId() }}"
+                   class="no-margin fat button icon-fat icon-32 icon-modify"
+                   target="_blank"
+                   data-equalizer-watch>Pastoral Care</a>
+            </li>
+            {% endif %}
         </ul>
     </div>
 </div>

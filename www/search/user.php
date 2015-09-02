@@ -21,18 +21,21 @@ function renderStudent(
     User $userHandler
 ) {
     // Handle eportfolio auth here for now
-
     $authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $user['uid'], 'profile');
+    // Handle parent/child relations here for now
+    $isParentOfChild = $groupHandler->isParentOfChild($user['uid']);
     $page->setFile(TEMPLATE_content, 'output.html');
     $page->setVar(
         'OUTPUT',
         $page->getTwig()->render(
             'user/student.twig',
             [
-                'session'        => $_SESSION,
-                'user'           => \Schoolbox\UserMapper::getInstance()->findById($user['uid']),
-                'externalUser'   => $synUserHandler->getStudent($user['synergy_id']),
-                'eportfolioAuth' => $authenticator->canView(),
+                'session'         => $_SESSION,
+                'user'            => \Schoolbox\UserMapper::getInstance()->findById($user['uid']),
+                'externalUser'    => $synUserHandler->getStudent($user['synergy_id']),
+                'eportfolioAuth'  => $authenticator->canView(),
+                'isParentOfChild' => $isParentOfChild,
+                'now'             => Alaress_Date_Format::now(),
             ]
         )
     );
