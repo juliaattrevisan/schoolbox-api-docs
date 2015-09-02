@@ -5,37 +5,7 @@
             <!-- BEGIN modify -->
             <a href="/adminv2/modify-user/{ID}" class="button icon-modify" title="Modify User"></a>
             <!-- END modify -->
-            <a href="#" class="button icon-more" data-dropdown="row-options"></a>
         </span>
-        <ul class="f-dropdown" data-dropdown-content id="row-options">
-            <!-- BEGIN due_work -->
-            <li><a href="/submission/dueWork/0/{ID}" class="icon-due-work">Due Work</a></li>
-            <!-- END due_work -->
-
-            <!-- BEGIN grades_button -->
-            <li><a href="/submission/allWork/{ID}" class="icon-tick">Grades</a></li>
-            <!-- END grades_button -->
-
-            <!-- BEGIN eportfolio -->
-            <li><a href="/eportfolio/{ID}/profile" class="icon-eportfolio">ePortfolio</a></li>
-            <!-- END eportfolio -->
-
-            <!-- BEGIN user_calendar -->
-            <li><a href='/calendar/full/{USER_CALENDAR_CURRENTDATE}/{ID}' class="icon-calendar">Calendar</a></li>
-            <!-- END user_calendar -->
-
-            <!-- BEGIN timetable_link -->
-            <li><a href="/timetable/{ID}" class="icon-timetable">Timetable</a></li>
-            <!-- END timetable_link -->
-
-            <!-- BEGIN boarder_leave -->
-            <li><a href="/modules/leave/student/{ID}" class="icon-boarder-leave">Boarder Leave</a></li>
-            <!-- END boarder_leave -->
-
-            <!-- BEGIN pastoral_care -->
-            <li><a href="{SYNWEB_URL}/stud.aspx?id={SYNERGY_ID}" class="icon-modify" target="_blank">Pastoral Care</a></li>
-            <!-- END pastoral_care -->
-        </ul>
     </div>
 </div>
 
@@ -114,6 +84,35 @@
                         </dl>
                     </div>
                 </div>
+                <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8" data-equalizer>
+                    <!-- BEGIN due_work -->
+                    <li class="no-pad"><a href="/submission/dueWork/0/{ID}" class="no-margin fat button icon-fat icon-32 icon-due-work" data-equalizer-watch>Due Work</a></li>
+                    <!-- END due_work -->
+
+                    <!-- BEGIN grades_button -->
+                    <li class="no-pad"><a href="/submission/allWork/{ID}" class="no-margin fat button icon-fat icon-32 icon-tick" data-equalizer-watch>Grades</a></li>
+                    <!-- END grades_button -->
+
+                    <!-- BEGIN eportfolio -->
+                    <li class="no-pad"><a href="/eportfolio/{ID}/profile" class="no-margin fat button icon-fat icon-32 icon-eportfolio" data-equalizer-watch>ePortfolio</a></li>
+                    <!-- END eportfolio -->
+
+                    <!-- BEGIN user_calendar -->
+                    <li class="no-pad"><a href='/calendar/full/{USER_CALENDAR_CURRENTDATE}/{ID}' class="no-margin fat button icon-fat icon-32 icon-calendar" data-equalizer-watch>Calendar</a></li>
+                    <!-- END user_calendar -->
+
+                    <!-- BEGIN timetable_link -->
+                    <li class="no-pad"><a href="/timetable/{ID}" class="no-margin fat button icon-fat icon-32 icon-timetable" data-equalizer-watch>Timetable</a></li>
+                    <!-- END timetable_link -->
+
+                    <!-- BEGIN boarder_leave -->
+                    <li class="no-pad"><a href="/modules/leave/student/{ID}" class="no-margin fat button icon-fat icon-32 icon-boarder-leave" data-equalizer-watch>Boarder Leave</a></li>
+                    <!-- END boarder_leave -->
+
+                    <!-- BEGIN pastoral_care -->
+                    <li class="no-pad"><a href="{SYNWEB_URL}/stud.aspx?id={SYNERGY_ID}" class="no-margin fat button icon-fat icon-32 icon-modify" target="_blank" data-equalizer-watch>Pastoral Care</a></li>
+                    <!-- END pastoral_care -->
+                </ul>
             </div>
             </section>
         </div>
