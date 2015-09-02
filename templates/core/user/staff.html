@@ -1,49 +1,74 @@
-<h1>{NAME}</h1>
-<div class="profile-info">
-
-    <div class="profile-img">
-    <!-- BEGIN portrait -->
-    <img src="/portrait.php?userId={SYNERGY_ID}&size=constrain200"/>
-    <!-- END portrait -->
-    </div>
-    <div class="staff-detail">
-        <dl>
-            <dt class="dark"><strong>Email</strong></dt>
-            <dd class="dark mail-profile">{EMAIL}</dd>
-        </dl>
-        <!-- BEGIN staff_synergy -->
-        <dl>
-            <dt><strong>Department</strong></dt>
-            <dd>{DEPARTMENT}</dd>
-            <dt class="dark"><strong>Type</strong></dt>
-            <dd class="dark">{CATEGORY}</dd>
-            <dt><strong>Building</strong></dt>
-            <dd>{BUILDING}</dd>
-            <dt class="dark"><strong>Room</strong></dt>
-            <dd class="dark">{ROOM}</dd>
-            <dt><strong>Extension</strong></dt>
-            <dd>{EXTENSION}</dd>
-            <dt class="dark"><strong>Campus</strong></dt>
-            <dd class="dark">{CAMPUS}</dd>
-        </dl>
-        <!-- END staff_synergy -->
-        <p class="school-info">
-            <!-- BEGIN eportfolio -->
-            <a href="/eportfolio/{ID}/profile" class="btn eportfolio float-left"><span></span>ePortfolio</a>
-            <!-- END eportfolio -->
-
-            <!-- BEGIN user_calendar -->
-            <a href='/calendar/full/{USER_CALENDAR_CURRENTDATE}/{ID}' class="btn calendar float-left"><span></span>Calendar</a>
-            <!-- END user_calendar -->
-
-            <!-- BEGIN timetable_link -->
-            <a href="/timetable/{ID}" class="btn time-table float-left"><span></span>Timetable</a>
-            <!-- END timetable_link -->
-
+<div class="row">
+    <div class="small-12 column">
+        <h1>{NAME}</h1>
+        <span class='header-actions'>
             <!-- BEGIN modify -->
-            <a href="/adminv2/modify-user/{ID}" class="btn modify float-left"><span></span>Modify User</a>
+            <a href="/adminv2/modify-user/{ID}" class="button icon-modify" title="Modify User"></a>
             <!-- END modify -->
-        </p>
+        </span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="no-pad">
+            <div class="content no-pad">
+                <div class="row no-margin">
+                    <div class="small-12 medium-6 large-4 columns no-pad">
+                        <!-- BEGIN portrait -->
+                        <img src="/portrait.php?userId={SYNERGY_ID}&amp;size=profile" class="full-width"/>
+                        <!-- END portrait -->
+                    </div>
+
+                    <div class="small-12 medium-6 large-8 columns no-pad">
+                        <dl class="inline-dl no-margin">
+                            <dt class="no-margin small-6 medium-3">Email</dt>
+                            <dd class="no-margin small-6 medium-9">{EMAIL}</dd>
+                            <!-- BEGIN staff_synergy -->
+                            <dt class="no-margin small-6 medium-3">Department</dt>
+                            <dd class="no-margin small-6 medium-9">{DEPARTMENT}</dd>
+                            <dt class="no-margin small-6 medium-3">Type</dt>
+                            <dd class="no-margin small-6 medium-9">{CATEGORY}</dd>
+                            <dt class="no-margin small-6 medium-3">Building</dt>
+                            <dd class="no-margin small-6 medium-9">{BUILDING}</dd>
+                            <dt class="no-margin small-6 medium-3">Room</dt>
+                            <dd class="no-margin small-6 medium-9">{ROOM}</dd>
+                            <dt class="no-margin small-6 medium-3">Extension</dt>
+                            <dd class="no-margin small-6 medium-9">{EXTENSION}</dd>
+                            <dt class="no-margin small-6 medium-3">Campus</dt>
+                            <dd class="no-margin small-6 medium-9">{CAMPUS}</dd>
+                            <!-- END staff_synergy -->
+                        </dl>
+                    </div>
+                </div>
+                <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8" data-equalizer>
+
+                    <!-- BEGIN eportfolio -->
+                    <li class="no-pad">
+                        <a href="/eportfolio/{ID}/profile"
+                           class="no-margin fat button icon-fat icon-32 icon-eportfolio"
+                           data-equalizer-watch>ePortfolio</a>
+                    </li>
+                    <!-- END eportfolio -->
+
+                    <!-- BEGIN user_calendar -->
+                    <li class="no-pad">
+                        <a href='/calendar/full/{USER_CALENDAR_CURRENTDATE}/{ID}'
+                           class="no-margin fat button icon-fat icon-32 icon-calendar"
+                           data-equalizer-watch>Calendar</a>
+                    </li>
+                    <!-- END user_calendar -->
+
+                    <!-- BEGIN timetable_link -->
+                    <li class="no-pad">
+                        <a href="/timetable/{ID}"
+                           class="no-margin fat button icon-fat icon-32 icon-timetable"
+                           data-equalizer-watch>Timetable</a>
+                    </li>
+                    <!-- END timetable_link -->
+                </ul>
+            </div>
+        </section>
     </div>
 </div>
 
