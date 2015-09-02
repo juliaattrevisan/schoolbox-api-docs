@@ -119,6 +119,8 @@ if (is_numeric($_GET['eventID'])) {
         )
     );
 
+    $page->parse('delete_button_block', 'delete_button');
+
     /* Recurrence
      */
     // Is there a recurrence? If so don't show the repeat selector.
@@ -137,6 +139,7 @@ if (is_numeric($_GET['eventID'])) {
         $page->setVar('recurring_reminder_block', '');
         $page->parse('recurring_dates_block', 'recurring_dates');
     }
+
 } else {
     /* Create new event
      */
@@ -340,8 +343,6 @@ foreach ($allFolderList as $currentFolder) {
 
     $page->parse('event_group_drop_block', 'event_group_drop', true);
 }
-
-$page->parse('delete_button_block', 'delete_button');
 
 /* Render all the dropdowns
  */
