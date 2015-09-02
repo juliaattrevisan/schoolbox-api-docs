@@ -20,7 +20,16 @@ function renderStudent(
     External_User $synUserHandler,
     User $userHandler
 ) {
-    //If student photo protected don't show other students
+    $page->setFile(TEMPLATE_content, 'output.html');
+    $page->setVar(
+        'OUTPUT',
+        $page->getTwig()->render(
+            'user/student.twig',
+            ['user' => \Schoolbox\UserMapper::getInstance()->findById($user['uid'])]
+        )
+    );
+    return;
+    // I'm pretty sure that student photos are never protected.
     $page->parse("portrait_block", "portrait");
 
 
@@ -426,38 +435,38 @@ if (is_numeric($this->arg[0])) {
     }
 
     if ($groupHandler->isStudent($user['uid'])) {
-        $this->setFile(TEMPLATE_content, 'user/student.html');
-        $this->setBlock(TEMPLATE_content, "portrait", "portrait_block");
-        $this->setBlock(TEMPLATE_content, "timetable_link", "timetable_link_block");
-        $this->setBlock(TEMPLATE_content, "due_work", "due_work_block");
-        $this->setBlock(TEMPLATE_content, "grades_button", "grades_button_block");
-        $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
-        $this->setBlock(TEMPLATE_content, "boarder_leave", "boarder_leave_block");
-        $this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
-        $this->setBlock(TEMPLATE_content, 'pastoral_care', 'pastoral_care_block');
-        $this->setBlock(TEMPLATE_content, 'modify', 'modify_block');
-        $this->setBlock(TEMPLATE_content, "student_synergy_form", "student_synergy_form_block");
-        $this->setBlock(TEMPLATE_content, "student_synergy_tutor", "student_synergy_tutor_block");
-        $this->setBlock(TEMPLATE_content, 'contact_synergy', 'contact_synergy_block');
-        $this->setBlock('contact_synergy', 'edit_emergency', 'edit_emergency_block');
-        $this->setBlock('contact_synergy', 'edit_contact', 'edit_contact_block');
-        $this->setBlock('contact_synergy', 'contact_details', 'contact_details_block');
-        $this->setBlock('contact_synergy', 'contact_alert', 'contact_alert_block');
-        $this->setBlock('contact_details', 'contact_email', 'contact_email_block');
-        $this->setBlock('contact_details', 'contact_mobile', 'contact_mobile_block');
-        $this->setBlock('contact_details', 'contact_phone', 'contact_phone_block');
-        $this->setBlock('contact_details', 'spouse_details', 'spouse_details_block');
-        $this->setBlock('contact_synergy', 'emergency', 'emergency_block');
-        $this->setBlock('emergency', 'emergency_contact', 'emergency_contact_block');
-        $this->setBlock('spouse_details', 'spouse_email', 'spouse_email_block');
-        $this->setBlock('spouse_details', 'spouse_mobile', 'spouse_mobile_block');
-        $this->setBlock('spouse_details', 'spouse_phone', 'spouse_phone_block');
-        $this->setBlock(TEMPLATE_content, 'medical', 'medical_block');
-        $this->setBlock(TEMPLATE_content, 'group', 'group_block');
-        $this->setBlock('group', 'group_row', 'group_row_block');
-        $this->setBlock('group', 'group_mail', 'group_mail_block');
-        $this->setBlock('group_row', 'group_item', 'group_item_block');
-        $this->setBlock('group_item', 'group_teacher', 'group_teacher_block');
+//        $this->setFile(TEMPLATE_content, 'user/student.html');
+//        $this->setBlock(TEMPLATE_content, "portrait", "portrait_block");
+//        $this->setBlock(TEMPLATE_content, "timetable_link", "timetable_link_block");
+//        $this->setBlock(TEMPLATE_content, "due_work", "due_work_block");
+//        $this->setBlock(TEMPLATE_content, "grades_button", "grades_button_block");
+//        $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
+//        $this->setBlock(TEMPLATE_content, "boarder_leave", "boarder_leave_block");
+//        $this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
+//        $this->setBlock(TEMPLATE_content, 'pastoral_care', 'pastoral_care_block');
+//        $this->setBlock(TEMPLATE_content, 'modify', 'modify_block');
+//        $this->setBlock(TEMPLATE_content, "student_synergy_form", "student_synergy_form_block");
+//        $this->setBlock(TEMPLATE_content, "student_synergy_tutor", "student_synergy_tutor_block");
+//        $this->setBlock(TEMPLATE_content, 'contact_synergy', 'contact_synergy_block');
+//        $this->setBlock('contact_synergy', 'edit_emergency', 'edit_emergency_block');
+//        $this->setBlock('contact_synergy', 'edit_contact', 'edit_contact_block');
+//        $this->setBlock('contact_synergy', 'contact_details', 'contact_details_block');
+//        $this->setBlock('contact_synergy', 'contact_alert', 'contact_alert_block');
+//        $this->setBlock('contact_details', 'contact_email', 'contact_email_block');
+//        $this->setBlock('contact_details', 'contact_mobile', 'contact_mobile_block');
+//        $this->setBlock('contact_details', 'contact_phone', 'contact_phone_block');
+//        $this->setBlock('contact_details', 'spouse_details', 'spouse_details_block');
+//        $this->setBlock('contact_synergy', 'emergency', 'emergency_block');
+//        $this->setBlock('emergency', 'emergency_contact', 'emergency_contact_block');
+//        $this->setBlock('spouse_details', 'spouse_email', 'spouse_email_block');
+//        $this->setBlock('spouse_details', 'spouse_mobile', 'spouse_mobile_block');
+//        $this->setBlock('spouse_details', 'spouse_phone', 'spouse_phone_block');
+//        $this->setBlock(TEMPLATE_content, 'medical', 'medical_block');
+//        $this->setBlock(TEMPLATE_content, 'group', 'group_block');
+//        $this->setBlock('group', 'group_row', 'group_row_block');
+//        $this->setBlock('group', 'group_mail', 'group_mail_block');
+//        $this->setBlock('group_row', 'group_item', 'group_item_block');
+//        $this->setBlock('group_item', 'group_teacher', 'group_teacher_block');
     } elseif ($groupHandler->isParent($user['uid'])) {
         $this->setFile(TEMPLATE_content, 'user/parent.html');
         $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
