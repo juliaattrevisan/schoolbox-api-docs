@@ -3,12 +3,12 @@
     /**
      * Timetable
      *
-     * Takes a full timetable grid and crunches it down into
+     * Takes a Day row grid and crunches it down into
      * ones that will fit into smaller devices
      *
      * @param options
      */
-    $.fn.timetableDashboard = function(options) {
+    $.fn.timetableRow = function(options) {
         options = options || {};
 
         var config = init(options, $(this));
