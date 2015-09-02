@@ -20,7 +20,7 @@ class StaffUnsetOnUpdate extends Synchronise_Base_Hydrator_UnsetOnUpdate
     protected function hydrateOnUpdate($externalUser, $newUser)
     {
         /* Don't change non teacher staff campus */
-        if($externalUser['StaffCategoryType'] != 'TEACHER') {
+        if ($externalUser['StaffCategory'] != 'TEACH') {
             unset($newUser['campus']);
             unset($newUser['defaultCampus']);
         }
