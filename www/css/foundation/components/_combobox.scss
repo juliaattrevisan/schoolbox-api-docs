@@ -16,20 +16,20 @@
     display: block;
     height: 100%;
     width: 100%;
-    font-size: 9px;
+    font-size: rem-calc($base-font-size * 0.75);
     text-align: center;
     vertical-align: middle;
     color: $selectize-arrow-color;
 }
 .combobox_button {
-    background: $selectize-color-dropdown;
+    background: transparent;
     position: absolute;
     // No border, so make this fit inside a bordered input
     right: 1px;
     top: 1px;
     display: block;
     height: 100%;
-    width: 18px;
+    width: rem-calc($base-font-size * 1.5);
 }
 
 .combobox_button:hover {
@@ -42,22 +42,24 @@
 
 .combobox_selector {
     background: $selectize-color-dropdown;
-    font-size: 12px;
+    font-size: $input-font-size;
     z-index: 1000;
-    max-height: 200px;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: $selectize-max-height-dropdown;
 }
 
 .combobox_selector ul {
     padding: 0;
     margin: 0;
     list-style: none;
-    border:1px solid $selectize-color-dropdown-border;
+    border: $input-border-width $input-border-style $selectize-color-dropdown-border;
 }
 
 .combobox_selector li {
-    padding: 2px 3px;
-    margin: 0 !important;
+    @include form-element;
+    margin: 0;
+    border-width: 0;
 }
 
 .combobox_selector li:hover,
