@@ -1041,6 +1041,7 @@ nav {
 ul.flex-list {
 	width: 100%;
 	display: table;
+	table-layout: fixed;
 	margin: 0;
 	&.buttons {
 		> li > a {
@@ -1051,7 +1052,6 @@ ul.flex-list {
 		display: table-cell;
 		margin: 0;
 		padding-right: 1px;
-		width: 1000px; // hack that makes them as evenly sized as possible
 		&:last-child {
 			padding-right: 0;
 		}
