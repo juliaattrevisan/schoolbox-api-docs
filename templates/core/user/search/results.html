@@ -4,47 +4,45 @@
 		<section>
 			<ul class="action-list">
 			    <!-- BEGIN user -->
-				<li class="row" data-equalizer>
-					<div class="column no-pad small-11" data-equalizer-watch>
-						<div class="avatar card">
-							<a href='/search/user/{USER_SEARCH_ID}'>
-								<img src="/portrait.php?userId={USER_SEARCH_SYNERGY_ID}&size=square64" width="48" />
-								<h3>{USER_SEARCH_NAME}</h3>
-							</a>
-							<p class="meta">{USER_SEARCH_YEAR} {USER_SEARCH_CAMPUS} {USER_SEARCH_GROUP}</p>
-						</div>
+				<li class="actions-small-1">
+					<div class="avatar card">
+						<a href='/search/user/{USER_SEARCH_ID}'>
+							<img src="/portrait.php?userId={USER_SEARCH_SYNERGY_ID}&size=square64" width="48" />
+							<h3>{USER_SEARCH_NAME}</h3>
+						</a>
+						<p class="meta">{USER_SEARCH_YEAR} {USER_SEARCH_CAMPUS} {USER_SEARCH_GROUP}</p>
 					</div>
-					<div class="actions one">
+					<nav>
 						<a href="#" data-dropdown="overflow{USER_SEARCH_ID}" class="no-text icon-more" data-equalizer-watch></a>
-					</div>
+					</nav>
 					<!-- Dropdown -->
 					<ul class="f-dropdown" data-dropdown-content="" id="overflow{USER_SEARCH_ID}">
 						<!-- BEGIN modify -->
-						<li><a href="/adminv2/modify-user/{USER_SEARCH_ID}" class="icon-modify" title="Modify User"><span>Modify</span></a></li>
+						<li><a href="/adminv2/modify-user/{USER_SEARCH_ID}" class="icon-modify" title="Modify User">Modify</a></li>
 						<!-- END modify -->
 
 						<!-- BEGIN boarder_leave -->
-						<li><a href="/modules/leave/student/{USER_SEARCH_ID}" class="icon-boarder-leave"><span></span>Boarding Leave</a></li>
+						<li><a href="/modules/leave/student/{USER_SEARCH_ID}" class="icon-boarder-leave">Boarding Leave</a></li>
 						<!-- END boarder_leave -->
 
 						<!-- BEGIN timetable -->
-						<li><a href="/timetable/{USER_SEARCH_ID}" class="icon-timetable"><span></span>Timetable</a></li>
+						<li><a href="/timetable/{USER_SEARCH_ID}" class="icon-timetable">Timetable</a></li>
 						<!-- END timetable -->
 
 						<!-- BEGIN user_calendar -->
-						<li><a href='/calendar/full/{USER_CALENDAR_CURRENTDATE}/{USER_SEARCH_ID}' class="icon-calendar"><span></span>Calendar</a></li>
+						<li><a href='/calendar/full/{USER_CALENDAR_CURRENTDATE}/{USER_SEARCH_ID}' class="icon-calendar">Calendar</a></li>
 						<!-- END user_calendar -->
 
 						<!-- BEGIN eportfolio -->
-						<li><a href="/eportfolio/{USER_SEARCH_ID}/profile" class="icon-eportfolio"><span></span>ePortfolio</a></li>
+						<li><a href="/eportfolio/{USER_SEARCH_ID}/profile" class="icon-eportfolio">ePortfolio</a></li>
 						<!-- END eportfolio -->
 
 						<!-- BEGIN grades_button -->
-						<li><a href="/submission/allWork/{USER_SEARCH_ID}" class="icon-approve"><span></span>Grades</a></li>
+						<li><a href="/submission/allWork/{USER_SEARCH_ID}" class="icon-approve">Grades</a></li>
 						<!-- END grades_button -->
 
 						<!-- BEGIN due_work -->
-						<li><a href="/submission/dueWork/0/{USER_SEARCH_ID}" class="icon-due-work"><span></span>Due Work</a></li>
+						<li><a href="/submission/dueWork/0/{USER_SEARCH_ID}" class="icon-due-work">Due Work</a></li>
 						<!-- END due_work -->
 
 					</ul>
