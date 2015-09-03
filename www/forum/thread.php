@@ -1,6 +1,8 @@
 <?php
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+use \Schoolbox\Breadcrumbs;
+
 $forumHandler = new Forum();
 $groupHandler = new Group();
 
@@ -191,3 +193,24 @@ if (is_array($postList)) {
 } else {
     $this->setVar('post_block', '<p>There are no posts to display. Create a new post.</p>');
 }
+
+/* Render out breadcrumbs
+ */
+$trail = new Breadcrumbs();
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => $category->getName(),
+        'href' => "/homepage/{$category->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => 'Forum',
+        'href' => "/forum/{$category->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($thread['title']),
+        'href' => '',
+        'class' => 'active',
+    ]
+]);
