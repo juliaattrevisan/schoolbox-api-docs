@@ -242,8 +242,9 @@
            or session.user.getId() == user.getId()
         %}
         <div class="row">
-            {% block contacts %}
+            {% block contacts_island %}
             <div class="small-12 medium-6 xlarge-12 island">
+                {% block contacts %}
                 <h2 class="subheader">Contact Information</h2>
 
                 {% for message in externalUser.AlertMessages %}
@@ -345,11 +346,13 @@
                         </ul>
                     </div>
                 </section>
+                {% endblock contacts %}
             </div>
-            {% endblock contacts %}
+            {% endblock contacts_island %}
 
-            {% block emergencyContacts %}
+            {% block emergencyContacts_island %}
             <div class="small-12 medium-6 xlarge-12 island">
+                {% block emergencyContacts %}
                 {# up to 3 emergency contact blocks
                  # show no header if no emergencies
                  #}
@@ -393,8 +396,9 @@
                     </div>
                 </section>
                 {% endif %}
+                {% endblock emergencyContacts %}
             </div>
-            {% endblock emergencyContacts %}
+            {% endblock emergencyContacts_island %}
         </div>
         {% endif %}
     </div>

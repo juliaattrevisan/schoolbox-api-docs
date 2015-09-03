@@ -3,5 +3,13 @@
 {% block medicalAlert %}
 {% endblock medicalAlert %}
 
-{% block emergencyContacts %}
-{% endblock emergencyContacts %}
+{% block contacts_island %}
+<div class="small-12 island">
+    {% block contacts %}
+        {{ parent() }}
+    {% endblock contacts %}
+</div>
+{% endblock contacts_island %}
+
+{% block emergencyContacts_island %}
+{% endblock emergencyContacts_island %}
