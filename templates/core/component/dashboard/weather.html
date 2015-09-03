@@ -7,36 +7,44 @@
                 <a href="/weather/">Weather{WEATHER_LOCATION}</a>
             </h2>
             <section>
-                <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+                <ul class="information-list">
                     <!-- BEGIN weather_forecast -->
                     <li>
-                        <div class="weather content {FC_CLASS}">
-                            <div class="avatar-card clearfix">
-                                <img src="{FC_IMAGE}" title="{FC_PRECIS}" alt="{FC_PRECIS}" />
-
-                                <h5>{FC_DAY}</h5>
-
-                                <!-- BEGIN temp_now -->
-                                <span class="label neutral">{FC_ACTUAL}&deg;</span>
-                                <!-- END temp_now -->
-                                <!-- BEGIN temp_range -->
-                                <span class="label hot">{FC_HIGH}&deg;</span>
-                                <span class="label cold">{FC_LOW}&deg;</span>
-                                <!-- END temp_range -->
+                        <div class="list-item">
+                            <div class="small-2 large-4 columns no-pad">
+                                <img src="{FC_IMAGE}" class='content' title="{FC_PRECIS}" alt="{FC_PRECIS}" />
+                            </div>
+                            <div class="small-2 large-3 columns content">
+                                {FC_DAY}
+                            </div>
+                            <div class="small-8 large-5 columns content">
+                                <div class="row">
+                                    <!-- BEGIN temp_now -->
+                                    <div class="small-12 columns no-pad">
+                                        <span class="label neutral full-width">{FC_ACTUAL}&deg;</span>
+                                    </div>
+                                    <!-- END temp_now -->
+                                    <!-- BEGIN temp_range -->
+                                    <div class="small-6 columns no-pad">
+                                        <span class="label hot full-width">{FC_HIGH}&deg;</span>
+                                    </div>
+                                    <div class="small-6 columns no-pad">
+                                        <span class="label cold full-width">{FC_LOW}&deg;</span>
+                                    </div>
+                                    <!-- END temp_range -->
+                                </div>
                             </div>
                         </div>
                     </li>
                     <!-- END weather_forecast -->
                 </ul>
 
-                <!-- BEGIN weather_unavailable -->
                 <div class="content">
-                    <p class="information-notification">Weather service is temporarily unavailable.</p>
-                </div>
-                <!-- END weather_unavailable -->
+                    <!-- BEGIN weather_unavailable -->
+                    <p class="meta">Weather service is temporarily unavailable.</p>
+                    <!-- END weather_unavailable -->
 
-                <div class="content">
-                    <a href="/weather/" title="View weekly forecast" class="button icon-weather">View weekly forecast</a>
+                    <a href="/weather/" title="View Weekly Forecast" class="button icon-weather">View Weekly Forecast</a>
                 </div>
             </section>
         </div>
