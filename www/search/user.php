@@ -8,6 +8,40 @@ use Schoolbox\Resource\Folder;
 //display user description page
 
 /**
+ * Staff rendering, extracted to a method.
+ * @param SitePage                 $page
+ * @param array                    $user
+ * @param External_User            $synUserHandler
+ * @param UserMapper               $userMapper
+ * @param Eportfolio_Authenticator $authenticator
+ */
+function renderStaff(
+    SitePage $page,
+    $user,
+    External_User $synUserHandler,
+    UserMapper $userMapper,
+    Eportfolio_Authenticator $authenticator
+) {
+
+    $externalUser = $synUserHandler->getStaff($user['synergy_id']);
+    // TwigLib
+    $page->setFile(TEMPLATE_content, 'output.html');
+    $page->setVar(
+        'OUTPUT',
+        $page->getTwig()->render(
+            'user/staff.twig',
+            [
+                'session'         => $_SESSION,
+                'user'            => $userMapper->findById($user['uid']),
+                'externalUser'    => $externalUser,
+                'eportfolioAuth'  => $authenticator->canView(),
+                'now'             => Alaress_Date_Format::now(),
+            ]
+        )
+    );
+}
+
+/**
  * Student rendering, extracted to a method.
  *
  * @param SitePage                 $page
@@ -188,14 +222,7 @@ if (is_numeric($this->arg[0])) {
         $this->setBlock(TEMPLATE_content, 'parent_synergy_form', 'parent_synergy_form_block');
         $this->setBlock('parent_synergy_form', 'parent_spouse', 'parent_spouse_block');
     } else {
-        $this->setFile(TEMPLATE_content, 'user/staff.html');
-        $this->setBlock(TEMPLATE_content, "portrait", "portrait_block");
-        $this->setBlock(TEMPLATE_content, "timetable_link", "timetable_link_block");
-        $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
-        $this->setBlock(TEMPLATE_content, "staff_synergy", "staff_synergy_block");
-        $this->setBlock(TEMPLATE_content, 'modify', 'modify_block');
-        $this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
-
+        // Twig
     }
 
     $blank = array(
@@ -358,24 +385,31 @@ if (is_numeric($this->arg[0])) {
                     new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
                 );
             } elseif ($groupHandler->isStaff($user['uid']) && $groupHandler->isStaff()) {
-                $this->parse("timetable_link_block", "timetable_link");
-                $this->parse("portrait_block", "portrait");
-
-                $synInfo = $synUserHandler->getStaff($user['synergy_id']);
-
-                $this->setVar('EXTENSION', $synInfo['StaffExtension']);
-                $this->setVar('MOBILE', $synInfo['StaffMobilePhone']);
-                $this->setVar('DEPARTMENT', $synInfo['StaffDepartment']);
-                $this->setVar('ROOM', $synInfo['StaffRoom']);
-                $this->setVar('BUILDING', $synInfo['StaffBuilding']);
-                $this->setVar('CAMPUS', $synInfo['StaffCampusDescription']);
-                $this->setVar('CATEGORY', $synInfo['StaffCategoryDescription']);
-                $this->setVar('VOICEMAIL', $synInfo['StaffVoiceMail']);
-
-                $this->parse('staff_synergy_block', 'staff_synergy');
-                if ($_SESSION['su']) {
-                    $this->parse('modify_block', 'modify');
-                }
+                renderStaff(
+                    $this,
+                    $user,
+                    $synUserHandler,
+                    new UserMapper(),
+                    new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
+                );
+//                $this->parse("timetable_link_block", "timetable_link");
+//                $this->parse("portrait_block", "portrait");
+//
+//                $synInfo = $synUserHandler->getStaff($user['synergy_id']);
+//
+//                $this->setVar('EXTENSION', $synInfo['StaffExtension']);
+//                $this->setVar('MOBILE', $synInfo['StaffMobilePhone']);
+//                $this->setVar('DEPARTMENT', $synInfo['StaffDepartment']);
+//                $this->setVar('ROOM', $synInfo['StaffRoom']);
+//                $this->setVar('BUILDING', $synInfo['StaffBuilding']);
+//                $this->setVar('CAMPUS', $synInfo['StaffCampusDescription']);
+//                $this->setVar('CATEGORY', $synInfo['StaffCategoryDescription']);
+//                $this->setVar('VOICEMAIL', $synInfo['StaffVoiceMail']);
+//
+//                $this->parse('staff_synergy_block', 'staff_synergy');
+//                if ($_SESSION['su']) {
+//                    $this->parse('modify_block', 'modify');
+//                }
             }
         }
     } else {
