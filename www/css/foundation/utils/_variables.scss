@@ -8,15 +8,17 @@ $charset: "utf-8";
 $primary-color:					#0066b0;
 $secondary-color:				#bdd7ea;
 $tertiary-color:				#0066b0;
-$button-color:					#bdd7ea;
-$secondary-button-color:		#bdd7ea;
-$submit-button-color:			#0066b0;
+
+$button-color:					$secondary-color;
+$secondary-button-color:		$secondary-color;
+$submit-button-color:			$primary-color;
+
 $alert-color:					#ff5757;
 $success-color:					#1c9e1c;
 $warning-color:					#ff7d00;
 $info-color:					#a0d3e8;
-$white:							#ffffff;
-$black:							#000000;
+$highlight-color:				#fff3bd;
+
 $body-grey:						#8b8b8b;
 $body-bg:						#ededed;
 $ocean-sunset:					#fff3bd;
@@ -25,6 +27,7 @@ $ocean-sunset:					#fff3bd;
 $asgard:                        #E8E8E8;
 
 // Foundation dependant colours - do not delete
+$white:							#ffffff;
 $ghost: 						#FAFAFA;
 $snow: 							#F9F9F9;
 $vapor: 						#F6F6F6;
@@ -42,6 +45,7 @@ $charcoal: 						#555555;
 $tuatara: 						#444444;
 $oil: 							#333333;
 $jet: 							#222222;
+$black:							#000000;
 
 $hot-color: 					$alert-color;
 $cold-color: 					$primary-color;
