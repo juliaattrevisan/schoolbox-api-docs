@@ -7,6 +7,7 @@ $charset: "utf-8";
 // Colours
 $primary-color:					#0066b0;
 $secondary-color:				#bdd7ea;
+$tertiary-color:				#0066b0;
 $button-color:					#bdd7ea;
 $secondary-button-color:		#bdd7ea;
 $submit-button-color:			#0066b0;
@@ -14,7 +15,6 @@ $alert-color:					#ff5757;
 $success-color:					#1c9e1c;
 $warning-color:					#ff7d00;
 $info-color:					#a0d3e8;
-$tertiary:						#0066b0;
 $white:							#ffffff;
 $black:							#000000;
 $body-grey:						#8b8b8b;
@@ -46,6 +46,10 @@ $jet: 							#222222;
 $hot-color: 					$alert-color;
 $cold-color: 					$primary-color;
 $neutral-color:					$gainsboro;
+
+// for BC
+$tertiary:						$tertiary-color;
+
 
 // Dimensions
 // $search-width: 					256px;
