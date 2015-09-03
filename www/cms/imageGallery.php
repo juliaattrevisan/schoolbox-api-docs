@@ -75,7 +75,7 @@ if (is_numeric($this->arg[0])) {
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text' => $folder->getName(),
-            'href' => "/homepage/{$folder->getId()}",
+            'href' => "/homepage/{$returnId}",
             'class' => '',
         ],
         [
