@@ -33,6 +33,17 @@ function renderStudent(
     );
     $page->setFile(TEMPLATE_content, 'output.html');
     // TODO make preg_replace available to Twig
+
+    // Load the list of groups, and their owner.
+    $groups = $groupHandler->involvedInCategoryList($user['uid'], false);
+    foreach ($groups as &$group) {
+        $owner = $groupHandler->getOwner($group['id']);
+        if (is_array($owner)) {
+            $group['owner'] = \Schoolbox\UserMapper::getInstance()->findById($owner['uid']);
+        }
+    }
+    unset($group);
+
     $page->setVar(
         'OUTPUT',
         $page->getTwig()->render(
@@ -47,7 +58,7 @@ function renderStudent(
                 'boarderType'     => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
                 'contacts'        => $synUserHandler->getStudentContactList($user['synergy_id']),
                 'subjects'        => $synUserHandler->getSubjectList($user['synergy_id'], $user['uid']),
-                'groups'          => $groupHandler->involvedInCategoryList($user['uid'], false),
+                'groups'          => $groups,
             ]
         )
     );
