@@ -1,47 +1,24 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
-<script type="text/javascript">
-$(function() {
-
-	$('#folderForm').validate({
-		rules: {
-			'group[{REQUIRED_PERMS}]': {
-				groupCheck: true
-			}
-		}
-	});
-
-    jQuery.validator.addMethod("groupCheck", function(value, element, params) {
-        var hasDefaultPerms = $("input[name='group[{REQUIRED_PERMS}]']:checked").val();
-        var individualPerms = $('input[name=groupcheck]').is(':checked');
-
-        if ((hasDefaultPerms < 2) && !individualPerms) {
-          return confirm("You do not currently have write access to this folder. Do you wish to continue?");
-        }
-        else {
-          return true;
-        }
-    }, "Please select write access for this group.");
-});
-</script>
-<!-- END custom_head -->
 <ul class="breadcrumb">
 	<li><a href="/homepage/{PARENT_ID}/">{PARENT_NAME}</a></li>
 	<li class="active"><a href="#">{ACTION} Folder</a></li>
 </ul>
+
 <div class="row">
 	<div class="small-12 island">
 		<h1>{ACTION} Folder</h1>
 		<form action="/cms/categoryForm.php" method="post" id="folderForm" class="top">
-			<section>
+            <input type="hidden" id="parent" name="parent" value="{PARENT_ID}" />
+            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+
+            <section>
 				<fieldset class="content">
 					<div class="small-12 columns">
-						<label>Folder Name
+						<label>
+                            Folder Name
 							<input type="text" id="name" class="required" name="name" maxlength="100" size="40" value="{NAME}" />
 						</label>
-						<label>Homepage Template
+						<label>
+                            Homepage Template
 							<span data-tooltip class="hint has-tip tip-top" data-width="200" title="If you would like a homepage associated with this folder select a basic layout to get started with">?</span>
 							<select name="template">
 								<!-- BEGIN template_list -->
@@ -65,13 +42,16 @@ $(function() {
 						<!-- BEGIN perm_table -->
 						<tr>
 							<td>{GROUP_NAME}</td>
-							<td><input type="radio" class="no_permission required" id="groupNone{GROUP_ID}" name="group[{GROUP_ID}]" value="0" {PERM_0_SELECTED} />
+							<td>
+                                <input type="radio" class="no_permission required" id="groupNone{GROUP_ID}" name="group[{GROUP_ID}]" value="0" {PERM_0_SELECTED} />
 								<label class="radio-label" for="groupNone{GROUP_ID}"></label>
 							</td>
-							<td><input type="radio" name="group[{GROUP_ID}]" id="groupRead{GROUP_ID}" value="1" {PERM_1_SELECTED} />
+							<td>
+                                <input type="radio" name="group[{GROUP_ID}]" id="groupRead{GROUP_ID}" value="1" {PERM_1_SELECTED} />
 								<label class="radio-label" for="groupRead{GROUP_ID}"></label>
 							</td>
-							<td><input type="radio" name="group[{GROUP_ID}]" id="groupWrite{GROUP_ID}" value="2" {PERM_2_SELECTED} />
+							<td>
+                                <input type="radio" name="group[{GROUP_ID}]" id="groupWrite{GROUP_ID}" value="2" {PERM_2_SELECTED} />
 								<label class="radio-label" for="groupWrite{GROUP_ID}"></label>
 							</td>
 						</tr>
@@ -83,7 +63,8 @@ $(function() {
 						<label for="recursive" class="checkbox-label">Apply these permissions to all subfolders</label>
 						<!-- END recursive -->
 						<!-- BEGIN indiv_perms -->
-						<label>Create Group
+						<label>
+                            Create Group
 							<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Manage individual user access to this folder. You will automatically be assigned administration rights">?</span>
 							<div class="switch">
 								<input type="checkbox" id="groupcheck" name="groupcheck" value="1" />
@@ -95,30 +76,34 @@ $(function() {
 					<!-- BEGIN indiv_modify -->
 					</fieldset>
 					<fieldset class="content">
-					<div class="small-12 columns">
-						<label>Group Management
-							<p><a class="button icon-group" href="/group/modify/{CATEGORY_ID}" title="Manage individual user access to this folder">Modify Group</a></p>
-						</label>
-					</div>
+                        <div class="small-12 columns">
+                            <label>
+                                Group Management
+                                <p><a class="button icon-group" href="/group/modify/{CATEGORY_ID}" title="Manage individual user access to this folder">Modify Group</a></p>
+                            </label>
+                        </div>
 					</fieldset>
 					<!-- END indiv_modify -->
 				</fieldset>
 				<fieldset class="content">
 					<div class="small-12 columns">
 						<!-- BEGIN reset_content -->
-						<label>Reset Homepage Content
+						<label>
+                            Reset Homepage Content
 							<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Removes all content from modules, clears the folder contents, and resets the homepage to its template">?</span>
 							<p><a class="button alert icon-delete" href="/cms/category/reset/{CATEGORY_ID}" onclick="return(confirm('Are you sure you wish to delete all content from this homepage? This includes:\n - Assessments\n - Blogs\n - Calendar events\n - News\n - Chats\n - Dropbox\n - Files\n - Forums\n - Polls\n - Due Work\n - Surveys\n - TextBoxes\n - Wikis'));">Reset Content</a></p>
 						</label>
 						<!-- END reset_content -->
 						<!-- BEGIN synergy_input -->
-						<label>{DATABASE_TYPE} Subject Codes
+						<label>
+                            {DATABASE_TYPE} Subject Codes
 							<span data-tooltip class="hint has-tip tip-top" data-width="200" title="If you want this category to be a subject enter its code here. You may enter multiple codes by separating them with a comma">?</span>
 							<input type="text" name="code" size="40" value="{CODE}" />
 						</label>
 						<!-- END synergy_input -->
 						<!-- BEGIN curriculum_code_input -->
-						<label>Curriculum Codes
+						<label>
+                            Curriculum Codes
 							<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Link this folder with a corresponding curriculum area, you can link multiple curriculum areas to this folder">?</span>
 							{CURRICULUM_CODE_INPUT}
 						</label>
@@ -128,11 +113,37 @@ $(function() {
 			</section>
 			<div class="row">
 				<div class="small-12 column">
-					<input type="hidden" id="parent" name="parent" value="{PARENT_ID}" />
-					<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-					<input type="submit" label="Submit" name="submit" value="{ACTION} Folder" />
+					<input type="submit" name="submit" value="{ACTION} Folder" />
 				</div>
 			</div>
 		</form>
 	</div>
 </div>
+
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
+<script type="text/javascript">
+    $(function() {
+
+        $('#folderForm').validate({
+            rules: {
+                'group[{REQUIRED_PERMS}]': {
+                    groupCheck: true
+                }
+            }
+        });
+
+        jQuery.validator.addMethod("groupCheck", function(value, element, params) {
+            var hasDefaultPerms = $("input[name='group[{REQUIRED_PERMS}]']:checked").val();
+            var individualPerms = $('input[name=groupcheck]').is(':checked');
+
+            if ((hasDefaultPerms < 2) && !individualPerms) {
+                return confirm("You do not currently have write access to this folder. Do you wish to continue?");
+            }
+            else {
+                return true;
+            }
+        }, "Please select write access for this group.");
+    });
+</script>
