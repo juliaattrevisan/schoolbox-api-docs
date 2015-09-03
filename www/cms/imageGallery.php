@@ -5,6 +5,8 @@
  *                                                          *
  ************************************************************/
 
+use \Schoolbox\Breadcrumbs;
+
 /* This page generates a photo gallery of the provided folder.
  * Displays one image at large size and the rest as thumbnails.
  * Clicking the thumbnails makes them the larger images.
@@ -66,6 +68,23 @@ if (is_numeric($this->arg[0])) {
     } else {
         $this->setVar('image_gallery_block', '');
     }
-} else {
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Image Gallery',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
+}
+else {
     error(2);
 }
