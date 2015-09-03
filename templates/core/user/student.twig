@@ -15,9 +15,8 @@
             <div class="content no-pad">
                 <div class="row no-margin">
                     <div class="small-12 medium-6 large-4 columns no-pad">
-                        <!-- BEGIN portrait -->
+                        {# as far as I know portrait always shows #}
                         <img src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=profile" class="full-width"/>
-                        <!-- END portrait -->
                     </div>
 
                     <div class="small-12 medium-6 large-8 columns no-pad">
@@ -174,7 +173,7 @@
                                     <div class="avatar-card">
                                         {# need to know user's schoolbox info here #}
                                         <a href="{CONTACT_LINK}">
-                                            <img src="/portrait.php?userId={{ contact.StudentContactID }}&size=square64" />
+                                            <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
                                             {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
                                         </a>
                                         <p class="meta">{{ contact.StudentContactRelation }}</p>
@@ -203,7 +202,7 @@
                                     <div class="avatar-card">
                                         {# need to know user's schoolbox info here #}
                                         <a href="{SPOUSE_LINK}">
-                                            <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&size=square64" />
+                                            <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
                                             {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
                                         </a>
                                         <p class="meta">{{ contact.StudentContactSpouseRelation }}</p>
@@ -385,7 +384,7 @@
                                 <div class="list-item">
                                     <div class="avatar-card">
                                         <a href="/search/user/{{ group.owner.getId() }}">
-                                            <img src="/portrait.php?userId={{ group.owner.getExternalId() }}&size=square64" />
+                                            <img src="/portrait.php?userId={{ group.owner.getExternalId() }}&amp;size=square64" />
                                             {{ group.owner.formatName() }}
                                         </a>
                                         <p class="meta">{{ group.owner.getRole().getName() }}</p>
