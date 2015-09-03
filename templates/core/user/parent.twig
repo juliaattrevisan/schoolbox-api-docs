@@ -30,13 +30,13 @@
                             {% if not externalUser.SilentPhoneFlag %}
                             <dt class="no-margin small-6 medium-3">Home Phone</dt>
                             <dd class="no-margin small-6 medium-9">
-                                <a href="tel:{{ contact.HomePhone }}">{{ contact.HomePhone }}</a>
+                                <a href="tel:{{ externalUser.HomePhone }}">{{ externalUser.HomePhone }}</a>
                             </dd>
                             {% endif %}
 
                             <dt class="no-margin small-6 medium-3">Mobile Phone</dt>
                             <dd class="no-margin small-6 medium-9">
-                                <a href="tel:{{ contact.MobilePhone }}">{{ contact.MobilePhone }}</a>
+                                <a href="tel:{{ externalUser.MobilePhone }}">{{ externalUser.MobilePhone }}</a>
                             </dd>
 
                             {% if externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname %}
@@ -53,13 +53,13 @@
                                     <p>{{ externalUser.SpouseTitle }} {{ externalUser.SpousePreferred }} {{ externalUser.SpouseSurname }}</p>
                                     {% endif %}
 
-                                    {% if config.restrict_parent_emails and not session.user.getRole().isStaff() %}
+                                    {% if not (config.restrict_parent_emails and not session.user.getRole().isStaff()) %}
                                     <p class="meta">
                                         <a href="{{ session.mailhandle }}{{ externalUser.SpouseEmail }}">{{ externalUser.SpouseEmail }}</a>
                                     </p>
                                     {% endif %}
                                     <p class="meta">
-                                        <a href="tel:{{ contact.SpouseMobilePhone }}">{{ contact.SpouseMobilePhone }}</a>
+                                        <a href="tel:{{ externalUser.SpouseMobilePhone }}">{{ externalUser.SpouseMobilePhone }}</a>
                                     </p>
                                 </div>
                             </dd>
