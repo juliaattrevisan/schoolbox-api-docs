@@ -1,5 +1,8 @@
 <?php
 
+use Schoolbox\UserMapper;
+use Schoolbox\Resource\Folder;
+
 //require_once 'include/permission.php';
 
 //display user description page
@@ -7,29 +10,26 @@
 /**
  * Student rendering, extracted to a method.
  *
- * @param SitePage       $page
- * @param array          $user
- * @param Group          $groupHandler
- * @param External_User  $synUserHandler
- * @param External_Class $classHandler
+ * @param SitePage                 $page
+ * @param array                    $user
+ * @param Group                    $groupHandler
+ * @param External_User            $synUserHandler
+ * @param External_Class           $classHandler
+ * @param UserMapper               $userMapper
+ * @param Folder\Mapper            $folderMapper
+ * @param Eportfolio_Authenticator $authenticator
  */
 function renderStudent(
     SitePage $page,
     $user,
     Group $groupHandler,
     External_User $synUserHandler,
-    External_Class $classHandler
+    External_Class $classHandler,
+    UserMapper $userMapper,
+    Folder\Mapper $folderMapper,
+    Eportfolio_Authenticator $authenticator
 ) {
-    // Handlers
 
-    // External handlers
-
-    // Mappers
-    $userMapper   = new Schoolbox\UserMapper();
-    $folderMapper = new Schoolbox\Resource\Folder\Mapper();
-
-    // Handle eportfolio auth here for now
-    $authenticator = new \Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile');
     // Handle parent/child relations here for now
     $isParentOfChild = $groupHandler->isParentOfChild($user['uid']);
     $externalUser = $synUserHandler->getStudent($user['synergy_id']);
@@ -53,9 +53,9 @@ function renderStudent(
             $subject['folder'] = $folderMapper->findByCode($subject['code']);
         } catch (\Exception $e) {
             if (\Config::get('show_all_subjects')) {
-                $code = new \Schoolbox\Resource\Folder\Code\Model();
+                $code = new Folder\Code\Model();
                 $code->setCode($subject['code']);
-                $subject['folder'] = new Schoolbox\Resource\Folder\Model();
+                $subject['folder'] = new Folder\Model();
                 $subject['folder']->setName($subject['name'])->addCode($code);
             } else {
                 continue;
@@ -351,7 +351,10 @@ if (is_numeric($this->arg[0])) {
                     $user,
                     $groupHandler,
                     $synUserHandler,
-                    new External_Class()
+                    new External_Class(),
+                    new UserMapper(),
+                    new Folder\Mapper(),
+                    new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
                 );
             } elseif ($groupHandler->isStaff($user['uid']) && $groupHandler->isStaff()) {
                 $this->parse("timetable_link_block", "timetable_link");
@@ -375,7 +378,7 @@ if (is_numeric($this->arg[0])) {
             }
         }
     } else {
-//Remove subjects from output
+        //Remove subjects from output
         $renderer = new \Schoolbox\SubjectList\UserProfile($this, array());
         $renderer->render();
     }
