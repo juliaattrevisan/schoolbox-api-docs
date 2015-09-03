@@ -85,6 +85,9 @@ $sub-nav-active-cursor: default;
 $sub-nav-bg-color: $secondary-color;
 $sub-nav-bg-active-color: $white;
 
+$sub-nav-secondary-bg-color: tint($secondary-color, 60%);
+$sub-nav-secondary-bg-active-color: $white;
+
 //
 // TOP BAR
 //
@@ -280,6 +283,16 @@ $menu-slide: "transform 500ms ease";
 			background-color: $sub-nav-active-bg-hover;
 		}
 	}
+
+	&.secondary {
+		a {
+			background-color: $sub-nav-secondary-bg-color;
+			&:hover{
+				background-color: $sub-nav-active-bg-hover;
+			}
+		}
+	}
+
 }
 
 // Top bar
