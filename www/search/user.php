@@ -216,6 +216,8 @@ function renderStudent(
     // TODO make preg_replace available to Twig
     // TODO make session contents available to Twig by default, either through whole _SESSION or Aura
     // TODO make $now available to Twig by default
+    $userObject = $userMapper->findById($user['uid']);
+    $userObject->loadParents();
     $page->setFile(TEMPLATE_content, 'output.html');
     $page->setVar(
         'OUTPUT',
@@ -223,7 +225,7 @@ function renderStudent(
             'user/student.twig',
             [
                 'session'         => $_SESSION,
-                'user'            => $userMapper->findById($user['uid']),
+                'user'            => $userObject,
                 'externalUser'    => $externalUser,
                 'eportfolioAuth'  => $authenticator->canView(),
                 'isParentOfChild' => $isParentOfChild,

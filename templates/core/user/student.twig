@@ -21,7 +21,9 @@
 
                     <div class="small-12 medium-6 large-8 columns no-pad">
                         {% block medicalAlert %}
-                        {% if externalUser.StudentMedicalAlert %}
+                        {% if  externalUser.StudentMedicalAlert
+                           and not config.protect_medicalspecial_profile
+                           and (session.user.isStaff() or session.user.isParentOf(user)) %}
                         <div class="alert-box alert icon-alert no-margin">
                             Medical Note: {{ externalUser.StudentMedicalAlert }}
                         </div>
