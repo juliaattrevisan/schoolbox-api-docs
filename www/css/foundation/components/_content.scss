@@ -414,6 +414,8 @@ $clearing-carousel-thumb-active-border: 4px solid tint($tertiary, 26%);
 @import "../../../javascript/components/foundation/scss/foundation/components/clearing";
 
 
+$row-hover-background: tint($highlight-color, 87%);
+
 //
 // CUSTOM OVERRIDES
 //
@@ -462,7 +464,7 @@ thead tr th, .row-header, .island table.dataTable thead th {
 }
 tbody tr:hover {
 	th, td {
-		background-color: $ocean-sunset;
+		background-color: $row-hover-background;
 	}
 	nav a {
 		opacity: 1;
