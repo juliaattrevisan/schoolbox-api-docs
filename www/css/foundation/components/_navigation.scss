@@ -385,6 +385,10 @@ $menu-slide: "transform 500ms ease";
 			display: block;
 			line-height: 1.5rem;
 		}
+
+		&:before, span {
+			@include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
+		}
 	}
 }
 
