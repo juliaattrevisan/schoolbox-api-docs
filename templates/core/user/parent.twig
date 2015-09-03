@@ -1,0 +1,95 @@
+<div class="row">
+    <div class="small-12 column">
+        <h1>{{ user.formatName() }}</h1>
+        <span class='header-actions'>
+            {% if session.user.isSuperuser() %}
+                <a href="/adminv2/modify-user/{{ user.getId() }}" class="button icon-modify" title="Modify User"></a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="no-pad">
+            <div class="content no-pad">
+                <div class="row no-margin">
+                    <div class="small-12 medium-6 large-4 columns no-pad">
+                        <img src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=profile" class="full-width"/>
+                    </div>
+
+                    <div class="small-12 medium-6 large-8 columns no-pad">
+                        <dl class="inline-dl no-margin">
+                            <dt class="no-margin small-6 medium-3">Email</dt>
+                            <dd class="no-margin small-6 medium-9">
+                                <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
+                            </dd>
+
+                            {% if externalUser.DirectoryIncludeFlag %}
+
+                            {% if not externalUser.SilentPhoneFlag %}
+                            <dt class="no-margin small-6 medium-3">Home Phone</dt>
+                            <dd class="no-margin small-6 medium-9">
+                                <a href="tel:{{ contact.HomePhone }}">{{ contact.HomePhone }}</a>
+                            </dd>
+                            {% endif %}
+
+                            <dt class="no-margin small-6 medium-3">Mobile Phone</dt>
+                            <dd class="no-margin small-6 medium-9">
+                                <a href="tel:{{ contact.MobilePhone }}">{{ contact.MobilePhone }}</a>
+                            </dd>
+
+                            {% if externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname %}
+                            <dt class="no-margin small-12">Partner</dt>
+                            <dd class="no-margin small-12">
+                                <div class="avatar-card">
+                                    {% if spouse %}
+                                    <a href="/search/user/{{ spouse.id }}">
+                                        <img src="/portrait.php?userId={{ externalUser.SpouseID }}&amp;size=square64">
+                                        <p>{{ externalUser.SpouseTitle }} {{ externalUser.SpousePreferred }} {{ externalUser.SpouseSurname }}</p>
+                                    </a>
+                                    {% else %}
+                                    <img src="/portrait.php?userId={{ externalUser.SpouseID }}&amp;size=square64">
+                                    <p>{{ externalUser.SpouseTitle }} {{ externalUser.SpousePreferred }} {{ externalUser.SpouseSurname }}</p>
+                                    {% endif %}
+
+                                    {% if config.restrict_parent_emails and not session.user.getRole().isStaff() %}
+                                    <p class="meta">
+                                        <a href="{{ session.mailhandle }}{{ externalUser.SpouseEmail }}">{{ externalUser.SpouseEmail }}</a>
+                                    </p>
+                                    {% endif %}
+                                    <p class="meta">
+                                        <a href="tel:{{ contact.SpouseMobilePhone }}">{{ contact.SpouseMobilePhone }}</a>
+                                    </p>
+                                </div>
+                            </dd>
+                            {% endif %}
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+                <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8" data-equalizer>
+
+                    {% block buttons_eportfolio %}
+                        {% if eportfolioAuth %}
+                            <li class="no-pad">
+                                <a href="/eportfolio/{{ user.getId() }}/profile"
+                                   class="no-margin fat button icon-fat icon-32 icon-eportfolio"
+                                   data-equalizer-watch>ePortfolio</a>
+                            </li>
+                        {% endif %}
+                    {% endblock buttons_eportfolio %}
+
+                    {% block buttons_calendar %}
+                        <li class="no-pad">
+                            <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
+                               class="no-margin fat button icon-fat icon-32 icon-calendar"
+                               data-equalizer-watch>Calendar</a>
+                        </li>
+                    {% endblock buttons_calendar %}
+
+                </ul>
+            </div>
+        </section>
+    </div>
+</div>

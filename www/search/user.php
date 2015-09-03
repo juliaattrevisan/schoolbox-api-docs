@@ -8,6 +8,47 @@ use Schoolbox\Resource\Folder;
 //display user description page
 
 /**
+ * Parent rendering, extracted to a method.
+ * @param SitePage                 $page
+ * @param array                    $user
+ * @param External_User            $synUserHandler
+ * @param UserMapper               $userMapper
+ * @param Eportfolio_Authenticator $authenticator
+ */
+function renderParent(
+    SitePage $page,
+    $user,
+    External_User $synUserHandler,
+    UserMapper $userMapper,
+    Eportfolio_Authenticator $authenticator
+) {
+
+    $externalUser = $synUserHandler->getParent($user['synergy_id']);
+    try {
+        $spouse = $userMapper->findByExternalId($externalUser['SpouseID']);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        $spouse = null;
+    }
+
+    // TwigLib
+    $page->setFile(TEMPLATE_content, 'output.html');
+    $page->setVar(
+        'OUTPUT',
+        $page->getTwig()->render(
+            'user/parent.twig',
+            [
+                'session'         => $_SESSION,
+                'user'            => $userMapper->findById($user['uid']),
+                'externalUser'    => $externalUser,
+                'spouse'          => $spouse,
+                'eportfolioAuth'  => $authenticator->canView(),
+                'now'             => Alaress_Date_Format::now(),
+            ]
+        )
+    );
+}
+
+/**
  * Staff rendering, extracted to a method.
  * @param SitePage                 $page
  * @param array                    $user
@@ -215,12 +256,7 @@ if (is_numeric($this->arg[0])) {
     if ($groupHandler->isStudent($user['uid'])) {
         // Twig
     } elseif ($groupHandler->isParent($user['uid'])) {
-        $this->setFile(TEMPLATE_content, 'user/parent.html');
-        $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
-        $this->setBlock(TEMPLATE_content, 'modify', 'modify_block');
-        $this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
-        $this->setBlock(TEMPLATE_content, 'parent_synergy_form', 'parent_synergy_form_block');
-        $this->setBlock('parent_synergy_form', 'parent_spouse', 'parent_spouse_block');
+        // Twig
     } else {
         // Twig
     }
@@ -270,9 +306,9 @@ if (is_numeric($this->arg[0])) {
             )
         );
 
-        if (!$groupHandler->isStudent($user['uid']) && !$groupHandler->isStaff($user['uid'])) {
-            $this->parse('user_calendar_block', 'user_calendar');
-        }
+//        if (!$groupHandler->isStudent($user['uid']) && !$groupHandler->isStaff($user['uid'])) {
+//            $this->parse('user_calendar_block', 'user_calendar');
+//        }
     }
 
     //Format email address link
@@ -320,58 +356,65 @@ if (is_numeric($this->arg[0])) {
 
     $this->setVar($outputUser);
 
-    if ($_SESSION['su'] && !$groupHandler->isStudent($user['uid']) && !$groupHandler->isStaff($user['uid'])) {
-        $this->parse('modify_block', 'modify');
-    }
+//    if ($_SESSION['su'] && !$groupHandler->isStudent($user['uid']) && !$groupHandler->isStaff($user['uid'])) {
+//        $this->parse('modify_block', 'modify');
+//    }
 
     //advanced synergetic information
     if (Cfg::get('external_enable') && $user['synergy_id']) {
         $synUserHandler = new External_User();
 
         if ($groupHandler->isParent($user['uid']) && $groupHandler->isStaff()) {
-            $parent = $synUserHandler->getParent($user['synergy_id']);
-
-            if ($parent['DirectoryIncludeFlag']) {
-                $output = array(
-                    'NAME'         => Scrub::text($parent['Title'] . ' ' . $parent['Preferred'] . ' ' . $parent['Surname']),
-                    'HOME_PHONE'   => !$parent['SilentPhoneFlag']
-                            ? '<a href="tel:' . Scrub::text($parent['HomePhone']) . '">' . Scrub::text($parent['HomePhone']) . '</a>'
-                            : '',
-                    'MOBILE_PHONE' => '<a href="tel:' . Scrub::text($parent['MobilePhone']) . '">' . Scrub::text($parent['MobilePhone']) . '</a>',
-                );
-
-                $this->setVar($output);
-
-                if ($parent['SpouseDirectoryIncludeFlag'] && $parent['SpouseSurname']) {
-                    $output = array(
-
-                        'SPOUSE_NAME'   => Scrub::text(
-                            $parent['SpouseTitle'] . ' ' . $parent['SpousePreferred'] . ' ' . $parent['SpouseSurname']
-                        ),
-                        'SPOUSE_MOBILE' => '<a href="tel:' . Scrub::text(
-                            $parent['SpouseMobilePhone']
-                        ) . '">' . Scrub::text($parent['SpouseMobilePhone']) . '</a>',
-                        'SPOUSE_EMAIL'  => '<a href="' . $_SESSION['mailhandle'] . $parent['SpouseEmail'] . '\">' . $parent['SpouseEmail'] . '</a>',
-                    );
-
-                    /* If restrict_parent_emails and not a staff member, remove the email address */
-                    if ((Cfg::get('restrict_parent_emails') == '1') && $groupHandler->isParent(
-                        $user['uid']
-                    ) && !$groupHandler->isStaff()
-                    ) {
-                        $output['SPOUSE_EMAIL'] = '';
-                    }
-
-                    $this->setVar($output);
-                    $this->parse('parent_spouse_block', 'parent_spouse');
-                } else {
-                    $this->setVar('parent_spouse_block');
-                }
-
-                $this->parse('parent_synergy_form_block', 'parent_synergy_form');
-            } else {
-                $this->setVar('parent_synergy_form_block');
-            }
+            renderParent(
+                $this,
+                $user,
+                $synUserHandler,
+                new UserMapper(),
+                new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
+            );
+//            $parent = $synUserHandler->getParent($user['synergy_id']);
+//
+//            if ($parent['DirectoryIncludeFlag']) {
+//                $output = array(
+//                    'NAME'         => Scrub::text($parent['Title'] . ' ' . $parent['Preferred'] . ' ' . $parent['Surname']),
+//                    'HOME_PHONE'   => !$parent['SilentPhoneFlag']
+//                            ? '<a href="tel:' . Scrub::text($parent['HomePhone']) . '">' . Scrub::text($parent['HomePhone']) . '</a>'
+//                            : '',
+//                    'MOBILE_PHONE' => '<a href="tel:' . Scrub::text($parent['MobilePhone']) . '">' . Scrub::text($parent['MobilePhone']) . '</a>',
+//                );
+//
+//                $this->setVar($output);
+//
+//                if ($parent['SpouseDirectoryIncludeFlag'] && $parent['SpouseSurname']) {
+//                    $output = array(
+//
+//                        'SPOUSE_NAME'   => Scrub::text(
+//                            $parent['SpouseTitle'] . ' ' . $parent['SpousePreferred'] . ' ' . $parent['SpouseSurname']
+//                        ),
+//                        'SPOUSE_MOBILE' => '<a href="tel:' . Scrub::text(
+//                            $parent['SpouseMobilePhone']
+//                        ) . '">' . Scrub::text($parent['SpouseMobilePhone']) . '</a>',
+//                        'SPOUSE_EMAIL'  => '<a href="' . $_SESSION['mailhandle'] . $parent['SpouseEmail'] . '\">' . $parent['SpouseEmail'] . '</a>',
+//                    );
+//
+//                    /* If restrict_parent_emails and not a staff member, remove the email address */
+//                    if ((Cfg::get('restrict_parent_emails') == '1') && $groupHandler->isParent(
+//                        $user['uid']
+//                    ) && !$groupHandler->isStaff()
+//                    ) {
+//                        $output['SPOUSE_EMAIL'] = '';
+//                    }
+//
+//                    $this->setVar($output);
+//                    $this->parse('parent_spouse_block', 'parent_spouse');
+//                } else {
+//                    $this->setVar('parent_spouse_block');
+//                }
+//
+//                $this->parse('parent_synergy_form_block', 'parent_synergy_form');
+//            } else {
+//                $this->setVar('parent_synergy_form_block');
+//            }
         } else {
             if ($groupHandler->isStudent($user['uid'])) {
                 renderStudent(
@@ -400,16 +443,16 @@ if (is_numeric($this->arg[0])) {
         $renderer->render();
     }
 
-    /* ePortfolio link
-    */
-    if (!$groupHandler->isStudent($user['uid']) && !$groupHandler->isStaff($user['uid'])) {
-        $authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $user['uid'], 'profile');
-        if ($authenticator->canView()) {
-            $this->parse('eportfolio_block', 'eportfolio');
-        } else {
-            $this->setVar('eportfolio_block', '');
-        }
-    }
+//    /* ePortfolio link
+//    */
+//    if (!$groupHandler->isStudent($user['uid']) && !$groupHandler->isStaff($user['uid'])) {
+//        $authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $user['uid'], 'profile');
+//        if ($authenticator->canView()) {
+//            $this->parse('eportfolio_block', 'eportfolio');
+//        } else {
+//            $this->setVar('eportfolio_block', '');
+//        }
+//    }
 
 } else {
     error(2);
