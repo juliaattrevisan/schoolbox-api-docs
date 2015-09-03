@@ -37,16 +37,29 @@
                             <dt class="no-margin small-6 medium-3">Date of Birth:</dt>
                             <dd class="no-margin small-6 medium-9">{{ externalUser.StudentBirthDate }}</dd>
 
-                            {# This can be a separate external user #}
+                            {% if formTeacher %}
                             <dt class="no-margin small-6 medium-3">Class Teacher:</dt>
-                            <dd class="no-margin small-6 medium-9">{FORM_STAFF}</dd>
+                            <dd class="no-margin small-6 medium-9">
+                                {% if formTeacher.getId() %}
+                                <a href="{{ session.mailhandle }}{{ formTeacher.getEmail() }}">{{ formTeacher.formatName() }}</a>
+                                {% else %}
+                                {{ formTeacher.formatName() }}
+                                {% endif %}
+                            </dd>
+                            {% endif %}
 
                             <dt class="no-margin small-6 medium-3">Year Level:</dt>
                             <dd class="no-margin small-6 medium-9">{{ externalUser.StudentYearLevel }}</dd>
 
-                            {% if externalUser.StudentForm|trim %}
+                            {% if tutorTeacher and externalUser.StudentForm|trim %}
                             <dt class="no-margin small-6 medium-3">Tutor:</dt>
-                            <dd class="no-margin small-6 medium-9">{TUTOR}</dd>
+                            <dd class="no-margin small-6 medium-9">
+                                {% if tutorTeacher.getId() %}
+                                    <a href="{{ session.mailhandle }}{{ tutorTeacher.getEmail() }}">{{ tutorTeacher.formatName() }}</a>
+                                {% else %}
+                                    {{ tutorTeacher.formatName() }}
+                                {% endif %}
+                            </dd>
                             {% endif %}
 
                             <dt class="no-margin small-6 medium-3">House:</dt>
@@ -56,8 +69,16 @@
                             <dt class="no-margin small-6 medium-3">Tutor Group:</dt>
                             <dd class="no-margin small-6 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
 
+                            {% if hohTeacher %}
                             <dt class="no-margin small-6 medium-3">Head of House:</dt>
-                            <dd class="no-margin small-6 medium-9">{HOH}</dd>
+                            <dd class="no-margin small-6 medium-9">
+                                {% if hohTeacher.getId() %}
+                                    <a href="{{ session.mailhandle }}{{ hohTeacher.getEmail() }}">{{ hohTeacher.formatName() }}</a>
+                                {% else %}
+                                    {{ hohTeacher.formatName() }}
+                                {% endif %}
+                            </dd>
+                            {% endif %}
 
                             {% else %}
                             <dt class="no-margin small-6 medium-3">Class:</dt>
