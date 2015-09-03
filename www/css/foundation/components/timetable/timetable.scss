@@ -1,15 +1,18 @@
+$timetable-indicator-color: #ffd100 !default;
+$timetable-cell-border: $body-bg;
+
 .timetable, .timetable-small {
     td, th {
-        border: 1px solid $smoke;
+        border: 1px solid $timetable-cell-border;
     }
 
     th {
         &.timetable-day-active {
-            // background-color: #ffd100;
+            // background-color: $timetable-indicator-color;
         }
 
         &.timetable-period-active {
-            // background-color: #ffd100;
+            // background-color: $timetable-indicator-color;
         }
     }
 
@@ -38,7 +41,7 @@
 /* Active subject(s) decoration
  */
 .timetable-subject-active {
-    border: 0.5rem solid #ffd100;
+    border: 0.5rem solid $timetable-indicator-color;
     box-sizing: border-box;
 }
 
