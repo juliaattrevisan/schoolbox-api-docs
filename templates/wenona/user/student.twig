@@ -1,0 +1,46 @@
+{% extends '@core/user/student.twig' %}
+
+{% block details_hohTeacher %}
+{% endblock details_hohTeacher %}
+
+{% block details_coordTeacher %}
+    {% if coordTeacher %}
+        <dt class="no-margin small-6 medium-3">Year Coordinator:</dt>
+        <dd class="no-margin small-6 medium-9">
+            {% if coordTeacher.getId() %}
+                <a href="{{ session.mailhandle }}{{ coordTeacher.getEmail() }}">{{ coordTeacher.formatName() }}</a>
+            {% else %}
+                {{ coordTeacher.formatName() }}
+            {% endif %}
+        </dd>
+    {% endif %}
+{% endblock details_coordTeacher %}
+
+{% block medicalAlert %}
+{% endblock medicalAlert %}
+
+{# Buttons - add intranet at start of list #}
+{% block buttons %}
+    <li class="no-pad">
+        <a href="http://testintranet.wenona.nsw.edu.au/contentpages/studentprofile/default.aspx?studentID={{ user.getExternalId() }}"
+           class="no-margin fat button icon-fat icon-32 icon-synergetic"
+           data-equalizer-watch>Intranet</a>
+    </li>
+    {{ parent() }}
+    {# Change of information request can go here #}
+    <li class="no-pad">
+        <a href="{{ session.mailhandler }}changeofinformation@wenona.nsw.edu.au"
+           class="no-margin fat button icon-fat icon-32 icon-email"
+           title="Email Wenona about updates to your information"
+           data-equalizer-watch>Email Updates</a>
+    </li>
+{% endblock buttons %}
+
+{% block buttons_dueWork %}
+{% endblock buttons_dueWork %}
+
+{% block buttons_grades %}
+{% endblock buttons_grades %}
+
+{% block contacts_alert %}
+{% endblock contacts_alert %}
