@@ -415,6 +415,7 @@ $clearing-carousel-thumb-active-border: 4px solid tint($tertiary, 26%);
 
 
 $row-hover-background: tint($highlight-color, 87%);
+$row-action-hover-background: darken($row-hover-background, 7%);
 
 //
 // CUSTOM OVERRIDES
@@ -724,7 +725,7 @@ $rotate-th-width: $square-grid-td-size;
 
 .highlight-panel {
 	@include panel(
-		$bg:$ocean-sunset,
+		$bg:$row-hover-background,
 		$adjust:true
 	);
 }
@@ -771,7 +772,7 @@ $rotate-th-width: $square-grid-td-size;
     &.sortable {
         .ui-sortable-helper {
             border-bottom: none;
-            background-color: darken($ocean-sunset, 7%);
+            background-color: $row-action-hover-background;
         }
         .grip {
             @include grid-column(1);
@@ -913,7 +914,7 @@ $rotate-th-width: $square-grid-td-size;
 	}
 	li{
 		a:hover{
-			background-color: $ocean-sunset;
+			background-color: $row-hover-background;
 		}
 		ul{
 			clear: both;
@@ -957,7 +958,7 @@ $rotate-th-width: $square-grid-td-size;
 	@extend .information-list;
 	> li{
 		&:hover{
-			background-color: $ocean-sunset;
+			background-color: $row-hover-background;
 			.actions > a, nav a {
 				opacity: 1;
 			}
@@ -996,7 +997,7 @@ $rotate-th-width: $square-grid-td-size;
 		opacity: 0.3;
 		text-align: center;
 		&:hover{
-			background-color: darken($ocean-sunset, 7%);
+			background-color: $row-action-hover-background;
 		}
 		&:before{
 			@media #{$small-only, $medium-only}{
