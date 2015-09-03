@@ -96,11 +96,15 @@
                             <dd class="no-margin small-6 medium-9">{{ externalUser.StudentHouseDescription }}</dd>
                             {% endblock details_house %}
 
+                            {% block details_tutorGroup %}
                             {% if externalUser.StudentForm|trim %}
                             <dt class="no-margin small-6 medium-3">Tutor Group:</dt>
                             <dd class="no-margin small-6 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
+                            {% endif %}
+                            {% endblock details_tutorGroup %}
 
-                            {% if hohTeacher %}
+                            {% block details_hohTeacher %}
+                            {% if hohTeacher and externalUser.StudentForm|trim %}
                             <dt class="no-margin small-6 medium-3">Head of House:</dt>
                             <dd class="no-margin small-6 medium-9">
                                 {% if hohTeacher.getId() %}
@@ -110,11 +114,14 @@
                                 {% endif %}
                             </dd>
                             {% endif %}
+                            {% endblock details_hohTeacher %}
 
-                            {% else %}
+                            {% block details_studentForm %}
+                            {% if not externalUser.StudentForm|trim %}
                             <dt class="no-margin small-6 medium-3">Class:</dt>
                             <dd class="no-margin small-6 medium-9">{{ externalUser.StudentForm }}</dd>
                             {% endif %}
+                            {% endblock details_studentForm %}
 
                             {% block details_studentType %}
                             <dt class="no-margin small-6 medium-3">Student Type:</dt>
