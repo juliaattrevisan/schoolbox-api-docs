@@ -114,6 +114,26 @@ function renderStudent(
         }
     }
 
+    // Load contact's user IDs
+    $contacts = [];
+    foreach ($synUserHandler->getStudentContactList($user['synergy_id']) as $contact) {
+        $main = null;
+        try {
+            $main = \Schoolbox\UserMapper::getInstance()->findByExternalId($contact['StudentContactID']);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // noop
+        }
+        $spouse = null;
+        try {
+            $spouse = \Schoolbox\UserMapper::getInstance()->findByExternalId($contact['StudentContactSpouseID']);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // noop
+        }
+        $contact['main']   = $main;
+        $contact['spouse'] = $spouse;
+        $contacts[]        = $contact;
+    }
+
     $page->setVar(
         'OUTPUT',
         $page->getTwig()->render(
@@ -126,7 +146,7 @@ function renderStudent(
                 'isParentOfChild' => $isParentOfChild,
                 'now'             => Alaress_Date_Format::now(),
                 'boarderType'     => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
-                'contacts'        => $synUserHandler->getStudentContactList($user['synergy_id']),
+                'contacts'        => $contacts,
                 'subjects'        => $subjects,
                 'groups'          => $groups,
                 'formTeacher'     => $formTeacher,

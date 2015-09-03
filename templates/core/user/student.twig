@@ -192,11 +192,15 @@
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="avatar-card">
-                                        {# need to know user's schoolbox info here #}
-                                        <a href="{CONTACT_LINK}">
+                                        {% if contact.main %}
+                                        <a href="/search/user/{{ contact.main.getId() }}">
                                             <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
                                             {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
                                         </a>
+                                        {% else %}
+                                        <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
+                                        {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
+                                        {% endif %}
                                         <p class="meta">{{ contact.StudentContactRelation }}</p>
                                     </div>
                                 </div>
@@ -222,10 +226,15 @@
                                 <div class="list-item">
                                     <div class="avatar-card">
                                         {# need to know user's schoolbox info here #}
-                                        <a href="{SPOUSE_LINK}">
+                                        {% if contact.spouse %}
+                                        <a href="/search/user/{{ contact.spouse.getId() }}">
                                             <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
                                             {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
                                         </a>
+                                        {% else %}
+                                        <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
+                                        {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
+                                        {% endif %}
                                         <p class="meta">{{ contact.StudentContactSpouseRelation }}</p>
                                     </div>
                                 </div>
