@@ -14,6 +14,7 @@ $this->setBlock('thread', 'modify_thread', 'modify_thread_block');
 $this->setBlock('thread', 'modified', 'modified_block');
 $this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
+$this->setBlock(TEMPLATE_content, 'no_thread', 'no_thread_block');
 $this->setBlock(TEMPLATE_content, 'forum_post', 'forum_post_block');
 $this->setBlock(TEMPLATE_content, 'modify_heading', 'modify_heading_block');
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
@@ -187,8 +188,16 @@ if (is_array($threadList)) {
 
         $this->parse('thread_block', 'thread', true);
     }
-} else {
-    $this->setVar('thread_block', '<p>This forum is currently empty, to get started post a new thread.</p>');
+
+    $this->setVar(array(
+        'no_thread_block' => ''
+    ));
+}
+else {
+    $this->parse('no_thread_block', 'no_thread');
+    $this->setVar(array(
+        'thread_block' => ''
+    ));
 }
 
 /* Render out breadcrumbs
