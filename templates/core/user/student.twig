@@ -299,47 +299,50 @@
     </div>
 
     <div class="small-12 xlarge-6 xlarge-pull-6 columns">
-        <!-- BEGIN subject -->
+        {% for group, subjectGroup in subjects %}
         <div class="row">
             <div class="small-12 island">
-                <h2 class="subheader">{SUBJECT_CLASSTYPE}</h2>
-                <!-- BEGIN subject_row -->
-                <!-- BEGIN subject_item -->
+                <h2 class="subheader">{{ group }}</h2>
+                {% for subject in subjectGroup %}
                 <section>
                     <div class="content no-pad">
                         <ul class="subject-list">
                             <li>
                                 <div class="list-item">
                                     <div class="small-12 avatar card">
-                                        <a href="{SUBJECT_URL}">
+                                        {% if subject.folder.getId() %}
+                                        <a href="/homepage/code/{{ subject.code }}">
                                             <span class="icon-folder icon-32"></span>
-                                            {SUBJECT_NAME}
+                                            {{ subject.name }}
                                         </a>
-                                        <p class="meta">{SUBJECT_CODE}</p>
+                                        {% else %}
+                                        <span class="icon-folder icon-32"></span>
+                                        {{ subject.name }}
+                                        {% endif %}
+                                        <p class="meta">{{ subject.code }}</p>
                                     </div>
                                 </div>
                             </li>
-                            <!-- BEGIN subject_teacher -->
+                            {% for teacher in subject.teachers %}
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="avatar-card">
-                                        <a href="/search/user/{SUBJECT_TEACHER_ID}">
-                                            <img src="/portrait.php?userId={SUBJECT_TEACHER_EXTERNAL_ID}&size=square64" />
-                                            {SUBJECT_TEACHER_NAME}
+                                        <a href="/search/user/{{ teacher.getId() }}">
+                                            <img src="/portrait.php?userId={{ teacher.getExternalId() }}&amp;size=square64" />
+                                            {{ teacher.formatName() }}
                                         </a>
-                                        <p class="meta">Teacher</p>
+                                        <p class="meta">{{ teacher.getRole().getName() }}</p>
                                     </div>
                                 </div>
                                 <nav>
-                                    <a class="icon-email" href="{SUBJECT_TEACHER_EMAIL}" title="Email {SUBJECT_TEACHER_NAME}"></a>
+                                    <a class="icon-email" href="{{ session.mailhandle }}{{ teacher.getEmail() }}" title="Email {{ teacher.getEmail() }}"></a>
                                 </nav>
                             </li>
-                            <!-- END subject_teacher -->
+                            {% endfor %}
                         </ul>
                     </div>
                 </section>
-                <!-- END subject_item -->
-                <!-- END subject_row -->
+                {% endfor %}
 
                 <!-- BEGIN subject_mail -->
                 <form action="/mail/createMail.php" method="post">
@@ -353,8 +356,8 @@
                 </form>
                 <!-- END subject_mail -->
             </div>
+            {% endfor %}
         </div>
-        <!-- END subject -->
 
         {% if groups is not empty %}
         <div class="row">

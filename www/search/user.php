@@ -34,6 +34,39 @@ function renderStudent(
     $page->setFile(TEMPLATE_content, 'output.html');
     // TODO make preg_replace available to Twig
 
+    // Load the list of subjects, and their teacher.
+    // Then group by subject type?
+    $subjects      = [];
+    $splitSubjects = \Config::get('mysubjects_split');
+    $classHandler  = new External_Class();
+    $teacherRoles  = $groupHandler->getStaffGroupTypeIds();
+    foreach ($synUserHandler->getSubjectList($user['synergy_id'], $user['uid']) as $subject) {
+        $group = $splitSubjects ? $subject['classType'] : 'Subject';
+        // Load a bunch of category and teacher info too
+        try {
+            $subject['folder'] = Schoolbox\Resource\Folder\Mapper::getInstance()
+                ->findByCode($subject['code']);
+        } catch (\Exception $e) {
+            if (\Config::get('show_all_subjects')) {
+                $code = new \Schoolbox\Resource\Folder\Code\Model();
+                $code->setCode($subject['code']);
+                $subject['folder'] = new Schoolbox\Resource\Folder\Model();
+                $subject['folder']->setName($subject['name'])->addCode($code);
+            } else {
+                continue;
+            }
+        }
+        $subject['teachers'] = \Schoolbox\UserMapper::getInstance()->findByColumnList([
+            'synergy_id' => $classHandler->getTeacherName($subject['code']),
+            'group_id'   => $teacherRoles,
+        ]);
+//        var_dump($teachers);
+//        foreach ($classHandler->getTeacherName($subject['code']) as $teacher) {
+//            var_dump($teacher);
+//        }
+        $subjects[$group][] = $subject;
+    }
+
     // Load the list of groups, and their owner.
     $groups = $groupHandler->involvedInCategoryList($user['uid'], false);
     foreach ($groups as &$group) {
@@ -57,7 +90,7 @@ function renderStudent(
                 'now'             => Alaress_Date_Format::now(),
                 'boarderType'     => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
                 'contacts'        => $synUserHandler->getStudentContactList($user['synergy_id']),
-                'subjects'        => $synUserHandler->getSubjectList($user['synergy_id'], $user['uid']),
+                'subjects'        => $subjects,
                 'groups'          => $groups,
             ]
         )
