@@ -35,7 +35,7 @@
                             <dd class="no-margin small-6 medium-9">{{ user.getExternalId() }}</dd>
 
                             <dt class="no-margin small-6 medium-3">Date of Birth:</dt>
-                            <dd class="no-margin small-6 medium-9">{{ externalUser.StudentBirthDate }}</dd>
+                            <dd class="no-margin small-6 medium-9">{{ externalUser.StudentBirthDate|date(locale.date.dateOnlyFormat) }}</dd>
 
                             {% if formTeacher %}
                             <dt class="no-margin small-6 medium-3">Class Teacher:</dt>
