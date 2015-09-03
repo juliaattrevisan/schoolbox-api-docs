@@ -12,33 +12,6 @@
     width: 100%;
 }
 
-/* Dashboard: Timetable
- */
-.timetable {
-    // TODO remove hardcoded highlight colors, replace with a SASS var
-    .period-name.dayCurrent {
-        background-color: #ffffe5;
-    }
-    .period {
-        padding: 0;
-        vertical-align: top;
-        &.current {
-            background-color: #ffffb2;
-        }
-    }
-    .attendance-link {
-        float: right;
-        padding: rem-calc($base-font-size) rem-calc($base-font-size * .5) 0 0;
-    }
-    .timetabled-class {
-        padding: rem-calc($base-font-size);
-        display: block;
-        .class-name {
-            display: block;
-        }
-    }
-}
-
 /* Countdown
  */
 ul.countdown {

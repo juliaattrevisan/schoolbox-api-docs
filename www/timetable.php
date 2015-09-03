@@ -25,7 +25,9 @@ $this->setFile(TEMPLATE_content, 'class/timetable.html');
 $this->setTitle('Timetable');
 $this->setTab('timetable');
 
+$this->setBlock(TEMPLATE_content, "no_timetable", "no_timetable_block");
 $this->setBlock(TEMPLATE_content, "timetable", "timetable_listing");
+$this->setBlock(TEMPLATE_content, 'timetable_selector', 'timetable_selector_block');
 $this->setBlock("timetable", "period", "period_listing");
 $this->setBlock("period", "day", "day_listing");
 $this->setBlock('day', 'period_class', 'period_class_block');
@@ -101,6 +103,9 @@ if ($groupHandler->isParent()) {
     }
 }
 
+/* Used to determine whether or not to display No Timetables message
+ */
+$numTimetables = 0;
 
 if (is_array($outputList)) {
     foreach ($outputList as $user) {
@@ -111,8 +116,11 @@ if (is_array($outputList)) {
         $outputUser = array(
             'PERSON' => $userHandler->formatName($user),
             'YEAR'   => $user['year'] ? ', Year ' . $user['year'] : '',
+            'USER_ID' => $user['uid'],
         );
+
         $this->setVar($outputUser);
+        $this->parse('timetable_selector_block', 'timetable_selector', true);
 
         $staffFlag = $groupHandler->isStaff($user['uid']);
 
@@ -145,6 +153,8 @@ if (is_array($outputList)) {
         }
 
         if (is_array($timetable) && !empty($timetable) && $classCount) {
+            $numTimetables++;
+
             $days = count($timetable[1]['day']);
 
             $this->setVar('TIMETABLE_FIELD_WIDTH', round((95 / ($days + 1)), 1));
@@ -159,7 +169,7 @@ if (is_array($outputList)) {
                         'PERIOD_NAME'  => $row['periodName'],
                         'PERIOD_START' => $row['periodStart'],
                         'PERIOD_END'   => $row['periodEnd'],
-                        'PERIOD_CLASS' => ($is_current_period ? 'dayCurrent' : 'normal'),
+                        'PERIOD_CLASS' => ($is_current_period ? 'timetable-period-active' : ''),
                     );
                     $this->setVar($outputPeriodDefinition);
 
@@ -170,24 +180,42 @@ if (is_array($outputList)) {
                         if ($periodCount == 1) {
                             //output day header
                             if ($dayCount == $dayCurrent) {
-                                $this->setVar('TIMETABLE_CLASS', 'dayCurrent');
+                                $this->setVar('DAY_CLASS', 'timetable-day-active');
                             } else {
-                                $this->setVar('TIMETABLE_CLASS', 'normal');
+                                $this->setVar('DAY_CLASS', '');
                             }
                             $this->setVar('DAY_NAME', $timetableHandler->getDayName($dayCount));
                             $this->parse('day_header_listing', 'day_header', true);
                         }
 
                         $outputPeriod = array(
-                            'PERIOD_DESC'     => '',
-                            'PERIOD_CODE'     => '',
-                            'PERIOD_ROOM'     => '',
-                            'PERIOD_ONCLICK'  => '',
-                            'PERIOD_STAFF'    => '',
-                            'PERIOD_COLOUR'   => '',
-                            'PERIOD_URL'      => '',
-                            'TIMETABLE_CLASS' => '',
+                            'PERIOD_DESC'    => '',
+                            'PERIOD_CODE'    => '',
+                            'PERIOD_ROOM'    => '',
+                            'PERIOD_ONCLICK' => '',
+                            'PERIOD_STAFF'   => '',
+                            'PERIOD_COLOUR'  => '',
+                            'PERIOD_URL'     => '',
+                            'DAY_CLASS'      => '',
                         );
+
+                        if ($is_current_period) {
+                            if ($dayCount == $dayCurrent) {
+                                // current period, also current day: intersection
+                                $this->setVar('DAY_CLASS', 'timetable-subject-active');
+                            } else {
+                                // current period, not current day: display row
+                                $this->setVar('DAY_CLASS', '');
+                            }
+                        } else {
+                            if ($dayCount == $dayCurrent) {
+                                // not current period, but is current day: display column
+                                $this->setVar('DAY_CLASS', '');
+                            } else {
+                                // neither current period nor current day
+                                $this->setVar('DAY_CLASS', '');
+                            }
+                        }
 
                         $this->setVar('period_class_link_block', '');
                         $this->setVar('period_class_block', '');
@@ -271,24 +299,6 @@ if (is_array($outputList)) {
                             $this->parse('period_class_block', 'period_class');
                         }
 
-                        if ($is_current_period) {
-                            if ($dayCount == $dayCurrent) {
-                                // current period, also current day: intersection
-                                $this->setVar('TIMETABLE_CLASS', 'dayCurrent current');
-                            } else {
-                                // current period, not current day: display row
-                                $this->setVar('TIMETABLE_CLASS', 'dayCurrent');
-                            }
-                        } else {
-                            if ($dayCount == $dayCurrent) {
-                                // not current period, but is current day: display column
-                                $this->setVar('TIMETABLE_CLASS', 'dayCurrent');
-                            } else {
-                                // neither current period nor current day
-                                $this->setVar('TIMETABLE_CLASS', 'normal');
-                            }
-                        }
-
                         $this->parse('day_listing', 'day', true);
                         $dayCount++;
                     }
@@ -307,7 +317,14 @@ if (is_array($outputList)) {
             //In case no timetable has been output for what ever reason
             $this->setVar('timetable_listing', '');
         }
-
     }
+}
 
+if ($numTimetables) {
+    $this->setVar(array(
+        'no_timetable_block' => ''
+    ));
+}
+else {
+    $this->parse('no_timetable_block', 'no_timetable');
 }

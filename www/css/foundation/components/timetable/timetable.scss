@@ -1,0 +1,55 @@
+$timetable-indicator-color: #ffd100 !default;
+$timetable-cell-border: $body-bg;
+
+.timetable, .timetable-small {
+    td, th {
+        border: 1px solid $timetable-cell-border;
+    }
+
+    th {
+        &.timetable-day-active {
+            // background-color: $timetable-indicator-color;
+        }
+
+        &.timetable-period-active {
+            // background-color: $timetable-indicator-color;
+        }
+    }
+
+    /* Remove padding on cells containing classes
+     */
+    td {
+        padding: 0px;
+    }
+
+    /* For subtext under period names to sit correctly
+     * on all size displays
+     */
+    time {
+        clear: both;
+        display: block;
+        font-weight: normal;
+    }
+
+    /* For coloured blocks
+     */
+    .timetable-subject {
+        padding: 1rem;
+    }
+}
+
+/* Active subject(s) decoration
+ */
+.timetable-subject-active {
+    border: 0.5rem solid $timetable-indicator-color;
+    box-sizing: border-box;
+}
+
+/* Fifty-fifty split on small devices
+ */
+.timetable-small {
+    th, th {
+        width: 50%;
+    }
+}
+
