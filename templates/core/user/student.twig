@@ -138,7 +138,11 @@
                 </div>
             </div>
         </section>
+
+        {% block buttons %}
         <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8" data-equalizer>
+
+            {% block buttons_dueWork %}
             {% if not (config.restrict_parent_duework_access and session.user.isParent()) %}
             <li class="no-pad">
                 <a href="/submission/dueWork/0/{{ user.getId() }}"
@@ -146,7 +150,9 @@
                    data-equalizer-watch>Due Work</a>
             </li>
             {% endif %}
+            {% endblock buttons_dueWork %}
 
+            {% block buttons_grades %}
             {% if not (config.restrict_parent_grades and session.user.isParent()) %}
             <li class="no-pad">
                 <a href="/submission/allWork/{{ user.getId() }}"
@@ -154,7 +160,9 @@
                    data-equalizer-watch>Grades</a>
             </li>
             {% endif %}
+            {% endblock buttons_grades %}
 
+            {% block buttons_eportfolio %}
             {% if eportfolioAuth %}
             <li class="no-pad">
                 <a href="/eportfolio/{{ user.getId() }}/profile"
@@ -162,7 +170,9 @@
                    data-equalizer-watch>ePortfolio</a>
             </li>
             {% endif %}
+            {% endblock buttons_eportfolio %}
 
+            {% block buttons_calendar %}
             {% if isParentOfChild
                or session.user.isSuperUser()
                or session.user.getRole().isStaff()
@@ -174,7 +184,9 @@
                    data-equalizer-watch>Calendar</a>
             </li>
             {% endif %}
+            {% endblock buttons_calendar %}
 
+            {% block buttons_timetable %}
             {% if isParentOfChild
                or session.user.isSuperUser()
                or session.user.getRole().isStaff()
@@ -186,7 +198,9 @@
                    data-equalizer-watch>Timetable</a>
             </li>
             {% endif %}
+            {% endblock buttons_timetable %}
 
+            {% block buttons_boarderLeave %}
             {% if  config.boarder_leave_enabled
                and user.getResidentialHouse()
                and (isParentOfChild
@@ -200,7 +214,9 @@
                    data-equalizer-watch>Boarder Leave</a>
             </li>
             {% endif %}
+            {% endblock buttons_boarderLeave %}
 
+            {% block buttons_pastoralCare %}
             {% if  (session.user.isSuperUser() or session.user.getRole().isStaff())
                and config.external_type == 'synergetic'
                and config.external_staff_portal
@@ -212,7 +228,9 @@
                    data-equalizer-watch>Pastoral Care</a>
             </li>
             {% endif %}
+            {% endblock buttons_pastoralCare %}
         </ul>
+        {% endblock buttons %}
     </div>
 </div>
 
