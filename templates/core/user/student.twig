@@ -300,6 +300,8 @@
 
     <div class="small-12 xlarge-6 xlarge-pull-6 columns">
         {% for group, subjectGroup in subjects %}
+        {# Keep a running total of all teachers emails in this group #}
+        {% set teacherEmails = '' %}
         <div class="row">
             <div class="small-12 island">
                 <h2 class="subheader">{{ group }}</h2>
@@ -324,6 +326,7 @@
                                 </div>
                             </li>
                             {% for teacher in subject.teachers %}
+                            {% set teacherEmails = teacherEmails ~ teacher.getEmail() ~ ',' %}
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="avatar-card">
@@ -344,17 +347,17 @@
                 </section>
                 {% endfor %}
 
-                <!-- BEGIN subject_mail -->
+                {% if session.user.getRole().isStaff() and config.mail_enable %}
                 <form action="/mail/createMail.php" method="post">
                     <div class="row">
                         <div class="small-12 columns">
-                            <input type="hidden" name="replyto" value="{REPLYTO}"/>
-                            <input type="hidden" name="bcc" value="{EMAILALL}"/>
-                            <input type="submit" value="Email All {SUBJECT_CLASSTYPE} Teachers" />
+                            <input type="hidden" name="replyto" value="{{ session.user.getEmail() }}"/>
+                            <input type="hidden" name="bcc" value="{{ teacherEmails }}"/>
+                            <input type="submit" value="Email All {{ group }} Teachers" />
                         </div>
                     </div>
                 </form>
-                <!-- END subject_mail -->
+                {% endif %}
             </div>
         </div>
         {% endfor %}
