@@ -2,6 +2,8 @@
 
 require_once SITE_root . '/include/Bootstrap.php';
 
+use \Schoolbox\Breadcrumbs;
+
 $forumHandler = new Forum();
 $groupHandler = new Group();
 
@@ -188,3 +190,19 @@ if (is_array($threadList)) {
 } else {
     $this->setVar('thread_block', '<p>This forum is currently empty, to get started post a new thread.</p>');
 }
+
+/* Render out breadcrumbs
+ */
+$trail = new Breadcrumbs();
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => $category->getName(),
+        'href' => "/homepage/{$category->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => 'Forum',
+        'href' => '',
+        'class' => 'active',
+    ]
+]);

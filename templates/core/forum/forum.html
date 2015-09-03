@@ -1,11 +1,7 @@
-<ul class="breadcrumb">
-    <li><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a></li>
-    <li  class="active"><a href="#">Forum</a></li>
-</ul>
+{BREADCRUMB}
 
 <div class="row">
     <div class="small-12 island">
-
         <h1>{CATEGORY} Forum</h1>
 
         <!-- BEGIN forum_post -->
@@ -13,8 +9,6 @@
             <a class="button icon-add" href="/forum/modify/{CATEGORY_ID}">Post Thread</a>
         </span>
         <!-- END forum_post -->
-
-
 
         <form action="/forum/modifyForm.php" method="post">
             <table>
