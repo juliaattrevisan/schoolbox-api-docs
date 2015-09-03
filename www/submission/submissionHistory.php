@@ -534,7 +534,7 @@ if (isset($recent_activity)) {
         }
     } else {
         $this->setVar('plag_score_block', '');
-    }http://192.168.36.10/submission/submissionHistory/42/242
+    }
 
     // only allow a resubmission:
     // if the current user is the owner
