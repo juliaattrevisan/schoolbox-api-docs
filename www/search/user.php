@@ -29,7 +29,6 @@ function renderStudent(
     Folder\Mapper $folderMapper,
     Eportfolio_Authenticator $authenticator
 ) {
-
     // Handle parent/child relations here for now
     $isParentOfChild = $groupHandler->isParentOfChild($user['uid']);
     $externalUser = $synUserHandler->getStudent($user['synergy_id']);
@@ -39,7 +38,6 @@ function renderStudent(
         -1,
         PREG_SPLIT_NO_EMPTY
     );
-    // TODO make preg_replace available to Twig
 
     // Load the list of subjects, and their teacher.
     // Then group by subject type?
@@ -140,6 +138,9 @@ function renderStudent(
     }
 
     // TwigLib
+    // TODO make preg_replace available to Twig
+    // TODO make session contents available to Twig by default, either through whole _SESSION or Aura
+    // TODO make $now available to Twig by default
     $page->setFile(TEMPLATE_content, 'output.html');
     $page->setVar(
         'OUTPUT',
