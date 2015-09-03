@@ -86,14 +86,14 @@
                     </div>
                 </fieldset>
                 <!-- END indiv_modify -->
-				
+
 				<fieldset class="content">
 					<div class="small-12 columns">
 						<!-- BEGIN reset_content -->
 						<label>
                             Reset Homepage Content
 							<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Removes all content from modules, clears the folder contents, and resets the homepage to its template">?</span><br />
-							<a class="button alert icon-delete" href="/cms/category/reset/{CATEGORY_ID}" onclick="return(confirm('Are you sure you wish to delete all content from this homepage? This includes:\n - Assessments\n - Blogs\n - Calendar events\n - News\n - Chats\n - Dropbox\n - Files\n - Forums\n - Polls\n - Due Work\n - Surveys\n - TextBoxes\n - Wikis'));">Reset Content</a>
+							<a class="button alert icon-delete" href="/cms/category/reset/{CATEGORY_ID}" data-reset-homepage-content>Reset Content</a>
 						</label>
 						<!-- END reset_content -->
 						<!-- BEGIN synergy_input -->
@@ -125,9 +125,9 @@
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
     $(function() {
-
         $('#folderForm').validate({
             rules: {
                 'group[{REQUIRED_PERMS}]': {
@@ -147,5 +147,19 @@
                 return true;
             }
         }, "Please select write access for this group.");
+
+
+        $('[data-reset-homepage-content]').click(function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+            $(this).confirmDialog({
+                text: 'Are you sure you wish to delete all content from this homepage? This includes:\n - Assessments\n - Blogs\n - Calendar events\n - News\n - Chats\n - Dropbox\n - Files\n - Forums\n - Polls\n - Due Work\n - Surveys\n - TextBoxes\n - Wikis',
+                confirmEvent: function() {
+                    window.location.href = element.attr('href');
+                }
+            });
+        });
+
     });
 </script>
