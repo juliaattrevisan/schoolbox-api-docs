@@ -270,7 +270,7 @@ if (is_numeric($this->arg[0])) {
             )
         );
 
-        if (!$groupHandler->isStudent($user['uid'])) {
+        if (!$groupHandler->isStudent($user['uid']) && !$groupHandler->isStaff($user['uid'])) {
             $this->parse('user_calendar_block', 'user_calendar');
         }
     }
@@ -320,7 +320,7 @@ if (is_numeric($this->arg[0])) {
 
     $this->setVar($outputUser);
 
-    if ($_SESSION['su'] && !$groupHandler->isStudent($user['uid'])) {
+    if ($_SESSION['su'] && !$groupHandler->isStudent($user['uid']) && !$groupHandler->isStaff($user['uid'])) {
         $this->parse('modify_block', 'modify');
     }
 
@@ -392,24 +392,6 @@ if (is_numeric($this->arg[0])) {
                     new UserMapper(),
                     new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
                 );
-//                $this->parse("timetable_link_block", "timetable_link");
-//                $this->parse("portrait_block", "portrait");
-//
-//                $synInfo = $synUserHandler->getStaff($user['synergy_id']);
-//
-//                $this->setVar('EXTENSION', $synInfo['StaffExtension']);
-//                $this->setVar('MOBILE', $synInfo['StaffMobilePhone']);
-//                $this->setVar('DEPARTMENT', $synInfo['StaffDepartment']);
-//                $this->setVar('ROOM', $synInfo['StaffRoom']);
-//                $this->setVar('BUILDING', $synInfo['StaffBuilding']);
-//                $this->setVar('CAMPUS', $synInfo['StaffCampusDescription']);
-//                $this->setVar('CATEGORY', $synInfo['StaffCategoryDescription']);
-//                $this->setVar('VOICEMAIL', $synInfo['StaffVoiceMail']);
-//
-//                $this->parse('staff_synergy_block', 'staff_synergy');
-//                if ($_SESSION['su']) {
-//                    $this->parse('modify_block', 'modify');
-//                }
             }
         }
     } else {
@@ -420,7 +402,7 @@ if (is_numeric($this->arg[0])) {
 
     /* ePortfolio link
     */
-    if (!$groupHandler->isStudent($user['uid'])) {
+    if (!$groupHandler->isStudent($user['uid']) && !$groupHandler->isStaff($user['uid'])) {
         $authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $user['uid'], 'profile');
         if ($authenticator->canView()) {
             $this->parse('eportfolio_block', 'eportfolio');
