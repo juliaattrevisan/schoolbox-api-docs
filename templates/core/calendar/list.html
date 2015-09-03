@@ -7,10 +7,10 @@
 <script type="text/javascript">
 	$(function() {
 
-		var exportForm = $('#calendar-export .filter-drop');
+		var exportForm = $('#calendar-export');
 
 		$('[data-filters="true"]').filterSelector({
-			filterContainer: '#calendar-list .filter-drop',
+			filterContainer: '#calendar-controls',
 			eventContainer: $('[data-eventlist="true"]'),
 			exportContainer: exportForm
 		})
@@ -227,7 +227,7 @@
     </div>
 </div>
 <form data-type='calendar-controls' action="/calendar/list" method="post">
-    <div class="row printEventList" id="calendar-list" data-eventlist="true">
+    <div class="row">
         <div class="small-4 large-2 columns">
                 <input type="hidden" name='userKey' value='{USER_ID}' />
                 <input id="start_date_alt" name='start_date' type="hidden" value="{SELECTED_FORMATTED_START}" />
@@ -251,7 +251,8 @@
         </div>
     </div>
 </form>
-<div class="row">
+
+<div class="row printEventList" id="calendar-list" data-eventlist="true">
     <div class="small-12 island">
         <!-- BEGIN date -->
         <h2 class="subheader">{EVENT_DATE}</h2>
