@@ -25,6 +25,7 @@ $this->setFile(TEMPLATE_content, 'class/timetable.html');
 $this->setTitle('Timetable');
 $this->setTab('timetable');
 
+$this->setBlock(TEMPLATE_content, "no_timetable", "no_timetable_block");
 $this->setBlock(TEMPLATE_content, "timetable", "timetable_listing");
 $this->setBlock(TEMPLATE_content, 'timetable_selector', 'timetable_selector_block');
 $this->setBlock("timetable", "period", "period_listing");
@@ -311,7 +312,16 @@ if (is_array($outputList)) {
             //In case no timetable has been output for what ever reason
             $this->setVar('timetable_listing', '');
         }
-
     }
 
+    $this->setVar(array(
+        'no_timetable_block' => ''
+    ));
+}
+else {
+    $this->setVar(array(
+        'timetable_listing' => ''
+    ));
+
+    $this->parse('no_timetable_block', 'no_timetable');
 }
