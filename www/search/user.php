@@ -28,7 +28,7 @@ function renderStudent(
     $folderMapper = new Schoolbox\Resource\Folder\Mapper();
 
     // Handle eportfolio auth here for now
-    $authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $user['uid'], 'profile');
+    $authenticator = new \Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile');
     // Handle parent/child relations here for now
     $isParentOfChild = $groupHandler->isParentOfChild($user['uid']);
     $externalUser = $synUserHandler->getStudent($user['synergy_id']);
