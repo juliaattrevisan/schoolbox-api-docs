@@ -40,13 +40,6 @@ if (is_numeric($this->arg[0])) {
     // which homepage do I return to?
     $returnId = $folder->getId();
 
-    if (isset($this->arg[1])
-        && preg_match('/^returnTo:(?P<returnId>\\d+)$/', $this->arg[1], $matches)
-    ) {
-        $returnId = $matches['returnId'];
-    }
-    $this->setVar('RETURN_CATEGORY_ID', $returnId);
-
     $allImages = $folderMapper->findImages($folder);
 
     if ($allImages->count()) {
@@ -69,13 +62,27 @@ if (is_numeric($this->arg[0])) {
         $this->setVar('image_gallery_block', '');
     }
 
+    /* Get the homepage from which you came, in case you are sharing
+     * this image gallery in another homepage.
+     */
+    if (isset($this->arg[1])
+        && preg_match('/^returnTo:(?P<returnId>\\d+)$/', $this->arg[1], $matches)
+    ) {
+        try {
+            $folder = $folderMapper->findById($matches['returnId']);
+        }
+        catch (\Exception $e) {
+            error(2);
+        }
+    }
+
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text' => $folder->getName(),
-            'href' => "/homepage/{$returnId}",
+            'href' => "/homepage/{$folder->getId()}",
             'class' => '',
         ],
         [
