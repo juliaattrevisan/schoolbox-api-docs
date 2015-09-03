@@ -103,6 +103,9 @@ if ($groupHandler->isParent()) {
     }
 }
 
+/* Used to determine whether or not to display No Timetables message
+ */
+$numTimetables = 0;
 
 if (is_array($outputList)) {
     foreach ($outputList as $user) {
@@ -150,6 +153,8 @@ if (is_array($outputList)) {
         }
 
         if (is_array($timetable) && !empty($timetable) && $classCount) {
+            $numTimetables++;
+
             $days = count($timetable[1]['day']);
 
             $this->setVar('TIMETABLE_FIELD_WIDTH', round((95 / ($days + 1)), 1));
@@ -313,15 +318,13 @@ if (is_array($outputList)) {
             $this->setVar('timetable_listing', '');
         }
     }
+}
 
+if ($numTimetables) {
     $this->setVar(array(
         'no_timetable_block' => ''
     ));
 }
 else {
-    $this->setVar(array(
-        'timetable_listing' => ''
-    ));
-
     $this->parse('no_timetable_block', 'no_timetable');
 }
