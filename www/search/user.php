@@ -7,21 +7,22 @@
 /**
  * Student rendering, extracted to a method.
  *
- * @param SitePage      $page
- * @param array         $user
- * @param Group         $groupHandler
- * @param External_User $synUserHandler
+ * @param SitePage       $page
+ * @param array          $user
+ * @param Group          $groupHandler
+ * @param External_User  $synUserHandler
+ * @param External_Class $classHandler
  */
 function renderStudent(
     SitePage $page,
     $user,
     Group $groupHandler,
-    External_User $synUserHandler
+    External_User $synUserHandler,
+    External_Class $classHandler
 ) {
     // Handlers
 
     // External handlers
-    $classHandler = new External_Class();
 
     // Mappers
     $userMapper   = new Schoolbox\UserMapper();
@@ -346,7 +347,11 @@ if (is_numeric($this->arg[0])) {
         } else {
             if ($groupHandler->isStudent($user['uid'])) {
                 renderStudent(
-                    $this, $user, $groupHandler, $synUserHandler
+                    $this,
+                    $user,
+                    $groupHandler,
+                    $synUserHandler,
+                    new External_Class()
                 );
             } elseif ($groupHandler->isStaff($user['uid']) && $groupHandler->isStaff()) {
                 $this->parse("timetable_link_block", "timetable_link");
