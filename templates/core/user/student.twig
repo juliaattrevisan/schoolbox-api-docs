@@ -20,23 +20,34 @@
                     </div>
 
                     <div class="small-12 medium-6 large-8 columns no-pad">
+                        {% block medicalAlert %}
                         {% if externalUser.StudentMedicalAlert %}
                         <div class="alert-box alert icon-alert no-margin">
                             Medical Note: {{ externalUser.StudentMedicalAlert }}
                         </div>
                         {% endif %}
+                        {% endblock medicalAlert %}
+
+                        {% block details %}
                         <dl class="inline-dl no-margin">
+                            {% block details_email %}
                             <dt class="no-margin small-6 medium-3">Email:</dt>
                             <dd class="no-margin small-6 medium-9">
                                 <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
                             </dd>
+                            {% endblock details_email %}
 
+                            {% block details_studentId %}
                             <dt class="no-margin small-6 medium-3">Student ID:</dt>
                             <dd class="no-margin small-6 medium-9">{{ user.getExternalId() }}</dd>
+                            {% endblock details_studentId %}
 
+                            {% block details_dob %}
                             <dt class="no-margin small-6 medium-3">Date of Birth:</dt>
                             <dd class="no-margin small-6 medium-9">{{ externalUser.StudentBirthDate|date(locale.date.dateOnlyFormat) }}</dd>
+                            {% endblock details_dob %}
 
+                            {% block details_formTeacher %}
                             {% if formTeacher %}
                             <dt class="no-margin small-6 medium-3">Class Teacher:</dt>
                             <dd class="no-margin small-6 medium-9">
@@ -47,10 +58,14 @@
                                 {% endif %}
                             </dd>
                             {% endif %}
+                            {% endblock details_formTeacher %}
 
+                            {% block details_yearLevel %}
                             <dt class="no-margin small-6 medium-3">Year Level:</dt>
                             <dd class="no-margin small-6 medium-9">{{ externalUser.StudentYearLevel }}</dd>
+                            {% endblock details_yearLevel %}
 
+                            {% block details_tutorTeacher %}
                             {% if tutorTeacher and externalUser.StudentForm|trim %}
                             <dt class="no-margin small-6 medium-3">Tutor:</dt>
                             <dd class="no-margin small-6 medium-9">
@@ -61,7 +76,9 @@
                                 {% endif %}
                             </dd>
                             {% endif %}
+                            {% endblock details_tutorTeacher %}
 
+                            {% block details_coordTeacher %}
                             {#{% if coordTeacher %}#}
                             {#<dt class="no-margin small-6 medium-3">Year Coordinator:</dt>#}
                             {#<dd class="no-margin small-6 medium-9">#}
@@ -72,9 +89,12 @@
                                 {#{% endif %}#}
                             {#</dd>#}
                             {#{% endif %}#}
+                            {% endblock details_coordTeacher %}
 
+                            {% block details_house %}
                             <dt class="no-margin small-6 medium-3">House:</dt>
                             <dd class="no-margin small-6 medium-9">{{ externalUser.StudentHouseDescription }}</dd>
+                            {% endblock details_house %}
 
                             {% if externalUser.StudentForm|trim %}
                             <dt class="no-margin small-6 medium-3">Tutor Group:</dt>
@@ -96,12 +116,17 @@
                             <dd class="no-margin small-6 medium-9">{{ externalUser.StudentForm }}</dd>
                             {% endif %}
 
+                            {% block details_studentType %}
                             <dt class="no-margin small-6 medium-3">Student Type:</dt>
                             <dd class="no-margin small-6 medium-9">{{ boarderType }}</dd>
+                            {% endblock details_studentType %}
 
+                            {% block details_studiesCode %}
                             {#<dt class="no-margin small-6 medium-3">Studies Code:</dt>#}
                             {#<dd class="no-margin small-6 medium-9">{{ externalUser.StudentStudiesCode }}</dd>#}
+                            {% endblock details_studiesCode %}
                         </dl>
+                        {% endblock details %}
                     </div>
                 </div>
             </div>
