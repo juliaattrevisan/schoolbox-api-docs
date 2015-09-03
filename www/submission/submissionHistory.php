@@ -497,7 +497,7 @@ if (isset($recent_activity)) {
     $this->setVar($output);
 
     // if we are the owning student, display plagiarism details if they are available
-    if (($userID == $currentUserId && $conf->get('plagscan_student_visible')) || $_SESSION['user']->isSuperuser()) {
+    if (($userID == $currentUserId && $conf->get('plagscan_student_visible')) || $_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser()) {
         // retrieve plagiarism score, if available
         $docMapper = Plagscan_DocumentMapper::getInstance();
         $plagDoc   = null;
@@ -534,7 +534,7 @@ if (isset($recent_activity)) {
         }
     } else {
         $this->setVar('plag_score_block', '');
-    }
+    }http://192.168.36.10/submission/submissionHistory/42/242
 
     // only allow a resubmission:
     // if the current user is the owner
