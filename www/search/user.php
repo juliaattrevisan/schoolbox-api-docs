@@ -8,14 +8,14 @@
  * Student rendering, extracted to a method.
  *
  * @param SitePage      $page
- * @param Group         $groupHandler
  * @param array         $user
+ * @param Group         $groupHandler
  * @param External_User $synUserHandler
  */
 function renderStudent(
     SitePage $page,
-    Group $groupHandler,
     $user,
+    Group $groupHandler,
     External_User $synUserHandler
 ) {
     // Handlers
@@ -346,10 +346,7 @@ if (is_numeric($this->arg[0])) {
         } else {
             if ($groupHandler->isStudent($user['uid'])) {
                 renderStudent(
-                    $this,
-                    $groupHandler,
-                    $user,
-                    $synUserHandler
+                    $this, $user, $groupHandler, $synUserHandler
                 );
             } elseif ($groupHandler->isStaff($user['uid']) && $groupHandler->isStaff()) {
                 $this->parse("timetable_link_block", "timetable_link");
