@@ -274,6 +274,9 @@ class Bootstrap implements BootstrapInterface {
 					// Paths: prefer templates/{site_location} over templates/core
 					$baseLoader->addPath($config->get('siteRoot') . '/templates/' . $config->get('site_location'));
 					$baseLoader->addPath($config->get('siteRoot') . '/templates/core');
+					// Core path: always uses templates/core, even if templates/{site_location} exists
+					// Used as a base for default path templates to inherit from.
+					$baseLoader->addPath($config->get('siteRoot').'/templates/core', 'core');
 					$chainLoader->addLoader($baseLoader);
 
 					return $chainLoader;
