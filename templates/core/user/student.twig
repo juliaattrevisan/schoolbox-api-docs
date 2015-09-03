@@ -139,9 +139,10 @@
             </div>
         </section>
 
-        {% block buttons %}
+        {% block buttons_island %}
         <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8" data-equalizer>
 
+            {% block buttons %}
             {% block buttons_dueWork %}
             {% if not (config.restrict_parent_duework_access and session.user.isParent()) %}
             <li class="no-pad">
@@ -229,8 +230,10 @@
             </li>
             {% endif %}
             {% endblock buttons_pastoralCare %}
+
+            {% endblock buttons %}
         </ul>
-        {% endblock buttons %}
+        {% endblock buttons_island %}
     </div>
 </div>
 
