@@ -60,10 +60,6 @@ function renderStudent(
             'synergy_id' => $classHandler->getTeacherName($subject['code']),
             'group_id'   => $teacherRoles,
         ]);
-//        var_dump($teachers);
-//        foreach ($classHandler->getTeacherName($subject['code']) as $teacher) {
-//            var_dump($teacher);
-//        }
         $subjects[$group][] = $subject;
     }
 
@@ -76,6 +72,47 @@ function renderStudent(
         }
     }
     unset($group);
+
+    // Load users for form teacher, tutor, etc.
+    $formTeacher = null;
+    if ($externalUser['StudentFormStaffName'] && $externalUser['TeacherFormID']) {
+        try {
+            $formTeacher = \Schoolbox\UserMapper::getInstance()->findByExternalId($externalUser['TeacherFormID']);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $formTeacher = new \Schoolbox\User();
+            $formTeacher->setLastname($externalUser['StudentFormStaffName']);
+        }
+    }
+
+    $tutorTeacher = null;
+    if ($externalUser['StudentTutorName'] && $externalUser['TeacherTutorID']) {
+        try {
+            $tutorTeacher = \Schoolbox\UserMapper::getInstance()->findByExternalId($externalUser['TeacherTutorID']);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $tutorTeacher = new \Schoolbox\User();
+            $tutorTeacher->setLastname($externalUser['StudentTutorName']);
+        }
+    }
+
+    $hohTeacher = null;
+    if ($externalUser['StudentHeadOfHouse'] && $externalUser['HeadOfHouseID']) {
+        try {
+            $hohTeacher = \Schoolbox\UserMapper::getInstance()->findByExternalId($externalUser['HeadOfHouseID']);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $hohTeacher = new \Schoolbox\User();
+            $hohTeacher->setLastname($externalUser['StudentHeadOfHouse']);
+        }
+    }
+
+    $coordTeacher = null;
+    if ($externalUser['StudentYearLevelCoordinator'] && $externalUser['YearLevelCoordID']) {
+        try {
+            $coordTeacher = \Schoolbox\UserMapper::getInstance()->findByExternalId($externalUser['YearLevelCoordID']);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $coordTeacher = new \Schoolbox\User();
+            $coordTeacher->setLastname($externalUser['StudentYearLevelCoordinator']);
+        }
+    }
 
     $page->setVar(
         'OUTPUT',
@@ -92,6 +129,10 @@ function renderStudent(
                 'contacts'        => $synUserHandler->getStudentContactList($user['synergy_id']),
                 'subjects'        => $subjects,
                 'groups'          => $groups,
+                'formTeacher'     => $formTeacher,
+                'tutorTeacher'    => $tutorTeacher,
+                'hohTeacher'      => $hohTeacher,
+                'coordTeacher'    => $coordTeacher,
             ]
         )
     );
