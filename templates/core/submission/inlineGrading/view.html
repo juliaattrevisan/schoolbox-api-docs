@@ -21,13 +21,13 @@
 
 <div class="row collapse">
     <div class="small-1 columns">
-        <a class="button icon-previous" href="" title=""></a>
+        <a class="button icon-previous" rel="prev" href="" title=""></a>
     </div>
     <div class="small-10 medium-6 columns">
         <select name="student-select"></select>
     </div>
     <div class="small-1 columns">
-        <a class="button icon-next" href="" title=""></a>
+        <a class="button icon-next" rel="next" href="" title=""></a>
     </div>
     <div class="small-12 medium-4 columns">
         <form action="/submission/inlineGrading/configForm.php" method="post">
@@ -191,8 +191,8 @@
             });
         });
 
-        var navNext = $('.next-item');
-        var navPrev = $('.previous-item');
+        var navNext = $('a[rel="next"]');
+        var navPrev = $('a[rel="prev"]');
 
         var tgt = $('select[name=student-select]'), ize,
                 skipUnsubmitted = $('#skipUnsubmitted'),
