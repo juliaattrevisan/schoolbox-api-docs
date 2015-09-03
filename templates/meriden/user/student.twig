@@ -1,0 +1,11 @@
+{% extends '@core/user/student.twig' %}
+
+{% block buttons_grades %}
+    {% if not (config.restrict_parent_grades and session.user.isParent()) %}
+        <li class="no-pad">
+            <a href="/modules/custom/meriden/pastoral/{{ user.getId() }}"
+               class="no-margin fat button icon-fat icon-32 icon-tick"
+               data-equalizer-watch>eReport</a>
+        </li>
+    {% endif %}
+{% endblock buttons_grades %}
