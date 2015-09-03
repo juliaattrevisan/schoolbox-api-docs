@@ -209,7 +209,7 @@ $off-canvas-label-border-top: 0px; //1px solid scale-color($off-canvas-label-bg,
 $off-canvas-label-border-bottom: none;
 $off-canvas-label-margin:0;
 $off-canvas-link-padding: rem-calc(($base-font-size));
-$off-canvas-link-color: $primary-color;
+$off-canvas-link-color: contrast-bg(0.50, $body-bg, 0%, $primary-color, $primary-color);
 $off-canvas-link-border-bottom: 0px; //1px solid scale-color($off-canvas-bg, $lightness: -25%);
 $off-canvas-back-bg: scale-color($tabbar-bg, $lightness: -20%);
 $off-canvas-back-border-top: $off-canvas-label-border-top;
@@ -219,7 +219,7 @@ $off-canvas-back-hover-border-top: 0px;
 $off-canvas-back-hover-border-bottom: none;
 
 // Off Canvas Menu Icon Variables
-$tabbar-menu-icon-color: $primary-color;
+$tabbar-menu-icon-color: contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color);
 $tabbar-menu-icon-hover: tint($tabbar-menu-icon-color, 20%);
 
 $tabbar-menu-icon-text-indent: rem-calc(35);
@@ -339,28 +339,49 @@ $menu-slide: "transform 500ms ease";
 	height: inherit;
 	li{
 		margin: 0;
+		width: 5rem;
 	}
 	a{
-		width: 5rem;
 		height: 5rem;
 		padding: rem-calc(($base-font-size / 2)) rem-calc(($base-font-size));
 		text-align: center;
 		@extend .icon-32;
 		@extend .no-text;
+
+		&.navthis {
+			background-color: calc-text-color(
+				$tabbar-bg,
+				rgba($white, 0.04),
+				rgba($black, 0.04)
+			);
+			&:before, span {
+				color: calc-text-color($tabbar-bg, $white, $primary-color);
+			}
+		}
+
 		&:hover{
-			background-color: $primary-color;
-			color: $body-bg;
-			label {
-				color: $body-bg;
+			&:before, span {
+				color: calc-text-color($tabbar-bg, $white, $primary-color);
 			}
 		}
 		&:before{
 			text-align: center;
 			float: none;
+
+			color: calc-text-color(
+				$tabbar-bg,
+				contrast-bg(0.50, $body-bg, 0%, $primary-color, $primary-color),
+				contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color)
+			);
+
 		}
 		span {
 			font-weight: $font-weight-normal;
-			color: $primary-color;
+			color: calc-text-color(
+				$tabbar-bg,
+				contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color),
+				contrast-bg(0.50, $body-bg, 0%, $primary-color, $primary-color)
+			);
 			display: block;
 			line-height: 1.5rem;
 		}
@@ -462,7 +483,7 @@ $menu-slide: "transform 500ms ease";
 		margin: 0;
 		z-index: 1;
 		&:before{
-			color: $primary-color;
+			@include contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color);
 		}
 	}
 	#search-field:focus,
@@ -482,9 +503,12 @@ $menu-slide: "transform 500ms ease";
 	}
 }
 
-.left-off-canvas-toggle:hover,
-.right-off-canvas-toggle:hover{
-	background-color: $white;
+.left-off-canvas-toggle,
+.right-off-canvas-toggle {
+	@include contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color);
+	&:hover {
+		color: calc-text-color($tabbar-bg, $white, $primary-color);
+	}
 }
 
 .right-off-canvas-toggle{
