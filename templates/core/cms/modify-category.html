@@ -25,34 +25,39 @@
 						</label>
 					</div>
 				</fieldset>
+
 				<fieldset class="content">
 					<legend>Access Permissions
 						<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select user roles which have access to this folder">?</span>
 					</legend>
 					<table>
-						<tr>
-							<th><b>Role</b></th>
-							<th><b>None</b></th>
-							<th><b>Read</b></th>
-							<th><b>Write</b></th>
-						</tr>
-						<!-- BEGIN perm_table -->
-						<tr>
-							<td>{GROUP_NAME}</td>
-							<td>
-                                <input type="radio" class="no_permission required" id="groupNone{GROUP_ID}" name="group[{GROUP_ID}]" value="0" {PERM_0_SELECTED} />
-								<label class="radio-label" for="groupNone{GROUP_ID}"></label>
-							</td>
-							<td>
-                                <input type="radio" name="group[{GROUP_ID}]" id="groupRead{GROUP_ID}" value="1" {PERM_1_SELECTED} />
-								<label class="radio-label" for="groupRead{GROUP_ID}"></label>
-							</td>
-							<td>
-                                <input type="radio" name="group[{GROUP_ID}]" id="groupWrite{GROUP_ID}" value="2" {PERM_2_SELECTED} />
-								<label class="radio-label" for="groupWrite{GROUP_ID}"></label>
-							</td>
-						</tr>
-						<!-- END perm_table -->
+                        <thead>
+                            <tr>
+                                <th><b>Role</b></th>
+                                <th><b>None</b></th>
+                                <th><b>Read</b></th>
+                                <th><b>Write</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- BEGIN perm_table -->
+                            <tr>
+                                <td>{GROUP_NAME}</td>
+                                <td>
+                                    <input type="radio" class="no_permission required" id="groupNone{GROUP_ID}" name="group[{GROUP_ID}]" value="0" {PERM_0_SELECTED} />
+                                    <label class="radio-label" for="groupNone{GROUP_ID}"></label>
+                                </td>
+                                <td>
+                                    <input type="radio" name="group[{GROUP_ID}]" id="groupRead{GROUP_ID}" value="1" {PERM_1_SELECTED} />
+                                    <label class="radio-label" for="groupRead{GROUP_ID}"></label>
+                                </td>
+                                <td>
+                                    <input type="radio" name="group[{GROUP_ID}]" id="groupWrite{GROUP_ID}" value="2" {PERM_2_SELECTED} />
+                                    <label class="radio-label" for="groupWrite{GROUP_ID}"></label>
+                                </td>
+                            </tr>
+                            <!-- END perm_table -->
+                        </tbody>
 					</table>
 					<div class="small-12 columns">
 						<!-- BEGIN recursive -->
@@ -60,35 +65,35 @@
 						<label for="recursive" class="checkbox-label">Apply these permissions to all subfolders</label>
 						<!-- END recursive -->
 						<!-- BEGIN indiv_perms -->
-						<label>
+						<label for="groupcheck">
                             Create Group
 							<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Manage individual user access to this folder. You will automatically be assigned administration rights">?</span>
-							<div class="switch">
-								<input type="checkbox" id="groupcheck" name="groupcheck" value="1" />
-								<label for="groupcheck"></label>
-							</div>
 						</label>
+                        <div class="switch">
+                            <input type="checkbox" id="groupcheck" name="groupcheck" value="1" />
+                            <label for="groupcheck"></label>
+                        </div>
 						<!-- END indiv_perms -->
 					</div>
-					<!-- BEGIN indiv_modify -->
-					</fieldset>
-					<fieldset class="content">
-                        <div class="small-12 columns">
-                            <label>
-                                Group Management
-                                <p><a class="button icon-group" href="/group/modify/{CATEGORY_ID}" title="Manage individual user access to this folder">Modify Group</a></p>
-                            </label>
-                        </div>
-					</fieldset>
-					<!-- END indiv_modify -->
-				</fieldset>
+                </fieldset>
+                <!-- BEGIN indiv_modify -->
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Group Management<br />
+                            <a class="button icon-group" href="/group/modify/{CATEGORY_ID}" title="Manage individual user access to this folder">Modify Group</a>
+                        </label>
+                    </div>
+                </fieldset>
+                <!-- END indiv_modify -->
+				
 				<fieldset class="content">
 					<div class="small-12 columns">
 						<!-- BEGIN reset_content -->
 						<label>
                             Reset Homepage Content
-							<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Removes all content from modules, clears the folder contents, and resets the homepage to its template">?</span>
-							<p><a class="button alert icon-delete" href="/cms/category/reset/{CATEGORY_ID}" onclick="return(confirm('Are you sure you wish to delete all content from this homepage? This includes:\n - Assessments\n - Blogs\n - Calendar events\n - News\n - Chats\n - Dropbox\n - Files\n - Forums\n - Polls\n - Due Work\n - Surveys\n - TextBoxes\n - Wikis'));">Reset Content</a></p>
+							<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Removes all content from modules, clears the folder contents, and resets the homepage to its template">?</span><br />
+							<a class="button alert icon-delete" href="/cms/category/reset/{CATEGORY_ID}" onclick="return(confirm('Are you sure you wish to delete all content from this homepage? This includes:\n - Assessments\n - Blogs\n - Calendar events\n - News\n - Chats\n - Dropbox\n - Files\n - Forums\n - Polls\n - Due Work\n - Surveys\n - TextBoxes\n - Wikis'));">Reset Content</a>
 						</label>
 						<!-- END reset_content -->
 						<!-- BEGIN synergy_input -->
