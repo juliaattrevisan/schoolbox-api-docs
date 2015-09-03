@@ -1,0 +1,82 @@
+<div class="row">
+    <div class="small-12 column">
+        <h1>{{ user.formatName() }}</h1>
+        <span class='header-actions'>
+            {% if session.user.isSuperuser() %}
+                <a href="/adminv2/modify-user/{{ user.getId() }}" class="button icon-modify" title="Modify User"></a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="no-pad">
+            <div class="content no-pad">
+                <div class="row no-margin">
+                    <div class="small-12 medium-6 large-4 columns no-pad">
+                        <img src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=profile" class="full-width"/>
+                    </div>
+
+                    <div class="small-12 medium-6 large-8 columns no-pad">
+                        <dl class="inline-dl no-margin">
+                            <dt class="no-margin small-6 medium-3">Email</dt>
+                            <dd class="no-margin small-6 medium-9">
+                                <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
+                            </dd>
+                            {% if externalUser %}
+                            <dt class="no-margin small-6 medium-3">Department</dt>
+                            <dd class="no-margin small-6 medium-9">{{ externalUser.StaffDepartment }}</dd>
+                            <dt class="no-margin small-6 medium-3">Type</dt>
+                            <dd class="no-margin small-6 medium-9">{{ externalUser.StaffCategoryDescription }}</dd>
+                            <dt class="no-margin small-6 medium-3">Building</dt>
+                            <dd class="no-margin small-6 medium-9">{{ externalUser.StaffBuilding }}</dd>
+                            <dt class="no-margin small-6 medium-3">Room</dt>
+                            <dd class="no-margin small-6 medium-9">{{ externalUser.StaffRoom }}</dd>
+                            <dt class="no-margin small-6 medium-3">Extension</dt>
+                            <dd class="no-margin small-6 medium-9">{{ externalUser.StaffExtension }}</dd>
+                            <dt class="no-margin small-6 medium-3">Campus</dt>
+                            <dd class="no-margin small-6 medium-9">{{ externalUser.StaffCampusDescription }}</dd>
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+
+                {% block buttons_island %}
+                    <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8" data-equalizer>
+
+                        {% block buttons %}
+                            {% block buttons_eportfolio %}
+                                {% if eportfolioAuth %}
+                                    <li class="no-pad">
+                                        <a href="/eportfolio/{{ user.getId() }}/profile"
+                                           class="no-margin fat button icon-fat icon-32 icon-eportfolio"
+                                           data-equalizer-watch>ePortfolio</a>
+                                    </li>
+                                {% endif %}
+                            {% endblock buttons_eportfolio %}
+
+                            {% block buttons_calendar %}
+                                <li class="no-pad">
+                                    <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
+                                       class="no-margin fat button icon-fat icon-32 icon-calendar"
+                                       data-equalizer-watch>Calendar</a>
+                                </li>
+                            {% endblock buttons_calendar %}
+
+                            {% block buttons_timetable %}
+                                <li class="no-pad">
+                                    <a href="/timetable/{{ user.getId() }}"
+                                       class="no-margin fat button icon-fat icon-32 icon-timetable"
+                                       data-equalizer-watch>Timetable</a>
+                                </li>
+                            {% endblock buttons_timetable %}
+
+                        {% endblock buttons %}
+                    </ul>
+                {% endblock buttons_island %}
+
+            </div>
+        </section>
+    </div>
+</div>
