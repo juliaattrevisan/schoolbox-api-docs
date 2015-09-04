@@ -9,6 +9,7 @@
     or session.user.getId() == user.getId()
     or session.user.isParentOf(user)
 %}
+{% set showButtons = showDetails %}
 
 <div class="row">
     <div class="small-12 column">
@@ -153,6 +154,7 @@
             </div>
         </section>
 
+        {% if showButtons %}
         {% block buttons_island %}
         <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8" data-equalizer>
 
@@ -248,11 +250,13 @@
             {% endblock buttons %}
         </ul>
         {% endblock buttons_island %}
+        {% endif %}
     </div>
 </div>
 
 <div class="row">
     <div class="small-12 xlarge-6 xlarge-push-6 columns">
+        {# Should a student see their own contact details? #}
         {% if session.user.isParentOf(user)
            or session.user.isSuperUser()
            or session.user.getRole().isStaff()
