@@ -25,15 +25,14 @@
 <div class="row">
     <div class="small-12 island">
         <!-- BEGIN category_selected -->
-        <h2 class="subheader">{QUESTION_CATEGORY}</h2>
-
         <form id='questionBankForm' action='/assess/questionbank/addToSection' method='post'>
             <input name='section_id' type='hidden' value='{SECTION_ID}'/>
 
+            <h2 class="subheader">{QUESTION_CATEGORY}</h2>
             <section>
                 <!-- BEGIN no_questions -->
                 <div class="content">
-                    <p>There are no questions in this category's Question Bank.</p>
+                    <p>There are no questions in this folder's Question Bank.</p>
                 </div>
                 <!-- END no_questions -->
 
