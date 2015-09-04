@@ -5,6 +5,8 @@
  *                                                          *
  ************************************************************/
 
+use \Schoolbox\Breadcrumbs;
+
 /* This page generates a photo gallery of the provided folder.
  * Displays one image at large size and the rest as thumbnails.
  * Clicking the thumbnails makes them the larger images.
@@ -14,10 +16,10 @@
 
 if (is_numeric($this->arg[0])) {
     $groupHandler    = new Group;
-    $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+    $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 
     try {
-        $category = $categoryMapper->findById($this->arg[0]);
+        $folder = $folderMapper->findById($this->arg[0]);
     } catch (\Exception $e) {
         error(2);
     }
@@ -27,25 +29,18 @@ if (is_numeric($this->arg[0])) {
     }
 
     $this->setFile(TEMPLATE_content, 'cms/image-gallery.html');
-    $this->setTitle('Image Gallery for ' . $category->getName());
+    $this->setTitle('Image Gallery for ' . $folder->getName());
     $this->setTab('resources');
 
     $this->setBlock(TEMPLATE_content, 'image_gallery', 'image_gallery_block');
 
-    $this->setVar('FOLDER_NAME', $category->getName());
-    $this->setVar('CATEGORY_ID', $category->getId());
+    $this->setVar('FOLDER_NAME', $folder->getName());
+    $this->setVar('CATEGORY_ID', $folder->getId());
 
     // which homepage do I return to?
-    $returnId = $category->getId();
+    $returnId = $folder->getId();
 
-    if (isset($this->arg[1])
-        && preg_match('/^returnTo:(?P<returnId>\\d+)$/', $this->arg[1], $matches)
-    ) {
-        $returnId = $matches['returnId'];
-    }
-    $this->setVar('RETURN_CATEGORY_ID', $returnId);
-
-    $allImages = $categoryMapper->findImages($category);
+    $allImages = $folderMapper->findImages($folder);
 
     if ($allImages->count()) {
         foreach ($allImages as $currentImage) {
@@ -66,6 +61,37 @@ if (is_numeric($this->arg[0])) {
     } else {
         $this->setVar('image_gallery_block', '');
     }
-} else {
+
+    /* Get the homepage from which you came, in case you are sharing
+     * this image gallery in another homepage.
+     */
+    if (isset($this->arg[1])
+        && preg_match('/^returnTo:(?P<returnId>\\d+)$/', $this->arg[1], $matches)
+    ) {
+        try {
+            $folder = $folderMapper->findById($matches['returnId']);
+        }
+        catch (\Exception $e) {
+            error(2);
+        }
+    }
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Image Gallery',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
+}
+else {
     error(2);
 }
