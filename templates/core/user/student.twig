@@ -159,7 +159,6 @@
             </div>
         </section>
 
-        {% if showButtons %}
         {% block buttons_island %}
         <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8" data-equalizer>
 
@@ -195,23 +194,27 @@
             {% endblock buttons_eportfolio %}
 
             {% block buttons_calendar %}
+            {% if showButtons %}
             <li class="no-pad">
                 <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
                    class="no-margin fat button icon-fat icon-32 icon-calendar"
                    data-equalizer-watch>Calendar</a>
             </li>
+            {% endif %}
             {% endblock buttons_calendar %}
 
             {% block buttons_timetable %}
+            {% if showButtons %}
             <li class="no-pad">
                 <a href="/timetable/{{ user.getId() }}"
                    class="no-margin fat button icon-fat icon-32 icon-timetable"
                    data-equalizer-watch>Timetable</a>
             </li>
+            {% endif %}
             {% endblock buttons_timetable %}
 
             {% block buttons_boarderLeave %}
-            {% if config.boarder_leave_enabled %}
+            {% if showButtons and config.boarder_leave_enabled and user.getResidentialHouse() %}
             <li class="no-pad">
                 <a href="/modules/leave/student/{{ user.getId() }}"
                    class="no-margin fat button icon-fat icon-32 icon-boarder-leave"
@@ -234,7 +237,6 @@
             {% endblock buttons %}
         </ul>
         {% endblock buttons_island %}
-        {% endif %}
     </div>
 </div>
 
