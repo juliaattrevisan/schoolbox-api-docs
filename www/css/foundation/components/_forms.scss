@@ -424,7 +424,9 @@ select.visibility {
 section > fieldset {
 
 	border: none;
-	@include grid-row($behavior:nest);
+	@include grid-row;
+
+	@include responsive-sides(-1, margin);
 
 	@media #{$small-only} {
 		padding: 0;
