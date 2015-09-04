@@ -240,6 +240,7 @@ function renderStudent(
     );
 }
 
+/** @var SitePage $this */
 if (is_numeric($this->arg[0])) {
     $this->setTitle('Address Book');
 
@@ -256,7 +257,7 @@ if (is_numeric($this->arg[0])) {
     if (Cfg::get('external_enable') && $user['synergy_id']) {
         $synUserHandler = new External_User();
 
-        if ($groupHandler->isParent($user['uid']) && $groupHandler->isStaff()) {
+        if ($groupHandler->isParent($user['uid'])/* && $groupHandler->isStaff()*/) {
             renderParent(
                 $this,
                 $user,
@@ -276,7 +277,7 @@ if (is_numeric($this->arg[0])) {
                     new Folder\Mapper(),
                     new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
                 );
-            } elseif ($groupHandler->isStaff($user['uid']) && $groupHandler->isStaff()) {
+            } elseif ($groupHandler->isStaff($user['uid'])/* && $groupHandler->isStaff()*/) {
                 renderStaff(
                     $this,
                     $user,
@@ -287,9 +288,12 @@ if (is_numeric($this->arg[0])) {
             }
         }
     } else {
-        //Remove subjects from output
-        $renderer = new \Schoolbox\SubjectList\UserProfile($this, array());
-        $renderer->render();
+        // Show something else (non-twig)
+        // Probably a 404 screen
+        $this->pageNotFound();
+//        //Remove subjects from output
+//        $renderer = new \Schoolbox\SubjectList\UserProfile($this, array());
+//        $renderer->render();
     }
 } else {
     error(2);
