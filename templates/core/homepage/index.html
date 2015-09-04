@@ -142,7 +142,7 @@
                     this.addClass('insert-new').find('h4 strong, .notification').remove();
                 },
                 refreshItem: function () {
-                    this.find('strong em').text(this.data('count'));
+                    this.find('[data-relation="count"]').text(this.data('count'));
                 }
             },
             spectrum: {
@@ -308,7 +308,7 @@
                             <div class="avatar card">
                                 <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
                                     <span class="icon-32 icon-masonry icon-masonry-{HOMEPAGE_COMPONENT_CLASS}"></span>
-                                    <p>{HOMEPAGE_COMPONENT_NAME} ({HOMEPAGE_COMPONENT_COUNT})</p>
+                                    <p>{HOMEPAGE_COMPONENT_NAME} (<span data-relation="count">{HOMEPAGE_COMPONENT_COUNT}</span>)</p>
                                 </a>
                             </div>
                         </li>

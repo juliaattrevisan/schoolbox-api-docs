@@ -748,6 +748,7 @@
             }
 
             item.data('count', count);
+            masonry.options.palette.refreshItem.call(item);
         });
 
         //// reapply <s>every 4 hours</s>never
