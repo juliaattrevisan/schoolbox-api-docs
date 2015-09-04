@@ -4,29 +4,33 @@
     <!-- END allowed_files -->
 </style>
 
-<h1>Showcased Work for {USER_FIRSTNAME} {USER_LASTNAME}</h1>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Showcased Work for {USER_FIRSTNAME} {USER_LASTNAME}</h1>
 
-<ul class="sub-nav">
-    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
-    <!-- BEGIN showcase_page -->
-    <li class="active" ><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
-    <!-- END showcase_page -->
-    <!-- BEGIN eportfolio_page -->
-    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
-    <!-- END eportfolio_page -->
-    <!-- BEGIN can_add_page -->
-    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="icon-add">Add page</a></li>
-    <!-- END can_add_page -->
-</ul>
+        <ul class="sub-nav">
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
+            <!-- BEGIN showcase_page -->
+            <li class="active" ><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
+            <!-- END showcase_page -->
+            <!-- BEGIN eportfolio_page -->
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
+            <!-- END eportfolio_page -->
+            <!-- BEGIN can_add_page -->
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="icon-add">Add page</a></li>
+            <!-- END can_add_page -->
+        </ul>
+    </div>
+</div>
 
 <div class="row">
-    <div class="small-12 island no-pad">
+    <div class="small-12 island">
         <!-- BEGIN no_showcased_work -->
         <h2 class="subheader">{USER_FIRSTNAME} {USER_LASTNAME} has no showcased work</h2>
         <!-- END no_showcased_work -->
 
         <!-- BEGIN has_intro -->
-        <div class="content">
+        <div class="alert-box content">
             <p>Visit your submission history page to publish items to your showcase.</p>
             <p><a href='/submission/allWork/{USER_ID}' class="button icon-due-work">Submission History</a></p>
         </div>
@@ -55,7 +59,7 @@
                     <!-- BEGIN no_submission -->
                     <div class="five-column" data-equalizer-watch>
                         <div class="info card">
-                            <h3>{{SHOWCASED_WORK_BOX_NAME}}</h3>
+                            <h3>{SHOWCASED_WORK_BOX_NAME}</h3>
                             <p class="meta">{SHOWCASED_WORK_SUBMISSION_FILESIZE}</p>
                             <p class="meta"><a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></p>
                         </div>
@@ -66,7 +70,9 @@
                         {SHOWCASED_WORK_SUBMISSION_SUBMITTED}
                     </div>
                     <div class="two-column text-center">
-                        <span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span>
+                        <p class="grade gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">
+                            <span>{SHOWCASED_WORK_RETURNED_MARK}</span>
+                        </p>
                     </div>
                     <div class="two-column">
                         <!-- BEGIN has_modify_form -->
