@@ -1,11 +1,17 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
     $(function () {
-        $('#deleteFile').click(function () {
-            if (confirm('Are you sure you want to delete this file?')) {
-                window.location = '/cms/fileForm.php?delete={FILE_ID}&redirect=/homepage/{CATEGORY_ID}';
-            }
+        $('[data-delete]').click(function(event) {
+            event.preventDefault();
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this file?',
+                confirmEvent: function() {
+                    window.location = '/cms/fileForm.php?delete={FILE_ID}&redirect=/homepage/{CATEGORY_ID}';
+                }
+            });
         });
 
         $('#fileForm').validate();
@@ -23,7 +29,7 @@
             <a href='#' class='button icon-more' data-dropdown='header-options'></a>
         </span>
         <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
-            <li><a id='deleteFile' class="icon-delete">Delete File</a></li>
+            <li><a class="icon-delete" data-delete>Delete File</a></li>
         </ul>
         <!-- END delete_button -->
 
