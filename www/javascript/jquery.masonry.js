@@ -623,7 +623,7 @@
 
         this.palette = $(palOpt.selector).find(palOpt.containerSelector);
 
-        $(palOpt.selector).tabs();
+        //$(palOpt.selector).tabs();
 
         // apply qtips to each element
         this.applyQTip($(palOpt.handleSelector));
