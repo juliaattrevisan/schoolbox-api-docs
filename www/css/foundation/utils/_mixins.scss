@@ -183,3 +183,14 @@
 @mixin contrast-bg($opacity: 0.5, $background: $body-bg, $saturation: 0%, $light: $white, $dark: $black) {
 	color: contrast-bg($opacity, $background, $saturation, $light, $dark);
 }
+
+@mixin selection($color: $primary-color) {
+	::-moz-selection {
+		color: calc-text-color($color);
+		background-color: $color;
+	}
+	::selection      {
+		color: calc-text-color($color);
+		background-color: $color;
+	}
+}

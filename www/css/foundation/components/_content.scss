@@ -418,6 +418,9 @@ $clearing-carousel-thumb-active-border: 4px solid tint($tertiary, 26%);
 // CUSTOM OVERRIDES
 //
 
+
+@include selection;
+
 // Deleting Components
 .delete-it{
 	background-color: tint($warning-color, 74%);
