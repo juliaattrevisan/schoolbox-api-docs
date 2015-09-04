@@ -1,25 +1,17 @@
 {# Permissions #}
+{% set isStaff = session.user.isSuperUser() or session.user.getRole().isStaff() %}
+{% set isSelf = session.user.getId() == user.getId() %}
+{% set isParentOfStudent = session.user.isParentOf(user) %}
+
 {# medical: if allowed in config, and user is staff or parent of this child #}
-{% set showMedicalAlert =
-    not config.protect_medicalspecial_profile
-    and (session.user.isStaff() or session.user.isParentOf(user))
-%}
+{% set showMedicalAlert = not config.protect_medicalspecial_profile and isStaff %}
 {# details: su, staff, self or parent #}
-{% set showDetails =
-    session.user.isSuperUser()
-    or session.user.getRole().isStaff()
-    or session.user.getId() == user.getId()
-    or session.user.isParentOf(user)
-%}
+{% set showDetails = isStaff or isSelf or isParentOfStudent %}
 {% set showButtons = showDetails %}
 {# contacts: su, staff or parent #}
 {# Should a student see their own contact details? I think so #}
-{% set showContacts =
-    session.user.isSuperUser()
-    or session.user.getRole().isStaff()
-    or session.user.isParentOf(user)
-%}
-{% set showContactsAlert = showContacts and (session.user.isSuperUser() or session.user.getRole().isStaff()) %}
+{% set showContacts = isStaff or isParentOfStudent %}
+{% set showContactsAlert = showContacts and isStaff %}
 {% set showSubjects = showDetails %}
 {% set showGroups = showDetails %}
 
