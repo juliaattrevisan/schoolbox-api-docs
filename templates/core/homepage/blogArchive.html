@@ -1,11 +1,22 @@
-<h1>Blog Archive for {CATEGORY_NAME}</h1>
-<span class="header-actions">
-    <!-- BEGIN submit_blog -->
-    <a href="/blog/modify/new/{ID}" class="button icon-add">Post Blog</a>
-    <!-- END submit_blog -->
-    <a href="/homepage/{ID}" class="button icon-previous">Return to Homepage</a>
-</span>
+<div class="actions-small-2 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Blog Archive</h1>
 
+            <ul class="meta">
+                <li class="icon-home"><a href="/homepage/{ID}" title="Visit Homepage">{CATEGORY_NAME}</a></li>
+            </ul>
+        </div>
+    </div>
+    <nav>
+        <a href="/homepage/{ID}" class="icon-previous" title="Return to Homepage"></a>
+        <!-- BEGIN submit_blog -->
+        <a href="/blog/modify/new/{ID}" class="icon-add" title="Post Blog"></a>
+        <!-- END submit_blog -->
+    </nav>
+</div>
+
+       
 <div class="large-2 columns">
     <ul>
         <li>
