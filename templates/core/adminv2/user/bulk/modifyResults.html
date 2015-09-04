@@ -1,36 +1,47 @@
-<h1>Results</h1>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Results</h1>
+    </div>
+</div>
 
-<p>
-	{MODIFIED_COUNT} users were processed.
-</p>
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div class="content">
+                <p>
+                    {MODIFIED_COUNT} user(s) were processed.
+                </p>
+            </div>
 
-<!-- BEGIN has_users -->
-<table>
-	<colgroup>
-		<col width="150" />
-		<col />
-		<col />
-	</colgroup>
-	<thead>
-		<tr>
-			<th>External ID</th>
-			<th>Firstname</th>
-			<th>Lastname</th>
-		</tr>
-	</thead>
-	<tbody>
-		<!-- BEGIN user -->
-		<tr>
-			<td>{USER_EXTERNAL_ID}</td>
-			<td>{USER_FIRSTNAME}</td>
-			<td>{USER_LASTNAME}</td>
-		</tr>
-		<!-- END user -->
-	</tbody>
-</table>
-<!-- END has_users -->
+            <!-- BEGIN has_users -->
+            <table>
+                <colgroup>
+                    <col width="150" />
+                    <col />
+                    <col />
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>External ID</th>
+                    <th>Firstname</th>
+                    <th>Lastname</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- BEGIN user -->
+                <tr>
+                    <td>{USER_EXTERNAL_ID}</td>
+                    <td>{USER_FIRSTNAME}</td>
+                    <td>{USER_LASTNAME}</td>
+                </tr>
+                <!-- END user -->
+                </tbody>
+            </table>
+            <!-- END has_users -->
 
-<p>
-	<a href="/adminv2/user/bulk/modify" class="button">Back to Search</a>
-</p>
-
+            <div class="content">
+                <a href="/adminv2/user/bulk/modify" class="button icon-previous">Back to Search</a>
+            </div>
+        </section>
+    </div>
+</div>
