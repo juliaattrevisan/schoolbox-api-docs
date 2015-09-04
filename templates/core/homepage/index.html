@@ -279,34 +279,35 @@
 </div>
 
 <!-- BEGIN customise_page -->
-<div id="tabs-homepage" class="hide">
+<div id="tabs-homepage">
 <div id="tabs-1" class="customise-components">
-    <div id="tabs-sub"> <!-- tabs-sub -->
-        <ul class="ui-tabs admin-nav">
-            <!-- BEGIN homepage_component_tab -->
-            <li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
-            <!-- END homepage_component_tab -->
-        </ul>
-        <div class="clearfix"></div>
-        <div class="components clearfix">
-            <!-- BEGIN homepage_component_page -->
-            <div id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
-                <!-- BEGIN homepage_component -->
-                <div class="add-component {HOMEPAGE_COMPONENT_MULTIPLE_STATE} clearfix" data-count="{HOMEPAGE_COMPONENT_COUNT}" data-multi="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}">
-                    <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" class="{HOMEPAGE_COMPONENT_CLASS}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
-                        <span class="icon"></span>
-                        <span class="notification"><strong></strong>Added</span>
-                        <!-- <div class="plus">+</div> -->
-                        <h4>
-                            <span>{HOMEPAGE_COMPONENT_NAME}</span>
-                            <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong>
-                        </h4>
-                    </a>
-                </div>
-                <!-- END homepage_component -->
+    <ul class="admin-nav tabs" data-tab>
+        <!-- BEGIN homepage_component_tab -->
+        <li class="tab-title">
+            <a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">
+                {COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})
+            </a>
+        </li>
+        <!-- END homepage_component_tab -->
+    </ul>
+    <div class="tabs-content components">
+        <!-- BEGIN homepage_component_page -->
+        <div id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
+            <!-- BEGIN homepage_component -->
+            <div class="add-component {HOMEPAGE_COMPONENT_MULTIPLE_STATE} clearfix" data-count="{HOMEPAGE_COMPONENT_COUNT}" data-multi="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}">
+                <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" class="{HOMEPAGE_COMPONENT_CLASS}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
+                    <span class="icon"></span>
+                    <span class="notification"><strong></strong>Added</span>
+                    <!-- <div class="plus">+</div> -->
+                    <h4>
+                        <span>{HOMEPAGE_COMPONENT_NAME}</span>
+                        <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong>
+                    </h4>
+                </a>
             </div>
-            <!-- END homepage_component_page -->
+            <!-- END homepage_component -->
         </div>
+        <!-- END homepage_component_page -->
     </div>
 </div>
 <!--/tabs-1-->
