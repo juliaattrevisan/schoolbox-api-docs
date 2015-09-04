@@ -19,8 +19,7 @@
     or session.user.getRole().isStaff()
     or session.user.isParentOf(user)
 %}
-{% set showContactsAlert = session.user.isSuperUser() or session.user.getRole().isStaff() %}
-
+{% set showContactsAlert = showContacts and (session.user.isSuperUser() or session.user.getRole().isStaff()) %}
 {% set showSubjects = showDetails %}
 {% set showGroups = showDetails %}
 
