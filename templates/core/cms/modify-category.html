@@ -1,3 +1,47 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#folderForm').validate({
+            rules: {
+                'group[{REQUIRED_PERMS}]': {
+                    groupCheck: true
+                }
+            }
+        });
+
+        jQuery.validator.addMethod("groupCheck", function(value, element, params) {
+            var hasDefaultPerms = $("input[name='group[{REQUIRED_PERMS}]']:checked").val();
+            var individualPerms = $('input[name=groupcheck]').is(':checked');
+
+            if ((hasDefaultPerms < 2) && !individualPerms) {
+                return confirm("You do not currently have write access to this folder. Do you wish to continue?");
+            }
+            else {
+                return true;
+            }
+        }, "Please select write access for this group.");
+
+
+        $('[data-reset-homepage-content]').click(function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+            $(this).confirmDialog({
+                text: 'Are you sure you wish to delete all content from this homepage? This includes:\n - Assessments\n - Blogs\n - Calendar events\n - News\n - Chats\n - Dropbox\n - Files\n - Forums\n - Polls\n - Due Work\n - Surveys\n - TextBoxes\n - Wikis',
+                confirmEvent: function() {
+                    window.location.href = element.attr('href');
+                }
+            });
+        });
+
+    });
+</script>
+<!-- BEGIN custom_head -->
+
 {BREADCRUMB}
 
 <div class="row">
@@ -33,10 +77,10 @@
 					<table>
                         <thead>
                             <tr>
-                                <th><b>Role</b></th>
-                                <th><b>None</b></th>
-                                <th><b>Read</b></th>
-                                <th><b>Write</b></th>
+                                <th>Role</th>
+                                <th>None</th>
+                                <th>Read</th>
+                                <th>Write</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -121,45 +165,3 @@
 		</form>
 	</div>
 </div>
-
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
-<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $('#folderForm').validate({
-            rules: {
-                'group[{REQUIRED_PERMS}]': {
-                    groupCheck: true
-                }
-            }
-        });
-
-        jQuery.validator.addMethod("groupCheck", function(value, element, params) {
-            var hasDefaultPerms = $("input[name='group[{REQUIRED_PERMS}]']:checked").val();
-            var individualPerms = $('input[name=groupcheck]').is(':checked');
-
-            if ((hasDefaultPerms < 2) && !individualPerms) {
-                return confirm("You do not currently have write access to this folder. Do you wish to continue?");
-            }
-            else {
-                return true;
-            }
-        }, "Please select write access for this group.");
-
-
-        $('[data-reset-homepage-content]').click(function(event) {
-            event.preventDefault();
-
-            var element = $(this);
-            $(this).confirmDialog({
-                text: 'Are you sure you wish to delete all content from this homepage? This includes:\n - Assessments\n - Blogs\n - Calendar events\n - News\n - Chats\n - Dropbox\n - Files\n - Forums\n - Polls\n - Due Work\n - Surveys\n - TextBoxes\n - Wikis',
-                confirmEvent: function() {
-                    window.location.href = element.attr('href');
-                }
-            });
-        });
-
-    });
-</script>
