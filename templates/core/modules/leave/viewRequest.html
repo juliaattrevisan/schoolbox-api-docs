@@ -1,57 +1,73 @@
-<h1>Leave Request: {USER_NAME}, Year {USER_YEAR}, {USER_HOUSE}</h1>
-
-<div class="large-12 columns">
-    <h2>Student</h2>
-    <dl>
-        <dt>Name</dt>
-        <dd>{USER_NAME}</dd>
-        <dt>Phone</dt>
-        <dd>{REQUEST_USER_PHONE}</dd>
-    </dl>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Leave Request: {USER_NAME}, Year {USER_YEAR}, {USER_HOUSE}</h1>
+    </div>
 </div>
 
-<div class="large-6 columns">
-    <h2>Status</h2>
-    {REQUEST_STATUS}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Lorem ipsizzle go to hizzle phat amizzle.</h2>
+        <section class="content">
+            <div class="row">
+                <div class="small-12 columns">
+                    <div class="small-12 columns">
+                        <h2>Student</h2>
+                        <dl>
+                            <dt>Name</dt>
+                            <dd>{USER_NAME}</dd>
+                            <dt>Phone</dt>
+                            <dd>{REQUEST_USER_PHONE}</dd>
+                        </dl>
+                    </div>
+
+                    <div class="small-12 large-6 columns">
+                        <h2>Status</h2>
+                        {REQUEST_STATUS}
+                    </div>
+
+                    <div class="small-12 large-6 columns">
+                        <h2>Requested By</h2>
+                        {AUTHOR_NAME}
+                    </div>
+
+                    <div class="small-12 large-6 columns">
+                        <h2>Leave Date</h2>
+                        {REQUEST_START_DATE} {REQUEST_START_TIME}
+                    </div>
+
+                    <div class="small-12 large-6 columns">
+                        <h2>Return Date</h2>
+                        {REQUEST_FINISH_DATE} {REQUEST_FINISH_TIME}
+                    </div>
+
+                    <div class="small-12 large-6 columns">
+                        <h2>Host</h2>
+                        <dl>
+                            <dt>Type</dt>
+                            <dd>{HOST_TYPE}</dd>
+
+                            <dt><span data-tooltip class="has-tip" title="The host will need to confirm your leave arrangements; you can forward them the email you receive.">Name</span></dt>
+                            <dd>{REQUEST_HOST_NAME}</dd>
+
+                            <dt>Phone</dt>
+                            <dd>{REQUEST_HOST_PHONE}</dd>
+                        </dl>
+                    </div>
+
+                    <div class="small-12 large-6 columns">
+                        <h2>Travel Method</h2>
+
+                        <dl>
+                            <dt>Type</dt>
+                            <dd>{REQUEST_TRAVEL_TYPE}</dd>
+
+                            <dt>Description</dt>
+                            <dd>{REQUEST_DESCRIPTION}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
 </div>
 
-<div class="large-6 columns">
-    <h2>Requested By</h2>
-    {AUTHOR_NAME}
-</div>
-
-<div class="large-6 columns">
-    <h2>Leave Date</h2>
-    {REQUEST_START_DATE} {REQUEST_START_TIME}
-</div>
-
-<div class="large-6 columns">
-    <h2>Return Date</h2>
-    {REQUEST_FINISH_DATE} {REQUEST_FINISH_TIME}
-</div>
-
-<div class="large-6 columns">
-    <h2>Host</h2>
-    <dl>
-        <dt>Type</dt>
-        <dd>{HOST_TYPE}</dd>
-
-        <dt><span data-tooltip aria-haspopup="true" class="has-tip" title="The host will need to confirm your leave arrangements; you can forward them the email you receive.">Name</span></dt>
-        <dd>{REQUEST_HOST_NAME}</dd>
-
-        <dt>Phone</dt>
-        <dd>{REQUEST_HOST_PHONE}</dd>
-    </dl>
-</div>
-
-<div class="large-6 columns">
-    <h2>Travel Method</h2>
-
-    <dl>
-        <dt>Type</dt>
-        <dd>{REQUEST_TRAVEL_TYPE}</dd>
-
-        <dt>Description</dt>
-        <dd>{REQUEST_DESCRIPTION}</dd>
-    </dl>
-</div>
