@@ -308,51 +308,59 @@
                 <!-- BEGIN homepage_color_selector -->
                 <form method="POST" action="" name="saveColours">
 
-                    <div class="column-colours">
-                        <!-- These are selectable items - default to top selected only -->
-                        <a href="#" id="top" class="columns left-right selected" data-column-selector data-interaction-state="selected">Top</a>
-                        <a href="#" id="left" class="columns left-right" data-column-selector>Left</a>
-                        <a href="#" id="right" class="columns left-right" data-column-selector>Right</a>
+                    <div class="row" data-equalizer data-equalizer-mq="medium-up">
+                        <div class="small-12 columns">
+                            <fieldset>
+                                <legend>Layout</legend>
+                                <div class="small-12 columns">
+                                    <input id="choose-top" type="checkbox" checked />
+                                    <label for="choose-top" class="checkbox-label">Top</label>
+                                </div>
+                                <div class="small-6 columns">
+                                    <input id="choose-left" type="checkbox" checked />
+                                    <label for="choose-left" class="checkbox-label">Left</label>
+                                </div>
+                                <div class="small-6 columns">
+                                    <input id="choose-right" type="checkbox" checked />
+                                    <label for="choose-right" class="checkbox-label">Right</label>
+                                </div>
+                            </fieldset>
+                        </div>
+
                         <!--
-                        <a href="#" id="bottom" class="columns left-right" data-column-selector>Bottom</a>
+                        <div class="column-colours">
+                            <a href="#" id="top" class="columns left-right selected" data-column-selector data-interaction-state="selected">Top</a>
+                            <a href="#" id="left" class="columns left-right" data-column-selector>Left</a>
+                            <a href="#" id="right" class="columns left-right" data-column-selector>Right</a>
+                        </div>
                         -->
+
+                        <div class="small-12 medium-6 columns">
+                            <fieldset data-equalizer-watch>
+                                <legend>Heading</legend>
+                                <label for="head_font">Text</label>
+                                <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
+                                <label for="head_bg">Background</label>
+                                <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
+                            </fieldset>
+                        </div>
+
+                        <div class="small-12 medium-6 columns">
+                            <fieldset data-equalizer-watch>
+                                <legend>Content</legend>
+                                <label for="bg_primary">Primary Background</label>
+                                <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
+                                <label for="bg_secondary">Secondary Background</label>
+                                <input id="bg_secondary" class="colorBox" name="colors[bg_secondary]" type="text" data-colorpicker />
+                                <label for="font">Text</label>
+                                <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
+                                <label for="link">Link</label>
+                                <input id="link" class="colorBox" name="colors[link]" type="text" data-colorpicker />
+                                <label for="hover">Link Hover</label>
+                                <input id="hover" class="colorBox" name="colors[hover]" type="text" data-colorpicker />
+                            </fieldset>
+                        </div>
                     </div>
-
-                    <fieldset>
-                        <legend>Heading</legend>
-                        <div class="colour clearfix">
-                            <label for="head_font">Text</label>
-                            <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
-                        </div>
-                        <div class="colour clearfix">
-                            <label for="head_bg">Background</label>
-                            <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
-                        </div>
-                    </fieldset>
-
-                    <fieldset>
-                        <legend>Content</legend>
-                        <div class="colour clearfix">
-                            <label for="bg_primary">Primary Background</label>
-                            <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
-                        </div>
-                        <div class="colour clearfix">
-                            <label for="bg_secondary">Secondary Background</label>
-                            <input id="bg_secondary" class="colorBox" name="colors[bg_secondary]" type="text" data-colorpicker />
-                        </div>
-                        <div class="colour clearfix">
-                            <label for="font">Text</label>
-                            <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
-                        </div>
-                        <div class="colour clearfix">
-                            <label for="link">Link</label>
-                            <input id="link" class="colorBox" name="colors[link]" type="text" data-colorpicker />
-                        </div>
-                        <div class="colour clearfix">
-                            <label for="hover">Link Hover</label>
-                            <input id="hover" class="colorBox" name="colors[hover]" type="text" data-colorpicker />
-                        </div>
-                    </fieldset>
 
                     <ul class="button-group">
                         <li><input type="submit" id="saveColour" value="Save"/></li>
