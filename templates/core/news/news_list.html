@@ -53,16 +53,17 @@
                 <!-- END news -->
             </ul>
         </section>
+
+        <ul class="pagination">
+            <!-- BEGIN previous_button -->
+            <li><a class="arrow" href="/news/{PREVIOUS_PAGE}">&lsaquo;</a></li>
+            <!-- END previous_button -->
+            <!-- BEGIN page_number -->
+            <li class="{CURRENT}"><a href="/news/{PAGE_INDEX_REF}">{PAGE_INDEX}</a></li>
+            <!-- END page_number -->
+            <!-- BEGIN next_button -->
+            <li><a class="arrow" href="/news/{NEXT_PAGE}">&rsaquo;</a></li>
+            <!-- END next_button -->
+        </ul>
     </div>
 </div>
-<ul class="admin-nav foot">
-    <!-- BEGIN previous_button -->
-    <li><a class="prev" href="/news/{PREVIOUS_PAGE}">&lsaquo; Prev</a></li>
-    <!-- END previous_button -->
-    <!-- BEGIN page_number -->
-    <li><a class="number {CURRENT}" href="/news/{PAGE_INDEX_REF}">{PAGE_INDEX}</a></li>
-    <!-- END page_number -->
-    <!-- BEGIN next_button -->
-    <li><a class="next" href="/news/{NEXT_PAGE}">Next &rsaquo;</a></li>
-    <!-- END next_button -->
-</ul>
