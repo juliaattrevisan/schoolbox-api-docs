@@ -20,11 +20,11 @@
     <div class="small-12 large-3 island">
         <h2 class="subheader">Archive</h2>
         <section class="content" data-equalizer-watch>
-            <ul>
+            <ul class="information-list">
                 <li>
                     <!-- BEGIN year -->
                     {YEAR}
-                    <ul>
+                    <ul class="information-list">
                         <!-- BEGIN month -->
                         <li>
                             <a href="/homepage/blogArchive/{ID}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
@@ -40,59 +40,61 @@
     <div class="small-12 large-9 island">
         <h2 class="subheader">Blog</h2>
         <section class="content" data-equalizer-watch>
-            <ul>
+            <ul class="information-list">
                 <!-- BEGIN blog -->
                 <li>
                     <a name="{BLOG_ID}"></a>
 
-                    <h2>{BLOG_HEADING}</h2>
-                    <span class="header-actions">
-                        <!-- BEGIN can_modify -->
-                        <a class="button icon-modify no-text" data-tooltip title="Modify" href="/blog/modify/{BLOG_ID}"></a>
-                        <!-- END can_modify -->
-                    </span>
-
-                    <div class="clearfix">
-                        <div class="avatar-card">
-                            <a href="/search/user/{BLOG_AUTHOR_ID}" title="View Profile">
-                                <img src="/portrait.php?userId={BLOG_AUTHOR_EXTERNAL_ID}&size=square64" alt="View Profile">
-                                <p>{BLOG_AUTHOR_NAME}</p>
-                            </a>
-                            <p class="meta">Posted {BLOG_POSTED_DATE}</p>
+                    <div class="actions-small-1 row">
+                        <div class="list-item">
+                            <div class="small-12 column">
+                                <h2>{BLOG_HEADING}</h2>
+                            </div>
                         </div>
+                        <nav>
+                            <!-- BEGIN can_modify -->
+                            <a class="icon-modify" title="Modify" href="/blog/modify/{BLOG_ID}"></a>
+                            <!-- END can_modify -->
+                        </nav>
                     </div>
 
-                    <div>
+                    <div class="avatar card">
+                        <a href="/search/user/{BLOG_AUTHOR_ID}" title="View Profile">
+                            <img src="/portrait.php?userId={BLOG_AUTHOR_EXTERNAL_ID}&size=square64" alt="View Profile" />
+                            <p>{BLOG_AUTHOR_NAME}</p>
+                        </a>
+                        <p class="meta">Posted {BLOG_POSTED_DATE}</p>
+                    </div>
+
+                    <article>
                         {BLOG_BODY}
-                    </div>
+                    </article>
 
-                    <ul class="information-list">
+                    <ul class="information-list reply">
                         <!-- BEGIN comment -->
                         <li>
-                            <div class="large-12 columns">
-                                {DELETE_COMMENT}
+                            {DELETE_COMMENT}
 
-                                <div class="clearfix">
-                                    <div class="avatar-card">
-                                        <a href="/search/user/{COMMENT_AUTHOR_ID}" title="View Profile">
-                                            <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32" alt="View Profile">
-                                            <p>{COMMENT_AUTHOR_NAME}</p>
-                                        </a>
-                                        <p class="meta">Commented {COMMENT_CREATED}</p>
-                                    </div>
-                                </div>
+                            <div class="avatar card">
+                                <a href="/search/user/{COMMENT_AUTHOR_ID}" title="View Profile">
+                                    <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square64" alt="View Profile" />
+                                    <p>{COMMENT_AUTHOR_NAME}</p>
+                                </a>
+                                <p class="meta">Commented {COMMENT_CREATED}</p>
+                            </div>
 
+                            <article>
                                 <p>
                                     {COMMENT_BODY}
                                 </p>
-                            </div>
+                            </article>
                         </li>
                         <!-- END comment -->
                     </ul>
 
                     <form method="post" action="/blog/comment/new/{BLOG_ID}">
                         <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
-                        <input type="submit" name="comment" value="Add comment"/>
+                        <input type="submit" class="expand" name="comment" value="Add comment"/>
                     </form>
                 </li>
                 <!-- END blog -->
