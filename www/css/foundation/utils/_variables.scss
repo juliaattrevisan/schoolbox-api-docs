@@ -58,6 +58,9 @@ $input-border-color:			tint($tertiary, 66%);
 $tabbar-bg:						$primary-color;
 $off-canvas-bg:					$white;
 
+$row-hover-background: tint($highlight-color, 87%);
+$row-action-hover-background: darken($row-hover-background, 7%);
+
 // Dimensions
 // $search-width: 					256px;
 // $logo-width: 					172px;
