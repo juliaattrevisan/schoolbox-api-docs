@@ -976,7 +976,7 @@ $rotate-th-width: $square-grid-td-size;
 	//@media #{$large-up} { @include block-grid(4); }
 	//@media #{$medium-up} { @include block-grid(2); }
 	//@media #{$small-up} { @include block-grid(2); }
-	@extend .information-list;
+	//@extend .information-list;
 	> li{
         padding-bottom: 0 !important; // SORRY! foundation's selector is just too specific :'(
 		border-right: 1px solid $body-bg;
