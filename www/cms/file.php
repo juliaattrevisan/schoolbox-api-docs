@@ -57,6 +57,22 @@ if(is_numeric($this->arg[0])) {
 
 	$this->setVar($output);
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Modify File',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }
 else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
