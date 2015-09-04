@@ -419,6 +419,7 @@ h1, h2 {
 		background-color: $f-dropdown-content-bg;
     }
 	.separator {
+		color: $f-dropdown-font-color;
 		padding: $f-dropdown-list-padding;
 		font-weight: 700;
 		background-color: $f-dropdown-list-separator-bg;
