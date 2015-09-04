@@ -306,59 +306,60 @@
 
             <div id="tabs-2" class="content">
                 <!-- BEGIN homepage_color_selector -->
-                <div class="column-colours">
-                    <!-- These are selectable items - default to top selected only -->
-                    <a href="#" id="top" class="columns left-right selected" data-column-selector data-interaction-state="selected">Top</a>
-                    <a href="#" id="left" class="columns left-right" data-column-selector>Left</a>
-                    <a href="#" id="right" class="columns left-right" data-column-selector>Right</a>
-                    <!--
-                    <a href="#" id="bottom" class="columns left-right" data-column-selector>Bottom</a>
-                    -->
-                </div>
-                <div class="colours">
-                    <div class="colours-split">
-                        <h3>Heading: </h3>
+                <form method="POST" action="" name="saveColours">
+
+                    <div class="column-colours">
+                        <!-- These are selectable items - default to top selected only -->
+                        <a href="#" id="top" class="columns left-right selected" data-column-selector data-interaction-state="selected">Top</a>
+                        <a href="#" id="left" class="columns left-right" data-column-selector>Left</a>
+                        <a href="#" id="right" class="columns left-right" data-column-selector>Right</a>
+                        <!--
+                        <a href="#" id="bottom" class="columns left-right" data-column-selector>Bottom</a>
+                        -->
+                    </div>
+
+                    <fieldset>
+                        <legend>Heading</legend>
                         <div class="colour clearfix">
+                            <label for="head_font">Text</label>
                             <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
-                            <p>Text</p>
                         </div>
                         <div class="colour clearfix">
+                            <label for="head_bg">Background</label>
                             <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
-                            <p>Background</p>
                         </div>
-                    </div>
-                    <div class="colours-split">
-                        <h3>Content: </h3>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Content</legend>
                         <div class="colour clearfix">
+                            <label for="bg_primary">Primary Background</label>
                             <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
-                            <p>Primary Background</p>
                         </div>
                         <div class="colour clearfix">
+                            <label for="bg_secondary">Secondary Background</label>
                             <input id="bg_secondary" class="colorBox" name="colors[bg_secondary]" type="text" data-colorpicker />
-                            <p>Secondary Background</p>
                         </div>
                         <div class="colour clearfix">
+                            <label for="font">Text</label>
                             <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
-                            <p>Text</p>
                         </div>
                         <div class="colour clearfix">
+                            <label for="link">Link</label>
                             <input id="link" class="colorBox" name="colors[link]" type="text" data-colorpicker />
-                            <p>Link</p>
                         </div>
                         <div class="colour clearfix">
+                            <label for="hover">Link Hover</label>
                             <input id="hover" class="colorBox" name="colors[hover]" type="text" data-colorpicker />
-                            <p>Link Hover</p>
                         </div>
-                    </div>
-                    <div class="colours-buttons">
-                        <form method="POST" action="" name="saveColours">
-                            <button class="submit-btn-plain save-colours inline-block" type="button" id="saveColour">Save</button>
-                            <button class="submit-btn-plain inline-block" type="button" id="restore">Reset</button>
-                            <button class="submit-btn-plain inline-block" type="button" id="cancel">Cancel</button>
-                        </form>
-                        <div class="saved-colours">Saved colour set!</div>
-                    </div>
-                </div>
+                    </fieldset>
+
+                    <ul class="button-group">
+                        <li><input type="submit" id="saveColour" value="Save"/></li>
+                        <li><input type="submit" id="restore" value="Reset"/></li>
+                        <li><input type="submit" id="cancel" value="Cancel"/></li>
+                    </ul>
+                </form>
                 <!-- END homepage_color_selector -->
                 <div style="clear:both;">
                     <form method="POST" action="" >
