@@ -1,9 +1,6 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>Bulk Modify</h1>
-        <p>
-            Search for users with the criteria listed below, and apply changes to selected users.
-        </p>
     </div>
 </div>
 
@@ -11,9 +8,15 @@
     <div class="small-12 island">
         <h2 class="subheader">Search</h2>
 
-        <section>
-            <div class="row collapse">
-                <form action="/adminv2/user/bulk/modify" method="post">
+        <form action="/adminv2/user/bulk/modify" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <p>
+                            Search for users with the criteria listed below, and apply changes to selected users.
+                        </p>
+                    </div>
+
                     <div class="small-12 medium-6 large-3 columns">
                         <label>
                             Campus
@@ -62,9 +65,9 @@
                             <input type="submit" value="Search" />
                         </label>
                     </div>
-                </form>
-            </div>
-        </section>
+                </fieldset>
+            </section>
+        </form>
     </div>
 </div>
 
