@@ -28,7 +28,7 @@ if ($isSuperuser || $isAllowedTeacher) {
 			exit;
 		}
 		// Ensure the file is available locally
-		$filename = tempnam(sys_get_temp_dir(), 'zip');
+		$filename = tempnam(Config::get('zip_dir'), 'zip');
 		$fp       = fopen($filename, 'wb');
 		stream_copy_to_stream($result->readStream(), $fp);
 		fclose($fp);
