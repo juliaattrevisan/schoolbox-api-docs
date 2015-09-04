@@ -17,7 +17,8 @@ $form-label-font-color: $black;
 $form-label-bottom-margin: 0;
 // $input-font-family: inherit;
 $input-font-color: $black;
-$input-font-size: rem-calc(($base-font-size - 2));
+$input-font-size: rem-calc(($base-font-size - 3));
+$input-height: 2.5rem;
 $input-bg-color: $white;
 $input-focus-bg-color: $ocean-sunset;
 $input-focus-color: $black;
@@ -135,6 +136,7 @@ textarea,
 select{
 	@include single-transition(all, 0.15s, linear);
 	@extend %p;
+	min-height: $input-height;
 	font-weight: $font-weight-normal;
 	&:hover{
 		background-color: $input-hover-bg-color;
