@@ -15,30 +15,27 @@
 <div class="row">
     <div class="small-12 island">
         <span class="submitted label full-width">Finished</span>
-        <section>
-            <div class="content">
+        <section class="content">
+            <!-- BEGIN has_marks -->
+            <p class="grade">
+                <span>{ATTEMPT_MARKS}/{ATTEMPT_TOTAL} ({ATTEMPT_PERCENTAGE}%)</span>
+            </p>
 
-                <!-- BEGIN has_marks -->
-                <p class="grade">
-                    <span>{ATTEMPT_MARKS}/{ATTEMPT_TOTAL} ({ATTEMPT_PERCENTAGE}%)</span>
-                </p>
-
-                <p>
-                    <em>This mark is unconfirmed and may change following teacher review.</em>
-                </p>
-                <!-- END has_marks -->
+            <p>
+                <em>This mark is unconfirmed and may change following teacher review.</em>
+            </p>
+            <!-- END has_marks -->
 
 
-                <!-- BEGIN unmarkedRemaining -->
-                <p>
-                    {ATTEMPT_NUM_MARKED_QUESTIONS} out of {ATTEMPT_NUM_QUESTIONS} questions of your quiz have been marked.
-                    <strong>There are {ATTEMPT_NUM_UNMARKED_QUESTIONS} questions remaining to be marked, worth
-                    {ATTEMPT_VALUE_UNMARKED_QUESTIONS} marks.</strong>
-                </p>
-                <!-- END unmarkedRemaining -->
+            <!-- BEGIN unmarkedRemaining -->
+            <p>
+                {ATTEMPT_NUM_MARKED_QUESTIONS} out of {ATTEMPT_NUM_QUESTIONS} questions of your quiz have been marked.
+                <strong>There are {ATTEMPT_NUM_UNMARKED_QUESTIONS} questions remaining to be marked, worth
+                {ATTEMPT_VALUE_UNMARKED_QUESTIONS} marks.</strong>
+            </p>
+            <!-- END unmarkedRemaining -->
 
-                <article>{ASSESS_COMPLETION_MESSAGE}</article>
-            </div>
+            <article>{ASSESS_COMPLETION_MESSAGE}</article>
         </section>
     </div>
 </div>
