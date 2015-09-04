@@ -16,78 +16,91 @@
 </div>
 
 <!-- BEGIN no_requests -->
-{HOUSE_NAME} has no pending or previous requests.
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <p>
+                {HOUSE_NAME} has no pending or previous requests.
+            </p>
+        </section>
+    </div>
+</div>
 <!-- END no_requests -->
 
-<!-- BEGIN request_list -->
-<!-- BEGIN pending_request_list -->
-<section>
-    <h2>Pending Requests</h2>
-    <table data-topic="pendingRequests">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Year</th>
-                <th>Boarding Status</th>
-                <th>Leave Date</th>
-                <th>Days</th>
-                <th>Host</th>
-                <th>View</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- BEGIN pending_request -->
-            <tr>
-                <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
-                <td>{USER_YEAR}</td>
-                <td>{USER_BOARDING_STATUS}</td>
-                <td>{REQUEST_START}</td>
-                <td>{REQUEST_DURATION}</td>
-                <td>{REQUEST_HOST_TYPE}</td>
-                <td><a class="icon-view no-text" href="/modules/leave/modify/{REQUEST_ID}"></a></td>
-            </tr>
-            <!-- END pending_request -->
-        </tbody>
-    </table>
-</section>
-<!-- END pending_request_list -->
+<div class="row">
+    <div class="small-12 island">
+        <!-- BEGIN request_list -->
+        <!-- BEGIN pending_request_list -->
+        <h2 class="subheader">Pending Requests</h2>
+        <section>
+            <table data-topic="pendingRequests">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Year</th>
+                    <th>Boarding Status</th>
+                    <th>Leave Date</th>
+                    <th>Days</th>
+                    <th>Host</th>
+                    <th>View</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- BEGIN pending_request -->
+                <tr>
+                    <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
+                    <td>{USER_YEAR}</td>
+                    <td>{USER_BOARDING_STATUS}</td>
+                    <td>{REQUEST_START}</td>
+                    <td>{REQUEST_DURATION}</td>
+                    <td>{REQUEST_HOST_TYPE}</td>
+                    <td><a class="icon-view no-text" href="/modules/leave/modify/{REQUEST_ID}"></a></td>
+                </tr>
+                <!-- END pending_request -->
+                </tbody>
+            </table>
+        </section>
+        <!-- END pending_request_list -->
 
-<!-- BEGIN previous_request_list -->
-<section>
-    <h2>Request History</h2>
-    <table data-topic="previousRequests">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Year</th>
-                <th>Leave Date</th>
-                <th>Days</th>
-                <th>Host</th>
-                <th>Status</th>
-                <th>Status Updated On</th>
-                <th>Status Updated by</th>
-                <th>View</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- BEGIN previous_request -->
-            <tr>
-                <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
-                <td>{USER_YEAR}</td>
-                <td>{REQUEST_START}</td>
-                <td>{REQUEST_DURATION}</td>
-                <td>{REQUEST_HOST_TYPE}</td>
-                <td>{REQUEST_STATUS}</td>
-                <td>{REQUEST_AUTHORISATION_DATETIME}</td>
-                <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
-                <td><a href="/modules/leave/modify/{REQUEST_ID}"></a></td>
-            </tr>
-            <!-- END previous_request -->
-        </tbody>
-    </table>
-</section>
-<!-- END previous_request_list -->
-<!-- END request_list -->
+        <!-- BEGIN previous_request_list -->
+        <h2 class="subheader">Request History</h2>
+        <section class="content">
+            <table data-topic="previousRequests">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Year</th>
+                    <th>Leave Date</th>
+                    <th>Days</th>
+                    <th>Host</th>
+                    <th>Status</th>
+                    <th>Status Updated On</th>
+                    <th>Status Updated by</th>
+                    <th>View</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- BEGIN previous_request -->
+                <tr>
+                    <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
+                    <td>{USER_YEAR}</td>
+                    <td>{REQUEST_START}</td>
+                    <td>{REQUEST_DURATION}</td>
+                    <td>{REQUEST_HOST_TYPE}</td>
+                    <td>{REQUEST_STATUS}</td>
+                    <td>{REQUEST_AUTHORISATION_DATETIME}</td>
+                    <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
+                    <td><a href="/modules/leave/modify/{REQUEST_ID}"></a></td>
+                </tr>
+                <!-- END previous_request -->
+                </tbody>
+            </table>
+        </section>
+        <!-- END previous_request_list -->
+        <!-- END request_list -->
+    </div>
+</div>
+
 
 <script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
 <script type="text/javascript">
