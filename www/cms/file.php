@@ -3,7 +3,7 @@
 use Schoolbox\Resource\Attachment\GenericZone;
 use \Schoolbox\Resource\File\Mapper as FileMapper;
 use \Schoolbox\Resource\Folder\Mapper as CategoryMapper;
-
+use \Schoolbox\Breadcrumbs;
 
 $groupHandler = new Group;
 
@@ -57,6 +57,22 @@ if(is_numeric($this->arg[0])) {
 
 	$this->setVar($output);
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Modify File',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }
 else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
@@ -99,6 +115,21 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Post File',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }
 else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 	/* Upload multiple files at once */
