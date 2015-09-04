@@ -498,6 +498,7 @@ table.mceLayout tr td {
 	table.mceLayout {
 		border: none;
 		.mceToolbar {
+			height: 32px;
 			padding: 0 !important;
 			background-color: $input-border-color;
 			border: none;
@@ -509,6 +510,10 @@ table.mceLayout tr td {
 		tr.mceLast td.mceStatusbar {
 			background: none;
 			border: none;
+			@extend .meta;
+			span, a {
+				@extend .meta;
+			}
 		}
 	}
 
