@@ -1,90 +1,64 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
-<script language="JavaScript" type="text/javascript">
-	$(document).ready(function() {
-		$('input[type=file].prettify').prettyFileInput({
-			additionalButtonClasses: 'no-marg float-left',
-			buttonActiveClass: 'tick',
-			defaultText: '<span></span>Choose file',
-			defaultFileSelectedText: '<span></span>File selected'
-		});
-		
-		$('#zipUpload').validate({
-			rules: { 
-				file: {
-					required: true,
-					accept: "zip"
-				 }
-			},
-			errorPlacement: function(error, element) {
-				error.insertAfter(element.parent().parent().parent().children(':last-child'));
-			},
-			messages: {
-				file: {
-					required: "Please choose a file",
-					accept: "Only .zip files are allowed, please choose again"
-				}
-			}
-		
-		});
-		
-	});
-</script>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <!-- END custom_head -->
+<ul class="breadcrumb">
+	<li><a href="/homepage/{ID}/">{CATEGORY_NAME}</a></li>
+	<li class="active"><a href="#">Upload Zip</a></li>
+</ul>
 
-<h1>Zip Upload</h1>
-
-<form action="/cms/zipFileForm.php" method="post" id="zipUpload" enctype="multipart/form-data">
-	
-	<table class="standardForm table">
-	
-	<tr>
-			<td class="formLabelWidth">
-				<h4>Upload</h4>
-				<em>You can create a zip file on your computer and uploading it here will decompress it whilst maintaining folder structure. </em>
-			</td>
-			<td>
-				<div class="clearfix"><input name="file" type="file" class="prettify" /></div>
-			</td>
-		</tr>
-                <tr>
-			<td class="formLabelWidth">
-				<h4>Destination</h4>
-				<em>Folder in which the zip file will decompress</em>
-			</td>
-			<td>
-				{CATEGORY_NAME}
-			</td>
-		</tr>
-	
-	
-	
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Group Permissions</h4>
-				<em>Allow predefined groups of users access to this folder. </em>
-			</td>
-			<td>
-				<table class="table">
-					<tr>
-						<th><b>Group</b></th>
-						<th><b>None</b></th>
-						<th><b>Read</b></th>
-						<th><b>Write</b></th>
-					</tr>
-					<!-- BEGIN perm_table -->
-					<tr>
-						<td>{GROUP_NAME}</td>
-						<td><input type="radio" class="no_permission" name="group[{GROUP_ID}]" value="0" {PERM_0_SELECTED} /></td>
-						<td><input type="radio" name="group[{GROUP_ID}]" value="1" {PERM_1_SELECTED} /></td>
-						<td><input type="radio" name="group[{GROUP_ID}]" value="2" {PERM_2_SELECTED} /></td>
-					</tr>
-					<!-- END perm_table -->
-				</table>
-			</td>
-		</tr>
-	</table>
-    <input type="hidden" name="category" value="{CID}" />
-	<input type="submit" class="submit-btn-plain" value="Upload" />
-</form>
+<div class="row">
+	<div class="small-12 island">
+		<h1>Upload Zip</h1>
+		<form action="/cms/zipFileForm.php" method="post" id="zipUpload" enctype="multipart/form-data" class="top">
+			<section>
+				<fieldset class="content">
+					<div class="small-12 columns">
+						<label>Upload
+							<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Upload a zip file and it will be extracted into folders and files">?</span>
+							{ATTACH_ZONE}
+						</label>
+					</div>
+				</fieldset>
+				<fieldset class="content">
+					<legend>Default Permissions
+						<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Allow predefined roles of users access folders created by this extraction">?</span>
+					</legend>
+					<div class="small-12 columns">
+						<table>
+								<tr>
+									<th>Role</th>
+									<th>None</th>
+									<th>Read</th>
+									<th>Write</th>
+								</tr>
+								<!-- BEGIN perm_table -->
+								<tr>
+									<td>{GROUP_NAME}</td>
+									<td>
+										<input type="radio" class="no_permission" name="group[{GROUP_ID}]" id="groupNone{GROUP_ID}" value="0" {PERM_0_SELECTED} />
+										<label for="groupNone{GROUP_ID}" class="radio-label"></label>
+									</td>
+									<td>
+										<input type="radio" name="group[{GROUP_ID}]" id="groupRead{GROUP_ID}" value="1" {PERM_1_SELECTED} />
+										<label for="groupRead{GROUP_ID}" class="radio-label"></label>
+									</td>
+									<td>
+										<input type="radio" name="group[{GROUP_ID}]" id="groupWrite{GROUP_ID}" value="2" {PERM_2_SELECTED} />
+										<label for="groupWrite{GROUP_ID}" class="radio-label"></label>
+									</td>
+								</tr>
+								<!-- END perm_table -->
+						</table>
+					</div>
+				</fieldset>
+			</section>
+			<div class="row">
+				<div class="small-12 column">
+					<input type="hidden" name="category" value="{CID}" />
+					<input type="submit" value="Upload" />
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
 
