@@ -1,0 +1,1 @@
+INSERT INTO `lu_config_type` (`type`) VALUES ('Skin Config');
