@@ -20,6 +20,7 @@ $this->setBlock('setting', 'setting_type_boolean', 'setting_type_boolean_block')
 $this->setBlock('setting', 'setting_type_select', 'setting_type_select_block');
 $this->setBlock('setting_type_select', 'setting_select', 'setting_select_block');
 $this->setBlock('setting', 'setting_type_colour', 'setting_type_colour_block');
+$this->setBlock('setting', 'setting_type_file', 'setting_type_file_block');
 $this->setBlock('setting', 'setting_type_list', 'setting_type_list_block');
 $this->setBlock('setting', 'setting_type_resource', 'setting_type_resource_block');
 $this->setBlock(TEMPLATE_content, 'setting_save', 'setting_save_block');
@@ -76,6 +77,7 @@ if(is_array($optionList)) {
             'setting_type_list_block'        => '',
             'setting_type_resource_block'    => '',
             'setting_type_colour_block'      => '',
+            'setting_type_file_block'      => '',
             'setting_group_localisation_block' => '',
         );
 
@@ -189,6 +191,22 @@ if(is_array($optionList)) {
 
                 case 'colour':
                     $this->parse('setting_type_colour_block', 'setting_type_colour', true);
+                    break;
+
+                case 'file':
+                    $zone = new \Schoolbox\Resource\Attachment\Zone(Scrub::text($option['name']));
+                    $zone->setThumbnailSize(64);
+                    $zone->setAttachPrompt('Attach '. Scrub::text(strtolower($option['title'])));
+                    $zone->setAttachmentsLabel('');
+                    $zone->setFileVar(Scrub::text($option['name']));
+                    $zone->setMimeFilter('image/*');
+                    $zone->setModalTitle('Select '. Scrub::text(strtolower($option['title'])));
+                    if($option['value']) {
+                        $file = str_replace('store:','',$option['value']);
+                        $zone->attachFiles(array($file));
+                    }
+                    $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
+                    $this->parse('setting_type_file_block', 'setting_type_file', true);
                     break;
             }
         }

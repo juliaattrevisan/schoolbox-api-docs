@@ -1,4 +1,6 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+
 <link rel="stylesheet" type="text/css" href="/javascript/components/spectrum/spectrum.css" />
 <script type="text/javascript" src="/javascript/components/spectrum/spectrum.js"></script>
 
@@ -133,6 +135,9 @@
                     <input type="text" value="{SETTING_VALUE}" name="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} data-colour-picker />
                     <!-- END setting_type_colour -->
 
+                    <!-- BEGIN setting_type_file -->
+                    {ATTACH_ZONE}
+                    <!-- END setting_type_file -->
 
                     <!-- END setting -->
 
