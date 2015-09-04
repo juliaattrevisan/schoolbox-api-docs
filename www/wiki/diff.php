@@ -14,6 +14,7 @@ if (is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'revert_link', 'revert_link_block');
 	$this->setBlock(TEMPLATE_content, 'lock_link', 'lock_link_block');
 	$this->setBlock(TEMPLATE_content, 'revision_list', 'revision_list_block');
+    $this->setBlock(TEMPLATE_content, 'wiki_locked', 'wiki_locked_block');
 	$this->setBlock('revision_list', 'revision_comparison', 'revision_comparison_block');
 
 	$from = $wiki->getByID($this->arg[0], $this->arg[1]);
@@ -56,9 +57,16 @@ if (is_numeric($this->arg[0])) {
 			'AUTHOR'           => $userHandler->formatName($from),
 			'AUTHOR_ID'        => $from['authorID'],
 			'CURRENT_REVISION' => $from['revisionID'],
-			'LOCKED'           => $from['locked'] == 'true' ? '(Locked)' : '',
-			'LOCK_UNLOCK'      => $from['locked'] == 'true' ? 'Unlock' : 'Lock',
 	));
+
+    if ($from['locked'] == 'true') {
+        $this->parse('wiki_locked_block', 'wiki_locked');
+    }
+    else {
+        $this->setVar(array(
+            'wiki_locked_block' => '',
+        ));
+    }
 
 	// output revisions
 	$revisionList = $wiki->getRevisionList($from['wikiID']);
