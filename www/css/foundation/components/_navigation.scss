@@ -195,7 +195,7 @@ $tabbar-header-margin: 0;
 
 // Off Canvas Menu Variables
 $off-canvas-width: rem-calc(260);
-$off-canvas-bg: $body-bg !important;
+$off-canvas-bg: $body-bg !default;
 $off-canvas-bg-hover: scale-color($tabbar-bg, $lightness: -10%);
 
 // Off Canvas Menu List Variables
