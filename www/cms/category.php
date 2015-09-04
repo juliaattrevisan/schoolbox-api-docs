@@ -1,5 +1,7 @@
 <?php
 
+use \Schoolbox\Breadcrumbs;
+
 $folderMapper = new \Schoolbox\Resource\CategoryMapper();
 $groupHandler = new Group();
 
@@ -127,7 +129,24 @@ if (is_numeric($this->arg[0])) {
     } else {
         $this->setVar('synergy_input_block', '');
     }
-} else {
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folderParent->getName(),
+            'href' => "/homepage/{$folderParent->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Modify Folder',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
+}
+else {
     if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         if ($this->arg[1] == 0) {
             $folderParent = new \Schoolbox\Resource\Category();
@@ -253,6 +272,22 @@ if (is_numeric($this->arg[0])) {
         } else {
             $this->setVar('synergy_input_block', '');
         }
+
+        /* Render out breadcrumbs
+         */
+        $trail = new Breadcrumbs();
+        $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+            [
+                'text' => $folderParent->getName(),
+                'href' => "/homepage/{$folderParent->getId()}",
+                'class' => '',
+            ],
+            [
+                'text' => 'Add Folder',
+                'href' => '',
+                'class' => 'active',
+            ]
+        ]);
     } else {
         if ($this->arg[0] == 'reset' && is_numeric($this->arg[1])) {
             try {
