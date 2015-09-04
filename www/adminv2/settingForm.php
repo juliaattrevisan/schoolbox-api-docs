@@ -1,4 +1,5 @@
 <?php
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 $page = new SitePage();
@@ -30,7 +31,13 @@ if ($groupHandler->isSuperuser()) {
         /* handle conversion to bytes */
         if ($record['field_id'] == Config::FIELD_BYTES) {
             $newValue = Alaress_Byte_Format::stringToBytes($_POST[$currentRow]);
-        } else {
+        }
+        else if ($record['field_id'] == Config::FIELD_FILE) {
+            $factory = new \Schoolbox\Resource\Attachment\Collector\CollectorFactory();
+            $result = $factory->build(array($_POST[$currentRow]))->getFirst();
+            $newValue = $result->getHash();
+        }
+        else {
             $newValue = $_POST[$currentRow];
         }
         $record['value'] = $newValue;

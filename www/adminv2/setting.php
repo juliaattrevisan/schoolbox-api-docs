@@ -202,8 +202,7 @@ if(is_array($optionList)) {
                     $zone->setMimeFilter('image/*');
                     $zone->setModalTitle('Select '. Scrub::text(strtolower($option['title'])));
                     if($option['value']) {
-                        $file = str_replace('store:','',$option['value']);
-                        $zone->attachFiles(array($file));
+                        $zone->attachFiles(array($option['value']));
                     }
                     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
                     $this->parse('setting_type_file_block', 'setting_type_file', true);
