@@ -142,6 +142,16 @@ class Zone {
         return $this;
     }
 
+    /**
+     * @param string $text
+     * @return self
+     */
+    public function setFileVar($text)
+    {
+        $this->text['fileVar'] = $text;
+        return $this;
+    }
+
 
     /**
      * @param string $text
@@ -260,7 +270,7 @@ class Zone {
             'AZ_ID'         => $this->id,
             'AZ_ID_CAMEL'   => $this->delim2camel($this->id),
             'AZ_THUMB_SIZE' => (int)$this->size,
-
+            'AZ_FILE_VAR'   => $this->text['fileVar'] ? $this->text['fileVar'] : 'attachments[]',
             'AZ_ATTACH_PROMPT'     => $this->text['attachPrompt'],
             'AZ_ATTACHMENTS_LABEL' => count($this->attachments) ? $this->text['attachmentsLabel'] : '',
             'AZ_MODAL_TITLE'       => $this->text['modalTitle'],

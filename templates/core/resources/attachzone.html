@@ -7,7 +7,7 @@
 
         <a href="#" data-dz-remove title="Detach" class="button alert icon-delete">Remove</a>
 
-      <input type="hidden" name="attachment[]" value="{AZ_FILE_HASH}" data-az-attachment />
+      <input type="hidden" name="{AZ_FILE_VAR}" value="{AZ_FILE_HASH}" data-az-attachment />
       <!-- END attachment_editable -->
       <img alt="{AZ_FILE_NAME}" src="{AZ_FILE_PREVIEW}" />
       <p class="filename" data-dz-name>{AZ_FILE_NAME}</p>
@@ -24,7 +24,7 @@
 
         <img data-dz-thumbnail src="/images/emails/spacer.gif" />
         <p class="filename" data-dz-name></p>
-        <input type="hidden" data-az-attachment name="attachment[]" value="" />
+        <input type="hidden" data-az-attachment name="{AZ_FILE_VAR}" value="" />
       </li>
     </ul>
   </div>
