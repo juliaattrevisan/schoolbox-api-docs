@@ -309,79 +309,77 @@
     </div>
     <!--/tabs-1-->
 
-<div id="tabs-2" class="customise-components clearfix">
-    <!-- BEGIN homepage_color_selector -->
-    <div class="column-colours">
-        <!-- These are selectable items - default to top selected only -->
-        <a href="#" id="top" class="columns left-right selected" data-column-selector data-interaction-state="selected">Top</a>
-        <a href="#" id="left" class="columns left-right" data-column-selector>Left</a>
-        <a href="#" id="right" class="columns left-right" data-column-selector>Right</a>
-        <!--
-        <a href="#" id="bottom" class="columns left-right" data-column-selector>Bottom</a>
-        -->
-    </div>
-    <div class="colours">
-        <div class="colours-split">
-            <h3>Heading: </h3>
-            <div class="colour clearfix">
-                <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
-                <p>Text</p>
-            </div>
-            <div class="colour clearfix">
-                <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
-                <p>Background</p>
-            </div>
+    <div id="tabs-2" class="customise-components clearfix">
+        <!-- BEGIN homepage_color_selector -->
+        <div class="column-colours">
+            <!-- These are selectable items - default to top selected only -->
+            <a href="#" id="top" class="columns left-right selected" data-column-selector data-interaction-state="selected">Top</a>
+            <a href="#" id="left" class="columns left-right" data-column-selector>Left</a>
+            <a href="#" id="right" class="columns left-right" data-column-selector>Right</a>
+            <!--
+            <a href="#" id="bottom" class="columns left-right" data-column-selector>Bottom</a>
+            -->
         </div>
-        <div class="colours-split">
-            <h3>Content: </h3>
-            <div class="colour clearfix">
-                <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
-                <p>Primary Background</p>
-            </div>
-            <div class="colour clearfix">
-                <input id="bg_secondary" class="colorBox" name="colors[bg_secondary]" type="text" data-colorpicker />
-                <p>Secondary Background</p>
-            </div>
-            <div class="colour clearfix">
-                <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
-                <p>Text</p>
-            </div>
-            <div class="colour clearfix">
-                <input id="link" class="colorBox" name="colors[link]" type="text" data-colorpicker />
-                <p>Link</p>
-            </div>
-            <div class="colour clearfix">
-                <input id="hover" class="colorBox" name="colors[hover]" type="text" data-colorpicker />
-                <p>Link Hover</p>
-            </div>
-        </div>
-        <div class="colours-buttons">
-            <form method="POST" action="" name="saveColours">
-                <button class="submit-btn-plain save-colours inline-block" type="button" id="saveColour">Save</button>
-                <button class="submit-btn-plain inline-block" type="button" id="restore">Reset</button>
-                <button class="submit-btn-plain inline-block" type="button" id="cancel">Cancel</button>
-            </form>
-            <div class="saved-colours">Saved colour set!</div>
-        </div>
-    </div>
-    <!-- END homepage_color_selector -->
-    <div style="clear:both;">
-        <form method="POST" action="" >
-            <p class="information-notification pad-it ">In order to adjust the
-                widths of the left and right columns on the page, drag the slider
-                below left and right. </p>
-            <div class="clearfix slide-guide">
-                <h3>Column width slider</h3>
-                <div class="slider-house">
-                    <div id="slider"></div>
+        <div class="colours">
+            <div class="colours-split">
+                <h3>Heading: </h3>
+                <div class="colour clearfix">
+                    <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
+                    <p>Text</p>
+                </div>
+                <div class="colour clearfix">
+                    <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
+                    <p>Background</p>
                 </div>
             </div>
-            <div class="saved-layout">Saved layout</div>
-
-        </form>
+            <div class="colours-split">
+                <h3>Content: </h3>
+                <div class="colour clearfix">
+                    <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
+                    <p>Primary Background</p>
+                </div>
+                <div class="colour clearfix">
+                    <input id="bg_secondary" class="colorBox" name="colors[bg_secondary]" type="text" data-colorpicker />
+                    <p>Secondary Background</p>
+                </div>
+                <div class="colour clearfix">
+                    <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
+                    <p>Text</p>
+                </div>
+                <div class="colour clearfix">
+                    <input id="link" class="colorBox" name="colors[link]" type="text" data-colorpicker />
+                    <p>Link</p>
+                </div>
+                <div class="colour clearfix">
+                    <input id="hover" class="colorBox" name="colors[hover]" type="text" data-colorpicker />
+                    <p>Link Hover</p>
+                </div>
+            </div>
+            <div class="colours-buttons">
+                <form method="POST" action="" name="saveColours">
+                    <button class="submit-btn-plain save-colours inline-block" type="button" id="saveColour">Save</button>
+                    <button class="submit-btn-plain inline-block" type="button" id="restore">Reset</button>
+                    <button class="submit-btn-plain inline-block" type="button" id="cancel">Cancel</button>
+                </form>
+                <div class="saved-colours">Saved colour set!</div>
+            </div>
+        </div>
+        <!-- END homepage_color_selector -->
+        <div style="clear:both;">
+            <form method="POST" action="" >
+                <p class="information-notification pad-it ">In order to adjust the
+                    widths of the left and right columns on the page, drag the slider
+                    below left and right. </p>
+                <div class="clearfix slide-guide">
+                    <h3>Column width slider</h3>
+                    <div class="slider-house">
+                        <div id="slider"></div>
+                    </div>
+                </div>
+                <div class="saved-layout">Saved layout</div>
+            </form>
+        </div>
     </div>
-    <div class="clearfix"></div>
-</div>
 </div>
 <!-- END customise_page -->
 
