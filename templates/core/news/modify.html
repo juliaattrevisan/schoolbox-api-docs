@@ -4,13 +4,8 @@
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
-    function confirmDelete(newsID) {
-        if (confirm('Delete this news item?')) {
-            window.open('/news/modifyForm.php?delete=' + newsID, '_self', '');
-        }
-    }
-
     $(function () {
         $.fn.alaressTiny({
             mode: 'textareas'
@@ -79,11 +74,24 @@
                 }
             }
         });
+
+        $('[data-delete]').click(function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this item?',
+                confirmEvent: function() {
+                    window.location.href = $(element).attr('href');
+                }
+            });
+        });
     });
 </script>
 <!-- END custom_head -->
 
-<div class="actions-small-1 row">
+<div class="actions-small-2 row">
     <div class="list-item">
         <div class="small-12 column">
             <h1>{ACTION} News</h1>
@@ -91,6 +99,9 @@
     </div>
     <nav>
         <a class="icon-advanced-list customise" href="#" title="Toggle Advanced Options"></a>
+        <!-- BEGIN delete_button -->
+        <a class="icon-delete" href='/news/modifyForm.php?delete={NEWS_ID}' title="Delete News" data-delete></a>
+        <!-- END delete_button -->
     </nav>
 </div>
 
@@ -224,13 +235,8 @@
             </section>
             <div class="row">
                 <div class="small-12 column">
-                    <input type="submit" name="submit" value="{ACTION} News"/>
+                    <input type="submit" value="{ACTION} News"/>
                 </div>
-                <!-- BEGIN delete_button -->
-                <div class="small-12 column">
-                    <a class="button alert icon-delete expand" onclick="confirmDelete({NEWS_ID});">Delete News</a>
-                </div>
-                <!-- END delete_button -->
             </div>
         </form>
     </div>
