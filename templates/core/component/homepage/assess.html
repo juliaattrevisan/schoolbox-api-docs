@@ -6,9 +6,9 @@
             <section>
                 <ul class="action-list">
                     <!-- BEGIN assess -->
-                    <li class="row" data-equalizer>
-                        <div class="column small-10 no-pad" data-equalizer-watch>
-                            <div class="info card">
+                    <li class="actions-small-4" data-equalizer>
+                        <div class="list-item">
+                            <div class="small-12 info card">
                                 <!-- BEGIN assessLink -->
                                 <h3><a href="/assess/intro/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></h3>
                                 <!-- END assessLink -->
@@ -29,23 +29,29 @@
                                     <!-- END assess_finish_date -->
                                 </p>
                                 <!-- END assessDue -->
-                            </div>
-                            <article class="{COMPONENT_COMPACTMODE}">{ASSESS_DESCRIPTION}</article>
-                            <p class="list-item-content {COMPONENT_COMPACTMODE}">Created by <a href='/search/user/{ASSESS_USER_ID}'>{ASSESS_USER_FIRSTNAME} {ASSESS_USER_LASTNAME}</a> {ASSESS_CREATED}</p>
-                        </div>
-                        <div class="two actions">
-                            <!-- BEGIN resultLink -->
-                            <a data-equalizer-watch class="icon-poll no-text" data-tooltip href="/assess/results/{ASSESS_ASSESS_ID}" title="View Results"></a>
-                            <!-- END resultLink -->
 
+                                <p class="list-item-content {COMPONENT_COMPACTMODE}">
+                                    Created by <a href='/search/user/{ASSESS_USER_ID}'>{ASSESS_USER_FIRSTNAME} {ASSESS_USER_LASTNAME}</a>
+                                    {ASSESS_CREATED}
+                                </p>
+                            </div>
+
+                            <article class="{COMPONENT_COMPACTMODE}">{ASSESS_DESCRIPTION}</article>
+                        </div>
+                        <nav>
                             <!-- BEGIN teacherLink -->
-                            <a data-equalizer-watch class="icon-modify no-text" data-tooltip href="/assess/modify/{ASSESS_ASSESS_ID}" title="Modify Quiz"></a>
+                            <a data-equalizer-watch class="icon-delete" href="/assess/delete/{ASSESS_ASSESS_ID}" title="Delete Quiz"></a>
+                            <a data-equalizer-watch class="icon-modify" href="/assess/modify/{ASSESS_ASSESS_ID}" title="Modify Quiz"></a>
                             <!-- END teacherLink -->
 
+                            <!-- BEGIN resultLink -->
+                            <a data-equalizer-watch class="icon-poll" href="/assess/results/{ASSESS_ASSESS_ID}" title="View Results"></a>
+                            <!-- END resultLink -->
+
                             <!-- BEGIN has_previous_attempts -->
-                            <a data-equalizer-watch class="icon-list no-text" data-tooltip href="/assess/attempts/{ASSESS_ASSESS_ID}/{ASSESS_RESPONDENT_ID}" title="See previous attempts"></a>
+                            <a data-equalizer-watch class="icon-list" href="/assess/attempts/{ASSESS_ASSESS_ID}/{ASSESS_RESPONDENT_ID}" title="See previous attempts"></a>
                             <!-- END has_previous_attempts -->
-                        </div>
+                        </nav>
                     </li>
                     <!-- END assess -->
                 </ul>
