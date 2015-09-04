@@ -10,11 +10,11 @@
             allowEmpty: false,
             showAlpha: true,
             showInput: true,
-            preferredFormat: 'hex',
+            preferredFormat: 'rgb',
             clickoutFiresChange: true,
             showInitial: true,
             change: function(color) {
-                $(this).val(color.toHex8());
+                $(this).val(color.toRgbString());
             }
         });
     });
