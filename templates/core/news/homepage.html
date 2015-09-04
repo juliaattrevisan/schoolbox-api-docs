@@ -35,15 +35,18 @@ $(function() {
         <form class="top" action="/news/homepageForm.php" method="post" enctype="multipart/form-data" id="newsForm">
             <input type="hidden" name="id" value="{NEWS_ID}" />
             <input type="hidden" name="code" value="{CATEGORY_ID}" />
+            <input type="hidden" name="newsID" value="{NEWS_ID}"/>
 
             <section>
-                <input type="hidden" name="newsID" value="{NEWS_ID}"/>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>Headline
+                        <label>
+                            Headline
                             <input type="text" class="required" name="heading" size="35" maxlength="100" value="{HEADING}" />
                         </label>
-                        <label>Article
+                        
+                        <label>
+                            Article
                             <textarea id="body" name="body">{BODY}</textarea>
                         </label>
                     </div>
