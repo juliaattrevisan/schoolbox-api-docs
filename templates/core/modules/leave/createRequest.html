@@ -50,125 +50,150 @@
 </script>
 <!-- END custom_head -->
 
-<h1>Create Leave Request</h1>
-
-<form method="post" action="/modules/leave/processCreate" data-validate>
-
-    <div class="large-12 columns">
-        <fieldset>
-            <legend>Student</legend>
-            <div class="large-6 columns">
-                <!-- BEGIN student_autocomplete -->
-                <label for="userId">Name</label>
-                <input id='userId' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
-                <!-- END student_autocomplete -->
-                <!-- BEGIN student_selector -->
-                <label for="userIdSelect">Name</label>
-                <select id="userIdSelect" name="userId" class="formfield">
-                    <option disabled>select a child</option>
-                    <!-- BEGIN student_drop -->
-                    <option value="{STUDENT_DROP_VALUE}" label="{STUDENT_DROP_NAME}" {STUDENT_DROP_VALUE_SELECTED}>{STUDENT_DROP_NAME}</option>
-                    <!-- END student_drop -->
-                </select>
-                <!-- END student_selector -->
-            </div>
-            <div class="large-6 columns">
-                <label for="requestuserPhone">Phone</label>
-                <input type="text" name="request[userPhone]" id="requestuserPhone" required />
-            </div>
-        </fieldset>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Create Leave Request</h1>
     </div>
+</div>
 
-    <div class="large-6 columns">
-        <fieldset>
-            <legend>Leaving</legend>
-            <div class="large-8 columns">
-                <label for="startDate">Date</label>
-                <input name="request[start][date]" id="startDate" type="text" required data-datepicker />
+<div class="row">
+    <div class="small-12 island">
+        <form action="/modules/leave/processCreate" method="post" class="top">
+            <section>
+                <fieldset class="content">
+                    <legend>Student</legend>
+                    <div class="small-12 large-6 columns">
+                        <!-- BEGIN student_autocomplete -->
+                        <label for="userId">
+                            Name
+                            <input id='userId' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />s
+                        </label>
+                        <!-- END student_autocomplete -->
+
+                        <!-- BEGIN student_selector -->
+                        <label for="userIdSelect">
+                            Name
+                            <select id="userIdSelect" name="userId" class="formfield">
+                                <option disabled>select a child</option>
+                                <!-- BEGIN student_drop -->
+                                <option value="{STUDENT_DROP_VALUE}" label="{STUDENT_DROP_NAME}" {STUDENT_DROP_VALUE_SELECTED}>{STUDENT_DROP_NAME}</option>
+                                <!-- END student_drop -->
+                            </select>
+                        </label>
+                        <!-- END student_selector -->
+                    </div>
+                    <div class="small-12 large-6 columns">
+                        <label for="requestuserPhone">
+                            Phone
+                            <input type="text" name="request[userPhone]" id="requestuserPhone" required />
+                        </label>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Leaving</legend>
+                    <div class="small-12 large-6 columns">
+                        <label for="startDate">
+                            Date
+                            <input name="request[start][date]" id="startDate" type="text" required data-datepicker />
+                        </label>
+                    </div>
+                    <div class="small-12 large-6 columns">
+                        <label for="startTime">
+                            Time
+                            <select name='request[start][time]' id="startTime">
+                                <!-- BEGIN request_start_time -->
+                                <option value='{REQUEST_START_TIME_VALUE}' {REQUEST_START_TIME_SELECTED}>{REQUEST_START_TIME_LABEL}</option>
+                                <!-- END request_start_time -->
+                            </select>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Returning</legend>
+
+                    <div class="small-12 large-6 columns">
+                        <label for="finishDate">Date</label>
+                        <input name="request[finish][date]" id="finishDate" type="text" required data-datepicker />
+                    </div>
+                    <div class="small-12 large-6 columns">
+                        <label for="finishTime">Time</label>
+                        <select name='request[finish][time]' id="finishTime">
+                            <!-- BEGIN request_finish_time -->
+                            <option value='{REQUEST_FINISH_TIME_VALUE}' {REQUEST_FINISH_TIME_SELECTED}>{REQUEST_FINISH_TIME_LABEL}</option>
+                            <!-- END request_finish_time -->
+                        </select>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Host</legend>
+
+                    <div class="small-12 large-6 columns">
+                        <label for="requesthostType">
+                            Type
+                            <select name="request[hostType]" id="requesthostType" data-relation="host_type_selector">
+                                <!-- BEGIN host_type -->
+                                <option value="{HOST_TYPE_VALUE}" {HOST_TYPE_VALUE_SELECTED}>{HOST_TYPE_LABEL}</option>
+                                <!-- END host_type -->
+                            </select>
+                        </label>
+                    </div>
+                    <div class="small-12 large-3 columns" data-relation="host_type_field">
+                        <label for="requesthostName">
+                            Name
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The host will need to confirm your leave arrangements; you can forward them the email you receive.">?</span>
+                            <input type="text" name="request[hostName]" id="requesthostName" required />
+                        </label>
+                    </div>
+                    <div class="small-12 large-3 columns" data-relation="host_type_field">
+                        <label for="requesthostPhone">
+                            Phone
+                            <input type="text" name="request[hostPhone]" id="requesthostPhone" required />
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Other Information</legend>
+                    <div class="small-12 large-6 columns">
+                        <label for="requestTravelType">
+                            Travel Method
+                            <select name="request[travelType]" id="requestTravelType">
+                                <!-- BEGIN travel_drop -->
+                                <option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}" {TRAVEL_DROP_VALUE_SELECTED}>{TRAVEL_DROP_NAME}</option>
+                                <!-- END travel_drop -->
+                            </select>
+                        </label>
+                    </div>
+                    <div class="small-12 large-6 columns">
+                        <label for="requestTravelType">
+                            Description
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Only complete for special leave information or travel arrangements">?</span>
+                            <textarea id='description' name="request[description]" maxlength="100" data-warninglength="67"></textarea>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Terms and Conditions</legend>
+
+                    <div class="small-12 columns">
+                        <article>{TERMS_AND_CONDITIONS}</article>
+
+                        <input type="checkbox" id="requestTerms" name="request[terms]" required />
+                        <label for="requestTerms" class="checkbox-label">
+                            I Accept Terms &amp; Conditions and that this application is true and correct
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Submit Leave Application" />
+                </div>
             </div>
-            <div class="large-4 columns">
-                <label for="startTime">Time</label>
-                <select name='request[start][time]' id="startTime">
-                    <!-- BEGIN request_start_time -->
-                    <option value='{REQUEST_START_TIME_VALUE}' {REQUEST_START_TIME_SELECTED}>{REQUEST_START_TIME_LABEL}</option>
-                    <!-- END request_start_time -->
-                </select>
-            </div>
-        </fieldset>
+        </form>
     </div>
-
-    <div class="large-6 columns">
-        <fieldset>
-            <legend>Returning</legend>
-            <div class="large-8 columns">
-                <label for="finishDate">Date</label>
-                <input name="request[finish][date]" id="finishDate" type="text" required data-datepicker />
-            </div>
-            <div class="large-4 columns">
-                <label for="finishTime">Time</label>
-                <select name='request[finish][time]' id="finishTime">
-                    <!-- BEGIN request_finish_time -->
-                    <option value='{REQUEST_FINISH_TIME_VALUE}' {REQUEST_FINISH_TIME_SELECTED}>{REQUEST_FINISH_TIME_LABEL}</option>
-                    <!-- END request_finish_time -->
-                </select>
-            </div>
-        </fieldset>
-    </div>
-
-    <div class="large-12 columns">
-        <fieldset>
-            <legend>Host</legend>
-            <div class="large-6 columns">
-                <label for="requesthostType">Type</label>
-                <select name="request[hostType]" id="requesthostType" data-relation="host_type_selector">
-                    <!-- BEGIN host_type -->
-                    <option value="{HOST_TYPE_VALUE}" {HOST_TYPE_VALUE_SELECTED}>{HOST_TYPE_LABEL}</option>
-                    <!-- END host_type -->
-                </select>
-            </div>
-            <div class="large-3 columns" data-relation="host_type_field">
-                <label for="requesthostName">Name
-                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The host will need to confirm your leave arrangements; you can forward them the email you receive.">?</span>
-                </label>
-                <input type="text" name="request[hostName]" id="requesthostName" required />
-            </div>
-            <div class="large-3 columns" data-relation="host_type_field">
-                <label for="requesthostPhone">Phone</label>
-                <input type="text" name="request[hostPhone]" id="requesthostPhone" required />
-            </div>
-        </fieldset>
-
-        <fieldset>
-            <legend>Other Information</legend>
-            <div class="large-6 columns">
-                <label for="requestTravelType">Travel Method</label>
-                <select name="request[travelType]" id="requestTravelType">
-                    <!-- BEGIN travel_drop -->
-                    <option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}" {TRAVEL_DROP_VALUE_SELECTED}>{TRAVEL_DROP_NAME}</option>
-                    <!-- END travel_drop -->
-                </select>
-            </div>
-            <div class="large-6 columns">
-                <label for="requestTravelType">Description
-                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Only complete for special leave information or travel arrangements">?</span>
-                </label>
-                <textarea id='description' name="request[description]" maxlength="100" data-warninglength="67"></textarea>
-            </div>
-        </fieldset>
-
-        <fieldset>
-            <legend>Terms and Conditions</legend>
-
-            <div class="large-12 columns">
-                <div class="wysiwyg">{TERMS_AND_CONDITIONS}</div>
-
-                <input type="checkbox" id="requestTerms" name="request[terms]" required />
-                <label for="requestTerms" class="checkbox-label">
-                    I Accept Terms &amp; Conditions and that this application is true and correct
-                </label>
-            </div>
-        </fieldset>
-    </div>
-
-	<button type="submit">Submit Leave Application</button>
-</form>
+</div>
