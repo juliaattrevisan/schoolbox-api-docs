@@ -49,7 +49,7 @@ $news
 	->setExpiryDate($expiryDate);
 
 /* Delete news */
-if($_POST['delete']) {
+if($_POST['type'] == 'delete') {
 	\Schoolbox\Resource\Category\NewsMapper::getInstance()->delete($news);
 }
 else {
