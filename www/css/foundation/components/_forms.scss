@@ -151,7 +151,7 @@ select option				{
 }
 
 
-@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem) {
+@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem, $hover-color: $input-border-color, $active-color: $success-color) {
 
     $checkbox-inner-size: $checkbox-size - (2 * $input-border-width);
 
@@ -187,7 +187,7 @@ select option				{
             content: "";
             width: $checkbox-size;
             height: $checkbox-size;
-            background-color: $input-border-color;
+            background-color: $hover-color;
             position: absolute;
             top: 0;
             left: 0;
@@ -217,7 +217,7 @@ select option				{
         + #{$label-selector} {
             &:before, &:after {
                 color: $success-color !important;
-                background-color: tint($success-color, 70%) !important;
+                background-color: tint($active-color, 70%) !important;
             }
         }
     }
@@ -226,7 +226,7 @@ select option				{
         + #{$label-selector} {
             &:hover {
                 &:before, &:after {
-                    background-color: tint($input-border-color, 50%);
+                    background-color: tint($hover-color, 50%);
                 }
 
                 &:after {
@@ -237,7 +237,7 @@ select option				{
         &:focus {
             + #{$label-selector} {
                 &:before, &:after {
-                    background-color: tint($input-border-color, 50%);
+                    background-color: tint($hover-color, 50%);
                 }
 
                 &:after {
@@ -424,7 +424,7 @@ select.visibility {
 section > fieldset {
 
 	border: none;
-	@include grid-row;
+	@include grid-row(nest-collapse);
 
 	@include responsive-sides(-1, margin);
 
