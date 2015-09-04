@@ -168,76 +168,84 @@
         <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8" data-equalizer>
 
             {% block buttons %}
-            {% block buttons_dueWork %}
-            {% if showButtons and not (config.restrict_parent_duework_access and session.user.isParent()) %}
-            <li class="no-pad">
-                <a href="/submission/dueWork/0/{{ user.getId() }}"
-                   class="no-margin fat button icon-fat icon-32 icon-due-work"
-                   data-equalizer-watch>Due Work</a>
-            </li>
-            {% endif %}
-            {% endblock buttons_dueWork %}
+                {% if showButtons %}
+                    {% block buttons_dueWork %}
+                        {% if not (config.restrict_parent_duework_access and session.user.isParent()) %}
+                            <li class="no-pad">
+                                <a href="/submission/dueWork/0/{{ user.getId() }}"
+                                   class="no-margin fat button icon-fat icon-32 icon-due-work"
+                                   data-equalizer-watch>Due Work</a>
+                            </li>
+                        {% endif %}
+                    {% endblock buttons_dueWork %}
+                {% endif %}
 
-            {% block buttons_grades %}
-            {% if showButtons and not (config.restrict_parent_grades and session.user.isParent()) %}
-            <li class="no-pad">
-                <a href="/submission/allWork/{{ user.getId() }}"
-                   class="no-margin fat button icon-fat icon-32 icon-tick"
-                   data-equalizer-watch>Grades</a>
-            </li>
-            {% endif %}
-            {% endblock buttons_grades %}
+                {% if showButtons %}
+                    {% block buttons_grades %}
+                        {% if not (config.restrict_parent_grades and session.user.isParent()) %}
+                            <li class="no-pad">
+                                <a href="/submission/allWork/{{ user.getId() }}"
+                                   class="no-margin fat button icon-fat icon-32 icon-tick"
+                                   data-equalizer-watch>Grades</a>
+                            </li>
+                        {% endif %}
+                    {% endblock buttons_grades %}
+                {% endif %}
 
-            {% block buttons_eportfolio %}
-            {% if eportfolioAuth %}
-            <li class="no-pad">
-                <a href="/eportfolio/{{ user.getId() }}/profile"
-                   class="no-margin fat button icon-fat icon-32 icon-eportfolio"
-                   data-equalizer-watch>ePortfolio</a>
-            </li>
-            {% endif %}
-            {% endblock buttons_eportfolio %}
+                {% if eportfolioAuth %}
+                    {% block buttons_eportfolio %}
+                        <li class="no-pad">
+                            <a href="/eportfolio/{{ user.getId() }}/profile"
+                               class="no-margin fat button icon-fat icon-32 icon-eportfolio"
+                               data-equalizer-watch>ePortfolio</a>
+                        </li>
+                    {% endblock buttons_eportfolio %}
+                {% endif %}
 
-            {% block buttons_calendar %}
-            {% if showButtons %}
-            <li class="no-pad">
-                <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
-                   class="no-margin fat button icon-fat icon-32 icon-calendar"
-                   data-equalizer-watch>Calendar</a>
-            </li>
-            {% endif %}
-            {% endblock buttons_calendar %}
+                {% if showButtons %}
+                    {% block buttons_calendar %}
+                        <li class="no-pad">
+                            <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
+                               class="no-margin fat button icon-fat icon-32 icon-calendar"
+                               data-equalizer-watch>Calendar</a>
+                        </li>
+                    {% endblock buttons_calendar %}
+                {% endif %}
 
-            {% block buttons_timetable %}
-            {% if showButtons %}
-            <li class="no-pad">
-                <a href="/timetable/{{ user.getId() }}"
-                   class="no-margin fat button icon-fat icon-32 icon-timetable"
-                   data-equalizer-watch>Timetable</a>
-            </li>
-            {% endif %}
-            {% endblock buttons_timetable %}
+                {% if showButtons %}
+                    {% block buttons_timetable %}
+                        <li class="no-pad">
+                            <a href="/timetable/{{ user.getId() }}"
+                               class="no-margin fat button icon-fat icon-32 icon-timetable"
+                               data-equalizer-watch>Timetable</a>
+                        </li>
+                    {% endblock buttons_timetable %}
+                {% endif %}
 
-            {% block buttons_boarderLeave %}
-            {% if showButtons and config.boarder_leave_enabled and user.getResidentialHouse() %}
-            <li class="no-pad">
-                <a href="/modules/leave/student/{{ user.getId() }}"
-                   class="no-margin fat button icon-fat icon-32 icon-boarder-leave"
-                   data-equalizer-watch>Boarder Leave</a>
-            </li>
-            {% endif %}
-            {% endblock buttons_boarderLeave %}
+                {% if showButtons %}
+                    {% block buttons_boarderLeave %}
+                        {% if config.boarder_leave_enabled and user.getResidentialHouse() %}
+                            <li class="no-pad">
+                                <a href="/modules/leave/student/{{ user.getId() }}"
+                                   class="no-margin fat button icon-fat icon-32 icon-boarder-leave"
+                                   data-equalizer-watch>Boarder Leave</a>
+                            </li>
+                        {% endif %}
+                    {% endblock buttons_boarderLeave %}
+                {% endif %}
 
-            {% block buttons_pastoralCare %}
-            {% if isStaff and config.external_type == 'synergetic' and config.external_staff_portal %}
-            <li class="no-pad">
-                <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.getExternalId() }}"
-                   class="no-margin fat button icon-fat icon-32 icon-modify"
-                   target="_blank"
-                   data-equalizer-watch>Pastoral Care</a>
-            </li>
-            {% endif %}
-            {% endblock buttons_pastoralCare %}
+                {% if showButtons %}
+                    {% block buttons_pastoralCare %}
+                        {% if isStaff and config.external_type == 'synergetic' and config.external_staff_portal %}
+                            <li class="no-pad">
+                                <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.getExternalId() }}"
+                                   class="no-margin fat button icon-fat icon-32 icon-modify"
+                                   target="_blank"
+                                   data-equalizer-watch>Pastoral Care</a>
+                            </li>
+                        {% endif %}
+                    {% endblock buttons_pastoralCare %}
+                {% endif %}
 
             {% endblock buttons %}
         </ul>
