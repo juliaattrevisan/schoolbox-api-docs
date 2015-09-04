@@ -128,8 +128,12 @@ $block-grid-default-spacing: rem-calc(16);
         }
     }
 
-    > .row > .small-12,
-    > .row > .medium-12 {
-        @extend %mobile-padding;
+    > .row {
+        > .small-12,
+        > .medium-12,
+        > .list-item > .small-12,
+        > .list-item > .medium-12 {
+            @extend %mobile-padding;
+        }
     }
 }
