@@ -22,19 +22,26 @@
 <!-- BEGIN category_listing -->
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader"><a href="/homepage/{CATEGORY_ID}">{CATEGORY}</a></h2>
-        <span class='header-actions'>
-            <a href='#' class='button icon-more' data-dropdown='header-options-{CATEGORY_ID}'></a>
-        </span>
-        <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options-{CATEGORY_ID}'>
-            <!-- BEGIN learning_analytics -->
-            <li><a href="/learningAnalytics/course/{COURSE_FOLDER_ID}" class="icon-poll">{COURSE_FOLDER_NAME} Analytics</a></li>
-            <!-- END learning_analytics -->
-            <li><a href="/task/progressReport/{CATEGORY_ID}{SEM_SLUG}" class="icon-progress">Progress Report</a></li>
-            <li><a href="/submission/markSheet/{CATEGORY_ID}{SEM_SLUG}" class="icon-modify">Marksheet</a></li>
-            <li><a href="/assess/create/{CATEGORY_ID}/" class="icon-add">Create Quiz</a></li>
-            <li><a href="/submission/createSubmission/new/{CATEGORY_ID}/" class="icon-add">Post Due Work</a></li>
-        </ul>
+
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 column">
+                    <h2 class="subheader"><a href="/homepage/{CATEGORY_ID}">{CATEGORY}</a></h2>
+                </div>
+            </div>
+            <nav>
+                <a class="icon-more" title="" data-dropdown="header-options-{CATEGORY_ID}"><span></span></a>
+            </nav>
+            <ul id='header-options-{CATEGORY_ID}' class="f-dropdown" data-dropdown-content>
+                <!-- BEGIN learning_analytics -->
+                <li><a href="/learningAnalytics/course/{COURSE_FOLDER_ID}" class="icon-poll">{COURSE_FOLDER_NAME} Analytics</a></li>
+                <!-- END learning_analytics -->
+                <li><a href="/task/progressReport/{CATEGORY_ID}{SEM_SLUG}" class="icon-progress">Progress Report</a></li>
+                <li><a href="/submission/markSheet/{CATEGORY_ID}{SEM_SLUG}" class="icon-modify">Marksheet</a></li>
+                <li><a href="/assess/create/{CATEGORY_ID}/" class="icon-add">Create Quiz</a></li>
+                <li><a href="/submission/createSubmission/new/{CATEGORY_ID}/" class="icon-add">Post Due Work</a></li>
+            </ul>
+        </div>
 
         <ul class="meta">
             <li class="icon-staff-students">{STUDENTS} Students</li>
