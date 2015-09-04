@@ -625,8 +625,8 @@
 
         //$(palOpt.selector).tabs();
 
-        // apply qtips to each element
-        this.applyQTip($(palOpt.handleSelector));
+        //// apply qtips to each element
+        //this.applyQTip($(palOpt.handleSelector));
 
         if (!(palOpt.clickToInsert && palOpt.dragToInsert)) {
             throw new Error("One of palette.clickToInsert or palette.dragToInsert must be true");
@@ -750,40 +750,40 @@
             item.data('count', count);
         });
 
-        // reapply every 4 hours
-        this.applyQTip(handles);
+        //// reapply <s>every 4 hours</s>never
+        //this.applyQTip(handles);
     };
 
 
 
-    /**
-     * Apply QTips to the given elements
-     *
-     * @param {$} elements
-     */
-    Masonry.prototype.applyQTip = function (elements) {
-        var masonry = this;
-
-        elements.each(function () {
-            var item    = $(this),
-                c       = item.data('count'),
-                string  = '<strong>' + (c == 0 ? 'no' : c) + '</strong> instance';
-                string += c == 1 ? '' : 's';
-
-            item.find('strong').qtip({
-                content: 'You have ' + string + ' of this component currently active',
-                style: {
-                    classes: 'qtip-green qtip-shadow qtip-rounded'
-                },
-                position: {
-                    my: 'bottom left',
-                    at: 'top right'
-                }
-            });
-
-            masonry.options.palette.refreshItem.call(item);
-        });
-    };
+    ///**
+    // * Apply QTips to the given elements
+    // *
+    // * @param {$} elements
+    // */
+    //Masonry.prototype.applyQTip = function (elements) {
+    //    var masonry = this;
+    //
+    //    elements.each(function () {
+    //        var item    = $(this),
+    //            c       = item.data('count'),
+    //            string  = '<strong>' + (c == 0 ? 'no' : c) + '</strong> instance';
+    //            string += c == 1 ? '' : 's';
+    //
+    //        item.find('strong').qtip({
+    //            content: 'You have ' + string + ' of this component currently active',
+    //            style: {
+    //                classes: 'qtip-green qtip-shadow qtip-rounded'
+    //            },
+    //            position: {
+    //                my: 'bottom left',
+    //                at: 'top right'
+    //            }
+    //        });
+    //
+    //        masonry.options.palette.refreshItem.call(item);
+    //    });
+    //};
 
 
     /**
