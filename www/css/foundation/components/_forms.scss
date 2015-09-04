@@ -19,17 +19,22 @@ $form-label-bottom-margin: 0;
 $input-font-color: $black;
 $input-font-size: rem-calc(($base-font-size - 3));
 $input-height: 2.5rem;
+
 $input-bg-color: $white;
-$input-focus-bg-color: $ocean-sunset;
-$input-focus-color: $black;
+
+$input-focus-bg-color: tint($tertiary-color, 95%);
+$input-focus-color: calc-text-color($input-focus-bg-color);
+
 $input-border-color: tint($tertiary, 66%) !default;
-$input-focus-border-color: tint($tertiary, 66%);
-$input-hover-bg-color: tint($tertiary, 87%);
-$input-hover-color: $black;
+$input-focus-border-color: darken($input-border-color, 33%);
+
+$input-hover-bg-color: tint($tertiary-color, 87%);
+$input-hover-color: calc-text-color($input-hover-bg-color);
+
 $input-border-style: solid;
 $input-border-width: 0.125rem;
 $input-border-radius: $global-radius;
-$input-disabled-bg: rgba($primary-color, 0.05);
+$input-disabled-bg: rgba($input-focus-bg-color, 0.05);
 // $input-disabled-cursor: $cursor-default-value;
 $input-box-shadow: none;
 
@@ -141,10 +146,12 @@ select{
 	&:hover{
 		background-color: $input-hover-bg-color;
 		color: $input-hover-color;
+		border-color: $input-border-color;
 	}
 	&:focus{
 		color: $input-focus-color;
 		background-color: $input-focus-bg-color;
+		border-color: $input-focus-border-color;
 		outline: none;
 	}
 }
@@ -239,13 +246,9 @@ select option				{
         }
         &:focus {
             + #{$label-selector} {
-                &:before, &:after {
-                    background-color: tint($hover-color, 50%);
-                }
-
-                &:after {
-                    color: $white;
-                }
+				&:before {
+					background-color: $input-focus-border-color;
+				}
             }
         }
     }
