@@ -134,6 +134,7 @@ input,
 textarea,
 select{
 	@include single-transition(all, 0.15s, linear);
+	@extend %p;
 	font-weight: $font-weight-normal;
 	&:hover{
 		background-color: $input-hover-bg-color;
@@ -510,6 +511,7 @@ table.mceLayout tr td {
 		tr.mceLast td.mceStatusbar {
 			background: none;
 			border: none;
+			padding: 0 !important;
 			@extend .meta;
 			span, a {
 				@extend .meta;
@@ -519,6 +521,7 @@ table.mceLayout tr td {
 
 	.mceIframeContainer {
 		border: $input-border-style $input-border-width $input-border-color;
+		padding: 0 !important;
 	}
 
 	a.mceButton {
