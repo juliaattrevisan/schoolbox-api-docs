@@ -8,8 +8,6 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Modify Question</h2>
-
         <form id="createQuestionForm" action="/assess/question/modify" class="top" method="post">
             <input name="section_id" type="hidden" value="{SECTION_ID}" />
             <input name="question_id" type="hidden" value="{QUESTION_ID}" />
@@ -17,6 +15,7 @@
             <input name="sequence" type="hidden" value="{SEQUENCE}" />
             <input name="type_id" type="hidden" value="{QUESTIONTYPE_TYPE_ID}" />
 
+            <h2 class="subheader">Modify Question</h2>
             <section class="content">
                 <h3>{QUESTIONTYPE_DESCRIPTION}</h3>
 
