@@ -1,5 +1,6 @@
 {# Permissions #}
-{% set isStaff = session.user.isSuperUser() or session.user.getRole().isStaff() %}
+{% set isSuperuser = session.user.isSuperUser() %}
+{% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
 {% set isSelf = session.user.getId() == user.getId() %}
 {% set isParentOfStudent = session.user.isParentOf(user) %}
 
@@ -19,7 +20,7 @@
     <div class="small-12 column">
         <h1>{{ user.formatName() }}</h1>
         <span class='header-actions'>
-            {% if session.user.isSuperuser() %}
+            {% if isSuperuser %}
             <a href="/adminv2/modify-user/{{ user.getId() }}" class="button icon-modify" title="Modify User"></a>
             {% endif %}
         </span>
@@ -194,41 +195,23 @@
             {% endblock buttons_eportfolio %}
 
             {% block buttons_calendar %}
-            {% if session.user.isParentOf(user)
-               or session.user.isSuperUser()
-               or session.user.getRole().isStaff()
-               or session.user.getId() == user.getId()
-            %}
             <li class="no-pad">
                 <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
                    class="no-margin fat button icon-fat icon-32 icon-calendar"
                    data-equalizer-watch>Calendar</a>
             </li>
-            {% endif %}
             {% endblock buttons_calendar %}
 
             {% block buttons_timetable %}
-            {% if session.user.isParentOf(user)
-               or session.user.isSuperUser()
-               or session.user.getRole().isStaff()
-               or session.user.getId() == user.getId()
-            %}
             <li class="no-pad">
                 <a href="/timetable/{{ user.getId() }}"
                    class="no-margin fat button icon-fat icon-32 icon-timetable"
                    data-equalizer-watch>Timetable</a>
             </li>
-            {% endif %}
             {% endblock buttons_timetable %}
 
             {% block buttons_boarderLeave %}
-            {% if  config.boarder_leave_enabled
-               and user.getResidentialHouse()
-               and (session.user.isParentOf(user)
-                    or session.user.isSuperUser()
-                    or session.user.getRole().isStaff()
-                    or session.user.getId() == user.getId())
-            %}
+            {% if config.boarder_leave_enabled %}
             <li class="no-pad">
                 <a href="/modules/leave/student/{{ user.getId() }}"
                    class="no-margin fat button icon-fat icon-32 icon-boarder-leave"
@@ -238,10 +221,7 @@
             {% endblock buttons_boarderLeave %}
 
             {% block buttons_pastoralCare %}
-            {% if  (session.user.isSuperUser() or session.user.getRole().isStaff())
-               and config.external_type == 'synergetic'
-               and config.external_staff_portal
-            %}
+            {% if isStaff and config.external_type == 'synergetic' and config.external_staff_portal %}
             <li class="no-pad">
                 <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.getExternalId() }}"
                    class="no-margin fat button icon-fat icon-32 icon-modify"
