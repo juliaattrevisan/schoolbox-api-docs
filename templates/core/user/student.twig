@@ -8,6 +8,9 @@
 {% set showMedicalAlert = not config.protect_medicalspecial_profile and isStaff %}
 {# details: su, staff, self or parent #}
 {% set showDetails = isStaff or isSelf or isParentOfStudent %}
+{# emails: students may view other student's emails #}
+{% set showEmail = showDetails or session.user.getRole().isStudent() %}
+
 {% set showButtons = showDetails %}
 {# contacts: su, staff or parent #}
 {# Should a student see their own contact details? I think so #}
@@ -37,7 +40,6 @@
                         <img src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=profile" class="full-width"/>
                     </div>
 
-                    {% if showDetails %}
                     <div class="small-12 medium-6 large-8 columns no-pad">
                         {% block medicalAlert %}
                         {% if externalUser.StudentMedicalAlert and showMedicalAlert %}
@@ -50,24 +52,30 @@
                         {% block details %}
                         <dl class="inline-dl no-margin">
                             {% block details_email %}
+                            {% if showEmail %}
                             <dt class="no-margin small-6 medium-3">Email:</dt>
                             <dd class="no-margin small-6 medium-9">
                                 <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
                             </dd>
+                            {% endif %}
                             {% endblock details_email %}
 
                             {% block details_studentId %}
+                            {% if showDetails %}
                             <dt class="no-margin small-6 medium-3">Student ID:</dt>
                             <dd class="no-margin small-6 medium-9">{{ user.getExternalId() }}</dd>
+                            {% endif %}
                             {% endblock details_studentId %}
 
                             {% block details_dob %}
+                            {% if showDetails %}
                             <dt class="no-margin small-6 medium-3">Date of Birth:</dt>
                             <dd class="no-margin small-6 medium-9">{{ externalUser.StudentBirthDate|date(locale.date.dateOnlyFormat) }}</dd>
+                            {% endif %}
                             {% endblock details_dob %}
 
                             {% block details_formTeacher %}
-                            {% if formTeacher %}
+                            {% if showDetails and formTeacher %}
                             <dt class="no-margin small-6 medium-3">Class Teacher:</dt>
                             <dd class="no-margin small-6 medium-9">
                                 {% if formTeacher.getId() %}
@@ -80,12 +88,14 @@
                             {% endblock details_formTeacher %}
 
                             {% block details_yearLevel %}
+                            {% if showDetails %}
                             <dt class="no-margin small-6 medium-3">Year Level:</dt>
                             <dd class="no-margin small-6 medium-9">{{ externalUser.StudentYearLevel }}</dd>
+                            {% endif %}
                             {% endblock details_yearLevel %}
 
                             {% block details_tutorTeacher %}
-                            {% if tutorTeacher and externalUser.StudentForm|trim %}
+                            {% if showDetails and tutorTeacher and externalUser.StudentForm|trim %}
                             <dt class="no-margin small-6 medium-3">Tutor:</dt>
                             <dd class="no-margin small-6 medium-9">
                                 {% if tutorTeacher.getId() %}
@@ -98,6 +108,7 @@
                             {% endblock details_tutorTeacher %}
 
                             {% block details_coordTeacher %}
+                            {% if showDetails %}
                             {#{% if coordTeacher %}#}
                             {#<dt class="no-margin small-6 medium-3">Year Coordinator:</dt>#}
                             {#<dd class="no-margin small-6 medium-9">#}
@@ -108,22 +119,25 @@
                                 {#{% endif %}#}
                             {#</dd>#}
                             {#{% endif %}#}
+                            {% endif %}
                             {% endblock details_coordTeacher %}
 
                             {% block details_house %}
+                            {% if showDetails %}
                             <dt class="no-margin small-6 medium-3">House:</dt>
                             <dd class="no-margin small-6 medium-9">{{ externalUser.StudentHouseDescription }}</dd>
+                            {% endif %}
                             {% endblock details_house %}
 
                             {% block details_tutorGroup %}
-                            {% if externalUser.StudentForm|trim %}
+                            {% if showDetails and externalUser.StudentForm|trim %}
                             <dt class="no-margin small-6 medium-3">Tutor Group:</dt>
                             <dd class="no-margin small-6 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
                             {% endif %}
                             {% endblock details_tutorGroup %}
 
                             {% block details_hohTeacher %}
-                            {% if hohTeacher and externalUser.StudentForm|trim %}
+                            {% if showDetails and hohTeacher and externalUser.StudentForm|trim %}
                             <dt class="no-margin small-6 medium-3">Head of House:</dt>
                             <dd class="no-margin small-6 medium-9">
                                 {% if hohTeacher.getId() %}
@@ -136,25 +150,28 @@
                             {% endblock details_hohTeacher %}
 
                             {% block details_studentForm %}
-                            {% if not externalUser.StudentForm|trim %}
+                            {% if showDetails and not externalUser.StudentForm|trim %}
                             <dt class="no-margin small-6 medium-3">Class:</dt>
                             <dd class="no-margin small-6 medium-9">{{ externalUser.StudentForm }}</dd>
                             {% endif %}
                             {% endblock details_studentForm %}
 
                             {% block details_studentType %}
+                            {% if showDetails %}
                             <dt class="no-margin small-6 medium-3">Student Type:</dt>
                             <dd class="no-margin small-6 medium-9">{{ boarderType }}</dd>
+                            {% endif %}
                             {% endblock details_studentType %}
 
                             {% block details_studiesCode %}
+                            {% if showDetails %}
                             {#<dt class="no-margin small-6 medium-3">Studies Code:</dt>#}
                             {#<dd class="no-margin small-6 medium-9">{{ externalUser.StudentStudiesCode }}</dd>#}
+                            {% endif %}
                             {% endblock details_studiesCode %}
                         </dl>
                         {% endblock details %}
                     </div>
-                    {% endif %}
                 </div>
             </div>
         </section>
