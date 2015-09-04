@@ -1,1 +1,1 @@
-INSERT INTO `lu_config_field` (`field`) VALUES ('file');
+INSERT INTO `lu_config_field` (`id`, `field`) VALUES ('12','file');
