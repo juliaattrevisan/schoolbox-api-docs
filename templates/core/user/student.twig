@@ -176,7 +176,7 @@
             {% endblock buttons_eportfolio %}
 
             {% block buttons_calendar %}
-            {% if isParentOfChild
+            {% if session.user.isParentOf(user)
                or session.user.isSuperUser()
                or session.user.getRole().isStaff()
                or session.user.getId() == user.getId()
@@ -190,7 +190,7 @@
             {% endblock buttons_calendar %}
 
             {% block buttons_timetable %}
-            {% if isParentOfChild
+            {% if session.user.isParentOf(user)
                or session.user.isSuperUser()
                or session.user.getRole().isStaff()
                or session.user.getId() == user.getId()
@@ -206,7 +206,7 @@
             {% block buttons_boarderLeave %}
             {% if  config.boarder_leave_enabled
                and user.getResidentialHouse()
-               and (isParentOfChild
+               and (session.user.isParentOf(user)
                     or session.user.isSuperUser()
                     or session.user.getRole().isStaff()
                     or session.user.getId() == user.getId())
@@ -241,7 +241,7 @@
 
 <div class="row">
     <div class="small-12 xlarge-6 xlarge-push-6 columns">
-        {% if isParentOfChild
+        {% if session.user.isParentOf(user)
            or session.user.isSuperUser()
            or session.user.getRole().isStaff()
            or session.user.getId() == user.getId()

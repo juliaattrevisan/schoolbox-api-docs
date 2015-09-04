@@ -104,8 +104,6 @@ function renderStudent(
     Folder\Mapper $folderMapper,
     Eportfolio_Authenticator $authenticator
 ) {
-    // Handle parent/child relations here for now
-    $isParentOfChild = $groupHandler->isParentOfChild($user['uid']);
     $externalUser = $synUserHandler->getStudent($user['synergy_id']);
     $externalUser['AlertMessages'] = preg_split(
         '/[\\n\\r]+/',
@@ -224,20 +222,19 @@ function renderStudent(
         $page->getTwig()->render(
             'user/student.twig',
             [
-                'session'         => $_SESSION,
-                'user'            => $userObject,
-                'externalUser'    => $externalUser,
-                'eportfolioAuth'  => $authenticator->canView(),
-                'isParentOfChild' => $isParentOfChild,
-                'now'             => Alaress_Date_Format::now(),
-                'boarderType'     => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
-                'contacts'        => $contacts,
-                'subjects'        => $subjects,
-                'groups'          => $groups,
-                'formTeacher'     => $formTeacher,
-                'tutorTeacher'    => $tutorTeacher,
-                'hohTeacher'      => $hohTeacher,
-                'coordTeacher'    => $coordTeacher,
+                'session'        => $_SESSION,
+                'user'           => $userObject,
+                'externalUser'   => $externalUser,
+                'eportfolioAuth' => $authenticator->canView(),
+                'now'            => Alaress_Date_Format::now(),
+                'boarderType'    => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
+                'contacts'       => $contacts,
+                'subjects'       => $subjects,
+                'groups'         => $groups,
+                'formTeacher'    => $formTeacher,
+                'tutorTeacher'   => $tutorTeacher,
+                'hohTeacher'     => $hohTeacher,
+                'coordTeacher'   => $coordTeacher,
             ]
         )
     );
