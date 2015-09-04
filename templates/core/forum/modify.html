@@ -5,18 +5,18 @@
         <h1>{ACTION} {THREAD_POST}</h1>
 
         <form data-validatable method="post" enctype="multipart/form-data" action="/forum/modifyForm.php" class="top">
+            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+            <input type="hidden" name="threadID" value="{THREAD_ID}" />
+            <input type="hidden" name="postID" value="{POST_ID}" />
+            <input type="hidden" name="quoteID" value="{QUOTE_ID}" />
+
             <section>
                 <fieldset class="content">
-                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-                    <input type="hidden" name="threadID" value="{THREAD_ID}" />
-                    <input type="hidden" name="postID" value="{POST_ID}" />
-                    <input type="hidden" name="quoteID" value="{QUOTE_ID}" />
-
                     <!-- BEGIN title -->
                     <div class="small-12 columns">
                         <label for="forumTitle">
                             Title
-                            <input type="text" name="title" id="forumTitle" maxlength="100" value="{THREAD_TITLE}" required />
+                            <input type="text" name="title" id="forumTitle" maxlength="100" value="{THREAD_TITLE}" class="required" />
                         </label>
                     </div>
                     <!-- END title -->
