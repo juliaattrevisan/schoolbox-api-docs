@@ -1,15 +1,31 @@
 <span class="header-actions">
-    <a class="button icon-print" href="javascript:window.print()">Print</a>
-    <a class="button icon-export" data-action="export" title="Export">Export</a>
 </span>
 
-<h1>Catering Report</h1>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Catering Report</h1>
+        </div>
+    </div>
+    <nav>
+        <a class="icon-print" href="javascript:window.print()" title="Print"></a>
+        <a class="icon-export" data-action="export" title="Export"></a>
+    </nav>
+</div>
 
 <!-- BEGIN no_houses -->
-No houses found.
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <p>
+                No houses found.
+            </p>
+        </section>
+    </div>
+</div>
 <!-- END no_houses -->
-<!-- BEGIN house_list -->
 
+<!-- BEGIN house_list -->
 <div class="row">
     <div class="small-12 island">
         <form data-form_type="search">
