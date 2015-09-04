@@ -18,6 +18,6 @@ if (is_readable('images/' . $page->site . '/favicon.ico')) {
     exit;
 }
 else {
-    header('Location: /images/core/favicon.ico',TRUE,302);
+    header('Location: /images/logo.php?logo=skin_logo_square&size=favicon',TRUE,302);
     exit;
 }
