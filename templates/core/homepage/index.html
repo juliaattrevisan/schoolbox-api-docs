@@ -292,20 +292,18 @@
         </ul>
         <div class="tabs-content">
             <!-- BEGIN homepage_component_page -->
-            <div class="content" id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
+            <ul class="content grid small-block-grid-2 medium-block-grid-4" id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
                 <!-- BEGIN homepage_component -->
-                <div class="add-component {HOMEPAGE_COMPONENT_MULTIPLE_STATE}" data-count="{HOMEPAGE_COMPONENT_COUNT}" data-multi="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}">
-                    <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" class="{HOMEPAGE_COMPONENT_CLASS}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
-                        <span class="icon"></span>
-                        <span class="notification"><strong></strong>Added</span>
-                        <h4>
-                            <span>{HOMEPAGE_COMPONENT_NAME}</span>
-                            <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong>
-                        </h4>
-                    </a>
-                </div>
+                <li class="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}" data-count="{HOMEPAGE_COMPONENT_COUNT}" data-multi="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}">
+                    <div class="avatar card">
+                        <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
+                            <span class="icon-32 icon-masonry icon-masonry-{HOMEPAGE_COMPONENT_CLASS}"></span>
+                            <p>{HOMEPAGE_COMPONENT_NAME} ({HOMEPAGE_COMPONENT_COUNT})</p>
+                        </a>
+                    </div>
+                </li>
                 <!-- END homepage_component -->
-            </div>
+            </ul>
             <!-- END homepage_component_page -->
         </div>
     </div>
