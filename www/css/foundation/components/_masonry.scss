@@ -1,5 +1,12 @@
-// Homepage masonry icons
+// Hide the placeholders for non-empty columns
+.masonry-placeholder {
+  display: none;
+}
+.empty-column .masonry-placeholder {
+  display: inherit;
+}
 
+// Homepage masonry icons
 .icon-masonry:before {
   // default icon
   @extend .icon-add:before;
