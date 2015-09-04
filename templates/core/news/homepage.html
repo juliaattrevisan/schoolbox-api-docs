@@ -33,6 +33,9 @@ $(function() {
     <div class="small-12 island">
         <h1>{ACTION} Homepage News</h1>
         <form class="top" action="/news/homepageForm.php" method="post" enctype="multipart/form-data" id="newsForm">
+            <input type="hidden" name="id" value="{NEWS_ID}" />
+            <input type="hidden" name="code" value="{CATEGORY_ID}" />
+
             <section>
                 <input type="hidden" name="newsID" value="{NEWS_ID}"/>
                 <fieldset class="content">
@@ -61,7 +64,6 @@ $(function() {
                         </label>
                         <input type="text" class="required" name="datetime_expires" id="datetime_expires" maxlength="50" value="{DATETIME_EXPIRES}"/>
                     </div>
-
                 </fieldset>
             </section>
             <div class="row">
@@ -74,10 +76,6 @@ $(function() {
                 </div>
                 <!-- END delete_button -->
             </div>
-
-            <input type="hidden" name="id" value="{NEWS_ID}" />
-            <input type="hidden" name="code" value="{CATEGORY_ID}" />
-
         </form>
     </div>
 </div>
