@@ -164,7 +164,7 @@
 
             {% block buttons %}
             {% block buttons_dueWork %}
-            {% if not (config.restrict_parent_duework_access and session.user.isParent()) %}
+            {% if showButtons and not (config.restrict_parent_duework_access and session.user.isParent()) %}
             <li class="no-pad">
                 <a href="/submission/dueWork/0/{{ user.getId() }}"
                    class="no-margin fat button icon-fat icon-32 icon-due-work"
@@ -174,7 +174,7 @@
             {% endblock buttons_dueWork %}
 
             {% block buttons_grades %}
-            {% if not (config.restrict_parent_grades and session.user.isParent()) %}
+            {% if showButtons and not (config.restrict_parent_grades and session.user.isParent()) %}
             <li class="no-pad">
                 <a href="/submission/allWork/{{ user.getId() }}"
                    class="no-margin fat button icon-fat icon-32 icon-tick"
