@@ -53,10 +53,12 @@
                         <dl class="inline-dl no-margin">
                             {% if showEmail %}
                                 {% block details_email %}
+                                {% if user.getEmail() %}
                                 <dt class="no-margin small-6 medium-3">Email:</dt>
                                 <dd class="no-margin small-6 medium-9">
                                     <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
                                 </dd>
+                                {% endif %}
                                 {% endblock details_email %}
                             {% endif %}
 
@@ -67,8 +69,10 @@
                                 {% endblock details_studentId %}
 
                                 {% block details_dob %}
+                                {% if externalUser.StudentBirthDate %}
                                 <dt class="no-margin small-6 medium-3">Date of Birth:</dt>
                                 <dd class="no-margin small-6 medium-9">{{ externalUser.StudentBirthDate|date(locale.date.dateOnlyFormat) }}</dd>
+                                {% endif %}
                                 {% endblock details_dob %}
 
                                 {% block details_formTeacher %}
@@ -85,8 +89,10 @@
                                 {% endblock details_formTeacher %}
 
                                 {% block details_yearLevel %}
+                                {% if externalUser.StudentYearLevel %}
                                 <dt class="no-margin small-6 medium-3">Year Level:</dt>
                                 <dd class="no-margin small-6 medium-9">{{ externalUser.StudentYearLevel }}</dd>
+                                {% endif %}
                                 {% endblock details_yearLevel %}
 
                                 {% block details_tutorTeacher %}
@@ -116,8 +122,10 @@
                                 {% endblock details_coordTeacher %}
 
                                 {% block details_house %}
+                                {% if externalUser.StudentHouseDescription %}
                                 <dt class="no-margin small-6 medium-3">House:</dt>
                                 <dd class="no-margin small-6 medium-9">{{ externalUser.StudentHouseDescription }}</dd>
+                                {% endif %}
                                 {% endblock details_house %}
 
                                 {% block details_tutorGroup %}
@@ -148,13 +156,17 @@
                                 {% endblock details_studentForm %}
 
                                 {% block details_studentType %}
+                                {% if boarderType %}
                                 <dt class="no-margin small-6 medium-3">Student Type:</dt>
                                 <dd class="no-margin small-6 medium-9">{{ boarderType }}</dd>
+                                {% endif %}
                                 {% endblock details_studentType %}
 
                                 {% block details_studiesCode %}
+                                {#{% if externalUser.StudentStudiesCode %}#}
                                 {#<dt class="no-margin small-6 medium-3">Studies Code:</dt>#}
                                 {#<dd class="no-margin small-6 medium-9">{{ externalUser.StudentStudiesCode }}</dd>#}
+                                {#{% endblock %}#}
                                 {% endblock details_studiesCode %}
                             {% endif %}
                         </dl>
