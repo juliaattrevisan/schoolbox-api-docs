@@ -1,14 +1,19 @@
 {BREADCRUMB}
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>{ASSESS_HEADING}</h1>
-        <span class='header-actions'>
-            <!-- BEGIN importXML -->
-            <a href="#" id="import" data-reveal-id="import-modal" class="button icon-upload">Import from XML file</a>
-            <!-- END importXML -->
-        </span>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{ASSESS_HEADING}</h1>
+        </div>
     </div>
+    <!-- BEGIN importXML -->
+    <nav>
+        <a class="icon-more" title="" data-dropdown="header-options"><span></span></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li><a href="#" id="import" data-reveal-id="import-modal" class="icon-upload">Import from XML file</a></li>
+    </ul>
+    <!-- END importXML -->
 </div>
 
 <div class="row">
