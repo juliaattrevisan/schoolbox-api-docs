@@ -27,3 +27,6 @@ MAILTO="support@schoolbox.com.au"
 
 # Etherpad - sync back to MySQL - every hour
 0 * * * *	root	php /usr/share/schoolbox/tools/etherpad-sync.php >> /dev/null 2>&1
+
+# Skin Builder - Every 5 minutes
+*/5 * * * *	root	php /usr/share/schoolbox/tools/skin/builder.php >> /dev/null 2>&1
