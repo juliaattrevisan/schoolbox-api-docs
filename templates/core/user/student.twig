@@ -1,3 +1,15 @@
+{# Permissions #}
+{% set showMedicalAlert =
+    not config.protect_medicalspecial_profile
+    and (session.user.isStaff() or session.user.isParentOf(user))
+%}
+{% set showDetails =
+    session.user.isSuperUser()
+    or session.user.getRole().isStaff()
+    or session.user.getId() == user.getId()
+    or session.user.isParentOf(user)
+%}
+
 <div class="row">
     <div class="small-12 column">
         <h1>{{ user.formatName() }}</h1>
@@ -19,11 +31,10 @@
                         <img src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=profile" class="full-width"/>
                     </div>
 
+                    {% if showDetails %}
                     <div class="small-12 medium-6 large-8 columns no-pad">
                         {% block medicalAlert %}
-                        {% if  externalUser.StudentMedicalAlert
-                           and not config.protect_medicalspecial_profile
-                           and (session.user.isStaff() or session.user.isParentOf(user)) %}
+                        {% if externalUser.StudentMedicalAlert and showMedicalAlert %}
                         <div class="alert-box alert icon-alert no-margin">
                             Medical Note: {{ externalUser.StudentMedicalAlert }}
                         </div>
@@ -137,6 +148,7 @@
                         </dl>
                         {% endblock details %}
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </section>
