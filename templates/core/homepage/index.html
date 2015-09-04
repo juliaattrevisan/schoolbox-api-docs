@@ -305,7 +305,6 @@
             <!--/tabs-1-->
 
             <div id="tabs-2" class="content">
-                <!-- BEGIN homepage_color_selector -->
                 <form method="POST" action="" name="saveColours">
 
                     <div class="row" data-equalizer data-equalizer-mq="medium-up">
@@ -324,17 +323,17 @@
                                     <input id="choose-right" type="checkbox" checked />
                                     <label for="choose-right" class="checkbox-label">Right</label>
                                 </div>
+
+                                <p class="meta">
+                                    Select a position to modify its colours below.
+                                </p>
+                                <p class="meta">
+                                    Drag the slider to change the width of the left and right columns.
+                                </p>
                             </fieldset>
                         </div>
 
-                        <!--
-                        <div class="column-colours">
-                            <a href="#" id="top" class="columns left-right selected" data-column-selector data-interaction-state="selected">Top</a>
-                            <a href="#" id="left" class="columns left-right" data-column-selector>Left</a>
-                            <a href="#" id="right" class="columns left-right" data-column-selector>Right</a>
-                        </div>
-                        -->
-
+                        <!-- BEGIN homepage_color_selector -->
                         <div class="small-12 medium-6 columns">
                             <fieldset data-equalizer-watch>
                                 <legend>Heading</legend>
@@ -361,6 +360,14 @@
                             </fieldset>
                         </div>
                     </div>
+                    <!-- END homepage_color_selector -->
+
+                    <div class="range-slider" data-slider data-options="start: 1; end: 11; display_selector: #slider_output">
+                        <span class="range-slider-handle" role="slider" tabindex="0"></span>
+                        <span class="range-slider-active-segment"></span>
+                        <input type="hidden">
+                    </div>
+                    <span id="slider_output"></span>
 
                     <ul class="button-group">
                         <li><input type="submit" id="saveColour" value="Save"/></li>
@@ -368,21 +375,6 @@
                         <li><input type="submit" id="cancel" value="Cancel"/></li>
                     </ul>
                 </form>
-                <!-- END homepage_color_selector -->
-                <div style="clear:both;">
-                    <form method="POST" action="" >
-                        <p class="information-notification pad-it ">In order to adjust the
-                            widths of the left and right columns on the page, drag the slider
-                            below left and right. </p>
-                        <div class="clearfix slide-guide">
-                            <h3>Column width slider</h3>
-                            <div class="slider-house">
-                                <div id="slider"></div>
-                            </div>
-                        </div>
-                        <div class="saved-layout">Saved layout</div>
-                    </form>
-                </div>
             </div>
         </section>
     </div>
