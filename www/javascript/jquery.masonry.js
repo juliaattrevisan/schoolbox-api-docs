@@ -642,34 +642,12 @@
 
                 if (!element.hasClass('disabled')) {
                     element.addClass(loadingClass);
+                    var column = $(masonry.element).find(opt.column.position.left);
+                    var placeholder = element.closest(palOpt.handleSelector).clone();
+                    column.prepend(placeholder);
                     masonry.newComponentInstance(element)
                         .done(function(response) {
-                            var leftColumn  = $(masonry.element).find(opt.column.position.left);
-
-                            element.addClass(loadedClass);
-
-                            $(response).hide().prependTo(leftColumn).css('opacity', 0)
-                                .slideDown(400, function () {
-                                    masonry.refreshColumns();
-
-                                    // these 2 calls should happen together so there's no opacity flicker
-                                    element.removeClass(loadingClass);
-                                    masonry.refreshPalette();
-
-                                    $(this).animate({opacity: 1}, 300, function () {
-                                        element.removeClass(loadedClass);
-                                    });
-
-                                    // only go in for applying colours if you've got colours to set
-                                    if (masonry.spectrum) {
-                                        masonry.spectrum.masonrySpectrum('resetColours', leftColumn);
-                                    }
-                                });
-
-                            /* Collapse content on components
-                             * Really...I have to do it like this?
-                             */
-                            $('#' + $(response).attr('id')).find('[data-collapser=true]').collapsable();
+                            masonry.insertComponentInstance($(response), placeholder);
                         })
                         .fail(function() {
                             masonry.refreshColumns();
