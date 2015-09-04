@@ -8,42 +8,42 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form name="create" action="/survey/section/create" id="createSection" method="post">
+        <form name="create" action="/survey/section/create" id="createSection" method="post" class="top">
             <h2 class="subheader">Create Section</h2>
-            <section>
-                <div class="content">
-                    <input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
-                    <input name="section_id" type="hidden" value="{SECTION_ID}" />
-                    <input name="sequence" type="hidden" value="{SEQUENCE}" />
+            <section class="content">
+                <input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
+                <input name="section_id" type="hidden" value="{SECTION_ID}" />
+                <input name="sequence" type="hidden" value="{SEQUENCE}" />
 
-                    <label>
-                        Section Title
-                        <input name="title" type="text" size="35" class="required"/>
-                    </label>
+                <label>
+                    Section Title
+                    <input name="title" type="text" size="35" class="required"/>
+                </label>
 
-                    <label>
-                        Shuffle Questions
-                        <span class="hint has-tip tip-top" data-tooltip title="Questions should be selected randomly">?</span>
-                    </label>
-                    <div class="switch">
-                        <input name="random" id="random" type="checkbox" value="1" data-shuffle />
-                        <label for="random"></label>
-                    </div>
-
-                    <label class="hide" data-max-questions-prompt>
-                        Maximum number of questions to show
-                        <input name="pool" disabled="disabled" type="text" data-max-questions />
-                    </label>
-
-                    <label>
-                        Description
-                        <textarea name="description"></textarea>
-                    </label>
+                <label>
+                    Shuffle Questions
+                    <span class="hint has-tip tip-top" data-tooltip title="Questions should be selected randomly">?</span>
+                </label>
+                <div class="switch">
+                    <input name="random" id="random" type="checkbox" value="1" data-shuffle />
+                    <label for="random"></label>
                 </div>
+
+                <label class="hide" data-max-questions-prompt>
+                    Maximum number of questions to show
+                    <input name="pool" disabled="disabled" type="text" data-max-questions />
+                </label>
+
+                <label>
+                    Description
+                    <textarea name="description"></textarea>
+                </label>
             </section>
-            <label>
-                <input class="expand" type="submit" value="Create Section" />
-            </label>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Create Section" />
+                </div>
+            </div>
         </form>
     </div>
 </div>
