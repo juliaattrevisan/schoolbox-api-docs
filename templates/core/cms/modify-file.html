@@ -16,45 +16,50 @@
     <li><a href="/homepage/{CATEGORY_ID}/">{CATEGORY_NAME}</a></li>
     <li class="active"><a href="#">{ACTION} File</a></li>
 </ul>
+
 <div class="row">
     <div class="small-12 island">
-        <h1 class="type">{ACTION} File</h1>
+        <h1>{ACTION} File</h1>
         <form method="post" enctype="multipart/form-data" id="fileForm" action="/cms/fileForm.php" class="top">
+            <input type='hidden' name='fileID' value='{FILE_ID}'  />
+            <input type='hidden' name='category' value='{CATEGORY_ID}'  />
+
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>Title
+                        <label>
+                            Title
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="One line description of the file, this will be used for display and search">?</span>
                             <input type="text" name="description" maxlength="100" size="40" class="required" value="{DESCRIPTION}" />
                         </label>
-                        <label>Attach File
+                        <label>
+                            Attach File
                             {ATTACH_ZONE}
                         </label>
-                        <label>Description
+                        <label>
+                            Description
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Any further details you wish to make about the file, useful for enhancing search results">?</span>
                             <textarea name="comment" cols="40" rows="4" style="width:100%">{COMMENT}</textarea>
                         </label>
-                        <label>Hidden
+                        <label for="hidden">
+                            Hidden
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Hide this file from anyone with read-only access">?</span>
-                            <div class="switch">
-                                <input name="hidden" id="hidden" type="checkbox" {HIDDEN_SELECTED}>
-                                <label for="hidden"></label>
-                            </div>
                         </label>
+                        <div class="switch">
+                            <input name="hidden" id="hidden" type="checkbox" {HIDDEN_SELECTED}>
+                            <label for="hidden"></label>
+                        </div>
                     </div>
                 </fieldset>
             </section>
             <div class="row">
                 <div class="small-12 column">
                     <input type="submit" name="Submit" value="{ACTION} File" />
-                    <input type='hidden' name='fileID' value='{FILE_ID}'  />
-                    <input type='hidden' name='category' value='{CATEGORY_ID}'  />
+
+                    <!-- BEGIN delete_button -->
+                    <input id='deleteFile' type="submit" class="alert icon-delete" value="Delete File" />
+                    <!-- END delete_button -->
                 </div>
-            <!-- BEGIN delete_button -->
-                <div class="small-12 column">
-                    <input id='deleteFile' type="button" class="alert icon-delete"  value="Delete File" />
-                </div>
-            <!-- END delete_button -->
             </div>
         </form>
     </div>
