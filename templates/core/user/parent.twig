@@ -98,6 +98,16 @@
                 </div>
                 <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8" data-equalizer>
 
+                    {% if eportfolioAuth %}
+                        {% block buttons_eportfolio %}
+                            <li class="no-pad">
+                                <a href="/eportfolio/{{ user.getId() }}/profile"
+                                   class="no-margin fat button icon-fat icon-32 icon-eportfolio"
+                                   data-equalizer-watch>ePortfolio</a>
+                            </li>
+                        {% endblock buttons_eportfolio %}
+                    {% endif %}
+
                     {% if showButtons %}
                         {% block buttons_calendar %}
                             <li class="no-pad">
@@ -106,16 +116,6 @@
                                    data-equalizer-watch>Calendar</a>
                             </li>
                         {% endblock buttons_calendar %}
-                    {% endif %}
-
-                    {% if showButtons %}
-                        {% block buttons_timetable %}
-                            <li class="no-pad">
-                                <a href="/timetable/{{ user.getId() }}"
-                                   class="no-margin fat button icon-fat icon-32 icon-timetable"
-                                   data-equalizer-watch>Timetable</a>
-                            </li>
-                        {% endblock buttons_timetable %}
                     {% endif %}
 
                 </ul>
