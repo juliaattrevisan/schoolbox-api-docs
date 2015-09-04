@@ -1,3 +1,12 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript">
+    $(function() {
+
+    });
+</script>
+<!-- END custom_head -->
+
 {BREADCRUMB}
 
 <div class="row actions-small-3">
@@ -9,10 +18,10 @@
 	</div>
 	<nav>
 		<!-- BEGIN lock_link -->
-		<a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}" class="icon-locked" data-tooltip title="{LOCK_UNLOCK}"></a>
+		<a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}" class="icon-locked" title="{LOCK_UNLOCK}"></a>
 		<!-- END lock_link -->
         <!-- BEGIN modify_link -->
-        <a href="/wiki/modify/{WIKI_ID}" class="icon-modify" data-tooltip title="Modify"></a>
+        <a href="/wiki/modify/{WIKI_ID}" class="icon-modify"title="Modify"></a>
         <!-- END modify_link -->
         <a href="#" class="icon-more" data-dropdown="more-options"></a>
 	</nav>
