@@ -10,7 +10,7 @@
 
 @function calc-text-color($bg, $light: $white, $dark: $black) {
 	@if (lightness($bg) > 50) {
-		@return $dark; // Lighter backgorund, return dark color
+		@return $dark; // Lighter background, return dark color
 	} @else {
 		@return $light; // Darker background, return light color
 	}
