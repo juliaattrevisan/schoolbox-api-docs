@@ -18,6 +18,7 @@ if ($this->arg[0] == 'revision') {
     $this->setBlock(TEMPLATE_content, 'lock_link', 'lock_link_block');
     $this->setBlock(TEMPLATE_content, 'export_link', 'export_link_block');
     $this->setBlock(TEMPLATE_content, 'revision_list', 'revision_list_block');
+    $this->setBlock(TEMPLATE_content, 'wiki_locked', 'wiki_locked_block');
     $this->setBlock('revision_list', 'revision_comparison', 'revision_comparison_block');
 
     /* Load just by id (from homepage)
@@ -57,12 +58,19 @@ if ($this->arg[0] == 'revision') {
         'AUTHOR' => $userHandler->formatName($wiki),
         'AUTHOR_ID' => $wiki['authorID'],
         'CURRENT_REVISION' => $wiki['revisionID'],
-        'LOCKED' => $wiki['locked'] == 'true' ? '(Locked)' : '',
-        'LOCK_UNLOCK' => $wiki['locked'] == 'true' ? 'Unlock' : 'Lock',
         'EXPORT' => 'Export',
     );
 
     $this->setVar($output);
+
+    if ($wiki['locked'] == 'true') {
+        $this->parse('wiki_locked_block', 'wiki_locked');
+    }
+    else {
+        $this->setVar(array(
+            'wiki_locked_block' => '',
+        ));
+    }
 
     // output revisions
     $revisionList = $wikiHandler->getRevisionList($wiki['wikiID']);
@@ -188,7 +196,8 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
                 'class' => 'active',
             ]
         ]);
-    } /* Otherwise load it
+    }
+    /* Otherwise load it
 	 */
     else {
         $this->setFile(TEMPLATE_content, 'wiki.html');
@@ -198,6 +207,7 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         $this->setBlock(TEMPLATE_content, 'lock_link', 'lock_link_block');
         $this->setBlock(TEMPLATE_content, 'export_link', 'export_link_block');
         $this->setBlock(TEMPLATE_content, 'revision_list', 'revision_list_block');
+        $this->setBlock(TEMPLATE_content, 'wiki_locked', 'wiki_locked_block');
         $this->setBlock('revision_list', 'revision_comparison', 'revision_comparison_block');
 
         /* Load just by id (from homepage)
@@ -237,12 +247,19 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
             'AUTHOR' => $userHandler->formatName($wiki),
             'AUTHOR_ID' => $wiki['authorID'],
             'CURRENT_REVISION' => $wiki['revisionID'],
-            'LOCKED' => $wiki['locked'] == 'true' ? '(Locked)' : '',
-            'LOCK_UNLOCK' => $wiki['locked'] == 'true' ? 'Unlock' : 'Lock',
             'EXPORT' => 'Export',
         );
 
         $this->setVar($output);
+
+        if ($wiki['locked'] == 'true') {
+            $this->parse('wiki_locked_block', 'wiki_locked');
+        }
+        else {
+            $this->setVar(array(
+                'wiki_locked_block' => '',
+            ));
+        }
 
         // output revisions
         $revisionList = $wikiHandler->getRevisionList($wiki['wikiID']);
