@@ -52,41 +52,40 @@
 </div>
 
 <div class="row">
-    <form id="createQuestionForm" action="/survey/questionbank/question/modify" method="post">
-      <div class="small-12 island">
-        <h2 class="subheader">Modify Question</h2>
+    <div class="small-12 island">
+        <form id="createQuestionForm" action="/survey/questionbank/question/modify" method="post" class="top">
             <input name="question_bank_id" type="hidden" value="{QUESTION_BANK_ID}" />
             <input type="hidden" name="type_id" value="{QUESTIONTYPE_TYPE_ID}" />
 
-            <section>
-                <div class="content">
-                    <h3>{QUESTIONTYPE_DESCRIPTION}</h3>
+            <h2 class="subheader">Modify Question</h2>
+            <section class="content">
+                <h3>{QUESTIONTYPE_DESCRIPTION}</h3>
 
-                    <label>
-                        Question
-                        <textarea name="question">{QUESTION}</textarea>
-                    </label>
+                <label>
+                    Question
+                    <textarea name="question">{QUESTION}</textarea>
+                </label>
 
-                    <!-- BEGIN has_answer_configuration -->
-                    <fieldset>
-                        <legend>Configuration Options</legend>
-                        <!-- BEGIN answer_configuration -->
+                <!-- BEGIN has_answer_configuration -->
+                <fieldset>
+                    <legend>Configuration Options</legend>
+                    <!-- BEGIN answer_configuration -->
 
-                        <!-- END answer_configuration -->
-                    </fieldset>
-                    <!-- END has_answer_configuration -->
+                    <!-- END answer_configuration -->
+                </fieldset>
+                <!-- END has_answer_configuration -->
 
-                    <div>
-                        <!-- BEGIN answerInputs -->
+                <div>
+                    <!-- BEGIN answerInputs -->
 
-                        <!-- END answerInputs -->
-                    </div>
+                    <!-- END answerInputs -->
                 </div>
             </section>
-        </div>
-        <div class="small-12 column">
-            <input class="expand" type="submit" name="create" value="Modify" />
-        </div>
-    </form>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" name="create" value="Modify" />
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
-
