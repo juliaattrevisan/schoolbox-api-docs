@@ -368,9 +368,11 @@ $this->parse('colour_list_block', 'colour_list', true);
 // Widths
 $allWidths = $homepageHandler->getColumnWidths();
 
+$leftWidth = (int)($allWidths['left_column_width'] * 0.12);
+
 $this->setVar(array(
-    'TEMPLATE_LEFT_COLUMN_WIDTH' => $allWidths['left_column_width'],
-    'TEMPLATE_RIGHT_COLUMN_WIDTH' => $allWidths['right_column_width'],
+    'TEMPLATE_LEFT_COLUMN_WIDTH'  => $leftWidth,
+    'TEMPLATE_RIGHT_COLUMN_WIDTH' => 12 - $leftWidth,
 ));
 
 $colours = $homepageHandler->getColorList();

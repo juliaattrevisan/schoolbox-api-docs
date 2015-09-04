@@ -1,4 +1,4 @@
-<div id='component{COMPONENT_INSTANCE_ID}' data-component>
+<div id='component{COMPONENT_INSTANCE_ID}' data-component class="top">
     {CONFIGURATION}
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
@@ -15,30 +15,28 @@
             <section>
                 <div class="tabs-content">
                     <!-- BEGIN topic -->
-                    <ul class="information-list content {TOPIC_ACTIVE}" id="component{COMPONENT_INSTANCE_ID}-{TOPIC_CLEAN}">
+                    <ul class="information-list {TOPIC_ACTIVE}" id="component{COMPONENT_INSTANCE_ID}-{TOPIC_CLEAN}">
                         <!-- BEGIN news -->
                         <li class="row">
-                            <div class="column no-pad small-12" data-equalizer-watch>
-                                <div class="avatar card">
-                                    <a href="{NEWS_URL}" title="{NEWS_TITLE}">
-                                        <!-- BEGIN news_image -->
-                                        <img src="/storage/image.php?hash={NEWS_IMAGE}&size=square64" />
-                                        <!-- END news_image -->
-                                        <!-- BEGIN news_no_image -->
-                                        <div class="icon-news icon-64"></div>
-                                        <!-- END news_no_image -->
-                                        <h3>{NEWS_TITLE}</h3>
-                                    </a>
-                                    <p class="meta">
-                                        Posted by <a href="/user/profile/{NEWS_AUTHOR_ID}">{NEWS_AUTHOR_NAME}</a> {NEWS_TIME}
-                                    </p>
-                                </div>
-                                <article>
-                                    <p>
-                                        {NEWS_SHORT}
-                                    </p>
-                                </article>
+                            <div class="avatar card small-12" data-equalizer-watch>
+                                <a href="{NEWS_URL}" title="{NEWS_TITLE}">
+                                    <!-- BEGIN news_image -->
+                                    <img src="/storage/image.php?hash={NEWS_IMAGE}&size=square64" />
+                                    <!-- END news_image -->
+                                    <!-- BEGIN news_no_image -->
+                                    <div class="icon-news icon-64"></div>
+                                    <!-- END news_no_image -->
+                                    <h3>{NEWS_TITLE}</h3>
+                                </a>
+                                <p class="meta">
+                                    Posted by <a href="/user/profile/{NEWS_AUTHOR_ID}">{NEWS_AUTHOR_NAME}</a> {NEWS_TIME}
+                                </p>
                             </div>
+                            <article>
+                                <p>
+                                    {NEWS_SHORT}
+                                </p>
+                            </article>
                         </li>
                         <!-- END news -->
                     </ul>

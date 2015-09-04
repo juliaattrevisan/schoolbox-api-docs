@@ -179,137 +179,107 @@
 <script type="text/javascript" src="/javascript/components/mediaelement/build/mediaelement-and-player.min.js"></script>
 <!-- END custom_head -->
 
-<h1><span>{HEADING}</span></h1>
-
-<ul id="tab-control" class="homepage-controls clearfix">
-    <!-- BEGIN page_controls -->
-    <li>
-        <div class="booking-controls">
-            <div class="status-selector">
-                <a href="#" class="btn homepage-overflow no-text"><span></span></a>
-                <ul class="status-buttons">
-                    <li class="status-header">Folder Actions</li>
-                    <!-- BEGIN stats_data -->
-                    <li>
-                        <a href="/cms/category/{ID}" class="status-option">
-                            <span class="btn modify"><span></span></span>
-                            <span class="status-label">Modify Folder</span>
-                        </a>
-                    </li>
-                    <!-- END stats_data -->
-                    <!-- BEGIN manage_page -->
-                    <li>
-                        <a href="/group/modify/{ID}" class="status-option">
-                            <span class="btn groups"><span></span></span>
-                            <span class="status-label">Manage Group</span>
-                        </a>
-                    </li>
-                    <!-- END manage_page -->
-                    <!-- BEGIN addmylinks -->
-                    <li>
-                        <a href="/cms/myLinksForm.php?url={HOMEPAGE_URL}&description={HEADING}&return=1" class="status-option">
-                            <span class="btn add"><span></span></span>
-                            <span class="status-label">Add to My Links</span>
-                        </a>
-                    </li>
-                    <!-- END addmylinks -->
-                    <!-- BEGIN view_stats -->
-                    <li>
-                        <a href="/statistics/homepage/{ID}" class="status-option">
-                            <span class="btn line-graph"><span></span></span>
-                            <span class="status-label">View Statistics</span>
-                        </a>
-                    </li>
-                    <!-- END view_stats -->
-                    <li>
-                        <a href="/resources/{ID}" class="status-option">
-                            <span class="btn folder"><span></span></span>
-                            <span class="status-label">Browse Resources</span>
-                        </a>
-                    </li>
-                    <!-- BEGIN subscribedModerated -->
-                    <li>
-                        <a href="/group/joinForm.php?leave={ID}&return=true" class="status-option">
-                            <span class="btn delete"><span></span></span>
-                            <span class="status-label">Awaiting approval</span>
-                        </a>
-                    </li>
-                    <!-- END subscribedModerated -->
-                    <!-- BEGIN subscribed -->
-                    <li>
-                        <a href="/group/joinForm.php?leave={ID}" class="status-option">
-                            <span class="btn delete"><span></span></span>
-                            <span class="status-label">Leave Group</span>
-                        </a>
-                    </li>
-                    <!-- END subscribed -->
-                    <!-- BEGIN unsubscribed -->
-                    <li>
-                        <a href="/group/joinForm.php?join={ID}&return=true" class="status-option">
-                            <span class="btn add"><span></span></span>
-                            <span class="status-label">Join Group</span>
-                        </a>
-                    </li>
-                    <!-- END unsubscribed -->
-                    <li>
-                        <a class="status-option" href="/homepage/rss/{ID}/{USER_TOKEN}">
-                            <span class="btn rss" ><span></span></span>
-                            <span class="status-label">RSS</span>
-                        </a>
-                    </li>
-                    <!-- BEGIN manage_class -->
-                    <li class="status-header">Class Actions</li>
-                    <!-- BEGIN student_grades -->
-                    <a href="/submission/allWork/{USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ID}" title="View grades" class="status-option">
-                        <span class="btn tick"><span></span></span>
-                        <span class="status-label">View Grades</span>
-                    </a>
-                    <!-- END student_grades -->
-                    <!-- BEGIN class_list -->
-                    <a href="/subject/classList/{CODE}" class="status-option"><span class="btn report"><span></span></span><span class="status-label">Class List</span></a>
-                    <!-- END class_list -->
-                    <!-- BEGIN class_mark -->
-                    <a href="/submission/listSubmission/{WORK_YEAR}/{WORK_SEMESTER}/{ID}/" class="status-option"><span class="btn due-work"><span></span></span><span class="status-label">View All Work</span></a>
-                    <a href="/submission/markSheet/{ID}" class="status-option"><span class="btn statistics"><span></span></span><span class="status-label">Marksheet</span></a>
-                    <a href="/submission/rubricCriteria/{ID}" class="status-option"><span class="btn modify"><span></span></span><span class="status-label">Manage Criteria</span></a>
-
-                    <!-- END class_mark -->
-                    <!-- END manage_class -->
-                </ul>
-            </div>
+<div class="row actions-small-4">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{HEADING}</h1>
         </div>
-    </li>
+    </div>
+    <nav>
+        <!-- BEGIN edit_page -->
+        <a id="tab-columns" class="icon-edit-columns" data-tab="tabs-2" title="Edit columns">
+            <span></span>
+        </a>
+        <a id="tab-component" class="icon-components" data-tab="tabs-1" title="Add components">
+            <span></span>
+        </a>
+        <!-- END edit_page -->
+        <!-- BEGIN readonly_switch_on -->
+        <a href="?readonly=1" class="icon-staff-students" title="Teacher View - click to switch to Student View">
+            <span></span>
+        </a>
+        <!-- END readonly_switch_on -->
+        <!-- BEGIN readonly_switch_off -->
+        <a href="?readonly=0" class="icon-teacher" title="Student View - click to switch back to Teacher View">
+            <span></span>
+        </a>
+        <!-- END readonly_switch_off -->
+        <a href="#" class="icon-more" data-dropdown="tab-control"></a>
+    </nav>
+    <!-- BEGIN page_controls -->
+    <ul id="tab-control" class="f-dropdown" data-dropdown-content>
+        <li class="separator">Folder Actions</li>
+        <!-- BEGIN stats_data -->
+        <li>
+            <a href="/cms/category/{ID}" class="icon-modify">Modify Folder</a>
+        </li>
+        <!-- END stats_data -->
+        <!-- BEGIN manage_page -->
+        <li>
+            <a href="/group/modify/{ID}" class="icon-group">Manage Group</a>
+        </li>
+        <!-- END manage_page -->
+        <!-- BEGIN addmylinks -->
+        <li>
+            <a href="/cms/myLinksForm.php?url={HOMEPAGE_URL}&description={HEADING}&return=1" class="icon-favourite">Add to My Links</a>
+        </li>
+        <!-- END addmylinks -->
+        <!-- BEGIN view_stats -->
+        <li>
+            <a href="/statistics/homepage/{ID}" class="icon-progress">View Statistics</a>
+        </li>
+        <!-- END view_stats -->
+        <li>
+            <a href="/resources/{ID}" class="icon-folder">Browse Resources</a>
+        </li>
+        <!-- BEGIN subscribedModerated -->
+        <li>
+            <a href="/group/joinForm.php?leave={ID}&return=true" class="icon-help">Awaiting approval</a>
+        </li>
+        <!-- END subscribedModerated -->
+        <!-- BEGIN subscribed -->
+        <li>
+            <a href="/group/joinForm.php?leave={ID}" class="icon-logout">Leave Group</a>
+        </li>
+        <!-- END subscribed -->
+        <!-- BEGIN unsubscribed -->
+        <li>
+            <a href="/group/joinForm.php?join={ID}&return=true" class="icon-add">Join Group</a>
+        </li>
+        <!-- END unsubscribed -->
+        <li>
+            <a href="/homepage/rss/{ID}/{USER_TOKEN}" class="icon-homepagefeed">RSS</a>
+        </li>
+        <!-- BEGIN manage_class -->
+        <li class="separator">Class Actions</li>
+        <!-- BEGIN student_grades -->
+        <li>
+            <a href="/submission/allWork/{USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ID}" title="View grades" class="icon-approve">View Grades</a>
+        </li>
+        <!-- END student_grades -->
+        <!-- BEGIN class_list -->
+        <li>
+            <a href="/subject/classList/{CODE}" class="icon-class-list">Class List</a>
+        </li>
+        <!-- END class_list -->
+        <!-- BEGIN class_mark -->
+        <li>
+            <a href="/submission/listSubmission/{WORK_YEAR}/{WORK_SEMESTER}/{ID}/" class="icon-task">View All Work</a>
+        </li>
+        <li>
+            <a href="/submission/markSheet/{ID}" class="icon-curriculum">Marksheet</a>
+        </li>
+        <li>
+            <a href="/submission/rubricCriteria/{ID}" class="icon-criteria">Manage Criteria</a>
+        </li>
+        <!-- END class_mark -->
+        <!-- END manage_class -->
+    </ul>
     <!-- END page_controls -->
-    <!-- BEGIN edit_page -->
-    <li>
-        <a id="tab-columns" class="btn homepage-columns no-text" data-tab="tabs-2" title="Edit columns">
-            <span></span>
-        </a>
-    </li>
-    <li>
-        <a id="tab-component" class="btn homepage-component no-text" data-tab="tabs-1" title="Add components">
-            <span></span>
-        </a>
-    </li>
-    <!-- END edit_page -->
-    <!-- BEGIN readonly_switch_on -->
-    <li>
-        <a href="?readonly=1" class="btn homepage-view no-text" title="Teacher View - click to switch to Student View">
-            <span></span>
-        </a>
-    </li>
-    <!-- END readonly_switch_on -->
-    <!-- BEGIN readonly_switch_off -->
-    <li>
-        <a href="?readonly=0" class="btn homepage-view no-text" title="Student View - click to switch back to Teacher View">
-            <span></span>
-        </a>
-    </li>
-    <!-- END readonly_switch_off -->
-</ul>
+</div>
 
 <!-- BEGIN customise_page -->
-<div id="tabs-homepage">
+<div id="tabs-homepage" class="hide">
 <div id="tabs-1" class="customise-components">
     <div id="tabs-sub"> <!-- tabs-sub -->
         <ul class="ui-tabs admin-nav">
@@ -417,10 +387,10 @@
 </div>
 <!-- END customise_page -->
 
-<div id="homepage" class="homepage clearfix">
-    <div class="clearfix column top" data-position="top">{component_position_top}</div>
-    <div class="clearfix column left" data-position="left" style="width: {TEMPLATE_LEFT_COLUMN_WIDTH}%">{component_position_left}</div>
-    <div class="clearfix column right" data-position="right" style="width: {TEMPLATE_RIGHT_COLUMN_WIDTH}%">{component_position_right}</div>
+<div id="homepage" class="row">
+    <div class="small-12 column" data-position="top">{component_position_top}</div>
+    <div class="small-12 large-{TEMPLATE_LEFT_COLUMN_WIDTH} column" data-position="left">{component_position_left}</div>
+    <div class="small-12 large-{TEMPLATE_RIGHT_COLUMN_WIDTH} column" data-position="right">{component_position_right}</div>
     <!--
     <div class="bottom clearfix">{component_position_bottom}</div>
     -->
