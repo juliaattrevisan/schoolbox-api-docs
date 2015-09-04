@@ -8,28 +8,28 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form name="create" action="/survey/section/modify" id="modifySection" method="post">
+        <form name="create" action="/survey/section/modify" id="modifySection" method="post" class="top">
             <input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
             <input name="section_id" type="hidden" value="{SECTION_ID}" />
             <input name="sequence" type="hidden" value="{SEQUENCE}" />
 
             <h2 class="subheader">Modify Section</h2>
-            <section>
-                <div class="content">
-                    <label>
-                        Section Title
-                        <input name="title" type="text" size="35" value="{TITLE}" />
-                    </label>
+            <section class="content">
+                <label>
+                    Section Title
+                    <input name="title" type="text" size="35" value="{TITLE}" />
+                </label>
 
-                    <label>
-                        Description
-                        <textarea name="description">{DESCRIPTION}</textarea>
-                    </label>
-                </div>
+                <label>
+                    Description
+                    <textarea name="description">{DESCRIPTION}</textarea>
+                </label>
             </section>
-            <label>
-                <input type="submit" class='expand' value="Modify Section" />
-            </label>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" class='expand' value="Modify Section" />
+                </div>
+            </div>
         </form>
     </div>
 </div>
