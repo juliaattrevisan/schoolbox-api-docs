@@ -83,16 +83,19 @@
 </script>
 <!-- END custom_head -->
 
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{ACTION} News</h1>
+        </div>
+    </div>
+    <nav>
+        <a class="icon-advanced-list customise" href="#" title="Toggle Advanced Options"></a>
+    </nav>
+</div>
+
 <div class="row">
     <div class="small-12 island">
-        <h1>{ACTION} News</h1>
-        <span class="header-actions">
-            <a class="button icon-advanced-list customise" href="#" title="Advanced Options">
-                <span {ADV_OFF}>Show</span>
-                <span {ADV_ON}>Hide</span>
-            </a>
-        </span>
-
         <form class="top" id="newsForm" method="post" enctype="multipart/form-data" action="/news/modifyForm.php">
             <section>
                 <input type="hidden" name="newsID" value="{NEWS_ID}"/>
