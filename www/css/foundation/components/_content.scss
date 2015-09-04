@@ -788,7 +788,7 @@ $rotate-th-width: $square-grid-td-size;
         }
     }
 	> li{
-		@extend .row; // there is no scenario in which .information-list > li will operate as anything other than a row
+		@include grid-row($behavior:nest); // there is no scenario in which .information-list > li will operate as anything other than a row
 		border-bottom: 1px solid $body-bg;
 		position: relative;
 		overflow: visible;
@@ -1425,6 +1425,24 @@ ul.meta {
 			padding-right: $meta-icon-margin;
 		}
 	}
+}
+
+dl.inline-dl {
+
+	@include grid-row($behavior:nest);
+
+	dt, dd {
+		@include grid-column($columns:false, $position:true);
+	}
+
+	dt {
+		clear: left;
+	}
+
+	dd {
+		clear: right;
+	}
+
 }
 
 @media #{$small-only} {

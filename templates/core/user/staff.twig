@@ -1,0 +1,117 @@
+{# Permissions #}
+{% set isSuperuser = session.user.isSuperUser() %}
+{% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
+{% set isSelf = session.user.getId() == user.getId() %}
+
+{# details: su, staff, self or parent #}
+{% set showDetails = isStaff or isSelf %}
+{# emails: students may view other student's emails #}
+{% set showEmail = showDetails or session.user.getRole().isStudent() %}
+
+{% set showButtons = showDetails %}
+
+<div class="row">
+    <div class="small-12 column">
+        <h1>{{ user.formatName() }}</h1>
+        <span class='header-actions'>
+            {% if isSuperuser %}
+                <a href="/adminv2/modify-user/{{ user.getId() }}" class="button icon-modify" title="Modify User"></a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="no-pad">
+            <div class="content no-pad">
+                <div class="row no-margin">
+                    <div class="small-12 medium-6 large-4 columns no-pad">
+                        <img src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=profile" class="full-width"/>
+                    </div>
+
+                    <div class="small-12 medium-6 large-8 columns no-pad">
+                        <dl class="inline-dl no-margin">
+                            {% if showEmail %}
+                                {% block details_email %}
+                                    {% if user.getEmail() %}
+                                        <dt class="no-margin small-6 medium-3">Email:</dt>
+                                        <dd class="no-margin small-6 medium-9">
+                                            <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
+                                        </dd>
+                                    {% endif %}
+                                {% endblock details_email %}
+                            {% endif %}
+
+                            {% if showDetails %}
+                                {% if externalUser.StaffDepartment %}
+                                    <dt class="no-margin small-6 medium-3">Department</dt>
+                                    <dd class="no-margin small-6 medium-9">{{ externalUser.StaffDepartment }}</dd>
+                                {% endif %}
+                                {% if externalUser.StaffCategoryDescription %}
+                                    <dt class="no-margin small-6 medium-3">Type</dt>
+                                    <dd class="no-margin small-6 medium-9">{{ externalUser.StaffCategoryDescription }}</dd>
+                                {% endif %}
+                                {% if externalUser.StaffBuilding %}
+                                    <dt class="no-margin small-6 medium-3">Building</dt>
+                                    <dd class="no-margin small-6 medium-9">{{ externalUser.StaffBuilding }}</dd>
+                                {% endif %}
+                                {% if externalUser.StaffRoom %}
+                                    <dt class="no-margin small-6 medium-3">Room</dt>
+                                    <dd class="no-margin small-6 medium-9">{{ externalUser.StaffRoom }}</dd>
+                                {% endif %}
+                                {% if externalUser.StaffExtension %}
+                                    <dt class="no-margin small-6 medium-3">Extension</dt>
+                                    <dd class="no-margin small-6 medium-9">{{ externalUser.StaffExtension }}</dd>
+                                {% endif %}
+                                {% if externalUser.StaffCampusDescription %}
+                                    <dt class="no-margin small-6 medium-3">Campus</dt>
+                                    <dd class="no-margin small-6 medium-9">{{ externalUser.StaffCampusDescription }}</dd>
+                                {% endif %}
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+
+                {% block buttons_island %}
+                    <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8" data-equalizer>
+
+                        {% block buttons %}
+                            {% if eportfolioAuth %}
+                                {% block buttons_eportfolio %}
+                                    <li class="no-pad">
+                                        <a href="/eportfolio/{{ user.getId() }}/profile"
+                                           class="no-margin fat button icon-fat icon-32 icon-eportfolio"
+                                           data-equalizer-watch>ePortfolio</a>
+                                    </li>
+                                {% endblock buttons_eportfolio %}
+                            {% endif %}
+
+                            {% if showButtons %}
+                                {% block buttons_calendar %}
+                                    <li class="no-pad">
+                                        <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
+                                           class="no-margin fat button icon-fat icon-32 icon-calendar"
+                                           data-equalizer-watch>Calendar</a>
+                                    </li>
+                                {% endblock buttons_calendar %}
+                            {% endif %}
+
+                            {% if showButtons %}
+                                {% block buttons_timetable %}
+                                    <li class="no-pad">
+                                        <a href="/timetable/{{ user.getId() }}"
+                                           class="no-margin fat button icon-fat icon-32 icon-timetable"
+                                           data-equalizer-watch>Timetable</a>
+                                    </li>
+                                {% endblock buttons_timetable %}
+                            {% endif %}
+
+                        {% endblock buttons %}
+                    </ul>
+                {% endblock buttons_island %}
+
+            </div>
+        </section>
+    </div>
+</div>

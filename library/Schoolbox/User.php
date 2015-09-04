@@ -544,6 +544,42 @@ class User implements JsonSerializable
     }
 
     /**
+     * Is this user a parent of $child?
+     *
+     * Requires that `loadParents()` has been called on $child.
+     *
+     * @param  User $child
+     * @return bool
+     */
+    public function isParentOf(User $child)
+    {
+        foreach ($child->getParents() as $parent) {
+            if ($parent->getId() == $this->getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Is this user a child of $parent?
+     *
+     * Requires that `loadParents()` has been called on this user.
+     *
+     * @param  User $parent
+     * @return bool
+     */
+    public function isChildOf(User $parent)
+    {
+        foreach ($this->getParents() as $childParent) {
+            if ($childParent->getId() == $parent->getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Load parents into object from external db
      */
     public function loadParents()

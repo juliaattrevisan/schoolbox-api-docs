@@ -1,0 +1,546 @@
+{# Permissions #}
+{% set isSuperuser = session.user.isSuperUser() %}
+{% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
+{% set isSelf = session.user.getId() == user.getId() %}
+{% set isParentOfStudent = session.user.isParentOf(user) %}
+
+{# medical: if allowed in config, and user is staff or parent of this child #}
+{% set showMedicalAlert = not config.protect_medicalspecial_profile and isStaff %}
+{# details: su, staff, self or parent #}
+{% set showDetails = isStaff or isSelf or isParentOfStudent %}
+{# emails: students may view other student's emails #}
+{% set showEmail = showDetails or session.user.getRole().isStudent() %}
+
+{% set showButtons = showDetails %}
+{# contacts: su, staff or parent #}
+{# Should a student see their own contact details? I think so #}
+{% set showContacts = isStaff or isParentOfStudent %}
+{% set showContactsAlert = showContacts and isStaff %}
+{% set showSubjects = showDetails %}
+{% set showGroups = showDetails %}
+
+<div class="row">
+    <div class="small-12 column">
+        <h1>{{ user.formatName() }}</h1>
+        <span class='header-actions'>
+            {% if isSuperuser %}
+            <a href="/adminv2/modify-user/{{ user.getId() }}" class="button icon-modify" title="Modify User"></a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="no-pad no-margin">
+            <div class="content no-pad">
+                <div class="row no-margin">
+                    <div class="small-12 medium-6 large-4 columns no-pad">
+                        {# as far as I know portrait always shows #}
+                        <img src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=profile" class="full-width"/>
+                    </div>
+
+                    <div class="small-12 medium-6 large-8 columns no-pad">
+                        {% block medicalAlert %}
+                        {% if externalUser.StudentMedicalAlert and showMedicalAlert %}
+                        <div class="alert-box alert icon-alert no-margin">
+                            Medical Note: {{ externalUser.StudentMedicalAlert }}
+                        </div>
+                        {% endif %}
+                        {% endblock medicalAlert %}
+
+                        {% block details %}
+                        <dl class="inline-dl no-margin">
+                            {% if showEmail %}
+                                {% block details_email %}
+                                {% if user.getEmail() %}
+                                <dt class="no-margin small-6 medium-3">Email:</dt>
+                                <dd class="no-margin small-6 medium-9">
+                                    <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
+                                </dd>
+                                {% endif %}
+                                {% endblock details_email %}
+                            {% endif %}
+
+                            {% if showDetails %}
+                                {% block details_studentId %}
+                                <dt class="no-margin small-6 medium-3">Student ID:</dt>
+                                <dd class="no-margin small-6 medium-9">{{ user.getExternalId() }}</dd>
+                                {% endblock details_studentId %}
+
+                                {% block details_dob %}
+                                {% if externalUser.StudentBirthDate %}
+                                <dt class="no-margin small-6 medium-3">Date of Birth:</dt>
+                                <dd class="no-margin small-6 medium-9">{{ externalUser.StudentBirthDate|date(locale.date.dateOnlyFormat) }}</dd>
+                                {% endif %}
+                                {% endblock details_dob %}
+
+                                {% block details_formTeacher %}
+                                {% if formTeacher %}
+                                <dt class="no-margin small-6 medium-3">Class Teacher:</dt>
+                                <dd class="no-margin small-6 medium-9">
+                                    {% if formTeacher.getId() %}
+                                    <a href="{{ session.mailhandle }}{{ formTeacher.getEmail() }}">{{ formTeacher.formatName() }}</a>
+                                    {% else %}
+                                    {{ formTeacher.formatName() }}
+                                    {% endif %}
+                                </dd>
+                                {% endif %}
+                                {% endblock details_formTeacher %}
+
+                                {% block details_yearLevel %}
+                                {% if externalUser.StudentYearLevel %}
+                                <dt class="no-margin small-6 medium-3">Year Level:</dt>
+                                <dd class="no-margin small-6 medium-9">{{ externalUser.StudentYearLevel }}</dd>
+                                {% endif %}
+                                {% endblock details_yearLevel %}
+
+                                {% block details_tutorTeacher %}
+                                {% if tutorTeacher %}
+                                <dt class="no-margin small-6 medium-3">Tutor:</dt>
+                                <dd class="no-margin small-6 medium-9">
+                                    {% if tutorTeacher.getId() %}
+                                        <a href="{{ session.mailhandle }}{{ tutorTeacher.getEmail() }}">{{ tutorTeacher.formatName() }}</a>
+                                    {% else %}
+                                        {{ tutorTeacher.formatName() }}
+                                    {% endif %}
+                                </dd>
+                                {% endif %}
+                                {% endblock details_tutorTeacher %}
+
+                                {% block details_coordTeacher %}
+                                {#{% if coordTeacher %}#}
+                                {#<dt class="no-margin small-6 medium-3">Year Coordinator:</dt>#}
+                                {#<dd class="no-margin small-6 medium-9">#}
+                                    {#{% if coordTeacher.getId() %}#}
+                                        {#<a href="{{ session.mailhandle }}{{ coordTeacher.getEmail() }}">{{ coordTeacher.formatName() }}</a>#}
+                                    {#{% else %}#}
+                                        {#{{ coordTeacher.formatName() }}#}
+                                    {#{% endif %}#}
+                                {#</dd>#}
+                                {#{% endif %}#}
+                                {% endblock details_coordTeacher %}
+
+                                {% block details_house %}
+                                {% if externalUser.StudentHouseDescription %}
+                                <dt class="no-margin small-6 medium-3">House:</dt>
+                                <dd class="no-margin small-6 medium-9">{{ externalUser.StudentHouseDescription }}</dd>
+                                {% endif %}
+                                {% endblock details_house %}
+
+                                {% block details_tutorGroup %}
+                                {% if externalUser.StudentTutorDescription %}
+                                <dt class="no-margin small-6 medium-3">Tutor Group:</dt>
+                                <dd class="no-margin small-6 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
+                                {% endif %}
+                                {% endblock details_tutorGroup %}
+
+                                {% block details_hohTeacher %}
+                                {% if hohTeacher %}
+                                <dt class="no-margin small-6 medium-3">Head of House:</dt>
+                                <dd class="no-margin small-6 medium-9">
+                                    {% if hohTeacher.getId() %}
+                                        <a href="{{ session.mailhandle }}{{ hohTeacher.getEmail() }}">{{ hohTeacher.formatName() }}</a>
+                                    {% else %}
+                                        {{ hohTeacher.formatName() }}
+                                    {% endif %}
+                                </dd>
+                                {% endif %}
+                                {% endblock details_hohTeacher %}
+
+                                {% block details_studentForm %}
+                                {% if externalUser.StudentForm %}
+                                <dt class="no-margin small-6 medium-3">Class:</dt>
+                                <dd class="no-margin small-6 medium-9">{{ externalUser.StudentForm }}</dd>
+                                {% endif %}
+                                {% endblock details_studentForm %}
+
+                                {% block details_studentType %}
+                                {% if boarderType %}
+                                <dt class="no-margin small-6 medium-3">Student Type:</dt>
+                                <dd class="no-margin small-6 medium-9">{{ boarderType }}</dd>
+                                {% endif %}
+                                {% endblock details_studentType %}
+
+                                {% block details_studiesCode %}
+                                {#{% if externalUser.StudentStudiesCode %}#}
+                                {#<dt class="no-margin small-6 medium-3">Studies Code:</dt>#}
+                                {#<dd class="no-margin small-6 medium-9">{{ externalUser.StudentStudiesCode }}</dd>#}
+                                {#{% endblock %}#}
+                                {% endblock details_studiesCode %}
+                            {% endif %}
+                        </dl>
+                        {% endblock details %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {% block buttons_island %}
+        <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8" data-equalizer>
+
+            {% block buttons %}
+                {% if showButtons %}
+                    {% block buttons_dueWork %}
+                        {% if not (config.restrict_parent_duework_access and session.user.isParent()) %}
+                            <li class="no-pad">
+                                <a href="/submission/dueWork/0/{{ user.getId() }}"
+                                   class="no-margin fat button icon-fat icon-32 icon-due-work"
+                                   data-equalizer-watch>Due Work</a>
+                            </li>
+                        {% endif %}
+                    {% endblock buttons_dueWork %}
+                {% endif %}
+
+                {% if showButtons %}
+                    {% block buttons_grades %}
+                        {% if not (config.restrict_parent_grades and session.user.isParent()) %}
+                            <li class="no-pad">
+                                <a href="/submission/allWork/{{ user.getId() }}"
+                                   class="no-margin fat button icon-fat icon-32 icon-tick"
+                                   data-equalizer-watch>Grades</a>
+                            </li>
+                        {% endif %}
+                    {% endblock buttons_grades %}
+                {% endif %}
+
+                {% if eportfolioAuth %}
+                    {% block buttons_eportfolio %}
+                        <li class="no-pad">
+                            <a href="/eportfolio/{{ user.getId() }}/profile"
+                               class="no-margin fat button icon-fat icon-32 icon-eportfolio"
+                               data-equalizer-watch>ePortfolio</a>
+                        </li>
+                    {% endblock buttons_eportfolio %}
+                {% endif %}
+
+                {% if showButtons %}
+                    {% block buttons_calendar %}
+                        <li class="no-pad">
+                            <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
+                               class="no-margin fat button icon-fat icon-32 icon-calendar"
+                               data-equalizer-watch>Calendar</a>
+                        </li>
+                    {% endblock buttons_calendar %}
+                {% endif %}
+
+                {% if showButtons %}
+                    {% block buttons_timetable %}
+                        <li class="no-pad">
+                            <a href="/timetable/{{ user.getId() }}"
+                               class="no-margin fat button icon-fat icon-32 icon-timetable"
+                               data-equalizer-watch>Timetable</a>
+                        </li>
+                    {% endblock buttons_timetable %}
+                {% endif %}
+
+                {% if showButtons %}
+                    {% block buttons_boarderLeave %}
+                        {% if config.boarder_leave_enabled and user.getResidentialHouse() %}
+                            <li class="no-pad">
+                                <a href="/modules/leave/student/{{ user.getId() }}"
+                                   class="no-margin fat button icon-fat icon-32 icon-boarder-leave"
+                                   data-equalizer-watch>Boarder Leave</a>
+                            </li>
+                        {% endif %}
+                    {% endblock buttons_boarderLeave %}
+                {% endif %}
+
+                {% if showButtons %}
+                    {% block buttons_pastoralCare %}
+                        {% if isStaff and config.external_type == 'synergetic' and config.external_staff_portal %}
+                            <li class="no-pad">
+                                <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.getExternalId() }}"
+                                   class="no-margin fat button icon-fat icon-32 icon-modify"
+                                   target="_blank"
+                                   data-equalizer-watch>Pastoral Care</a>
+                            </li>
+                        {% endif %}
+                    {% endblock buttons_pastoralCare %}
+                {% endif %}
+
+            {% endblock buttons %}
+        </ul>
+        {% endblock buttons_island %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 xlarge-6 xlarge-push-6 columns">
+        {% if showContacts %}
+        <div class="row">
+            {% block contacts_island %}
+            <div class="small-12 medium-6 xlarge-12 island">
+                {% block contacts %}
+                <h2 class="subheader">Contact Information</h2>
+
+                {% for message in externalUser.AlertMessages %}
+                {% block contacts_alert %}
+                    {# Only staff may view contact alerts #}
+                    {% if showContactsAlert %}
+                    <div class="alert-box alert icon-alert no-margin">
+                        {{ message }}
+                    </div>
+                    {% endif %}
+                {% endblock contacts_alert %}
+                {% endfor %}
+
+                <section>
+                    <div class="content no-pad">
+                        <ul class="information-list">
+                            {% for contact in contacts %}
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="avatar-card">
+                                        {% if contact.main %}
+                                        <a href="/search/user/{{ contact.main.getId() }}">
+                                            <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
+                                            {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
+                                        </a>
+                                        {% else %}
+                                        <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
+                                        {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
+                                        {% endif %}
+                                        <p class="meta">{{ contact.StudentContactRelation }}</p>
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a href="#" class="icon-more" data-dropdown="row-options-contact-{{ contact.StudentContactID }}"></a>
+                                </nav>
+                                <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ contact.StudentContactID }}">
+                                    {% if contact.StudentContactDefaultEmail %}
+                                    <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></li>
+                                    {% endif %}
+                                    {% if contact.StudentContactMobilePhone %}
+                                    <li><a class="icon-mobile" href="tel:{{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a></li>
+                                    {% endif %}
+                                    {% if contact.StudentContactOccupPhone %}
+                                    <li><a class="icon-mobile" href="tel:{{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a></li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+
+                            {# is there a spouse? #}
+                            {% if contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred %}
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="avatar-card">
+                                        {# need to know user's schoolbox info here #}
+                                        {% if contact.spouse %}
+                                        <a href="/search/user/{{ contact.spouse.getId() }}">
+                                            <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
+                                            {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
+                                        </a>
+                                        {% else %}
+                                        <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
+                                        {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
+                                        {% endif %}
+                                        <p class="meta">{{ contact.StudentContactSpouseRelation }}</p>
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a href="#" class="icon-more" data-dropdown="row-options-contact-{{ contact.StudentContactSpouseID }}"></a>
+                                </nav>
+                                <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ contact.StudentContactSpouseID }}">
+                                    {% if contact.StudentContactSpouseDefaultEmail %}
+                                        <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a></li>
+                                    {% endif %}
+                                    {% if contact.StudentContactSpouseMobilePhone %}
+                                        <li><a class="icon-mobile" href="tel:{{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a></li>
+                                    {% endif %}
+                                    {% if contact.StudentContactSpouseOccupPhone %}
+                                        <li><a class="icon-mobile" href="tel:{{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a></li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+                            {% endif %}
+
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="avatar-card">
+                                        <span class="icon-home icon-32"></span>
+                                        {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
+                                        <p>{{ contact.StudentContactAddress1 }}</p>
+                                        <p>{{ contact.StudentContactAddress2 }}</p>
+                                        <p>{{ contact.StudentContactAddress3 }}</p>
+                                        <p>{{ contact.StudentContactSuburb }},</p>
+                                        <p>{{ contact.StudentContactState }} {{ contact.StudentContactPostCode }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a class="icon-mobile" href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}"></a>
+                                </nav>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </section>
+                {% endblock contacts %}
+            </div>
+            {% endblock contacts_island %}
+
+            {% block emergencyContacts_island %}
+            <div class="small-12 medium-6 xlarge-12 island">
+                {% block emergencyContacts %}
+                {# up to 3 emergency contact blocks
+                 # show no header if no emergencies
+                 #}
+                {% if externalUser.StudentEmergencyName
+                   or externalUser.StudentEmergency2Name
+                   or externalUser.StudentEmergency3Name
+                %}
+                <h2 class="subheader">Emergency Contact Information</h2>
+                <section>
+                    <div class="content no-pad">
+                        <ul class="information-list">
+                            {% for i in 1..3 %}
+                                {% set index = (i == 1 ? '' : i) %}
+                                {% if externalUser["StudentEmergency#{index}Name"] %}
+                                    <li class="actions-small-1 actions-medium-2">
+                                        <div class="list-item">
+                                            <div class="avatar-card">
+                                                <span class="icon-alert icon-32"></span>
+                                                {{ externalUser["StudentEmergency#{index}Name"] }}
+                                            </div>
+                                        </div>
+                                        <nav>
+                                            <a href="#" class="icon-more" data-dropdown="row-options-emergency-{{ i }}"></a>
+                                        </nav>
+                                        <ul class="f-dropdown" data-dropdown-content id="row-options-emergency-{{ i }}">
+                                            <li class="full-width">
+                                                <a class="icon-mobile" href="tel:{{ externalUser["StudentEmergency#{index}Phone"] }}">
+                                                    {{ externalUser["StudentEmergency#{index}Phone"] }}
+                                                </a>
+                                            </li>
+                                            <li class="full-width">
+                                                <a class="icon-mobile" href="tel:{{ externalUser["StudentEmergency#{index}PhoneAlt"] }}">
+                                                    {{ externalUser["StudentEmergency#{index}PhoneAlt"] }}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </section>
+                {% endif %}
+                {% endblock emergencyContacts %}
+            </div>
+            {% endblock emergencyContacts_island %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="small-12 xlarge-6 xlarge-pull-6 columns">
+        {% if showSubjects %}
+        {% for group, subjectGroup in subjects %}
+        {# Keep a running total of all teachers emails in this group #}
+        {% set teacherEmails = '' %}
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">{{ group }}</h2>
+                {% for subject in subjectGroup %}
+                <section>
+                    <div class="content no-pad">
+                        <ul class="subject-list">
+                            <li>
+                                <div class="list-item">
+                                    <div class="small-12 avatar card">
+                                        {% if subject.folder.getId() %}
+                                        <a href="/homepage/code/{{ subject.code }}">
+                                            <span class="icon-folder icon-32"></span>
+                                            {{ subject.name }}
+                                        </a>
+                                        {% else %}
+                                        <span class="icon-folder icon-32"></span>
+                                        {{ subject.name }}
+                                        {% endif %}
+                                        <p class="meta">{{ subject.code }}</p>
+                                    </div>
+                                </div>
+                            </li>
+                            {% for teacher in subject.teachers %}
+                            {% set teacherEmails = teacherEmails ~ teacher.getEmail() ~ ',' %}
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="avatar-card">
+                                        <a href="/search/user/{{ teacher.getId() }}">
+                                            <img src="/portrait.php?userId={{ teacher.getExternalId() }}&amp;size=square64" />
+                                            {{ teacher.formatName() }}
+                                        </a>
+                                        <p class="meta">{{ teacher.getRole().getName() }}</p>
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a class="icon-email" href="{{ session.mailhandle }}{{ teacher.getEmail() }}" title="Email {{ teacher.getEmail() }}"></a>
+                                </nav>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </section>
+                {% endfor %}
+
+                {% if session.user.getRole().isStaff() and config.mail_enable %}
+                <form action="/mail/createMail.php" method="post">
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <input type="hidden" name="replyto" value="{{ session.user.getEmail() }}"/>
+                            <input type="hidden" name="bcc" value="{{ teacherEmails }}"/>
+                            <input type="submit" value="Email All {{ group }} Teachers" />
+                        </div>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if showGroups and groups is not empty %}
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">Groups</h2>
+                {% for group in groups %}
+                <section>
+                    <div class="content no-pad">
+                        <ul class="subject-list">
+                            <li>
+                                <div class="list-item">
+                                    <div class="small-12 avatar card">
+                                        <a href="/homepage/{{ group.id }}">
+                                            <span class="icon-folder icon-32"></span>
+                                            {{ group.name }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                            {% if group.owner %}
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="avatar-card">
+                                        <a href="/search/user/{{ group.owner.getId() }}">
+                                            <img src="/portrait.php?userId={{ group.owner.getExternalId() }}&amp;size=square64" />
+                                            {{ group.owner.formatName() }}
+                                        </a>
+                                        <p class="meta">{{ group.owner.getRole().getName() }}</p>
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a class="icon-email"
+                                       href="{{ session.mailhandle }}{{ group.owner.email }}"
+                                       title="Email {{ group.owner.name }}"></a>
+                                </nav>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </section>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
