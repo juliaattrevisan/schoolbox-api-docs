@@ -4,7 +4,7 @@
     <div class="small-12 island">
         <h1>{ACTION} {THREAD_POST}</h1>
 
-        <form data-validatable method="post" enctype="multipart/form-data" action="/forum/modifyForm.php" class="top">
+        <form method="post" enctype="multipart/form-data" action="/forum/modifyForm.php" class="top" data-validatable>
             <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
             <input type="hidden" name="threadID" value="{THREAD_ID}" />
             <input type="hidden" name="postID" value="{POST_ID}" />
