@@ -151,18 +151,18 @@
 	textarea:hover:-ms-input-placeholder		{ color: $color; }
 }
 
-@mixin responsive-sides($multiplier: 1, $property: padding) {
+@mixin responsive-sides($multiplier: 1, $property: padding, $small-adjust: 8, $medium-adjust: 4, $large-adjust: 0) {
   @media #{$small-up} {
-    #{$property}-left: rem-calc(($multiplier * ($base-font-size - 8)));
-    #{$property}-right: rem-calc(($multiplier * ($base-font-size - 8)));
+    #{$property}-left: rem-calc(($multiplier * ($base-font-size - $small-adjust)));
+    #{$property}-right: rem-calc(($multiplier * ($base-font-size - $small-adjust)));
   }
   @media #{$medium-up} {
-    #{$property}-left: rem-calc(($multiplier * ($base-font-size - 4)));
-    #{$property}-right: rem-calc(($multiplier * ($base-font-size - 4)));
+    #{$property}-left: rem-calc(($multiplier * ($base-font-size - $medium-adjust)));
+    #{$property}-right: rem-calc(($multiplier * ($base-font-size - $medium-adjust)));
   }
   @media #{$large-up} {
-    #{$property}-left: rem-calc(($multiplier * $base-font-size));
-    #{$property}-right: rem-calc(($multiplier * $base-font-size));
+    #{$property}-left: rem-calc(($multiplier * $base-font-size - $large-adjust));
+    #{$property}-right: rem-calc(($multiplier * $base-font-size - $large-adjust));
   }
 }
 
