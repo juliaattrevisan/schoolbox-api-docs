@@ -372,7 +372,7 @@ input[type="submit"]{
 
 		// no text? be subtle
 		&.no-text {
-			@include contrast-bg();
+			//@include contrast-bg();
 			background: transparent;
 		}
 
@@ -517,7 +517,7 @@ ul.pagination .active a{
 }
 
 
-@mixin action-html-classes($size, $button-size: 3rem) {
+@mixin action-html-classes($size, $button-size: 3rem, $button-color: $primary-color) {
 
 	@for $i from 1 through $total-columns {
 
@@ -543,19 +543,27 @@ ul.pagination .active a{
 				//	height: 100%;
 				//}
 
+				&:hover {
+					a {
+						opacity: 0.4;
+					}
+				}
+
 				a {
 					display: inline-block;
-					opacity: 0.3;
+					opacity: 0.7;
 					text-align: center;
 					width: $button-size;
 					line-height: $button-size;
+					color: $button-color;
 
 					&:before {
 						padding-right: 0;
 					}
 
 					&:hover {
-						background-color: darken($ocean-sunset, 7%);
+						//background-color: darken($ocean-sunset, 7%);
+						opacity: 1;
 					}
 
 				}
