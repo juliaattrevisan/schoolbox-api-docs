@@ -12,7 +12,10 @@ $recaptcha = new ReCaptcha( Config::get('recaptcha_public_api_key'), Config::get
 
 $page->setFile(TEMPLATE_content, 'feedback.html');
 $page->setBlock(TEMPLATE_content, 'recaptcha', 'recaptcha_block');
-$page->setTitle('Feedback');
+
+$page->setVar(array(
+    'TITLE' => Cfg::get('title')
+));
 
 if ( is_numeric($_SESSION['id']) ) {
     $user = $userHandler->getByID($_SESSION['id']);
