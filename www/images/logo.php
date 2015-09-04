@@ -30,7 +30,6 @@ $logoSizes = array('skin_logo_square' => array(
                                             'apple144'  => array(144,144),
                                             'apple152'  => array(152,152),
                                             'apple180'  => array(180,180),
-
                                         ),
               'skin_logo_large' => array(
                                             'normal' => array(196, 400),
