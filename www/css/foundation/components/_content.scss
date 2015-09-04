@@ -800,6 +800,7 @@ $rotate-th-width: $square-grid-td-size;
     }
 	> li{
 		@include grid-row($behavior:nest); // there is no scenario in which .information-list > li will operate as anything other than a row
+		@include responsive-sides(-1, margin);
 		border-bottom: 1px solid $body-bg;
 		position: relative;
 		overflow: visible;
@@ -899,6 +900,9 @@ $rotate-th-width: $square-grid-td-size;
     }
 	form {
 		margin: 0;
+	}
+	nav a:hover {
+		background-color: $row-action-hover-background;
 	}
 }
 
