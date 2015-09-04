@@ -187,12 +187,14 @@
     </div>
     <nav>
         <!-- BEGIN edit_page -->
-        <a id="tab-columns" class="icon-edit-columns" data-tab="tabs-2" title="Edit columns">
-            <span></span>
-        </a>
-        <a id="tab-component" class="icon-components" data-tab="tabs-1" title="Add components">
-            <span></span>
-        </a>
+        <ul class="tabs" data-tab>
+            <li class="tab-title">
+                <a class="icon-components" href="#tabs-1" title="Add components"></a>
+            </li>
+            <li class="tab-title">
+                <a class="icon-edit-columns" href="#tabs-2" title="Edit columns"></a>
+            </li>
+        </ul>
         <!-- END edit_page -->
         <!-- BEGIN readonly_switch_on -->
         <a href="?readonly=1" class="icon-staff-students" title="Teacher View - click to switch to Student View">
@@ -279,8 +281,8 @@
 </div>
 
 <!-- BEGIN customise_page -->
-<div id="tabs-homepage">
-    <div id="tabs-1">
+<div id="tabs-homepage" class="tabs-content">
+    <div id="tabs-1" class="content">
         <ul class="tabs" data-tab>
             <!-- BEGIN homepage_component_tab -->
             <li class="tab-title">
@@ -309,7 +311,7 @@
     </div>
     <!--/tabs-1-->
 
-    <div id="tabs-2" class="customise-components clearfix">
+    <div id="tabs-2" class="content">
         <!-- BEGIN homepage_color_selector -->
         <div class="column-colours">
             <!-- These are selectable items - default to top selected only -->
