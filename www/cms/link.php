@@ -4,6 +4,7 @@ $groupHandler = new Group;
 
 use \Schoolbox\Resource\LinkMapper;
 use \Schoolbox\Resource\CategoryMapper;
+use \Schoolbox\Breadcrumbs;
 
 if (is_numeric($this->arg[0])) {
     try {
@@ -36,10 +37,26 @@ if (is_numeric($this->arg[0])) {
         'CATEGORY_ID'     => $link->getFolder()->getId(),
         'HIDDEN_SELECTED' => $link->getHidden() > 0 ? 'checked="checked"' : '',
     );
+
     $this->setVar($output);
 
-
-} elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Modify Link',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
+}
+elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     try {
         $folder = CategoryMapper::getInstance()->findById($this->arg[1]);
 
@@ -71,7 +88,23 @@ if (is_numeric($this->arg[0])) {
     );
     $this->setVar($output);
 
-} elseif ($this->arg[0] == 'multicat') {
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Add Link',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
+}
+elseif ($this->arg[0] == 'multicat') {
     /* Upload a link to multiple categories */
 
     $this->setFile(TEMPLATE_content, 'cms/add-link-multi-cat.html');

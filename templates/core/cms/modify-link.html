@@ -1,16 +1,12 @@
 <!-- BEGIN custom_head -->
 <script language="javascript" type="text/javascript" src="/javascript/jquery.validate.extensions.js"></script>
+<script language="javascript" type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script language="JavaScript" type="text/javascript">
+    $(function() {
 
-
-    $(document).ready(function () {
-
-        /*
-         * Modal for URL homepage selection
-         * */
-
-        $('#urlForm').on('click', '.open-modal', function() {
-
+        /* Modal for URL homepage selection
+         */
+        $('#urlForm').on('click', '[data-browse-resources]', function() {
             $('#resource-browser').socialstreamBrowser({
                 title: 'Choose a folder',
                 categoryId: 0,
@@ -21,11 +17,17 @@
             });
         });
 
-        $('#deleteLink').click(function () {
-            if (confirm('Are you sure you want to delete this link?')) {
-                window.location = '/cms/linkForm.php?delete={LINK_ID}&redirect=/homepage/{CATEGORY_ID}';
-            }
+        $('[data-delete]').click(function(event) {
+            event.preventDefault();
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this link?',
+                confirmEvent: function() {
+                    window.location = '/cms/linkForm.php?delete={LINK_ID}&redirect=/homepage/{CATEGORY_ID}';
+                }
+            });
         });
+
         $('#urlForm').validate({
             rules:{
                 url:{
@@ -34,54 +36,75 @@
             }
         });
     });
-
 </script>
 <!-- END custom_head -->
 
-<h1>{ACTION} Link</h1>
-<form method="post" id="urlForm" class="clearfix" onSubmit="return(verify());" action="/cms/linkForm.php">
-    <table class="standardForm table">
-        <tr>
-            <td><h4>Title</h4>
-                <em>One line description of the URL for the title </em></td>
-            <td><label><input type="text" name="description" maxlength="100" size="40" class="required"
-                              value="{DESCRIPTION}"/></label></td>
-        </tr>
-        <tr>
-        <tr>
-            <td class="formLabelWidth"><h4>URL</h4>
-                <em>The internet address for the website, eg. http://www.google.com.</em>
-                <em>Relative URLs are allowed, and will resolve relative to this domain.</em>
-            </td>
-            <td><label><input class="required" type="text" name="url" id="url" size="40" maxlength="250" value="{URL}"/></label>
-                <p class="clearfix"><a href="#" class="btn float-left open-modal"><span></span>Browse Resources</a>
-                </p>
+{BREADCRUMB}
 
-                <div id="resource-browser" class="hide">
-            </td>
-        </tr>
-        <td><h4>Description</h4>
-            <em>Any further details you wish to make about the URL, useful for enhancing search results</em>
-        </td>
-        <td><textarea name="comment" cols="40" rows="4" style="width:100%">{COMMENT}</textarea></td>
-        </tr>
-        <tr>
-            <td><h4>Location</h4>
-                <em>The link will be located in this folder. You can <a href="/cms/link/multicat/">upload a link to
-                    multiple locations</a> here.</em>
-            </td>
-            <td><input name="category" value="{CATEGORY_ID}" type="hidden"/><strong>{CATEGORY_NAME}</strong></div>
-            </td>
-        </tr>
-        <tr>
-            <td><h4>Hidden</h4>
-                <em>Hide this URL from anyone with read-only access.</em></td>
-            <td><input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} /></td>
-        </tr>
-    </table>
-    <input type='hidden' name='linkID' value='{LINK_ID}'/>
-    <input type="submit" name="Submit" value="{ACTION} Link" class="submit-btn-plain"/>
-    <!-- BEGIN delete_button -->
-    <input id='deleteLink' type="button" class="submit-btn-plain" value="Delete Link"/>
-    <!-- END delete_button -->
-</form>
+<div class="row">
+    <div class="small-12 island">
+
+        <!-- BEGIN delete_button -->
+        <span class='header-actions'>
+            <a href='#' class='button icon-more' data-dropdown='header-options'></a>
+        </span>
+        <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
+            <li><a class="icon-delete" data-delete>Delete Link</a></li>
+        </ul>
+        <!-- END delete_button -->
+
+        <h1>{ACTION} Link</h1>
+
+        <form method="post" id="urlForm" class="top" action="/cms/linkForm.php">
+            <input type='hidden' name='linkID' value='{LINK_ID}'/>
+            <input type='hidden' name='category' value='{CATEGORY_ID}'/>
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Title
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="One line description of the link, this will be used for display and search">?</span>
+                            <input type="text" name="description" maxlength="100" size="40" class="required" value="{DESCRIPTION}" />
+                        </label>
+
+                        <label for="url">
+                            URL
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The internet address for the website, eg. http://www.google.com. Relative URLs are allowed, and will resolve relative to this domain">?</span>
+                        </label>
+                    </div>
+                    <div class="medium-8 large-9 columns">
+                        <label for="url">
+                            <input class="required" type="text" name="url" id="url" size="40" maxlength="250" value="{URL}"/>
+                        </label>
+                    </div>
+                    <div class="medium-4 large-3 columns">
+                        <a href="#" class="button icon-folder" data-browse-resources>Browse Resources</a>
+                        <div id="resource-browser" class="hide"></div>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>
+                            Description
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Any further details you wish to make about the link, useful for enhancing search results">?</span>
+                            <textarea name="comment" cols="40" rows="4">{COMMENT}</textarea>
+                        </label>
+                        <label for="hidden">
+                            Hidden
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Hide this link from anyone with read-only access">?</span>
+                        </label>
+                        <div class="switch">
+                            <input name="hidden" id="hidden" type="checkbox" {HIDDEN_SELECTED}>
+                            <label for="hidden"></label>
+                        </div>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" name="Submit" value="{ACTION} Link"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
