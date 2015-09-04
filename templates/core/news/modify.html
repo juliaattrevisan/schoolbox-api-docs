@@ -56,7 +56,6 @@
             }
         });
 
-
         $('#newsForm').validate({
             rules:{
                 'group[]':{
@@ -80,9 +79,7 @@
                 }
             }
         });
-
     });
-
 </script>
 <!-- END custom_head -->
 
@@ -90,7 +87,7 @@
     <div class="small-12 island">
         <h1>{ACTION} News</h1>
         <span class="header-actions">
-            <a class="button icon-advanced-list customise" href="#" data-tooltip title="Advanced Options">
+            <a class="button icon-advanced-list customise" href="#" title="Advanced Options">
                 <span {ADV_OFF}>Show</span>
                 <span {ADV_ON}>Hide</span>
             </a>
@@ -101,83 +98,90 @@
                 <input type="hidden" name="newsID" value="{NEWS_ID}"/>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>Headline
+                        <label>
+                            Headline
                             <input type="text" class="required" name="heading" size="35" maxlength="100" value="{HEADING}"/>
                         </label>
-                        <label>Article
-                            <textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea>
+
+                        <label>
+                            Article
+                            <textarea id="body" name="body">{BODY}</textarea>
                         </label>
-                        <label>Feature Image
+
+                        <label>
+                            Feature Image
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The feature image to be attached to your news post">?</span>
                             {ATTACH_ZONE}
                         </label>
-                        <label>Topic
+
+                        <label>
+                            Topic
                             <select name="item_topic_id">
                                 <!-- BEGIN topic_list -->
-                                <option value="{TOPIC_ID}"
-                                {TOPIC_ID_SELECTED}>{TOPIC_NAME}</option>
+                                <option value="{TOPIC_ID}" {TOPIC_ID_SELECTED}>{TOPIC_NAME}</option>
                                 <!-- END topic_list -->
                             </select>
                         </label>
                     </div>
-                    </fieldset>
-                    <fieldset class="content">
-                        <div class="small-12 medium-6 columns">
-                            <fieldset>
-                                <legend>Roles
-                                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This news item will only be visible to the roles you select">?</span>
-                                </legend>
-                                <!-- BEGIN group_selection -->
-                                <input type="checkbox" id="role{GROUP_ID}" value="{GROUP_ID}" name="group[]" {GROUP_ID_SELECTED}/>
-                                <label for="role{GROUP_ID}" class="checkbox-label">{GROUP_NAME}</label>
-                                <!-- END group_selection -->
-                                <input type="checkbox" id="roleAll" value="{GROUP_ID}" name="" class="select_all" />
-                                <label for="roleAll" class="checkbox-label">Select all</label>
-                            </fieldset>
-                        </div>
-                        <!-- BEGIN campus_row -->
-                        <div class="small-12 medium-6 columns">
-                            <fieldset>
-                                <legend>Campus
-                                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This news item will only be visible to users that are within this campus">?</span>
-                                </legend>
-                                <!-- BEGIN campus_selection -->
-                                <input type="checkbox" id="campus{CAMPUS_ID}" value="{CAMPUS_ID}" name="campus[]" {CAMPUS_ID_SELECTED} />
-                                <label for="campus{CAMPUS_ID}" class="checkbox-label">{CAMPUS_NAME}</label>
-                                <!-- END campus_selection -->
-                                <input type="checkbox" id="campusAll" value="{GROUP_ID}" name="" class="select_all" />
-                                <label for="campusAll" class="checkbox-label">Select all</label>
-                            </fieldset>
-                        </div>
-                        <!-- END campus_row -->
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 medium-6 columns">
+                        <legend>
+                            Roles
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This news item will only be visible to the roles you select">?</span>
+                        </legend>
+                        <!-- BEGIN group_selection -->
+                        <input type="checkbox" id="role{GROUP_ID}" value="{GROUP_ID}" name="group[]" {GROUP_ID_SELECTED}/>
+                        <label for="role{GROUP_ID}" class="checkbox-label">{GROUP_NAME}</label>
+                        <!-- END group_selection -->
+                        <input type="checkbox" id="roleAll" value="{GROUP_ID}" name="" class="select_all" />
+                        <label for="roleAll" class="checkbox-label">Select all</label>
+                    </div>
+                    <!-- BEGIN campus_row -->
+                    <div class="small-12 medium-6 columns">
+                        <legend>Campus
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This news item will only be visible to users that are within this campus">?</span>
+                        </legend>
+                        <!-- BEGIN campus_selection -->
+                        <input type="checkbox" id="campus{CAMPUS_ID}" value="{CAMPUS_ID}" name="campus[]" {CAMPUS_ID_SELECTED} />
+                        <label for="campus{CAMPUS_ID}" class="checkbox-label">{CAMPUS_NAME}</label>
+                        <!-- END campus_selection -->
+                        <input type="checkbox" id="campusAll" value="{GROUP_ID}" name="" class="select_all" />
+                        <label for="campusAll" class="checkbox-label">Select all</label>
+                    </div>
+                    <!-- END campus_row -->
                     <div class="small-12 columns">
                         <label class="advanced" {SHOW_ADVANCED}>
                             Add users
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You may add users individually by typing their name and selecting from the list">?</span>
-                                <select id="addUser" name="userList[]" multiple placeholder="Search Users"></select>
+                            <select id="addUser" name="userList[]" multiple placeholder="Search Users"></select>
                         </label>
                     </div>
                 </fieldset>
                 <fieldset class="content">
                     <legend>Availability</legend>
                         <div class="small-12 large-6 columns">
-                                <label for="item_datetime_published" class="advanced" {SHOW_ADVANCED}>Publish Date
-                                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a date for when this news item will become available">?</span>
-                                    <input type="text" class="required" name="item_datetime_published" id="item_datetime_published" maxlength="50" value="{ITEM_DATETIME_PUBLISHED}"/>
-                                </label>
+                            <label for="item_datetime_published" class="advanced" {SHOW_ADVANCED}>
+                                Publish Date
+                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a date for when this news item will become available">?</span>
+                                <input type="text" class="required" name="item_datetime_published" id="item_datetime_published" maxlength="50" value="{ITEM_DATETIME_PUBLISHED}"/>
+                            </label>
                         </div>
                         <div class="small-4 large-2 columns">
-                            <label class="advanced" {SHOW_ADVANCED}>Hour
+                            <label class="advanced" {SHOW_ADVANCED}>
+                                Hour
                                 <input name="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" class="timeField"/>
                             </label>
                         </div>
                         <div class="small-4 large-2 columns">
-                            <label class="advanced" {SHOW_ADVANCED}>Minute
+                            <label class="advanced" {SHOW_ADVANCED}>
+                                Minute
                                 <input name="publish_minute" type="text" maxlength="2" value="{PUBLISH_MIN}" class="timeField"/>
                             </label>
                         </div>
                         <div class="small-4 large-2 columns">
-                            <label class="advanced" {SHOW_ADVANCED}>Period
+                            <label class="advanced" {SHOW_ADVANCED}>
+                                Period
                                 <select name="publish_period" class="short">
                                     <option value="am">AM</option>
                                     <option value="pm"
@@ -186,27 +190,30 @@
                             </label>
                         </div>
                         <div class="small-12 large-6 columns">
-                                <label for="item_datetime_expires">Expiry Date
-                                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a date for when this item will expire">?</span>
-                                </label>
-                                <input type="text" class="required" name="item_datetime_expires" id="item_datetime_expires" maxlength="50" value="{ITEM_DATETIME_EXPIRES}"/>
+                            <label for="item_datetime_expires">
+                                Expiry Date
+                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a date for when this item will expire">?</span>
+                            </label>
+                            <input type="text" class="required" name="item_datetime_expires" id="item_datetime_expires" maxlength="50" value="{ITEM_DATETIME_EXPIRES}"/>
                         </div>
                         <div class="small-4 large-2 columns">
-                            <label>Hour
+                            <label>
+                                Hour
                                 <input name="expires_hour" type="text" maxlength="2" value="{EXPIRES_HOUR}" class="timeField"/>
                             </label>
                         </div>
                         <div class="small-4 large-2 columns">
-                            <label>Minute
+                            <label>
+                                Minute
                                 <input name="expires_minute" type="text" maxlength="2" value="{EXPIRES_MIN}" class="timeField"/>
                             </label>
                         </div>
                         <div class="small-4 large-2 columns">
-                            <label>Period
+                            <label>
+                                Period
                                 <select name="expires_period" class="short">
                                     <option value="am">AM</option>
-                                    <option value="pm"
-                                    {EXPIRES_PM}>PM</option>
+                                    <option value="pm" {EXPIRES_PM}>PM</option>
                                 </select>
                             </label>
                         </div>
@@ -216,11 +223,11 @@
                 <div class="small-12 column">
                     <input type="submit" name="submit" value="{ACTION} News"/>
                 </div>
-            <!-- BEGIN delete_button -->
+                <!-- BEGIN delete_button -->
                 <div class="small-12 column">
                     <a class="button alert icon-delete expand" onclick="confirmDelete({NEWS_ID});">Delete News</a>
                 </div>
-            <!-- END delete_button -->
+                <!-- END delete_button -->
             </div>
         </form>
     </div>
