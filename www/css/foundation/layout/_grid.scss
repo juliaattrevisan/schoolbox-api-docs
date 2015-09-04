@@ -76,7 +76,7 @@ $block-grid-default-spacing: rem-calc(16);
 
 %mobile-padding {
 
-    > .button {
+    > .button, input[type=submit] {
         // loop in expand by default
         @extend .expand;
     }
