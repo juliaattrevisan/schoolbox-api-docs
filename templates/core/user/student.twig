@@ -96,7 +96,7 @@
                                 {% endblock details_yearLevel %}
 
                                 {% block details_tutorTeacher %}
-                                {% if tutorTeacher and externalUser.StudentForm|trim %}
+                                {% if tutorTeacher %}
                                 <dt class="no-margin small-6 medium-3">Tutor:</dt>
                                 <dd class="no-margin small-6 medium-9">
                                     {% if tutorTeacher.getId() %}
@@ -129,14 +129,14 @@
                                 {% endblock details_house %}
 
                                 {% block details_tutorGroup %}
-                                {% if externalUser.StudentForm|trim %}
+                                {% if externalUser.StudentTutorDescription %}
                                 <dt class="no-margin small-6 medium-3">Tutor Group:</dt>
                                 <dd class="no-margin small-6 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
                                 {% endif %}
                                 {% endblock details_tutorGroup %}
 
                                 {% block details_hohTeacher %}
-                                {% if hohTeacher and externalUser.StudentForm|trim %}
+                                {% if hohTeacher %}
                                 <dt class="no-margin small-6 medium-3">Head of House:</dt>
                                 <dd class="no-margin small-6 medium-9">
                                     {% if hohTeacher.getId() %}
@@ -149,7 +149,7 @@
                                 {% endblock details_hohTeacher %}
 
                                 {% block details_studentForm %}
-                                {% if not externalUser.StudentForm|trim %}
+                                {% if externalUser.StudentForm %}
                                 <dt class="no-margin small-6 medium-3">Class:</dt>
                                 <dd class="no-margin small-6 medium-9">{{ externalUser.StudentForm }}</dd>
                                 {% endif %}
