@@ -41,20 +41,22 @@ $(function() {
                             <input type="text" class="required" name="heading" size="35" maxlength="100" value="{HEADING}" />
                         </label>
                         <label>Article
-                            <textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea>
+                            <textarea id="body" name="body">{BODY}</textarea>
                         </label>
                     </div>
                 </fieldset>
                 <fieldset class="content">
                     <legend>Availability</legend>
                     <div class="small-12 columns">
-                        <label for="datetime_published" class="advanced">Publish Date
+                        <label for="datetime_published" class="advanced">
+                            Publish Date
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a date for when this news item will become available">?</span>
                             <input type="text" class="required" name="datetime_published" id="datetime_published" maxlength="50" value="{DATETIME_PUBLISHED}"/>
                         </label>
                     </div>
                     <div class="small-12 columns">
-                        <label for="datetime_published">Expiry Date
+                        <label for="datetime_published">
+                            Expiry Date
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a date for when this item will expire">?</span>
                         </label>
                         <input type="text" class="required" name="datetime_expires" id="datetime_expires" maxlength="50" value="{DATETIME_EXPIRES}"/>
