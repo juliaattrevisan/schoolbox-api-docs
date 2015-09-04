@@ -8,6 +8,7 @@ $charset: "utf-8";
 $primary-color:					#0066b0;
 $secondary-color:				#bdd7ea;
 $tertiary-color:				#0066b0;
+$body-bg:						#ededed;
 
 $button-color:					$secondary-color;
 $secondary-button-color:		$secondary-color;
@@ -20,7 +21,6 @@ $info-color:					#a0d3e8;
 $highlight-color:				#ffd100;
 
 $body-grey:						#8b8b8b;
-$body-bg:						#ededed;
 $ocean-sunset:					#fff3bd;
 
 // Socialstream New Post
@@ -54,6 +54,9 @@ $neutral-color:					$gainsboro;
 // for BC
 $tertiary:						$tertiary-color;
 
+$input-border-color:			tint($tertiary, 66%);
+$tabbar-bg:						$primary-color;
+$off-canvas-bg:					$white;
 
 // Dimensions
 // $search-width: 					256px;

@@ -176,7 +176,7 @@ $topbar-divider-border-top: solid 1px tint($topbar-bg, 20%);
 // Off Canvas Tab Bar Variables
 $include-html-off-canvas-classes: $include-html-classes !default;
 
-$tabbar-bg: $body-bg;
+$tabbar-bg: $body-bg !default;
 $tabbar-height: rem-calc(80);
 $tabbar-icon-width: $tabbar-height;
 $tabbar-line-height: $tabbar-height;
@@ -195,16 +195,16 @@ $tabbar-header-margin: 0;
 
 // Off Canvas Menu Variables
 $off-canvas-width: rem-calc(260);
-$off-canvas-bg: $body-bg;
+$off-canvas-bg: $body-bg !important;
 $off-canvas-bg-hover: scale-color($tabbar-bg, $lightness: -10%);
 
 // Off Canvas Menu List Variables
 $off-canvas-label-padding: rem-calc(($base-font-size));
-$off-canvas-label-color: $black;
+$off-canvas-label-color: calc-text-color($off-canvas-bg);
 $off-canvas-label-text-transform: uppercase;
 $off-canvas-label-font-size: rem-calc(($base-font-size - 2));
 $off-canvas-label-font-weight: $font-weight-bold;
-$off-canvas-label-bg: $off-canvas-bg;
+$off-canvas-label-bg: transparent !important;
 $off-canvas-label-border-top: 0px; //1px solid scale-color($off-canvas-label-bg, $lightness: 14%);
 $off-canvas-label-border-bottom: none;
 $off-canvas-label-margin:0;
@@ -614,7 +614,7 @@ $menu-slide: "transform 500ms ease";
     overflow: hidden;
   }
 	.tab-bar-section.middle{
-		padding-left: 12.375rem;
+		padding-left: 11.25rem;
 	}
 }
 
