@@ -10,12 +10,6 @@
         </span>
         <!-- END forum_post -->
 
-        <!-- BEGIN no_thread -->
-        <div class="alert-box warning">
-            This forum is currently empty. Post a new thread to get started.
-        </div>
-        <!-- END no_thread -->
-
         <form action="/forum/modifyForm.php" method="post">
             <table>
                 <thead>
@@ -62,6 +56,11 @@
                 <!-- END thread -->
                 </tbody>
             </table>
+            <!-- BEGIN no_thread -->
+            <div class="alert-box icon-alert">
+                This forum is currently empty. Post a new thread to get started.
+            </div>
+            <!-- END no_thread -->
             <p>
                 <!-- BEGIN delete_button -->
                 <a class="button icon-delete" data-action="delete">Delete Selected</a>
