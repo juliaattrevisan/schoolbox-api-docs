@@ -7,17 +7,19 @@
     <!-- END breadcrumb -->
 </ul>
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>{SURVEY_NAME}</h1>
-        <span class='header-actions'>
-            <a href='#' class='button icon-more no-text' data-dropdown='header-options'></a>
-        </span>
-        <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
-            <li><a href="/survey/attempts/{ASSESS_ID}" class="icon-view">View All Attempts</a></li>
-            <li><a href="/survey/export/csv/{ASSESS_ID}" class="icon-download">Export Survey CSV</a></li>
-        </ul>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{SURVEY_NAME}</h1>
+        </div>
     </div>
+    <nav>
+        <a class="icon-more" title="" data-dropdown="header-options"><span></span></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li><a href="/survey/attempts/{ASSESS_ID}" class="icon-view">View All Attempts</a></li>
+        <li><a href="/survey/export/csv/{ASSESS_ID}" class="icon-download">Export Survey CSV</a></li>
+    </ul>
 </div>
 
 <!-- BEGIN section -->
