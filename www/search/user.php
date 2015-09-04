@@ -256,8 +256,7 @@ if (is_numeric($this->arg[0])) {
     // advanced synergetic information
     if (Cfg::get('external_enable') && $user['synergy_id']) {
         $synUserHandler = new External_User();
-
-        if ($groupHandler->isParent($user['uid'])/* && $groupHandler->isStaff()*/) {
+        if ($groupHandler->isParent($user['uid'])) {
             renderParent(
                 $this,
                 $user,
@@ -265,35 +264,32 @@ if (is_numeric($this->arg[0])) {
                 new UserMapper(),
                 new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
             );
+        } elseif ($groupHandler->isStudent($user['uid'])) {
+            renderStudent(
+                $this,
+                $user,
+                $groupHandler,
+                $synUserHandler,
+                new External_Class(),
+                new UserMapper(),
+                new Folder\Mapper(),
+                new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
+            );
+        } elseif ($groupHandler->isStaff($user['uid'])) {
+            renderStaff(
+                $this,
+                $user,
+                $synUserHandler,
+                new UserMapper(),
+                new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
+            );
         } else {
-            if ($groupHandler->isStudent($user['uid'])) {
-                renderStudent(
-                    $this,
-                    $user,
-                    $groupHandler,
-                    $synUserHandler,
-                    new External_Class(),
-                    new UserMapper(),
-                    new Folder\Mapper(),
-                    new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
-                );
-            } elseif ($groupHandler->isStaff($user['uid'])/* && $groupHandler->isStaff()*/) {
-                renderStaff(
-                    $this,
-                    $user,
-                    $synUserHandler,
-                    new UserMapper(),
-                    new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
-                );
-            }
+            $this->pageNotFound();
         }
     } else {
         // Show something else (non-twig)
         // Probably a 404 screen
         $this->pageNotFound();
-//        //Remove subjects from output
-//        $renderer = new \Schoolbox\SubjectList\UserProfile($this, array());
-//        $renderer->render();
     }
 } else {
     error(2);
