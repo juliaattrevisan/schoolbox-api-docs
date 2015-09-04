@@ -1,8 +1,20 @@
+{# Permissions #}
+{% set isSuperuser = session.user.isSuperUser() %}
+{% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
+{% set isSelf = session.user.getId() == user.getId() %}
+
+{# details: only if allowed to show in include flag #}
+{% set showDetails = externalUser.DirectoryIncludeFlag and (isStaff or isSelf) %}
+{# emails: staff may view emails #}
+{% set showEmail = showDetails or isStaff %}
+
+{% set showButtons = isStaff or isSelf %}
+
 <div class="row">
     <div class="small-12 column">
         <h1>{{ user.formatName() }}</h1>
         <span class='header-actions'>
-            {% if session.user.isSuperuser() %}
+            {% if isSuperuser %}
                 <a href="/adminv2/modify-user/{{ user.getId() }}" class="button icon-modify" title="Modify User"></a>
             {% endif %}
         </span>
@@ -20,73 +32,91 @@
 
                     <div class="small-12 medium-6 large-8 columns no-pad">
                         <dl class="inline-dl no-margin">
-                            <dt class="no-margin small-6 medium-3">Email</dt>
-                            <dd class="no-margin small-6 medium-9">
-                                <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
-                            </dd>
-
-                            {% if externalUser.DirectoryIncludeFlag %}
-
-                            {% if not externalUser.SilentPhoneFlag %}
-                            <dt class="no-margin small-6 medium-3">Home Phone</dt>
-                            <dd class="no-margin small-6 medium-9">
-                                <a href="tel:{{ externalUser.HomePhone }}">{{ externalUser.HomePhone }}</a>
-                            </dd>
+                            {% if showEmail %}
+                                {% block details_email %}
+                                    {% if user.getEmail() %}
+                                        <dt class="no-margin small-6 medium-3">Email:</dt>
+                                        <dd class="no-margin small-6 medium-9">
+                                            <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
+                                        </dd>
+                                    {% endif %}
+                                {% endblock details_email %}
                             {% endif %}
 
-                            <dt class="no-margin small-6 medium-3">Mobile Phone</dt>
-                            <dd class="no-margin small-6 medium-9">
-                                <a href="tel:{{ externalUser.MobilePhone }}">{{ externalUser.MobilePhone }}</a>
-                            </dd>
-
-                            {% if externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname %}
-                            <dt class="no-margin small-12">Partner</dt>
-                            <dd class="no-margin small-12">
-                                <div class="avatar-card">
-                                    {% if spouse %}
-                                    <a href="/search/user/{{ spouse.id }}">
-                                        <img src="/portrait.php?userId={{ externalUser.SpouseID }}&amp;size=square64">
-                                        <p>{{ externalUser.SpouseTitle }} {{ externalUser.SpousePreferred }} {{ externalUser.SpouseSurname }}</p>
-                                    </a>
-                                    {% else %}
-                                    <img src="/portrait.php?userId={{ externalUser.SpouseID }}&amp;size=square64">
-                                    <p>{{ externalUser.SpouseTitle }} {{ externalUser.SpousePreferred }} {{ externalUser.SpouseSurname }}</p>
-                                    {% endif %}
-
-                                    {% if not (config.restrict_parent_emails and not session.user.getRole().isStaff()) %}
-                                    <p class="meta">
-                                        <a href="{{ session.mailhandle }}{{ externalUser.SpouseEmail }}">{{ externalUser.SpouseEmail }}</a>
-                                    </p>
-                                    {% endif %}
-                                    <p class="meta">
-                                        <a href="tel:{{ externalUser.SpouseMobilePhone }}">{{ externalUser.SpouseMobilePhone }}</a>
-                                    </p>
-                                </div>
-                            </dd>
+                            {% if showDetails and not externalUser.SilentPhoneFlag %}
+                                {% if externalUser.HomePhone %}
+                                    <dt class="no-margin small-6 medium-3">Home Phone</dt>
+                                    <dd class="no-margin small-6 medium-9">
+                                        <a href="tel:{{ externalUser.HomePhone }}">{{ externalUser.HomePhone }}</a>
+                                    </dd>
+                                {% endif %}
                             {% endif %}
+
+                            {% if showDetails %}
+                                {% if externalUser.MobilePhone %}
+                                    <dt class="no-margin small-6 medium-3">Mobile Phone</dt>
+                                    <dd class="no-margin small-6 medium-9">
+                                        <a href="tel:{{ externalUser.MobilePhone }}">{{ externalUser.MobilePhone }}</a>
+                                    </dd>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if showDetails %}
+                                {% if externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname %}
+                                    <dt class="no-margin small-12">Partner</dt>
+                                    <dd class="no-margin small-12">
+                                        <div class="avatar-card">
+                                            {% if spouse %}
+                                                <a href="/search/user/{{ spouse.id }}">
+                                                    <img src="/portrait.php?userId={{ externalUser.SpouseID }}&amp;size=square64">
+                                                    <p>{{ externalUser.SpouseTitle }} {{ externalUser.SpousePreferred }} {{ externalUser.SpouseSurname }}</p>
+                                                </a>
+                                            {% else %}
+                                                <img src="/portrait.php?userId={{ externalUser.SpouseID }}&amp;size=square64">
+                                                <p>{{ externalUser.SpouseTitle }} {{ externalUser.SpousePreferred }} {{ externalUser.SpouseSurname }}</p>
+                                            {% endif %}
+
+                                            {% if showEmail %}
+                                                {% if externalUser.SpouseEmail %}
+                                                    <p class="meta">
+                                                        <a href="{{ session.mailhandle }}{{ externalUser.SpouseEmail }}">{{ externalUser.SpouseEmail }}</a>
+                                                    </p>
+                                                {% endif %}
+                                            {% endif %}
+
+                                            {% if externalUser.SpouseMobilePhone %}
+                                            <p class="meta">
+                                                <a href="tel:{{ externalUser.SpouseMobilePhone }}">{{ externalUser.SpouseMobilePhone }}</a>
+                                            </p>
+                                            {% endif %}
+                                        </div>
+                                    </dd>
+                                {% endif %}
                             {% endif %}
                         </dl>
                     </div>
                 </div>
                 <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8" data-equalizer>
 
-                    {% block buttons_eportfolio %}
-                        {% if eportfolioAuth %}
+                    {% if showButtons %}
+                        {% block buttons_calendar %}
                             <li class="no-pad">
-                                <a href="/eportfolio/{{ user.getId() }}/profile"
-                                   class="no-margin fat button icon-fat icon-32 icon-eportfolio"
-                                   data-equalizer-watch>ePortfolio</a>
+                                <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
+                                   class="no-margin fat button icon-fat icon-32 icon-calendar"
+                                   data-equalizer-watch>Calendar</a>
                             </li>
-                        {% endif %}
-                    {% endblock buttons_eportfolio %}
+                        {% endblock buttons_calendar %}
+                    {% endif %}
 
-                    {% block buttons_calendar %}
-                        <li class="no-pad">
-                            <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
-                               class="no-margin fat button icon-fat icon-32 icon-calendar"
-                               data-equalizer-watch>Calendar</a>
-                        </li>
-                    {% endblock buttons_calendar %}
+                    {% if showButtons %}
+                        {% block buttons_timetable %}
+                            <li class="no-pad">
+                                <a href="/timetable/{{ user.getId() }}"
+                                   class="no-margin fat button icon-fat icon-32 icon-timetable"
+                                   data-equalizer-watch>Timetable</a>
+                            </li>
+                        {% endblock buttons_timetable %}
+                    {% endif %}
 
                 </ul>
             </div>
