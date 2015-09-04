@@ -8,7 +8,7 @@ VALUES ('skin_primary_colour',
         '11',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
-        'true');
+        'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_secondary_colour',
@@ -18,7 +18,7 @@ VALUES ('skin_secondary_colour',
         '11',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
-        'true');
+        'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_tertiary_colour',
@@ -28,7 +28,7 @@ VALUES ('skin_tertiary_colour',
         '11',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
-        'true');
+        'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_body_bg_colour',
@@ -37,7 +37,7 @@ VALUES ('skin_body_bg_colour',
         'Used for background colours and outlines',
         '11',(SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
-        'true');
+        'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_tab_bg_colour',
@@ -47,7 +47,7 @@ VALUES ('skin_tab_bg_colour',
         '11',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
-        'true');
+        'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_off_canvas_bg_colour',
@@ -57,7 +57,7 @@ VALUES ('skin_off_canvas_bg_colour',
         '11',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
-        'true');
+        'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_logo_square',
@@ -67,7 +67,7 @@ VALUES ('skin_logo_square',
         '12',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
-        'true');
+        'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_logo_large',
@@ -77,7 +77,7 @@ VALUES ('skin_logo_large',
         '12',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
-        'true');
+        'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_logo_login',
@@ -87,4 +87,14 @@ VALUES ('skin_logo_login',
         '12',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
-        'true');
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_login_bg',
+        'Login Background',
+        '',
+        'Upload large image to be used behind login form',
+        '12',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');

@@ -41,6 +41,11 @@ $logoSizes = array('skin_logo_square' => array(
                                             'hidpi' => array(592, 800),
                                             'tile310' => array(310,150),
               ),
+              'skin_login_bg' => array(
+                       'normal' => array(1024,768),
+                       'hidpi' => array(2048, 1440),
+                       'mobile' => array(512,384),
+              ),
 );
 
 $logo = $_GET['logo'];

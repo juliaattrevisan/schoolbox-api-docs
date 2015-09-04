@@ -1160,21 +1160,11 @@ class SitePage extends Page
         }
 
         // choose a background picture
-        $options = glob(WEB_root . "/images/{$this->site}/login-*.jpg");
+        $options = array(Config::get('skin_login_bg'));
 
         if (count($options)) {
-
-            // rip out any options that contain "logo", because a consistent naming convention is apparently too much to ask (sigh)
-            foreach ($options as $i => $opt) {
-                if (strpos($opt, 'logo')) {
-                    unset($options[$i]);
-                }
-            }
-            $options = array_values($options);
-
             $bg = $options[array_rand($options)];
-
-            $this->setVar('LOGIN_BG', substr($bg, strpos($bg, '/images/')));
+            $this->setVar('LOGIN_BG', '/images/logo.php?logo=skin_login_bg&size=normal');
         } else {
             $this->setVar('LOGIN_BG', '');
         }
