@@ -4,17 +4,16 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 use Schoolbox\Forum\PostMapper;
 use Schoolbox\Forum\ThreadMapper;
 use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Breadcrumbs;
 
 $forumHandler = new Forum();
 $groupHandler = new Group();
 
 $this->setFile(TEMPLATE_content, 'forum/modify.html');
-$this->setBlock(TEMPLATE_content, 'thread_link', 'thread_link_block');
 $this->setBlock(TEMPLATE_content, 'title', 'title_block');
 $this->setBlock(TEMPLATE_content, 'quote', 'quote_block');
 
 $this->setVar('title_block', '');
-
 
 if (is_numeric($this->arg[0])) {
     /* Category exists
@@ -25,7 +24,6 @@ if (is_numeric($this->arg[0])) {
     } catch (Exception $e) {
         error(2);
     }
-
 
     /* Forum exists
      */
@@ -63,10 +61,11 @@ if (is_numeric($this->arg[0])) {
 
             /** @var \Schoolbox\Forum\Thread $thread */
             $thread = ThreadMapper::getInstance()->findById($post->getThread()->getId());
-
-        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+        }
+        catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             //There is cases where you need to edit deleted stuff so letting this go through..
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             error(2);
         }
 
@@ -97,17 +96,39 @@ if (is_numeric($this->arg[0])) {
         $output['POST_ID']      = $post->getId();
         $output['BODY']         = Scrub::text($post->getBody());
 
+        /* Render out breadcrumbs
+         */
+        $trail = new Breadcrumbs();
+        $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+            [
+                'text' => $folder->getName(),
+                'href' => "/homepage/{$folder->getId()}",
+                'class' => '',
+            ],
+            [
+                'text' => 'Forum',
+                'href' => "/forum/{$folder->getId()}",
+                'class' => '',
+            ],
+            [
+                'text' => 'Modify Post',
+                'href' => "/forum/modify/{$folder->getId()}/{$post->getId()}/{$thread->getId()}",
+                'class' => 'active',
+            ]
+        ]);
+    }
+    elseif (is_numeric($this->arg[1])) {
 
-        $this->parse('thread_link_block', 'thread_link');
-    } elseif (is_numeric($this->arg[1])) {
         /* Add new reply
          */
         try {
             /** @var \Schoolbox\Forum\Thread $thread */
             $thread = ThreadMapper::getInstance()->findById($this->arg[1]);
-        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+        }
+        catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             //There is cases where you need to edit deleted stuff so letting this go through..
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             error(2);
         }
 
@@ -117,30 +138,66 @@ if (is_numeric($this->arg[0])) {
             error(19);
         }
 
-
         $output['ACTION']       = 'Post';
         $output['ACTION_CLASS'] = 'icon-add';
         $output['THREAD_POST']  = 'Reply';
         $output['THREAD_ID']    = $thread->getId();
         $output['THREAD_TITLE'] = Scrub::text($thread->getTitle());
 
-
-        $this->parse('thread_link_block', 'thread_link');
-    } else {
+        /* Render out breadcrumbs
+         */
+        $trail = new Breadcrumbs();
+        $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+            [
+                'text' => $folder->getName(),
+                'href' => "/homepage/{$folder->getId()}",
+                'class' => '',
+            ],
+            [
+                'text' => 'Forum',
+                'href' => "/forum/{$folder->getId()}",
+                'class' => '',
+            ],
+            [
+                'text' => 'Post Reply',
+                'href' => "/forum/modify/{$folder->getId()}/{$thread->getId()}",
+                'class' => 'active',
+            ]
+        ]);
+    }
+    else {
         $output['ACTION']       = 'Post';
         $output['ACTION_CLASS'] = 'icon-add';
         $output['THREAD_POST']  = 'Thread';
 
         $this->parse('title_block', 'title');
-        $this->setVar('thread_link_block', '');
-    }
 
+        /* Render out breadcrumbs
+         */
+        $trail = new Breadcrumbs();
+        $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+            [
+                'text' => $folder->getName(),
+                'href' => "/homepage/{$folder->getId()}",
+                'class' => '',
+            ],
+            [
+                'text' => 'Forum',
+                'href' => "/forum/{$folder->getId()}",
+                'class' => '',
+            ],
+            [
+                'text' => 'New Thread',
+                'href' => '',
+                'class' => 'active',
+            ]
+        ]);
+    }
 
     $this->setVar($output);
 
     /* output quote
      */
-
     $quotePostID = $this->arg[3];
 
     if (!is_numeric($quotePostID) && $this->arg[1]) {
@@ -161,9 +218,11 @@ if (is_numeric($this->arg[0])) {
                 'QUOTE_AUTHOR_ID' => $quote->getOwner()->getId()
             ));
             $this->parse('quote_block', 'quote');
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
         }
     }
-} else {
+}
+else {
     error(2);
 }

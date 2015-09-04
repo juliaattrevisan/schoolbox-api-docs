@@ -1,89 +1,86 @@
-<!-- BEGIN forum_post -->
-<span class="header-actions">
-    <a class="button icon-add" href="/forum/modify/{CATEGORY_ID}">Post Thread</a>
-</span>
-<!-- END forum_post -->
+{BREADCRUMB}
 
-<h1>{CATEGORY} Forum</h1>
+<div class="row">
+    <div class="small-12 island">
+        <h1>{CATEGORY} Forum</h1>
 
-<ul class="breadcrumb">
-    <li><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a></li>
-    <li><a href="#">Forum</a></li>
-</ul>
+        <!-- BEGIN forum_post -->
+        <span class="header-actions">
+            <a class="button icon-add" href="/forum/modify/{CATEGORY_ID}">Post Thread</a>
+        </span>
+        <!-- END forum_post -->
 
-<form action="/forum/modifyForm.php" method="post">
-    <table>
-        <thead>
-            <tr>
-                <!-- BEGIN modify_heading -->
-                <th></th>
-                <!-- END modify_heading -->
-                <th>Forum</th>
-                <th>Author</th>
-                <th>Replies</th>
-                <th>Views</th>
-                <th colspan="2">Last Post</th>
-            </tr>
-        </thead>
-        <tbody>
-        <!-- BEGIN thread -->
-        <tr>
-            <!-- BEGIN modify_thread -->
-            <td>
-                <input id="deleteThreads{THREAD_ID}" type="checkbox" name="deleteThreads[]" value="{THREAD_ID}" />
-                <label for="deleteThreads{THREAD_ID}" class="checkbox-label"></label>
-            </td>
-            <!-- END modify_thread -->
-            <td>
-                <h2><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE} {THREAD_LOCKED}</a></h2>
-            </td>
-            <td>
-                <div class="avatar-card">
-                    <a href="/search/user/{THREAD_AUTHOR_ID}" title="View Profile">
-                        <img src="/portrait.php?userId={THREAD_AUTHOR_EXTERNAL_ID}&size=square32"/>
-                        <p>{THREAD_AUTHOR}</p>
-                    </a>
-                    <p class="meta">Posted {THREAD_TIME}</p>
-                </div>
-            </td>
-            <td>{THREAD_REPLIES}</td>
-            <td>{THREAD_VIEWS}</td>
-            <td>
-                <!-- BEGIN last_post -->
-                <div class="avatar-card">
-                    <a href="/search/user/{THREAD_LAST_POST_USER_ID}" title="View Profile">
-                        <img src="/portrait.php?userId={THREAD_LAST_POST_USER_EXTERNAL_ID}&size=square32"/>
-                        <p>{THREAD_LAST_POST_USER}</p>
-                    </a>
-                    <p class="meta">Posted {THREAD_LAST_POST_TIME}</p>
-                </div>
-                <!-- END last_post -->
-            </td>
-            <td>
-                <a href="/forum/thread/{THREAD_ID}/{THREAD_LAST_PAGE}/#bottom" class="no-text icon-view" title="View Thread"></a>
-            </td>
-        </tr>
-        <!-- END thread -->
-        </tbody>
-    </table>
-    <p>
-        <!-- BEGIN delete_button -->
-        <button type="submit" class="icon-delete" data-action="delete" name="submit" value="Delete Selected">Delete Selected</button>
-        <!-- END delete_button -->
-    </p>
-</form>
+        <form action="/forum/modifyForm.php" method="post">
+            <table>
+                <thead>
+                    <tr>
+                        <!-- BEGIN modify_heading -->
+                        <th></th>
+                        <!-- END modify_heading -->
+                        <th>Forum</th>
+                        <th>Author</th>
+                        <th>Replies</th>
+                        <th>Views</th>
+                        <th>Last Post</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <!-- BEGIN thread -->
+                <tr>
+                    <!-- BEGIN modify_thread -->
+                    <td>
+                        <input id="deleteThreads{THREAD_ID}" type="checkbox" name="deleteThreads[]" value="{THREAD_ID}" />
+                        <label for="deleteThreads{THREAD_ID}" class="checkbox-label"></label>
+                    </td>
+                    <!-- END modify_thread -->
+                    <td>
+                        <a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE} {THREAD_LOCKED}</a>
+                    </td>
+                    <td>
+                        <a href="/search/user/{THREAD_AUTHOR_ID}" title="View Profile">
+                            {THREAD_AUTHOR}
+                        </a>
+                        <p class="meta">Posted {THREAD_TIME}</p>
+                    </td>
+                    <td>{THREAD_REPLIES}</td>
+                    <td>{THREAD_VIEWS}</td>
+                    <td>
+                        <!-- BEGIN last_post -->
+                        <a href="/search/user/{THREAD_LAST_POST_USER_ID}" title="View Profile">
+                            {THREAD_LAST_POST_USER}
+                        </a>
+                        <p class="meta">Posted {THREAD_LAST_POST_TIME}</p>
+                        <!-- END last_post -->
+                    </td>
+                </tr>
+                <!-- END thread -->
+                </tbody>
+            </table>
+            <!-- BEGIN no_thread -->
+            <div class="alert-box icon-alert">
+                This forum is currently empty. Post a new thread to get started.
+            </div>
+            <!-- END no_thread -->
+            <p>
+                <!-- BEGIN delete_button -->
+                <a class="button icon-delete" data-action="delete">Delete Selected</a>
+                <!-- END delete_button -->
+            </p>
+        </form>
 
-<ul class="pagination">
-    <!-- BEGIN previous_button -->
-    <li class="arrow"><a href="/forum/{CATEGORY_ID}/{PREVIOUS_PAGE}">&lsaquo;</a></li>
-    <!-- END previous_button -->
-    <!-- BEGIN page_number -->
-    <li class="{CURRENT}"><a href="/forum/{CATEGORY_ID}/{PAGE_INDEX}">{PAGE_INDEX}</a></li>
-    <!-- END page_number -->
-    <!-- BEGIN next_button -->
-    <li class="arrow"><a href="/forum/{CATEGORY_ID}/{NEXT_PAGE}">&rsaquo;</a></li>
-    <!-- END next_button -->
-</ul>
+        <ul class="pagination">
+            <!-- BEGIN previous_button -->
+            <li class="arrow"><a href="/forum/{CATEGORY_ID}/{PREVIOUS_PAGE}">&lsaquo;</a></li>
+            <!-- END previous_button -->
+            <!-- BEGIN page_number -->
+            <li class="{CURRENT}"><a href="/forum/{CATEGORY_ID}/{PAGE_INDEX}">{PAGE_INDEX}</a></li>
+            <!-- END page_number -->
+            <!-- BEGIN next_button -->
+            <li class="arrow"><a href="/forum/{CATEGORY_ID}/{NEXT_PAGE}">&rsaquo;</a></li>
+            <!-- END next_button -->
+        </ul>
+    </div>
+</div>
 
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
