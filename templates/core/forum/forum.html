@@ -1,15 +1,20 @@
 {BREADCRUMB}
 
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{CATEGORY} Forum</h1>
+        </div>
+    </div>
+    <nav>
+        <!-- BEGIN forum_post -->
+        <a class="icon-add" href="/forum/modify/{CATEGORY_ID}"><span></span></a>
+        <!-- END forum_post -->
+    </nav>
+</div>
+
 <div class="row">
     <div class="small-12 island">
-        <h1>{CATEGORY} Forum</h1>
-
-        <!-- BEGIN forum_post -->
-        <span class="header-actions">
-            <a class="button icon-add" href="/forum/modify/{CATEGORY_ID}">Post Thread</a>
-        </span>
-        <!-- END forum_post -->
-
         <form action="/forum/modifyForm.php" method="post">
             <table>
                 <thead>
