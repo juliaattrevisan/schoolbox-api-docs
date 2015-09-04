@@ -1,8 +1,10 @@
 {# Permissions #}
+{# medical: if allowed in config, and user is staff or parent of this child #}
 {% set showMedicalAlert =
     not config.protect_medicalspecial_profile
     and (session.user.isStaff() or session.user.isParentOf(user))
 %}
+{# details: su, staff, self or parent #}
 {% set showDetails =
     session.user.isSuperUser()
     or session.user.getRole().isStaff()
@@ -10,6 +12,17 @@
     or session.user.isParentOf(user)
 %}
 {% set showButtons = showDetails %}
+{# contacts: su, staff or parent #}
+{# Should a student see their own contact details? I think so #}
+{% set showContacts =
+    session.user.isSuperUser()
+    or session.user.getRole().isStaff()
+    or session.user.isParentOf(user)
+%}
+{% set showContactsAlert = session.user.isSuperUser() or session.user.getRole().isStaff() %}
+
+{% set showSubjects = showDetails %}
+{% set showGroups = showDetails %}
 
 <div class="row">
     <div class="small-12 column">
@@ -256,11 +269,7 @@
 
 <div class="row">
     <div class="small-12 xlarge-6 xlarge-push-6 columns">
-        {# Should a student see their own contact details? #}
-        {% if session.user.isParentOf(user)
-           or session.user.isSuperUser()
-           or session.user.getRole().isStaff()
-        %}
+        {% if showContacts %}
         <div class="row">
             {% block contacts_island %}
             <div class="small-12 medium-6 xlarge-12 island">
@@ -270,7 +279,7 @@
                 {% for message in externalUser.AlertMessages %}
                 {% block contacts_alert %}
                     {# Only staff may view contact alerts #}
-                    {% if session.user.isSuperUser() or session.user.getRole().isStaff() %}
+                    {% if showContactsAlert %}
                     <div class="alert-box alert icon-alert no-margin">
                         {{ message }}
                     </div>
@@ -427,6 +436,7 @@
     </div>
 
     <div class="small-12 xlarge-6 xlarge-pull-6 columns">
+        {% if showSubjects %}
         {% for group, subjectGroup in subjects %}
         {# Keep a running total of all teachers emails in this group #}
         {% set teacherEmails = '' %}
@@ -489,8 +499,9 @@
             </div>
         </div>
         {% endfor %}
+        {% endif %}
 
-        {% if groups is not empty %}
+        {% if showGroups and groups is not empty %}
         <div class="row">
             <div class="small-12 island">
                 <h2 class="subheader">Groups</h2>
