@@ -51,7 +51,7 @@ $block-grid-default-spacing: rem-calc(16);
 // Responsive Column Padding
 .column,
 .columns{
-    @include responsive-sides(1, padding);
+    @include responsive-sides(2, padding, 12, 0);
 }
 
 .full-width {
@@ -121,6 +121,13 @@ $block-grid-default-spacing: rem-calc(16);
 
 // yes, these are really really really specific, but it's for the greater good
 #content, .top {
+
+    @media #{$large-up} {
+        > .row {
+            margin-left: 1rem;
+        }
+    }
+
     > .row > .small-12,
     > .row > .medium-12 {
         @extend %mobile-padding;
