@@ -122,7 +122,7 @@
             },
             column: {
                 leftColumnWidth: '{TEMPLATE_LEFT_COLUMN_WIDTH}',
-                placeholderTpl: '<p class="placeholder" />',
+                placeholderTpl: '<p class="placeholder alert-box" />',
                 onToggle: function () {
                     var page = $(this.element);
 
@@ -300,7 +300,7 @@
                     <!-- BEGIN homepage_component_page -->
                     <ul class="content grid small-block-grid-2 medium-block-grid-4" id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
                         <!-- BEGIN homepage_component -->
-                        <li class="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}"
+                        <li class="{HOMEPAGE_COMPONENT_MULTIPLE_STATE} no-margin"
                             data-component-palette
                             data-count="{HOMEPAGE_COMPONENT_COUNT}"
                             data-multi="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}"
