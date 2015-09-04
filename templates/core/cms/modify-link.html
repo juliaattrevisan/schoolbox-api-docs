@@ -1,11 +1,11 @@
 <!-- BEGIN custom_head -->
 <script language="javascript" type="text/javascript" src="/javascript/jquery.validate.extensions.js"></script>
+<script language="javascript" type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script language="JavaScript" type="text/javascript">
-    $(document).ready(function () {
-        /*
-         * Modal for URL homepage selection
-         * */
+    $(function() {
 
+        /* Modal for URL homepage selection
+         */
         $('#urlForm').on('click', '[data-browse-resources]', function() {
             $('#resource-browser').socialstreamBrowser({
                 title: 'Choose a folder',
@@ -17,11 +17,17 @@
             });
         });
 
-        $('#deleteLink').click(function () {
-            if (confirm('Are you sure you want to delete this link?')) {
-                window.location = '/cms/linkForm.php?delete={LINK_ID}&redirect=/homepage/{CATEGORY_ID}';
-            }
+        $('[data-delete]').click(function(event) {
+            event.preventDefault();
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this link?',
+                confirmEvent: function() {
+                    window.location = '/cms/linkForm.php?delete={LINK_ID}&redirect=/homepage/{CATEGORY_ID}';
+                }
+            });
         });
+
         $('#urlForm').validate({
             rules:{
                 url:{
@@ -30,7 +36,6 @@
             }
         });
     });
-
 </script>
 <!-- END custom_head -->
 
@@ -91,7 +96,7 @@
                     <input type="submit" name="Submit" value="{ACTION} Link"/>
 
                     <!-- BEGIN delete_button -->
-                    <input id='deleteLink' type="button" class="button alert icon-delete" value="Delete Link"/>
+                    <input id='deleteLink' type="button" class="button alert icon-delete" value="Delete Link" data-delete />
                     <!-- END delete_button -->
                 </div>
             </div>
