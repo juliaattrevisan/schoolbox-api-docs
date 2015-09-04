@@ -1,65 +1,81 @@
-<h1>Chat Archive for {CATEGORY_TITLE}</h1>
-<span class="header-actions">
-    <a href="/homepage/{CATEGORY_ID}" class="button icon-previous">Return to Homepage</a>
-</span>
-
-<div class="large-2 columns">
-    <ul>
-        <li>
-            <!-- BEGIN year -->
-            {YEAR}
-            <ul>
-                <!-- BEGIN month -->
-                <li>
-                    <a href="/homepage/chatArchive/{MENU_CATEGORY_CLEAN}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
-                </li>
-                <!-- END month -->
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Chat Archive</h1>
+            <ul class="meta">
+                <li class="icon-home"><a href="/homepage/{CATEGORY_ID}" title="Visit Homepage">{CATEGORY_TITLE}</a></li>
             </ul>
-            <!-- END year -->
-        </li>
-    </ul>
+        </div>
+    </div>
+    <nav>
+        <a href="/homepage/{CATEGORY_ID}" class="icon-previous" title="Return to Homepage"></a>
+    </nav>
 </div>
 
-<div class="large-10 columns">
-    <!-- BEGIN chat_date -->
-    <h2>{CHAT_DATE}</h2>
-    <ul class="information-list">
-        <!-- BEGIN chat -->
-        <li>
-            <div class="large-12 columns">
-                <div class="clearfix">
-                    <div class="avatar-card">
-                        <a href="/search/user/{BLOG_AUTHOR_ID}" title="View Profile">
-                            <img src="/portrait.php?userId={CHAT_USER_SYNERGY_ID}&size=square32" alt="View Profile">
-                            <p>{POSTER}</p>
-                        </a>
-                        <p class="meta">Posted {DATETIME}</p>
+
+<div class="row">
+    <div class="small-12 large-3 island">
+        <h2 class="subheader">Archive</h2>
+        <section class="content">
+            <ul class="information-list">
+                <li>
+                    <!-- BEGIN year -->
+                    {YEAR}
+                    <ul class="information-list">
+                        <!-- BEGIN month -->
+                        <li>
+                            <a href="/homepage/chatArchive/{MENU_CATEGORY_CLEAN}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
+                        </li>
+                        <!-- END month -->
+                    </ul>
+                    <!-- END year -->
+                </li>
+            </ul>
+        </section>
+    </div>
+
+    <div class="small-12 large-9 island">
+        <!-- BEGIN chat_date -->
+        <h2 class="subheader">{CHAT_DATE}</h2>
+        <section>
+            <ul class="information-list">
+                <!-- BEGIN chat -->
+                <li>
+                    <div class="large-12 columns">
+                        <div class="avatar card">
+                            <a href="/search/user/{BLOG_AUTHOR_ID}" title="View Profile">
+                                <img src="/portrait.php?userId={CHAT_USER_SYNERGY_ID}&size=square64" alt="View Profile" />
+                                <p>{POSTER}</p>
+                            </a>
+                            <p class="meta">Posted {DATETIME}</p>
+                        </div>
+
+                        <article>
+                            {CHAT_BODY}
+                        </article>
                     </div>
-                </div>
+                </li>
+                <!-- END chat -->
+            </ul>
+        </section>
+        <!-- END chat_date -->
 
-                {CHAT_BODY}
-            </div>
-        </li>
-        <!-- END chat -->
-    </ul>
-    <!-- END chat_date -->
-
-    <ul class="pagination">
-        <!-- BEGIN previous_button -->
-        <li>
-            <a class="arrow" href="/homepage/chatArchive/{PREVIOUS_PAGE}">‹</a>
-        </li>
-        <!-- END previous_button -->
-        <!-- BEGIN page_number -->
-        <li class="{CURRENT}" >
-            <a href="/homepage/chatArchive/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
-        </li>
-        <!-- END page_number -->
-        <!-- BEGIN next_button -->
-        <li>
-            <a class="arrow" href="/homepage/chatArchive/{NEXT_PAGE}">›</a>
-        </li>
-        <!-- END next_button -->
-    </ul>
+        <ul class="pagination">
+            <!-- BEGIN previous_button -->
+            <li>
+                <a class="arrow" href="/homepage/chatArchive/{PREVIOUS_PAGE}">‹</a>
+            </li>
+            <!-- END previous_button -->
+            <!-- BEGIN page_number -->
+            <li class="{CURRENT}" >
+                <a href="/homepage/chatArchive/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
+            </li>
+            <!-- END page_number -->
+            <!-- BEGIN next_button -->
+            <li>
+                <a class="arrow" href="/homepage/chatArchive/{NEXT_PAGE}">›</a>
+            </li>
+            <!-- END next_button -->
+        </ul>
+    </div>
 </div>
-
