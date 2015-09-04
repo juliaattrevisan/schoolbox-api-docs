@@ -743,18 +743,29 @@ $rotate-th-width: $square-grid-td-size;
 
 // Hints
 .hint {
-	color: $white !important;
-	top: -3px;
+	color: calc-text-color($input-border-color) !important;
+	top: -1px;
 	margin-left: 4px;
+	width: 1rem;
+	height: 1rem;
 
-	@include label(
-		$padding: rem-calc(($base-font-size - 12)) rem-calc(($base-font-size - 10)),
-		$bg: $iron,
-		$radius: 12px
-	);
+	text-align: center;
+	text-decoration: none;
+	line-height: 1rem;
+	white-space: nowrap;
+	display: inline-block;
+	position: relative;
+	margin-bottom: auto;
+	padding: 1px 6px;
+	font-size: 0.75rem;
+	background-color: $input-border-color;
+	border-radius: 0.5rem;
 
 	&.icon-help:before{
 		color: $monsoon;
+	}
+	&.has-tip:hover {
+		border-bottom: none;
 	}
 }
 
