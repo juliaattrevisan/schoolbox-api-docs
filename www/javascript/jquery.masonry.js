@@ -722,9 +722,8 @@
         });
 
         handles.each(function () {
-            // TODO remove this $.children(a)
             var item         = $(this),
-                definitionId = item.children('a').attr('rel').split(' ')[0],
+                definitionId = item.find('a').attr('rel').split(' ')[0],
                 count        = typeof counts[definitionId] == 'undefined' ? 0 : counts[definitionId];
 
             // only allowed one
