@@ -21,7 +21,7 @@ $input-font-size: rem-calc(($base-font-size - 2));
 $input-bg-color: $white;
 $input-focus-bg-color: $ocean-sunset;
 $input-focus-color: $black;
-$input-border-color: tint($tertiary, 66%);
+$input-border-color: tint($tertiary, 66%) !default;
 $input-focus-border-color: tint($tertiary, 66%);
 $input-hover-bg-color: tint($tertiary, 87%);
 $input-hover-color: $black;
@@ -151,7 +151,7 @@ select option				{
 }
 
 
-@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem, $hover-color: $input-border-color, $active-color: $success-color) {
+@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem, $hover-color: $input-border-color, $active-color: $primary-color) {
 
     $checkbox-inner-size: $checkbox-size - (2 * $input-border-width);
 
@@ -216,7 +216,7 @@ select option				{
     &:checked {
         + #{$label-selector} {
             &:before, &:after {
-                color: $success-color !important;
+                color: $active-color !important;
                 background-color: tint($active-color, 70%) !important;
             }
         }
