@@ -184,9 +184,7 @@
      */
     MasonrySpectrum.prototype.getSelectedColumns = function () {
         return $(this.options.columnSelectorSelector)
-            .filter(function() {
-                return $(this).data(interactionState) === 'selected';
-            })
+            .filter(':checked')
             .map(function() { return this.id; })
             .toArray();
     };
