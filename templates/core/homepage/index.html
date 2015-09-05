@@ -1,28 +1,48 @@
 <!-- BEGIN custom_head -->
+
+<!-- Styles for text  -->
 <style type="text/css">
-    .top h2														{ color: #{top_head_font}; background-color: #{top_head_bg}; }
+    .column-top .top-bar,
+    .column-top .top-bar a, {
+        color: #{top_head_font} !important;
+        background-color: #{top_head_bg} !important;
+    }
+    .column-top .top-bar a.button,
+    .column-top .top-bar .divider {
+        border-color: #{top_head_font} !important;
+    }
     .top p, .top h3, .top .listing p.small, .top .wysiwyg		{ color: #{top_font}; }
-    .top a, .top .listing p.small a								{ color: #{top_link}; }
-    .top .box a:hover, .top .listing p.small a:hover			{ color: #{top_hover};  }
-    .top .text													{ background: #{top_bg_primary}; }
-    .top .listing, .top .information-list						{ background: #{top_bg_primary}; }
-    .top .listing .dark, .top .information-list .dark			{ background-color: #{top_bg_secondary}; }
+    /*.top .text													{ background: #{top_bg_primary}; }*/
+    /*.top .listing, .top .information-list						{ background: #{top_bg_primary}; }*/
+    /*.top .listing .dark, .top .information-list .dark			{ background-color: #{top_bg_secondary}; }*/
 
-    .left h2													{ color: #{left_head_font}; background-color: #{left_head_bg};	}
+    .column-left .top-bar,
+    .column-left .top-bar a {
+        color: #{left_head_font} !important;
+        background-color: #{left_head_bg} !important;
+    }
+    .column-left .top-bar a.button,
+    .column-left .top-bar .divider {
+        border-color: #{left_head_font} !important;
+    }
     .left p, .left h3, .left .listing p.small, .left .wysiwyg	{ color: #{left_font}; }
-    .left a, .left .listing p.small a							{ color: #{left_link}; }
-    .left .box a:hover, .left .listing p.small a:hover			{ color: #{left_hover};  }
-    .left .text													{ background: #{left_bg_primary}; }
-    .left .listing, .left .information-list > li	            { background: #{left_bg_primary}; }
-    .left .listing .dark, .left .information-list li.dark		{ background-color: #{left_bg_secondary}; }
+    /*.left .text													{ background: #{left_bg_primary}; }*/
+    /*.left .listing, .left .information-list > li	            { background: #{left_bg_primary}; }*/
+    /*.left .listing .dark, .left .information-list li.dark		{ background-color: #{left_bg_secondary}; }*/
 
-    .right h2													{ color: #{right_head_font}; background-color: #{right_head_bg};	}
+    .column-right .top-bar,
+    .column-right .top-bar a {
+        color: #{right_head_font} !important;
+        background-color: #{right_head_bg} !important;
+    }
+    .column-right .top-bar a.button,
+    .column-right .top-bar .divider {
+        border-color: #{right_head_font} !important;
+    }
     .right p, .right h3, .right .listing p.small, .right .wysiwyg { color: #{right_font}; }
-    .right a, .right .listing p.small a							{ color: #{right_link}; }
-    .right .box a:hover, .right .listing p.small a:hover		{ color: #{right_hover};  }
-    .right .text												{ background: #{right_bg_primary}; }
-    .right .listing, .right .information-list					{ background: #{right_bg_primary}; }
-    .right .listing .dark, .right .information-list .dark		{ background-color: #{right_bg_secondary}; }
+    /*.right .text												{ background: #{right_bg_primary}; }*/
+    /*.right .listing, .right .information-list					{ background: #{right_bg_primary}; }*/
+    /*.right .listing .dark, .right .information-list .dark		{ background-color: #{right_bg_secondary}; }*/
 
     /* wrap mimetypes in classes */
     <!-- BEGIN allowed_files -->
@@ -387,9 +407,9 @@
 <!-- END customise_page -->
 
 <div id="homepage" class="row">
-    <div class="small-12 column" data-position="top">{component_position_top}</div>
-    <div class="small-12 large-{TEMPLATE_LEFT_COLUMN_WIDTH} column" data-position="left">{component_position_left}</div>
-    <div class="small-12 large-{TEMPLATE_RIGHT_COLUMN_WIDTH} column" data-position="right">{component_position_right}</div>
+    <div class="small-12 column column-top" data-position="top">{component_position_top}</div>
+    <div class="small-12 large-{TEMPLATE_LEFT_COLUMN_WIDTH} column column-left" data-position="left">{component_position_left}</div>
+    <div class="small-12 large-{TEMPLATE_RIGHT_COLUMN_WIDTH} column column-right" data-position="right">{component_position_right}</div>
     <!--
     <div class="bottom clearfix">{component_position_bottom}</div>
     -->
