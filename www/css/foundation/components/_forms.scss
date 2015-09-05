@@ -131,8 +131,8 @@ $switch-negative-color: tint($secondary-color, 74%);
 // Custom overrides
 //
 form{
-	@include placeholder-color($body-grey, $font-weight-normal);
-	@include placeholder-hover-color($black);
+	@include placeholder-color($input-border-color, $font-weight-normal);
+	@include placeholder-hover-color($input-border-color);
 	margin: $form-spacing / 2 0;
 }
 

@@ -195,7 +195,7 @@ h1, h2 {
 
 h3, h4, h5, h6 {
 	.subheader {
-		@include contrast-bg(0.5, $white);
+		@include contrast-bg($background: $white);
 	}
 }
 
