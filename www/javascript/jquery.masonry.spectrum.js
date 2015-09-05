@@ -86,6 +86,7 @@
                     throw Error("Invalid selector");
                 }
 
+                mspec.resetWidth();
                 mspec.resetColours(mspec.masonry.columns, colourSet);
 
                 // copy values from defaults into pickers and reload
@@ -197,6 +198,13 @@
         colours = colours || this.options.colours.defaults;
         $.each(colours, this.updateColor);
         return false;
+    };
+
+    /**
+     * @returns {boolean}
+     */
+    MasonrySpectrum.prototype.resetWidth = function () {
+        this.masonry.updateWidth(this.masonry.slider.data('original-value'));
     };
 
     /**

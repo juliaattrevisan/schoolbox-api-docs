@@ -179,31 +179,33 @@
 
 
     Masonry.prototype.initSlider = function () {
-        var opt     = this.options,
-            // cache these here, so they don't have to be computed ever time the slider is moved
-            columns = {
-                left: this.columns.filter(opt.column.position.left),
-                right: this.columns.filter(opt.column.position.right)
-            },
-            classes = [];
+        var masonry = this;
 
         if (this.slider) {
             throw new Error("Slider is already initialised");
         }
 
+        this.slider = $(this.options.slider.selector);
+        this.slider.on('change.fndtn.slider', function() {
+            masonry.updateWidth($(this).attr('data-slider'));
+        });
+    };
+
+    Masonry.prototype.updateWidth = function(width) {
+        var columns = {
+                left: this.columns.filter(this.options.column.position.left),
+                right: this.columns.filter(this.options.column.position.right)
+            },
+            classes = [],
+            left  = width,
+            right = 12 - left;
+
         for (var i = 1; i <= 11; i++) {
             classes.push('large-'+Number(i));
         }
         classes = classes.join(' ');
-        this.slider = $(this.options.slider.selector);
-        this.slider.on('change.fndtn.slider', function() {
-            // Search left and right cols
-            var left  = $(this).attr('data-slider');
-            var right = 12 - left;
-
-            columns.left.removeClass(classes).addClass('large-'+Number(left));
-            columns.right.removeClass(classes).addClass('large-'+Number(right));
-        });
+        columns.left.removeClass(classes).addClass('large-'+Number(left));
+        columns.right.removeClass(classes).addClass('large-'+Number(right));
     };
 
 
