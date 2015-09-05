@@ -87,7 +87,7 @@
                 }
 
                 mspec.resetWidth();
-                mspec.resetColours(mspec.masonry.columns, colourSet);
+                mspec.resetColours(colourSet);
 
                 // copy values from defaults into pickers and reload
                 $.each(colourSet, function(key, value) {
@@ -189,14 +189,16 @@
 
 
     /**
-     * @param {$} columns - the columns to be reset. Array of JQuery DOM references
      * @param {object} colours
      * @returns {boolean}
      */
-    MasonrySpectrum.prototype.resetColours = function (columns, colours) {
+    MasonrySpectrum.prototype.resetColours = function (colours) {
         //noinspection AssignmentToFunctionParameterJS
+        var masonry = this;
         colours = colours || this.options.colours.defaults;
-        $.each(colours, this.updateColor);
+        $.each(colours, function(i, v) {
+            masonry.updateColor(i, v);
+        });
         return false;
     };
 
@@ -261,7 +263,7 @@
 
                 switch (masonry) {
                     case 'resetColours':
-                        mspec.resetColours(args[1], mspec.options.colours.original);
+                        mspec.resetColours(mspec.options.colours.original);
                         break;
 
                     default:
