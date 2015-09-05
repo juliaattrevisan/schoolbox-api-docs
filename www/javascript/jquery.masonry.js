@@ -180,55 +180,29 @@
 
     Masonry.prototype.initSlider = function () {
         var opt     = this.options,
-            masonry = this;
-
             // cache these here, so they don't have to be computed ever time the slider is moved
             columns = {
                 left: this.columns.filter(opt.column.position.left),
                 right: this.columns.filter(opt.column.position.right)
-            };
+            },
+            classes = [];
 
         if (this.slider) {
             throw new Error("Slider is already initialised");
         }
 
+        for (var i = 1; i <= 11; i++) {
+            classes.push('large-'+Number(i));
+        }
+        classes = classes.join(' ');
         this.slider = $(this.options.slider.selector);
+        this.slider.on('change.fndtn.slider', function() {
+            // Search left and right cols
+            var left  = $(this).attr('data-slider');
+            var right = 12 - left;
 
-        this.slider.slider({
-            min: opt.slider.min,
-            max: opt.slider.max,
-            value: opt.column.leftColumnWidth,
-
-            slide: function (event, ui) {
-                var width = ui.value - 0.5;
-
-                columns.left.css('width', width + '%');
-                columns.right.css('width', (99 - width) + '%')
-            },
-
-            create: function () {
-                // magic string is acceptable here because it's put there by jquery.slider
-                masonry.slider.find('.'+sliderHandleClass).append('<span/>');
-            },
-
-            stop: function (event, ui) {
-
-                // why does this need to send both values? in all other cases, rWidth is calculated from lWidth...
-                var data = {
-                    leftColWidth: ui.value - 0.5,
-                    rightColWidth: 99.5 - ui.value
-                };
-
-                data = $.extend({}, data, masonry.options.context);
-
-                // don't attempt to fire a request an a non-existent URL
-                if (!opt.slider.url) {
-                    console.log('AJAX sliderStop', data);
-                    return;
-                }
-
-                $.post(opt.slider.url, data, opt.slider.complete);
-            }
+            columns.left.removeClass(classes).addClass('large-'+Number(left));
+            columns.right.removeClass(classes).addClass('large-'+Number(right));
         });
     };
 
