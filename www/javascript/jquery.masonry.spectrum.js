@@ -204,6 +204,11 @@
      * @returns {boolean}
      */
     MasonrySpectrum.prototype.resetWidth = function () {
+        this.masonry.slider.foundation(
+            'slider',
+            'set_value',
+            this.masonry.slider.data('original-value')
+        );
         this.masonry.updateWidth(this.masonry.slider.data('original-value'));
     };
 
