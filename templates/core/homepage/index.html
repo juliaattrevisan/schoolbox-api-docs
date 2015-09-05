@@ -3,7 +3,7 @@
 <!-- Styles for text  -->
 <style type="text/css">
     .column-top .top-bar,
-    .column-top .top-bar a, {
+    .column-top .top-bar a {
         color: #{top_head_font} !important;
         background-color: #{top_head_bg} !important;
     }
@@ -11,10 +11,10 @@
     .column-top .top-bar .divider {
         border-color: #{top_head_font} !important;
     }
-    .top p, .top h3, .top .listing p.small, .top .wysiwyg		{ color: #{top_font}; }
-    /*.top .text													{ background: #{top_bg_primary}; }*/
-    /*.top .listing, .top .information-list						{ background: #{top_bg_primary}; }*/
-    /*.top .listing .dark, .top .information-list .dark			{ background-color: #{top_bg_secondary}; }*/
+    .column-top .island .content {
+        color: #{top_font} !important;
+        background-color: #{top_bg_primary} !important;
+    }
 
     .column-left .top-bar,
     .column-left .top-bar a {
@@ -25,10 +25,10 @@
     .column-left .top-bar .divider {
         border-color: #{left_head_font} !important;
     }
-    .left p, .left h3, .left .listing p.small, .left .wysiwyg	{ color: #{left_font}; }
-    /*.left .text													{ background: #{left_bg_primary}; }*/
-    /*.left .listing, .left .information-list > li	            { background: #{left_bg_primary}; }*/
-    /*.left .listing .dark, .left .information-list li.dark		{ background-color: #{left_bg_secondary}; }*/
+    .column-left .island .content {
+        color: #{left_font} !important;
+        background-color: #{left_bg_primary} !important;
+    }
 
     .column-right .top-bar,
     .column-right .top-bar a {
@@ -39,10 +39,10 @@
     .column-right .top-bar .divider {
         border-color: #{right_head_font} !important;
     }
-    .right p, .right h3, .right .listing p.small, .right .wysiwyg { color: #{right_font}; }
-    /*.right .text												{ background: #{right_bg_primary}; }*/
-    /*.right .listing, .right .information-list					{ background: #{right_bg_primary}; }*/
-    /*.right .listing .dark, .right .information-list .dark		{ background-color: #{right_bg_secondary}; }*/
+    .column-right .island .content {
+        color: #{right_font} !important;
+        background-color: #{right_bg_primary} !important;
+    }
 
     /* wrap mimetypes in classes */
     <!-- BEGIN allowed_files -->
