@@ -219,10 +219,10 @@
                     break;
                 case 'head_font':
                     column.find('.top-bar, .top-bar a').css({color: color});
+                    column.find('.top-bar .divider').css({borderColor: color});
                     break;
                 case 'head_bg':
                     column.find('.top-bar, .top-bar a').css({backgroundColor: color});
-                    column.find('.top-bar .divider').css({borderColor: color});
                     break;
             }
         }
