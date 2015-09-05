@@ -65,15 +65,10 @@
 
         $(this.element)
             .on('click', this.options.columnSelectorSelector, function (event) {
-                event.preventDefault();
                 // Don't allow deselect of the only column selected
-                var element  = $(this);
-                var deselect = element.data(interactionState) === 'selected';
-                if (!(deselect && mspec.getSelectedColumns().length <= 1)) {
-                    element
-                        .toggleClass('selected', !deselect)
-                        .data(interactionState, deselect ? '' : 'selected');
-
+                if (mspec.getSelectedColumns().length < 1) {
+                    event.preventDefault();
+                } else {
                     mspec.loadColorpickerColors();
                 }
             })
