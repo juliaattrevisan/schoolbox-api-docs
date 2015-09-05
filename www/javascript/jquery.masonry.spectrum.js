@@ -206,70 +206,25 @@
      * @returns {*}
      */
     MasonrySpectrum.prototype.updateColor = function (element, color) {
-        switch (element) {
-            case 'top_bg_primary':
-                return $('.top .text, .top .listing, .top .information-list li').css('background-color', color);
-                break;
-            case 'top_bg_secondary':
-                return $('.top .dark').css('background-color', color);
-                break;
-            case 'top_head_font':
-                return $('.top h2').css('color', color);
-                break;
-            case 'top_head_bg':
-                return $('.top h2').css('background-color', color);
-                break;
-            case 'top_font':
-                return $('.top, .top p').css('color', color);
-                break;
-            case 'top_link':
-                return $('.top a').css('color', color);
-                break;
-            case 'left_bg_primary':
-                return $('.left .text, .left .listing, .left .information-list li').css('background-color', color);
-                break;
-            case 'left_bg_secondary':
-                return $('.left .dark').css('background-color', color);
-                break;
-            case 'left_head_font':
-                return $('.left h2').css('color', color);
-                break;
-            case 'left_head_bg':
-                return $('.left h2').css('background-color', color);
-                break;
-            case 'left_font':
-                return $('.left, .left p').css('color', color);
-                break;
-            case 'left_link':
-                return $('.left a').css('color', color);
-                break;
-            case 'left_hover':
-                return $('.right a:hover').css('color', color);
-                break;
-            case 'right_bg_primary':
-                return $('.right .text, .right .listing, .right .information-list li').css('background-color', color);
-                break;
-            case 'right_bg_secondary':
-                return $('.right .dark').css('background-color', color);
-                break;
-            case 'right_head_font':
-                return $('.right h2').css('color', color);
-                break;
-            case 'right_head_bg':
-                return $('.right h2').css('background-color', color);
-                break;
-            case 'right_font':
-                return $('.right, .right p').css('color', color);
-                break;
-            case 'right_link':
-                return $('.right a').css('color', color);
-                break;
-            case 'right_hover':
-                return $('.right a:hover').css('color', color);
-                break;
-            default:
-                return $('.left .text').css('background-color', color);
-                break;
+        // 1: column, 2: element to update
+        var matches = element.match(/^(.*?)_(.*)/);
+        if (matches) {
+            var column = this.masonry.columns.filter('[data-position="'+matches[1]+'"]');
+            switch (matches[2]) {
+                case 'font':
+                    column.find('.island section').css({color: color});
+                    break;
+                case 'bg_primary':
+                    column.find('.island section').css({backgroundColor: color});
+                    break;
+                case 'head_font':
+                    column.find('.top-bar, .top-bar a').css({color: color});
+                    break;
+                case 'head_bg':
+                    column.find('.top-bar, .top-bar a').css({backgroundColor: color});
+                    column.find('.top-bar .divider').css({borderColor: color});
+                    break;
+            }
         }
     };
 
