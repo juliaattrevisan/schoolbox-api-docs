@@ -102,8 +102,10 @@
                     return;
                 }
 
+                // This saves everything, not just colors
                 var data = {
-                    colors: mspec.options.colours.pickers
+                    colors: mspec.options.colours.pickers,
+                    width: masonry.slider.attr('data-slider')
                 };
 
                 data = $.extend({}, data, mspec.masonry.options.context);
