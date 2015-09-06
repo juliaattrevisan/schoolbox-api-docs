@@ -333,19 +333,39 @@
             </div>
             <!--/tabs-1-->
 
-            <div id="tabs-2" class="content">
+            <div id="tabs-2" class="content" data-equalizer data-equalizer-mq="medium-up">
                 <form method="POST" action="" name="saveColours">
 
-                    <div class="row" data-equalizer data-equalizer-mq="medium-up">
+                    <!-- no point showing a slider for small screens which they cannot affect -->
+                    <fieldset class="hide-for-small">
+                        <legend>
+                            Column Width
+                            <span data-tooltip class="has-tip tip-top hint" title="Drag the slider to change the width of the left and right columns. (On small screens, the right column will drop below the left.)">?</span>
+                        </legend>
+
+                        <div class="small-6 small-offset-3 end columns">
+                            <div class="range-slider"
+                                 data-original-value="{TEMPLATE_LEFT_COLUMN_WIDTH}"
+                                 data-slider="{TEMPLATE_LEFT_COLUMN_WIDTH}"
+                                 data-interaction="column-width"
+                                 data-options="start: 3; end: 9"
+                            >
+                                <span class="range-slider-handle" role="slider" tabindex="0"></span>
+                                <span class="range-slider-active-segment"></span>
+                                <input type="hidden" name="width" value="{TEMPLATE_LEFT_COLUMN_WIDTH}">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- BEGIN homepage_color_selector -->
+                    <fieldset>
+                        <legend>Colours</legend>
                         <div class="small-12 columns">
                             <fieldset>
-                                <legend>Layout</legend>
-                                <!-- BEGIN homepage_column_selector -->
-                                <div class="small-12 columns">
-                                    <p class="meta">
-                                        Select a position to modify its colours below.
-                                    </p>
-                                </div>
+                                <legend>
+                                    Columns
+                                    <span data-tooltip class="has-tip tip-top hint" title="Select a column to modify colours for.">?</span>
+                                </legend>
                                 <div class="small-12 columns">
                                     <input id="top" type="checkbox" data-column-selector checked />
                                     <label for="top" class="checkbox-label">Top</label>
@@ -358,31 +378,8 @@
                                     <input id="right" type="checkbox" data-column-selector checked />
                                     <label for="right" class="checkbox-label">Right</label>
                                 </div>
-                                <!-- END homepage_column_selector -->
-                                <!-- no point showing a slider for small screens which they cannot affect -->
-                                <div class="small-12 columns hide-for-small">
-                                    <p class="meta">
-                                        Drag the slider to change the width of the left and right columns.
-                                    </p>
-                                    <div class="row">
-                                        <div class="small-6 small-offset-3 end columns">
-                                            <div class="range-slider"
-                                                 data-original-value="{TEMPLATE_LEFT_COLUMN_WIDTH}"
-                                                 data-slider="{TEMPLATE_LEFT_COLUMN_WIDTH}"
-                                                 data-interaction="column-width"
-                                                 data-options="start: 3; end: 9"
-                                            >
-                                                <span class="range-slider-handle" role="slider" tabindex="0"></span>
-                                                <span class="range-slider-active-segment"></span>
-                                                <input type="hidden" name="width" value="{TEMPLATE_LEFT_COLUMN_WIDTH}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </fieldset>
                         </div>
-
-                        <!-- BEGIN homepage_color_selector -->
                         <div class="small-12 medium-6 columns">
                             <fieldset data-equalizer-watch>
                                 <legend>Heading</legend>
@@ -392,7 +389,6 @@
                                 <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
                             </fieldset>
                         </div>
-
                         <div class="small-12 medium-6 columns">
                             <fieldset data-equalizer-watch>
                                 <legend>Content</legend>
@@ -402,8 +398,8 @@
                                 <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
                             </fieldset>
                         </div>
-                        <!-- END homepage_color_selector -->
-                    </div>
+                    </fieldset>
+                    <!-- END homepage_color_selector -->
 
                     <ul class="button-group">
                         <li><input type="submit" id="saveColour" value="Save"/></li>
