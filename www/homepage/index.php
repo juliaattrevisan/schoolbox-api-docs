@@ -150,6 +150,7 @@ if ($virtualPermission >= WRITE_ACCESS) {
         }
     }
 
+    $tabNumber = 0;
     if ($total = $definitionCollection->count()) {
         $i = 0;
         $previous = new Component_Definition();
@@ -174,6 +175,7 @@ if ($virtualPermission >= WRITE_ACCESS) {
                 'HOMEPAGE_COMPONENT_CLASS' => str_replace('\\', '_', $component->getClass()),
                 'HOMEPAGE_COMPONENT_MULTIPLE_STATE' => $class,
                 'HOMEPAGE_COMPONENT_CATEGORY_ID' => $previous->getComponentCategory(),
+                'HOMEPAGE_COMPONENT_CATEGORY_CLASS' => $tabNumber === 0 ? 'active' : '',
             );
 
             $this->setVar($output);
@@ -182,6 +184,7 @@ if ($virtualPermission >= WRITE_ACCESS) {
                 $this->parse('homepage_component_page_block', 'homepage_component_page', true);
                 $this->setVar('homepage_component_block', '');
                 $this->parse('homepage_component_block', 'homepage_component', true);
+                $tabNumber++;
 
                 // last rotation
                 if ($total == $i) {
@@ -216,15 +219,18 @@ if ($virtualPermission >= WRITE_ACCESS) {
     }
 
     if (isset($tabList) && count($tabList)) {
+        $tabNumber = 0;
         foreach ($tabList as $id => $tab) {
             $output = array(
                 'COMPONENT_CATEGORY_ID' => $id,
                 'COMPONENT_CATEGORY_NAME' => Scrub::text($tab['name']),
-                'COMPONENT_CATEGORY_COUNT' => $tab['count']
+                'COMPONENT_CATEGORY_COUNT' => $tab['count'],
+                'COMPONENT_CATEGORY_CLASS' => $tabNumber === 0 ? 'active' : '',
             );
 
             $this->setVar($output);
             $this->parse('homepage_component_tab_block', 'homepage_component_tab', true);
+            $tabNumber++;
         }
     }
 
