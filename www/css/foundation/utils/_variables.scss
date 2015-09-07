@@ -13,6 +13,7 @@ $body-bg:						#ededed;
 $button-color:					$secondary-color;
 $secondary-button-color:		$secondary-color;
 $submit-button-color:			$primary-color;
+$anchor-font-color:             $primary-color;
 
 // for BC
 $tertiary:						$tertiary-color;
@@ -21,7 +22,7 @@ $input-border-color:			tint($tertiary, 66%);
 $tabbar-bg:						$primary-color;
 $off-canvas-bg:					$white;
 
-$row-hover-background: tint($highlight-color, 87%);
+$row-hover-background: tint($secondary-color, 87%);
 $row-action-hover-background: darken($row-hover-background, 7%);
 
 // Dimensions

@@ -22,10 +22,10 @@ $input-height: 2.5rem;
 
 $input-bg-color: $white;
 
-$input-focus-bg-color: tint($tertiary-color, 95%);
+$input-focus-bg-color: tint($primary-color, 95%);
 $input-focus-color: calc-text-color($input-focus-bg-color);
 
-$input-border-color: tint($tertiary, 66%) !default;
+$input-border-color: tint($tertiary-color, 66%) !default;
 $input-focus-border-color: darken($input-border-color, 33%);
 
 $input-hover-bg-color: tint($tertiary-color, 87%);

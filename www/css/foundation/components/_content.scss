@@ -469,6 +469,9 @@ tbody tr:hover {
 	}
 	nav a {
 		opacity: 1;
+		&:hover {
+			background-color: $row-action-hover-background;
+		}
 	}
 }
 td, th{
