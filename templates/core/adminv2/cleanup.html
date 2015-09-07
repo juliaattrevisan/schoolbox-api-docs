@@ -1,63 +1,53 @@
 {ADMIN_NAV}
         
 <div class="row">
-    <div class="large-6 island">
+    <div class="small-12 large-6 island">
         <h2 class='subheader'>Remove Deleted Files</h2>
 
-        <section>
-            <div class="content">
-                <p>If a user has deleted a file or link this will clean up the soft deleted remnants. This should be completed yearly to keep disk usage down.</p>
-                <p><a href="/adminv2/cleanup/file" class="button icon-delete" data-cleanup="file">Remove Files</a></p>
-            </div>
+        <section class="content">
+            <p>If a user has deleted a file or link this will clean up the soft deleted remnants. This should be completed yearly to keep disk usage down.</p>
+            <p><a href="/adminv2/cleanup/file" class="button icon-delete" data-cleanup="file">Remove Files</a></p>
         </section>
     </div>
-    <div class="large-6 island">
+    <div class="small-12 large-6 island">
         <h2 class='subheader'>Remove Expired News</h2>
 
-        <section>
-            <div class="content">
-                <p>This function will delete any news that has expired and is no longer available.  You should only run this if your news system is running slow. We do not recommend doing this as it will remove all news from the archives.</p>
-                <p><a href="/adminv2/cleanup/news/subnews" class="button icon-delete" data-cleanup="subnews">Remove Archives</a></p>
-            </div>
+        <section class="content">
+            <p>This function will delete any news that has expired and is no longer available.  You should only run this if your news system is running slow. We do not recommend doing this as it will remove all news from the archives.</p>
+            <p><a href="/adminv2/cleanup/news/subnews" class="button icon-delete" data-cleanup="subnews">Remove Archives</a></p>
         </section>
     </div>
 </div>
 
 <div class="row">
-    <div class="large-6 island">
+    <div class="small-12 large-6 island">
         <h2 class='subheader'>Clean filesystem of stale files</h2>
 
-        <section>
-            <div class="content">
-                <p>This function will scan the filesystem for files that are no longer in the database.  This can occur due to errors in processing or cleanup.  This should be completed once a year to minimise disk wastage.</p>
-                <p><a href="/adminv2/cleanup/fileclean" class="button icon-delete" data-cleanup="fileclean">Clean Filesystem</a></p>
-            </div>
+        <section class="content">
+            <p>This function will scan the filesystem for files that are no longer in the database.  This can occur due to errors in processing or cleanup.  This should be completed once a year to minimise disk wastage.</p>
+            <p><a href="/adminv2/cleanup/fileclean" class="button icon-delete" data-cleanup="fileclean">Clean Filesystem</a></p>
         </section>
     </div>
-    <div class="large-6 island">
+    <div class="small-12 large-6 island">
         <h2 class="subheader">Clean Log Files</h2>
 
-        <section>
-            <div class="content">
-                <p>This will delete all content from the log tables and help speed up the system.  The log tables include the login log, submission box, homepage access and CMS log.  This should be completed once a year.</p>
-                <p><a href="/adminv2/cleanup/log" class="button icon-delete" data-cleanup="log">Clean Log Files</a></p>
-            </div>
+        <section class="content">
+            <p>This will delete all content from the log tables and help speed up the system.  The log tables include the login log, submission box, homepage access and CMS log.  This should be completed once a year.</p>
+            <p><a href="/adminv2/cleanup/log" class="button icon-delete" data-cleanup="log">Clean Log Files</a></p>
         </section>
     </div>
 </div>
 
 <div class="row">
-    <div class="large-6 island">
+    <div class="small-12 large-6 island">
         <h2 class="subheader">Clean Image Cache</h2>
 
-        <section>
-            <div class="content">
-                <p>If you are having issues with image thumbnails or you would like to free up some diskspace.  Note his will increase server load and page load times while images are recreated.</p>
-                <p><a href="/adminv2/cleanup/image" class="button icon-delete" data-cleanup="image">Clean Image Cache</a></p>
-            </div>
+        <section class="content">
+            <p>If you are having issues with image thumbnails or you would like to free up some diskspace.  Note his will increase server load and page load times while images are recreated.</p>
+            <p><a href="/adminv2/cleanup/image" class="button icon-delete" data-cleanup="image">Clean Image Cache</a></p>
         </section>
     </div>
-    <div class="large-6 island">
+    <div class="small-12 large-6 island">
         <h2 class="subheader">Clean Stream Cache</h2>
 
         <section>
