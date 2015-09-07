@@ -1,7 +1,10 @@
-<div class="actions-small-1 row">
+<div class="actions-small-3 row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>Boarder Leave Requests for {HOUSE_NAME}</h1>
+            <h1>Boarder Leave Requests</h1>
+            <ul class="meta">
+                <li class="icon-home">{HOUSE_NAME}</li>
+            </ul>
         </div>
     </div>
     <nav>
@@ -32,7 +35,7 @@
         <!-- BEGIN request_list -->
         <!-- BEGIN pending_request_list -->
         <h2 class="subheader">Pending Requests</h2>
-        <section>
+        <section class="scrollable">
             <table data-topic="pendingRequests">
                 <thead>
                 <tr>
@@ -64,7 +67,7 @@
 
         <!-- BEGIN previous_request_list -->
         <h2 class="subheader">Request History</h2>
-        <section class="content">
+        <section class="scrollable">
             <table data-topic="previousRequests">
                 <thead>
                 <tr>
