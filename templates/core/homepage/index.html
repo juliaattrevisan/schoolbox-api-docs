@@ -303,16 +303,19 @@
                         <!-- BEGIN homepage_component_page -->
                         <ul class="content grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {HOMEPAGE_COMPONENT_CATEGORY_CLASS}" id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
                             <!-- BEGIN homepage_component -->
-                            <li class="{HOMEPAGE_COMPONENT_MULTIPLE_STATE} no-margin"
-                                data-count="{HOMEPAGE_COMPONENT_COUNT}"
-                                data-multi="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}"
-                            >
-                                <div class="avatar card" data-component-palette>
-                                    <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
-                                        <span class="icon-32 icon-masonry icon-masonry-{HOMEPAGE_COMPONENT_CLASS}"></span>
-                                        <p>{HOMEPAGE_COMPONENT_NAME}</p>
-                                        <p class="meta">(<span data-relation="count">{HOMEPAGE_COMPONENT_COUNT}</span>)</p>
-                                    </a>
+                            <li>
+                                <div class="{HOMEPAGE_COMPONENT_MULTIPLE_STATE} no-margin"
+                                     data-count="{HOMEPAGE_COMPONENT_COUNT}"
+                                     data-multi="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}"
+                                     data-component-palette
+                                >
+                                    <div class="avatar card">
+                                        <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
+                                            <span class="icon-32 icon-masonry icon-masonry-{HOMEPAGE_COMPONENT_CLASS}"></span>
+                                            <p>{HOMEPAGE_COMPONENT_NAME}</p>
+                                            <p class="meta">(<span data-relation="count">{HOMEPAGE_COMPONENT_COUNT}</span>)</p>
+                                        </a>
+                                    </div>
                                 </div>
                             </li>
                             <!-- END homepage_component -->
