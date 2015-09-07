@@ -1,15 +1,19 @@
 <div class="row">
     <div class="small-12 columns">
-        <h1>Leave Request: {USER_NAME}, Year {USER_YEAR}, {USER_HOUSE}</h1>
+        <h1>View Leave Request</h1>
+        <ul class="meta">
+            <li class="icon-staff-students"><a href="/search/user/{USER_ID}" title="View Profile">{USER_NAME}</a></li>
+            <li class="icon-group">Year {USER_YEAR}</li>
+            <li class="icon-home">{USER_HOUSE}</li>
+        </ul>
     </div>
 </div>
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Lorem ipsizzle go to hizzle phat amizzle.</h2>
-        <section class="content">
-            <div class="row">
-                <div class="small-12 columns">
+        <section>
+            <ul class="information-list">
+                <li class="row">
                     <div class="small-12 columns">
                         <h2>Student</h2>
                         <dl>
@@ -19,34 +23,51 @@
                             <dd>{REQUEST_USER_PHONE}</dd>
                         </dl>
                     </div>
+                </li>
 
-                    <div class="small-12 large-6 columns">
+                <li class="row">
+                    <div class="small-6 columns">
                         <h2>Status</h2>
-                        {REQUEST_STATUS}
+                        <p>
+                            {REQUEST_STATUS}
+                        </p>
                     </div>
 
-                    <div class="small-12 large-6 columns">
+                    <div class="small-6 columns">
                         <h2>Requested By</h2>
-                        {AUTHOR_NAME}
+                        <p>
+                            {AUTHOR_NAME}
+                        </p>
                     </div>
+                </li>
 
-                    <div class="small-12 large-6 columns">
+                <li class="row">
+                    <div class="small-6 columns">
                         <h2>Leave Date</h2>
-                        {REQUEST_START_DATE} {REQUEST_START_TIME}
+                        <p>
+                            {REQUEST_START_DATE} {REQUEST_START_TIME}
+                        </p>
                     </div>
 
-                    <div class="small-12 large-6 columns">
+                    <div class="small-6 columns">
                         <h2>Return Date</h2>
-                        {REQUEST_FINISH_DATE} {REQUEST_FINISH_TIME}
+                        <p>
+                            {REQUEST_FINISH_DATE} {REQUEST_FINISH_TIME}
+                        </p>
                     </div>
+                </li>
 
+                <li class="row">
                     <div class="small-12 large-6 columns">
                         <h2>Host</h2>
                         <dl>
                             <dt>Type</dt>
                             <dd>{HOST_TYPE}</dd>
 
-                            <dt><span data-tooltip class="has-tip" title="The host will need to confirm your leave arrangements; you can forward them the email you receive.">Name</span></dt>
+                            <dt>
+                                Name
+                                <span data-tooltip class="hint has-tip tip-top" title="The host will need to confirm your leave arrangements; you can forward them the email you receive.">?</span>
+                            </dt>
                             <dd>{REQUEST_HOST_NAME}</dd>
 
                             <dt>Phone</dt>
@@ -65,8 +86,8 @@
                             <dd>{REQUEST_DESCRIPTION}</dd>
                         </dl>
                     </div>
-                </div>
-            </div>
+                </li>
+            </ul>
         </section>
     </div>
 </div>

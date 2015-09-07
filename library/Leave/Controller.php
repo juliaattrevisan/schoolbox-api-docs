@@ -634,6 +634,7 @@ class Leave_Controller extends Controller
                 array(
                     'REQUEST_ID' => $request->getId(),
                     'REQUEST_STATUS' => $request->getStatus(true),
+                    'USER_ID' => $request->getUser()->getId(),
                     'USER_NAME' => $request->getUser()->formatName(),
                     'USER_EXTERNAL_ID' => $user->getExternalId(),
                     'USER_YEAR' => $user->getYear(),
