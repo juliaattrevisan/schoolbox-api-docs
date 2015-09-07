@@ -74,57 +74,57 @@ $block-grid-default-spacing: rem-calc(16);
 	padding: rem-calc(($base-font-size - 8)) !important;
 }
 
-%top-content-alignment {
+@mixin top-content-alignment($media: $small-only, $wide-margin: 2rem, $narrow-margin: 0.5rem) {
 
-    @media #{$small-only} {
+    @media #{$media} {
         h1,
         .subheader,
         ul.meta,
         .pagination,
         > .alert-box {
             // on small screens, full width is FULL width, so indent floating content
-            margin-left: 2rem;
-            margin-right: 2rem;
+            margin-left: $wide-margin;
+            margin-right: $wide-margin;
         }
         > .header-actions {
-            margin-right: 2rem;
-            margin-left: 0.5rem;
+            margin-right: $wide-margin;
+            margin-left: $narrow-margin;
         }
 
         .content {
-            padding-left: 2rem;
-            padding-right: 2rem;
+            padding-left: $wide-margin;
+            padding-right: $wide-margin;
         }
     }
 
 }
 
-%mobile-padding {
+@mixin mobile-padding($wide-margin: 2rem, $narrow-margin: 0.5rem) {
 
-    @include responsive-sides(2, padding, 12, 0);
+    @include responsive-sides($wide-margin, padding, 12, 0);
 
     > .button, input[type=submit] {
         // loop in expand by default
         @extend .expand;
     }
 
-    @extend %top-content-alignment;
+    @include top-content-alignment($small-only, $wide-margin, $narrow-margin);
 
     @media #{$small-only} {
         padding: 0;
 
         table {
             td:first-child, th:first-child {
-                padding-left: 2rem;
+                padding-left: $wide-margin;
             }
             td:last-child, th:last-child {
-                padding-right: 2rem;
+                padding-right: $wide-margin;
             }
         }
     }
 
     @media #{$medium-only} {
-        padding: 0 2.5rem;
+        padding: 0 ($wide-margin + $narrow-margin);
     }
 }
 
@@ -142,13 +142,13 @@ $block-grid-default-spacing: rem-calc(16);
         > .medium-12,
         > .list-item > .small-12,
         > .list-item > .medium-12 {
-            @extend %mobile-padding;
+            @include mobile-padding();
         }
     }
 }
 
 [data-component] {
-    @extend %top-content-alignment;
+    @include top-content-alignment();
     .button {
         margin-bottom: 0;
     }
