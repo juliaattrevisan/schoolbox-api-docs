@@ -66,7 +66,8 @@
                 left: '.column[data-position=left]',
                 right: '.column[data-position=right]'
                 // , bottom: '.column[data-position=bottom]'
-            }
+            },
+            onToggle: noop
         },
 
         // Box that contains the options to drag into play: if `palette` or `palette.selector` is null, no create-new-on-drag JS will be loaded
