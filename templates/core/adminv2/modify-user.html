@@ -152,8 +152,8 @@
 {ADMIN_NAV}
 
 <div class="row">
-    <div class="large-12 columns">
-        <h2>{FULLNAME}</h2>
+    <div class="small-12 columns">
+        <h2 class="subheader">{FULLNAME}</h2>
         <span class="header-actions">
             <form method="POST" action="/adminv2/userForm.php">
                 <input type="hidden" name="login" value="{USERNAME}" />
@@ -165,7 +165,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">User Detail</h2>
+        <h3 class="subheader">User Detail</h3>
         <section>
             <div class="content">
                 <div class="row">
@@ -287,7 +287,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Groups</h2>
+        <h3 class="subheader">Groups</h3>
         <section>
             <ul class="action-list">
                 <li class="row row-header">
@@ -352,7 +352,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader" id="permissions">Permissions</h2>
+        <h3 class="subheader" id="permissions">Permissions</h3>
         <section>
             <ul class="action-list">
                 <li class="row row-header">
@@ -539,7 +539,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader" id="linked">Linked Accounts</h2>
+        <h3 class="subheader" id="linked">Linked Accounts</h3>
         <section>
             <ul class="action-list">
                 <!-- BEGIN user_linked -->
@@ -572,14 +572,18 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h2 class="subheader">Recent Activity Logs</h2>
+        <h3 class="subheader">Recent Activity Logs</h3>
     </div>
     <div class="small-12 medium-6 island">
         <section>
             <span class="header-actions">
                 <a class="button icon-view" href="/adminv2/reports/login/user={USERNAME}">See All</a>
             </span>
-            <h3 class="content subheader">Logins</h3>
+
+            <div class="content">
+                <h4 class="subheader">Logins</h4>
+            </div>
+
             <table>
                 <thead>
                 <tr>
@@ -606,7 +610,11 @@
             <span class="header-actions">
                 <a class="button icon-view" href="/adminv2/reports/activity/user={USERNAME}">See All</a>
             </span>
-            <h3 class="content subheader">Activity</h3>
+
+            <div class="content">
+                <h3 class="subheader">Activity</h3>
+            </div>
+
             <table>
                 <thead>
                     <tr>
@@ -629,29 +637,30 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">
-            Send Message to {FULLNAME}
-        </h2>
-        <section>
-            <div class="content">
-                <p><em>{FIRSTNAME} must be signed in to receive a popup alert.</em></p>
-                <form action="/adminv2/sendAlert" method="POST">
-                    <input type="hidden" name="user" value="{USERID}" />
-                    <div class="row">
-                        <div class="small-12 columns">
-                            <label>
-                                <strong>Message from {SITE_LOGINNAME}:</strong>
-                                <input type="text" value="" name="body" />
-                            </label>
-                        </div>
-                        <div class="small-12 columns">
-                            <label>
-                                <input type="submit" value="Send" />
-                            </label>
-                        </div>
+        <h3 class="subheader">Send Message to {FULLNAME}</h3>
+
+        <div class="alert-box secondary">
+            <p class="no-margin">{FIRSTNAME} must be signed in to receive a popup alert.</p>
+        </div>
+
+        <form action="/adminv2/sendAlert" method="POST">
+            <input type="hidden" name="user" value="{USERID}" />
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Message from {SITE_LOGINNAME}
+                            <input type="text" value="" name="body" />
+                        </label>
                     </div>
-                </form>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Send" />
+                </div>
             </div>
-        </section>
+        </form>
     </div>
 </div>
