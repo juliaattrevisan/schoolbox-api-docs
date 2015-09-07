@@ -6,16 +6,14 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <h2 class="subheader">{COMPONENT_NAME}</h2>
-            <section>
-                <div class="content">
-                    <ul class="dashboard-subject-list clearfix">
-                        <!-- BEGIN subject -->
-                        <li class="subject subject-{SUBJECT_CODE}">
-                            <a href="/homepage/{SUBJECT_CODE}">{SUBJECT_NAME}</a>
-                        </li>
-                        <!-- END subject -->
-                    </ul>
-                </div>
+            <section class="content">
+                <ul class="dashboard-subject-list">
+                    <!-- BEGIN subject -->
+                    <li class="subject subject-{SUBJECT_CODE}">
+                        <a href="/homepage/{SUBJECT_CODE}">{SUBJECT_NAME}</a>
+                    </li>
+                    <!-- END subject -->
+                </ul>
             </section>
         </div>
     </div>
