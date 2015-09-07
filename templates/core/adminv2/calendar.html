@@ -195,42 +195,44 @@
                     <form action="/adminv2/calendar/modifyForm" method="post">
                         <input type="hidden" name='action' value='cleanup' />
 
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>
-                                        <input id="check-all" type="checkbox" data-selectall="true" value="" />
-                                        <label for="check-all" class="checkbox-label"></label>
-                                    </th>
-                                    <th>Title</th>
-                                    <th>Type</th>
-                                    <th>Author</th>
-                                    <th>Start</th>
-                                    <th>End</th>
-                                    <th>Applies to</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- BEGIN cleanup_event -->
-                                <tr>
-                                    <td>
-                                        <input id="check-{CLEANUP_EVENT_ID}" type="checkbox" name="cleanupEventId[]" data-modifier='{CLEANUP_EVENT_MODIFIER}' value="{CLEANUP_EVENT_ID}" />
-                                        <label for="check-{CLEANUP_EVENT_ID}" class="checkbox-label"></label>
-                                    </td>
-                                    <td><a href='/calendar/modify.php?eventID={CLEANUP_EVENT_ID}'>{CLEANUP_EVENT_TITLE}</a></td>
-                                    <td>{CLEANUP_EVENT_EVENTTYPE}</td>
-                                    <td><a href="/search/user/{CLEANUP_EVENT_AUTHOR_ID}">{CLEANUP_EVENT_AUTHOR}</a></td>
-                                    <td>{CLEANUP_EVENT_START}</td>
-                                    <td>{CLEANUP_EVENT_END}</td>
-                                    <td>
-                                        {CLEANUP_EVENT_USERS}
-                                        {CLEANUP_EVENT_CATEGORIES}
-                                        {CLEANUP_EVENT_CAMPUSES}
-                                    </td>
-                                </tr>
-                                <!-- END cleanup_event -->
-                            </tbody>
-                        </table>
+                        <div class="scrollable">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <input id="check-all" type="checkbox" data-selectall="true" value="" />
+                                            <label for="check-all" class="checkbox-label"></label>
+                                        </th>
+                                        <th>Title</th>
+                                        <th>Type</th>
+                                        <th>Author</th>
+                                        <th>Start</th>
+                                        <th>End</th>
+                                        <th>Applies to</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- BEGIN cleanup_event -->
+                                    <tr>
+                                        <td>
+                                            <input id="check-{CLEANUP_EVENT_ID}" type="checkbox" name="cleanupEventId[]" data-modifier='{CLEANUP_EVENT_MODIFIER}' value="{CLEANUP_EVENT_ID}" />
+                                            <label for="check-{CLEANUP_EVENT_ID}" class="checkbox-label"></label>
+                                        </td>
+                                        <td><a href='/calendar/modify.php?eventID={CLEANUP_EVENT_ID}'>{CLEANUP_EVENT_TITLE}</a></td>
+                                        <td>{CLEANUP_EVENT_EVENTTYPE}</td>
+                                        <td><a href="/search/user/{CLEANUP_EVENT_AUTHOR_ID}">{CLEANUP_EVENT_AUTHOR}</a></td>
+                                        <td>{CLEANUP_EVENT_START}</td>
+                                        <td>{CLEANUP_EVENT_END}</td>
+                                        <td>
+                                            {CLEANUP_EVENT_USERS}
+                                            {CLEANUP_EVENT_CATEGORIES}
+                                            {CLEANUP_EVENT_CAMPUSES}
+                                        </td>
+                                    </tr>
+                                    <!-- END cleanup_event -->
+                                </tbody>
+                            </table>
+                        </div>
 
                         <div class="content">
                             <input type="submit" value="Remove Selected Events" />

@@ -15,35 +15,39 @@
                     </label>
                     <h3>Role Permissions</h3>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Role</th>
-                            <th>None</th>
-                            <th>Read</th>
-                            <th>Write</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- BEGIN group -->
-                        <tr>
-                            <td>{GROUP_NAME}</td>
-                            <td>
-                                <input id="sel-{GROUP_ID}-0" type="radio" class="no_permission required" name="groupPerm[{GROUP_ID}]" value="0" />
-                                <label for="sel-{GROUP_ID}-0" class="radio-label"></label>
-                            </td>
-                            <td>
-                                <input id="sel-{GROUP_ID}-1" type="radio" name="groupPerm[{GROUP_ID}]" value="1" />
-                                <label for="sel-{GROUP_ID}-1" class="radio-label"></label>
-                            </td>
-                            <td>
-                                <input id="sel-{GROUP_ID}-2" type="radio" name="groupPerm[{GROUP_ID}]" value="2" />
-                                <label for="sel-{GROUP_ID}-2" class="radio-label"></label>
-                            </td>
-                        </tr>
-                        <!-- END group -->
-                    </tbody>
-                </table>
+
+                <div class="scrollable">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Role</th>
+                                <th>None</th>
+                                <th>Read</th>
+                                <th>Write</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- BEGIN group -->
+                            <tr>
+                                <td>{GROUP_NAME}</td>
+                                <td>
+                                    <input id="sel-{GROUP_ID}-0" type="radio" class="no_permission required" name="groupPerm[{GROUP_ID}]" value="0" />
+                                    <label for="sel-{GROUP_ID}-0" class="radio-label"></label>
+                                </td>
+                                <td>
+                                    <input id="sel-{GROUP_ID}-1" type="radio" name="groupPerm[{GROUP_ID}]" value="1" />
+                                    <label for="sel-{GROUP_ID}-1" class="radio-label"></label>
+                                </td>
+                                <td>
+                                    <input id="sel-{GROUP_ID}-2" type="radio" name="groupPerm[{GROUP_ID}]" value="2" />
+                                    <label for="sel-{GROUP_ID}-2" class="radio-label"></label>
+                                </td>
+                            </tr>
+                            <!-- END group -->
+                        </tbody>
+                    </table>
+                </div>
+
                 <div class="content">
                     <h3>
                         Homepage Template
