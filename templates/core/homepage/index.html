@@ -141,25 +141,12 @@
             column: {
                 leftColumnWidth: '{TEMPLATE_LEFT_COLUMN_WIDTH}',
                 placeholderTpl: '<p class="masonry-placeholder alert-box" />'
-//                ,
-//                onToggle: function () {
-//                    var page = $(this.element);
-//
-//                    if (page.find('.ui-sortable-helper').length || $('#tabs-1').is('.open')) {
-//                        page.addClass('show-empty');
-//                    } else {
-//                        page.removeClass('show-empty');
-//                    }
-//                }
             },
             palette: {
                 url: url,
                 selector: '#tabs-1',
                 containerSelector: '.tabs-content',
                 handleSelector: '[data-component-palette]',
-//                dragHelperInit: function () {
-//                    this.addClass('insert-new').find('h4 strong, .notification').remove();
-//                },
                 refreshItem: function () {
                     this.find('[data-relation="count"]').text(this.data('count'));
                 }
