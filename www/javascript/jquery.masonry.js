@@ -105,8 +105,8 @@
             columnSelectorSelector: '[data-column-selector]',
             restoreBtnSelector: null,
             cancelBtnSelector: null,
-            saveBtnSelector: null
-
+            saveBtnSelector: null,
+            saveLabelSelector: null
         },
         persist: {
             url: null,

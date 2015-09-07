@@ -102,6 +102,7 @@
 <script type="text/javascript" src="/javascript/jquery.masonry.js"></script>
 <script type="text/javascript" src="/javascript/jquery.masonry.spectrum.js"></script>
 <script type="text/javascript" src="/javascript/jquery.droptab.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 
 <script type="text/javascript">
     $(function() {
@@ -169,6 +170,7 @@
                 restoreBtnSelector: '[data-role="reset-to-default"]',
                 cancelBtnSelector: '[data-role="undo"]',
                 saveBtnSelector: '[data-role="save"]',
+                saveLabelSelector: '[data-relation="saveLayout"]',
                 url: url
             },
             slider: {
@@ -412,6 +414,8 @@
                         <li><button type="reset" data-role="reset-to-default">Reset</button></li>
                         <li><button type="reset" data-role="undo">Undo Changes</button></li>
                     </ul>
+
+                    <span class="label full-width hide" data-relation="saveLayout"></span>
                 </form>
             </div>
         </section>

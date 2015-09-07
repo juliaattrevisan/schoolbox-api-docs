@@ -26,7 +26,8 @@
         columnSelectorSelector: '[data-column-selector]',
         restoreBtnSelector: null,
         cancelBtnSelector: null,
-        saveBtnSelector: null
+        saveBtnSelector: null,
+        saveLabelSelector: null
     };
 
     /**
@@ -61,8 +62,9 @@
         // setup colour selectors
         this.loadColorpickerColors();
 
-        // attach listeners
-
+        // attach listeners if
+        var saveLabel = $(this.options.saveLabelSelector);
+        var useLabel  = saveLabel.length && saveLabel.labelActivate && saveLabel.labelTimeout;
         $(this.element)
             .on('click', this.options.columnSelectorSelector, function (event) {
                 // Don't allow deselect of the only column selected
@@ -75,13 +77,15 @@
             .on('click', opt.restoreBtnSelector+", "+opt.cancelBtnSelector, function (event) {
                 event.preventDefault();
 
-                var colourSet;
+                var colourSet, labelParams = {css: 'success'};
 
                 // if it's the restore button
                 if ($(this).filter(opt.restoreBtnSelector).length) {
-                    colourSet = opt.colours.defaults;
+                    colourSet        = opt.colours.defaults;
+                    labelParams.text = 'Colours restored to defaults'
                 } else if ($(this).filter(opt.cancelBtnSelector).length) {
-                    colourSet = opt.colours.original;
+                    colourSet        = opt.colours.original;
+                    labelParams.text = 'Colour changes undone'
                 } else {
                     throw Error("Invalid selector");
                 }
@@ -94,6 +98,10 @@
                     opt.colours.pickers[key] = value;
                 });
                 mspec.loadColorpickerColors();
+                if (useLabel) {
+                    saveLabel.labelActivate(labelParams);
+                    saveLabel.labelTimeout(labelParams);
+                }
             })
             .on('click', this.options.saveBtnSelector, function (event) {
                 event.preventDefault();
@@ -111,7 +119,25 @@
 
                 data = $.extend({}, data, mspec.masonry.options.context);
 
-                $.post(opt.url, data, opt.complete);
+                var ajaxRequest = $.post(opt.url, data, opt.complete);
+                if (useLabel) {
+                    saveLabel.labelActivate({
+                        text: 'Saving...'
+                    });
+                    ajaxRequest
+                        .done(function() {
+                            saveLabel.labelTimeout({
+                                text: 'Columns Saved',
+                                css: 'success'
+                            });
+                        })
+                        .fail(function() {
+                            saveLabel.labelTimeout({
+                                text: 'Error!',
+                                css: 'alert'
+                            });
+                        });
+                }
             });
 
 
