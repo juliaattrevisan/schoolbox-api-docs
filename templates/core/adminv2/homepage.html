@@ -1,3 +1,51 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
+<script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-definition-palette]').configurator({
+            context: 'homepage',
+            dropDownSelector: '[data-template-select]',
+            disabledMsg: 'This component can only be used once, and is already active for the template selected.'
+        }).start();
+
+        $("[data-form=new]").dialog({
+            autoOpen: false,
+            modal: true
+        });
+
+        $('[data-button=new]').click(function() {
+            $('[data-form=new]').dialog("open");
+        });
+
+        $("[data-form=rename]").dialog({
+            autoOpen: false,
+            modal: true
+        });
+
+        $('[data-button=rename]').click(function() {
+            $( '[data-form=rename]').dialog("open");
+        });
+
+        $('[data-button=delete]').click(function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+            $(this).confirmDialog({
+                text: 'Are you sure you wish to delete this template?',
+                confirmEvent: function() {
+                    // Build a hidden input with the delete button's name/val,
+                    // then submit
+                    var form = element.closest('form');
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 {ADMIN_NAV}
         
 <h2>
@@ -65,49 +113,3 @@
 </div>
 
 <div id="resource-browser" class="hide"></div>
-
-<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
-<script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
-<script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $('[data-definition-palette]').configurator({
-            context: 'homepage',
-            dropDownSelector: '[data-template-select]',
-            disabledMsg: 'This component can only be used once, and is already active for the template selected.'
-        }).start();
-
-        $("[data-form=new]").dialog({
-            autoOpen: false,
-            modal: true
-        });
-
-        $('[data-button=new]').click(function() {
-            $('[data-form=new]').dialog("open");
-        });
-
-        $("[data-form=rename]").dialog({
-            autoOpen: false,
-            modal: true
-        });
-
-        $('[data-button=rename]').click(function() {
-            $( '[data-form=rename]').dialog("open");
-        });
-
-        $('[data-button=delete]').click(function(event) {
-            event.preventDefault();
-
-            var element = $(this);
-            $(this).confirmDialog({
-                text: 'Are you sure you wish to delete this template?',
-                confirmEvent: function() {
-                    // Build a hidden input with the delete button's name/val,
-                    // then submit
-                    var form = element.closest('form');
-                    form.submit();
-                }
-            });
-        });
-    });
-</script>
