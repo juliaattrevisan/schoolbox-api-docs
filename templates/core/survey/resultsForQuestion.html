@@ -38,37 +38,39 @@ $(function() {
                 <div class="small-12 large-6 columns">
                     <article>{QUESTION_QUESTION}</article>
 
-                    <table>
-                        <thead>
-                            <tr>
-                                <!-- BEGIN respondent_heading -->
-                                <th>Respondent</th>
-                                <!-- END respondent_heading -->
-                                <th>
-                                    Response
-                                    <span class="hint has-tip tip-top" data-tooltip title="Click on a response letter to see the other respondents who selected that answer.">?</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- BEGIN respondent -->
-                            <tr>
-                                <!-- BEGIN respondent_name -->
-                                <td>
-                                    <span data-response="{RESPONDENT_RESPONSE_DATA}">{RESPONDENT_NAME}</span>
-                                </td>
-                                <!-- END respondent_name -->
-                                <td>
-                                    <ul class="inline-list">
-                                        <li>
-                                            <a href="#" data-response-item="{RESPONDENT_RESPONSE_DATA}">{RESPONDENT_RESPONSE}</a>
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-                            <!-- END respondent -->
-                        </tbody>
-                    </table>
+                    <div class="scrollable">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <!-- BEGIN respondent_heading -->
+                                    <th>Respondent</th>
+                                    <!-- END respondent_heading -->
+                                    <th>
+                                        Response
+                                        <span class="hint has-tip tip-top" data-tooltip title="Click on a response letter to see the other respondents who selected that answer.">?</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- BEGIN respondent -->
+                                <tr>
+                                    <!-- BEGIN respondent_name -->
+                                    <td>
+                                        <span data-response="{RESPONDENT_RESPONSE_DATA}">{RESPONDENT_NAME}</span>
+                                    </td>
+                                    <!-- END respondent_name -->
+                                    <td>
+                                        <ul class="inline-list">
+                                            <li>
+                                                <a href="#" data-response-item="{RESPONDENT_RESPONSE_DATA}">{RESPONDENT_RESPONSE}</a>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <!-- END respondent -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <div class="small-12 large-6 columns">
                     <!-- BEGIN graph -->

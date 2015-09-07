@@ -30,37 +30,39 @@
         <h2 class="subheader">Attempts</h2>
         <section>
             <form action='/survey/deleteAttempt' method='post'>
-                <table data-sortable>
-                    <thead>
-                    <tr>
-                        <th></th>
-                        <!-- BEGIN respondent_heading -->
-                        <th>Lastname</th>
-                        <th>Firstname</th>
-                        <!-- END respondent_heading -->
-                        <th>Start</th>
-                        <th>Finish</th>
-                        <th>&nbsp;</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- BEGIN attempt -->
-                    <tr>
-                        <td>
-                            <input type='checkbox' id='attempt-{ATTEMPT_ATTEMPT_ID}' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
-                            <label for="attempt-{ATTEMPT_ATTEMPT_ID}" class="checkbox-label"></label>
-                        </td>
-                        <!-- BEGIN respondent_name -->
-                        <td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_LASTNAME}</a></td>
-                        <td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_FIRSTNAME}</a></td>
-                        <!-- END respondent_name -->
-                        <td>{ATTEMPT_START}</td>
-                        <td>{ATTEMPT_FINISH}</td>
-                        <td><a href='/survey/review/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}' class="icon-view no-text"></a></td>
-                    </tr>
-                    <!-- END attempt -->
-                    </tbody>
-                </table>
+                <div class="scrollable">
+                    <table data-sortable>
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <!-- BEGIN respondent_heading -->
+                            <th>Lastname</th>
+                            <th>Firstname</th>
+                            <!-- END respondent_heading -->
+                            <th>Start</th>
+                            <th>Finish</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- BEGIN attempt -->
+                        <tr>
+                            <td>
+                                <input type='checkbox' id='attempt-{ATTEMPT_ATTEMPT_ID}' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
+                                <label for="attempt-{ATTEMPT_ATTEMPT_ID}" class="checkbox-label"></label>
+                            </td>
+                            <!-- BEGIN respondent_name -->
+                            <td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_LASTNAME}</a></td>
+                            <td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_FIRSTNAME}</a></td>
+                            <!-- END respondent_name -->
+                            <td>{ATTEMPT_START}</td>
+                            <td>{ATTEMPT_FINISH}</td>
+                            <td><a href='/survey/review/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}' class="icon-view no-text"></a></td>
+                        </tr>
+                        <!-- END attempt -->
+                        </tbody>
+                    </table>
+                </div>
 
                 <div class="content">
                     <input type='submit' value='Delete selected' />
