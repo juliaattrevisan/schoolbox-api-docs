@@ -166,9 +166,9 @@
             spectrum: {
                 selector: '#tabs-2',
                 colours: colours,
-                restoreBtnSelector: '#restore',
-                cancelBtnSelector: '#cancel',
-                saveBtnSelector: '#saveColour',
+                restoreBtnSelector: '[data-role="reset-to-default"]',
+                cancelBtnSelector: '[data-role="undo"]',
+                saveBtnSelector: '[data-role="save"]',
                 url: url
             },
             slider: {
@@ -408,9 +408,9 @@
                     <!-- END homepage_color_selector -->
 
                     <ul class="button-group">
-                        <li><input type="submit" id="saveColour" value="Save"/></li>
-                        <li><input type="submit" id="restore" value="Reset"/></li>
-                        <li><input type="submit" id="cancel" value="Cancel"/></li>
+                        <li><input type="submit" value="Save" data-role="save" /></li>
+                        <li><button type="reset" data-role="reset-to-default">Reset</button></li>
+                        <li><button type="reset" data-role="undo">Undo Changes</button></li>
                     </ul>
                 </form>
             </div>
