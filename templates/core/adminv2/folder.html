@@ -2,51 +2,51 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">
-            Bulk Add Folders
-        </h2>
+        <h2 class="subheader">Bulk Add Folders</h2>
         <section>
             <form action="/adminv2/bulkAddFolders" method="post" enctype="multipart/form-data" name="form" id="form">
                 <div class="content">
                     <h3>Upload Bulk Folder CSV</h3>
                     <p>Download the template first, then fill it out and upload it here.</p>
                     <a href="/adminv2/csv/folderBulkAdd.csv" class="button icon-download">Download Template</a>
+
                     <label>
                         <input name="bulkadd" type="file" />
                     </label>
                     <h3>Role Permissions</h3>
                 </div>
-                <table class="table">
+                <table>
                     <thead>
-                    <tr>
-                        <th>Role</th>
-                        <th>None</th>
-                        <th>Read</th>
-                        <th>Write</th>
-                    </tr>
+                        <tr>
+                            <th>Role</th>
+                            <th>None</th>
+                            <th>Read</th>
+                            <th>Write</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    <!-- BEGIN group -->
-                    <tr>
-                        <td>{GROUP_NAME}</td>
-                        <td>
-                            <input id="sel-{GROUP_ID}-0" type="radio" class="no_permission required" name="groupPerm[{GROUP_ID}]" value="0" />
-                            <label for="sel-{GROUP_ID}-0" class="radio-label"></label>
-                        </td>
-                        <td>
-                            <input id="sel-{GROUP_ID}-1" type="radio" name="groupPerm[{GROUP_ID}]" value="1" />
-                            <label for="sel-{GROUP_ID}-1" class="radio-label"></label>
-                        </td>
-                        <td>
-                            <input id="sel-{GROUP_ID}-2" type="radio" name="groupPerm[{GROUP_ID}]" value="2" />
-                            <label for="sel-{GROUP_ID}-2" class="radio-label"></label>
-                        </td>
-                    </tr>
-                    <!-- END group -->
+                        <!-- BEGIN group -->
+                        <tr>
+                            <td>{GROUP_NAME}</td>
+                            <td>
+                                <input id="sel-{GROUP_ID}-0" type="radio" class="no_permission required" name="groupPerm[{GROUP_ID}]" value="0" />
+                                <label for="sel-{GROUP_ID}-0" class="radio-label"></label>
+                            </td>
+                            <td>
+                                <input id="sel-{GROUP_ID}-1" type="radio" name="groupPerm[{GROUP_ID}]" value="1" />
+                                <label for="sel-{GROUP_ID}-1" class="radio-label"></label>
+                            </td>
+                            <td>
+                                <input id="sel-{GROUP_ID}-2" type="radio" name="groupPerm[{GROUP_ID}]" value="2" />
+                                <label for="sel-{GROUP_ID}-2" class="radio-label"></label>
+                            </td>
+                        </tr>
+                        <!-- END group -->
                     </tbody>
                 </table>
                 <div class="content">
-                    <h3>Homepage Template
+                    <h3>
+                        Homepage Template
                         <span data-tooltip class="hint has-tip tip-right" title="This homepage template will be applied to each uploaded folder.">?</span>
                     </h3>
                     <select name='template'>
