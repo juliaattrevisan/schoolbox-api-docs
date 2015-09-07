@@ -1,31 +1,4 @@
-{ADMIN_NAV}
-
-<div class="row">
-    <div class="small-12 columns">
-        <h2 class="subheader">Usage for <a href="/search/user/{USAGE_USER_ID}">{USAGE_USER_FULLNAME}</a></h2>
-    </div>
-</div>
-<div class="row">
-    <div class="small-12 island">
-        <section>
-            <div class="row">
-                <div class="small-12 large-4 columns">
-                    <div class="content">
-                        <div data-panel='total' class='loader'>Loading data...</div>
-                    </div>
-                    <div data-panel='group' class='loader'>Loading data...</div>
-                </div>
-                <div class="small-12 large-8 columns">
-                    <div data-panel='type' class='loader'>Loading data...</div>
-                </div>
-            </div>
-        </section>
-    </div>
-    <div class="small-12 columns">
-	    <div data-panel='user' class='loader'>Loading data...</div>
-    </div>
-</div>
-
+<!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type='text/javascript' src='/javascript/shared/jquery.number-format.js'></script>
 <script type="text/javascript" src="/javascript/admin/jquery.serverUsage.js"></script>
@@ -86,3 +59,32 @@
         });
     });
 </script>
+<!-- END custom_head -->
+
+{ADMIN_NAV}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Usage for <a href="/search/user/{USAGE_USER_ID}">{USAGE_USER_FULLNAME}</a></h2>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div class="row">
+                <div class="small-12 large-4 columns">
+                    <div class="content">
+                        <div data-panel='total' class='loader'>Loading data...</div>
+                    </div>
+                    <div data-panel='group' class='loader'>Loading data...</div>
+                </div>
+                <div class="small-12 large-8 columns">
+                    <div data-panel='type' class='loader'>Loading data...</div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <div class="small-12 columns">
+	    <div data-panel='user' class='loader'>Loading data...</div>
+    </div>
+</div>
