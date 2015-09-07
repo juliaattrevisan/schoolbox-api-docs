@@ -171,38 +171,40 @@
         <h2 class="subheader">Users</h2>
 
         <form data-action="userUpdate" id="updateForm" action="/adminv2/user/bulk/modifyForm" method="post">
-            <table data-users="true">
-                <thead>
-                    <tr>
-                        <th>
-                            <input type="checkbox" data-selectall="true" id="selectAll">
-                            <label for="selectAll" class="checkbox-label"></label>
-                        </th>
-                        <th>Firstname</th>
-                        <th>Lastname</th>
-                        <th>External ID</th>
-                        <th>Campuses</th>
-                        <th>Role</th>
-                        <th>Year</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- BEGIN user -->
-                    <tr>
-                        <td>
-                            <input data-selectallgroup="users" name='userId[]' type="checkbox" value="{USER_ID}" id="user-{USER_ID}" />
-                            <label for="user-{USER_ID}" class="checkbox-label"></label>
-                        </td>
-                        <td>{USER_FIRSTNAME}</td>
-                        <td>{USER_LASTNAME}</td>
-                        <td>{USER_EXTERNAL_ID}</td>
-                        <td>{USER_CAMPUS}</td>
-                        <td>{USER_GROUP}</td>
-                        <td>{USER_YEAR}</td>
-                    </tr>
-                    <!-- END user -->
-                </tbody>
-            </table>
+            <div class="scrollable">
+                <table data-users="true">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" data-selectall="true" id="selectAll">
+                                <label for="selectAll" class="checkbox-label"></label>
+                            </th>
+                            <th>Firstname</th>
+                            <th>Lastname</th>
+                            <th>External ID</th>
+                            <th>Campuses</th>
+                            <th>Role</th>
+                            <th>Year</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- BEGIN user -->
+                        <tr>
+                            <td>
+                                <input data-selectallgroup="users" name='userId[]' type="checkbox" value="{USER_ID}" id="user-{USER_ID}" />
+                                <label for="user-{USER_ID}" class="checkbox-label"></label>
+                            </td>
+                            <td>{USER_FIRSTNAME}</td>
+                            <td>{USER_LASTNAME}</td>
+                            <td>{USER_EXTERNAL_ID}</td>
+                            <td>{USER_CAMPUS}</td>
+                            <td>{USER_GROUP}</td>
+                            <td>{USER_YEAR}</td>
+                        </tr>
+                        <!-- END user -->
+                    </tbody>
+                </table>
+            </div>
 
             <section class="content">
                 <div class="row">
