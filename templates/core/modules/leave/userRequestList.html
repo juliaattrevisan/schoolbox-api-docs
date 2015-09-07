@@ -1,11 +1,32 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
 <script type="text/javascript">
-    $(function() {
+    $(function () {
+        $('table[data-topic="pendingRequests"]').tablesorter({
+            cssHeader:'sortable',
+            cssAsc:'ascending',
+            cssDesc:'descending',
+            headers:{
+                0:{ sorter:false},
+                5:{ sorter:false}
+            }
+        });
+
+        $('table[data-topic="previousRequests"]').tablesorter({
+            cssHeader:'sortable',
+            cssAsc:'ascending',
+            cssDesc:'descending',
+            headers:{
+                8:{ sorter:false}
+            }
+        });
+
         $('[data-print]').artificialPrint();
     });
 </script>
 <!-- END custom_head -->
+
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
@@ -41,7 +62,7 @@
         <!-- BEGIN request_list -->
         <!-- BEGIN pending_request_list -->
         <h2 class="subheader">Pending Requests</h2>
-        <section class="content">
+        <section>
             <table data-topic="pendingRequests">
                 <thead>
                 <tr>
@@ -71,7 +92,7 @@
 
         <!-- BEGIN previous_request_list -->
         <h2 class="subheader">Request History</h2>
-        <section class="content">
+        <section>
             <!-- BEGIN export -->
             <!-- now in options menu -->
             <!-- END export -->
@@ -112,26 +133,3 @@
 </div>
 
 
-<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
-<script type="text/javascript">
-    $(function () {
-        $('table[data-topic="pendingRequests"]').tablesorter({
-            cssHeader:'sortable',
-            cssAsc:'ascending',
-            cssDesc:'descending',
-            headers:{
-                0:{ sorter:false},
-                5:{ sorter:false}
-            }
-        });
-
-        $('table[data-topic="previousRequests"]').tablesorter({
-            cssHeader:'sortable',
-            cssAsc:'ascending',
-            cssDesc:'descending',
-            headers:{
-                8:{ sorter:false}
-            }
-        });
-    });
-</script>
