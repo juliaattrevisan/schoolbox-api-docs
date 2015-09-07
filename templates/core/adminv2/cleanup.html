@@ -1,3 +1,35 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript">
+    $(function() {
+
+        /* Confirm strings
+         */
+        var str = {
+            file: 'This will permanently delete files that have been soft deleted by users. Are you sure you want to proceed?',
+            subnews: 'This will clean the database of all content no longer visible to users.',
+            fileclean: 'This will delete all files that are no longer in the database.',
+            log: 'This will delete all logs, it will impact only on the whats new feature.',
+            image: 'This will delete all image transformations that have been cached.',
+            stream: 'This will delete all thumbnails.'
+        };
+
+        $('[data-cleanup]').click(function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                text: str[element.data('cleanup')],
+                confirmEvent: function() {
+                    window.location.href = element.attr('href');
+                }
+            });
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 {ADMIN_NAV}
         
 <div class="row">
@@ -59,32 +91,3 @@
     </div>
 </div>
 
-<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
-<script type="text/javascript">
-    $(function() {
-
-        /* Confirm strings
-         */
-        var str = {
-            file: 'This will permanently delete files that have been soft deleted by users. Are you sure you want to proceed?',
-            subnews: 'This will clean the database of all content no longer visible to users.',
-            fileclean: 'This will delete all files that are no longer in the database.',
-            log: 'This will delete all logs, it will impact only on the whats new feature.',
-            image: 'This will delete all image transformations that have been cached.',
-            stream: 'This will delete all thumbnails.'
-        };
-
-        $('[data-cleanup]').click(function(event) {
-            event.preventDefault();
-
-            var element = $(this);
-
-            $(this).confirmDialog({
-                text: str[element.data('cleanup')],
-                confirmEvent: function() {
-                    window.location.href = element.attr('href');
-                }
-            });
-        });
-    });
-</script>
