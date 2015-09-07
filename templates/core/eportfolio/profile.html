@@ -1,8 +1,22 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+    $(function() {
+        $('#add-coverphoto').click(function(event){
+            event.preventDefault();
+            $('#coverphoto-image').show().trigger('click').hide();
+        });
+        $('#coverphoto-image').change(function(){
+            $('#coverphoto-form').submit();
+        })
+    });
+</script>
+
 <style type='text/css'>
     <!-- BEGIN allowed_files -->
     a.{NAME}{background-image: url(/images/mime/22x22/{ICON});}
     <!-- END allowed_files -->
 </style>
+<!-- END custom_head -->
 
 <div class="row">
     <div class="small-12 columns">
@@ -101,7 +115,7 @@
                             <div class="four-column">
                                 {SHOWCASED_WORK_SUBMISSION_SUBMITTED}
                             </div>
-                            <div class="two-column text-center">
+                            <div class="two-column grade text-center">
                                 <span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span>
                             </div>
                         </li>
@@ -226,15 +240,3 @@
     <input type='hidden' name='userId' value='{USER_ID}' />
     <input id="coverphoto-image" type='file' name='imagehash' value='' />
 </form>
-
-<script type="text/javascript">
-    $(function() {
-        $('#add-coverphoto').click(function(event){
-            event.preventDefault();
-            $('#coverphoto-image').show().trigger('click').hide();
-        });
-        $('#coverphoto-image').change(function(){
-            $('#coverphoto-form').submit();
-        })
-    });
-</script>
