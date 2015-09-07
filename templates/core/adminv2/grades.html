@@ -142,47 +142,43 @@
 <div class="row" data-equalizer>
     <div class="small-12 medium-6 island">
         <h2 class="subheader">Guide</h2>
-        <section>
-            <div class="content" data-equalizer-watch>
-                <h3>Creating Grades</h3>
-                <p>
-                    Type into empty fields to create a new grade grouping,
-                    or a new grade level for an existing grouping.
-                </p>
-                <p>
-                    Once grades or groupings have been created, they cannot be removed;
-                    they can be renamed, but ensure that if you do that you rename them to something semantically
-                    equivalent, since it will affect all marks already given.
-                </p>
-            </div>
+        <section class="content" data-equalizer-watch>
+            <h3>Creating Grades</h3>
+            <p>
+                Type into empty fields to create a new grade grouping,
+                or a new grade level for an existing grouping.
+            </p>
+            <p>
+                Once grades or groupings have been created, they cannot be removed;
+                they can be renamed, but ensure that if you do that you rename them to something semantically
+                equivalent, since it will affect all marks already given.
+            </p>
         </section>
     </div>
     <div class="small-12 medium-6 island">
         <h2 class="subheader">Glossary</h2>
-        <section>
-            <div class="content" data-equalizer-watch>
-                <h3>Lower Bound</h3>
-                <p>
-                    This value is used for the purpose of displaying a grade average for a student or assessment.
-                    The caption with the highest lower bound above the average grade will be displayed.
-                </p>
+        <section class="content" data-equalizer-watch>
+            <h3>Lower Bound</h3>
+            <p>
+                This value is used for the purpose of displaying a grade average for a student or assessment.
+                The caption with the highest lower bound above the average grade will be displayed.
+            </p>
 
-                <h3>Normalised Grade</h3>
-                <p>
-                    The value (out of 100) that will be used for grade average calculations
-                    for an assessment that you give this grade.
-                </p>
-                <p>
-                    This value should be greater than (not equal to) the lower bound, and less than
-                    (not equal to) the next highest lower bound.
-                </p>
-            </div>
+            <h3>Normalised Grade</h3>
+            <p>
+                The value (out of 100) that will be used for grade average calculations
+                for an assessment that you give this grade.
+            </p>
+            <p>
+                This value should be greater than (not equal to) the lower bound, and less than
+                (not equal to) the next highest lower bound.
+            </p>
         </section>
     </div>
 </div>
 <div class="row">
-    <form method="POST" action="/adminv2/gradesForm.php" data-action="saveGradeLevels">
-        <div class="small-12 island">
+    <div class="small-12 island">
+            <form method="POST" action="/adminv2/gradesForm.php" data-action="saveGradeLevels">
             <div data-role="gradeGroupList">
                 <!-- BEGIN submission_grade_group -->
                 <div data-role="gradeGroup" data-groupid="{SUBMISSION_GRADE_GROUP_ID}">
@@ -235,6 +231,6 @@
                 <!-- END submission_grade_group -->
             </div>
             <input type="submit" value="Save changes" />
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
