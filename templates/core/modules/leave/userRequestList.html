@@ -65,26 +65,26 @@
         <section class='overflow'>
             <table data-topic="pendingRequests">
                 <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Year</th>
-                    <th>Leave Date</th>
-                    <th>Days</th>
-                    <th>Host</th>
-                    <th>View</th>
-                </tr>
+                    <tr>
+                        <th>Name</th>
+                        <th>Year</th>
+                        <th>Leave Date</th>
+                        <th>Days</th>
+                        <th>Host</th>
+                        <th>View</th>
+                    </tr>
                 </thead>
                 <tbody>
-                <!-- BEGIN pending_request -->
-                <tr>
-                    <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
-                    <td>{USER_YEAR}</td>
-                    <td>{REQUEST_START}</td>
-                    <td>{REQUEST_DURATION}</td>
-                    <td>{REQUEST_HOST_TYPE}</td>
-                    <td><a href="/modules/leave/{ALLOWED_ACTION}/{REQUEST_ID}">View</a></td>
-                </tr>
-                <!-- END pending_request -->
+                    <!-- BEGIN pending_request -->
+                    <tr>
+                        <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
+                        <td>{USER_YEAR}</td>
+                        <td>{REQUEST_START}</td>
+                        <td>{REQUEST_DURATION}</td>
+                        <td>{REQUEST_HOST_TYPE}</td>
+                        <td><a href="/modules/leave/{ALLOWED_ACTION}/{REQUEST_ID}" class="icon-view"></a></td>
+                    </tr>
+                    <!-- END pending_request -->
                 </tbody>
             </table>
         </section>
@@ -98,32 +98,32 @@
             <!-- END export -->
             <table data-topic="previousRequests">
                 <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Year</th>
-                    <th>Leave Date</th>
-                    <th>Days</th>
-                    <th>Host</th>
-                    <th>Status</th>
-                    <th>Approval Date</th>
-                    <th>Approved By</th>
-                    <th>View</th>
-                </tr>
+                    <tr>
+                        <th>Name</th>
+                        <th>Year</th>
+                        <th>Leave Date</th>
+                        <th>Days</th>
+                        <th>Host</th>
+                        <th>Status</th>
+                        <th>Approval Date</th>
+                        <th>Approved By</th>
+                        <th>View</th>
+                    </tr>
                 </thead>
                 <tbody>
-                <!-- BEGIN previous_request -->
-                <tr>
-                    <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
-                    <td>{USER_YEAR}</td>
-                    <td>{REQUEST_START}</td>
-                    <td>{REQUEST_DURATION}</td>
-                    <td>{REQUEST_HOST_TYPE}</td>
-                    <td>{REQUEST_STATUS}</td>
-                    <td>{REQUEST_AUTHORISATION_DATETIME}</td>
-                    <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
-                    <td><a href="/modules/leave/{ALLOWED_ACTION}/{REQUEST_ID}">View</a></td>
-                </tr>
-                <!-- END previous_request -->
+                    <!-- BEGIN previous_request -->
+                    <tr>
+                        <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
+                        <td>{USER_YEAR}</td>
+                        <td>{REQUEST_START}</td>
+                        <td>{REQUEST_DURATION}</td>
+                        <td>{REQUEST_HOST_TYPE}</td>
+                        <td>{REQUEST_STATUS}</td>
+                        <td>{REQUEST_AUTHORISATION_DATETIME}</td>
+                        <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
+                        <td><a href="/modules/leave/{ALLOWED_ACTION}/{REQUEST_ID}" class="icon-view"></a></td>
+                    </tr>
+                    <!-- END previous_request -->
                 </tbody>
             </table>
         </section>
