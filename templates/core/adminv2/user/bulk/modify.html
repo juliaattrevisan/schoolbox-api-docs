@@ -1,3 +1,85 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('table[data-users="true"]').selectAll({
+            key: 'selectall',
+            checkboxName: 'userId[]'
+        });
+
+        /* Count number of things selected
+         */
+        $('table[data-users="true"] input[data-selectallgroup="users"], input[data-selectall="true"]').click(function(event) {
+            var num = $('table[data-users="true"] input[data-selectallgroup="users"]:checked').length;
+
+            $('span[data-selected="true"]').text(num);
+        });
+
+        $('input[data-action="delete"]').click(function(event) {
+            event.preventDefault();
+            var theForm = $(this).closest('form');
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete the selected users?',
+                confirmEvent: function() {
+                    theForm.append('<input name="deleteUsers" type="hidden" value="1" />');
+                    theForm.submit();
+                }
+            });
+        });
+
+        /* Special validation conditionals for campus selections
+         */
+        var allInputs = $('ul[data-applycampus="true"]').find('input');
+
+        allInputs.click(function(event) {
+
+            /* Uncheck everything except Unchanged
+             */
+            if ($(this).val() == -1) {
+                for (var i = 0; i < allInputs.length; i++) {
+                    if ($(allInputs[i]).val() != -1) {
+                        $(allInputs[i]).prop('checked', false);
+                    }
+                }
+            }
+            /* Uncheck Unchanged, leave everything else as is
+             */
+            else {
+                for (var i = 0; i < allInputs.length; i++) {
+                    if ($(allInputs[i]).val() == -1) {
+                        $(allInputs[i]).prop('checked', false);
+                    }
+                }
+            }
+        });
+
+        var updateForm = $('form[data-action="userUpdate"]');
+        updateForm.validate({
+            rules: {
+                'apply_campus[]': {
+                    minlength: 1,
+                    required: true
+                }
+            },
+            messages: {
+                'apply_campus[]': "Please select a campus"
+            },
+            errorPlacement: function(error, element) {
+                if (element.attr('name') == 'apply_campus[]') {
+                    var location = updateForm.find('ul[data-applycampus="true"]');
+                }
+                else {
+                    var location = element;
+                }
+
+                error.insertAfter(location);
+            }
+        });
+    });
+</script>
+<!-- END custom_head -->
+        
 <div class="row">
     <div class="small-12 columns">
         <h1>Bulk Modify</h1>
@@ -229,83 +311,3 @@
     </div>
 </div>
 <!-- END has_results -->
-
-<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
-<script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $('table[data-users="true"]').selectAll({
-            key: 'selectall',
-            checkboxName: 'userId[]'
-        });
-
-        /* Count number of things selected
-         */
-        $('table[data-users="true"] input[data-selectallgroup="users"], input[data-selectall="true"]').click(function(event) {
-            var num = $('table[data-users="true"] input[data-selectallgroup="users"]:checked').length;
-
-            $('span[data-selected="true"]').text(num);
-        });
-
-        $('input[data-action="delete"]').click(function(event) {
-            event.preventDefault();
-            var theForm = $(this).closest('form');
-            $(this).confirmDialog({
-                text: 'Are you sure you want to delete the selected users?',
-                confirmEvent: function() {
-                    theForm.append('<input name="deleteUsers" type="hidden" value="1" />');
-                    theForm.submit();
-                }
-            });
-        });
-
-        /* Special validation conditionals for campus selections
-         */
-        var allInputs = $('ul[data-applycampus="true"]').find('input');
-
-        allInputs.click(function(event) {
-
-            /* Uncheck everything except Unchanged
-             */
-            if ($(this).val() == -1) {
-                for (var i = 0; i < allInputs.length; i++) {
-                    if ($(allInputs[i]).val() != -1) {
-                        $(allInputs[i]).prop('checked', false);
-                    }
-                }
-            }
-            /* Uncheck Unchanged, leave everything else as is
-             */
-            else {
-                for (var i = 0; i < allInputs.length; i++) {
-                    if ($(allInputs[i]).val() == -1) {
-                        $(allInputs[i]).prop('checked', false);
-                    }
-                }
-            }
-        });
-
-        var updateForm = $('form[data-action="userUpdate"]');
-        updateForm.validate({
-            rules: {
-                'apply_campus[]': {
-                    minlength: 1,
-                    required: true
-                }
-            },
-            messages: {
-                'apply_campus[]': "Please select a campus"
-            },
-            errorPlacement: function(error, element) {
-                if (element.attr('name') == 'apply_campus[]') {
-                    var location = updateForm.find('ul[data-applycampus="true"]');
-                }
-                else {
-                    var location = element;
-                }
-
-                error.insertAfter(location);
-            }
-        });
-    });
-</script>
