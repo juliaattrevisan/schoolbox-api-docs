@@ -140,6 +140,10 @@ function init(){
             l.css('top', Math.max(0, ($(window).height() - l.height() - fy) / 2));
         }).trigger('resize');
 
+        l.on('submit', function () {
+            $(this).find('input[type=submit]').prop('disabled', true);
+        });
+
     });
 
 </script>

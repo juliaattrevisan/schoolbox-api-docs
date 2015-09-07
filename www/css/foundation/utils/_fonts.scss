@@ -2,19 +2,22 @@
 	font-family: 'schoolbox', #{$body-font-family};
 }
 
-[class^="icon-"]:before, [class*=" icon-"]:before {
-	@extend %iconify;
-	speak: none;
-	font-style: normal;
-	font-size: 1rem;
-	font-weight: normal;
-	font-variant: normal;
-	text-transform: none;
-	padding-right: 10px;
+[class^="icon-"], [class*=" icon-"] {
+	@include contrast-bg();
+	&:before {
+		@extend %iconify;
+		speak: none;
+		font-style: normal;
+		font-size: 1rem;
+		font-weight: normal;
+		font-variant: normal;
+		text-transform: none;
+		padding-right: 10px;
 
-	/* Better Font Rendering =========== */
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+		/* Better Font Rendering =========== */
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
 }
 
 // No padding icon: use with .fat.button
@@ -23,11 +26,13 @@
 	display: block;
 }
 
-.icon [class^="icon-"]:before,
-.icon [class*=" icon-"]:before{
-	text-align: center;
-  width: 100%;
-	font-size: 20px;
+.icon [class^="icon-"],
+.icon [class*=" icon-"] {
+	&:before {
+		text-align: center;
+		width: 100%;
+		font-size: 20px;
+	}
 }
 
 .no-text:before{
@@ -75,6 +80,9 @@
 }
 .icon-audio:before {
 	content: "\e606";
+}
+.icon-blog:before {
+	content: "\e610";
 }
 .icon-boarder-leave:before {
 	content: "\e607";

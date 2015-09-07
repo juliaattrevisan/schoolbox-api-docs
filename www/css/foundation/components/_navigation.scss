@@ -85,6 +85,9 @@ $sub-nav-active-cursor: default;
 $sub-nav-bg-color: $secondary-color;
 $sub-nav-bg-active-color: $white;
 
+$sub-nav-secondary-bg-color: tint($secondary-color, 60%);
+$sub-nav-secondary-bg-active-color: $white;
+
 //
 // TOP BAR
 //
@@ -173,7 +176,7 @@ $topbar-divider-border-top: solid 1px tint($topbar-bg, 20%);
 // Off Canvas Tab Bar Variables
 $include-html-off-canvas-classes: $include-html-classes !default;
 
-$tabbar-bg: $body-bg;
+$tabbar-bg: $body-bg !default;
 $tabbar-height: rem-calc(80);
 $tabbar-icon-width: $tabbar-height;
 $tabbar-line-height: $tabbar-height;
@@ -192,31 +195,34 @@ $tabbar-header-margin: 0;
 
 // Off Canvas Menu Variables
 $off-canvas-width: rem-calc(260);
-$off-canvas-bg: $body-bg;
-$off-canvas-bg-hover: scale-color($tabbar-bg, $lightness: -10%);
+$off-canvas-bg: $body-bg !default;
+$off-canvas-bg-hover: darken($tabbar-bg, 10%);
+$off-canvas-hover-color: $off-canvas-bg;
 
 // Off Canvas Menu List Variables
 $off-canvas-label-padding: rem-calc(($base-font-size));
-$off-canvas-label-color: $black;
+$off-canvas-label-color: calc-text-color($off-canvas-bg);
 $off-canvas-label-text-transform: uppercase;
 $off-canvas-label-font-size: rem-calc(($base-font-size - 2));
 $off-canvas-label-font-weight: $font-weight-bold;
-$off-canvas-label-bg: $body-bg;
+$off-canvas-label-bg: transparent !default;
 $off-canvas-label-border-top: 0px; //1px solid scale-color($off-canvas-label-bg, $lightness: 14%);
 $off-canvas-label-border-bottom: none;
 $off-canvas-label-margin:0;
+
 $off-canvas-link-padding: rem-calc(($base-font-size));
-$off-canvas-link-color: $primary-color;
+$off-canvas-link-color: contrast-bg(0.7, $off-canvas-bg, 0%, $primary-color, $primary-color);
 $off-canvas-link-border-bottom: 0px; //1px solid scale-color($off-canvas-bg, $lightness: -25%);
-$off-canvas-back-bg: scale-color($tabbar-bg, $lightness: -20%);
+
+$off-canvas-back-bg: $off-canvas-bg-hover;
 $off-canvas-back-border-top: $off-canvas-label-border-top;
 $off-canvas-back-border-bottom: $off-canvas-label-border-bottom;
-$off-canvas-back-hover-bg: scale-color($off-canvas-back-bg, $lightness: -25%);
+$off-canvas-back-hover-bg: $tabbar-bg;
 $off-canvas-back-hover-border-top: 0px;
 $off-canvas-back-hover-border-bottom: none;
 
 // Off Canvas Menu Icon Variables
-$tabbar-menu-icon-color: $primary-color;
+$tabbar-menu-icon-color: contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color);
 $tabbar-menu-icon-hover: tint($tabbar-menu-icon-color, 20%);
 
 $tabbar-menu-icon-text-indent: rem-calc(35);
@@ -280,6 +286,16 @@ $menu-slide: "transform 500ms ease";
 			background-color: $sub-nav-active-bg-hover;
 		}
 	}
+
+	&.secondary {
+		a {
+			background-color: $sub-nav-secondary-bg-color;
+			&:hover{
+				background-color: $sub-nav-active-bg-hover;
+			}
+		}
+	}
+
 }
 
 // Top bar
@@ -318,6 +334,8 @@ $menu-slide: "transform 500ms ease";
 	}
 }
 
+$icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($background: $tabbar-bg, $opacity: 0.65));
+
 // Hybrid Bar
 .icon-nav{
 	@include inline-list;
@@ -326,30 +344,55 @@ $menu-slide: "transform 500ms ease";
 	height: inherit;
 	li{
 		margin: 0;
+		width: 5rem;
 	}
 	a{
-		width: 5rem;
 		height: 5rem;
 		padding: rem-calc(($base-font-size / 2)) rem-calc(($base-font-size));
 		text-align: center;
 		@extend .icon-32;
 		@extend .no-text;
+
+		&.navthis {
+			background-color: calc-text-color(
+				$tabbar-bg,
+				tint($tabbar-bg, 4%),
+				darken($tabbar-bg, 4%)
+			);
+			&:before, span {
+				color: $icon-nav-highlight-color;
+			}
+		}
+
 		&:hover{
-			background-color: $primary-color;
-			color: $body-bg;
-			label {
-				color: $body-bg;
+			&:before, span {
+				color: $icon-nav-highlight-color;
 			}
 		}
 		&:before{
 			text-align: center;
 			float: none;
+
+			color: calc-text-color(
+				$tabbar-bg,
+				contrast-bg(0.50, $white, 0%, $primary-color, $primary-color),
+				contrast-bg(0.25, $black, 0%, $primary-color, $primary-color)
+			);
+
 		}
 		span {
 			font-weight: $font-weight-normal;
-			color: $primary-color;
+			color: calc-text-color(
+				$tabbar-bg,
+				contrast-bg(0.25, $white, 0%, $primary-color, $primary-color),
+				contrast-bg(0.50, $black, 0%, $primary-color, $primary-color)
+			);
 			display: block;
 			line-height: 1.5rem;
+		}
+
+		&:before, span {
+			@include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
 		}
 	}
 }
@@ -449,7 +492,7 @@ $menu-slide: "transform 500ms ease";
 		margin: 0;
 		z-index: 1;
 		&:before{
-			color: $primary-color;
+			@include contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color);
 		}
 	}
 	#search-field:focus,
@@ -469,9 +512,12 @@ $menu-slide: "transform 500ms ease";
 	}
 }
 
-.left-off-canvas-toggle:hover,
-.right-off-canvas-toggle:hover{
-	background-color: $white;
+.left-off-canvas-toggle,
+.right-off-canvas-toggle {
+	@include contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color);
+	&:hover {
+		color: calc-text-color($tabbar-bg, $white, $primary-color);
+	}
 }
 
 .right-off-canvas-toggle{
@@ -499,6 +545,7 @@ $menu-slide: "transform 500ms ease";
 	}
 	// Profile
 	.account-menu{
+		color: $off-canvas-link-color;
 		background-color: transparent;
 		padding: 0 2.5rem 0 0;
 		font-weight: $font-weight-bold;
@@ -521,10 +568,15 @@ $menu-slide: "transform 500ms ease";
 		max-width: none;
 	}
 	// Left nav arrow override
-	ul.off-canvas-list li.has-submenu > a:after{
-		content: "\e645";
-		font-family: 'schoolbox';
-		float: right;
+	ul.off-canvas-list {
+		a:hover {
+			color: $off-canvas-hover-color;
+		}
+		li.has-submenu > a:after{
+			content: "\e645";
+			font-family: 'schoolbox';
+			float: right;
+		}
 	}
 	.left-submenu .back > a:before{
 		content: "\e64d";
@@ -573,7 +625,7 @@ $menu-slide: "transform 500ms ease";
     overflow: hidden;
   }
 	.tab-bar-section.middle{
-		padding-left: 12.375rem;
+		padding-left: 11.25rem;
 	}
 }
 

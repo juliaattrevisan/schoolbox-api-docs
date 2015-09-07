@@ -151,18 +151,18 @@
 	textarea:hover:-ms-input-placeholder		{ color: $color; }
 }
 
-@mixin responsive-sides($multiplier: 1, $property: padding) {
+@mixin responsive-sides($multiplier: 1, $property: padding, $small-adjust: 8, $medium-adjust: 4, $large-adjust: 0) {
   @media #{$small-up} {
-    #{$property}-left: rem-calc(($multiplier * ($base-font-size - 8)));
-    #{$property}-right: rem-calc(($multiplier * ($base-font-size - 8)));
+    #{$property}-left: rem-calc(($multiplier * ($base-font-size - $small-adjust)));
+    #{$property}-right: rem-calc(($multiplier * ($base-font-size - $small-adjust)));
   }
   @media #{$medium-up} {
-    #{$property}-left: rem-calc(($multiplier * ($base-font-size - 4)));
-    #{$property}-right: rem-calc(($multiplier * ($base-font-size - 4)));
+    #{$property}-left: rem-calc(($multiplier * ($base-font-size - $medium-adjust)));
+    #{$property}-right: rem-calc(($multiplier * ($base-font-size - $medium-adjust)));
   }
   @media #{$large-up} {
-    #{$property}-left: rem-calc(($multiplier * $base-font-size));
-    #{$property}-right: rem-calc(($multiplier * $base-font-size));
+    #{$property}-left: rem-calc(($multiplier * $base-font-size - $large-adjust));
+    #{$property}-right: rem-calc(($multiplier * $base-font-size - $large-adjust));
   }
 }
 
@@ -180,19 +180,17 @@
   }
 }
 
-@mixin contrast-bg($opacity: 0.5, $background: $body-bg, $saturation: 0%, $light: $white, $dark: $black) {
+@mixin contrast-bg($opacity: 0.35, $background: $body-bg, $saturation: 0%, $light: $white, $dark: $black) {
+	color: contrast-bg($opacity, $background, $saturation, $light, $dark);
+}
 
-	// this will come back as black or white
-	$text: calc-text-color($background, $light, $dark);
-
-	// apply the opacity given
-	$translucent: rgba($text, $opacity);
-
-	// flatten opacity onto the background
-	$flat: flatten-alpha($translucent, $background);
-
-	// boost saturation
-	$saturated: saturate($flat, $saturation);
-
-	color: $saturated;
+@mixin selection($color: $primary-color) {
+	::-moz-selection {
+		color: calc-text-color($color);
+		background-color: $color;
+	}
+	::selection      {
+		color: calc-text-color($color);
+		background-color: $color;
+	}
 }

@@ -17,18 +17,24 @@ $form-label-font-color: $black;
 $form-label-bottom-margin: 0;
 // $input-font-family: inherit;
 $input-font-color: $black;
-$input-font-size: rem-calc(($base-font-size - 2));
+$input-font-size: rem-calc(($base-font-size - 3));
+$input-height: 2.5rem;
+
 $input-bg-color: $white;
-$input-focus-bg-color: $ocean-sunset;
-$input-focus-color: $black;
-$input-border-color: tint($tertiary, 66%);
-$input-focus-border-color: tint($tertiary, 66%);
-$input-hover-bg-color: tint($tertiary, 87%);
-$input-hover-color: $black;
+
+$input-focus-bg-color: tint($primary-color, 95%);
+$input-focus-color: calc-text-color($input-focus-bg-color);
+
+$input-border-color: tint($tertiary-color, 66%) !default;
+$input-focus-border-color: darken($input-border-color, 33%);
+
+$input-hover-bg-color: tint($tertiary-color, 87%);
+$input-hover-color: calc-text-color($input-hover-bg-color);
+
 $input-border-style: solid;
 $input-border-width: 0.125rem;
 $input-border-radius: $global-radius;
-$input-disabled-bg: rgba($primary-color, 0.05);
+$input-disabled-bg: rgba($input-focus-bg-color, 0.05);
 // $input-disabled-cursor: $cursor-default-value;
 $input-box-shadow: none;
 
@@ -125,8 +131,8 @@ $switch-negative-color: tint($secondary-color, 74%);
 // Custom overrides
 //
 form{
-	@include placeholder-color($body-grey, $font-weight-normal);
-	@include placeholder-hover-color($black);
+	@include placeholder-color($input-border-color, $font-weight-normal);
+	@include placeholder-hover-color($input-border-color);
 	margin: $form-spacing / 2 0;
 }
 
@@ -134,14 +140,19 @@ input,
 textarea,
 select{
 	@include single-transition(all, 0.15s, linear);
+	@extend %p;
+	min-height: $input-height;
+	line-height: inherit;
 	font-weight: $font-weight-normal;
 	&:hover{
 		background-color: $input-hover-bg-color;
 		color: $input-hover-color;
+		border-color: $input-border-color;
 	}
 	&:focus{
 		color: $input-focus-color;
 		background-color: $input-focus-bg-color;
+		border-color: $input-focus-border-color;
 		outline: none;
 	}
 }
@@ -151,7 +162,7 @@ select option				{
 }
 
 
-@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem) {
+@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem, $hover-color: $input-border-color, $active-color: $primary-color) {
 
     $checkbox-inner-size: $checkbox-size - (2 * $input-border-width);
 
@@ -187,7 +198,7 @@ select option				{
             content: "";
             width: $checkbox-size;
             height: $checkbox-size;
-            background-color: $input-border-color;
+            background-color: $hover-color;
             position: absolute;
             top: 0;
             left: 0;
@@ -216,8 +227,8 @@ select option				{
     &:checked {
         + #{$label-selector} {
             &:before, &:after {
-                color: $success-color !important;
-                background-color: tint($success-color, 70%) !important;
+                color: $active-color !important;
+                background-color: tint($active-color, 70%) !important;
             }
         }
     }
@@ -226,7 +237,7 @@ select option				{
         + #{$label-selector} {
             &:hover {
                 &:before, &:after {
-                    background-color: tint($input-border-color, 50%);
+                    background-color: tint($hover-color, 50%);
                 }
 
                 &:after {
@@ -236,13 +247,9 @@ select option				{
         }
         &:focus {
             + #{$label-selector} {
-                &:before, &:after {
-                    background-color: tint($input-border-color, 50%);
-                }
-
-                &:after {
-                    color: $white;
-                }
+				&:before {
+					background-color: $input-focus-border-color;
+				}
             }
         }
     }
@@ -424,7 +431,9 @@ select.visibility {
 section > fieldset {
 
 	border: none;
-	@include grid-row($behavior:nest);
+	@include grid-row(nest-collapse);
+
+	@include responsive-sides(-1, margin);
 
 	@media #{$small-only} {
 		padding: 0;
@@ -491,15 +500,51 @@ table.mceLayout tr td {
 	background-color: transparent;
 }
 
-.cirkuitSkin a.mceButton {
-	@include border-radius(0);
-	background-image: none;
-	background-color: $body-bg;
-	padding: 4px 5px;
-	width: 2rem;
-	height: 2rem;
-	&.mceButtonActive {
-		background-color: $secondary-color !important;
+.mceEditor.cirkuitSkin {
+
+	table.mceLayout {
+		border: none;
+		.mceToolbar {
+			height: 32px;
+			padding: 0 !important;
+			background-color: $input-border-color;
+			border: none;
+			margin: 0;
+			.mceToolbarStartButton {
+				display: none;
+			}
+		}
+		tr.mceLast td.mceStatusbar {
+			background: none;
+			border: none;
+			padding: 0 !important;
+			@extend .meta;
+			span, a {
+				@extend .meta;
+			}
+		}
+	}
+
+	.mceIframeContainer {
+		border: $input-border-style $input-border-width $input-border-color;
+		padding: 0 !important;
+	}
+
+	a.mceButton {
+		@include border-radius(0);
+		margin: 0;
+		border-color: transparent !important;
+		background-color: transparent;
+		background-image: none;
+		padding: 4px 5px;
+		width: 2rem;
+		height: 2rem;
+		&.mceButtonActive {
+			background-color: $secondary-color !important;
+		}
+		&:hover {
+			background-color: tint($secondary-color, 40%) !important;
+		}
 	}
 }
 

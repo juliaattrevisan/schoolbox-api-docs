@@ -74,20 +74,13 @@ $block-grid-default-spacing: rem-calc(16);
 	padding: rem-calc(($base-font-size - 8)) !important;
 }
 
-%mobile-padding {
-
-    > .button {
-        // loop in expand by default
-        @extend .expand;
-    }
+%top-content-alignment {
 
     @media #{$small-only} {
-        padding: 0;
-
-        > h1,
-        > .subheader,
-        > ul.meta,
-        > .pagination,
+        h1,
+        .subheader,
+        ul.meta,
+        .pagination,
         > .alert-box {
             // on small screens, full width is FULL width, so indent floating content
             margin-left: 2rem;
@@ -102,7 +95,23 @@ $block-grid-default-spacing: rem-calc(16);
             padding-left: 2rem;
             padding-right: 2rem;
         }
+    }
 
+}
+
+%mobile-padding {
+
+    @include responsive-sides(2, padding, 12, 0);
+
+    > .button, input[type=submit] {
+        // loop in expand by default
+        @extend .expand;
+    }
+
+    @extend %top-content-alignment;
+
+    @media #{$small-only} {
+        padding: 0;
 
         table {
             td:first-child, th:first-child {
@@ -121,8 +130,23 @@ $block-grid-default-spacing: rem-calc(16);
 
 // yes, these are really really really specific, but it's for the greater good
 #content, .top {
-    > .row > .small-12,
-    > .row > .medium-12 {
-        @extend %mobile-padding;
+
+    @media #{$large-up} {
+        > .row {
+            margin-left: 1rem;
+        }
     }
+
+    > .row {
+        > .small-12,
+        > .medium-12,
+        > .list-item > .small-12,
+        > .list-item > .medium-12 {
+            @extend %mobile-padding;
+        }
+    }
+}
+
+[data-component] {
+    @extend %top-content-alignment;
 }

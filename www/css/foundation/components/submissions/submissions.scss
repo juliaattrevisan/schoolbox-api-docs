@@ -1,3 +1,5 @@
+$table-cell-highlight-background: tint($primary-color, 74%);
+
 /* Plagscan
  */
 .plagscan-ok {
@@ -46,7 +48,7 @@ table.rubric {
         }
 
         input:checked + label {
-            background-color: tint($success-color, 75%);
+            background-color: $table-cell-highlight-background;
         }
     }
 }

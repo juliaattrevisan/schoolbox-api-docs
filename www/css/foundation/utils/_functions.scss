@@ -8,9 +8,24 @@
 	@return mix(black, $color, $percent);
 }
 
+@function perceptive-luminance($bg) {
+	// see http://stackoverflow.com/a/1855903
+	$red-magic: 0.299;
+	$green-magic: 0.587;
+	$blue-magic: 0.114;
+
+	$red:   red($bg) * $red-magic;
+	$green: green($bg) * $green-magic;
+	$blue:  blue($bg) * $blue-magic;
+
+	$perceptive-luminance: 1 - ($red + $green + $blue) / 255;
+
+	@return $perceptive-luminance;
+}
+
 @function calc-text-color($bg, $light: $white, $dark: $black) {
-	@if (lightness($bg) > 50) {
-		@return $dark; // Lighter backgorund, return dark color
+	@if (perceptive-luminance($bg) < 0.5) {
+		@return $dark; // Lighter background, return dark color
 	} @else {
 		@return $light; // Darker background, return light color
 	}
@@ -21,4 +36,27 @@
 	$opaque: opacify($color, 1);
 	$solid-color: mix($opaque, $background, $percent);
 	@return $solid-color;
+}
+
+@function contrast-bg($opacity: 0.35, $background: $body-bg, $saturation: 0%, $light: $white, $dark: $black) {
+
+	$luminance: perceptive-luminance($background);
+
+	$text: $dark;
+
+	@if $luminance > 0.5 {
+		$text: $light;
+		$opacity: 1 - $opacity;
+	}
+
+	// apply the opacity given
+	$translucent: rgba($text, $opacity);
+
+	// flatten opacity onto the background
+	$flat: flatten-alpha($translucent, $background);
+
+	// boost saturation
+	$saturated: saturate($flat, $saturation);
+
+	@return $saturated;
 }

@@ -45,7 +45,7 @@ $subheader-font-weight: $header-font-weight;
 // $paragraph-font-family: inherit;
 // $paragraph-font-weight: $font-weight-normal;
 $paragraph-font-size: rem-calc(($base-font-size - 2));
-$paragraph-line-height: 1.25rem;
+$paragraph-line-height: 1.5rem;
 $paragraph-margin-bottom: rem-calc(($base-font-size - 2));
 $paragraph-aside-font-size: rem-calc(($base-font-size - 4));
 // $paragraph-aside-line-height: 1.35;
@@ -139,7 +139,7 @@ $paragraph-aside-font-size: rem-calc(($base-font-size - 4));
              //  s,     m,      l+
 $h1-font-scale: (1.5,    1.75,   2.25);
 $h2-font-scale: (1.25,   1.3125, 1.375);
-$h3-font-scale: (1.0625, 1.125, 1.1875);
+$h3-font-scale: (1.125,  1.25,   1.25);
 $h4-font-scale: (1.0625  1.125   1.1875);
 $h5-font-scale: (1,      1.0625, 1.125);
 $h6-font-scale: (0.9375, 1,      1.0625);
@@ -195,7 +195,7 @@ h1, h2 {
 
 h3, h4, h5, h6 {
 	.subheader {
-		@include contrast-bg(0.5, $white);
+		@include contrast-bg($background: $white);
 	}
 }
 

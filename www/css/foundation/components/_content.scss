@@ -418,6 +418,9 @@ $clearing-carousel-thumb-active-border: 4px solid tint($tertiary, 26%);
 // CUSTOM OVERRIDES
 //
 
+
+@include selection;
+
 // Deleting Components
 .delete-it{
 	background-color: tint($warning-color, 74%);
@@ -462,10 +465,13 @@ thead tr th, .row-header, .island table.dataTable thead th {
 }
 tbody tr:hover {
 	th, td {
-		background-color: $ocean-sunset;
+		background-color: $row-hover-background;
 	}
 	nav a {
 		opacity: 1;
+		&:hover {
+			background-color: $row-action-hover-background;
+		}
 	}
 }
 td, th{
@@ -722,7 +728,7 @@ $rotate-th-width: $square-grid-td-size;
 
 .highlight-panel {
 	@include panel(
-		$bg:$ocean-sunset,
+		$bg:$row-hover-background,
 		$adjust:true
 	);
 }
@@ -740,18 +746,29 @@ $rotate-th-width: $square-grid-td-size;
 
 // Hints
 .hint {
-	color: $white !important;
-	top: -3px;
+	color: calc-text-color($input-border-color) !important;
+	top: -1px;
 	margin-left: 4px;
+	width: 1rem;
+	height: 1rem;
 
-	@include label(
-		$padding: rem-calc(($base-font-size - 12)) rem-calc(($base-font-size - 10)),
-		$bg: $iron,
-		$radius: 12px
-	);
+	text-align: center;
+	text-decoration: none;
+	line-height: 1rem;
+	white-space: nowrap;
+	display: inline-block;
+	position: relative;
+	margin-bottom: auto;
+	padding: 1px 6px;
+	font-size: 0.75rem;
+	background-color: $input-border-color;
+	border-radius: 0.5rem;
 
 	&.icon-help:before{
 		color: $monsoon;
+	}
+	&.has-tip:hover {
+		border-bottom: none;
 	}
 }
 
@@ -769,7 +786,7 @@ $rotate-th-width: $square-grid-td-size;
     &.sortable {
         .ui-sortable-helper {
             border-bottom: none;
-            background-color: darken($ocean-sunset, 7%);
+            background-color: $row-action-hover-background;
         }
         .grip {
             @include grid-column(1);
@@ -789,6 +806,7 @@ $rotate-th-width: $square-grid-td-size;
     }
 	> li{
 		@include grid-row($behavior:nest); // there is no scenario in which .information-list > li will operate as anything other than a row
+		@include responsive-sides(-1, margin);
 		border-bottom: 1px solid $body-bg;
 		position: relative;
 		overflow: visible;
@@ -889,6 +907,9 @@ $rotate-th-width: $square-grid-td-size;
 	form {
 		margin: 0;
 	}
+	nav a:hover {
+		background-color: $row-action-hover-background;
+	}
 }
 
 // Activity list
@@ -911,7 +932,7 @@ $rotate-th-width: $square-grid-td-size;
 	}
 	li{
 		a:hover{
-			background-color: $ocean-sunset;
+			background-color: $row-hover-background;
 		}
 		ul{
 			clear: both;
@@ -955,7 +976,7 @@ $rotate-th-width: $square-grid-td-size;
 	@extend .information-list;
 	> li{
 		&:hover{
-			background-color: $ocean-sunset;
+			background-color: $row-hover-background;
 			.actions > a, nav a {
 				opacity: 1;
 			}
@@ -973,7 +994,7 @@ $rotate-th-width: $square-grid-td-size;
 	//@media #{$large-up} { @include block-grid(4); }
 	//@media #{$medium-up} { @include block-grid(2); }
 	//@media #{$small-up} { @include block-grid(2); }
-	@extend .information-list;
+	//@extend .information-list;
 	> li{
         padding-bottom: 0 !important; // SORRY! foundation's selector is just too specific :'(
 		border-right: 1px solid $body-bg;
@@ -994,7 +1015,7 @@ $rotate-th-width: $square-grid-td-size;
 		opacity: 0.3;
 		text-align: center;
 		&:hover{
-			background-color: darken($ocean-sunset, 7%);
+			background-color: $row-action-hover-background;
 		}
 		&:before{
 			@media #{$small-only, $medium-only}{

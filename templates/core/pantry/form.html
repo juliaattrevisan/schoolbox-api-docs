@@ -1,3 +1,8 @@
+<ul class="breadcrumb">
+    <li><a href="/">Schoolbox</a></li>
+    <li><a href="/pantry">Pantry</a></li>
+    <li class="active"><a href="/pantry/form">Sample Form</a></li>
+</ul>
 <div class="row">
     <div class="small-12 island">
         <h1 id="forms">Sample Form</h1>
@@ -6,7 +11,8 @@
                 and a variety of elements all through it. Real forms will hopefully be more straightforward and easier on the eye.
             </li>
         </ul>
-        <form class="top" action="#">
+        <h2 class="subheader">You can update your datums here</h2>
+        <form action="#">
             <section>
                 <fieldset class="content">
                     <legend>In Most Cases, Single Column Works Best</legend>
@@ -21,7 +27,7 @@
                         <div class="small-12 columns">
                             <label>Input Label
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
-                                <input type="text" />
+                                <input type="text" placeholder="Put some text here" />
                             </label>
                         </div>
 
@@ -39,7 +45,13 @@
                         <div class="small-12 columns">
                             <label>Textarea Label
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
-                                <textarea>Hey look! <b>WYSIWYG</b> content.</textarea>
+                                <textarea>
+                                    <p>Hey look! <b>WYSIWYG</b> content.</p>
+                                    <p>XOXO cold-pressed roof party butcher banh mi, tilde single-origin coffee Odd Future. Heirloom farm-to-table authentic keffiyeh. Put a bird on it PBR health goth, cold-pressed deep v Pitchfork 3 wolf moon kale chips Blue Bottle. Pinterest street art butcher, irony single-origin coffee hashtag Truffaut. Williamsburg normcore chambray ethical pickled pour-over lo-fi. Distillery readymade flannel chia, fingerstache Marfa fashion axe pug asymmetrical disrupt beard Truffaut single-origin coffee. Kale chips irony blog skateboard tousled, paleo Austin tofu PBR&B taxidermy PBR trust fund Marfa organic cold-pressed.</p>
+                                    <p>Hashtag locavore wolf, meh typewriter put a bird on it keffiyeh fashion axe crucifix heirloom fixie readymade 90's Helvetica High Life. Echo Park keytar heirloom deep v trust fund meh, squid small batch. Hashtag cold-pressed you probably haven't heard of them, normcore gastropub chillwave Helvetica biodiesel. Irony occupy cold-pressed, mustache master cleanse mumblecore fap direct trade keytar hoodie High Life distillery. Ennui biodiesel organic vegan, 90's blog Truffaut meditation fap single-origin coffee squid Schlitz seitan craft beer. Literally farm-to-table tilde, Brooklyn Bushwick cardigan Vice. Gastropub farm-to-table Helvetica, chia XOXO whatever Shoreditch small batch Truffaut narwhal Marfa disrupt American Apparel.</p>
+                                    <p>Taxidermy seitan Bushwick, cronut roof party messenger bag occupy. Selfies mustache distillery, plaid YOLO tilde mumblecore keffiyeh. Gastropub Marfa plaid, irony hashtag banjo mumblecore. Health goth disrupt bespoke, craft beer Odd Future cardigan Williamsburg. Echo Park listicle pickled VHS DIY. Freegan health goth four dollar toast swag Blue Bottle Echo Park. Thundercats butcher four dollar toast, flexitarian meditation cliche letterpress kitsch.</p>
+                                    <p>Narwhal Pinterest four loko heirloom cliche ethical. Wes Anderson Carles try-hard sartorial. Wayfarers chillwave VHS, Bushwick hella bicycle rights pickled skateboard art party paleo cardigan readymade. Lomo tattooed mumblecore, pickled health goth drinking vinegar scenester Neutra skateboard. Cray Wes Anderson hella beard try-hard health goth wolf. Banh mi distillery Vice pickled blog Portland. PBR&B small batch lomo actually.</p>
+                                </textarea>
                             </label>
                             <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
                             <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
@@ -201,14 +213,14 @@
 
                     <div class="column small-12 medium-4">
                         <label>Date:
-                            <input type="text" data-datepicker>
+                            <input type="text" data-datepicker placeholder="Date">
                         </label>
                     </div>
 
                     <div class="column small-6 medium-4">
                         <div class="timepick">
                             <label>Select start:
-                                <input data-timepicker type="text" autocomplete="off" />
+                                <input data-timepicker type="text" autocomplete="off" placeholder="Start Time" />
                             </label>
                         </div>
                     </div>
@@ -216,7 +228,7 @@
                     <div class="column small-6 medium-4">
                         <div class="timepick">
                             <label>Select end:
-                                <input data-timepicker type="text" autocomplete="off" />
+                                <input data-timepicker type="text" autocomplete="off" placeholder="End Time" />
                             </label>
                         </div>
                     </div>
