@@ -74,35 +74,37 @@
 					<legend>Access Permissions
 						<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select user roles which have access to this folder">?</span>
 					</legend>
-					<table>
-                        <thead>
-                            <tr>
-                                <th>Role</th>
-                                <th>None</th>
-                                <th>Read</th>
-                                <th>Write</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- BEGIN perm_table -->
-                            <tr>
-                                <td>{GROUP_NAME}</td>
-                                <td>
-                                    <input type="radio" class="no_permission required" id="groupNone{GROUP_ID}" name="group[{GROUP_ID}]" value="0" {PERM_0_SELECTED} />
-                                    <label class="radio-label" for="groupNone{GROUP_ID}"></label>
-                                </td>
-                                <td>
-                                    <input type="radio" name="group[{GROUP_ID}]" id="groupRead{GROUP_ID}" value="1" {PERM_1_SELECTED} />
-                                    <label class="radio-label" for="groupRead{GROUP_ID}"></label>
-                                </td>
-                                <td>
-                                    <input type="radio" name="group[{GROUP_ID}]" id="groupWrite{GROUP_ID}" value="2" {PERM_2_SELECTED} />
-                                    <label class="radio-label" for="groupWrite{GROUP_ID}"></label>
-                                </td>
-                            </tr>
-                            <!-- END perm_table -->
-                        </tbody>
-					</table>
+                    <div class="scrollable">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Role</th>
+                                    <th>None</th>
+                                    <th>Read</th>
+                                    <th>Write</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- BEGIN perm_table -->
+                                <tr>
+                                    <td>{GROUP_NAME}</td>
+                                    <td>
+                                        <input type="radio" class="no_permission required" id="groupNone{GROUP_ID}" name="group[{GROUP_ID}]" value="0" {PERM_0_SELECTED} />
+                                        <label class="radio-label" for="groupNone{GROUP_ID}"></label>
+                                    </td>
+                                    <td>
+                                        <input type="radio" name="group[{GROUP_ID}]" id="groupRead{GROUP_ID}" value="1" {PERM_1_SELECTED} />
+                                        <label class="radio-label" for="groupRead{GROUP_ID}"></label>
+                                    </td>
+                                    <td>
+                                        <input type="radio" name="group[{GROUP_ID}]" id="groupWrite{GROUP_ID}" value="2" {PERM_2_SELECTED} />
+                                        <label class="radio-label" for="groupWrite{GROUP_ID}"></label>
+                                    </td>
+                                </tr>
+                                <!-- END perm_table -->
+                            </tbody>
+                        </table>
+                    </div>
 					<div class="small-12 columns">
 						<!-- BEGIN recursive -->
 						<input type="checkbox" id="recursive" name="recursive" value="1" />
