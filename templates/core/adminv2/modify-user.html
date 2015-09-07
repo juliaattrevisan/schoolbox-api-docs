@@ -1,3 +1,154 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript">
+    $(function() {
+
+        /**
+         * AJAX submit of forms (used by groups and services)
+         */
+        $(':input[data-autosubmit]').change(function() {
+            var form = $(this.form);
+            $.post('/adminv2/userForm.php', form.serializeArray());
+        });
+
+        /**
+         * Show/hide password
+         */
+        var passwordDisplayer = $('[data-role="passwordDisplay"]');
+        if (passwordDisplayer.length) {
+            var passwordShow = passwordDisplayer.find('[data-action="show"]');
+            var passwordHide = passwordDisplayer.find('[data-action="hide"]');
+            var passwordView = passwordDisplayer.find('[data-relation="password"]');
+            passwordShow.show();
+            passwordHide.hide();
+            passwordView.hide();
+            passwordShow.click(function(e) {
+                e.preventDefault();
+                passwordShow.hide();
+                passwordHide.show();
+                passwordView.show();
+            });
+            passwordHide.click(function(e) {
+                e.preventDefault();
+                passwordShow.show();
+                passwordHide.hide();
+                passwordView.hide();
+            });
+        }
+
+        /**
+         * Hide campus selector if I selected a service that doesn't use them
+         */
+        var addServiceForm = $('form[data-action="addService"]');
+        addServiceForm.on(
+            'change',
+            ':input[data-role="serviceSelector"]',
+            function() {
+                // Search for this item, disable others
+                var currentService = $(this).find(':selected').data('identifier');
+                var selectors      = addServiceForm.find(':input[data-service-type]');
+                selectors.hide();
+                selectors.filter('[data-service-type="'+currentService+'"]').show();
+            }
+        );
+
+        /**
+         * User details validation
+         */
+        $('form[data-validatable-as="userDetails"]').validate({
+            rules: {
+                alt_email: {
+                    email:true
+                },
+                firstname: {
+                    require_from_group: [1, '[data-relation="name"]']
+                },
+                lastname: {
+                    require_from_group: [1, '[data-relation="name"]']
+                }
+            },
+            messages: {
+                firstname: {
+                    require_from_group: "Please enter either a first name or surname"
+                },
+                lastname: {
+                    require_from_group: "Please enter either a first name or surname"
+                },
+                defaultCampus: "Please select a default campus",
+                alt_email: "If you are entering an alternative email, please ensure it's a valid address"
+            },
+            errorPlacement: function(error, element) {
+                if (element.is('[data-role="defaultCampus"]')) {
+                    error.css('margin', 0);
+                    error.insertAfter(element.closest('[data-role="campusList"]'));
+                } else {
+                    error.insertAfter(element)
+                }
+            }
+        });
+
+        /**
+         * Service validation
+         */
+        $('form[data-validatable-as="addService"]').validate();
+
+        $('form[data-validatable-as="addGroup"]').validate();
+
+        // Handles autosuggest for linking users to other user accounts
+        var addUserSelector = $(':input[data-selectizeuser="addUser"]');
+        var addUserButton   = $(addUserSelector.prop('form')).find(':submit');
+        addUserSelector
+                .selectizeSelector({
+                    multiple: true,
+                    ajax: {
+                        url:      '/ajax/user.php',
+                        type:     'GET',
+                        data:     {groupID: 0},
+                        dataType: 'json'
+                    }
+                })
+                .on('selectize.item_add', function() {
+                    addUserButton.prop('disabled', false);
+                })
+                .on('selectize.item_remove', function() {
+                    // Disable only if empty
+                    if ($(this).data('selectize').items.length === 0) {
+                        addUserButton.prop('disabled', true);
+                    }
+                });
+
+        /**
+         * Confirm update of superuser field
+         */
+        $('input[data-role="superuser"]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Change this user\'s superuser status?',
+                confirmEvent: function(element) {
+                    element.prop('checked', !(element.prop('checked')));
+                }
+            });
+        });
+
+        /**
+         * Confirm update of account enabled field
+         */
+        $('input[data-role="enabled"]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Change this user\'s account status?',
+                confirmEvent: function(element) {
+                    element.prop('checked', !(element.prop('checked')));
+                }
+            });
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 {ADMIN_NAV}
 
 <div class="row">
@@ -504,153 +655,3 @@
         </section>
     </div>
 </div>
-
-<script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
-<script type="text/javascript">
-
-    $(function() {
-
-        /**
-         * AJAX submit of forms (used by groups and services)
-         */
-        $(':input[data-autosubmit]').change(function() {
-            var form = $(this.form);
-            $.post('/adminv2/userForm.php', form.serializeArray());
-        });
-
-        /**
-         * Show/hide password
-         */
-        var passwordDisplayer = $('[data-role="passwordDisplay"]');
-        if (passwordDisplayer.length) {
-            var passwordShow = passwordDisplayer.find('[data-action="show"]');
-            var passwordHide = passwordDisplayer.find('[data-action="hide"]');
-            var passwordView = passwordDisplayer.find('[data-relation="password"]');
-            passwordShow.show();
-            passwordHide.hide();
-            passwordView.hide();
-            passwordShow.click(function(e) {
-                e.preventDefault();
-                passwordShow.hide();
-                passwordHide.show();
-                passwordView.show();
-            });
-            passwordHide.click(function(e) {
-                e.preventDefault();
-                passwordShow.show();
-                passwordHide.hide();
-                passwordView.hide();
-            });
-        }
-
-        /**
-         * Hide campus selector if I selected a service that doesn't use them
-         */
-        var addServiceForm = $('form[data-action="addService"]');
-        addServiceForm.on(
-                'change',
-                ':input[data-role="serviceSelector"]',
-                function() {
-                    // Search for this item, disable others
-                    var currentService = $(this).find(':selected').data('identifier');
-                    var selectors      = addServiceForm.find(':input[data-service-type]');
-                    selectors.hide();
-                    selectors.filter('[data-service-type="'+currentService+'"]').show();
-                }
-        );
-
-        /**
-         * User details validation
-         */
-        $('form[data-validatable-as="userDetails"]').validate({
-            rules: {
-                alt_email: {
-                    email:true
-                },
-                firstname: {
-                    require_from_group: [1, '[data-relation="name"]']
-                },
-                lastname: {
-                    require_from_group: [1, '[data-relation="name"]']
-                }
-            },
-            messages: {
-                firstname: {
-                    require_from_group: "Please enter either a first name or surname"
-                },
-                lastname: {
-                    require_from_group: "Please enter either a first name or surname"
-                },
-                defaultCampus: "Please select a default campus",
-                alt_email: "If you are entering an alternative email, please ensure it's a valid address"
-            },
-            errorPlacement: function(error, element) {
-                if (element.is('[data-role="defaultCampus"]')) {
-                    error.css('margin', 0);
-                    error.insertAfter(element.closest('[data-role="campusList"]'));
-                } else {
-                    error.insertAfter(element)
-                }
-            }
-        });
-
-        /**
-         * Service validation
-         */
-        $('form[data-validatable-as="addService"]').validate();
-
-        $('form[data-validatable-as="addGroup"]').validate();
-
-        // Handles autosuggest for linking users to other user accounts
-        var addUserSelector = $(':input[data-selectizeuser="addUser"]');
-        var addUserButton   = $(addUserSelector.prop('form')).find(':submit');
-        addUserSelector
-                .selectizeSelector({
-                    multiple: true,
-                    ajax: {
-                        url:      '/ajax/user.php',
-                        type:     'GET',
-                        data:     {groupID: 0},
-                        dataType: 'json'
-                    }
-                })
-                .on('selectize.item_add', function() {
-                    addUserButton.prop('disabled', false);
-                })
-                .on('selectize.item_remove', function() {
-                    // Disable only if empty
-                    if ($(this).data('selectize').items.length === 0) {
-                        addUserButton.prop('disabled', true);
-                    }
-                });
-
-        /**
-         * Confirm update of superuser field
-         */
-        $('input[data-role="superuser"]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                text: 'Change this user\'s superuser status?',
-                confirmEvent: function(element) {
-                    element.prop('checked', !(element.prop('checked')));
-                }
-            });
-        });
-
-        /**
-         * Confirm update of account enabled field
-         */
-        $('input[data-role="enabled"]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                text: 'Change this user\'s account status?',
-                confirmEvent: function(element) {
-                    element.prop('checked', !(element.prop('checked')));
-                }
-            });
-        });
-    });
-</script>
