@@ -1,3 +1,18 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
+<script type="text/javascript" charset="utf-8" src="/javascript/components/datatables/media/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('table[data-sortable]').DataTable({
+            paging: false,
+            searching: false
+        });
+
+        $('[data-print]').artificialPrint();
+    });
+</script>
+<!-- END custom_head -->
+
 <div class="actions-small-3 row">
     <div class="list-item">
         <div class="small-12 column">
@@ -14,7 +29,7 @@
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         <li><a class="icon-export" href="/modules/leave/house/export/{HOUSE_ID}">Export History</a></li>
-        <li><a class="icon-print" href="javascript:window.print()">Print</a></li>
+        <li><a class="icon-print" data-print>Print</a></li>
     </ul>
 </div>
 
@@ -36,7 +51,7 @@
         <!-- BEGIN pending_request_list -->
         <h2 class="subheader">Pending Requests</h2>
         <section class="scrollable">
-            <table data-topic="pendingRequests">
+            <table data-topic="pendingRequests" data-sortable>
                 <thead>
                 <tr>
                     <th>Name</th>
@@ -45,7 +60,7 @@
                     <th>Leave Date</th>
                     <th>Days</th>
                     <th>Host</th>
-                    <th>View</th>
+                    <th data-sortable="false">View</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -68,7 +83,7 @@
         <!-- BEGIN previous_request_list -->
         <h2 class="subheader">Request History</h2>
         <section class="scrollable">
-            <table data-topic="previousRequests">
+            <table data-topic="previousRequests" data-sortable>
                 <thead>
                 <tr>
                     <th>Name</th>
@@ -79,7 +94,7 @@
                     <th>Status</th>
                     <th>Status Updated On</th>
                     <th>Status Updated by</th>
-                    <th>View</th>
+                    <th data-sortable="false">View</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -104,27 +119,3 @@
     </div>
 </div>
 
-
-<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $('table[data-topic="pendingRequests"]').tablesorter({
-            cssHeader: 'sortable',
-            cssAsc: 'ascending',
-            cssDesc: 'descending',
-            headers: {
-                0: { sorter: false},
-                6: { sorter: false}
-            }
-        });
-
-        $('table[data-topic="previousRequests"]').tablesorter({
-            cssHeader: 'sortable',
-            cssAsc: 'ascending',
-            cssDesc: 'descending',
-            headers: {
-                8: { sorter: false}
-            }
-        });
-    });
-</script>
