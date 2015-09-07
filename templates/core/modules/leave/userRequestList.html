@@ -1,25 +1,11 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
-<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
+<script type="text/javascript" charset="utf-8" src="/javascript/components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript">
     $(function () {
-        $('table[data-topic="pendingRequests"]').tablesorter({
-            cssHeader:'sortable',
-            cssAsc:'ascending',
-            cssDesc:'descending',
-            headers:{
-                0:{ sorter:false},
-                5:{ sorter:false}
-            }
-        });
-
-        $('table[data-topic="previousRequests"]').tablesorter({
-            cssHeader:'sortable',
-            cssAsc:'ascending',
-            cssDesc:'descending',
-            headers:{
-                8:{ sorter:false}
-            }
+        $('table[data-sortable]').DataTable({
+            paging: false,
+            searching: false
         });
 
         $('[data-print]').artificialPrint();
@@ -63,7 +49,7 @@
         <!-- BEGIN pending_request_list -->
         <h2 class="subheader">Pending Requests</h2>
         <section class='scrollable'>
-            <table data-topic="pendingRequests">
+            <table data-topic="pendingRequests" data-sortable>
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -71,7 +57,7 @@
                         <th>Leave Date</th>
                         <th>Days</th>
                         <th>Host</th>
-                        <th>View</th>
+                        <th data-sortable="false">View</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -96,7 +82,7 @@
             <!-- BEGIN export -->
             <!-- now in options menu -->
             <!-- END export -->
-            <table data-topic="previousRequests">
+            <table data-topic="previousRequests" data-sortable>
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -107,7 +93,7 @@
                         <th>Status</th>
                         <th>Approval Date</th>
                         <th>Approved By</th>
-                        <th>View</th>
+                        <th data-sortable="false">View</th>
                     </tr>
                 </thead>
                 <tbody>
