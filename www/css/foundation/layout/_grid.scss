@@ -129,7 +129,7 @@ $block-grid-default-spacing: rem-calc(16);
 }
 
 // yes, these are really really really specific, but it's for the greater good
-#content, .top {
+#content {
 
     @media #{$large-up} {
         > .row {
@@ -149,4 +149,7 @@ $block-grid-default-spacing: rem-calc(16);
 
 [data-component] {
     @extend %top-content-alignment;
+    .button {
+        margin-bottom: 0;
+    }
 }
