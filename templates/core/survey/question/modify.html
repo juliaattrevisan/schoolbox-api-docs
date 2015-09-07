@@ -1,3 +1,24 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $.fn.alaressTiny({
+            mode: "exact",
+            elements: "question",
+            file_browser_category_id: '{ASSESS_CATEGORY_ID}'
+        });
+    });
+
+    /* For overriding plugin redirection destination when modifying
+     * questions inside the QuestionBank
+     *
+     * This must appear before injected html fragments
+     */
+    var questionBank = false;
+</script>
+<!-- END custom_head -->
+
 {BREADCRUMB}
 
 <div class="row">
@@ -47,22 +68,3 @@
         </form>
     </div>
 </div>
-
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $.fn.alaressTiny({
-            mode: "exact",
-            elements: "question",
-            file_browser_category_id: '{ASSESS_CATEGORY_ID}'
-        });
-    });
-
-    /* For overriding plugin redirection destination when modifying
-     * questions inside the QuestionBank
-     *
-     * This must appear before injected html fragments
-     */
-    var questionBank = false;
-</script>
