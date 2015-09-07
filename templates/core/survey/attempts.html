@@ -1,4 +1,24 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" href="/javascript/components/datatables/media/css/jquery.dataTables.min.css">
+<script type="text/javascript" charset="utf-8" src="/javascript/components/datatables/media/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-sortable]').DataTable({
+            paging: false,
+            searching: false,
+            columnDefs: [
+                {
+                    orderable: false,
+                    targets: [0, -1]
+                }
+            ]
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 {BREADCRUMB}
+
 <div class="row">
     <div class="small-12 columns">
         <h1>{SURVEY_NAME}</h1>
@@ -49,21 +69,3 @@
         </section>
     </div>
 </div>
-
-<link rel="stylesheet" type="text/css" href="/javascript/components/datatables/media/css/jquery.dataTables.min.css">
-<script type="text/javascript" charset="utf-8" src="/javascript/components/datatables/media/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $('[data-sortable]').DataTable({
-            paging: false,
-            searching: false,
-            columnDefs: [
-                {
-                    orderable: false,
-                    targets: [0, -1]
-                }
-            ]
-        });
-    });
-</script>
-
