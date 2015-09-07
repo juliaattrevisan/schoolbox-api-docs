@@ -1,3 +1,85 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css"/>
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type='text/javascript'>
+    $(function() {
+
+        /* Toggle answer visibility
+         */
+        $('[data-show-answer-content]').click(function(event) {
+            event.preventDefault();
+
+            var id = $(this).attr('data-show-answer-content');
+
+            $('[data-answer-content='+id+']').toggleClass('hide');
+        });
+
+        /* Delete confirmation
+         */
+        $('[data-delete-question]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Do you want to remove this question from the Question Bank?',
+                confirmEvent: $.confirmDialog.followHref($(this))
+            });
+        });
+
+        /* Folder tree
+         */
+        $("#categoryTree")
+                .on('ready.jstree', function (event, jstree) {
+                    var openNodes = [
+                        {SELECTED_NODES}
+                    ];
+
+                    jstree.instance.open_node(openNodes);
+
+                    /* Style selected node if one was chozen
+                     */
+                    if (openNodes.length) {
+                        $('#' + openNodes[0]).children('a.jstree-anchor').addClass('jstree-clicked');
+                    }
+                })
+                .on('click', 'a.jstree-anchor', function () {
+                    location.href = this.href
+                })
+                .on('move_node.jstree', function (e, data) {
+                    $.ajax({
+                        url: '/survey/questionbank/move.php',
+                        data: {
+                            position: data.position,
+                            destination: data.parent.split('_').pop(),
+                            target: data.node.id.split('_').pop()
+                        }
+                    });
+                })
+                .jstree({
+                    "core": {
+                        animation: 0,
+                        force_text: true,
+                        check_callback: true,
+                        multiple: false,
+                        "themes": {
+                            "variant": "schoolbox",
+                            "dots": true,
+                            "icons": false
+                        }
+                    },
+                    "plugins": ["dnd"],
+                    dnd: {
+                        copy: false
+                    }
+                });
+
+        /* Reveals
+         */
+        $('#edit-category-modal').find('form').validate();
+        $('#add-subcategory-modal').find('form').validate();
+    });
+</script>
+<!-- END custom_head -->
+
 {BREADCRUMB}
 
 <div class="row">
@@ -164,83 +246,3 @@
         </section>
     </div>
 </div>
-
-<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css"/>
-<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
-<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
-<script type='text/javascript'>
-    $(function() {
-
-        /* Toggle answer visibility
-         */
-        $('[data-show-answer-content]').click(function(event) {
-            event.preventDefault();
-
-            var id = $(this).attr('data-show-answer-content');
-
-            $('[data-answer-content='+id+']').toggleClass('hide');
-        });
-
-        /* Delete confirmation
-         */
-        $('[data-delete-question]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                text: 'Do you want to remove this question from the Question Bank?',
-                confirmEvent: $.confirmDialog.followHref($(this))
-            });
-        });
-
-        /* Folder tree
-         */
-        $("#categoryTree")
-                .on('ready.jstree', function (event, jstree) {
-                    var openNodes = [
-                        {SELECTED_NODES}
-                    ];
-
-                    jstree.instance.open_node(openNodes);
-
-                    /* Style selected node if one was chozen
-                     */
-                    if (openNodes.length) {
-                        $('#' + openNodes[0]).children('a.jstree-anchor').addClass('jstree-clicked');
-                    }
-                })
-                .on('click', 'a.jstree-anchor', function () {
-                    location.href = this.href
-                })
-                .on('move_node.jstree', function (e, data) {
-                    $.ajax({
-                        url: '/survey/questionbank/move.php',
-                        data: {
-                            position: data.position,
-                            destination: data.parent.split('_').pop(),
-                            target: data.node.id.split('_').pop()
-                        }
-                    });
-                })
-                .jstree({
-                    "core": {
-                        animation: 0,
-                        force_text: true,
-                        check_callback: true,
-                        multiple: false,
-                        "themes": {
-                            "variant": "schoolbox",
-                            "dots": true,
-                            "icons": false
-                        }
-                    },
-                    "plugins": ["dnd"],
-                    dnd: {
-                        copy: false
-                    }
-                });
-
-        /* Reveals
-         */
-        $('#edit-category-modal').find('form').validate();
-        $('#add-subcategory-modal').find('form').validate();
-    });
-</script>
