@@ -5,10 +5,10 @@ $charset: "utf-8";
 // =============================================================================
 
 // Colours
-$primary-color:					#0066b0;
-$secondary-color:				#bdd7ea;
-$tertiary-color:				#0066b0;
-$body-bg:						#ededed;
+$primary-color:					#0066b0 !default;
+$secondary-color:				#bdd7ea !default;
+$tertiary-color:				#0066b0 !default;
+$body-bg:						#ededed !default;
 
 $button-color:					$secondary-color;
 $secondary-button-color:		$secondary-color;
