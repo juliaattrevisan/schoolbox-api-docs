@@ -1,5 +1,37 @@
-<span class="header-actions">
-</span>
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('input[data-datepicker]').datepicker({
+            constrainInput: false,
+            onClose: function (string) {
+                var input = $(this);
+
+                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
+
+        $(document).on('click', '[data-action]', function (event) {
+            event.preventDefault();
+
+            var searchForm = $('form[data-form_type="search"]');
+            var date     = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
+            var action   = $(this).data('action');
+            var location = '/modules/leave/report/catering/' + date;
+
+            if (action == 'export') {
+                location += '/export';
+            }
+
+            window.location.href = location;
+        });
+
+        $('[data-print]').artificialPrint();
+    });
+</script>
+<!-- END custom_head -->
 
 <div class="actions-small-1 row">
     <div class="list-item">
@@ -8,7 +40,7 @@
         </div>
     </div>
     <nav>
-        <a class="icon-print" href="javascript:window.print()" title="Print"></a>
+        <a class="icon-print" title="Print" data-print></a>
         <a class="icon-export" data-action="export" title="Export"></a>
     </nav>
 </div>
@@ -95,33 +127,3 @@
     </div>
 </div>
 <!-- END house_list -->
-
-<script type="text/javascript">
-    $(function() {
-        $('input[data-datepicker]').datepicker({
-            constrainInput: false,
-            onClose: function (string) {
-                var input = $(this);
-
-                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-                    input.val(data.time);
-                })
-            }
-        });
-
-        $(document).on('click', '[data-action]', function (event) {
-            event.preventDefault();
-
-            var searchForm = $('form[data-form_type="search"]');
-            var date     = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
-            var action   = $(this).data('action');
-            var location = '/modules/leave/report/catering/' + date;
-
-            if (action == 'export') {
-                location += '/export';
-            }
-
-            window.location.href = location;
-        });
-    });
-</script>
