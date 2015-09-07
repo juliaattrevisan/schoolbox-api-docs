@@ -147,7 +147,7 @@
                     <div class="small-12 large-6 columns">
                         <label for="requestTravelType">
                             Description
-                            <span data-tooltip aria-haspopup="true" class="hint has-tip tip-top" title="Only complete for special leave information or travel arrangements">?</span>
+                            <span data-tooltip class="hint has-tip tip-top" title="Only complete for special leave information or travel arrangements">?</span>
                             <textarea id='description' name="request[description]" maxlength="100" data-warninglength="67">{REQUEST_DESCRIPTION}</textarea>
                         </label>
                     </div>
@@ -172,14 +172,12 @@
                 </fieldset>
                 <!-- END has_confirmed_by -->
             </section>
-            <div class="row">
-                <div class="small-12 columns">
-                    <button type="submit" name="modify" value="Modify">Modify</button>
-                    <button type="submit" name="delete" value="Delete" data-action="delete">Delete</button>
-                    <button type="submit" name="reject" value="Reject">Reject</button>
-                    <button type="submit" name="approve" value="Approve">Approve</button>
-                </div>
-            </div>
+            <ul class="button-group">
+                <li><button type="submit" name="modify" value="Modify">Modify</button></li>
+                <li><button type="submit" name="delete" value="Delete" data-action="delete">Delete</button></li>
+                <li><button type="submit" name="reject" value="Reject">Reject</button></li>
+                <li><button type="submit" name="approve" value="Approve">Approve</button></li>
+            </ul>
         </form>
     </div>
 </div>
