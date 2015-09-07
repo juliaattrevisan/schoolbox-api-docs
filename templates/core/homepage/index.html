@@ -336,8 +336,8 @@
             <div id="tabs-2" class="content" data-equalizer data-equalizer-mq="medium-up">
                 <form method="POST" action="" name="saveColours">
 
-                    <!-- no point showing a slider for small screens which they cannot affect -->
-                    <fieldset class="hide-for-small">
+                    <!-- don't show a slider for screens which don't have multiple columns -->
+                    <fieldset class="hide-for-medium-down">
                         <legend>
                             Column Width
                             <span data-tooltip class="has-tip tip-top hint" title="Drag the slider to change the width of the left and right columns. (On small screens, the right column will drop below the left.)">?</span>
