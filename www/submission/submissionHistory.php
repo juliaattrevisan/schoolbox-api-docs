@@ -21,7 +21,8 @@ $this->setBlock(TEMPLATE_content, 'recent_submission', 'recent_submission_block'
 $this->setBlock(TEMPLATE_content, 'confirm_terms', 'confirm_terms_block');
 $this->setBlock(TEMPLATE_content, 'show_owner', 'show_owner_block');
 $this->setBlock(TEMPLATE_content, 'returned_work', 'returned_work_block');
-$this->setBlock(TEMPLATE_content, 'rubric', 'rubric_block');
+$this->setBlock(TEMPLATE_content, 'has_rubric', 'has_rubric_block');
+$this->setBlock('has_rubric', 'rubric', 'rubric_block');
 $this->setBlock(TEMPLATE_content, 'action_submit', 'action_submit_block');
 $this->setBlock(TEMPLATE_content, 'attachments', 'attachments_block');
 $this->setBlock('returned_work', 'return_file', 'return_file_block');
@@ -682,10 +683,15 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
 if ($box->isRubric()) {
     $rb = new DueWork_Rubric_Lightbox($this);
     $rb->render('rubric_block', $box->getId(), $user['uid'], $box->canViewRubric($_SESSION['user']), false);
-} else {
-    $this->setVar('rubric_block', '');
-}
 
+    $this->parse('has_rubric_block', 'has_rubric');
+}
+else {
+    $this->setVar(array(
+        'has_rubric_block' => '',
+        'rubric_block' => ''
+    ));
+}
 
 /* Only offer a publish button if there is a submission history OR a return history
  * and if the submission box isn't already published for this user
