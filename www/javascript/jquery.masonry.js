@@ -579,6 +579,7 @@
             }
 
             replacement.empty().replaceWith(response.removeAttr('style'));
+            masonry.spectrum.masonrySpectrum('reapplyColors');
             masonry.saveSorting();
             masonry.refreshPalette();
         });

@@ -266,6 +266,10 @@
                         mspec.resetColours(mspec.options.colours.original);
                         break;
 
+                    case 'reapplyColors':
+                        mspec.resetColours(mspec.options.colours.pickers);
+                        break;
+
                     default:
                         break;
                 }
