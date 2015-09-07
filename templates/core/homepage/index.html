@@ -209,16 +209,21 @@
             </span>
         </span>
         <!-- END edit_page -->
-        <!-- BEGIN readonly_switch_on -->
-        <a href="?readonly=1" class="icon-staff-students" title="Teacher View - click to switch to Student View"></a>
-        <!-- END readonly_switch_on -->
-        <!-- BEGIN readonly_switch_off -->
-        <a href="?readonly=0" class="icon-teacher" title="Student View - click to switch back to Teacher View"></a>
-        <!-- END readonly_switch_off -->
         <a href="#" class="icon-more" data-dropdown="tab-control"></a>
     </nav>
-    <!-- BEGIN page_controls -->
     <ul id="tab-control" class="f-dropdown" data-dropdown-content>
+
+        <!-- BEGIN readonly_switch_on -->
+        <li class="separator">You are in Teacher View</li>
+        <li><a href="?readonly=1" class="icon-staff-students">Switch to Student View</a></li>
+        <!-- END readonly_switch_on -->
+
+        <!-- BEGIN readonly_switch_off -->
+        <li class="separator">You are in Student View</li>
+        <li><a href="?readonly=0" class="icon-teacher">Switch to Teacher View</a></li>
+        <!-- END readonly_switch_off -->
+
+        <!-- BEGIN page_controls -->
         <li class="separator">Folder Actions</li>
         <!-- BEGIN stats_data -->
         <li>
@@ -285,8 +290,8 @@
         </li>
         <!-- END class_mark -->
         <!-- END manage_class -->
+        <!-- END page_controls -->
     </ul>
-    <!-- END page_controls -->
 </div>
 
 <!-- BEGIN customise_page -->
