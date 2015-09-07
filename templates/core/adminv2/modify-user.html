@@ -145,6 +145,20 @@
                 }
             });
         });
+
+        $('[data-delete]').click(function(event) {
+            event.preventDefault();
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this user?',
+                confirmEvent: function() {
+                    var form = $('[data-modify-user-form]');
+
+                    form.find('input[name=type]').val('delete');
+                    form.submit();
+                }
+            });
+        });
     });
 </script>
 <!-- END custom_head -->
@@ -168,7 +182,11 @@
         <h3 class="subheader">User Detail</h3>
         <section class="content">
             <div class="row">
-                <form method="POST" action="/adminv2/userForm.php" data-validatable-as="userDetails">
+                <form method="POST" action="/adminv2/userForm.php" data-validatable-as="userDetails" data-modify-user-form>
+                    <input type="hidden" name="type" value="modify" />
+
+                    <a class="icon-delete" title="Delete User" data-delete>Delete User</a>
+
                     <div class="small-12 medium-6 island">
                         <label for="title">Title</label>
                         <select id="title" name="title">
@@ -274,8 +292,7 @@
                     </div>
 
                     <div class="small-12 columns">
-                        <input type="submit" name="submit" value="Update User" />
-                        <input type="submit" name="delete" data-action="delete" value="Delete User" />
+                        <input type="submit" value="Update User" />
                     </div>
                 </form>
             </div>

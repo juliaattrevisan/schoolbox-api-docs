@@ -14,46 +14,48 @@ if (!$groupHandler->isSuperuser()) {
 /* Update existing user details
  */
 if (is_numeric($_POST['userID']) && $_POST['modusername']) {
-    if ($_POST['delete']) {
+    if ($_POST['type'] == 'delete') {
         $userHandler->delete($_POST['userID']);
 
         SitePage::localRedir('/adminv2/user/');
     }
+    else {
+        $user = array(
+            'id' => $_POST['userID'],
+            'username' => $_POST['modusername'],
+            'title' => $_POST['title'],
+            'firstname' => $_POST['firstname'],
+            'lastname' => $_POST['lastname'],
+            'synergy_id' => $_POST['database_id'] == '' ? 'NULL' : $_POST['database_id'],
+            'local_email' => $_POST['local_email'],
+            'mail_handler' => $_POST['mail_handler'],
+            'alt_email' => $_POST['alt_email'],
+            'webmail' => $_POST['webmail'],
+            'group_id' => $_POST['group'],
+            'campus' => $_POST['campus'],
+            'defaultCampus' => $_POST['defaultCampus'],
+            'su' => isset($_POST['superuser']) ? '1' : '0',
+            'year' => $_POST['year'] == '' ? 'NULL' : $_POST['year'],
+            'eportfolio_enabled' => $_POST['eportfolio'] == 1 ? 1 : 0,
+            'house' => $_POST['house'],
+            'residential_house_id' => $_POST['residential_house'],
+            'enabled' => $_POST['account_enabled']
+        );
 
-    $user = array(
-        'id' => $_POST['userID'],
-        'username' => $_POST['modusername'],
-        'title' => $_POST['title'],
-        'firstname' => $_POST['firstname'],
-        'lastname' => $_POST['lastname'],
-        'synergy_id' => $_POST['database_id'] == '' ? 'NULL' : $_POST['database_id'],
-        'local_email' => $_POST['local_email'],
-        'mail_handler' => $_POST['mail_handler'],
-        'alt_email' => $_POST['alt_email'],
-        'webmail' => $_POST['webmail'],
-        'group_id' => $_POST['group'],
-        'campus' => $_POST['campus'],
-        'defaultCampus' => $_POST['defaultCampus'],
-        'su' => isset($_POST['superuser']) ? '1' : '0',
-        'year' => $_POST['year'] == '' ? 'NULL' : $_POST['year'],
-        'eportfolio_enabled' => $_POST['eportfolio'] == 1 ? 1 : 0,
-        'house' => $_POST['house'],
-        'residential_house_id' => $_POST['residential_house'],
-        'enabled' => $_POST['account_enabled']
-    );
+        //Do not change password if its the default output value
+        if ($_POST['modpassword'] != 'donotchange') {
+            $user['password'] = $_POST['modpassword'];
+            $user['email_pass'] = $_POST['modpassword'];
+        }
 
-    //Do not change password if its the default output value
-    if ($_POST['modpassword'] != 'donotchange') {
-        $user['password'] = $_POST['modpassword'];
-        $user['email_pass'] = $_POST['modpassword'];
+        if ($userHandler->update($user) === false) {
+            error(138);
+        }
+
+        SitePage::localRedir('/adminv2/modify-user/' . $user['id']);
     }
-
-    if ($userHandler->update($user) === false) {
-        error(138);
-    }
-
-    SitePage::localRedir('/adminv2/modify-user/' . $user['id']);
-} /* Create new user
+}
+/* Create new user
  */
 elseif ($_POST['modusername']) {
     $user = array(
