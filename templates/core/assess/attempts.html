@@ -9,37 +9,39 @@
     <div class="small-12 island">
         <h2 class="subheader">Attempts by {ATTEMPT_USER_NAME}</h2>
         <section>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Start</th>
-                        <th>Finish</th>
-                        <th>Time Taken</th>
-                        <th>Reviewed</th>
-                        <th>Grade</th>
-                        <th>&nbsp;</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- BEGIN attempt -->
-                    <tr>
-                        <td>{ATTEMPT_START}</td>
-                        <td>{ATTEMPT_FINISH}</td>
-                        <td>{ATTEMPT_TIME_TAKEN}</td>
-                        <td>{ATTEMPT_REVIEWED_AT}</td>
-                        <td>{ATTEMPT_MARKS}</td>
-                        <td>
-                            <!-- BEGIN attempt_review -->
-                            <a href='/assess/studentReview/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}' class="icon-view no-text" title="Review"></a>
-                            <!-- END attempt_review -->
-                            <!-- BEGIN attempt_resume -->
-                            <a href='/assess/attempt/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}' class="icon-next no-text" title="Resume"></a>
-                            <!-- END attempt_resume -->
-                        </td>
-                    </tr>
-                    <!-- END attempt -->
-                </tbody>
-            </table>
+            <div class="scrollable">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Start</th>
+                            <th>Finish</th>
+                            <th>Time Taken</th>
+                            <th>Reviewed</th>
+                            <th>Grade</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- BEGIN attempt -->
+                        <tr>
+                            <td>{ATTEMPT_START}</td>
+                            <td>{ATTEMPT_FINISH}</td>
+                            <td>{ATTEMPT_TIME_TAKEN}</td>
+                            <td>{ATTEMPT_REVIEWED_AT}</td>
+                            <td>{ATTEMPT_MARKS}</td>
+                            <td>
+                                <!-- BEGIN attempt_review -->
+                                <a href='/assess/studentReview/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}' class="icon-view no-text" title="Review"></a>
+                                <!-- END attempt_review -->
+                                <!-- BEGIN attempt_resume -->
+                                <a href='/assess/attempt/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}' class="icon-next no-text" title="Resume"></a>
+                                <!-- END attempt_resume -->
+                            </td>
+                        </tr>
+                        <!-- END attempt -->
+                    </tbody>
+                </table>
+            </div>
         </section>
     </div>
 </div>
