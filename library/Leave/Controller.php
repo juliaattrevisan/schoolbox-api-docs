@@ -544,6 +544,7 @@ class Leave_Controller extends Controller
                 'REQUEST_ID' => $request->getId(),
                 'REQUEST_STATUS' => $request->getStatus(true),
                 'AUTHOR_NAME' => $request->getAuthor()->formatName(),
+                'USER_ID' => $user->getId(),
                 'USER_NAME' => $user->formatName(),
                 'USER_EXTERNAL_ID' => $user->getExternalId(),
                 'USER_YEAR' => $user->getYear(),
