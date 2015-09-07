@@ -420,8 +420,10 @@
                 } else {
                     ui.item.removeClass(sortingClass);
                     masonry.saveSorting();
+                    if (masonry.spectrum) {
+                        masonry.spectrum.masonrySpectrum('reapplyColors');
+                    }
                 }
-
             },
             sort: function (event, ui) {
 
@@ -579,9 +581,11 @@
             }
 
             replacement.empty().replaceWith(response.removeAttr('style'));
-            masonry.spectrum.masonrySpectrum('reapplyColors');
             masonry.saveSorting();
             masonry.refreshPalette();
+            if (masonry.spectrum) {
+                masonry.spectrum.masonrySpectrum('reapplyColors');
+            }
         });
     };
 
