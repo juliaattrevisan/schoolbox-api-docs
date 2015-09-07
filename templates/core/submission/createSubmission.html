@@ -410,16 +410,18 @@
                     <!-- BEGIN gradegroup_explanation -->
                     <div id="gradegroup-{GRADEGROUP_ID}" class="reveal-modal" data-reveal>
                         <h2>{GRADEGROUP_NAME}</h2>
-                        <table>
-                            <tbody>
-                            <!-- BEGIN gradegroup_explanation_level -->
-                            <tr>
-                                <td>{GRADEGROUP_LEVEL_LOWER_BOUND}+</td>
-                                <td>{GRADEGROUP_LEVEL_CAPTION}</td>
-                            </tr>
-                            <!-- END gradegroup_explanation_level -->
-                            </tbody>
-                        </table>
+                        <div class="scrollable">
+                            <table>
+                                <tbody>
+                                <!-- BEGIN gradegroup_explanation_level -->
+                                <tr>
+                                    <td>{GRADEGROUP_LEVEL_LOWER_BOUND}+</td>
+                                    <td>{GRADEGROUP_LEVEL_CAPTION}</td>
+                                </tr>
+                                <!-- END gradegroup_explanation_level -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <!-- END gradegroup_explanation -->
 
