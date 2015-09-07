@@ -7,13 +7,15 @@
 </div>
 
 <div class="row">
-    <fieldset class="small-12 island">
+    <div class="small-12 island">
+        <form action="/submission/submissionForm.php" method="post" name="form" class="top" id="createSubmissionForm" enctype="multipart/form-data">
+            <input type="hidden" name="category" value="{CATEGORY}" />
+            <input type="hidden" name="unit_id" value="{UNIT_ID}" />
+            <input type="hidden" name="is_task" value="{IS_TASK}" />
+            <input type="hidden" name='fileId' value="{FILEID}"/>
+            <input type="hidden" name="id" value="{ID}" />
 
-        <form action="/submission/submissionForm.php" method="post" name="form" id="createSubmissionForm"
-              enctype="multipart/form-data">
-            <input type="hidden" name="category" value="{CATEGORY}"/>
-            <input type="hidden" name="unit_id" value="{UNIT_ID}"/>
-            <input name="is_task" type="hidden" value="{IS_TASK}" />
+        
             <section>
                 <fieldset class="content">
                     <legend>Overview</legend>
@@ -518,12 +520,7 @@
                     </div>
                 </fieldset>
                 <!-- END curriculum_code_input -->
-
             </section>
-
-            <input type="hidden" name='fileId' value="{FILEID}"/>
-            <input type="hidden" name="id" value="{ID}"/></td>
-
             <div class="row">
                 <div class="small-12 columns">
                     <input type="submit" name="Submit" value="{HEADING}" />
@@ -614,21 +611,21 @@
         });
 
         var timetableSelector = $('[data-interaction="timetableSelector"]')
-                .timetableDaySelector({
-                    dateFormat: dateDisplayFormats.momentJs,
-                    campusList: {USER_CAMPUS_LIST},
-                    getChangeDateAjax: function(campus, day, date, previous) {
-                        return {
-                            url:      '/timetable/dateForTimetableDay',
-                            dataType: 'json',
-                            data:     {
-                                campus:   campus,
-                                day:      day,
-                                previous: (previous ? 1 : 0),
-                                date:     date
-                            }
+            .timetableDaySelector({
+                dateFormat: dateDisplayFormats.momentJs,
+                campusList: {USER_CAMPUS_LIST},
+                getChangeDateAjax: function(campus, day, date, previous) {
+                    return {
+                        url:      '/timetable/dateForTimetableDay',
+                        dataType: 'json',
+                        data:     {
+                            campus:   campus,
+                            day:      day,
+                            previous: (previous ? 1 : 0),
+                            date:     date
                         }
                     }
-                });
+                }
+            });
     });
 </script>
