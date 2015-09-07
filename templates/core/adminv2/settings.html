@@ -1,3 +1,26 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/javascript/components/spectrum/spectrum.css" />
+<script type="text/javascript" src="/javascript/components/spectrum/spectrum.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+        $("[data-colour-picker]").spectrum({
+            allowEmpty: false,
+            showAlpha: true,
+            showInput: true,
+            preferredFormat: 'rgb',
+            clickoutFiresChange: true,
+            showInitial: true,
+            change: function(color) {
+                $(this).val(color.toRgbString());
+            }
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 {ADMIN_NAV}
 
 <div class="row">
@@ -107,6 +130,14 @@
                         <!-- END setting_select -->
                     </select>
                     <!-- END setting_type_select -->
+
+                    <!-- BEGIN setting_type_colour -->
+                    <input type="text" value="{SETTING_VALUE}" name="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} data-colour-picker />
+                    <!-- END setting_type_colour -->
+
+                    <!-- BEGIN setting_type_file -->
+                    {ATTACH_ZONE}
+                    <!-- END setting_type_file -->
 
                     <!-- END setting -->
 

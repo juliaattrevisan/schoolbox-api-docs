@@ -26,4 +26,7 @@ MAILTO="support@schoolbox.com.au"
 30 * * * *	root	php /usr/share/schoolboxdev/tools/crocodoc/upload.php >> /var/log/schoolboxdev/crocodoc.log 2>&1
 
 # Etherpad - sync back to MySQL - every hour
-0 * * * *	root	php /usr/share/schoolbox/tools/etherpad-sync.php >> /dev/null 2>&1
+0 * * * *	root	php /usr/share/schoolboxdev/tools/etherpad-sync.php >> /dev/null 2>&1
+
+# Skin Builder - Every 5 minutes
+*/5 * * * *	root	php /usr/share/schoolboxdev/tools/skin/builder.php >> /dev/null 2>&1
