@@ -56,14 +56,14 @@ if(!( array_key_exists($logo, $logoSizes) && array_key_exists($size, $logoSizes[
 }
 
 
-/* Choose a caching method to use
- */
-$key   = $logoSizes[$logo][$size][0] . 'x' . $logoSizes[$logo][$size][1];
-$store  = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash(Config::get($logo));
-
-/* Process and stream image
- */
 try {
+    /* Choose a caching method to use
+     */
+    $key   = $logoSizes[$logo][$size][0] . 'x' . $logoSizes[$logo][$size][1];
+    $store  = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash(Config::get($logo));
+
+    /* Process and stream image
+     */
     $imageProcessor = new Freeform(
         new Cache\Storage($store, $key),
         new Transformation\MyImage( $logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]),
