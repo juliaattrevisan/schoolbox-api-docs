@@ -1,7 +1,12 @@
 <div class="actions-small-3 row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>Leave Request: {USER_NAME}, Year {USER_YEAR}, {USER_HOUSE}</h1>
+            <h1>Leave Request</h1>
+            <ul class="meta">
+                <li class="icon-staff-students">{USER_NAME}</li>
+                <li class="icon-group">Year {USER_YEAR}</li>
+                <li class="icon-home">{USER_HOUSE}</li>
+            </ul>
         </div>
     </div>
     <nav>
@@ -41,14 +46,18 @@
 
                 <fieldset class="content">
                     <div class="small-12 large-6 columns">
-                        <legend>Status</legend>
+                        <label>
+                            Status
+                        </label>
                         <p>
                             {REQUEST_STATUS}
                         </p>
                     </div>
 
                     <div class="small-12 large-6 columns">
-                        <legend>Requested By</legend>
+                        <label>
+                            Requested By
+                        </label>
                         <p>
                             {AUTHOR_NAME}
                         </p>
@@ -57,13 +66,13 @@
 
                 <fieldset class="content">
                     <legend>Leaving</legend>
-                    <div class="small-12 large-6 columns">
+                    <div class="small-6 columns">
                         <label for="startDate">
                             Date
                             <input name="request[start][date]" id="startDate" type="text" required data-datepicker value="{REQUEST_START_DATE}" />
                         </label>
                     </div>
-                    <div class="small-12 large-6 columns">
+                    <div class="small-6 columns">
                         <label for="startTime">
                             Time
                             <select name='request[start][time]' id="startTime">
