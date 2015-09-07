@@ -16,29 +16,31 @@
 <div class="row">
     <div class="small-12 island scrollable">
         <h2 class="subheader">Forecast</h2>
-        <table>
-            <tr>
-                <!-- BEGIN forecast_header -->
-                <th style="width:{FC_WIDTH}%" class="text-center">{FC_DAY}</th>
-                <!-- END forecast_header -->
-            </tr>
-            <tr>
-                <!-- BEGIN forecast_image -->
-                <td class="{FC_CURRENT} text-center">
-                    <img src="{FC_IMAGE}" alt="{FC_PRECIS}" width="50" height="50"/><br />
-                    {FC_PRECIS}
-                </td>
-                <!-- END forecast_image -->
-            </tr>
-            <tr>
-                <!-- BEGIN forecast_data -->
-                <td>
-                    <span class="label hot full-width">{FC_HIGH}&deg;</span>
-                    <span class="label cold full-width">{FC_LOW}&deg;</span>
-                </td>
-                <!-- END forecast_data -->
-            </tr>
-        </table>
+        <div class="scrollable">
+            <table>
+                <tr>
+                    <!-- BEGIN forecast_header -->
+                    <th style="width:{FC_WIDTH}%" class="text-center">{FC_DAY}</th>
+                    <!-- END forecast_header -->
+                </tr>
+                <tr>
+                    <!-- BEGIN forecast_image -->
+                    <td class="{FC_CURRENT} text-center">
+                        <img src="{FC_IMAGE}" alt="{FC_PRECIS}" width="50" height="50"/><br />
+                        {FC_PRECIS}
+                    </td>
+                    <!-- END forecast_image -->
+                </tr>
+                <tr>
+                    <!-- BEGIN forecast_data -->
+                    <td>
+                        <span class="label hot full-width">{FC_HIGH}&deg;</span>
+                        <span class="label cold full-width">{FC_LOW}&deg;</span>
+                    </td>
+                    <!-- END forecast_data -->
+                </tr>
+            </table>
+        </div>
     </div>
 </div>
 <!-- END forecast -->
