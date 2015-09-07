@@ -168,7 +168,7 @@
                 $(settings.content).replaceWith(content)/*.foundation('equalizer')*/;
 
                 // update the counter (duplicate selector intentional)
-                var unreadTotal = $(settings.content).children('[data-status="unread"]').length;
+                var unreadTotal = $(settings.content).find('[data-status="' + settings.itemUnread + '"]').length;
 
                 // set the counter
                 $('[data-' + settings.counterUnread + ']').attr('data-' + settings.counterUnread, unreadTotal);
@@ -594,7 +594,7 @@
                 e.stopPropagation();
 
                 var unreads = [];
-                $(settings.content).find('[data-' + settings.itemUnread + ']').each(function() {
+                $(settings.content).find('[data-status="' + settings.itemUnread + '"]').each(function() {
                     unreads.push(this.id.substr(2));
                 });
 
