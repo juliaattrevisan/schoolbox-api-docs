@@ -4,17 +4,24 @@
 
     $.fn.notifier = function(options) {
         var settings = $.extend({
+
+            // selectors
+
+            counter:    '#unread-count',
+            content:    '#msg-content',
+            list:       '#message-list',
+            readall:    '#msg-mar',
+            alertBox:   '#alert-dialog',
+            alertList:  '#alert-content',
+            footer:     '[data-msgfooter-action]',
+            modalTitle: '[data-modal-title]',
+
+            // socket configuration
+
             secure:    'false',
             host:      '192.168.1.1',
             port:      '8080',
             path:      '/',
-
-            counter:   '#go-msg',
-            content:   '#msg-content',
-            list:      '#message-list',
-            readall:   '#msg-mar',
-            alertBox:  '#alert-dialog',
-
             prefetch:  5,
             maxstack:  3,
             debug:     false,
@@ -22,7 +29,31 @@
             transport: 'socket',
             timeout:   500,
             maxRetry:  10,
-            alertTtl:  30
+            alertTtl:  30,
+
+            // data attributes
+
+            counterUnread: 'unread',
+            tplItem:      'msgitem',
+            tplItemHref:  'msgitem-href',
+            tplItemThumb: 'msgitem-thumb',
+            tplItemTitle: 'msgitem-title',
+            tplItemTime:  'msgitem-time',
+            tplItemAck:   'msgitem-ack',
+
+            // internal configuration
+
+            itemUnread:       'unread',
+            itemTimeFormat:   'LLLL',
+            itemTextEmphasis: 'b',
+
+            // dictionary values
+
+            dictItemOthers:       'others',
+            dictItemAnd:          'and',
+            dictFooterSeeAll:     'See All',
+            dictFooterNoMessages: 'No Messages'
+
         }, options);
 
         var backoff = 0;
@@ -114,60 +145,36 @@
 
                 var i;
 
-                // template for message list items
-                var msgLiTpl = $('<li/>').addClass('msg').append(
-                    $('<a/>').addClass('action').attr('href', '#').append(
-                        $('<img/>').attr('width', '32').attr('height', '32')
-                    ).append(
-                        $('<span/>').addClass('descript')
-                    ).append(
-                        $('<time/>').addClass('time')
-                    )
-                ).append(
-                    $('<a/>').addClass('pip').attr('href', '#').attr('title', 'Mark as read')
-                );
-
                 var footerText = '';
 
                 if(toInsert.length > 0) {
                     // append the list of messages
                     for(i = toInsert.length - 1; i >= 0; --i) {
-                        var data = toInsert[i];
-                        id = data.id;
 
-                        var icon = data.icon;
-                        var href = data.href;
+                        var li = settings.tpl.clone();
 
-                        var status = data.status;
-                        var message = applyTokens(data.body, data.params);
-                        var timestamp = data.timestamp;
+                        applyMessageData(li, toInsert[i]);
 
-                        var li = msgLiTpl.clone();
-
-                        var now = moment.unix(timestamp);
-
-                        li.attr('id', 'm-'+id).addClass(status);
-                        li.find('a').attr('href', href);
-                        li.find('span').html(message);
-                        li.find('time').html(now.fromNow()).attr('title', now.format('LLLL'));
-                        li.find('img').attr('src', icon);
                         content.append(li);
                     }
-                    footerText = 'See All';
+                    footerText = settings.dictFooterSeeAll;
                 }
                 else {
-                    footerText = 'No Messages'
+                    footerText = settings.dictFooterNoMessages;
                 }
 
                 // update the actual DOM
-                $(settings.list).children('.footer').children('a').html(footerText);
-                $(settings.content).replaceWith(content);
+                $(settings.list).find(settings.footer).html(footerText);
+                $(settings.content).replaceWith(content)/*.foundation('equalizer')*/;
 
                 // update the counter (duplicate selector intentional)
-                var unreadTotal = $(settings.content).children('li.unread').length;
+                var unreadTotal = $(settings.content).find('[data-status="' + settings.itemUnread + '"]').length;
 
                 // set the counter
-                dom.attr('data-unread', unreadTotal).children(settings.counter).html(unreadTotal ? unreadTotal : '');
+                $('[data-' + settings.counterUnread + ']').attr('data-' + settings.counterUnread, unreadTotal);
+
+                $(settings.counter).html(unreadTotal ? unreadTotal : '');
+
                 $.ajax({
                     accepts  : 'application/json',
                     async    : true,
@@ -187,11 +194,11 @@
                 // don't render a future time if server clock happens to be ahead of client
                 var now = Math.floor(new Date().getTime() / 1000);
 
-                $('#messages').children('li.message').each(function(k, v) {
+                $(settings.list).children('[data-' + settings.tplItem + ']').each(function(k, v) {
                     var msgId = this.id.split('-')[1];
                     if(typeof messages[msgId] !== 'undefined') {
                         var timestamp = messages[msgId].timestamp;
-                        $(this).find('time').text(moment.unix(Math.min(timestamp, now)).fromNow());
+                        $(this).find('[data-' + settings.tplItemTime + ']').text(moment.unix(Math.min(timestamp, now)).fromNow());
                     }
                 });
             }
@@ -199,11 +206,15 @@
 
             /**
              * @private
-             * @param string
-             * @param tokens
+             * @param {string} string
+             * @param {object} tokens
              */
             function applyTokens(string, tokens) {
-                $.each(tokens, function(token, value) {
+                var b  = '<'  + settings.itemTextEmphasis + '>',
+                    _b = '</' + settings.itemTextEmphasis + '>';
+
+                // don't blow up if tokens is undefined
+                $.each(tokens || {}, function(token, value) {
 
                     // arrange instance into an array so they can be sorted
                     var instances = [];
@@ -239,12 +250,31 @@
                     if(stack.length > settings.maxstack) {
                         // trim
                         var excess = stack.length - settings.maxstack + 1;
-                        stack = [stack[0], stack[1], excess + ' others'];
+                        stack = [stack[0], stack[1], excess + ' ' + settings.dictItemOthers];
                     }
 
-                    string = string.replace(':'+token, '<b>' + stack.join('</b>, <b>') + '</b>');
+                    string = string.replace(':'+token, b + stack.join(_b + ', ' + b) + _b);
                 });
-                return string.replaceLast('</b>,', '</b> and');
+                return string.replaceLast(_b + ',', b + ' ' + settings.dictItemAnd);
+            }
+
+
+            /**
+             * @private
+             * @param {jQuery} element
+             * @param {object} data;   defined as [id, href, timestamp, status, icon, body(, params)]
+             */
+            function applyMessageData(element, data) {
+
+                var now = moment.unix(data.timestamp),
+                    msg = applyTokens(data.body, data.params);
+
+                element.attr('id', 'm-' + data.id).attr('data-status', data.status).addClass('status-' + data.status);
+
+                element.find('[data-' + settings.tplItemHref + ']').attr('href', data.href);
+                element.find('[data-' + settings.tplItemTitle + ']').html(msg);
+                element.find('[data-' + settings.tplItemTime + ']').html(now.fromNow()).attr('title', now.format(settings.itemTimeFormat));
+                element.find('[data-' + settings.tplItemThumb + ']').attr('src', data.icon);
             }
 
 
@@ -452,32 +482,29 @@
 
                     var ii,
                         box         = $(settings.alertBox),
-                        msg         = box.find('li.tpl').clone().removeClass('tpl'),
+                        title       = box.find(settings.modalTitle),
+                        list        = $(settings.alertList),
+                        item        = settings.alertTpl.clone(false),
                         noModal     = typeof box.data('ui-dialog') == 'undefined',
                         closeDialog = function () {
-                            box.dialog('close').find('li.msg').not('.tpl').detach();
+                            box.foundation('reveal', 'close');
                             clearTimeout(ii);
                         };
 
-                    msg.attr('id', 'm-'+msgId);
-                    msg.find('a.action').attr('href', amqpMsg.href);
-                    msg.find('img').attr('src', amqpMsg.icon);
-                    msg.find('span.descript').html(amqpMsg.body);
+                    // jam that data back in there!
+                    amqpMsg.id = msgId;
 
-                    box.find('ul.content').append(msg);
+                    applyMessageData(item, amqpMsg);
 
-                    if (noModal || !box.data('ui-dialog')._isOpen) {
-                        box.dialog({
-                            title: amqpMsg.meta.title,
-                            modal: true,
-                            width: 300,
-                            resizable: false,
-                            buttons: {
-                                Ok: closeDialog
-                            },
-                            close: closeDialog
-                        });
-                    } else {
+                    list.append(item);
+
+                    if (!title.html().length) {
+                        title.text(amqpMsg.meta.title);
+                    }
+
+                    $(box).foundation('reveal', 'open');
+
+                    if (settings.alertOpen) {
                         // reset the countdown
                         clearTimeout(ii);
                     }
@@ -527,6 +554,11 @@
             var domTimeout;
             var ii;
 
+            // yank the template content out of their containers
+            settings.tpl      = $(settings.content).find('[data-' + settings.tplItem + ']').clone(false);
+            settings.alertTpl = $(settings.alertList).find('[data-' + settings.tplItem + ']').clone(false);
+            $(settings.content).empty();
+            $(settings.alertList).empty();
 
             // whenever the flyout is about to open, update relative times so they appear correctly
             $(settings.counter).on('click', function(e) {
@@ -536,11 +568,14 @@
 
             // mark-as-read listener
             $(settings.list).on('click', 'a', function(e) {
-                var pip = $(this).hasClass('pip');
-                var action = $(this).hasClass('action') && $(this).closest('li').hasClass('unread');
 
-                if(pip || action) {
-                    var msgId = $(this).closest('li.msg').attr('id').split('-')[1];
+                var $a     = $(this);
+                var $item  = $a.closest('[data-' + settings.tplItem + ']');
+                var pip    = $a.dataIsset(settings.tplItemAck);
+                var action = $a.dataIsset(settings.tplItemHref) && $item.dataIsset(settings.itemUnread);
+
+                if (pip || action) {
+                    var msgId = $item.attr('id').split('-')[1];
                     send({ack : msgId});
 
                     if(pip) {
@@ -559,7 +594,7 @@
                 e.stopPropagation();
 
                 var unreads = [];
-                $(settings.content).find('li.unread').each(function() {
+                $(settings.content).find('[data-status="' + settings.itemUnread + '"]').each(function() {
                     unreads.push(this.id.substr(2));
                 });
 
@@ -567,26 +602,24 @@
                 return false;
             });
 
+            // listen for alert open/close; we bind globally, but ignore anything not relevant to us
+            $(document).on('open.fndtn.reveal close.fndtn.reveal', '[data-reveal]', function (e) {
+                if ($(e.target).is($(settings.alertBox))) {
+                    settings.alertOpen = e.type == 'open';
+                }
+            });
 
-            // testing: toggle indicator
-            if(settings.debug) {
-                var bell = $('#infoPanel').children('li.bell');
-                var a = $('#go-msg');
-                // test add remove count
-                $('#header a.logo').on('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if(bell.attr('data-unread') == 0) {
-                        var i = parseInt(Math.random() * 26 + 1);
-                        a.html(i);
-                        bell.attr('data-unread', i);
-                    }
-                    else {
-                        a.html('');
-                        bell.attr('data-unread', '0');
-                    }
-                });
-            }
+            // once the alert box has finished closing, clear it out for next use
+            $(document).on('closed.fndtn.reveal', '[data-reveal]', function (e) {
+                var target = $(e.target),
+                    box    = $(settings.alertBox);
+
+                // remove the content of the alert box
+                if (target.is(box)) {
+                    box.find(settings.modalTitle).empty();
+                    $(settings.alertList).empty();
+                }
+            });
 
             // attempt a connection
             establishConnection();
@@ -661,6 +694,14 @@
         String.prototype.replaceLast = function (what, replacement) {
             return this.reverse().replace(new RegExp(what.reverse()), replacement.reverse()).reverse();
         };
+    }
+
+    if(!$.fn.dataIsset) {
+        $.fn.dataIsset = function (data) {
+            return this.each(function () {
+                return ('undefined' != typeof $(this).data(data));
+            });
+        }
     }
 
 } (jQuery));
