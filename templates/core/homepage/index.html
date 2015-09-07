@@ -1,28 +1,46 @@
 <!-- BEGIN custom_head -->
+
+<!-- Styles for text  -->
 <style type="text/css">
-    .top h2														{ color: #{top_head_font}; background-color: #{top_head_bg}; }
-    .top p, .top h3, .top .listing p.small, .top .wysiwyg		{ color: #{top_font}; }
-    .top a, .top .listing p.small a								{ color: #{top_link}; }
-    .top .box a:hover, .top .listing p.small a:hover			{ color: #{top_hover};  }
-    .top .text													{ background: #{top_bg_primary}; }
-    .top .listing, .top .information-list						{ background: #{top_bg_primary}; }
-    .top .listing .dark, .top .information-list .dark			{ background-color: #{top_bg_secondary}; }
+    /** Make these styles more specific than topbar styles  **/
+    #homepage .column-top .top-bar,
+    #homepage .column-top .top-bar a {
+        color: #{top_head_font};
+        background-color: #{top_head_bg};
+    }
+    #homepage .column-top .top-bar .divider {
+        border-color: #{top_head_font};
+    }
+    #homepage .column-top .island section {
+        color: #{top_font};
+        background-color: #{top_bg_primary};
+    }
 
-    .left h2													{ color: #{left_head_font}; background-color: #{left_head_bg};	}
-    .left p, .left h3, .left .listing p.small, .left .wysiwyg	{ color: #{left_font}; }
-    .left a, .left .listing p.small a							{ color: #{left_link}; }
-    .left .box a:hover, .left .listing p.small a:hover			{ color: #{left_hover};  }
-    .left .text													{ background: #{left_bg_primary}; }
-    .left .listing, .left .information-list > li	            { background: #{left_bg_primary}; }
-    .left .listing .dark, .left .information-list li.dark		{ background-color: #{left_bg_secondary}; }
+    #homepage .column-left .top-bar,
+    #homepage .column-left .top-bar a {
+        color: #{left_head_font};
+        background-color: #{left_head_bg};
+    }
+    #homepage .column-left .top-bar .divider {
+        border-color: #{left_head_font};
+    }
+    #homepage .column-left .island section {
+        color: #{left_font};
+        background-color: #{left_bg_primary};
+    }
 
-    .right h2													{ color: #{right_head_font}; background-color: #{right_head_bg};	}
-    .right p, .right h3, .right .listing p.small, .right .wysiwyg { color: #{right_font}; }
-    .right a, .right .listing p.small a							{ color: #{right_link}; }
-    .right .box a:hover, .right .listing p.small a:hover		{ color: #{right_hover};  }
-    .right .text												{ background: #{right_bg_primary}; }
-    .right .listing, .right .information-list					{ background: #{right_bg_primary}; }
-    .right .listing .dark, .right .information-list .dark		{ background-color: #{right_bg_secondary}; }
+    #homepage .column-right .top-bar,
+    #homepage .column-right .top-bar a {
+        color: #{right_head_font};
+        background-color: #{right_head_bg};
+    }
+    #homepage .column-right .top-bar .divider {
+        border-color: #{right_head_font};
+    }
+    #homepage .column-right .island section {
+        color: #{right_font};
+        background-color: #{right_bg_primary};
+    }
 
     /* wrap mimetypes in classes */
     <!-- BEGIN allowed_files -->
@@ -83,7 +101,7 @@
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.masonry.js"></script>
 <script type="text/javascript" src="/javascript/jquery.masonry.spectrum.js"></script>
-<script type="text/javascript" src="/javascript/jquery.droptab.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 
 <script type="text/javascript">
     $(function() {
@@ -122,54 +140,35 @@
             },
             column: {
                 leftColumnWidth: '{TEMPLATE_LEFT_COLUMN_WIDTH}',
-                placeholderTpl: '<p class="placeholder" />',
-                onToggle: function () {
-                    var page = $(this.element);
-
-                    if (page.find('.ui-sortable-helper').length || $('#tabs-1').is('.open')) {
-                        page.addClass('show-empty');
-                    } else {
-                        page.removeClass('show-empty');
-                    }
-                }
+                placeholderTpl: '<p class="masonry-placeholder alert-box" />'
             },
             palette: {
                 url: url,
                 selector: '#tabs-1',
-                dragHelperInit: function () {
-                    this.addClass('insert-new').find('h4 strong, .notification').remove();
-                },
+                containerSelector: '.tabs-content',
+                handleSelector: '[data-component-palette]',
                 refreshItem: function () {
-                    this.find('strong em').text(this.data('count'));
+                    this.find('[data-relation="count"]').text(this.data('count'));
                 }
             },
             spectrum: {
                 selector: '#tabs-2',
                 colours: colours,
-                restoreBtnSelector: '#restore',
-                cancelBtnSelector: '#cancel',
-                saveBtnSelector: '#saveColour',
+                restoreBtnSelector: '[data-role="reset-to-default"]',
+                cancelBtnSelector: '[data-role="undo"]',
+                saveBtnSelector: '[data-role="save"]',
+                saveLabelSelector: '[data-relation="saveLayout"]',
                 url: url
             },
             slider: {
-                selector: '#slider',
+                selector: '[data-interaction="column-width"]',
                 url: url
             }
         });
 
-        $('#tabs-homepage').droptab({
-            buttonSelector: '#tab-control a[data-tab]',
-            tabSelector: '> div.customise-components',
-            onOpen: function () {
-                if (this.id == 'tab-component') {
-                    $('#homepage').addClass('show-empty');
-                } else {
-                    $('#homepage').removeClass('show-empty');
-                }
-            },
-            onClose: function () {
-                $('#homepage').removeClass('show-empty');
-            }
+        // Fix slider on tab
+        $('[data-tab]').on('toggled', function (event, tab) {
+            tab.foundation('reflow');
         });
     });
 </script>
@@ -187,27 +186,30 @@
     </div>
     <nav>
         <!-- BEGIN edit_page -->
-        <a id="tab-columns" class="icon-edit-columns" data-tab="tabs-2" title="Edit columns">
-            <span></span>
-        </a>
-        <a id="tab-component" class="icon-components" data-tab="tabs-1" title="Add components">
-            <span></span>
-        </a>
+        <span data-tab>
+            <span class="tab-title">
+                <a class="icon-components" href="#tabs-1" title="Add components"></a>
+            </span>
+            <span class="tab-title">
+                <a class="icon-edit-columns" href="#tabs-2" title="Edit columns"></a>
+            </span>
+        </span>
         <!-- END edit_page -->
-        <!-- BEGIN readonly_switch_on -->
-        <a href="?readonly=1" class="icon-staff-students" title="Teacher View - click to switch to Student View">
-            <span></span>
-        </a>
-        <!-- END readonly_switch_on -->
-        <!-- BEGIN readonly_switch_off -->
-        <a href="?readonly=0" class="icon-teacher" title="Student View - click to switch back to Teacher View">
-            <span></span>
-        </a>
-        <!-- END readonly_switch_off -->
         <a href="#" class="icon-more" data-dropdown="tab-control"></a>
     </nav>
-    <!-- BEGIN page_controls -->
     <ul id="tab-control" class="f-dropdown" data-dropdown-content>
+
+        <!-- BEGIN readonly_switch_on -->
+        <li class="separator">You are in Teacher View</li>
+        <li><a href="?readonly=1" class="icon-staff-students">Switch to Student View</a></li>
+        <!-- END readonly_switch_on -->
+
+        <!-- BEGIN readonly_switch_off -->
+        <li class="separator">You are in Student View</li>
+        <li><a href="?readonly=0" class="icon-teacher">Switch to Teacher View</a></li>
+        <!-- END readonly_switch_off -->
+
+        <!-- BEGIN page_controls -->
         <li class="separator">Folder Actions</li>
         <!-- BEGIN stats_data -->
         <li>
@@ -274,123 +276,148 @@
         </li>
         <!-- END class_mark -->
         <!-- END manage_class -->
+        <!-- END page_controls -->
     </ul>
-    <!-- END page_controls -->
 </div>
 
 <!-- BEGIN customise_page -->
-<div id="tabs-homepage" class="hide">
-<div id="tabs-1" class="customise-components">
-    <div id="tabs-sub"> <!-- tabs-sub -->
-        <ul class="ui-tabs admin-nav">
-            <!-- BEGIN homepage_component_tab -->
-            <li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
-            <!-- END homepage_component_tab -->
-        </ul>
-        <div class="clearfix"></div>
-        <div class="components clearfix">
-            <!-- BEGIN homepage_component_page -->
-            <div id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
-                <!-- BEGIN homepage_component -->
-                <div class="add-component {HOMEPAGE_COMPONENT_MULTIPLE_STATE} clearfix" data-count="{HOMEPAGE_COMPONENT_COUNT}" data-multi="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}">
-                    <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" class="{HOMEPAGE_COMPONENT_CLASS}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
-                        <span class="icon"></span>
-                        <span class="notification"><strong></strong>Added</span>
-                        <!-- <div class="plus">+</div> -->
-                        <h4>
-                            <span>{HOMEPAGE_COMPONENT_NAME}</span>
-                            <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong>
-                        </h4>
-                    </a>
-                </div>
-                <!-- END homepage_component -->
+<div class="row">
+    <div class="small-12 island">
+        <section id="tabs-homepage" class="tabs-content">
+            <div id="tabs-1" class="content">
+                <fieldset>
+                    <legend>
+                        Components
+                        <span data-tooltip class="has-tip tip-top hint" title="Click to add a component, or drag and drop it into position.">?</span>
+                    </legend>
+                    <ul class="tabs" data-tab>
+                        <!-- BEGIN homepage_component_tab -->
+                        <li class="tab-title {COMPONENT_CATEGORY_CLASS}">
+                            <a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">
+                                {COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})
+                            </a>
+                        </li>
+                        <!-- END homepage_component_tab -->
+                    </ul>
+                    <div class="tabs-content">
+                        <!-- BEGIN homepage_component_page -->
+                        <ul class="content grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {HOMEPAGE_COMPONENT_CATEGORY_CLASS}" id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
+                            <!-- BEGIN homepage_component -->
+                            <li>
+                                <div class="{HOMEPAGE_COMPONENT_MULTIPLE_STATE} no-margin"
+                                     data-count="{HOMEPAGE_COMPONENT_COUNT}"
+                                     data-multi="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}"
+                                     data-component-palette
+                                >
+                                    <div class="avatar card">
+                                        <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
+                                            <span class="icon-32 icon-masonry icon-masonry-{HOMEPAGE_COMPONENT_CLASS}"></span>
+                                            <p>{HOMEPAGE_COMPONENT_NAME}</p>
+                                            <p class="meta">(<span data-relation="count">{HOMEPAGE_COMPONENT_COUNT}</span>)</p>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                            <!-- END homepage_component -->
+                        </ul>
+                        <!-- END homepage_component_page -->
+                    </div>
+                </fieldset>
             </div>
-            <!-- END homepage_component_page -->
-        </div>
-    </div>
-</div>
-<!--/tabs-1-->
+            <!--/tabs-1-->
 
-<div id="tabs-2" class="customise-components clearfix">
-    <!-- BEGIN homepage_color_selector -->
-    <div class="column-colours">
-        <!-- These are selectable items - default to top selected only -->
-        <a href="#" id="top" class="columns left-right selected" data-column-selector data-interaction-state="selected">Top</a>
-        <a href="#" id="left" class="columns left-right" data-column-selector>Left</a>
-        <a href="#" id="right" class="columns left-right" data-column-selector>Right</a>
-        <!--
-        <a href="#" id="bottom" class="columns left-right" data-column-selector>Bottom</a>
-        -->
-    </div>
-    <div class="colours">
-        <div class="colours-split">
-            <h3>Heading: </h3>
-            <div class="colour clearfix">
-                <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
-                <p>Text</p>
-            </div>
-            <div class="colour clearfix">
-                <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
-                <p>Background</p>
-            </div>
-        </div>
-        <div class="colours-split">
-            <h3>Content: </h3>
-            <div class="colour clearfix">
-                <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
-                <p>Primary Background</p>
-            </div>
-            <div class="colour clearfix">
-                <input id="bg_secondary" class="colorBox" name="colors[bg_secondary]" type="text" data-colorpicker />
-                <p>Secondary Background</p>
-            </div>
-            <div class="colour clearfix">
-                <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
-                <p>Text</p>
-            </div>
-            <div class="colour clearfix">
-                <input id="link" class="colorBox" name="colors[link]" type="text" data-colorpicker />
-                <p>Link</p>
-            </div>
-            <div class="colour clearfix">
-                <input id="hover" class="colorBox" name="colors[hover]" type="text" data-colorpicker />
-                <p>Link Hover</p>
-            </div>
-        </div>
-        <div class="colours-buttons">
-            <form method="POST" action="" name="saveColours">
-                <button class="submit-btn-plain save-colours inline-block" type="button" id="saveColour">Save</button>
-                <button class="submit-btn-plain inline-block" type="button" id="restore">Reset</button>
-                <button class="submit-btn-plain inline-block" type="button" id="cancel">Cancel</button>
-            </form>
-            <div class="saved-colours">Saved colour set!</div>
-        </div>
-    </div>
-    <!-- END homepage_color_selector -->
-    <div style="clear:both;">
-        <form method="POST" action="" >
-            <p class="information-notification pad-it ">In order to adjust the
-                widths of the left and right columns on the page, drag the slider
-                below left and right. </p>
-            <div class="clearfix slide-guide">
-                <h3>Column width slider</h3>
-                <div class="slider-house">
-                    <div id="slider"></div>
-                </div>
-            </div>
-            <div class="saved-layout">Saved layout</div>
+            <div id="tabs-2" class="content" data-equalizer data-equalizer-mq="medium-up">
+                <form method="POST" action="" name="saveColours">
 
-        </form>
+                    <!-- don't show a slider for screens which don't have multiple columns -->
+                    <fieldset class="hide-for-medium-down">
+                        <legend>
+                            Column Width
+                            <span data-tooltip class="has-tip tip-top hint" title="Drag the slider to change the width of the left and right columns. (On small screens, the right column will drop below the left.)">?</span>
+                        </legend>
+
+                        <div class="small-6 small-offset-3 end columns">
+                            <div class="range-slider"
+                                 data-original-value="{TEMPLATE_LEFT_COLUMN_WIDTH}"
+                                 data-slider="{TEMPLATE_LEFT_COLUMN_WIDTH}"
+                                 data-interaction="column-width"
+                                 data-options="start: 3; end: 9"
+                            >
+                                <span class="range-slider-handle" role="slider" tabindex="0"></span>
+                                <span class="range-slider-active-segment"></span>
+                                <input type="hidden" name="width" value="{TEMPLATE_LEFT_COLUMN_WIDTH}">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- BEGIN homepage_color_selector -->
+                    <fieldset>
+                        <legend>Colours</legend>
+                        <div class="small-12 columns">
+                            <fieldset class="hide-for-medium-down">
+                                <legend>
+                                    Columns
+                                    <span data-tooltip class="has-tip tip-top hint" title="Select a column to modify colours for.">?</span>
+                                </legend>
+                                <div class="small-12 columns">
+                                    <input id="top" type="checkbox" data-column-selector checked />
+                                    <label for="top" class="checkbox-label">Top</label>
+                                </div>
+                                <div class="small-12 large-6 columns">
+                                    <input id="left" type="checkbox" data-column-selector checked />
+                                    <label for="left" class="checkbox-label">
+                                        <span class="hide-for-medium-down">Left</span>
+                                        <span class="show-for-medium-down">Middle</span>
+                                    </label>
+                                </div>
+                                <div class="small-12 large-6 columns">
+                                    <input id="right" type="checkbox" data-column-selector checked />
+                                    <label for="right" class="checkbox-label">
+                                        <span class="hide-for-medium-down">Right</span>
+                                        <span class="show-for-medium-down">Bottom</span>
+                                    </label>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="small-12 medium-6 columns">
+                            <fieldset data-equalizer-watch>
+                                <legend>Heading</legend>
+                                <label for="head_font">Text</label>
+                                <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
+                                <label for="head_bg">Background</label>
+                                <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
+                            </fieldset>
+                        </div>
+                        <div class="small-12 medium-6 columns">
+                            <fieldset data-equalizer-watch>
+                                <legend>Content</legend>
+                                <label for="font">Text</label>
+                                <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
+                                <label for="bg_primary">Background</label>
+                                <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
+                            </fieldset>
+                        </div>
+                    </fieldset>
+                    <!-- END homepage_color_selector -->
+
+                    <ul class="button-group even-3">
+                        <li><a href="#" class="button secondary" data-role="save">Save</a></li>
+                        <li><a href="#" class="button" data-role="reset-to-default">Reset</a></li>
+                        <li><a href="#" class="button" data-role="undo">Undo Changes</a></li>
+                    </ul>
+
+                    <span class="label full-width hide" data-relation="saveLayout"></span>
+                </form>
+            </div>
+        </section>
     </div>
-    <div class="clearfix"></div>
-</div>
 </div>
 <!-- END customise_page -->
 
 <div id="homepage" class="row">
-    <div class="small-12 column" data-position="top">{component_position_top}</div>
-    <div class="small-12 large-{TEMPLATE_LEFT_COLUMN_WIDTH} column" data-position="left">{component_position_left}</div>
-    <div class="small-12 large-{TEMPLATE_RIGHT_COLUMN_WIDTH} column" data-position="right">{component_position_right}</div>
+    <div class="small-12 column column-top" data-position="top">{component_position_top}</div>
+    <div class="small-12 large-{TEMPLATE_LEFT_COLUMN_WIDTH} column column-left" data-position="left">{component_position_left}</div>
+    <div class="small-12 large-{TEMPLATE_RIGHT_COLUMN_WIDTH} column column-right" data-position="right">{component_position_right}</div>
     <!--
     <div class="bottom clearfix">{component_position_bottom}</div>
     -->

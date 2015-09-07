@@ -26,7 +26,8 @@
         columnSelectorSelector: '[data-column-selector]',
         restoreBtnSelector: null,
         cancelBtnSelector: null,
-        saveBtnSelector: null
+        saveBtnSelector: null,
+        saveLabelSelector: null
     };
 
     /**
@@ -61,43 +62,46 @@
         // setup colour selectors
         this.loadColorpickerColors();
 
-        // attach listeners
-
+        // attach listeners if
+        var saveLabel = $(this.options.saveLabelSelector);
+        var useLabel  = saveLabel.length && saveLabel.labelActivate && saveLabel.labelTimeout;
         $(this.element)
             .on('click', this.options.columnSelectorSelector, function (event) {
-                event.preventDefault();
                 // Don't allow deselect of the only column selected
-                var element  = $(this);
-                var deselect = element.data(interactionState) === 'selected';
-                if (!(deselect && mspec.getSelectedColumns().length <= 1)) {
-                    element
-                        .toggleClass('selected', !deselect)
-                        .data(interactionState, deselect ? '' : 'selected');
-
+                if (mspec.getSelectedColumns().length < 1) {
+                    event.preventDefault();
+                } else {
                     mspec.loadColorpickerColors();
                 }
             })
             .on('click', opt.restoreBtnSelector+", "+opt.cancelBtnSelector, function (event) {
                 event.preventDefault();
 
-                var colourSet;
+                var colourSet, labelParams = {css: 'success'};
 
                 // if it's the restore button
                 if ($(this).filter(opt.restoreBtnSelector).length) {
-                    colourSet = opt.colours.defaults;
+                    colourSet        = opt.colours.defaults;
+                    labelParams.text = 'Colours restored to defaults'
                 } else if ($(this).filter(opt.cancelBtnSelector).length) {
-                    colourSet = opt.colours.original;
+                    colourSet        = opt.colours.original;
+                    labelParams.text = 'Colour changes undone'
                 } else {
                     throw Error("Invalid selector");
                 }
 
-                mspec.resetColours(mspec.masonry.columns, colourSet);
+                mspec.resetWidth();
+                mspec.resetColours(colourSet);
 
                 // copy values from defaults into pickers and reload
                 $.each(colourSet, function(key, value) {
                     opt.colours.pickers[key] = value;
                 });
                 mspec.loadColorpickerColors();
+                if (useLabel) {
+                    saveLabel.labelActivate(labelParams);
+                    saveLabel.labelTimeout(labelParams);
+                }
             })
             .on('click', this.options.saveBtnSelector, function (event) {
                 event.preventDefault();
@@ -107,13 +111,33 @@
                     return;
                 }
 
+                // This saves everything, not just colors
                 var data = {
-                    colors: mspec.options.colours.pickers
+                    colors: mspec.options.colours.pickers,
+                    width: masonry.slider.attr('data-slider')
                 };
 
                 data = $.extend({}, data, mspec.masonry.options.context);
 
-                $.post(opt.url, data, opt.complete);
+                var ajaxRequest = $.post(opt.url, data, opt.complete);
+                if (useLabel) {
+                    saveLabel.labelActivate({
+                        text: 'Saving...'
+                    });
+                    ajaxRequest
+                        .done(function() {
+                            saveLabel.labelTimeout({
+                                text: 'Columns Saved',
+                                css: 'success'
+                            });
+                        })
+                        .fail(function() {
+                            saveLabel.labelTimeout({
+                                text: 'Error!',
+                                css: 'alert'
+                            });
+                        });
+                }
             });
 
 
@@ -184,24 +208,36 @@
      */
     MasonrySpectrum.prototype.getSelectedColumns = function () {
         return $(this.options.columnSelectorSelector)
-            .filter(function() {
-                return $(this).data(interactionState) === 'selected';
-            })
+            .filter(':checked')
             .map(function() { return this.id; })
             .toArray();
     };
 
 
     /**
-     * @param {$} columns - the columns to be reset. Array of JQuery DOM references
      * @param {object} colours
      * @returns {boolean}
      */
-    MasonrySpectrum.prototype.resetColours = function (columns, colours) {
+    MasonrySpectrum.prototype.resetColours = function (colours) {
         //noinspection AssignmentToFunctionParameterJS
+        var masonry = this;
         colours = colours || this.options.colours.defaults;
-        $.each(colours, this.updateColor);
+        $.each(colours, function(i, v) {
+            masonry.updateColor(i, v);
+        });
         return false;
+    };
+
+    /**
+     * @returns {boolean}
+     */
+    MasonrySpectrum.prototype.resetWidth = function () {
+        this.masonry.slider.foundation(
+            'slider',
+            'set_value',
+            this.masonry.slider.data('original-value')
+        );
+        this.masonry.updateWidth(this.masonry.slider.data('original-value'));
     };
 
     /**
@@ -213,70 +249,25 @@
      * @returns {*}
      */
     MasonrySpectrum.prototype.updateColor = function (element, color) {
-        switch (element) {
-            case 'top_bg_primary':
-                return $('.top .text, .top .listing, .top .information-list li').css('background-color', color);
-                break;
-            case 'top_bg_secondary':
-                return $('.top .dark').css('background-color', color);
-                break;
-            case 'top_head_font':
-                return $('.top h2').css('color', color);
-                break;
-            case 'top_head_bg':
-                return $('.top h2').css('background-color', color);
-                break;
-            case 'top_font':
-                return $('.top, .top p').css('color', color);
-                break;
-            case 'top_link':
-                return $('.top a').css('color', color);
-                break;
-            case 'left_bg_primary':
-                return $('.left .text, .left .listing, .left .information-list li').css('background-color', color);
-                break;
-            case 'left_bg_secondary':
-                return $('.left .dark').css('background-color', color);
-                break;
-            case 'left_head_font':
-                return $('.left h2').css('color', color);
-                break;
-            case 'left_head_bg':
-                return $('.left h2').css('background-color', color);
-                break;
-            case 'left_font':
-                return $('.left, .left p').css('color', color);
-                break;
-            case 'left_link':
-                return $('.left a').css('color', color);
-                break;
-            case 'left_hover':
-                return $('.right a:hover').css('color', color);
-                break;
-            case 'right_bg_primary':
-                return $('.right .text, .right .listing, .right .information-list li').css('background-color', color);
-                break;
-            case 'right_bg_secondary':
-                return $('.right .dark').css('background-color', color);
-                break;
-            case 'right_head_font':
-                return $('.right h2').css('color', color);
-                break;
-            case 'right_head_bg':
-                return $('.right h2').css('background-color', color);
-                break;
-            case 'right_font':
-                return $('.right, .right p').css('color', color);
-                break;
-            case 'right_link':
-                return $('.right a').css('color', color);
-                break;
-            case 'right_hover':
-                return $('.right a:hover').css('color', color);
-                break;
-            default:
-                return $('.left .text').css('background-color', color);
-                break;
+        // 1: column, 2: element to update
+        var matches = element.match(/^(.*?)_(.*)/);
+        if (matches) {
+            var column = this.masonry.columns.filter('[data-position="'+matches[1]+'"]');
+            switch (matches[2]) {
+                case 'font':
+                    column.find('.island section').css({color: color});
+                    break;
+                case 'bg_primary':
+                    column.find('.island section').css({backgroundColor: color});
+                    break;
+                case 'head_font':
+                    column.find('.top-bar, .top-bar a').css({color: color});
+                    column.find('.top-bar .divider').css({borderColor: color});
+                    break;
+                case 'head_bg':
+                    column.find('.top-bar, .top-bar a').css({backgroundColor: color});
+                    break;
+            }
         }
     };
 
@@ -298,7 +289,11 @@
 
                 switch (masonry) {
                     case 'resetColours':
-                        mspec.resetColours(args[1], mspec.options.colours.original);
+                        mspec.resetColours(mspec.options.colours.original);
+                        break;
+
+                    case 'reapplyColors':
+                        mspec.resetColours(mspec.options.colours.pickers);
                         break;
 
                     default:

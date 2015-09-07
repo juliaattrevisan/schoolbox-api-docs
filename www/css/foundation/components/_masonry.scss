@@ -1,0 +1,157 @@
+// Hide the placeholders for non-empty columns
+.masonry-placeholder {
+  display: none;
+}
+.empty-column .masonry-placeholder {
+  display: inherit;
+}
+
+// Homepage masonry icons
+.icon-masonry:before {
+  // default icon
+  @extend .icon-add:before;
+}
+.icon-masonry-Component_Homepage_BreadcrumbController:before {
+  @extend .icon-breadcrumbs:before;
+}
+.icon-masonry-Component_Homepage_NewsController:before {
+  @extend .icon-news:before;
+}
+.icon-masonry-Component_Homepage_LinkListController:before {
+  @extend .icon-link:before;
+}
+.icon-masonry-Component_Homepage_FileListController:before {
+  @extend .icon-files:before;
+}
+.icon-masonry-Component_Homepage_MembersController:before {
+  @extend .icon-group:before;
+}
+.icon-masonry-Component_Homepage_ForumListController:before {
+  @extend .icon-forum:before;
+}
+.icon-masonry-Component_Homepage_ManageClassController:before {
+  @extend .icon-class-list:before;
+}
+.icon-masonry-Component_Homepage_ManageFolderController:before {
+  @extend .icon-folder:before;
+}
+.icon-masonry-Component_Homepage_ManagersController:before {
+  @extend .icon-group-managers:before;
+}
+.icon-masonry-Component_Homepage_ImageController:before {
+  @extend .icon-image:before;
+}
+.icon-masonry-Component_Homepage_FolderListController:before {
+  @extend .icon-folder:before;
+}
+.icon-masonry-Component_Homepage_EventListController:before {
+  @extend .icon-calendar:before;
+}
+.icon-masonry-Component_Homepage_ClickviewController:before {
+  @extend .icon-click-view:before;
+}
+.icon-masonry-Component_Homepage_ImageGalleryController:before {
+  @extend .icon-image-gallery:before;
+}
+.icon-masonry-Component_Homepage_RandImageController:before {
+  @extend .icon-random-image:before;
+}
+.icon-masonry-Component_Homepage_DropBoxController:before {
+  @extend .icon-drop-box:before;
+}
+.icon-masonry-Component_Homepage_DueWorkListController:before {
+  @extend .icon-due-work:before;
+}
+.icon-masonry-Component_Homepage_RSSController:before {
+  @extend .icon-rss:before;
+}
+.icon-masonry-Component_Homepage_TeachersController:before {
+  @extend .icon-teacher:before;
+}
+.icon-masonry-Component_Homepage_CalendarListController:before {
+  @extend .icon-calendar:before;
+}
+.icon-masonry-Component_Homepage_DutiesController:before {
+  // ?
+  @extend .icon-task:before;
+}
+.icon-masonry-Component_Homepage_PollController:before {
+  @extend .icon-poll:before;
+}
+.icon-masonry-Component_Homepage_WikiController:before {
+  @extend .icon-wiki:before;
+}
+.icon-masonry-Component_Homepage_FeedController:before {
+  @extend .icon-homepagefeed:before;
+}
+.icon-masonry-Component_Homepage_TextBoxController:before {
+  @extend .icon-textbox:before;
+}
+.icon-masonry-Component_Homepage_AudioController:before {
+  @extend .icon-audio:before;
+}
+.icon-masonry-Component_Homepage_PodcastController:before {
+  @extend .icon-podcast:before;
+}
+.icon-masonry-Component_Homepage_BlogController:before {
+  @extend .icon-comment:before;
+}
+.icon-masonry-Component_Homepage_TranslateController:before {
+  // Doesn't yet exist and probably never will. Could make something up
+  //@extend .icon-add:before;
+  //content: 'Ω';
+}
+.icon-masonry-Component_Homepage_ScrollerController:before {
+  @extend .icon-image-slideshow:before;
+}
+.icon-masonry-Component_Homepage_AssessController:before {
+  @extend .icon-quiz:before;
+}
+.icon-masonry-Component_Homepage_CountdownController:before {
+  @extend .icon-countdown:before;
+}
+.icon-masonry-Component_Homepage_ChatController:before {
+  @extend .icon-chat:before;
+}
+.icon-masonry-Component_Homepage_SurveyController:before {
+  @extend .icon-surveys:before;
+}
+.icon-masonry-Component_Homepage_TwitterController:before {
+  @extend .icon-twitter:before;
+}
+.icon-masonry-Component_Homepage_ClassListController:before {
+  @extend .icon-class-list:before;
+}
+.icon-masonry-Component_Homepage_VideoController:before {
+  @extend .icon-video:before;
+}
+.icon-masonry-Component_Homepage_WolframController:before {
+  @extend .icon-wolfram-alpha:before;
+}
+.icon-masonry-Component_Homepage_CourseInstanceController:before {
+  @extend .icon-course-builder:before;
+}
+.icon-masonry-Component_Homepage_CourseTaskListController:before {
+  @extend .icon-course-outline:before;
+}
+.icon-masonry-Component_Homepage_RubricController:before {
+  @extend .icon-criteria:before;
+}
+.icon-masonry-Component_Homepage_SocialStreamController:before {
+  @extend .icon-social-stream:before;
+}
+.icon-masonry-Component_Homepage_EtherpadController:before {
+  @extend .icon-collab-docs:before;
+}
+.icon-masonry-Component_Homepage_PinterestController:before {
+  @extend .icon-pinterest:before;
+}
+.icon-masonry-Schoolbox_Tile_Component_HomepageTileController:before {
+  @extend .icon-tiles:before;
+}
+.icon-masonry-Schoolbox_Curriculum_Component_CurriculumDetailsController:before {
+  @extend .icon-curriculum-details:before;
+}
+.icon-masonry-Schoolbox_Curriculum_Component_CurriculumOverviewController:before {
+  @extend .icon-curriculum:before;
+}

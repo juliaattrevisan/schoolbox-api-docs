@@ -108,6 +108,11 @@ if (is_numeric($_REQUEST['cid'])) {
         foreach ($_POST['colors'] as $key => $value) {
             $color[$key] = substr($value, 1);
         }
+        // Also try to save width
+        if (!empty($_POST['width'])) {
+            // Mangle width into percentages
+            $homepage->updateGrid($_POST['width']);
+        }
         $homepage->saveDisplayProperties($color);
     } // GET config options from homepage
     elseif ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
@@ -180,10 +185,10 @@ if (is_numeric($_REQUEST['cid'])) {
         }
         SitePage::localRedir("/homepage/" . $_GET['cid']);
     } // AJAX new column widths
-    elseif ($_POST['cid'] && is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
-        $homepage = new Homepage($_POST['cid']);
-        $homepage->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
-    }
+//    elseif ($_POST['cid'] && is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
+//        $homepage = new Homepage($_POST['cid']);
+//        $homepage->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
+//    }
 } // no cid provided
 else {
     error(2);

@@ -66,7 +66,8 @@
                 left: '.column[data-position=left]',
                 right: '.column[data-position=right]'
                 // , bottom: '.column[data-position=bottom]'
-            }
+            },
+            onToggle: noop
         },
 
         // Box that contains the options to drag into play: if `palette` or `palette.selector` is null, no create-new-on-drag JS will be loaded
@@ -105,8 +106,8 @@
             columnSelectorSelector: '[data-column-selector]',
             restoreBtnSelector: null,
             cancelBtnSelector: null,
-            saveBtnSelector: null
-
+            saveBtnSelector: null,
+            saveLabelSelector: null
         },
         persist: {
             url: null,
@@ -179,57 +180,33 @@
 
 
     Masonry.prototype.initSlider = function () {
-        var opt     = this.options,
-            masonry = this;
-
-            // cache these here, so they don't have to be computed ever time the slider is moved
-            columns = {
-                left: this.columns.filter(opt.column.position.left),
-                right: this.columns.filter(opt.column.position.right)
-            };
+        var masonry = this;
 
         if (this.slider) {
             throw new Error("Slider is already initialised");
         }
 
         this.slider = $(this.options.slider.selector);
-
-        this.slider.slider({
-            min: opt.slider.min,
-            max: opt.slider.max,
-            value: opt.column.leftColumnWidth,
-
-            slide: function (event, ui) {
-                var width = ui.value - 0.5;
-
-                columns.left.css('width', width + '%');
-                columns.right.css('width', (99 - width) + '%')
-            },
-
-            create: function () {
-                // magic string is acceptable here because it's put there by jquery.slider
-                masonry.slider.find('.'+sliderHandleClass).append('<span/>');
-            },
-
-            stop: function (event, ui) {
-
-                // why does this need to send both values? in all other cases, rWidth is calculated from lWidth...
-                var data = {
-                    leftColWidth: ui.value - 0.5,
-                    rightColWidth: 99.5 - ui.value
-                };
-
-                data = $.extend({}, data, masonry.options.context);
-
-                // don't attempt to fire a request an a non-existent URL
-                if (!opt.slider.url) {
-                    console.log('AJAX sliderStop', data);
-                    return;
-                }
-
-                $.post(opt.slider.url, data, opt.slider.complete);
-            }
+        this.slider.on('change.fndtn.slider', function() {
+            masonry.updateWidth($(this).attr('data-slider'));
         });
+    };
+
+    Masonry.prototype.updateWidth = function(width) {
+        var columns = {
+                left: this.columns.filter(this.options.column.position.left),
+                right: this.columns.filter(this.options.column.position.right)
+            },
+            classes = [],
+            left  = width,
+            right = 12 - left;
+
+        for (var i = 1; i <= 11; i++) {
+            classes.push('large-'+Number(i));
+        }
+        classes = classes.join(' ');
+        columns.left.removeClass(classes).addClass('large-'+Number(left));
+        columns.right.removeClass(classes).addClass('large-'+Number(right));
     };
 
 
@@ -444,8 +421,10 @@
                 } else {
                     ui.item.removeClass(sortingClass);
                     masonry.saveSorting();
+                    if (masonry.spectrum) {
+                        masonry.spectrum.masonrySpectrum('reapplyColors');
+                    }
                 }
-
             },
             sort: function (event, ui) {
 
@@ -605,6 +584,9 @@
             replacement.empty().replaceWith(response.removeAttr('style'));
             masonry.saveSorting();
             masonry.refreshPalette();
+            if (masonry.spectrum) {
+                masonry.spectrum.masonrySpectrum('reapplyColors');
+            }
         });
     };
 
@@ -623,10 +605,10 @@
 
         this.palette = $(palOpt.selector).find(palOpt.containerSelector);
 
-        $(palOpt.selector).tabs();
+        //$(palOpt.selector).tabs();
 
-        // apply qtips to each element
-        this.applyQTip($(palOpt.handleSelector));
+        //// apply qtips to each element
+        //this.applyQTip($(palOpt.handleSelector));
 
         if (!(palOpt.clickToInsert && palOpt.dragToInsert)) {
             throw new Error("One of palette.clickToInsert or palette.dragToInsert must be true");
@@ -642,34 +624,12 @@
 
                 if (!element.hasClass('disabled')) {
                     element.addClass(loadingClass);
+                    var column = $(masonry.element).find(opt.column.position.left);
+                    var placeholder = element.closest(palOpt.handleSelector).clone();
+                    column.prepend(placeholder);
                     masonry.newComponentInstance(element)
                         .done(function(response) {
-                            var leftColumn  = $(masonry.element).find(opt.column.position.left);
-
-                            element.addClass(loadedClass);
-
-                            $(response).hide().prependTo(leftColumn).css('opacity', 0)
-                                .slideDown(400, function () {
-                                    masonry.refreshColumns();
-
-                                    // these 2 calls should happen together so there's no opacity flicker
-                                    element.removeClass(loadingClass);
-                                    masonry.refreshPalette();
-
-                                    $(this).animate({opacity: 1}, 300, function () {
-                                        element.removeClass(loadedClass);
-                                    });
-
-                                    // only go in for applying colours if you've got colours to set
-                                    if (masonry.spectrum) {
-                                        masonry.spectrum.masonrySpectrum('resetColours', leftColumn);
-                                    }
-                                });
-
-                            /* Collapse content on components
-                             * Really...I have to do it like this?
-                             */
-                            $('#' + $(response).attr('id')).find('[data-collapser=true]').collapsable();
+                            masonry.insertComponentInstance($(response), placeholder);
                         })
                         .fail(function() {
                             masonry.refreshColumns();
@@ -722,9 +682,8 @@
         });
 
         handles.each(function () {
-            // TODO remove this $.children(a)
             var item         = $(this),
-                definitionId = item.children('a').attr('rel').split(' ')[0],
+                definitionId = item.find('a').attr('rel').split(' ')[0],
                 count        = typeof counts[definitionId] == 'undefined' ? 0 : counts[definitionId];
 
             // only allowed one
@@ -749,42 +708,43 @@
             }
 
             item.data('count', count);
-        });
-
-        // reapply every 4 hours
-        this.applyQTip(handles);
-    };
-
-
-
-    /**
-     * Apply QTips to the given elements
-     *
-     * @param {$} elements
-     */
-    Masonry.prototype.applyQTip = function (elements) {
-        var masonry = this;
-
-        elements.each(function () {
-            var item    = $(this),
-                c       = item.data('count'),
-                string  = '<strong>' + (c == 0 ? 'no' : c) + '</strong> instance';
-                string += c == 1 ? '' : 's';
-
-            item.find('strong').qtip({
-                content: 'You have ' + string + ' of this component currently active',
-                style: {
-                    classes: 'qtip-green qtip-shadow qtip-rounded'
-                },
-                position: {
-                    my: 'bottom left',
-                    at: 'top right'
-                }
-            });
-
             masonry.options.palette.refreshItem.call(item);
         });
+
+        //// reapply <s>every 4 hours</s>never
+        //this.applyQTip(handles);
     };
+
+
+
+    ///**
+    // * Apply QTips to the given elements
+    // *
+    // * @param {$} elements
+    // */
+    //Masonry.prototype.applyQTip = function (elements) {
+    //    var masonry = this;
+    //
+    //    elements.each(function () {
+    //        var item    = $(this),
+    //            c       = item.data('count'),
+    //            string  = '<strong>' + (c == 0 ? 'no' : c) + '</strong> instance';
+    //            string += c == 1 ? '' : 's';
+    //
+    //        item.find('strong').qtip({
+    //            content: 'You have ' + string + ' of this component currently active',
+    //            style: {
+    //                classes: 'qtip-green qtip-shadow qtip-rounded'
+    //            },
+    //            position: {
+    //                my: 'bottom left',
+    //                at: 'top right'
+    //            }
+    //        });
+    //
+    //        masonry.options.palette.refreshItem.call(item);
+    //    });
+    //};
 
 
     /**
