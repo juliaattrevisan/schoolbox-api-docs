@@ -1,3 +1,11 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-print]').artificialPrint();
+    });
+</script>
+<!-- END custom_head -->
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
@@ -5,13 +13,13 @@
         </div>
     </div>
     <nav>
-        <a class="icon-more" title="" data-dropdown="header-options"><span></span></a>
+        <a class="icon-more" title="More Options" data-dropdown="header-options"><span></span></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         <li><a class="icon-document" href="/modules/leave/report/catering/">Catering Report</a></li>
         <li><a class="icon-document" href="/modules/leave/report/house/{HOUSE_ID}">House Report</a></li>
         <li><a class="icon-export" href="/modules/leave/student/export/{USER_ID}">Export History</a></li>
-        <li><a class="icon-print" href="javascript:window.print()">Print</a></li>
+        <li><a class="icon-print" data-print>Print</a></li>
     </ul>
 </div>
 
