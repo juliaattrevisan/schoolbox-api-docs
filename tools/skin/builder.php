@@ -35,7 +35,7 @@ if($fp) {
 }
 
 if($origSha != $newSha) {
-    exec('cd ../../; grunt sass');
+    exec('cd ' . SITE_root . '; grunt sass');
 }
 
 
