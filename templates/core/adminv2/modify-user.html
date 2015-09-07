@@ -176,7 +176,7 @@
 <div class="actions-small-2 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h2 class="subheader">{FULLNAME}</h2><h1></h1>
+            <h2 class="subheader">{FULLNAME}</h2>
         </div>
     </div>
     <nav>
@@ -604,12 +604,15 @@
     </div>
     <div class="small-12 medium-6 island">
         <section>
-            <span class="header-actions">
-                <a class="button icon-view" href="/adminv2/reports/login/user={USERNAME}">See All</a>
-            </span>
-
-            <div class="content">
-                <h4 class="subheader">Logins</h4>
+            <div class="actions-small-1 row">
+                <div class="list-item content">
+                    <div class="small-12 columns">
+                        <h4>Logins</h4>
+                    </div>
+                </div>
+                <nav>
+                    <a class="icon-view" href="/adminv2/reports/login/user={USERNAME}" title="See All"></a>
+                </nav>
             </div>
 
             <table>
@@ -635,12 +638,17 @@
 
     <div class="small-12 medium-6 island">
         <section>
-            <span class="header-actions">
-                <a class="button icon-view" href="/adminv2/reports/activity/user={USERNAME}">See All</a>
-            </span>
-
-            <div class="content">
-                <h3 class="subheader">Activity</h3>
+            <div class="">
+                <div class="actions-small-1 row">
+                    <div class="list-item content">
+                        <div class="small-12 columns">
+                            <h4>Activity</h4>
+                        </div>
+                    </div>
+                    <nav>
+                        <a class="icon-view" href="/adminv2/reports/activity/user={USERNAME}" title="See All"></a>
+                    </nav>
+                </div>
             </div>
 
             <table>
