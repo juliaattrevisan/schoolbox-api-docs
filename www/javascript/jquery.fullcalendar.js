@@ -501,8 +501,8 @@ Calendar.prototype.init = function() {
                             c.dom.fullCalendar('removeEvents', 'placeholder');
                             c.dom.fullCalendar('renderEvent', JSON.parse(responseText), true);
                         }
-                        $(document).foundation('reveal', 'close');
-                    })
+                        c.bubble.hide();
+                    });
                     c.clearForms()
                 })
             }
@@ -530,7 +530,7 @@ Calendar.prototype.init = function() {
                             c.dom.fullCalendar('removeEvents', matchEvents(eventId));
                             c.dom.fullCalendar('renderEvent', newEvent);
                         }
-                        $(document).foundation('reveal', 'close');
+                        c.bubble.hide();
                     })
                 })
             }
@@ -813,7 +813,12 @@ Bubble.prototype.fillForm = function(formId, vars) {
             fillElement(form.find('.'+k), k, v, vars)
         }
     })
-}
+};
+
+
+Bubble.prototype.hide = function() {
+    $(document).foundation('reveal', 'close');
+};
 
 /* Helper functions */
 
