@@ -1,9 +1,0 @@
-<a href="{% if event.eventId != -1 %}/m/calendar/event/{{ event.eventId }}/{{event.connectorId}}{% else %}#{% endif %}">
-    {% if not event.allDay %}
-    <time>{{ event.startTime.timeOnly }}</time>
-    {% endif %}
-    {{ event.title|raw }}
-    {% if event.topic %}
-    <aside>{{ event.topic }}</aside>
-    {% endif %}
-</a>
