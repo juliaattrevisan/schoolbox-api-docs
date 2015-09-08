@@ -211,7 +211,7 @@
                         <label>
                             Level
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select who you would like to be able to see this event">?</span>
-                            <select name="level" id="level">
+                            <select name="level" id="level" data-interaction="select-level">
                                 <!-- BEGIN event_level_drop -->
                                 <option value="{EVENT_EVENTLEVEL_ID}" {EVENT_EVENTLEVEL_ID_SELECTED}>{EVENT_EVENTLEVEL_NAME}</option>
                                 <!-- END event_level_drop -->
@@ -225,7 +225,7 @@
                             <input id="publishDate" name="publishDate" data-datepicker="true" type="text" size="15" maxlength="30" value="{EVENT_PUBLISH_DATE}"/>
                         </label>
                     </div>
-                    <div id="groupDrop" class="small-12 column" style="display: none">
+                    <div class="small-12 column" data-hide-watch="[data-interaction='select-level']" data-hide-watch-value="2">
                         <fieldset class="checklist">
                             <legend>
                                 Groups
@@ -237,7 +237,7 @@
                             <!-- END event_group_drop -->
                         </fieldset>
                     </div>
-                    <div id="roleList" class="small-12 large-6 column" style="display: none">
+                    <div class="small-12 large-6 column" data-hide-watch="[data-interaction='select-level']" data-hide-watch-value="3">
                         <fieldset class="checklist">
                             <legend>
                                 Roles
@@ -251,7 +251,7 @@
                             <label for="roleSelectAll">Select all</label>
                         </fieldset>
                     </div>
-                    <div id="campusList" class="small-12 large-6 column" style="display: none">
+                    <div class="small-12 large-6 column" data-hide-watch="[data-interaction='select-level']" data-hide-watch-value="3">
                         <fieldset class="checklist">
                             <legend>
                                 Campus
