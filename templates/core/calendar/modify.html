@@ -35,7 +35,11 @@
             </ul>
             <!-- END delete_button -->
         </span>
+    </div>
+</div>
 
+<div class="row">
+    <div class="small-12 island">
         <form id="eventForm" method="post" action="/calendar/modifyForm.php" class="top">
 
         	<input name="id" type="hidden" value="{EVENT_ID}" />
@@ -48,6 +52,7 @@
 
             <section>
                 <fieldset class="content">
+                    <legend>Overview</legend>
                     <div class="small-12 column">
                         <label>
                             Title
@@ -116,6 +121,111 @@
                             <label for="allday">All Day</label>
                         </fieldset>
                     </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Event Details</legend>
+                    <div class="small-12 column">
+                        <label>
+                            Type
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the type of event. This will be represented via different colours">?</span>
+                            <!-- BEGIN type_select -->
+                            <select name="type">
+                                <!-- BEGIN type_drop -->
+                                <option value="{EVENT_EVENTTYPE_ID}" {EVENT_EVENTTYPE_ID_SELECTED}>{EVENT_EVENTTYPE_NAME}</option>
+                                <!-- END type_drop -->
+                            </select>
+                            <!-- END type_select -->
+                            <!-- BEGIN type_no_select -->
+                            <input type="hidden" name="type" value="{EVENT_EVENTTYPE_ID}" />
+                            {EVENT_EVENTTYPE_NAME}
+                            <!-- END type_no_select -->
+                        </label>
+                    </div>
+                    <div class="small-12 column">
+                        <label>
+                            Location
+                            <input name="location" type="text" value="{EVENT_LOCATION}"/>
+                        </label>
+                    </div>
+                    <div class="small-12 column">
+                        <label>
+                            Details
+                            <textarea class='event-detail' name="detail">{EVENT_DETAIL}</textarea>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Availability</legend>
+                    <div class="small-12 columns">
+                        <label>
+                            Level
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select who you would like to be able to see this event">?</span>
+                            <select name="level" id="level">
+                                <!-- BEGIN event_level_drop -->
+                                <option value="{EVENT_EVENTLEVEL_ID}" {EVENT_EVENTLEVEL_ID_SELECTED}>{EVENT_EVENTLEVEL_NAME}</option>
+                                <!-- END event_level_drop -->
+                            </select>
+                        </label>
+                    </div>
+                    <div id="groupDrop" class="small-12 column" style="display: none">
+                        <fieldset class="checklist">
+                            <legend>
+                                Groups
+                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the group which will be able to view this event">?</span>
+                            </legend>
+                            <!-- BEGIN event_group_drop -->
+                            <input type="checkbox" name="group[]" value="{EVENT_GROUP_ID}" id="group{EVENT_GROUP_ID}" {EVENT_GROUP_ID_SELECTED} />
+                            <label for="group{EVENT_GROUP_ID}" class="checkbox">{EVENT_GROUP_NAME}</label>
+                            <!-- END event_group_drop -->
+                        </fieldset>
+                    </div>
+                    <div id="roleList" class="small-12 large-6 column" style="display: none">
+                        <fieldset class="checklist">
+                            <legend>
+                                Roles
+                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the roles which will be able to view this event">?</span>
+                            </legend>
+                            <!-- BEGIN event_role_list -->
+                            <input type="checkbox" name="roles[]" id="role{EVENT_ROLE_ID}" value="{EVENT_ROLE_ID}" {EVENT_ROLE_ID_SELECTED} />
+                            <label for="role{EVENT_ROLE_ID}">{EVENT_ROLE_NAME}</label>
+                            <!-- END event_role_list -->
+                            <input type="checkbox" data-selectall="true" id="roleSelectAll"/>
+                            <label for="roleSelectAll">Select all</label>
+                        </fieldset>
+                    </div>
+
+                    <div id="campusList" class="small-12 large-6 column" style="display: none">
+                        <fieldset class="checklist">
+                            <legend>
+                                Campus
+                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the campus' which will be able to view this event">?</span>
+                            </legend>
+                            <!-- BEGIN event_campus_list -->
+                            <input type="checkbox" class="campusCheck" name="campus[]" id="campus{EVENT_CAMPUS_ID}" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} />
+                            <label for="campus{EVENT_CAMPUS_ID}">{EVENT_CAMPUS_NAME}</label>
+                            <!-- END event_campus_list -->
+                            <input type="checkbox" data-selectall='true' id="campusSelectAll" />
+                            <label for="campusSelectAll">Select all</label>
+                        </fieldset>
+                    </div>
+
+
+                    <div id="attendance" class="small-12 column">
+                        <label>
+                            Attendance
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Allow people to RSVP to this event">?</span>
+                            <div class="switch">
+                                <input name="attendance" id="attendanceCheckbox" type="checkbox" value="1" {EVENT_ATTENDANCE}>
+                                <label for="attendanceCheckbox"></label>
+                            </div>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Recurrence</legend>
                     <div class="small-12 columns" data-advanced style="display:{SHOW_ADVANCED}">
                         <label>Publish Date
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This event will only be visible to the public after this date">?</span>
@@ -151,96 +261,6 @@
                         </div>
                     </div>
         			<!-- END recurring_reminder -->
-                    <div class="small-12 columns">
-        			    <label>
-                            Location
-                            <input name="location" type="text" value="{EVENT_LOCATION}"/>
-                        </label>
-                        <label>
-                            Type
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the type of event. This will be represented via different colours">?</span>
-                            <!-- BEGIN type_select -->
-                            <select name="type">
-                                <!-- BEGIN type_drop -->
-                                <option value="{EVENT_EVENTTYPE_ID}" {EVENT_EVENTTYPE_ID_SELECTED}>{EVENT_EVENTTYPE_NAME}</option>
-                                <!-- END type_drop -->
-                            </select>
-                            <!-- END type_select -->
-                            <!-- BEGIN type_no_select -->
-                            <input type="hidden" name="type" value="{EVENT_EVENTTYPE_ID}" />
-                           {EVENT_EVENTTYPE_NAME}
-                            <!-- END type_no_select -->
-        				</label>
-                        <label>
-        					Level
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select who you would like to be able to see this event">?</span>
-        					<select name="level" id="level">
-        						<!-- BEGIN event_level_drop -->
-        						<option value="{EVENT_EVENTLEVEL_ID}" {EVENT_EVENTLEVEL_ID_SELECTED}>{EVENT_EVENTLEVEL_NAME}</option>
-        						<!-- END event_level_drop -->
-        					</select>
-        				</label>
-                    </div>
-                    <div id="groupDrop" class="small-12 column" style="display: none">
-                        <fieldset class="checklist">
-                            <legend>
-                                Groups
-                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the group which will be able to view this event">?</span>
-                            </legend>
-        					<!-- BEGIN event_group_drop -->
-                            <input type="checkbox" name="group[]" value="{EVENT_GROUP_ID}" id="group{EVENT_GROUP_ID}" {EVENT_GROUP_ID_SELECTED} />
-                            <label for="group{EVENT_GROUP_ID}" class="checkbox">{EVENT_GROUP_NAME}</label>
-        					<!-- END event_group_drop -->
-        				</fieldset>
-        			</div>
-        			<div id="roleList" class="small-12 large-6 column" style="display: none">
-                        <fieldset class="checklist">
-                            <legend>
-                                Roles
-                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the roles which will be able to view this event">?</span>
-                            </legend>
-                            <!-- BEGIN event_role_list -->
-                            <input type="checkbox" name="roles[]" id="role{EVENT_ROLE_ID}" value="{EVENT_ROLE_ID}" {EVENT_ROLE_ID_SELECTED} />
-                            <label for="role{EVENT_ROLE_ID}">{EVENT_ROLE_NAME}</label>
-                            <!-- END event_role_list -->
-                            <input type="checkbox" data-selectall="true" id="roleSelectAll"/>
-                            <label for="roleSelectAll">Select all</label>
-                        </fieldset>
-                    </div>
-
-        			<div id="campusList" class="small-12 large-6 column" style="display: none">
-                        <fieldset class="checklist">
-                        <legend>
-                            Campus
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the campus' which will be able to view this event">?</span>
-                        </legend>
-                            <!-- BEGIN event_campus_list -->
-                            <input type="checkbox" class="campusCheck" name="campus[]" id="campus{EVENT_CAMPUS_ID}" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} />
-                            <label for="campus{EVENT_CAMPUS_ID}">{EVENT_CAMPUS_NAME}</label>
-                            <!-- END event_campus_list -->
-                            <input type="checkbox" data-selectall='true' id="campusSelectAll" />
-                            <label for="campusSelectAll">Select all</label>
-                        </fieldset>
-                    </div>
-
-
-        			<div id="attendance" class="small-12 column">
-        				<label>
-                            Attendance
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Allow people to RSVP to this event">?</span>
-                            <div class="switch">
-                                <input name="attendance" id="attendanceCheckbox" type="checkbox" value="1" {EVENT_ATTENDANCE}>
-                                <label for="attendanceCheckbox"></label>
-                            </div>
-                        </label>
-                    </div>
-                    <div class="small-12 column">
-                        <label>
-                            Details
-                            <textarea class='event-detail' name="detail">{EVENT_DETAIL}</textarea>
-                        </label>
-
-                    </div>
                 </fieldset>
             </section>
             <div class="row">
@@ -264,6 +284,3 @@
         </form>
     </div>
 </div>
-
-
-
