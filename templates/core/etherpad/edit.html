@@ -1,3 +1,12 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/etherpad/jquery.etherpad.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-collabdoc]').collabDoc();
+    });
+</script>
+<!-- END custom_head -->
+        
 <ul class="breadcrumb">
     <li><a href="/homepage/{HOMEPAGE_ID}/">{FOLDER_NAME}</a></li>
     <li class="active"><a href="#">Collab Doc</a></li>
@@ -8,24 +17,17 @@
         <h1>{ETHERPAD_NAME}</h1>
     </div>
     <nav>
-            <!-- BEGIN etherpad_lock -->
-        <a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='icon-unlocked' data-tooltip title="Lock"></a>
-            <!-- END etherpad_lock -->
+        <!-- BEGIN etherpad_lock -->
+        <a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='icon-unlocked' title="Lock"></a>
+        <!-- END etherpad_lock -->
 
-            <!-- BEGIN etherpad_unlock -->
-        <a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='icon-locked' data-tooltip title="Unlock"></a>
-            <!-- END etherpad_unlock -->
+        <!-- BEGIN etherpad_unlock -->
+        <a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='icon-locked' title="Unlock"></a>
+        <!-- END etherpad_unlock -->
     </nav>
 </div>
 <div class="row">
     <div class="small-12 island">
-        <iframe data-collabdoc src='{ETHERPAD_URL}'></iframe>
+        <iframe src='{ETHERPAD_URL}' data-collabdoc></iframe>
     </div>
 </div>
-
-<script type="text/javascript" src="/javascript/etherpad/jquery.etherpad.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $('[data-collabdoc]').collabDoc();
-    });
-</script>
