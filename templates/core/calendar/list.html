@@ -71,25 +71,28 @@
             window.location = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
         });
 
-		$('#calendar-export form').submit(function(event) {
-			event.preventDefault();
-
-            // Copy and paste button - show only when ready
-            var button = $('#copy-button').hide();
-            var client = new ZeroClipboard(button);
-            client.on('ready', function() {
-                button.show();
-            });
-
-            var form = $(this);
-            var url = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray());
-            $('#calendar-export-dialog-url').text(url).select();
-            $('#calendar-export-dialog').foundation('reveal', 'open');
-		});
-
         //select all clicked
         $('#calendar-controls').on('change','.select_all', function(e) {
             $(this).parent().find(':checkbox').prop('checked', $(this).prop('checked'));
+        });
+
+        /* Export calendar
+         */
+        $.fn.calendarExport({
+            afterReady: function() {
+                var form = $('#calendar-export-form');
+                var url = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray());
+
+                /* Bypass foundation bug
+                 * https://github.com/zurb/foundation/issues/4746
+                 */
+                $('#calendar-export-dialog-url').val(url);
+                $('#calendar-export-dialog').foundation('reveal', 'open');
+
+                $('#calendar-export-dialog').on('opened', function(){
+                    $('#calendar-export-dialog-url').select();
+                });
+            }
         });
 
         /* Attendance
