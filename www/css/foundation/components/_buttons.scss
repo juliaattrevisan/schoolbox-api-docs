@@ -431,7 +431,7 @@ $f-dropdown-icon-align: 0.25rem;
 		background-color: $f-dropdown-content-bg;
     }
 	.separator, .meta {
-		color: contrast-bg($background: $f-dropdown-bg, $dark: $white);
+		color: contrast-bg($background: $f-dropdown-bg, $dark: $primary-color);
 	}
 	.separator {
 		padding: $f-dropdown-list-padding;
