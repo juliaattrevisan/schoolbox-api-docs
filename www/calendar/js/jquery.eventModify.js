@@ -29,9 +29,11 @@
 		 */
 		//setupAllDay();
 		setupSelectAll();
-		/* Show/hide advanced options
-		 */
-		setupAdvancedOptions();
+
+		// Advanced options no longer exist
+		///* Show/hide advanced options
+		// */
+		//setupAdvancedOptions();
 
 		/* Show/hide repeat event options
 		 */
@@ -135,23 +137,23 @@
 		//	});
 		//}
 
-		/**
-		 * Set up Advanced Option toggle
-		 */
-		function setupAdvancedOptions() {
-			$('[data-customise]').click(function(event) {
-				event.preventDefault();
-
-				/* Alternate between button texts
-				 */
-				$(this).children('span').toggle();
-
-				/* Alternate between option visibility
-				 */
-				$('[data-advanced]').toggle();
-
-			});
-		}
+		///**
+		// * Set up Advanced Option toggle
+		// */
+		//function setupAdvancedOptions() {
+		//	$('[data-customise]').click(function(event) {
+		//		event.preventDefault();
+        //
+		//		/* Alternate between button texts
+		//		 */
+		//		$(this).children('span').toggle();
+        //
+		//		/* Alternate between option visibility
+		//		 */
+		//		$('[data-advanced]').toggle();
+        //
+		//	});
+		//}
 
 		/**
 		 * Set up repeating events options
