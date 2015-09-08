@@ -324,13 +324,11 @@
             /* Copy from task panel to event panel
              */
             if ($(tab).attr('id') == 'createTaskPanel') {
-                console.log('copying to event panel');
                 cp('event', 'task', ['date', 'displayDate', 'title', 'allDay'])
             }
             /* Copy from event panel to task panel
              */
             else {
-                console.log('copying to task panel');
                 cp('task', 'event', ['date', 'displayDate', 'title', 'allDay'])
             }
         });

@@ -802,6 +802,7 @@ Bubble.prototype.fillForm = function(formId, vars) {
     $.each(vars, function(k, v) {
         // first test if it's an input with the name we're after
         var element = form.find('[name=' + k + ']')
+
         if(element.length) {
             var type = element.attr('type')
             // textboxes and textareas get filled with text...
@@ -820,7 +821,17 @@ Bubble.prototype.fillForm = function(formId, vars) {
         }
         // if no form input element found, try for an element with the right class
         else {
-            fillElement(form.find('.'+k), k, v, vars)
+            /* Check for data attribute first
+             */
+            var dataSelector = $('[data-event-modal-field="'+k+'"]');
+            if (dataSelector.length) {
+                fillElement(dataSelector, k, v, vars)
+            }
+            /* Otherwise assume classes
+             */
+            else {
+                fillElement(form.find('.'+k), k, v, vars)
+            }
         }
     })
 };
