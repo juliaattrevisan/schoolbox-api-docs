@@ -111,7 +111,14 @@ switch($to)
         $formArray['btnLogin'] = "Login";
         $formArray['authtype'] = "uid";
         $formArray['ref'] = "";
-break;
+    break;
+
+    case "infotrac":
+        $form="form";
+        $action="http://infotrac.galegroup.com/itweb/melgg";
+        $method="GET";
+        $formArray['id'] = 'literature';
+    break;
 
 default:
 	echo "Did not recognise the site";
