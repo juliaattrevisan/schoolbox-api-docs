@@ -652,8 +652,6 @@
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
-<h1>Calendar for {USER_FULLNAME}</h1>
-
 <div id="calendar-loading" class="reveal-modal tiny no-pad" data-reveal aria-hidden="true" role="dialog">
     <div class='loader'></div>
     <p>
@@ -663,7 +661,13 @@
     </p>
 </div>
 
-<div id="calendar"></div>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Calendar for {USER_FULLNAME}</h1>
+
+        <div id="calendar"></div>
+    </div>
+</div>
 
 <div id="calendar-controls" class="reveal-modal large" data-reveal aria-hidden="true" role="dialog">
     <form class="clearfix">
