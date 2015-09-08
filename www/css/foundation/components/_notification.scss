@@ -42,7 +42,7 @@ $notification-header-background: $tabbar-bg !default;
         ul.off-canvas-list {
             label {
                 background: $notification-header-background;
-                color: inherit;
+                color: contrast-bg(0.4, $notification-header-background);
             }
             .mark-all-read {
                 height: 0;
