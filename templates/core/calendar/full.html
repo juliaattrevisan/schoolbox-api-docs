@@ -552,7 +552,7 @@
                     </label>
                 </section>
                 <div class="row">
-                    <div class="small-12 columns">
+                    <div class="small-12 columns no-pad">
                         <input type="submit" disabled value="Create Event" />
                     </div>
                 </div>
@@ -565,18 +565,32 @@
                 <input name="allDay" type="hidden" value="" />
                 <input name="type" type="hidden" value="{TASK_TYPE_ID}" />
 
-                <h3>Due <span data-event-modal-field="displayDate"><!-- Date gets shoved in here --></span></h3>
+                <section>
+                    <div class="actions-small-1 row">
+                        <div class="list-item">
+                            <div class="small-12 columns no-pad">
+                                <h3>Due <span data-event-modal-field="displayDate"><!-- Date gets shoved in here --></span></h3>
+                            </div>
+                        </div>
+                        <nav>
+                        </nav>
+                    </div>
 
-                <label>
-                    Task
-                    <input name="title" type="text" value="" />
-                </label>
+                    <label>
+                        Task
+                        <input name="title" type="text" value="" />
+                    </label>
 
-                <label class="detail">
-                    Note
-                    <textarea name="detail"></textarea>
-                </label>
-                <input type="submit" disabled value="Create Task" />
+                    <label class="detail">
+                        Note
+                        <textarea name="detail"></textarea>
+                    </label>
+                </section>
+                <div class="row">
+                    <div class="small-12 columns no-pad">
+                        <input type="submit" disabled value="Create Task" />
+                    </div>
+                </div>
             </form>
         </div>
     </div>
