@@ -84,14 +84,7 @@
 
             $(config.copy).show();
 
-            /* Bypass foundation bug
-             * https://github.com/zurb/foundation/issues/4746
-             */
-            dialog.foundation('reveal', 'open');
-
-            dialog.on('opened', function() {
-                dialogUrl.select();
-            });
+            dialogUrl.select();
         }
 
         /**
