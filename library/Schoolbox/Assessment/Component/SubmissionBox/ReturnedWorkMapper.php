@@ -468,11 +468,10 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
                     Task\InstanceCompletionMapper::getInstance()->save($completion);
                 }
             }
-
-            //Copy data to remote system
-            $externalMarkbook = new \External_Markbook();
-            $externalMarkbook->setMark($object);
         }
+        // Copy data to remote system
+        $externalMarkbook = new \External_Markbook();
+        $externalMarkbook->setMark($object);
     }
 
 
