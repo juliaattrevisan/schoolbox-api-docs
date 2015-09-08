@@ -5,6 +5,9 @@
 <script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.js"></script>
 <script type="text/javascript" src="/javascript/jquery.hourpicker.js"></script>
 <script type="text/javascript" src="/javascript/jquery.minutepicker.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/datepicker.js"></script>
+<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/datepickerSync.js"></script>
 <script type="text/javascript" src="/javascript/data-plugins/timepicker.js"></script>
 <script type="text/javascript" src="/javascript/data-plugins/hideWatch.js"></script>
 <script type="text/javascript">
@@ -68,7 +71,7 @@
                         <label for="startDate">When
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a date for when this item will expire">?</span>
                         </label>
-                        <input name="startDate" id="startDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
+                        <input name="startDate" id="startDate" data-datepicker='true' data-datepicker-sync data-datepicker-sync-enddate="#endDate" type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
                     </div>
                     <div class="small-12 large-6 columns" data-hide-watch="#allday" data-hide-watch-invert>
                         <div class="row">

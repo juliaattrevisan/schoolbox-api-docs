@@ -17,13 +17,13 @@
 
 		/* Add datepickers to various fields
 		 */
-		setupDatepickers();
+		//setupDatepickers();
 
 		/* Ensure one date is the same as, or before, the other
 		 */
-		var startDateElement = config.element.find('input[name=startDate]');
-		var endDateElement = config.element.find('input[name=endDate]');
-		setupDateSync(startDateElement, endDateElement);
+		//var startDateElement = config.element.find('input[name=startDate]');
+		//var endDateElement = config.element.find('input[name=endDate]');
+		//setupDateSync(startDateElement, endDateElement);
 
 		/* All Day checkbox should hide the time fields
 		 */
@@ -66,58 +66,58 @@
 			return merged;
 		}
 
-		/**
-		 * Assign datepickerability to everything
-		 */
-		function setupDatepickers() {
-			var allDatepickerElements = config.element.find('[data-datepicker="true"]');
+		///**
+		// * Assign datepickerability to everything
+		// */
+		//function setupDatepickers() {
+		//	var allDatepickerElements = config.element.find('[data-datepicker="true"]');
+        //
+		//	$.each(allDatepickerElements, function(index, element) {
+		//		$(element).datepicker({
+		//			constrainInput: false,
+		//			onClose: function(string) {
+		//				$.getJSON('/ajax/strtotime.php', {string: string}, function(data) {
+		//					$(element).val(data.time);
+		//				});
+		//			}
+		//		});
+		//	});
+		//}
 
-			$.each(allDatepickerElements, function(index, element) {
-				$(element).datepicker({
-					constrainInput: false,
-					onClose: function(string) {
-						$.getJSON('/ajax/strtotime.php', {string: string}, function(data) {
-							$(element).val(data.time);
-						});
-					}
-				});
-			});
-		}
-
-		/**
-		 * Ensure that startDate is always before endDate
-		 *
-		 * @param startDate
-		 * @param endDate
-		 */
-		function setupDateSync(startDateElement, endDateElement) {
-			$(startDateElement).change(function(event) {
-				sync(startDateElement, endDateElement);
-			});
-
-			$(endDateElement).change(function(event) {
-				sync(startDateElement, endDateElement);
-			});
-
-			/**
-			 * Synchronise watches
-			 *
-			 * @param startDateElement
-			 * @param endDateElement
-			 */
-			function sync(startDateElement, endDateElement) {
-
-				/* Sync only when two elements have values
-				 * and when the endDate value is earlier than
-				 * the startDate value
-				 */
-				if (startDateElement.val() && endDateElement.val()) {
-					if (endDateElement.val() < startDateElement.val()) {
-						endDateElement.val(startDateElement.val());
-					}
-				}
-			}
-		}
+		///**
+		// * Ensure that startDate is always before endDate
+		// *
+		// * @param startDate
+		// * @param endDate
+		// */
+		//function setupDateSync(startDateElement, endDateElement) {
+		//	$(startDateElement).change(function(event) {
+		//		sync(startDateElement, endDateElement);
+		//	});
+        //
+		//	$(endDateElement).change(function(event) {
+		//		sync(startDateElement, endDateElement);
+		//	});
+        //
+		//	/**
+		//	 * Synchronise watches
+		//	 *
+		//	 * @param startDateElement
+		//	 * @param endDateElement
+		//	 */
+		//	function sync(startDateElement, endDateElement) {
+        //
+		//		/* Sync only when two elements have values
+		//		 * and when the endDate value is earlier than
+		//		 * the startDate value
+		//		 */
+		//		if (startDateElement.val() && endDateElement.val()) {
+		//			if (endDateElement.val() < startDateElement.val()) {
+		//				endDateElement.val(startDateElement.val());
+		//			}
+		//		}
+		//	}
+		//}
 
 		///**
 		// * Allow All Day checkbox to toggle visibility of time fields
