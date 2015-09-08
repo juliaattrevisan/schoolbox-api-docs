@@ -202,9 +202,14 @@ function Calendar(id, bubbleId, opts) {
                     data.relatedBookings = calEvent.data.booking.related;
                 }
 
-                self.bubble.display('edit', data, jsEvent, this)
-                $('#calendar-bubble').foundation('reveal','open');
+                self.bubble.display('edit', data, jsEvent, this);
 
+                // Hide event types in the bubble
+                var isTask = data.eventTypeId == c.options.taskTypeId;
+                var bubble = $('#calendar-bubble');
+                bubble.foundation('reveal', 'open');
+                bubble.find('#editTask').toggleClass('hide', !isTask);
+                bubble.find('#editEvent').toggleClass('hide', isTask);
             }
         },
         datepicker: {
