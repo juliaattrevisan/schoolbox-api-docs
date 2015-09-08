@@ -1,8 +1,14 @@
+$notification-unread-background: $alert-color !default;
+$notification-unread-color: calc-text-color($notification-unread-background);
+$notification-header-background: $tabbar-bg !default;
+
 // where data-unread != 0
 .right-off-canvas-toggle {
     width: 5rem;
     height: 5rem;
     display: block;
+
+    background: $notification-header-background;
 
     &[data-unread] {
 
@@ -14,8 +20,8 @@
         }
 
         &:not([data-unread="0"]) {
-            background-color: $alert-color;
-            color: $white;
+            background-color: $notification-unread-background;
+            color: $notification-unread-color;
             padding-left: 1.25rem;
 
             span {
@@ -35,7 +41,7 @@
     &[data-unread="0"] {
         ul.off-canvas-list {
             label {
-                background: $body-bg;
+                background: $notification-header-background;
                 color: inherit;
             }
             .mark-all-read {
@@ -51,8 +57,8 @@
             }
             height: 5rem;
             line-height: 3rem;
-            background: $alert-color;
-            color: $white;
+            background: $notification-unread-background;
+            color: $notification-unread-color;
         }
     }
     .button {
@@ -70,7 +76,7 @@
         }
     }
     .status-read {
-        background: $body-bg;
+        background: transparent;
         b {
             font-weight: normal;
         }

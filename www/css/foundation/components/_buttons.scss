@@ -421,21 +421,31 @@ h1, h2 {
 @include header-action-button($xlarge-only, 71px, 42px);
 
 
+$f-dropdown-list-padding: rem-calc(($base-font-size - 6)) rem-calc(($base-font-size - 3));
+$f-dropdown-icon-align: 0.25rem;
+
 // Dropdown
 .f-dropdown{
 	@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
 	&.content-drop {
 		background-color: $f-dropdown-content-bg;
     }
+	.separator, .meta {
+		color: contrast-bg($background: $f-dropdown-bg, $dark: $white);
+	}
 	.separator {
-		color: $f-dropdown-font-color;
 		padding: $f-dropdown-list-padding;
-		font-weight: 700;
-		background-color: $f-dropdown-list-separator-bg;
+		font-weight: 100;
+		text-transform: uppercase;
+		background-color: transparent;
 		cursor: default;
+		font-size: rem-calc($base-font-size - 3);
 		&:hover {
-			background-color: $f-dropdown-list-separator-bg;
+			background-color: $f-dropdown-bg;
 		}
+	}
+	[class*="icon-"]:before {
+		padding: 0 (0.5rem + $f-dropdown-icon-align) 0 $f-dropdown-icon-align;
 	}
 }
 

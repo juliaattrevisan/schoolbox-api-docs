@@ -443,6 +443,8 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
         display: none !important;
     }
     img{
+      display: block;
+      max-height: 5rem;
       max-width: none;
     }
   }
