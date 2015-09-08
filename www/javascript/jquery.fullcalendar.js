@@ -724,10 +724,10 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
 	 * (This happens on subscribed vcals for example)
 	 */
 	if (eventData.authorId == -1) {
-		$('dd.post-by').hide();
+		$('[data-event-modal-field="post-by"]').hide();
 	}
 	else {
-		$('dd.post-by').show();
+		$('[data-event-modal-field="post-by"]').show();
 	}
 
     // Hide reviewed by as well
