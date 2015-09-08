@@ -62,7 +62,7 @@
                         <input name="event[id]" type="hidden" value="{{ event.eventId }}">
                         {% if renderer.attendanceStatus() %}
                         <a class="button icon-close" data-attendance-request href="#">Unattend</a>
-                    {% else %}
+                        {% else %}
                         <a class="button icon-approve" data-attendance-request href="#">RSVP</a>
                         {% endif %}
                     </form>

@@ -4,6 +4,7 @@
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
 <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
 <script type="text/javascript">
 	$(function() {
 		var exportForm = $('#calendar-export');
@@ -91,24 +92,9 @@
             $(this).parent().find(':checkbox').prop('checked', $(this).prop('checked'));
         });
 
-        $(document).on('click', 'a.attendance-request', function (event) {
-            event.preventDefault();
-
-            var button = $(this);
-
-            var data = button.parent('form').serialize();
-
-            $.post('/service/attendance/processToggleAttendance', data, function (data) {
-                if (data.error == undefined) {
-                    if (button.text() == 'RSVP') {
-                        button.html('<span></span>Unattend');
-                    }
-                    else {
-                        button.html('<span></span>RSVP');
-                    }
-                }
-            });
-        });
+        /* Attendance
+         */
+        $('#calendar-list').calendarAttendance();
 	});
 </script>
 <!-- END custom_head -->
