@@ -164,13 +164,12 @@ function Calendar(id, bubbleId, opts) {
                 // Attendance List butonye
                 if (data.attendanceListButton.toString() == 'true') {
                     data.attendanceIcon = ''
-                    data.attendanceListButton = '<a class="btn groups float-left" href="/calendar/attendance/list/'
-                        + calEvent.data.meta.eventId + '"><span></span>Attendees</a>'
+                    data.attendanceListButton = '<a class="button icon-group" href="/calendar/attendance/list/'
+                        + calEvent.data.meta.eventId + '">Attendees</a>'
                 }
                 // Attend/Unattend butonye
                 if (data.attendanceRequestButton.toString() != 'false') {
-                    data.attendanceRequestButton = '<a class="btn reply float-left" href="#"><span></span>' + data.attendanceRequestButton.toString() + '</a>'
-
+                    data.attendanceRequestButton = '<a class="button icon-reply" href="#">' + data.attendanceRequestButton.toString() + '</a>'
                 }
 
                 data.bookingActions = [];
