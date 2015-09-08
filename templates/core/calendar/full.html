@@ -525,34 +525,55 @@
     <div class="tabs-content">
         <div class="content active" id="createEventPanel" aria-hidden="false">
             <form id="createEvent" method="post" action="#" class="top">
-            <input name='userId' type='hidden' value='{USER_CALENDAR_ID}' />
-            <input name="allDay" type="hidden" value="" />
-            <input name="date" type="hidden" value="" />
-            <label>On
-                <span class="displayDate"><!-- Date gets shoved in here --></span>
-            </label>
-            <label>Event Title<input name="title" type="text" value="" /></label>
-            <label>Event Type
-                <select name="type">
-                <!-- BEGIN event_type -->
-                <option value="{EVENT_TYPE_ID}">{EVENT_TYPE_NAME}</option>
-                <!-- END event_type -->
-            </select>
-            </label>
-            <input type="submit" disabled value="Create Event" />
-            <a href="#" id="edit-full">Edit event &raquo;</a>
+                <input name='userId' type='hidden' value='{USER_CALENDAR_ID}' />
+                <input name="allDay" type="hidden" value="" />
+                <input name="date" type="hidden" value="" />
+
+                <label>
+                    On
+                    <span class="displayDate"><!-- Date gets shoved in here --></span>
+                </label>
+
+                <label>
+                <label>
+                    Event Title
+                    <input name="title" type="text" value="" />
+                </label>
+
+                <label>
+                    Event Type
+                    <select name="type">
+                        <!-- BEGIN event_type -->
+                        <option value="{EVENT_TYPE_ID}">{EVENT_TYPE_NAME}</option>
+                        <!-- END event_type -->
+                    </select>
+                </label>
+
+                <input type="submit" disabled value="Create Event" />
+                <a href="#" id="edit-full">Edit event &raquo;</a>
             </form>
         </div>
         <div class="content" id="createTaskPanel" aria-hidden="true" tabindex="-1">
             <form id="createTask" method="post" action="#">
-            <input name='userId' type='hidden' value='{USER_CALENDAR_ID}' />
-            <input name="date" type="hidden" value="" />
-            <input name="allDay" type="hidden" value="" />
-            <input name="type" type="hidden" value="{TASK_TYPE_ID}" />
-            <label>Due <span class="displayDate"><!-- Date gets shoved in here --></span></label>
-            <label>Task<input name="title" type="text" value="" /></label>
-            <label class="detail">Note<textarea name="detail"></textarea></label>
-            <input type="submit" disabled value="Create Task" />
+                <input name='userId' type='hidden' value='{USER_CALENDAR_ID}' />
+                <input name="date" type="hidden" value="" />
+                <input name="allDay" type="hidden" value="" />
+                <input name="type" type="hidden" value="{TASK_TYPE_ID}" />
+
+                <label>
+                    Due <span class="displayDate"><!-- Date gets shoved in here --></span>
+                </label>
+
+                <label>
+                    Task
+                    <input name="title" type="text" value="" />
+                </label>
+
+                <label class="detail">
+                    Note
+                    <textarea name="detail"></textarea>
+                </label>
+                <input type="submit" disabled value="Create Task" />
             </form>
         </div>
     </div>
@@ -562,15 +583,20 @@
     <!-- Edit Event Form -->
     <form id="editEvent">
         <input type="hidden" name="eventId" />
+
         <div class="row">
             <div class="small-12">
                 <h3 class="note"></h3>
                 <p class="meta"><span class="date"></span></p>
                 <p class="location meta"></p>
+
                 <article class="detail" data-is-html="1"></article>
+
                 <p class="post-by meta">Posted by <a class="author" href="#" data-is-user-link="1"></a></p>
                 <p class="reviewed-by">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></p>
+
                 <ul class="relatedBookings"></ul>
+
                 <div class="attendance">
                     <dl>
                         <dd><p class="attendanceIcon"></p></dd>
@@ -592,28 +618,53 @@
             </div>
         </div>
     </form>
+
     <form id="editTask">
-        <h3>Task</h3>
         <input type="hidden" name="eventId" />
-        <label>Due <span class="date"><!-- Date gets shoved in here --></span></label>
+
+        <h3>Task</h3>
+
+        <label>
+            Due
+            <span class="date"><!-- Date gets shoved in here --></span>
+        </label>
+
         <input id="modifyTaskBubbleCompleted" name="completed" type="checkbox" value="1" />
-        <label for="modifyTaskBubbleCompleted" class="checkbox-label">Complete</label>
-        <label>Task<input id="modifyTaskBubbleNote" name="title" type="text" value="" /></label>
-        <label class="detail">Note<textarea id="modifyTaskBubbleDetail" name="detail"></textarea></label>
+
+        <label for="modifyTaskBubbleCompleted" class="checkbox-label">
+            Complete
+        </label>
+
+        <label>
+            Task
+            <input id="modifyTaskBubbleNote" name="title" type="text" value="" />
+        </label>
+
+        <label class="detail">
+            Note
+            <textarea id="modifyTaskBubbleDetail" name="detail"></textarea>
+        </label>
+
         <input type="submit" value="Update Task" />
         <a href="#" class="deleteTask">Delete</a>
     </form>
+
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
 <h1>Calendar for {USER_FULLNAME}</h1>
 
-<div id="calendar-loading" class="reveal-modal tiny" data-reveal aria-hidden="true" role="dialog">
+<div id="calendar-loading" class="reveal-modal tiny no-pad" data-reveal aria-hidden="true" role="dialog">
     <div class='loader'></div>
-    <p>Loading events</p>
+    <p>
+        <span class="label neutral full-width">
+        Loading events
+        </span>
+    </p>
 </div>
 
 <div id="calendar"></div>
+
 <div id="calendar-controls" class="reveal-modal large" data-reveal aria-hidden="true" role="dialog">
     <form class="clearfix">
         <section>
@@ -709,7 +760,6 @@
     </form>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
-
 
 <div class="reveal-modal" data-reveal aria-labelledby="firstModalTitle" aria-hidden="true" role="dialog" id="calendar-export-dialog">
 	<div id="calendar-export-dialog-text">
