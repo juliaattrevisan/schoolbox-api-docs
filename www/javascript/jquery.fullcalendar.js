@@ -501,6 +501,7 @@ Calendar.prototype.init = function() {
                             c.dom.fullCalendar('removeEvents', 'placeholder');
                             c.dom.fullCalendar('renderEvent', JSON.parse(responseText), true);
                         }
+                        $(document).foundation('reveal', 'close');
                     })
                     c.clearForms()
                 })
@@ -529,6 +530,7 @@ Calendar.prototype.init = function() {
                             c.dom.fullCalendar('removeEvents', matchEvents(eventId));
                             c.dom.fullCalendar('renderEvent', newEvent);
                         }
+                        $(document).foundation('reveal', 'close');
                     })
                 })
             }
