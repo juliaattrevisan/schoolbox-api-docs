@@ -270,8 +270,8 @@ select option				{
     }
 }
 
-input[type=radio]    { @include fancy-check('radio-label'); }
-input[type=checkbox] { @include fancy-check('checkbox-label'); }
+input[type=radio]:not(.plain)    { @include fancy-check('radio-label'); }
+input[type=checkbox]:not(.plain) { @include fancy-check('checkbox-label'); }
 
 input[type=radio] + label {
     &:before, &:after {
