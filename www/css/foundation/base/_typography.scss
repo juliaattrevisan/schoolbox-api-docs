@@ -215,6 +215,11 @@ a{
 	}
 }
 
+// Deleted or struck out content
+.strike, .del {
+    text-decoration: line-through;
+}
+
 // Typically descriptive text1
 .desc{
 	//font-size: rem-calc(($base-font-size - 3));
