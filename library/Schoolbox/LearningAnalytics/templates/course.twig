@@ -1,4 +1,3 @@
-<link rel="stylesheet" type="text/css" media="screen" href="/css/foundation/chrome.css?v={SITE_VERSION}" />
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
 <script type="text/javascript" src="/learninganalytics/js/progress/overall.js"></script>
@@ -225,7 +224,7 @@
     {% for folder in metadata.folder.all %}
     <li>
         <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ folder.getId() }}' class="{% if (folder.getId() == metadata.folder.selected.getId()) and (metadata.route == 'folder') %}current{% endif %}">
-            {{ folder.getName() }}
+            {{ folder.getName() }} {%  if folder.getCodeString() %}({{ folder.getCodeString() }}){% endif %}
         </a>
     </li>
     {% endfor %}

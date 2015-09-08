@@ -151,39 +151,56 @@ class UnitInstanceMapper extends Mapper {
 
     /**
      * Find all the folders which use a Unit that was spawned from
-     * the original Course folder, $folder
+     * the original Course folder, $folder.  This limited to the provided year
      *
      * @param Folder $folder
+     * @param $year
      * @return Collection
      */
-    public function findAllFoldersUsingCourse(Folder $folder) {
+    public function findAllFoldersUsingCourse(Folder $folder, $year) {
         $folderMapper = $this->getJoinMapper('unit_category');
+        $code_mapper = $this->getJoinMapper('category')->getJoinMapper('codes');
 
         $query = "
-            SELECT {$folderMapper->getColumnString('c')}
+            SELECT {$folderMapper->getColumnString('c')}, {$code_mapper->getColumnString('cc')}
             FROM {$this->getTable()} `ui`
             LEFT JOIN {$this->getJoinSql('unit_category', 'ui', 'uc')}
             LEFT JOIN {$this->getJoinSql('course_folder', 'uc', 'cf')}
             LEFT JOIN {$this->getJoinSql('category', 'ui', 'c')}
+            LEFT JOIN categoryCode cc ON c.id = cc.categoryID
             WHERE `cf`.`id` = :folderId
               AND c.deleted_at IS NULL
               AND ui.deleted_at IS NULL
               AND uc.deleted_at IS NULL
+              AND YEAR(ui.due_date) = :year
             GROUP BY `c`.`id`
         ";
 
         $statement = $this->database->prepare($query);
         $statement->execute(array(
-            'folderId' => $folder->getId()
+            'folderId' => $folder->getId(),
+            'year'     => $year,
         ));
 
         $collection = new Collection();
 
         while ($row = $statement->fetch()) {
-            $folder = $folderMapper->hydrate($row, 'c');
-            $collection->add($folder);
+            $existingCat = $collection->filterBy('id', $row['c.id']);
+            if ($existingCat->count()) {
+                $code = $code_mapper->hydrate($row, 'cc');
+                if ($code->getCategory()->getId()) {
+                    $existingCat->first()->addCode($code);
+                }
+            }
+            else {
+                $folder = $folderMapper->hydrate($row, 'c');
+                $code = $code_mapper->hydrate($row, 'cc');
+                if ($code->getCategory()->getId()) {
+                    $folder->addCode($code);
+                }
+                $collection->add($folder);
+            }
         }
-
         return $collection;
     }
 
