@@ -232,7 +232,7 @@ class External_Maze_User implements External_UserInterface {
 					DF2.F_EMAIL AS AltFamilyEmail2
 				FROM ST
 				LEFT JOIN DF DF1 ON ST.FAMILY = DF1.DFKEY
-				LEFT JOIN DF DF2 ON ST.FAMB = DF2.DFKEY
+				LEFT JOIN DF DF2 ON (ST.FAMB = DF2.DFKEY AND ST.LIVING_B != 'N')
 				WHERE ST.STKEY IN $allIds
 			";
 
@@ -448,7 +448,7 @@ class External_Maze_User implements External_UserInterface {
 				'' AS StudentContactSpouseRelation
 			FROM DF
 			LEFT JOIN UM ON DF.HOMEKEY = UM.UMKEY
-			LEFT JOIN ST ON (DF.DFKEY = ST.FAMILY OR DF.DFKEY = ST.FAMB)
+			LEFT JOIN ST ON (DF.DFKEY = ST.FAMILY OR (ST.FAMB = DF.DFKEY AND ST.LIVING_B != 'N'))
 			WHERE ST.STKEY = '{$externalUserId}'
 		";
 
@@ -529,7 +529,7 @@ class External_Maze_User implements External_UserInterface {
 				'' AS SpouseDirectoryIncludeFlag,
 				'' AS StudentParentsSeparatedFlag
 			FROM ST
-			LEFT JOIN DF ON (ST.FAMILY = DF.DFKEY OR ST.FAMB = DF.DFKEY)
+			LEFT JOIN DF ON (ST.FAMILY = DF.DFKEY OR (ST.FAMB = DF.DFKEY AND ST.LIVING_B != 'N'))
 			LEFT JOIN UM ON DF.HOMEKEY = UM.UMKEY
 			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
 			WHERE 1 = 1
