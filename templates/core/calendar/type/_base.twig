@@ -25,16 +25,18 @@
 
             {% block eventBubbleSummary %}
             <h3>{{ event.title }}</h3>
-            <h4>
-                {% if event.eventType %}
-                {{ event.eventType }}:
-                {% endif %}
-                {{ event.getFullDate()|raw }}
-            </h4>
 
-            {% if event.location %}
-                <p class="location">{{ event.location }}</p>
-            {% endif %}
+            <ul class="meta">
+                <li class="icon-calendar"><time>{{ event.getFullDate()|raw }}</time></li>
+
+                {% if event.eventType %}
+                <li class="icon-event-type">{{ event.eventType }}:</li>
+                {% endif %}
+
+                {% if event.location %}
+                <li class="icon-location">{{ event.location }}</li>
+                {% endif %}
+            </ul>
 
             <article>{{ event.detail|purify}}</article>
             {% endblock eventBubbleSummary %}
@@ -54,6 +56,16 @@
             <p class="meta">Attendance {{ renderer.attendanceStatus() }}</p>
             {% endif %}
             {% endblock eventBubbleMeta %}
+
+
+
+
+
+
+
+
+
+
 
             {% block eventBubbleButtons %}
             <div>
