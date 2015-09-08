@@ -2,6 +2,10 @@
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/calendar/js/jquery.eventModify.js"></script>
 <script type="text/javascript" src="/javascript/jquery.collapsable.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.js"></script>
+<script type="text/javascript" src="/javascript/jquery.hourpicker.js"></script>
+<script type="text/javascript" src="/javascript/jquery.minutepicker.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/timepicker.js"></script>
 <script type="text/javascript">
 	$(function() {
 		$.fn.alaressTiny({
@@ -70,13 +74,15 @@
                     <div class="small-12 large-6 columns" data-timeinputs style="display:none">
                         <div class="row">
                             <div class="small-4 columns">
-                                <label>Hour
-                                    <input name="startHour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" />
+                                <label class="timepick">
+                                    Hour
+                                    <input name="startHour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" data-timepicker="hour" />
                                 </label>
                             </div>
                             <div class="small-4 columns">
-                                <label>Minute
-                                    <input name="startMinute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
+                                <label class="timepick">
+                                    Minute
+                                    <input name="startMinute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" data-timepicker="minute" />
                                 </label>
                             </div>
                             <div class="small-4 columns">
@@ -98,13 +104,15 @@
                     <div class="small-12 large-6 columns" data-timeinputs style="display:none">
                         <div class="row">
                             <div class="small-4 columns" >
-                                <label>Hour
-                                    <input name="endHour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" />
+                                <label class="timepick">
+                                    Hour
+                                    <input name="endHour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" data-timepicker="hour" />
                                 </label>
                             </div>
                             <div class="small-4 columns" >
-                                <label>Minute
-                                    <input name="endMinute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
+                                <label class="timepick">
+                                    Minute
+                                    <input name="endMinute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" data-timepicker="minute" />
                                 </label>
                             </div>
                             <div class="small-4 columns" >
