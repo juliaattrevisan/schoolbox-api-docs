@@ -22,10 +22,6 @@
     <div class="small-12 island">
         <h1>{FUNCTION} Event</h1>
         <span class="header-actions">
-            <a class="button icon-components" data-customise href="#" title="Advanced Options">
-                <span {ADVANCED_SHOW}>Show</span>
-                <span {ADVANCED_CLOSE}>Hide</span>
-            </a>
             <!-- BEGIN delete_button -->
             <a href="#" class="button icon-overflow" data-dropdown="overflow"></a>
             <ul class="f-dropdown" data-dropdown-content id="overflow">
@@ -121,12 +117,41 @@
                             <label for="allday">All Day</label>
                         </fieldset>
                     </div>
-                    <div class="small-12 columns">
-                        <label>Publish
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This event will only be visible to the public on or after this date">?</span>
-                            <input id="publishDate" name="publishDate" data-datepicker="true" type="text" size="15" maxlength="30" value="{EVENT_PUBLISH_DATE}"/>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>
+                        Recurrence
+                    </legend>
+                    <!-- BEGIN recurring_dates -->
+                    <div class="small-6 columns" data-advanced style="display:{SHOW_ADVANCED}">
+                        <label>Repeat
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The frequency with which this event recurs, if at all">?</span>
+                            <select name="repeat">
+                                <option value="">Single Event</option>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="fortnightly">Fortnightly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
                         </label>
                     </div>
+                    <div id="repeatUntil" class="small-6 columns" data-repeat-until style="display:{SHOW_ADVANCED}">
+                        <label>
+                            Repeat Until
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The date at which recurrence should cease">?</span>
+                            <input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
+                        </label>
+                    </div>
+                    <!-- END recurring_dates -->
+                    <!-- BEGIN recurring_reminder -->
+                    <div id="repeat-reminder" class="small-12 columns">
+                        <div class="highlight-panel">
+                            <h5>This event is part of a recurring series</h5>
+                            <p>{EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong></p>
+                        </div>
+                    </div>
+                    <!-- END recurring_reminder -->
                 </fieldset>
 
                 <fieldset class="content">
@@ -208,7 +233,6 @@
                             <label for="roleSelectAll">Select all</label>
                         </fieldset>
                     </div>
-
                     <div id="campusList" class="small-12 large-6 column" style="display: none">
                         <fieldset class="checklist">
                             <legend>
@@ -235,39 +259,6 @@
                             </div>
                         </label>
                     </div>
-                </fieldset>
-
-                <fieldset class="content">
-                    <legend>Recurrence</legend>
-                    <!-- BEGIN recurring_dates -->
-                    <div class="small-6 columns" data-advanced style="display:{SHOW_ADVANCED}">
-                        <label>Repeat
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The frequency with which this event recurs, if at all">?</span>
-        					<select name="repeat">
-        						<option value="">Single Event</option>
-        						<option value="daily">Daily</option>
-        						<option value="weekly">Weekly</option>
-        						<option value="fortnightly">Fortnightly</option>
-        						<option value="monthly">Monthly</option>
-        					</select>
-                        </label>
-                    </div>
-                    <div id="repeatUntil" class="small-6 columns" data-repeat-until style="display:{SHOW_ADVANCED}">
-                        <label>
-                            Repeat Until
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The date at which recurrence should cease">?</span>
-                            <input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
-                        </label>
-                    </div>
-        			<!-- END recurring_dates -->
-        			<!-- BEGIN recurring_reminder -->
-                    <div id="repeat-reminder" class="small-6 columns" data-advanced >
-                        <div class="highlight-panel">
-                            <h5>This event is part of a recurring series</h5>
-                            <p>{EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong></p>
-                        </div>
-                    </div>
-        			<!-- END recurring_reminder -->
                 </fieldset>
             </section>
             <div class="row">
