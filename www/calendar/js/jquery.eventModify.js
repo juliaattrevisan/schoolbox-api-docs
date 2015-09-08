@@ -35,16 +35,16 @@
 		// */
 		//setupAdvancedOptions();
 
-		/* Show/hide repeat event options
-		 */
-		setupRepeat();
-
 		//setupOptionVariance();
 
 		/* Form validator
 		 */
 		setupFormActions();
 		setupEventValidation();
+
+		/* Show/hide repeat event options (after validation)
+		 */
+		setupRepeat();
 
 		/**
 		 * Initialise various configured params and determine a bunch
@@ -159,18 +159,22 @@
 		 * Set up repeating events options
 		 */
 		function setupRepeat() {
-			config.element.find('select[name=repeat]').change(function(event) {
+			// TODO move this to hideWatch plugin (once we apply rules conditionally)
+			var showRepeats = function() {
 				if ($(this).val() !== '') {
 					$('#repeatUntil').show();
-                    $('[data-repeat-until]').removeClass('hide');
+					$('[data-repeat-until]').removeClass('hide');
 					config.element.find('input[name=repeat_until]').rules('add', 'required');
 				}
 				else {
 					$('#repeatUntil, [data-repeat-until]').hide();
-                    $('[data-repeat-until]').addClass('hide');
+					$('[data-repeat-until]').addClass('hide');
 					config.element.find('input[name=repeat_until]').rules('remove', 'required');
 				}
-			});
+			};
+			var repeatSelector = config.element.find('select[name=repeat]');
+			repeatSelector.change(showRepeats);
+			showRepeats.apply(repeatSelector);
 		}
 
 		/**
