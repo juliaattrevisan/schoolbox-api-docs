@@ -27,7 +27,7 @@
 
 		/* All Day checkbox should hide the time fields
 		 */
-		setupAllDay();
+		//setupAllDay();
 		setupSelectAll();
 		/* Show/hide advanced options
 		 */
@@ -119,21 +119,21 @@
 			}
 		}
 
-		/**
-		 * Allow All Day checkbox to toggle visibility of time fields
-		 */
-		function setupAllDay() {
-			config.element.find('[data-timeinputs]').hide();
-
-			config.element.find('input[name=allday]').change(function() {
-				if ($(this).is(':checked')) {
-					config.element.find('[data-timeinputs]').hide();
-				}
-				else {
-					config.element.find('[data-timeinputs]').show();
-				}
-			});
-		}
+		///**
+		// * Allow All Day checkbox to toggle visibility of time fields
+		// */
+		//function setupAllDay() {
+		//	config.element.find('[data-timeinputs]').hide();
+        //
+		//	config.element.find('input[name=allday]').change(function() {
+		//		if ($(this).is(':checked')) {
+		//			config.element.find('[data-timeinputs]').hide();
+		//		}
+		//		else {
+		//			config.element.find('[data-timeinputs]').show();
+		//		}
+		//	});
+		//}
 
 		/**
 		 * Set up Advanced Option toggle
