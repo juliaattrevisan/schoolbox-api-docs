@@ -137,9 +137,9 @@
                     // If this event is a task, alter the state of the checkbox accordingly
                     if (calEvent.data.meta.eventTypeId == c.options.taskTypeId) {
                         inner.prepend(
-                                $('<input type="checkbox" name="completed" />')
+                                $('<input type="checkbox" name="completed" class="plain" />')
                                         .attr('id', 't'+ calEvent.data.meta.eventId)
-                        )
+                        );
                         if (calEvent.data.meta.completed == '1') {
                             title.addClass('strike')
                             inner.find(':checkbox').prop('checked', true)
