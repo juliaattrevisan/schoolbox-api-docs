@@ -732,10 +732,10 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
 
     // Hide reviewed by as well
     if (!('reviewerId' in eventData) || eventData.reviewerId == -1) {
-        $('dd.reviewed-by').hide();
+        $('[data-event-modal-field="reviewedBy"]').hide();
     }
     else {
-        $('dd.reviewed-by').show();
+        $('[data-event-modal-field="reviewedBy"]').show();
     }
 
     // Fill in resauce borking separately
