@@ -839,10 +839,9 @@ Bubble.prototype.hide = function() {
  * @param selector
  */
 function cp(from, to, selector) {
-
     $.each(selector, function() {
         // copy the date in the createEvent form into the createTask form
-        $(['input[name='+this+']', '.'+this]).each(function() {
+        $(['input[name='+this+']', '[data-event-modal-field="'+this+'"]']).each(function() {
             var orig = c.bubble.forms['create'+from.capitalise()].find(this.toString())
             var targ = c.bubble.forms['create'+to.capitalise()].find(this.toString())
 

@@ -292,7 +292,7 @@ $(document).ready(function() {
                 <input type="hidden" name="startTime" />
                 {# In this case, item ID is preset #}
                 {% if isRouteAuthorized('resourceBooking.book', {id: item.id, item: item}) %}
-                    Create booking for: <span class="displayDate"></span>
+                    Create booking for: <span data-event-modal-field="displayDate"></span>
                     <div class="bookingActions">
                         <input class="btn float-right modify no-icon" type="submit" value="Create Booking" />
                     </div>

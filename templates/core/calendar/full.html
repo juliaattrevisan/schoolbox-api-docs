@@ -317,24 +317,23 @@
             .on('keyup', toggleCreateButtonState)
         ;
 
-        // toggle onto the create task form
-        $('#showCreateTaskForm').click(function(e) {
-            // copy details from event to task
-            cp('event', 'task', ['date', 'displayDate', 'title', 'allDay'])
+        /* When you switch panels, preserve some data
+         */
+        $('[data-tab]').on('toggled', function (event, tab) {
 
-            // Apply whether the submit button is enabled or not
-            toggleFormState(form);
+            /* Copy from task panel to event panel
+             */
+            if ($(tab).attr('id') == 'createTaskPanel') {
+                console.log('copying to event panel');
+                cp('event', 'task', ['date', 'displayDate', 'title', 'allDay'])
+            }
+            /* Copy from event panel to task panel
+             */
+            else {
+                console.log('copying to task panel');
+                cp('task', 'event', ['date', 'displayDate', 'title', 'allDay'])
+            }
         });
-
-        // toggle onto the create event form
-        $('#showCreateEventForm').click(function(e) {
-            // copy details from event to task
-            cp('task', 'event', ['date', 'displayDate', 'title', 'allDay'])
-
-            // Apply whether the submit button is enabled or not
-            toggleFormState(form);
-
-        })
 
         // click 'Edit Event' and push data through to main form page
         $('#edit-full').click(function(e) {
@@ -511,8 +510,6 @@
         //$('#calendar').foundation('reveal','reflow'); this should work but foundation is buggy
         $('#fc-button-filter').click(function() { $('#calendar-controls').foundation('reveal','open') });
         $('#fc-button-export').click(function() { $('#calendar-export').foundation('reveal','open') });
-
-
     })
 </script>
 <!-- END custom_head -->
@@ -532,7 +529,7 @@
 
                 <label>
                     On
-                    <span class="displayDate"><!-- Date gets shoved in here --></span>
+                    <span data-event-modal-field="displayDate"><!-- Date gets shoved in here --></span>
                 </label>
 
                 <label>
@@ -562,7 +559,8 @@
                 <input name="type" type="hidden" value="{TASK_TYPE_ID}" />
 
                 <label>
-                    Due <span class="displayDate"><!-- Date gets shoved in here --></span>
+                    Due
+                    <span data-event-modal-field="displayDate"><!-- Date gets shoved in here --></span>
                 </label>
 
                 <label>
