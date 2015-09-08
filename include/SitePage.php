@@ -353,8 +353,6 @@ class SitePage extends Page
         $this->renderStudents();
         $this->renderInstantMessages();
 
-        $this->parseFooterMobileLink('footerTpl');
-
         $this->parse('MAIN_HEADER_REGION', 'headerTpl');
         $this->parse('MAIN_FOOTER_REGION', 'footerTpl');
 
@@ -1187,7 +1185,6 @@ class SitePage extends Page
             }
             $this->localRedir($redirectUrl);
         } else {
-            $this->parseFooterMobileLink(TEMPLATE_body);
             $this->outputPage(true);
         }
         exit;
@@ -1305,18 +1302,6 @@ class SitePage extends Page
     function canWrite($perm)
     {
         return $perm >= 2 ? true : false;
-    }
-
-    public function parseFooterMobileLink($parent = TEMPLATE_content)
-    {
-        // determine whether or not to show a mobile switch link
-        $this->setBlock($parent, 'mobile_switch', "mobile_switch_{$parent}_block");
-
-        if (Cfg::get('mobile_enabled')) {
-            $this->parse("mobile_switch_{$parent}_block", 'mobile_switch');
-        } else {
-            $this->setVar("mobile_switch_{$parent}_block", '');
-        }
     }
 
 
