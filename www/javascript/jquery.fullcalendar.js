@@ -710,14 +710,6 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
         return
     }
 
-    var id = method
-    if(eventData !== undefined) {
-        id += (eventData.eventTypeId == this.calendar.options.taskTypeId ? 'Task' : 'Event')
-    }
-    else {
-        id += 'Event'
-    }
-
 	/* Hide "Posted By" if there is no author
 	 * (This happens on subscribed vcals for example)
 	 */
@@ -747,7 +739,8 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
     }
     delete eventData.relatedBookings;
 
-    this.fillForm(id, eventData)
+    this.fillForm(method+'Event', eventData);
+    this.fillForm(method+'Task', eventData);
 }
 
 
