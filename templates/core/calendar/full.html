@@ -525,25 +525,37 @@
                 <input name="allDay" type="hidden" value="" />
                 <input name="date" type="hidden" value="" />
 
-                <h3>On <span data-event-modal-field="displayDate"><!-- Date gets shoved in here --></span></h3>
+                <section>
+                    <div class="actions-small-1 row">
+                        <div class="list-item">
+                            <div class="small-12 columns no-pad">
+                                <h3>On <span data-event-modal-field="displayDate"><!-- Date gets shoved in here --></span></h3>
+                            </div>
+                        </div>
+                        <nav>
+                            <a href="#" id="edit-full" class="icon-modify" title="Edit Event"></a>
+                        </nav>
+                    </div>
 
-                <label>
-                <label>
-                    Event Title
-                    <input name="title" type="text" value="" />
-                </label>
+                    <label>
+                        Event Title
+                        <input name="title" type="text" value="" />
+                    </label>
 
-                <label>
-                    Event Type
-                    <select name="type">
-                        <!-- BEGIN event_type -->
-                        <option value="{EVENT_TYPE_ID}">{EVENT_TYPE_NAME}</option>
-                        <!-- END event_type -->
-                    </select>
-                </label>
-
-                <input type="submit" disabled value="Create Event" />
-                <a href="#" id="edit-full" class="button icon-modify">Edit Event</a>
+                    <label>
+                        Event Type
+                        <select name="type">
+                            <!-- BEGIN event_type -->
+                            <option value="{EVENT_TYPE_ID}">{EVENT_TYPE_NAME}</option>
+                            <!-- END event_type -->
+                        </select>
+                    </label>
+                </section>
+                <div class="row">
+                    <div class="small-12 columns">
+                        <input type="submit" disabled value="Create Event" />
+                    </div>
+                </div>
             </form>
         </div>
         <div class="content" id="createTaskPanel" aria-hidden="true" tabindex="-1">
