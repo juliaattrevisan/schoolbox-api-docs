@@ -19,7 +19,7 @@
 {% set showSubjects = showDetails %}
 {% set showGroups = showDetails %}
 
-<div class="actions-small-1 row">
+<div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
     <div class="list-item">
         <div class="small-12 column">
             <h1>{{ user.formatName() }}</h1>
