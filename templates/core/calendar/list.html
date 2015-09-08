@@ -83,14 +83,17 @@
                 var form = $('#calendar-export-form');
                 var url = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray());
 
+                var dialog = $('#calendar-export-dialog');
+                var dialogUrl = $('#calendar-export-dialog-url');
+
                 /* Bypass foundation bug
                  * https://github.com/zurb/foundation/issues/4746
                  */
-                $('#calendar-export-dialog-url').val(url);
-                $('#calendar-export-dialog').foundation('reveal', 'open');
+                dialogUrl.val(url);
+                dialog.foundation('reveal', 'open');
 
-                $('#calendar-export-dialog').on('opened', function(){
-                    $('#calendar-export-dialog-url').select();
+                dialog.on('opened', function() {
+                    dialogUrl.select();
                 });
             }
         });
