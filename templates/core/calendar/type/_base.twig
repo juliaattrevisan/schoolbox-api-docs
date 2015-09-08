@@ -30,42 +30,30 @@
                 <li class="icon-calendar"><time>{{ event.getFullDate()|raw }}</time></li>
 
                 {% if event.eventType %}
-                <li class="icon-event-type">{{ event.eventType }}:</li>
+                <li class="icon-list">{{ event.eventType }}:</li>
                 {% endif %}
 
                 {% if event.location %}
                 <li class="icon-location">{{ event.location }}</li>
                 {% endif %}
+
+                {% block eventBubbleMeta %}
+                {% if event.authorName %}
+                <li class="icon-staff-students">Posted by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a></li>
+                {% endif %}
+
+                {% if event.category %}
+                <li class="icon-home"><a href='/homepage/{{ event.categoryId }}'>{{ event.categoryName }}</a></li>
+                {% endif %}
+
+                {% if event.attendance %}
+                <li class="icon-list">Attendance {{ renderer.attendanceStatus() }}</li>
+                {% endif %}
+                {% endblock eventBubbleMeta %}
             </ul>
 
             <article>{{ event.detail|purify}}</article>
             {% endblock eventBubbleSummary %}
-
-            {% block eventBubbleMeta %}
-            <div class="created meta">
-                {% if event.authorName %}
-                Posted by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a>
-                {% endif %}
-
-                {% if event.category %}
-                in <a href='/homepage/{{ event.categoryId }}'>{{ event.categoryName }}</a>
-                {% endif %}
-            </div>
-
-            {% if event.attendance %}
-            <p class="meta">Attendance {{ renderer.attendanceStatus() }}</p>
-            {% endif %}
-            {% endblock eventBubbleMeta %}
-
-
-
-
-
-
-
-
-
-
 
             {% block eventBubbleButtons %}
             <div>
