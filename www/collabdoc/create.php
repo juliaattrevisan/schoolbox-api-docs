@@ -15,7 +15,7 @@ use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 $authenticator = new \Etherpad\Authenticator();
 
 try{
-	$folder = FolderMapper::getInstance()->findById($this->arg[0]));
+	$folder = FolderMapper::getInstance()->findById($this->arg[0]);
 }
 catch (\Schoolbox\Mapper\Exception $e) {
 	error(2);
