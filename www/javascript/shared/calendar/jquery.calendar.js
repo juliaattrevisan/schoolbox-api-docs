@@ -50,7 +50,12 @@
 
                 /* The element containing the export url
                  */
-                exportUrl: '#calendar-export-dialog-url'
+                exportUrl: '#calendar-export-dialog-url',
+
+                /* Executes after Ready
+                 */
+                afterReady: function() {
+                }
             }
 
             var derived = {
@@ -86,6 +91,8 @@
 
                     button.show();
                 });
+
+                config.afterReady();
             });
         }
     }
