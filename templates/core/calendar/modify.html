@@ -6,6 +6,7 @@
 <script type="text/javascript" src="/javascript/jquery.hourpicker.js"></script>
 <script type="text/javascript" src="/javascript/jquery.minutepicker.js"></script>
 <script type="text/javascript" src="/javascript/data-plugins/timepicker.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/hideWatch.js"></script>
 <script type="text/javascript">
 	$(function() {
 		$.fn.alaressTiny({
@@ -278,11 +279,6 @@
                     </div>
                 </fieldset>
             </section>
-            <div class="row">
-                <div class="small-12 column">
-                    <input id="b{FUNCTION}" type="submit" name="{FUNCTION}" value="{FUNCTION} Event" />
-                </div>
-            </div>
             <div class='hide' id="dialog-bulk" data-dialog="bulk"  title="This event is part of a series">
                 <p>
                     <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
@@ -296,6 +292,8 @@
                     Are you sure you want to delete this event?
                 </p>
             </div>
+
+            <input id="b{FUNCTION}" type="submit" name="{FUNCTION}" value="{FUNCTION} Event" />
         </form>
     </div>
 </div>
