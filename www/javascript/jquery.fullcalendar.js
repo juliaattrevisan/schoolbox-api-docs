@@ -79,6 +79,12 @@ function Calendar(id, bubbleId, opts) {
              */
             eventClick: function(calEvent, jsEvent, view) {
 
+                // Did this event come from a checkbox?
+                // If so do nothing, those events are handled elsewhere.
+                if ($(jsEvent.target).is(':checkbox')) {
+                    return;
+                }
+
                 // setup data to be displayed
                 var data = $.extend(true, {}, calEvent.data.meta)
 
