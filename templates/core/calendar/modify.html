@@ -147,7 +147,7 @@
                             </select>
                         </label>
                     </div>
-                    <div id="repeatUntil" class="small-6 columns" data-repeat-until style="display:{SHOW_ADVANCED}">
+                    <div id="repeatUntil" class="small-6 columns" data-repeat-until>
                         <label>
                             Repeat Until
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The date at which recurrence should cease">?</span>
@@ -156,7 +156,7 @@
                     </div>
                     <!-- END recurring_dates -->
                     <!-- BEGIN recurring_reminder -->
-                    <div id="repeat-reminder" class="small-12 columns">
+                    <div id="repeat-reminder" class="small-12 columns" data-collapsable="true">
                         <div class="highlight-panel">
                             <h5>This event is part of a recurring series</h5>
                             <p>{EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong></p>
