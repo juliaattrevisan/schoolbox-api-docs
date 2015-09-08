@@ -39,7 +39,7 @@
 		 */
 		setupRepeat();
 
-		setupOptionVariance();
+		//setupOptionVariance();
 
 		/* Form validator
 		 */
@@ -187,49 +187,49 @@
 			});
 		}
 
-		/**
-		 * When you change Level, only certain other options become
-		 * available to you
-		 */
-		function setupOptionVariance() {
-			$('select[name="level"]').change(function() {
-				$('#groupDrop, #campusList, #roleList, #attendance').hide();
-
-				/* Personal
-				 */
-				if ($(this).val() == '1') {
-					var attendance_input = $('#attendance input');
-
-					attendance_input.prop('checked', false);
-
-					if (attendance_input.parent().hasClass('active-checkbox')) {
-						attendance_input.parent().removeClass('active-checkbox')
-					}
-					else {
-						attendance_input.parent().addClass('active-checkbox');
-					}
-				}
-				/* Group
-				 */
-				else if ($(this).val() == "2") {
-					$('#groupDrop, #attendance').show()
-				}
-				/* Campus
-				 */
-				else if ($(this).val() == "3") {
-					$('#campusList, #roleList, #attendance').show()
-				}
-			});
-
-			/* Defaults, I guess
-			 */
-			if ($('select[name="level"]').val() == "2") {
-				$('#groupDrop, #attendance').show()
-			}
-			else if ($('select[name="level"]').val() == "3") {
-				$('#campusList, #roleList, #attendance').show()
-			}
-		}
+		///**
+		// * When you change Level, only certain other options become
+		// * available to you
+		// */
+		//function setupOptionVariance() {
+		//	$('select[name="level"]').change(function() {
+		//		$('#groupDrop, #campusList, #roleList, #attendance').hide();
+        //
+		//		/* Personal
+		//		 */
+		//		if ($(this).val() == '1') {
+		//			var attendance_input = $('#attendance input');
+        //
+		//			attendance_input.prop('checked', false);
+        //
+		//			if (attendance_input.parent().hasClass('active-checkbox')) {
+		//				attendance_input.parent().removeClass('active-checkbox')
+		//			}
+		//			else {
+		//				attendance_input.parent().addClass('active-checkbox');
+		//			}
+		//		}
+		//		/* Group
+		//		 */
+		//		else if ($(this).val() == "2") {
+		//			$('#groupDrop, #attendance').show()
+		//		}
+		//		/* Campus
+		//		 */
+		//		else if ($(this).val() == "3") {
+		//			$('#campusList, #roleList, #attendance').show()
+		//		}
+		//	});
+        //
+		//	/* Defaults, I guess
+		//	 */
+		//	if ($('select[name="level"]').val() == "2") {
+		//		$('#groupDrop, #attendance').show()
+		//	}
+		//	else if ($('select[name="level"]').val() == "3") {
+		//		$('#campusList, #roleList, #attendance').show()
+		//	}
+		//}
 
 		/**
 		 * Apply button actions
