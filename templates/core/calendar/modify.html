@@ -121,6 +121,12 @@
                             <label for="allday">All Day</label>
                         </fieldset>
                     </div>
+                    <div class="small-12 columns">
+                        <label>Publish
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This event will only be visible to the public on or after this date">?</span>
+                            <input id="publishDate" name="publishDate" data-datepicker="true" type="text" size="15" maxlength="30" value="{EVENT_PUBLISH_DATE}"/>
+                        </label>
+                    </div>
                 </fieldset>
 
                 <fieldset class="content">
@@ -226,12 +232,6 @@
 
                 <fieldset class="content">
                     <legend>Recurrence</legend>
-                    <div class="small-12 columns" data-advanced style="display:{SHOW_ADVANCED}">
-                        <label>Publish Date
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This event will only be visible to the public after this date">?</span>
-                            <input id="publishDate" name="publishDate" data-datepicker="true" type="text" size="15" maxlength="30" value="{EVENT_PUBLISH_DATE}"/>
-                        </label>
-                    </div>
                     <!-- BEGIN recurring_dates -->
                     <div class="small-6 columns" data-advanced style="display:{SHOW_ADVANCED}">
                         <label>Repeat
