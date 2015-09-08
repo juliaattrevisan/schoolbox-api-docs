@@ -199,8 +199,15 @@ class Kernel extends \Alaress\Application\Kernel
             exit;
         }
 
+        // we shall assume that if a specific page is requested, the user just be sent to that page regardless of device
+        if ((isset($_GET['page']) && $_GET['page']) && $_GET['page'] != '/') {
+            $pageName = $_GET['page'];
+        } else {
+            $pageName = 'dashboard';
+        }
+
         $page = $this->di->get('sitePage');
-        $page->loadContent($_GET['page']);
+        $page->loadContent($pageName);
         $page->outputPage();
     }
 }
