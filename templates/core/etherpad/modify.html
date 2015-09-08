@@ -6,16 +6,14 @@
         form.find('input[name="type"]').val('update');
         form.validate();
 
-        form.find('input[name="delete"]').click(function(event) {
+        $('[data-delete]').click(function(event) {
             event.preventDefault();
 
             var element = $(this);
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Collab Doc?',
                 confirmEvent: function() {
-                    // Build a hidden input with the delete button's name/val,
-                    // then submit
-                    var form = element.closest('form');
+
                     form.find('input[name="type"]').val('delete');
                     form.submit();
                 }
@@ -34,7 +32,7 @@
     <div class="small-12 island">
         <h1>Modify Collab Doc</h1>
 
-        <form data-form='edit' action="/collabdoc/editForm" method="post" class="top">
+        <form data-form='modify' action="/collabdoc/editForm" method="post" class="top">
             <input type="hidden" name='padId' value="{ETHERPAD_PAD_ID}" />
             <input type="hidden" name="homepageId" value="{HOMEPAGE_ID}"  />
             <input type="hidden" name="type" value="update" />
@@ -51,9 +49,9 @@
             </section>
             <div class="row">
                 <div class="small-12 column">
-                    <input type="submit"  value="Update Collab Doc" />
+                    <input type="submit" value="Update Collab Doc" />
                     <!-- BEGIN etherpad_delete -->
-                    <input type="submit" class="alert" value="Delete Collab Doc" />
+                    <input type="submit" class="alert" value="Delete Collab Doc" data-delete />
                     <!-- END etherpad_delete -->
                 </div>
             </div>
