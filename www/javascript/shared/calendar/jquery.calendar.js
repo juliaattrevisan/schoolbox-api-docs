@@ -52,10 +52,10 @@
                  */
                 exportUrl: '#calendar-export-dialog-url',
 
-                /* Executes after Ready
+                /* Executes when Ready
                  */
-                afterReady: function() {
-                    defaultAfterReady();
+                onReady: function() {
+                    defaultOnReady();
                 }
             }
 
@@ -70,9 +70,19 @@
         /**
          * Default After Ready function
          */
-        function defaultAfterReady() {
+        function defaultOnReady() {
             var dialog = $(config.exportElement);
             var dialogUrl = $(config.exportUrl);
+
+            dialogUrl.text($.getExportCalendarLink(
+                config.userToken,
+                {
+                    'export': 'group',
+                    'group': config.groupId
+                }
+            ));
+
+            $(config.copy).show();
 
             /* Bypass foundation bug
              * https://github.com/zurb/foundation/issues/4746
@@ -99,18 +109,8 @@
                 var client = new ZeroClipboard(button);
 
                 client.on('ready', function() {
-                    $(config.exportUrl).text($.getExportCalendarLink(
-                        config.userToken,
-                        {
-                            'export': 'group',
-                            'group': config.groupId
-                        }
-                    ));
-
-                    button.show();
+                    config.onReady();
                 });
-
-                config.afterReady();
             });
         }
     }

@@ -79,7 +79,7 @@
         /* Export calendar
          */
         $.fn.calendarExport({
-            afterReady: function() {
+            onReady: function() {
                 var form = $('#calendar-export-form');
                 var url = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray());
 
@@ -95,6 +95,8 @@
                 dialog.on('opened', function() {
                     dialogUrl.select();
                 });
+
+                var button = $('#copy-button').show();
             }
         });
 
