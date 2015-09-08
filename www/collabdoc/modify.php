@@ -9,6 +9,7 @@
  */
 
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Breadcrumbs;
 
 /* Check that you have write permissions
  */
@@ -37,6 +38,22 @@ if ($authenticator->canCreate($etherpad->getHomepageId())) {
 	));
 
 	$this->parse('etherpad_delete_block', 'etherpad_delete');
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Modify Collab Doc',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }
 else {
 	error(19);
