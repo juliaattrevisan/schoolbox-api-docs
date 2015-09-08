@@ -9,6 +9,7 @@
  */
 
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Breadcrumbs;
 
 /* Check that you have write permissions
  */
@@ -28,6 +29,22 @@ if ($authenticator->canCreate($this->arg[0])) {
 		'HOMEPAGE_ID' => $this->arg[0],
 		'FOLDER_NAME' => Scrub::text($folder->getName())
 	));
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Create Collab Doc',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }
 else {
 	error(19);
