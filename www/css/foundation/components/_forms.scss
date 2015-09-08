@@ -263,9 +263,16 @@ select option				{
     }
 }
 
+// Beautifully styled checkboxes - just use the "plain" class
+input[type=radio].plain,
+input[type=checkbox].plain {
+    margin: 0;
+    min-height: inherit;
+}
+
 .checklist, .radiolist {
-    input[type=radio],
-    input[type=checkbox] {
+    input[type=radio]:not(.plain),
+    input[type=checkbox]:not(.plain) {
         @include fancy-check();
     }
 }
@@ -273,15 +280,15 @@ select option				{
 input[type=radio]:not(.plain)    { @include fancy-check('radio-label'); }
 input[type=checkbox]:not(.plain) { @include fancy-check('checkbox-label'); }
 
-input[type=radio] + label {
+input[type=radio]:not(.plain) + label {
     &:before, &:after {
         @include border-radius(1rem);
     }
 }
 
 // Disabled
-input[type=checkbox]:disabled,
-input[type=radio]:disabled{
+input[type=checkbox]:not(.plain):disabled,
+input[type=radio]:not(.plain):disabled{
   & + label{
     opacity: 0.5;
     &:after{
@@ -290,13 +297,13 @@ input[type=radio]:disabled{
   }
 }
 
-input[type=checkbox]:disabled:checked + label,
-input[type=radio]:disabled:checked + label{
+input[type=checkbox]:not(.plain):disabled:checked + label,
+input[type=radio]:not(.plain):disabled:checked + label{
   opacity: 0.5;
 }
 
 // Toggle Checkbox
-input[type=checkbox] + label.checkbox-toggle{
+input[type=checkbox]:not(.plain) + label.checkbox-toggle{
 	background-color: $button-color;
 	font-weight: $font-weight-normal;
 	margin-left: 0;
@@ -306,11 +313,11 @@ input[type=checkbox] + label.checkbox-toggle{
 	@include single-transition(background-color, 0.15s, linear);
 }
 
-input[type=checkbox]:hover + label.checkbox-toggle{
+input[type=checkbox]:not(.plain):hover + label.checkbox-toggle{
 	background-color: $button-bg-hover;
 }
 
-input[type=checkbox]:checked + label.checkbox-toggle{
+input[type=checkbox]:not(.plain):checked + label.checkbox-toggle{
 	background-color: $success-color;
 }
 
@@ -333,8 +340,8 @@ select.visibility {
 	display: none;
 	padding: rem-calc(($base-font-size));
 
-	input[type=radio] + label.radio-label,
-	input[type=checkbox] + label.checkbox-label{
+	input[type=radio]:not(.plain) + label.radio-label,
+	input[type=checkbox]:not(.plain) + label.checkbox-label{
 		display: inline-block;
 	}
 }
