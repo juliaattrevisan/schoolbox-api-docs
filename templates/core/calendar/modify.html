@@ -1,6 +1,7 @@
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/calendar/js/jquery.eventModify.js"></script>
+<script type="text/javascript" src="/javascript/jquery.collapsable.js"></script>
 <script type="text/javascript">
 	$(function() {
 		$.fn.alaressTiny({
@@ -10,6 +11,11 @@
 		$('#eventForm').eventModify({
 			functionLabel: "{FUNCTION}"
 		});
+
+        // Collapsables
+        $('[data-collapser=true]').collapsable({
+            container: '[data-collapsable-container]'
+        });
 	});
 </script>
 
@@ -119,12 +125,17 @@
                     </div>
                 </fieldset>
 
-                <fieldset class="content">
+                <fieldset class="content" data-collapsable-container>
                     <legend>
+                        <a data-collapser="true"
+                           href="#"
+                           class="icon-collapse"
+                           title="Collapse Content"
+                        ></a>
                         Recurrence
                     </legend>
                     <!-- BEGIN recurring_dates -->
-                    <div class="small-6 columns" data-advanced style="display:{SHOW_ADVANCED}">
+                    <div class="small-6 columns" data-collapsable="true">
                         <label>Repeat
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The frequency with which this event recurs, if at all">?</span>
                             <select name="repeat">
