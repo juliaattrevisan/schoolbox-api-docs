@@ -7,7 +7,7 @@
 <script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
 <script type="text/javascript">
 	$(function() {
-		var exportForm = $('#calendar-export');
+		var exportForm = $('#calendar-export-form-container');
 
 		$('[data-filters="true"]').filterSelector({
 			filterContainer: '#calendar-controls',
@@ -18,7 +18,7 @@
         /* Calendar controls
          */
         $('[data-filters]').click(function() { $('#calendar-controls').foundation('reveal','open') });
-        $('[data-export]').click(function() { $('#calendar-export').foundation('reveal','open') });
+        $('[data-export]').click(function() { $('#calendar-export-form-container').foundation('reveal','open') });
 
         $('[data-type=calendar-controls]').submit(function(event) {
             event.preventDefault();
@@ -79,6 +79,7 @@
         /* Export calendar
          */
         $.fn.calendarExport({
+            exportActivator: '#open-calendar-export-dialog',
             onReady: function() {
                 var form = $('#calendar-export-form');
                 var url = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray());
@@ -107,7 +108,7 @@
 </script>
 <!-- END custom_head -->
 
-<div id="calendar-export" class="reveal-modal small" data-reveal aria-hidden="true" role="dialog">
+<div id="calendar-export-form-container" class="reveal-modal small" data-reveal aria-hidden="true" role="dialog">
     <form class="top" action="#" id="calendar-export-form">
         <section>
             <fieldset class="content radiolist">
