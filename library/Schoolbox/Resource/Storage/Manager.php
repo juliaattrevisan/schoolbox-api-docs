@@ -11,9 +11,6 @@ namespace Schoolbox\Resource\Storage;
 
 
 use Alaress_Byte_Format;
-use ErrorException;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
 use Schoolbox\File;
 
@@ -119,51 +116,12 @@ class Manager
                 throw new File\Exception("Failed to copy uploaded file, '{$storage->getBasename()}', to storage");
             }
 
-            $this->reverseSymlink($storage);
         } catch (\League\Flysystem\FileExistsException $e) {
             // the target file already exists, and that's ok
             // should probably log the dedupe event though...
         }
 
         return true;
-    }
-
-
-    /**
-     * Create symlink for backward-compatibility.
-     * TODO once nothing points to the old system, remove this method completely
-     *
-     * @deprecated, remove once all references to old storage systems are removed
-     * @param Model $storage
-     */
-    private function reverseSymlink(Model $storage)
-    {
-        $version = \Database::getInstance()->query("SELECT `value` FROM `config` WHERE `name` = 'site_version'")->fetchColumn();
-
-        // ONLY DO THIS IF YOU ARE RUNNING v14
-        if (strpos($version, '14.') !== 0) {
-            return;
-        }
-
-        $stmt = \Database::getInstance()->query("SELECT storage_id FROM `storage` WHERE `hash` = ?", [ $storage->getHash() ]);
-
-        $internalId = $stmt->fetchColumn();
-
-        /** @var Filesystem $fsys */
-        $fsys = $this->mgr->getFilesystem(self::FS_STORAGE);
-
-        /** @var Local $adpt */
-        $adpt = $fsys->getAdapter();
-
-        $path = $adpt->getPathPrefix() . $storage->getPath();
-        $link = $adpt->getPathPrefix() . $internalId . ".dat";
-
-        try {
-            // in http mode, symlink will raise a warning, but we don't care.
-            @symlink($path, $link);
-        } catch (ErrorException $e) {
-            // in daemon mode, symlink will throw an exception, but we don't care.
-        }
     }
 
     /**
