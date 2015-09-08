@@ -70,7 +70,6 @@
             window.location = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
         });
 
-
 		$('#calendar-export form').submit(function(event) {
 			event.preventDefault();
 
@@ -90,8 +89,7 @@
         //select all clicked
         $('#calendar-controls').on('change','.select_all', function(e) {
             $(this).parent().find(':checkbox').prop('checked', $(this).prop('checked'));
-        })
-
+        });
 
         $(document).on('click', 'a.attendance-request', function (event) {
             event.preventDefault();
@@ -227,12 +225,12 @@
 </div>
 
 <form data-type='calendar-controls' action="/calendar/list" method="post">
+    <input type="hidden" name='userKey' value='{USER_ID}' />
+
     <div class="row">
         <div class="small-4 large-2 columns">
-                <input type="hidden" name='userKey' value='{USER_ID}' />
-                <input id="start_date_alt" name='start_date' type="hidden" value="{SELECTED_FORMATTED_START}" />
-                <input id='start_date' type="text" size="9" value="{SELECTED_START}" />
-
+            <input id="start_date_alt" type="hidden" name='start_date' value="{SELECTED_FORMATTED_START}" />
+            <input id='start_date' type="text" size="9" value="{SELECTED_START}" />
         </div>
         <div class="small-4 large-2 columns">
             <input id="finish_date_alt" name='finish_date' type="hidden" value="{SELECTED_FORMATTED_FINISH}" />
@@ -252,7 +250,7 @@
     </div>
 </form>
 
-<div class="row printEventList" id="calendar-list" data-eventlist="true">
+<div class="row" id="calendar-list" data-eventlist="true">
     <div class="small-12 island">
         <!-- BEGIN date -->
         <h2 class="subheader">{EVENT_DATE}</h2>
