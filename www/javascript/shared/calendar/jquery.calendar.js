@@ -55,6 +55,7 @@
                 /* Executes after Ready
                  */
                 afterReady: function() {
+                    defaultAfterReady();
                 }
             }
 
@@ -64,6 +65,23 @@
             var merged = $.extend(defaults, derived, options);
 
             return merged;
+        }
+
+        /**
+         * Default After Ready function
+         */
+        function defaultAfterReady() {
+            var dialog = $(config.exportElement);
+            var dialogUrl = $(config.exportUrl);
+
+            /* Bypass foundation bug
+             * https://github.com/zurb/foundation/issues/4746
+             */
+            dialog.foundation('reveal', 'open');
+
+            dialog.on('opened', function() {
+                dialogUrl.select();
+            });
         }
 
         /**
