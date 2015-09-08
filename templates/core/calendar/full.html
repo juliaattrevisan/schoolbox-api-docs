@@ -331,6 +331,11 @@
             else {
                 cp('task', 'event', ['date', 'displayDate', 'title', 'allDay'])
             }
+
+            /* Update button state when switching tabs
+             */
+            toggleFormState(c.getForm('createEvent'));
+            toggleFormState(c.getForm('createTask'));
         });
 
         // click 'Edit Event' and push data through to main form page
