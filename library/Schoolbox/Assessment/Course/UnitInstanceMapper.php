@@ -166,6 +166,9 @@ class UnitInstanceMapper extends Mapper {
             LEFT JOIN {$this->getJoinSql('course_folder', 'uc', 'cf')}
             LEFT JOIN {$this->getJoinSql('category', 'ui', 'c')}
             WHERE `cf`.`id` = :folderId
+              AND c.deleted_at IS NULL
+              AND ui.deleted_at IS NULL
+              AND uc.deleted_at IS NULL
             GROUP BY `c`.`id`
         ";
 
