@@ -592,21 +592,18 @@
             </div>
         </div>
     </form>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-
-<div class="reveal-modal large" data-reveal aria-hidden="true" role="dialog" id="modify-task" >
-<!-- Modify Task Form -->
     <form id="editTask">
         <h3>Task</h3>
         <input type="hidden" name="eventId" />
-        <label style="font-weight: bold;">Due Date<span class="date"><!-- Date gets shoved in here --></span></label>
-        <label>Complete<input id="modifyTaskBubbleCompleted" name="completed" type="checkbox" value="1" /></label>
+        <label>Due <span class="date"><!-- Date gets shoved in here --></span></label>
+        <input id="modifyTaskBubbleCompleted" name="completed" type="checkbox" value="1" />
+        <label for="modifyTaskBubbleCompleted" class="checkbox-label">Complete</label>
         <label>Task<input id="modifyTaskBubbleNote" name="title" type="text" value="" /></label>
         <label class="detail">Note<textarea id="modifyTaskBubbleDetail" name="detail"></textarea></label>
         <input type="submit" value="Update Task" />
         <a href="#" class="deleteTask">Delete</a>
     </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
 <h1>Calendar for {USER_FULLNAME}</h1>
