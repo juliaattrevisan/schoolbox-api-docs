@@ -1,19 +1,24 @@
 <!-- BEGIN custom_head -->
 <link rel="alternate" type="application/rss+xml" title="School News" href="http://{SCHOOL_NEWS_RSS_FEED_URL}" />
 <!-- END custom_head -->
-<div class="row">
-    <div class="column small-12">
-        <h1>News</h1>
-        <span class="header-actions">
-            <!-- BEGIN add_news -->
-            <a class="button icon-add no-text" href="/news/modify" data-tooltip title="Add News"></a>
-            <!-- END add_news -->
-            <!-- BEGIN allnews_button -->
-            <a class="button icon-view no-text" href="/news-archive/{TOPIC_CLEAN}" data-tooltip title="View Archived News"></a>
-            <!-- END allnews_button -->
-            <a class="button icon-rss no-text" href="/news-archive/{TOPIC_CLEAN}" data-tooltip title="RSS"></a>
-        </span>
 
+<div class="row actions-small-3">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>News</h1>
+        </div>
+    </div>
+    <nav>
+        <!-- BEGIN add_news -->
+        <a class="icon-add" href="/news/modify" title="Add News"></a>
+        <!-- END add_news -->
+        <!-- BEGIN allnews_button -->
+        <a class="icon-view" href="/news-archive/{TOPIC_CLEAN}" title="View Archived News"></a>
+        <!-- END allnews_button -->
+        <a class="icon-rss" href="/news-archive/{TOPIC_CLEAN}" title="RSS"></a>
+    </nav>
+
+    <div class="column small-12">
         <dl class="tabs">
             <!-- BEGIN topic_list -->
             <dd class="{LIST_TOPIC_SELECTED}">
@@ -26,38 +31,39 @@
 <div class="row">
     <div class="small-12 island">
         <section>
-        <ul class="information-list">
-            <!-- BEGIN news -->
-            <li>
-                <div class="column no-pad small-12" data-equalizer-watch>
-                    <div class="avatar card">
-                        <a href="/news/item/{NEWS_ID}" title="{NEWS_TITLE}">
-                            <!-- BEGIN news_image -->
-                            <img src="/storage/image.php?hash={NEWS_IMAGE}&size=square64" />
-                            <!-- END news_image -->
-                            <h3>{NEWS_TITLE}</h3>
-                        </a>
-                        <p class="meta">Posted by {POSTER} {DATETIME}</p>
-
+            <ul class="information-list">
+                <!-- BEGIN news -->
+                <li>
+                    <div class="column no-pad small-12" data-equalizer-watch>
+                        <div class="avatar card">
+                            <a href="/news/item/{NEWS_ID}" title="{NEWS_TITLE}">
+                                <!-- BEGIN news_image -->
+                                <img src="/storage/image.php?hash={NEWS_IMAGE}&size=square64" />
+                                <!-- END news_image -->
+                                <h3>{NEWS_TITLE}</h3>
+                            </a>
+                            <p class="meta">Posted by {POSTER}</p>
+                            <p class="meta">{DATETIME}</p>
+                        </div>
+                        <article>
+                            <p>{NEWS_SHORT}</p>
+                        </article>
                     </div>
-                    <article>
-                        <p>{NEWS_SHORT}</p>
-                    </article>
-                </div>
-            </li>
-            <!-- END news -->
-        </ul>
+                </li>
+                <!-- END news -->
+            </ul>
         </section>
+
+        <ul class="pagination">
+            <!-- BEGIN previous_button -->
+            <li><a class="arrow" href="/news/{PREVIOUS_PAGE}">&lsaquo;</a></li>
+            <!-- END previous_button -->
+            <!-- BEGIN page_number -->
+            <li class="{CURRENT}"><a href="/news/{PAGE_INDEX_REF}">{PAGE_INDEX}</a></li>
+            <!-- END page_number -->
+            <!-- BEGIN next_button -->
+            <li><a class="arrow" href="/news/{NEXT_PAGE}">&rsaquo;</a></li>
+            <!-- END next_button -->
+        </ul>
     </div>
 </div>
-<ul class="admin-nav foot">
-    <!-- BEGIN previous_button -->
-    <li><a class="prev" href="/news/{PREVIOUS_PAGE}">&lsaquo; Prev</a></li>
-    <!-- END previous_button -->
-    <!-- BEGIN page_number -->
-    <li><a class="number {CURRENT}" href="/news/{PAGE_INDEX_REF}">{PAGE_INDEX}</a></li>
-    <!-- END page_number -->
-    <!-- BEGIN next_button -->
-    <li><a class="next" href="/news/{NEXT_PAGE}">Next &rsaquo;</a></li>
-    <!-- END next_button -->
-</ul>

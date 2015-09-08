@@ -1,22 +1,29 @@
 <div class="row">
     <div class="small-12 columns">
-        <h1>{WORK_USER_NAME} Work</h1>
-
-        <!-- BEGIN is_parent -->
-        <span class='header-actions'>
-            <a href='#' class='button icon-group' data-dropdown='header-options'></a>
-        </span>
-        <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
-            <!-- BEGIN child -->
-            <li class="avatar-card">
-                <a href="/submission/dueWork/0/{CHILD_ID}">
-                    <img src="/portrait.php?userId={CHILD_EXTERNAL_ID}&size=square64">
-                    <p>{CHILD_NAME}</p>
-                </a>
-            </li>
-            <!-- END child -->
-        </ul>
-        <!-- END is_parent -->
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 column">
+                    <h1>{WORK_USER_NAME} Work</h1>
+                </div>
+            </div>
+            <!-- BEGIN is_parent -->
+            <nav>
+                <a class='icon-group' data-dropdown='header-options'></a>
+            </nav>
+            <ul id="header-options" class="f-dropdown" data-dropdown-content>
+                <!-- BEGIN child -->
+                <li>
+                    <div class="avatar card">
+                        <a href="/submission/dueWork/0/{CHILD_ID}" title="View Profile">
+                            <img src="/portrait.php?userId={CHILD_EXTERNAL_ID}&size=square64" alt="View Profile" />
+                            <p>{CHILD_NAME}</p>
+                        </a>
+                    </div>
+                </li>
+                <!-- END child -->
+            </ul>
+            <!-- END is_parent -->
+        </div>
     </div>
 </div>
 

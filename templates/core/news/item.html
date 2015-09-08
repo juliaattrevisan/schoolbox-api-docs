@@ -1,20 +1,28 @@
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{NEWS_TITLE}</h1>
+        </div>
+    </div>
+    <nav>
+        <!-- BEGIN modify_news -->
+        <a class="icon-modify" href="/news/modify/{NEWS_ID}" title="Modify News"></a>
+        <!-- END modify_news -->
+    </nav>
+</div>
+
 <div class="row">
     <div class="small-12 island">
-        <h1>{NEWS_TITLE}</h1>
-        <span class="header-actions">
-            <!-- BEGIN modify_news -->
-            <a class="button icon-modify no-text" data-tooltip title="Modify" href="/news/modify/{NEWS_ID}"></a>
-            <!-- END modify_news -->
-        </span>
         <section>
             <div class="avatar card">
                 <a href="/search/user/{POSTER_ID}" title="View Profile">
-                    <img src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square32" alt="View Profile">
+                    <img src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square64" alt="View Profile">
                     <p>{POSTER}</p>
                 </a>
                 <p class="meta">{DATETIME}</p>
             </div>
-            </section>
+        </section>
+
         <section>
             <div class="row content">
                 <!-- BEGIN featured_image -->
@@ -44,7 +52,6 @@
         </div>
     </div>
 </div>
-
 
     <!-- BEGIN add_news -->
     <!-- END add_news -->

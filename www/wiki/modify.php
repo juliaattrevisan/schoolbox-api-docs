@@ -56,7 +56,12 @@ if (is_numeric($this->arg[0])) {
             'class' => '',
         ],
         [
-            'text' => 'Modify Wiki',
+            'text' => 'Wiki',
+            'href' => "/wiki/{$folder->getId()}/{$wiki['slug']}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Modify',
             'href' => '',
             'class' => 'active',
         ]

@@ -27,40 +27,62 @@ $(function () {
 </script>
 <!-- END custom_head -->
 
-<h1>{TITLE}</h1>
-<form id="feedbackForm"  method="post" action="/emailForm.php" >
-  <table class="standardForm table">
-    <tr>
-      <td><h4>Your Name</h4><input type="text" name="name" id="name" size="35" value="{NAME}" /></td>
-    </tr>
-    <tr>
-      <td><h4>Email</h4><input type="text" name="email" id="email" size="35"  value="{EMAIL}" /></td>
-    </tr>
-    <tr>
-      <td><h4>Type of Feedback</h4><select name="subject" id="subject" style="width: 236px;">
-          <option></option>
-          <option value="Technical Issue">Technical Issue</option>
-          <option value="Support">Support</option>
-          <option value="Enquiry">Enquiry</option>
-        </select></td>
-    </tr>
-    <tr>
-      <td><h4>Feedback</h4><textarea id="message" name="message" style="width:100%;height:250px"></textarea></td>
-    </tr>
-    <!-- BEGIN recaptcha -->
-    <tr>
-      <td><h4>Human Checker</h4>
-      	<em>Please type out these two words so that we know you're not a bot </em><br />
-          {RECAPTCHA}
-		</td>
-    </tr>
-    <!-- END recaptcha -->
-    <tr class="pedantic">
-      <td><input type="hidden" name="template" value="feedback.html" />
-        <input type="hidden" name="confirmation" value="/thank-you.php" />
-		<input type="submit" class="submit-btn-plain" value="Submit Feedback"/>
-        </td>
-    </tr>
-  </table>
-  
-</form>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{TITLE}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form id="feedbackForm" action="/emailForm.php" method="post" class="top">
+            <input type="hidden" name="template" value="feedback.html" />
+            <input type="hidden" name="confirmation" value="/thank-you.php" />
+
+            <h2 class="subheader">Feedback</h2>
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Your Name
+                            <input type="text" name="name" id="name" size="35" value="{NAME}" />
+                        </label>
+
+                        <label>
+                            Email
+                            <input type="text" name="email" id="email" size="35"  value="{EMAIL}" />
+                        </label>
+
+                        <label>
+                            Type of Feedback
+                            <select name="subject" id="subject">
+                                <option></option>
+                                <option value="Technical Issue">Technical Issue</option>
+                                <option value="Support">Support</option>
+                                <option value="Enquiry">Enquiry</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Feedback
+                            <textarea id="message" name="message"></textarea>
+                        </label>
+
+                        <!-- BEGIN recaptcha -->
+                        <label>
+                            Human Checker
+                            <span class="hint has-tip tip-top" data-tooltip title="Please type out these two words so that we know you're not a bot.">?</span>
+                            {RECAPTCHA}
+                        </label>
+                        <!-- END recaptcha -->
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Submit Feedback"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

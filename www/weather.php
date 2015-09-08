@@ -61,7 +61,7 @@ if($count) {
         $forecastConditions = $weather['forecast'][$i];
         $forecastDate = new Alaress_Date_Format($forecastConditions['datetime'], 'U');
         $this->setVar(array(
-			"FC_CURRENT"=> ($i == 0) ? 'current' : '',
+			"FC_CURRENT"=> ($i == 0) ? 'active' : '',
             "FC_DAY"    => $forecastDate->getUsingFormat('D'),
             "FC_IMAGE"  => $imageLocation . parse_url($forecastConditions['styles']['wxug_icon'], PHP_URL_PATH),
             "FC_PRECIS" => $forecastConditions['conditions'],

@@ -1,109 +1,4 @@
-{ADMIN_NAV}
-
-<div class="row">
-    <div class="small-12 island">
-        <h2>Create New User</h2>
-        <h2 class="subheader">User Detail</h2>
-        <section>
-            <div class="content">
-                <div class="row">
-                    <form method="POST" action="/adminv2/userForm.php" data-validatable-as="userDetails">
-                        <div class="small-12 medium-6 columns">
-                            <label for="title">Title</label>
-                            <select id="title" name="title">
-                                <!-- BEGIN title -->
-                                <option value="{NAME_TITLE}" {TITLE_SELECTED}>{NAME_TITLE}</option>
-                                <!-- END title -->
-                            </select>
-                            <label for="firstname">First Name</label>
-                            <input id="firstname" type="text" name="firstname" value="" data-relation="name" />
-
-                            <label for="lastname">Surname</label>
-                            <input id="lastname" type="text" name="lastname" value="" data-relation="name" />
-
-                            <label for="database" class="">{DATABASE_TYPE} ID</label>
-                            <input id="database" type="text" name="database_id" value=""/>
-
-                            <label for="group">Role</label>
-                            <select id="group" name="group">
-                                <!-- BEGIN system_group -->
-                                <option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
-                                <!-- END system_group -->
-                            </select>
-
-                            <label>Campus</label>
-                            <table data-role="campusList">
-                                <tbody>
-                                    <!-- BEGIN campus -->
-                                    <tr>
-                                        <td>{CAMPUS_NAME}</td>
-                                        <td>
-                                            <input id="defaultCampus-{CAMPUS_ID}" data-role="defaultCampus" type="radio" name="defaultCampus" value="{CAMPUS_ID}" {CAMPUS_DEFAULT_CHECKED} required />
-                                            <label for="defaultCampus-{CAMPUS_ID}" class="radio-label">Default?</label>
-                                        </td>
-                                        <td>
-                                            <input id="campus-{CAMPUS_ID}" type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_CHECKED} />
-                                            <label for="campus-{CAMPUS_ID}" class="checkbox-label">Involved?</label>
-                                        </td>
-                                    </tr>
-                                    <!-- END campus -->
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="small-12 medium-6 columns">
-                            <label for ="username">Username</label>
-                            <input id="username" type="text" class="required" name="modusername" value="" />
-
-                            <label for="password">Password</label>
-                            <input id="password" type="password"  name="modpassword"/>
-
-                            <label for="alt_email">Alternate Email</label>
-                            <input id="alt_email" type="text" name="alt_email" value="" class="email" />
-
-                            <label for="year">Year</label>
-                            <input id="year" type="text" name="year" value="" />
-
-                            <label for="house">House</label>
-                            <select id="house" name="house">
-                                <option value="">Not Set</option>
-                                <!-- BEGIN house -->
-                                <option value="{HOUSE_ID}" {HOUSE_ID_SELECTED}>{HOUSE_NAME}</option>
-                                <!-- END house -->
-                            </select>
-
-                            <label for="residential_house">Residential House</label>
-                            <select id="residential_house" name="residential_house">
-                                <option value="">Not Set</option>
-                                <!-- BEGIN residential_house -->
-                                <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
-                                <!-- END residential_house -->
-                            </select>
-
-                            <input id="eportfolio" type="checkbox" name="eportfolio" value="1" />
-                            <label for="eportfolio" class="checkbox-label">E-Portfolio</label>
-
-                            <input id="local_email" type="checkbox" name="local_email" value="1" />
-                            <label for="local_email" class="checkbox-label">Email Address from Username</label>
-
-                            <input id="mail_handler" type="checkbox" name="mail_handler" value="1"/>
-                            <label for="mail_handler" class="checkbox-label">Use External Mail Client</label>
-
-                            <input id="webmail" type="checkbox" name="webmail" value="1" />
-                            <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
-
-                            <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" />
-                            <label for="superuser" class="checkbox-label">Superuser</label>
-                        </div>
-                        <div class="small-12 columns">
-                            <input type="submit" name="submit" value="Add User" />
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </section>
-    </div>
-</div>
+<!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
@@ -157,3 +52,112 @@
         });
     });
 </script>
+<!-- EMD custom_head -->
+
+{ADMIN_NAV}
+
+<div class="row">
+    <div class="small-12 island">
+        <form  method="POST" action="/adminv2/userForm.php" class="top" data-validatable-as="userDetails">
+
+            <h2 class="subheader">Create New User</h2>
+            <h3 class="subheader">User Detail</h3>
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 medium-6 columns">
+                        <label for="title">Title</label>
+                        <select id="title" name="title">
+                            <!-- BEGIN title -->
+                            <option value="{NAME_TITLE}" {TITLE_SELECTED}>{NAME_TITLE}</option>
+                            <!-- END title -->
+                        </select>
+                        <label for="firstname">First Name</label>
+                        <input id="firstname" type="text" name="firstname" value="" data-relation="name" />
+
+                        <label for="lastname">Surname</label>
+                        <input id="lastname" type="text" name="lastname" value="" data-relation="name" />
+
+                        <label for="database" class="">{DATABASE_TYPE} ID</label>
+                        <input id="database" type="text" name="database_id" value=""/>
+
+                        <label for="group">Role</label>
+                        <select id="group" name="group">
+                            <!-- BEGIN system_group -->
+                            <option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
+                            <!-- END system_group -->
+                        </select>
+
+                        <label>Campus</label>
+                        <table data-role="campusList">
+                            <tbody>
+                            <!-- BEGIN campus -->
+                            <tr>
+                                <td>{CAMPUS_NAME}</td>
+                                <td>
+                                    <input id="defaultCampus-{CAMPUS_ID}" data-role="defaultCampus" type="radio" name="defaultCampus" value="{CAMPUS_ID}" {CAMPUS_DEFAULT_CHECKED} required />
+                                    <label for="defaultCampus-{CAMPUS_ID}" class="radio-label">Default?</label>
+                                </td>
+                                <td>
+                                    <input id="campus-{CAMPUS_ID}" type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_CHECKED} />
+                                    <label for="campus-{CAMPUS_ID}" class="checkbox-label">Involved?</label>
+                                </td>
+                            </tr>
+                            <!-- END campus -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="small-12 medium-6 columns">
+                        <label for ="username">Username</label>
+                        <input id="username" type="text" class="required" name="modusername" value="" />
+
+                        <label for="password">Password</label>
+                        <input id="password" type="password"  name="modpassword"/>
+
+                        <label for="alt_email">Alternate Email</label>
+                        <input id="alt_email" type="text" name="alt_email" value="" class="email" />
+
+                        <label for="year">Year</label>
+                        <input id="year" type="text" name="year" value="" />
+
+                        <label for="house">House</label>
+                        <select id="house" name="house">
+                            <option value="">Not Set</option>
+                            <!-- BEGIN house -->
+                            <option value="{HOUSE_ID}" {HOUSE_ID_SELECTED}>{HOUSE_NAME}</option>
+                            <!-- END house -->
+                        </select>
+
+                        <label for="residential_house">Residential House</label>
+                        <select id="residential_house" name="residential_house">
+                            <option value="">Not Set</option>
+                            <!-- BEGIN residential_house -->
+                            <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
+                            <!-- END residential_house -->
+                        </select>
+
+                        <input id="eportfolio" type="checkbox" name="eportfolio" value="1" />
+                        <label for="eportfolio" class="checkbox-label">E-Portfolio</label>
+
+                        <input id="local_email" type="checkbox" name="local_email" value="1" />
+                        <label for="local_email" class="checkbox-label">Email Address from Username</label>
+
+                        <input id="mail_handler" type="checkbox" name="mail_handler" value="1"/>
+                        <label for="mail_handler" class="checkbox-label">Use External Mail Client</label>
+
+                        <input id="webmail" type="checkbox" name="webmail" value="1" />
+                        <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
+
+                        <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" />
+                        <label for="superuser" class="checkbox-label">Superuser</label>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Add User" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

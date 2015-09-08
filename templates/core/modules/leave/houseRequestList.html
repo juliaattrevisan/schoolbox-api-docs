@@ -1,109 +1,121 @@
-<span class="header-actions">
-    <a class="button icon-list" href="/modules/leave/report/catering/">Catering Report</a>
-    <a class="button icon-list" href="/modules/leave/report/house/{HOUSE_ID}">House Report</a>
-    <a class="button icon-more" href="#" data-dropdown="options">Options</a>
-</span>
-<ul class="f-dropdown fadeInDown" data-dropdown-content="" id="options">
-    <li><a class="icon-export" href="/modules/leave/house/export/{HOUSE_ID}">Export History</a></li>
-    <li><a class="icon-print" href="javascript:window.print()">Print</a></li>
-</ul>
-
-<h1>Boarder Leave Requests for {HOUSE_NAME}</h1>
-
-<!-- BEGIN no_requests -->
-{HOUSE_NAME} has no pending or previous requests.
-<!-- END no_requests -->
-
-<!-- BEGIN request_list -->
-<!-- BEGIN pending_request_list -->
-<section>
-    <h2>Pending Requests</h2>
-    <table data-topic="pendingRequests">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Year</th>
-                <th>Boarding Status</th>
-                <th>Leave Date</th>
-                <th>Days</th>
-                <th>Host</th>
-                <th>View</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- BEGIN pending_request -->
-            <tr>
-                <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
-                <td>{USER_YEAR}</td>
-                <td>{USER_BOARDING_STATUS}</td>
-                <td>{REQUEST_START}</td>
-                <td>{REQUEST_DURATION}</td>
-                <td>{REQUEST_HOST_TYPE}</td>
-                <td><a class="icon-view no-text" href="/modules/leave/modify/{REQUEST_ID}"></a></td>
-            </tr>
-            <!-- END pending_request -->
-        </tbody>
-    </table>
-</section>
-<!-- END pending_request_list -->
-
-<!-- BEGIN previous_request_list -->
-<section>
-    <h2>Request History</h2>
-    <table data-topic="previousRequests">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Year</th>
-                <th>Leave Date</th>
-                <th>Days</th>
-                <th>Host</th>
-                <th>Status</th>
-                <th>Status Updated On</th>
-                <th>Status Updated by</th>
-                <th>View</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- BEGIN previous_request -->
-            <tr>
-                <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
-                <td>{USER_YEAR}</td>
-                <td>{REQUEST_START}</td>
-                <td>{REQUEST_DURATION}</td>
-                <td>{REQUEST_HOST_TYPE}</td>
-                <td>{REQUEST_STATUS}</td>
-                <td>{REQUEST_AUTHORISATION_DATETIME}</td>
-                <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
-                <td><a href="/modules/leave/modify/{REQUEST_ID}"></a></td>
-            </tr>
-            <!-- END previous_request -->
-        </tbody>
-    </table>
-</section>
-<!-- END previous_request_list -->
-<!-- END request_list -->
-
-<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
+<script type="text/javascript" charset="utf-8" src="/javascript/components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript">
     $(function() {
-        $('table[data-topic="pendingRequests"]').tablesorter({
-            cssHeader: 'sortable',
-            cssAsc: 'ascending',
-            cssDesc: 'descending',
-            headers: {
-                0: { sorter: false},
-                6: { sorter: false}
-            }
+        $('table[data-sortable]').DataTable({
+            paging: false,
+            searching: false
         });
 
-        $('table[data-topic="previousRequests"]').tablesorter({
-            cssHeader: 'sortable',
-            cssAsc: 'ascending',
-            cssDesc: 'descending',
-            headers: {
-                8: { sorter: false}
-            }
-        });
+        $('[data-print]').artificialPrint();
     });
 </script>
+<!-- END custom_head -->
+
+<div class="actions-small-3 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Boarder Leave Requests</h1>
+            <ul class="meta">
+                <li class="icon-home">{HOUSE_NAME}</li>
+            </ul>
+        </div>
+    </div>
+    <nav>
+        <a class="icon-list" href="/modules/leave/report/catering/" title="Catering Report"></a>
+        <a class="icon-list" href="/modules/leave/report/house/{HOUSE_ID}" title="House Report"></a>
+        <a class="icon-more" href="#" title='Options' data-dropdown="header-options"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li><a class="icon-export" href="/modules/leave/house/export/{HOUSE_ID}">Export History</a></li>
+        <li><a class="icon-print" data-print>Print</a></li>
+    </ul>
+</div>
+
+<!-- BEGIN no_requests -->
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <p>
+                {HOUSE_NAME} has no pending or previous requests.
+            </p>
+        </section>
+    </div>
+</div>
+<!-- END no_requests -->
+
+<div class="row">
+    <div class="small-12 island">
+        <!-- BEGIN request_list -->
+        <!-- BEGIN pending_request_list -->
+        <h2 class="subheader">Pending Requests</h2>
+        <section class="scrollable">
+            <table data-topic="pendingRequests" data-sortable>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Year</th>
+                    <th>Boarding Status</th>
+                    <th>Leave Date</th>
+                    <th>Days</th>
+                    <th>Host</th>
+                    <th data-sortable="false">View</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- BEGIN pending_request -->
+                <tr>
+                    <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
+                    <td>{USER_YEAR}</td>
+                    <td>{USER_BOARDING_STATUS}</td>
+                    <td>{REQUEST_START}</td>
+                    <td>{REQUEST_DURATION}</td>
+                    <td>{REQUEST_HOST_TYPE}</td>
+                    <td><a class="icon-view no-text" href="/modules/leave/modify/{REQUEST_ID}"></a></td>
+                </tr>
+                <!-- END pending_request -->
+                </tbody>
+            </table>
+        </section>
+        <!-- END pending_request_list -->
+
+        <!-- BEGIN previous_request_list -->
+        <h2 class="subheader">Request History</h2>
+        <section class="scrollable">
+            <table data-topic="previousRequests" data-sortable>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Year</th>
+                    <th>Leave Date</th>
+                    <th>Days</th>
+                    <th>Host</th>
+                    <th>Status</th>
+                    <th>Status Updated On</th>
+                    <th>Status Updated by</th>
+                    <th data-sortable="false">View</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- BEGIN previous_request -->
+                <tr>
+                    <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
+                    <td>{USER_YEAR}</td>
+                    <td>{REQUEST_START}</td>
+                    <td>{REQUEST_DURATION}</td>
+                    <td>{REQUEST_HOST_TYPE}</td>
+                    <td>{REQUEST_STATUS}</td>
+                    <td>{REQUEST_AUTHORISATION_DATETIME}</td>
+                    <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
+                    <td><a href="/modules/leave/modify/{REQUEST_ID}"></a></td>
+                </tr>
+                <!-- END previous_request -->
+                </tbody>
+            </table>
+        </section>
+        <!-- END previous_request_list -->
+        <!-- END request_list -->
+    </div>
+</div>
+

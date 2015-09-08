@@ -1,30 +1,67 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-delete-wiki]').click(function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete the entire wiki?',
+                confirmEvent: function() {
+                    window.location.href = element.attr('href');
+                }
+            });
+        });
+
+        $('[data-revert]').click(function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                text: 'Revert to this revision?',
+                confirmEvent: function() {
+                    window.location.href = element.attr('href');
+                }
+            });
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 {BREADCRUMB}
 
 <div class="row actions-small-3">
 	<div class="small-12 column list-item">
-		<h1>{HEADING} {LOCKED}</h1>
+		<h1>{HEADING}</h1>
         <ul class="meta">
             <li class="icon-modify">Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</li>
+
+            <!-- BEGIN wiki_locked -->
+            <li class="icon-locked">Locked</li>
+            <!-- END wiki_locked -->
         </ul>
 	</div>
 	<nav>
 		<!-- BEGIN lock_link -->
-		<a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}" class="icon-locked" data-tooltip title="{LOCK_UNLOCK}"></a>
+		<a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}" class="icon-locked" title="{LOCK_UNLOCK}"></a>
 		<!-- END lock_link -->
         <!-- BEGIN modify_link -->
-        <a href="/wiki/modify/{WIKI_ID}" class="icon-modify" data-tooltip title="Modify"></a>
+        <a href="/wiki/modify/{WIKI_ID}" class="icon-modify" title="Modify"></a>
         <!-- END modify_link -->
         <a href="#" class="icon-more" data-dropdown="more-options"></a>
 	</nav>
 	<ul class="f-dropdown" data-dropdown-content="" id="more-options">
 		<!-- BEGIN delete_link -->
-		<li><a href="/wiki/modifyForm.php?delete={WIKI_ID}" onclick="return confirm('Are you sure you want to delete the entire wiki?');" class="icon-delete">Delete</a></li>
+		<li><a href="/wiki/modifyForm.php?delete={WIKI_ID}" class="icon-delete" data-delete-wiki>Delete</a></li>
 		<!-- END delete_link -->
 		<!-- BEGIN revert_link -->
-		<li><a href="/wiki/modifyForm.php?wikiID={WIKI_ID}&revert={CURRENT_REVISION}" onclick="return confirm('Revert to this revision?');" class="icon-refresh"><span></span>Revert to this revision</a></li>
+		<li><a href="/wiki/modifyForm.php?wikiID={WIKI_ID}&revert={CURRENT_REVISION}" class="icon-refresh" data-revert>Revert to this revision</a></li>
 		<!-- END revert_link -->
 		<!-- BEGIN export_link -->
-		<li><a href="/wiki/exportForm.php?wikiID={WIKI_ID}" class="icon-download"><span></span>{EXPORT}</a></li>
+		<li><a href="/wiki/exportForm.php?wikiID={WIKI_ID}" class="icon-download">{EXPORT}</a></li>
 		<!-- END export_link -->
 	</ul>
 </div>
@@ -53,7 +90,11 @@
 				<tr class="{REVISION_CURRENT}">
 					<td><a href="/wiki/revision/{WIKI_ID}/{REVISION_COMPARE}">{REVISION_DATE}</a></td>
 					<td>{REVISION_AUTHOR}</td>
-					<td><!-- BEGIN revision_comparison --><a href="/wiki/diff/{WIKI_ID}/{REVISION_ID}/{REVISION_COMPARE}" class="icon-view" data-tooltip title="Compare"></a><!-- END revision_comparison --></td>
+					<td>
+                        <!-- BEGIN revision_comparison -->
+                        <a href="/wiki/diff/{WIKI_ID}/{REVISION_ID}/{REVISION_COMPARE}" class="icon-view" title="Compare"></a>
+                        <!-- END revision_comparison -->
+                    </td>
 				</tr>
 				<!-- END revision_list -->
 			</tbody>

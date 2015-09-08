@@ -1,139 +1,145 @@
 {BREADCRUMB}
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>{ASSESS_HEADING}</h1>
-        <span class='header-actions'>
-            <!-- BEGIN importXML -->
-            <a href="#" id="import" data-reveal-id="import-modal" class="button icon-upload">Import from XML file</a>
-            <!-- END importXML -->
-        </span>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{ASSESS_HEADING}</h1>
+        </div>
     </div>
+    <!-- BEGIN importXML -->
+    <nav>
+        <a class="icon-more" title="" data-dropdown="header-options"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li><a href="#" id="import" data-reveal-id="import-modal" class="icon-upload">Import from XML file</a></li>
+    </ul>
+    <!-- END importXML -->
 </div>
 
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">{ASSESS_ACTION} {ASSESS_KIND}</h2>
-        <form name="create" action="/survey/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" method="post">
+
+        <form name="create" action="/survey/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" class='top' method="post">
             <input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
             <input type="hidden" name="max_attempts" value="1" />
 
-            <section>
-                <div class="content">
-                    <label>
-                        Title
-                        <input name="title" type="text" maxlength="100" value="{ASSESS_TITLE}" id="title"/>
-                    </label>
+            <section class="content">
+                <label>
+                    Title
+                    <input name="title" type="text" maxlength="100" value="{ASSESS_TITLE}" id="title"/>
+                </label>
 
-                    <!-- BEGIN assess_timespan -->
-                    <!-- Available from this time -->
-                    <div class="row">
-                        <div class="small-12 large-6 columns">
+                <!-- BEGIN assess_timespan -->
+                <!-- Available from this time -->
+                <div class="row">
+                    <div class="small-12 large-6 columns">
+                        <label>
+                            Open Date
+                            <span class="hint has-tip tip-top" data-tooltip title="The date and time from when the survey will be available.">?</span>
+                            <input name="start[date]" id="start_date" type="text" size="15" maxlength="30" value="{ASSESS_START_DATE}" />
+                        </label>
+                    </div>
+                    <div class="small-4 large-2 columns">
+                        <div class="timepick">
                             <label>
-                                Open Date
-                                <span class="hint has-tip tip-top" data-tooltip title="The date and time from when the survey will be available.">?</span>
-                                <input name="start[date]" id="start_date" type="text" size="15" maxlength="30" value="{ASSESS_START_DATE}" />
-                            </label>
-                        </div>
-                        <div class="small-4 large-2 columns">
-                            <div class="timepick">
-                                <label>
-                                    Hour
-                                    <input name="start[hour]" type="text" class='timeField' value="{START_HOUR_VALUE}" data-timepicker="hour" />
-                                </label>
-                            </div>
-                        </div>
-                        <div class="small-4 large-2 columns">
-                            <div class="timepick">
-                                <label>
-                                    Minute
-                                    <input name="start[minute]" type="text" class='timeField' value="{START_MINUTE_VALUE}" data-timepicker="minute" />
-                                </label>
-                            </div>
-                        </div>
-                        <div class="small-4 large-2 columns">
-                            <label>
-                                Period
-                                <select name="start[meridiem]">
-                                    <!-- BEGIN startMeridiem -->
-                                    <option value="{START_MERIDIEM_VALUE}" {START_MERIDIEM_SELECTED}>{START_MERIDIEM_VALUE}</option>
-                                    <!-- END startMeridiem -->
-                                </select>
+                                Hour
+                                <input name="start[hour]" type="text" class='timeField' value="{START_HOUR_VALUE}" data-timepicker="hour" />
                             </label>
                         </div>
                     </div>
-
-                    <!-- Available until this time -->
-                    <div class="row">
-                        <div class="small-12 large-6 columns">
+                    <div class="small-4 large-2 columns">
+                        <div class="timepick">
                             <label>
-                                Due Date
-                                <span class="hint has-tip tip-top" data-tooltip title="Actual date and time the survey is due. Respondents will not be able to take the survey after this date.">?</span>
-                                <input name="finish[date]" id="finish_date" type="text" size="15" maxlength="30" value="{ASSESS_FINISH_DATE}" />
-                            </label>
-                        </div>
-                        <div class="small-4 large-2 columns">
-                            <div class="timepick">
-                                <label>
-                                    Hour
-                                    <input name="finish[hour]" type="text" class='timeField' value="{FINISH_HOUR_VALUE}" data-timepicker="hour" />
-                                </label>
-                            </div>
-                        </div>
-                        <div class="small-4 large-2 columns">
-                            <div class="timepick">
-                                <label>
-                                    Minute
-                                    <input name="finish[minute]" type="text" class='timeField' value="{FINISH_MINUTE_VALUE}" data-timepicker="minute" />
-                                </label>
-                            </div>
-                        </div>
-                        <div class="small-4 large-2 columns">
-                            <label>
-                                Period
-                                <select name="finish[meridiem]">
-                                    <!-- BEGIN finishMeridiem -->
-                                    <option value="{FINISH_MERIDIEM_VALUE}" {FINISH_MERIDIEM_SELECTED}>{FINISH_MERIDIEM_VALUE}</option>
-                                    <!-- END finishMeridiem -->
-                                </select>
+                                Minute
+                                <input name="start[minute]" type="text" class='timeField' value="{START_MINUTE_VALUE}" data-timepicker="minute" />
                             </label>
                         </div>
                     </div>
-                    <!-- END assess_timespan -->
-
-                    <label>
-                        Description
-                        <textarea id='description' name="description">{ASSESS_DESCRIPTION}</textarea>
-                    </label>
-
-                    <label>
-                        Completion Message
-                        <textarea id='completion-message' name="completion_message">{ASSESS_COMPLETION_MESSAGE}</textarea>
-                    </label>
-
-                    <fieldset>
-                        <legend>Options</legend>
-
-                        <input id="max_attempts" name="max_attempts" type="checkbox" value="0" {MAX_ATTEMPTS_CHECKED} />
-                        <label for="max_attempts" class="checkbox-label">
-                            Participants can submit multiple responses
+                    <div class="small-4 large-2 columns">
+                        <label>
+                            Period
+                            <select name="start[meridiem]">
+                                <!-- BEGIN startMeridiem -->
+                                <option value="{START_MERIDIEM_VALUE}" {START_MERIDIEM_SELECTED}>{START_MERIDIEM_VALUE}</option>
+                                <!-- END startMeridiem -->
+                            </select>
                         </label>
-
-                        <input id='anonymous_result' name="anonymous_result" type="checkbox" value="1" {ASSESS_ANONYMOUS_RESULT_CHECKED} />
-                        <label for="anonymous_result" class="checkbox-label">
-                            Anonymise results
-                        </label>
-
-                        <input id='notify_author' name="notify_author" type="checkbox" value="1" {ASSESS_NOTIFY_AUTHOR_CHECKED} />
-                        <label for="notify_author" class="checkbox-label">
-                            Notify creator via email when response received
-                        </label>
-                    </fieldset>
+                    </div>
                 </div>
+
+                <!-- Available until this time -->
+                <div class="row">
+                    <div class="small-12 large-6 columns">
+                        <label>
+                            Due Date
+                            <span class="hint has-tip tip-top" data-tooltip title="Actual date and time the survey is due. Respondents will not be able to take the survey after this date.">?</span>
+                            <input name="finish[date]" id="finish_date" type="text" size="15" maxlength="30" value="{ASSESS_FINISH_DATE}" />
+                        </label>
+                    </div>
+                    <div class="small-4 large-2 columns">
+                        <div class="timepick">
+                            <label>
+                                Hour
+                                <input name="finish[hour]" type="text" class='timeField' value="{FINISH_HOUR_VALUE}" data-timepicker="hour" />
+                            </label>
+                        </div>
+                    </div>
+                    <div class="small-4 large-2 columns">
+                        <div class="timepick">
+                            <label>
+                                Minute
+                                <input name="finish[minute]" type="text" class='timeField' value="{FINISH_MINUTE_VALUE}" data-timepicker="minute" />
+                            </label>
+                        </div>
+                    </div>
+                    <div class="small-4 large-2 columns">
+                        <label>
+                            Period
+                            <select name="finish[meridiem]">
+                                <!-- BEGIN finishMeridiem -->
+                                <option value="{FINISH_MERIDIEM_VALUE}" {FINISH_MERIDIEM_SELECTED}>{FINISH_MERIDIEM_VALUE}</option>
+                                <!-- END finishMeridiem -->
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <!-- END assess_timespan -->
+
+                <label>
+                    Description
+                    <textarea id='description' name="description">{ASSESS_DESCRIPTION}</textarea>
+                </label>
+
+                <label>
+                    Completion Message
+                    <textarea id='completion-message' name="completion_message">{ASSESS_COMPLETION_MESSAGE}</textarea>
+                </label>
+
+                <fieldset>
+                    <legend>Options</legend>
+
+                    <input id="max_attempts" name="max_attempts" type="checkbox" value="0" {MAX_ATTEMPTS_CHECKED} />
+                    <label for="max_attempts" class="checkbox-label">
+                        Participants can submit multiple responses
+                    </label>
+
+                    <input id='anonymous_result' name="anonymous_result" type="checkbox" value="1" {ASSESS_ANONYMOUS_RESULT_CHECKED} />
+                    <label for="anonymous_result" class="checkbox-label">
+                        Anonymise results
+                    </label>
+
+                    <input id='notify_author' name="notify_author" type="checkbox" value="1" {ASSESS_NOTIFY_AUTHOR_CHECKED} />
+                    <label for="notify_author" class="checkbox-label">
+                        Notify creator via email when response received
+                    </label>
+                </fieldset>
             </section>
-            <label>
-                <input type="submit" class='expand' value="{ASSESS_ACTION} {ASSESS_KIND}" />
-            </label>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="{ASSESS_ACTION} {ASSESS_KIND}" />
+                </div>
+            </div>
         </form>
     </div>
 </div>
@@ -158,7 +164,7 @@
 <script type="text/javascript" src="/javascript/jquery.hourpicker.js"></script>
 <script type="text/javascript" src="/javascript/jquery.minutepicker.js"></script>
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(function() {
         $.fn.alaressTiny({
             mode : "exact",
             elements: "description, completion-message",
@@ -175,6 +181,7 @@
                 })
             }
         });
+
         $('#start_date').syncDates({endDate: $('#finish_date')});
 
         /* Timepicker

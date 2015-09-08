@@ -110,7 +110,7 @@ $pageSlug = "${selectedTopic}/";
 if ($totalPages > 1) {
     for ($j = 1; $j <= $totalPages; $j++) {
         if ($page == $j) {
-            $this->setVar('CURRENT', ' current');
+            $this->setVar('CURRENT', 'active');
         } else {
             $this->setVar('CURRENT', '');
         }

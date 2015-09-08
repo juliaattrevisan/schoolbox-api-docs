@@ -70,19 +70,17 @@
             <!-- BEGIN has_header -->
             <h2 class="subheader">{COMPONENT_NAME}</h2>
             <!-- END has_header -->
-            <section>
-                <div class="content">
-                    <div data-imagescroller>
-                        <!-- BEGIN image_scroller -->
-                        <div data-imagescroller-image>
-                            <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}"
-                                 alt="{IMAGE_NAME}"/>
-                            <!-- BEGIN show_caption -->
-                            <p class="meta">{IMAGE_NAME}</p>
-                            <!-- END show_caption -->
-                        </div>
-                        <!-- END image_scroller -->
+            <section class="content">
+                <div data-imagescroller>
+                    <!-- BEGIN image_scroller -->
+                    <div data-imagescroller-image>
+                        <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}"
+                             alt="{IMAGE_NAME}"/>
+                        <!-- BEGIN show_caption -->
+                        <p class="meta">{IMAGE_NAME}</p>
+                        <!-- END show_caption -->
                     </div>
+                    <!-- END image_scroller -->
                 </div>
             </section>
         </div>

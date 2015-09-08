@@ -1,24 +1,27 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <!-- END custom_head -->
+
 {BREADCRUMB}
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>{ASSESS_TITLE}</h1>
-        <span class="header-actions">
-            <a href="#" class="icon-more button" data-dropdown="header-options"></a>
-        </span>
-        <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
-            <li class="separator">{ASSESS_KIND}</li>
-            <li><a class="icon-modify" href="/{ASSESS_KIND_LC}/modify/{ASSESS_ASSESS_ID}">Modify</a></li>
-            <li><a class="icon-poll" href="/{ASSESS_KIND_LC}/results/{ASSESS_ASSESS_ID}">View Results</a></li>
-            <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/delete/{ASSESS_ASSESS_ID}" data-delete>Delete</a></li>
-            <li><a class="icon-export" href="/{ASSESS_KIND_LC}/export/xml/{ASSESS_ASSESS_ID}">Export</a></li>
-            <li class="separator">Section</li>
-            <li><a class="icon-add" href="/{ASSESS_KIND_LC}/section/create/{ASSESS_ASSESS_ID}">Add Section</a></li>
-        </ul>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{ASSESS_TITLE}</h1>
+        </div>
     </div>
+    <nav>
+        <a class="icon-more" title="" data-dropdown="header-options"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li class="separator">{ASSESS_KIND}</li>
+        <li><a class="icon-modify" href="/{ASSESS_KIND_LC}/modify/{ASSESS_ASSESS_ID}">Modify</a></li>
+        <li><a class="icon-poll" href="/{ASSESS_KIND_LC}/results/{ASSESS_ASSESS_ID}">View Results</a></li>
+        <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/delete/{ASSESS_ASSESS_ID}" data-delete>Delete</a></li>
+        <li><a class="icon-export" href="/{ASSESS_KIND_LC}/export/xml/{ASSESS_ASSESS_ID}">Export</a></li>
+        <li class="separator">Section</li>
+        <li><a class="icon-add" href="/{ASSESS_KIND_LC}/section/create/{ASSESS_ASSESS_ID}">Add Section</a></li>
+    </ul>
 </div>
 
 <div class="row">
@@ -31,8 +34,8 @@
             <!-- END has_due_date -->
             <li class="icon-time-value icon-16">Time allowed: {ASSESS_DURATION}</li>
         </ul>
-        <section>
-            <article class="content">{ASSESS_DESCRIPTION}</article>
+        <section class="content">
+            <article>{ASSESS_DESCRIPTION}</article>
         </section>
         <!-- BEGIN allQuestions -->
         <!-- END allQuestions -->

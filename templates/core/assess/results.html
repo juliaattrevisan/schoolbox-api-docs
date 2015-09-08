@@ -1,36 +1,38 @@
 {BREADCRUMB}
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Submissions for {ASSESS_TITLE}</h1>
-        <span class='header-actions'>
-            <a href='#' class='button icon-more' data-dropdown='header-options'></a>
-        </span>
-        <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
-            <!-- BEGIN has_attempt -->
-            <li>
-                <a href="/assess/export/csv/{ASSESS_ASSESS_ID}" class="icon-download">Download All</a>
-            </li>
-            <li>
-                <a href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}" class="icon-modify">Review Horizontally</a>
-            </li>
-            <!-- END has_attempt -->
-            <!-- BEGIN modify_btn -->
-            <li>
-                <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="icon-modify">Modify</a>
-            </li>
-            <!-- END modify_btn -->
-        </ul>
-        <ul class="meta">
-            <li class="icon-calendar icon-16">Due <time>{ASSESS_DUEDATE}</time></li>
-            <li class="{VISIBILITY_CLASS} icon-16">Visible to {GRADE_VISIBILITY}</li>
-            <!-- BEGIN is_archived -->
-            <li class="icon-locked">Archived</li>
-            <!-- END is_archived -->
-        </ul>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Submissions for {ASSESS_TITLE}</h1>
+            <ul class="meta">
+                <li class="icon-calendar icon-16">Due <time>{ASSESS_DUEDATE}</time></li>
+                <li class="{VISIBILITY_CLASS} icon-16">Visible to {GRADE_VISIBILITY}</li>
+                <!-- BEGIN is_archived -->
+                <li class="icon-locked">Archived</li>
+                <!-- END is_archived -->
+            </ul>
+        </div>
     </div>
+    <nav>
+        <a class="icon-more" title="" data-dropdown="header-options"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <!-- BEGIN has_attempt -->
+        <li>
+            <a href="/assess/export/csv/{ASSESS_ASSESS_ID}" class="icon-download">Download All</a>
+        </li>
+        <li>
+            <a href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}" class="icon-modify">Review Horizontally</a>
+        </li>
+        <!-- END has_attempt -->
+        <!-- BEGIN modify_btn -->
+        <li>
+            <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="icon-modify">Modify</a>
+        </li>
+        <!-- END modify_btn -->
+    </ul>
 </div>
-        
+
 <div class="row">
     <div class="small-12 island">
         <form action='/assess/deleteAttempt' method='post'>

@@ -1,44 +1,45 @@
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/evaluation/evaluation.graphs.js"></script>
+
 <ul class="breadcrumb">
     <!-- BEGIN breadcrumb -->
     <li class="{BREADCRUMB_ACTIVE}"><a href="/homepage/{BREADCRUMB_FOLDER_ID}">{BREADCRUMB_FOLDER_NAME}</a></li>
     <!-- END breadcrumb -->
 </ul>
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>{SURVEY_NAME}</h1>
-        <span class='header-actions'>
-            <a href='#' class='button icon-more no-text' data-dropdown='header-options'></a>
-        </span>
-        <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
-            <li><a href="/survey/attempts/{ASSESS_ID}" class="icon-view">View All Attempts</a></li>
-            <li><a href="/survey/export/csv/{ASSESS_ID}" class="icon-download">Export Survey CSV</a></li>
-        </ul>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{SURVEY_NAME}</h1>
+        </div>
     </div>
+    <nav>
+        <a class="icon-more" title="" data-dropdown="header-options"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li><a href="/survey/attempts/{ASSESS_ID}" class="icon-view">View All Attempts</a></li>
+        <li><a href="/survey/export/csv/{ASSESS_ID}" class="icon-download">Export Survey CSV</a></li>
+    </ul>
 </div>
 
 <!-- BEGIN section -->
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">{SECTION_NAME}</h2>
-        <section>
-            <div class="content">
-                <!-- BEGIN question -->
-                <div>
-                    <h3>Q{QUESTION_INDEX})</h3>
+        <section class="content">
+            <!-- BEGIN question -->
+            <div>
+                <h3>Q{QUESTION_INDEX})</h3>
 
-                    <article>{QUESTION_QUESTION}</article>
+                <article>{QUESTION_QUESTION}</article>
 
-                    <!-- BEGIN graph -->
-                    <!-- END graph -->
+                <!-- BEGIN graph -->
+                <!-- END graph -->
 
-                    <a href='/survey/export/csv/{ASSESS_ID}/{QUESTION_QUESTION_ID}/{QUESTION_INDEX}' class="button icon-export">Export CSV</a>
-                    <a href='/survey/resultsForQuestion/{ASSESS_ID}/{QUESTION_QUESTION_ID}/{QUESTION_INDEX}' class="button icon-view">View All Responses</a>
-                </div>
-                <!-- END question -->
+                <a href='/survey/export/csv/{ASSESS_ID}/{QUESTION_QUESTION_ID}/{QUESTION_INDEX}' class="button icon-export">Export CSV</a>
+                <a href='/survey/resultsForQuestion/{ASSESS_ID}/{QUESTION_QUESTION_ID}/{QUESTION_INDEX}' class="button icon-view">View All Responses</a>
             </div>
+            <!-- END question -->
         </section>
     </div>
 </div>

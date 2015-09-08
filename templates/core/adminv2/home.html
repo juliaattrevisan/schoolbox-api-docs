@@ -1,112 +1,4 @@
-{ADMIN_NAV}
-
-<div class="row">
-    <div class="small-12 large-4 island collapse">
-        <h2 class="subheader">Server Usage</h2>
-        <section>
-            <div data-graph="usage"></div>
-        </section>
-
-        <h2 class="subheader">Status of Services</h2>
-        <section>
-            <table>
-                <colgroup>
-                    <col />
-                    <col width="20%" />
-                </colgroup>
-                <tbody>
-                    <tr>
-                        <td>{EXTERNAL_DB}</td>
-                        <td><span class="full-width {EXTERNAL_DB_LIGHT} label">{EXTERNAL_DB_STATUS}</span></td>
-                    </tr>
-                    <tr>
-                        <td>Email</td>
-                        <td><span class="full-width {EMAIL_LIGHT} label">{EMAIL_STATUS}</span></td>
-                    </tr>
-                    <tr>
-                        <td>LDAP Primary</td>
-                        <td><span class="full-width {LDAP_LIGHT} label">{LDAP_STATUS}</span></td>
-                    </tr>
-                    <tr>
-                        <td>LDAP Secondary</td>
-                        <td><span class="full-width {LDAP_ALT_LIGHT} label">{LDAP_ALT_STATUS}</span></td>
-                    </tr>
-                    <tr>
-                        <td>WWW</td>
-                        <td><span class="full-width {WWW_LIGHT} label" data-light="www">{WWW_STATUS}</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <h2 class="subheader">Role Statistics</h2>
-        <section>
-            <div class="loading"></div>
-            <table id="group-summary">
-                <colgroup>
-                    <col width="50%" />
-                    <col width="20%" />
-                    <col width="30%" />
-                </colgroup>
-                <thead>
-                <tr>
-                    <th>Role</th>
-                    <th>Total</th>
-                    <th>Logged In</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- BEGIN group_summary -->
-                <tr>
-                    <td><a href="/adminv2/reports/group/{GROUP_ID}">{GROUP_NAME}</a></td>
-                    <td>{GROUP_USER}</td>
-                    <td>{GROUP_LOGGED_IN}</td>
-                </tr>
-                <!-- END group_summary -->
-                </tbody>
-            </table>
-
-            <!-- BEGIN no_js_warning -->
-            <noscript>
-                <p>
-                    It seems your browser either has Javascript disabled, or doesn't support it.</br>
-                    You can <a href="/adminv2/home/nojscript">reload the page</a> to see these statistics, but please be patient while they load.
-                </p>
-            </noscript>
-            <!-- END no_js_warning -->
-        </section>
-    </div>
-
-    <div class="small-12 large-8 island collapse">
-        <h2 class="subheader">Recent Activity</h2>
-        <span class="header-actions">
-            <a href="/adminv2/reports/login/all" class="button icon-progress">Login Report</a>
-            <a href="/adminv2/reports/activity/all" class="button icon-progress">Activity Report</a>
-        </span>
-
-        <section>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Action</th>
-                        <th>User</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- BEGIN recent_log -->
-                    <tr>
-                        <td>{LOG_DATE}</td>
-                        <td>{LOG_ACTION}</td>
-                        <td>{LOG_NAME}</td>
-                    </tr>
-                    <!-- END recent_log -->
-                </tbody>
-            </table>
-        </section>
-    </div>
-</div>
-
+<!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/admin/jquery.serverUsage.js"></script>
 <script type="text/javascript">
@@ -201,3 +93,119 @@
         }
     });
 </script>
+<!-- END custom_head -->
+
+{ADMIN_NAV}
+
+<div class="row">
+    <div class="small-12 large-4 island collapse">
+        <h2 class="subheader">Server Usage</h2>
+        <section>
+            <div data-graph="usage"></div>
+        </section>
+
+        <h2 class="subheader">Status of Services</h2>
+        <section>
+            <table>
+                <colgroup>
+                    <col />
+                    <col width="20%" />
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <td>{EXTERNAL_DB}</td>
+                        <td><span class="full-width {EXTERNAL_DB_LIGHT} label">{EXTERNAL_DB_STATUS}</span></td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td><span class="full-width {EMAIL_LIGHT} label">{EMAIL_STATUS}</span></td>
+                    </tr>
+                    <tr>
+                        <td>LDAP Primary</td>
+                        <td><span class="full-width {LDAP_LIGHT} label">{LDAP_STATUS}</span></td>
+                    </tr>
+                    <tr>
+                        <td>LDAP Secondary</td>
+                        <td><span class="full-width {LDAP_ALT_LIGHT} label">{LDAP_ALT_STATUS}</span></td>
+                    </tr>
+                    <tr>
+                        <td>WWW</td>
+                        <td><span class="full-width {WWW_LIGHT} label" data-light="www">{WWW_STATUS}</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <h2 class="subheader">Role Statistics</h2>
+        <section>
+            <div class="loading"></div>
+            <table id="group-summary">
+                <colgroup>
+                    <col width="50%" />
+                    <col width="20%" />
+                    <col width="30%" />
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th>Total</th>
+                        <th>Logged In</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- BEGIN group_summary -->
+                    <tr>
+                        <td><a href="/adminv2/reports/group/{GROUP_ID}">{GROUP_NAME}</a></td>
+                        <td>{GROUP_USER}</td>
+                        <td>{GROUP_LOGGED_IN}</td>
+                    </tr>
+                    <!-- END group_summary -->
+                </tbody>
+            </table>
+
+            <!-- BEGIN no_js_warning -->
+            <noscript>
+                <p>
+                    It seems your browser either has Javascript disabled, or doesn't support it.<br />
+                    You can <a href="/adminv2/home/nojscript">reload the page</a> to see these statistics, but please be patient while they load.
+                </p>
+            </noscript>
+            <!-- END no_js_warning -->
+        </section>
+    </div>
+
+    <div class="small-12 large-8 island">
+        <div class="actions-small-2 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Recent Activity</h2>
+                </div>
+            </div>
+            <nav>
+                <a href="/adminv2/reports/login/all" class="icon-progress" title="Login Report"></a>
+                <a href="/adminv2/reports/activity/all" class="icon-list" title="Activity Report"></a>
+            </nav>
+        </div>
+
+        <section>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Action</th>
+                        <th>User</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- BEGIN recent_log -->
+                    <tr>
+                        <td>{LOG_DATE}</td>
+                        <td>{LOG_ACTION}</td>
+                        <td>{LOG_NAME}</td>
+                    </tr>
+                    <!-- END recent_log -->
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>

@@ -1,28 +1,35 @@
 {ADMIN_NAV}
 
 <div class="row">
-    <div class="small-12 columns">
+    <div class="small-12 island">
         <!-- BEGIN filter -->
-        <div class="panel">
-            <h3>Filter</h3>
+        <form action="/adminv2/reportsForm.php" method="POST">
+            <input type="hidden" readonly="readonly" name="bounce" value="{RETURN}" />
 
-            <form action="/adminv2/reportsForm.php" method="POST">
-                <input type="hidden" readonly="readonly" name="bounce" value="{RETURN}" />
+            <section>
+                <fieldset class="content">
+                    <legend>Filter</legend>
 
-                <dl class="row">
-                    <!-- BEGIN search_options -->
-                    <dd class="column medium-4 end">
-                        <label for="{FILTER_ID}">
-                            {FILTER_NAME}
-                            <input id="{FILTER_ID}" name="{FILTER_ID}" type="text" value="{FILTER_VALUE}" placeholder="{FILTER_PLACEHOLDER}" />
-                        </label>
-                    </dd>
-                    <!-- END search_options -->
-                </dl>
-
-                <input id="filtersubmit" type="submit" value="Filter" />
-            </form>
-        </div>
+                    <div class="small-12 columns">
+                        <dl class="row">
+                            <!-- BEGIN search_options -->
+                            <dd class="small-12 medium-4 columns end">
+                                <label for="{FILTER_ID}">
+                                    {FILTER_NAME}
+                                    <input id="{FILTER_ID}" name="{FILTER_ID}" type="text" value="{FILTER_VALUE}" placeholder="{FILTER_PLACEHOLDER}" />
+                                </label>
+                            </dd>
+                            <!-- END search_options -->
+                        </dl>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input id="filtersubmit" type="submit" value="Filter" />
+                </div>
+            </div>
+        </form>
         <!-- END filter -->
     </div>
 </div>
@@ -30,12 +37,18 @@
 <!-- BEGIN result_table -->
 <div class="row">
     <div class="small-12 columns">
-        <h2 class="subheader">{REPORT_TITLE}<!-- BEGIN count -->: {COUNTABLE_COUNT} {COUNTABLE}<!-- END count --></h2>
-        <!-- BEGIN download_report -->
-        <span class="header-actions">
-            <a href="/adminv2/reports/{REPORT_FILTER}exportToCSV" class="button icon-download no-text" data-tooltip title="Download Report"></a>
-        </span>
-        <!-- END download_report -->
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">{REPORT_TITLE}<!-- BEGIN count -->: {COUNTABLE_COUNT} {COUNTABLE}<!-- END count --></h2>
+                </div>
+            </div>
+            <!-- BEGIN download_report -->
+            <nav>
+                <a href="/adminv2/reports/{REPORT_FILTER}exportToCSV" class="icon-download" title="Download Report"></a>
+            </nav>
+            <!-- END download_report -->
+        </div>
 
         <!-- BEGIN result -->
         {RESULT}

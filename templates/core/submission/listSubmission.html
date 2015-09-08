@@ -1,3 +1,16 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" href="/javascript/components/datatables/media/css/jquery.dataTables.min.css">
+<script type="text/javascript" charset="utf-8" src="/javascript/components/datatables/media/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $('[data-tablesorter]').DataTable({
+            paging: false,
+            searching: false
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 <div class="row">
     <div class="small-12 island">
         <h1>Student Submissions</h1>
@@ -22,109 +35,106 @@
 <!-- BEGIN category_listing -->
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader"><a href="/homepage/{CATEGORY_ID}">{CATEGORY}</a></h2>
-        <span class='header-actions'>
-            <a href='#' class='button icon-more' data-dropdown='header-options-{CATEGORY_ID}'></a>
-        </span>
-        <ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options-{CATEGORY_ID}'>
-            <!-- BEGIN learning_analytics -->
-            <li><a href="/learningAnalytics/course/{COURSE_FOLDER_ID}" class="icon-poll">{COURSE_FOLDER_NAME} Analytics</a></li>
-            <!-- END learning_analytics -->
-            <li><a href="/task/progressReport/{CATEGORY_ID}{SEM_SLUG}" class="icon-progress">Progress Report</a></li>
-            <li><a href="/submission/markSheet/{CATEGORY_ID}{SEM_SLUG}" class="icon-modify">Marksheet</a></li>
-            <li><a href="/assess/create/{CATEGORY_ID}/" class="icon-add">Create Quiz</a></li>
-            <li><a href="/submission/createSubmission/new/{CATEGORY_ID}/" class="icon-add">Post Due Work</a></li>
-        </ul>
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 column">
+                    <h2 class="subheader"><a href="/homepage/{CATEGORY_ID}">{CATEGORY}</a></h2>
+                </div>
+            </div>
+            <nav>
+                <a class="icon-more" title="" data-dropdown="header-options-{CATEGORY_ID}"></a>
+            </nav>
+            <ul id='header-options-{CATEGORY_ID}' class="f-dropdown" data-dropdown-content>
+                <!-- BEGIN learning_analytics -->
+                <li><a href="/learningAnalytics/course/{COURSE_FOLDER_ID}" class="icon-poll">{COURSE_FOLDER_NAME} Analytics</a></li>
+                <!-- END learning_analytics -->
+                <li><a href="/task/progressReport/{CATEGORY_ID}{SEM_SLUG}" class="icon-progress">Progress Report</a></li>
+                <li><a href="/submission/markSheet/{CATEGORY_ID}{SEM_SLUG}" class="icon-modify">Marksheet</a></li>
+                <li><a href="/assess/create/{CATEGORY_ID}/" class="icon-add">Create Quiz</a></li>
+                <li><a href="/submission/createSubmission/new/{CATEGORY_ID}/" class="icon-add">Post Due Work</a></li>
+            </ul>
+        </div>
 
         <ul class="meta">
             <li class="icon-staff-students">{STUDENTS} Students</li>
         </ul>
 
-        <table data-tablesorter>
-            <thead>
-                <tr>
-                    <th>Assignment Title</th>
-                    <th>Type</th>
-                    <th>Open Date</th>
-                    <th>Due Date</th>
-                    <th class="text-center">Submitted</th>
-                    <th class="text-center">Graded</th>
-                    <th class="text-center" data-orderable="false">Visibility</th>
-                    <th class="text-center" data-orderable="false"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- BEGIN submission_listing -->
-                <tr>
-                    <!-- BEGIN normalSubmission -->
-                    <td><a href="/submission/viewSubmission/{ID}">{ASSDESC}</a></td>
-                    <td>{TYPE}</td>
-                    <td data-order="{ASSESS_START_TIMESTAMP}">
-                        <!-- BEGIN writable_open -->
-                        {OPENDATE}
-                        <!-- END writable_open -->
-                        <!-- BEGIN readonly_open -->
-                        {OPENDATE}
-                        <!-- END readonly_open -->
-                    </td>
-                    <td data-order="{ASSESS_FINISH_TIMESTAMP}">
-                        <!-- BEGIN writable_close -->
-                        {DUEDATE}
-                        <!-- END writable_close -->
-                        <!-- BEGIN readonly_close -->
-                        {DUEDATE}
-                        <!-- END readonly_close -->
-                    </td>
-                    <td class="text-center">{TOTAL}</td>
-                    <td class="text-center">{MARKED}</td>
-                    <td class="text-center"><span class='{ASSESS_VISIBILITY_CSS}' title="{ASSESS_VISIBILITY}"></span></td>
-                    <!-- BEGIN readonly_duework -->
-                    <td class="text-center"></td>
-                    <!-- END readonly_duework -->
-                    <!-- BEGIN writable_duework -->
-                    <td class="actions-small-2">
-                        <nav>
-                            <a href="/submission/submissionForm.php?deleteBox={ID}" class="icon-delete"  title="Delete" onclick='return(confirm("Remove {JAVAASSDESC}?"));'></a>
-                            <a href="/submission/createSubmission/modify/{ID}" class="icon-modify" title="Modify"></a>
-                        </nav>
-                    </td>
-                    <!-- END writable_duework -->
-                    <!-- END normalSubmission -->
-                    <!-- BEGIN onlineAssessment -->
-                    <td><a href="/assess/results/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></td>
-                    <td>{ASSESS_TYPE}</td>
-                    <td data-timestamp="{ASSESS_START_TIMESTAMP}">{ASSESS_START}</td>
-                    <td data-timestamp="{ASSESS_FINISH_TIMESTAMP}">{ASSESS_FINISH}</td>
-                    <td class="text-center">{ASSESS_ATTEMPTS}</td>
-                    <td class="text-center">{ASSESS_REVIEWED}</td>
-                    <td class="text-center"><span class='{ASSESS_VISIBILITY_CSS}' title="{ASSESS_VISIBILITY}"></span></td>
-                    <!-- BEGIN readonly_assess -->
-                    <td class="text-center"></td>
-                    <!-- END readonly_assess -->
-                    <!-- BEGIN writable_assess -->
-                    <td class="actions-small-2">
-                        <nav>
-                            <a href="/assess/delete/{ASSESS_ASSESS_ID}" class="icon-delete" title="Delete" onclick='return(confirm("Remove {JAVAASSDESC}?"));'></a>
-                            <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="icon-modify" title="Modify"></a>
-                        </nav>
-                    </td>
-                    <!-- END writable_assess -->
-                    <!-- END onlineAssessment -->
-                </tr>
-                <!-- END submission_listing -->
-            </tbody>
-        </table>
+        <div class="scrollable">
+            <table data-tablesorter>
+                <thead>
+                    <tr>
+                        <th>Assignment Title</th>
+                        <th>Type</th>
+                        <th>Open Date</th>
+                        <th>Due Date</th>
+                        <th class="text-center">Submitted</th>
+                        <th class="text-center">Graded</th>
+                        <th class="text-center" data-orderable="false">Visibility</th>
+                        <th class="text-center" data-orderable="false"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- BEGIN submission_listing -->
+                    <tr>
+                        <!-- BEGIN normalSubmission -->
+                        <td><a href="/submission/viewSubmission/{ID}">{ASSDESC}</a></td>
+                        <td>{TYPE}</td>
+                        <td data-order="{ASSESS_START_TIMESTAMP}">
+                            <!-- BEGIN writable_open -->
+                            {OPENDATE}
+                            <!-- END writable_open -->
+                            <!-- BEGIN readonly_open -->
+                            {OPENDATE}
+                            <!-- END readonly_open -->
+                        </td>
+                        <td data-order="{ASSESS_FINISH_TIMESTAMP}">
+                            <!-- BEGIN writable_close -->
+                            {DUEDATE}
+                            <!-- END writable_close -->
+                            <!-- BEGIN readonly_close -->
+                            {DUEDATE}
+                            <!-- END readonly_close -->
+                        </td>
+                        <td class="text-center">{TOTAL}</td>
+                        <td class="text-center">{MARKED}</td>
+                        <td class="text-center"><span class='{ASSESS_VISIBILITY_CSS}' title="{ASSESS_VISIBILITY}"></span></td>
+                        <!-- BEGIN readonly_duework -->
+                        <td class="text-center"></td>
+                        <!-- END readonly_duework -->
+                        <!-- BEGIN writable_duework -->
+                        <td class="actions-small-2">
+                            <nav>
+                                <a href="/submission/submissionForm.php?deleteBox={ID}" class="icon-delete"  title="Delete" onclick='return(confirm("Remove {JAVAASSDESC}?"));'></a>
+                                <a href="/submission/createSubmission/modify/{ID}" class="icon-modify" title="Modify"></a>
+                            </nav>
+                        </td>
+                        <!-- END writable_duework -->
+                        <!-- END normalSubmission -->
+                        <!-- BEGIN onlineAssessment -->
+                        <td><a href="/assess/results/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></td>
+                        <td>{ASSESS_TYPE}</td>
+                        <td data-timestamp="{ASSESS_START_TIMESTAMP}">{ASSESS_START}</td>
+                        <td data-timestamp="{ASSESS_FINISH_TIMESTAMP}">{ASSESS_FINISH}</td>
+                        <td class="text-center">{ASSESS_ATTEMPTS}</td>
+                        <td class="text-center">{ASSESS_REVIEWED}</td>
+                        <td class="text-center"><span class='{ASSESS_VISIBILITY_CSS}' title="{ASSESS_VISIBILITY}"></span></td>
+                        <!-- BEGIN readonly_assess -->
+                        <td class="text-center"></td>
+                        <!-- END readonly_assess -->
+                        <!-- BEGIN writable_assess -->
+                        <td class="actions-small-2">
+                            <nav>
+                                <a href="/assess/delete/{ASSESS_ASSESS_ID}" class="icon-delete" title="Delete" onclick='return(confirm("Remove {JAVAASSDESC}?"));'></a>
+                                <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="icon-modify" title="Modify"></a>
+                            </nav>
+                        </td>
+                        <!-- END writable_assess -->
+                        <!-- END onlineAssessment -->
+                    </tr>
+                    <!-- END submission_listing -->
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 <!-- END category_listing -->
-
-<link rel="stylesheet" type="text/css" href="/javascript/components/datatables/media/css/jquery.dataTables.min.css">
-<script type="text/javascript" charset="utf-8" src="/javascript/components/datatables/media/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript">
-    $(function(){
-        $('[data-tablesorter]').DataTable({
-            paging: false,
-            searching: false
-        });
-    });
-</script>

@@ -1,4 +1,5 @@
 {BREADCRUMB}
+
 <div class="row">
     <div class="small-12 column">
         <h1>{ASSESS_TITLE}</h1>
@@ -8,29 +9,33 @@
         </ul>
     </div>
 </div>
+
 <div class="row">
     <div class="small-12 island">
-        <section>
-            <article class="content">
+        <section class="content">
+            <article>
                 {ASSESS_DESCRIPTION}
             </article>
-        <table>
-            <thead>
-                <tr>
-                    <th>Section</th>
-                    <th>Number of questions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- BEGIN section -->
-                <tr>
-                    <td>{SECTION_TITLE}</td>
-                    <td>{SECTION_NUMQUESTIONS}</td>
-                </tr>
-                <!-- END section -->
-                </tbody>
-        </table>
         </section>
+
+        <div class="scrollable">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Section</th>
+                        <th>Number of questions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- BEGIN section -->
+                    <tr>
+                        <td>{SECTION_TITLE}</td>
+                        <td>{SECTION_NUMQUESTIONS}</td>
+                    </tr>
+                    <!-- END section -->
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -59,7 +64,7 @@
                         </div>
                     </div>
                     <div class="one actions">
-                        <a href="/homepage/{ASSESS_FOLDER_ID}" class="icon-next no-text"></a>
+                        <a href="/homepage/{ASSESS_FOLDER_ID}" class="icon-next"></a>
                     </div>
                 </li>
                 <li class="row">
@@ -73,8 +78,8 @@
                         </div>
                     </div>
                     <div class="two actions">
-                        <a href="/search/user/{ASSESS_AUTHOR_ID}" class="icon-next no-text"></a>
-                        <a href="#" class="icon-email no-text"></a>
+                        <a href="/search/user/{ASSESS_AUTHOR_ID}" class="icon-next"></a>
+                        <a href="#" class="icon-email"></a>
                     </div>
                 </li>
             </ul>

@@ -9,7 +9,7 @@
 <!-- BEGIN welcome -->
 <div class="row">
     <div class="small-12 column">
-        <section class="alert-box secondary content">
+        <section class="alert-box content">
             <p>
                 Welcome to the Quiz Question Bank. Here you will find questions
                 that can be used in your Quiz. You can also store your own
@@ -25,15 +25,14 @@
 <div class="row">
     <div class="small-12 island">
         <!-- BEGIN category_selected -->
-        <h2 class="subheader">{QUESTION_CATEGORY}</h2>
-
         <form id='questionBankForm' action='/assess/questionbank/addToSection' method='post'>
             <input name='section_id' type='hidden' value='{SECTION_ID}'/>
 
+            <h2 class="subheader">{QUESTION_CATEGORY}</h2>
             <section>
                 <!-- BEGIN no_questions -->
                 <div class="content">
-                    <p>There are no questions in this category's Question Bank.</p>
+                    <p>There are no questions in this folder's Question Bank.</p>
                 </div>
                 <!-- END no_questions -->
 
@@ -50,7 +49,7 @@
                         </div>
                         <div class="eight-column">
                             <!-- BEGIN missing_class -->
-                            <div class="alert-panel">
+                            <div class="alert-box warning">
                                 <p>
                                     This question type no longer exists - it cannot be copied to the
                                     Quiz, and should be removed from the Question Bank.
@@ -123,7 +122,7 @@
                 <a class="button icon-modify" href="#" data-reveal-id="edit-category-modal">Edit Category</a>
 
                 <div id="edit-category-modal" class='reveal-modal' data-reveal>
-                    <form action='/assess/questionbank/modify.php' method='post'>
+                    <form action='/assess/questionbank/modify.php' class='top' method='post'>
                         <input name='questionCategoryId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
 
                         <label>
@@ -131,7 +130,11 @@
                             <input class='required' name='name' type='text' value='{QUESTION_CATEGORY}' />
                         </label>
 
-                        <input type='submit' value='Rename Category' />
+                        <div class="row">
+                            <div class="small-12 columns no-pad">
+                                <input type='submit' value='Rename Category' />
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <!-- END has_edit_category -->
@@ -139,7 +142,7 @@
                 <a class="button icon-add" href="#" data-reveal-id="add-subcategory-modal">Add Subcategory</a>
 
                 <div id="add-subcategory-modal" class='reveal-modal' data-reveal>
-                    <form action='/assess/questionbank/create' method='post'>
+                    <form action='/assess/questionbank/create' class="top" method='post'>
                         <input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
 
                         <label>
@@ -147,7 +150,11 @@
                             <input class="required" name='name' type='text' value=''  />
                         </label>
 
-                        <input type='submit' value='Add New Subcategory' />
+                        <div class="row">
+                            <div class="small-12 columns no-pad">
+                                <input type='submit' value='Add New Subcategory' />
+                            </div>
+                        </div>
                     </form>
                 </div>
 

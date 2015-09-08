@@ -1,23 +1,24 @@
-<table>
-    <thead>
+<div class="scrollable">
+    <table>
+        <thead>
+            <tr>
+                <th><a href="/adminv2/reports/{SORT_BASE}/date/{SORT_DATE_DIR}">Date</a></th>
+                <th><a href="/adminv2/reports/{SORT_BASE}/user/{SORT_USER_DIR}">User</a></th>
+                <th><a href="/adminv2/reports/{SORT_BASE}/role/{SORT_ROLE_DIR}">Role</a></th>
+                <th><a href="/adminv2/reports/{SORT_BASE}/login/{SORT_LOGIN_DIR}">Action</a></th>
+                <th><a href="/adminv2/reports/{SORT_BASE}/ip/{SORT_IP_DIR}">Originating IP</a></th>
+            </tr>
+        </thead>
+        <tbody>
+        <!-- BEGIN activity -->
         <tr>
-            <th><a href="/adminv2/reports/{SORT_BASE}/date/{SORT_DATE_DIR}">Date</a></th>
-            <th><a href="/adminv2/reports/{SORT_BASE}/user/{SORT_USER_DIR}">User</a></th>
-            <th><a href="/adminv2/reports/{SORT_BASE}/role/{SORT_ROLE_DIR}">Role</a></th>
-            <th><a href="/adminv2/reports/{SORT_BASE}/login/{SORT_LOGIN_DIR}">Action</a></th>
-            <th><a href="/adminv2/reports/{SORT_BASE}/ip/{SORT_IP_DIR}">Originating IP</a></th>
+            <td>{DATE}</td>
+            <td><a href="/search/user/{UID}">{USERNAME}</a></td>
+            <td>{ROLE}</td>
+            <td>{ACTION}</td>
+            <td>{IP}</td>
         </tr>
-    </thead>
-    <tbody>
-    <!-- BEGIN activity -->
-    <tr>
-        <td>{DATE}</td>
-        <td><a href="/search/user/{UID}">{USERNAME}</a></td>
-        <td>{ROLE}</td>
-        <td>{ACTION}</td>
-        <td>{IP}</td>
-    </tr>
-    <!-- END activity -->
-    </tbody>
-</table>
-
+        <!-- END activity -->
+        </tbody>
+    </table>
+</div>

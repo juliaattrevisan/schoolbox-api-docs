@@ -10,7 +10,7 @@ if (!$groupHandler->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'adminv2/home.html');
 $this->setBlock(TEMPLATE_content, 'group_summary', 'group_summary_block');
 $this->setBlock(TEMPLATE_content, 'recent_log', 'recent_log_block');
-$this->setBlock(TEMPLATE_content, 'memory', 'memory_block');
+//$this->setBlock(TEMPLATE_content, 'memory', 'memory_block');
 $this->setBlock(TEMPLATE_content, 'no_js_warning', 'no_js_warning_block');
 
 // include the admin navigation
@@ -50,9 +50,9 @@ if(is_readable('/proc/meminfo')) {
         'MEMORY_GRADIENT' => $memGradient
     );
     $this->setVar($memory);
-    $this->parse('memory_block', 'memory');
+//    $this->parse('memory_block', 'memory');
 } else {
-    $this->setVar('memory_block', '');
+//    $this->setVar('memory_block', '');
 }
 
 /* External system checks */

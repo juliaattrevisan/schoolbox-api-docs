@@ -2,7 +2,7 @@
 
 {% block body %}
 <div class="row">
-    <div class="small-12 large-12 columns overflow">
+    <div class="small-12 large-12 columns scrollable">
         <table>
             <thead>
                 <tr>
@@ -77,20 +77,16 @@
         <h2 class="subheader">Campus Mapping</h2>
     </div>
     <div class="small-12 large-5 island">
-        <section>
-            <div class="content">
-                {% include 'adminv2/synchronise/sub/campus/external.twig' %}
-            </div>
+        <section class="content">
+            {% include 'adminv2/synchronise/sub/campus/external.twig' %}
         </section>
     </div>
     <div class="small-12 large-2 columns text-center">
         =
     </div>
     <div class="small-12 large-5 island">
-        <section>
-            <div class="content">
-                {% include 'adminv2/synchronise/sub/campus/schoolbox.twig' %}
-            </div>
+        <section class="content">
+            {% include 'adminv2/synchronise/sub/campus/schoolbox.twig' %}
         </section>
     </div>
 </div>
@@ -100,20 +96,16 @@
         <h2 class="subheader">Role Mapping</h2>
     </div>
     <div class="small-12 large-5 island">
-        <section>
-            <div class="content">
-                {% include 'adminv2/synchronise/sub/role/staff/external.twig' %}
-            </div>
+        <section class="content">
+            {% include 'adminv2/synchronise/sub/role/staff/external.twig' %}
         </section>
     </div>
     <div class="small-12 large-2 columns text-center">
         =
     </div>
     <div class="small-12 large-5 island">
-        <section>
-            <div class="content">
-                {% include 'adminv2/synchronise/sub/role/schoolbox.twig' %}
-            </div>
+        <section class="content">
+            {% include 'adminv2/synchronise/sub/role/schoolbox.twig' %}
         </section>
     </div>
 </div>

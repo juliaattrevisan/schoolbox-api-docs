@@ -9,33 +9,33 @@
         <!-- BEGIN submit_news -->
         <!-- END submit_news -->
         <section>
-            <ul class="information-list">
+            <ul class="action-list">
                 <!-- BEGIN news -->
-                <li class="row" data-equalizer>
-                    <div class="small-11 columns" data-equalizer-watch>
-                        <h2>{NEWS_HEADING}</h2>
-                        <div class="avatar card">
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
                             <a href="/search/user/{AUTHOR_ID}" title="View Profile">
-                                <img src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square64" alt="View Profile" />
-                                <p>{AUTHOR}</p>
+                                <img src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square64" alt="" />
+                                <p>{NEWS_HEADING}</p>
                             </a>
+                            <p class="meta">{AUTHOR}</p>
                             <p class="meta">Posted {POSTED_DATE}</p>
                         </div>
-                    </div>
-                    <div class="one actions">
-                        <!-- BEGIN can_modify -->
-                        <a class="icon-modify no-text" href="/news/homepage/{NEWS_ID}" title="Modify News"></a>
-                        <!-- END can_modify -->
-                    </div>
-
-                    <div class="small-12 columns">
                         <article>
                             {NEWS_BODY}
                         </article>
                     </div>
+                    <nav>
+                        <!-- BEGIN can_modify -->
+                        <a class="icon-modify" href="/news/homepage/{NEWS_ID}" title="Modify News"></a>
+                        <!-- END can_modify -->
+                    </nav>
                 </li>
                 <!-- END news -->
             </ul>
         </section>
     </div>
 </div>
+
+
+

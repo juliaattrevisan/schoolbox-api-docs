@@ -1,3 +1,13 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
+<script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-definition-palette]').configurator().start();
+    });
+</script>
+<!-- END custom_head -->
+
 {ADMIN_NAV}
         
 <h2>
@@ -7,7 +17,7 @@
 </h2>
 
 <div class="row">
-    <div class="large-3 columns">
+    <div class="small-12 large-3 columns">
         <div data-definition-palette>
             <select data-group-select>
                 <!-- BEGIN group -->
@@ -21,7 +31,7 @@
         </div>
     </div>
 
-    <div class="large-9 columns">
+    <div class="small-12 large-9 columns">
         <div class="dashboard" data-dashboard-layout>
             <!-- BEGIN layout --><!-- END layout -->
         </div>
@@ -29,11 +39,3 @@
 </div>
 
 <div id="resource-browser" class="hide"></div>
-
-<script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
-<script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $('[data-definition-palette]').configurator().start();
-    });
-</script>

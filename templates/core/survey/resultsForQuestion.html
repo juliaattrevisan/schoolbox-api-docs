@@ -1,3 +1,4 @@
+<!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/evaluation/evaluation.graphs.js"></script>
 
@@ -19,6 +20,7 @@ $(function() {
     });
 });
 </script>
+<!-- END custom_head -->
 
 {BREADCRUMB}
 
@@ -31,12 +33,12 @@ $(function() {
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Responses</h2>
-        <section>
-            <div class="content">
-                <div class="row">
-                    <div class="small-12 large-6 columns">
-                        <article>{QUESTION_QUESTION}</article>
+        <section class="content">
+            <div class="row">
+                <div class="small-12 large-6 columns">
+                    <article>{QUESTION_QUESTION}</article>
 
+                    <div class="scrollable">
                         <table>
                             <thead>
                                 <tr>
@@ -50,33 +52,31 @@ $(function() {
                                 </tr>
                             </thead>
                             <tbody>
-                            <!-- BEGIN respondent -->
-                            <tr>
-                                <!-- BEGIN respondent_name -->
-                                <td>
-                                    <span data-response="{RESPONDENT_RESPONSE_DATA}">{RESPONDENT_NAME}</span>
-                                </td>
-                                <!-- END respondent_name -->
-                                <td>
-                                    <ul class="inline-list">
-                                        <li>
-                                            <a href="#" data-response-item="{RESPONDENT_RESPONSE_DATA}">{RESPONDENT_RESPONSE}</a>
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-                            <!-- END respondent -->
+                                <!-- BEGIN respondent -->
+                                <tr>
+                                    <!-- BEGIN respondent_name -->
+                                    <td>
+                                        <span data-response="{RESPONDENT_RESPONSE_DATA}">{RESPONDENT_NAME}</span>
+                                    </td>
+                                    <!-- END respondent_name -->
+                                    <td>
+                                        <ul class="inline-list">
+                                            <li>
+                                                <a href="#" data-response-item="{RESPONDENT_RESPONSE_DATA}">{RESPONDENT_RESPONSE}</a>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <!-- END respondent -->
                             </tbody>
                         </table>
                     </div>
-                    <div class="small-12 large-6 columns">
-                        <!-- BEGIN graph -->
-                        <!-- END graph -->
-                    </div>
+                </div>
+                <div class="small-12 large-6 columns">
+                    <!-- BEGIN graph -->
+                    <!-- END graph -->
                 </div>
             </div>
         </section>
     </div>
 </div>
-
-

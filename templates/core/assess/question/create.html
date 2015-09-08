@@ -8,10 +8,11 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Create Question</h2>
         <form id="createQuestionForm" action="/{ASSESS_KIND_LC}/question/create" method="post">
             <input name="section_id" type="hidden" value="{SECTION_ID}" />
             <input name="sequence" type="hidden" value="{SEQUENCE}" />
+
+            <h2 class="subheader">Create Question</h2>
             <section class="content">
                 <label>
                     Question Type
@@ -32,9 +33,11 @@
                 <!-- BEGIN has_answer_configuration -->
                 <fieldset>
                     <legend>Configuration Options</legend>
+                    <div class="small-12 column">
                     <!-- BEGIN answer_configuration -->
 
                     <!-- END answer_configuration -->
+                    </div>
                 </fieldset>
                 <!-- END has_answer_configuration -->
 

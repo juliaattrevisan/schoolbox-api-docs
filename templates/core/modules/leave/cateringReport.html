@@ -1,73 +1,5 @@
-<span class="header-actions">
-    <a class="button icon-print" href="javascript:window.print()">Print</a>
-    <a class="button icon-export" data-action="export" title="Export">Export</a>
-</span>
-
-<h1>Catering Report</h1>
-
-<!-- BEGIN no_houses -->
-No houses found.
-<!-- END no_houses -->
-<!-- BEGIN house_list -->
-
-<form data-form_type="search">
-    <input type="hidden" name="reportHouse" value="1" />
-    <fieldset>
-        <legend>Search</legend>
-        <div class="large-10 columns">
-            <input data-datepicker id="reportDate" name="reportDate" type="text" value="{REPORT_DATE}">
-        </div>
-        <div class="large-2 columns">
-            <button data-action="search" data-tooltip aria-haspopup="true" title="Search" class="icon-search">Search</button>
-        </div>
-    </fieldset>
-</form>
-
-<p>The following shows the number of people in each House who require food.</p>
-
-<table>
-    <thead>
-        <tr>
-            <th></th>
-            <!-- BEGIN request_date_header -->
-            <th colspan='3'>{REQUEST_DATE_HEADER_DATE}</th>
-            <!-- END request_date_header -->
-        </tr>
-        <tr>
-            <th>House</th>
-            <th>Breakfast</th>
-            <th>Lunch</th>
-            <th>Dinner</th>
-            <th>Breakfast</th>
-            <th>Lunch</th>
-            <th>Dinner</th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- BEGIN house -->
-        <tr>
-            <td><a href="/modules/leave/house/{HOUSE_ID}">{HOUSE_NAME}</a></td>
-            <!-- BEGIN request_period -->
-            <td>{REQUEST_PERIOD_MORNING}</td>
-            <td>{REQUEST_PERIOD_DAY}</td>
-            <td>{REQUEST_PERIOD_NIGHT}</td>
-            <!-- END request_period -->
-        </tr>
-        <!-- END house -->
-    </tbody>
-    <tfoot>
-        <tr>
-            <td>Total</td>
-            <!-- BEGIN request_period_total -->
-            <td>{REQUEST_PERIOD_TOTAL_MORNING}</td>
-            <td>{REQUEST_PERIOD_TOTAL_DAY}</td>
-            <td>{REQUEST_PERIOD_TOTAL_NIGHT}</td>
-            <!-- END request_period_total -->
-        </tr>
-    </tfoot>
-</table>
-<!-- END house_list -->
-
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
 <script type="text/javascript">
     $(function() {
         $('input[data-datepicker]').datepicker({
@@ -95,5 +27,103 @@ No houses found.
 
             window.location.href = location;
         });
+
+        $('[data-print]').artificialPrint();
     });
 </script>
+<!-- END custom_head -->
+
+<div class="actions-small-2 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Catering Report</h1>
+        </div>
+    </div>
+    <nav>
+        <a class="icon-print" title="Print" data-print></a>
+        <a class="icon-export" data-action="export" title="Export"></a>
+    </nav>
+</div>
+
+<!-- BEGIN no_houses -->
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <p>
+                No houses found.
+            </p>
+        </section>
+    </div>
+</div>
+<!-- END no_houses -->
+
+<!-- BEGIN house_list -->
+<div class="row">
+    <div class="small-12 island">
+        <form data-form_type="search">
+            <input type="hidden" name="reportHouse" value="1" />
+
+            <section class="content">
+                <fieldset>
+                    <legend>Search</legend>
+                    <div class="large-10 columns">
+                        <input data-datepicker id="reportDate" name="reportDate" type="text" value="{REPORT_DATE}">
+                    </div>
+                    <div class="large-2 columns">
+                        <button data-action="search" title="Search" class="icon-search">Search</button>
+                    </div>
+                </fieldset>
+            </section>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <p>The following shows the number of people in each House who require food.</p>
+        </section>
+        <table>
+            <thead>
+            <tr>
+                <th></th>
+                <!-- BEGIN request_date_header -->
+                <th colspan='3'>{REQUEST_DATE_HEADER_DATE}</th>
+                <!-- END request_date_header -->
+            </tr>
+            <tr>
+                <th>House</th>
+                <th>Breakfast</th>
+                <th>Lunch</th>
+                <th>Dinner</th>
+                <th>Breakfast</th>
+                <th>Lunch</th>
+                <th>Dinner</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- BEGIN house -->
+            <tr>
+                <td><a href="/modules/leave/house/{HOUSE_ID}">{HOUSE_NAME}</a></td>
+                <!-- BEGIN request_period -->
+                <td>{REQUEST_PERIOD_MORNING}</td>
+                <td>{REQUEST_PERIOD_DAY}</td>
+                <td>{REQUEST_PERIOD_NIGHT}</td>
+                <!-- END request_period -->
+            </tr>
+            <!-- END house -->
+            </tbody>
+            <tfoot>
+            <tr>
+                <td>Total</td>
+                <!-- BEGIN request_period_total -->
+                <td>{REQUEST_PERIOD_TOTAL_MORNING}</td>
+                <td>{REQUEST_PERIOD_TOTAL_DAY}</td>
+                <td>{REQUEST_PERIOD_TOTAL_NIGHT}</td>
+                <!-- END request_period_total -->
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<!-- END house_list -->

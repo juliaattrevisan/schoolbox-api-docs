@@ -1,61 +1,69 @@
 {BREADCRUMB}
 
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{CATEGORY} Forum</h1>
+        </div>
+    </div>
+    <nav>
+        <!-- BEGIN forum_post -->
+        <a class="icon-add" href="/forum/modify/{CATEGORY_ID}"></a>
+        <!-- END forum_post -->
+    </nav>
+</div>
+
 <div class="row">
     <div class="small-12 island">
-        <h1>{CATEGORY} Forum</h1>
-
-        <!-- BEGIN forum_post -->
-        <span class="header-actions">
-            <a class="button icon-add" href="/forum/modify/{CATEGORY_ID}">Post Thread</a>
-        </span>
-        <!-- END forum_post -->
-
         <form action="/forum/modifyForm.php" method="post">
-            <table>
-                <thead>
+            <div class="scrollable">
+                <table>
+                    <thead>
+                        <tr>
+                            <!-- BEGIN modify_heading -->
+                            <th></th>
+                            <!-- END modify_heading -->
+                            <th>Forum</th>
+                            <th>Author</th>
+                            <th>Replies</th>
+                            <th>Views</th>
+                            <th>Last Post</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <!-- BEGIN thread -->
                     <tr>
-                        <!-- BEGIN modify_heading -->
-                        <th></th>
-                        <!-- END modify_heading -->
-                        <th>Forum</th>
-                        <th>Author</th>
-                        <th>Replies</th>
-                        <th>Views</th>
-                        <th>Last Post</th>
+                        <!-- BEGIN modify_thread -->
+                        <td>
+                            <input id="deleteThreads{THREAD_ID}" type="checkbox" name="deleteThreads[]" value="{THREAD_ID}" />
+                            <label for="deleteThreads{THREAD_ID}" class="checkbox-label"></label>
+                        </td>
+                        <!-- END modify_thread -->
+                        <td>
+                            <a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE} {THREAD_LOCKED}</a>
+                        </td>
+                        <td>
+                            <a href="/search/user/{THREAD_AUTHOR_ID}" title="View Profile">
+                                {THREAD_AUTHOR}
+                            </a>
+                            <p class="meta">Posted {THREAD_TIME}</p>
+                        </td>
+                        <td>{THREAD_REPLIES}</td>
+                        <td>{THREAD_VIEWS}</td>
+                        <td>
+                            <!-- BEGIN last_post -->
+                            <a href="/search/user/{THREAD_LAST_POST_USER_ID}" title="View Profile">
+                                {THREAD_LAST_POST_USER}
+                            </a>
+                            <p class="meta">Posted {THREAD_LAST_POST_TIME}</p>
+                            <!-- END last_post -->
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                <!-- BEGIN thread -->
-                <tr>
-                    <!-- BEGIN modify_thread -->
-                    <td>
-                        <input id="deleteThreads{THREAD_ID}" type="checkbox" name="deleteThreads[]" value="{THREAD_ID}" />
-                        <label for="deleteThreads{THREAD_ID}" class="checkbox-label"></label>
-                    </td>
-                    <!-- END modify_thread -->
-                    <td>
-                        <a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE} {THREAD_LOCKED}</a>
-                    </td>
-                    <td>
-                        <a href="/search/user/{THREAD_AUTHOR_ID}" title="View Profile">
-                            {THREAD_AUTHOR}
-                        </a>
-                        <p class="meta">Posted {THREAD_TIME}</p>
-                    </td>
-                    <td>{THREAD_REPLIES}</td>
-                    <td>{THREAD_VIEWS}</td>
-                    <td>
-                        <!-- BEGIN last_post -->
-                        <a href="/search/user/{THREAD_LAST_POST_USER_ID}" title="View Profile">
-                            {THREAD_LAST_POST_USER}
-                        </a>
-                        <p class="meta">Posted {THREAD_LAST_POST_TIME}</p>
-                        <!-- END last_post -->
-                    </td>
-                </tr>
-                <!-- END thread -->
-                </tbody>
-            </table>
+                    <!-- END thread -->
+                    </tbody>
+                </table>
+            </div>
+
             <!-- BEGIN no_thread -->
             <div class="alert-box icon-alert">
                 This forum is currently empty. Post a new thread to get started.

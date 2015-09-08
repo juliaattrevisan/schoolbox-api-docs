@@ -1,71 +1,4 @@
-{ADMIN_NAV}
-        
-<h2>
-    Homepage Templates
-    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You can drag and reorder the main components of the homepage template here. Grab one from the left column and
-        move it to the right boxes or just reorganise the components that are already active.">?</span>
-</h2>
-
-<div class="row">
-    <div class="large-3 columns">
-        <div data-definition-palette>
-            <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST">
-                <input type="hidden" name="action" value="delete" />
-
-                <select data-template-select name="template">
-                    <!-- BEGIN template -->
-                    <option value="{template.id}">{template.name}</option>
-                    <!-- END template -->
-                </select>
-
-                <a data-button="new" class="button icon-add" href="#">Create</a>
-                <a data-button="rename" class="button icon-modify" href="#">Rename</a>
-                <a data-button="delete" class="button icon-delete" href="#" >Delete</a>
-            </form>
-
-            <!-- BEGIN definition -->
-            <div class="component definition-id-{definition.id} {definition.singleton}">{definition.name}</div>
-            <!-- END definition -->
-        </div>
-    </div>
-
-    <div class="large-9 columns">
-        <div data-homepage-layout>
-            <!-- BEGIN layout --><!-- END layout -->
-        </div>
-    </div>
-</div>
-
-<div data-form="new" title="Add new homepage template">
-    <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST">
-        <label>
-            Template name
-            <input type="text" name="name" />
-        </label>
-        <input type="submit" name="action" value="Create" />
-    </form>
-</div>
-
-<div data-form="rename" title="Rename existing homepage template">
-    <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST">
-        <label>
-            Existing Template
-            <select id="template-select" name="template" >
-                <!-- BEGIN template -->
-                <option value="{template.id}">{template.name}</option>
-                <!-- END template -->
-            </select>
-        </label>
-        <label>
-            New name
-            <input type="text" name="name"/>
-        </label>
-        <input type="submit" name="action" value="Rename" />
-    </form>
-</div>
-
-<div id="resource-browser" class="hide"></div>
-
+<!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
 <script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
@@ -111,3 +44,72 @@
         });
     });
 </script>
+<!-- END custom_head -->
+
+{ADMIN_NAV}
+        
+<h2>
+    Homepage Templates
+    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You can drag and reorder the main components of the homepage template here. Grab one from the left column and
+        move it to the right boxes or just reorganise the components that are already active.">?</span>
+</h2>
+
+<div class="row">
+    <div class="small-12 large-3 columns">
+        <div data-definition-palette>
+            <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST">
+                <input type="hidden" name="action" value="delete" />
+
+                <select data-template-select name="template">
+                    <!-- BEGIN template -->
+                    <option value="{template.id}">{template.name}</option>
+                    <!-- END template -->
+                </select>
+
+                <a data-button="new" class="button icon-add" href="#">Create</a>
+                <a data-button="rename" class="button icon-modify" href="#">Rename</a>
+                <a data-button="delete" class="button icon-delete" href="#" >Delete</a>
+            </form>
+
+            <!-- BEGIN definition -->
+            <div class="component definition-id-{definition.id} {definition.singleton}">{definition.name}</div>
+            <!-- END definition -->
+        </div>
+    </div>
+
+    <div class="small-12 large-9 columns">
+        <div data-homepage-layout>
+            <!-- BEGIN layout --><!-- END layout -->
+        </div>
+    </div>
+</div>
+
+<div data-form="new" title="Add new homepage template">
+    <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST">
+        <label>
+            Template name
+            <input type="text" name="name" />
+        </label>
+        <input type="submit" name="action" value="Create" />
+    </form>
+</div>
+
+<div data-form="rename" title="Rename existing homepage template">
+    <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST">
+        <label>
+            Existing Template
+            <select id="template-select" name="template" >
+                <!-- BEGIN template -->
+                <option value="{template.id}">{template.name}</option>
+                <!-- END template -->
+            </select>
+        </label>
+        <label>
+            New name
+            <input type="text" name="name"/>
+        </label>
+        <input type="submit" name="action" value="Rename" />
+    </form>
+</div>
+
+<div id="resource-browser" class="hide"></div>

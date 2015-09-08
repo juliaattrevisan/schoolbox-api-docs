@@ -1,134 +1,313 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript">
+    $(function() {
+
+        /**
+         * AJAX submit of forms (used by groups and services)
+         */
+        $(':input[data-autosubmit]').change(function() {
+            var form = $(this.form);
+            $.post('/adminv2/userForm.php', form.serializeArray());
+        });
+
+        /**
+         * Show/hide password
+         */
+        var passwordDisplayer = $('[data-role="passwordDisplay"]');
+        if (passwordDisplayer.length) {
+            var passwordShow = passwordDisplayer.find('[data-action="show"]');
+            var passwordHide = passwordDisplayer.find('[data-action="hide"]');
+            var passwordView = passwordDisplayer.find('[data-relation="password"]');
+            passwordShow.show();
+            passwordHide.hide();
+            passwordView.hide();
+            passwordShow.click(function(e) {
+                e.preventDefault();
+                passwordShow.hide();
+                passwordHide.show();
+                passwordView.show();
+            });
+            passwordHide.click(function(e) {
+                e.preventDefault();
+                passwordShow.show();
+                passwordHide.hide();
+                passwordView.hide();
+            });
+        }
+
+        /**
+         * Hide campus selector if I selected a service that doesn't use them
+         */
+        var addServiceForm = $('form[data-action="addService"]');
+        addServiceForm.on(
+            'change',
+            ':input[data-role="serviceSelector"]',
+            function() {
+                // Search for this item, disable others
+                var currentService = $(this).find(':selected').data('identifier');
+                var selectors      = addServiceForm.find(':input[data-service-type]');
+                selectors.hide();
+                selectors.filter('[data-service-type="'+currentService+'"]').show();
+            }
+        );
+
+        /**
+         * User details validation
+         */
+        $('form[data-validatable-as="userDetails"]').validate({
+            rules: {
+                alt_email: {
+                    email:true
+                },
+                firstname: {
+                    require_from_group: [1, '[data-relation="name"]']
+                },
+                lastname: {
+                    require_from_group: [1, '[data-relation="name"]']
+                }
+            },
+            messages: {
+                firstname: {
+                    require_from_group: "Please enter either a first name or surname"
+                },
+                lastname: {
+                    require_from_group: "Please enter either a first name or surname"
+                },
+                defaultCampus: "Please select a default campus",
+                alt_email: "If you are entering an alternative email, please ensure it's a valid address"
+            },
+            errorPlacement: function(error, element) {
+                if (element.is('[data-role="defaultCampus"]')) {
+                    error.css('margin', 0);
+                    error.insertAfter(element.closest('[data-role="campusList"]'));
+                } else {
+                    error.insertAfter(element)
+                }
+            }
+        });
+
+        /**
+         * Service validation
+         */
+        $('form[data-validatable-as="addService"]').validate();
+
+        $('form[data-validatable-as="addGroup"]').validate();
+
+        // Handles autosuggest for linking users to other user accounts
+        var addUserSelector = $(':input[data-selectizeuser="addUser"]');
+        var addUserButton   = $(addUserSelector.prop('form')).find(':submit');
+        addUserSelector
+                .selectizeSelector({
+                    multiple: true,
+                    ajax: {
+                        url:      '/ajax/user.php',
+                        type:     'GET',
+                        data:     {groupID: 0},
+                        dataType: 'json'
+                    }
+                })
+                .on('selectize.item_add', function() {
+                    addUserButton.prop('disabled', false);
+                })
+                .on('selectize.item_remove', function() {
+                    // Disable only if empty
+                    if ($(this).data('selectize').items.length === 0) {
+                        addUserButton.prop('disabled', true);
+                    }
+                });
+
+        /**
+         * Confirm update of superuser field
+         */
+        $('input[data-role="superuser"]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Change this user\'s superuser status?',
+                confirmEvent: function(element) {
+                    element.prop('checked', !(element.prop('checked')));
+                }
+            });
+        });
+
+        /**
+         * Confirm update of account enabled field
+         */
+        $('input[data-role="enabled"]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Change this user\'s account status?',
+                confirmEvent: function(element) {
+                    element.prop('checked', !(element.prop('checked')));
+                }
+            });
+        });
+
+        $('[data-delete]').click(function(event) {
+            event.preventDefault();
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this user?',
+                confirmEvent: function() {
+                    var form = $('[data-modify-user-form]');
+
+                    form.find('input[name=type]').val('delete');
+                    form.submit();
+                }
+            });
+        });
+
+        /* Log in as user via the jtm
+         */
+        $('[data-assimilator]').click(function(event) {
+            event.preventDefault();
+
+            $('[data-assimilator-form]').submit();
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 {ADMIN_NAV}
 
-<div class="row">
-    <div class="large-12 columns">
-        <h2>{FULLNAME}</h2>
-        <span class="header-actions">
-            <form method="POST" action="/adminv2/userForm.php">
-                <input type="hidden" name="login" value="{USERNAME}" />
-                <input type="submit" {ASSUME_CLASS} value="{ASSUME_PROMPT}" />
-            </form>
-        </span>
+<div class="actions-small-2 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h2 class="subheader">{FULLNAME}</h2>
+        </div>
     </div>
+    <nav>
+        <a class="icon-staff-students" title="{ASSUME_PROMPT}" data-assimilator></a>
+        <a class="icon-more" title="" data-dropdown="header-options"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li><a class="icon-delete" title="Delete User" data-delete>Delete User</a></li>
+    </ul>
 </div>
+
+<form method="POST" action="/adminv2/userForm.php" data-assimilator-form>
+    <input type="hidden" name="login" value="{USERNAME}" />
+</form>
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">User Detail</h2>
-        <section>
-            <div class="content">
-                <div class="row">
-                    <form method="POST" action="/adminv2/userForm.php" data-validatable-as="userDetails">
-                        <div class="small-12 medium-6 island">
-                            <label for="title">Title</label>
-                            <select id="title" name="title">
-                                <!-- BEGIN title -->
-                                <option value="{NAME_TITLE}" {NAME_TITLE_SELECTED}>{NAME_TITLE}</option>
-                                <!-- END title -->
-                            </select>
-                            <label for="firstname">First Name</label>
-                            <input id="firstname" type="text" name="firstname" value="{FIRSTNAME}" data-relation="name" />
+        <h3 class="subheader">User Detail</h3>
+        <section class="content">
+            <div class="row">
+                <form method="POST" action="/adminv2/userForm.php" data-validatable-as="userDetails" data-modify-user-form>
+                    <input type="hidden" name="type" value="modify" />
 
-                            <label for="lastname">Surname</label>
-                            <input id="lastname" type="text" name="lastname" value="{LASTNAME}" data-relation="name" />
+                    <div class="small-12 medium-6 island">
+                        <label for="title">Title</label>
+                        <select id="title" name="title">
+                            <!-- BEGIN title -->
+                            <option value="{NAME_TITLE}" {NAME_TITLE_SELECTED}>{NAME_TITLE}</option>
+                            <!-- END title -->
+                        </select>
+                        <label for="firstname">First Name</label>
+                        <input id="firstname" type="text" name="firstname" value="{FIRSTNAME}" data-relation="name" />
 
-                            <label for="database" class="">{DATABASE_TYPE} ID</label>
-                            <input id="database" type="text" name="database_id" value="{DATABASE_ID}"/>
+                        <label for="lastname">Surname</label>
+                        <input id="lastname" type="text" name="lastname" value="{LASTNAME}" data-relation="name" />
 
-                            <label for="userId">Schoolbox User ID</label>
-                            <input id="userId" type="text" disabled value="{USERID}"/>
-                            <!-- submit user ID anyway -->
-                            <input type="hidden" name="userID" value="{USERID}" />
+                        <label for="database">{DATABASE_TYPE} ID</label>
+                        <input id="database" type="text" name="database_id" value="{DATABASE_ID}"/>
 
-                            <label for="group">Role</label>
-                            <select id="group" name="group">
-                                <!-- BEGIN system_group -->
-                                <option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
-                                <!-- END system_group -->
-                            </select>
+                        <label for="userId">Schoolbox User ID</label>
+                        <input id="userId" type="text" disabled value="{USERID}"/>
+                        <!-- submit user ID anyway -->
+                        <input type="hidden" name="userID" value="{USERID}" />
 
-                            <label>Campus</label>
-                            <table data-role="campusList">
-                                <tbody>
-                                <!-- BEGIN campus -->
-                                <tr>
-                                    <td>{CAMPUS_NAME}</td>
-                                    <td>
-                                        <input id="defaultCampus-{CAMPUS_ID}" data-role="defaultCampus" type="radio" name="defaultCampus" value="{CAMPUS_ID}" {CAMPUS_DEFAULT_CHECKED} required />
-                                        <label for="defaultCampus-{CAMPUS_ID}" class="radio-label">Default?</label>
-                                    </td>
-                                    <td>
-                                        <input id="campus-{CAMPUS_ID}" type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_CHECKED} />
-                                        <label for="campus-{CAMPUS_ID}" class="checkbox-label">Involved?</label>
-                                    </td>
-                                </tr>
-                                <!-- END campus -->
-                                </tbody>
-                            </table>
+                        <label for="group">Role</label>
+                        <select id="group" name="group">
+                            <!-- BEGIN system_group -->
+                            <option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
+                            <!-- END system_group -->
+                        </select>
+
+                        <label>Campus</label>
+                        <table data-role="campusList">
+                            <tbody>
+                            <!-- BEGIN campus -->
+                            <tr>
+                                <td>{CAMPUS_NAME}</td>
+                                <td>
+                                    <input id="defaultCampus-{CAMPUS_ID}" data-role="defaultCampus" type="radio" name="defaultCampus" value="{CAMPUS_ID}" {CAMPUS_DEFAULT_CHECKED} required />
+                                    <label for="defaultCampus-{CAMPUS_ID}" class="radio-label">Default?</label>
+                                </td>
+                                <td>
+                                    <input id="campus-{CAMPUS_ID}" type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_CHECKED} />
+                                    <label for="campus-{CAMPUS_ID}" class="checkbox-label">Involved?</label>
+                                </td>
+                            </tr>
+                            <!-- END campus -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="small-12 medium-6 island">
+                        <label for ="username">Username</label>
+                        <input id="username" type="text" class="required" name="modusername" value="{USERNAME}" />
+
+                        <label for="password">Password</label>
+                        <input id="password" type="password" name="modpassword" class="password" value="{PASSWORD}" />
+
+                        <!-- BEGIN reveal_password -->
+                        <div data-role="passwordDisplay">
+                            <a href="#" data-action="show">Reveal Password</a>
+                            <span data-relation="password">{CLEAR_PASSWORD}</span>
+                            <a href="#" data-action="hide">Hide Password</a>
                         </div>
+                        <!-- END reveal_password -->
 
-                        <div class="small-12 medium-6 island">
-                            <label for ="username">Username</label>
-                            <input id="username" type="text" class="required" name="modusername" value="{USERNAME}" />
+                        <label for="alt_email">Alternate Email</label>
+                        <input id="alt_email" type="text" name="alt_email" value="{ALT_EMAIL}" />
 
-                            <label for="password">Password</label>
-                            <input id="password" type="password" name="modpassword" class="password" value="{PASSWORD}" />
+                        <label for="year">Year</label>
+                        <input id="year" type="text" name="year" value="{YEAR}" />
 
-                            <!-- BEGIN reveal_password -->
-                            <div data-role="passwordDisplay">
-                                <a href="#" data-action="show">Reveal Password</a>
-                                <span data-relation="password">{CLEAR_PASSWORD}</span>
-                                <a href="#" data-action="hide">Hide Password</a>
-                            </div>
-                            <!-- END reveal_password -->
+                        <label for="house">House</label>
+                        <select id="house" name="house">
+                            <option value="">Not Set</option>
+                            <!-- BEGIN house -->
+                            <option value="{HOUSE_ID}" {HOUSE_ID_SELECTED}>{HOUSE_NAME}</option>
+                            <!-- END house -->
+                        </select>
 
-                            <label for="alt_email">Alternate Email</label>
-                            <input id="alt_email" type="text" name="alt_email" value="{ALT_EMAIL}" />
+                        <label for="residential_house">Residential House</label>
+                        <select id="residential_house" name="residential_house">
+                            <option value="">Not Set</option>
+                            <!-- BEGIN residential_house -->
+                            <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
+                            <!-- END residential_house -->
+                        </select>
 
-                            <label for="year">Year</label>
-                            <input id="year" type="text" name="year" value="{YEAR}" />
+                        <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {EPORTFOLIO_CHECKED} />
+                        <label for="eportfolio" class="checkbox-label">E-Portfolio</label>
 
-                            <label for="house">House</label>
-                            <select id="house" name="house">
-                                <option value="">Not Set</option>
-                                <!-- BEGIN house -->
-                                <option value="{HOUSE_ID}" {HOUSE_ID_SELECTED}>{HOUSE_NAME}</option>
-                                <!-- END house -->
-                            </select>
+                        <input id="local_email" type="checkbox" name="local_email" value="1" {LOCAL_EMAIL_CHECKED} />
+                        <label for="local_email" class="checkbox-label">Email Address from Username</label>
 
-                            <label for="residential_house">Residential House</label>
-                            <select id="residential_house" name="residential_house">
-                                <option value="">Not Set</option>
-                                <!-- BEGIN residential_house -->
-                                <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
-                                <!-- END residential_house -->
-                            </select>
+                        <input id="mail_handler" type="checkbox" name="mail_handler" value="1" {MAILHANDLER_CHECKED}/>
+                        <label for="mail_handler" class="checkbox-label">Use External Mail Client</label>
 
-                            <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {EPORTFOLIO_CHECKED} />
-                            <label for="eportfolio" class="checkbox-label">E-Portfolio</label>
+                        <input id="webmail" type="checkbox" name="webmail" value="1" {WEBMAIL_CHECKED} />
+                        <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
 
-                            <input id="local_email" type="checkbox" name="local_email" value="1" {LOCAL_EMAIL_CHECKED} />
-                            <label for="local_email" class="checkbox-label">Email Address from Username</label>
+                        <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" {SUPERUSER_CHECKED} />
+                        <label for="superuser" class="checkbox-label">Superuser</label>
 
-                            <input id="mail_handler" type="checkbox" name="mail_handler" value="1" {MAILHANDLER_CHECKED}/>
-                            <label for="mail_handler" class="checkbox-label">Use External Mail Client</label>
+                        <input id="account_enabled" type="checkbox" name="account_enabled" data-role="enabled" value="1" {ACCOUNT_ENABLED_CHECKED} />
+                        <label for="account_enabled" class="checkbox-label">Account Enabled</label>
+                    </div>
 
-                            <input id="webmail" type="checkbox" name="webmail" value="1" {WEBMAIL_CHECKED} />
-                            <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
-
-                            <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" {SUPERUSER_CHECKED} />
-                            <label for="superuser" class="checkbox-label">Superuser</label>
-
-                            <input id="account_enabled" type="checkbox" name="account_enabled" data-role="enabled" value="1" {ACCOUNT_ENABLED_CHECKED} />
-                            <label for="account_enabled" class="checkbox-label">Account Enabled</label>
-                        </div>
-
-                        <div class="small-12 columns">
-                            <input type="submit" name="submit" value="Update User" />
-                            <input type="submit" name="delete" data-action="delete" value="Delete User" />
-                        </div>
-                    </form>
-                </div>
+                    <div class="small-12 columns">
+                        <input type="submit" value="Update User" />
+                    </div>
+                </form>
             </div>
         </section>
     </div>
@@ -136,7 +315,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Groups</h2>
+        <h3 class="subheader">Groups</h3>
         <section>
             <ul class="action-list">
                 <li class="row row-header">
@@ -201,7 +380,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader" id="permissions">Permissions</h2>
+        <h3 class="subheader" id="permissions">Permissions</h3>
         <section>
             <ul class="action-list">
                 <li class="row row-header">
@@ -388,7 +567,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader" id="linked">Linked Accounts</h2>
+        <h3 class="subheader" id="linked">Linked Accounts</h3>
         <section>
             <ul class="action-list">
                 <!-- BEGIN user_linked -->
@@ -421,14 +600,21 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h2 class="subheader">Recent Activity Logs</h2>
+        <h3 class="subheader">Recent Activity Logs</h3>
     </div>
     <div class="small-12 medium-6 island">
         <section>
-            <span class="header-actions">
-                <a class="button icon-view" href="/adminv2/reports/login/user={USERNAME}">See All</a>
-            </span>
-            <h3 class="content subheader">Logins</h3>
+            <div class="actions-small-1 row">
+                <div class="list-item content">
+                    <div class="small-12 columns">
+                        <h4>Logins</h4>
+                    </div>
+                </div>
+                <nav>
+                    <a class="icon-view" href="/adminv2/reports/login/user={USERNAME}" title="See All"></a>
+                </nav>
+            </div>
+
             <table>
                 <thead>
                 <tr>
@@ -452,10 +638,19 @@
 
     <div class="small-12 medium-6 island">
         <section>
-            <span class="header-actions">
-                <a class="button icon-view" href="/adminv2/reports/activity/user={USERNAME}">See All</a>
-            </span>
-            <h3 class="content subheader">Activity</h3>
+            <div class="">
+                <div class="actions-small-1 row">
+                    <div class="list-item content">
+                        <div class="small-12 columns">
+                            <h4>Activity</h4>
+                        </div>
+                    </div>
+                    <nav>
+                        <a class="icon-view" href="/adminv2/reports/activity/user={USERNAME}" title="See All"></a>
+                    </nav>
+                </div>
+            </div>
+
             <table>
                 <thead>
                     <tr>
@@ -478,179 +673,30 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">
-            Send Message to {FULLNAME}
-        </h2>
-        <section>
-            <div class="content">
-                <p><em>{FIRSTNAME} must be signed in to receive a popup alert.</em></p>
-                <form action="/adminv2/sendAlert" method="POST">
-                    <input type="hidden" name="user" value="{USERID}" />
-                    <div class="row">
-                        <div class="small-12 columns">
-                            <label>
-                                <strong>Message from {SITE_LOGINNAME}:</strong>
-                                <input type="text" value="" name="body" />
-                            </label>
-                        </div>
-                        <div class="small-12 columns">
-                            <label>
-                                <input type="submit" value="Send" />
-                            </label>
-                        </div>
+        <h3 class="subheader">Send Message to {FULLNAME}</h3>
+
+        <div class="alert-box secondary">
+            <p class="no-margin">{FIRSTNAME} must be signed in to receive a popup alert.</p>
+        </div>
+
+        <form action="/adminv2/sendAlert" method="POST">
+            <input type="hidden" name="user" value="{USERID}" />
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Message from {SITE_LOGINNAME}
+                            <input type="text" value="" name="body" />
+                        </label>
                     </div>
-                </form>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Send" />
+                </div>
             </div>
-        </section>
+        </form>
     </div>
 </div>
-
-<script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
-<script type="text/javascript">
-
-    $(function() {
-
-        /**
-         * AJAX submit of forms (used by groups and services)
-         */
-        $(':input[data-autosubmit]').change(function() {
-            var form = $(this.form);
-            $.post('/adminv2/userForm.php', form.serializeArray());
-        });
-
-        /**
-         * Show/hide password
-         */
-        var passwordDisplayer = $('[data-role="passwordDisplay"]');
-        if (passwordDisplayer.length) {
-            var passwordShow = passwordDisplayer.find('[data-action="show"]');
-            var passwordHide = passwordDisplayer.find('[data-action="hide"]');
-            var passwordView = passwordDisplayer.find('[data-relation="password"]');
-            passwordShow.show();
-            passwordHide.hide();
-            passwordView.hide();
-            passwordShow.click(function(e) {
-                e.preventDefault();
-                passwordShow.hide();
-                passwordHide.show();
-                passwordView.show();
-            });
-            passwordHide.click(function(e) {
-                e.preventDefault();
-                passwordShow.show();
-                passwordHide.hide();
-                passwordView.hide();
-            });
-        }
-
-        /**
-         * Hide campus selector if I selected a service that doesn't use them
-         */
-        var addServiceForm = $('form[data-action="addService"]');
-        addServiceForm.on(
-                'change',
-                ':input[data-role="serviceSelector"]',
-                function() {
-                    // Search for this item, disable others
-                    var currentService = $(this).find(':selected').data('identifier');
-                    var selectors      = addServiceForm.find(':input[data-service-type]');
-                    selectors.hide();
-                    selectors.filter('[data-service-type="'+currentService+'"]').show();
-                }
-        );
-
-        /**
-         * User details validation
-         */
-        $('form[data-validatable-as="userDetails"]').validate({
-            rules: {
-                alt_email: {
-                    email:true
-                },
-                firstname: {
-                    require_from_group: [1, '[data-relation="name"]']
-                },
-                lastname: {
-                    require_from_group: [1, '[data-relation="name"]']
-                }
-            },
-            messages: {
-                firstname: {
-                    require_from_group: "Please enter either a first name or surname"
-                },
-                lastname: {
-                    require_from_group: "Please enter either a first name or surname"
-                },
-                defaultCampus: "Please select a default campus",
-                alt_email: "If you are entering an alternative email, please ensure it's a valid address"
-            },
-            errorPlacement: function(error, element) {
-                if (element.is('[data-role="defaultCampus"]')) {
-                    error.css('margin', 0);
-                    error.insertAfter(element.closest('[data-role="campusList"]'));
-                } else {
-                    error.insertAfter(element)
-                }
-            }
-        });
-
-        /**
-         * Service validation
-         */
-        $('form[data-validatable-as="addService"]').validate();
-
-        $('form[data-validatable-as="addGroup"]').validate();
-
-        // Handles autosuggest for linking users to other user accounts
-        var addUserSelector = $(':input[data-selectizeuser="addUser"]');
-        var addUserButton   = $(addUserSelector.prop('form')).find(':submit');
-        addUserSelector
-                .selectizeSelector({
-                    multiple: true,
-                    ajax: {
-                        url:      '/ajax/user.php',
-                        type:     'GET',
-                        data:     {groupID: 0},
-                        dataType: 'json'
-                    }
-                })
-                .on('selectize.item_add', function() {
-                    addUserButton.prop('disabled', false);
-                })
-                .on('selectize.item_remove', function() {
-                    // Disable only if empty
-                    if ($(this).data('selectize').items.length === 0) {
-                        addUserButton.prop('disabled', true);
-                    }
-                });
-
-        /**
-         * Confirm update of superuser field
-         */
-        $('input[data-role="superuser"]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                text: 'Change this user\'s superuser status?',
-                confirmEvent: function(element) {
-                    element.prop('checked', !(element.prop('checked')));
-                }
-            });
-        });
-
-        /**
-         * Confirm update of account enabled field
-         */
-        $('input[data-role="enabled"]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                text: 'Change this user\'s account status?',
-                confirmEvent: function(element) {
-                    element.prop('checked', !(element.prop('checked')));
-                }
-            });
-        });
-    });
-</script>

@@ -1,3 +1,17 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+    $(function() {
+        $('#add-coverphoto').click(function(event){
+            event.preventDefault();
+            $('#coverphoto-image').show().trigger('click').hide();
+        });
+        $('#coverphoto-image').change(function(){
+            $('#coverphoto-form').submit();
+        })
+    });
+</script>
+
+<!-- END custom_head -->
 <style type='text/css'>
     <!-- BEGIN allowed_files -->
     a.{NAME}{background-image: url(/images/mime/22x22/{ICON});}
@@ -15,7 +29,7 @@
             <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
             <!-- END eportfolio_page -->
             <!-- BEGIN can_add_page -->
-            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="button icon-add" id="add-page">Add page</a></li>
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="icon-add" id="add-page">Add page</a></li>
             <!-- END can_add_page -->
         </ul>
     </div>
@@ -57,10 +71,18 @@
         <!-- BEGIN has_showcased_work -->
         <div class="row">
             <div class="small-12 island">
-                <h2 class="subheader">Recent Showcased Work</h2>
-                <span class="header-actions">
-                    <a href="/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase" class="button icon-due-work">Showcased Work</a>
-                </span>
+
+                <div class="actions-small-1 row">
+                    <div class="list-item">
+                        <div class="small-12 columns">
+                            <h2 class="subheader">Recent Showcased Work</h2>
+                        </div>
+                    </div>
+                    <nav>
+                        <a href="/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase" class="icon-showcase" title="Showcased Work"></a>
+                    </nav>
+                </div>
+
                 <section>
                     <ul class="information-list">
                         <!-- BEGIN showcased_work -->
@@ -69,7 +91,7 @@
                             <div class="six-column" data-equalizer-watch>
                                 <div class="avatar card">
                                     <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1" title="View Profile">
-                                        <img src="/images/mime/60x60/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="" class="content" />
+                                        <img src="/images/mime/60x60/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="" class="mime" />
                                         <p>{SHOWCASED_WORK_BOX_NAME}</p>
                                     </a>
                                     <p class="meta"><a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></p>
@@ -93,7 +115,7 @@
                             <div class="four-column">
                                 {SHOWCASED_WORK_SUBMISSION_SUBMITTED}
                             </div>
-                            <div class="two-column text-center">
+                            <div class="two-column grade text-center">
                                 <span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span>
                             </div>
                         </li>
@@ -218,15 +240,3 @@
     <input type='hidden' name='userId' value='{USER_ID}' />
     <input id="coverphoto-image" type='file' name='imagehash' value='' />
 </form>
-
-<script type="text/javascript">
-    $(function() {
-        $('#add-coverphoto').click(function(event){
-            event.preventDefault();
-            $('#coverphoto-image').show().trigger('click').hide();
-        });
-        $('#coverphoto-image').change(function(){
-            $('#coverphoto-form').submit();
-        })
-    });
-</script>

@@ -1,28 +1,4 @@
-{ADMIN_NAV}
-<div class="row">
-    <div class="small-12 columns">
-        <h2 class="subheader">Global Usage</h2>
-    </div>
-    <div class="small-12 island">
-        <section>
-            <div class="row">
-                <div class="small-12 large-4 column">
-                    <div data-panel='global' class='loader'></div>
-                    <div data-panel='group' class='loader'></div>
-                </div>
-                <div class="small-12 large-8 column">
-                    <section>
-                        <div data-panel='type' class='loader'></div>
-                    </section>
-                </div>
-            </div>
-        </section>
-    </div>
-    <div class="small-12 columns">
-        <div data-panel='user' class='loader'></div>
-    </div>
-</div>
-
+<!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type='text/javascript' src='/javascript/shared/jquery.number-format.js'></script>
 <script type="text/javascript" src="/javascript/admin/jquery.serverUsage.js"></script>
@@ -59,3 +35,30 @@
         });
     });
 </script>
+<!-- END custom_head -->
+
+{ADMIN_NAV}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Global Usage</h2>
+    </div>
+    <div class="small-12 island">
+        <section>
+            <div class="row">
+                <div class="small-12 large-4 column">
+                    <div data-panel='global' class='loader'></div>
+                    <div data-panel='group' class='loader'></div>
+                </div>
+                <div class="small-12 large-8 column">
+                    <section>
+                        <div data-panel='type' class='loader'></div>
+                    </section>
+                </div>
+            </div>
+        </section>
+    </div>
+    <div class="small-12 columns">
+        <div data-panel='user' class='loader'></div>
+    </div>
+</div>

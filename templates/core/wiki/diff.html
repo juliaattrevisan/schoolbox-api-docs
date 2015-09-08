@@ -1,10 +1,14 @@
 {BREADCRUMB}
 
 <div class="row">
-	<div class="small-12">
-		<h1>{HEADING} {LOCKED} (Comparing Revision {FROM_ID} to {TO_ID})</h1>
+	<div class="small-12 columns">
+		<h1>{HEADING} (Comparing Revision {FROM_ID} to {TO_ID})</h1>
         <ul class="meta">
             <li class="icon-modify">Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on <time>{MODIFIED}</time></li>
+
+            <!-- BEGIN wiki_locked -->
+            <li class="icon-locked">Locked</li>
+            <!-- END wiki_locked -->
         </ul>
 	</div>
 </div>
@@ -33,7 +37,11 @@
                 <tr>
                     <td><a href="/wiki/revision/{WIKI_ID}/{REVISION_COMPARE}">{REVISION_DATE}</a></td>
                     <td>{REVISION_AUTHOR}</td>
-                    <td><!-- BEGIN revision_comparison --><a href="/wiki/diff/{WIKI_ID}/{REVISION_ID}/{REVISION_COMPARE}" class="icon-view" data-tooltip title="Compare"></a><!-- END revision_comparison --></td>
+                    <td>
+                        <!-- BEGIN revision_comparison -->
+                        <a href="/wiki/diff/{WIKI_ID}/{REVISION_ID}/{REVISION_COMPARE}" class="icon-view" title="Compare"></a>
+                        <!-- END revision_comparison -->
+                    </td>
                 </tr>
                 <!-- END revision_list -->
 			</tbody>

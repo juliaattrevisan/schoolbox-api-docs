@@ -10,15 +10,17 @@
 
 {% set showButtons = isStaff or isSelf %}
 
-<div class="row">
-    <div class="small-12 column">
-        <h1>{{ user.formatName() }}</h1>
-        <span class='header-actions'>
-            {% if isSuperuser %}
-                <a href="/adminv2/modify-user/{{ user.getId() }}" class="button icon-modify" title="Modify User"></a>
-            {% endif %}
-        </span>
+<div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{{ user.formatName() }}</h1>
+        </div>
     </div>
+    <nav>
+        {% if isSuperuser %}
+        <a href="/adminv2/modify-user/{{ user.getId() }}" class="icon-modify" title="Modify User"></a>
+        {% endif %}
+    </nav>
 </div>
 
 <div class="row">

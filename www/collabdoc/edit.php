@@ -9,6 +9,7 @@
  */
 
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Breadcrumbs;
 
 /* Check if the currently logged in user can participate
  */
@@ -63,6 +64,22 @@ if ($authenticator->isParticipator($pad->getHomepageId(), $_SESSION['user']->get
 		'ETHERPAD_NAME' => Scrub::text($pad->getDisplayName()),
 		'ETHERPAD_URL' => "/collabdoc/load/{$pad->getId()}"
 	));
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Edit Collab Doc',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }
 else {
 	error(19);

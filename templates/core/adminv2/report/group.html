@@ -1,34 +1,36 @@
-<table>
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th><a href="/adminv2/reports/{SORT_BASE}/firstname/{SORT_FIRSTNAME_DIR}">First name</a></th>
-            <th><a href="/adminv2/reports/{SORT_BASE}/lastname/{SORT_LASTNAME_DIR}">Surname</a></th>
-            <th><a href="/adminv2/reports/{SORT_BASE}/username/{SORT_USERNAME_DIR}">Username</a></th>
-            <th><a href="/adminv2/reports/{SORT_BASE}/synergy_id/{SORT_SYNERGY_ID_DIR}">External ID</a></th>
-            <th><a href="/adminv2/reports/{SORT_BASE}/campus/{SORT_CAMPUS_DIR}">Campus</a></th>
-            <th><a href="/adminv2/reports/{SORT_BASE}/year/{SORT_YEAR_DIR}">Year</a></th>
-            <th><a href="/adminv2/reports/{SORT_BASE}/alt_email/{SORT_ALT_EMAIL_DIR}">Email</a></th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- BEGIN user -->
-        <tr>
-            <td>{USER_TITLE}</td>
-            <td><a href="/search/user/{UID}">{USER_FIRSTNAME}</a></td>
-            <td><a href="/search/user/{UID}">{USER_SURNAME}</a></td>
-            <td>{USER_USERNAME}</td>
-            <td>{USER_SYNERGY_ID}</td>
-            <td>{USER_CAMPUS}</td>
-            <td>{USER_YEAR}</td>
-            <td>{USER_EMAIL}</td>
-            <td>
-                <!-- BEGIN modify -->
-                <a href="/adminv2/modify-user/{UID}" class="icon-modify no-text" title="Modify User"></a>
-                <!-- END modify -->
-            </td>
-        </tr>
-        <!-- END user -->
-    </tbody>
-</table>
+<div class="scrollable">
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th><a href="/adminv2/reports/{SORT_BASE}/firstname/{SORT_FIRSTNAME_DIR}">First name</a></th>
+                <th><a href="/adminv2/reports/{SORT_BASE}/lastname/{SORT_LASTNAME_DIR}">Surname</a></th>
+                <th><a href="/adminv2/reports/{SORT_BASE}/username/{SORT_USERNAME_DIR}">Username</a></th>
+                <th><a href="/adminv2/reports/{SORT_BASE}/synergy_id/{SORT_SYNERGY_ID_DIR}">External ID</a></th>
+                <th><a href="/adminv2/reports/{SORT_BASE}/campus/{SORT_CAMPUS_DIR}">Campus</a></th>
+                <th><a href="/adminv2/reports/{SORT_BASE}/year/{SORT_YEAR_DIR}">Year</a></th>
+                <th><a href="/adminv2/reports/{SORT_BASE}/alt_email/{SORT_ALT_EMAIL_DIR}">Email</a></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- BEGIN user -->
+            <tr>
+                <td>{USER_TITLE}</td>
+                <td><a href="/search/user/{UID}">{USER_FIRSTNAME}</a></td>
+                <td><a href="/search/user/{UID}">{USER_SURNAME}</a></td>
+                <td>{USER_USERNAME}</td>
+                <td>{USER_SYNERGY_ID}</td>
+                <td>{USER_CAMPUS}</td>
+                <td>{USER_YEAR}</td>
+                <td>{USER_EMAIL}</td>
+                <td>
+                    <!-- BEGIN modify -->
+                    <a href="/adminv2/modify-user/{UID}" class="icon-modify no-text" title="Modify User"></a>
+                    <!-- END modify -->
+                </td>
+            </tr>
+            <!-- END user -->
+        </tbody>
+    </table>
+</div>

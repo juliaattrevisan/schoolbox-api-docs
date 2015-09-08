@@ -6,25 +6,23 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <h2 class="subheader">{COMPONENT_NAME}</h2>
-            <section>
-                <div class="content">
-                    <ul class="clearing-thumbs" data-clearing data-equalizer>
-                        <!-- BEGIN image_gallery -->
-                        <li>
-                            <a class="th"
-                               href="/cms/image.php?id={THUMBNAIL_ID}&height=600&width=800"
-                               title="{THUMBNAIL_DESCRIPTION}"
-                               data-equalizer-watch
-                            >
-                                <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0"
-                                     alt="{THUMBNAIL_DESCRIPTION}"
-                                     data-caption="{THUMBNAIL_DESCRIPTION}"
-                                />
-                            </a>
-                        </li>
-                        <!-- END image_gallery -->
-                    </ul>
-                </div>
+            <section class="content">
+                <ul class="clearing-thumbs" data-clearing data-equalizer>
+                    <!-- BEGIN image_gallery -->
+                    <li>
+                        <a class="th"
+                           href="/cms/image.php?id={THUMBNAIL_ID}&height=600&width=800"
+                           title="{THUMBNAIL_DESCRIPTION}"
+                           data-equalizer-watch
+                        >
+                            <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0"
+                                 alt="{THUMBNAIL_DESCRIPTION}"
+                                 data-caption="{THUMBNAIL_DESCRIPTION}"
+                            />
+                        </a>
+                    </li>
+                    <!-- END image_gallery -->
+                </ul>
             </section>
         </div>
     </div>
