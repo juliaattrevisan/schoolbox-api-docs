@@ -101,17 +101,8 @@
 
                         <div class="one actions">
                             <!-- BEGIN unit_actions -->
-                            <a data-dropdown="unit-actions-{UNIT_ID}"
-                               href="#"
-                               class="no-text icon-more"
-                               aria-controls="unit-actions-{UNIT_ID}"
-                               aria-expanded="false"
-                            ></a>
-                            <ul data-dropdown-content
-                                id="unit-actions-{UNIT_ID}"
-                                class="f-dropdown"
-                                aria-hidden="true"
-                            >
+                            <a data-dropdown="unit-actions-{UNIT_ID}" href="#" class="no-text icon-more" aria-controls="unit-actions-{UNIT_ID}" aria-expanded="false"></a>
+                            <ul data-dropdown-content id="unit-actions-{UNIT_ID}" class="f-dropdown" aria-hidden="true">
                                 <!-- BEGIN unit_modify -->
                                 <li>
                                     <a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="icon-modify">Modify this unit</a>
@@ -127,7 +118,7 @@
                         </div>
 
                         <div class="content">
-                            <div class="twelve-column hide panel clearfix" data-form-container data-interaction="delete_unit_container">
+                            <div class="twelve-column hide alert-box" data-form-container data-interaction="delete_unit_container">
                                 <p><span class="label alert full-width">Are you sure you wish to delete this unit?</span></p>
                                 <p>All tasks, linked due work and quizzes within the unit will be deleted.</p>
 
@@ -136,8 +127,14 @@
                                     <input type="hidden" name="id"        value="{UNIT_ID}" />
                                     <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
 
-                                    <input type="submit" class="button secondary" data-interaction="delete_confirm" value="Yes">
-                                    <a href="#" class="button" data-interaction="delete_reject">No</a>
+                                    <div class="row">
+                                        <div class="small-6 columns no-pad">
+                                            <input type="submit" class="button secondary" data-interaction="delete_confirm" value="Yes">
+                                        </div>
+                                        <div class="small-6 columns no-pad">
+                                            <a href="#" class="button expand" data-interaction="delete_reject">No</a>
+                                        </div>
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -281,7 +278,7 @@
 
                                 <!-- BEGIN unit_task_delete_form -->
                                 <div class="content">
-                                    <div class="twelve-column panel hide" data-form-container data-interaction="delete_task_container">
+                                    <div class="twelve-column alert-box hide" data-form-container data-interaction="delete_task_container">
                                         <p><span class="label alert full-width">Are you sure you wish to delete this task?</span></p>
                                         <p>Any linked due work items and quizzes will be deleted, as will all student's completion of this task.</p>
 
@@ -291,8 +288,14 @@
                                             <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
                                             <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
 
-                                            <input type="submit" data-interaction="delete_confirm" value="Yes" />
-                                            <a href="#" class="button" data-interaction="delete_reject">No</a>
+                                            <div class="row">
+                                                <div class="small-6 columns no-pad">
+                                                    <input type="submit" data-interaction="delete_confirm" value="Yes" />
+                                                </div>
+                                                <div class="small-6 columns no-pad">
+                                                    <a href="#" class="button" data-interaction="delete_reject">No</a>
+                                                </div>
+                                            </div>
                                         </form>
                                     </div>
                                 </div>
@@ -314,7 +317,7 @@
 
                         <!-- This is the form for inline creation of tasks -->
                         <div class="content">
-                            <div class="twelve-column panel hide" data-form-container data-for-task data-new-task-container>
+                            <div class="twelve-column alert-box hide" data-form-container data-for-task data-new-task-container>
                                 <form action="/task/saveInstanceForm.php" method="post" data-form_type="task">
                                     <input type="hidden" name="id" value=""/>
                                     <input type="hidden" name="unit_id" value="{UNIT_ID}"/>
