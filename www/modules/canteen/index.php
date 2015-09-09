@@ -2,7 +2,6 @@
 /**
  * CIS canteen SSO
  *
- * Currently in test mode - only one parent is set up.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
@@ -16,6 +15,19 @@
 //}
 $this->setFile(TEMPLATE_content, 'modules/remote/frame.html');
 $remoteUrl = 'http://campusonline.cis.edu.sg/signon.asp';
+$mapFile = '/home/cispl/parent_map.csv';
+
+if(!file_exists($mapFile) || !is_readable($mapFile)) {
+    $this->error(2);
+}
+
+if (($handle = fopen($mapFile, 'r')) !== FALSE) {
+    while (($row = fgetcsv($handle, 1000, ',')) !== FALSE) {
+            $map[$row[0]] = $row[1];
+    }
+    fclose($handle);
+}
+
 
 // is this specifying a height for the parent frame?
 $height = '460px';
@@ -30,9 +42,18 @@ if(strpos($remoteUrl, 'zx_h=')) {
 //    $this->error(2);
 //}
 
-$externalUserId = 'CIS000041-02';
+
+
+$isamsID = str_replace('P-','',$_SESSION['user']->getExternalId());
+
+$externalUserId = $map[$isamsID];
 $secret         = Config::get('remote_secret');
 $time           = time();
+
+
+if(!$externalUserId) {
+    $this->error(2);
+}
 
 $key = hash('sha256', $externalUserId.$time.$secret);
 
