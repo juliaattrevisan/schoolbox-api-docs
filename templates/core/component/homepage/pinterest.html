@@ -5,30 +5,28 @@
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
-            <section>
-                <div class="content">
-                    <!-- BEGIN has_pinterest_user -->
-                    <a data-pin-do="embedUser" href="{PINTEREST_URL}" id="pinterest{COMPONENT_INSTANCE_ID}"></a>
-                    <script type="text/javascript">
-                        $(function() {
-                            $('#pinterest{COMPONENT_INSTANCE_ID}').pinterestUser();
+            <section class="content">
+                <!-- BEGIN has_pinterest_user -->
+                <a data-pin-do="embedUser" href="{PINTEREST_URL}" id="pinterest{COMPONENT_INSTANCE_ID}"></a>
+                <script type="text/javascript">
+                    $(function() {
+                        $('#pinterest{COMPONENT_INSTANCE_ID}').pinterestUser();
 
-                            $.getScript('//assets.pinterest.com/js/pinit.js');
-                        });
-                    </script>
-                    <!-- END has_pinterest_user -->
+                        $.getScript('//assets.pinterest.com/js/pinit.js');
+                    });
+                </script>
+                <!-- END has_pinterest_user -->
 
-                    <!-- BEGIN has_pinterest_board -->
-                    <a data-pin-do="embedBoard" href="{PINTEREST_URL}" id="pinterest{COMPONENT_INSTANCE_ID}"></a>
-                    <script type="text/javascript">
-                        $(function() {
-                            $('#pinterest{COMPONENT_INSTANCE_ID}').pinterestBoard();
+                <!-- BEGIN has_pinterest_board -->
+                <a data-pin-do="embedBoard" href="{PINTEREST_URL}" id="pinterest{COMPONENT_INSTANCE_ID}"></a>
+                <script type="text/javascript">
+                    $(function() {
+                        $('#pinterest{COMPONENT_INSTANCE_ID}').pinterestBoard();
 
-                            $.getScript('//assets.pinterest.com/js/pinit.js');
-                        });
-                    </script>
-                    <!-- END has_pinterest_board -->
-                </div>
+                        $.getScript('//assets.pinterest.com/js/pinit.js');
+                    });
+                </script>
+                <!-- END has_pinterest_board -->
             </section>
         </div>
     </div>
