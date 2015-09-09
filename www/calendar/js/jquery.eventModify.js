@@ -28,7 +28,7 @@
 		/* All Day checkbox should hide the time fields
 		 */
 		//setupAllDay();
-		setupSelectAll();
+		//setupSelectAll();
 
 		// Advanced options no longer exist
 		///* Show/hide advanced options
@@ -177,19 +177,19 @@
 			showRepeats.apply(repeatSelector);
 		}
 
-		/**
-		 * Add "select all" capability to checkboxes
-		 */
-		function setupSelectAll() {
-			config.element.find('[data-selectall]').change(function(){
-				if ($(this).is(':checked')) {
-					$(this).closest('fieldset').find(':checkbox').not('[data-selectall]').prop('checked', true);
-				}
-				else {
-					$(this).closest('fieldset').find(':checkbox').not('[data-selectall]').prop('checked', false);
-				}
-			});
-		}
+		///**
+		// * Add "select all" capability to checkboxes
+		// */
+		//function setupSelectAll() {
+		//	config.element.find('[data-selectall]').change(function(){
+		//		if ($(this).is(':checked')) {
+		//			$(this).closest('fieldset').find(':checkbox').not('[data-selectall]').prop('checked', true);
+		//		}
+		//		else {
+		//			$(this).closest('fieldset').find(':checkbox').not('[data-selectall]').prop('checked', false);
+		//		}
+		//	});
+		//}
 
 		///**
 		// * When you change Level, only certain other options become

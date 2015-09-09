@@ -10,6 +10,7 @@
 <script type="text/javascript" src="/javascript/data-plugins/datepickerSync.js"></script>
 <script type="text/javascript" src="/javascript/data-plugins/timepicker.js"></script>
 <script type="text/javascript" src="/javascript/data-plugins/hideWatch.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/selectAll.js"></script>
 <script type="text/javascript">
 	$(function() {
 		$.fn.alaressTiny({
@@ -252,7 +253,7 @@
                             <input type="checkbox" name="roles[]" id="role{EVENT_ROLE_ID}" value="{EVENT_ROLE_ID}" {EVENT_ROLE_ID_SELECTED} />
                             <label for="role{EVENT_ROLE_ID}">{EVENT_ROLE_NAME}</label>
                             <!-- END event_role_list -->
-                            <input type="checkbox" data-selectall="true" id="roleSelectAll"/>
+                            <input type="checkbox" data-select-all id="roleSelectAll"/>
                             <label for="roleSelectAll">Select all</label>
                         </fieldset>
                     </div>
@@ -266,7 +267,7 @@
                             <input type="checkbox" class="campusCheck" name="campus[]" id="campus{EVENT_CAMPUS_ID}" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} />
                             <label for="campus{EVENT_CAMPUS_ID}">{EVENT_CAMPUS_NAME}</label>
                             <!-- END event_campus_list -->
-                            <input type="checkbox" data-selectall='true' id="campusSelectAll" />
+                            <input type="checkbox" data-select-all id="campusSelectAll" />
                             <label for="campusSelectAll">Select all</label>
                         </fieldset>
                     </div>
