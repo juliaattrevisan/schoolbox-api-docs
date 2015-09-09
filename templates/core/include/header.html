@@ -25,6 +25,12 @@
   $(document).ready(function() { $('#infoPanel').find('a[data-menu]').flyout(); });
   $(document).ready(function() {
       $('#nav').touchMenu();
+
+      var s = $('#search');
+      s.on('click', 'i', function () {
+          s.submit();
+      });
+
   });
 
   // Date formats (global variable)
