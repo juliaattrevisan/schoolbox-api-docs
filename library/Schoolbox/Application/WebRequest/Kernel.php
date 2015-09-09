@@ -15,11 +15,8 @@ use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Aura\Di;
 use Aura\Router\Route;
-use Cfg;
-use HttpUserAgent;
 use ReflectionMethod;
 use RuntimeException;
-use SitePage;
 use Zend\Uri\Uri;
 
 class Kernel extends \Alaress\Application\Kernel
@@ -206,15 +203,9 @@ class Kernel extends \Alaress\Application\Kernel
         if ((isset($_GET['page']) && $_GET['page']) && $_GET['page'] != '/') {
             $pageName = $_GET['page'];
         } else {
-            // hey, are you a mobile? You should go check out the mobile site. As in, now. Scram.
-            if (Cfg::get('mobile_enabled')) {
-                $agent = new HttpUserAgent();
-                if ($agent->isMobile()) {
-                    SitePage::localRedir('/m/');
-                }
-            }
             $pageName = 'dashboard';
         }
+
         $page = $this->di->get('sitePage');
         $page->loadContent($pageName);
         $page->outputPage();

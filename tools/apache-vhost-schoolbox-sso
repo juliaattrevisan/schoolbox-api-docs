@@ -110,7 +110,6 @@
         #RewriteCond %{REQUEST_URI} !^/login
         #RewriteCond %{REQUEST_URI} !^/login/.*
         #RewriteCond %{REQUEST_URI} !^/adminv2/.*
-        #RewriteCond %{REQUEST_URI} !^/m/.*
         #RewriteCond %{REQUEST_URI} !^/saml
         #RewriteCond %{REQUEST_URI} !^/saml/.*
         #RewriteCond %{REQUEST_URI} !^/cms/network
@@ -128,17 +127,7 @@
         RewriteCond %{REQUEST_URI} /homepage/rss/[0-9]*
         RewriteRule ^(.*)$ /homepage/rss.php?page=$1 [L]
 
-        # Mobile Edition
-        RewriteCond %{REQUEST_URI} /m/.*
-        RewriteCond %{REQUEST_URI} !/m/inc/.*
-        RewriteCond %{REQUEST_URI} !/m/img/.*
-        RewriteCond %{REQUEST_URI} !/m/manifest.php
-        RewriteCond %{REQUEST_FILENAME} !-d
-        RewriteCond %{REQUEST_FILENAME} !-f
-        RewriteRule ^(.*)$ /m/index.php?url=$1 [L,QSA]
-
         RewriteCond %{REQUEST_URI} !/dav/.*
-        RewriteCond %{REQUEST_URI} !/m/.*
         RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
         RewriteRule ^(.*)$ /index.php?page=$1 [L,QSA]
 

@@ -51,6 +51,5 @@ echo "$vag Applying UTF8 schema patch";
 
 # Need to re-enable modules too, because they're off by default
 echo "$vag Enabling modules";
-/vagrant/tools/module.sh enable mobile;
 /vagrant/tools/module.sh enable leave;
 /vagrant/tools/module.sh enable resource;

@@ -36,7 +36,7 @@ module.exports = function(grunt) {
             files: [{
                 expand: true,
                 cwd: 'www/css',
-                src: [cssDir+'/{chrome,mchrome,print}.less'],
+                src: [cssDir+'/{chrome,print}.less'],
                 dest: 'www/css/',
                 ext: '.css'
             }]
@@ -141,7 +141,7 @@ module.exports = function(grunt) {
         },
         clean: {
             js: ['www/javascript/components/schoolbox.{min,map}.js'],
-            css: ['www/css/*/{chrome,mchrome,print}.css']
+            css: ['www/css/*/{chrome,print}.css']
         },
         less: buildTasks,
         sass: {
