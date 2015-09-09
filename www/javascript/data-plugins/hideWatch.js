@@ -1,5 +1,8 @@
 /**
- * Generic hide watcher setup, based on data attributes
+ * Generic hide watcher setup, based on data attributes.
+ *
+ * Shows or hides elements with a `data-hide-watch` tag, based on the value of
+ * the selector that tag points to.
  *
  * Usage (checkbox based):
  * <div class="hide" data-hide-watch="switcher">...</div>
@@ -23,6 +26,8 @@
  *
  * Options:
  * * hide-watch:                  a selector that selects an element to watch
+ * * hide-watch-invert:           checkbox based only - by default, content shows when the checkbox
+ *                                is checked. If this attribute exists, content shows when unchecked.
  * * hide-watch-value:            select value based only - if the watched element is this value,
  *                                show this element, otherwise hide
  * * hide-watch-option-attribute: select value based only - check this attribute instead of the value
@@ -31,21 +36,24 @@
     $(function(){
         $('[data-hide-watch]').each(function() {
             var element = $(this);
-            var watch   = $(element.data('hide-watch'));
+            var data    = element.data();
+            var watch   = $(data.hideWatch);
             if (watch.length) {
                 var toggleCallback = function() { return true; };
                 if (watch.is(':checkbox')) {
                     toggleCallback = function() {
-                        return !watch.prop('checked');
+                        var invert  = 'hideWatchInvert' in data;
+                        var checked = watch.prop('checked');
+                        return invert ? checked : !checked;
                     };
                 } else {
                     // Watch on a value, or attribute of the selected option
-                    var watchValue = element.data('hide-watch-value');
+                    var watchValue = data.hideWatchValue;
                     toggleCallback = function() {
                         return watch.val() != watchValue;
                     };
                     if (watch.is('select')) {
-                        var watchAttribute = element.data('hide-watch-option-attribute');
+                        var watchAttribute = data.hideWatchOptionAttribute;
                         if (watchAttribute) {
                             toggleCallback = function() {
                                 return watch.find('option:selected').attr(watchAttribute)

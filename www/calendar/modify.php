@@ -74,7 +74,7 @@ if (is_numeric($_GET['eventID'])) {
     $page->setVar(
         array(
             'FUNCTION'       => 'Update',
-            'SHOW_ADVANCED'  => '',
+            'SHOW_ADVANCED'  => 'none',
             'ADVANCED_SHOW'  => '',
             'ADVANCED_CLOSE' => 'hidden',
         )
@@ -116,8 +116,12 @@ if (is_numeric($_GET['eventID'])) {
                 $_GET['homepageId'],
                 $_GET['userId']
             ),
+            'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
+            'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
         )
     );
+
+    $page->parse('delete_button_block', 'delete_button');
 
     /* Recurrence
      */
@@ -131,12 +135,15 @@ if (is_numeric($_GET['eventID'])) {
         $page->setVar('EVENT_REC_FREQ', ucfirst($recurrence['freq']));
         $page->setVar('EVENT_REC_START', $recurrence['start']->getLongDateOnly());
         $page->setVar('EVENT_REC_END', $recurrence['end']->getLongDateOnly());
+        $page->setVar('EVENT_RECURRENCE_COLLAPSE_STATE', 'uncollapsed');
+        $page->setVar('EVENT_RECURRENCE_COLLAPSE_CLASS', '');
         $page->parse('recurring_reminder_block', 'recurring_reminder');
         $page->setVar('recurring_dates_block', '');
     } else {
         $page->setVar('recurring_reminder_block', '');
         $page->parse('recurring_dates_block', 'recurring_dates');
     }
+
 } else {
     /* Create new event
      */
@@ -165,7 +172,7 @@ if (is_numeric($_GET['eventID'])) {
     $page->setVar(
         array(
             'FUNCTION'       => 'Add',
-            'SHOW_ADVANCED'  => '',
+            'SHOW_ADVANCED'  => 'none',
             'ADVANCED_SHOW'  => '',
             'ADVANCED_CLOSE' => 'hidden',
         )
@@ -207,6 +214,8 @@ if (is_numeric($_GET['eventID'])) {
                 $_GET['homepageId'],
                 $_GET['userId']
             ),
+            'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
+            'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
         )
     );
 
@@ -340,8 +349,6 @@ foreach ($allFolderList as $currentFolder) {
 
     $page->parse('event_group_drop_block', 'event_group_drop', true);
 }
-
-$page->parse('delete_button_block', 'delete_button');
 
 /* Render all the dropdowns
  */
