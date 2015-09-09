@@ -215,7 +215,14 @@
 
                 <fieldset class="content">
                     <legend>Availability</legend>
-                    <div class="small-12 large-6 columns">
+                    <div class="small-12 columns">
+                        <label>
+                            Publish Date
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This event will only be visible to the public on or after this date">?</span>
+                            <input id="publishDate" name="publishDate" data-datepicker="true" type="text" size="15" maxlength="30" value="{EVENT_PUBLISH_DATE}"/>
+                        </label>
+                    </div>
+                    <div class="small-12 columns">
                         <label>
                             Level
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select who you would like to be able to see this event">?</span>
@@ -224,13 +231,6 @@
                                 <option value="{EVENT_EVENTLEVEL_ID}" {EVENT_EVENTLEVEL_ID_SELECTED}>{EVENT_EVENTLEVEL_NAME}</option>
                                 <!-- END event_level_drop -->
                             </select>
-                        </label>
-                    </div>
-                    <div class="small-12 large-6 columns">
-                        <label>
-                            Publish Date
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This event will only be visible to the public on or after this date">?</span>
-                            <input id="publishDate" name="publishDate" data-datepicker="true" type="text" size="15" maxlength="30" value="{EVENT_PUBLISH_DATE}"/>
                         </label>
                     </div>
                     <div class="small-12 column" data-hide-watch="[data-interaction='select-level']" data-hide-watch-value="2">
