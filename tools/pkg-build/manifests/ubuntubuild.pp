@@ -28,6 +28,13 @@ package { 'openjdk-7-jre':
 package { 'python-software-properties':
         ensure  => latest,
 }
+package { 'rabbitmq-server':
+	ensure  => absent,
+}
+file { '/usr/bin/sass':
+	ensure => 'link',
+	target => '/usr/local/bin/sass',
+}
 #apt::ppa { 'ppa:chris-lea/node.js': }
 #package { 'nodejs':
 #        ensure  => latest,
