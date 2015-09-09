@@ -323,29 +323,29 @@
                     <div class="small-4 columns end"><div class="content">Access</div></div>
                 </li>
                 <!-- BEGIN user_group -->
-                <li class="row" data-equalizer>
-                    <div class="small-7 columns">
-                        <div class="content">
+                <li class="actions-small-1" data-equalizer>
+                    <div class="list-item">
+                        <div class="info card small-7" data-equalizer-watch>
                             <a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a>
                         </div>
-                    </div>
-                    <div class="small-4 columns" data-equalizer-watch>
-                        <form action="/adminv2/userForm.php" method="post">
-                            <input type="hidden" name="uid" value="{USERID}" />
-                            <input type="hidden" name="sid" value="{USER_GROUP_ID}" />
-                            <input type="hidden" name="service" value="1" />
-                            <input type="hidden" name="updateGroups" value="1" />
+                        <div class="small-5 columns" data-equalizer-watch>
+                            <form action="/adminv2/userForm.php" method="post">
+                                <input type="hidden" name="uid" value="{USERID}" />
+                                <input type="hidden" name="sid" value="{USER_GROUP_ID}" />
+                                <input type="hidden" name="service" value="1" />
+                                <input type="hidden" name="updateGroups" value="1" />
 
-                            <select name="type" data-autosubmit>
-                                <option value="1" {READ_SELECTED}>Read</option>
-                                <option value="2" {WRITE_SELECTED}>Write</option>
-                                <option value="3" {ADMIN_SELECTED}>Group Admin</option>
-                            </select>
-                        </form>
+                                <select name="type" data-autosubmit>
+                                    <option value="1" {READ_SELECTED}>Read</option>
+                                    <option value="2" {WRITE_SELECTED}>Write</option>
+                                    <option value="3" {ADMIN_SELECTED}>Group Admin</option>
+                                </select>
+                            </form>
+                        </div>
                     </div>
-                    <div class="actions one">
-                        <a class="no-text icon-delete" data-equalizer-watch title="Remove" href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}" ></a>
-                    </div>
+                    <nav>
+                        <a class="icon-delete" title="Remove" href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}" data-equalizer-watch></a>
+                    </nav>
                 </li>
                 <!-- END user_group -->
                 <li class="row">
