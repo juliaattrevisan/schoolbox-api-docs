@@ -116,6 +116,8 @@ if (is_numeric($_GET['eventID'])) {
                 $_GET['homepageId'],
                 $_GET['userId']
             ),
+            'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
+            'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
         )
     );
 
@@ -133,6 +135,8 @@ if (is_numeric($_GET['eventID'])) {
         $page->setVar('EVENT_REC_FREQ', ucfirst($recurrence['freq']));
         $page->setVar('EVENT_REC_START', $recurrence['start']->getLongDateOnly());
         $page->setVar('EVENT_REC_END', $recurrence['end']->getLongDateOnly());
+        $page->setVar('EVENT_RECURRENCE_COLLAPSE_STATE', 'uncollapsed');
+        $page->setVar('EVENT_RECURRENCE_COLLAPSE_CLASS', '');
         $page->parse('recurring_reminder_block', 'recurring_reminder');
         $page->setVar('recurring_dates_block', '');
     } else {
@@ -210,6 +214,8 @@ if (is_numeric($_GET['eventID'])) {
                 $_GET['homepageId'],
                 $_GET['userId']
             ),
+            'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
+            'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
         )
     );
 
