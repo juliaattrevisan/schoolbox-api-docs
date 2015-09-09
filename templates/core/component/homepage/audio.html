@@ -1,4 +1,4 @@
-<div data-component id="component{COMPONENT_INSTANCE_ID}">
+<div id="component{COMPONENT_INSTANCE_ID}" data-component>
     <link href="/javascript/components/mediaelement/build/mediaelementplayer.min.css" rel="stylesheet" property="stylesheet">
     <script src="/javascript/components/mediaelement/build/mediaelement-and-player.min.js"></script>
     <script src="/javascript/jquery.mediaPlaylist.js"></script>
@@ -31,7 +31,7 @@
 	{CONFIGURATION}
 
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="island small-12">
+        <div class="small-12 island">
             <section>
                 <!-- BEGIN default_audio -->
                 <div class="content">
@@ -50,12 +50,13 @@
                     <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
                     <ul data-dz-container class="action-list">
                         <!-- BEGIN audio_list -->
-                        <li class="row">
-                            <div class="avatar-card">
+                        <li>
+                            <div class="avatar card small-12" data-equalizer-watch >
                                 <a href="/cms/sendVideo.php?type=sbfs&id={AUDIO_LIST_ID}" data-role="media-playlist-track">
                                     <div class="icon-audio icon-32"></div>
                                     <h3>{AUDIO_LIST_TITLE}</h3>
                                 </a>
+
                                 <p class="meta">
                                     ({AUDIO_LIST_DURATION}) Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a>
                                 </p>
@@ -65,9 +66,10 @@
                             </article>
                         </li>
                         <!-- END audio_list -->
+
                         <!-- BEGIN audio_pending_list -->
-                        <li class="row">
-                            <div class="avatar-card">
+                        <li>
+                            <div class="avatar card small-12" data-equalizer-watch >
                                 <img src="{AUDIO_LIST_STATUSIMG}" title="Currently transcoding {AUDIO_LIST_TITLE}" />
                                 <h3>{AUDIO_LIST_TITLE}</h3>
                                 <p class="meta">Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a></p>
