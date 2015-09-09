@@ -392,63 +392,43 @@
 
 					// series
 					if (multi) {
-						//$('[data-message=bulk-update]').css('display', act === 'Update' ? 'inline' : 'none');
-						//$('[data-message=bulk-delete]').css('display', act === 'Delete' ? 'inline' : 'none');
 						// Show a dialog
+						var dialog = $('[data-dialog="bulk-modify"]');
 						if (act === 'Delete') {
-							$('[data-dialog="bulk-delete"]').foundation('reveal', 'open');
-						} else {
-							$('[data-dialog="bulk-modify"]').foundation('reveal', 'open');
+							dialog = $('[data-dialog="bulk-delete"]');
 						}
-						//$("[data-dialog=bulk]").dialog({
-						//	resizable: false,
-						//	height: 180,
-						//	width: 500,
-						//	modal: true,
-						//	draggable: false,
-						//	buttons: {
-						//		"Only this event": function() {
-						//			$('#efficacy').val('self');
-						//			form.submit();
-						//		},
-						//		"All events in the series": function() {
-						//			$('#efficacy').val('series');
-						//			form.submit();
-						//		},
-						//		"Cancel": function() {
-						//			$(this).dialog("close");
-						//		}
-						//	},
-						//	close: function() {
-						//		return false;
-						//	}
-						//});
+						dialog.foundation('reveal', 'open');
+
+						// Rebind events on open/close/cancel
+						dialog.find('[data-action="self"]')
+							.off('click')
+							.on('click', function() {
+								$('#efficacy').val('self');
+								dialog.foundation('reveal', 'close');
+								form.submit();
+							});
+						dialog.find('[data-action="series"]')
+							.off('click')
+							.on('click', function() {
+								$('#efficacy').val('series');
+								dialog.foundation('reveal', 'close');
+								form.submit();
+							});
+						dialog.find('[data-action="cancel"]')
+							.off('click')
+							.on('click', function() {
+								dialog.foundation('reveal', 'close');
+							});
 					}
 					// single event
 					else {
 						if (act == 'Update') {
 							form.submit();
 						} else if (act == 'Delete') {
-							$('[data-dialog="delete"]').foundation('reveal', 'open');
-							//// dialog time
-							//$("[data-dialog=bulk]").dialog({
-							//	resizable: false,
-							//		height: 180,
-							//		width: 500,
-							//		modal: true,
-							//		draggable: false,
-							//		buttons: {
-							//		"Yes": function() {
-							//			form.submit();
-							//		},
-							//		"No": function() {
-							//			$(this).dialog("close");
-							//		}
-							//	},
-							//	close: function() {
-							//		return false;
-							//	}
-							//});
+							$('<div />').confirmDialog({
+								text: 'Are you sure you want to delete this event?',
+								confirmEvent: form.submit
+							});
 						} else {
 							form.submit();
 						}
