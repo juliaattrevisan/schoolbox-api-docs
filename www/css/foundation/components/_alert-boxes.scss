@@ -71,6 +71,6 @@ $amount: 90%;
   }
   &.alert {
     background-color: $alert-color;
-    color: tint($alert-color, $amount);
+    color: calc-text-color($alert-color, tint($alert-color, $amount), darken($alert-color, $amount));
   }
 }
