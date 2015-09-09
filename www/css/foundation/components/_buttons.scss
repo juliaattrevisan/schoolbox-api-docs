@@ -342,7 +342,9 @@ input[type="submit"]{
 		color: $white;
 	}
 	&:disabled {
+		opacity: $button-disabled-opacity;
 		background-color: $submit-button-color;
+		color: calc-text-color($submit-button-color);
 	}
 }
 
