@@ -21,48 +21,49 @@
             <section>
                 <ul class="information-list">
                     <!-- BEGIN blog -->
-                    <li class="row" id="blog_{BLOG_ID}">
-                        <div class="column small-11 no-pad">
-                            <div class="avatar card">
-                                <img src="{BLOG_AUTHOR_THUMB}" />
-                                <h3>{BLOG_HEADING}</h3>
+                    <li class="actions-small-1" id="blog_{BLOG_ID}" data-equalizer>
+                        <div class="list-item">
+                            <div class="avatar card small-12" data-equalizer-watch>
+                                <a href="#">
+                                    <img src="{BLOG_AUTHOR_THUMB}" />
+                                    <h3>{BLOG_HEADING}</h3>
+                                </a>
                                 <p class="meta">Posted by <a href="/search/user/{BLOG_AUTHOR_ID}">{BLOG_AUTHOR_NAME}</a> {BLOG_CREATED}</p>
                             </div>
                             <article>{BLOG_BODY}</article>
 
-                        </div>
-
-                        <!-- BEGIN modify_blog -->
-                        <div class="one actions">
-                            <a class="no-text icon-modify" href="/blog/modify/{BLOG_ID}" title="Modify Blog post"></a>
-                        </div>
-                        <!-- END modify_blog -->
-
-                        <div class="column small-12">
-                            <p>
+                            <div class="content">
                                 <a data-interaction="showcomments" class="button icon-chat" data-numcomments="{BLOG_TOTAL_COMMENTS}">Show Comments ({BLOG_TOTAL_COMMENTS})</a>
                                 <a data-toggle="commentform-{BLOG_ID}" class='button icon-add'>Add Comment</a>
-                            </p>
+                            </div>
                         </div>
+                        <nav>
+                            <!-- BEGIN modify_blog -->
+                            <a class="icon-modify" href="/blog/modify/{BLOG_ID}" title="Modify Blog post"></a>
+                            <!-- END modify_blog -->
+                        </nav>
+
                         <ul class="information-list reply" id="blogComment_{BLOG_ID}">
                             <!-- BEGIN has_comments -->
                             <!-- BEGIN comment -->
-                            <li class="row" data-thread>
-                                <div class="column small-11 no-pad">
-                                    <div class="avatar card">
+                            <li class="actions-small-1" id="blog_{BLOG_ID}" data-equalizer data-thread>
+                                <div class="list-item">
+                                    <div class="avatar card small-12" data-equalizer-watch>
                                         <a href="/search/user/{COMMENT_AUTHOR_ID}">
                                             <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square64" />
                                             <p>{COMMENT_AUTHOR_NAME}</p>
                                         </a>
                                         <p class="meta">Commented {COMMENT_CREATED}</p>
                                     </div>
-                                    <p class="list-item-content">{COMMENT_BODY}</p>
+                                    <article>
+                                        <p class="list-item-content">{COMMENT_BODY}</p>
+                                    </article>
                                 </div>
-                                <!-- BEGIN has_comment_delete -->
-                                <div class="one actions">
-                                    <a data-interaction="deletecomment" class="icon-delete no-text" href="/blog/comment/delete/{COMMENT_COMMENT_ID}"></a>
-                                </div>
-                                <!-- END has_comment_delete -->
+                                <nav>
+                                    <!-- BEGIN has_comment_delete -->
+                                    <a data-interaction="deletecomment" class="icon-delete" href="/blog/comment/delete/{COMMENT_COMMENT_ID}"></a>
+                                    <!-- END has_comment_delete -->
+                                </nav>
                             </li>
                             <!-- END comment -->
                             <!-- END has_comments -->
