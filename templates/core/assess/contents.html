@@ -65,26 +65,24 @@
 <section>
     <ul class="action-list sortable" id="section{SECTION_SECTION_ID}" data-question-list>
         <!-- BEGIN question -->
-        <li class="row" id="question_{QUESTION_QUESTION_ID}">
-            <div class="grip"></div>
-            <div class="ten-column">
-                <h4>
-                    <span data-seq>Q{QUESTION_SEQUENCE}</span>
-                    <!-- BEGIN has_mark -->
-                    <span class="meta">({QUESTION_MARKS} marks)</span>
-                    <!-- END has_mark -->
-                </h4>
-
+        <li class="actions-small-3" id="question_{QUESTION_QUESTION_ID}" data-equalizer>
+            <div class="list-item">
+                <div class="grip"></div>
+                <div class="avatar card small-11" data-equalizer-watch>
+                    <h4>
+                        <span data-seq>Q{QUESTION_SEQUENCE}</span>
+                        <!-- BEGIN has_mark -->
+                        <span class="meta">({QUESTION_MARKS} marks)</span>
+                        <!-- END has_mark -->
+                    </h4>
+                </div>
                 <article>{QUESTION_QUESTION}</article>
             </div>
-            <div class="one actions">
-                <a href="#" class="icon-more no-text" data-dropdown="question{QUESTION_QUESTION_ID}-options"></a>
-                <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="question{QUESTION_QUESTION_ID}-options">
-                    <li><a class="icon-modify" href="/{ASSESS_KIND_LC}/question/modify/{QUESTION_QUESTION_ID}">Modify</a></li>
-                    <li><a class="icon-download" href="/{ASSESS_KIND_LC}/questionbank/addQuestion/{QUESTION_QUESTION_ID}" data-reveal-id="question-bank" data-reveal-ajax="true">Import into Question Bank</a></li>
-                    <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/question/delete/{QUESTION_QUESTION_ID}" data-delete>Delete</a></li>
-                </ul>
-            </div>
+            <nav>
+                <a class="icon-delete" href="/{ASSESS_KIND_LC}/question/delete/{QUESTION_QUESTION_ID}" title="Delete" data-delete data-equalizer-watch></a>
+                <a class="icon-modify" href="/{ASSESS_KIND_LC}/question/modify/{QUESTION_QUESTION_ID}" title="Modify" data-equalizer-watch></a>
+                <a class="icon-download" href="/{ASSESS_KIND_LC}/questionbank/addQuestion/{QUESTION_QUESTION_ID}" data-reveal-id="question-bank" data-reveal-ajax="true" data-equalizer-watch title="Import into Question Bank"></a>
+            </nav>
         </li>
         <!-- END question -->
     </ul>
