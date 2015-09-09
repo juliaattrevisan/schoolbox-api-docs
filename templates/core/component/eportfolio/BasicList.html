@@ -63,40 +63,40 @@
             <section>
                 <ul class="action-list">
                     <!-- BEGIN list_item -->
-                    <li class="row" data-list-item-basic='{LIST_ITEM_ID}'>
-                        <div class="small-10 columns no-pad">
-                            <div class="info card" data-content-row="{LIST_ITEM_ID}">
+                    <li class="actions-small-1" data-list-item-basic='{LIST_ITEM_ID}' data-equalizer>
+                        <div class="list-item">
+                            <div class="info card small-12" data-content-row="{LIST_ITEM_ID}" data-equalizer-watch>
                                 <h3>{LIST_ITEM_CONTENT}</h3>
                             </div>
-
-                            <!-- BEGIN has_modify_form -->
-                            <div class="content hide" data-create-panel="{LIST_ITEM_ID}">
-                                <form class='modifyForm' action='/eportfolio/component/basiclist/modifyForm.php' method='post'>
-                                    <input type='hidden' name='action' value='updateItem' />
-                                    <input type='hidden' name='userId' value='{ID}' />
-                                    <input type='hidden' name='pageId' value='{PAGE_ID}' />
-                                    <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
-                                    <input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
-
-                                    <label>
-                                        Content
-                                        <input type='text' name='content' value='{LIST_ITEM_CONTENT}' data-first-focus />
-                                    </label>
-
-                                    <input type='submit' value='Update' />
-                                </form>
-                            </div>
-                            <!-- END has_modify_form -->
                         </div>
-                        <div class="two actions">
+                        <nav>
                             <!-- BEGIN has_delete_form -->
-                            <a class="icon-delete no-text" title="Remove link" href="/eportfolio/component/basiclist/modifyForm.php?action=removeItem&userId={ID}&pageId={PAGE_ID}&componentInstanceId={COMPONENT_INSTANCE_ID}&listItemId={LIST_ITEM_ID}" data-delete></a>
+                            <a class="icon-delete" title="Remove link" href="/eportfolio/component/basiclist/modifyForm.php?action=removeItem&userId={ID}&pageId={PAGE_ID}&componentInstanceId={COMPONENT_INSTANCE_ID}&listItemId={LIST_ITEM_ID}" data-delete></a>
                             <!-- END has_delete_form -->
 
                             <!-- BEGIN has_modify_button -->
-                            <a class='icon-modify no-text' data-list-item-id='{LIST_ITEM_ID}' title="Edit item"></a>
+                            <a class='icon-modify' data-list-item-id='{LIST_ITEM_ID}' title="Edit item"></a>
                             <!-- END has_modify_button -->
+                        </nav>
+
+                        <!-- BEGIN has_modify_form -->
+                        <div class="content hide" data-create-panel="{LIST_ITEM_ID}">
+                            <form class='modifyForm' action='/eportfolio/component/basiclist/modifyForm.php' method='post'>
+                                <input type='hidden' name='action' value='updateItem' />
+                                <input type='hidden' name='userId' value='{ID}' />
+                                <input type='hidden' name='pageId' value='{PAGE_ID}' />
+                                <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
+                                <input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
+
+                                <label>
+                                    Content
+                                    <input type='text' name='content' value='{LIST_ITEM_CONTENT}' data-first-focus />
+                                </label>
+
+                                <input type='submit' value='Update' />
+                            </form>
                         </div>
+                        <!-- END has_modify_form -->
                     </li>
                     <!-- END list_item -->
                 </ul>
