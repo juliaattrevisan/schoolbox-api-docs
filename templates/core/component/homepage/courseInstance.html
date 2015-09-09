@@ -81,41 +81,35 @@
                 <!-- BEGIN course_unit_list -->
                 <ul class="information-list">
                     <!-- BEGIN unit -->
-                    <li class="row interact {UNIT_EXPANDED_STATE}" data-unit data-unit_id="{UNIT_ID}" data-open_date="{UNIT_OPEN_DATE}" data-due_date="{UNIT_DUE_DATE}">
-                        <div class="eleven-column">
-                            <h3>
-                                <!-- BEGIN unit_expand -->
-                                <a class="expand-link {UNIT_EXPANDED_STATE_ICON}" data-interaction="toggle-expanded" data-interaction-state="{UNIT_EXPANDED_STATE}"></a>
-                                <a href="/homepage/{UNIT_HOMEPAGE_ID}">{UNIT_NAME}</a>
-                                <!-- END unit_expand -->
+                    <li class="actions-small-2 interact {UNIT_EXPANDED_STATE}" data-unit data-unit_id="{UNIT_ID}" data-open_date="{UNIT_OPEN_DATE}" data-due_date="{UNIT_DUE_DATE}" data-equalizer>
+                        <div class="list-item">
+                            <div class="info card small-12" data-equalizer-watch>
+                                <h3>
+                                    <!-- BEGIN unit_expand -->
+                                    <a class="expand-link {UNIT_EXPANDED_STATE_ICON}" data-interaction="toggle-expanded" data-interaction-state="{UNIT_EXPANDED_STATE}"></a>
+                                    <a href="/homepage/{UNIT_HOMEPAGE_ID}">{UNIT_NAME}</a>
+                                    <!-- END unit_expand -->
 
-                                <!-- BEGIN unit_no_expand -->
-                                {UNIT_NAME}
-                                <!-- END unit_no_expand -->
-                            </h3>
+                                    <!-- BEGIN unit_no_expand -->
+                                    {UNIT_NAME}
+                                    <!-- END unit_no_expand -->
+                                </h3>
 
-                            <!-- BEGIN unit_completion -->
-                            <span class="gradient-{UNIT_UPCOMING_URGENCY}">{UNIT_COMPLETION_STATUS} {UNIT_RELATIVE_DATE}.</span>
-                            <!-- END unit_completion -->
+                                <!-- BEGIN unit_completion -->
+                                <span class="gradient-{UNIT_UPCOMING_URGENCY}">{UNIT_COMPLETION_STATUS} {UNIT_RELATIVE_DATE}.</span>
+                                <!-- END unit_completion -->
+                            </div>
                         </div>
-
-                        <div class="one actions">
+                        <nav>
                             <!-- BEGIN unit_actions -->
-                            <a data-dropdown="unit-actions-{UNIT_ID}" href="#" class="no-text icon-more" aria-controls="unit-actions-{UNIT_ID}" aria-expanded="false"></a>
-                            <ul data-dropdown-content id="unit-actions-{UNIT_ID}" class="f-dropdown" aria-hidden="true">
-                                <!-- BEGIN unit_modify -->
-                                <li>
-                                    <a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="icon-modify">Modify this unit</a>
-                                </li>
-                                <!-- END unit_modify -->
-                                <!-- BEGIN unit_delete -->
-                                <li>
-                                    <a href="#" class="icon-delete" data-interaction="open_delete_unit_form">Delete this unit</a>
-                                </li>
-                                <!-- END unit_delete -->
-                            </ul>
+                            <!-- BEGIN unit_delete -->
+                            <a href="#" class="icon-delete" data-interaction="open_delete_unit_form" title="Delete this unit"></a>
+                            <!-- END unit_delete -->
+                            <!-- BEGIN unit_modify -->
+                            <a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="icon-modify" title="Modify this unit"></a>
+                            <!-- END unit_modify -->
                             <!-- END unit_actions -->
-                        </div>
+                        </nav>
 
                         <div class="content">
                             <div class="twelve-column hide alert-box" data-form-container data-interaction="delete_unit_container">
