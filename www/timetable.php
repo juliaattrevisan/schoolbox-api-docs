@@ -20,6 +20,7 @@ $groupHandler     = new Group;
 $userHandler      = new User;
 $timetableHandler = new External_Timetable;
 $categoryMapper   = new \Schoolbox\Resource\CategoryMapper();
+$userMapper       = new \Schoolbox\UserMapper();
 
 $this->setFile(TEMPLATE_content, 'class/timetable.html');
 $this->setTitle('Timetable');
@@ -33,13 +34,12 @@ $this->setBlock("period", "day", "day_listing");
 $this->setBlock('day', 'period_class', 'period_class_block');
 $this->setBlock('day', 'period_class_link', 'period_class_link_block');
 $this->setBlock("timetable", "day_header", "day_header_listing");
-$outputList = array();
 
 /* Fetch list of homepage colours for use */
 $colourList = Timetable_ColourMapper::getInstance()->findAll();
 
-/* Don't output if multiple timetables if external campus code is the same */
-$checked_campus_list = array();
+/** @var Schoolbox\User[] $userList */
+$userList = [];
 
 $child_id = $this->arg[0];
 if ($groupHandler->isParent()) {
@@ -50,93 +50,59 @@ if ($groupHandler->isParent()) {
             // show everyone.
             $checked_campus_list = array();
             if (!$child_id || ($child_id == $child['id'])) {
-                $user       = $userHandler->getByID($child['id']);
-                $campusList = $userHandler->getUserCampus($child['id']);
-                foreach ($campusList as $campus) {
-                    $campusObj = Schoolbox\CampusMapper::getInstance()->findById($campus);
-                    if ($campusObj instanceof Schoolbox\Campus) {
-                        $campus_code = $campusObj->getExtTimetableCode();
-                        if (!isset($checked_campus_list[$campus_code])) {
-                            $checked_campus_list[$campus_code] = true;
-                            $user['campus']     = $campusObj;
-                            $user['campusName'] = $campusObj->getName();
-                            $outputList[]       = $user;
-                        }
-                    }
-                }
+                $userList[] = $userMapper->findById($child['id']);
             }
         }
     }
     //
     // Requesting a child that isn't yours? Access Denied
-    if ($child_id && empty($outputList)) {
+    if (empty($userList)) {
         error(19);
     }
 } else {
     if ($child_id) {
         if ($groupHandler->isStaff() || $child_id == $_SESSION['id']) {
             //Output a timetable for each campus user is involved in
-            $user       = $userHandler->getByID($child_id);
-            $campusList = $userHandler->getUserCampus($child_id);
-            foreach ($campusList as $campus) {
-                $campusObj = Schoolbox\CampusMapper::getInstance()->findById($campus);
-                if ($campusObj instanceof Schoolbox\Campus) {
-                    $campus_code = $campusObj->getExtTimetableCode();
-                    if (!isset($checked_campus_list[$campus_code])) {
-                        $checked_campus_list[$campus_code] = true;
-                        $user['campus']     = $campusObj;
-                        $user['campusName'] = $campusObj->getName();
-                        $outputList[]       = $user;
-
-                    }
-                }
-            }
+            $userList[] = $userMapper->findById($child_id);
         } else {
             error(19);
         }
     } else {
         // Output my own timetable (all campuses)
         /** @var Schoolbox\User $userObject **/
-        $userObject = $_SESSION['user'];
-        $user       = $userHandler->getByID($userObject->getId());
-        foreach ($userObject->getCampusCollection() as $campusObj) {
-            $campus_code = $campusObj->getExtTimetableCode();
-            if (!isset($checked_campus_list[$campus_code])) {
-                $checked_campus_list[$campus_code] = true;
-                $user['campus']     = $campusObj;
-                $user['campusName'] = $campusObj->getName();
-                $outputList[]       = $user;
-            }
-        }
+        $userList[] = $_SESSION['user'];
     }
 }
 
-/* Used to determine whether or not to display No Timetables message
- */
-$numTimetables = 0;
+foreach ($userList as $user) {
+    $checkedCampusList = [];
+    foreach ($user->getCampusCollection() as $campus) {
+        $campusCode = $campus->getExtTimetableCode();
+        if (isset($checkedCampusList[$campusCode])) {
+            continue;
+        }
+        $checkedCampusList[$campusCode] = true;
 
-if (is_array($outputList)) {
-    foreach ($outputList as $user) {
         /* Setup colour map */
         $subjectColourMap = array();
         $colourIndex      = 0;
 
         $outputUser = array(
-            'PERSON' => $userHandler->formatName($user),
-            'YEAR'   => $user['year'] ? ', Year ' . $user['year'] : '',
-            'USER_ID' => $user['uid'],
+            'PERSON' => $user->formatName(),
+            'YEAR'   => $user->getYear() ? ', Year ' . $user->getYear() : '',
+            'USER_ID' => $user->getId(),
         );
 
         $this->setVar($outputUser);
         $this->parse('timetable_selector_block', 'timetable_selector', true);
 
-        $staffFlag = $groupHandler->isStaff($user['uid']);
+        $staffFlag = $user->getRole()->isStaff();
 
-        $periodCurrent = $timetableHandler->getPeriodNumber($user['campus']);
-        $dayCurrent    = $timetableHandler->getDayNumber($user['campus']);
+        $periodCurrent = $timetableHandler->getPeriodNumber($campus);
+        $dayCurrent    = $timetableHandler->getDayNumber($campus);
 
         try {
-            $timetable = $timetableHandler->getFullTimetable($user['synergy_id'], $user['uid'], $user['campus']);
+            $timetable = $timetableHandler->getFullTimetable($user->getExternalId(), $user->getId(), $campus);
         } catch (\Schoolbox\External\Exception $e) {
             error(22);
         }
