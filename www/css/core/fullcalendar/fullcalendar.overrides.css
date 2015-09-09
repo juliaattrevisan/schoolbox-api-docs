@@ -32,26 +32,14 @@
 .fc-state-default{
     text-shadow: none;
     box-shadow: none;
+    background-image: none;
+    background-color: #bdd7ea;
+    text-transform: capitalize;
 }
 
 .fc-state-down, .fc-state-active {
     box-shadow: none;
 }
-
-.fc .fc-button-group > * {
-    float: left;
-    margin: 4px;
-}
-
-.fc .fc-button-group > :first-child {
-    margin-left: 0;
-}
-
-.fc .fc-toolbar > * > * { /* extra precedence to override button border margins */
-    float: left;
-    margin-left: 4px;
-}
-
 /**
  * Booking-related CSS
  */
@@ -75,4 +63,19 @@
     /** Cancelled events - currently not shown, but put a line through them **/
     text-decoration: line-through;
     font-style: italic;
+}
+
+.fc table {
+    margin-bottom: 0;
+}
+
+.fc table tr:hover td {
+    background-color: transparent;
+}
+
+.fc-row .fc-content-skeleton td {
+    border-color: inherit;
+}
+.fc-toolbar {
+    margin-bottom: 0;
 }

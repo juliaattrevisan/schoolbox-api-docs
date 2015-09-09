@@ -79,6 +79,12 @@ function Calendar(id, bubbleId, opts) {
              */
             eventClick: function(calEvent, jsEvent, view) {
 
+                // Did this event come from a checkbox?
+                // If so do nothing, those events are handled elsewhere.
+                if ($(jsEvent.target).is(':checkbox')) {
+                    return;
+                }
+
                 // setup data to be displayed
                 var data = $.extend(true, {}, calEvent.data.meta)
 
@@ -130,10 +136,10 @@ function Calendar(id, bubbleId, opts) {
                     else {
                         url = '/calendar/modify.php?eventID=' + calEvent.data.meta.eventId + '&returnTo=calendar';
                         deleteUrl = '/calendar/modifyForm.php?action=Delete&id=' + calEvent.data.meta.eventId + '&returnTo=calendar';
-                        data.deleteLink = '<a class="btn delete float-left" href="' + deleteUrl + '"><span></span>Delete</a>';
+                        data.deleteLink = '<a class="button icon-delete" href="' + deleteUrl + '"><span></span>Delete</a>';
                     }
 
-                    data.modifyLink = '<a class="btn modify float-left" href="' + url + '"><span></span>Modify</a>';
+                    data.modifyLink = '<a class="button icon-modify" href="' + url + '"><span></span>Modify</a>';
                 }
                 else {
                     data.modifyLink = '';
@@ -158,13 +164,12 @@ function Calendar(id, bubbleId, opts) {
                 // Attendance List butonye
                 if (data.attendanceListButton.toString() == 'true') {
                     data.attendanceIcon = ''
-                    data.attendanceListButton = '<a class="btn groups float-left" href="/calendar/attendance/list/'
-                        + calEvent.data.meta.eventId + '"><span></span>Attendees</a>'
+                    data.attendanceListButton = '<a class="button icon-group" href="/calendar/attendance/list/'
+                        + calEvent.data.meta.eventId + '">Attendees</a>'
                 }
                 // Attend/Unattend butonye
                 if (data.attendanceRequestButton.toString() != 'false') {
-                    data.attendanceRequestButton = '<a class="btn reply float-left" href="#"><span></span>' + data.attendanceRequestButton.toString() + '</a>'
-
+                    data.attendanceRequestButton = '<a class="button icon-reply" href="#" data-attendance-request>' + data.attendanceRequestButton.toString() + '</a>'
                 }
 
                 data.bookingActions = [];
@@ -196,8 +201,14 @@ function Calendar(id, bubbleId, opts) {
                     data.relatedBookings = calEvent.data.booking.related;
                 }
 
+                self.bubble.display('edit', data, jsEvent, this);
 
-                self.bubble.display('edit', data, jsEvent, this)
+                // Hide event types in the bubble
+                var isTask = data.eventTypeId == c.options.taskTypeId;
+                var bubble = $('#calendar-bubble');
+                bubble.foundation('reveal', 'open');
+                bubble.find('#editTask').toggleClass('hide', !isTask);
+                bubble.find('#editEvent').toggleClass('hide', isTask);
             }
         },
         datepicker: {
@@ -226,31 +237,18 @@ function Calendar(id, bubbleId, opts) {
 
         interaction: function(cal) {
 
-            // Only set up interactions that actually exist.
-            var calendarButtons = $(cal.options.filter.btnSelector)
-            var exportButtons   = $(cal.options.filter.exportButtonSelector)
-
+            // Only set up interactions that actually exist
             var calendarControls = $(cal.options.filter.parentSelector)
             var exportControls   = $(cal.options.filter.exportSelector)
 
             // show the filter 'dialog' when the button is clicked
             cal.dom.on('click', cal.options.filter.btnSelector, function() {
-                cal.bubble.hide()
-                calendarControls.find(cal.options.filter.boxSelector).toggle()
-                exportControls.find(cal.options.filter.boxSelector).hide()
-                exportButtons.removeClass('engaged')
-                calendarButtons.toggleClass('engaged')
                 return false
             })
 
             // Show the export filter, if it exists
             if (cal.options.filter.exportButtonSelector) {
                 cal.dom.on('click', cal.options.filter.exportButtonSelector, function() {
-                    cal.bubble.hide()
-                    calendarControls.find(cal.options.filter.boxSelector).hide()
-                    exportControls.find(cal.options.filter.boxSelector).toggle()
-                    calendarButtons.removeClass('engaged')
-                    exportButtons.toggleClass('engaged')
                     return false
                 })
             }
@@ -265,16 +263,10 @@ function Calendar(id, bubbleId, opts) {
             if (cal.options.filter.applyFiltersSelector) {
                 calendarControls.on('click', cal.options.filter.applyFiltersSelector, function() {
                     cal.filters.organise(cal, ["campus", "groups", "sources"])
-                    calendarControls.find(cal.options.filter.boxSelector).hide()
-                    $(cal.options.filter.btnSelector).removeClass('engaged')
+                    calendarControls.foundation('reveal', 'close');
                     return false
                 })
             }
-
-            $('body').click(function() {
-                $(cal.options.filter.boxSelector).hide()
-                $(cal.options.filter.btnSelector).removeClass('engaged')
-            })
 
             if (cal.options.filter.boxSelector) {
                 calendarControls.add(exportControls).on('click', cal.options.filter.boxSelector, function(e) {
@@ -374,7 +366,8 @@ function Calendar(id, bubbleId, opts) {
                         return false;
                     }
                 });
-                event.is_rendered = is_rendered;
+                // disabled until filters are fully fixed
+                 event.is_rendered = is_rendered;
             });
 
             //
@@ -428,14 +421,14 @@ Calendar.prototype.init = function() {
     this.dom.fullCalendar(this.options.fullCalendar)
     /* Button for list view
      */
-    var headerRight = this.dom.find('.fc-toolbar .fc-right');
+    var headerRight = this.dom.find('.fc-toolbar .fc-right .fc-button-group');
     var baseButton  = headerRight.find('.fc-button').first();
     if (this.options.filter.listViewButton) {
         headerRight.prepend(
             baseButton.clone()
                 .html('list')
                 .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active no-icon')
-                .addClass(' fc-corner-left no-icon')
+                .addClass(' fc-corner-left')
                 .attr('id','fc-button-list')
         );
     }
@@ -447,8 +440,9 @@ Calendar.prototype.init = function() {
                 baseButton.clone()
                     .html('filters')
                     .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
-                    .addClass('fc-button-filter fc-corner-left fc-corner-right btn')
+                    .addClass('fc-button-filter fc-corner-left fc-corner-right')
                     .attr('id','fc-button-filter')
+                    .attr('data-reveal-id',this.options.filter.parentSelector.substr(1))
             );
         }
         if (this.options.filter.exportButtonSelector) {
@@ -456,8 +450,9 @@ Calendar.prototype.init = function() {
                 baseButton.clone()
                     .html('export')
                     .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
-                    .addClass('fc-button-filter fc-corner-left fc-corner-right btn reply')
+                    .addClass('fc-button-filter fc-corner-left fc-corner-right')
                     .attr('id','fc-button-export')
+                    .attr('data-reveal-id',this.options.filter.exportSelector.substr(1))
             );
         }
     }
@@ -516,9 +511,9 @@ Calendar.prototype.init = function() {
                             c.dom.fullCalendar('removeEvents', 'placeholder');
                             c.dom.fullCalendar('renderEvent', JSON.parse(responseText), true);
                         }
-                    })
+                        c.bubble.hide();
+                    });
                     c.clearForms()
-                    c.bubble.hide()
                 })
             }
             else {
@@ -545,8 +540,8 @@ Calendar.prototype.init = function() {
                             c.dom.fullCalendar('removeEvents', matchEvents(eventId));
                             c.dom.fullCalendar('renderEvent', newEvent);
                         }
+                        c.bubble.hide();
                     })
-                    c.bubble.hide()
                 })
             }
         }
@@ -689,15 +684,15 @@ function Bubble(calendar, bubbleDomId) {
     this.calendar = calendar
     this.forms = {}
     this.dom = $('#'+bubbleDomId)
-    this.initForms(bubbleDomId)
+    this.initForms()
 }
 
 /**
  * Go through the bubble's DOM and cache all its forms
  * @param bubbleDomId
  */
-Bubble.prototype.initForms = function(bubbleDomId) {
-    var bbl = $('#'+bubbleDomId)
+Bubble.prototype.initForms = function() {
+    var bbl = $(document)
 
     // define a way for the each loop to reach the parent
     var self = this
@@ -725,30 +720,22 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
         return
     }
 
-    var id = method
-    if(eventData !== undefined) {
-        id += (eventData.eventTypeId == this.calendar.options.taskTypeId ? 'Task' : 'Event')
-    }
-    else {
-        id += 'Event'
-    }
-
 	/* Hide "Posted By" if there is no author
 	 * (This happens on subscribed vcals for example)
 	 */
 	if (eventData.authorId == -1) {
-		$('dd.post-by').hide();
+		$('[data-event-modal-field="post-by"]').hide();
 	}
 	else {
-		$('dd.post-by').show();
+		$('[data-event-modal-field="post-by"]').show();
 	}
 
     // Hide reviewed by as well
     if (!('reviewerId' in eventData) || eventData.reviewerId == -1) {
-        $('dd.reviewed-by').hide();
+        $('[data-event-modal-field="reviewedBy"]').hide();
     }
     else {
-        $('dd.reviewed-by').show();
+        $('[data-event-modal-field="reviewedBy"]').show();
     }
 
     // Fill in resauce borking separately
@@ -762,72 +749,10 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
     }
     delete eventData.relatedBookings;
 
-    var xPos = mouseEvent.pageX
-    var yPos = mouseEvent.pageY + 5
-    this.fillForm(id, eventData)
-    this.showForm(id, xPos, yPos)
+    this.fillForm(method+'Event', eventData);
+    this.fillForm(method+'Task', eventData);
 }
 
-/**
- * Display a form in a particular location - does not perform data loading
- * @param id
- * @param x horizontal position of the bubble speech point
- * @param y vertical position of the bubble speech point
- */
-Bubble.prototype.showForm = function(id, x, y) {
-
-    var minEdgeDistance = 5
-    var navWidth = $('#nav').width()
-
-    // hide the bubble, but keep it displayed
-    this.dom.css({visibility:'hidden', display:'block'})
-    $.each(this.forms, function(i, elem) {
-        if(i == id) {
-            this.css({display:'block'})
-        }
-        else {
-            this.css({display:'none'})
-        }
-    })
-
-    // now that the correct form is filling the bubble, position appropriately
-    // position the popup in the right spot!!
-    var mid = this.dom.find('.middle')
-
-    // unfortunately dimension-related things don't work when elements are not displayed
-    this.dom.css('visibility', 'hidden')
-    this.dom.show()
-
-    var bubbleHeight = mid.outerHeight() + mid.find('.bottom').outerHeight()
-    // don't allow the bubble to fall off the top of the page
-    var topEdge = Math.max(minEdgeDistance, y - bubbleHeight)
-
-    var bubbleWidth = mid.outerWidth()
-    var desiredX  = x - bubbleWidth + 25
-
-    // don't allow the bubble to overlap the left nav (z-index issues)
-    var leftEdge = Math.max(desiredX, minEdgeDistance + navWidth)
-
-    // don't allow the bubble to fall off the right edge of the page
-//    console.log($j(window).width(), bubbleWidth, minEdgeDistance)
-    leftEdge = Math.min(x, leftEdge, $(window).width() - bubbleWidth - minEdgeDistance)
-
-    var talkMarkX = Math.min(22 + leftEdge - desiredX, mid.width())
-
-    var pos = {top: topEdge, left: leftEdge}
-
-    this.dom.offset(pos)
-    this.dom.find('.bottom').css('right', talkMarkX)
-    this.dom.css('visibility', 'visible')
-
-}
-
-/**
- * Make the bubble go away
- */
-Bubble.prototype.hide = function() {
-    this.dom.css({visibility:'visible', display:'none'})
-}
 
 /**
  * Populate the nominated form with the data supplied
@@ -877,6 +802,7 @@ Bubble.prototype.fillForm = function(formId, vars) {
     $.each(vars, function(k, v) {
         // first test if it's an input with the name we're after
         var element = form.find('[name=' + k + ']')
+
         if(element.length) {
             var type = element.attr('type')
             // textboxes and textareas get filled with text...
@@ -895,10 +821,25 @@ Bubble.prototype.fillForm = function(formId, vars) {
         }
         // if no form input element found, try for an element with the right class
         else {
-            fillElement(form.find('.'+k), k, v, vars)
+            /* Check for data attribute first
+             */
+            var dataSelector = $('[data-event-modal-field="'+k+'"]');
+            if (dataSelector.length) {
+                fillElement(dataSelector, k, v, vars)
+            }
+            /* Otherwise assume classes
+             */
+            else {
+                fillElement(form.find('.'+k), k, v, vars)
+            }
         }
     })
-}
+};
+
+
+Bubble.prototype.hide = function() {
+    $(document).foundation('reveal', 'close');
+};
 
 /* Helper functions */
 
@@ -909,10 +850,9 @@ Bubble.prototype.fillForm = function(formId, vars) {
  * @param selector
  */
 function cp(from, to, selector) {
-
     $.each(selector, function() {
         // copy the date in the createEvent form into the createTask form
-        $(['input[name='+this+']', '.'+this]).each(function() {
+        $(['input[name='+this+']', '[data-event-modal-field="'+this+'"]']).each(function() {
             var orig = c.bubble.forms['create'+from.capitalise()].find(this.toString())
             var targ = c.bubble.forms['create'+to.capitalise()].find(this.toString())
 

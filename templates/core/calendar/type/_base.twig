@@ -8,7 +8,8 @@
     {% endblock eventSpan %}
 
     {% block eventTitle %}
-    <div class="nine-column" data-dropdown="contentDrop{{ event.getEventId() }}{{ augmentedId }}" style="background-color:{{ event.colour }}">
+
+    <div class="nine-column" data-reveal-id="modal{{ event.getEventId() }}{{ augmentedId }}" style="background-color:{{ event.colour }}">
         {{ event.title }}
 
         <span class="right" style="background-color:{{ event.colour }}">
@@ -19,41 +20,39 @@
     </div>
     {% endblock eventTitle %}
 
-
-    <div class="f-dropdown content content-drop medium" data-dropdown-content="" id="contentDrop{{ event.getEventId() }}{{ augmentedId }}">
+    <div id="modal{{ event.getEventId() }}{{ augmentedId }}" class="reveal-modal" data-reveal>
         {% block eventBubble %}
-
             {% block eventBubbleSummary %}
             <h3>{{ event.title }}</h3>
-            <h4>
+
+            <ul class="meta">
+                <li class="icon-calendar"><time>{{ event.getFullDate()|raw }}</time></li>
+
                 {% if event.eventType %}
-                {{ event.eventType }}:
+                <li class="icon-list">{{ event.eventType }}:</li>
                 {% endif %}
-                {{ event.getFullDate()|raw }}
-            </h4>
 
-            {% if event.location %}
-                <p class="location">{{ event.location }}</p>
-            {% endif %}
+                {% if event.location %}
+                <li class="icon-location">{{ event.location }}</li>
+                {% endif %}
 
-            <article>{{ event.detail|purify}}</article>
-            {% endblock eventBubbleSummary %}
-
-            {% block eventBubbleMeta %}
-            <div class="created meta">
+                {% block eventBubbleMeta %}
                 {% if event.authorName %}
-                Posted by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a>
+                <li class="icon-staff-students">Posted by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a></li>
                 {% endif %}
 
                 {% if event.category %}
-                in <a href='/homepage/{{ event.categoryId }}'>{{ event.categoryName }}</a>
+                <li class="icon-home"><a href='/homepage/{{ event.categoryId }}'>{{ event.categoryName }}</a></li>
                 {% endif %}
-            </div>
 
-            {% if event.attendance %}
-            <p class="meta">Attendance {{ renderer.attendanceStatus() }}</p>
-            {% endif %}
-            {% endblock eventBubbleMeta %}
+                {% if event.attendance %}
+                <li class="icon-list">Attendance {{ renderer.attendanceStatus() }}</li>
+                {% endif %}
+                {% endblock eventBubbleMeta %}
+            </ul>
+
+            <article>{{ event.detail|purify}}</article>
+            {% endblock eventBubbleSummary %}
 
             {% block eventBubbleButtons %}
             <div>
@@ -62,7 +61,7 @@
                         <input name="event[id]" type="hidden" value="{{ event.eventId }}">
                         {% if renderer.attendanceStatus() %}
                         <a class="button icon-close" data-attendance-request href="#">Unattend</a>
-                    {% else %}
+                        {% else %}
                         <a class="button icon-approve" data-attendance-request href="#">RSVP</a>
                         {% endif %}
                     </form>
@@ -78,5 +77,7 @@
             </div>
             {% endblock eventBubbleButtons %}
         {% endblock eventBubble %}
+
+        <a class="close-reveal-modal">&#215;</a>
     </div>
 </li>

@@ -1,4 +1,11 @@
 <div id="component{COMPONENT_INSTANCE_ID}" data-component>
+    <script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('#component{COMPONENT_INSTANCE_ID}').calendarAttendance();
+        });
+    </script>
+
     {CONFIGURATION}
 
     <div class="row">
@@ -28,26 +35,3 @@
         <!-- END day -->
     </div>
 </div>
-
-<script type="text/javascript">
-    $(function () {
-        $(document).on('click', 'a.attendance-request', function (event) {
-            event.preventDefault();
-
-            var button = $(this);
-
-            var data = button.parent('form').serialize();
-
-            $.post('/service/attendance/processToggleAttendance', data, function (data) {
-                if (data.error == undefined) {
-                    if (button.text() == 'RSVP') {
-                        button.html('<span></span>Unattend');
-                    }
-                    else {
-                        button.html('<span></span>RSVP');
-                    }
-                }
-            });
-        });
-    });
-</script>

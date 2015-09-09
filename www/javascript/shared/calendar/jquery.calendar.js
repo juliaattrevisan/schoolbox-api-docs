@@ -50,7 +50,13 @@
 
                 /* The element containing the export url
                  */
-                exportUrl: '#calendar-export-dialog-url'
+                exportUrl: '#calendar-export-dialog-url',
+
+                /* Executes when Ready
+                 */
+                onReady: function() {
+                    defaultOnReady();
+                }
             }
 
             var derived = {
@@ -59,6 +65,26 @@
             var merged = $.extend(defaults, derived, options);
 
             return merged;
+        }
+
+        /**
+         * Default After Ready function
+         */
+        function defaultOnReady() {
+            var dialog = $(config.exportElement);
+            var dialogUrl = $(config.exportUrl);
+
+            dialogUrl.text($.getExportCalendarLink(
+                config.userToken,
+                {
+                    'export': 'group',
+                    'group': config.groupId
+                }
+            ));
+
+            $(config.copy).show();
+
+            dialogUrl.select();
         }
 
         /**
@@ -76,15 +102,7 @@
                 var client = new ZeroClipboard(button);
 
                 client.on('ready', function() {
-                    $(config.exportUrl).text($.getExportCalendarLink(
-                        config.userToken,
-                        {
-                            'export': 'group',
-                            'group': config.groupId
-                        }
-                    ));
-
-                    button.show();
+                    config.onReady();
                 });
             });
         }
@@ -126,6 +144,12 @@
                 text: {
                     rsvp: 'RSVP',
                     unattend: 'Unattend'
+                },
+
+                /* You can determine post data your own way
+                 */
+                getFormData: function(button) {
+                    return defaultGetFormData(button);
                 }
             }
 
@@ -148,7 +172,7 @@
 
                 var button = $(this);
 
-                var data = button.parent('form').serialize();
+                var data = config.getFormData(button);
 
                 $.post(config.url, data, function (data) {
                     if (data.error == undefined) {
@@ -161,6 +185,16 @@
                     }
                 });
             });
+        }
+
+        /**
+         * Default way of getting post data
+         *
+         * @param button
+         * @returns {*}
+         */
+        function defaultGetFormData(button) {
+            return button.parent('form').serialize();
         }
     }
 }(jQuery));

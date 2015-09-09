@@ -47,11 +47,11 @@
 		 * Add ability to toggle popup on/off
 		 */
 		function applyPopupToggle() {
-			$(config.element).click(function(event) {
+			$('#applyFilters').click(function(event) {
 				event.preventDefault();
 
-				$(config.exportContainer).hide();
-				$(config.filterContainer).toggle();
+				$(config.filterContainer).foundation('reveal','close');
+
 			});
 		}
 
@@ -104,10 +104,10 @@
 		function toggleHeaders() {
 			$.each($(config.eventContainer).find('ul'), function(index, element) {
 				if ($(element).find('li').not(':hidden').length) {
-					$(element).prev('h2').show();
+					$(element).parent().prev('h2').show();
 				}
 				else {
-					$(element).prev('h2').hide();
+					$(element).parent().prev('h2').hide();
 				}
 			});
 		}

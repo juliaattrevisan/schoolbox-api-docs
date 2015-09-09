@@ -1,21 +1,25 @@
+<!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 <script type="text/javascript" src="/calendar/js/jquery.filterSelector.js"></script>
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
 <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
 <script type="text/javascript">
 	$(function() {
-
-		var exportForm = $('#calendar-export .filter-drop');
+		var exportForm = $('#calendar-export-form-container');
 
 		$('[data-filters="true"]').filterSelector({
-			filterContainer: '#calendar-list .filter-drop',
+			filterContainer: '#calendar-controls',
 			eventContainer: $('[data-eventlist="true"]'),
 			exportContainer: exportForm
 		})
 
         /* Calendar controls
          */
+        $('[data-filters]').click(function() { $('#calendar-controls').foundation('reveal','open') });
+        $('[data-export]').click(function() { $('#calendar-export-form-container').foundation('reveal','open') });
+
         $('[data-type=calendar-controls]').submit(function(event) {
             event.preventDefault();
 
@@ -30,9 +34,6 @@
 
 		/* date picker */
 		$('#start_date').datepicker({
-			showOn: 'both',
-			buttonImage: '/images/core/calendar/calendar-click.png',
-			buttonImageOnly: true,
 			constrainInput: false,
             altField: '#start_date_alt',
             altFormat: 'dd-mm-yy',
@@ -46,9 +47,6 @@
         
         /* date picker */
         $('#finish_date').datepicker({
-            showOn: 'both',
-            buttonImage: '/images/core/calendar/calendar-click.png',
-            buttonImageOnly: true,
             constrainInput: false,
             altField: '#finish_date_alt',
             altFormat: 'dd-mm-yy',
@@ -64,13 +62,6 @@
 			endDate: $('#finish_date')
 		});
 
-		$('.btn.export').click(function(event) {
-			event.preventDefault();
-			$('.filter-drop').not(exportForm).hide();
-			exportForm.toggle();
-		});
-
-//		exportControls.find(cal.options.filter.boxSelector).toggle()
 		//
 		// Form listener for exporter - brings up a dialog box that offers a URL
 		// to click.
@@ -80,252 +71,215 @@
             window.location = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
         });
 
-
-		$('#calendar-export form').submit(function(event) {
-			event.preventDefault();
-
-            // Copy and paste button - show only when ready
-            var button = $('#copy-button').hide();
-            var client = new ZeroClipboard(button);
-            client.on('ready', function() {
-                button.show();
-            });
-
-            var form = $(this);
-			$('#calendar-export-dialog').dialog({
-				open: function(event, ui) {
-					$(event.target).find('#calendar-export-dialog-url')
-							.text($.getExportCalendarLink('{USER_TOKEN}', form.serializeArray()));
-				},
-				minWidth: 400,
-				modal: true
-			});
-		});
-
-
-		$('.filter-cat.sources').selectAll({
-			key: 'selectallsources',
-			checkboxName: 'source',
-			change: function() {
-				$('input[name=source]').change();
-			}
-		});
-
-		$('.filter-cat.groups').selectAll({
-			key: 'selectallgroups',
-			checkboxName: 'group',
-			change: function() {
-				$('input[name=group]').change();
-			}
-		});
-
-		$('.filter-cat.campus').selectAll({
-			key: 'selectallcampuses',
-			checkboxName: 'campus',
-			change: function() {
-				$('input[name=campus]').change();
-			}
-		});
-
-		$('.filter-cat.events').selectAll({
-			key: 'selectalleventtypes',
-			checkboxName: 'events',
-			change: function() {
-				$('input[name=events]').change();
-			}
-		});
-
-        $(document).on('click', 'a.attendance-request', function (event) {
-            event.preventDefault();
-
-            var button = $(this);
-
-            var data = button.parent('form').serialize();
-
-            $.post('/service/attendance/processToggleAttendance', data, function (data) {
-                if (data.error == undefined) {
-                    if (button.text() == 'RSVP') {
-                        button.html('<span></span>Unattend');
-                    }
-                    else {
-                        button.html('<span></span>RSVP');
-                    }
-                }
-            });
+        //select all clicked
+        $('#calendar-controls').on('change','.select_all', function(e) {
+            $(this).parent().find(':checkbox').prop('checked', $(this).prop('checked'));
         });
 
+        /* Export calendar
+         */
+        $.fn.calendarExport({
+            exportActivator: '#open-calendar-export-dialog',
+            onReady: function() {
+                var form = $('#calendar-export-form');
+                var url = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray());
+
+                var dialog = $('#calendar-export-dialog');
+                var dialogUrl = $('#calendar-export-dialog-url');
+
+                /* Bypass foundation bug
+                 * https://github.com/zurb/foundation/issues/4746
+                 */
+                dialogUrl.val(url);
+                dialog.foundation('reveal', 'open');
+
+                dialog.on('opened', function() {
+                    dialogUrl.select();
+                });
+
+                var button = $('#copy-button').show();
+            }
+        });
+
+        /* Attendance
+         */
+        $('#calendar-list').calendarAttendance();
 	});
 </script>
+<!-- END custom_head -->
 
-<div class="navHelp">
-	<h1>Calendar for {USER_FULLNAME}</h1>
+<div id="calendar-export-form-container" class="reveal-modal small" data-reveal aria-hidden="true" role="dialog">
+    <form class="top" action="#" id="calendar-export-form">
+        <section>
+            <fieldset class="content radiolist">
+                <input type="radio" name="export" value="all" id="export-all" checked />
+                <label for="export-all" class="c">All events</label>
+                <input type="radio" name="export" value="personal" id="export-personal" />
+                <label for="export-personal">Personal events only</label>
+                <input type="radio" name="export" value="timetable" id="export-timetable" />
+                <label for="export-timetable">Timetable Classes</label>
+                <input type="radio" name="export" value="timetabledays" id="export-timetableday" />
+                <label for="export-timetableday">Timetable Days</label>
+                <input type="radio" name="export" value="duework" id="export-duework" />
+                <label for="export-duework">Due Work</label>
+                <input type="radio" name="export" value="campus" id="export-campus" />
+                <label for="export-campus">Events for campus:
+                    <select name="campus">
+                        <option value="">-- select --</option>
+                        <!-- BEGIN export_campus -->
+                        <option label="{EXPORT_CAMPUS_NAME}" value="{EXPORT_CAMPUS_ID}">{EXPORT_CAMPUS_NAME}</option>
+                        <!-- END export_campus -->
+                    </select>
+                </label>
+                <input type="radio" name="export" value="group" id="export-group" />
+                <label for="export-group">Events for group:
+                    <select name="group">
+                        <option value="">-- select --</option>
+                        <!-- BEGIN export_group -->
+                        <option label="{EXPORT_GROUP_NAME}" value="{EXPORT_GROUP_ID}">{EXPORT_GROUP_NAME}</option>
+                        <!-- END export_group -->
+                    </select>
+                </label>
+            </fieldset>
+        </section>
+        <input type="submit" id="open-calendar-export-dialog" value="Generate URL"  />
+        <input type="submit" id="download-calendar-export" value="Download CSV"/>
+    </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
-<div id="calendar-export" class="calendar-controls no-height clearfix">
-	<div class="link-case">
-        <div class="filter-drop clearfix">
-            <div class="filter-list">
-                <form class="clearfix">
-                    <div class="export-cat all-events">
-                        <label title="All events" for="export-all">
-                            <input type="radio" name="export" value="all" id="export-all" checked />
-                            All events
-                        </label>
-                    </div>
-                    <div class="export-cat personal-events">
-                        <label title="Personal events only" for="export-personal">
-                            <input type="radio" name="export" value="personal" id="export-personal" />
-                            Personal events only
-                        </label>
-                    </div>
-                    <div class="export-cat group-events">
-                        <label title="Events for group" for="export-group">
-                            <input type="radio" name="export" value="group" id="export-group" />
-                            Events for group:
-                            <select name="group">
-                                <option value="">-- select --</option>
-                                <!-- BEGIN export_group -->
-                                <option label="{EXPORT_GROUP_NAME}" value="{EXPORT_GROUP_ID}">{EXPORT_GROUP_NAME}</option>
-                                <!-- END export_group -->
-                            </select>
-                        </label>
-                    </div>
-                    <div class="export-cat campus-events">
-                        <label title="Events for campus" for="export-campus">
-                            <input type="radio" name="export" value="campus" id="export-campus" />
-                            Events for campus:
-                            <select name="campus">
-                                <option value="">-- select --</option>
-                                <!-- BEGIN export_campus -->
-                                <option label="{EXPORT_CAMPUS_NAME}" value="{EXPORT_CAMPUS_ID}">{EXPORT_CAMPUS_NAME}</option>
-                                <!-- END export_campus -->
-                            </select>
-                        </label>
-                    </div>
-                    <div class="export-cat timetable-events">
-                        <label title="Timetable Classes" for="export-timetable">
-                            <input type="radio" name="export" value="timetable" id="export-timetable" />
-                            Timetable Classes
-                        </label>
-                    </div>
-                    <div class="export-cat timetableday-events">
-                        <label title="Timetable days" for="export-timetableday">
-                            <input type="radio" name="export" value="timetabledays" id="export-timetableday" />
-                            Timetable Days
-                        </label>
-                    </div>
-                    <div class="export-cat duework-events">
-                        <label title="Due Work" for="export-duework">
-                            <input type="radio" name="export" value="duework" id="export-duework" />
-                            Due Work
-                        </label>
-                    </div>
-                    <input type="submit" id="open-calendar-export-dialog" value="Generate URL" class="submit-btn-plain" />
-                    <input type="submit" id="download-calendar-export" value="Download CSV" class="submit-btn-plain" />
-                </form>
-            </div>
-        </div>
-	</div>
-</div>
-<div id="calendar-export-dialog">
+<div class="reveal-modal" data-reveal aria-labelledby="firstModalTitle" aria-hidden="true" role="dialog" id="calendar-export-dialog">
     <div id="calendar-export-dialog-text">
         Use the following address to subscribe your favourite calendar application to a live feed.
     </div>
     <textarea readonly id="calendar-export-dialog-url" rows="6"></textarea>
-    <button class="btn no-icon" id="copy-button" data-clipboard-target="calendar-export-dialog-url" title="Click to copy me.">Copy to Clipboard</button>
+    <button id="copy-button" data-clipboard-target="calendar-export-dialog-url" class="icon-copy">Copy to Clipboard</button>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
-<div id="calendar-list" class='printEventList' data-eventlist="true">
-	<div class="calendar-controls">
-		<div class="link-case">
-			<div class="filter-drop clearfix">
-				<div class="filter-list">
-					<form class="clearfix">
-						<div class="filter-cat sources clearfix checkboxes"><span class="filter-title">Sources</span>
-							<label>
-								<input data-selectallsources='true' type="checkbox" class="checkbox" checked/>Select all
-							</label>
-							<!-- BEGIN filter_source -->
-							<label title="{SOURCE_NAME}">
-                                <input type="checkbox" name="source" id="{SOURCE_ID}" value="source{SOURCE_ID}" {SOURCE_ID_SELECTED} class="checkbox applyFilters"/>
-                                {SOURCE_NAME}
-							</label>
-							<!-- END filter_source -->
-						</div>
-						<div class="filter-cat groups clearfix checkboxes"><span class="filter-title">Groups</span>
-							<label>
-								<input data-selectallgroups='true' type="checkbox" class="checkbox" checked/>Select all
-							</label>
-							<!-- BEGIN filter_group -->
-							<label title="{GROUP_NAME}">
-								<input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="checkbox applyFilters"/>
-								{GROUP_NAME}
-							</label>
-							<!-- END filter_group -->
-						</div>
-						<div class="filter-cat campus checkboxes"><span class="filter-title">Campus</span>
-							<label>
-								<input data-selectallcampuses='true' type="checkbox" class="checkbox" checked/>Select all
-							</label>
-							<!-- BEGIN filter_campus -->
-							<label title="{CAMPUS_NAME}">
-								<input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="checkbox applyFilters"/>
-								{CAMPUS_NAME}
-							</label>
-							<!-- END filter_campus -->
-						</div>
-						<div class="filter-cat events checkboxes last"><span class="filter-title">Event</span>
-							<label>
-								<input data-selectalleventtypes='true' type="checkbox" class=" checkbox" checked/>Select all
-							</label>
-							<!-- BEGIN filter_event_type -->
-							<label title="{EVENT_TYPE_NAME}">
-								<input type="checkbox" name="events" id="{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED} value="type{EVENT_TYPE_ID}" class="checkbox applyFilters"/>
-								<span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
-							</label>
-							<!-- END filter_event_type -->
-						</div>
-						<!--/filter-list-->
-					</form>
-					<!--/filter-drop-->
-				</div>
-			</div>
-		</div>
-        <div class="float-right">
-        <a href="#" class="btn list" data-filters="true"><span></span>Filters</a>
-        <a href="#" class='active'><span></span>List</a>
-        <a href="/calendar/full/{CALENDAR_PARAMS}#month" class='btn small no-icon'><span></span>Month</a>
-        <a href="/calendar/full/{CALENDAR_PARAMS}#agendaWeek" class='btn small no-icon'><span></span>Week</a>
-        <a href="/calendar/full/{CALENDAR_PARAMS}#agendaDay" class='btn small no-icon'><span></span>Day</a>
-        <a href="#" class='btn export'><span></span>Export</a>
-        </div>
+
+<div id="calendar-controls" class="reveal-modal large" data-reveal aria-hidden="true" role="dialog">
+    <form class="clearfix">
+        <section>
+            <fieldset class="content filter-list">
+                <div class="small-6 large-3 columns">
+                    <fieldset class="checklist sources">
+                        <legend>Sources</legend>
+                        <input type="checkbox" class="select_all" id="sourceSelectAll"/>
+                        <label for="sourceSelectAll">Select all</label>
+                        <!-- BEGIN filter_source -->
+                        <input type="checkbox" name="source" id="source{SOURCE_ID}" value="source{SOURCE_ID}" {SOURCE_ID_SELECTED} class="applyFilters"/>
+                        <label for="source{SOURCE_ID}">{SOURCE_NAME}</label>
+                        <!-- END filter_source -->
+                    </fieldset>
+                </div>
+                <div class="small-6 large-3 columns">
+                    <fieldset class="checklist groups">
+                        <legend>Groups</legend>
+                        <input type="checkbox" class="select_all" id="groupsSelectAll" checked />
+                        <label for="groupsSelectAll">Select all</label>
+                        <!-- BEGIN filter_group -->
+                        <input type="checkbox" name="group" id="group{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="applyFilters"/>
+                        <label for="group{GROUP_ID}">{GROUP_NAME}</label>
+                        <!-- END filter_group -->
+                    </fieldset>
+                </div>
+                <div class="small-6 large-3 columns">
+                    <fieldset class="checklist campus">
+                        <legend>Campus</legend>
+                        <input type="checkbox" class="select_all"  id="campusSelectAll" checked />
+                        <label for="campusSelectAll">Select all</label>
+                        <!-- BEGIN filter_campus -->
+                        <input type="checkbox" name="campus" id="campus{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="applyFilters"/>
+                        <label for="campus{CAMPUS_ID}">{CAMPUS_NAME}</label>
+                        <!-- END filter_campus -->
+                    </fieldset>
+                </div>
+                <div class="small-6 large-3 columns">
+                    <fieldset class="checklist events">
+                        <legend>Event</legend>
+                        <input type="checkbox" id="eventTypeSelectAll" class="select_all" checked />
+                        <label for="eventTypeSelectAll">Select all</label>
+                        <!-- BEGIN filter_event_type -->
+                        <input type="checkbox" name="events" id="eventType{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED} value="type{EVENT_TYPE_ID}" class="applyFilters"/>
+                        <label for="eventType{EVENT_TYPE_ID}"><span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span></label>
+                        <!-- END filter_event_type -->
+                    </fieldset>
+                </div>
+            </fieldset>
+        </section>
+    </form>
+    <a href="#" id="applyFilters" class="button icon-tick">Apply Filters</a>
+    <!--/filter-drop-->
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Calendar for {USER_FULLNAME}</h1>
+    </div>
+</div>
+
+<div class="row" data-equalizer>
+    <div class="small-12 columns">
         <form data-type='calendar-controls' action="/calendar/list" method="post">
-			<input type="hidden" name='userKey' value='{USER_ID}' />
-            <input id="start_date_alt" name='start_date' type="hidden" value="{SELECTED_FORMATTED_START}" />
-            <input id="finish_date_alt" name='finish_date' type="hidden" value="{SELECTED_FORMATTED_FINISH}" />
+            <input type="hidden" name='userKey' value='{USER_ID}' />
 
-            <div class="float-left dateSelector">
-                <input id='start_date' type="text" size="9" value="{SELECTED_START}" />
-                to <input id='finish_date' type="text" size="9" value="{SELECTED_FINISH}" />
-            </div>
-
-            <input type="submit" class="submit-btn-plain" value="Update" />
+            <section>
+                <fieldset>
+                    <div class="small-12 large-6 island">
+                        <section class="content" data-equalizer-watch>
+                            <div class="row">
+                                <div class="small-4 columns">
+                                    <input id="start_date_alt" type="hidden" name='start_date' value="{SELECTED_FORMATTED_START}" />
+                                    <input id='start_date' type="text" size="9" value="{SELECTED_START}" />
+                                </div>
+                                <div class="small-4 columns">
+                                    <input id="finish_date_alt" name='finish_date' type="hidden" value="{SELECTED_FORMATTED_FINISH}" />
+                                    <input id='finish_date' type="text" size="9" value="{SELECTED_FINISH}" />
+                                </div>
+                                <div class="small-4 columns">
+                                    <input type="submit" value="Update" />
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="small-12 large-6 island">
+                        <section class="content" data-equalizer-watch>
+                            <a href="#" class="button icon-filter" data-filters><span></span>Filters</a>
+                            <a href="#" class='button active'><span></span>List</a>
+                            <a href="/calendar/full/{CALENDAR_PARAMS}#month" class='button'>Month</a>
+                            <a href="/calendar/full/{CALENDAR_PARAMS}#agendaWeek" class='button'>Week</a>
+                            <a href="/calendar/full/{CALENDAR_PARAMS}#agendaDay" class='button'>Day</a>
+                            <a href="#" class='button icon-export' data-export>Export</a>
+                        </section>
+                    </div>
+                </fieldset>
+            </section>
         </form>
     </div>
-	<div class="clearfix"></div>
-
-	<!-- BEGIN date -->
-	<h2>{EVENT_DATE}</h2>
-	<ul class="js_happening calendar">
-		<!-- BEGIN event -->
-            {TWIG_EVENT}
-		<!-- END event -->
-	</ul>
-	<!-- END date -->
-
-	<!-- BEGIN has_no_events -->
-	<p>
-		There are no events.
-	</p>
-	<!-- END has_no_events -->
 </div>
 
+<div class="row" id="calendar-list" data-eventlist="true">
+    <div class="small-12 island">
+        <!-- BEGIN date -->
+        <h2 class="subheader">{EVENT_DATE}</h2>
+        <section>
+            <ul class="activity-list">
+            <!-- BEGIN event -->
+                {TWIG_EVENT}
+            <!-- END event -->
+            </ul>
+        </section>
+        <!-- END date -->
+
+        <!-- BEGIN has_no_events -->
+        <li class="row">
+            <div class="row">
+                <div class="twelve-column">
+                    <em>There are no upcoming events.</em>
+                </div>
+            </div>
+        </li>
+        <!-- END has_no_events -->
+    </div>
+</div>
