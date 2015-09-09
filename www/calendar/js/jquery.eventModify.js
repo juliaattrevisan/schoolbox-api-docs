@@ -392,56 +392,63 @@
 
 					// series
 					if (multi) {
-						$('[data-message=bulk-update]').css('display', act === 'Update' ? 'inline' : 'none');
-						$('[data-message=bulk-delete]').css('display', act === 'Delete' ? 'inline' : 'none');
-						$("[data-dialog=bulk]").dialog({
-							resizable: false,
-							height: 180,
-							width: 500,
-							modal: true,
-							draggable: false,
-							buttons: {
-								"Only this event": function() {
-									$('#efficacy').val('self');
-									form.submit();
-								},
-								"All events in the series": function() {
-									$('#efficacy').val('series');
-									form.submit();
-								},
-								"Cancel": function() {
-									$(this).dialog("close");
-								}
-							},
-							close: function() {
-								return false;
-							}
-						});
+						//$('[data-message=bulk-update]').css('display', act === 'Update' ? 'inline' : 'none');
+						//$('[data-message=bulk-delete]').css('display', act === 'Delete' ? 'inline' : 'none');
+						// Show a dialog
+						if (act === 'Delete') {
+							$('[data-dialog="bulk-delete"]').foundation('reveal', 'open');
+						} else {
+							$('[data-dialog="bulk-modify"]').foundation('reveal', 'open');
+						}
+						//$("[data-dialog=bulk]").dialog({
+						//	resizable: false,
+						//	height: 180,
+						//	width: 500,
+						//	modal: true,
+						//	draggable: false,
+						//	buttons: {
+						//		"Only this event": function() {
+						//			$('#efficacy').val('self');
+						//			form.submit();
+						//		},
+						//		"All events in the series": function() {
+						//			$('#efficacy').val('series');
+						//			form.submit();
+						//		},
+						//		"Cancel": function() {
+						//			$(this).dialog("close");
+						//		}
+						//	},
+						//	close: function() {
+						//		return false;
+						//	}
+						//});
 					}
 					// single event
 					else {
 						if (act == 'Update') {
 							form.submit();
 						} else if (act == 'Delete') {
-							// dialog time
-							$("[data-dialog=bulk]").dialog({
-								resizable: false,
-									height: 180,
-									width: 500,
-									modal: true,
-									draggable: false,
-									buttons: {
-									"Yes": function() {
-										form.submit();
-									},
-									"No": function() {
-										$(this).dialog("close");
-									}
-								},
-								close: function() {
-									return false;
-								}
-							});
+							$('[data-dialog="delete"]').foundation('reveal', 'open');
+							//// dialog time
+							//$("[data-dialog=bulk]").dialog({
+							//	resizable: false,
+							//		height: 180,
+							//		width: 500,
+							//		modal: true,
+							//		draggable: false,
+							//		buttons: {
+							//		"Yes": function() {
+							//			form.submit();
+							//		},
+							//		"No": function() {
+							//			$(this).dialog("close");
+							//		}
+							//	},
+							//	close: function() {
+							//		return false;
+							//	}
+							//});
 						} else {
 							form.submit();
 						}
