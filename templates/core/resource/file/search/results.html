@@ -4,26 +4,25 @@
 		<section>
 			<ul class="action-list">
 			    <!-- BEGIN file -->
-				<li class="row" data-equalizer>
-					<div class="column no-pad small-11" data-equalizer-watch>
-						<div class="avatar card">
-							<a href='/send.php?id={FILE_ID}'>
-								<img src="/images/mime/60x60/{FILE_ICON}" class="content" />
-								<h3>{FILE_DESCRIPTION}</h3>
-							</a>
-							<p class="meta">{FILE_BREADCRUMB}</p>
+                <li class="actions-small-1" data-equalizer>
+                    <div class="list-item">
+                        <div class="avatar card small-12" data-equalizer-watch>
+                            <a href='/send.php?id={FILE_ID}'>
+                                <img src="/images/mime/60x60/{FILE_ICON}" class="content" />
+                                <h3>{FILE_DESCRIPTION}</h3>
+                            </a>
+                            <p class="meta">{FILE_BREADCRUMB}</p>
                             <p class="meta">Uploaded by <a href="/search/user/{FILE_OWNER}">{FILE_OWNER_NAME}</a> {FILE_CREATED}</p>
-							<p class="meta">{FILE_SIZE}</p>
-						</div>
-						<article>{FILE_COMMENT}</article>
-
-					</div>
-					<!-- BEGIN modify -->
-					<div class="one actions">
-						<a data-equalizer-watch data-tooltip class="icon-modify no-text" href="/cms/file/{FILE_ID}" title="Modify"></a>
-					</div>
-					<!-- END modify -->
-				</li>
+                            <p class="meta">{FILE_SIZE}</p>
+                        </div>
+                        <article>{FILE_COMMENT}</article>
+                    </div>
+                    <nav>
+                        <!-- BEGIN modify -->
+                        <a class="icon-modify" href="/cms/file/{FILE_ID}" title="Modify" data-equalizer-watch></a>
+                        <!-- END modify -->
+                    </nav>
+                </li>
     			<!-- END file -->
 			</ul>
 
