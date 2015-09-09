@@ -49,15 +49,6 @@ override_dh_install:
 	cp -a --parents www/include/permission.php $(CURDIR)/mgssport
 	rm -fR www/include/permission.php
 	## End MGS Sport Module
-	## Mobile Module
-	mkdir -pv $(CURDIR)/mobile
-	cp -a --parents templates/*/m $(CURDIR)/mobile
-	rm -fR templates/*/m
-	cp -a --parents sql/modules/mobile $(CURDIR)/mobile
-	rm -fR sql/modules/mobile
-	cp -a --parents library/Schoolbox/Mobile $(CURDIR)/mobile
-	rm -fR library/Schoolbox/Mobile
-	## End Mobile Module
 	## Resource Module
 	mkdir -pv $(CURDIR)/resource
 	cp -a --parents sql/modules/resource $(CURDIR)/resource
