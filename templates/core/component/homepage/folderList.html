@@ -1,5 +1,4 @@
 <div id='component{COMPONENT_INSTANCE_ID}' data-component>
-
     {CONFIGURATION}
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
@@ -7,22 +6,20 @@
             <section>
                 <ul class="action-list">
                     <!-- BEGIN folders -->
-                    <li class="row" data-equalizer>
-                        <div class="column small-11 no-pad" data-equalizer-watch>
-                            <div class="avatar card">
-                            <a href="/homepage/{FOLDER_ID}/">
-                                <img class="content" src="/images/icons/60x60/{FOLDER_ICON}.png" />
-                                <h3>
-                                    {FOLDER_NAME}
-                                </h3>
-                            </a>
+                    <li class="actions-small-1" data-equalizer>
+                        <div class="list-item">
+                            <div class="avatar card small-12" data-equalizer-watch>
+                                <a href="/homepage/{FOLDER_ID}/">
+                                    <img class="content" src="/images/icons/60x60/{FOLDER_ICON}.png" />
+                                    <h3>{FOLDER_NAME}</h3>
+                                </a>
                             </div>
                         </div>
-                        <div class="one actions">
+                        <nav>
                             <!-- BEGIN modify_folder -->
-                            <a class="icon-modify no-text" href="/cms/category/{FOLDER_ID}" title="Modify"></a>
+                            <a class="icon-modify" href="/cms/category/{FOLDER_ID}" title="Modify"></a>
                             <!-- END modify_folder -->
-                        </div>
+                        </nav>
                     </li>
                     <!-- END folders -->
                 </ul>
