@@ -144,6 +144,11 @@ $block-grid-default-spacing: rem-calc(16);
         > .list-item > .medium-12 {
             @include mobile-padding();
         }
+        > .small-12, .medium-12 {
+            > [class*="actions-"] {
+                margin-right: 0;
+            }
+        }
     }
 }
 
