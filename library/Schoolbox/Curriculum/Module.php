@@ -28,6 +28,10 @@ class Module extends BaseModule
     {
         $importModule = new Import\Module($injector);
         $importModule->init($basePath.'/import');
+        $areaModule = new LearningArea\Module($injector);
+        $areaModule->init($basePath.'/area');
+        $levelModule = new LearningLevel\Module($injector);
+        $levelModule->init($basePath.'/level');
     }
 
     /**
@@ -38,12 +42,6 @@ class Module extends BaseModule
         $router->attachResource('curriculum', $basePath);
         $router->attachResourcePostAlias('curriculum', $basePath);
         $router->addGet('curriculum.search', $basePath . '/search');
-//        // Attach standard REST routes
-//        $router->attachResource('tile', $basePath);
-//        $router->attachResourcePostAlias('tile', $basePath);
-//        // but have separate add tile paths
-//        $router->addGet('tile.add', $basePath.'/add/{componentId}');
-//        $router->addPost('tile.create', $basePath.'/add/{componentId}');
     }
 
     /**

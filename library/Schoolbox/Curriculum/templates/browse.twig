@@ -30,6 +30,10 @@
                 return row;
             });
 
+            var dialogOptions = {autoOpen: false, modal: true};
+            var areaDialog    = $('[data-role="add-area-dialog"]').dialog(dialogOptions);
+            var levelDialog   = $('[data-role="add-level-dialog"]').dialog(dialogOptions);
+
             /**
              * Builds a readonly view of the curriculum node
              *
@@ -168,6 +172,24 @@
             resizePanels();
             $(window).resize(resizePanels);
 
+            // Triggers for adding new levels or areas
+            formPanel.on('change', '#node-form select', function(event) {
+                var option      = $(this).find(':selected');
+                var interaction = option.data('interaction');
+                switch (interaction) {
+                    case 'add-level-dialog-open':
+                        event.preventDefault();
+                        levelDialog.dialog('open');
+                        break;
+                    case 'add-area-dialog-open':
+                        event.preventDefault();
+                        areaDialog.dialog('open');
+                        break;
+                    default:
+                        break;
+                }
+            });
+
             // Node save form submission
             formPanel.on('submit', '#node-form', function(event) {
                 event.preventDefault();
@@ -247,6 +269,46 @@
                 event.preventDefault();
                 buildForm({ save: createUri }, {});
             });
+
+            // Create new level/area submit event
+            var allDialogs = $(areaDialog).add(levelDialog)
+            allDialogs.on('submit', 'form', function(event) {
+                event.preventDefault();
+                formPanel.addClass('loading');
+                var form     = $(this);
+                var selector = form.data('relation');
+                var submit   = form.find(':submit').prop('disabled', true);
+                var ajax     = $.ajax({
+                    method: this.method,
+                    url:    this.action,
+                    data:   form.serializeArray()
+                });
+                ajax
+                    .done(function(data) {
+                        // Update what gets chosen
+                        formPanel.addClass('loaded');
+                        var nameInput = form.find('input[name="name"]');
+                        var name      = nameInput.val();
+                        nameInput.val('');
+                        formPanel.find('#node-form').find(selector).append(
+                            $('<option />')
+                                .attr('value', data.item.id)
+                                .attr('label', name)
+                                .prop('selected', true)
+                                .text(name)
+                        );
+                        allDialogs.dialog('close');
+                    })
+                    .fail(function() {
+                        // Not sure?
+                        formPanel.addClass('failed');
+                    })
+                    .always(function() {
+                        // Re-enable submit button no matter what
+                        formPanel.removeClass('loading');
+                        submit.prop('disabled', false);
+                    });
+            });
         })
     })(jQuery);
 </script>
@@ -317,6 +379,7 @@
                         {{~ }}
                     </optgroup>
                     {{~}}
+                    <option value="" data-interaction="add-level-dialog-open">Add New Level...</option>
                 </select>
                 <select name="learningArea">
                     <option value="">-- select an area --</option>
@@ -327,6 +390,7 @@
                         {{~ }}
                     </optgroup>
                     {{~}}
+                    <option value="" data-interaction="add-area-dialog-open">Add New Area...</option>
                 </select>
             </dd>
         </dl>
@@ -403,4 +467,18 @@
         <div class="pane curriculum-editor">
         </div>
     </div>
+</div>
+
+<div data-role="add-area-dialog" title="Create New Learning Area">
+    <form action="{{ routeLookup('curriculumLearningArea.create') }}" method="post" data-relation="[name='learningArea']">
+        <input name="name" type="text" value="" />
+        <input type="submit" class="submit-btn-plain float-right" value="Create" />
+    </form>
+</div>
+
+<div data-role="add-level-dialog" title="Create New Learning Level">
+    <form action="{{ routeLookup('curriculumLearningLevel.create') }}" method="post" data-relation="[name='learningLevel']">
+        <input name="name" type="text" value="" />
+        <input type="submit" class="submit-btn-plain float-right" value="Create" />
+    </form>
 </div>
