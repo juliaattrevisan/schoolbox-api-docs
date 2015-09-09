@@ -37,7 +37,7 @@
                             {% if showEmail %}
                                 {% block details_email %}
                                     {% if user.getEmail() %}
-                                        <dt class="no-margin small-6 medium-3">Email:</dt>
+                                        <dt class="no-margin small-6 medium-3">Email</dt>
                                         <dd class="no-margin small-6 medium-9">
                                             <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
                                         </dd>
