@@ -121,46 +121,46 @@
 
                 <ul class="action-list">
                     <!-- BEGIN question -->
-                    <li class="row">
-                        <div class="one-column">
-                            <!-- BEGIN select_question -->
-                            <label>
+                    <li class="actions-small-1" data-equalizer>
+                        <div class="list-item">
+                            <div class="small-1 columns">
+                                <!-- BEGIN select_question -->
                                 <input name='question_bank_id[]' id='questionbank-id-{QUESTION_BANK_ID}' type='checkbox' value='{QUESTION_BANK_ID}' />
                                 <label for='questionbank-id-{QUESTION_BANK_ID}' class="checkbox-label"></label>
-                            </label>
-                            <!-- END select_question -->
-                        </div>
-                        <div class="eight-column">
-                            <!-- BEGIN missing_class -->
-                            <div class="alert-box warning">
-                                <p>
-                                    This question type no longer exists - it cannot be copied to the
-                                    Survey, and should be removed from the Question Bank.
-                                </p>
+                                <!-- END select_question -->
                             </div>
-                            <!-- END missing_class -->
+                            <div class="info card small-11" data-equalizer-watch>
+                                <!-- BEGIN missing_class -->
+                                <div class="alert-box warning">
+                                    <p>
+                                        This question type no longer exists - it cannot be copied to the
+                                        Survey, and should be removed from the Question Bank.
+                                    </p>
+                                </div>
+                                <!-- END missing_class -->
 
-                            <article>
-                                {QUESTION}
-                            </article>
+                                <article>
+                                    {QUESTION}
+                                </article>
 
-                            <div class="hide panel" data-answer-content="{QUESTION_BANK_ID}">
-                                <ul>
-                                    <!-- BEGIN answers -->
-                                    <li>
-                                        <article>{ANSWER_DESCRIPTION}</article>
-                                    </li>
-                                    <!-- END answers -->
-                                </ul>
+                                <div class="hide panel" data-answer-content="{QUESTION_BANK_ID}">
+                                    <ul>
+                                        <!-- BEGIN answers -->
+                                        <li>
+                                            <article>{ANSWER_DESCRIPTION}</article>
+                                        </li>
+                                        <!-- END answers -->
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                        <div class="three actions">
-                            <a class="icon-view no-text" href="#" title="Show Answers" data-show-answer-content="{QUESTION_BANK_ID}"></a>
+                        <nav>
+                            <a class="icon-view" href="#" title="Show Answers" data-show-answer-content="{QUESTION_BANK_ID}" data-equalizer-watch></a>
                             <!-- BEGIN show_delete -->
-                            <a class="icon-delete no-text" href="/survey/questionbank/question/delete/{QUESTION_BANK_ID}" title="Delete" data-delete-question></a>
+                            <a class="icon-delete" href="/survey/questionbank/question/delete/{QUESTION_BANK_ID}" title="Delete" data-delete-question data-equalizer-watch></a>
                             <!-- END show_delete -->
-                            <a class="icon-modify no-text" href="/survey/questionbank/question/modify/{QUESTION_BANK_ID}" title="Modify"></a>
-                        </div>
+                            <a class="icon-modify" href="/survey/questionbank/question/modify/{QUESTION_BANK_ID}" title="Modify" data-equalizer-watch></a>
+                        </nav>
                     </li>
                     <!-- END question -->
                 </ul>
