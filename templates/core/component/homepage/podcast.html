@@ -16,11 +16,11 @@
             <section>
                 <ul class="action-list">
                     <!-- BEGIN default_podcast -->
-                    <li class="row" data-equalizer>
-                        <div class="twelve-column" data-equalizer-watch>
+                    <li data-equalizer>
+                        <div class="list-item content">
                             <h3 data-role="media-playlist-title">{DEFAULT_PODCAST_TITLE}</h3>
 
-                            <audio id="schoolbox_audio{COMPONENT_INSTANCE_ID}" class="media-player" data-role="media-playlist-player" controls preload="none" width="100%">
+                            <audio id="schoolbox_audio{COMPONENT_INSTANCE_ID}" class="media-player" data-role="media-playlist-player" controls preload="none" style='width:100%;'>
                                 <source src="{DEFAULT_PODCAST_URL}" type="audio/mp3" />
                             </audio>
                         </div>
@@ -28,16 +28,16 @@
                     <!-- END default_podcast -->
 
                     <!-- BEGIN podcast_list -->
-                    <li class="row" data-equalizer>
-                        <div class="twelve-column" data-equalizer-watch>
-                            <a href="{PODCAST_URL}" data-role="media-playlist-track">
-                                {PODCAST_TITLE}
-                            </a>
+                    <li data-equalizer>
+                        <div class="list-item content">
+                            <a href="{PODCAST_URL}" data-role="media-playlist-track">{PODCAST_TITLE}</a>
 
                             <article class="{COMPONENT_COMPACTMODE}">
                                 {PODCAST_DESCRIPTION}
                             </article>
                         </div>
+                        <nav>
+                        </nav>
                     </li>
                     <!-- END podcast_list -->
                 </ul>
