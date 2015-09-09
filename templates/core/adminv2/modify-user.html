@@ -389,48 +389,68 @@
                     <div class="small-3 columns end"><div class="content">Access</div></div>
                 </li>
                 <!-- BEGIN user_calendar -->
-                <li class="row" data-equalizer>
-                    <div class="small-4 columns"><div class="content">Calendar</div></div>
-                    <div class="small-4 columns"><div class="content">{PERM_CAMPUS_NAME}</div></div>
-                    <div class="small-3 columns" data-equalizer-watch>
-                        <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
-                            <input type="hidden" name="uid" value="{USERID}" />
-                            <input type="hidden" name="sid" value="{SID}" />
-                            <input type="hidden" name="service" value="{SERVICE_ID}" />
-                            <input type="hidden" name="updateServices" value="1" />
-                            <select name="type" data-autosubmit>
-                                <option value="1" {READ_SELECTED}>Read</option>
-                                <option value="2" {WRITE_SELECTED}>Write</option>
-                                <option value="3" {ADMIN_SELECTED}>Moderate</option>
-                            </select>
-                        </form>
+                <li class="actions-small-1" data-equalizer>
+                    <div class="list-item">
+                        <div class="small-4 columns">
+                            <div class="content">
+                                Calendar
+                            </div>
+                        </div>
+                        <div class="small-4 columns">
+                            <div class="content">
+                                {PERM_CAMPUS_NAME}
+                            </div>
+                        </div>
+                        <div class="small-4 columns" data-equalizer-watch>
+                            <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
+                                <input type="hidden" name="uid" value="{USERID}" />
+                                <input type="hidden" name="sid" value="{SID}" />
+                                <input type="hidden" name="service" value="{SERVICE_ID}" />
+                                <input type="hidden" name="updateServices" value="1" />
+                                <select name="type" data-autosubmit>
+                                    <option value="1" {READ_SELECTED}>Read</option>
+                                    <option value="2" {WRITE_SELECTED}>Write</option>
+                                    <option value="3" {ADMIN_SELECTED}>Moderate</option>
+                                </select>
+                            </form>
+                        </div>
                     </div>
-                    <div class="actions one">
-                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove" data-equalizer-watch></a>
-                    </div>
+                    <nav>
+                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="icon-delete" title="Remove" data-equalizer-watch></a>
+                    </nav>
                 </li>
                 <!-- END user_calendar -->
 
                 <!-- BEGIN user_news -->
-                <li class="row" data-equalizer>
-                    <div class="small-4 columns"><div class="content">News</div></div>
-                    <div class="small-4 columns"><div class="content">{PERM_CAMPUS_NAME}</div></div>
-                    <div class="small-3 columns" data-equalizer-watch>
-                        <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
-                            <input type="hidden" name="uid" value="{USERID}" />
-                            <input type="hidden" name="sid" value="{SID}" />
-                            <input type="hidden" name="service" value="{SERVICE_ID}" />
-                            <input type="hidden" name="updateServices" value="1" />
-                            <select name="type" data-autosubmit>
-                                <option value="1" {READ_SELECTED}>Read</option>
-                                <option value="2" {WRITE_SELECTED}>Write</option>
-                                <option value="3" {ADMIN_SELECTED}>Moderate</option>
-                            </select>
-                        </form>
+                <li class="actions-small-1" data-equalizer>
+                    <div class="list-item">
+                        <div class="small-4 columns">
+                            <div class="content">
+                                News
+                            </div>
+                        </div>
+                        <div class="small-4 columns">
+                            <div class="content">
+                                {PERM_CAMPUS_NAME}
+                            </div>
+                        </div>
+                        <div class="small-4 columns" data-equalizer-watch>
+                            <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
+                                <input type="hidden" name="uid" value="{USERID}" />
+                                <input type="hidden" name="sid" value="{SID}" />
+                                <input type="hidden" name="service" value="{SERVICE_ID}" />
+                                <input type="hidden" name="updateServices" value="1" />
+                                <select name="type" data-autosubmit>
+                                    <option value="1" {READ_SELECTED}>Read</option>
+                                    <option value="2" {WRITE_SELECTED}>Write</option>
+                                    <option value="3" {ADMIN_SELECTED}>Moderate</option>
+                                </select>
+                            </form>
+                        </div>
                     </div>
-                    <div class="actions one">
-                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove" data-equalizer-watch></a>
-                    </div>
+                    <nav>
+                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="icon-delete" title="Remove" data-equalizer-watch></a>
+                    </nav>
                 </li>
                 <!-- END user_news -->
 
