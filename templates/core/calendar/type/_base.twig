@@ -8,7 +8,8 @@
     {% endblock eventSpan %}
 
     {% block eventTitle %}
-    <div class="nine-column" data-dropdown="contentDrop{{ event.getEventId() }}{{ augmentedId }}" style="background-color:{{ event.colour }}">
+
+    <div class="nine-column" data-reveal-id="modal{{ event.getEventId() }}{{ augmentedId }}" style="background-color:{{ event.colour }}">
         {{ event.title }}
 
         <span class="right" style="background-color:{{ event.colour }}">
@@ -19,10 +20,8 @@
     </div>
     {% endblock eventTitle %}
 
-
-    <div class="f-dropdown content content-drop medium" data-dropdown-content="" id="contentDrop{{ event.getEventId() }}{{ augmentedId }}">
+    <div id="modal{{ event.getEventId() }}{{ augmentedId }}" class="reveal-modal" data-reveal>
         {% block eventBubble %}
-
             {% block eventBubbleSummary %}
             <h3>{{ event.title }}</h3>
 
@@ -78,5 +77,7 @@
             </div>
             {% endblock eventBubbleButtons %}
         {% endblock eventBubble %}
+
+        <a class="close-reveal-modal">&#215;</a>
     </div>
 </li>
