@@ -135,82 +135,59 @@
 
                         <ul class="action-list sortable ui-sortable task-list {UNIT_LIST_CLASS}" data-task-list>
                             <!-- BEGIN unit_task -->
-                            <li class="row interact {UNIT_TASK_COMPLETE_CLASS}" data-unit-task data-unit_task_id="{UNIT_TASK_ID}">
-                                <div class="one-column grip"></div>
-                                <div class="ten-column">
-                                    <a class="icon-16 {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}" {UNIT_TASK_PREVIEW} href="/task/start/{UNIT_TASK_ID}">{UNIT_TASK_NAME}</a>
+                            <li class="actions-small-3 interact {UNIT_TASK_COMPLETE_CLASS}" data-unit-task data-unit_task_id="{UNIT_TASK_ID}">
+                                <div class="list-item">
+                                    <div class="grip"></div>
+                                    <div class="small-11 avatar card ">
+                                        <a class="icon-32 {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}" {UNIT_TASK_PREVIEW} href="/task/start/{UNIT_TASK_ID}"></a>
+                                        <h3>{UNIT_TASK_NAME}</h3>
 
-                                    <!--
-                                    Student: see buttons for starting/ending task
-                                    Teacher: sees completion stats
-                                    -->
-                                    <!-- BEGIN unit_task_completion -->
-                                    <p class="meta">
-                                        <span class="unit-task-completion">{UNIT_TASK_COMPLETION_STATUS}</span>
-                                    </p>
-                                    <!-- END unit_task_completion -->
+                                        <!--
+                                        Student: see buttons for starting/ending task
+                                        Teacher: sees completion stats
+                                        -->
+                                        <!-- BEGIN unit_task_completion -->
+                                        <p class="meta">
+                                            <span class="unit-task-completion">{UNIT_TASK_COMPLETION_STATUS}</span>
+                                        </p>
+                                        <!-- END unit_task_completion -->
 
-                                    <!-- BEGIN unit_task_count -->
-                                    <p class="meta">
-                                        <span class="gradient-{UNIT_TASK_GRADIENT}">{UNIT_TASK_COMPLETION_COUNT}/{UNIT_STUDENT_COUNT} students completed</span>
-                                    </p>
-                                    <!-- END unit_task_count -->
+                                        <!-- BEGIN unit_task_count -->
+                                        <p class="meta">
+                                            <span class="gradient-{UNIT_TASK_GRADIENT}">{UNIT_TASK_COMPLETION_COUNT}/{UNIT_STUDENT_COUNT} students completed</span>
+                                        </p>
+                                        <!-- END unit_task_count -->
 
-                                    <!-- BEGIN unit_task_due_date -->
-                                    <p class="meta">
-                                        <span class="unit-task-due-date">Due {UNIT_TASK_RELATIVE_DUE_DATE} on {UNIT_TASK_DUE_DATE}</span>
-                                    </p>
-                                    <!-- END unit_task_due_date -->
+                                        <!-- BEGIN unit_task_due_date -->
+                                        <p class="meta">
+                                            <span class="unit-task-due-date">Due {UNIT_TASK_RELATIVE_DUE_DATE} on {UNIT_TASK_DUE_DATE}</span>
+                                        </p>
+                                        <!-- END unit_task_due_date -->
+                                    </div>
                                 </div>
-                                <div class="one actions">
+                                <nav>
                                     <!-- BEGIN unit_task_start -->
-                                    <a href="/task/start/{UNIT_TASK_ID}{UNIT_TASK_SET_STATUS}"
-                                       class="{UNIT_TASK_COMPLETE_CLASS} no-text"
-                                       data-interaction="update_progress"
-                                       title="{UNIT_TASK_COMPLETION_TITLE} - click to update"
-                                    ></a>
+                                    <a href="/task/start/{UNIT_TASK_ID}{UNIT_TASK_SET_STATUS}" class="{UNIT_TASK_COMPLETE_CLASS} no-text" data-interaction="update_progress" title="{UNIT_TASK_COMPLETION_TITLE} - click to update"></a>
                                     <!-- END unit_task_start -->
 
                                     <!-- BEGIN unit_task_actions -->
-                                    <a data-dropdown="task-actions-{UNIT_TASK_ID}"
-                                       href="#"
-                                       class="no-text icon-more"
-                                       aria-controls="task-actions-{UNIT_TASK_ID}"
-                                       aria-expanded="false"
-                                    ></a>
-                                    <ul data-dropdown-content
-                                        id="task-actions-{UNIT_TASK_ID}"
-                                        class="f-dropdown"
-                                        aria-hidden="true"
-                                    >
-                                        <!-- BEGIN unit_task_modify -->
-                                        <li>
-                                            <a href="/task/instance/modify/{UNIT_TASK_ID}" class="icon-modify" data-interaction="open_edit_task_form">Modify this task</a>
-                                        </li>
-                                        <!-- END unit_task_modify -->
-                                        <!-- BEGIN unit_task_delete -->
-                                        <li>
-                                            <a href="#" class="icon-delete" data-interaction="open_delete_task_form">Delete this task</a>
-                                        </li>
-                                        <!-- END unit_task_delete -->
-                                        <!-- BEGIN unit_task_quiz_results -->
-                                        <li>
-                                            <a href="/assess/results/{UNIT_QUIZ_ID}" class="icon-progress">View Results</a>
-                                        </li>
-                                        <!-- END unit_task_quiz_results -->
-                                        <!-- BEGIN unit_task_quiz_attempts -->
-                                        <li>
-                                            <a href="/assess/attempts/{UNIT_QUIZ_ID}/{USER_ID}" class="icon-quiz">See previous attempts</a>
-                                        </li>
-                                        <!-- END unit_task_quiz_attempts -->
-                                        <!-- BEGIN unit_task_duework_results -->
-                                        <li>
-                                            <a href="/submission/viewSubmission/{UNIT_DUEWORK_ID}" class="icon-progress">View Results</a>
-                                        </li>
-                                        <!-- END unit_task_duework_results -->
-                                    </ul>
+                                    <!-- BEGIN unit_task_modify -->
+                                    <a href="/task/instance/modify/{UNIT_TASK_ID}" class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task"></a>
+                                    <!-- END unit_task_modify -->
+                                    <!-- BEGIN unit_task_delete -->
+                                    <a href="#" class="icon-delete" data-interaction="open_delete_task_form" title="Delete this task"></a>
+                                    <!-- END unit_task_delete -->
+                                    <!-- BEGIN unit_task_quiz_results -->
+                                    <a href="/assess/results/{UNIT_QUIZ_ID}" class="icon-progress" title="View Results"></a>
+                                    <!-- END unit_task_quiz_results -->
+                                    <!-- BEGIN unit_task_quiz_attempts -->
+                                    <a href="/assess/attempts/{UNIT_QUIZ_ID}/{USER_ID}" class="icon-quiz" title="See previous attempts"></a>
+                                    <!-- END unit_task_quiz_attempts -->
+                                    <!-- BEGIN unit_task_duework_results -->
+                                    <a href="/submission/viewSubmission/{UNIT_DUEWORK_ID}" class="icon-progress" title="View Results"></a>
+                                    <!-- END unit_task_duework_results -->
                                     <!-- END unit_task_actions -->
-                                </div>
+                                </nav>
 
                                 <!-- BEGIN unit_task_modify_form -->
                                 <div class="content">
