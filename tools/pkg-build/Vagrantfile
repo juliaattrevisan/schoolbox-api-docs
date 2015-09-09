@@ -6,8 +6,8 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  config.vm.box = "ubuntu-1204-gold-PHP55"
-  config.vm.box_url = "http://vagrant.alaress-dev.com.au/ubuntu-1204-gold.box"
+  config.vm.box = "ubuntu-1404-gold"
+  config.vm.box_url = "http://vagrant.alaress-dev.com.au/ubuntu-1404-gold.box"
 
   config.vm.host_name = "ubuntubuild-schoolbox"
 
