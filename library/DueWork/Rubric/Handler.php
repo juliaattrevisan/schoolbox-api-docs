@@ -186,7 +186,9 @@ class DueWork_Rubric_Handler
             $marks[$row['tstamp']][$row['criterion_id']]['description'] = $row['description'];
         }
 
+        // Use the youngest rubric mark set.
         if (count($marks)) {
+            ksort($marks);
             $marks = array_pop(array_values($marks));
         }
 
