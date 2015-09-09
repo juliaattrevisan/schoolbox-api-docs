@@ -108,12 +108,7 @@ if (!isset($user['uid'])) {
     error(2);
 }
 
-
-if ($user['synergy_id'] || $user['synergy_id'] === 0) {
-    $categoryList = $groupHandler->involvedInCategoryList($user['uid']);
-} else {
-    $categoryList = array();
-}
+$categoryList = $groupHandler->involvedInCategoryList($user['uid']);
 
 $categoryIDList = array();
 
