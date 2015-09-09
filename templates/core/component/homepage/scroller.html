@@ -74,25 +74,23 @@
 
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
-            <section>
-                <div class="content">
-                    <div data-imagescroller>
-                        <!-- BEGIN image_scroller -->
-                        <div data-imagescroller-image>
-                            <p>
-                                <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
-                            </p>
-                            <!-- BEGIN show_caption -->
-                            <p class="meta">{IMAGE_NAME}</p>
-                            <!-- END show_caption -->
-                        </div>
-                        <!-- END image_scroller -->
+            <section class="content">
+                <div data-imagescroller>
+                    <!-- BEGIN image_scroller -->
+                    <div data-imagescroller-image>
+                        <p>
+                            <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
+                        </p>
+                        <!-- BEGIN show_caption -->
+                        <p class="meta">{IMAGE_NAME}</p>
+                        <!-- END show_caption -->
                     </div>
-
-                    <!-- BEGIN submit_image -->
-                    <a href="/cms/file/multi/{IMAGESCROLLER_CATEGORY_ID}" class="button icon-upload">Post Images</a>
-                    <!-- END submit_image -->
+                    <!-- END image_scroller -->
                 </div>
+
+                <!-- BEGIN submit_image -->
+                <a href="/cms/file/multi/{IMAGESCROLLER_CATEGORY_ID}" class="button icon-upload">Post Images</a>
+                <!-- END submit_image -->
             </section>
         </div>
     </div>
