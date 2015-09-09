@@ -8,27 +8,27 @@
             <section>
                 <ul class="action-list">
                     <!-- BEGIN wiki_row -->
-                    <li class="row" data-equalizer>
-                        <div class="small-11 columns" data-equalizer-watch>
-                            <div class="avatar card">
-                                <a href='/wiki/{WIKI_CATEGORYID}/{WIKI_SLUG}'>
+                    <li class="actions-small-1" data-equalizer>
+                        <div class="list-item">
+                            <div class="avatar card small-12" data-equalizer-watch>
+                                <a href='/wiki/{WIKI_CATEGORYID}/{WIKI_SLUG}' title="View Wiki">
                                     <img class="content" src="/images/mime/60x60/document.png">
                                     <h3>{WIKI_HEADING}</h3>
                                 </a>
                                 <p class="meta">
                                     Last edited by
-                                    <a href="/search/user/{WIKI_AUTHOR_ID}">{WIKI_AUTHOR}</a>
+                                    <a href="/search/user/{WIKI_AUTHOR_ID}" title="View Profile">{WIKI_AUTHOR}</a>
                                     {WIKI_MODIFIED}
                                 </p>
                                 <!-- BEGIN compact_hide -->
                                 <!-- END compact_hide -->
                             </div>
                         </div>
-                        <div class="one actions">
+                        <nav>
                             <!-- BEGIN modify_wiki -->
-                            <a data-equalizer-watch class="icon-modify no-text" href="/wiki/modify/{WIKI_ID}" title="Modify Wiki"></a>
+                            <a data-equalizer-watch class="icon-modify" href="/wiki/modify/{WIKI_ID}" title="Modify Wiki"></a>
                             <!-- END modify_wiki -->
-                        </div>
+                        </nav>
                     </li>
                     <!-- END wiki_row -->
                 </ul>

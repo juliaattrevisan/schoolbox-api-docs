@@ -64,17 +64,19 @@
             <section>
                 <ul class="action-list">
                     <!-- BEGIN list_item -->
-                    <li class="row" data-list-item-advanced-content='{LIST_ITEM_ID}' id="list_item_advanced_content_{LIST_ITEM_ID}">
-                        <div class="small-10 columns no-pad">
-
+                    <li class="actions-small-1" data-list-item-advanced-content='{LIST_ITEM_ID}' id="list_item_advanced_content_{LIST_ITEM_ID}">
+                        <div class="list-item">
                             <!-- BEGIN has_image -->
-                            <div class="avatar-card clearfix" data-content-row="{LIST_ITEM_ID}">
+                            <div class="avatar card small-12" data-content-row="{LIST_ITEM_ID}" data-equalizer-watch>
                                 <a href="/storage/image.php?size=maxsize&hash={LIST_ITEM_IMAGEHASH}" rel="lightbox[eportfolio-{COMPONENT_INSTANCE_ID}]" title="{LIST_ITEM_TITLE}">
                                     <img src="/storage/image.php?size=square64&hash={LIST_ITEM_IMAGEHASH}" alt="{LIST_ITEM_TITLE}" />
                                     <p>{LIST_ITEM_TITLE}</p>
                                 </a>
+
                                 <article>
-                                    <p class="meta">{LIST_ITEM_CONTENT}</p>
+                                    <p class="meta">
+                                        {LIST_ITEM_CONTENT}
+                                    </p>
                                 </article>
                             </div>
                             <!-- END has_image -->
@@ -120,15 +122,15 @@
                             </div>
                             <!-- END has_modify_form -->
                         </div>
-                        <div class="two actions">
+                        <nav>
                             <!-- BEGIN has_delete_form -->
-                            <a class="icon-delete no-text" title="Delete item" href="/eportfolio/component/advancedlist/modifyForm.php?action=removeItem&userId={ID}&pageId={PAGE_ID}&componentInstanceId={COMPONENT_INSTANCE_ID}&listItemId={LIST_ITEM_ID}" data-delete></a>
+                            <a class="icon-delete" title="Delete item" href="/eportfolio/component/advancedlist/modifyForm.php?action=removeItem&userId={ID}&pageId={PAGE_ID}&componentInstanceId={COMPONENT_INSTANCE_ID}&listItemId={LIST_ITEM_ID}" data-delete></a>
                             <!-- END has_delete_form -->
 
                             <!-- BEGIN has_modify_button -->
-                            <a class='icon-modify no-text' data-list-item-id="{LIST_ITEM_ID}" title="Edit item"></a>
+                            <a class='icon-modify' title="Edit item" data-list-item-id="{LIST_ITEM_ID}" ></a>
                             <!-- END has_modify_button -->
-                        </div>
+                        </nav>
                     </li>
                     <!-- END list_item -->
                 </ul>

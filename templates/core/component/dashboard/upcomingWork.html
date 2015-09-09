@@ -3,40 +3,40 @@
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
-            <h2 class="subheader">
-                Upcoming Due Work
-            </h2>
+            <h2 class="subheader">Upcoming Due Work</h2>
             <section>
                 <!-- BEGIN has_upcoming_work -->
                 <ul class="action-list">
                     <!-- BEGIN upcoming_work -->
-                    <li class="row" data-equalizer>
-                        <div class="small-11 columns" data-equalizer-watch>
-                            <!-- BEGIN upcoming_work_link -->
-                            <h3>
-                                <a class="title" href="{UPCOMING_HREF}">{UPCOMING_TITLE}</a>
-                            </h3>
-                            <!-- END upcoming_work_link -->
+                    <li class="actions-small-1" data-equalizer>
+                        <div class="list-item">
+                            <div class="info card small-12" data-equalizer-watch>
+                                <!-- BEGIN upcoming_work_link -->
+                                <h3>
+                                    <a class="title" href="{UPCOMING_HREF}">{UPCOMING_TITLE}</a>
+                                </h3>
+                                <!-- END upcoming_work_link -->
 
-                            <!-- BEGIN upcoming_work_nolink -->
-                            <h3>
-                                {UPCOMING_TITLE}
-                            </h3>
-                            <!-- END upcoming_work_nolink -->
+                                <!-- BEGIN upcoming_work_nolink -->
+                                <h3>
+                                    {UPCOMING_TITLE}
+                                </h3>
+                                <!-- END upcoming_work_nolink -->
 
-                            <p class="meta">
-                                <a href="/homepage/{UPCOMING_SUBJ_ID}">{UPCOMING_SUBJ_NAME}</a> {UPCOMING_TYPE}
-                            </p>
+                                <p class="meta">
+                                    <a href="/homepage/{UPCOMING_SUBJ_ID}">{UPCOMING_SUBJ_NAME}</a> {UPCOMING_TYPE}
+                                </p>
 
-                            <p class="meta">
-                                <span class="gradient-{UPCOMING_URGENCY}">Due {UPCOMING_DATE}</span> on {UPCOMING_TIME}
-                            </p>
+                                <p class="meta">
+                                    <span class="gradient-{UPCOMING_URGENCY}">Due {UPCOMING_DATE}</span> on {UPCOMING_TIME}
+                                </p>
+                            </div>
                         </div>
-                        <div class="one actions">
+                        <nav>
                             <!-- BEGIN upcoming_work_actionable -->
-                            <a href="{UPCOMING_BUTTON_HREF}" class="{UPCOMING_BTN_ICON} no-text"></a>
+                            <a href="{UPCOMING_BUTTON_HREF}" class="{UPCOMING_BTN_ICON}" data-equalizer-watch></a>
                             <!-- END upcoming_work_actionable -->
-                        </div>
+                        </nav>
                     </li>
                     <!-- END upcoming_work -->
                 </ul>

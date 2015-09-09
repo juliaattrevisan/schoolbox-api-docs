@@ -46,27 +46,25 @@
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
-            <section>
-                <div class="content">
-                    <div id="videohere{COMPONENT_INSTANCE_ID}">
-                        <!-- BEGIN has_clickview -->
-                        <script type='text/javascript' src="//webplayer.clickview.com.au/e.aspx?p={VIDEO_ID}"></script>
-                        <!-- END has_clickview -->
-                        <!-- BEGIN online_clickview -->
-                        <script type="text/javascript" src="//online.clickview.com.au/scripts/cv-online.view_player_embedding.js?e=1&i={VIDEO_ID}"></script>
-                        <!-- END online_clickview -->
-                        <!-- BEGIN iframe_clickview -->
-                        <iframe frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen width="100%" height="360" src="//online.clickview.com.au/Share/PlayEmbed?shareCode={VIDEO_ID}&a=false"></iframe>
-                        <!-- END iframe_clickview -->
-                    </div>
-                    <!-- BEGIN select_video -->
-                    <div id="plugin{COMPONENT_INSTANCE_ID}" >
-                        <iframe frameborder="0" id="plugin-frame{COMPONENT_INSTANCE_ID}" src="//online.clickview.com.au/lmsplugin?consumerKey=79fph239f0b7&sizeSelector=false&amp;schoolId={CLICKVIEW_SCHOOL_ID}" width="100%" height="401" style="border: 0;"></iframe>
-                    </div>
-
-                    <a href="#" class="button icon-add" id="videoadd{COMPONENT_INSTANCE_ID}">Select Video</a>
-                    <!-- END select_video -->
+            <section class="content">
+                <div id="videohere{COMPONENT_INSTANCE_ID}">
+                    <!-- BEGIN has_clickview -->
+                    <script type='text/javascript' src="//webplayer.clickview.com.au/e.aspx?p={VIDEO_ID}"></script>
+                    <!-- END has_clickview -->
+                    <!-- BEGIN online_clickview -->
+                    <script type="text/javascript" src="//online.clickview.com.au/scripts/cv-online.view_player_embedding.js?e=1&i={VIDEO_ID}"></script>
+                    <!-- END online_clickview -->
+                    <!-- BEGIN iframe_clickview -->
+                    <iframe frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen width="100%" height="360" src="//online.clickview.com.au/Share/PlayEmbed?shareCode={VIDEO_ID}&a=false"></iframe>
+                    <!-- END iframe_clickview -->
                 </div>
+                <!-- BEGIN select_video -->
+                <div id="plugin{COMPONENT_INSTANCE_ID}" >
+                    <iframe frameborder="0" id="plugin-frame{COMPONENT_INSTANCE_ID}" src="//online.clickview.com.au/lmsplugin?consumerKey=79fph239f0b7&sizeSelector=false&amp;schoolId={CLICKVIEW_SCHOOL_ID}" width="100%" height="401" style="border: 0;"></iframe>
+                </div>
+
+                <a href="#" class="button icon-add" id="videoadd{COMPONENT_INSTANCE_ID}">Select Video</a>
+                <!-- END select_video -->
             </section>
         </div>
     </div>

@@ -8,37 +8,31 @@
             <section>
                 <ul class="information-list">
                     <!-- BEGIN news -->
-                    <li class="row" data-equalizer>
-                        <div class="small-11 columns" data-equalizer-watch>
-                            <h3>
-                                {NEWS_HEADING}
-                            </h3>
+                    <li class="actions-small-1" data-equalizer>
+                        <div class="list-item">
+                            <div class="avatar card small-12" data-equalizer-watch>
+                                <h3>{NEWS_HEADING}</h3>
 
-                            <div class="avatar card">
-                                <a href="/search/user/{AUTHOR_ID}" title="View Profile">
+                                <a href="/search/user/{AUTHOR_ID}">
                                     <img src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square64" alt="View Profile" />
                                     <p>{AUTHOR}</p>
                                 </a>
+                                <p class="meta">Posted {POSTED_DATE}</p>
 
-                                <p class="meta">
-                                    Posted {POSTED_DATE}
-                                    <!-- BEGIN has_publish_date -->
-                                    (Published on {NEWS_PUBLISH_DATE})
-                                    <!-- END has_publish_date -->
-                                </p>
+                                <!-- BEGIN has_publish_date -->
+                                <p class="meta">(Published on {NEWS_PUBLISH_DATE})</p>
+                                <!-- END has_publish_date -->
                             </div>
-                        </div>
-                        <div class="one actions">
-                            <!-- BEGIN can_modify_news -->
-                            <a class="icon-modify no-text" href="/news/homepage/{NEWS_ID}" title="Modify News"></a>
-                            <!-- END can_modify_news -->
-                        </div>
 
-                        <div class="small-12 columns">
                             <article>
                                 {NEWS_BODY}
                             </article>
                         </div>
+                        <nav>
+                            <!-- BEGIN can_modify_news -->
+                            <a class="icon-modify" href="/news/homepage/{NEWS_ID}" title="Modify News"></a>
+                            <!-- END can_modify_news -->
+                        </nav>
                     </li>
                     <!-- END news -->
                 </ul>

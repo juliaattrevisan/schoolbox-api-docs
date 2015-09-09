@@ -32,8 +32,7 @@
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
-            <section>
-                <div class="content">
+            <section class="content">
                 <!-- BEGIN drop_student -->
                 <form action="/subject/modDropBox.php" method="post" enctype="multipart/form-data" id="component{COMPONENT_INSTANCE_ID}-dropBox" >
                     <input type="hidden" name="category" value="{ID}" />
@@ -52,9 +51,9 @@
                 <!-- BEGIN drop_staff -->
                 <ul class="action-list">
                     <!-- BEGIN drop_file -->
-                    <li class="row" data-equalizer>
-                        <div class="eleven-column" data-equalizer-watch>
-                            <div class="avatar card">
+                    <li class="actions-small-1" data-equalizer>
+                        <div class="list-item">
+                            <div class="avatar card small-12" data-equalizer-watch>
                                 <a href="/subject/modDropBox.php?id={DROPBOX_ID}" title="View File" rel="external">
                                     <img src="/images/mime/60x60/{DROPBOX_MIME_IMAGE}" />
                                     <p>{DROPBOX_DESCRIPTION}</p>
@@ -64,14 +63,13 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="one actions">
-                            <a class="icon-delete no-text" data-delete href="/subject/modDropBox.php?delete={DROPBOX_ID}" title="Delete"></a>
-                        </div>
+                        <nav>
+                            <a class="icon-delete" href="/subject/modDropBox.php?delete={DROPBOX_ID}" title="Delete" data-delete data-equalizer-watch></a>
+                        </nav>
                     </li>
                     <!-- END drop_file -->
                 </ul>
                 <!-- END drop_staff -->
-                </div>
             </section>
         </div>
     </div>

@@ -13,27 +13,27 @@
             <section>
                 <ul class="action-list">
                     <!-- BEGIN link -->
-                    <li class="row" data-equalizer>
-                        <div class="column small-11 no-pad {HIDDEN}" data-equalizer-watch>
-                            <div class="info card">
-                                <h3>
-                                    <a data-plugin="preview" rel="{LINK_TARGET}" href="/redir.php?id={LINK_ID}">{LINK_NAME}</a>
-                                </h3>
+                    <li class="actions-small-1" data-equalizer>
+                        <div class="list-item {HIDDEN}">
+                            <div class="info card small-12" data-equalizer-watch>
+                                <h3><a data-plugin="preview" rel="{LINK_TARGET}" href="/redir.php?id={LINK_ID}">{LINK_NAME}</a></h3>
+
                                 <p class="meta">
                                     Posted by
                                     <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a>
                                     on {LINK_POSTED_DATE}
                                 </p>
                             </div>
+
                             <p class="list-item-content {COMPONENT_COMPACTMODE}">
                                 {LINK_COMMENT}
                             </p>
                         </div>
-                        <div class="one actions">
+                        <nav>
                             <!-- BEGIN modify_link -->
-                            <a data-equalizer-watch class="icon-modify no-text" href="/cms/link/{LINK_ID}" data-tooltip title="Edit link"></a>
+                            <a data-equalizer-watch class="icon-modify" href="/cms/link/{LINK_ID}" title="Edit link"></a>
                             <!-- END modify_link -->
-                        </div>
+                        </nav>
                     </li>
                     <!-- END link -->
                 </ul>

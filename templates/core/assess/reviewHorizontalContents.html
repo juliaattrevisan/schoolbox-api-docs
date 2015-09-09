@@ -3,21 +3,23 @@
 <section>
     <ul class="action-list">
         <!-- BEGIN question -->
-        <li class="row">
-            <div class="eleven-column">
-                <a href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{QUESTION_QUESTION_ID}">
-                <h4>
-                    <span>Q{QUESTION_SEQUENCE})</span>
-                    <!-- BEGIN has_mark -->
-                    <span class="meta">({QUESTION_MARKS} marks)</span>
-                    <!-- END has_mark -->
-                </h4>
-                </a>
+        <li class="actions-small-1" data-equalizer>
+            <div class="list-item">
+                <div class="info card small-12" data-equalizer-watch>
+                    <a href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{QUESTION_QUESTION_ID}">
+                        <h3>
+                            <span>Q{QUESTION_SEQUENCE})</span>
+                            <!-- BEGIN has_mark -->
+                            <span class="meta">({QUESTION_MARKS} marks)</span>
+                            <!-- END has_mark -->
+                        </h3>
+                    </a>
+                </div>
                 <article>{QUESTION_QUESTION}</article>
             </div>
-            <div class="one actions">
-                <a href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{QUESTION_QUESTION_ID}" class="icon-view no-text" title="Review Question"></a>
-            </div>
+            <nav>
+                <a href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{QUESTION_QUESTION_ID}" class="icon-view" title="Review Question" data-equalizer-watch></a>
+            </nav>
         </li>
         <!-- END question -->
     </ul>

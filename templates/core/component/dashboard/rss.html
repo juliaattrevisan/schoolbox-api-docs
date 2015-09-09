@@ -11,18 +11,19 @@
             <section>
                 <ul class="information-list">
                     <!-- BEGIN rss_stories -->
-                    <li class="row" data-equalizer>
-                        <div class="twelve-column" data-equalizer-watch>
-                            <h3>
-                                <a href="/redir.php?url={RSS_URL}">{RSS_TITLE}</a>
-                            </h3>
+                    <li data-equalizer>
+                        <div class="list-item">
+                            <div class="info card small-12" data-equalizer-watch>
+                                <h3>
+                                    <a href="/redir.php?url={RSS_URL}">{RSS_TITLE}</a>
+                                </h3>
 
-                            <!-- BEGIN rss_date -->
-                            <p class="meta">
-                                Posted {RSS_POSTED_DATE}
-                            </p>
-                            <!-- END rss_date -->
-
+                                <!-- BEGIN rss_date -->
+                                <p class="meta">
+                                    Posted {RSS_POSTED_DATE}
+                                </p>
+                                <!-- END rss_date -->
+                            </div>
                             <!-- BEGIN rss_brief_output -->
                             <article>
                                 {RSS_BRIEF}

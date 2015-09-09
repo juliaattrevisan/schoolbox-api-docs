@@ -63,48 +63,48 @@
             <section>
                 <ul class="action-list">
                     <!-- BEGIN list_item -->
-                    <li class="row" data-list-item-basic='{LIST_ITEM_ID}'>
-                        <div class="small-10 columns no-pad">
-                            <div class="avatar card" data-content-row="{LIST_ITEM_ID}">
+                    <li class="actions-small-2" data-list-item-basic='{LIST_ITEM_ID}' data-equalizer>
+                        <div class="list-item">
+                            <div class="avatar card small-12" data-content-row="{LIST_ITEM_ID}" data-equalizer-watch>
                                 <a rel="{LIST_ITEM_TARGET}" href='{LIST_ITEM_ENCODED_URL}'>
                                     <img src="/images/mime/60x60/html.png" alt="{LIST_ITEM_TITLE}" class="content" />
                                     <h3>{LIST_ITEM_TITLE}</h3>
                                     <p class="meta">{LIST_ITEM_URL}</p>
                                 </a>
                             </div>
-
-                            <!-- BEGIN has_modify_form -->
-                            <div class="content hide" data-create-panel="{LIST_ITEM_ID}">
-                                <form class='modifyForm' action='/eportfolio/component/linklist/modifyForm.php' method="post">
-                                    <input type='hidden' name='action' value='updateItem' />
-                                    <input type='hidden' name='userId' value='{ID}' />
-                                    <input type='hidden' name='pageId' value='{PAGE_ID}' />
-                                    <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
-                                    <input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
-
-                                    <label>
-                                        Title
-                                        <input type='text' name='title' value='{LIST_ITEM_TITLE}' data-first-focus />
-                                    </label>
-                                    <label>
-                                        Link Address
-                                        <input type='text' name='content' value='{LIST_ITEM_URL}' />
-                                    </label>
-
-                                    <input type='submit' value='Update' />
-                                </form>
-                            </div>
-                            <!-- END has_modify_form -->
                         </div>
-                        <div class="two actions">
+                        <nav>
                             <!-- BEGIN has_delete_form -->
-                            <a class="icon-delete no-text" title="Remove link" href="/eportfolio/component/linklist/modifyForm.php?action=removeItem&userId={USER_ID}&pageId={PAGE_ID}&componentInstanceId={COMPONENT_INSTANCE_ID}&listItemId={LIST_ITEM_ID}" data-delete></a>
+                            <a class="icon-delete" title="Remove link" href="/eportfolio/component/linklist/modifyForm.php?action=removeItem&userId={USER_ID}&pageId={PAGE_ID}&componentInstanceId={COMPONENT_INSTANCE_ID}&listItemId={LIST_ITEM_ID}" data-delete data-equalizer-watch></a>
                             <!-- END has_delete_form -->
 
                             <!-- BEGIN has_modify_button -->
-                            <a class='icon-modify no-text' data-list-item-id='{LIST_ITEM_ID}' title="Edit item"></a>
+                            <a class='icon-modify' data-list-item-id='{LIST_ITEM_ID}' title="Edit item" data-equalizer-watch></a>
                             <!-- END has_modify_button -->
+                        </nav>
+
+                        <!-- BEGIN has_modify_form -->
+                        <div class="content hide" data-create-panel="{LIST_ITEM_ID}">
+                            <form class='modifyForm' action='/eportfolio/component/linklist/modifyForm.php' method="post">
+                                <input type='hidden' name='action' value='updateItem' />
+                                <input type='hidden' name='userId' value='{ID}' />
+                                <input type='hidden' name='pageId' value='{PAGE_ID}' />
+                                <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
+                                <input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
+
+                                <label>
+                                    Title
+                                    <input type='text' name='title' value='{LIST_ITEM_TITLE}' data-first-focus />
+                                </label>
+                                <label>
+                                    Link Address
+                                    <input type='text' name='content' value='{LIST_ITEM_URL}' />
+                                </label>
+
+                                <input type='submit' value='Update' />
+                            </form>
                         </div>
+                        <!-- END has_modify_form -->
                     </li>
                     <!-- END list_item -->
                 </ul>
@@ -139,8 +139,3 @@
         </div>
     </div>
 </div>
-
-
-
-
-

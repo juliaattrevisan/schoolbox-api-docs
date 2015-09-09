@@ -8,25 +8,24 @@
             <section>
                 <ul class="action-list">
                     <!-- BEGIN forum -->
-                    <li class="row" data-equalizer>
-                        <div class="ten-column no-pad" data-equalizer-watch>
-                            <div class="avatar card">
-                                <a href='/forum/thread/{THREAD_ID}'>
+                    <li class="actions-small-2" data-equalizer>
+                        <div class="list-item">
+                            <div class="avatar card small-12" data-equalizer-watch>
+                                <a href='/forum/thread/{THREAD_ID}' title="View Thread">
                                     <img src="/portrait.php?userId={THREAD_USER_EXTERNAL_ID}&size=square64" alt="{THREAD_USER}" />
-                                    <h3>
-                                        {THREAD_TITLE}
-                                    </h3>
+                                    <h3>{THREAD_TITLE}</h3>
                                 </a>
+
                                 <p class="meta">Posted by {THREAD_USER} {THREAD_DATE}</p>
                             </div>
                         </div>
-                        <div class="two actions">
+                        <nav>
                             <!-- BEGIN forum_reply -->
-                            <a data-equalizer-watch class="icon-forum no-text" href="/forum/modify/{ID}/{THREAD_ID}" data-tooltip title="Post a reply"></a>
+                            <a data-equalizer-watch class="icon-forum" href="/forum/modify/{ID}/{THREAD_ID}" title="Post a reply"></a>
                             <!-- END forum_reply -->
 
-                            <a data-equalizer-watch class="icon-next no-text" href="/forum/{COMPONENT_CONFIG_SRC_ID}" data-tooltip title="Go to Forum"></a>
-                        </div>
+                            <a data-equalizer-watch class="icon-next" href="/forum/{COMPONENT_CONFIG_SRC_ID}" title="Go to Forum"></a>
+                        </nav>
                     </li>
                     <!-- END forum -->
                 </ul>

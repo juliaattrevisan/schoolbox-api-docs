@@ -5,32 +5,30 @@
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
-            <section>
-                <div class="content">
-                    <!-- BEGIN output_text -->
-                    <article id='textbox_content_{COMPONENT_INSTANCE_ID}'>
-                        {TEXTBOX_CONTENT}
-                    </article>
-                    <!-- END output_text -->
+            <section class="content">
+                <!-- BEGIN output_text -->
+                <article id='textbox_content_{COMPONENT_INSTANCE_ID}'>
+                    {TEXTBOX_CONTENT}
+                </article>
+                <!-- END output_text -->
 
-                    <!-- BEGIN has_modify_form -->
-                    <form id='modify_textbox_form_{COMPONENT_INSTANCE_ID}' class='modifyForm' action='/eportfolio/component/textbox/modifyForm.php' method='post'>
-                        <input type='hidden' name='action' value='updateItem' />
-                        <input type='hidden' name='userId' value='{ID}' />
-                        <input type='hidden' name='pageId' value='{PAGE_ID}' />
-                        <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
-                        <input type='hidden' name='textboxId' value='{COMPONENT_INSTANCE_ID}' />
+                <!-- BEGIN has_modify_form -->
+                <form id='modify_textbox_form_{COMPONENT_INSTANCE_ID}' class='modifyForm' action='/eportfolio/component/textbox/modifyForm.php' method='post'>
+                    <input type='hidden' name='action' value='updateItem' />
+                    <input type='hidden' name='userId' value='{ID}' />
+                    <input type='hidden' name='pageId' value='{PAGE_ID}' />
+                    <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
+                    <input type='hidden' name='textboxId' value='{COMPONENT_INSTANCE_ID}' />
 
-                        <textarea name='content' class='mceEditor' rows="20">{TEXTBOX_CONTENT}</textarea>
+                    <textarea name='content' class='mceEditor' rows="20">{TEXTBOX_CONTENT}</textarea>
 
-                        <input type="submit" value="Save Document" />
-                    </form>
-                    <!-- END has_modify_form -->
+                    <input type="submit" value="Save Document" />
+                </form>
+                <!-- END has_modify_form -->
 
-                    <!-- BEGIN modify_text -->
-                    <a href="/eportfolio/{ID}/{PAGE_ID}/textbox/modify/{COMPONENT_INSTANCE_ID}#modify_textbox_form_{COMPONENT_INSTANCE_ID}" class="button icon-modify">Modify</a>
-                    <!-- END modify_text -->
-                </div>
+                <!-- BEGIN modify_text -->
+                <a href="/eportfolio/{ID}/{PAGE_ID}/textbox/modify/{COMPONENT_INSTANCE_ID}#modify_textbox_form_{COMPONENT_INSTANCE_ID}" class="button icon-modify">Modify</a>
+                <!-- END modify_text -->
             </section>
         </div>
     </div>
