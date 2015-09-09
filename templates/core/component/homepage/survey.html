@@ -8,47 +8,47 @@
             <section>
                 <ul class="action-list">
                     <!-- BEGIN survey -->
-                    <li class="row" data-equalizer>
-                        <div class="ten-column" data-equalizer-watch>
+                    <li class="actions-small-2" data-equalizer>
+                        <div class="list-item">
+                            <div class="avatar card small-12" data-equalizer-watch>
+                                <!-- BEGIN surveyLink -->
+                                <h3>
+                                    <a href="/survey/intro/{SURVEY_ASSESS_ID}">{SURVEY_TITLE}</a>
+                                </h3>
+                                <!-- END surveyLink -->
 
-                            <!-- BEGIN surveyLink -->
-                            <h3>
-                                <a href="/survey/intro/{SURVEY_ASSESS_ID}">{SURVEY_TITLE}</a>
-                            </h3>
-                            <!-- END surveyLink -->
+                                <!-- BEGIN surveyNoLink -->
+                                <h3>{SURVEY_TITLE}</h3>
+                                <!-- END surveyNoLink -->
 
-                            <!-- BEGIN surveyNoLink -->
-                            <h3>{SURVEY_TITLE}</h3>
-                            <!-- END surveyNoLink -->
+                                <!-- BEGIN resumeLink -->
+                                <h3>
+                                    <a href="/survey/attempt/{SURVEY_ASSESS_ID}/{SURVEY_SECTION_ID}">{SURVEY_TITLE}</a>
+                                </h3>
+                                <!-- END resumeLink -->
 
-                            <!-- BEGIN resumeLink -->
-                            <h3>
-                                <a href="/survey/attempt/{SURVEY_ASSESS_ID}/{SURVEY_SECTION_ID}">{SURVEY_TITLE}</a>
-                            </h3>
-                            <!-- END resumeLink -->
+                                <p class="meta">{SURVEY_FINISH_DATE}</p>
 
-                            <p class="meta">{SURVEY_FINISH_DATE}</p>
-
-                            <p class="meta">
-                                Created by
-                                <a href='/search/user/{SURVEY_USER_ID}'>{SURVEY_USER_FIRSTNAME} {SURVEY_USER_LASTNAME}</a>
-                                {SURVEY_CREATED}
-                            </p>
-
+                                <p class="meta">
+                                    Created by
+                                    <a href='/search/user/{SURVEY_USER_ID}'>{SURVEY_USER_FIRSTNAME} {SURVEY_USER_LASTNAME}</a>
+                                    {SURVEY_CREATED}
+                                </p>
+                            </div>
                             <article class="{COMPONENT_COMPACTMODE}">
                                 {SURVEY_DESCRIPTION}
                             </article>
                         </div>
-                        <div class="two actions">
+                        <nav>
                             <!-- BEGIN teacherLink -->
-                            <a class="icon-poll no-text" href="/survey/results/{SURVEY_ASSESS_ID}" title="View Results"></a>
-                            <a class="icon-modify no-text" href="/survey/modify/{SURVEY_ASSESS_ID}" title="Modify Survey"></a>
+                            <a class="icon-poll" href="/survey/results/{SURVEY_ASSESS_ID}" title="View Results" data-equalizer-watch></a>
+                            <a class="icon-modify" href="/survey/modify/{SURVEY_ASSESS_ID}" title="Modify Survey" data-equalizer-watch></a>
                             <!-- END teacherLink -->
 
                             <!-- BEGIN reviewLink -->
-                            <a class="icon-quiz no-text" href="/survey/studentReview/{SURVEY_ASSESS_ID}/{SURVEY_SECTION_ID}/{SURVEY_ATTEMPT_ID}" title="Review"></a>
+                            <a class="icon-quiz" href="/survey/studentReview/{SURVEY_ASSESS_ID}/{SURVEY_SECTION_ID}/{SURVEY_ATTEMPT_ID}" title="Review" data-equalizer-watch></a>
                             <!-- END reviewLink -->
-                        </div>
+                        </nav>
                     </li>
                     <!-- END survey -->
                 </ul>
