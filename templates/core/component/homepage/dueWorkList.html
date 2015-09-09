@@ -8,31 +8,31 @@
             <section>
                 <ul class="action-list">
                     <!-- BEGIN duework -->
-                    <li class="row" data-equalizer>
-                        <div class="small-10 columns" data-equalizer-watch>
-                            <a href='/submission/submissionHistory/{DUE_ID}'>
-                                <h3>{DUE_NAME}</h3>
-                            </a>
-
-                            <!-- BEGIN duework_due_date -->
-                            <p class="meta">
-                                <span class="gradient-{WORK_URGENCY}">Due {DUE_DATE_RELATIVE}</span> on {DUE_DATE}
-                            </p>
-                            <!-- END duework_due_date -->
-
+                    <li class="actions-small-2" data-equalizer>
+                        <div class="list-item">
+                            <div class="info card small-12" data-equalizer-watch>
+                                <a href='/submission/submissionHistory/{DUE_ID}'>
+                                    <h3>{DUE_NAME}</h3>
+                                </a>
+                                <!-- BEGIN duework_due_date -->
+                                <p class="meta">
+                                    <span class="gradient-{WORK_URGENCY}">Due {DUE_DATE_RELATIVE}</span> on {DUE_DATE}
+                                </p>
+                                <!-- END duework_due_date -->
+                            </div>
                             <article class="{COMPONENT_COMPACTMODE}">{DUE_COMMENT}</article>
                         </div>
-                        <div class="two actions">
+                        <nav>
                             <!-- BEGIN has_actions -->
                             <!-- BEGIN duework_result_link -->
-                            <a data-equalizer-watch class="icon-poll no-text" href="/submission/viewSubmission/{DUE_ID}" title="View Results"></a>
+                            <a data-equalizer-watch class="icon-poll" href="/submission/viewSubmission/{DUE_ID}" title="View Results"></a>
                             <!-- END duework_result_link -->
 
                             <!-- BEGIN duework_actions -->
-                            <a data-equalizer-watch class="icon-{DUE_ACTION_ICON} no-text" href="{DUE_ACTION}" title="{DUE_ACTION_NAME}"></a>
+                            <a data-equalizer-watch class="icon-{DUE_ACTION_ICON}" href="{DUE_ACTION}" title="{DUE_ACTION_NAME}"></a>
                             <!-- END duework_actions -->
                             <!-- END has_actions -->
-                        </div>
+                        </nav>
                     </li>
                     <!-- END duework -->
                 </ul>
