@@ -48,8 +48,22 @@ if ($groupHandler->isParent()) {
             //
             // Was a specific child ID requested? show them only, otherwise
             // show everyone.
+            $checked_campus_list = array();
             if (!$child_id || ($child_id == $child['id'])) {
-                $outputList[] = $userHandler->getByID($child['id']);
+                $user       = $userHandler->getByID($child['id']);
+                $campusList = $userHandler->getUserCampus($child['id']);
+                foreach ($campusList as $campus) {
+                    $campusObj = Schoolbox\CampusMapper::getInstance()->findById($campus);
+                    if ($campusObj instanceof Schoolbox\Campus) {
+                        $campus_code = $campusObj->getExtTimetableCode();
+                        if (!isset($checked_campus_list[$campus_code])) {
+                            $checked_campus_list[$campus_code] = true;
+                            $user['campus']     = $campusObj;
+                            $user['campusName'] = $campusObj->getName();
+                            $outputList[]       = $user;
+                        }
+                    }
+                }
             }
         }
     }
@@ -58,12 +72,6 @@ if ($groupHandler->isParent()) {
     if ($child_id && empty($outputList)) {
         error(19);
     }
-    // Inject campus ID into child list
-    foreach ($outputList as &$user) {
-        $campusObj      = Schoolbox\CampusMapper::getInstance()->findById($user['campus']);
-        $user['campus'] = $campusObj;
-    }
-    unset($user);
 } else {
     if ($child_id) {
         if ($groupHandler->isStaff() || $child_id == $_SESSION['id']) {
