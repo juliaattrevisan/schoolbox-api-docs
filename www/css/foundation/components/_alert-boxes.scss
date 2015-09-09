@@ -52,8 +52,8 @@ $alert-transition-ease: ease-out;
 $amount: 90%;
 
 .alert-box {
-  background-color: $primary-color;
-  color: tint($primary-color, $amount);
+  background-color: $body-bg;
+  color: calc-text-color($body-bg, tint($body-bg, $amount), darken($body-bg, $amount));
 
   .close { color: inherit; }
 
