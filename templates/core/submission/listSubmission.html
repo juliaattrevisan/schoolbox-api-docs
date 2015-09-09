@@ -65,12 +65,12 @@
                 <thead>
                     <tr>
                         <th>Assignment Title</th>
-                        <th>Type</th>
-                        <th>Open Date</th>
+                        <th class="hide-for-small">Type</th>
+                        <th class="hide-for-medium-down">Open Date</th>
                         <th>Due Date</th>
-                        <th class="text-center">Submitted</th>
-                        <th class="text-center">Graded</th>
-                        <th class="text-center" data-orderable="false">Visibility</th>
+                        <th class="text-center hide-for-small">Submitted</th>
+                        <th class="text-center hide-for-small">Graded</th>
+                        <th class="text-center hide-for-small" data-orderable="false">Visibility</th>
                         <th class="text-center" data-orderable="false"></th>
                     </tr>
                 </thead>
@@ -79,8 +79,8 @@
                     <tr>
                         <!-- BEGIN normalSubmission -->
                         <td><a href="/submission/viewSubmission/{ID}">{ASSDESC}</a></td>
-                        <td>{TYPE}</td>
-                        <td data-order="{ASSESS_START_TIMESTAMP}">
+                        <td class="hide-for-small">{TYPE}</td>
+                        <td class="hide-for-medium-down" data-order="{ASSESS_START_TIMESTAMP}">
                             <!-- BEGIN writable_open -->
                             {OPENDATE}
                             <!-- END writable_open -->
@@ -96,9 +96,9 @@
                             {DUEDATE}
                             <!-- END readonly_close -->
                         </td>
-                        <td class="text-center">{TOTAL}</td>
-                        <td class="text-center">{MARKED}</td>
-                        <td class="text-center"><span class='{ASSESS_VISIBILITY_CSS}' title="{ASSESS_VISIBILITY}"></span></td>
+                        <td class="text-center hide-for-medium-down">{TOTAL}</td>
+                        <td class="text-center hide-for-small">{MARKED}</td>
+                        <td class="text-center hide-for-small"><span class='{ASSESS_VISIBILITY_CSS}' title="{ASSESS_VISIBILITY}"></span></td>
                         <!-- BEGIN readonly_duework -->
                         <td class="text-center"></td>
                         <!-- END readonly_duework -->
@@ -113,12 +113,12 @@
                         <!-- END normalSubmission -->
                         <!-- BEGIN onlineAssessment -->
                         <td><a href="/assess/results/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></td>
-                        <td>{ASSESS_TYPE}</td>
-                        <td data-timestamp="{ASSESS_START_TIMESTAMP}">{ASSESS_START}</td>
+                        <td class="hide-for-small">{ASSESS_TYPE}</td>
+                        <td class="hide-for-medium-down" data-timestamp="{ASSESS_START_TIMESTAMP}">{ASSESS_START}</td>
                         <td data-timestamp="{ASSESS_FINISH_TIMESTAMP}">{ASSESS_FINISH}</td>
-                        <td class="text-center">{ASSESS_ATTEMPTS}</td>
-                        <td class="text-center">{ASSESS_REVIEWED}</td>
-                        <td class="text-center"><span class='{ASSESS_VISIBILITY_CSS}' title="{ASSESS_VISIBILITY}"></span></td>
+                        <td class="text-center hide-for-medium-down">{ASSESS_ATTEMPTS}</td>
+                        <td class="text-center hide-for-small">{ASSESS_REVIEWED}</td>
+                        <td class="text-center hide-for-small"><span class='{ASSESS_VISIBILITY_CSS}' title="{ASSESS_VISIBILITY}"></span></td>
                         <!-- BEGIN readonly_assess -->
                         <td class="text-center"></td>
                         <!-- END readonly_assess -->
