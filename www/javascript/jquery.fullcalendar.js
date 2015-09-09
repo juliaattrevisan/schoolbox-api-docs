@@ -169,7 +169,7 @@ function Calendar(id, bubbleId, opts) {
                 }
                 // Attend/Unattend butonye
                 if (data.attendanceRequestButton.toString() != 'false') {
-                    data.attendanceRequestButton = '<a class="button icon-reply" href="#">' + data.attendanceRequestButton.toString() + '</a>'
+                    data.attendanceRequestButton = '<a class="button icon-reply" href="#" data-attendance-request>' + data.attendanceRequestButton.toString() + '</a>'
                 }
 
                 data.bookingActions = [];

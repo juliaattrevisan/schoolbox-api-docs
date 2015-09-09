@@ -2,6 +2,7 @@
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
+<script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
 <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
@@ -347,26 +348,21 @@
         // hide bubbles if any header buttons are clicked
         $('#calendar .fc-header').on('click', 'span.fc-button', function(e) {
             c.bubble.hide()
-        })
+        });
 
-        // AJAX update attendance when the attendance toggle-button is clicked
-        c.getForm('editEvent').on('click', '.attendanceRequestButton', function(e) {
-            e.preventDefault()
-            var postData = {
-                event: {id: c.getForm('editEvent').find('input[name="eventId"]').val()}
-            };
-            c.post('/service/attendance/processToggleAttendance', postData, function (data) {
-                var btn = c.getForm('editEvent').find('.attendanceRequestButton a')
-                if (data.error == undefined) {
-                    if (btn.text() == 'RSVP') {
-                        btn.html('<span></span>Unattend')
-                    }
-                    else {
-                        btn.html('<span></span>RSVP')
+        /* Process attendances
+         * NB May not be necessary to use custom getFormData();
+         */
+        $('#editEvent').calendarAttendance({
+            getFormData: function() {
+                return {
+                    event: {
+                        id: c.getForm('editEvent').find('input[name="eventId"]').val()
                     }
                 }
-            })
-        })
+            }
+        });
+
 
         // if a checkbox on the editTask form is interacted, update the appropriate event on the calendar
         c.getForm('editTask').on('change', 'input[name=completed]', function(e) {
@@ -627,7 +623,7 @@
                         <dd class="rm"><p class="attendanceStatus"></p></dd>
                     </dl>
                 </div>
-                <div class="actions">
+                <div>
                     <dl>
                         <dd>
                             <span class="homepageLink" data-is-html="1"></span>

@@ -144,6 +144,12 @@
                 text: {
                     rsvp: 'RSVP',
                     unattend: 'Unattend'
+                },
+
+                /* You can determine post data your own way
+                 */
+                getFormData: function(button) {
+                    return defaultGetFormData(button);
                 }
             }
 
@@ -166,7 +172,7 @@
 
                 var button = $(this);
 
-                var data = button.parent('form').serialize();
+                var data = config.getFormData(button);
 
                 $.post(config.url, data, function (data) {
                     if (data.error == undefined) {
@@ -179,6 +185,16 @@
                     }
                 });
             });
+        }
+
+        /**
+         * Default way of getting post data
+         *
+         * @param button
+         * @returns {*}
+         */
+        function defaultGetFormData(button) {
+            return button.parent('form').serialize();
         }
     }
 }(jQuery));
