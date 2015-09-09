@@ -7,27 +7,19 @@
         <div class="small-12 island">
             <h2 class="subheader">{COMPONENT_NAME}</h2>
             <section>
-                <ul class="activity-list">
+                <ul class="information-list">
                     <!-- BEGIN work -->
-                    <li class="row">
-                        <div class="one-column text-center">
+                    <li>
+                        <div class="small-1 columns text-center">
                             <span title="{WORK_COUNT} new submission(s)">{WORK_COUNT}</span>
                         </div>
-                        <div class="eleven-column">
+                        <div class="small-11 columns">
                             <!-- BEGIN submission -->
-                            <h3>
-                                <a href="/submission/viewSubmission/{WORK_BOX_ID}">
-                                    {WORK_DESCRIPTION}
-                                </a>
-                            </h3>
+                            <h3><a href="/submission/viewSubmission/{WORK_BOX_ID}">{WORK_DESCRIPTION}</a></h3>
                             <!-- END submission -->
 
                             <!-- BEGIN assess -->
-                            <p>
-                                <a href="/assess/results/{WORK_BOX_ID}">
-                                    {WORK_DESCRIPTION}
-                                </a>
-                            </p>
+                            <p><a href="/assess/results/{WORK_BOX_ID}">{WORK_DESCRIPTION}</a></p>
                             <!-- END assess -->
 
                             <p class="meta">
