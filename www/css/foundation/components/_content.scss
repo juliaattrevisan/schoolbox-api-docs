@@ -1456,20 +1456,28 @@ ul.meta {
 	}
 }
 
-dl.inline-dl {
+dl {
+	&.inline-dl {
 
-	@include grid-row($behavior:nest);
+		@include grid-row($behavior:nest);
 
-	dt, dd {
-		@include grid-column($columns:false, $position:true);
+		dt, dd {
+			@include grid-column($columns:false, $position:true);
+		}
+
+		dt {
+			clear: left;
+		}
+
+		dd {
+			clear: right;
+		}
+
 	}
 
-	dt {
-		clear: left;
-	}
-
-	dd {
-		clear: right;
+	&.profile {
+		@extend .inline-dl;
+		margin: 1rem 0;
 	}
 
 }
