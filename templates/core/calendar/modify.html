@@ -11,6 +11,7 @@
 <script type="text/javascript" src="/javascript/data-plugins/timepicker.js"></script>
 <script type="text/javascript" src="/javascript/data-plugins/hideWatch.js"></script>
 <script type="text/javascript" src="/javascript/data-plugins/selectAll.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
 	$(function() {
 		$.fn.alaressTiny({
@@ -18,7 +19,8 @@
 		});
 
 		$('#eventForm').eventModify({
-			functionLabel: "{FUNCTION}"
+			functionLabel: "{FUNCTION}",
+            deleteButton: $('[data-action="delete"]')
 		});
 
         // Collapsables
@@ -42,7 +44,7 @@
     <!-- BEGIN delete_button -->
     <nav><a href="#" class="icon-overflow" data-dropdown="overflow"></a></nav>
     <ul class="f-dropdown" data-dropdown-content id="overflow">
-        <li><a href="/calendar/modifyForm.php?action=Delete&id={EVENT_ID}" class="icon-delete">Delete Event</a></li>
+        <li><a data-action="delete" href="/calendar/modifyForm.php?action=Delete&id={EVENT_ID}" class="icon-delete">Delete Event</a></li>
     </ul>
     <!-- END delete_button -->
 </div>

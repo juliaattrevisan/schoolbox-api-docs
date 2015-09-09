@@ -46,6 +46,8 @@
 		 */
 		setupRepeat();
 
+		setupDeleteActions(config.deleteButton);
+
 		/**
 		 * Initialise various configured params and determine a bunch
 		 * of ids and stuff that we'll probably use elsewhere
@@ -57,7 +59,8 @@
 		function init(options, element) {
 			var defaults = {
 				element: element,
-				functionLabel: ''
+				functionLabel: '',
+				deleteButton: $()
 			}
 
 			var derived = {
@@ -252,6 +255,24 @@
 		}
 
 		/**
+		 * Applies delete actions to the delete button.
+		 *
+		 * * single event: show confirm dialog (which will use foundation reveals)
+		 * * multi event: ask if applying to this event or all in series
+		 *
+		 * @param deleteButton
+		 */
+		function setupDeleteActions(deleteButton) {
+			deleteButton.on('click', function(event) {
+				event.preventDefault();
+				deleteButton.confirmDialog({
+					text:         'Are you sure you want to delete this event?',
+					confirmEvent: $.confirmDialog.followHref
+				});
+			})
+		}
+
+		/**
 		 * Validate form data
 		 */
 		function setupEventValidation() {
@@ -427,16 +448,7 @@
 					}
 					// single event
 					else {
-						if (act == 'Update') {
-							form.submit();
-						} else if (act == 'Delete') {
-							$('<div />').confirmDialog({
-								text: 'Are you sure you want to delete this event?',
-								confirmEvent: form.submit
-							});
-						} else {
-							form.submit();
-						}
+						form.submit();
 					}
 				}
 			});
