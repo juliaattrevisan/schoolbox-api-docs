@@ -24,7 +24,9 @@ Depends: apache2, libapache2-mod-php5,
  schoolbox-ffmpeg,
  imagemagick,
  ${misc:Depends}
-Conflicts: javascript-common
+Provides: schoolbox-mobile
+Replaces: schoolbox-mobile
+Conflicts: javascript-common, schoolbox-mobile
 Description: Schoolbox LMS by Alaress Pty. Ltd.
  Schoolbox is at the leading edge of eLearning solutions for the K-12
  education market. The Schoolbox system is carefully integrated with school
@@ -69,12 +71,6 @@ Architecture: all
 Depends: schoolbox, ${misc:Depends}
 Description: Leave module for the Schoolbox LMS
  Leave module for the Schoolbox LMS
-
-Package: schoolbox-mobile
-Architecture: all
-Depends: schoolbox, ${misc:Depends}
-Description: Mobile module for the Schoolbox LMS
- Mobile module for the Schoolbox LMS
 
 Package: schoolbox-mgssport
 Architecture: all
