@@ -162,16 +162,18 @@
             <!------------------------>
             <ul class="information-list reply">
                 <!-- BEGIN socialstream_reply -->
-                <li class="row" data-equalizer="three" data-socialstream-row>
-                    <div class="eleven-column" data-equalizer-watch="three">
-                        <div class="avatar-card">
+                <li class="actions-small-1" data-equalizer="three" data-socialstream-row>
+                    <div class="list-item" data-equalizer-watch="three">
+                        <div class="avatar card small-12" data-equalizer-watch>
                             <a href="/search/user/{SOCIALSTREAM_REPLY_USER_ID}" title="View Profile">
                                 <img src="/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square64" alt="" class="hide-for-small-only">
                                 <p>{SOCIALSTREAM_REPLY_USER_FULLNAME}</p>
+
                                 <p class="meta">Posted {SOCIALSTREAM_REPLY_CREATED_AT}</p>
                             </a>
                         </div>
-                        <div data-body class="body">
+
+                        <article data-body class="body">
                             <p>{SOCIALSTREAM_REPLY_BODY}</p>
 
                             <!-- BEGIN socialstream_reply_has_attachment -->
@@ -201,13 +203,7 @@
                                 <!-- END socialstream_reply_has_player -->
 
                                 <!-- BEGIN socialstream_reply_has_video -->
-                                <video id="socialstream_video{SOCIALSTREAM_REPLY_POST_ID}"
-                                       controls
-                                       preload="none"
-                                       poster="{SOCIALSTREAM_REPLY_VIDEO_POSTER}"
-                                       width="100%"
-                                       height="400"
-                                        >
+                                <video id="socialstream_video{SOCIALSTREAM_REPLY_POST_ID}" controls preload="none" poster="{SOCIALSTREAM_REPLY_VIDEO_POSTER}" width="100%" height="400">
                                     <source src="{SOCIALSTREAM_REPLY_VIDEO_SRC}" type='video/mp4'>
                                 </video>
                                 <script>
@@ -226,13 +222,13 @@
                                 <!-- END socialstream_reply_has_metadata -->
                             </div>
                             <!-- END socialstream_reply_has_attachment -->
-                        </div>
+                        </article>
                     </div>
-                    <div class="one actions" data-equalizer-watch="three">
+                    <nav>
                         <!-- BEGIN socialstream_reply_has_delete -->
-                        <a class="icon-delete no-text" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}" title="Delete Reply" data-socialstream-delete data-equalizer-watch></a>
+                        <a class="icon-delete" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}" title="Delete Reply" data-socialstream-delete data-equalizer-watch="three"></a>
                         <!-- END socialstream_reply_has_delete -->
-                    </div>
+                    </nav>
                 </li>
                 <!-- END socialstream_reply -->
             </ul>
