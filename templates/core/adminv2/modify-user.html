@@ -619,15 +619,15 @@
         <section>
             <ul class="action-list">
                 <!-- BEGIN user_linked -->
-                <li class="row">
-                    <div class="small-11 columns">
-                        <div class="content">
+                <li class="actions-small-1" data-equalizer>
+                    <div class="list-item">
+                        <div class="info card small-12" data-equalizer-watch>
                             <a href="/adminv2/modify-user/{LINKED_USER_ID}">{LINKED_USER}</a>
                         </div>
                     </div>
-                    <div class="actions one">
-                        <a href="/adminv2/userForm.php?deleteUserLink={USERID}&amp;linkedUser={LINKED_USER_ID}" class="no-text icon-delete" title="Remove"></a>
-                    </div>
+                    <nav>
+                        <a href="/adminv2/userForm.php?deleteUserLink={USERID}&amp;linkedUser={LINKED_USER_ID}" class="icon-delete" title="Remove" data-equalizer-watch></a>
+                    </nav>
                 </li>
                 <!-- END user_linked -->
                 <li class="row">
