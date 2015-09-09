@@ -263,13 +263,66 @@
 		 * @param deleteButton
 		 */
 		function setupDeleteActions(deleteButton) {
-			deleteButton.on('click', function(event) {
-				event.preventDefault();
-				deleteButton.confirmDialog({
-					text:         'Are you sure you want to delete this event?',
-					confirmEvent: $.confirmDialog.followHref
+			var multi = $('#repeat-reminder, [data-repeat-reminder]').length != 0;
+			if (multi) {
+				deleteButton.on('click', function(event) {
+					event.preventDefault();
+					var dialog = $('[data-dialog="bulk-delete"]');
+					dialog.foundation('reveal', 'open');
+					// Do stuff with buttons
+					setupBulkDialogEvents(
+						dialog,
+						function() {
+							// Add self to href
+							location.href = deleteButton.attr('href')+'&efficacy=self';
+						},
+						function() {
+							// Add series to href
+							location.href = deleteButton.attr('href')+'&efficacy=series';
+						}
+					);
 				});
-			})
+			} else {
+				deleteButton.on('click', function(event) {
+					event.preventDefault();
+					deleteButton.confirmDialog({
+						text:         'Are you sure you want to delete this event?',
+						confirmEvent: $.confirmDialog.followHref
+					});
+				})
+			}
+		}
+
+		/**
+		 * Resets events on bulk modify or delete dialog.
+		 *
+		 * @param dialog
+		 * @param selfCallback   Call this when updating or deleting this event only
+		 * @param seriesCallback Call this when updating or deleting entire series
+		 */
+		function setupBulkDialogEvents(dialog, selfCallback, seriesCallback)
+		{
+			// Rebind events on open/close/cancel
+			dialog.find('[data-action="self"]')
+				.off('click')
+				.on('click', function(e) {
+					e.preventDefault();
+					dialog.foundation('reveal', 'close');
+					selfCallback();
+				});
+			dialog.find('[data-action="series"]')
+				.off('click')
+				.on('click', function(e) {
+					e.preventDefault();
+					dialog.foundation('reveal', 'close');
+					seriesCallback();
+				});
+			dialog.find('[data-action="cancel"]')
+				.off('click')
+				.on('click', function(e) {
+					e.preventDefault();
+					dialog.foundation('reveal', 'close');
+				});
 		}
 
 		/**
@@ -411,43 +464,25 @@
                     }
                 },
 				submitHandler: function(form) {
-
-					// the desired action, and if this is a series event or not
-					var act = $('#action').val();
 					var multi = $('#repeat-reminder, [data-repeat-reminder]').length != 0;
-
-					// series
 					if (multi) {
-						// Show a dialog
+						// series - show a dialog
 						var dialog = $('[data-dialog="bulk-modify"]');
-						if (act === 'Delete') {
-							dialog = $('[data-dialog="bulk-delete"]');
-						}
 						dialog.foundation('reveal', 'open');
-
-						// Rebind events on open/close/cancel
-						dialog.find('[data-action="self"]')
-							.off('click')
-							.on('click', function() {
+						setupBulkDialogEvents(
+							dialog,
+							function() {
 								$('#efficacy').val('self');
-								dialog.foundation('reveal', 'close');
 								form.submit();
-							});
-						dialog.find('[data-action="series"]')
-							.off('click')
-							.on('click', function() {
+							},
+							function() {
 								$('#efficacy').val('series');
-								dialog.foundation('reveal', 'close');
 								form.submit();
-							});
-						dialog.find('[data-action="cancel"]')
-							.off('click')
-							.on('click', function() {
-								dialog.foundation('reveal', 'close');
-							});
+							}
+						);
 					}
-					// single event
 					else {
+						// single event - just submit
 						form.submit();
 					}
 				}
