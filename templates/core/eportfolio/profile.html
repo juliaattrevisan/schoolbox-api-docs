@@ -137,16 +137,18 @@
                 <section>
                     <ul class="action-list">
                         <!-- BEGIN recent_blog -->
-                        <li class="row">
-                            <div class="two-column">
-                                {RECENT_BLOG_CREATED_AT}
+                        <li class="actions-small-1" data-equalizer>
+                            <div class="list-item">
+                                <div class="small-3 columns">
+                                    {RECENT_BLOG_CREATED_AT}
+                                </div>
+                                <div class="info card small-9" data-equalizer-watch>
+                                    <a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{RECENT_BLOG_PAGE_ID}#blog_{RECENT_BLOG_BLOG_ID}' title="{RECENT_BLOG_TITLE}">{RECENT_BLOG_TITLE}</a>
+                                </div>
                             </div>
-                            <div class="nine-column">
-                                <a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{RECENT_BLOG_PAGE_ID}#blog_{RECENT_BLOG_BLOG_ID}' title="{RECENT_BLOG_TITLE}">{RECENT_BLOG_TITLE}</a>
-                            </div>
-                            <div class="one actions">
-                                <a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{RECENT_BLOG_PAGE_ID}#blog_{RECENT_BLOG_BLOG_ID}' class="icon-next no-text"></a>
-                            </div>
+                            <nav>
+                                <a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{RECENT_BLOG_PAGE_ID}#blog_{RECENT_BLOG_BLOG_ID}' class="icon-next" data-equalizer-watch></a>
+                            </nav>
                         </li>
                         <!-- END recent_blog -->
                     </ul>
