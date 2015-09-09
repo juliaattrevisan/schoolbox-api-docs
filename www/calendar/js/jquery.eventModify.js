@@ -161,15 +161,20 @@
 		function setupRepeat() {
 			// TODO move this to hideWatch plugin (once we apply rules conditionally)
 			var showRepeats = function() {
+				var repeatInput = config.element.find('input[name=repeat_until]');
 				if ($(this).val() !== '') {
 					$('#repeatUntil').show();
 					$('[data-repeat-until]').removeClass('hide');
-					config.element.find('input[name=repeat_until]').rules('add', 'required');
+					if (repeatInput.length) {
+						repeatInput.rules('add', 'required');
+					}
 				}
 				else {
 					$('#repeatUntil, [data-repeat-until]').hide();
 					$('[data-repeat-until]').addClass('hide');
-					config.element.find('input[name=repeat_until]').rules('remove', 'required');
+					if (repeatInput.length) {
+						repeatInput.rules('remove', 'required');
+					}
 				}
 			};
 			var repeatSelector = config.element.find('select[name=repeat]');
