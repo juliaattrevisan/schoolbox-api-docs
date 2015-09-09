@@ -90,7 +90,7 @@ class Module extends BaseModule {
 
         /* Try to find all the folders which used $courseFolder as a source
          */
-        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder);
+        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, date('Y'));
 
         /* Acrobatics
          */
@@ -168,7 +168,7 @@ class Module extends BaseModule {
 
         /* Try to find all the folders which used $courseFolder as a source
          */
-        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder);
+        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, date('Y'));
 
         /* No acrobatics required
          */
