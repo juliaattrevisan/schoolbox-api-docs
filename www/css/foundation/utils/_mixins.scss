@@ -151,18 +151,18 @@
 	textarea:hover:-ms-input-placeholder		{ color: $color; }
 }
 
-@mixin responsive-sides($multiplier: 1, $property: padding, $small-adjust: 8, $medium-adjust: 4, $large-adjust: 0) {
+@mixin responsive-sides($multiplier: 1, $property: padding, $small-adjust: 8, $medium-adjust: 4, $large-adjust: 0, $importance: "") {
   @media #{$small-up} {
-    #{$property}-left: rem-calc(($multiplier * ($base-font-size - $small-adjust)));
-    #{$property}-right: rem-calc(($multiplier * ($base-font-size - $small-adjust)));
+    #{$property}-left: rem-calc(($multiplier * ($base-font-size - $small-adjust))) #{$importance};
+    #{$property}-right: rem-calc(($multiplier * ($base-font-size - $small-adjust))) #{$importance};
   }
   @media #{$medium-up} {
-    #{$property}-left: rem-calc(($multiplier * ($base-font-size - $medium-adjust)));
-    #{$property}-right: rem-calc(($multiplier * ($base-font-size - $medium-adjust)));
+    #{$property}-left: rem-calc(($multiplier * ($base-font-size - $medium-adjust))) #{$importance};
+    #{$property}-right: rem-calc(($multiplier * ($base-font-size - $medium-adjust))) #{$importance};
   }
   @media #{$large-up} {
-    #{$property}-left: rem-calc(($multiplier * $base-font-size - $large-adjust));
-    #{$property}-right: rem-calc(($multiplier * $base-font-size - $large-adjust));
+    #{$property}-left: rem-calc(($multiplier * $base-font-size - $large-adjust)) #{$importance};
+    #{$property}-right: rem-calc(($multiplier * $base-font-size - $large-adjust)) #{$importance};
   }
 }
 
