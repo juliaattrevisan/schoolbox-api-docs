@@ -946,6 +946,13 @@ $rotate-th-width: $square-grid-td-size;
 	}
 }
 
+.news-list {
+	@extend .information-list;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	@include responsive-sides($importance: !important);
+}
+
 .grade{
 	//min-height: 3rem;
 	font-size: rem-calc(($base-font-size - 4));
