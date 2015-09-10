@@ -604,10 +604,15 @@ abstract class Component_ControllerAbstract
 
         // Residual blockage
         $this->setBlock($templateHandle, 'header', 'header_block');
+        $this->setBlock($templateHandle, 'dashboard_header', 'dashboard_header_block');
+        $this->setVar('header_block', '');
+        $this->setVar('dashboard_header_block', '');
         if ($renderHeader) {
-            $this->parse('header_block', 'header');
-        } else {
-            $this->setVar('header_block', '');
+            if ($this->getInstance()->getModule() == 'dashboard') {
+                $this->parse('dashboard_header_block', 'dashboard_header');
+            } else {
+                $this->parse('header_block', 'header');
+            }
         }
 
         // Render the twig template
