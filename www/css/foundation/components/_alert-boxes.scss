@@ -49,28 +49,34 @@ $alert-transition-ease: ease-out;
 // Custom overrides
 //
 
-$amount: 90%;
+$alert-tint-amount: 90%;
+
+$alert-default-background: darken($body-bg, 10%);
 
 .alert-box {
-  background-color: $body-bg;
-  color: calc-text-color($body-bg, tint($body-bg, $amount), darken($body-bg, $amount));
+  background-color: $alert-default-background;
+  color: calc-text-color($alert-default-background, tint($alert-default-background, $alert-tint-amount), darken($alert-default-background, $alert-tint-amount));
 
   .close { color: inherit; }
 
+  &.primary {
+    background-color: $primary-color;
+    color: calc-text-color($primary-color, tint($primary-color, $alert-tint-amount), darken($primary-color, $alert-tint-amount));
+  }
   &.secondary {
     background-color: $secondary-color;
-    color: calc-text-color($secondary-color, tint($secondary-color, $amount), darken($secondary-color, $amount));
+    color: calc-text-color($secondary-color, tint($secondary-color, $alert-tint-amount), darken($secondary-color, $alert-tint-amount));
   }
   &.success {
     background-color: $success-color;
-    color: calc-text-color($success-color, tint($success-color, $amount), darken($success-color, $amount));
+    color: calc-text-color($success-color, tint($success-color, $alert-tint-amount), darken($success-color, $alert-tint-amount));
   }
   &.warning {
     background-color: $warning-color;
-    color: calc-text-color($warning-color, tint($warning-color, $amount), darken($warning-color, $amount));
+    color: calc-text-color($warning-color, tint($warning-color, $alert-tint-amount), darken($warning-color, $alert-tint-amount));
   }
   &.alert {
     background-color: $alert-color;
-    color: calc-text-color($alert-color, tint($alert-color, $amount), darken($alert-color, $amount));
+    color: calc-text-color($alert-color, tint($alert-color, $alert-tint-amount), darken($alert-color, $alert-tint-amount));
   }
 }
