@@ -220,7 +220,13 @@
                 var type = $(this).attr(config.more);
 
                 window.location.hash = '#' + type + ',1';
-                window.location.reload(true);
+
+                // Ajax more results instead
+                $(config.element).search({
+                    keyword: config.keyword,
+                    section: type,
+                    pageNumber: 1
+                });
             });
         }
     }
