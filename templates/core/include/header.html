@@ -28,7 +28,9 @@
 
       var s = $('#search');
       s.on('click', 'i', function () {
-          s.submit();
+          if (s.find('input').val()) {
+              s.submit();
+          }
       });
 
   });
