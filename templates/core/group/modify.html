@@ -172,6 +172,9 @@ $(document).ready(function() {
         <a href="#" class="icon-more" data-dropdown="tab-control"></a>
     </nav>
     <ul id="tab-control" class="f-dropdown" data-dropdown-content>
+        <!-- BEGIN mail_all -->
+        <li><a href="/mail/createMail.php?replyto=&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;&amp;bcc={EMAILALL}" class="icon-email">Email All Group Members</a></li>
+        <!-- END mail_all -->
         <li><a href="/group/bulk/{CATEGORY_ID}" class="icon-add">Add Bulk Members</a></li>
         <li><a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" class="icon-delete">Disband Group</a></li>
     </ul>
@@ -240,13 +243,6 @@ $(document).ready(function() {
                     </table>
                     <input type="submit" id="deleteButton" value="Delete Selected" />
                 </form>
-                <!-- BEGIN mail_all -->
-                <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
-                    <input type="hidden" name="replyto" value="&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;"/>
-                    <input type="hidden" name="bcc"     value="{EMAILALL}"/>
-                    <input type="submit"class="button" value="Email All" />
-                </form>
-                <!-- END mail_all -->
             </fieldset>
             <fieldset class="content">
                 <table class="standardForm table" cellpadding="0" cellspacing="0">
