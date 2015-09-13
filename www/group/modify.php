@@ -6,6 +6,7 @@ use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 
 $this->setFile(TEMPLATE_content, 'group/modify.html');
 $this->setBlock(TEMPLATE_content, 'groupOwner', 'groupOwner_block');
+$this->setBlock('groupOwner', 'msg_enabled_followadmin', 'msg_enabled_followadmin_block');
 $this->setBlock(TEMPLATE_content, 'groupUnmanaged', 'groupUnmanaged_block');
 $this->setBlock(TEMPLATE_content, 'member', 'member_block');
 $this->setBlock('member', 'make_owner', 'make_owner_block');
@@ -43,10 +44,11 @@ if (is_numeric($this->arg[0])) {
 
     $this->setVar(
         array(
-            'groupOwner_block'           => '',
-            'groupUnmanaged_block'       => '',
-            'msg_enabled_followth_block' => '',
-            'msg_enabled_block'          => ''
+            'groupOwner_block'              => '',
+            'groupUnmanaged_block'          => '',
+            'msg_enabled_followth_block'    => '',
+            'msg_enabled_followadmin_block' => '',
+            'msg_enabled_block'             => ''
         )
     );
 
@@ -121,6 +123,7 @@ if (is_numeric($this->arg[0])) {
                 'OWNER_ID'    => $folderOwner->getUser()->getId(),
             )
         );
+        $this->parse('msg_enabled_followadmin_block', 'msg_enabled_followadmin');
         $this->parse('groupOwner_block', 'groupOwner');
     } else {
         $this->parse('groupUnmanaged_block', 'groupUnmanaged');
