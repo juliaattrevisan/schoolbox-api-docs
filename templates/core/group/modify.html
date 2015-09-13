@@ -163,166 +163,172 @@ $(document).ready(function() {
 
 {BREADCRUMB}
 
-<h1>User Group Maintenance - {CATEGORY_NAME} <a class="btn go-back" href="/homepage/{CATEGORY_ID}">Return to Homepage</a></h1>
-<div class="">
-	<table class="standardForm table" cellpadding="0" cellspacing="0">
-		<tr>
-			<td class="formLabelWidth"><h4>Group Admin</h4></td>
-			<td>
-				<!-- BEGIN groupOwner -->
-				<a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a>
-				<!-- END groupOwner -->
-				<!-- BEGIN groupUnmanaged -->
-				Unmanaged
-				<!-- END groupUnmanaged -->
-			</td>
-		</tr>
-		<tr>
-			<td valign="top"><h4>Add users</h4>
-				<em>You may add users individually by typing their name and selecting from the list.  Alternatively click the bulk link quickly add many members</em>
-				</td>
-			<td>
-				<form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
-                    <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
-					<input type="submit" value="Add Users" class="submit-btn-plain disabled" disabled />
-				</form>
+<div class="row">
+    <div class="small-12 island">
+        <h1>Manage Group</h1>
+        <section>
+            <fieldset class="content">
+                <table class="standardForm table" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td class="formLabelWidth"><h4>Group Admin</h4></td>
+                        <td>
+                            <!-- BEGIN groupOwner -->
+                            <a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a>
+                            <!-- END groupOwner -->
+                            <!-- BEGIN groupUnmanaged -->
+                            Unmanaged
+                            <!-- END groupUnmanaged -->
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><h4>Add users</h4>
+                            <em>You may add users individually by typing their name and selecting from the list.  Alternatively click the bulk link quickly add many members</em>
+                        </td>
+                        <td>
+                            <form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
+                                <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
+                                <input type="submit" value="Add Users" class="submit-btn-plain disabled" disabled />
+                            </form>
 
 
 
-                <a href="/group/bulk/{CATEGORY_ID}" class="btn add float-left"><span></span>Add Bulk Members</a>
-			</td>
-		</tr>
-		<tr>
-			<td valign="top"><h4>Access Type</h4>
-				<em>Restricted groups are private. Moderated allows users to join, but only access once approved.  Free groups can be joined and left by anyone.  See the <a href="/group/join">group page</a> for available groups.</em>
-				</td>
-				<td>
-                    <form class="ajax" action="/group/modifyForm.php" method="post" id="type_form">
-                        <input type="hidden" name="categoryID" value="{CATEGORY_ID}">
-                        <label>
-                            <input name="type" type="radio" value="1" {GROUP_TYPE_1} /> Restricted
-                        </label>
-                        <label>
-                            <input name="type" type="radio" value="2" {GROUP_TYPE_2} /> Moderated
-                        </label>
-                        <label>
-                            <input name="type" type="radio" value="3" {GROUP_TYPE_3} /> Free
-                        </label>
-				    </form>
-                </td>
-		</tr>
-        <!-- BEGIN msg_enabled -->
-        <tr>
-            <td>
-                <h4>Messages</h4>
-                <em>
-                    Whether or not messages are enabled for this group.
-                    If 'force follow' is disabled, users can still opt in or out of receiving messages.
-                </em>
-            </td>
-            <td>
-                <form class="ajax" action="/group/modifyForm.php" method="post" id="follow_form">
-                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}">
-                    <input type="hidden" name="msg[enabled]" value="0" />
-                    <label>
-                        <input data-fieldset="ffollow" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} /> Messages enabled
-                    </label>
-                    <fieldset id="ffollow">
-                        <input name="msg[force_follow]" type="hidden" value="0" />
-                        <label>
-                            <input name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} /> Force Follow
-                        </label>
-                    </fieldset>
+                            <a href="/group/bulk/{CATEGORY_ID}" class="btn add float-left"><span></span>Add Bulk Members</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><h4>Access Type</h4>
+                            <em>Restricted groups are private. Moderated allows users to join, but only access once approved.  Free groups can be joined and left by anyone.  See the <a href="/group/join">group page</a> for available groups.</em>
+                        </td>
+                        <td>
+                            <form class="ajax" action="/group/modifyForm.php" method="post" id="type_form">
+                                <input type="hidden" name="categoryID" value="{CATEGORY_ID}">
+                                <label>
+                                    <input name="type" type="radio" value="1" {GROUP_TYPE_1} /> Restricted
+                                </label>
+                                <label>
+                                    <input name="type" type="radio" value="2" {GROUP_TYPE_2} /> Moderated
+                                </label>
+                                <label>
+                                    <input name="type" type="radio" value="3" {GROUP_TYPE_3} /> Free
+                                </label>
+                            </form>
+                        </td>
+                    </tr>
+                    <!-- BEGIN msg_enabled -->
+                    <tr>
+                        <td>
+                            <h4>Messages</h4>
+                            <em>
+                                Whether or not messages are enabled for this group.
+                                If 'force follow' is disabled, users can still opt in or out of receiving messages.
+                            </em>
+                        </td>
+                        <td>
+                            <form class="ajax" action="/group/modifyForm.php" method="post" id="follow_form">
+                                <input type="hidden" name="categoryID" value="{CATEGORY_ID}">
+                                <input type="hidden" name="msg[enabled]" value="0" />
+                                <label>
+                                    <input data-fieldset="ffollow" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} /> Messages enabled
+                                </label>
+                                <fieldset id="ffollow">
+                                    <input name="msg[force_follow]" type="hidden" value="0" />
+                                    <label>
+                                        <input name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} /> Force Follow
+                                    </label>
+                                </fieldset>
 
-                    <!-- BEGIN default_follow -->
-                    <label>
-                        <input name="follow" type="radio" value="{FOLLOW_VALUE}" {FOLLOW_SELECTED} /> {FOLLOW_LABEL}
-                    </label>
-                    <!-- END default_follow -->
-                </form>
-            </td>
-        </tr>
-        <!-- END msg_enabled -->
-		<tr>
-			<td valign="top"><h4>Members</h4>
-				<em>You can give write access to any member of the group, this will enable them to post resources and moderate the forum.  Only one user may be the group admin and it cannot be a student.  Making another user the group admin will relinquish your control over the group.</em>
-				</td>
-				<td>
-				<form action="/group/modifyForm.php" method="post" id="deleteForm">
-					<table id="members" class="table ruler">
-						<tr>
-							<th style="width: 20px; text-align: center;"><input type="checkbox" class="checkAll" id="delCheck" /></th>
-							<th>Name</th>
-							<th style="text-align: center;">Write</th>
-							<th style="text-align: center;">Delete</th>
-                            <!-- BEGIN msg_enabled_followth -->
-							<th style="text-align: center;">Following</th>
-                            <!-- END msg_enabled_followth -->
-							<th style="text-align: center; white-space: nowrap;">Make Admin </th>
-						</tr>
-						<!-- BEGIN member -->
-						<tr>
-							<td style="text-align: center;"><input class="delCheck" type="checkbox" name="delete[]" value="{USER_ID}"  /></td>
-							<td style="white-space: nowrap;"><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
-							<td style="text-align: center;"><input class="greenCheck" type="checkbox" rel="{USER_ID}" {GROUP_CHECKED} /></td>
-							<td style="text-align: center;"><a href="/group/modifyForm.php?delete={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Remove {USER_JAVA}?');">Delete</a></td>
-                            <!-- BEGIN msg_enabled_userfollow -->
-                            <td style="text-align: center;">{USER_FOLLOWING}</td>
-                            <!-- END msg_enabled_userfollow -->
-							<td style="text-align: center; white-space: nowrap;">
-                                <!-- BEGIN make_owner -->
-								<a href='#' class='makeAdmin' data-userid='{USER_ID}' data-categoryid='{CATEGORY_ID}' data-username="{USER_JAVA}">Make Admin</a>
-								<!-- END make_owner -->
-                            </td>
-						</tr>
-						<!-- END member -->
-					</table>
-					<p class="clearfix">
-						<input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
-						<input type="button" id="deleteButton" value="Delete Selected" class="submit-btn-plain" />
+                                <!-- BEGIN default_follow -->
+                                <label>
+                                    <input name="follow" type="radio" value="{FOLLOW_VALUE}" {FOLLOW_SELECTED} /> {FOLLOW_LABEL}
+                                </label>
+                                <!-- END default_follow -->
+                            </form>
+                        </td>
+                    </tr>
+                    <!-- END msg_enabled -->
+                    <tr>
+                        <td valign="top"><h4>Members</h4>
+                            <em>You can give write access to any member of the group, this will enable them to post resources and moderate the forum.  Only one user may be the group admin and it cannot be a student.  Making another user the group admin will relinquish your control over the group.</em>
+                        </td>
+                        <td>
+                            <form action="/group/modifyForm.php" method="post" id="deleteForm">
+                                <table id="members" class="table ruler">
+                                    <tr>
+                                        <th style="width: 20px; text-align: center;"><input type="checkbox" class="checkAll" id="delCheck" /></th>
+                                        <th>Name</th>
+                                        <th style="text-align: center;">Write</th>
+                                        <th style="text-align: center;">Delete</th>
+                                        <!-- BEGIN msg_enabled_followth -->
+                                        <th style="text-align: center;">Following</th>
+                                        <!-- END msg_enabled_followth -->
+                                        <th style="text-align: center; white-space: nowrap;">Make Admin </th>
+                                    </tr>
+                                    <!-- BEGIN member -->
+                                    <tr>
+                                        <td style="text-align: center;"><input class="delCheck" type="checkbox" name="delete[]" value="{USER_ID}"  /></td>
+                                        <td style="white-space: nowrap;"><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
+                                        <td style="text-align: center;"><input class="greenCheck" type="checkbox" rel="{USER_ID}" {GROUP_CHECKED} /></td>
+                                        <td style="text-align: center;"><a href="/group/modifyForm.php?delete={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Remove {USER_JAVA}?');">Delete</a></td>
+                                        <!-- BEGIN msg_enabled_userfollow -->
+                                        <td style="text-align: center;">{USER_FOLLOWING}</td>
+                                        <!-- END msg_enabled_userfollow -->
+                                        <td style="text-align: center; white-space: nowrap;">
+                                            <!-- BEGIN make_owner -->
+                                            <a href='#' class='makeAdmin' data-userid='{USER_ID}' data-categoryid='{CATEGORY_ID}' data-username="{USER_JAVA}">Make Admin</a>
+                                            <!-- END make_owner -->
+                                        </td>
+                                    </tr>
+                                    <!-- END member -->
+                                </table>
+                                <p class="clearfix">
+                                    <input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
+                                    <input type="button" id="deleteButton" value="Delete Selected" class="submit-btn-plain" />
 
-					</p>
+                                </p>
 
-				</form>
-                    <!-- BEGIN mail_all -->
-                    <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
-                        <input type="hidden" name="replyto" value="&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;"/>
-                        <input type="hidden" name="bcc"     value="{EMAILALL}"/>
-                        <a href="#" class="btn submit-this float-left email "><span></span>Email All</a>
-                    </form>
-                    <!-- END mail_all -->
-				</td>
-		</tr>
+                            </form>
+                            <!-- BEGIN mail_all -->
+                            <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
+                                <input type="hidden" name="replyto" value="&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;"/>
+                                <input type="hidden" name="bcc"     value="{EMAILALL}"/>
+                                <a href="#" class="btn submit-this float-left email "><span></span>Email All</a>
+                            </form>
+                            <!-- END mail_all -->
+                        </td>
+                    </tr>
 
-		<!-- BEGIN authorisation -->
-		<tr>
-			<td><h4>Awaiting Authorisation</h4>
-				<em>These users are currently awaiting your authorisation to join this group</em>
-				</td>
-				<td><form action="/group/modifyForm.php" method="post" id="acceptForm">
-					<table class="table">
-						<tr>
-							<th style="width: 20px; text-align: center;"><input type="checkbox" class="checkAll" id="acceptCheck" /></th>
-							<th>Name</th>
-							<th style="text-align: center;">Add</th>
-						</tr>
-						<!-- BEGIN waiting -->
-						<tr>
-							<td style="text-align: center;"><input class="acceptCheck" type="checkbox" name="accept[]" value="{WAITING_ID}" /></td>
-							<td><a href="/search/user/{WAITING_ID}">{WAITING_NAME}</a></td>
-							<td style="text-align: center;"><a href="/group/modifyForm.php?accept={WAITING_ID}&categoryID={CATEGORY_ID}">Add</a></td>
-						</tr>
-						<!-- END waiting -->
-					</table>
-					<input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
-					<input type="submit" value="Accept Selected" class="submit-btn-plain" />
-				</form></td>
-		</tr>
-		<!-- END authorisation -->
-		<tr>
-			<td valign="top"><h4>Disband Group</h4>
-				<em>Removes all members of the group including admin, but leaves all content</em></td>
-				<td><a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" onclick="return confirm('Disband this group?');">Disband Now</a></td>
-		</tr>
-	</table>
+                    <!-- BEGIN authorisation -->
+                    <tr>
+                        <td><h4>Awaiting Authorisation</h4>
+                            <em>These users are currently awaiting your authorisation to join this group</em>
+                        </td>
+                        <td><form action="/group/modifyForm.php" method="post" id="acceptForm">
+                            <table class="table">
+                                <tr>
+                                    <th style="width: 20px; text-align: center;"><input type="checkbox" class="checkAll" id="acceptCheck" /></th>
+                                    <th>Name</th>
+                                    <th style="text-align: center;">Add</th>
+                                </tr>
+                                <!-- BEGIN waiting -->
+                                <tr>
+                                    <td style="text-align: center;"><input class="acceptCheck" type="checkbox" name="accept[]" value="{WAITING_ID}" /></td>
+                                    <td><a href="/search/user/{WAITING_ID}">{WAITING_NAME}</a></td>
+                                    <td style="text-align: center;"><a href="/group/modifyForm.php?accept={WAITING_ID}&categoryID={CATEGORY_ID}">Add</a></td>
+                                </tr>
+                                <!-- END waiting -->
+                            </table>
+                            <input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
+                            <input type="submit" value="Accept Selected" class="submit-btn-plain" />
+                        </form></td>
+                    </tr>
+                    <!-- END authorisation -->
+                    <tr>
+                        <td valign="top"><h4>Disband Group</h4>
+                            <em>Removes all members of the group including admin, but leaves all content</em></td>
+                        <td><a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" onclick="return confirm('Disband this group?');">Disband Now</a></td>
+                    </tr>
+                </table>
+            </fieldset>
+        </section>
+    </div>
 </div>
