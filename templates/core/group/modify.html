@@ -182,9 +182,15 @@ $(document).ready(function() {
         <section>
             <fieldset class="content">
                 <legend>Members</legend>
+
+                <!-- BEGIN groupUnmanaged -->
+                <div class="alert-box">This group currently has no administrator.</div>
+                <!-- END groupUnmanaged -->
+
                 <form action="/group/modifyForm.php" method="post" id="deleteForm">
                     <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
                     <table id="members">
+                        <thead>
                         <tr>
                             <th>
                                 <input id="delCheck" type="checkbox" data-select-all data-select-all-for-group="delete" />
@@ -195,8 +201,21 @@ $(document).ready(function() {
                             <!-- BEGIN msg_enabled_followth -->
                             <th>Following</th>
                             <!-- END msg_enabled_followth -->
-                            <th>Make Admin </th>
+                            <th>Make Admin</th>
                         </tr>
+                        </thead>
+                        <tbody>
+
+                        <!-- BEGIN groupOwner -->
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td><a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a></td>
+                            <td>Admin</td>
+                            <td>Yes</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                        <!-- END groupOwner -->
+
                         <!-- BEGIN member -->
                         <tr>
                             <td>
@@ -215,6 +234,7 @@ $(document).ready(function() {
                             </td>
                         </tr>
                         <!-- END member -->
+                        </tbody>
                     </table>
                     <input type="submit" id="deleteButton" value="Delete Selected" />
                 </form>
@@ -228,17 +248,6 @@ $(document).ready(function() {
             </fieldset>
             <fieldset class="content">
                 <table class="standardForm table" cellpadding="0" cellspacing="0">
-                    <tr>
-                        <td class="formLabelWidth"><h4>Group Admin</h4></td>
-                        <td>
-                            <!-- BEGIN groupOwner -->
-                            <a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a>
-                            <!-- END groupOwner -->
-                            <!-- BEGIN groupUnmanaged -->
-                            Unmanaged
-                            <!-- END groupUnmanaged -->
-                        </td>
-                    </tr>
                     <tr>
                         <td valign="top"><h4>Add users</h4>
                             <em>You may add users individually by typing their name and selecting from the list.  Alternatively click the bulk link quickly add many members</em>
@@ -301,13 +310,6 @@ $(document).ready(function() {
                         </td>
                     </tr>
                     <!-- END msg_enabled -->
-                    <tr>
-                        <td valign="top"><h4>Members</h4>
-                            <em>You can give write access to any member of the group, this will enable them to post resources and moderate the forum.  Only one user may be the group admin and it cannot be a student.  Making another user the group admin will relinquish your control over the group.</em>
-                        </td>
-                        <td>
-                        </td>
-                    </tr>
 
                     <!-- BEGIN authorisation -->
                     <tr>
