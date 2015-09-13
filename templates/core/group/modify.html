@@ -41,6 +41,7 @@
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/javascript/admin/jquery.makeAdmin.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/selectAll.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 	$('.makeAdmin').makeAdmin({
@@ -185,10 +186,12 @@ $(document).ready(function() {
                     <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
                     <table id="members">
                         <tr>
-                            <th><input type="checkbox" class="checkAll" id="delCheck" /></th>
+                            <th>
+                                <input id="delCheck" type="checkbox" data-select-all data-select-all-for-group="delete" />
+                                <label for="delCheck" class="checkbox-label"></label>
+                            </th>
                             <th>Name</th>
                             <th>Write</th>
-                            <th>Delete</th>
                             <!-- BEGIN msg_enabled_followth -->
                             <th>Following</th>
                             <!-- END msg_enabled_followth -->
@@ -196,10 +199,12 @@ $(document).ready(function() {
                         </tr>
                         <!-- BEGIN member -->
                         <tr>
-                            <td><input class="delCheck" type="checkbox" name="delete[]" value="{USER_ID}"  /></td>
+                            <td>
+                                <input id="delCheck-{USER_ID}" type="checkbox" name="delete[]" value="{USER_ID}" data-select-all-group="delete" />
+                                <label for="delCheck-{USER_ID}" class="checkbox-label"></label>
+                            </td>
                             <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
                             <td><input class="greenCheck" type="checkbox" rel="{USER_ID}" {GROUP_CHECKED} /></td>
-                            <td><a href="/group/modifyForm.php?delete={USER_ID}&categoryID={CATEGORY_ID}">Delete</a></td>
                             <!-- BEGIN msg_enabled_userfollow -->
                             <td>{USER_FOLLOWING}</td>
                             <!-- END msg_enabled_userfollow -->
