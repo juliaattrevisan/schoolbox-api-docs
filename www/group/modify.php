@@ -228,6 +228,20 @@ if (is_numeric($this->arg[0])) {
             : '',
         'MAKEADMIN_SUPER' => isset($_SESSION['su']) ? $_SESSION['su'] : 0
     ));
+
+    $trail = new \Schoolbox\Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $category->getName(),
+            'href' => "/homepage/{$category->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Manage Group',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 } else {
     error(2);
 }
