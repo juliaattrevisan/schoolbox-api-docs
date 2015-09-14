@@ -331,20 +331,17 @@ $(document).ready(function() {
             </fieldset>
             <!-- END authorisation -->
 
-            <table class="standardForm table" cellpadding="0" cellspacing="0">
-                <tr>
-                    <td valign="top"><h4>Add users</h4>
-                        <em>You may add users individually by typing their name and selecting from the list.  Alternatively click the bulk link quickly add many members</em>
-                    </td>
-                    <td>
-                        <form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
-                            <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
-                            <input type="submit" value="Add Users" class="submit-btn-plain disabled" disabled />
-                        </form>
-                    </td>
-                </tr>
-            </table>
-
+            <fieldset class="content">
+                <legend>
+                    Add Members
+                    <span data-tooltip class="has-tip tip-top hint" title="You may add users individually by typing their name and selecting from the list.">?</span>
+                </legend>
+                <div class="small-12 columns">
+                    <form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
+                        <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
+                    </form>
+                </div>
+            </fieldset>
         </section>
     </div>
 </div>
