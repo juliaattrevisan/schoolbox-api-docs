@@ -80,18 +80,18 @@
             <section class="content">
                 <fieldset>
                     <legend>Search</legend>
-                    <div class="large-5 columns">
+                    <div class="small-12 large-5 columns">
                         <select name="reportHouse">
                             <!-- BEGIN house -->
                             <option value="{HOUSE_ID}" {HOUSE_SELECTED}>{HOUSE_NAME}</option>
                             <!-- END house -->
                         </select>
                     </div>
-                    <div class="large-5 columns">
+                    <div class="small-12 large-5 columns">
                         <input data-datepicker name="reportDate" type="text" value="{REPORT_DATE}">
                     </div>
-                    <div class="large-2 columns">
-                        <button data-action="search" title="Search" class="icon-search">Search</button>
+                    <div class="small-12 large-2 columns">
+                        <input type="submit" title="Search" value='Search' data-action="search">
                     </div>
                 </fieldset>
             </section>
