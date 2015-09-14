@@ -40,6 +40,9 @@
         // Allow checking of anchor for view to display
         var anchor = '';
         var parts  = location.href.split('#');
+
+        var calendarLoadingElement = $('#calendar-loading');
+        
         if (parts.length > 1) {
             anchor = parts[1];
             switch (anchor) {
