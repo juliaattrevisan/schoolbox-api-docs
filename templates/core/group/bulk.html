@@ -62,6 +62,7 @@ $(document).ready(function() {
             <li class="tab-title"><a href="#userRoles">From Role</a></li>
             <li class="tab-title"><a href="#userList">From List</a></li>
         </ul>
+        <section>
         <div class="tabs-content">
             <form action="/group/addUserByGroup.php?type=individual&destinationID={CATEGORY_ID}"
                   method="post"
@@ -69,15 +70,11 @@ $(document).ready(function() {
                   id="userGroups"
             >
                 <input type="hidden" name="individualGroupID" id="individualGroupID" />
-                <section>
-                    <fieldset class="content">
-                        <legend>
-                            From Group
-                            <span data-tooltip class="has-tip tip-top hint" title="Add all users that belong to another group.">?</span>
-                        </legend>
-                        <input id="addUsersByIndividualGroup" type="text" size="30" placeholder="Search User Groups" />
-                    </fieldset>
-                </section>
+                <label for="addUsersByIndividualGroup">
+                    Group
+                    <span data-tooltip class="has-tip tip-top hint" title="Add all users that belong to another group.">?</span>
+                </label>
+                <input id="addUsersByIndividualGroup" type="text" size="30" placeholder="Search User Groups" />
                 <input type="submit" value="Add Individual Group" />
             </form>
 
@@ -87,15 +84,11 @@ $(document).ready(function() {
                   id="userRoles"
             >
                 <input type="hidden" name="systemGroupID" id="systemGroupID" />
-                <section>
-                    <fieldset class="content">
-                        <legend>
-                            From Role
-                            <span data-tooltip class="has-tip tip-top hint" title="Add all users of a particular role in the system.">?</span>
-                        </legend>
-                    </fieldset>
-                    <input id="addUsersBySystemGroup" type="text" size="30" placeholder="Search User Roles" />
-                </section>
+                <label for="addUsersBySystemGroup">
+                    Role
+                    <span data-tooltip class="has-tip tip-top hint" title="Add all users of a particular role in the system.">?</span>
+                </label>
+                <input id="addUsersBySystemGroup" type="text" size="30" placeholder="Search User Roles" />
                 <input type="submit" value="Add System Role" />
             </form>
 
@@ -104,18 +97,15 @@ $(document).ready(function() {
                   class="content"
                   id="userList"
             >
-                <section>
-                    <fieldset class="content">
-                        <legend>
-                            User List
-                            <span data-tooltip class="has-tip tip-top hint" title="Add a list of users (either external user IDs or Schoolbox usernames).">?</span>
-                        </legend>
-                            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-                            <textarea name="bulkAdd" cols="30" rows="20"></textarea>
-                    </fieldset>
-                </section>
+                <label for="addUsersByList">
+                    User List
+                    <span data-tooltip class="has-tip tip-top hint" title="Add a list of users (either external user IDs or Schoolbox usernames).">?</span>
+                </label>
+                <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                <textarea name="bulkAdd" id="addUsersByList" cols="30" rows="20"></textarea>
                 <input type="submit" name="Submit" />
             </form>
         </div>
+        </section>
     </div>
 </div>
