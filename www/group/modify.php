@@ -11,6 +11,7 @@ $this->setBlock(TEMPLATE_content, 'groupUnmanaged', 'groupUnmanaged_block');
 $this->setBlock(TEMPLATE_content, 'member', 'member_block');
 $this->setBlock('member', 'make_owner', 'make_owner_block');
 $this->setBlock('member', 'msg_enabled_userfollow', 'msg_enabled_userfollow_block');
+$this->setBlock('member', 'msg_enabled_usermute', 'msg_enabled_usermute_block');
 
 $this->setBlock(TEMPLATE_content, 'msg_enabled', 'msg_enabled_block');
 
@@ -159,19 +160,22 @@ if (is_numeric($this->arg[0])) {
                 $member['uid']
             );
 
-            $output = array('USER_NAME'		=> $userHandler->formatName($member),
-                            'USER_JAVA'		=> addslashes($userHandler->formatName($member)),
-                            'USER_ID'		=> $member['uid'],
-                            'GROUP_CHECKED'	=> $member['type'] > 1 ? 'checked=\'checked\'' : '',
-                            'USER_FOLLOWING' => $following ? 'Yes' : 'No'
-                            );
+            $output = array(
+                'USER_NAME'           => $userHandler->formatName($member),
+                'USER_JAVA'           => addslashes($userHandler->formatName($member)),
+                'USER_ID'             => $member['uid'],
+                'GROUP_CHECKED'       => $member['type'] > 1 ? 'checked=\'checked\'' : '',
+                'USER_FOLLOWING'      => $following ? 'Yes' : 'No',
+                'USER_FOLLOWING_ICON' => $following ? 'icon-tick' : 'icon-mute',
+            );
 
             $this->setVar($output);
 
 
             $this->setVar(array(
                 'make_owner_block'             => '',
-                'msg_enabled_userfollow_block' => ''
+                'msg_enabled_userfollow_block' => '',
+                'msg_enabled_usermute_block'   => '',
             ));
 
             if ($groupHandler->allowOwner($member['uid'])) {
@@ -179,7 +183,11 @@ if (is_numeric($this->arg[0])) {
             }
 
             if ($messagingEnabled) {
-                $this->parse('msg_enabled_userfollow_block', 'msg_enabled_userfollow');
+                if ($following) {
+                    $this->parse('msg_enabled_userfollow_block', 'msg_enabled_userfollow');
+                } else {
+                    $this->parse('msg_enabled_usermute_block', 'msg_enabled_usermute');
+                }
             }
 
             $this->parse('member_block', 'member', true);

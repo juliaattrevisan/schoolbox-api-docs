@@ -69,7 +69,7 @@ $(document).ready(function() {
                                 <span data-tooltip class="has-tip tip-top hint" title="Users with write access are able to post resources and moderate the forum.">?</span>
                             </th>
                             <!-- BEGIN msg_enabled_followth -->
-                            <th>Following</th>
+
                             <!-- END msg_enabled_followth -->
                             <th>
                                 Admin
@@ -85,11 +85,13 @@ $(document).ready(function() {
 
                         <!-- BEGIN groupOwner -->
                         <tr>
-                            <td><a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a></td>
+                            <td>
+                                <!-- BEGIN msg_enabled_followadmin -->
+                                <span data-tooltip class="has-tip tip-top icon-tick" title="{GROUP_OWNER} is receiving messages from this group, because they are the group admin."></span>
+                                <!-- END msg_enabled_followadmin -->
+                                <a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a>
+                            </td>
                             <td>Admin</td>
-                            <!-- BEGIN msg_enabled_followadmin -->
-                            <td>Yes</td>
-                            <!-- END msg_enabled_followadmin -->
                             <td>
                                 <fieldset class="switch round no-margin" tabindex="0">
                                     <input id="admin-{OWNER_ID}" type="checkbox" name="owner" value="{OWNER_ID}" checked data-checkbox-group="admin" />
@@ -102,14 +104,18 @@ $(document).ready(function() {
 
                         <!-- BEGIN member -->
                         <tr>
-                            <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
+                            <td>
+                                <!-- BEGIN msg_enabled_userfollow -->
+                                <span data-tooltip class="has-tip tip-top icon-tick" title="{USER_NAME} is receiving messages from this group."></span>
+                                <!-- END msg_enabled_userfollow -->
+                                <!-- BEGIN msg_enabled_usermute -->
+                                <span data-tooltip class="has-tip tip-top icon-mute" title="{USER_NAME} has muted messages from this group."></span>
+                                <!-- END msg_enabled_usermute -->
+                                <a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
                             <td>
                                 <input id="writeCheck-{USER_ID}" type="checkbox" name="write[]" value="{USER_ID}" {GROUP_CHECKED} />
                                 <label for="writeCheck-{USER_ID}" class="checkbox-label"></label>
                             </td>
-                            <!-- BEGIN msg_enabled_userfollow -->
-                            <td>{USER_FOLLOWING}</td>
-                            <!-- END msg_enabled_userfollow -->
                             <td>
                                 <!-- BEGIN make_owner -->
                                 <fieldset class="switch round no-margin" tabindex="0">
