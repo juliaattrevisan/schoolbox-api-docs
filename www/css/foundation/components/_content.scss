@@ -954,18 +954,6 @@ $rotate-th-width: $square-grid-td-size;
         border-right: 1px solid $body-bg;
         text-align: center;
 
-        &.temperature {
-            text-align: center;
-
-            .hot {
-                color: $hot-color;
-                margin-right: 1rem;
-            }
-            .cold {
-                color: $cold-color;
-            }
-        }
-
         &:first-child {
             padding-top: 1rem;
         }
@@ -976,6 +964,29 @@ $rotate-th-width: $square-grid-td-size;
         }
     }
 }
+
+.weather-list-summary {
+    @extend .information-list;
+    .active {
+        background-color: $row-hover-background;
+    }
+}
+
+/* Separate for usage in component view
+ */
+.temperature {
+    text-align: center;
+
+    .hot {
+        color: $hot-color;
+        margin-right: 1rem;
+    }
+    .cold {
+        color: $cold-color;
+    }
+}
+
+
 
 .grade{
 	//min-height: 3rem;
