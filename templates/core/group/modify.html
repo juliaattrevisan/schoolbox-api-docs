@@ -275,21 +275,17 @@ $(document).ready(function() {
                 <fieldset class="content">
                     <legend>Messaging</legend>
                     <div class="small-12 columns">
-                        <form class="ajax" action="/group/modifyForm.php" method="post" id="follow_form">
-                            <input type="hidden" name="categoryID" value="{CATEGORY_ID}">
+                        <input type="hidden" name="msg[enabled]" value="0" />
+                        <input id="msg-enabled" data-fieldset="ffollow" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} />
+                        <label for="msg-enabled" class="checkbox-label">Messages enabled</label>
 
-                            <input type="hidden" name="msg[enabled]" value="0" />
-                            <input id="msg-enabled" data-fieldset="ffollow" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} />
-                            <label for="msg-enabled" class="checkbox-label">Messages enabled</label>
-
-                            <!-- Hide this if messaging isn't enabled -->
-                            <input name="msg[force_follow]" type="hidden" value="0" />
-                            <input id="msg-force-follow" name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} />
-                            <label for="msg-force-follow" class="checkbox-label">
-                                Force Follow
-                                <span data-tooltip class="has-tip tip-top hint" title="Group members may not opt out of receiving messages if Force Follow is enabled.">?</span>
-                            </label>
-                        </form>
+                        <!-- Hide this if messaging isn't enabled -->
+                        <input name="msg[force_follow]" type="hidden" value="0" />
+                        <input id="msg-force-follow" name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} />
+                        <label for="msg-force-follow" class="checkbox-label">
+                            Force Follow
+                            <span data-tooltip class="has-tip tip-top hint" title="Group members may not opt out of receiving messages if Force Follow is enabled.">?</span>
+                        </label>
                     </div>
                 </fieldset>
                 <!-- END msg_enabled -->
