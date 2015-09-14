@@ -16,8 +16,8 @@ $uaMapper = UserAccessMapper::getInstance();
 
 // handle both ajax and form submissions
 $groupsSelected = [];
-if (!empty($_POST['groups'])) {
-	$groupsSelected = $_POST['groups'];
+if (!empty($_POST['group'])) {
+	$groupsSelected = $_POST['group'];
 } elseif (is_numeric($_GET['join'])) {
 	$groupsSelected[$_GET['join']] = true;
 } elseif (is_numeric($_GET['leave'])) {
@@ -74,7 +74,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
 }
 
 // if there is an ajax flag, return a json response
-if(is_numeric($_GET['ajax'])) {
+if ($page->detectAjax()) {
 	header($_SERVER['SERVER_PROTOCOL'] . ' 202 Accepted');
 	header('Content-Type: application/json');
 	die(json_encode(array('status' => $response)));
