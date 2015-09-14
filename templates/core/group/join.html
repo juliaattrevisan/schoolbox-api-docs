@@ -19,7 +19,8 @@
                     <div class="small-12 columns">
                         <fieldset class="checklist">
                             <!-- BEGIN free_list -->
-                            <input id="freeList-{GROUP_ID}" type="checkbox" {GROUP_CHECKED} />
+                            <input name="group[{GROUP_ID}]" value="0" type="hidden" />
+                            <input id="freeList-{GROUP_ID}" name="group[{GROUP_ID}]" value="1" type="checkbox" {GROUP_CHECKED} />
                             <label for="freeList-{GROUP_ID}">{GROUP_NAME}</label>
                             <!-- END free_list -->
                         </fieldset>
@@ -39,7 +40,8 @@
                     <div class="small-12 columns">
                         <fieldset class="checklist">
                             <!-- BEGIN moderated_list -->
-                            <input id="moderatedList-{GROUP_ID}" type="checkbox" {GROUP_CHECKED} />
+                            <input name="group[{GROUP_ID}]" value="0" type="hidden" />
+                            <input id="moderatedList-{GROUP_ID}" name="group[{GROUP_ID}]" value="1" type="checkbox" {GROUP_CHECKED} />
                             <label for="moderatedList-{GROUP_ID}">
                                 {GROUP_NAME}
                                 <!-- BEGIN waiting -->
