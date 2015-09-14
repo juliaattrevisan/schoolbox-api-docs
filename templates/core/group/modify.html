@@ -182,171 +182,174 @@ $(document).ready(function() {
 
 <div class="row">
     <div class="small-12 island">
-        <section>
-            <fieldset class="content">
-                <legend>Current Members</legend>
+        <form action="/group/modifyForm.php" method="post">
+            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+            <section>
+                <fieldset class="content">
+                    <legend>Current Members</legend>
 
-                <!-- BEGIN groupUnmanaged -->
-                <div class="alert-box">This group currently has no administrator.</div>
-                <!-- END groupUnmanaged -->
+                    <!-- BEGIN groupUnmanaged -->
+                    <div class="alert-box">This group currently has no administrator.</div>
+                    <!-- END groupUnmanaged -->
 
-                <form action="/group/modifyForm.php" method="post" id="deleteForm">
-                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-                    <table id="members">
-                        <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>
-                                Write
-                                <span data-tooltip class="has-tip tip-top hint" title="Users with write access are able to post resources and moderate the forum.">?</span>
-                            </th>
-                            <!-- BEGIN msg_enabled_followth -->
-                            <th>Following</th>
-                            <!-- END msg_enabled_followth -->
-                            <th>
-                                Make Admin
-                                <span data-tooltip class="has-tip tip-top hint" title="Only one user may be the group admin - making another user the group admin will relinquish the current admin's control over the group. Students may not be group admins.">?</span>
-                            </th>
-                            <th>
-                                <input id="delCheck" type="checkbox" data-select-all data-select-all-for-group="delete" />
-                                <label for="delCheck" class="checkbox-label">Delete?</label>
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody>
+                    <form action="/group/modifyForm.php" method="post" id="deleteForm">
+                        <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                        <table id="members">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>
+                                    Write
+                                    <span data-tooltip class="has-tip tip-top hint" title="Users with write access are able to post resources and moderate the forum.">?</span>
+                                </th>
+                                <!-- BEGIN msg_enabled_followth -->
+                                <th>Following</th>
+                                <!-- END msg_enabled_followth -->
+                                <th>
+                                    Make Admin
+                                    <span data-tooltip class="has-tip tip-top hint" title="Only one user may be the group admin - making another user the group admin will relinquish the current admin's control over the group. Students may not be group admins.">?</span>
+                                </th>
+                                <th>
+                                    <input id="delCheck" type="checkbox" data-select-all data-select-all-for-group="delete" />
+                                    <label for="delCheck" class="checkbox-label">Delete?</label>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
 
-                        <!-- BEGIN groupOwner -->
-                        <tr>
-                            <td><a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a></td>
-                            <td>Admin</td>
-                            <!-- BEGIN msg_enabled_followadmin -->
-                            <td>Yes</td>
-                            <!-- END msg_enabled_followadmin -->
-                            <td>&nbsp;</td>
-                            <td>&nbsp;</td>
-                        </tr>
-                        <!-- END groupOwner -->
+                            <!-- BEGIN groupOwner -->
+                            <tr>
+                                <td><a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a></td>
+                                <td>Admin</td>
+                                <!-- BEGIN msg_enabled_followadmin -->
+                                <td>Yes</td>
+                                <!-- END msg_enabled_followadmin -->
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <!-- END groupOwner -->
 
-                        <!-- BEGIN member -->
-                        <tr>
-                            <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
-                            <td>
-                                <input id="writeCheck-{USER_ID}" type="checkbox" name="write[]" value="{USER_ID}" {GROUP_CHECKED} />
-                                <label for="writeCheck-{USER_ID}" class="checkbox-label"></label>
-                            </td>
-                            <!-- BEGIN msg_enabled_userfollow -->
-                            <td>{USER_FOLLOWING}</td>
-                            <!-- END msg_enabled_userfollow -->
-                            <td>
-                                <!-- BEGIN make_owner -->
-                                <a href='#' class='makeAdmin' data-userid='{USER_ID}' data-categoryid='{CATEGORY_ID}' data-username="{USER_JAVA}">Make Admin</a>
-                                <!-- END make_owner -->
-                            </td>
-                            <td>
-                                <input id="delCheck-{USER_ID}" type="checkbox" name="delete[]" value="{USER_ID}" data-select-all-group="delete" />
-                                <label for="delCheck-{USER_ID}" class="checkbox-label"></label>
-                            </td>
-                        </tr>
-                        <!-- END member -->
-                        </tbody>
-                    </table>
-                </form>
-            </fieldset>
-            <fieldset class="content">
-                <legend>Access</legend>
-                <div class="small-12 columns">
-                    <form class="ajax" action="/group/modifyForm.php" method="post" id="type_form">
-                        <input type="hidden" name="categoryID" value="{CATEGORY_ID}">
-                        <input id="type-1" name="type" type="radio" value="1" {GROUP_TYPE_1} />
-                        <label for="type-1" class="radio-label">
-                            Restricted
-                            <span data-tooltip class="has-tip tip-top hint" title="Membership is only by invitation from a group admin.">?</span>
-                        </label>
-                        <input id="type-2" name="type" type="radio" value="2" {GROUP_TYPE_2} />
-                        <label for="type-2" class="radio-label">
-                            Moderated
-                            <span data-tooltip class="has-tip tip-top hint" title="Users may request membership, but must be approved by a group admin.">?</span>
-                        </label>
-                        <input id="type-3" name="type" type="radio" value="3" {GROUP_TYPE_3} />
-                        <label for="type-3" class="radio-label">
-                            Free
-                            <span data-tooltip class="has-tip tip-top hint" title="Users may join and leave at any time, without approval.">?</span>
-                        </label>
+                            <!-- BEGIN member -->
+                            <tr>
+                                <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
+                                <td>
+                                    <input id="writeCheck-{USER_ID}" type="checkbox" name="write[]" value="{USER_ID}" {GROUP_CHECKED} />
+                                    <label for="writeCheck-{USER_ID}" class="checkbox-label"></label>
+                                </td>
+                                <!-- BEGIN msg_enabled_userfollow -->
+                                <td>{USER_FOLLOWING}</td>
+                                <!-- END msg_enabled_userfollow -->
+                                <td>
+                                    <!-- BEGIN make_owner -->
+                                    <a href='#' class='makeAdmin' data-userid='{USER_ID}' data-categoryid='{CATEGORY_ID}' data-username="{USER_JAVA}">Make Admin</a>
+                                    <!-- END make_owner -->
+                                </td>
+                                <td>
+                                    <input id="delCheck-{USER_ID}" type="checkbox" name="delete[]" value="{USER_ID}" data-select-all-group="delete" />
+                                    <label for="delCheck-{USER_ID}" class="checkbox-label"></label>
+                                </td>
+                            </tr>
+                            <!-- END member -->
+                            </tbody>
+                        </table>
                     </form>
-                </div>
-            </fieldset>
-            <!-- BEGIN msg_enabled -->
-            <fieldset class="content">
-                <legend>Messaging</legend>
-                <div class="small-12 columns">
-                    <form class="ajax" action="/group/modifyForm.php" method="post" id="follow_form">
-                        <input type="hidden" name="categoryID" value="{CATEGORY_ID}">
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Access</legend>
+                    <div class="small-12 columns">
+                        <form class="ajax" action="/group/modifyForm.php" method="post" id="type_form">
+                            <input type="hidden" name="categoryID" value="{CATEGORY_ID}">
+                            <input id="type-1" name="type" type="radio" value="1" {GROUP_TYPE_1} />
+                            <label for="type-1" class="radio-label">
+                                Restricted
+                                <span data-tooltip class="has-tip tip-top hint" title="Membership is only by invitation from a group admin.">?</span>
+                            </label>
+                            <input id="type-2" name="type" type="radio" value="2" {GROUP_TYPE_2} />
+                            <label for="type-2" class="radio-label">
+                                Moderated
+                                <span data-tooltip class="has-tip tip-top hint" title="Users may request membership, but must be approved by a group admin.">?</span>
+                            </label>
+                            <input id="type-3" name="type" type="radio" value="3" {GROUP_TYPE_3} />
+                            <label for="type-3" class="radio-label">
+                                Free
+                                <span data-tooltip class="has-tip tip-top hint" title="Users may join and leave at any time, without approval.">?</span>
+                            </label>
+                        </form>
+                    </div>
+                </fieldset>
+                <!-- BEGIN msg_enabled -->
+                <fieldset class="content">
+                    <legend>Messaging</legend>
+                    <div class="small-12 columns">
+                        <form class="ajax" action="/group/modifyForm.php" method="post" id="follow_form">
+                            <input type="hidden" name="categoryID" value="{CATEGORY_ID}">
 
-                        <input type="hidden" name="msg[enabled]" value="0" />
-                        <input id="msg-enabled" data-fieldset="ffollow" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} />
-                        <label for="msg-enabled" class="checkbox-label">Messages enabled</label>
+                            <input type="hidden" name="msg[enabled]" value="0" />
+                            <input id="msg-enabled" data-fieldset="ffollow" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} />
+                            <label for="msg-enabled" class="checkbox-label">Messages enabled</label>
 
-                        <!-- Hide this if messaging isn't enabled -->
-                        <input name="msg[force_follow]" type="hidden" value="0" />
-                        <input id="msg-force-follow" name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} />
-                        <label for="msg-force-follow" class="checkbox-label">
-                            Force Follow
-                            <span data-tooltip class="has-tip tip-top hint" title="Group members may not opt out of receiving messages if Force Follow is enabled.">?</span>
-                        </label>
+                            <!-- Hide this if messaging isn't enabled -->
+                            <input name="msg[force_follow]" type="hidden" value="0" />
+                            <input id="msg-force-follow" name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} />
+                            <label for="msg-force-follow" class="checkbox-label">
+                                Force Follow
+                                <span data-tooltip class="has-tip tip-top hint" title="Group members may not opt out of receiving messages if Force Follow is enabled.">?</span>
+                            </label>
+                        </form>
+                    </div>
+                </fieldset>
+                <!-- END msg_enabled -->
+
+                <!-- BEGIN authorisation -->
+                <fieldset class="content">
+                    <legend>
+                        Awaiting Members
+                        <span data-tooltip class="has-tip tip-top hint" title="These users are currently awaiting your authorisation to join this group.">?</span>
+                    </legend>
+                    <form action="/group/modifyForm.php" method="post" id="acceptForm">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>
+                                    <input id="acceptCheck" type="checkbox" data-select-all data-select-all-for-group="accept" />
+                                    <label for="acceptCheck" class="checkbox-label">Accept?</label>
+                                </th>
+                            </tr>
+                            </thead>
+                            <!-- BEGIN waiting -->
+                            <tr>
+                                <td><a href="/search/user/{WAITING_ID}">{WAITING_NAME}</a></td>
+                                <td>
+                                    <input id="acceptCheck-{USER_ID}" type="checkbox" name="accept[]" value="{WAITING_ID}" data-select-all-group="accept" />
+                                    <label for="acceptCheck-{USER_ID}" class="checkbox-label"></label>
+                                </td>
+                            </tr>
+                            <!-- END waiting -->
+                        </table>
+                        <input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
                     </form>
+                </fieldset>
+                <!-- END authorisation -->
+
+                <fieldset class="content">
+                    <legend>
+                        Add Members
+                        <span data-tooltip class="has-tip tip-top hint" title="You may add users individually by typing their name and selecting from the list.">?</span>
+                    </legend>
+                    <div class="small-12 columns">
+                        <form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
+                            <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
+                        </form>
+                    </div>
+                </fieldset>
+            </section>
+
+            <div class="row">
+                <div class="small-12 column">
+                    <input type="submit" value="Update Group" />
                 </div>
-            </fieldset>
-            <!-- END msg_enabled -->
-
-            <!-- BEGIN authorisation -->
-            <fieldset class="content">
-                <legend>
-                    Awaiting Members
-                    <span data-tooltip class="has-tip tip-top hint" title="These users are currently awaiting your authorisation to join this group.">?</span>
-                </legend>
-                <form action="/group/modifyForm.php" method="post" id="acceptForm">
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>
-                                <input id="acceptCheck" type="checkbox" data-select-all data-select-all-for-group="accept" />
-                                <label for="acceptCheck" class="checkbox-label">Accept?</label>
-                            </th>
-                        </tr>
-                        </thead>
-                        <!-- BEGIN waiting -->
-                        <tr>
-                            <td><a href="/search/user/{WAITING_ID}">{WAITING_NAME}</a></td>
-                            <td>
-                                <input id="acceptCheck-{USER_ID}" type="checkbox" name="accept[]" value="{WAITING_ID}" data-select-all-group="accept" />
-                                <label for="acceptCheck-{USER_ID}" class="checkbox-label"></label>
-                            </td>
-                        </tr>
-                        <!-- END waiting -->
-                    </table>
-                    <input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
-                </form>
-            </fieldset>
-            <!-- END authorisation -->
-
-            <fieldset class="content">
-                <legend>
-                    Add Members
-                    <span data-tooltip class="has-tip tip-top hint" title="You may add users individually by typing their name and selecting from the list.">?</span>
-                </legend>
-                <div class="small-12 columns">
-                    <form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
-                        <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
-                    </form>
-                </div>
-            </fieldset>
-        </section>
-
-        <div class="row">
-            <div class="small-12 column">
-                <input type="submit" value="Update Group" />
             </div>
-        </div>
+        </form>
     </div>
 </div>
