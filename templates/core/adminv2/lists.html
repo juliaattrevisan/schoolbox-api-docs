@@ -1,23 +1,21 @@
 {ADMIN_NAV}
 
 <div class="row">
-    <div class="large-12 columns">
+    <div class="small-12 island">
         <dl class="sub-nav">
             <!-- BEGIN table_tab -->
             <dd class="{TABLE_CURRENT}"><a href="/adminv2/list/{TABLE_NAME}">{TABLE_TITLE}</a></dd>
             <!-- END table_tab -->
         </dl>
 
-        <div>
-            <form method="post" action="/adminv2/listForm.php">
-                <!-- BEGIN table_schema -->
-                <input name="tableName" type="hidden" value="{TABLE_CURRENT_NAME}" />
-                <input name="tableIndex" type="hidden" value="{TABLE_CURRENT_INDEX}" />
+        <form method="post" action="/adminv2/listForm.php">
+            <!-- BEGIN table_schema -->
+            <input name="tableName" type="hidden" value="{TABLE_CURRENT_NAME}" />
+            <input name="tableIndex" type="hidden" value="{TABLE_CURRENT_INDEX}" />
+
+            <section>
                 <!-- END table_schema -->
                 <table data-list>
-                    <colgroup>
-                        <col width="10%" />
-                    </colgroup>
                     <thead>
                         <tr>
                             <!-- BEGIN table_heading -->
@@ -65,12 +63,15 @@
                         <!-- END table_row -->
                     </tbody>
                 </table>
+
                 <!-- BEGIN create_new -->
-                <a href="#" data-button="add-row" class="button icon-add">New Row</a>
+                <div class="content">
+                    <a href="#" data-button="add-row" class="button icon-add">New Row</a>
+                </div>
                 <!-- END create_new -->
-                <input type="submit" value="Save"/>
-            </form>
-        </div>
+            </section>
+            <input type="submit" value="Save"/>
+        </form>
     </div>
 </div>
 
