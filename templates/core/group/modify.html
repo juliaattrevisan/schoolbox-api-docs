@@ -296,29 +296,26 @@ $(document).ready(function() {
                         Awaiting Members
                         <span data-tooltip class="has-tip tip-top hint" title="These users are currently awaiting your authorisation to join this group.">?</span>
                     </legend>
-                    <form action="/group/modifyForm.php" method="post" id="acceptForm">
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>
-                                    <input id="acceptCheck" type="checkbox" data-select-all data-select-all-for-group="accept" />
-                                    <label for="acceptCheck" class="checkbox-label">Accept?</label>
-                                </th>
-                            </tr>
-                            </thead>
-                            <!-- BEGIN waiting -->
-                            <tr>
-                                <td><a href="/search/user/{WAITING_ID}">{WAITING_NAME}</a></td>
-                                <td>
-                                    <input id="acceptCheck-{USER_ID}" type="checkbox" name="accept[]" value="{WAITING_ID}" data-select-all-group="accept" />
-                                    <label for="acceptCheck-{USER_ID}" class="checkbox-label"></label>
-                                </td>
-                            </tr>
-                            <!-- END waiting -->
-                        </table>
-                        <input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
-                    </form>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>
+                                <input id="acceptCheck" type="checkbox" data-select-all data-select-all-for-group="accept" />
+                                <label for="acceptCheck" class="checkbox-label">Accept?</label>
+                            </th>
+                        </tr>
+                        </thead>
+                        <!-- BEGIN waiting -->
+                        <tr>
+                            <td><a href="/search/user/{WAITING_ID}">{WAITING_NAME}</a></td>
+                            <td>
+                                <input id="acceptCheck-{USER_ID}" type="checkbox" name="accept[]" value="{WAITING_ID}" data-select-all-group="accept" />
+                                <label for="acceptCheck-{USER_ID}" class="checkbox-label"></label>
+                            </td>
+                        </tr>
+                        <!-- END waiting -->
+                    </table>
                 </fieldset>
                 <!-- END authorisation -->
 
