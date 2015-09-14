@@ -24,6 +24,13 @@ $groupMapper = GroupMapper::getInstance();
 
 $categoryId = $_REQUEST['categoryID'];
 
+try {
+	$folder = $catMapper->findById($categoryId);
+} catch (\Schoolbox\Mapper\Exception $e) {
+	error(2);
+	exit;
+}
+
 if(!is_numeric($categoryId)) {
 	error(2);
 }
@@ -47,13 +54,14 @@ if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
         $group = $groupMapper->createModel();
         // yes, group category doesn't map to an actual category.
         // no, I'm not fixing it right now, but will at least check it exists.
-        try {
-            $catMapper->findById($categoryId);
-            $group->setCategory($categoryId);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            header(':', true, 404);
-            die("The specified folder ({$categoryId}) does not exist.");
-        }
+        $group->setCategory($categoryId);
+//        try {
+//            $catMapper->findById($categoryId);
+//            $group->setCategory($categoryId);
+//        } catch (\Schoolbox\Mapper\Exception $e) {
+//            header(':', true, 404);
+//            die("The specified folder ({$categoryId}) does not exist.");
+//        }
     }
 
     if (isset($_POST['type'])) {
@@ -133,7 +141,6 @@ if(isset($_REQUEST['accept'])) {
 /* Add user */
 if(isset($_POST['userID'])) {
 	$ua->setServiceIdentifier($categoryId);
-    $folder = $catMapper->findById($categoryId);
 	/** @var Collection|User[] $userList */
 	$userList = $userMapper->findByColumn('id', $_POST['userID']);
 
@@ -148,23 +155,17 @@ if(isset($_POST['userID'])) {
 }
 
 /* Set new owner/administrator */
-if(is_numeric($_GET['owner'])) {
-	try {
-		$category = $catMapper->findById($categoryId);
-	}
-	catch(Schoolbox\Mapper\Exception $e) {
-		error(2);
-		exit;
-	}
+if(is_numeric($_POST['owner'])) {
+	$ownerId = $_POST['owner'];
 
 	//check if member is allowed to become a owner
-	if (!$groupHandler->allowOwner($_GET['owner'])) {
+	if (!$groupHandler->allowOwner($ownerId)) {
 		error(30);
 	}
 
 	//if we are accessing group for first time create group
-	if (!$groupHandler->groupExists($_GET['categoryID'])) {
-		$groupHandler->createGroup($_GET['categoryID']);
+	if (!$groupHandler->groupExists($categoryId)) {
+		$groupHandler->createGroup($categoryId);
 	}
 
 	// demote current owner
@@ -172,7 +173,7 @@ if(is_numeric($_GET['owner'])) {
 		/** @var UserAccess $ua */
 		$ua = $uaMapper->findOneByColumnList(array(
 			'service' => UserAccess::SERVICE_HOMEPAGE,
-			'sid'     => $category->getId(),
+			'sid'     => $folder->getId(),
 			'type'    => UserAccess::ACCESS_FULL
 		));
 
@@ -182,23 +183,14 @@ if(is_numeric($_GET['owner'])) {
 	catch(Schoolbox\Mapper\Exception $e) {
 		// just ignore it, this kingdom had no king
 		$ua->setUser(new User())
-		   ->setServiceIdentifier($category->getId());
+		   ->setServiceIdentifier($folder->getId());
 	}
 
 	// promote new owner
 	$ua->setAccessLevel(UserAccess::ACCESS_FULL)
-	   ->getUser()->setId($_GET['owner']);
+	   ->getUser()->setId($ownerId);
 
 	$uaMapper->save($ua);
-
-	// re-check permissions, redirect user changing ownership to homepage if they have lost ownership
-	$groupHandler->clearPermissionsCache();
-	if ($groupHandler->getPermission($_GET['categoryID']) < FULL_ACCESS) {
-		SitePage::localRedir("/homepage/" . $_GET['categoryID']);
-	}
-	else {
-		SitePage::localRedir("/group/modify/" . $_GET['categoryID']);
-	}
 }
 
 /* Bulk-add users */
@@ -238,4 +230,10 @@ if(isset($_POST['bulkAdd'])) {
 }
 
 // Once all else is done
-SitePage::localRedir('/group/modify/' . $categoryId);
+// re-check permissions, redirect user changing ownership to homepage if they have lost ownership
+$groupHandler->clearPermissionsCache();
+if ($groupHandler->getPermission($_GET['categoryID']) < FULL_ACCESS) {
+	SitePage::localRedir("/homepage/" . $_GET['categoryID']);
+} else {
+	SitePage::localRedir('/group/modify/' . $categoryId);
+}
