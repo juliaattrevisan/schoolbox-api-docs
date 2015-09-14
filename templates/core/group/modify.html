@@ -126,44 +126,6 @@ $(document).ready(function() {
                         </tbody>
                     </table>
                 </fieldset>
-                <fieldset class="content">
-                    <legend>Access</legend>
-                    <div class="small-12 columns">
-                        <input id="type-1" name="type" type="radio" value="1" {GROUP_TYPE_1} />
-                        <label for="type-1" class="radio-label">
-                            Restricted
-                            <span data-tooltip class="has-tip tip-top hint" title="Membership is only by invitation from a group admin.">?</span>
-                        </label>
-                        <input id="type-2" name="type" type="radio" value="2" {GROUP_TYPE_2} />
-                        <label for="type-2" class="radio-label">
-                            Moderated
-                            <span data-tooltip class="has-tip tip-top hint" title="Users may request membership, but must be approved by a group admin.">?</span>
-                        </label>
-                        <input id="type-3" name="type" type="radio" value="3" {GROUP_TYPE_3} />
-                        <label for="type-3" class="radio-label">
-                            Free
-                            <span data-tooltip class="has-tip tip-top hint" title="Users may join and leave at any time, without approval.">?</span>
-                        </label>
-                    </div>
-                </fieldset>
-                <!-- BEGIN msg_enabled -->
-                <fieldset class="content">
-                    <legend>Messaging</legend>
-                    <div class="small-12 columns">
-                        <input type="hidden" name="msg[enabled]" value="0" />
-                        <input id="msg-enabled" data-fieldset="ffollow" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} />
-                        <label for="msg-enabled" class="checkbox-label">Messages enabled</label>
-
-                        <!-- Hide this if messaging isn't enabled -->
-                        <input name="msg[force_follow]" type="hidden" value="0" />
-                        <input id="msg-force-follow" name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} />
-                        <label for="msg-force-follow" class="checkbox-label">
-                            Force Follow
-                            <span data-tooltip class="has-tip tip-top hint" title="Group members may not opt out of receiving messages if Force Follow is enabled.">?</span>
-                        </label>
-                    </div>
-                </fieldset>
-                <!-- END msg_enabled -->
 
                 <!-- BEGIN authorisation -->
                 <fieldset class="content">
@@ -203,6 +165,47 @@ $(document).ready(function() {
                         <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
                     </div>
                 </fieldset>
+
+                <fieldset class="content">
+                    <div class="small-12 medium-6 columns">
+                        <fieldset class="content no-pad">
+                            <legend>Access</legend>
+                            <input id="type-1" name="type" type="radio" value="1" {GROUP_TYPE_1} />
+                            <label for="type-1" class="radio-label">
+                                Restricted
+                                <span data-tooltip class="has-tip tip-top hint" title="Membership is only by invitation from a group admin.">?</span>
+                            </label>
+                            <input id="type-2" name="type" type="radio" value="2" {GROUP_TYPE_2} />
+                            <label for="type-2" class="radio-label">
+                                Moderated
+                                <span data-tooltip class="has-tip tip-top hint" title="Users may request membership, but must be approved by a group admin.">?</span>
+                            </label>
+                            <input id="type-3" name="type" type="radio" value="3" {GROUP_TYPE_3} />
+                            <label for="type-3" class="radio-label">
+                                Free
+                                <span data-tooltip class="has-tip tip-top hint" title="Users may join and leave at any time, without approval.">?</span>
+                            </label>
+                        </fieldset>
+                    </div>
+                    <!-- BEGIN msg_enabled -->
+                    <div class="small-12 medium-6 columns">
+                        <fieldset class="content no-pad">
+                            <legend>Messaging</legend>
+                            <input type="hidden" name="msg[enabled]" value="0" />
+                            <input id="msg-enabled" data-fieldset="ffollow" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} />
+                            <label for="msg-enabled" class="checkbox-label">Messages enabled</label>
+
+                            <!-- Hide this if messaging isn't enabled -->
+                            <input name="msg[force_follow]" type="hidden" value="0" />
+                            <input id="msg-force-follow" name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} />
+                            <label for="msg-force-follow" class="checkbox-label">
+                                Force Follow
+                                <span data-tooltip class="has-tip tip-top hint" title="Group members may not opt out of receiving messages if Force Follow is enabled.">?</span>
+                            </label>
+                        </fieldset>
+                    </div>
+                </fieldset>
+                <!-- END msg_enabled -->
             </section>
 
             <div class="row">
