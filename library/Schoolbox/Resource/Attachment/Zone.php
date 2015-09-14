@@ -238,7 +238,8 @@ class Zone {
             $context['attachments'][] = array(
                 'name'    => $vars['AZ_FILE_NAME'],
                 'hash'    => $vars['AZ_FILE_HASH'],
-                'preview' => $vars['AZ_FILE_PREVIEW']
+                'preview' => $vars['AZ_FILE_PREVIEW'],
+                'isImage' => $vars['AZ_FILE_IS_IMAGE'],
             );
         }
 
@@ -311,14 +312,19 @@ class Zone {
     protected function deriveSitePageVars($file)
     {
         // if it's an image, render it out, otherwise use its mime thumbnail
-        $href = $file->getMimetype()->isImage()
-            ? "/storage/image.php?hash={$file->getHash()}&size=square{$this->size}"
-            : '/ajax/mime/' . $file->getMime();
+        if ($file->getMimetype()->isImage()) {
+            $href = "/storage/image.php?hash={$file->getHash()}&size=square{$this->size}";
+            $isImage = true;
+        } else {
+            $href = '/ajax/mime/' . $file->getMime();
+            $isImage = false;
+        }
 
         return array(
-            'AZ_FILE_NAME'    => $file->getFilename(),
-            'AZ_FILE_HASH'    => NodeFactory::STORE . ':' . $file->getHash(),
-            'AZ_FILE_PREVIEW' => $href,
+            'AZ_FILE_NAME'     => $file->getFilename(),
+            'AZ_FILE_HASH'     => NodeFactory::STORE . ':' . $file->getHash(),
+            'AZ_FILE_PREVIEW'  => $href,
+            'AZ_FILE_IS_IMAGE' => $isImage,
         );
 
     }
