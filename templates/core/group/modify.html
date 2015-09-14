@@ -11,19 +11,7 @@ $(document).ready(function() {
 		super: '{MAKEADMIN_SUPER}'
 	});
 
-//    $('#members').on('change', '.greenCheck', function() {
-//        var input = $(this),
-//            data  = {
-//                categoryID: '{CATEGORY_ID}',
-//                userID: input.attr('rel'),
-//                write: input.prop('checked') ? 2 : 1
-//            };
-//
-//        $.get('/group/modifyForm.php', data);
-//    });
-
     var addUserSelector = $('#addUser');
-//    var addUserButton   = addUserSelector.closest('form').find(':submit');
     addUserSelector
         .selectizeSelector({
             multiple: true,
@@ -34,91 +22,6 @@ $(document).ready(function() {
                 dataType: 'json'
             }
         });
-//        .on('selectize.item_add', function(event, value) {
-//            addUserButton.prop('disabled', false).removeClass('disabled');
-//        })
-//        .on('selectize.item_remove', function() {
-//            // Disable only if empty
-//            if ($(this).data('selectize').items.length === 0) {
-//                addUserButton.prop('disabled', true).addClass('disabled');
-//            }
-//        });
-
-//    $('form.ajax').on('change', 'input', function (event) {
-//
-//        var input = $(this),
-//            dataAttr, ajaxingClass, form, method, action, data;
-//
-//        updateFieldset(input, 120);
-//
-////        if (this.type == 'radio') {
-//            dataAttr     = 'wasdisabled';
-//            ajaxingClass = 'ajaxing';
-//            form         = event.delegateTarget;
-//            method       = form.method || 'POST';
-//            action       = form.action || '/';
-//            data         = $(form).serialize();
-//
-//            $(form).addClass(ajaxingClass).find('input:not([type=hidden])').each(function () {
-//                $(this).data(dataAttr, !!this.disabled).attr('disabled', 'disabled');
-////                console.log('in', this, $(this).data(dataAttr));
-//            });
-//
-//            $.ajax({
-//                type: method,
-//                url: action,
-//                data: data,
-//                complete: function () {
-//                    $(form).removeClass(ajaxingClass).find('input:not([type=hidden])').each(function () {
-//                        var input = $(this);
-////                        console.log('out', this, input.data(dataAttr));
-//                        if(!input.data(dataAttr)) {
-//                            input.removeAttr('disabled');
-//                        }
-//                        input.data(dataAttr, undefined);
-//                    });
-//                }
-//            });
-////        }
-//
-//    });
-//
-//    // tell all input to hide their fieldsets if appropriate
-//    $('input[data-fieldset]').each(function () {
-//        updateFieldset($(this), 0);
-//    });
-
-
-//	$('input.checkAll').each(function () {
-//		$(this).mouseup(function () {
-//			var node = $(this);
-//			$("input." + $(this).attr("id")).each(function () {
-//				$(this).prop("checked",  !(node.prop("checked")));
-//			});
-//		});
-//	});
-
-//	$('#deleteButton').click(function () {
-//		if (confirm('Delete all selected users?'))
-//			$('#deleteForm').submit();
-//	});
-
-//    /**
-//     * @param {jQuery} input
-//     * @param {Integer} transitionSpeed
-//     */
-//    function updateFieldset(input, transitionSpeed)
-//    {
-//        if (input.data('fieldset')) {
-//            fieldset = $('#' + input.data('fieldset'));
-//
-//            if (input.is(':checked')) {
-//                fieldset.fadeIn(transitionSpeed).find('input').removeAttr('disabled');
-//            } else {
-//                fieldset.fadeOut(transitionSpeed).find('input').attr('disabled', 'disabled');
-//            }
-//        }
-//    }
 });
 </script>
 <!-- END custom_head -->
