@@ -196,11 +196,16 @@ $(document).ready(function() {
                         <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Write</th>
+                            <th>
+                                Write
+                                <span data-tooltip class="has-tip tip-top hint" title="Users with write access are able to post resources and moderate the forum.">?</span>
+                            </th>
                             <!-- BEGIN msg_enabled_followth -->
                             <th>Following</th>
                             <!-- END msg_enabled_followth -->
-                            <th>Make Admin</th>
+                            <th><span data-tooltip class="has-tip tip-top hint" title="Only one user may be the group admin - making another user the group admin will relinquish the current admin's control over the group. Students may not be group admins.">?</span>
+                                Make Admin
+                            </th>
                             <th>
                                 <input id="delCheck" type="checkbox" data-select-all data-select-all-for-group="delete" />
                                 <label for="delCheck" class="checkbox-label">Delete?</label>
