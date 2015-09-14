@@ -79,3 +79,19 @@
 .fc-toolbar {
     margin-bottom: 0;
 }
+
+/* Overcome specificity
+ */
+#content > .row > .small-12 table .fc-day-header.fc-widget-header,
+#content > .row > .small-12 table .fc-head .fc-widget-header,
+#content > .row > .small-12 table .fc-body .fc-widget-content,
+#content > .row > .small-12 table .fc-day-number.fc-past,
+#content > .row > .small-12 table .fc-day-number.fc-future
+{
+    padding: 0;
+}
+
+#calendar-loading {
+    min-height: 0;
+    max-height: 92px;
+}
