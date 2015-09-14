@@ -37,6 +37,11 @@ if (is_numeric($this->arg[0])) {
             'class' => '',
         ],
         [
+            'text' => 'Manage Group',
+            'href' => "/group/modify/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
             'text' => 'Add Bulk Members',
             'href' => '',
             'class' => 'active',
