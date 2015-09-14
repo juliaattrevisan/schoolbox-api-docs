@@ -254,24 +254,21 @@ $(document).ready(function() {
                 <fieldset class="content">
                     <legend>Access</legend>
                     <div class="small-12 columns">
-                        <form class="ajax" action="/group/modifyForm.php" method="post" id="type_form">
-                            <input type="hidden" name="categoryID" value="{CATEGORY_ID}">
-                            <input id="type-1" name="type" type="radio" value="1" {GROUP_TYPE_1} />
-                            <label for="type-1" class="radio-label">
-                                Restricted
-                                <span data-tooltip class="has-tip tip-top hint" title="Membership is only by invitation from a group admin.">?</span>
-                            </label>
-                            <input id="type-2" name="type" type="radio" value="2" {GROUP_TYPE_2} />
-                            <label for="type-2" class="radio-label">
-                                Moderated
-                                <span data-tooltip class="has-tip tip-top hint" title="Users may request membership, but must be approved by a group admin.">?</span>
-                            </label>
-                            <input id="type-3" name="type" type="radio" value="3" {GROUP_TYPE_3} />
-                            <label for="type-3" class="radio-label">
-                                Free
-                                <span data-tooltip class="has-tip tip-top hint" title="Users may join and leave at any time, without approval.">?</span>
-                            </label>
-                        </form>
+                        <input id="type-1" name="type" type="radio" value="1" {GROUP_TYPE_1} />
+                        <label for="type-1" class="radio-label">
+                            Restricted
+                            <span data-tooltip class="has-tip tip-top hint" title="Membership is only by invitation from a group admin.">?</span>
+                        </label>
+                        <input id="type-2" name="type" type="radio" value="2" {GROUP_TYPE_2} />
+                        <label for="type-2" class="radio-label">
+                            Moderated
+                            <span data-tooltip class="has-tip tip-top hint" title="Users may request membership, but must be approved by a group admin.">?</span>
+                        </label>
+                        <input id="type-3" name="type" type="radio" value="3" {GROUP_TYPE_3} />
+                        <label for="type-3" class="radio-label">
+                            Free
+                            <span data-tooltip class="has-tip tip-top hint" title="Users may join and leave at any time, without approval.">?</span>
+                        </label>
                     </div>
                 </fieldset>
                 <!-- BEGIN msg_enabled -->
