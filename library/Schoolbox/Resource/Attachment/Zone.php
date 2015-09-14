@@ -65,7 +65,7 @@ class Zone {
     public function __construct($zoneId, $mapper = null)
     {
         $this->id       = $zoneId;
-        $this->size     = 32;
+        $this->size     = 64;
         $this->multi    = false;
         $this->text     = array(
             'attachPrompt'     => 'Attach files',
