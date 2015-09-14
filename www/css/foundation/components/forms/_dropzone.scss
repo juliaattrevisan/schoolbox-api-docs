@@ -1,12 +1,13 @@
 
 $overlay-duration: 800ms;
+$overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 
 .dragging {
     .dropzone.overlay {
         opacity: 1;
         z-index: 2;
 
-        transition: opacity $overlay-duration cubic-bezier(0.14, 1.11, 0.07, 0.99);
+        transition: opacity $overlay-duration $overlay-timing;
     }
 }
 
@@ -26,7 +27,7 @@ $overlay-duration: 800ms;
         display: block;
         z-index: -1;
 
-        transition: opacity $overlay-duration cubic-bezier(0.14, 1.11, 0.07, 0.99),
+        transition: opacity $overlay-duration $overlay-timing,
         z-index 0s $overlay-duration linear;
 
     }
@@ -90,10 +91,10 @@ ul.az-error-list {
         clear: none;
         //background-color: $monsoon;
         @include transition( (
-                opacity 100ms ease-in,
-                height 150ms ease-out 50ms,
-                padding 150ms ease-out 50ms,
-                background-color 500ms ease-out
+                opacity 100ms $overlay-timing,
+                height 150ms $overlay-timing 50ms,
+                padding 150ms $overlay-timing 50ms,
+                background-color 500ms $overlay-timing
         )
         );
         &:nth-child(2n) {
@@ -104,13 +105,6 @@ ul.az-error-list {
             height: 0;
             padding-top: 0;
             padding-bottom: 0;
-            .actions {
-                display: none;
-            }
-        }
-        .actions {
-            float: right;
-            margin: 0;
         }
     }
     img {
@@ -129,7 +123,6 @@ ul.az-error-list {
 
 ul.az-error-list {
     background: #fee;
-    margin-top: rem-calc(($base-font-size - 12));
     .dz-error {
         height: 24px;
     }
@@ -139,9 +132,6 @@ ul.az-error-list {
         text-decoration: underline;
         font-style: italic;
         cursor: pointer;
-    }
-    .actions .btn {
-        margin-top: 0;
     }
 }
 
@@ -207,7 +197,7 @@ ul.az-error-list {
     }
     img[data-dz-thumbnail] {
         background: url('/images/resources/ajax.gif') no-repeat 50%;
-        @include single-transition(opacity, 0.15s, ease-in);
+        @include single-transition(opacity, 0.15s, $overlay-timing);
     }
     ul.az-list > li {
         position: relative;
@@ -223,10 +213,10 @@ ul.az-error-list {
         font-weight: bold;
         width: 100%;
         @include transition( (
-                background-color 150ms ease-out,
-                border-color 150ms ease-out,
-                color 150ms ease-out,
-                height 150ms ease-out 150ms
+                background-color 150ms $overlay-timing,
+                border-color 150ms $overlay-timing,
+                color 150ms $overlay-timing,
+                height 150ms $overlay-timing 150ms
         )
         );
         //@include single-transition(all, 0.15s, ease-out);
@@ -281,7 +271,7 @@ ul.az-error-list {
     }
     .filename {
         opacity: 0.4;
-        @include single-transition(opacity, 0.15s, ease-out);
+        @include single-transition(opacity, 0.15s, $overlay-timing);
     }
 }
 
@@ -294,7 +284,7 @@ ul.az-error-list {
         border: 2px dashed $success-color;
         box-sizing: border-box;
         margin-right: 4px;
-        @include single-transition(all, 0.15s, ease-out);
+        @include single-transition(all, 0.15s, $overlay-timing);
         &.dz-started, &.dz-browser-not-supported {
             border-color: transparent;
             background-color: transparent;
@@ -409,7 +399,7 @@ ul.az-error-list {
         position: absolute;
         top: 0;
         left: 0;
-        @include single-transition(all, 0.15s, ease-out);
+        @include single-transition(all, 0.15s, $overlay-timing);
     }
 
     .dz-success .dz-progress [data-dz-uploadprogress] {
@@ -436,7 +426,7 @@ ul.az-error-list {
         background-image: url('/images/foundation/dropzone.png');
         background-repeat: no-repeat;
         background-position: 0 0;
-        @include single-transition(opacity, 0.3s, ease-in-out);
+        @include single-transition(opacity, 0.3s, $overlay-timing);
         opacity: 1;
         -ms-filter: none;
         filter: none;
@@ -495,7 +485,7 @@ ul.az-error-list {
         opacity: 0;
         -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
         filter: alpha(opacity=0);
-        @include single-transition(opacity, 0.4s, ease-in-out);
+        @include single-transition(opacity, 0.4s, $overlay-timing);
     }
 
     .dz-preview .dz-success-mark,
@@ -667,7 +657,7 @@ ul.az-error-list {
     opacity: 0;
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
     filter: alpha(opacity=0);
-    @include single-transition(opacity, 0.4s, ease-in-out);
+    @include single-transition(opacity, 0.4s, $overlay-timing);
 }
 
 .dz-preview .dz-error-message,
@@ -676,7 +666,7 @@ ul.az-error-list {
     opacity: 0;
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
     filter: alpha(opacity=0);
-    @include single-transition(opacity, 0.3s, ease-in-out);
+    @include single-transition(opacity, 0.3s, $overlay-timing);
 }
 
 .dz-preview:hover.dz-error .dz-error-message,
@@ -689,7 +679,7 @@ ul.az-error-list {
 .dz-preview .dz-progress .dz-upload,
 .dropzone-previews .dz-preview .dz-progress .dz-upload {
     @include animation(loading 0.4s linear infinite);
-    @include single-transition(width, 0.3s, ease-in-out);
+    @include single-transition(width, 0.3s, $overlay-timing);
     -webkit-border-radius: 2px;
     border-radius: 2px;
     position: absolute;
