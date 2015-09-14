@@ -38,11 +38,6 @@ $(document).ready(function() {
     .on('selectize.item_remove', function() {
         $('#individualGroupID').val('')
     });
-
-    // Reflow on switch tab
-    $('[data-tab]').on('toggled', function (event, tab) {
-        tab.foundation('reflow');
-    });
 });
 </script>
 <!-- END custom_head -->
