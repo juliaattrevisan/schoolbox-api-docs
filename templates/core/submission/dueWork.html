@@ -295,29 +295,32 @@
     </div>
 </div>
 
-<div id="calendar-bubble" class="cal-bubble">
-    <div class="middle">
-        <div class="close">&times;</div>
-        <div class="js-data clearfix">
-            <!-- Edit Event Form -->
-            <form id="editEvent">
-                <input type="hidden" name="eventId" />
-                <dl>
-                    <dd><h3 class="note"></h3></dd>
-                    <dd><h4><span class="date"></span></h4></dd>
-                    <dd><p class="location"></p></dd>
-                    <dd><p class="detail wysiwyg" data-is-html="1"></p></dd>
-                    <dd class="post-by meta">Posted by <a class="author" href="#" data-is-user-link="1"></a></dd>
-                    <dd class="reviewed-by">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></dd>
-                </dl>
+<div class="reveal-modal large" data-reveal aria-hidden="true" role="dialog" id="calendar-bubble" >
+    <!-- Edit Event Form -->
+    <form id="editEvent">
+        <input type="hidden" name="eventId" />
+
+        <div class="row">
+            <div class="small-12">
+                <h3 class="note"></h3>
+                <ul class="meta">
+                    <li class="icon-calendar date"></li>
+                    <li class="icon-location"></li>
+                    <li class="icon-staff-students" data-event-modal-field="post-by">Posted by <a class="author" href="#" data-is-user-link="1"></a></li>
+                    <li class="icon-staff-students" data-event-modal-field="reviewedBy">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></li>
+                </ul>
+
+                <article class="detail" data-is-html="1"></article>
+
                 <ul class="relatedBookings"></ul>
+
                 <div class="attendance">
                     <dl>
                         <dd><p class="attendanceIcon"></p></dd>
                         <dd class="rm"><p class="attendanceStatus"></p></dd>
                     </dl>
                 </div>
-                <div class="actions">
+                <div>
                     <dl>
                         <dd>
                             <span class="homepageLink" data-is-html="1"></span>
@@ -328,12 +331,42 @@
                         </dd>
                     </dl>
                 </div>
-                <div class="bookingActions" data-is-html="1">
-                </div>
-            </form>
+                <div class="bookingActions" data-is-html="1"></div>
+            </div>
         </div>
-        <div class="bottom"><strong></strong></div>
-    </div>
+    </form>
+
+    <form id="editTask">
+        <input type="hidden" name="eventId" />
+
+        <h3>Task</h3>
+
+        <label>
+            Due
+            <span class="date"><!-- Date gets shoved in here --></span>
+        </label>
+
+        <input id="modifyTaskBubbleCompleted" name="completed" type="checkbox" value="1" />
+
+        <label for="modifyTaskBubbleCompleted" class="checkbox-label">
+            Complete
+        </label>
+
+        <label>
+            Task
+            <input id="modifyTaskBubbleNote" name="title" type="text" value="" />
+        </label>
+
+        <label class="detail">
+            Note
+            <textarea id="modifyTaskBubbleDetail" name="detail"></textarea>
+        </label>
+
+        <input type="submit" value="Update Task" />
+        <a href="#" class="deleteTask">Delete</a>
+    </form>
+
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
 
