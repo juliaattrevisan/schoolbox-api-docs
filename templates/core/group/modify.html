@@ -71,7 +71,7 @@ $(document).ready(function() {
                             <!-- BEGIN msg_enabled_followth -->
 
                             <!-- END msg_enabled_followth -->
-                            <th>
+                            <th class="hide-for-small">
                                 Admin
                                 <span data-tooltip class="has-tip tip-top hint" title="Only one user may be the group admin - making another user the group admin will relinquish the current admin's control over the group. Students may not be group admins.">?</span>
                             </th>
@@ -92,7 +92,7 @@ $(document).ready(function() {
                                 <a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a>
                             </td>
                             <td>Admin</td>
-                            <td>
+                            <td class="hide-for-small">
                                 <fieldset class="switch round no-margin" tabindex="0">
                                     <input id="admin-{OWNER_ID}" type="checkbox" name="owner" value="{OWNER_ID}" checked data-checkbox-group="admin" />
                                     <label for="admin-{OWNER_ID}"></label>
@@ -116,7 +116,7 @@ $(document).ready(function() {
                                 <input id="writeCheck-{USER_ID}" type="checkbox" name="write[]" value="{USER_ID}" {GROUP_CHECKED} />
                                 <label for="writeCheck-{USER_ID}" class="checkbox-label"></label>
                             </td>
-                            <td>
+                            <td class="hide-for-small">
                                 <!-- BEGIN make_owner -->
                                 <fieldset class="switch round no-margin" tabindex="0">
                                     <input id="admin-{USER_ID}" type="checkbox" name="owner" value="{USER_ID}" data-checkbox-group="admin" />
