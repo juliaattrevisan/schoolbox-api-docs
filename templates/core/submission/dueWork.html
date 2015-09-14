@@ -35,14 +35,15 @@
         });
     };
 
-    var calendarElement = $('#calendar');
-    var calendarLoadingElement = $('#calendar-loading');
-
     // once the DOM has loaded, punch a fancy calendar into it
     $(function() {
         // Allow checking of anchor for view to display
         var anchor = '';
         var parts  = location.href.split('#');
+
+        var calendarElement = $('#calendar');
+        var calendarLoadingElement = $('#calendar-loading');
+
         if (parts.length > 1) {
             anchor = parts[1];
             switch (anchor) {
@@ -168,17 +169,15 @@
                     /* Show loading div right in the middle
                      */
                     if (isLoading === true) {
-                        calendarLoadingElement.css({
-                            top: (calendarElement.height() - calendarLoadingElement.height())/2,
-                            left: (calendarElement.width() - calendarLoadingElement.width())/2
-                        }).show();
+                        calendarLoadingElement.removeClass('hide');
                     }
                     /* Has finished loading
                      */
                     else {
                         /* Hide loading div
                          */
-                        calendarLoadingElement.hide();
+                        console.log(calendarLoadingElement);
+                        calendarLoadingElement.addClass('hide');
                         var d = c.dom.fullCalendar('getDate');
                         $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'));
                     }
