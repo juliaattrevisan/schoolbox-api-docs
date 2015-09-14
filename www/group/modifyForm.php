@@ -95,21 +95,18 @@ if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
     }
 
     $groupMapper->save($group);
-//    header(':', true, $_POST['debug'] ? 200 : 204);
-    header(':', true, 204);
-    exit;
 }
 
-/* Change write permission */
-elseif(is_numeric($_GET['write']) && is_numeric($_GET['userID'])) {
-	$ua->setServiceIdentifier($_GET['categoryID'])
-	   ->setUser($userMapper->findById($_GET['userID']))
-	   ->setAccessLevel($_GET['write']);
-	$uaMapper->save($ua);
-}
+/* Change write permission - no longer done via link, always done via form */
+//elseif(is_numeric($_GET['write']) && is_numeric($_GET['userID'])) {
+//	$ua->setServiceIdentifier($_GET['categoryID'])
+//	   ->setUser($userMapper->findById($_GET['userID']))
+//	   ->setAccessLevel($_GET['write']);
+//	$uaMapper->save($ua);
+//}
 
 /* Delete user */
-elseif(isset($_REQUEST['delete'])) {
+if(isset($_REQUEST['delete'])) {
 	if(isset($_REQUEST['service'])) {
 		$groupHandler->setService($_REQUEST['service']);
 	}
@@ -119,12 +116,10 @@ elseif(isset($_REQUEST['delete'])) {
 			$groupHandler->deleteUser($categoryId, $id);
 		}
 	}
-
-	$page->backToTheFuture(1);
 }
 
 /* Accept user */
-elseif(isset($_REQUEST['accept'])) {
+if(isset($_REQUEST['accept'])) {
 	foreach((array)$_REQUEST['accept'] as $id) {
 		if (is_numeric($id)) {
 			$ua->setAccessLevel(UserAccess::ACCESS_READ)
@@ -133,14 +128,12 @@ elseif(isset($_REQUEST['accept'])) {
 			$uaMapper->save($ua);
 		}
 	}
-
-	SitePage::localRedir('/group/modify/' . $categoryId);
 }
 
 /* Add user */
-elseif(isset($_POST['userID'])) {
-	$ua->setServiceIdentifier($_GET['categoryID']);
-    $folder = $catMapper->findById($_GET['categoryID']);
+if(isset($_POST['userID'])) {
+	$ua->setServiceIdentifier($categoryId);
+    $folder = $catMapper->findById($categoryId);
 	/** @var Collection|User[] $userList */
 	$userList = $userMapper->findByColumn('id', $_POST['userID']);
 
@@ -152,11 +145,10 @@ elseif(isset($_POST['userID'])) {
             $uaMapper->save($ua);
         }
 	}
-	SitePage::localRedir('/group/modify/' . $_GET['categoryID']);
 }
 
 /* Set new owner/administrator */
-elseif(is_numeric($_GET['owner'])) {
+if(is_numeric($_GET['owner'])) {
 	try {
 		$category = $catMapper->findById($categoryId);
 	}
@@ -210,7 +202,7 @@ elseif(is_numeric($_GET['owner'])) {
 }
 
 /* Bulk-add users */
-elseif(isset($_POST['bulkAdd'])) {
+if(isset($_POST['bulkAdd'])) {
 	//get rid of newlines
 	$string = preg_replace('/(\r\n|\n|\r)/', ',', $_POST['bulkAdd']);
 
@@ -243,7 +235,7 @@ elseif(isset($_POST['bulkAdd'])) {
 			$uaMapper->save($ua);
 		}
 	}
-
-	SitePage::localRedir('/group/modify/' . $categoryId);
 }
 
+// Once all else is done
+SitePage::localRedir('/group/modify/' . $categoryId);
