@@ -195,38 +195,34 @@ $(document).ready(function() {
                     <table id="members">
                         <thead>
                         <tr>
-                            <th>
-                                <input id="delCheck" type="checkbox" data-select-all data-select-all-for-group="delete" />
-                                <label for="delCheck" class="checkbox-label"></label>
-                            </th>
                             <th>Name</th>
                             <th>Write</th>
                             <!-- BEGIN msg_enabled_followth -->
                             <th>Following</th>
                             <!-- END msg_enabled_followth -->
                             <th>Make Admin</th>
+                            <th>
+                                <input id="delCheck" type="checkbox" data-select-all data-select-all-for-group="delete" />
+                                <label for="delCheck" class="checkbox-label">Delete?</label>
+                            </th>
                         </tr>
                         </thead>
                         <tbody>
 
                         <!-- BEGIN groupOwner -->
                         <tr>
-                            <td>&nbsp;</td>
                             <td><a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a></td>
                             <td>Admin</td>
                             <!-- BEGIN msg_enabled_followadmin -->
                             <td>Yes</td>
                             <!-- END msg_enabled_followadmin -->
                             <td>&nbsp;</td>
+                            <td>&nbsp;</td>
                         </tr>
                         <!-- END groupOwner -->
 
                         <!-- BEGIN member -->
                         <tr>
-                            <td>
-                                <input id="delCheck-{USER_ID}" type="checkbox" name="delete[]" value="{USER_ID}" data-select-all-group="delete" />
-                                <label for="delCheck-{USER_ID}" class="checkbox-label"></label>
-                            </td>
                             <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
                             <td><input class="greenCheck" type="checkbox" rel="{USER_ID}" {GROUP_CHECKED} /></td>
                             <!-- BEGIN msg_enabled_userfollow -->
@@ -236,6 +232,10 @@ $(document).ready(function() {
                                 <!-- BEGIN make_owner -->
                                 <a href='#' class='makeAdmin' data-userid='{USER_ID}' data-categoryid='{CATEGORY_ID}' data-username="{USER_JAVA}">Make Admin</a>
                                 <!-- END make_owner -->
+                            </td>
+                            <td>
+                                <input id="delCheck-{USER_ID}" type="checkbox" name="delete[]" value="{USER_ID}" data-select-all-group="delete" />
+                                <label for="delCheck-{USER_ID}" class="checkbox-label"></label>
                             </td>
                         </tr>
                         <!-- END member -->
