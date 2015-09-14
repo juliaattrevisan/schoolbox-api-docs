@@ -33,6 +33,12 @@ if($groupHandler->getPermission($categoryId) < FULL_ACCESS) {
 	error(19);
 }
 
+// Handle disbandment before anything else
+if (isset($_GET['disband'])) {
+	$groupHandler->disbandGroup($_GET['categoryID']);
+	SitePage::localRedir('/');
+}
+
 if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
     /** @var \Schoolbox\Resource\Group $group */
     try {
@@ -201,12 +207,6 @@ elseif(is_numeric($_GET['owner'])) {
 	else {
 		SitePage::localRedir("/group/modify/" . $_GET['categoryID']);
 	}
-}
-
-/* Disband group */
-elseif(isset($_GET['disband'])) {
-	$groupHandler->disbandGroup($_GET['categoryID']);
-	SitePage::localRedir('/');
 }
 
 /* Bulk-add users */
