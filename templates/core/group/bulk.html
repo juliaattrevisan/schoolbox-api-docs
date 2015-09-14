@@ -37,7 +37,12 @@ $(document).ready(function() {
     })
     .on('selectize.item_remove', function() {
         $('#individualGroupID').val('')
-    })
+    });
+
+    // Reflow on switch tab
+    $('[data-tab]').on('toggled', function (event, tab) {
+        tab.foundation('reflow');
+    });
 });
 </script>
 <!-- END custom_head -->
@@ -58,47 +63,59 @@ $(document).ready(function() {
             <li class="tab-title"><a href="#userList">From List</a></li>
         </ul>
         <div class="tabs-content">
-            <section class="content active" id="userGroups">
-                <fieldset class="content">
-                    <legend>
-                        From Group
-                        <span data-tooltip class="has-tip tip-top hint" title="Add all users that belong to another group.">?</span>
-                    </legend>
-                    <form action="/group/addUserByGroup.php?type=individual&destinationID={CATEGORY_ID}" method="post">
+            <form action="/group/addUserByGroup.php?type=individual&destinationID={CATEGORY_ID}"
+                  method="post"
+                  class="content active"
+                  id="userGroups"
+            >
+                <input type="hidden" name="individualGroupID" id="individualGroupID" />
+                <section>
+                    <fieldset class="content">
+                        <legend>
+                            From Group
+                            <span data-tooltip class="has-tip tip-top hint" title="Add all users that belong to another group.">?</span>
+                        </legend>
                         <input id="addUsersByIndividualGroup" type="text" size="30" placeholder="Search User Groups" />
-                        <input type="hidden" name="individualGroupID" id="individualGroupID" />
-                    </form>
-                </fieldset>
+                    </fieldset>
+                </section>
                 <input type="submit" value="Add Individual Group" class="submit-btn-plain" />
-            </section>
+            </form>
 
-            <section class="content" id="userRoles">
-                <fieldset class="content">
-                    <legend>
-                        From Role
-                        <span data-tooltip class="has-tip tip-top hint" title="Add all users of a particular role in the system.">?</span>
-                    </legend>
-                    <form action="/group/addUserByGroup.php?type=system&destinationID={CATEGORY_ID}" class="clearfix" method="post">
-                        <input id="addUsersBySystemGroup" type="text" size="30" placeholder="Search User Roles" />
-                        <input type="hidden" name="systemGroupID" id="systemGroupID" />
-                    </form>
-                </fieldset>
+            <form action="/group/addUserByGroup.php?type=system&destinationID={CATEGORY_ID}"
+                  method="post"
+                  class="content"
+                  id="userRoles"
+            >
+                <input type="hidden" name="systemGroupID" id="systemGroupID" />
+                <section>
+                    <fieldset class="content">
+                        <legend>
+                            From Role
+                            <span data-tooltip class="has-tip tip-top hint" title="Add all users of a particular role in the system.">?</span>
+                        </legend>
+                    </fieldset>
+                    <input id="addUsersBySystemGroup" type="text" size="30" placeholder="Search User Roles" />
+                </section>
                 <input type="submit" value="Add System Role" class="submit-btn-plain" />
-            </section>
+            </form>
 
-            <section class="content" id="userList">
-                <fieldset class="content">
-                    <legend>
-                        User List
-                        <span data-tooltip class="has-tip tip-top hint" title="Add a list of users (either external user IDs or Schoolbox usernames).">?</span>
-                    </legend>
-                    <form action="/group/modifyForm.php" method="post" id="form" class="clearfix" >
-                        <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-                        <textarea name="bulkAdd" cols="30" rows="20"></textarea>
-                    </form>
-                </fieldset>
+            <form action="/group/modifyForm.php"
+                  method="post"
+                  class="content"
+                  id="userList"
+            >
+                <section>
+                    <fieldset class="content">
+                        <legend>
+                            User List
+                            <span data-tooltip class="has-tip tip-top hint" title="Add a list of users (either external user IDs or Schoolbox usernames).">?</span>
+                        </legend>
+                            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                            <textarea name="bulkAdd" cols="30" rows="20"></textarea>
+                    </fieldset>
+                </section>
                 <input type="submit" name="Submit" value="Submit" class="submit-btn-plain" />
-            </section>
+            </form>
         </div>
     </div>
 </div>
