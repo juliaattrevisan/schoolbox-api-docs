@@ -11,7 +11,9 @@
 
 $this->setFile(TEMPLATE_content, 'news/news_list.html');
 $this->setBlock(TEMPLATE_content, 'add_news', 'add_news_block');
-$this->setBlock(TEMPLATE_content, 'news', 'news_block');
+$this->setBlock(TEMPLATE_content, 'has_news', 'has_news_block');
+$this->setBlock(TEMPLATE_content, 'no_news', 'no_news_block');
+$this->setBlock('has_news', 'news', 'news_block');
 $this->setBlock('news', "news_image", "news_image_block");
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
@@ -178,10 +180,18 @@ if (is_array($items)) {
 
             $this->parse('news_block', 'news',true);
         }
+
+        $this->parse('has_news_block', 'has_news');
+        $this->setVar(array(
+            'no_news_block' => ''
+        ));
     }
 } else {
+    $this->setVar(array(
+        'has_news_block' => ''
+    ));
 
-    $this->setVar('news_block', 'No current news in this topic.');
+    $this->parse('no_news_block', 'no_news');
 }
 
 
