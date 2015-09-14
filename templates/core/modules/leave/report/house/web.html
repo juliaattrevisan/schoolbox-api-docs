@@ -1,8 +1,8 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
 <script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
 <script type="text/javascript">
     $(function () {
-
         $('table[data-topic="requestList"]').tablesorter({
             cssHeader:'sortable',
             cssAsc:'ascending',
@@ -43,10 +43,11 @@
 
             window.location.href = location;
         });
+
+        $('[data-print]').artificialPrint();
     });
 </script>
 <!-- END custom_head -->
-
 
 <div class="actions-small-3 row">
     <div class="list-item">
@@ -56,7 +57,7 @@
     </div>
     <nav>
         <a class="icon-previous" href="/modules/leave/house/{HOUSE_ID}" title="Return to {HOUSE_NAME}"></a>
-        <a class="icon-print" href="javascript:window.print()" title="Print"></a>
+        <a class="icon-print" title="Print" data-print></a>
         <a class="icon-export" data-action="export" title="Export"></a>
     </nav>
 </div>
