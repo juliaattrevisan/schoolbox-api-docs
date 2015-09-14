@@ -83,47 +83,50 @@
         <section class="content">
             <p>The following shows the number of people in each House who require food.</p>
         </section>
-        <table>
-            <thead>
-            <tr>
-                <th></th>
-                <!-- BEGIN request_date_header -->
-                <th colspan='3'>{REQUEST_DATE_HEADER_DATE}</th>
-                <!-- END request_date_header -->
-            </tr>
-            <tr>
-                <th>House</th>
-                <th>Breakfast</th>
-                <th>Lunch</th>
-                <th>Dinner</th>
-                <th>Breakfast</th>
-                <th>Lunch</th>
-                <th>Dinner</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- BEGIN house -->
-            <tr>
-                <td><a href="/modules/leave/house/{HOUSE_ID}">{HOUSE_NAME}</a></td>
-                <!-- BEGIN request_period -->
-                <td>{REQUEST_PERIOD_MORNING}</td>
-                <td>{REQUEST_PERIOD_DAY}</td>
-                <td>{REQUEST_PERIOD_NIGHT}</td>
-                <!-- END request_period -->
-            </tr>
-            <!-- END house -->
-            </tbody>
-            <tfoot>
-            <tr>
-                <td>Total</td>
-                <!-- BEGIN request_period_total -->
-                <td>{REQUEST_PERIOD_TOTAL_MORNING}</td>
-                <td>{REQUEST_PERIOD_TOTAL_DAY}</td>
-                <td>{REQUEST_PERIOD_TOTAL_NIGHT}</td>
-                <!-- END request_period_total -->
-            </tr>
-            </tfoot>
-        </table>
+
+        <div class="scrollable">
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <!-- BEGIN request_date_header -->
+                        <th colspan='3'>{REQUEST_DATE_HEADER_DATE}</th>
+                        <!-- END request_date_header -->
+                    </tr>
+                    <tr>
+                        <th>House</th>
+                        <th>Breakfast</th>
+                        <th>Lunch</th>
+                        <th>Dinner</th>
+                        <th>Breakfast</th>
+                        <th>Lunch</th>
+                        <th>Dinner</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- BEGIN house -->
+                    <tr>
+                        <td><a href="/modules/leave/house/{HOUSE_ID}">{HOUSE_NAME}</a></td>
+                        <!-- BEGIN request_period -->
+                        <td>{REQUEST_PERIOD_MORNING}</td>
+                        <td>{REQUEST_PERIOD_DAY}</td>
+                        <td>{REQUEST_PERIOD_NIGHT}</td>
+                        <!-- END request_period -->
+                    </tr>
+                    <!-- END house -->
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td>Total</td>
+                        <!-- BEGIN request_period_total -->
+                        <td>{REQUEST_PERIOD_TOTAL_MORNING}</td>
+                        <td>{REQUEST_PERIOD_TOTAL_DAY}</td>
+                        <td>{REQUEST_PERIOD_TOTAL_NIGHT}</td>
+                        <!-- END request_period_total -->
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
     </div>
 </div>
 <!-- END house_list -->
