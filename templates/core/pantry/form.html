@@ -61,7 +61,7 @@
                             </script>
                         </div>
                 </fieldset>
-                <fieldset class="content">
+                <fieldset class="content" data-equalizer>
                     <legend>Use Two Columns Judiciously (and make sure they fall down into fewer columns on small displays)</legend>
 
                     <div class="small-12 columns">
@@ -69,7 +69,7 @@
                     </div>
 
                     <div class="small-12 medium-6 columns">
-                        <fieldset class="radiolist">
+                        <fieldset class="radiolist" data-equalizer-watch>
                             <legend>Which Pok&eacute;mon did you play first?</legend>
                             <input type="radio" name="pokemon" value="Red" id="pokemonRed" checked><label for="pokemonRed">Red</label>
                             <input type="radio" name="pokemon" value="Blue" id="pokemonBlue"><label for="pokemonBlue">Blue</label>
@@ -82,7 +82,7 @@
                     </div>
 
                     <div class="small-12 medium-6 columns">
-                        <fieldset class="checklist">
+                        <fieldset class="checklist" data-equalizer-watch>
                             <legend>
                                 Check These Out
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="If you want a tooltip for your checkbox list, put the tooltip in the legend, like this.">?</span>
@@ -94,11 +94,28 @@
                         </fieldset>
                     </div>
 
-                    <div class="small-12 columns">
+                    <div class="small-12 medium-6 columns">
                         <label for="exampleCheckboxSwitch">If you <em>reeeeeally</em> need a switch on your form...</label>
                         <div class="switch">
                             <input id="exampleCheckboxSwitch" type="checkbox">
                             <label for="exampleCheckboxSwitch"></label>
+                        </div>
+                    </div>
+
+                    <div class="small-12 medium-6 columns">
+                        <script type="text/javascript" src="/javascript/data-plugins/checkboxGroup.js"></script>
+                        <label for="checkboxGroup1">If you <em>reeeeeeeeeeeally</em> need a radio group which may be emptied:</label>
+                        <div class="switch round">
+                            <input id="checkboxGroup1" type="checkbox" checked data-checkbox-group="example" />
+                            <label for="checkboxGroup1"></label>
+                        </div>
+                        <div class="switch round">
+                            <input id="checkboxGroup2" type="checkbox" data-checkbox-group="example" />
+                            <label for="checkboxGroup2"></label>
+                        </div>
+                        <div class="switch round">
+                            <input id="checkboxGroup3" type="checkbox" data-checkbox-group="example" />
+                            <label for="checkboxGroup3"></label>
                         </div>
                     </div>
 
