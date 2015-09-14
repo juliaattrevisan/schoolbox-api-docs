@@ -229,7 +229,7 @@
 					/* Show loading div right in the middle
 					 */
 					if (isLoading === true) {
-						$('#calendar-loading').foundation('reveal','open')
+                        calendarLoadingElement.foundation('reveal','open')
 					}
 					/* Has finished loading
 					 */
@@ -237,7 +237,7 @@
 
 						/* Hide loading div
 						 */
-                        $('#calendar-loading').foundation('reveal','close')
+                        calendarLoadingElement.foundation('reveal','close')
 
                         // update any tasks that have been completed by strikethrough-ing them
                         $(this).find('input[type=checkbox]').each(function() {

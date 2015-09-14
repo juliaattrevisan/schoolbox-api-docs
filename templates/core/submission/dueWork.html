@@ -169,15 +169,19 @@
                     /* Show loading div right in the middle
                      */
                     if (isLoading === true) {
-                        calendarLoadingElement.removeClass('hide');
+
+                        calendarLoadingElement.foundation('reveal','open');
+                        calendarLoadingElement.css({
+                            height: '200px'
+                        });
                     }
                     /* Has finished loading
                      */
                     else {
                         /* Hide loading div
                          */
-                        console.log(calendarLoadingElement);
-                        calendarLoadingElement.addClass('hide');
+                        calendarLoadingElement.foundation('reveal','close');
+
                         var d = c.dom.fullCalendar('getDate');
                         $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'));
                     }
@@ -216,6 +220,12 @@
     {
         padding: 0;
     }
+
+    #calendar-loading {
+        min-height: 0;
+        max-height: 92px;
+    }
+
 </style>
 <!-- END custom_head -->
 
@@ -248,9 +258,17 @@
     </div>
 </div>
 
+<div id="calendar-loading" class="reveal-modal tiny no-pad" data-reveal aria-hidden="true" role="dialog">
+    <div class='loader'></div>
+    <p>
+        <span class="label neutral full-width">
+        Loading events
+        </span>
+    </p>
+</div>
+
 <div class="row">
     <div class="small-12 columns">
-        <div id="calendar-loading" class="loader text-center"></div>
         <div id="calendar"></div>
     </div>
 </div>
