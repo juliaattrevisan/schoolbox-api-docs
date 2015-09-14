@@ -946,6 +946,9 @@ $rotate-th-width: $square-grid-td-size;
  */
 .weather-list {
     @extend .information-list;
+    &.active {
+        background-color: $row-hover-background;
+    }
     li {
         border: 0px;
         border-right: 1px solid $body-bg;
