@@ -16,31 +16,30 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Forecast</h2>
-        <div class="scrollable">
-            <table>
-                <tr>
-                    <!-- BEGIN forecast_header -->
-                    <th style="width:{FC_WIDTH}%" class="text-center">{FC_DAY}</th>
-                    <!-- END forecast_header -->
-                </tr>
-                <tr>
-                    <!-- BEGIN forecast_image -->
-                    <td class="{FC_CURRENT} text-center">
-                        <img src="{FC_IMAGE}" alt="{FC_PRECIS}" width="50" height="50"/><br />
-                        {FC_PRECIS}
-                    </td>
-                    <!-- END forecast_image -->
-                </tr>
-                <tr>
-                    <!-- BEGIN forecast_data -->
-                    <td>
-                        <span class="label hot full-width">{FC_HIGH}&deg;</span>
-                        <span class="label cold full-width">{FC_LOW}&deg;</span>
-                    </td>
-                    <!-- END forecast_data -->
-                </tr>
-            </table>
-        </div>
+
+        <section>
+            <div class="row collapse">
+                <!-- BEGIN forecast_day -->
+                <div class="small-12 large-2 columns">
+                    <ul class="weather-list {FC_CURRENT}">
+                        <li>
+                            <h3>{FC_DAY}</h3>
+                        </li>
+                        <li>
+                            <img src="{FC_IMAGE}" alt="{FC_PRECIS}" />
+                        </li>
+                        <li>
+                            <span class="meta">{FC_PRECIS}</span>
+                        </li>
+                        <li class="content temperature">
+                            <span class="hot">{FC_HIGH}&deg;</span>
+                            <span class="cold">{FC_LOW}&deg;</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- END forecast_day -->
+            </div>
+        </section>
     </div>
 </div>
 <!-- END forecast -->
