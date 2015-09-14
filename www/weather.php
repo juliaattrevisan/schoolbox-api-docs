@@ -23,10 +23,8 @@ $this->setTitle('Weather Forecast');
 
 $this->setBlock(TEMPLATE_content, 'current', 'current_block');
 $this->setBlock(TEMPLATE_content, 'forecast', 'forecast_block');
+$this->setBlock('forecast', 'forecast_day', 'forecast_day_block');
 $this->setBlock(TEMPLATE_content, "weather_unavailable", "weather_unavailable_block");
-$this->setBlock('forecast', 'forecast_header', 'forecast_header_block');
-$this->setBlock('forecast', 'forecast_image', 'forecast_image_block');
-$this->setBlock('forecast', 'forecast_data', 'forecast_data_block');
 
 $this->setVar("current_block", "");
 $this->setVar("forecast_block", "");
@@ -70,9 +68,7 @@ if($count) {
             'FC_WIDTH'  => $width
         ));
 
-        $this->parse('forecast_header_block','forecast_header', true);
-        $this->parse('forecast_image_block','forecast_image', true);
-        $this->parse('forecast_data_block','forecast_data', true);
+        $this->parse('forecast_day_block', 'forecast_day', true);
     }
 }
 

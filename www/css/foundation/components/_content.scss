@@ -709,18 +709,7 @@ $rotate-th-width: $square-grid-td-size;
 	);
 	color: $warning-color;
 }
-.hot.label {
-    @include label(
-        $bg: $hot-color
-    );
-    color: $white;
-}
-.cold.label {
-    @include label(
-        $bg: $cold-color
-    );
-    color: $white;
-}
+
 .neutral.label {
     @include label(
         $bg: $neutral-color
@@ -951,6 +940,38 @@ $rotate-th-width: $square-grid-td-size;
 	padding-top: 0 !important;
 	padding-bottom: 0 !important;
 	@include responsive-sides($importance: !important);
+}
+
+/* Weekly Weather display
+ */
+.weather-list {
+    @extend .information-list;
+    li {
+        border: 0px;
+        border-right: 1px solid $body-bg;
+        text-align: center;
+
+        &.temperature {
+            text-align: center;
+
+            .hot {
+                color: $hot-color;
+                margin-right: 1rem;
+            }
+            .cold {
+                color: $cold-color;
+            }
+        }
+
+        &:first-child {
+            padding-top: 1rem;
+        }
+
+        &:last-child {
+            border-right: 1px solid $body-bg;
+            border-bottom: 1px solid $body-bg;
+        }
+    }
 }
 
 .grade{
