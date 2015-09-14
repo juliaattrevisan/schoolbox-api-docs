@@ -42,40 +42,69 @@ $(document).ready(function() {
 </script>
 <!-- END custom_head -->
 
-<h1>Add Bulk Members - {CATEGORY_NAME}</h1>
-<table class="standardForm table">
-    <tr>
-        <td class="formLabelWidth"><h4>User Groups</h4><em>Add all users that belong to another group</em></td><td>
-        <form action="/group/addUserByGroup.php?type=individual&destinationID={CATEGORY_ID}" class="clearfix" method="post">
-            <input id="addUsersByIndividualGroup" type="text" size="30" placeholder="Search User Groups" />
-            <input type="hidden" name="individualGroupID" id="individualGroupID" />
-            <input type="submit" value="Add Individual Group" class="submit-btn-plain" />
-        </form>
-    </td>
-    </tr>
+{BREADCRUMB}
 
-    <tr>
-        <td class="formLabelWidth"><h4>User Roles</h4><em>Add all users of a particular role in the system</em></td><td>
-        <form action="/group/addUserByGroup.php?type=system&destinationID={CATEGORY_ID}" class="clearfix" method="post">
-            <input id="addUsersBySystemGroup" type="text" size="30" placeholder="Search User Roles" />
-            <input type="hidden" name="systemGroupID" id="systemGroupID" />
-            <input type="submit" value="Add System Role" class="submit-btn-plain" />
-        </form>
-    </td>
-    </tr>
-</table>
-<form action="/group/modifyForm.php" method="post" id="form" class="clearfix" >
-	<table class="standardForm table">
-		<tr>
-			<td class="formLabelWidth"><h4>User List</h4>
-				<em>To add multiple users to this group place a list of school user IDs or usernames in the following space then press submit.<br />
-				<br />
-				You can extract a csv from your student management system of all the users you wish to invite then copy them into this box.</em></td>
-			<td><textarea name="bulkAdd" cols="30" rows="20"></textarea></td>
-		</tr>
-        </table>
-    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-    <input type="submit" name="Submit" value="Submit" class="submit-btn-plain" />
-</form>
+<div class="row">
+    <div class="list-item">
+        <h1>Add Bulk Members</h1>
+    </div>
+</div>
 
+<div class="row">
+    <div class="small-12 island">
+        <ul class="tabs" data-tab>
+            <li class="tab-title active"><a href="#userGroups">From Group</a></li>
+            <li class="tab-title"><a href="#userRoles">From Role</a></li>
+            <li class="tab-title"><a href="#userList">From List</a></li>
+        </ul>
+        <div class="tabs-content">
+            <div class="content active" id="userGroups">
+                <section>
+                    <fieldset class="content">
+                        <legend>
+                            From Group
+                            <span data-tooltip class="has-tip tip-top hint" title="Add all users that belong to another group.">?</span>
+                        </legend>
+                        <form action="/group/addUserByGroup.php?type=individual&destinationID={CATEGORY_ID}" method="post">
+                            <input id="addUsersByIndividualGroup" type="text" size="30" placeholder="Search User Groups" />
+                            <input type="hidden" name="individualGroupID" id="individualGroupID" />
+                        </form>
+                    </fieldset>
+                </section>
+                <input type="submit" value="Add Individual Group" class="submit-btn-plain" />
+            </div>
 
+            <div class="content" id="userRoles">
+                <section>
+                    <fieldset class="content">
+                        <legend>
+                            From Role
+                            <span data-tooltip class="has-tip tip-top hint" title="Add all users of a particular role in the system.">?</span>
+                        </legend>
+                        <form action="/group/addUserByGroup.php?type=system&destinationID={CATEGORY_ID}" class="clearfix" method="post">
+                            <input id="addUsersBySystemGroup" type="text" size="30" placeholder="Search User Roles" />
+                            <input type="hidden" name="systemGroupID" id="systemGroupID" />
+                        </form>
+                    </fieldset>
+                </section>
+                <input type="submit" value="Add System Role" class="submit-btn-plain" />
+            </div>
+
+            <div class="content" id="userList">
+                <section>
+                    <fieldset class="content">
+                        <legend>
+                            User List
+                            <span data-tooltip class="has-tip tip-top hint" title="Add a list of users (either external user IDs or Schoolbox usernames).">?</span>
+                        </legend>
+                        <form action="/group/modifyForm.php" method="post" id="form" class="clearfix" >
+                            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                            <textarea name="bulkAdd" cols="30" rows="20"></textarea>
+                        </form>
+                    </fieldset>
+                </section>
+                <input type="submit" name="Submit" value="Submit" class="submit-btn-plain" />
+            </div>
+        </div>
+    </div>
+</div>

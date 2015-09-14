@@ -28,6 +28,20 @@ if (is_numeric($this->arg[0])) {
         'CATEGORY_NAME' => Scrub::text($folder->getName()),
         'CATEGORY_ID'   => $folder->getId(),
     ));
+
+    $trail = new \Schoolbox\Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Add Bulk Members',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 } else {
     error(2);
 }
