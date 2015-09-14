@@ -275,6 +275,33 @@ $(document).ready(function() {
                     </form>
                 </div>
             </fieldset>
+            <!-- BEGIN msg_enabled -->
+            <fieldset class="content">
+                <legend>Messaging</legend>
+                <div class="small-12 columns">
+                    <form class="ajax" action="/group/modifyForm.php" method="post" id="follow_form">
+                        <input type="hidden" name="categoryID" value="{CATEGORY_ID}">
+
+                        <input type="hidden" name="msg[enabled]" value="0" />
+                        <input id="msg-enabled" data-fieldset="ffollow" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} />
+                        <label for="msg-enabled" class="checkbox-label">Messages enabled</label>
+
+                        <!-- Hide this if messaging isn't enabled -->
+                        <input name="msg[force_follow]" type="hidden" value="0" />
+                        <input id="msg-force-follow" name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} />
+                        <label for="msg-force-follow" class="checkbox-label">
+                            Force Follow
+                            <span data-tooltip class="has-tip tip-top hint" title="If enabled, group members may not opt out of receiving messages.">?</span>
+                        </label>
+
+                        <!-- BEGIN default_follow -->
+                        <input id="follow" name="follow" type="radio" value="{FOLLOW_VALUE}" {FOLLOW_SELECTED} />
+                        <label for="follow" class="radio-label">{FOLLOW_LABEL}</label>
+                        <!-- END default_follow -->
+                    </form>
+                </div>
+            </fieldset>
+            <!-- END msg_enabled -->
             <fieldset class="content">
                 <table class="standardForm table" cellpadding="0" cellspacing="0">
                     <tr>
@@ -288,38 +315,6 @@ $(document).ready(function() {
                             </form>
                         </td>
                     </tr>
-                    <!-- BEGIN msg_enabled -->
-                    <tr>
-                        <td>
-                            <h4>Messages</h4>
-                            <em>
-                                Whether or not messages are enabled for this group.
-                                If 'force follow' is disabled, users can still opt in or out of receiving messages.
-                            </em>
-                        </td>
-                        <td>
-                            <form class="ajax" action="/group/modifyForm.php" method="post" id="follow_form">
-                                <input type="hidden" name="categoryID" value="{CATEGORY_ID}">
-                                <input type="hidden" name="msg[enabled]" value="0" />
-                                <label>
-                                    <input data-fieldset="ffollow" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} /> Messages enabled
-                                </label>
-                                <fieldset id="ffollow">
-                                    <input name="msg[force_follow]" type="hidden" value="0" />
-                                    <label>
-                                        <input name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} /> Force Follow
-                                    </label>
-                                </fieldset>
-
-                                <!-- BEGIN default_follow -->
-                                <label>
-                                    <input name="follow" type="radio" value="{FOLLOW_VALUE}" {FOLLOW_SELECTED} /> {FOLLOW_LABEL}
-                                </label>
-                                <!-- END default_follow -->
-                            </form>
-                        </td>
-                    </tr>
-                    <!-- END msg_enabled -->
 
                     <!-- BEGIN authorisation -->
                     <tr>
