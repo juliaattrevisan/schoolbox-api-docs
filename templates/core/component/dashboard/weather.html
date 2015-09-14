@@ -11,20 +11,19 @@
                     <!-- BEGIN weather_forecast -->
                     <li class="{FC_CURRENT}" data-equalizer>
                         <div class="list-item">
-                            <div class="avatar card small-12" data-equalizer-watch>
+                            <div class="info card small-3" data-equalizer-watch>
                                 <img src="{FC_IMAGE}" class='mime' title="{FC_PRECIS}" alt="{FC_PRECIS}" />
-
-                                <p class="temperature">{FC_DAY}</p>
+                            </div>
+                            <div class="info card small-3 content temperature">
+                                {FC_DAY}
+                            </div>
+                            <div class="info card small-5 content temperature">
                                 <!-- BEGIN temp_now -->
-                                <p class="temperature">
-                                    <span class="meta">{FC_ACTUAL}&deg;</span>
-                                </p>
+                                <span class="meta">{FC_ACTUAL}&deg;</span>
                                 <!-- END temp_now -->
                                 <!-- BEGIN temp_range -->
-                                <p class="temperature">
-                                    <span class="hot">{FC_HIGH}&deg;</span>
-                                    <span class="cold">{FC_LOW}&deg;</span>
-                                </p>
+                                <span class="hot">{FC_HIGH}&deg;</span>
+                                <span class="cold">{FC_LOW}&deg;</span>
                                 <!-- END temp_range -->
                             </div>
                         </div>
