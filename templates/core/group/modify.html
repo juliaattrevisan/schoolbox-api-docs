@@ -23,7 +23,7 @@ $(document).ready(function() {
 //    });
 
     var addUserSelector = $('#addUser');
-    var addUserButton   = addUserSelector.closest('form').find(':submit');
+//    var addUserButton   = addUserSelector.closest('form').find(':submit');
     addUserSelector
         .selectizeSelector({
             multiple: true,
@@ -33,16 +33,16 @@ $(document).ready(function() {
                 data:     {groupID: 0},
                 dataType: 'json'
             }
-        })
-        .on('selectize.item_add', function(event, value) {
-            addUserButton.prop('disabled', false).removeClass('disabled');
-        })
-        .on('selectize.item_remove', function() {
-            // Disable only if empty
-            if ($(this).data('selectize').items.length === 0) {
-                addUserButton.prop('disabled', true).addClass('disabled');
-            }
         });
+//        .on('selectize.item_add', function(event, value) {
+//            addUserButton.prop('disabled', false).removeClass('disabled');
+//        })
+//        .on('selectize.item_remove', function() {
+//            // Disable only if empty
+//            if ($(this).data('selectize').items.length === 0) {
+//                addUserButton.prop('disabled', true).addClass('disabled');
+//            }
+//        });
 
 //    $('form.ajax').on('change', 'input', function (event) {
 //
