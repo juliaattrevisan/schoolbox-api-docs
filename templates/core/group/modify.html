@@ -1,19 +1,12 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-<script type="text/javascript" src="/javascript/admin/jquery.makeAdmin.js"></script>
 <script type="text/javascript" src="/javascript/data-plugins/selectAll.js"></script>
 <script type="text/javascript" src="/javascript/data-plugins/checkboxGroup.js"></script>
 <script type="text/javascript" src="/javascript/data-plugins/hideWatch.js"></script>
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-	$('.makeAdmin').makeAdmin({
-		currentUserId: '{MAKEADMIN_CURRENT_USER_ID}',
-		currentAdminId: '{MAKEADMIN_CURRENT_ADMIN_ID}',
-		super: '{MAKEADMIN_SUPER}'
-	});
-
     // Confirm disbandment
     $('[data-action="disband"]').click(function(event) {
         event.preventDefault();
@@ -21,6 +14,25 @@ $(document).ready(function() {
             text: 'Are you sure you wish to disband this group? All members of the group will be removed, but all homepage content will remain.',
             confirmEvent: $.confirmDialog.followHref
         });
+    });
+
+    // Message when you change admin
+    var isAdminChanged = false;
+    $('[data-checkbox-group="admin"]').click(function(event) {
+        if (!isAdminChanged) {
+            event.preventDefault();
+            var text = 'Are you sure you wish to change the group\'s admin?';
+            if (!(Number('{MAKEADMIN_SUPER}'))) {
+                text += ' If you make someone else group admin, you will lose your group admin privileges.'
+            }
+            $(this).confirmDialog({
+                text: text,
+                confirmEvent: function(element) {
+                    isAdminChanged = true;
+                    element.prop('checked', !element.prop('checked')).trigger('change');
+                }
+            });
+        }
     });
 
     var addUserSelector = $('#addUser');
