@@ -22,29 +22,31 @@ $catMapper = CategoryMapper::getInstance();
 $userMapper = UserMapper::getInstance();
 $groupMapper = GroupMapper::getInstance();
 
-if(!is_numeric($_REQUEST['categoryID'])) {
+$categoryId = $_REQUEST['categoryID'];
+
+if(!is_numeric($categoryId)) {
 	error(2);
 }
 
 /* Check access */
-if($groupHandler->getPermission($_REQUEST['categoryID']) < FULL_ACCESS) {
+if($groupHandler->getPermission($categoryId) < FULL_ACCESS) {
 	error(19);
 }
 
 if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
     /** @var \Schoolbox\Resource\Group $group */
     try {
-        $group = $groupMapper->findOneByColumn('cid', $_REQUEST['categoryID']);
+        $group = $groupMapper->findOneByColumn('cid', $categoryId);
     } catch (\Schoolbox\Mapper\Exception $e) {
         $group = $groupMapper->createModel();
         // yes, group category doesn't map to an actual category.
         // no, I'm not fixing it right now, but will at least check it exists.
         try {
-            $catMapper->findById($_REQUEST['categoryID']);
-            $group->setCategory($_REQUEST['categoryID']);
+            $catMapper->findById($categoryId);
+            $group->setCategory($categoryId);
         } catch (\Schoolbox\Mapper\Exception $e) {
             header(':', true, 404);
-            die("The specified folder ({$_REQUEST['categoryID']}) does not exist.");
+            die("The specified folder ({$categoryId}) does not exist.");
         }
     }
 
@@ -108,7 +110,7 @@ elseif(isset($_REQUEST['delete'])) {
 
 	foreach((array)$_REQUEST['delete'] as $id) {
 		if(is_numeric($id)) {
-			$groupHandler->deleteUser($_REQUEST['categoryID'], $id);
+			$groupHandler->deleteUser($categoryId, $id);
 		}
 	}
 
@@ -121,12 +123,12 @@ elseif(isset($_REQUEST['accept'])) {
 		if (is_numeric($id)) {
 			$ua->setAccessLevel(UserAccess::ACCESS_READ)
 			   ->setUser($userMapper->findById($id))
-			   ->setServiceIdentifier($_REQUEST['categoryID']);
+			   ->setServiceIdentifier($categoryId);
 			$uaMapper->save($ua);
 		}
 	}
 
-	SitePage::localRedir('/group/modify/' . $_REQUEST['categoryID']);
+	SitePage::localRedir('/group/modify/' . $categoryId);
 }
 
 /* Add user */
@@ -150,7 +152,7 @@ elseif(isset($_POST['userID'])) {
 /* Set new owner/administrator */
 elseif(is_numeric($_GET['owner'])) {
 	try {
-		$category = $catMapper->findById($_REQUEST['categoryID']);
+		$category = $catMapper->findById($categoryId);
 	}
 	catch(Schoolbox\Mapper\Exception $e) {
 		error(2);
@@ -215,7 +217,7 @@ elseif(isset($_POST['bulkAdd'])) {
 	//split the list into an array
 	$list = preg_split('/[,; ]/', $string);
 
-	$ua->setServiceIdentifier($_REQUEST['categoryID'])
+	$ua->setServiceIdentifier($categoryId)
 	   ->setAccessLevel(UserAccess::ACCESS_READ);
 
 	foreach($list as $key) {
@@ -242,6 +244,6 @@ elseif(isset($_POST['bulkAdd'])) {
 		}
 	}
 
-	SitePage::localRedir('/group/modify/' . $_REQUEST['categoryID']);
+	SitePage::localRedir('/group/modify/' . $categoryId);
 }
 
