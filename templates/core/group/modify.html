@@ -184,7 +184,7 @@ $(document).ready(function() {
     <div class="small-12 island">
         <section>
             <fieldset class="content">
-                <legend>Members</legend>
+                <legend>Current Members</legend>
 
                 <!-- BEGIN groupUnmanaged -->
                 <div class="alert-box">This group currently has no administrator.</div>
@@ -297,47 +297,54 @@ $(document).ready(function() {
                 </div>
             </fieldset>
             <!-- END msg_enabled -->
-            <fieldset class="content">
-                <table class="standardForm table" cellpadding="0" cellspacing="0">
-                    <tr>
-                        <td valign="top"><h4>Add users</h4>
-                            <em>You may add users individually by typing their name and selecting from the list.  Alternatively click the bulk link quickly add many members</em>
-                        </td>
-                        <td>
-                            <form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
-                                <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
-                                <input type="submit" value="Add Users" class="submit-btn-plain disabled" disabled />
-                            </form>
-                        </td>
-                    </tr>
 
-                    <!-- BEGIN authorisation -->
-                    <tr>
-                        <td><h4>Awaiting Authorisation</h4>
-                            <em>These users are currently awaiting your authorisation to join this group</em>
-                        </td>
-                        <td><form action="/group/modifyForm.php" method="post" id="acceptForm">
-                            <table class="table">
-                                <tr>
-                                    <th style="width: 20px; text-align: center;"><input type="checkbox" class="checkAll" id="acceptCheck" /></th>
-                                    <th>Name</th>
-                                    <th style="text-align: center;">Add</th>
-                                </tr>
-                                <!-- BEGIN waiting -->
-                                <tr>
-                                    <td style="text-align: center;"><input class="acceptCheck" type="checkbox" name="accept[]" value="{WAITING_ID}" /></td>
-                                    <td><a href="/search/user/{WAITING_ID}">{WAITING_NAME}</a></td>
-                                    <td style="text-align: center;"><a href="/group/modifyForm.php?accept={WAITING_ID}&categoryID={CATEGORY_ID}">Add</a></td>
-                                </tr>
-                                <!-- END waiting -->
-                            </table>
-                            <input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
-                            <input type="submit" value="Accept Selected" class="submit-btn-plain" />
-                        </form></td>
-                    </tr>
-                    <!-- END authorisation -->
-                </table>
+            <!-- BEGIN authorisation -->
+            <fieldset class="content">
+                <legend>
+                    Awaiting Members
+                    <span data-tooltip class="has-tip tip-top hint" title="These users are currently awaiting your authorisation to join this group.">?</span>
+                </legend>
+                <form action="/group/modifyForm.php" method="post" id="acceptForm">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>
+                                <input id="acceptCheck" type="checkbox" data-select-all data-select-all-for-group="accept" />
+                                <label for="acceptCheck" class="checkbox-label">Accept?</label>
+                            </th>
+                        </tr>
+                        </thead>
+                        <!-- BEGIN waiting -->
+                        <tr>
+                            <td><a href="/search/user/{WAITING_ID}">{WAITING_NAME}</a></td>
+                            <td>
+                                <input id="acceptCheck-{USER_ID}" type="checkbox" name="accept[]" value="{WAITING_ID}" data-select-all-group="accept" />
+                                <label for="acceptCheck-{USER_ID}" class="checkbox-label"></label>
+                            </td>
+                        </tr>
+                        <!-- END waiting -->
+                    </table>
+                    <input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
+                    <input type="submit" value="Accept Selected" class="submit-btn-plain" />
+                </form>
             </fieldset>
+            <!-- END authorisation -->
+
+            <table class="standardForm table" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><h4>Add users</h4>
+                        <em>You may add users individually by typing their name and selecting from the list.  Alternatively click the bulk link quickly add many members</em>
+                    </td>
+                    <td>
+                        <form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
+                            <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
+                            <input type="submit" value="Add Users" class="submit-btn-plain disabled" disabled />
+                        </form>
+                    </td>
+                </tr>
+            </table>
+
         </section>
     </div>
 </div>
