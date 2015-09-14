@@ -5,6 +5,7 @@
 <script type="text/javascript" src="/javascript/data-plugins/selectAll.js"></script>
 <script type="text/javascript" src="/javascript/data-plugins/checkboxGroup.js"></script>
 <script type="text/javascript" src="/javascript/data-plugins/hideWatch.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 	$('.makeAdmin').makeAdmin({
@@ -12,6 +13,15 @@ $(document).ready(function() {
 		currentAdminId: '{MAKEADMIN_CURRENT_ADMIN_ID}',
 		super: '{MAKEADMIN_SUPER}'
 	});
+
+    // Confirm disbandment
+    $('[data-action="disband"]').click(function(event) {
+        event.preventDefault();
+        $(this).confirmDialog({
+            text: 'Are you sure you wish to disband this group? All members of the group will be removed, but all homepage content will remain.',
+            confirmEvent: $.confirmDialog.followHref
+        });
+    });
 
     var addUserSelector = $('#addUser');
     addUserSelector
@@ -42,7 +52,7 @@ $(document).ready(function() {
         <li><a href="/mail/createMail.php?replyto=&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;&amp;bcc={EMAILALL}" class="icon-email">Email All Group Members</a></li>
         <!-- END mail_all -->
         <li><a href="/group/bulk/{CATEGORY_ID}" class="icon-add">Add Bulk Members</a></li>
-        <li><a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" class="icon-delete">Disband Group</a></li>
+        <li><a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" class="icon-delete" data-action="disband">Disband Group</a></li>
     </ul>
 </div>
 
