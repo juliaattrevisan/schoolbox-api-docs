@@ -13,7 +13,6 @@ $this->setBlock('member', 'make_owner', 'make_owner_block');
 $this->setBlock('member', 'msg_enabled_userfollow', 'msg_enabled_userfollow_block');
 
 $this->setBlock(TEMPLATE_content, 'msg_enabled', 'msg_enabled_block');
-$this->setBlock('msg_enabled', 'default_follow', 'default_follow_block');
 
 $this->setBlock(TEMPLATE_content, 'msg_enabled_followth', 'msg_enabled_followth_block');
 
@@ -61,8 +60,6 @@ if (is_numeric($this->arg[0])) {
                     );
 
     $this->setVar($output);
-
-    $this->setVar('default_follow_block', '');
 
     $search = array(
         'user_id'        => 0,
