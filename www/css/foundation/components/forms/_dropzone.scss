@@ -114,6 +114,9 @@ ul.az-error-list {
             padding-top: 0;
             padding-bottom: 0;
         }
+        .avatar.card {
+            min-height: rem-calc($base-font-size * 3 + 1);
+        }
     }
     img {
         position: absolute;
@@ -132,11 +135,11 @@ ul.az-error-list {
 ul.az-error-list {
     background: $attachzone-error-background;
     .dz-error {
-        height: 24px;
+        height: rem-calc($base-font-size * 3 + 1);
     }
     .filename {
-        line-height: 24px;
-        height: 24px;
+        line-height: 2rem;
+        height: 2rem;
         font-style: italic;
         cursor: pointer;
     }
@@ -250,6 +253,7 @@ ul.az-error-list {
         }
         .progress {
             height: 0;
+            margin-bottom: 0;
         }
     }
     .dz-success {
@@ -264,6 +268,7 @@ ul.az-error-list {
         }
         .progress {
             height: 0;
+            margin-bottom: 0;
         }
     }
     div.dz-progress {
