@@ -99,7 +99,11 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     {
         $dayNumber = 0;
 
-        $api = new External_Denbigh2_Api('CurrentDay', array());
+        $params = [];
+        if ($date) {
+            $params['Date'] = new Alaress_Date_Format($date, Alaress_Date_Format::TIMESTAMP);
+        }
+        $api = new External_Denbigh2_Api('CurrentDay', $params);
 
         if (!$api->hasErrors()) {
             $dayNumber = $api->getResult()->data[0]->{'Current Day of Cycle'};
