@@ -20,7 +20,7 @@ $data = {
 #}
 <div class="attachzone s{{ attachzone.size }}" id="{{ attachzone.id }}-zone">
     <label>{{ attachzone.label }}</label>
-    <ul data-dz-previews class="action-list">
+    <ul data-dz-previews class="az-list">
         {% for attachment in attachzone.attachments %}
         <li class="dz-success {% if not attachzone.readonly %}actions-small-1{% endif %}">
             <div class="list-item">
@@ -52,11 +52,11 @@ $data = {
                     <a href="#" data-dz-remove title="Detach" class="icon-delete"></a>
                     <input type="hidden" data-az-attachment name="attachment[]" value="" />
                 </nav>
-                <div class="progress"><span class="meter" data-dz-uploadprogress></span></div>
+                <div class="progress"><span class="meter" style="width:0;" data-dz-uploadprogress></span></div>
             </li>
         </ul>
     </div>
-    <ul class="az-error-list action-list"></ul>
+    <ul class="az-error-list"></ul>
     <script type="text/javascript">
         $(function () {
             $('#{{ attachzone.id }}-zone').resourceAttach({
