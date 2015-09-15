@@ -54,7 +54,16 @@
                     },
                     force_text: true,
                     multiple: false,
-                    check_callback: true,
+                    check_callback: function(operation, node, node_parent) {
+                        // Ensure the node I'm dragging onto is one I have write access to
+                        if (operation === 'move_node') {
+                            var permission = node_parent.original.li_attr['data-permission'];
+                            if (!(permission == 'write' || permission == 'full')) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    },
                     themes: {
                         variant: "resourcetree",
                         dots: true,
