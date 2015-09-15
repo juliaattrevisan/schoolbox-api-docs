@@ -85,6 +85,12 @@
 	transform-origin: $transform-origin;
 }
 
+@mixin easy-transition($transition...) {
+	-webkit-transition: $transition;
+	-moz-transition: $transition;
+	-o-transition: $transition;
+	transition: $transition;
+}
 
 @mixin transition($properties: all, $duration: .3s, $easing: ease-out, $delay: 0s) {
 	@if length($properties) > 1 {
