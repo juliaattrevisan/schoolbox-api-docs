@@ -1,3 +1,85 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.hourpicker.js"></script>
+<script type="text/javascript" src="/javascript/jquery.minutepicker.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $.fn.alaressTiny({
+            mode : "exact",
+            elements: "description, completion-message",
+            file_browser_category_id : '{ASSESS_CATEGORY_ID}'
+        });
+
+        /* date picker */
+        $('#start_date, #finish_date').datepicker({
+            constrainInput: false,
+            onClose: function (string) {
+                var input = $(this);
+                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
+
+        $('#start_date').syncDates({endDate: $('#finish_date')});
+
+        /* Timepicker
+         */
+        $('input[data-timepicker="hour"]').hourpicker({
+            hours: 12,
+            appendTo: function ($input) {
+                return $input.closest('.timepick');
+            }
+        });
+        $('input[data-timepicker="minute"]').minutepicker({
+            appendTo: function ($input) {
+                return $input.closest('.timepick');
+            }
+        });
+
+        $('#createAssess').validate({
+            rules: {
+                title: {
+                    required: true,
+                    minlength: 2
+                },
+                "finish[hour]": {
+                    required: true,
+                    '12hour': true
+                },
+                "finish[minute]": {
+                    required: true,
+                    minute: true
+                },
+                "start[hour]": {
+                    required: true,
+                    '12hour': true
+                },
+                "start[minute]": {
+                    required: true,
+                    minute: true
+                }
+            },
+            messages: {
+                title: "Please enter a title",
+                description: "Please enter a description"
+            },
+            errorPlacement: function(error, element) {
+                var fieldset = element.closest('fieldset');
+                if (fieldset.length) {
+                    error.appendTo(fieldset);
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 {BREADCRUMB}
 
 <div class="actions-small-1 row">
@@ -157,82 +239,3 @@
     </form>
 </div>
 
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
-<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery.hourpicker.js"></script>
-<script type="text/javascript" src="/javascript/jquery.minutepicker.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $.fn.alaressTiny({
-            mode : "exact",
-            elements: "description, completion-message",
-            file_browser_category_id : '{ASSESS_CATEGORY_ID}'
-        });
-
-        /* date picker */
-        $('#start_date, #finish_date').datepicker({
-            constrainInput: false,
-            onClose: function (string) {
-                var input = $(this);
-                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-                    input.val(data.time);
-                })
-            }
-        });
-
-        $('#start_date').syncDates({endDate: $('#finish_date')});
-
-        /* Timepicker
-         */
-        $('input[data-timepicker="hour"]').hourpicker({
-            hours: 12,
-            appendTo: function ($input) {
-                return $input.closest('.timepick');
-            }
-        });
-        $('input[data-timepicker="minute"]').minutepicker({
-            appendTo: function ($input) {
-                return $input.closest('.timepick');
-            }
-        });
-
-        $('#createAssess').validate({
-            rules: {
-                title: {
-                    required: true,
-                    minlength: 2
-                },
-                "finish[hour]": {
-                    required: true,
-                    '12hour': true
-                },
-                "finish[minute]": {
-                    required: true,
-                    minute: true
-                },
-                "start[hour]": {
-                    required: true,
-                    '12hour': true
-                },
-                "start[minute]": {
-                    required: true,
-                    minute: true
-                }
-            },
-            messages: {
-                title: "Please enter a title",
-                description: "Please enter a description"
-            },
-            errorPlacement: function(error, element) {
-                var fieldset = element.closest('fieldset');
-                if (fieldset.length) {
-                    error.appendTo(fieldset);
-                } else {
-                    error.insertAfter(element);
-                }
-            }
-        });
-    });
-</script>
