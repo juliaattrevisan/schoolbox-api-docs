@@ -160,7 +160,14 @@ ul.az-error-list {
         }
     }
     .dzone {
-        background-image: url("/images/core/files/paperclip-64.png");
+        @extend .icon-attach;
+        @extend .icon-32;
+        &:before {
+            position: absolute;
+            left: 1rem;
+            top: 0.375rem;
+            font-weight: $font-weight-normal;
+        }
         @media #{$small-only} {
             background-size: 1.5rem;
             height: 3rem;
@@ -213,7 +220,7 @@ ul.az-error-list {
         color: $attachzone-can-accept-color;
     }
     img[data-dz-thumbnail] {
-        background: url('/images/resources/ajax.gif') no-repeat 50%;
+        background: url('/images/resources/ajax.gif') no-repeat center center;
         @include single-transition(opacity, 0.15s, $attachzone-overlay-timing);
     }
     ul.az-list > li {
@@ -257,10 +264,6 @@ ul.az-error-list {
         .dz-upload {
             background-color: $attachzone-error-background;
         }
-        .progress {
-            height: 0;
-            margin-bottom: 0;
-        }
     }
     .dz-success {
         img[data-dz-thumbnail] {
@@ -272,13 +275,15 @@ ul.az-error-list {
         .filename {
             opacity: 1;
         }
+    }
+    .dz-error, .dz-success {
         .progress {
             height: 0;
-            margin-bottom: 0;
         }
     }
-    div.dz-progress {
+    .progress {
         margin: 0;
+        clear: both;
     }
     .dz-upload {
         background-color: $vapor;
