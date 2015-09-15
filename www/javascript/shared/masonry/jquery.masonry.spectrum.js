@@ -48,7 +48,7 @@
             showPalette: false,
             showSelectionPalette: false,
             showButtons: false,
-            showAlpha: false,
+            showAlpha: true,
             showInitial: true,
             showInput: true,
             clickoutFiresChange: true,
@@ -152,7 +152,7 @@
      */
     MasonrySpectrum.prototype.onColorChange = function (element, colorObject) {
         // Change the colors for the selected items
-        var color   = '#' + colorObject.toHex(),
+        var color   = colorObject.toRgbString(),
             id      = element.id,
             pickers = this.options.colours.pickers,
             mspec   = this;
