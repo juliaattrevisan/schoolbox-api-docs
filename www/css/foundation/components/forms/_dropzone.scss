@@ -117,6 +117,12 @@ ul.az-error-list {
         .avatar.card {
             min-height: rem-calc($base-font-size * 3 + 1);
         }
+        nav a {
+            color: $attachzone-error-color;
+            &:hover {
+                background-color: tint($attachzone-error-color, 74%);
+            }
+        }
     }
     img {
         position: absolute;
