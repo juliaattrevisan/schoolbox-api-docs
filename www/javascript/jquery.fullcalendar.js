@@ -761,7 +761,7 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
  */
 Bubble.prototype.fillForm = function(formId, vars) {
     // retrieve form from cache
-    var form = this.forms[formId]
+    var form = $(this.forms[formId]);
 
     /**
      * Fill element helper: if the element that is getting filled has a

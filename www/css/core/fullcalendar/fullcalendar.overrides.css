@@ -79,3 +79,27 @@
 .fc-toolbar {
     margin-bottom: 0;
 }
+
+/* Overcome specificity
+ */
+#content > .row > .small-12 table .fc-day-header.fc-widget-header,
+#content > .row > .small-12 table .fc-head .fc-widget-header,
+#content > .row > .small-12 table .fc-body .fc-widget-content
+{
+    padding: 0;
+}
+
+#content > .row > .small-12 .fc-basic-view .fc-day-number {
+    padding: 0 0.25rem 0 0;
+}
+
+#calendar-loading {
+    min-height: 0;
+    max-height: 92px;
+}
+
+/* Make close button easier to hit on phones
+ */
+.reveal-modal .close-reveal-modal {
+    padding: 0.5rem;
+}

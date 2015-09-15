@@ -36,10 +36,14 @@
     };
 
     // once the DOM has loaded, punch a fancy calendar into it
-    $(document).ready(function() {
+    $(function() {
+
         // Allow checking of anchor for view to display
         var anchor = '';
         var parts  = location.href.split('#');
+
+        var calendarLoadingElement = $('#calendar-loading');
+
         if (parts.length > 1) {
             anchor = parts[1];
             switch (anchor) {
@@ -65,6 +69,13 @@
                     break;
             }
         }
+
+        var height = null;
+
+        if (isCalendarSmall()) {
+            height = 'auto';
+        }
+
         c = new Calendar('calendar', 'calendar-bubble', {
 			userId: '{CALENDAR_USER_ID}',
 
@@ -89,6 +100,7 @@
                     agendaDay:  'ddd D/M',
                     '':         'ddd D/M'
                 },
+                height: height,
                 defaultView: anchor || '{CALENDAR_VIEW}',
                 timeFormat: { month: 'h(:mm)a' },
                 // Event limit: could be configured from session but leave global for now
@@ -229,7 +241,7 @@
 					/* Show loading div right in the middle
 					 */
 					if (isLoading === true) {
-						$('#calendar-loading').foundation('reveal','open')
+                        calendarLoadingElement.foundation('reveal','open')
 					}
 					/* Has finished loading
 					 */
@@ -237,7 +249,7 @@
 
 						/* Hide loading div
 						 */
-                        $('#calendar-loading').foundation('reveal','close')
+                        calendarLoadingElement.foundation('reveal','close')
 
                         // update any tasks that have been completed by strikethrough-ing them
                         $(this).find('input[type=checkbox]').each(function() {

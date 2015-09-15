@@ -1,106 +1,8 @@
-<div class="row">
-    <div class="small-12 columns">
-        <div class="actions-small-1 row">
-            <div class="list-item">
-                <div class="small-12 column">
-                    <h1>{WORK_USER_NAME} Work</h1>
-                </div>
-            </div>
-            <!-- BEGIN is_parent -->
-            <nav>
-                <a class='icon-group' data-dropdown='header-options'></a>
-            </nav>
-            <ul id="header-options" class="f-dropdown" data-dropdown-content>
-                <!-- BEGIN child -->
-                <li>
-                    <div class="avatar card">
-                        <a href="/submission/dueWork/0/{CHILD_ID}" title="View Profile">
-                            <img src="/portrait.php?userId={CHILD_EXTERNAL_ID}&size=square64" alt="View Profile" />
-                            <p>{CHILD_NAME}</p>
-                        </a>
-                    </div>
-                </li>
-                <!-- END child -->
-            </ul>
-            <!-- END is_parent -->
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 columns">
-        <div id="calendar-loading" class="loader text-center"></div>
-        <div id="calendar"></div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 medium-6 columns">
-        {UPCOMING_WORK}
-
-        <div class="row">
-            <div class="small-12 island">
-                <h2 class="subheader">Recent Activity</h2>
-                <section>
-                    <ul class="information-list">
-                        {ACTIVITY_LIST}
-                    </ul>
-                </section>
-            </div>
-        </div>
-    </div>
-
-    <div class="small-12 medium-6 columns">
-        <h2 class="subheader">Subjects</h2>
-        {SUBJECT_LIST}
-    </div>
-</div>
-
-<div id="calendar-bubble" class="cal-bubble">
-    <div class="middle">
-        <div class="close">&times;</div>
-        <div class="js-data clearfix">
-            <!-- Edit Event Form -->
-            <form id="editEvent">
-                <input type="hidden" name="eventId" />
-                <dl>
-                    <dd><h3 class="note"></h3></dd>
-                    <dd><h4><span class="date"></span></h4></dd>
-                    <dd><p class="location"></p></dd>
-                    <dd><p class="detail wysiwyg" data-is-html="1"></p></dd>
-                    <dd class="post-by meta">Posted by <a class="author" href="#" data-is-user-link="1"></a></dd>
-                    <dd class="reviewed-by">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></dd>
-                </dl>
-                <ul class="relatedBookings"></ul>
-                <div class="attendance">
-                    <dl>
-                        <dd><p class="attendanceIcon"></p></dd>
-                        <dd class="rm"><p class="attendanceStatus"></p></dd>
-                    </dl>
-                </div>
-                <div class="actions">
-                    <dl>
-                        <dd>
-                            <span class="homepageLink" data-is-html="1"></span>
-                            <span class="modifyLink" data-is-html="1"></span>
-                            <span class="deleteLink" data-is-html="1"></span>
-                            <span class="attendanceListButton" data-is-html="1"></span>
-                            <span class="attendanceRequestButton" data-is-html="1"></span>
-                        </dd>
-                    </dl>
-                </div>
-                <div class="bookingActions" data-is-html="1">
-                </div>
-            </form>
-        </div>
-        <div class="bottom"><strong></strong></div>
-    </div>
-</div>
-
+<!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
-
+<script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
 <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
@@ -133,14 +35,14 @@
         });
     };
 
-    var calendarElement = $('#calendar');
-    var calendarLoadingElement = $('#calendar-loading');
-
     // once the DOM has loaded, punch a fancy calendar into it
     $(function() {
         // Allow checking of anchor for view to display
         var anchor = '';
         var parts  = location.href.split('#');
+
+        var calendarLoadingElement = $('#calendar-loading');
+
         if (parts.length > 1) {
             anchor = parts[1];
             switch (anchor) {
@@ -166,17 +68,15 @@
                     break;
             }
         }
+
+        var height = null;
+
+        if (isCalendarSmall()) {
+            height = 'auto';
+        }
+
         c = new Calendar('calendar', 'calendar-bubble', {
             userId: '{WORK_USER_ID}',
-
-            // overrides and callbacks
-//            taskTypeId: '{TASK_TYPE_ID}',
-//            crud: {
-//                c: '/calendar/ajax/create',
-//                // r: don't need it
-//                u: '/calendar/ajax/update',
-//                d: '/calendar/ajax/delete'
-//            },
             filter: {
                 ajax: '/calendar/ajax/filter',
                 btnSelector: false,
@@ -195,6 +95,7 @@
                     agendaDay:  'ddd D/M',
                     '':         'ddd D/M'
                 },
+                height: height,
                 defaultView: anchor || 'month',
                 timeFormat: { month: 'h(:mm)a' },
                 // Event limit: could be configured from session but leave global for now
@@ -265,17 +166,15 @@
                     /* Show loading div right in the middle
                      */
                     if (isLoading === true) {
-                        calendarLoadingElement.css({
-                            top: (calendarElement.height() - calendarLoadingElement.height())/2,
-                            left: (calendarElement.width() - calendarLoadingElement.width())/2
-                        }).show();
+                        calendarLoadingElement.foundation('reveal','open');
                     }
                     /* Has finished loading
                      */
                     else {
                         /* Hide loading div
                          */
-                        calendarLoadingElement.hide();
+                        calendarLoadingElement.foundation('reveal','close');
+
                         var d = c.dom.fullCalendar('getDate');
                         $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'));
                     }
@@ -304,3 +203,146 @@
         }).init();
     })
 </script>
+<!-- END custom_head -->
+<div id="glack" class="alert-box"></div>
+<div class="row">
+    <div class="small-12 columns">
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 column">
+                    <h1>{WORK_USER_NAME} Work</h1>
+                </div>
+            </div>
+            <!-- BEGIN is_parent -->
+            <nav>
+                <a class='icon-group' data-dropdown='header-options'></a>
+            </nav>
+            <ul id="header-options" class="f-dropdown" data-dropdown-content>
+                <!-- BEGIN child -->
+                <li>
+                    <div class="avatar card">
+                        <a href="/submission/dueWork/0/{CHILD_ID}" title="View Profile">
+                            <img src="/portrait.php?userId={CHILD_EXTERNAL_ID}&size=square64" alt="View Profile" />
+                            <p>{CHILD_NAME}</p>
+                        </a>
+                    </div>
+                </li>
+                <!-- END child -->
+            </ul>
+            <!-- END is_parent -->
+        </div>
+    </div>
+</div>
+
+<div id="calendar-loading" class="reveal-modal tiny no-pad" data-reveal aria-hidden="true" role="dialog">
+    <div class='loader'></div>
+    <p>
+        <span class="label neutral full-width">
+        Loading events
+        </span>
+    </p>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <div id="calendar"></div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 medium-6 columns">
+        {UPCOMING_WORK}
+
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">Recent Activity</h2>
+                <section>
+                    <ul class="information-list">
+                        {ACTIVITY_LIST}
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div class="small-12 medium-6 columns">
+        <h2 class="subheader">Subjects</h2>
+        {SUBJECT_LIST}
+    </div>
+</div>
+
+<div class="reveal-modal large" data-reveal aria-hidden="true" role="dialog" id="calendar-bubble" >
+    <!-- Edit Event Form -->
+    <form id="editEvent">
+        <input type="hidden" name="eventId" />
+
+        <div class="row">
+            <div class="small-12">
+                <h3 class="note"></h3>
+                <ul class="meta">
+                    <li class="icon-calendar date"></li>
+                    <li class="icon-location"></li>
+                    <li class="icon-staff-students" data-event-modal-field="post-by">Posted by <a class="author" href="#" data-is-user-link="1"></a></li>
+                    <li class="icon-staff-students" data-event-modal-field="reviewedBy">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></li>
+                </ul>
+
+                <article class="detail" data-is-html="1"></article>
+
+                <ul class="relatedBookings"></ul>
+
+                <div class="attendance">
+                    <dl>
+                        <dd><p class="attendanceIcon"></p></dd>
+                        <dd class="rm"><p class="attendanceStatus"></p></dd>
+                    </dl>
+                </div>
+                <div>
+                    <dl>
+                        <dd>
+                            <span class="homepageLink" data-is-html="1"></span>
+                            <span class="modifyLink" data-is-html="1"></span>
+                            <span class="deleteLink" data-is-html="1"></span>
+                            <span class="attendanceListButton" data-is-html="1"></span>
+                            <span class="attendanceRequestButton" data-is-html="1"></span>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="bookingActions" data-is-html="1"></div>
+            </div>
+        </div>
+    </form>
+
+    <form id="editTask">
+        <input type="hidden" name="eventId" />
+
+        <h3>Task</h3>
+
+        <label>
+            Due
+            <span class="date"><!-- Date gets shoved in here --></span>
+        </label>
+
+        <input id="modifyTaskBubbleCompleted" name="completed" type="checkbox" value="1" />
+
+        <label for="modifyTaskBubbleCompleted" class="checkbox-label">
+            Complete
+        </label>
+
+        <label>
+            Task
+            <input id="modifyTaskBubbleNote" name="title" type="text" value="" />
+        </label>
+
+        <label class="detail">
+            Note
+            <textarea id="modifyTaskBubbleDetail" name="detail"></textarea>
+        </label>
+
+        <input type="submit" value="Update Task" />
+        <a href="#" class="deleteTask">Delete</a>
+    </form>
+
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+
