@@ -67,6 +67,8 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
 //                'extra'     => ":other_alias.type = 'sbfs'",
 //            ]
 //        );
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'ensureOwnerIsNotNull']);
     }
 
     /**
@@ -219,4 +221,21 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         return $searcher;
     }
 
+    /**
+     * Pre-save callback: ensures that owner is not null.
+     *
+     * @param  Model $model
+     * @return bool  Always true
+     */
+    public function ensureOwnerIsNotNull(Model $model)
+    {
+        if ($model->getOwner() instanceof User) {
+            if (!$model->getOwner()->getId()) {
+                $dummyUser = new User();
+                $dummyUser->setId(0);
+                $model->setOwner($dummyUser);
+            }
+        }
+        return true;
+    }
 }
