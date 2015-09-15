@@ -4,8 +4,8 @@
         var abUpload          = $('#ab-upload'),
             abUploadForm      = abUpload.find('form.dzone'),
             abUploadControls  = abUpload.siblings('div.ctrl'),
-            abUploadSubmitBtn = abUploadControls.children('a.submit-btn-plain'),
-            abUploadCancelBtn = abUploadControls.children('a.cancel'),
+            abUploadSubmitBtn = abUploadControls.children('[data-submit]'),
+            abUploadCancelBtn = abUploadControls.children('[data-cancel]'),
             maxFiles           = {MAX_FILES};
 
         abUploadForm.dropzone({
@@ -237,6 +237,6 @@
   </form>
 </div>
 <div class="ctrl">
-  <a role="button" class="submit-btn-plain" disabled="disabled" href="#">Upload</a>
-  <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
+  <a role="button" data-submit class="submit" disabled="disabled" href="#">Upload</a>
+  <a role="button" data-cancel href="#">Cancel</a>
 </div>
