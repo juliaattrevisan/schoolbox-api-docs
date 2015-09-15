@@ -1,0 +1,1 @@
+UPDATE component_definition SET multiple = 'true' WHERE class='Component_Homepage_AudioController'
