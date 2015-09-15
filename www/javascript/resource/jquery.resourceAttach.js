@@ -39,7 +39,7 @@ if(typeof window.location.origin == 'undefined') {
 
             // our options
             trigger: null,
-            detachDelay: 200,
+            detachDelay: 800,
             detachSelector: 'p.actions a.delete',
             detachClass: 'detach',
             attachmentTag: 'li',
