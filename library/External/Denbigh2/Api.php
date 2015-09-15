@@ -106,7 +106,11 @@ class External_Denbigh2_Api {
              * Advised by Gort
              */
             $mungedValues[$keystring] = $keys[$i];
-            $mungedValues[$valuestring] = "=={$values[$i]}";
+            if ($values[$i] instanceof Alaress_Date_Format) {
+                $mungedValues[$valuestring] = $values[$i]->getUsingFormat('d/m/Y');
+            } else {
+                $mungedValues[$valuestring] = "=={$values[$i]}";
+            }
         }
 
         $dataset = array_merge($authentication, $mungedValues, $options);
