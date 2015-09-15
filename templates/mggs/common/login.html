@@ -78,15 +78,15 @@ function init(){
 <script type="text/javascript" src="/javascript/components/jquery/jquery.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
-        var images = ['login-1.jpg',
-            'login-2.jpg',
-            'login-3.jpg',
-            'login-4.jpg',
-            'login-5.jpg'];
+        var imageCount  = 44;
+        var randomImage = Math.max(1, Math.ceil(Math.random() * imageCount));
+        if (randomImage < 10) {
+            randomImage = '0' + String(randomImage);
+        }
 
         $('#login-bg-inner')
             .css({
-                'background-image': 'url(/images/{SITE_LOCATION}/' + images[Math.floor(Math.random() * images.length)] + ')'
+                'background-image': 'url(/images/{SITE_LOCATION}/login-' + randomImage + '.jpg)'
             });
 
         $(document).ready(function(){
