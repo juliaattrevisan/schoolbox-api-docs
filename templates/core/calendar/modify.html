@@ -1,3 +1,4 @@
+<!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/calendar/js/jquery.eventModify.js"></script>
@@ -13,22 +14,23 @@
 <script type="text/javascript" src="/javascript/data-plugins/selectAll.js"></script>
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
-	$(function() {
-		$.fn.alaressTiny({
-			mode: 'textareas'
-		});
+    $(function() {
+        $.fn.alaressTiny({
+            mode: 'textareas'
+        });
 
-		$('#eventForm').eventModify({
-			functionLabel: "{FUNCTION}",
+        $('#eventForm').eventModify({
+            functionLabel: "{FUNCTION}",
             deleteButton: $('[data-action="delete"]')
-		});
+        });
 
         // Collapsables
         $('[data-collapser=true]').collapsable({
             container: '[data-collapsable-container]'
         });
-	});
+    });
 </script>
+<!-- END custom_head -->
 
 <ul class="breadcrumb">
     <li><a href="/calendar/full/">Calendar</a></li>
