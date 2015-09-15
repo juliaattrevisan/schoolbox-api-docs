@@ -78,11 +78,14 @@ function init(){
 <script type="text/javascript" src="/javascript/components/jquery/jquery.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
-        var images = ['login-1.jpg',
-            'login-2.jpg',
-            'login-3.jpg',
-            'login-4.jpg',
-            'login-5.jpg'];
+        var images = [];
+        for (var i = 1; i <= 44; i++) {
+            var number = i;
+            if (number < 10) {
+                number = '0' + String(number);
+            }
+            images.push('login-'+String(number)+'.jpg');
+        }
 
         $('#login-bg-inner')
             .css({
