@@ -173,26 +173,27 @@
 <!-- END modify_layout -->
 <!-- END custom_head -->
 
-<div class="row">
+<div class="row actions-small-4">
     <div class="small-12 columns">
         <h1>{HEADING} - {PAGE_TITLE}</h1>
     </div>
+    <nav>
+        <!-- BEGIN edit_page -->
+        <span data-tab>
+            <span class="tab-title">
+                <a class="icon-components" href="#eportfolio-page-controls-tab-1" title="Add components"></a>
+            </span>
+            <span class="tab-title">
+                <a class="icon-edit-columns" href="#eportfolio-page-controls-tab-2" title="Edit columns"></a>
+            </span>
+            <span class="tab-title">
+                <a class="icon-modify" href="#eportfolio-page-controls-tab-3" title="Edit the page and its permissions"></a>
+            </span>
+        </span>
+        <!-- END edit_page -->
+        <a href="#" class="icon-delete" title="Delete this page"></a>
+    </nav>
 </div>
-
-<!-- BEGIN edit_page -->
-<div class="row">
-    <div class="small-12 columns">
-        <dl class="tabs" id="eportfolio-page-controls" data-tab >
-            <dd><a class="icon-components" href="#eportfolio-page-controls-tab-1" title="Add components"></a></dd>
-            <dd><a class="icon-edit-columns" href="#eportfolio-page-controls-tab-2" title="Edit columns"></a></dd>
-            <dd><a class="icon-modify" href="#eportfolio-page-controls-tab-3" title="Edit the page title"></a></dd>
-            <dd><a class="icon-group" href="#eportfolio-page-controls-tab-4" title="Change Permissions"></a></dd>
-            <dd><a class="icon-delete" href="#eportfolio-page-controls-tab-5" title="Delete this page"></a></dd>
-        </dl>
-    </div>
-</div>
-<!-- END edit_page -->
-
 
 <!-- BEGIN customise_page -->
 <div class="row">
@@ -342,18 +343,6 @@
                         <input type='text' name='pageTitle' value="{PAGE_TITLE}" />
                     </label>
 
-                    <input type="submit" value="Update Page" />
-                </form>
-            </div>
-
-            <!--------------------->
-            <!-- Component Tab 4 -->
-            <!--------------------->
-            <div id="eportfolio-page-controls-tab-4" class="content">
-                <form action="/eportfolio/configForm.php" method="post">
-                    <input type='hidden' name='page_id' value='{PAGE_ID}' />
-                    <input type='hidden' name='update' value='permissions' />
-
                     <div class="row">
                         <div class="small-12 large-6 columns">
                             <label>
@@ -364,7 +353,7 @@
                             <!-- BEGIN group_permission -->
                             <input type="checkbox" name="group_permission[]" id="group-permission-{GROUP_PERMISSION_GROUP_ID}" value="{GROUP_PERMISSION_GROUP_ID}" {GROUP_PERMISSION_SELECTED}/>
                             <label for="group-permission-{GROUP_PERMISSION_GROUP_ID}" class="checkbox-label">
-                            {GROUP_PERMISSION_NAME}
+                                {GROUP_PERMISSION_NAME}
                             </label>
                             <!-- END group_permission -->
                             <!-- END has_group_permissions -->
@@ -388,23 +377,6 @@
                             <input type="submit" value="Update Page" />
                         </div>
                     </div>
-                </form>
-            </div>
-
-            <!--------------------->
-            <!-- Component Tab 5 -->
-            <!--------------------->
-            <div id="eportfolio-page-controls-tab-5" class="content">
-                <form method='post' action='/eportfolio/configForm.php'>
-                    <input type='hidden' name='page_id' value='{PAGE_ID}' />
-                    <input type='hidden' name='deletePage' value='true' />
-
-                    <label>
-                        Delete Page
-                        <span class="hint has-tip tip-top" data-tooltip title="Remove this page from your ePortfolio.">?</span>
-                    </label>
-
-                    <input type='submit' value='Delete page' />
                 </form>
             </div>
         </section>
