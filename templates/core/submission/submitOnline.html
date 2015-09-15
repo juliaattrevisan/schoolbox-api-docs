@@ -1,63 +1,4 @@
-{BREADCRUMB}
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1>{BOX_NAME}</h1>
-
-        <ul class="meta">
-            <li class="icon-calendar">Due <time class="gradient-{BOX_DUEDATE_GRADIENT}">{BOX_DUEDATE}</time> on <time>{BOX_DUETIME}</time></li>
-            <li class="icon-due-work"><a href="/homepage/{FOLDER_ID}" title="{FOLDER_NAME}">{FOLDER_NAME}</a> {BOX_TYPE}</li>
-        </ul>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 columns">
-        <div class="panel content">
-            <p>
-                You can attach files and/or edit online for your submission.
-                Content you edit online will automatically save drafts, but your work will <strong>not be submitted</strong> until you Submit for Assessment.
-            </p>
-        </div>
-    </div>
-</div>
-
-<form id="editor-form" class="top" method="post" action="/submission/submitWorkForm.php" enctype="multipart/form-data">
-    <input type="hidden" name="box_id" value="{BOX_ID}" />
-    <input type="hidden" name="submission_id" value="{SUBMISSION_ID}" />
-
-    <div class="row" data-equalizer>
-        <div class="small-12 large-8 island">
-            <h2 class="subheader">Submit Online</h2>
-            <section class="content" data-equalizer-watch>
-                <textarea id="editor-body" name="body" rows="20">{TEXTBOX_BODY}</textarea>
-            </section>
-        </div>
-
-        <div class="small-12 large-4 island">
-            <h2 class="subheader">Attachments</h2>
-            <section class="content" data-equalizer-watch>
-                {ATTACH_ZONE}
-            </section>
-        </div>
-
-        <div class="small-12 columns">
-            <input type="submit" value="Submit for Assessment" data-action-save />
-
-            <span class="label full-width hide" data-save-draft></span>
-        </div>
-    </div>
-</form>
-
-<!-- BEGIN confirm_terms -->
-<div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog" title="Submit Work Terms">
-    <p>{STUDENT_SUBMIT_TERMS}</p>
-
-    <a class="button secondary" data-accept>Yes, I agree</a>
-    <a class="button" data-reject>Cancel</a>
-</div>
-<!-- END confirm_terms -->
-
+<!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
@@ -146,10 +87,10 @@
 
         $("[data-action-save]").click(function(e) {
             var form      = $(this).closest('form'),
-                dialog    = $('#confirm-dialog'),
-                submit    = form.find(':submit'),
-                inlineLen = tinyMCE.get('editor-body').getContent().length,
-                filesLen  = $('#submission-file-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
+                    dialog    = $('#confirm-dialog'),
+                    submit    = form.find(':submit'),
+                    inlineLen = tinyMCE.get('editor-body').getContent().length,
+                    filesLen  = $('#submission-file-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
 
             if (!inlineLen && !filesLen) {
                 // prevent submission without SOMETHING to submit
@@ -191,4 +132,64 @@
         });
     });
 </script>
+<!-- END custom_head -->
 
+{BREADCRUMB}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{BOX_NAME}</h1>
+
+        <ul class="meta">
+            <li class="icon-calendar">Due <time class="gradient-{BOX_DUEDATE_GRADIENT}">{BOX_DUEDATE}</time> on <time>{BOX_DUETIME}</time></li>
+            <li class="icon-due-work"><a href="/homepage/{FOLDER_ID}" title="{FOLDER_NAME}">{FOLDER_NAME}</a> {BOX_TYPE}</li>
+        </ul>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <div class="panel content">
+            <p>
+                You can attach files and/or edit online for your submission.
+                Content you edit online will automatically save drafts, but your work will <strong>not be submitted</strong> until you Submit for Assessment.
+            </p>
+        </div>
+    </div>
+</div>
+
+<form id="editor-form" class="top" method="post" action="/submission/submitWorkForm.php" enctype="multipart/form-data">
+    <input type="hidden" name="box_id" value="{BOX_ID}" />
+    <input type="hidden" name="submission_id" value="{SUBMISSION_ID}" />
+
+    <div class="row" data-equalizer>
+        <div class="small-12 large-8 island">
+            <h2 class="subheader">Submit Online</h2>
+            <section class="content" data-equalizer-watch>
+                <textarea id="editor-body" name="body" rows="20">{TEXTBOX_BODY}</textarea>
+            </section>
+        </div>
+
+        <div class="small-12 large-4 island">
+            <h2 class="subheader">Attachments</h2>
+            <section class="content" data-equalizer-watch>
+                {ATTACH_ZONE}
+            </section>
+        </div>
+
+        <div class="small-12 columns">
+            <input type="submit" value="Submit for Assessment" data-action-save />
+
+            <span class="label full-width hide" data-save-draft></span>
+        </div>
+    </div>
+</form>
+
+<!-- BEGIN confirm_terms -->
+<div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog" title="Submit Work Terms">
+    <p>{STUDENT_SUBMIT_TERMS}</p>
+
+    <a class="button secondary" data-accept>Yes, I agree</a>
+    <a class="button" data-reject>Cancel</a>
+</div>
+<!-- END confirm_terms -->
