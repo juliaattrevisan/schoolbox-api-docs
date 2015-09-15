@@ -9,6 +9,9 @@
  */
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Breadcrumbs;
 
 SitePage::extendExecutionTime(300);
 
@@ -22,13 +25,27 @@ if ($groupHandler->getPermission($_POST['homepageId']) < WRITE_ACCESS) {
     $categoryList = array($_POST['homepageId']);
     $groupList = array();
     $campusList = array();
-    $file = $_FILES['file']['tmp_name'];
 
     try {
-        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-        $category = $categoryMapper->findById($_POST['homepageId']);
+        $folderMapper = new FolderMapper();
+        $folder = $folderMapper->findById($_POST['homepageId']);
 
-        if (strlen($_FILES['file']['tmp_name']) && $_FILES['file']['size']) {
+
+        if (isset($_POST['attachment'])) {
+            $factory = new CollectorFactory();
+            try {
+                /** @var Storage\Model $result */
+                $result = $factory->build($_POST['attachment'])->getFirst();
+            } catch (\Schoolbox\Resource\Exception $e) {
+                error(2);
+                exit;
+            }
+            // Ensure the file is available locally
+            $file = tempnam(Config::get('xml_dir'), 'cal');
+            $fp       = fopen($file, 'wb');
+            stream_copy_to_stream($result->readStream(), $fp);
+            fclose($fp);
+
             $factory = new \Calendar\Import\Factory($user, $author, $categoryList, $groupList, $campusList, \Schoolbox\Calendar\Event::ACCESS_GROUP, $file);
             $strategy = $factory->build();
             $strategy->load();
@@ -54,10 +71,24 @@ if ($groupHandler->getPermission($_POST['homepageId']) < WRITE_ACCESS) {
                 $this->setVar('event_block', '');
             }
 
+            $trail = new Breadcrumbs();
+            $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+                [
+                    'text' => $folder->getName(),
+                    'href' => "/homepage/{$folder->getId()}",
+                    'class' => '',
+                ],
+                [
+                    'text' => 'Import Calendar',
+                    'href' => '',
+                    'class' => 'active',
+                ]
+            ]);
+
             $this->setVar(
                 array(
-                    'HOMEPAGE_ID' => $category->getId(),
-                    'HOMEPAGE_NAME' => $category->getName()
+                    'HOMEPAGE_ID' => $folder->getId(),
+                    'HOMEPAGE_NAME' => $folder->getName()
                 )
             );
         } else {
