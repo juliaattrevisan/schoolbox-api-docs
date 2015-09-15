@@ -84,11 +84,13 @@
  */
 #content > .row > .small-12 table .fc-day-header.fc-widget-header,
 #content > .row > .small-12 table .fc-head .fc-widget-header,
-#content > .row > .small-12 table .fc-body .fc-widget-content,
-#content > .row > .small-12 table .fc-day-number.fc-past,
-#content > .row > .small-12 table .fc-day-number.fc-future
+#content > .row > .small-12 table .fc-body .fc-widget-content
 {
     padding: 0;
+}
+
+#content > .row > .small-12 .fc-basic-view .fc-day-number {
+    padding: 0 0.25rem 0 0;
 }
 
 #calendar-loading {
