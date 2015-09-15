@@ -3,8 +3,12 @@
     <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
     <script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
     <script type='text/javascript'>
-        $(function () {
-            $('#component{COMPONENT_INSTANCE_ID}').calendarAttendance();
+        $(function() {
+            var allEvents = $('#component{COMPONENT_INSTANCE_ID}').find('[data-reveal-id]');
+
+            $.each(allEvents, function(index, element) {
+                $('#' + $(element).attr('data-reveal-id')).calendarAttendance();
+            });
 
             $('#component{COMPONENT_INSTANCE_ID}').calendarExport({
                 userToken: '{USER_TOKEN}',

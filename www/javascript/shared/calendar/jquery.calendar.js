@@ -130,6 +130,9 @@ function isCalendarSmall() {
     /**
      * Set up attendance processing
      *
+     * This should be applied to the element containing the RSVP control
+     * which is typically a modal div
+     *
      * @param options
      */
     $.fn.calendarAttendance = function(options) {
@@ -184,9 +187,7 @@ function isCalendarSmall() {
          * Set up attendances
          */
         function setupAttendance() {
-            var selector = '#' + config.element.attr('id') + ' ' + config.attendanceActivator;
-
-            $(document).on('click', selector, function (event) {
+            $('#' + config.element.attr('id')).on('click', config.attendanceActivator, function(event) {
                 event.preventDefault();
 
                 var button = $(this);
