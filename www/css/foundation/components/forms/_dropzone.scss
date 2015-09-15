@@ -171,12 +171,19 @@ ul.az-error-list {
     }
     .dzone {
         @extend .icon-attach;
-        @extend .icon-32;
         &:before {
             position: absolute;
-            left: 1rem;
-            top: 0.375rem;
             font-weight: $font-weight-normal;
+            @media #{$small-only} {
+                left: 0.625rem;
+                top: 0.25rem;
+                font-size: 1.5rem;
+            }
+            @media #{$medium-up} {
+                left: 1rem;
+                top: 0.375rem;
+                font-size: 2rem;
+            }
         }
         @media #{$small-only} {
             background-size: 1.5rem;
@@ -248,6 +255,7 @@ ul.az-error-list {
         position: relative;
     }
     .dzone {
+        @extend %p;
         position: relative;
         overflow: hidden;
         background-color: $attachzone-resting-background;
@@ -255,7 +263,6 @@ ul.az-error-list {
         background-repeat: no-repeat;
         display: block;
         color: $attachzone-resting-color;
-        font-weight: bold;
         width: 100%;
         @include easy-transition(
             background-color 360ms $attachzone-overlay-timing,
