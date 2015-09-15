@@ -126,9 +126,10 @@ ul.tileList {
 /* Dashboard: Recent Submissions
  */
 .counter {
-    padding: 0.5rem;
-    font-size: 0.75rem;
+    font-size: rem-calc(($base-font-size + 8));
+    line-height: 1.8rem;
     text-align: center;
+    padding: 0.5rem;
 }
 
 /* Homepage: Countdown
