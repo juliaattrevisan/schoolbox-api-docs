@@ -272,13 +272,17 @@ class Bootstrap implements BootstrapInterface {
 					$chainLoader = new Twig_Loader_Chain();
 					$baseLoader  = new Twig_Loader_Filesystem(array());
 					// Paths: prefer templates/{site_location} over templates/core
-					$baseLoader->addPath($config->get('siteRoot') . '/templates/' . $config->get('site_location'));
-					$baseLoader->addPath($config->get('siteRoot') . '/templates/core');
+					$basePath     = $config->get('siteRoot').'/templates/';
+					$overridePath = $basePath.$config->get('site_location');
+					$corePath     = $basePath.'core';
+					if (is_dir($overridePath)) {
+						$baseLoader->addPath($overridePath);
+					}
+					$baseLoader->addPath($corePath);
 					// Core path: always uses templates/core, even if templates/{site_location} exists
 					// Used as a base for default path templates to inherit from.
-					$baseLoader->addPath($config->get('siteRoot').'/templates/core', 'core');
+					$baseLoader->addPath($corePath, 'core');
 					$chainLoader->addLoader($baseLoader);
-
 					return $chainLoader;
 				}
 			)
