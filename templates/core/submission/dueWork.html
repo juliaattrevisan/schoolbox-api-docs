@@ -2,7 +2,7 @@
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
-
+<script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
 <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
@@ -68,17 +68,15 @@
                     break;
             }
         }
+
+        var height = null;
+
+        if (isCalendarSmall()) {
+            height = 'auto';
+        }
+
         c = new Calendar('calendar', 'calendar-bubble', {
             userId: '{WORK_USER_ID}',
-
-            // overrides and callbacks
-//            taskTypeId: '{TASK_TYPE_ID}',
-//            crud: {
-//                c: '/calendar/ajax/create',
-//                // r: don't need it
-//                u: '/calendar/ajax/update',
-//                d: '/calendar/ajax/delete'
-//            },
             filter: {
                 ajax: '/calendar/ajax/filter',
                 btnSelector: false,
@@ -97,7 +95,7 @@
                     agendaDay:  'ddd D/M',
                     '':         'ddd D/M'
                 },
-                height: 'auto',
+                height: height,
                 defaultView: anchor || 'month',
                 timeFormat: { month: 'h(:mm)a' },
                 // Event limit: could be configured from session but leave global for now
@@ -206,7 +204,7 @@
     })
 </script>
 <!-- END custom_head -->
-
+<div id="glack" class="alert-box"></div>
 <div class="row">
     <div class="small-12 columns">
         <div class="actions-small-1 row">

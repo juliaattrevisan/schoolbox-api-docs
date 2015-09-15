@@ -36,7 +36,8 @@
     };
 
     // once the DOM has loaded, punch a fancy calendar into it
-    $(document).ready(function() {
+    $(function() {
+
         // Allow checking of anchor for view to display
         var anchor = '';
         var parts  = location.href.split('#');
@@ -68,6 +69,13 @@
                     break;
             }
         }
+
+        var height = null;
+
+        if (isCalendarSmall()) {
+            height = 'auto';
+        }
+
         c = new Calendar('calendar', 'calendar-bubble', {
 			userId: '{CALENDAR_USER_ID}',
 
@@ -92,7 +100,7 @@
                     agendaDay:  'ddd D/M',
                     '':         'ddd D/M'
                 },
-                height: 'auto',
+                height: height,
                 defaultView: anchor || '{CALENDAR_VIEW}',
                 timeFormat: { month: 'h(:mm)a' },
                 // Event limit: could be configured from session but leave global for now
