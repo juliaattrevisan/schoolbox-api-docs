@@ -1,25 +1,8 @@
-{ADMIN_NAV}
-
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">
-            Side Menu
-            <span data-tooltip class="hint has-tip tip-top" data-width="200"  title="Drag and drop the menu items to reorder the core left navigation side menu.">?</span>
-        </h2>
-        <section class="content">
-            <a class="button icon-add" href="/adminv2/modify-side-menu/">Add New</a>
-            <section data-role="sideMenuTree">
-                {MENU_TREE}
-            </section>
-        </section>
-    </div>
-</div>
-
+<!-- BEGIN custom_head -->
 <link type="text/css" rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript">
     $(function () {
-
         $('section[data-role="sideMenuTree"]')
                 .on('ready.jstree', function(event, jstree) {
                     jstree.instance.open_node(jstree.instance.get_node('node_0'));
@@ -55,5 +38,22 @@
                     });
                 });
     });
-
 </script>
+<!-- END custom_head -->
+
+{ADMIN_NAV}
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">
+            Side Menu
+            <span data-tooltip class="hint has-tip tip-top" data-width="200"  title="Drag and drop the menu items to reorder the core left navigation side menu.">?</span>
+        </h2>
+        <section class="content">
+            <a class="button icon-add" href="/adminv2/modify-side-menu/">Add New</a>
+            <section data-role="sideMenuTree">
+                {MENU_TREE}
+            </section>
+        </section>
+    </div>
+</div>
