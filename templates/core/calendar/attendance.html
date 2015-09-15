@@ -127,24 +127,49 @@
 <!-- END approved_attendee_list -->
 
 <!-- BEGIN rejected_attendee_list -->
-<h2>Rejected Attendees</h2>
-<span class="header_option in-h2"><a href="/calendar/attendance/exportRejected/{EVENT_ID}" class="btn download"><span></span>Export To CSV</a></span>
-<table id="rejectedAttendeeList" class="ruler table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Role</th>
-            <th>Remove</th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- BEGIN rejected_attendee -->
-        <tr class="{CLASS}">
-            <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
-            <td>{USER_ROLE}</td>
-            <td><span class="actions one-button"><a href="/calendar/attendance/processRemoveAttendance/{ATTENDANCE_ID}" class="btn delete no-text float-left" title="Delete"><span></span></a></span>/td>
-        </tr>
-        <!-- END rejected_attendee -->
-    </tbody>
-</table>
+<div class="row">
+    <div class="small-12 columns">
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Rejected Attendees</h2>
+                </div>
+            </div>
+            <nav>
+                <a class="icon-export" title="Export To CSV" href="/calendar/attendance/exportRejected/{EVENT_ID}"></a>
+            </nav>
+        </div>
+
+        <div class="row">
+            <div class="small-12 columns">
+                <table id="rejectedAttendeeList">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- BEGIN rejected_attendee -->
+                        <tr>
+                            <td>
+                                <a href="/search/user/{USER_ID}" title="View Profile">{USER_NAME}</a>
+                            </td>
+                            <td>
+                                {USER_ROLE}
+                            </td>
+                            <td>
+                                <a href="/calendar/attendance/processRemoveAttendance/{ATTENDANCE_ID}" class="icon-delete" title="Delete"></a>
+                            </td>
+                        </tr>
+                        <!-- END rejected_attendee -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- END rejected_attendee_list -->
