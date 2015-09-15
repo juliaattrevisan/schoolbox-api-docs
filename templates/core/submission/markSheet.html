@@ -1,3 +1,17 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
+<script type="text/javascript">
+    $(function() {
+
+        /* Controls for Averages and Dynamic updates for input fields
+         */
+        $.fn.marksheetAverages();
+        $('[data-mark-sheet]').marksheetInputs();
+    });
+</script>
+<!-- END custom_head -->
+
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
@@ -112,14 +126,3 @@
     </div>
 </div>
 
-<script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
-<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
-<script type="text/javascript">
-    $(function() {
-
-        /* Controls for Averages and Dynamic updates for input fields
-         */
-        $.fn.marksheetAverages();
-        $('[data-mark-sheet]').marksheetInputs();
-    });
-</script>
