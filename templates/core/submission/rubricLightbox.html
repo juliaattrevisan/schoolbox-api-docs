@@ -1,3 +1,33 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.rubric-graph.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.fraction-display.js"></script>
+<script type="text/javascript">
+    $(function() {
+        if ({GRAPH_DATA}.length) {
+            $('[data-role="rubric-chart"]').rubricGraph({
+                categories: {GRAPH_LEGS},
+                data: {GRAPH_DATA},
+                ymax: {GRAPH_MAX},
+                inputs: '[data-role="rubric-window"]'
+            });
+        }
+        $('[data-role="rubric-sum"]').fractionDisplay({
+            inputs: '[data-role="rubric-window"] :radio'
+        });
+
+//        var radios = $('#rubric-tbody :radio');
+//        radios.removeClass('focused').parent('td').removeClass('focused');
+//        $('#rubric-tbody :checked').each(function() {
+//            var self = $(this);
+//            self.addClass('focused').parent('td').addClass('focused');
+//            self.closest('tr').children('.warning').first().children('div').css('visibility', 'hidden');
+//        })
+    });
+</script>
+<!-- END custom_head -->
+
 <div data-role="rubric-window">
     <!--<h3>Marking Guide</h3>-->
     <table class="rubric">
@@ -52,31 +82,3 @@
         </section>
     </div>
 </div>
-
-<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
-<script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
-<script type="text/javascript" src="/javascript/shared/submissions/jquery.rubric-graph.js"></script>
-<script type="text/javascript" src="/javascript/shared/submissions/jquery.fraction-display.js"></script>
-<script type="text/javascript">
-    $(function() {
-        if ({GRAPH_DATA}.length) {
-            $('[data-role="rubric-chart"]').rubricGraph({
-                categories: {GRAPH_LEGS},
-                data: {GRAPH_DATA},
-                ymax: {GRAPH_MAX},
-                inputs: '[data-role="rubric-window"]'
-            });
-        }
-        $('[data-role="rubric-sum"]').fractionDisplay({
-            inputs: '[data-role="rubric-window"] :radio'
-        });
-
-//        var radios = $('#rubric-tbody :radio');
-//        radios.removeClass('focused').parent('td').removeClass('focused');
-//        $('#rubric-tbody :checked').each(function() {
-//            var self = $(this);
-//            self.addClass('focused').parent('td').addClass('focused');
-//            self.closest('tr').children('.warning').first().children('div').css('visibility', 'hidden');
-//        })
-    });
-</script>
