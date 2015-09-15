@@ -1,3 +1,94 @@
+
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
+<script type="text/javascript" src="/javascript/jquery.timetableDaySelector.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.hourpicker.js"></script>
+<script type="text/javascript" src="/javascript/jquery.minutepicker.js"></script>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
+<script type="text/javascript" src="/javascript/submission/formValidate.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+
+<script type="text/javascript" src="/javascript/data-plugins/datepicker.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/timepicker.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/timetablepicker.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/datepickerSync.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/hideWatch.js"></script>
+
+<script type="text/javascript">
+    //    // from http://stackoverflow.com/a/5259788
+    //    $.fn.outerHTML = function () {
+    //        $t = $(this);
+    //        if ($t[0] === undefined) {
+    //            return '';
+    //        }
+    //        if ('outerHTML' in $t[0]) {
+    //            return $t[0].outerHTML;
+    //        }
+    //        else {
+    //            var content = $t.wrap('<div></div>').parent().html();
+    //            $t.unwrap();
+    //            return content;
+    //        }
+    //    };
+
+    $(function () {
+        var form = $('#createSubmissionForm');
+        form.submissionFormValidate();
+
+        $.fn.alaressTiny({
+            mode: 'exact',
+            elements: 'description-box'
+        });
+
+        // When I change the number of assessment levels,
+        // that means I want to use assessment specific descriptors.
+        $('[data-relation="rubric-descriptor-count"]').on('change', function(){
+            $('[data-relation="rubric-use-assessment-specific"]').prop('checked', true).trigger('change');
+        });
+
+        // Set up the gradegroup thing
+        $('a[data-role="showGradeScale"]').click(function(event) {
+            event.preventDefault();
+            var gradeScale = $('#gradegroup').val();
+            $('#gradegroup-'+gradeScale).foundation('reveal', 'open');
+        });
+
+        // Dialog box for confirming delete
+        $('a[data-action="delete"]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text:         'Are you sure you want to delete this submission box?',
+                confirmEvent: $.confirmDialog.followHref
+            });
+        });
+
+        var timetableSelector = $('[data-interaction="timetableSelector"]')
+                .timetableDaySelector({
+                    dateFormat: dateDisplayFormats.momentJs,
+                    campusList: {USER_CAMPUS_LIST},
+                    getChangeDateAjax: function(campus, day, date, previous) {
+                        return {
+                            url:      '/timetable/dateForTimetableDay',
+                            dataType: 'json',
+                            data:     {
+                                campus:   campus,
+                                day:      day,
+                                previous: (previous ? 1 : 0),
+                                date:     date
+                            }
+                        }
+                    }
+                });
+    });
+</script>
+<!-- END custom_head -->
+        
 {BREADCRUMB}
 
 <div class="row">
@@ -545,90 +636,3 @@
     <a href="#" data-action="close" class="button">Cancel</a>
 </div>
 
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
-<script type="text/javascript" src="/javascript/jquery.timetableDaySelector.js"></script>
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
-<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery.hourpicker.js"></script>
-<script type="text/javascript" src="/javascript/jquery.minutepicker.js"></script>
-<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
-<script type="text/javascript" src="/javascript/submission/formValidate.js"></script>
-<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
-
-<script type="text/javascript" src="/javascript/data-plugins/datepicker.js"></script>
-<script type="text/javascript" src="/javascript/data-plugins/timepicker.js"></script>
-<script type="text/javascript" src="/javascript/data-plugins/timetablepicker.js"></script>
-<script type="text/javascript" src="/javascript/data-plugins/datepickerSync.js"></script>
-<script type="text/javascript" src="/javascript/data-plugins/hideWatch.js"></script>
-
-<script type="text/javascript">
-    //    // from http://stackoverflow.com/a/5259788
-    //    $.fn.outerHTML = function () {
-    //        $t = $(this);
-    //        if ($t[0] === undefined) {
-    //            return '';
-    //        }
-    //        if ('outerHTML' in $t[0]) {
-    //            return $t[0].outerHTML;
-    //        }
-    //        else {
-    //            var content = $t.wrap('<div></div>').parent().html();
-    //            $t.unwrap();
-    //            return content;
-    //        }
-    //    };
-
-    $(function () {
-        var form = $('#createSubmissionForm');
-        form.submissionFormValidate();
-
-        $.fn.alaressTiny({
-            mode: 'exact',
-            elements: 'description-box'
-        });
-
-        // When I change the number of assessment levels,
-        // that means I want to use assessment specific descriptors.
-        $('[data-relation="rubric-descriptor-count"]').on('change', function(){
-            $('[data-relation="rubric-use-assessment-specific"]').prop('checked', true).trigger('change');
-        });
-
-        // Set up the gradegroup thing
-        $('a[data-role="showGradeScale"]').click(function(event) {
-            event.preventDefault();
-            var gradeScale = $('#gradegroup').val();
-            $('#gradegroup-'+gradeScale).foundation('reveal', 'open');
-        });
-
-        // Dialog box for confirming delete
-        $('a[data-action="delete"]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                text:         'Are you sure you want to delete this submission box?',
-                confirmEvent: $.confirmDialog.followHref
-            });
-        });
-
-        var timetableSelector = $('[data-interaction="timetableSelector"]')
-            .timetableDaySelector({
-                dateFormat: dateDisplayFormats.momentJs,
-                campusList: {USER_CAMPUS_LIST},
-                getChangeDateAjax: function(campus, day, date, previous) {
-                    return {
-                        url:      '/timetable/dateForTimetableDay',
-                        dataType: 'json',
-                        data:     {
-                            campus:   campus,
-                            day:      day,
-                            previous: (previous ? 1 : 0),
-                            date:     date
-                        }
-                    }
-                }
-            });
-    });
-</script>
