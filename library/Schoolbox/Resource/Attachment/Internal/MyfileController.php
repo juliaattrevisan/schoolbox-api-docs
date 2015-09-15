@@ -43,4 +43,13 @@ class MyfileController extends NavigatorController implements InternalInterface 
         return self::RENDER_INLINE;
     }
 
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return 'files';
+    }
+
 }

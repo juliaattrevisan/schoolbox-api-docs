@@ -38,6 +38,10 @@ interface ControllerInterface
      */
     public function getSlug();
 
+    /**
+     * @return string
+     */
+    public function getIcon();
 
     /**
      * @return string

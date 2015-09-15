@@ -48,4 +48,14 @@ class Office365Controller extends NavigatorController implements ExternalInterfa
     {
         return self::RENDER_INLINE;
     }
+
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return 'office-365';
+    }
+
 }
