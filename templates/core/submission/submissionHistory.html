@@ -1,3 +1,59 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<script type="text/javascript" src="/javascript/shared/eportfolio/jquery.eportfolio.js"></script>
+<script language="JavaScript" type="text/javascript">
+    $(function () {
+
+        /* Publish To Eportfolio
+         */
+        $('#publish-to-eportfolio-form').eportfolio_publish();
+
+        var x = 1, i = x - 1,
+                $historyMore = $('#history-more'),
+                $historyClose = $('#history-close'),
+                $viewHistory = $('#view-history'),
+                $history = $('#history');
+
+        $history.find('li:gt(' + i + ')').hide();
+
+        if ($history.find('li:hidden').length) {
+            $historyMore.show();
+        }
+
+        $historyMore.click(function (e) {
+            e.preventDefault();
+            i += 2 * x + 1;
+            $history.find('li:lt(' + i + ')').slideDown(100);
+            if (!$history.find('li:hidden').length) {
+                $historyMore.hide();
+            }
+        });
+
+        /* Modal
+         */
+        $viewHistory.on('click', function(event) {
+            var modal = $('#history-wrap');
+
+            modal.foundation('reveal', 'open');
+
+            $historyClose.click(function(event) {
+                modal.foundation('reveal', 'close');
+            });
+
+            /* Execute modal, then stop
+             */
+            event.preventDefault();
+
+            /* Hide "Show More" if nothing to show
+             */
+            if (!$history.find('li:hidden').length) {
+                $historyMore.hide();
+            }
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 <div class="row">
     <div class="small-12 columns">
         <div class="actions-small-1">
@@ -255,56 +311,3 @@
     <!-- END subject -->
 </div>
 
-<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
-<script type="text/javascript" src="/javascript/shared/eportfolio/jquery.eportfolio.js"></script>
-<script language="JavaScript" type="text/javascript">
-    $(function () {
-
-        /* Publish To Eportfolio
-         */
-        $('#publish-to-eportfolio-form').eportfolio_publish();
-
-        var x = 1, i = x - 1,
-                $historyMore = $('#history-more'),
-                $historyClose = $('#history-close'),
-                $viewHistory = $('#view-history'),
-                $history = $('#history');
-
-        $history.find('li:gt(' + i + ')').hide();
-
-        if ($history.find('li:hidden').length) {
-            $historyMore.show();
-        }
-
-        $historyMore.click(function (e) {
-            e.preventDefault();
-            i += 2 * x + 1;
-            $history.find('li:lt(' + i + ')').slideDown(100);
-            if (!$history.find('li:hidden').length) {
-                $historyMore.hide();
-            }
-        });
-
-        /* Modal
-         */
-        $viewHistory.on('click', function(event) {
-            var modal = $('#history-wrap');
-
-            modal.foundation('reveal', 'open');
-
-            $historyClose.click(function(event) {
-                modal.foundation('reveal', 'close');
-            });
-
-            /* Execute modal, then stop
-             */
-            event.preventDefault();
-
-            /* Hide "Show More" if nothing to show
-             */
-            if (!$history.find('li:hidden').length) {
-                $historyMore.hide();
-            }
-        });
-    });
-</script>
