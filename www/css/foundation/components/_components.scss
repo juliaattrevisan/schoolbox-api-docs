@@ -1,18 +1,138 @@
-/**
+/*********************************************************
  * Component styles for Dashboard, Homepage, Eportfolio
- */
+ *********************************************************/
+
+/* Dashboard, Homepage: Calendar Events
+  */
 .translucent {
     opacity: 0.3;
 }
 
-.top-bar .name h2 a {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow-x: hidden;
-    width: 100%;
+/* Dashboard, Homepage: Styles for Tyles
+ */
+$tiles-add-background:       #8fd16b;
+$tiles-add-background-hover: #aeff83;
+ul.tileList {
+    // Get rid of spacing between tiles
+    word-spacing: 0;
+    line-height: 0;
+
+    // TODO: remove margin padding 0 when Foundation is moved out of container
+    margin: 0;
+    padding: 0;
+
+    &.ui-sortable li {
+        // Get rid of border and background on sortable tiles
+        background-image: none;
+        border: none;
+    }
+
+    // Styles for individual tiles
+    li.tile {
+        // TODO: uncomment padding 0 when Foundation is moved out of container
+//        padding: 0;
+        position: relative;
+        display: inline-block;
+        height: auto;
+        // Styles for the tile's background image (if provided)
+        background-repeat: no-repeat;
+        // This tends to get clobbered by more specific styles which set a
+        // background as a color and nothing else.
+        background-size: cover;
+        background-position: center;
+        transition: background-color 0.1s;
+        &.contained {
+            background-size: contain;
+        }
+        &.background-top {
+            background-position-y: top;
+        }
+        &.background-middle {
+            background-position-y: center;
+        }
+        &.background-bottom {
+            background-position-y: bottom;
+        }
+        &.background-left {
+            background-position-x: left;
+        }
+        &.background-center {
+            background-position-x: center;
+        }
+        &.background-right {
+            background-position-x: right;
+        }
+        &.marked-for-delete {
+            // Fade out tiles marked for delete
+            filter: grayscale(1);
+            opacity: 0.3;
+        }
+        &.add {
+            // Add new tile link looks like a tile
+              background-color: $tiles-add-background;
+            &:hover {
+                background-color: $tiles-add-background-hover;
+            }
+            .title {
+                // its title is just a link in the middle of it
+                text-align: center;
+                vertical-align: middle;
+            }
+        }
+        .btn {
+            margin: 8px 8px 0 0;
+        }
+        .title {
+            // Title: revert spacing back to normal
+            position: absolute;
+            width: 100%;
+            word-spacing: normal;
+            line-height: normal;
+            // Font size: I assume some will want to change this and the font family
+            font-size: 2em;
+            padding: 1em;
+            box-sizing: border-box;
+            &.text-top {
+                top: 0;
+            }
+            &.text-middle {
+                top: 50%;
+                left: 50%;
+            }
+            &.text-bottom {
+                bottom: 0;
+            }
+            &.text-left {
+                text-align: left;
+            }
+            &.text-center {
+                text-align: center;
+            }
+            &.text-right {
+                text-align: right;
+            }
+        }
+        .tile-link, .edit {
+            // The tile's link and edit partition overlap the entire tile
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            transition: background-color 0.1s;
+        }
+    }
 }
 
-/* Countdown
+/* Dashboard: Recent Submissions
+ */
+.counter {
+    font-size: rem-calc(($base-font-size + 8));
+    line-height: 1.8rem;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+/* Homepage: Countdown
  */
 ul.countdown {
     width: 100%;
@@ -25,7 +145,7 @@ ul.countdown {
     }
 }
 
-/* Course Outline
+/* Homepage: Course Outline
  */
 .task-list {
     cursor: move;
@@ -34,6 +154,10 @@ ul.countdown {
 .ui-sortable-helper {
     cursor: move;
 }
+
+/*********************************************************
+ * Custom Components
+ *********************************************************/
 
 /* MGGS: Quicklinks
  */
@@ -245,122 +369,6 @@ ul.countdown {
             height: 60px;
             text-shadow: none;
             color: transparent;
-        }
-    }
-}
-
-/**
- * Styles for Tyles
- */
-$tiles-add-background:       #8fd16b;
-$tiles-add-background-hover: #aeff83;
-ul.tileList {
-    // Get rid of spacing between tiles
-    word-spacing: 0;
-    line-height: 0;
-
-    // TODO: remove margin padding 0 when Foundation is moved out of container
-    margin: 0;
-    padding: 0;
-
-    &.ui-sortable li {
-        // Get rid of border and background on sortable tiles
-        background-image: none;
-        border: none;
-    }
-
-    // Styles for individual tiles
-    li.tile {
-        // TODO: uncomment padding 0 when Foundation is moved out of container
-//        padding: 0;
-        position: relative;
-        display: inline-block;
-        height: auto;
-        // Styles for the tile's background image (if provided)
-        background-repeat: no-repeat;
-        // This tends to get clobbered by more specific styles which set a
-        // background as a color and nothing else.
-        background-size: cover;
-        background-position: center;
-        transition: background-color 0.1s;
-        &.contained {
-            background-size: contain;
-        }
-        &.background-top {
-            background-position-y: top;
-        }
-        &.background-middle {
-            background-position-y: center;
-        }
-        &.background-bottom {
-            background-position-y: bottom;
-        }
-        &.background-left {
-            background-position-x: left;
-        }
-        &.background-center {
-            background-position-x: center;
-        }
-        &.background-right {
-            background-position-x: right;
-        }
-        &.marked-for-delete {
-            // Fade out tiles marked for delete
-            filter: grayscale(1);
-            opacity: 0.3;
-        }
-        &.add {
-            // Add new tile link looks like a tile
-              background-color: $tiles-add-background;
-            &:hover {
-                background-color: $tiles-add-background-hover;
-            }
-            .title {
-                // its title is just a link in the middle of it
-                text-align: center;
-                vertical-align: middle;
-            }
-        }
-        .btn {
-            margin: 8px 8px 0 0;
-        }
-        .title {
-            // Title: revert spacing back to normal
-            position: absolute;
-            width: 100%;
-            word-spacing: normal;
-            line-height: normal;
-            // Font size: I assume some will want to change this and the font family
-            font-size: 2em;
-            padding: 1em;
-            box-sizing: border-box;
-            &.text-top {
-                top: 0;
-            }
-            &.text-middle {
-                top: 50%;
-                left: 50%;
-            }
-            &.text-bottom {
-                bottom: 0;
-            }
-            &.text-left {
-                text-align: left;
-            }
-            &.text-center {
-                text-align: center;
-            }
-            &.text-right {
-                text-align: right;
-            }
-        }
-        .tile-link, .edit {
-            // The tile's link and edit partition overlap the entire tile
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 100%;
-            transition: background-color 0.1s;
         }
     }
 }

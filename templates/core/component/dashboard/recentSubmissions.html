@@ -9,23 +9,25 @@
             <section>
                 <ul class="information-list">
                     <!-- BEGIN work -->
-                    <li>
-                        <div class="small-1 columns text-center">
-                            <span title="{WORK_COUNT} new submission(s)">{WORK_COUNT}</span>
-                        </div>
-                        <div class="small-11 columns">
-                            <!-- BEGIN submission -->
-                            <h3><a href="/submission/viewSubmission/{WORK_BOX_ID}">{WORK_DESCRIPTION}</a></h3>
-                            <!-- END submission -->
+                    <li data-equalizer>
+                        <div class="list-item">
+                            <div class="small-2 columns">
+                                <p class='counter' title="{WORK_COUNT} new submission(s)">{WORK_COUNT}</p>
+                            </div>
+                            <div class="info card small-10" data-equalizer-watch>
+                                <!-- BEGIN submission -->
+                                <h3><a href="/submission/viewSubmission/{WORK_BOX_ID}">{WORK_DESCRIPTION}</a></h3>
+                                <!-- END submission -->
 
-                            <!-- BEGIN assess -->
-                            <p><a href="/assess/results/{WORK_BOX_ID}">{WORK_DESCRIPTION}</a></p>
-                            <!-- END assess -->
+                                <!-- BEGIN assess -->
+                                <h3><a href="/assess/results/{WORK_BOX_ID}">{WORK_DESCRIPTION}</a></h3>
+                                <!-- END assess -->
 
-                            <p class="meta">
-                                Last submission {WORK_DATE} in
-                                <a href="/homepage/{WORK_SUBJECT_ID}">{WORK_SUBJECT}</a>
-                            </p>
+                                <p class="meta">
+                                    Last submission {WORK_DATE} in
+                                    <a href="/homepage/{WORK_SUBJECT_ID}">{WORK_SUBJECT}</a>
+                                </p>
+                            </div>
                         </div>
                     </li>
                     <!-- END work -->
@@ -34,3 +36,5 @@
         </div>
     </div>
 </div>
+
+
