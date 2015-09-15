@@ -116,7 +116,7 @@ if(typeof window.location.origin == 'undefined') {
             previewTemplate: this.tpl.html(),
 
             fallback: function () {
-                var mk  = opt.fallbackButtonMarkup || '<a href="#" data-attach-fallback class="btn attach float-left"><span></span>' + opt.dictDefaultMessage + '</a>',
+                var mk  = opt.fallbackButtonMarkup || '<a href="#" data-attach-fallback class="button icon-attach">' + opt.dictDefaultMessage + '</a>',
                     btn = $(mk);
 
                 // mimic dropzone behaviour
@@ -288,8 +288,8 @@ if(typeof window.location.origin == 'undefined') {
         element.appendTo(errList);
 
         element.children('.dz-progress, input').detach();
-        t = element.children('.filename').text();
-        element.children('.filename').text(t + ' failed: ' + data).attr('title', data);
+        t = element.children('[data-dz-name]').text();
+        element.children('[data-dz-name]').text(t + ' failed: ' + data).attr('title', data);
 
         if (this.dropzone) {
             this.dropzone.removeFile(file);
