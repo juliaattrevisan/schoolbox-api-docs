@@ -348,6 +348,14 @@ input[type="submit"]{
 	}
 }
 
+a[role="button"] {
+	@extend .button;
+}
+
+a.submit {
+	@extend input[type="submit"];
+}
+
 .expand-link{
 	margin: 0 rem-calc(($base-font-size / 2)) 0 0;
 	padding: 0;
