@@ -176,19 +176,6 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>{HEADING} - {PAGE_TITLE}</h1>
-
-        <ul class='sub-nav'>
-            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
-            <!-- BEGIN showcase_page -->
-            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
-            <!-- END showcase_page -->
-            <!-- BEGIN eportfolio_page -->
-            <li {EPORTFOLIO_CURRENT_PAGE}><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
-            <!-- END eportfolio_page -->
-            <!-- BEGIN can_add_page -->
-            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="icon-add">Add page</a></li>
-            <!-- END can_add_page -->
-        </ul>
     </div>
 </div>
 
@@ -424,6 +411,23 @@
     </div>
 </div>
 <!-- END customise_page -->
+
+<div class="row">
+    <div class="small-12 columns">
+        <ul class='sub-nav'>
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
+            <!-- BEGIN showcase_page -->
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
+            <!-- END showcase_page -->
+            <!-- BEGIN eportfolio_page -->
+            <li {EPORTFOLIO_CURRENT_PAGE}><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
+            <!-- END eportfolio_page -->
+            <!-- BEGIN can_add_page -->
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="icon-add">Add page</a></li>
+            <!-- END can_add_page -->
+        </ul>
+    </div>
+</div>
 
 <div id="e-portfolio" class="row">
     <div class="small-12 columns" data-position="top">{component_position_top}</div>
