@@ -1,22 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <style type="text/css">
-    .browsing .explorer[data-text]:before {
-      content: attr(data-text);
-      display: block;
-      position: absolute;
-      bottom: 53%;
-      left: 0;
-      width: 100%;
-      text-align: center;
-      z-index: -1;
-    }
-    #attachment-browser .explorer.preload {
-      background-position: 50% 50%;
-      background-attachment: initial;
-    }
-  </style>
   <script type="text/javascript">
     window.gpick = {
       picked: function (docs) {
@@ -31,7 +15,7 @@
       needAuth: function () { /* noop */ },
       loaded: function () {
         $('#attachment-browser')
-            .find('li[data-source="external/google"]')
+            .find('li[data-source="external-google"]')
             .find('div.explorer')
             .removeClass('preload');
       }
@@ -40,49 +24,61 @@
     $(function() {
       var ab = $('#attachment-browser');
 
-      $('li[data-source]').on('click', 'a.src-select', function (e) {
-        e.preventDefault();
-        var li  = $(e.delegateTarget),
-            src = li.attr('data-source');
+      ab.on('toggled', function (e, panel) {
 
-        li.addClass('browsing').siblings().removeClass('browsing');
+        panel = $(panel);
+
+        var src = panel.closest('[data-source]').attr('data-source');
 
         if (!ab.data(src)) {
 
           // load this tab
           ab.data(src, {loaded: true});
 
-          var tab = li.children('.explorer'),
-              url = tab.attr('data-url'),
-              mth = tab.attr('data-method');
+          var url = panel.attr('data-url'),
+              mth = panel.attr('data-method');
 
           if (mth == 'inline') {
-            tab.load(url, null, function() {
-              tab.removeClass('preload');
+            panel.load(url, null, function() {
+              panel.removeClass('preload');
             });
           }
           else if (mth == 'iframe') {
-            tab.html($('<iframe/>').attr('src', url));
+            panel.html($('<iframe/>').attr('src', url));
           }
         }
       });
 
-      $('li[data-source="{DEFAULT_VIEW}"] a').trigger('click');
+      $('dd[data-source="{DEFAULT_VIEW}"] a').trigger('click');
     });
 
+    $(document).foundation();
+
+    $('#attachment-browser').on('click', '[data-toggle]', function (e) {
+
+      var oldPanel = $('div.active'),
+          newPanel = $(this).closest('[data-source]').find('.content');
+
+      // hide the current panel
+      oldPanel.slideUp();
+
+      // open the new one
+      if (!oldPanel.is(newPanel)) {
+        newPanel.slideDown();
+      }
+
+    });
 
   </script>
 </head>
 <body>
-<ul id="attachment-browser">
+<dl id="attachment-browser" class="accordion" data-accordion>
   <!-- BEGIN source -->
-  <li data-source="{SRC_SLUG}">
-    <h3>
-      <a class="src-select" href="#{SRC_SLUG}">{SRC_LABEL}</a>
-    </h3>
-    <div class="explorer preload" data-url="{SRC_URL}" data-method="{SRC_METHOD}"></div>
-  </li>
+  <dd class="accordion-navigation" data-source="{SRC_SLUG}">
+    <a data-toggle class="icon-{SRC_ICON}" href="#{SRC_SLUG}">{SRC_LABEL}</a>
+    <div id="{SRC_SLUG}" class="preload content" data-url="{SRC_URL}" data-method="{SRC_METHOD}"></div>
+  </dd>
   <!-- END source -->
-</ul>
+</dl>
 </body>
 </html>
