@@ -321,17 +321,22 @@
     </div>
 </div>
 
-
-
 {% if rubrics.allRubrics|length > 0 %}
-<div class="clearfix"></div>
-
-<h2>Rubrics</h2>
-<div data-graph="rubrics" class='learning-analytics boxplots' style="height:{{ ((rubrics.allRubrics|length)*150)+75 }}px"></div>
-
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Rubrics</h2>
+        <section class="content">
+            <div data-graph="rubrics" style="height:{{ ((rubrics.allRubrics|length)*150)+75 }}px"></div>
+        </section>
+    </div>
+</div>
 {% endif %}
 
-<div class="clearfix"></div>
-
-<h2>Effort</h2>
-<div data-graph="effort" class='learning-analytics effort'></div>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Effort</h2>
+        <section class="content">
+            <div data-graph="effort"></div>
+        </section>
+    </div>
+</div>
