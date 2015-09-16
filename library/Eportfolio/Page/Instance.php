@@ -388,10 +388,10 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
     private function renderColumnWidths()
     {
         $allWidths = $this->getEportfolioHandler()->getColumnWidths();
-
+        $leftWidth = round($allWidths['left_column_width'] * 12 / 100);
         $this->getPage()->setVar(array(
-            'TEMPLATE_LEFT_COLUMN_WIDTH' => $allWidths['left_column_width'],
-            'TEMPLATE_RIGHT_COLUMN_WIDTH' => $allWidths['right_column_width'],
+            'TEMPLATE_LEFT_COLUMN_WIDTH'  => $leftWidth,
+            'TEMPLATE_RIGHT_COLUMN_WIDTH' => 12 - $leftWidth,
         ));
     }
 
