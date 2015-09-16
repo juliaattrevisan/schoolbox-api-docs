@@ -33,6 +33,10 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                 $color[$key] = substr($value, 1);
             }
 
+            // Also try to save width
+            if (!empty($_POST['width'])) {
+                $eportfolioHandler->updateGrid($_POST['width']);
+            }
             $eportfolioHandler->saveDisplayProperties($color);
         } /* Ajax request for drag and drop of components
 		 */
@@ -160,7 +164,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
         } /* AJAX new column widths
 		 */
         elseif (is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
-            $eportfolioHandler->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
+            $eportfolioHandler->updateGrid(Scrub::text($_POST['leftColWidth']));
         } /* Update permissions and page title
 		 */
         elseif (isset($_POST['update']) && ($_POST['update'] == 'page')) {
