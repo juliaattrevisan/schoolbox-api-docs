@@ -273,28 +273,63 @@
     </div>
 </div>
 
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h2 class="subheader">Results</h2>
 
-{# Foundation-friendly setup #}
-{#<h2>#}
-    {#Results#}
-    {#{% if results.tasks.types.selected.getId() > 0 %}#}
-        {#({{ results.tasks.types.selected.getName() }})#}
-    {#{% endif %}#}
-{#</h2>#}
-{#<a class="button icon-menu"href="#" data-dropdown="taskFilter">Type Filter</a>#}
-{#<ul class="f-dropdown" data-dropdown-content="" id="taskFilter">#}
-    {#{% if metadata.route == 'course' %}#}
-        {#<li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}">All</a></li>#}
-        {#{% for currentTaskType in results.tasks.types.all %}#}
-        {#<li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>#}
-        {#{% endfor %}#}
-    {#{% elseif metadata.route == 'folder' %}#}
-        {#<li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}">All</a></li>#}
-        {#{% for currentTaskType in results.tasks.types.all %}#}
-        {#<li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>#}
-        {#{% endfor %}#}
-    {#{% endif %}#}
-{#</ul>#}
+            {% if results.tasks.types.selected.getId() > 0 %}
+            <ul class="meta">
+                <li class="icon-calendar">{{ results.tasks.types.selected.getName() }}</li>
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+    <nav>
+        <a class="icon-more" title="Filter Options" data-dropdown="result-filter-options"></a>
+    </nav>
+    <ul id="result-filter-options" class="f-dropdown" data-dropdown-content>
+
+        {% if metadata.route == 'course' %}
+            <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}" class="icon-due-work" title="All">All</a></li>
+            {% for currentTaskType in results.tasks.types.all %}
+                {% set selected = '' %}
+
+                {% if results.tasks.types.selected.getId() == currentTaskType.getId() %}
+                    {% set selected = 'active' %}
+                {% endif %}
+                
+                <li class="{{ selected }}"><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/task/{{ currentTaskType.getId() }}" class="icon-due-work" title="{{ currentTaskType.getName() }}">{{ currentTaskType.getName() }}</a></li>
+            {% endfor %}
+        {% elseif metadata.route == 'folder' %}
+            <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}" class="icon-due-work" title="All">All</a></li>
+            {% for currentTaskType in results.tasks.types.all %}
+                {% set selected = '' %}
+
+                {% if results.tasks.types.selected.getId() == currentTaskType.getId() %}
+                    {% set selected = 'active' %}
+                {% endif %}
+
+                <li class="{{ selected }}"><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}/task/{{ currentTaskType.getId() }}" class='icon-due-work' title="{{ currentTaskType.getName() }}">{{ currentTaskType.getName() }}</a></li>
+            {% endfor %}
+        {% endif %}
+    </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 {# Un-Founded variant #}
 <script type="text/javascript">
@@ -306,38 +341,11 @@
         });
     });
 </script>
-<h2>
-    Results
-    {% if results.tasks.types.selected.getId() > 0 %}
-        ({{ results.tasks.types.selected.getName() }})
-    {% endif %}
 
     <select class="learning-analytics task-filter" data-taskfilter="true">
-        {% if metadata.route == 'course' %}
-            <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}">All</option>
-            {% for currentTaskType in results.tasks.types.all %}
-            {% set selected = '' %}
 
-            {% if results.tasks.types.selected.getId() == currentTaskType.getId() %}
-            {% set selected = 'selected="selected"' %}
-            {% endif %}
-
-            <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/task/{{ currentTaskType.getId() }}" {{ selected }}>{{ currentTaskType.getName() }}</option>
-            {% endfor %}
-        {% elseif metadata.route == 'folder' %}
-            <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}">All</option>
-            {% for currentTaskType in results.tasks.types.all %}
-            {% set selected = '' %}
-
-            {% if results.tasks.types.selected.getId() == currentTaskType.getId() %}
-            {% set selected = 'selected="selected"' %}
-            {% endif %}
-
-            <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}/task/{{ currentTaskType.getId() }}" {{ selected }}>{{ currentTaskType.getName() }}</option>
-            {% endfor %}
-        {% endif %}
     </select>
-</h2>
+
 
 <div data-graph="boxplots" class='learning-analytics boxplots'></div>
 
