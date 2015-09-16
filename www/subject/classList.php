@@ -23,7 +23,6 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
     $this->setBlock(TEMPLATE_content, 'email_class', 'email_class_block');
     $this->setBlock(TEMPLATE_content, 'select_all', 'select_all_block');
     $this->setBlock('student_list', 'select_student', 'select_student_block');
-    $this->setBlock('student_list', 'select_student_below', 'select_student_below_block');
     $this->setBlock('student_list', 'medical', 'medical_block');
     $this->setBlock('student_list', 'special', 'special_block');
     $this->setBlock('student_list', 'eportfolio', 'eportfolio_block');
@@ -125,12 +124,10 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
 
             $this->setVar(array(
                 'select_student_block' => '',
-                'select_student_below_block' => '',
             ));
 
             if ($canEmail) {
                 $this->parse('select_student_block', 'select_student');
-                $this->parse('select_student_below_block', 'select_student_below');
             }
 
             $student['StudentMedicalAlert'] = trim($student['StudentMedicalAlert']);
