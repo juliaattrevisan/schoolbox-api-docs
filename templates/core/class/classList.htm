@@ -73,7 +73,7 @@ $(function() {
                 </li>
                 <!-- END select_all -->
                 <!-- BEGIN student_list -->
-                <li class="actions-small-4">
+                <li class="actions-small-1 actions-medium-5">
                     <div class="list-item">
                         <!-- BEGIN select_student -->
                         <div class="small-2 medium-2 columns">
@@ -98,7 +98,7 @@ $(function() {
                             <p class="meta">{YEARLEVEL}</p>
                             <p class="meta">{HOUSE}</p>
 
-                            <p class="meta show-for-small-down">Last Visited: {LASTVISIT}</p>
+                            <p class="meta show-for-small-down">Last Visited: <time>{LASTVISIT}</time></p>
                         </div>
                         <div class="small-12 medium-2 columns content">
                             <!-- BEGIN special -->
@@ -109,24 +109,29 @@ $(function() {
                             <img src="/images/famicons/exclamation.png" alt="{MEDICAL_ALERT}" title="Medical Alert: {MEDICAL_ALERT}"/>
                             <!-- END medical -->
                         </div>
-                        <div class="small-12 medium-3 columns">
+                        <div class="small-12 medium-3 columns text-center">
                             <div class="show-for-medium-up">
-                                {LASTVISIT}
+                                <span class="meta">Last Visited:</span>
+                                <time>{LASTVISIT}</time>
                             </div>
                         </div>
                     </div>
                     <nav>
                         <!-- BEGIN actions -->
-                        <!-- BEGIN eportfolio -->
-                        <a href="/eportfolio/{ID}/profile" class="icon-eportfolio" title="View ePortfolio"></a>
-                        <!-- END eportfolio -->
+                        <span class="inline-block">
+                            <span class="hide-for-small">
+                                <!-- BEGIN eportfolio -->
+                                <a href="/eportfolio/{ID}/profile" class="icon-eportfolio" title="View ePortfolio"></a>
+                                <!-- END eportfolio -->
 
-                        <a href="/submission/dueWork/{ID}" class="icon-timetable" title="View Due Work"></a>
-                        <a href="/submission/allWork/{ID}" class="icon-approve" title="View Grades"></a>
+                                <a href="/submission/dueWork/{ID}" class="icon-timetable" title="View Due Work"></a>
+                                <a href="/submission/allWork/{ID}" class="icon-approve" title="View Grades"></a>
 
-                        <!-- BEGIN pastoral_care -->
-                        <a href="{SYNWEB_URL}/stud.aspx?id={SYNERGYID}" class="icon-modify" title="View Pastoral Care" target="_blank"></a>
-                        <!-- END pastoral_care -->
+                                <!-- BEGIN pastoral_care -->
+                                <a href="{SYNWEB_URL}/stud.aspx?id={SYNERGYID}" class="icon-modify" title="View Pastoral Care" target="_blank"></a>
+                                <!-- END pastoral_care -->
+                            </span>
+                        </span>
 
                         {EMAIL_BTN}
                         <!-- END actions -->
