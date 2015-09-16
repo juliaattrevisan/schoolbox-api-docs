@@ -204,37 +204,46 @@
             <!-- Component Tab 1 -->
             <!--------------------->
             <div id="eportfolio-page-controls-tab-1" class="content">
-                <!-- BEGIN no_eportfolio_components -->
-                <p>No components are available for you to add.</p>
-                <!-- END no_eportfolio_components -->
+                <fieldset>
+                    <legend>
+                        Components
+                        <span data-tooltip class="has-tip tip-top hint" title="Click to add a component, or drag and drop it into position.">?</span>
+                    </legend>
+                    <!-- BEGIN no_eportfolio_components -->
+                    <p>No components are available for you to add.</p>
+                    <!-- END no_eportfolio_components -->
 
-                <dl class="tabs" data-tab id="eportfolio-page-controls-sub">
-                    <!-- BEGIN eportfolio_component_tab -->
-                    <dd><a href="#eportfolio-page-controls-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></dd>
-                    <!-- END eportfolio_component_tab -->
-                </dl>
+                    <ul class="tabs" data-tab id="eportfolio-page-controls-sub">
+                        <!-- BEGIN eportfolio_component_tab -->
+                        <li class="tab-title">
+                            <a href="#eportfolio-page-controls-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a>
+                        </li>
+                        <!-- END eportfolio_component_tab -->
+                    </ul>
 
-                <div class="tabs-content">
-                    <!-- BEGIN eportfolio_component_page -->
-                    <div id="eportfolio-page-controls-sub-{EPORTFOLIO_COMPONENT_CATEGORY_ID}" class="content">
-                        <ul class="inline-list">
+                    <div class="tabs-content">
+                        <!-- BEGIN eportfolio_component_page -->
+                        <ul class="content grid small-block-grid-1 medium-block-grid-2 large-block-grid-3" id="eportfolio-page-controls-sub-{EPORTFOLIO_COMPONENT_CATEGORY_ID}">
                             <!-- BEGIN eportfolio_component -->
                             <li>
-                                <div class="add-component {EPORTFOLIO_COMPONENT_MULTIPLE_STATE}">
-                                    <a href="#" rel="{EPORTFOLIO_COMPONENT_DEFINITION_ID} {EPORTFOLIO_COMPONENT_ID}" class="{EPORTFOLIO_COMPONENT_CLASS}" title="{EPORTFOLIO_COMPONENT_DESCRIPTION}">
-                                        <span class="icon"></span>
-
-                                        <h3>{EPORTFOLIO_COMPONENT_NAME}</h3>
-
-                                        <span class='success label' data-notification="component-added">Added</span>
-                                    </a>
+                                <div class="{EPORTFOLIO_COMPONENT_MULTIPLE_STATE} no-margin"
+                                     data-count="{EPORTFOLIO_COMPONENT_COUNT}"
+                                     data-multi="{EPORTFOLIO_COMPONENT_MULTIPLE_STATE}"
+                                     data-component-palette
+                                >
+                                    <div class="avatar card">
+                                        <a href="#" rel="{EPORTFOLIO_COMPONENT_DEFINITION_ID} {EPORTFOLIO_COMPONENT_ID}" class="{EPORTFOLIO_COMPONENT_CLASS}" title="{EPORTFOLIO_COMPONENT_DESCRIPTION}">
+                                            <span class="icon-32 icon-masonry icon-masonry-{EPORTFOLIO_COMPONENT_CLASS}"></span>
+                                            <p>{EPORTFOLIO_COMPONENT_NAME}</p>
+                                        </a>
+                                    </div>
                                 </div>
                             </li>
                             <!-- END eportfolio_component -->
                         </ul>
+                        <!-- END eportfolio_component_page -->
                     </div>
-                    <!-- END eportfolio_component_page -->
-                </div>
+                </fieldset>
             </div>
 
             <!--------------------->
