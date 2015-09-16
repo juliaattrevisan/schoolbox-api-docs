@@ -7,6 +7,8 @@
 //ClassList object..displays class list with most recent visit
 
 use Schoolbox\Resource\Folder\Log\Model as Log;
+use \Schoolbox\Breadcrumbs;
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $groupHandler = new Group;
 
@@ -225,6 +227,22 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
             'email_class_block' => '',
         ));
     }
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $category->getName(),
+            'href' => "/homepage/{$category->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Class List',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 } else {
     error(19);
 }
