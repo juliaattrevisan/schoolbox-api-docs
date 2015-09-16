@@ -209,13 +209,13 @@
         <section>
             <ul class="allowed-files action-list">
                 <!-- BEGIN file -->
-                <li class="row" data-equalizer data-interaction-container>
+                <li class="row" data-interaction-container>
                     <form data-action="updateFileType" style="margin:0" id="allowed-file{FILE_ID}" method="post" action="/adminv2/allowed-fileForm.php">
                         <div data-interaction-display>
                             <div class="column one-column">
                                 <img src="/images/mime/60x60/{FILE_ICON}"/>
                             </div>
-                            <div class="column small-10 medium-8 content" data-equalizer-watch>
+                            <div class="column small-10 medium-8 content">
                                 <h3>{FILE_DESC}
                                     <!-- BEGIN enabled -->
                                     <span class="label alert">Disabled</span>
@@ -239,12 +239,12 @@
                                 </dl>
                             </div>
                             <div class="actions three show-for-medium-up">
-                                <a href="/adminv2/allowed-file/{FILE_ID}/{FILE_ENABLED_ACTION}" data-equalizer-watch data-interaction-{FILE_ENABLED_ACTION} class="no-text icon-{FILE_ENABLED_ICON}"  title="{FILE_ENABLED_TITLE}"></a>
-                                <a href="/adminv2/allowed-file/{FILE_ID}/modify" data-equalizer-watch data-interaction-modify  class="no-text icon-modify" title="Modify"></a>
-                                <a href="/adminv2/allowed-file/{FILE_ID}/delete" data-equalizer-watch data-interaction-delete  class="no-text delete icon-delete" title="Delete"></a>
+                                <a href="/adminv2/allowed-file/{FILE_ID}/{FILE_ENABLED_ACTION}" data-interaction-{FILE_ENABLED_ACTION} class="no-text icon-{FILE_ENABLED_ICON}"  title="{FILE_ENABLED_TITLE}"></a>
+                                <a href="/adminv2/allowed-file/{FILE_ID}/modify" data-interaction-modify  class="no-text icon-modify" title="Modify"></a>
+                                <a href="/adminv2/allowed-file/{FILE_ID}/delete" data-interaction-delete  class="no-text delete icon-delete" title="Delete"></a>
                             </div>
                             <div class="actions one hide-for-medium-up">
-                                <a href="#" data-equalizer-watch data-dropdown="more-{FILE_ID}" data-options="align:left" class="no-text icon-more"></a>
+                                <a href="#" data-dropdown="more-{FILE_ID}" data-options="align:left" class="no-text icon-more"></a>
                             </div>
                             <ul class="f-dropdown hide-for-medium-up" data-dropdown-content id="more-{FILE_ID}">
                                 <li>

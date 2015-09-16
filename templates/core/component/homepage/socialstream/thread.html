@@ -1,7 +1,7 @@
 <!-- BEGIN socialstream_post -->
-<li class="actions-small-1" data-equalizer="no" data-socialstream-row>
+<li class="actions-small-1" data-socialstream-row>
     <div class="list-item">
-        <div class="avatar card small-12" data-equalizer-watch="no">
+        <div class="avatar card small-12">
             <a href="/search/user/{SOCIALSTREAM_POST_USER_ID}" title="View Profile">
                 <img src="/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square64" alt="Moggy" class="hide-for-small-only">
                 <p>{SOCIALSTREAM_POST_USER_FULLNAME}</p>
@@ -67,11 +67,11 @@
     </div>
     <nav>
         <!-- BEGIN socialstream_post_has_delete -->
-        <a href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}" class="icon-delete no-text" title='Delete post' data-socialstream-delete data-equalizer-watch="no"></a>
+        <a href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}" class="icon-delete no-text" title='Delete post' data-socialstream-delete></a>
         <!-- END socialstream_post_has_delete -->
 
         <!-- BEGIN socialstream_post_has_add -->
-        <a href="#" class="icon-comment no-text" title="Add Reply" data-parentid="{SOCIALSTREAM_POST_POST_ID}" data-equalizer-watch="no" data-add-post-link data-rootid="{SOCIALSTREAM_POST_POST_ID}"></a>
+        <a href="#" class="icon-comment no-text" title="Add Reply" data-parentid="{SOCIALSTREAM_POST_POST_ID}" data-add-post-link data-rootid="{SOCIALSTREAM_POST_POST_ID}"></a>
         <!-- END socialstream_post_has_add -->
     </nav>
 
@@ -80,9 +80,9 @@
     <!-------------------------->
     <ul class="information-list reply">
         <!-- BEGIN socialstream_comment -->
-        <li class="actions-small-1" data-equalizer="two" data-socialstream-row>
+        <li class="actions-small-1" data-socialstream-row>
             <div class="list-item">
-                <div class="avatar card small-12" data-equalizer-watch>
+                <div class="avatar card small-12">
                     <a href="/search/user/{SOCIALSTREAM_COMMENT_USER_ID}" title="View Profile">
                         <img src="/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square64" alt="" class="hide-for-small-only">
                         <p>{SOCIALSTREAM_COMMENT_USER_FULLNAME}</p>
@@ -150,11 +150,11 @@
             </div>
             <nav>
                 <!-- BEGIN socialstream_comment_has_delete -->
-                <a class="icon-delete" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}" title="Delete Comment" data-socialstream-delete data-equalizer-watch="two"></a>
+                <a class="icon-delete" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}" title="Delete Comment" data-socialstream-delete></a>
                 <!-- END socialstream_comment_has_delete -->
 
                 <!-- BEGIN socialstream_comment_has_add -->
-                <a class="icon-comment" href="#" title="Add Reply" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_COMMENT_POST_ID}" data-add-post-link data-equalizer-watch="two"></a>
+                <a class="icon-comment" href="#" title="Add Reply" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_COMMENT_POST_ID}" data-add-post-link></a>
                 <!-- END socialstream_comment_has_add -->
             </nav>
 
@@ -163,9 +163,9 @@
             <!------------------------>
             <ul class="information-list reply">
                 <!-- BEGIN socialstream_reply -->
-                <li class="actions-small-1" data-equalizer="three" data-socialstream-row>
-                    <div class="list-item" data-equalizer-watch="three">
-                        <div class="avatar card small-12" data-equalizer-watch>
+                <li class="actions-small-1" data-socialstream-row>
+                    <div class="list-item">
+                        <div class="avatar card small-12">
                             <a href="/search/user/{SOCIALSTREAM_REPLY_USER_ID}" title="View Profile">
                                 <img src="/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square64" alt="" class="hide-for-small-only">
                                 <p>{SOCIALSTREAM_REPLY_USER_FULLNAME}</p>
@@ -227,7 +227,7 @@
                     </div>
                     <nav>
                         <!-- BEGIN socialstream_reply_has_delete -->
-                        <a class="icon-delete" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}" title="Delete Reply" data-socialstream-delete data-equalizer-watch="three"></a>
+                        <a class="icon-delete" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}" title="Delete Reply" data-socialstream-delete></a>
                         <!-- END socialstream_reply_has_delete -->
                     </nav>
                 </li>

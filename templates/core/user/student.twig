@@ -179,7 +179,7 @@
         </section>
 
         {% block buttons_island %}
-        <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8" data-equalizer>
+        <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8">
 
             {% block buttons %}
                 {% if showButtons %}
@@ -188,7 +188,7 @@
                             <li class="no-pad">
                                 <a href="/submission/dueWork/0/{{ user.getId() }}"
                                    class="no-margin fat button icon-fat icon-32 icon-due-work"
-                                   data-equalizer-watch>Due Work</a>
+                                  >Due Work</a>
                             </li>
                         {% endif %}
                     {% endblock buttons_dueWork %}
@@ -200,7 +200,7 @@
                             <li class="no-pad">
                                 <a href="/submission/allWork/{{ user.getId() }}"
                                    class="no-margin fat button icon-fat icon-32 icon-tick"
-                                   data-equalizer-watch>Grades</a>
+                                  >Grades</a>
                             </li>
                         {% endif %}
                     {% endblock buttons_grades %}
@@ -211,7 +211,7 @@
                         <li class="no-pad">
                             <a href="/eportfolio/{{ user.getId() }}/profile"
                                class="no-margin fat button icon-fat icon-32 icon-eportfolio"
-                               data-equalizer-watch>ePortfolio</a>
+                              >ePortfolio</a>
                         </li>
                     {% endblock buttons_eportfolio %}
                 {% endif %}
@@ -221,7 +221,7 @@
                         <li class="no-pad">
                             <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
                                class="no-margin fat button icon-fat icon-32 icon-calendar"
-                               data-equalizer-watch>Calendar</a>
+                              >Calendar</a>
                         </li>
                     {% endblock buttons_calendar %}
                 {% endif %}
@@ -231,7 +231,7 @@
                         <li class="no-pad">
                             <a href="/timetable/{{ user.getId() }}"
                                class="no-margin fat button icon-fat icon-32 icon-timetable"
-                               data-equalizer-watch>Timetable</a>
+                              >Timetable</a>
                         </li>
                     {% endblock buttons_timetable %}
                 {% endif %}
@@ -242,7 +242,7 @@
                             <li class="no-pad">
                                 <a href="/modules/leave/student/{{ user.getId() }}"
                                    class="no-margin fat button icon-fat icon-32 icon-boarder-leave"
-                                   data-equalizer-watch>Boarder Leave</a>
+                                  >Boarder Leave</a>
                             </li>
                         {% endif %}
                     {% endblock buttons_boarderLeave %}
@@ -255,7 +255,7 @@
                                 <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.getExternalId() }}"
                                    class="no-margin fat button icon-fat icon-32 icon-modify"
                                    target="_blank"
-                                   data-equalizer-watch>Pastoral Care</a>
+                                  >Pastoral Care</a>
                             </li>
                         {% endif %}
                     {% endblock buttons_pastoralCare %}

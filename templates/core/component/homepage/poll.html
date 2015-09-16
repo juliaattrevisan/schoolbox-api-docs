@@ -28,9 +28,9 @@
             <section>
                 <ul class="action-list">
                     <!-- BEGIN poll_question -->
-                    <li class="actions-small-3" data-equalizer>
+                    <li class="actions-small-3">
                         <div class="list-item">
-                            <div class="avatar card small-12" data-equalizer-watch>
+                            <div class="avatar card small-12">
                                 <a>
                                     <img src="{POLL_AUTHOR_THUMB}" alt="View Profile" />
                                     <h3>{POLL_QUESTION}</h3>
@@ -79,12 +79,12 @@
                         </div>
                         <nav>
                             <!-- BEGIN show_results -->
-                            <a data-equalizer-watch href="/homepage/{ID}/pollResults" class="icon-poll" title="Show Results"></a>
+                            <a href="/homepage/{ID}/pollResults" class="icon-poll" title="Show Results"></a>
                             <!-- END show_results -->
 
                             <!-- BEGIN modify_poll -->
-                            <a data-equalizer-watch href="/poll/modify/{POLL_ID}" class="icon-modify" title="Modify Poll"></a>
-                            <a data-equalizer-watch href="/poll/modifyForm.php?delete={POLL_ID}&amp;homepageComponentID={COMPONENT_INSTANCE_ID}" data-poll-delete class="icon-delete" title="Delete Poll"></a>
+                            <a href="/poll/modify/{POLL_ID}" class="icon-modify" title="Modify Poll"></a>
+                            <a href="/poll/modifyForm.php?delete={POLL_ID}&amp;homepageComponentID={COMPONENT_INSTANCE_ID}" data-poll-delete class="icon-delete" title="Delete Poll"></a>
                             <!-- END modify_poll -->
                         </nav>
                     </li>
