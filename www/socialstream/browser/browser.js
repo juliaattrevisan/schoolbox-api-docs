@@ -83,10 +83,10 @@ try {
 
                 /* selectors */
                 browserSelector: '[data-socialstream-browser]',
-                breadcrumbSelector: '.breadcrumb',
-                categoryNodeSelector: '.socialstream-node-category',
-                fileNodeSelector: '.socialstream-node-file',
-                useFolderSelector: '.socialstream-node-use-folder a'
+                breadcrumbSelector: '[data-breadcrumb]',
+                categoryNodeSelector: '[data-node-category]',
+                fileNodeSelector: '[data-node-file]',
+                useFolderSelector: '[data-use-folder]'
 			};
 
 			/* Type casting
