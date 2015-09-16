@@ -52,6 +52,9 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 
 .reveal-modal.file-picker {
     padding: 0;
+    h2 {
+        margin: 1rem;
+    }
 }
 
 // Attach Browser
