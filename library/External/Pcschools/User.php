@@ -22,6 +22,497 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
+     * Get student info for $externalUserId
+     * StudentID,
+     * StudentGiven1,
+     * StudentSurname,
+     * StudentBirthDate, (a unix timestamp)
+     * StudentHouseDescription,
+     * StudentHouse,
+     * HeadOfHouseID,
+     * StudentHeadOfHouse,
+     * StudentBoarder
+     * StudentForm,
+     * FormDescription,
+     * StudentFormStaffName,
+     * StudentTutor,
+     * StudentTutorName,
+     * StudentTutorDescription,
+     * TeacherFormID,
+     * TeacherTutorID,
+     * StudentYearLevel,
+     * YearLevelCoordID,
+     * StudentYearLevelCoordinator,
+     * StudentLockerBook,
+     * StudentEmergencyName,
+     * StudentEmergencyPhone,
+     * StudentEmergencyPhoneAlt,
+     * StudentEmergency2Name,
+     * StudentEmergency2Phone,
+     * StudentEmergency2PhoneAlt,
+     * StudentEmergency3Name,
+     * StudentEmergency3Phone,
+     * StudentEmergency3PhoneAlt,
+     * StudentMedicalAlert,
+     * StudentSpecialNeedsFlag,
+     * StudentStudiesCode,
+     * AlertMessage,
+     *
+     * @param $externalUserId
+     *
+     * @return array
+     */
+    public function getStudent($externalUserId)
+    {
+        // TODO: Implement getStudent() method.
+    }
+
+    /**
+     * Get a list of student contacts (parents) and their contact information
+     * for the student $externalUserId
+     * StudentContactID,
+     * StudentContactTitle,
+     * StudentContactPreferred,
+     * StudentContactSurname,
+     * StudentContactDefaultEmail,
+     * ValidAddressFlag,
+     * StudentContactAddress1,
+     * StudentContactAddress2,
+     * StudentContactAddress3,
+     * StudentContactSuburb,
+     * StudentContactPostCode,
+     * StudentContactState,
+     * StudentContactPhoneActual,
+     * StudentContactMobilePhone,
+     * StudentContactOccupPhone,
+     * StudentContactRelation,
+     * StudentContactSpouseID,
+     * StudentContactSpouseTitle,
+     * StudentContactSpousePreferred,
+     * StudentContactSpouseSurname,
+     * StudentContactSpouseMobilePhone,
+     * StudentContactSpouseOccupPhone,
+     * StudentContactSpouseDefaultEmail,
+     * StudentContactType,
+     * StudentContactSpouseRelation
+     *
+     * @param $externalUserId
+     *
+     * @return array
+     */
+    public function getStudentContactList($externalUserId)
+    {
+        // TODO: Implement getStudentContactList() method.
+    }
+
+    /**
+     * Gets a list of Contacts for all Students in a particular year level.
+     * The year level is stored in the external db.
+     * Used in reporting.
+     * StudentID,
+     * StudentGiven1,
+     * StudentSurname,
+     * StudentYearLevel,
+     * StudentHouse,
+     * StudentBoarder,
+     * StudentForm,
+     * StudentContactID,
+     * StudentContactTitle,
+     * StudentContactPreferred,
+     * StudentContactLegalFullName,
+     * StudentContactSurname,
+     * StudentContactDefaultEmail,
+     * ValidAddressFlag,
+     * StudentContactAddress1,
+     * StudentContactAddress2,
+     * StudentContactAddress3,
+     * StudentContactSuburb,
+     * StudentContactPostCode,
+     * StudentContactState,
+     * StudentContactCountryCode,
+     * StudentContactHomeAddress1,
+     * StudentContactHomeAddress2,
+     * StudentContactHomeAddress3,
+     * StudentContactHomeSuburb,
+     * StudentContactHomePostCode,
+     * StudentContactHomeState,
+     * StudentContactHomeCountryCode,
+     * StudentContactPhoneActual,
+     * StudentContactMobilePhone,
+     * StudentContactOccupPhone,
+     * StudentContactSpouseID,
+     * StudentContactSpouseTitle,
+     * StudentContactSpousePreferred,
+     * StudentContactSpouseLegalFullName,
+     * StudentContactSpouseSurname,
+     * StudentContactSpouseMobilePhone,
+     * StudentContactSpouseOccupPhone,
+     * StudentContactSpouseDefaultEmail,
+     * StudentContactType,
+     * StudentContactSilentPhoneFlag,
+     * Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
+     * Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
+     * StudentParentsSeparatedFlag
+     *
+     * @param $yearlevel
+     * @param $name
+     * @param $boardingStatus
+     * @param $form
+     *
+     * @return array
+     */
+    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    {
+        // TODO: Implement getStudentContactListExtended() method.
+    }
+
+    /**
+     * Gets some basic information about a student
+     * StudentID,
+     * NetworkLogin,
+     * StudentTitle,
+     * StudentPreferred,
+     * StudentSurname,
+     * StudentGender,
+     * StudentEmail,
+     * StudentOccupEmail,
+     * StudentYearLevel,
+     * StudentHouse,
+     * StudentBoarder,
+     * StudentBoardingHouse,
+     * StudentCampus
+     *
+     * @return array
+     */
+    public function getStudentUserAccountInfo()
+    {
+        // TODO: Implement getStudentUserAccountInfo() method.
+    }
+
+    /**
+     * Returns a list of email parent email addresseses for students.
+     *
+     * @param array $synergyIds
+     *
+     * @return array
+     */
+    public function getParentEmails($synergyIds)
+    {
+        // TODO: Implement getParentEmails() method.
+    }
+
+    /**
+     * Gets the contact info of the person who is a Student's Contact.
+     * $externalId is that of the Contact, not the Student
+     * Title,
+     * Preferred,
+     * Surname,
+     * Email,
+     * OccupEmail,
+     * DefaultEmailCode,
+     * HomePhone,
+     * SilentPhoneFlag,
+     * MobilePhone,
+     * DirectoryIncludeFlag,
+     * SpouseID,
+     * SpouseTitle,
+     * SpousePreferred,
+     * SpouseSurname,
+     * SpouseEmail,
+     * SpouseOccupEmail,
+     * SpouseDefaultEmailCode,
+     * SpouseMobilePhone,
+     * SpouseDirectoryIncludeFlag
+     *
+     * @param $externalUserId
+     *
+     * @return array
+     */
+    public function getParent($externalUserId)
+    {
+        // TODO: Implement getParent() method.
+    }
+
+    /**
+     * Gets the contact info of the person who is a Student's Contact. The ID
+     * passed is the $externalUserId of the Contact, not the Student. Anyone who
+     * is not supposed to be having their details publicised (via the
+     * DirectoryIncludeFlag) are not included in the result set.
+     * I think this was used to only update parents of current Schoolbox
+     * students, rather than updating everyone blindly
+     * Used in Synchronise
+     * Accept array of Synergy IDs, or just an int
+     *
+     * @param $externalUserId
+     *
+     * @return array (
+     *     ID,
+     *     Title,
+     *     Preferred,
+     *     Surname,
+     *     Email,
+     *     OccupEmail,
+     *     DefaultEmailCode,
+     *     DirectoryIncludeFlag
+     * )
+     * or
+     * @return array(
+     *     array(
+     *         ID,
+     *         Title,
+     *         Preferred,
+     *         Surname,
+     *         Email,
+     *         OccupEmail,
+     *         DefaultEmailCode,
+     *         DirectoryIncludeFlag
+     *     )
+     * )
+     */
+    public function getParentSync($externalUserId)
+    {
+        // TODO: Implement getParentSync() method.
+    }
+
+    /**
+     * Get the following fields for all parents
+     * (yes they're prefixed as Student-)
+     * Used in Synchronise
+     * StudentContactNetworkLogin,
+     * StudentContactID,
+     * StudentContactTitle,
+     * StudentContactPreferred,
+     * StudentContactSurname,
+     * StudentContactDefaultEmail,
+     * StudentContactSpouseNetworkLogin,
+     * StudentContactSpouseID,
+     * StudentContactSpouseTitle,
+     * StudentContactSpousePreferred,
+     * StudentContactSpouseSurname,
+     * StudentContactSpouseDefaultEmail,
+     * StudentYearLevel,
+     * StudentCampus,
+     * StudentGender
+     *
+     * @return array
+     */
+    public function getParentUserAccountInfo()
+    {
+        // TODO: Implement getParentUserAccountInfo() method.
+    }
+
+    /**
+     * Get the following fields for the staff member $externalUserId
+     * SchoolStaffCode,
+     * StaffBuilding,
+     * StaffRoom,
+     * StaffExtension,
+     * StaffMobilePhone,
+     * StaffCampusDescription,
+     * StaffCategoryDescription,
+     * StaffDepartment,
+     * StaffVoiceMail
+     *
+     * @param $externalUserId
+     *
+     * @return array
+     */
+    public function getStaff($externalUserId)
+    {
+        // TODO: Implement getStaff() method.
+    }
+
+    /**
+     * Get staff account information
+     * Used in Synchronise
+     *
+     * @return array(
+     *     array(
+     *         StaffID,
+     *         NetworkLogin,
+     *         ActiveFlag,
+     *         StaffTitle,
+     *         StaffPreferredName,
+     *         StaffSurname,
+     *         DefaultEmailCode,
+     *         OccupEmail,
+     *         Email,
+     *         StaffCampus,
+     *         StaffCategoryType,
+     *         StaffCategory,
+     *         StaffDepartment
+     *     )
+     * )
+     */
+    public function getStaffUserAccountInfo()
+    {
+        // TODO: Implement getStaffUserAccountInfo() method.
+    }
+
+    /**
+     * Get contact list for staff directory
+     * return array(
+     *     array(
+     *         StaffID,
+     *         NetworkLogin,
+     *         ActiveFlag,
+     *         StaffTitle,
+     *         StaffPreferredName,
+     *         StaffSurname,
+     *         DefaultEmailCode,
+     *         OccupEmail,
+     *         Email,
+     *         StaffCampus,
+     *         StaffCategoryType,
+     *         StaffCategory,
+     *         StaffDepartment
+     *     )
+     * )
+     *
+     * @return array
+     */
+    public function getStaffContactListExtended()
+    {
+        // TODO: Implement getStaffContactListExtended() method.
+    }
+
+    /**
+     * Gets the current semester for the user.
+     *
+     * @param string $externalUserId
+     *
+     * @return string The current semester
+     */
+    public function getCurrentSemester($externalUserId = null)
+    {
+        // TODO: Implement getCurrentSemester() method.
+    }
+
+    /**
+     * Gets the current year for the user.
+     * Needs a method because a user could be set on file as being on a
+     * previous year.
+     *
+     * @param string $externalUserId
+     *
+     * @return string The current file year for the user
+     */
+    public function getCurrentYear($externalUserId = null)
+    {
+        // TODO: Implement getCurrentYear() method.
+    }
+
+    /**
+     * Get a list of subjects for $externalUserId
+     * $externalUserId and $userId are properties of the same person
+     * This method internally distinguishes between students and
+     * staff by using the Schoolbox $userId
+     * returns array(
+     *     array(
+     *         'code' => class category code
+     *         'name' => class name
+     *         'classType' => a string e.g. academic, music, maths
+     *         'campusCode' => the campus this class is in
+     *     )
+     *     ...
+     * )
+     *
+     * @param $externalUserId
+     * @param $userId
+     *
+     * @return array
+     */
+    public function getSubjectList($externalUserId, $userId)
+    {
+        // TODO: Implement getSubjectList() method.
+    }
+
+    /**
+     * Get all the enrolled students belonging to $externalUserId
+     * (usually a parent)
+     * Returns an array of $externalId
+     *
+     * @param $externalUserId
+     *
+     * @return array
+     */
+    public function getEnrolledStudents($externalUserId)
+    {
+        // TODO: Implement getEnrolledStudents() method.
+    }
+
+    /**
+     * Get the email address as a string for a particular person
+     *
+     * @param $externalUserId
+     *
+     * @return string
+     */
+    public function getEmail($externalUserId)
+    {
+        // TODO: Implement getEmail() method.
+    }
+
+    /**
+     * Get the portrait for a particular user
+     * Returns a local file path to the user's portrait
+     *
+     * @param $externalUserId
+     *
+     * @return string
+     */
+    public function getPortrait($externalUserId)
+    {
+        // TODO: Implement getPortrait() method.
+    }
+
+    /**
+     * Determine whether someone is a day boarder or not
+     *
+     * @param $boarderValue
+     *
+     * @return string
+     */
+    public function determineBoarderType($boarderValue)
+    {
+        // TODO: Implement determineBoarderType() method.
+    }
+
+    /**
+     * Find the housemasterId for a particular house
+     *
+     * @param $houseID
+     *
+     * @return string
+     */
+    public function getHousemasterByHouseId($houseID)
+    {
+        // TODO: Implement getHousemasterByHouseId() method.
+    }
+
+    /**
+     * List of campuses a staff member is involved in based on timetable
+     *
+     * @param int $staffID
+     *
+     * @return array|bool
+     */
+    public function getCampusFromTimetable($staffID)
+    {
+        // TODO: Implement getCampusFromTimetable() method.
+    }
+
+    /**
+     * Retrieves a list of forms that a student may be in.
+     *
+     * @return array [['Code' => string, 'Description' => string], ...]
+     */
+    public function getStudentForms()
+    {
+        // TODO: Implement getStudentForms() method.
+    }
+
+    /**
      * @return MSSQL
      */
     private function getDatabase()
