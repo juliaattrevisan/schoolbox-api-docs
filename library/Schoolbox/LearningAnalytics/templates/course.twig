@@ -280,7 +280,7 @@
 
             {% if results.tasks.types.selected.getId() > 0 %}
             <ul class="meta">
-                <li class="icon-calendar">{{ results.tasks.types.selected.getName() }}</li>
+                <li class="icon-due-work">{{ results.tasks.types.selected.getName() }}</li>
             </ul>
             {% endif %}
         </div>
@@ -293,24 +293,12 @@
         {% if metadata.route == 'course' %}
             <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}" class="icon-due-work" title="All">All</a></li>
             {% for currentTaskType in results.tasks.types.all %}
-                {% set selected = '' %}
-
-                {% if results.tasks.types.selected.getId() == currentTaskType.getId() %}
-                    {% set selected = 'active' %}
-                {% endif %}
-                
-                <li class="{{ selected }}"><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/task/{{ currentTaskType.getId() }}" class="icon-due-work" title="{{ currentTaskType.getName() }}">{{ currentTaskType.getName() }}</a></li>
+            <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/task/{{ currentTaskType.getId() }}" class="icon-due-work" title="{{ currentTaskType.getName() }}">{{ currentTaskType.getName() }}</a></li>
             {% endfor %}
         {% elseif metadata.route == 'folder' %}
             <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}" class="icon-due-work" title="All">All</a></li>
             {% for currentTaskType in results.tasks.types.all %}
-                {% set selected = '' %}
-
-                {% if results.tasks.types.selected.getId() == currentTaskType.getId() %}
-                    {% set selected = 'active' %}
-                {% endif %}
-
-                <li class="{{ selected }}"><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}/task/{{ currentTaskType.getId() }}" class='icon-due-work' title="{{ currentTaskType.getName() }}">{{ currentTaskType.getName() }}</a></li>
+            <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}/task/{{ currentTaskType.getId() }}" class='icon-due-work' title="{{ currentTaskType.getName() }}">{{ currentTaskType.getName() }}</a></li>
             {% endfor %}
         {% endif %}
     </ul>
