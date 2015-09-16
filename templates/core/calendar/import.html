@@ -1,14 +1,16 @@
+<!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
 <script type="text/javascript">
-	$(function() {
-		$('#uploadForm').find('input[type="file"].prettify').prettyFileInput({
-			additionalButtonClasses: 'up-arrow no-marg float-right',
-			buttonActiveClass: 'tick',
-			defaultText: '<span></span>Upload File',
-			defaultFileSelectedText: '<span></span>File selected'
-		});
-	});
+    $(function() {
+        $('#uploadForm').find('input[type="file"].prettify').prettyFileInput({
+            additionalButtonClasses: 'up-arrow no-marg float-right',
+            buttonActiveClass: 'tick',
+            defaultText: '<span></span>Upload File',
+            defaultFileSelectedText: '<span></span>File selected'
+        });
+    });
 </script>
+<!-- END custom_head -->
 
 <h2>Import events into Group Calendar for {HOMEPAGE_NAME}</h2>
 <form id='uploadForm' action="/calendar/importForm" method="post" enctype="multipart/form-data">

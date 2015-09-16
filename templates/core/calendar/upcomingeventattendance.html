@@ -1,22 +1,30 @@
-<table class="table">
-	<tr>
-		<th>Event Name</th>
-		<th>Date</th>
-		<th>Location</th>
-		<th>Creator</th>
-		<th>Pending</th>
-		<th>Approved</th>
-		<th>Action</th>
-	</tr>
-	<!-- BEGIN event -->
-	<tr>
-		<td>{EVENT_TITLE}</td>
-		<td>{EVENT_DATE}</td>
-		<td>{EVENT_LOCATION}</td>
-		<td><a href='/user/{EVENT_USER_ID}'>{EVENT_USER_FIRSTNAME} {EVENT_USER_SURNAME}</a></td>
-		<td>{EVENT_PENDING}</td>
-		<td>{EVENT_APPROVED}</td>
-		<td><a href='/calendar/modify.php?eventID={EVENT_ID}&returnTo=upcomingEventAttendance'>Modify</a></td>
-	</tr>
-	<!-- END event -->
-</table>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Upcoming Event Attendance</h1>
+        
+        <div class="scrollable">
+            <table>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Creator</th>
+                    <th>Pending</th>
+                    <th>Approved</th>
+                    <th>Action</th>
+                </tr>
+                <!-- BEGIN event -->
+                <tr>
+                    <td>{EVENT_TITLE}</td>
+                    <td>{EVENT_DATE}</td>
+                    <td>{EVENT_LOCATION}</td>
+                    <td><a href='/user/{EVENT_USER_ID}'>{EVENT_USER_FIRSTNAME} {EVENT_USER_SURNAME}</a></td>
+                    <td>{EVENT_PENDING}</td>
+                    <td>{EVENT_APPROVED}</td>
+                    <td><a href='/calendar/modify.php?eventID={EVENT_ID}&returnTo=upcomingEventAttendance' class="icon-modify" title="Modify"></a></td>
+                </tr>
+                <!-- END event -->
+            </table>
+        </div>
+    </div>
+</div>

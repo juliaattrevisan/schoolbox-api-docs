@@ -1,3 +1,18 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript">
+    $(function() {
+        // Confirmation of delete button
+        $('[data-action="delete"]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                confirmEvent: $.confirmDialog.submitForm
+            });
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 {BREADCRUMB}
 
 <div class="actions-small-1 row">
@@ -89,16 +104,3 @@
         </ul>
     </div>
 </div>
-
-<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
-<script type="text/javascript">
-    $(function() {
-        // Confirmation of delete button
-        $('[data-action="delete"]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                confirmEvent: $.confirmDialog.submitForm
-            });
-        });
-    });
-</script>

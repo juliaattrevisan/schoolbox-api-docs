@@ -1,8 +1,9 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
-
 <link rel="stylesheet" type="text/css" href="/javascript/components/spectrum/spectrum.css" />
 <script type="text/javascript" src="/javascript/components/spectrum/spectrum.js"></script>
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 
 <script type="text/javascript">
     $(function() {
@@ -17,6 +18,29 @@
                 $(this).val(color.toRgbString());
             }
         });
+
+        $.fn.alaressTiny({
+            mode: "specific_textareas",
+            editor_selector: "mceEditor"
+        });
+
+        /**
+         * Homepage selector
+         */
+        var settings = $('form[data-action="saveSettings"]');
+        settings.on('click', 'a[data-interaction="homepage_selector"]', function(e) {
+            e.preventDefault();
+            var inputName = $(this).data('input_name');
+            $('#resource-browser').socialstreamBrowser({
+                title: 'Choose a folder',
+                mimeFilter: false,
+                categoryId: 0,
+                submitCallback: function(url) {
+                    settings.find('input[name="'+inputName+'"]').val(url);
+                }
+            });
+        });
+        settings.validate();
     });
 </script>
 <!-- END custom_head -->
@@ -152,32 +176,3 @@
 </div>
 
 <div id="resource-browser" class="hide"></div>
-
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $.fn.alaressTiny({
-            mode: "specific_textareas",
-            editor_selector: "mceEditor"
-        });
-
-        /**
-         * Homepage selector
-         */
-        var settings = $('form[data-action="saveSettings"]');
-        settings.on('click', 'a[data-interaction="homepage_selector"]', function(e) {
-            e.preventDefault();
-            var inputName = $(this).data('input_name');
-            $('#resource-browser').socialstreamBrowser({
-                title: 'Choose a folder',
-                mimeFilter: false,
-                categoryId: 0,
-                submitCallback: function(url) {
-                    settings.find('input[name="'+inputName+'"]').val(url);
-                }
-            });
-        });
-        settings.validate();
-    });
-</script>

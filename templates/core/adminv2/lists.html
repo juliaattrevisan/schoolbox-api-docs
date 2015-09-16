@@ -1,3 +1,19 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+    $(function() {
+        $('[data-button=add-row]').click(function(event) {
+            event.preventDefault();
+
+            var newRow = $('[data-clone]').find('tr').clone();
+
+            $('[data-list]').find('tbody').append(newRow).find('input[name="name[{ROW_NUMBER}]"]').last().focus();
+
+            return false;
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 {ADMIN_NAV}
 
 <div class="row">
@@ -105,17 +121,3 @@
 		</tr>
 	</tbody>
 </table>
-
-<script type="text/javascript">
-$(function() {
-	$('[data-button=add-row]').click(function(event) {
-        event.preventDefault();
-
-		var newRow = $('[data-clone]').find('tr').clone();
-
-		$('[data-list]').find('tbody').append(newRow).find('input[name="name[{ROW_NUMBER}]"]').last().focus();
-
-		return false;
-	});
-});
-</script>

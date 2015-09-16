@@ -1,3 +1,14 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/jquery.context-selector.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $.fn.contextSelector({
+            href: '{PAGE_HREF}'
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 <div class="small-12 medium-9 medium-offset-3 large-7 large-offset-5 columns">
     <div class="content">
         <div class="context-switch">
@@ -30,11 +41,3 @@
     </div>
 </div>
 
-<script type="text/javascript" src="/javascript/shared/jquery.context-selector.js"></script>
-<script type="text/javascript">
-    $(function () {
-        $.fn.contextSelector({
-            href: '{PAGE_HREF}'
-        });
-    });
-</script>

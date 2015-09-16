@@ -1,18 +1,20 @@
-<table>
-    <thead>
-        <tr>
-            <th><a href="/adminv2/reports/{SORT_BASE}/time/{SORT_TIME_DIR}">Date</a></th>
-            <th><a href="/adminv2/reports/{SORT_BASE}/action/{SORT_ACTION_DIR}">Action</a></th>
-            <th><a href="/adminv2/reports/{SORT_BASE}/user/{SORT_USER_DIR}">User</a></th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- BEGIN activity -->
-        <tr>
-            <td>{DATE}</td>
-            <td>{ACTION}</td>
-            <td><a href="/search/user/{UID}">{USERNAME}</a></td>
-        </tr>
-        <!-- END activity -->
-    </tbody>
-</table>
+<div class="scrollable">
+    <table>
+        <thead>
+            <tr>
+                <th><a href="/adminv2/reports/{SORT_BASE}/time/{SORT_TIME_DIR}">Date</a></th>
+                <th><a href="/adminv2/reports/{SORT_BASE}/action/{SORT_ACTION_DIR}">Action</a></th>
+                <th><a href="/adminv2/reports/{SORT_BASE}/user/{SORT_USER_DIR}">User</a></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- BEGIN activity -->
+            <tr>
+                <td>{DATE}</td>
+                <td>{ACTION}</td>
+                <td><a href="/search/user/{UID}">{USERNAME}</a></td>
+            </tr>
+            <!-- END activity -->
+        </tbody>
+    </table>
+</div>

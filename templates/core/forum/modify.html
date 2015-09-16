@@ -1,3 +1,18 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $.fn.alaressTiny({
+            mode: "textareas",
+            file_browser_category_id : '{CATEGORY_ID}'
+        });
+
+        $('form[data-validatable]').validate({ignore:false});
+    });
+</script>
+<!-- END custom_head -->
+
 {BREADCRUMB}
 
 <div class="row">
@@ -45,15 +60,4 @@
         </form>
     </div>
 </div>
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
-<script type="text/javascript">
-    $(function(){
-        $.fn.alaressTiny({
-            mode: "textareas",
-            file_browser_category_id : '{CATEGORY_ID}'
-        });
 
-        $('form[data-validatable]').validate({ignore:false});
-    });
-</script>
