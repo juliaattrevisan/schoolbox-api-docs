@@ -81,7 +81,7 @@ $(function() {
                             <label for="id-{SYNERGYID}" class="checkbox-label"></label>
                         </div>
                         <!-- END select_student -->
-                        <div class="small-10 medium-5 avatar card">
+                        <div class="small-8 medium-5 avatar card">
                             <img src="/portrait?userId={SYNERGYID}&size=square64" alt="{FIRSTNAME} {SURNAME}"/>
 
                             <p>
@@ -100,7 +100,7 @@ $(function() {
 
                             <p class="meta show-for-small-down">Last Visited: <time>{LASTVISIT}</time></p>
                         </div>
-                        <div class="small-12 medium-2 columns content">
+                        <div class="small-2 medium-2 columns">
                             <!-- BEGIN special -->
                             <img src="/images/famicons/bell.png" title="Special Needs"/>
                             <!-- END special -->
@@ -133,7 +133,9 @@ $(function() {
                             </span>
                         </span>
 
-                        {EMAIL_BTN}
+                        <!-- BEGIN has_email -->
+                        <a href="{HAS_EMAIL_URL}" class="icon-mail" title="Send Email"></a>
+                        <!-- END has_email -->
                         <!-- END actions -->
                     </nav>
                 </li>

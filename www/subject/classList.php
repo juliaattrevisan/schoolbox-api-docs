@@ -25,13 +25,12 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
     $this->setBlock('student_list', 'select_student', 'select_student_block');
     $this->setBlock('student_list', 'medical', 'medical_block');
     $this->setBlock('student_list', 'special', 'special_block');
-    $this->setBlock('student_list', 'eportfolio', 'eportfolio_block');
-    $this->setBlock('student_list', 'pastoral_care', 'pastoral_care_block');
-
     $this->setBlock('student_list', 'name_with_link', 'name_with_link_block');
     $this->setBlock('student_list', 'name_without_link', 'name_without_link_block');
     $this->setBlock('student_list', 'actions', 'actions_block');
-
+    $this->setBlock('actions', 'eportfolio', 'eportfolio_block');
+    $this->setBlock('actions', 'pastoral_care', 'pastoral_care_block');
+    $this->setBlock('actions', 'has_email', 'has_email_block');
     $this->setBlock(TEMPLATE_content, 'parent', 'parent_block');
     $this->setBlock(TEMPLATE_content, 'parent_email', 'parent_email_block');
 
@@ -107,11 +106,25 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
                 'SYNERGYID' => $student['synergy_id'],
                 'EMAIL' => $emailLink,
                 'EMAIL_ADDRESS' => $user->getEmail(),
-                'EMAIL_BTN' => $user->getEmail() ? sprintf('<a href="%s%s" title="Send email" class="btn email float-left"><span></span>Email</a>', $_SESSION['mailhandle'], $emailaddr) : '',
                 'MEDICAL_ALERT' => $student['StudentMedicalAlert'],
                 'ON_OFF' => ++$j % 2 ? '' : 'dark',
                 'SELECT' => $user->getEmail() ? sprintf('<input id="c%s" name="c%s" type="checkbox" value="%s"/>', $j, $j, $emailaddr) : '',
             ));
+
+            /* "Send Email" button
+             */
+            if ($user->getEmail()) {
+                $this->setVar(array(
+                    'HAS_EMAIL_URL' => $_SESSION['mailhandle'] . $emailaddr
+                ));
+
+                $this->parse('has_email_block', 'has_email');
+            }
+            else {
+                $this->setVar(array(
+                    'has_email_block' => ''
+                ));
+            }
 
             // Show pastoral care link to Synergetic
             if($groupHandler->isStaff() && Config::get('external_type') == 'synergetic' && Config::get('external_staff_portal') ) {
@@ -176,6 +189,14 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
             }
 
             $this->parse("student_list_block", "student_list", true);
+
+            /* Clear children after parsing out the parent
+             */
+            $this->setVar(array(
+                'has_email_block' => '',
+                'eportfolio_block' => '',
+                'pastoral_care_block' => '',
+            ));
         }
 
         // Show the email view/select forms
