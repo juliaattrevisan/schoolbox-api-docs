@@ -1,32 +1,46 @@
 <!-- BEGIN custom_head -->
 <style type="text/css">
+    /** Make these styles more specific than topbar styles  **/
+    #e-portfolio .column-top .top-bar,
+    #e-portfolio .column-top .top-bar a {
+        color: #{top_head_font};
+        background-color: #{top_head_bg};
+    }
+    #e-portfolio .column-top .top-bar .divider {
+        border-color: #{top_head_font};
+    }
+    #e-portfolio .column-top .island section {
+        color: #{top_font};
+        background-color: #{top_bg_primary};
+    }
 
-    .top h2                                              { color: #{current_top_head_font}; background-color: #{current_top_head_bg}; }
-    .top p, .top h3, .top .listing p.small               { color: #{current_top_font}; }
-    .top a, .top .listing p.small a                      { color: #{current_top_link}; }
-    .top .box a:hover, .top .listing p.small a:hover     { color: #{current_top_hover};  }
-    .top .text                                           { background: #{current_top_bg_primary}; }
-    .top .listing                                        { background: #{current_top_bg_primary}; }
-    .top .listing .dark                                  { background: #{current_top_bg_secondary}; }
+    #e-portfolio .column-left .top-bar,
+    #e-portfolio .column-left .top-bar a {
+        color: #{left_head_font};
+        background-color: #{left_head_bg};
+    }
+    #e-portfolio .column-left .top-bar .divider {
+        border-color: #{left_head_font};
+    }
+    #e-portfolio .column-left .island section {
+        color: #{left_font};
+        background-color: #{left_bg_primary};
+    }
 
-    .left h2                                             { color: #{current_left_head_font}; background-color: #{current_left_head_bg};	}
-    .left p, .left h3, .left .listing p.small,.left      { color: #{current_left_font}; }
-    .left a, .left .listing p.small a                    { color: #{current_left_link}; }
-    .left .box a:hover, .left .listing p.small a:hover   { color: #{current_left_hover};  }
-    .left .text                                          { background: #{current_left_bg_primary}; }
-    .left .listing                                       { background: #{current_left_bg_primary}; }
-    .left .listing .dark                                 { background: #{current_left_bg_secondary}; }
-
-    .right h2                                            { color: #{current_right_head_font}; background-color: #{current_right_head_bg};	}
-    .right p, .right h3, .right .listing p.small         { color: #{current_right_font}; }
-    .right a, .right .listing p.small a                  { color: #{current_right_link}; }
-    .right .box a:hover, .right .listing p.small a:hover { color: #{current_right_hover};  }
-    .right .text                                         { background: #{current_right_bg_primary}; }
-    .right .listing                                      { background: #{current_right_bg_primary}; }
-    .right .listing .dark                                { background: #{current_right_bg_secondary}; }
+    #e-portfolio .column-right .top-bar,
+    #e-portfolio .column-right .top-bar a {
+        color: #{right_head_font};
+        background-color: #{right_head_bg};
+    }
+    #e-portfolio .column-right .top-bar .divider {
+        border-color: #{right_head_font};
+    }
+    #e-portfolio .column-right .island section {
+        color: #{right_font};
+        background-color: #{right_bg_primary};
+    }
 
     /* wrap mimetypes in classes */
-
     <!-- BEGIN allowed_files -->
     a.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }
     <!-- END allowed_files -->
