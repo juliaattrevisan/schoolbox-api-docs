@@ -338,6 +338,12 @@ if(typeof window.location.origin == 'undefined') {
 
 
     ResourceAttach.prototype.build = function (data) {
+
+        if (singletonModal) {
+            // you've got a modal; don't try to make another one
+            return;
+        }
+
         var body = $('body');
 
         // if the modal already exists, destroy it
@@ -382,7 +388,9 @@ if(typeof window.location.origin == 'undefined') {
 
 
     ResourceAttach.prototype.close = function () {
-        singletonModal.foundation('reveal', 'close');
+        if (singletonModal) {
+            singletonModal.foundation('reveal', 'close');
+        }
     };
 
 
