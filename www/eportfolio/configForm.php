@@ -34,11 +34,6 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             }
 
             $eportfolioHandler->saveDisplayProperties($color);
-        } /* Save page title
-		 */
-        elseif (isset($_POST['user_id']) && is_numeric($_POST['user_id']) && strlen(trim($_POST['pageTitle']))) {
-            $eportfolioHandler->updatePageTitle(trim($_POST['pageTitle']));
-            SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/{$eportfolioHandler->getPageId()}");
         } /* Ajax request for drag and drop of components
 		 */
         elseif ($_POST['type'] == 'components') {
@@ -166,11 +161,11 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 		 */
         elseif (is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
             $eportfolioHandler->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
-        } /* Update permissions
+        } /* Update permissions and page title
 		 */
-        elseif (isset($_POST['update']) && ($_POST['update'] == 'permissions')) {
+        elseif (isset($_POST['update']) && ($_POST['update'] == 'page')) {
             \Eportfolio\PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'], $_POST['individual_permission']);
-
+            $eportfolioHandler->updatePageTitle(trim($_POST['pageTitle']));
             SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/{$eportfolioHandler->getPageId()}");
         } /* Softdelete this page and redirect back to profile
 		 */
