@@ -61,89 +61,91 @@ $(function() {
 </div>
 
 <div class="row">
-    <div class="small-12 columns">
-        <form id="contact-table-form" class="top">
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <table id='contact-table'>
-                            <thead>
-                            <tr>
-                                <th>
-                                    <!-- BEGIN select_all -->
-                                    <input type="checkbox" id='select-all' value="" />
-                                    <label for="select-all" class="checkbox-label"></label>
-                                    <!-- END select_all -->
-                                </th>
-                                <th>Name</th>
-                                <th>ID</th>
-                                <th>House</th>
-                                <th>Last Visited</th>
-                                <th>Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <!-- BEGIN student_list -->
-                            <tr>
-                                <td>
-                                    <!-- BEGIN select_student -->
-                                    <input type="checkbox" name="selected[]" value="{SYNERGYID}" />
-                                    <!-- END select_student -->
-                                </td>
-                                <td>
-                                    <div class="avatar card">
-                                        <a href="#" title="View Profile">
-                                            <img src="/portrait?userId={SYNERGYID}&size=square64" alt="{FIRSTNAME} {SURNAME}"/>
-                                            <!-- BEGIN name_with_link -->
-                                            <p><a href="/search/user/{ID}">{SURNAME}, {FIRSTNAME}</a></p>
-                                            <!-- END name_with_link -->
-                                            <!-- BEGIN name_without_link -->
-                                            <p>{SURNAME}, {FIRSTNAME}</p>
-                                            <!-- END name_without_link -->
-                                        </a>
-                                        <p class="meta">{YEARLEVEL}</p>
-                                        <p class="meta"></p>
-                                    </div>
-                                    <div>
-                                        <!-- BEGIN special -->
-                                        <img src="/images/famicons/bell.png" title="Special Needs"/>
-                                        <!-- END special -->
-                                        <!-- BEGIN medical -->
-                                        <img src="/images/famicons/exclamation.png" alt="{MEDICAL_ALERT}" title="Medical Alert: {MEDICAL_ALERT}"/>
-                                        <!-- END medical -->
-                                    </div>
-                                </td>
-                                <td>{SYNERGYID}</td>
-                                <td>{HOUSE}</td>
-                                <td>{LASTVISIT}</td>
-                                <td>
-                                    <!-- BEGIN actions -->
-                                    <div>
-                                        <!-- BEGIN eportfolio -->
-                                        <a href="/eportfolio/{ID}/profile" class="button icon-eportfolio" title="View ePortfolio">ePortfolio</a>
-                                        <!-- END eportfolio -->
-                                        <a href="/submission/dueWork/{ID}" class="button icon-timetable" title="View Due Work">Due Work</a>
-                                        <a href="/submission/allWork/{ID}" class="button icon-approve" title="View Grades">Grades</a>
-                                        <!-- BEGIN pastoral_care -->
-                                        <a href="{SYNWEB_URL}/stud.aspx?id={SYNERGYID}" class="button icon-modify" target="_blank">Pastoral Care</a>
-                                        <!-- END pastoral_care -->
-                                        {EMAIL_BTN}
-                                    </div>
-                                    <!-- END actions -->
-                                </td>
-                            </tr>
-                            <!-- END student_list -->
-                            </tbody>
-                        </table>
+    <div class="small-12 island">
+        <section>
+            <ul class="action-list" id="contact-table-form">
+                <li class="actions-small-4">
+                    <div class="list-item">
+                        <!-- BEGIN select_all -->
+                        <div class="small-2 columns">
+                            <input type="checkbox" id='select-all' value="" />
+                            <label for="select-all" class="checkbox-label"></label>
+                        </div>
+                        <!-- END select_all -->
+                        <div class="small-5 medium-5 columns show-for-medium-up">
+                            Name
+                        </div>
+                        <div class="small-2 medium-2 columns show-for-medium-up">
+                            Alerts
+                        </div>
+                        <div class="small-3 medium-3 columns show-for-medium-up">
+                            Last Visited
+                        </div>
                     </div>
-                </fieldset>
-            </section>
-            <div class="row">
-                <div class="small-12 columns">
-                    <input type="submit" value="Submit" />
-                </div>
-            </div>
-        </form>
+                </li>
+                <!-- BEGIN student_list -->
+                <li class="actions-small-4">
+                    <div class="list-item">
+                        <!-- BEGIN select_student -->
+                        <div class="small-12 medium-2 columns">
+                            <input type="checkbox" name="selected[]" id='id-{SYNERGYID}' value="{SYNERGYID}" />
+                            <label for="id-{SYNERGYID}" class="checkbox-label"></label>
+                        </div>
+                        <!-- END select_student -->
+                        <div class="small-12 medium-5 avatar card">
+                            <img src="/portrait?userId={SYNERGYID}&size=square64" alt="{FIRSTNAME} {SURNAME}"/>
+
+                            <p>
+                                <!-- BEGIN name_with_link -->
+                                <a href="/search/user/{ID}">{SURNAME}, {FIRSTNAME}</a>
+                                <!-- END name_with_link -->
+                                <!-- BEGIN name_without_link -->
+                                {SURNAME}, {FIRSTNAME}
+                                <!-- END name_without_link -->
+
+                                <span class="meta">({SYNERGYID})</span>
+                            </p>
+
+                            <p class="meta">{YEARLEVEL}</p>
+                            <p class="meta">{HOUSE}</p>
+
+                            <p class="meta show-for-small-down">Last Visited: {LASTVISIT}</p>
+                        </div>
+                        <div class="small-12 medium-2 columns">
+                            <!-- BEGIN special -->
+                            <img src="/images/famicons/bell.png" title="Special Needs"/>
+                            <!-- END special -->
+
+                            <!-- BEGIN medical -->
+                            <img src="/images/famicons/exclamation.png" alt="{MEDICAL_ALERT}" title="Medical Alert: {MEDICAL_ALERT}"/>
+                            <!-- END medical -->
+                        </div>
+                        <div class="small-12 medium-3 columns">
+                            <div class="show-for-medium-up">
+                                {LASTVISIT}
+                            </div>
+                        </div>
+                    </div>
+                    <nav>
+                        <!-- BEGIN actions -->
+                        <!-- BEGIN eportfolio -->
+                        <a href="/eportfolio/{ID}/profile" class="icon-eportfolio" title="View ePortfolio"></a>
+                        <!-- END eportfolio -->
+
+                        <a href="/submission/dueWork/{ID}" class="icon-timetable" title="View Due Work"></a>
+                        <a href="/submission/allWork/{ID}" class="icon-approve" title="View Grades"></a>
+
+                        <!-- BEGIN pastoral_care -->
+                        <a href="{SYNWEB_URL}/stud.aspx?id={SYNERGYID}" class="icon-modify" title="View Pastoral Care" target="_blank"></a>
+                        <!-- END pastoral_care -->
+
+                        {EMAIL_BTN}
+                        <!-- END actions -->
+                    </nav>
+                </li>
+                <!-- END student_list -->
+            </ul>
+        </section>
     </div>
 </div>
 
@@ -208,5 +210,3 @@ $(function() {
 	<input type="submit" class="submit-btn-plain" value="Email Parents of Selected Students"/>
 </form>
 <!-- END parent_email -->
-</div>
-
