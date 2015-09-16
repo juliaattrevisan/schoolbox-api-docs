@@ -64,7 +64,7 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getStudent($externalUserId)
     {
-        return $this->getDatabase()->getRow("
+        $row = $this->getDatabase()->getRow("
             SELECT
                 S.STUDENT# AS StudentID,
                 S.GIVEN_NAME AS StudentGiven1,
@@ -74,7 +74,7 @@ class External_Pcschools_User implements External_UserInterface
                 S.HOUSE AS StudentHouse,
                 '' AS HeadOfHouseID,
                 '' AS StudentHeadOfHouse,
-                -- '' AS StudentBoarder,
+                S.STATUS AS StudentBoarder,
                 S.HOME_CLASS AS StudentForm,
                 S_CLASS.DESCRIPTION AS FormDescription,
                 S_HOME_TEACHER.NAME_FOR_REPORT AS StudentFormStaffName,
@@ -108,6 +108,16 @@ class External_Pcschools_User implements External_UserInterface
             LEFT JOIN FAMILY AS S_FAMILY ON S.FAMILY_CODE = S_FAMILY.FAMKEY
             WHERE S.STUDKEY = {$this->getDatabase()->smartQuote($externalUserId)}
         ");
+        if (!empty($row)) {
+            $row = $this->getDatabase()->trimRow($row);
+            // Get boarder codes and munge student boarder status in
+            $boarderCodes = array_map(
+                'trim',
+                explode(',', $this->getDatabase()->getOne('SELECT BOARDERCODES FROM SYSFILE'))
+            );
+            $row['StudentBoarder'] = in_array($row['StudentBoarder'], $boarderCodes);
+        }
+        return $row;
     }
 
     /**
@@ -145,7 +155,144 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getStudentContactList($externalUserId)
     {
-        // TODO: Implement getStudentContactList() method.
+        // Split contacts into separate father/mother/guardian/carer records
+        // (at this stage, all with the same contact ID)
+        $rowset = $this->getDatabase()->getAll("
+            SELECT F.*
+            FROM FAMILY AS F
+            INNER JOIN STUDENT AS S ON F.FAMKEY = S.FAMILY_CODE
+            WHERE S.STUDKEY = {$this->getDatabase()->smartQuote($externalUserId)}
+        ");
+
+        $base   = [
+            'StudentContactID'                 => '',
+            'StudentContactTitle'              => '',
+            'StudentContactPreferred'          => '',
+            'StudentContactSurname'            => '',
+            'StudentContactDefaultEmail'       => '',
+            'ValidAddressFlag'                 => '',
+            'StudentContactAddress1'           => '',
+            'StudentContactAddress2'           => '',
+            'StudentContactAddress3'           => '',
+            'StudentContactSuburb'             => '',
+            'StudentContactPostCode'           => '',
+            'StudentContactState'              => '',
+            'StudentContactPhoneActual'        => '',
+            'StudentContactMobilePhone'        => '',
+            'StudentContactOccupPhone'         => '',
+            'StudentContactRelation'           => '',
+            'StudentContactSpouseID'           => '',
+            'StudentContactSpouseTitle'        => '',
+            'StudentContactSpousePreferred'    => '',
+            'StudentContactSpouseSurname'      => '',
+            'StudentContactSpouseMobilePhone'  => '',
+            'StudentContactSpouseOccupPhone'   => '',
+            'StudentContactSpouseDefaultEmail' => '',
+            'StudentContactType'               => '',
+            'StudentContactSpouseRelation'     => '',
+        ];
+        $result = [];
+        foreach ($rowset as $row) {
+            $row = $this->getDatabase()->trimRow($row);
+            // Father
+            // I'm going to assume on the DOMICILE field
+            if ($row['DAD_DOMICILE'] === 'Y') {
+                $result[] = array_merge(
+                    $base,
+                    [
+                        'StudentContactID'                 => $row['IDENTITY_ID#'],
+                        'StudentContactTitle'              => $row['FATHER_TITLE'],
+                        'StudentContactPreferred'          => $row['DAD_FIRSTNAME'],
+                        'StudentContactSurname'            => $row['DAD_SURNAME'],
+                        'StudentContactDefaultEmail'       => $row['DAD_EMAIL'],
+                        'ValidAddressFlag'                 => '',
+                        'StudentContactAddress1'           => $row['COR_ADDRESS'],
+                        'StudentContactAddress2'           => $row['COR_ADDRESS1'],
+                        'StudentContactAddress3'           => '',
+                        'StudentContactSuburb'             => $row['COR_TOWN'],
+                        'StudentContactPostCode'           => $row['COR_POST_CODE'],
+                        'StudentContactState'              => $row['STATE_COR'],
+                        'StudentContactPhoneActual'        => $row['DAD_HOME_PHONE'],
+                        'StudentContactMobilePhone'        => $row['DAD_MOBILE'],
+                        'StudentContactOccupPhone'         => $row['DAD_BUSS_PHONE'],
+                        'StudentContactRelation'           => $row['DAD_STATUS'] ?: 'Father',
+                    ]
+                );
+            }
+            // Mother
+            if ($row['MUM_DOMICILE'] === 'Y') {
+                $result[] = array_merge(
+                    $base,
+                    [
+                        'StudentContactID'                 => $row['IDENTITY_ID#'],
+                        'StudentContactTitle'              => $row['MOTHER_TITLE'],
+                        'StudentContactPreferred'          => $row['MUM_FIRSTNAME'],
+                        'StudentContactSurname'            => $row['MUM_SURNAME'],
+                        'StudentContactDefaultEmail'       => $row['MUM_EMAIL'],
+                        'ValidAddressFlag'                 => '',
+                        'StudentContactAddress1'           => $row['COR_ADDRESS'],
+                        'StudentContactAddress2'           => $row['COR_ADDRESS1'],
+                        'StudentContactAddress3'           => '',
+                        'StudentContactSuburb'             => $row['COR_TOWN'],
+                        'StudentContactPostCode'           => $row['COR_POST_CODE'],
+                        'StudentContactState'              => $row['STATE_COR'],
+                        'StudentContactPhoneActual'        => $row['MUM_HOME_PHONE'],
+                        'StudentContactMobilePhone'        => $row['MUM_MOBILE'],
+                        'StudentContactOccupPhone'         => $row['MUM_BUSS_PHONE'],
+                        'StudentContactRelation'           => $row['MUM_STATUS'] ?: 'Mother',
+                    ]
+                );
+            }
+            // Guardian
+            if ($row['GUARD_DOMICILE'] === 'Y') {
+                $result[] = array_merge(
+                    $base,
+                    [
+                        'StudentContactID'                 => $row['IDENTITY_ID#'],
+                        'StudentContactTitle'              => $row['GUARDIAN_TITLE'],
+                        'StudentContactPreferred'          => $row['GUARD_FIRSTNAME'],
+                        'StudentContactSurname'            => $row['GUARD_SURNAME'],
+                        'StudentContactDefaultEmail'       => $row['GUARD_EMAIL'],
+                        'ValidAddressFlag'                 => '',
+                        'StudentContactAddress1'           => $row['COR_ADDRESS'],
+                        'StudentContactAddress2'           => $row['COR_ADDRESS1'],
+                        'StudentContactAddress3'           => '',
+                        'StudentContactSuburb'             => $row['COR_TOWN'],
+                        'StudentContactPostCode'           => $row['COR_POST_CODE'],
+                        'StudentContactState'              => $row['STATE_COR'],
+                        'StudentContactPhoneActual'        => $row['GUARD_HOME_PH'],
+                        'StudentContactMobilePhone'        => $row['GUARD_MOBILE'],
+                        'StudentContactOccupPhone'         => $row['GUARD_BUSS_PH'],
+                        'StudentContactRelation'           => $row['GUARD_STATUS'] ?: 'Guardian',
+                    ]
+                );
+            }
+            // Carer
+            if ($row['CGIVE_DOMICILE'] === 'Y') {
+                $result[] = array_merge(
+                    $base,
+                    [
+                        'StudentContactID'                 => $row['IDENTITY_ID#'],
+                        'StudentContactTitle'              => $row['CGIVE_TITLE'],
+                        'StudentContactPreferred'          => $row['CGIVE_FIRSTNAME'],
+                        'StudentContactSurname'            => $row['CGIVE_SURNAME'],
+                        'StudentContactDefaultEmail'       => $row['CGIVE_EMAIL'],
+                        'ValidAddressFlag'                 => '',
+                        'StudentContactAddress1'           => $row['COR_ADDRESS'],
+                        'StudentContactAddress2'           => $row['COR_ADDRESS1'],
+                        'StudentContactAddress3'           => '',
+                        'StudentContactSuburb'             => $row['COR_TOWN'],
+                        'StudentContactPostCode'           => $row['COR_POST_CODE'],
+                        'StudentContactState'              => $row['STATE_COR'],
+                        'StudentContactPhoneActual'        => $row['CGIVE_HOME_PH'],
+                        'StudentContactMobilePhone'        => $row['CGIVE_MOBILE'],
+                        'StudentContactOccupPhone'         => $row['CGIVE_BUSS_PH'],
+                        'StudentContactRelation'           => $row['CGIVE_STATUS'] ?: 'Caregiver',
+                    ]
+                );
+            }
+        }
+        return $result;
     }
 
     /**
