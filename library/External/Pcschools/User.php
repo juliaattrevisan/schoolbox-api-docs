@@ -64,7 +64,50 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getStudent($externalUserId)
     {
-        // TODO: Implement getStudent() method.
+        return $this->getDatabase()->getRow("
+            SELECT
+                S.STUDENT# AS StudentID,
+                S.GIVEN_NAME AS StudentGiven1,
+                S.LEGAL_SURNAME AS StudentSurname,
+                S.BIRTH_DATE AS StudentBirthDate,
+                S_HOUSE.DESCRIPTION AS StudentHouseDescription,
+                S.HOUSE AS StudentHouse,
+                '' AS HeadOfHouseID,
+                '' AS StudentHeadOfHouse,
+                -- '' AS StudentBoarder,
+                S.HOME_CLASS AS StudentForm,
+                S_CLASS.DESCRIPTION AS FormDescription,
+                S_HOME_TEACHER.NAME_FOR_REPORT AS StudentFormStaffName,
+                S.DEAN AS StudentTutor,
+                S_HOME_TEACHER.NAME_FOR_REPORT AS StudentTutorName,
+                S_DEAN.NAME_FOR_REPORT AS StudentTutorDescription,
+                S.HOME_TEACHER AS TeacherFormID,
+                S.DEAN AS TeacherTutorID,
+                S.CURRENT_YEAR AS StudentYearLevel,
+                S.DEAN AS YearLevelCoordID,
+                '' AS StudentYearLevelCoordinator,
+                S.LOCKER AS StudentLockerBook,
+                S.EMERG_CONTACT AS StudentEmergencyName,
+                S.EMERG_PHONE AS StudentEmergencyPhone,
+                '' AS StudentEmergencyPhoneAlt,
+                S_FAMILY.DAD_FIRSTNAME | ' ' | S_FAMILY.DAD_SURNAME AS StudentEmergency2Name,
+                S_FAMILY.DAD_EMERG AS StudentEmergency2Phone,
+                S_FAMILY.DAD_EMERG_PH AS StudentEmergency2PhoneAlt,
+                S_FAMILY.MUM_FIRSTNAME | ' ' | S_FAMILY.MUM_SURNAME AS StudentEmergency3Name,
+                S_FAMILY.MUM_EMERG AS StudentEmergency3Phone,
+                S_FAMILY.MUM_EMERG_PH AS StudentEmergency3PhoneAlt,
+                S.ALERT AS StudentMedicalAlert,
+                '' AS StudentSpecialNeedsFlag,
+                '' AS StudentStudiesCode,
+                S.ALERT AS AlertMessage
+            FROM STUDENT S
+            LEFT JOIN CODEMAST AS S_HOUSE ON S.HOUSE = S_HOUSE.CODE AND S_HOUSE.TYPE = 'HOUSE'
+            LEFT JOIN CODEMAST AS S_CLASS ON S.HOME_CLASS = S_CLASS.CODE AND S_CLASS.TYPE = 'CLASS'
+            LEFT JOIN TEACHER AS S_HOME_TEACHER ON S.HOME_TEACHER = S_HOME_TEACHER.TEACHER_CODE
+            LEFT JOIN TEACHER AS S_DEAN ON S.DEAN = S_DEAN.TEACHER_CODE
+            LEFT JOIN FAMILY AS S_FAMILY ON S.FAMILY_CODE = S_FAMILY.FAMKEY
+            WHERE S.STUDKEY = {$this->getDatabase()->smartQuote($externalUserId)}
+        ");
     }
 
     /**
