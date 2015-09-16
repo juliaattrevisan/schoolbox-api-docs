@@ -58,6 +58,7 @@
 <script type="text/javascript" src="/javascript/jquery.masonry.spectrum.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
 
     var colours = {};
@@ -173,6 +174,14 @@
 				dataType: 'json'
 			}
 		});
+
+        $('[data-interaction="delete"]').click(function(e){
+            e.preventDefault();
+            $(this).confirmDialog({
+                text: "Are you sure you wish to this page from your ePortfolio?",
+                confirmEvent: $.confirmDialog.submitForm
+            })
+        });
     });
 </script>
 <!-- END modify_layout -->
@@ -183,20 +192,24 @@
         <h1>{HEADING} - {PAGE_TITLE}</h1>
     </div>
     <nav>
-        <!-- BEGIN edit_page -->
-        <span data-tab>
-            <span class="tab-title">
-                <a class="icon-components" href="#eportfolio-page-controls-tab-1" title="Add components"></a>
+        <form method="post" action="/eportfolio/configForm.php" class="no-margin">
+            <!-- BEGIN edit_page -->
+            <span data-tab>
+                <span class="tab-title">
+                    <a class="icon-components" href="#eportfolio-page-controls-tab-1" title="Add components"></a>
+                </span>
+                <span class="tab-title">
+                    <a class="icon-edit-columns" href="#eportfolio-page-controls-tab-2" title="Edit columns"></a>
+                </span>
+                <span class="tab-title">
+                    <a class="icon-modify" href="#eportfolio-page-controls-tab-3" title="Edit the page and its permissions"></a>
+                </span>
             </span>
-            <span class="tab-title">
-                <a class="icon-edit-columns" href="#eportfolio-page-controls-tab-2" title="Edit columns"></a>
-            </span>
-            <span class="tab-title">
-                <a class="icon-modify" href="#eportfolio-page-controls-tab-3" title="Edit the page and its permissions"></a>
-            </span>
-        </span>
-        <!-- END edit_page -->
-        <a href="#" class="icon-delete" title="Delete this page"></a>
+            <!-- END edit_page -->
+            <input type="hidden" name="page_id" value="{PAGE_ID}" />
+            <input type="hidden" name="deletePage" value="true" />
+            <a class="icon-delete" title="Delete this page" data-interaction="delete"></a>
+        </form>
     </nav>
 </div>
 
