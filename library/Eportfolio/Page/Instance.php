@@ -164,6 +164,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
             }
         }
 
+        $tabNumber = 0;
         if ($total = $instanceCollection->count()) {
             $i = 0;
             $previous = new Component_Instance();
@@ -225,6 +226,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                     'EPORTFOLIO_COMPONENT_CLASS' => $class,
                     'EPORTFOLIO_COMPONENT_CATEGORY_ID' => $previous->getIdentifier(),
                     'EPORTFOLIO_COMPONENT_MULTIPLE_STATE' => $multipleClass,
+                    'EPORTFOLIO_COMPONENT_CATEGORY_CLASS' => $tabNumber === 0 ? 'active' : '',
                 ));
 
                 $this_category = $component->getDefinition()->getComponentCategory();
@@ -236,6 +238,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                     $this->getPage()->parse('eportfolio_component_page_block', 'eportfolio_component_page', true);
                     $this->getPage()->setVar('eportfolio_component_block', '');
                     $this->getPage()->parse('eportfolio_component_block', 'eportfolio_component', true);
+                    $tabNumber++;
 
                     // last rotation
                     if ($total == $i) {
@@ -309,14 +312,17 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
         $tabList = $this->getTabList();
 
         if (isset($tabList) && count($tabList)) {
+            $tabNumber = 0;
             foreach ($tabList as $id => $tab) {
                 $this->getPage()->setVar(array(
                     'COMPONENT_CATEGORY_ID' => $id,
                     'COMPONENT_CATEGORY_NAME' => $tab['name'],
-                    'COMPONENT_CATEGORY_COUNT' => $tab['count']
+                    'COMPONENT_CATEGORY_COUNT' => $tab['count'],
+                    'COMPONENT_CATEGORY_CLASS' => $tabNumber === 0 ? 'active' : '',
                 ));
 
                 $this->getPage()->parse('eportfolio_component_tab_block', 'eportfolio_component_tab', true);
+                $tabNumber++;
             }
         }
     }
