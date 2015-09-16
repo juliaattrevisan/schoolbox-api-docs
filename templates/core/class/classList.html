@@ -142,67 +142,69 @@ $(function() {
                 <!-- END student_list -->
             </ul>
         </section>
+
+        <!-- BEGIN email_class -->
+        <script type="text/javascript">
+            $(function() {
+                $('#email-selected-students').click(function(event) {
+                    event.preventDefault();
+
+                    var form = $('#contact-table-form');
+                    form.data('noStudentEmails', false).data('noParentEmails', false)
+                    if (form.valid()) {
+                        $('#email-selected-students').emailSelected({
+                            source: $('#contact-table'),
+                            url: '/subject/classList/ajax/emailStudentsById.php',
+                            classCode: '{CLASS_CODE}',
+                            target: $(this).find('input[name=bcc]')
+                        })
+                                .on('emailSelected.noEmail', function() {
+                                    // Trigger the no student email error
+                                    form.data('noStudentEmails', true).valid();
+                                })
+                    }
+                });
+            });
+        </script>
+        <form id="email-selected-students" action="/mail/createMail.php" method="post">
+            <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
+            <input type="hidden" name="bcc" value=""/>
+            <input type="submit" value="Email Selected Students"/>
+        </form>
+        <!-- END email_class -->
+
+        <!-- BEGIN parent_email -->
+        <script type="text/javascript">
+            $(function() {
+                $('#email-selected-parents').click(function(event) {
+                    event.preventDefault();
+
+                    var form = $('#contact-table-form');
+                    form.data('noStudentEmails', false).data('noParentEmails', false)
+                    if (form.valid()) {
+                        $('#email-selected-parents').emailSelected({
+                            source: $('#contact-table'),
+                            url: '/subject/classList/ajax/emailParentsById.php',
+                            classCode: '{CLASS_CODE}',
+                            target: $(this).find('input[name=bcc]')
+                        })
+                                .on('emailSelected.noEmail', function() {
+                                    // Trigger the no parent email error
+                                    form.data('noParentEmails', true).valid();
+                                })
+                    }
+                });
+            });
+        </script>
+        <form id="email-selected-parents" action="/mail/createMail.php" method="post">
+            <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
+            <input type="hidden" name="bcc" value="" />
+            <input type="submit" value="Email Parents of Selected Students"/>
+        </form>
+        <!-- END parent_email -->
     </div>
 </div>
 
 <div id="errors"></div>
 
-<!-- BEGIN email_class -->
-<script type="text/javascript">
-$(function() {
-	$('#email-selected-students').click(function(event) {
-		event.preventDefault();
 
-		var form = $('#contact-table-form');
-		form.data('noStudentEmails', false).data('noParentEmails', false)
-		if (form.valid()) {
-			$('#email-selected-students').emailSelected({
-				source: $('#contact-table'),
-				url: '/subject/classList/ajax/emailStudentsById.php',
-				classCode: '{CLASS_CODE}',
-				target: $(this).find('input[name=bcc]')
-			})
-			.on('emailSelected.noEmail', function() {
-				// Trigger the no student email error
-				form.data('noStudentEmails', true).valid();
-			})
-		}
-	});
-});
-</script>
-<form id="email-selected-students" action="/mail/createMail.php" method="post">
-	<input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
-	<input type="hidden" name="bcc" value=""/>
-	<input type="submit" class="submit-btn-plain" value="Email Selected Students"/>
-</form>
-<!-- END email_class -->
-
-<!-- BEGIN parent_email -->
-<script type="text/javascript">
-$(function() {
-	$('#email-selected-parents').click(function(event) {
-		event.preventDefault();
-
-		var form = $('#contact-table-form');
-		form.data('noStudentEmails', false).data('noParentEmails', false)
-		if (form.valid()) {
-			$('#email-selected-parents').emailSelected({
-				source: $('#contact-table'),
-				url: '/subject/classList/ajax/emailParentsById.php',
-				classCode: '{CLASS_CODE}',
-				target: $(this).find('input[name=bcc]')
-			})
-			.on('emailSelected.noEmail', function() {
-				// Trigger the no parent email error
-				form.data('noParentEmails', true).valid();
-			})
-		}
-	});
-});
-</script>
-<form id="email-selected-parents" action="/mail/createMail.php" method="post">
-	<input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
-	<input type="hidden" name="bcc" value="" />
-	<input type="submit" class="submit-btn-plain" value="Email Parents of Selected Students"/>
-</form>
-<!-- END parent_email -->
