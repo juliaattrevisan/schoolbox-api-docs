@@ -64,35 +64,24 @@ $(function() {
     <div class="small-12 island">
         <section>
             <ul class="action-list" id="contact-table">
-                <li class="actions-small-4">
-                    <div class="list-item">
-                        <!-- BEGIN select_all -->
-                        <div class="small-2 columns">
-                            <input type="checkbox" id='select-all' value="" />
-                            <label for="select-all" class="checkbox-label"></label>
-                        </div>
-                        <!-- END select_all -->
-                        <div class="small-5 medium-5 columns show-for-medium-up">
-                            Name
-                        </div>
-                        <div class="small-2 medium-2 columns show-for-medium-up">
-                            Alerts
-                        </div>
-                        <div class="small-3 medium-3 columns show-for-medium-up">
-                            Last Visited
-                        </div>
+                <!-- BEGIN select_all -->
+                <li>
+                    <div class="small-12 columns">
+                        <input type="checkbox" id='select-all' value="" />
+                        <label for="select-all" class="checkbox-label">Select All</label>
                     </div>
                 </li>
+                <!-- END select_all -->
                 <!-- BEGIN student_list -->
                 <li class="actions-small-4">
                     <div class="list-item">
                         <!-- BEGIN select_student -->
-                        <div class="small-12 medium-2 columns">
+                        <div class="small-2 medium-2 columns">
                             <input type="checkbox" name="selected[]" id='id-{SYNERGYID}' value="{SYNERGYID}" />
                             <label for="id-{SYNERGYID}" class="checkbox-label"></label>
                         </div>
                         <!-- END select_student -->
-                        <div class="small-12 medium-5 avatar card">
+                        <div class="small-10 medium-5 avatar card">
                             <img src="/portrait?userId={SYNERGYID}&size=square64" alt="{FIRSTNAME} {SURNAME}"/>
 
                             <p>
@@ -111,7 +100,7 @@ $(function() {
 
                             <p class="meta show-for-small-down">Last Visited: {LASTVISIT}</p>
                         </div>
-                        <div class="small-12 medium-2 columns">
+                        <div class="small-12 medium-2 columns content">
                             <!-- BEGIN special -->
                             <img src="/images/famicons/bell.png" title="Special Needs"/>
                             <!-- END special -->
