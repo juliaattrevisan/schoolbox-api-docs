@@ -155,3 +155,32 @@
 .icon-masonry-Schoolbox_Curriculum_Component_CurriculumOverviewController:before {
   @extend .icon-curriculum:before;
 }
+
+// Eportfolio masonry icons
+.icon-masonry-Component_Eportfolio_AdvancedListController:before {
+  @extend .icon-advanced-list:before;
+}
+.icon-masonry-Component_Eportfolio_BasicListController:before {
+  @extend .icon-list:before;
+}
+.icon-masonry-Component_Eportfolio_BlogController:before {
+  @extend .icon-blog:before;
+}
+.icon-masonry-Component_Eportfolio_FileListController:before {
+  @extend .icon-files:before;
+}
+.icon-masonry-Component_Eportfolio_ImageController:before {
+  @extend .icon-image:before;
+}
+.icon-masonry-Component_Eportfolio_ImageListController:before {
+  @extend .icon-image-gallery:before;
+}
+.icon-masonry-Component_Eportfolio_LinkListController:before {
+  @extend .icon-link:before;
+}
+.icon-masonry-Component_Eportfolio_TextboxController:before {
+  @extend .icon-textbox:before;
+}
+.icon-masonry-Component_Eportfolio_VideoController:before {
+  @extend .icon-video:before;
+}
