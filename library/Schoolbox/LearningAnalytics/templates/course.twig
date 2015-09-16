@@ -212,12 +212,10 @@
     <div class="small-12 columns">
         <h1>Learning Analytics</h1>
         <ul class="meta">
-            <li class="icon-due-work">{{ metadata.pageTitle }}</li>
+            <li class="icon-course-builder">{{ metadata.pageTitle }}</li>
 
             {% if metadata.route == 'folder' %}
-            <li class="icon-due-work">{{ metadata.folder.selected.getName() }} {% if metadata.folder.selected.getCodeString() %}({{ metadata.folder.selected.getCodeString() }}){% endif %}</li>
-            {% else %}
-            <li class="icon-due-work">Whole Course</li>
+            <li class="icon-home">{{ metadata.folder.selected.getName() }} {% if metadata.folder.selected.getCodeString() %}({{ metadata.folder.selected.getCodeString() }}){% endif %}</li>
             {% endif %}
         </ul>
     </div>
