@@ -339,17 +339,21 @@
                     <input type='hidden' name='user_id' value='{ID}' />
                     <input type='hidden' name='page_id' value='{PAGE_ID}' />
 
-                    <label>
-                        Page Title
-                        <span class="hint has-tip tip-tip" data-tooltip title="Specify a title for this page.">?</span>
+                    <fieldset>
+                        <legend>Page</legend>
+                        <div class="small-12 columns">
+                            <label>
+                                Title
+                                <input type='text' name='pageTitle' value="{PAGE_TITLE}" />
+                            </label>
+                        </div>
+                    </fieldset>
 
-                        <input type='text' name='pageTitle' value="{PAGE_TITLE}" />
-                    </label>
-
-                    <div class="row">
+                    <fieldset>
+                        <legend>Permissions</legend>
                         <div class="small-12 large-6 columns">
                             <label>
-                                Group Permissions
+                                Group
                                 <span class="hint has-tip tip-top" data-tooltip title="Allow predefined groups to view your ePortfolio page.">?</span>
                             </label>
                             <!-- BEGIN has_group_permissions -->
@@ -363,7 +367,7 @@
                         </div>
                         <div class="small-12 large-6 columns">
                             <label>
-                                Student Permissions
+                                Student
                                 <span class="hint has-tip tip-top" data-tooltip title="Allow certain students to view your ePortfolio page.">?</span>
                             </label>
                             <select id='addIndividualPermission' name="individual_permission[]" multiple placeholder="Search Students"></select>
@@ -375,11 +379,10 @@
                                 <span class="hint has-tip tip-top" data-tooltip title="Allow your parents to view your ePortfolio page.">?</span>
                             </label>
                         </div>
-
                         <div class="small-12 columns">
                             <input type="submit" value="Update Page" />
                         </div>
-                    </div>
+                    </fieldset>
                 </form>
             </div>
         </section>
