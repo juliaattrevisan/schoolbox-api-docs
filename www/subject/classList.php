@@ -18,7 +18,7 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
     $userHandler = new User;
     $synergeticClass = new External_Class;
 
-    $this->setFile(TEMPLATE_content, 'class/classList.htm');
+    $this->setFile(TEMPLATE_content, 'class/classList.html');
     $this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
     $this->setBlock(TEMPLATE_content, 'email_class', 'email_class_block');
     $this->setBlock(TEMPLATE_content, 'select_all', 'select_all_block');
