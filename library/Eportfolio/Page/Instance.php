@@ -369,10 +369,6 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 	 */
     private function renderColours()
     {
-        /* Current colour set (currently chosen and saved in db)
-         */
-        $this->renderColourSet($this->getColours(), 'original');
-
         /* Pickers colour set (when you choose new colours for components)
          */
         $this->renderColourSet($this->getColours(), 'pickers');
@@ -380,6 +376,10 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
         /* Default colour set (reset)
          */
         $this->renderColourSet($this->getEportfolioHandler()->getDefaultColorList(), 'defaults');
+
+        /* Current colour set (currently chosen and saved in db)
+         */
+        $this->renderColourSet($this->getColours(), 'original');
     }
 
     /**
