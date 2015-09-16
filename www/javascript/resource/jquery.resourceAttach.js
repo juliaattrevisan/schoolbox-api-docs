@@ -254,7 +254,7 @@ if(typeof window.location.origin == 'undefined') {
             this.fallbackMaxFilesReached();
         }
 
-        // cache the content for this dialog
+        // cache the content for this reveal modal
         this.cacheModal();
 
         $(this.element).on('click', this.options.trigger, function (e) {
@@ -338,29 +338,25 @@ if(typeof window.location.origin == 'undefined') {
 
 
     ResourceAttach.prototype.build = function (data) {
-        var self = this,
-            body = $('body');
+        var body = $('body');
 
         // if the modal already exists, destroy it
         this.destroy();
 
-        singletonModal = $('<div/>')
+        singletonModal = $('<div data-reveal class="reveal-modal file-picker" />')
             .data('content', $.parseHTML(data, document, true))
             .data('rtn', this);
 
         body.append(singletonModal);
 
-        singletonModal.dialog({
-            width:     this.options.width,
-            height:    this.options.height,
-            title:     this.options.title,
-            modal:     this.options.modal,
-            resizable: this.options.resizable,
-            autoOpen:  false,
-            close: function (e) {
-                self.build(data);
-            }
-        });
+        // reinit
+        $(document)
+            .foundation('reveal', 'reflow')
+            .on('closed.fndtn.reveal', '[data-reveal]', function () {
+                singletonModal.detach();
+                singletonModal = null;
+            });
+
 
         singletonModal.on('click', '.cancel[role=button]', function (e) {
             window.top.postMessage(JSON.stringify({ data: [] }), location.origin);
@@ -373,28 +369,26 @@ if(typeof window.location.origin == 'undefined') {
             // this will construct a modal VIA the cache
             this.cacheModal(function () {
                 singletonModal.html(singletonModal.data('content'))
-                    .dialog('open');
+                              .foundation('reveal', 'open');
+
             });
         } else {
             // ensure the return points to the right element
             singletonModal.data('rtn', this)
                 .html(singletonModal.data('content'))
-                .dialog('open');
+                .foundation('reveal', 'open');
         }
     };
 
 
     ResourceAttach.prototype.close = function () {
-        singletonModal.dialog('close');
+        singletonModal.foundation('reveal', 'close');
     };
 
 
     ResourceAttach.prototype.destroy = function () {
         if (singletonModal) {
-            singletonModal.dialog('close');
-            singletonModal.dialog('destroy');
-            singletonModal.detach();
-            singletonModal = null;
+            singletonModal.foundation('reveal', 'close');
         }
     };
 
