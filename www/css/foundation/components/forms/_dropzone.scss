@@ -216,11 +216,6 @@ ul.az-error-list {
         //.transition(none);
         border-width: 0;
     }
-    &.dz-drag-hover .dzone {
-        border-color: $attachzone-can-accept-color;
-        background-color: $attachzone-can-accept-background;
-        color: $attachzone-can-accept-color;
-    }
     img[data-dz-thumbnail] {
         background: url('/images/resources/ajax.gif') no-repeat center center;
         @include easy-transition(opacity  0.15s  $attachzone-overlay-timing);
@@ -229,26 +224,7 @@ ul.az-error-list {
         position: relative;
     }
     .dzone {
-        @extend %p;
-        position: relative;
-        overflow: hidden;
-        background-color: $attachzone-resting-background;
-        border: 2px dashed $attachzone-resting-color;
-        background-repeat: no-repeat;
-        display: block;
-        color: $attachzone-resting-color;
         width: 100%;
-        @include easy-transition(
-            background-color 360ms $attachzone-overlay-timing,
-            border-color 360ms $attachzone-overlay-timing,
-            color 360ms $attachzone-overlay-timing,
-            height 360ms $attachzone-overlay-timing 360ms
-        );
-        //@include single-transition(all, 0.15s, ease-out);
-        &:hover {
-            background-color: rgba($attachzone-resting-background, 0.2);
-            cursor: pointer;
-        }
         span {
             display: inline-block;
             vertical-align: middle;
@@ -297,16 +273,42 @@ ul.az-error-list {
     }
 }
 
+.dzone {
+    @extend %p;
+    overflow: hidden;
+    position: relative;
+    background-color: $attachzone-resting-background;
+    border: 2px dashed $attachzone-resting-color;
+    background-repeat: no-repeat;
+    display: block;
+    color: $attachzone-resting-color;
+    @include easy-transition(
+        background-color 360ms $attachzone-overlay-timing,
+        border-color 360ms $attachzone-overlay-timing,
+        color 360ms $attachzone-overlay-timing,
+        height 360ms $attachzone-overlay-timing 360ms
+    );
+    &:hover {
+        background-color: rgba($attachzone-resting-background, 0.2);
+        cursor: pointer;
+    }
+}
+
+// hover can be applied either to child or self
+.dz-drag-hover .dzone, .dz-drag-hover.dzone {
+    border-color: $attachzone-can-accept-color;
+    background-color: $attachzone-can-accept-background;
+    color: $attachzone-can-accept-color;
+    span {
+        color: inherit;
+    }
+}
+
 // Attach-browser upload
 #ab-upload {
     .dzone {
-        min-height: 100%;
-        overflow: hidden;
-        background-color: rgba($success-color, 0.3);
-        border: 2px dashed $success-color;
-        box-sizing: border-box;
-        margin-right: 4px;
-        @include easy-transition(all 0.15s $attachzone-overlay-timing);
+        min-height: 100px;
+
         &.dz-started, &.dz-browser-not-supported {
             border-color: transparent;
             background-color: transparent;
@@ -326,9 +328,6 @@ ul.az-error-list {
                 text-align: center;
             }
         }
-    }
-    form.dzone.dz-drag-hover {
-        background-color: rgba($success-color, 0.2);
     }
     .dz-error-mark, .dz-success-mark {
         display: none;
