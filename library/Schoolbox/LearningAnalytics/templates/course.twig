@@ -188,49 +188,40 @@
         });
     });
 </script>
-<style type="text/css">
 
-</style>
-<h1>
-    Learning Analytics - {{ metadata.pageTitle }}
-    {% if metadata.route == 'folder' %}
-    - {{ metadata.folder.selected.getName() }}
-    {% endif %}
-</h1>
+<div class="row">
+    <div class="small-12 columns">
+        <dl class="sub-nav">
+            <dd class="{% if metadata.route == 'course' %}active{% endif %}">
+                <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}' class="button">
+                    Course
+                </a>
+            </dd>
+            {% for folder in metadata.folder.all %}
+            <dd class="{% if (folder.getId() == metadata.folder.selected.getId()) and (metadata.route == 'folder') %}active{% endif %}">
+                <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ folder.getId() }}' class="button">
+                    {{ folder.getName() }} {% if folder.getCodeString() %}({{ folder.getCodeString() }}){% endif %}
+                </a>
+            </dd>
+            {% endfor %}
+        </dl>
+    </div>
+</div>
 
-{# Foundation-friendly setup#}
-{#<dl class="tabs">#}
-    {#<dd class="{% if metadata.route == 'course' %}active{% endif %}">#}
-        {#<a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}'>#}
-            {#Course#}
-        {#</a>#}
-    {#</dd>#}
-    {#{% for folder in metadata.folder.all %}#}
-    {#<dd class="{% if (folder.getId() == metadata.folder.selected.getId()) and (metadata.route == 'folder') %}active{% endif %}">#}
-        {#<a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ folder.getId() }}'>#}
-            {#{{ folder.getName() }}#}
-        {#</a>#}
-    {#</dd>#}
-    {#{% endfor %}#}
-{#</dl>#}
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Learning Analytics</h1>
+        <ul class="meta">
+            <li class="icon-due-work">{{ metadata.pageTitle }}</li>
 
-{# Un-Founded variant #}
-<ul class="admin-nav">
-    <li>
-        <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}' class="{% if metadata.route == 'course' %}current{% endif %}">
-            Course
-        </a>
-    </li>
-    {% for folder in metadata.folder.all %}
-    <li>
-        <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ folder.getId() }}' class="{% if (folder.getId() == metadata.folder.selected.getId()) and (metadata.route == 'folder') %}current{% endif %}">
-            {{ folder.getName() }} {%  if folder.getCodeString() %}({{ folder.getCodeString() }}){% endif %}
-        </a>
-    </li>
-    {% endfor %}
-</ul>
-
-<div class="clearfix"></div>
+            {% if metadata.route == 'folder' %}
+            <li class="icon-due-work">{{ metadata.folder.selected.getName() }} {% if metadata.folder.selected.getCodeString() %}({{ metadata.folder.selected.getCodeString() }}){% endif %}</li>
+            {% else %}
+            <li class="icon-due-work">Whole Course</li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
 
 <h2>Overall Progress</h2>
 <div data-graph='overall' class='learning-analytics overall medium-6 columns'></div>
