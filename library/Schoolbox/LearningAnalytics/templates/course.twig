@@ -223,45 +223,55 @@
     </div>
 </div>
 
-<h2>Overall Progress</h2>
-<div data-graph='overall' class='learning-analytics overall medium-6 columns'></div>
+<div class="row">
+    <div class="small-12 large-6 island">
+        <h2 class="subheader">Overall Progress</h2>
 
-<div class="learning-analytics medium-3 columns">
-    <h3>Top Students</h3>
-    {% if results.ranking.top|length > 0 %}
-    <ul>
-        {% for currentStudent in results.ranking.top|slice(0,3) %}
-        <li>
-            <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
-            {{ currentStudent.average|number_format(1) }}%
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>
-        Nobody has attempted these tasks yet.
-    </p>
-    {% endif %}
-</div>
-<div class="learning-analytics medium-3 columns">
-    <h3>Bottom Students</h3>
-    {% if results.ranking.bottom|length > 0 %}
-    <ul>
-        {% for currentStudent in results.ranking.bottom|slice(0,3) %}
-        <li>
-            <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
-            {{ currentStudent.average|number_format(1) }}%
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>
-        Nobody has attempted these tasks yet.
-    </p>
-    {% endif %}
-</div>
+        <section class="content">
+            <div data-graph='overall'></div>
+        </section>
+    </div>
+    <div class="small-12 large-3 island">
+        <h3 class="subheader">Top Students</h3>
 
-<div class="clearfix"></div>
+        <section class="content">
+            {% if results.ranking.top|length > 0 %}
+            <ul class="information-list">
+                {% for currentStudent in results.ranking.top|slice(0,3) %}
+                <li>
+                    <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
+                    {{ currentStudent.average|number_format(1) }}%
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>
+                Nobody has attempted these tasks yet.
+            </p>
+            {% endif %}
+        </section>
+    </div>
+    <div class="small-12 large-3 island">
+        <h3 class="subheader">Bottom Students</h3>
+
+        <section class="content">
+            {% if results.ranking.bottom|length > 0 %}
+            <ul class="information-list">
+                {% for currentStudent in results.ranking.bottom|slice(0,3) %}
+                <li>
+                    <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
+                    {{ currentStudent.average|number_format(1) }}%
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>
+                Nobody has attempted these tasks yet.
+            </p>
+            {% endif %}
+        </section>
+    </div>
+</div>
 
 
 {# Foundation-friendly setup #}
