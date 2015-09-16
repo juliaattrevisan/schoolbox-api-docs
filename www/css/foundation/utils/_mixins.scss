@@ -128,10 +128,10 @@
 }
 
 @mixin transition-delay($transition-transition-delay: 500ms) {
-	-webkit-transition-delay: 500ms;
-  -moz-transition-delay: 500ms;
-  -o-transition-delay: 500ms;
-  transition-delay: 500ms;
+	-webkit-transition-delay: $transition-transition-delay;
+  -moz-transition-delay: $transition-transition-delay;
+  -o-transition-delay: $transition-transition-delay;
+  transition-delay: $transition-transition-delay;
 }
 
 @mixin placeholder-color($color, $font-weight) {
