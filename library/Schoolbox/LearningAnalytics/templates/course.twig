@@ -312,10 +312,16 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Unit Progress</h2>
+        <section class="content">
+            <div data-graph='unit-progress' style="height:{{ ((progress.allUnits|length)*50)+75 }}px"></div>
+        </section>
+    </div>
+</div>
 
 
-<h2>Unit Progress</h2>
-<div data-graph='unit-progress' class='learning-analytics unit-progress' style="height:{{ ((progress.allUnits|length)*50)+75 }}px"></div>
 
 {% if rubrics.allRubrics|length > 0 %}
 <div class="clearfix"></div>
