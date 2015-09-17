@@ -94,30 +94,29 @@ $(document).ready(function() {
                     <!-- BEGIN msg_enabled_followth -->
 
                     <!-- END msg_enabled_followth -->
+                    <div class="small-12 columns">
+                        <div class="row">
+                            <ul class="information-list">
+                                <!-- BEGIN groupOwner -->
+                                <li>
+                                    <div class="list-item">
+                                        <div class="small-12 avatar card">
+                                            <!-- BEGIN msg_enabled_followadmin -->
 
-                    <ul class="information-list">
-                        <!-- BEGIN groupOwner -->
-                        <li>
-                            <div class="list-item">
-                                <div class="small-12 avatar card">
-                                    <!-- BEGIN msg_enabled_followadmin -->
+                                            <!-- END msg_enabled_followadmin -->
+                                            <a href="/search/user/{OWNER_ID}">
+                                                <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
+                                                {GROUP_OWNER}
+                                            </a>
+                                            <p class="meta">Group Admin</p>
+                                        </div>
+                                    </div>
+                                </li>
+                                <!-- END groupOwner -->
 
-                                    <!-- END msg_enabled_followadmin -->
-                                    <a href="/search/user/{OWNER_ID}">
-                                        <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
-                                        {GROUP_OWNER}
-                                    </a>
-                                    <p class="meta">Group Admin</p>
-                                </div>
-                            </div>
-                        </li>
-                        <!-- END groupOwner -->
-
-                        <!-- BEGIN member -->
-                        <li>
-                            <div class="list-item">
-                                <div class="small-12 medium-6 columns">
-                                    <div class="row">
+                                <!-- BEGIN member -->
+                                <li class="actions-small-3">
+                                    <div class="list-item">
                                         <div class="small-12 avatar card">
                                             <a href="/search/user/{USER_ID}">
                                                 <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
@@ -133,22 +132,18 @@ $(document).ready(function() {
                                             </a>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="small-12 medium-6 columns">
-                                    <select name="accessType[{USER_ID}]">
-                                        <option value="0">Remove</option>
-                                        <option value="1" {READ_SELECTED}>Read-only</option>
-                                        <option value="2" {WRITE_SELECTED}>Write</option>
+                                    <nav>
+                                        <a href="#" class="icon-view" title="Set this user as read"></a>
+                                        <a href="#" class="icon-modify" title="Add this user"></a>
                                         <!-- BEGIN make_owner -->
-                                        <option value="3">Group Admin</option>
+                                        <a href="#" class="icon-favourite" title="Make admin"></a>
                                         <!-- END make_owner -->
-                                    </select>
-                                </div>
-                            </div>
-                        </li>
-                        <!-- END member -->
-                    </ul>
-                    <input type="submit" name="Submit" />
+                                    </nav>
+                                </li>
+                                <!-- END member -->
+                            </ul>
+                        </div>
+                    </div>
                 </form>
 
                 <form action="/group/modifyForm.php"
@@ -170,13 +165,11 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             <nav>
-                                <input id="acceptCheck-{WAITING_ID}" type="checkbox" name="accept[]" value="{WAITING_ID}" data-select-all-group="accept" />
-                                <label for="acceptCheck-{WAITING_ID}" class="checkbox-label"></label>
+                                <a href="#" class="icon-add" title="Add this user"></a>
                             </nav>
                         </li>
                         <!-- END waiting -->
                     </ul>
-                    <input type="submit" name="Submit" />
                     <!-- END authorisation -->
                 </form>
 
