@@ -102,6 +102,8 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         $params = [];
         if ($date) {
             $params['Date'] = new Alaress_Date_Format($date, Alaress_Date_Format::TIMESTAMP);
+        } else {
+            $params['Date'] = new Alaress_Date_Format();
         }
         $api = new External_Denbigh2_Api('CurrentDay', $params);
 
