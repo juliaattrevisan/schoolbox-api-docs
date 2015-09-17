@@ -54,7 +54,7 @@
             <section>
                 <ul class="action-list">
                     <!-- BEGIN attempt -->
-                    <li class="actions-small-2 {ATTEMPT_HIDDEN}" {ATTEMPT_EXPANDABLE} data-user="{USER_ID}" data-equalizer>
+                    <li class="actions-small-2 {ATTEMPT_HIDDEN}" {ATTEMPT_EXPANDABLE} data-user="{USER_ID}">
                         <div class="list-item">
                             <div class="small-1 columns text-center">
                                 <!-- BEGIN attempt_delete -->
@@ -63,7 +63,7 @@
                                 <!-- END attempt_delete -->
                             </div>
 
-                            <div class="avatar card small-4" data-equalizer-watch>
+                            <div class="avatar card small-4">
                                 <a href="/search/user/{USER_ID}" title="View Profile">
                                     <img src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square64" alt="View Profile" />
                                     <p>{ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}</p>
@@ -100,11 +100,11 @@
                         </div>
                         <nav>
                             <!-- BEGIN has_review -->
-                            <a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}" class="icon-view" title="Review Attempt" data-equalizer-watch></a>
+                            <a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}" class="icon-view" title="Review Attempt"></a>
                             <!-- END has_review -->
 
                             <!-- BEGIN expand_attempts -->
-                            <a href="#" class='icon-add' title="Expand attempts by {ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}" data-attempt-expander="{USER_ID}" data-equalizer-watch></a>
+                            <a href="#" class='icon-add' title="Expand attempts by {ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}" data-attempt-expander="{USER_ID}"></a>
                             <!-- END expand_attempts -->
                         </nav>
                     </li>

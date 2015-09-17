@@ -52,7 +52,7 @@
 
             mceEditorClass: 'mceEditor',
             calcSequenceData: noop,
-            url: null,
+            url: null
         },
 
         // default options for defining "columns" (includes top and bottom)
@@ -129,9 +129,10 @@
      */
     function Masonry(element, options) {
         var masonry = this, com, col;
-
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
+
+        this.sortableSetup = false;
 
         com = this.options.component;
         col = this.options.column;
@@ -149,7 +150,21 @@
         this.palette  = null;
         this.spectrum = null;
 
-        this.initSortable();
+        /* Disable dragon drop for small devices
+         */
+        if (!isSmallDevice()) {
+            this.initSortable();
+        }
+
+        // Throttled resize function
+        $(window).on('resize', Foundation.utils.debounce(function(e){
+            if (!isSmallDevice()) {
+                if (!masonry.sortableSetup) {
+                    masonry.initSortable();
+                    masonry.sortableSetup = true;
+                }
+            }
+        }, 300));
 
         this.initControls();
 

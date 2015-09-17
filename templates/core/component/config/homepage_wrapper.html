@@ -1,28 +1,25 @@
 <div class="row">
     <div class="small-12 columns">
-        <nav class="top-bar" data-topbar>
-            <ul class="title-area">
-                <!-- Title Area -->
-                <li class="name">
-                    <h2><a href="{COMPONENT_HREF}">{COMPONENT_NAME}</a></h2>
-                </li>
-                <li class="toggle-topbar icon-menu"></li>
-            </ul>
-            <section class="top-bar-section">
-                <!-- Right Nav Section -->
-                <ul class="right">
+        <ul class="component information-list">
+            <li class="actions-small-3">
+                <div class="list-item">
+                    <div class="small-12 card">
+                        <h2><a href="{COMPONENT_HREF}">{COMPONENT_NAME}</a></h2>
+                    </div>
+                </div>
+                <nav>
                     <!-- BEGIN settings_link -->
-                    <li><a data-target='settings' data-state='closed' href="#" class="component-control-button settings edit button icon-settings no-text" title="Settings"></a></li>
+                    <a data-target='settings' data-state='closed' href="#" class="icon-settings settings edit" title="Settings"></a>
                     <!-- END settings_link -->
                     <!-- BEGIN settings_collapse -->
-                    <li><a data-collapser="true" href="#" class="component-control-button collapse button no-text {CONFIG_COLLAPSED_ICON}" title="Collapse Content"></a></li>
+                    <a data-collapser="true" href="#" class="{CONFIG_COLLAPSED_ICON} collapse" title="Collapse Content"></a>
                     <!-- END settings_collapse -->
                     <!-- BEGIN settings_close -->
-                    <li><a data-target="delete" data-state='closed' href="#" class="button no-text icon-close" title="Close"></a></li>
+                    <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
                     <!-- END settings_close -->
-                </ul>
-            </section>
-        </nav>
+                </nav>
+            </li>
+        </ul>
 
         <!-- BEGIN settings_panel -->
         <div data-component-panel="settings" class="editPanel small-12 ">
@@ -34,11 +31,11 @@
                         <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}" />
                         <!-- BEGIN config_element -->
                         <div class="{CONFIG_ELEMENT_CLASS}" {CONFIG_DISPLAY}>
-                        <span>{CONFIG_ELEMENT_LABEL}: </span>
-                        {CONFIG_ELEMENT_CONTENT}
-                    </div>
-                    <!-- END config_element -->
-                    <input type="submit" value="Update" />
+                            <span>{CONFIG_ELEMENT_LABEL}: </span>
+                            {CONFIG_ELEMENT_CONTENT}
+                        </div>
+                        <!-- END config_element -->
+                        <input type="submit" value="Update" />
                     </form>
                 </div>
             </section>

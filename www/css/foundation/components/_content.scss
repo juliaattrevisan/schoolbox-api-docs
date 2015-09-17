@@ -774,6 +774,22 @@ $rotate-th-width: $square-grid-td-size;
 	list-style: none;
 	margin: 0;
 	padding: 0;
+
+    /* Topbar replacement
+     */
+    &.component {
+        .card {
+            min-height: 1rem;
+        }
+        /* Weird extra pixel that comes out of nowhere
+         */
+        nav {
+            overflow: hidden;
+        }
+        h2 {
+            font-size: 1.3125rem;
+        }
+    }
     &.sortable {
         .ui-sortable-helper {
             border-bottom: none;
@@ -1116,7 +1132,6 @@ $rotate-th-width: $square-grid-td-size;
 }
 
 .card {
-
 	position: relative;
     min-height: (3 * rem-calc($base-font-size));
     padding: 0.25rem 0.5rem 0 1rem;
