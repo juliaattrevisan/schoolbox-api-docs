@@ -189,34 +189,33 @@
     });
 </script>
 
-<div class="row">
-    <div class="small-12 columns">
-        <dl class="sub-nav">
-            <dd class="{% if metadata.route == 'course' %}active{% endif %}">
-                <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}' class="button">
-                    Course
-                </a>
-            </dd>
-            {% for folder in metadata.folder.all %}
-            <dd class="{% if (folder.getId() == metadata.folder.selected.getId()) and (metadata.route == 'folder') %}active{% endif %}">
-                <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ folder.getId() }}' class="button">
-                    {{ folder.getName() }} {% if folder.getCodeString() %}({{ folder.getCodeString() }}){% endif %}
-                </a>
-            </dd>
-            {% endfor %}
-        </dl>
-    </div>
-</div>
+<ul class="breadcrumb">
+   <li><a href="/submission/listSubmission">Submissions</a></li>
+    <li title="Course"  {% if metadata.route != 'folder' %} class="active" {% endif %}><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}" title="Course">{{ metadata.pageTitle }}</a></li>
+    {% if metadata.route == 'folder' %}
+        <li title="Class" class="active"><a href="/homepage/{{metadata.folder.selected.getId()}}" title="Class Page">{{ metadata.folder.selected.getName() }} {% if metadata.folder.selected.getCodeString() %}({{ metadata.folder.selected.getCodeString() }}){% endif %}</a></li>
+    {% endif %}
+</ul>
 
 <div class="row">
     <div class="small-12 columns">
         <h1>Learning Analytics</h1>
+        <dl class="sub-nav">
+            {% for folder in metadata.folder.all %}
+                <dd class="{% if (folder.getId() == metadata.folder.selected.getId()) and (metadata.route == 'folder') %}active{% endif %}">
+                    <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ folder.getId() }}' class="button">
+                        {{ folder.getName() }} {% if folder.getCodeString() %}({{ folder.getCodeString() }}){% endif %}
+                    </a>
+                </dd>
+            {% endfor %}
+        </dl>
         <ul class="meta">
-            <li class="icon-course-builder">{{ metadata.pageTitle }}</li>
+            <li class="icon-course-builder" title="Course"><a href="/homepage/{{ metadata.folder.course.getId()}}" title="Course Page">{{ metadata.pageTitle }}</a></li>
 
             {% if metadata.route == 'folder' %}
-            <li class="icon-home">{{ metadata.folder.selected.getName() }} {% if metadata.folder.selected.getCodeString() %}({{ metadata.folder.selected.getCodeString() }}){% endif %}</li>
+            <li class="icon-home" title="Class"><a href="/homepage/{{metadata.folder.selected.getId()}}" title="Class Page">{{ metadata.folder.selected.getName() }} {% if metadata.folder.selected.getCodeString() %}({{ metadata.folder.selected.getCodeString() }}){% endif %}</a></li>
             {% endif %}
+            <li class="icon-staff-students" title="Students">{{ effort.allEffort|length }} Students</li>
         </ul>
     </div>
 </div>
