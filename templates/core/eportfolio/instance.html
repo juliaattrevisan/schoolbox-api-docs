@@ -1,39 +1,30 @@
 <!-- BEGIN custom_head -->
 <style type="text/css">
     /** Make these styles more specific than topbar styles  **/
-    #e-portfolio .column-top .top-bar,
-    #e-portfolio .column-top .top-bar a {
+    #e-portfolio .column-top .component.information-list,
+    #e-portfolio .column-top .component.information-list a {
         color: #{top_head_font};
         background-color: #{top_head_bg};
-    }
-    #e-portfolio .column-top .top-bar .divider {
-        border-color: #{top_head_font};
     }
     #e-portfolio .column-top .island section {
         color: #{top_font};
         background-color: #{top_bg_primary};
     }
 
-    #e-portfolio .column-left .top-bar,
-    #e-portfolio .column-left .top-bar a {
+    #e-portfolio .column-left .component.information-list,
+    #e-portfolio .column-left .component.information-list a {
         color: #{left_head_font};
         background-color: #{left_head_bg};
-    }
-    #e-portfolio .column-left .top-bar .divider {
-        border-color: #{left_head_font};
     }
     #e-portfolio .column-left .island section {
         color: #{left_font};
         background-color: #{left_bg_primary};
     }
 
-    #e-portfolio .column-right .top-bar,
-    #e-portfolio .column-right .top-bar a {
+    #e-portfolio .column-right .component.information-list,
+    #e-portfolio .column-right .component.information-list a {
         color: #{right_head_font};
         background-color: #{right_head_bg};
-    }
-    #e-portfolio .column-right .top-bar .divider {
-        border-color: #{right_head_font};
     }
     #e-portfolio .column-right .island section {
         color: #{right_font};
@@ -59,6 +50,7 @@
 <script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.device.js"></script>
 <script type="text/javascript">
 
     var colours = {};
