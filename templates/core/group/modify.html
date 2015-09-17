@@ -158,28 +158,24 @@ $(document).ready(function() {
                 >
                     <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
                     <!-- BEGIN authorisation -->
-                    <fieldset>
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>
-                                    <input id="acceptCheck" type="checkbox" data-select-all data-select-all-for-group="accept" />
-                                    <label for="acceptCheck" class="checkbox-label">Accept?</label>
-                                </th>
-                            </tr>
-                            </thead>
-                            <!-- BEGIN waiting -->
-                            <tr>
-                                <td><a href="/search/user/{WAITING_ID}">{WAITING_NAME}</a></td>
-                                <td>
-                                    <input id="acceptCheck-{WAITING_ID}" type="checkbox" name="accept[]" value="{WAITING_ID}" data-select-all-group="accept" />
-                                    <label for="acceptCheck-{WAITING_ID}" class="checkbox-label"></label>
-                                </td>
-                            </tr>
-                            <!-- END waiting -->
-                        </table>
-                    </fieldset>
+                    <ul class="information-list">
+                        <!-- BEGIN waiting -->
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="small-12 avatar card">
+                                    <a href="/search/user/{WAITING_ID}">
+                                        <img src="/portrait.php?userId={WAITING_EXTERNAL_ID}&size=square64" />
+                                        {WAITING_NAME}
+                                    </a>
+                                </div>
+                            </div>
+                            <nav>
+                                <input id="acceptCheck-{WAITING_ID}" type="checkbox" name="accept[]" value="{WAITING_ID}" data-select-all-group="accept" />
+                                <label for="acceptCheck-{WAITING_ID}" class="checkbox-label"></label>
+                            </nav>
+                        </li>
+                        <!-- END waiting -->
+                    </ul>
                     <input type="submit" name="Submit" />
                     <!-- END authorisation -->
                 </form>

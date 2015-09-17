@@ -217,10 +217,11 @@ if (is_numeric($this->arg[0])) {
     $waitingList = $groupHandler->getWaitingList($category->getId());
     if (is_array($waitingList)) {
         foreach ($waitingList as $waiting) {
-            $output = array('WAITING_NAME' => $userHandler->formatName($waiting),
-                            'WAITING_ID' => $waiting['uid'],
-
-                            );
+            $output = array(
+                'WAITING_NAME'        => $userHandler->formatName($waiting),
+                'WAITING_ID'          => $waiting['uid'],
+                'WAITING_EXTERNAL_ID' => Scrub::text($waiting['synergy_id']),
+            );
             $this->setVar($output);
             $this->parse("waiting_block", "waiting", true);
         }
