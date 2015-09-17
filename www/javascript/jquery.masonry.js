@@ -132,6 +132,8 @@
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
 
+        this.sortableSetup = false;
+
         com = this.options.component;
         col = this.options.column;
 
@@ -155,9 +157,12 @@
         }
 
         // Throttled resize function
-        $(window).on('resize', Foundation.utils.throttle(function(e){
+        $(window).on('resize', Foundation.utils.debounce(function(e){
             if (!isSmallDevice()) {
-                masonry.initSortable();
+                if (!masonry.sortableSetup) {
+                    masonry.initSortable();
+                    masonry.sortableSetup = true;
+                }
             }
         }, 300));
 
