@@ -107,7 +107,7 @@ class External_Denbigh2_Api {
              */
             $mungedValues[$keystring] = $keys[$i];
             if ($values[$i] instanceof Alaress_Date_Format) {
-                $mungedValues[$valuestring] = $values[$i]->getUsingFormat('d/m/Y');
+                $mungedValues[$valuestring] = $values[$i]->getUsingFormat('m/d/Y');
             } else {
                 $mungedValues[$valuestring] = "=={$values[$i]}";
             }
