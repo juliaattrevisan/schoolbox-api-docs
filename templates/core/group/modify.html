@@ -189,7 +189,7 @@ $(document).ready(function() {
                                     <span data-tooltip class="has-tip tip-top hint" title="You may add users individually by typing their name and selecting from the list.">?</span>
                                 </label>
                                 <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
-                                <input type="submit" name="Submit" />
+                                <input type="submit" value="Add Users" />
                             </form>
 
                             <form action="/group/addUserByGroup.php?type=individual&destinationID={CATEGORY_ID}"
@@ -203,7 +203,7 @@ $(document).ready(function() {
                                     <span data-tooltip class="has-tip tip-top hint" title="Add all users that belong to another group.">?</span>
                                 </label>
                                 <input id="addUsersByIndividualGroup" type="text" size="30" placeholder="Search User Groups" />
-                                <input type="submit" value="Add Individual Group" />
+                                <input type="submit" value="Add Users" />
                             </form>
 
                             <form action="/group/addUserByGroup.php?type=system&destinationID={CATEGORY_ID}"
@@ -217,7 +217,7 @@ $(document).ready(function() {
                                     <span data-tooltip class="has-tip tip-top hint" title="Add all users of a particular role in the system.">?</span>
                                 </label>
                                 <input id="addUsersBySystemGroup" type="text" size="30" placeholder="Search User Roles" />
-                                <input type="submit" value="Add System Role" />
+                                <input type="submit" value="Add Users" />
                             </form>
 
                             <form action="/group/modifyForm.php"
@@ -231,7 +231,7 @@ $(document).ready(function() {
                                 </label>
                                 <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
                                 <textarea name="bulkAdd" id="addUsersByList" cols="30" rows="20"></textarea>
-                                <input type="submit" name="Submit" />
+                                <input type="submit" value="Add Users" />
                             </form>
                         </div>
                     </section>
