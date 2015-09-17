@@ -108,7 +108,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         $api = new External_Denbigh2_Api('CurrentDay', $params);
 
         if (!$api->hasErrors()) {
-            $dayNumber = $api->getResult()->data[0]->{'Current Day of Cycle'};
+            $dayNumber = $api->getResult()->data[0]->{'Day of Cycle'};
         }
 
         /* Just highlight day 1 by default, I guess
