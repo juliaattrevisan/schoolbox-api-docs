@@ -149,7 +149,11 @@
         this.palette  = null;
         this.spectrum = null;
 
-        this.initSortable();
+        /* Disable dragon drop for small devices
+         */
+        if (!isSmallDevice()) {
+            this.initSortable();
+        }
 
         this.initControls();
 
