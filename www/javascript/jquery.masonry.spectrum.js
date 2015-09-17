@@ -261,10 +261,10 @@
                     column.find('.island section').css({backgroundColor: color});
                     break;
                 case 'head_font':
-                    column.find('.component.action-list, .component.action-list a').css({color: color});
+                    column.find('.component.information-list, .component.information-list a').css({color: color});
                     break;
                 case 'head_bg':
-                    column.find('.component.action-list, .component.action-list a').css({backgroundColor: color});
+                    column.find('.component.information-list, .component.information-list a').css({backgroundColor: color});
                     break;
             }
         }

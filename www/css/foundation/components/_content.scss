@@ -1116,7 +1116,6 @@ $rotate-th-width: $square-grid-td-size;
 }
 
 .card {
-
 	position: relative;
     min-height: (3 * rem-calc($base-font-size));
     padding: 0.25rem 0.5rem 0 1rem;
@@ -1195,13 +1194,6 @@ $rotate-th-width: $square-grid-td-size;
         }
         ~ .progress {
             margin-bottom: 0;
-        }
-    }
-
-    /* Steve */
-    &.component {
-        h2 {
-            font-size: 1rem;
         }
     }
 
@@ -1300,6 +1292,15 @@ $rotate-th-width: $square-grid-td-size;
 				font-size: (0.8125 * rem-calc($base-font-size));
 			}
 		}
+    }
+}
+
+/* Steve
+ * Topbar replacement
+ */
+.component {
+    h2 {
+        font-size: 2rem;
     }
 }
 
