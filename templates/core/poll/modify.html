@@ -1,10 +1,7 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
-
 $(function() {
 	$('#cal_date').datepicker({
-		showOn: 'both',
-		buttonImage: '/images/core/calendar/calendar-click.png',
 		buttonImageOnly: true,
 		constrainInput: false,
 		onClose: function (string) {
@@ -17,76 +14,82 @@ $(function() {
 	});
 	
 	$('#modPoll').validate();
-	
 });
 </script>
 <!-- END custom_head -->
 
-<h1>{ACTION} Poll</h1>
-<form class="standardForm" id="modPoll" action="/poll/modifyForm.php" method="post">
-	<table class="table">
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Question</h4>
-				<em>What is the poll for</em>
-			</td>
-			<td>
-				<label><input class="required" type="text" name="question" value="{POLL_QUESTION}" size="50" /></label>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<h4>Options</h4>
-				<em>You can have a maximum of
-				ten options<br />
-				to vote on. You must fill in at least two.</em>
-			</td>
-			<td>
-				<label><input type="text" class="required" name="option_0" value="{OPTION_0}" /></label>
+{BREADCRUMB}
+        
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{ACTION} Poll</h1>
+    </div>
+</div>
 
-				<label><input type="text" class="required" name="option_1" value="{OPTION_1}" /></label>
+<div class="row">
+    <div class="small-12 island">
+        <form action="/poll/modifyForm.php" method="post" class="top" id="modPoll">
+            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+            <input type="hidden" name="pollID" value="{POLL_ID}" />
+            <input type="hidden" name="homepageComponentID" value="{COMPONENT_HOMEPAGE_ID}" />
 
-				<label><input type="text" name="option_2" value="{OPTION_2}" /></label>
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Question
+                            <input class="required" type="text" name="question" value="{POLL_QUESTION}" />
+                        </label>
+                    </div>
+                </fieldset>
 
-				<label><input type="text" name="option_3" value="{OPTION_3}" /></label>
+                <fieldset class="content">
+                    <legend>
+                        Options
+                        <span class="hint has-tip tip-top" data-tooltip title="Options that users can select as a response to your poll. You must fill in at least two.">?</span>
+                    </legend>
+                    <div class="small-12 columns">
+                        <label><input type="text" class="required" name="option_0" value="{OPTION_0}"/></label>
+                        <label><input type="text" class="required" name="option_1" value="{OPTION_1}"/></label>
+                        <label><input type="text" name="option_2" value="{OPTION_2}"/></label>
+                        <label><input type="text" name="option_3" value="{OPTION_3}"/></label>
+                        <label><input type="text" name="option_4" value="{OPTION_4}"/></label>
+                        <label><input type="text" name="option_5" value="{OPTION_5}"/></label>
+                        <label><input type="text" name="option_6" value="{OPTION_6}"/></label>
+                        <label><input type="text" name="option_7" value="{OPTION_7}"/></label>
+                        <label><input type="text" name="option_8" value="{OPTION_8}"/></label>
+                        <label><input type="text" name="option_9" value="{OPTION_9}"/></label>
+                    </div>
+                </fieldset>
 
-				<label><input type="text" name="option_4" value="{OPTION_4}" /></label>
+                <fieldset class="content">
+                    <div class="small-12 large-6 columns">
+                        <label>
+                            Close Date
+                            <span class="hint has-tip tip-top" data-tooltip title="No votes can be cast after this date">?</span>
+                            <input name="close" id="cal_date" type="text" size="15" maxlength="30" value="{CLOSE}"/>
+                        </label>
+                    </div>
+                    <div class="small-12 large-6 columns">
+                        <label>
+                            Voting Frequency
+                            <span class="hint has-tip tip-top" data-tooltip title="Selected how often users can place a new vote">?</span>
 
-				<label><input type="text" name="option_5" value="{OPTION_5}" /></label>
+                            <select name="frequency">
+                                <option value="once" {FREQUENCY_ONCE_SELECTED}>Once</option>
+                                <option value="hourly" {FREQUENCY_HOURLY_SELECTED}>Hourly</option>
+                                <option value="daily" {FREQUENCY_DAILY_SELECTED}>Daily</option>
+                            </select>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Save" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
-				<label><input type="text" name="option_6" value="{OPTION_6}" /></label>
-
-				<label><input type="text" name="option_7" value="{OPTION_7}" /></label>
-				<label><input type="text" name="option_8" value="{OPTION_8}" /></label>
-				<label><input type="text" name="option_9" value="{OPTION_9}" /></label>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<h4>Close Date</h4>
-				<em>No votes can be cast after this date.</em>
-			</td>
-			<td>
-				<input name="close" id="cal_date" type="text" size="15" maxlength="30" value="{CLOSE}"/>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<h4>Voting Frequency</h4>
-				<em>Selected how often users can place a new vote.</em>
-			</td>
-			<td>
-				<select name="frequency">
-					<option value="once" {FREQUENCY_ONCE_SELECTED}>Once</option>
-					<option value="hourly" {FREQUENCY_HOURLY_SELECTED}>Hourly</option>
-					<option value="daily" {FREQUENCY_DAILY_SELECTED}>Daily</option>
-				</select>
-
-				<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-				<input type="hidden" name="pollID" value="{POLL_ID}" />
-				<input type="hidden" name="homepageComponentID" value="{COMPONENT_HOMEPAGE_ID}" />
-			</td>
-		</tr>
-	</table>
-	<input type="submit" class="submit-btn-plain" value="Save" />
-</form>

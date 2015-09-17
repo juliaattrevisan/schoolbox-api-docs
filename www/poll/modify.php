@@ -2,6 +2,9 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
+use \Schoolbox\Breadcrumbs;
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
 $pollHandler = new Poll;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
@@ -46,6 +49,31 @@ if (is_numeric($this->arg[0])) {
     );
 
     $this->setVar($output);
+
+    /* Render out breadcrumbs
+     */
+    try {
+        $folderMapper = new FolderMapper();
+        $folder = $folderMapper->findById($poll['categoryID']);
+    }
+    catch (\Exception $e) {
+        error(13);
+    }
+
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Modify Poll',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
+
 } else if (is_numeric($this->arg[1])) {
 
     // check permission
@@ -79,7 +107,30 @@ if (is_numeric($this->arg[0])) {
     );
 
     $this->setVar($output);
+
+    /* Render out breadcrumbs
+     */
+    try {
+        $folderMapper = new FolderMapper();
+        $folder = $folderMapper->findById($this->arg[1]);
+    }
+    catch (\Exception $e) {
+        error(13);
+    }
+
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $folder->getName(),
+            'href' => "/homepage/{$folder->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'New Poll',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 } else {
     error(2);
 }
-?>
