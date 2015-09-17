@@ -526,7 +526,52 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getParentEmails($synergyIds)
     {
-        // TODO: Implement getParentEmails() method.
+        if (empty($synergyIds)) {
+            return [];
+        }
+        $query = "
+            SELECT
+                F.IDENTITY_ID#,
+                -- Father
+                F.DAD_DOMICILE,
+                F.DAD_EMAIL,
+                -- Mother
+                F.MUM_DOMICILE,
+                F.MUM_EMAIL,
+                -- Guardian
+                F.GUARD_DOMICILE,
+                F.GUARD_EMAIL,
+                -- Carer
+                F.CGIVE_DOMICILE,
+                F.CGIVE_EMAIL
+            FROM FAMILY AS F
+            INNER JOIN STUDENT AS S ON F.FAMKEY = S.FAMILY_CODE
+        ";
+        $whereParts = [];
+        foreach ($synergyIds as $id) {
+            $whereParts[] = "S.STUDKEY = {$this->getDatabase()->smartQuote($id)}";
+        }
+        $query .= ' WHERE '.implode(' OR ', $whereParts);
+
+        // Munge data in same way we would in getStudentContactList
+        $results = [];
+        foreach ($this->getDatabase()->getAll($query) as $row) {
+            $row = $this->getDatabase()->trimRow($row);
+            $id  = $row['IDENTITY_ID#'];
+            if ($row['DAD_DOMICILE'] === 'Y') {
+                $result[$id.'-M'] = $row['DAD_EMAIL'];
+            }
+            if ($row['MUM_DOMICILE'] === 'Y') {
+                $result[$id.'-F'] = $row['MUM_EMAIL'];
+            }
+            if ($row['GUARD_DOMICILE'] === 'Y') {
+                $result[$id.'-G'] = $row['GUARD_EMAIL'];
+            }
+            if ($row['CGIVE_DOMICILE'] === 'Y') {
+                $result[$id.'-C'] = $row['CGIVE_EMAIL'];
+            }
+        }
+        return $results;
     }
 
     /**
