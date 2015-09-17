@@ -603,7 +603,8 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getParent($externalUserId)
     {
-        // TODO: Implement getParent() method.
+        // Non-core promise
+        return [];
     }
 
     /**
@@ -644,7 +645,8 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getParentSync($externalUserId)
     {
-        // TODO: Implement getParentSync() method.
+        // Non-core promise
+        return [];
     }
 
     /**
