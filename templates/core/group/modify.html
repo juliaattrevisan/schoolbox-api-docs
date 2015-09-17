@@ -126,10 +126,10 @@ $(document).ready(function() {
                                     </div>
                                 </div>
                                 <div class="small-12 medium-6 columns">
-                                    <select name="type">
+                                    <select name="accessType[{USER_ID}]">
                                         <option value="0">Remove</option>
-                                        <option value="1">Read-only</option>
-                                        <option value="2">Write</option>
+                                        <option value="1" {READ_SELECTED}>Read-only</option>
+                                        <option value="2" {WRITE_SELECTED}>Write</option>
                                         <!-- BEGIN make_owner -->
                                         <option value="3">Group Admin</option>
                                         <!-- END make_owner -->

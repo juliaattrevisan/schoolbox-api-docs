@@ -2,6 +2,7 @@
 
 
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 
 $this->setFile(TEMPLATE_content, 'group/modify.html');
@@ -167,6 +168,8 @@ if (is_numeric($this->arg[0])) {
                 'USER_ID'             => $member['uid'],
                 'USER_EXTERNAL_ID'    => Scrub::text($member['synergy_id']),
                 'GROUP_CHECKED'       => $member['type'] > 1 ? 'checked=\'checked\'' : '',
+                'READ_SELECTED'       => $member['type'] == UserAccess::ACCESS_READ ? 'selected' : '',
+                'WRITE_SELECTED'      => $member['type'] == UserAccess::ACCESS_WRITE ? 'selected' : '',
                 'USER_FOLLOWING'      => $following ? 'Yes' : 'No',
                 'USER_FOLLOWING_ICON' => $following ? 'icon-tick' : 'icon-mute',
             );
