@@ -971,7 +971,8 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getEmail($externalUserId)
     {
-        // TODO: Implement getEmail() method.
+        // non-core promise
+        return '';
     }
 
     /**
@@ -984,7 +985,13 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getPortrait($externalUserId)
     {
-        // TODO: Implement getPortrait() method.
+        // Copied from External_Schoolbox_User strategy
+        $portraitPath = realpath(Config::get('portrait_dir')) . "/$externalUserId.jpg";
+        if (is_readable($portraitPath)) {
+            return $portraitPath;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -996,7 +1003,17 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function determineBoarderType($boarderValue)
     {
-        // TODO: Implement determineBoarderType() method.
+        // Non-core promise
+        return [];
+//        if (!strlen($boarderValue)) {
+//            return '';
+//        } else {
+//            $boarders = explode(',', $this->getDatabase()->getOne('SELECT BOARDERCODES FROM SYSFILE'));
+//            if (in_array($boarderValue, $boarders)) {
+//                return 'Boarder';
+//            }
+//        }
+//        return 'Day';
     }
 
     /**
@@ -1008,7 +1025,8 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getHousemasterByHouseId($houseID)
     {
-        // TODO: Implement getHousemasterByHouseId() method.
+        // Non-core promise
+        return '';
     }
 
     /**
@@ -1020,7 +1038,8 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getCampusFromTimetable($staffID)
     {
-        // TODO: Implement getCampusFromTimetable() method.
+        // Non-core promise
+        return [];
     }
 
     /**
@@ -1030,7 +1049,8 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getStudentForms()
     {
-        // TODO: Implement getStudentForms() method.
+        // Non-core promise
+        return [];
     }
 
     /**
