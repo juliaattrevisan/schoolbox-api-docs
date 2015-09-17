@@ -796,7 +796,23 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getStaff($externalUserId)
     {
-        // TODO: Implement getStaff() method.
+        return $this->getDatabase()->trimRow(
+            $this->getDatabase()->getRow("
+                SELECT
+                    T.TEACHER_CODE AS SchoolStaffCode,
+                    '' AS StaffBuilding,
+                    T.STAFF_ROOM AS StaffRoom,
+                    T.INTERNAL_PH_EXT AS StaffExtension,
+                    T.MOBILE AS StaffMobilePhone,
+                    T_CAMPUS.DESCRIPTION AS StaffCampusDescription,
+                    T.STATUS AS StaffCategoryDescription,
+                    '' AS StaffDepartment,
+                    '' AS StaffVoiceMail
+                FROM TEACHER T
+                LEFT JOIN CODEMAST AS T_CAMPUS ON T.CAMPUS = T_CAMPUS.CODE AND T_CAMPUS.TYPE = 'CAMPUS'
+                WHERE T.TEACHER# = {$this->getDatabase()->smartQuote($externalUserId)}
+            ")
+        );
     }
 
     /**
