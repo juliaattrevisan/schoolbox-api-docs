@@ -17,13 +17,22 @@ $nav->parse($this, 'engagement');
 $validPages = array('dueWork','quiz','files', 'links','fileTypes','news','collaboration','login','components','mobile');
 
 /* Setup period **/
-$start = new Alaress_Date_Format();
-$start = $start->addMonths(-6);
+if($this->arg[1]) {
+    $start = \Alaress_Date_Format::newUrlDate($this->arg[1]);
+}
+else {
+    $start = new Alaress_Date_Format();
+    $start = $start->addMonths(-6);
+}
 $start = $start->startOfMonth();
 
-$end = new Alaress_Date_Format();
+if($this->arg[1]) {
+    $end = \Alaress_Date_Format::newUrlDate($this->arg[2]);
+}
+else {
+    $end = new Alaress_Date_Format();
+}
 $end = $end->endOfMonth();
-
 
 if(in_array($this->arg[0],$validPages)) {
     $page = $this->arg[0];
@@ -32,6 +41,14 @@ else {
     $page = 'login';
 }
 
+
+$this->setVar(array(
+    'CURRENT_PAGE'              => $page,
+    'SELECTED_START'            => $start->getLocalShort(),
+    'SELECTED_FINISH'           => $end->getLocalShort(),
+    'SELECTED_FORMATTED_START'  => $start->getURLDate(),
+    'SELECTED_FORMATTED_FINISH' => $end->getURLDate(),
+));
 
 $this->setFile('REPORT_CONTENT', 'adminv2/engagement/' . $page . '.html');
 
