@@ -86,64 +86,58 @@ $(document).ready(function() {
                 >
                     <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
                     <!-- BEGIN groupUnmanaged -->
-                    <div class="small-12 columns no-pad">
-                        <div class="alert-box">This group currently has no administrator.</div>
-                    </div>
+                    <div class="alert-box">This group currently has no administrator.</div>
                     <!-- END groupUnmanaged -->
 
                     <!-- BEGIN msg_enabled_followth -->
 
                     <!-- END msg_enabled_followth -->
-                    <div class="small-12 columns">
-                        <div class="row">
-                            <ul class="information-list">
-                                <!-- BEGIN groupOwner -->
-                                <li>
-                                    <div class="list-item">
-                                        <div class="small-12 avatar card">
-                                            <!-- BEGIN msg_enabled_followadmin -->
+                    <ul class="information-list">
+                        <!-- BEGIN groupOwner -->
+                        <li>
+                            <div class="list-item">
+                                <div class="small-12 avatar card">
+                                    <!-- BEGIN msg_enabled_followadmin -->
 
-                                            <!-- END msg_enabled_followadmin -->
-                                            <a href="/search/user/{OWNER_ID}">
-                                                <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
-                                                {GROUP_OWNER}
-                                            </a>
-                                            <p class="meta">Group Admin</p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <!-- END groupOwner -->
+                                    <!-- END msg_enabled_followadmin -->
+                                    <a href="/search/user/{OWNER_ID}">
+                                        <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
+                                        {GROUP_OWNER}
+                                    </a>
+                                    <p class="meta">Group Admin</p>
+                                </div>
+                            </div>
+                        </li>
+                        <!-- END groupOwner -->
 
-                                <!-- BEGIN member -->
-                                <li class="actions-small-4">
-                                    <div class="list-item">
-                                        <div class="small-12 avatar card">
-                                            <a href="/search/user/{USER_ID}">
-                                                <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
+                        <!-- BEGIN member -->
+                        <li class="actions-small-4">
+                            <div class="list-item">
+                                <div class="small-12 avatar card">
+                                    <a href="/search/user/{USER_ID}">
+                                        <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
 
-                                                <!-- BEGIN msg_enabled_userfollow -->
+                                        <!-- BEGIN msg_enabled_userfollow -->
 
-                                                <!-- END msg_enabled_userfollow -->
-                                                <!-- BEGIN msg_enabled_usermute -->
-                                                <span data-tooltip class="tip-top icon-mute" title="{USER_NAME} has muted messages from this group."></span>
-                                                <!-- END msg_enabled_usermute -->
+                                        <!-- END msg_enabled_userfollow -->
+                                        <!-- BEGIN msg_enabled_usermute -->
+                                        <span data-tooltip class="tip-top icon-mute" title="{USER_NAME} has muted messages from this group."></span>
+                                        <!-- END msg_enabled_usermute -->
 
-                                                {USER_NAME}
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <nav>
-                                        <a href="#" class="icon-view" title="Set this user as read"></a>
-                                        <a href="#" class="icon-modify" title="Add this user"></a>
-                                        <!-- BEGIN make_owner -->
-                                        <a href="#" class="icon-favourite" title="Make admin"></a>
-                                        <!-- END make_owner -->
-                                    </nav>
-                                </li>
-                                <!-- END member -->
-                            </ul>
-                        </div>
-                    </div>
+                                        {USER_NAME}
+                                    </a>
+                                </div>
+                            </div>
+                            <nav>
+                                <a href="#" class="icon-view" title="Set this user as read"></a>
+                                <a href="#" class="icon-modify" title="Add this user"></a>
+                                <!-- BEGIN make_owner -->
+                                <a href="#" class="icon-favourite" title="Make admin"></a>
+                                <!-- END make_owner -->
+                            </nav>
+                        </li>
+                        <!-- END member -->
+                    </ul>
                 </form>
 
                 <form action="/group/modifyForm.php"
