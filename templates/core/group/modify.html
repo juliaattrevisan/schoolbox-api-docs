@@ -88,9 +88,9 @@ $(document).ready(function() {
 
                     <ul class="information-list">
                         <!-- BEGIN groupOwner -->
-                        <li class="actions">
+                        <li>
                             <div class="list-item">
-                                <div class="avatar card">
+                                <div class="small-12 avatar card">
                                     <!-- BEGIN msg_enabled_followadmin -->
 
                                     <!-- END msg_enabled_followadmin -->
@@ -105,21 +105,29 @@ $(document).ready(function() {
                         <!-- END groupOwner -->
 
                         <!-- BEGIN member -->
-                        <li class="actions small-1">
+                        <li>
                             <div class="list-item">
-                                <div class="avatar card">
-                                    <a href="/search/user/{USER_ID}">
-                                        <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
-                                        {USER_NAME}
+                                <div class="small-12 medium-6 columns">
+                                    <div class="row">
+                                        <div class="small-12 avatar card">
+                                            <a href="/search/user/{USER_ID}">
+                                                <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
 
-                                        <!-- BEGIN msg_enabled_userfollow -->
+                                                <!-- BEGIN msg_enabled_userfollow -->
 
-                                        <!-- END msg_enabled_userfollow -->
-                                        <!-- BEGIN msg_enabled_usermute -->
-                                        <span data-tooltip class="has-tip tip-top icon-mute" title="{USER_NAME} has muted messages from this group."></span>
-                                        <!-- END msg_enabled_usermute -->
-                                    </a>
+                                                <!-- END msg_enabled_userfollow -->
+                                                <!-- BEGIN msg_enabled_usermute -->
+                                                <span data-tooltip class="tip-top icon-mute" title="{USER_NAME} has muted messages from this group."></span>
+                                                <!-- END msg_enabled_usermute -->
+
+                                                {USER_NAME}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="small-12 medium-6 columns">
                                     <select name="type">
+                                        <option value="0">Remove</option>
                                         <option value="1">Read-only</option>
                                         <option value="2">Write</option>
                                         <!-- BEGIN make_owner -->
@@ -128,10 +136,6 @@ $(document).ready(function() {
                                     </select>
                                 </div>
                             </div>
-                            <nav>
-                                <input id="delCheck-{USER_ID}" type="checkbox" name="delete[]" value="{USER_ID}" data-select-all-group="delete" />
-                                <label for="delCheck-{USER_ID}" class="checkbox-label"></label>
-                            </nav>
                         </li>
                         <!-- END member -->
                     </ul>
