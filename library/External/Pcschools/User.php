@@ -391,8 +391,8 @@ class External_Pcschools_User implements External_UserInterface
      * StudentContactSpouseDefaultEmail,
      * StudentContactType,
      * StudentContactSilentPhoneFlag,
-     * Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
-     * Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
+     * PrimaryDirectoryIncludeFlag,
+     * SpouseDirectoryIncludeFlag,
      * StudentParentsSeparatedFlag
      *
      * @param $yearlevel
@@ -404,7 +404,75 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
     {
-        // TODO: Implement getStudentContactListExtended() method.
+        // Not required for MVP
+        return [];
+//        $query = "
+//            SELECT
+//                -- Student fields
+//                S.STUDENT# AS StudentID,
+//                S.GIVEN_NAME AS StudentGiven1,
+//                S.LEGAL_SURNAME AS StudentSurname,
+//                S.CURRENT_YEAR AS StudentYearLevel,
+//                S.HOUSE AS StudentHouse,
+//                S.STATUS AS StudentBoarder,
+//                S.HOME_CLASS AS StudentForm,
+//                -- Address
+//                F.COR_ADDRESS,
+//                F.COR_ADDRESS1,
+//                F.COR_TOWN,
+//                F.COR_POST_CODE,
+//                F.STATE_COR,
+//                -- Father
+//                F.FATHER_TITLE,
+//                F.DAD_FIRSTNAME,
+//                F.DAD_SURNAME,
+//                F.DAD_EMAIL,
+//                F.DAD_HOME_PHONE,
+//                F.DAD_MOBILE,
+//                F.DAD_BUSS_PHONE,
+//                F.DAD_STATUS,
+//                -- Mother
+//                F.MOTHER_TITLE,
+//                F.MUM_FIRSTNAME,
+//                F.MUM_SURNAME,
+//                F.MUM_EMAIL,
+//                F.MUM_HOME_PHONE,
+//                F.MUM_MOBILE,
+//                F.MUM_BUSS_PHONE,
+//                F.MUM_STATUS,
+//                -- Guardian
+//                F.GUARDIAN_TITLE,
+//                F.GUARD_FIRSTNAME,
+//                F.GUARD_SURNAME,
+//                F.GUARD_EMAIL,
+//                F.GUARD_HOME_PH,
+//                F.GUARD_MOBILE,
+//                F.GUARD_BUSS_PH,
+//                F.GUARD_STATUS,
+//                -- Carer
+//                F.CGIVE_TITLE,
+//                F.CGIVE_FIRSTNAME,
+//                F.CGIVE_SURNAME,
+//                F.CGIVE_EMAIL,
+//                F.CGIVE_HOME_PH,
+//                F.CGIVE_MOBILE,
+//                F.CGIVE_BUSS_PH,
+//                F.CGIVE_STATUS
+//            FROM STUDENT S
+//            LEFT JOIN FAMILY AS S_FAMILY ON S.FAMILY_CODE = S_FAMILY.FAMKEY
+//        ";
+//
+//        $whereParts = [];
+//        if (strlen($yearlevel)) {
+//            $whereParts[] = "S.CURRENT_YEAR = {$this->getDatabase()->smartQuote($yearlevel)}";
+//        }
+//        if (strlen($name)) {
+//            $name         = $this->getDatabase()->quote($name);
+//            $whereParts[] = "(S.GIVEN_NAME LIKE '%$name%' OR S.LEGAL_SURNAME LIKE '%$name%')";
+//        }
+//        if (strlen($form)) {
+//            $whereParts[] = "S.HOME_CLASS = {$this->getDatabase()->smartQuote($yearlevel)}";
+//        }
     }
 
     /**
