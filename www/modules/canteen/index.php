@@ -8,12 +8,11 @@
  * @link      http://www.alaress.com.au/
  */
 
-//if ($this->arg[1] == 'window') {
-//    $this->setFile(TEMPLATE_content, 'modules/remote/nwindow.html');
-//} else {
-//    $this->setFile(TEMPLATE_content, 'modules/remote/frame.html');
-//}
-$this->setFile(TEMPLATE_content, 'modules/remote/frame.html');
+if ($this->arg[0] == 'window') {
+    $this->setFile(TEMPLATE_content, 'modules/remote/nwindow.html');
+} else {
+    $this->setFile(TEMPLATE_content, 'modules/remote/frame.html');
+}
 $remoteUrl = 'http://campusonline.cis.edu.sg/signon.asp';
 $mapFile = '/home/cispl/parent_map.csv';
 
@@ -73,6 +72,6 @@ $remoteUrl = $remoteUrl . $glue . http_build_query([
 ]);
 
 $this->setVar([
-    'REMOTE_URL'   => Scrub::text($remoteUrl),
+    'REMOTE_URL'   => $remoteUrl,
     'FRAME_HEIGHT' => $height,
 ]);
