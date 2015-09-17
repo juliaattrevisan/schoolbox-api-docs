@@ -673,7 +673,109 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getParentUserAccountInfo()
     {
-        // TODO: Implement getParentUserAccountInfo() method.
+        $result = [];
+        $rowset = $this->getDatabase()->trimAll(
+            $this->getDatabase()->getAll("
+                SELECT
+                    F.IDENTITY_ID#,
+                    ID.LOGIN,
+                    -- Father
+                    F.DAD_DOMICILE,
+                    F.FATHER_TITLE,
+                    F.DAD_FIRSTNAME,
+                    F.DAD_SURNAME,
+                    F.DAD_EMAIL,
+                    -- Mother
+                    F.MUM_DOMICILE,
+                    F.MOTHER_TITLE,
+                    F.MUM_FIRSTNAME,
+                    F.MUM_SURNAME,
+                    F.MUM_EMAIL,
+                    -- Guardian
+                    F.GUARD_DOMICILE,
+                    F.GUARDIAN_TITLE,
+                    F.GUARD_FIRSTNAME,
+                    F.GUARD_SURNAME,
+                    F.GUARD_EMAIL,
+                    -- Carer
+                    F.CGIVE_DOMICILE,
+                    F.CGIVE_TITLE,
+                    F.CGIVE_FIRSTNAME,
+                    F.CGIVE_SURNAME,
+                    F.CGIVE_EMAIL,
+                    -- Student
+                    S.CURRENT_YEAR AS StudentYearLevel,
+                    S.CAMPUS AS StudentCampus,
+                    S.SEX AS StudentGender
+                FROM FAMILY AS F
+                LEFT JOIN \"IDENTITY\" AS ID ON F.IDENTITY_ID# = ID.MEMBER#
+                INNER JOIN STUDENT AS S ON F.FAMKEY = S.FAMILY_CODE
+            ")
+        );
+        foreach ($rowset as $row) {
+            $student = [
+                'StudentYearLevel' => $row['StudentYearLevel'],
+                'StudentCampus'    => $row['StudentCampus'],
+                'StudentGender'    => $row['StudentGender'],
+            ];
+            // I'm going to assume on the DOMICILE field
+            if ($row['DAD_DOMICILE'] === 'Y') {
+                $result[] = array_merge(
+                    $student,
+                    [
+                        'StudentContactID'                 => $row['IDENTITY_ID#'],
+                        'StudentContactTitle'              => $row['FATHER_TITLE'],
+                        'StudentContactPreferred'          => $row['DAD_FIRSTNAME'],
+                        'StudentContactLegalFullName'      => $row['DAD_FIRSTNAME'].' '.$row['DAD_SURNAME'],
+                        'StudentContactSurname'            => $row['DAD_SURNAME'],
+                        'StudentContactDefaultEmail'       => $row['DAD_EMAIL'],
+                    ]
+                );
+            }
+            // Mother
+            if ($row['MUM_DOMICILE'] === 'Y') {
+                $result[] = array_merge(
+                    $student,
+                    [
+                        'StudentContactID'                 => $row['IDENTITY_ID#'],
+                        'StudentContactTitle'              => $row['MOTHER_TITLE'],
+                        'StudentContactPreferred'          => $row['MUM_FIRSTNAME'],
+                        'StudentContactLegalFullName'      => $row['MUM_FIRSTNAME'].' '.$row['MUM_SURNAME'],
+                        'StudentContactSurname'            => $row['MUM_SURNAME'],
+                        'StudentContactDefaultEmail'       => $row['MUM_EMAIL'],
+                    ]
+                );
+            }
+            // Guardian
+            if ($row['GUARD_DOMICILE'] === 'Y') {
+                $result[] = array_merge(
+                    $student,
+                    [
+                        'StudentContactID'                 => $row['IDENTITY_ID#'],
+                        'StudentContactTitle'              => $row['GUARDIAN_TITLE'],
+                        'StudentContactPreferred'          => $row['GUARD_FIRSTNAME'],
+                        'StudentContactLegalFullName'      => $row['GUARD_FIRSTNAME'].' '.$row['GUARD_SURNAME'],
+                        'StudentContactSurname'            => $row['GUARD_SURNAME'],
+                        'StudentContactDefaultEmail'       => $row['GUARD_EMAIL'],
+                    ]
+                );
+            }
+            // Carer
+            if ($row['CGIVE_DOMICILE'] === 'Y') {
+                $result[] = array_merge(
+                    $student,
+                    [
+                        'StudentContactID'                 => $row['IDENTITY_ID#'],
+                        'StudentContactTitle'              => $row['CGIVE_TITLE'],
+                        'StudentContactPreferred'          => $row['CGIVE_FIRSTNAME'],
+                        'StudentContactLegalFullName'      => $row['CGIVE_FIRSTNAME'].' '.$row['CGIVE_SURNAME'],
+                        'StudentContactSurname'            => $row['CGIVE_SURNAME'],
+                        'StudentContactDefaultEmail'       => $row['CGIVE_EMAIL'],
+                    ]
+                );
+            }
+        }
+        return $result;
     }
 
     /**
