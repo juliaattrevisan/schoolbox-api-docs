@@ -188,172 +188,162 @@
         });
     });
 </script>
-<style type="text/css">
 
-</style>
-<h1>
-    Learning Analytics - {{ metadata.pageTitle }}
+<ul class="breadcrumb">
+   <li><a href="/submission/listSubmission">Submissions</a></li>
+    <li title="Course"  {% if metadata.route != 'folder' %} class="active" {% endif %}><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}" title="Course">{{ metadata.pageTitle }}</a></li>
     {% if metadata.route == 'folder' %}
-    - {{ metadata.folder.selected.getName() }}
+        <li title="Class" class="active"><a href="/homepage/{{metadata.folder.selected.getId()}}" title="Class Page">{{ metadata.folder.selected.getName() }} {% if metadata.folder.selected.getCodeString() %}({{ metadata.folder.selected.getCodeString() }}){% endif %}</a></li>
     {% endif %}
-</h1>
-
-{# Foundation-friendly setup#}
-{#<dl class="tabs">#}
-    {#<dd class="{% if metadata.route == 'course' %}active{% endif %}">#}
-        {#<a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}'>#}
-            {#Course#}
-        {#</a>#}
-    {#</dd>#}
-    {#{% for folder in metadata.folder.all %}#}
-    {#<dd class="{% if (folder.getId() == metadata.folder.selected.getId()) and (metadata.route == 'folder') %}active{% endif %}">#}
-        {#<a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ folder.getId() }}'>#}
-            {#{{ folder.getName() }}#}
-        {#</a>#}
-    {#</dd>#}
-    {#{% endfor %}#}
-{#</dl>#}
-
-{# Un-Founded variant #}
-<ul class="admin-nav">
-    <li>
-        <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}' class="{% if metadata.route == 'course' %}current{% endif %}">
-            Course
-        </a>
-    </li>
-    {% for folder in metadata.folder.all %}
-    <li>
-        <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ folder.getId() }}' class="{% if (folder.getId() == metadata.folder.selected.getId()) and (metadata.route == 'folder') %}current{% endif %}">
-            {{ folder.getName() }} {%  if folder.getCodeString() %}({{ folder.getCodeString() }}){% endif %}
-        </a>
-    </li>
-    {% endfor %}
 </ul>
 
-<div class="clearfix"></div>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Learning Analytics</h1>
+        <dl class="sub-nav">
+            {% for folder in metadata.folder.all %}
+                <dd class="{% if (folder.getId() == metadata.folder.selected.getId()) and (metadata.route == 'folder') %}active{% endif %}">
+                    <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ folder.getId() }}' class="button">
+                        {{ folder.getName() }} {% if folder.getCodeString() %}({{ folder.getCodeString() }}){% endif %}
+                    </a>
+                </dd>
+            {% endfor %}
+        </dl>
+        <ul class="meta">
+            <li class="icon-course-builder" title="Course"><a href="/homepage/{{ metadata.folder.course.getId()}}" title="Course Page">{{ metadata.pageTitle }}</a></li>
 
-<h2>Overall Progress</h2>
-<div data-graph='overall' class='learning-analytics overall medium-6 columns'></div>
-
-<div class="learning-analytics medium-3 columns">
-    <h3>Top Students</h3>
-    {% if results.ranking.top|length > 0 %}
-    <ul>
-        {% for currentStudent in results.ranking.top|slice(0,3) %}
-        <li>
-            <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
-            {{ currentStudent.average|number_format(1) }}%
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>
-        Nobody has attempted these tasks yet.
-    </p>
-    {% endif %}
-</div>
-<div class="learning-analytics medium-3 columns">
-    <h3>Bottom Students</h3>
-    {% if results.ranking.bottom|length > 0 %}
-    <ul>
-        {% for currentStudent in results.ranking.bottom|slice(0,3) %}
-        <li>
-            <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
-            {{ currentStudent.average|number_format(1) }}%
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>
-        Nobody has attempted these tasks yet.
-    </p>
-    {% endif %}
-</div>
-
-<div class="clearfix"></div>
-
-
-{# Foundation-friendly setup #}
-{#<h2>#}
-    {#Results#}
-    {#{% if results.tasks.types.selected.getId() > 0 %}#}
-        {#({{ results.tasks.types.selected.getName() }})#}
-    {#{% endif %}#}
-{#</h2>#}
-{#<a class="button icon-menu"href="#" data-dropdown="taskFilter">Type Filter</a>#}
-{#<ul class="f-dropdown" data-dropdown-content="" id="taskFilter">#}
-    {#{% if metadata.route == 'course' %}#}
-        {#<li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}">All</a></li>#}
-        {#{% for currentTaskType in results.tasks.types.all %}#}
-        {#<li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>#}
-        {#{% endfor %}#}
-    {#{% elseif metadata.route == 'folder' %}#}
-        {#<li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}">All</a></li>#}
-        {#{% for currentTaskType in results.tasks.types.all %}#}
-        {#<li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>#}
-        {#{% endfor %}#}
-    {#{% endif %}#}
-{#</ul>#}
-
-{# Un-Founded variant #}
-<script type="text/javascript">
-    $(function() {
-        $('select[data-taskfilter=true]').change(function(event) {
-            event.preventDefault();
-
-            window.location.href = $(this).val();
-        });
-    });
-</script>
-<h2>
-    Results
-    {% if results.tasks.types.selected.getId() > 0 %}
-        ({{ results.tasks.types.selected.getName() }})
-    {% endif %}
-
-    <select class="learning-analytics task-filter" data-taskfilter="true">
-        {% if metadata.route == 'course' %}
-            <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}">All</option>
-            {% for currentTaskType in results.tasks.types.all %}
-            {% set selected = '' %}
-
-            {% if results.tasks.types.selected.getId() == currentTaskType.getId() %}
-            {% set selected = 'selected="selected"' %}
+            {% if metadata.route == 'folder' %}
+            <li class="icon-home" title="Class"><a href="/homepage/{{metadata.folder.selected.getId()}}" title="Class Page">{{ metadata.folder.selected.getName() }} {% if metadata.folder.selected.getCodeString() %}({{ metadata.folder.selected.getCodeString() }}){% endif %}</a></li>
             {% endif %}
+            <li class="icon-staff-students" title="Students">{{ effort.allEffort|length }} Students</li>
+        </ul>
+    </div>
+</div>
 
-            <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/task/{{ currentTaskType.getId() }}" {{ selected }}>{{ currentTaskType.getName() }}</option>
+<div class="row">
+    <div class="small-12 large-6 island">
+        <h2 class="subheader">Overall Progress</h2>
+
+        <section class="content">
+            <div data-graph='overall'></div>
+        </section>
+    </div>
+    <div class="small-12 large-3 island">
+        <h3 class="subheader">Top Students</h3>
+
+        <section>
+            {% if results.ranking.top|length > 0 %}
+            <ul class="information-list">
+                {% for currentStudent in results.ranking.top|slice(0,3) %}
+                <li>
+                    <div class="avatar card">
+                        <a href="/search/user/{{ currentStudent.user.getId() }}" title="View Profile">
+                            <img src="/portrait.php?userId={{ currentStudent.user.getExternalId() }}&size=square64" alt="View Profile" />
+                            <p>{{ currentStudent.user.getFullName() }}</p>
+                        </a>
+                        <p class="meta">{{ currentStudent.average|number_format(1) }}%</p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>
+                Nobody has attempted these tasks yet.
+            </p>
+            {% endif %}
+        </section>
+    </div>
+    <div class="small-12 large-3 island">
+        <h3 class="subheader">Bottom Students</h3>
+
+        <section>
+            {% if results.ranking.bottom|length > 0 %}
+            <ul class="information-list">
+                {% for currentStudent in results.ranking.bottom|slice(0,3) %}
+                <li>
+                    <div class="avatar card">
+                        <a href="/search/user/{{ currentStudent.user.getId() }}" title="View Profile">
+                            <img src="/portrait.php?userId={{ currentStudent.user.getExternalId() }}&size=square64" alt="View Profile" />
+                            <p>{{ currentStudent.user.getFullName() }}</p>
+                        </a>
+                        <p class="meta">{{ currentStudent.average|number_format(1) }}%</p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>
+                Nobody has attempted these tasks yet.
+            </p>
+            {% endif %}
+        </section>
+    </div>
+</div>
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h2 class="subheader">Results</h2>
+
+            {% if results.tasks.types.selected.getId() > 0 %}
+            <ul class="meta">
+                <li class="icon-due-work">{{ results.tasks.types.selected.getName() }}</li>
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+    <nav>
+        <a class="icon-more" title="Filter Options" data-dropdown="result-filter-options"></a>
+    </nav>
+    <ul id="result-filter-options" class="f-dropdown" data-dropdown-content>
+
+        {% if metadata.route == 'course' %}
+            <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}" class="icon-due-work" title="All">All</a></li>
+            {% for currentTaskType in results.tasks.types.all %}
+            <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/task/{{ currentTaskType.getId() }}" class="icon-due-work" title="{{ currentTaskType.getName() }}">{{ currentTaskType.getName() }}</a></li>
             {% endfor %}
         {% elseif metadata.route == 'folder' %}
-            <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}">All</option>
+            <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}" class="icon-due-work" title="All">All</a></li>
             {% for currentTaskType in results.tasks.types.all %}
-            {% set selected = '' %}
-
-            {% if results.tasks.types.selected.getId() == currentTaskType.getId() %}
-            {% set selected = 'selected="selected"' %}
-            {% endif %}
-
-            <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}/task/{{ currentTaskType.getId() }}" {{ selected }}>{{ currentTaskType.getName() }}</option>
+            <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}/task/{{ currentTaskType.getId() }}" class='icon-due-work' title="{{ currentTaskType.getName() }}">{{ currentTaskType.getName() }}</a></li>
             {% endfor %}
         {% endif %}
-    </select>
-</h2>
+    </ul>
+</div>
 
-<div data-graph="boxplots" class='learning-analytics boxplots'></div>
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <div data-graph="boxplots"></div>
+        </section>
+    </div>
+</div>
 
-<div class="clearfix"></div>
-
-<h2>Unit Progress</h2>
-<div data-graph='unit-progress' class='learning-analytics unit-progress' style="height:{{ ((progress.allUnits|length)*50)+75 }}px"></div>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Unit Progress</h2>
+        <section class="content">
+            <div data-graph='unit-progress' style="height:{{ ((progress.allUnits|length)*50)+75 }}px"></div>
+        </section>
+    </div>
+</div>
 
 {% if rubrics.allRubrics|length > 0 %}
-<div class="clearfix"></div>
-
-<h2>Rubrics</h2>
-<div data-graph="rubrics" class='learning-analytics boxplots' style="height:{{ ((rubrics.allRubrics|length)*150)+75 }}px"></div>
-
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Rubrics</h2>
+        <section class="content">
+            <div data-graph="rubrics" style="height:{{ ((rubrics.allRubrics|length)*150)+75 }}px"></div>
+        </section>
+    </div>
+</div>
 {% endif %}
 
-<div class="clearfix"></div>
-
-<h2>Effort</h2>
-<div data-graph="effort" class='learning-analytics effort'></div>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Effort</h2>
+        <section class="content">
+            <div data-graph="effort"></div>
+        </section>
+    </div>
+</div>

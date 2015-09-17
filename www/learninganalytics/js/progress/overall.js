@@ -21,7 +21,8 @@
              */
             chart: {
                 type: 'column',
-                inverted: true
+                inverted: true,
+                height: 160
             },
             title: {
                 text: options.title
