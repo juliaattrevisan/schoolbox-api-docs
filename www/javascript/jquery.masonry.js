@@ -52,7 +52,7 @@
 
             mceEditorClass: 'mceEditor',
             calcSequenceData: noop,
-            url: null,
+            url: null
         },
 
         // default options for defining "columns" (includes top and bottom)
@@ -129,7 +129,6 @@
      */
     function Masonry(element, options) {
         var masonry = this, com, col;
-
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
 
@@ -154,6 +153,13 @@
         if (!isSmallDevice()) {
             this.initSortable();
         }
+
+        // Throttled resize function
+        $(window).on('resize', Foundation.utils.throttle(function(e){
+            if (!isSmallDevice()) {
+                this.initSortable();
+            }
+        }, 300));
 
         this.initControls();
 
