@@ -839,7 +839,27 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getStaffUserAccountInfo()
     {
-        // TODO: Implement getStaffUserAccountInfo() method.
+        return $this->getDatabase()->trimAll(
+            $this->getDatabase()->trimAll("
+                SELECT
+                    T.TEACHER# AS StaffID,
+                    ID.LOGIN AS NetworkLogin,
+                    '' AS ActiveFlag,
+                    T.SALUTATION AS StaffTitle,
+                    T.GIVEN_NAMES AS StaffPreferredName,
+                    T.SURNAME AS StaffSurname,
+                    '' AS DefaultEmailCode,
+                    '' AS OccupEmail,
+                    T.EMAIL AS Email,
+                    T.CAMPUS AS StaffCampus,
+                    '' AS StaffCategoryType,
+                    T.STATUS AS StaffCategory,
+                    '' AS StaffDepartment
+                FROM TEACHER T
+                LEFT JOIN \"IDENTITY\" AS ID ON T.TEACHER# = ID.MEMBER#
+                LEFT JOIN CODEMAST AS T_CAMPUS ON T.CAMPUS = T_CAMPUS.CODE AND T_CAMPUS.TYPE = 'CAMPUS'
+            ")
+        );
     }
 
     /**
