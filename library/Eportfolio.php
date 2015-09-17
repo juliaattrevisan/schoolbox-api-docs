@@ -215,6 +215,19 @@ class Eportfolio {
 	}
 
     /**
+     * Updates left and right columns widths based on the proportion (out of 12)
+     * the left column takes up.
+     *
+     * @param int $leftProportion min: 3, max: 9
+     */
+    public function updateGrid($leftProportion)
+    {
+        $leftProportion = min(9, max(3, $leftProportion));
+        $leftPercent    = round($leftProportion * (100/12)) - .5;
+        $this->updateColumnWidths($leftPercent, 99 - $leftPercent);
+    }
+
+    /**
      * Spawn a list of default colours
      *
      * @return array

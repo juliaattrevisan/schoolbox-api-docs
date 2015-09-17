@@ -164,6 +164,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
             }
         }
 
+        $tabNumber = 0;
         if ($total = $instanceCollection->count()) {
             $i = 0;
             $previous = new Component_Instance();
@@ -225,6 +226,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                     'EPORTFOLIO_COMPONENT_CLASS' => $class,
                     'EPORTFOLIO_COMPONENT_CATEGORY_ID' => $previous->getIdentifier(),
                     'EPORTFOLIO_COMPONENT_MULTIPLE_STATE' => $multipleClass,
+                    'EPORTFOLIO_COMPONENT_CATEGORY_CLASS' => $tabNumber === 0 ? 'active' : '',
                 ));
 
                 $this_category = $component->getDefinition()->getComponentCategory();
@@ -236,6 +238,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                     $this->getPage()->parse('eportfolio_component_page_block', 'eportfolio_component_page', true);
                     $this->getPage()->setVar('eportfolio_component_block', '');
                     $this->getPage()->parse('eportfolio_component_block', 'eportfolio_component', true);
+                    $tabNumber++;
 
                     // last rotation
                     if ($total == $i) {
@@ -309,14 +312,17 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
         $tabList = $this->getTabList();
 
         if (isset($tabList) && count($tabList)) {
+            $tabNumber = 0;
             foreach ($tabList as $id => $tab) {
                 $this->getPage()->setVar(array(
                     'COMPONENT_CATEGORY_ID' => $id,
                     'COMPONENT_CATEGORY_NAME' => $tab['name'],
-                    'COMPONENT_CATEGORY_COUNT' => $tab['count']
+                    'COMPONENT_CATEGORY_COUNT' => $tab['count'],
+                    'COMPONENT_CATEGORY_CLASS' => $tabNumber === 0 ? 'active' : '',
                 ));
 
                 $this->getPage()->parse('eportfolio_component_tab_block', 'eportfolio_component_tab', true);
+                $tabNumber++;
             }
         }
     }
@@ -363,10 +369,6 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 	 */
     private function renderColours()
     {
-        /* Current colour set (currently chosen and saved in db)
-         */
-        $this->renderColourSet($this->getColours(), 'original');
-
         /* Pickers colour set (when you choose new colours for components)
          */
         $this->renderColourSet($this->getColours(), 'pickers');
@@ -374,6 +376,10 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
         /* Default colour set (reset)
          */
         $this->renderColourSet($this->getEportfolioHandler()->getDefaultColorList(), 'defaults');
+
+        /* Current colour set (currently chosen and saved in db)
+         */
+        $this->renderColourSet($this->getColours(), 'original');
     }
 
     /**
@@ -382,10 +388,10 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
     private function renderColumnWidths()
     {
         $allWidths = $this->getEportfolioHandler()->getColumnWidths();
-
+        $leftWidth = round($allWidths['left_column_width'] * 12 / 100);
         $this->getPage()->setVar(array(
-            'TEMPLATE_LEFT_COLUMN_WIDTH' => $allWidths['left_column_width'],
-            'TEMPLATE_RIGHT_COLUMN_WIDTH' => $allWidths['right_column_width'],
+            'TEMPLATE_LEFT_COLUMN_WIDTH'  => $leftWidth,
+            'TEMPLATE_RIGHT_COLUMN_WIDTH' => 12 - $leftWidth,
         ));
     }
 
