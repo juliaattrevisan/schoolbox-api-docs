@@ -85,73 +85,70 @@ $(document).ready(function() {
                       id="members"
                 >
                     <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-                    <section>
-                        <fieldset class="content">
-                            <!-- BEGIN groupUnmanaged -->
-                            <div class="small-12 columns no-pad">
-                                <div class="alert-box">This group currently has no administrator.</div>
+                    <!-- BEGIN groupUnmanaged -->
+                    <div class="small-12 columns no-pad">
+                        <div class="alert-box">This group currently has no administrator.</div>
+                    </div>
+                    <!-- END groupUnmanaged -->
+
+                    <!-- BEGIN msg_enabled_followth -->
+
+                    <!-- END msg_enabled_followth -->
+
+                    <ul class="information-list">
+                        <!-- BEGIN groupOwner -->
+                        <li>
+                            <div class="list-item">
+                                <div class="small-12 avatar card">
+                                    <!-- BEGIN msg_enabled_followadmin -->
+
+                                    <!-- END msg_enabled_followadmin -->
+                                    <a href="/search/user/{OWNER_ID}">
+                                        <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
+                                        {GROUP_OWNER}
+                                    </a>
+                                    <p class="meta">Group Admin</p>
+                                </div>
                             </div>
-                            <!-- END groupUnmanaged -->
+                        </li>
+                        <!-- END groupOwner -->
 
-                            <!-- BEGIN msg_enabled_followth -->
-
-                            <!-- END msg_enabled_followth -->
-
-                            <ul class="information-list">
-                                <!-- BEGIN groupOwner -->
-                                <li>
-                                    <div class="list-item">
+                        <!-- BEGIN member -->
+                        <li>
+                            <div class="list-item">
+                                <div class="small-12 medium-6 columns">
+                                    <div class="row">
                                         <div class="small-12 avatar card">
-                                            <!-- BEGIN msg_enabled_followadmin -->
+                                            <a href="/search/user/{USER_ID}">
+                                                <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
 
-                                            <!-- END msg_enabled_followadmin -->
-                                            <a href="/search/user/{OWNER_ID}">
-                                                <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
-                                                {GROUP_OWNER}
+                                                <!-- BEGIN msg_enabled_userfollow -->
+
+                                                <!-- END msg_enabled_userfollow -->
+                                                <!-- BEGIN msg_enabled_usermute -->
+                                                <span data-tooltip class="tip-top icon-mute" title="{USER_NAME} has muted messages from this group."></span>
+                                                <!-- END msg_enabled_usermute -->
+
+                                                {USER_NAME}
                                             </a>
-                                            <p class="meta">Group Admin</p>
                                         </div>
                                     </div>
-                                </li>
-                                <!-- END groupOwner -->
-
-                                <!-- BEGIN member -->
-                                <li>
-                                    <div class="list-item">
-                                        <div class="small-12 medium-6 columns">
-                                            <div class="row">
-                                                <div class="small-12 avatar card">
-                                                    <a href="/search/user/{USER_ID}">
-                                                        <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
-
-                                                        <!-- BEGIN msg_enabled_userfollow -->
-
-                                                        <!-- END msg_enabled_userfollow -->
-                                                        <!-- BEGIN msg_enabled_usermute -->
-                                                        <span data-tooltip class="tip-top icon-mute" title="{USER_NAME} has muted messages from this group."></span>
-                                                        <!-- END msg_enabled_usermute -->
-
-                                                        {USER_NAME}
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="small-12 medium-6 columns">
-                                            <select name="accessType[{USER_ID}]">
-                                                <option value="0">Remove</option>
-                                                <option value="1" {READ_SELECTED}>Read-only</option>
-                                                <option value="2" {WRITE_SELECTED}>Write</option>
-                                                <!-- BEGIN make_owner -->
-                                                <option value="3">Group Admin</option>
-                                                <!-- END make_owner -->
-                                            </select>
-                                        </div>
-                                    </div>
-                                </li>
-                                <!-- END member -->
-                            </ul>
-                        </fieldset>
-                    </section>
+                                </div>
+                                <div class="small-12 medium-6 columns">
+                                    <select name="accessType[{USER_ID}]">
+                                        <option value="0">Remove</option>
+                                        <option value="1" {READ_SELECTED}>Read-only</option>
+                                        <option value="2" {WRITE_SELECTED}>Write</option>
+                                        <!-- BEGIN make_owner -->
+                                        <option value="3">Group Admin</option>
+                                        <!-- END make_owner -->
+                                    </select>
+                                </div>
+                            </div>
+                        </li>
+                        <!-- END member -->
+                    </ul>
+                    <input type="submit" name="Submit" />
                 </form>
 
                 <form action="/group/modifyForm.php"
