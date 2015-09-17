@@ -3,32 +3,32 @@
 <!-- Styles for text  -->
 <style type="text/css">
     /** Make these styles more specific than topbar styles  **/
-    #homepage .column-top .component.information-list,
-    #homepage .column-top .component.information-list a {
+    #component-layout .column-top .component.information-list,
+    #component-layout .column-top .component.information-list a {
         color: #{top_head_font};
         background-color: #{top_head_bg};
     }
-    #homepage .column-top .island section {
+    #component-layout .column-top .island section {
         color: #{top_font};
         background-color: #{top_bg_primary};
     }
 
-    #homepage .column-left .component.information-list,
-    #homepage .column-left .component.information-list a {
+    #component-layout .column-left .component.information-list,
+    #component-layout .column-left .component.information-list a {
         color: #{left_head_font};
         background-color: #{left_head_bg};
     }
-    #homepage .column-left .island section {
+    #component-layout .column-left .island section {
         color: #{left_font};
         background-color: #{left_bg_primary};
     }
 
-    #homepage .column-right .component.information-list,
-    #homepage .column-right .component.information-list a {
+    #component-layout .column-right .component.information-list,
+    #component-layout .column-right .component.information-list a {
         color: #{right_head_font};
         background-color: #{right_head_bg};
     }
-    #homepage .column-right .island section {
+    #component-layout .column-right .island section {
         color: #{right_font};
         background-color: #{right_bg_primary};
     }
@@ -99,7 +99,7 @@
 
         var url = '/homepage/configForm.php';
 
-        $('#homepage').masonry({
+        $('#component-layout').masonry({
             context: {
                 cid: '{ID}'
             },
@@ -405,7 +405,7 @@
 </div>
 <!-- END customise_page -->
 
-<div id="homepage" class="row">
+<div id="component-layout" class="row">
     <div class="small-12 column column-top" data-position="top">{component_position_top}</div>
     <div class="small-12 large-{TEMPLATE_LEFT_COLUMN_WIDTH} column column-left" data-position="left">{component_position_left}</div>
     <div class="small-12 large-{TEMPLATE_RIGHT_COLUMN_WIDTH} column column-right" data-position="right">{component_position_right}</div>
