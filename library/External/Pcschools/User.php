@@ -886,7 +886,8 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getStaffContactListExtended()
     {
-        // TODO: Implement getStaffContactListExtended() method.
+        // Non-core promise
+        return [];
     }
 
     /**
