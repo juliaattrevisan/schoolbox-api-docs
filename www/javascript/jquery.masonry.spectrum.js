@@ -261,11 +261,10 @@
                     column.find('.island section').css({backgroundColor: color});
                     break;
                 case 'head_font':
-                    column.find('.top-bar, .top-bar a').css({color: color});
-                    column.find('.top-bar .divider').css({borderColor: color});
+                    column.find('.component.card, .component.card a').css({color: color});
                     break;
                 case 'head_bg':
-                    column.find('.top-bar, .top-bar a').css({backgroundColor: color});
+                    column.find('.component.card, .component.card a').css({backgroundColor: color});
                     break;
             }
         }

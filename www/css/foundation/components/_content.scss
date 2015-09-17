@@ -1198,6 +1198,13 @@ $rotate-th-width: $square-grid-td-size;
         }
     }
 
+    /* Steve */
+    &.component {
+        h2 {
+            font-size: 1rem;
+        }
+    }
+
     &.wrap-down {
         h3, p, .meta {
             overflow-x: visible;
