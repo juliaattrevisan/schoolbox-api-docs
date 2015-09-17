@@ -117,8 +117,9 @@ if (is_numeric($this->arg[0])) {
     if ($folderOwner instanceof \Schoolbox\Permission\Access\UserAccess) {
         $this->setVar(
             array(
-                'GROUP_OWNER' => $folderOwner->getUser()->formatName(),
-                'OWNER_ID'    => $folderOwner->getUser()->getId(),
+                'GROUP_OWNER'       => Scrub::text($folderOwner->getUser()->formatName()),
+                'OWNER_ID'          => Scrub::text($folderOwner->getUser()->getId()),
+                'OWNER_EXTERNAL_ID' => Scrub::text($folderOwner->getUser()->getExternalId()),
             )
         );
         $this->parse('msg_enabled_followadmin_block', 'msg_enabled_followadmin');
@@ -164,6 +165,7 @@ if (is_numeric($this->arg[0])) {
                 'USER_NAME'           => $userHandler->formatName($member),
                 'USER_JAVA'           => addslashes($userHandler->formatName($member)),
                 'USER_ID'             => $member['uid'],
+                'USER_EXTERNAL_ID'    => Scrub::text($member['synergy_id']),
                 'GROUP_CHECKED'       => $member['type'] > 1 ? 'checked=\'checked\'' : '',
                 'USER_FOLLOWING'      => $following ? 'Yes' : 'No',
                 'USER_FOLLOWING_ICON' => $following ? 'icon-tick' : 'icon-mute',
