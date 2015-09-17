@@ -157,7 +157,7 @@
         // Throttled resize function
         $(window).on('resize', Foundation.utils.throttle(function(e){
             if (!isSmallDevice()) {
-                this.initSortable();
+                masonry.initSortable();
             }
         }, 300));
 
