@@ -495,7 +495,26 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getStudentUserAccountInfo()
     {
-        // TODO: Implement getStudentUserAccountInfo() method.
+        // To reformat boarder status or not?
+        return $this->getDatabase()->trimAll(
+            $this->getDatabase()->getAll("
+                SELECT
+                    S.STUDENT# AS StudentID,
+                    ID.LOGIN AS NetworkLogin,
+                    S.GIVEN_NAME AS StudentPreferred,
+                    S.LEGAL_SURNAME AS StudentSurname,
+                    S.SEX AS StudentGender,
+                    S.EMAIL AS StudentEmail,
+                    '' AS StudentOccupEmail,
+                    S.CURRENT_YEAR AS StudentYearLevel,
+                    S.HOUSE AS StudentHouse,
+                    S.STATUS AS StudentBoarder,
+                    '' AS StudentBoardingHouse,
+                    S.CAMPUS AS StudentCampus
+                FROM STUDENT S
+                LEFT JOIN \"IDENTITY\" AS ID ON S.STUDENT# = ID.MEMBER#
+            ")
+        );
     }
 
     /**
