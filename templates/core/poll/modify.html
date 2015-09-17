@@ -38,9 +38,7 @@ $(function() {
                     <div class="small-12 columns">
                         <label>
                             Question
-                            <span class="hint has-tip tip-top" data-tooltip title="What the poll is for.">?</span>
-
-                            <input class="required" type="text" name="question" value="{POLL_QUESTION}" size="50" />
+                            <input class="required" type="text" name="question" value="{POLL_QUESTION}" />
                         </label>
                     </div>
                 </fieldset>
@@ -48,7 +46,7 @@ $(function() {
                 <fieldset class="content">
                     <legend>
                         Options
-                        <span class="hint has-tip tip-top" data-tooltip title="You can have a maximum of ten options to vote on. You must fill in at least two.">?</span>
+                        <span class="hint has-tip tip-top" data-tooltip title="Options that users can select as a response to your poll. You must fill in at least two.">?</span>
                     </legend>
                     <div class="small-12 columns">
                         <label><input type="text" class="required" name="option_0" value="{OPTION_0}"/></label>
@@ -68,14 +66,14 @@ $(function() {
                     <div class="small-12 large-6 columns">
                         <label>
                             Close Date
-                            <span class="hint has-tip tip-top" data-tooltip title="No votes can be cast after this date.">?</span>
+                            <span class="hint has-tip tip-top" data-tooltip title="No votes can be cast after this date">?</span>
                             <input name="close" id="cal_date" type="text" size="15" maxlength="30" value="{CLOSE}"/>
                         </label>
                     </div>
                     <div class="small-12 large-6 columns">
                         <label>
                             Voting Frequency
-                            <span class="hint has-tip tip-top" data-tooltip title="Selected how often users can place a new vote.">?</span>
+                            <span class="hint has-tip tip-top" data-tooltip title="Selected how often users can place a new vote">?</span>
 
                             <select name="frequency">
                                 <option value="once" {FREQUENCY_ONCE_SELECTED}>Once</option>
