@@ -70,165 +70,189 @@ $(document).ready(function() {
 
 <div class="row">
     <div class="small-12 island">
-        <form action="/group/modifyForm.php" method="post">
-            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-            <section>
-                <fieldset class="content">
-                    <legend>Current Members</legend>
+        <ul class="tabs" data-tab>
+            <li class="tab-title active"><a href="#members">Current Members</a></li>
+            <li class="tab-title"><a href="#waitingList">Waiting List</a></li>
+            <li class="tab-title"><a href="#addMembers">Add Members</a></li>
+            <li class="tab-title"><a href="#settings">Settings</a></li>
+        </ul>
 
-                    <!-- BEGIN groupUnmanaged -->
-                    <div class="small-12 columns no-pad">
-                        <div class="alert-box">This group currently has no administrator.</div>
-                    </div>
-                    <!-- END groupUnmanaged -->
-
-                    <!-- BEGIN msg_enabled_followth -->
-
-                    <!-- END msg_enabled_followth -->
-
-                    <ul class="information-list">
-                        <!-- BEGIN groupOwner -->
-                        <li>
-                            <div class="list-item">
-                                <div class="small-12 avatar card">
-                                    <!-- BEGIN msg_enabled_followadmin -->
-
-                                    <!-- END msg_enabled_followadmin -->
-                                    <a href="/search/user/{OWNER_ID}">
-                                        <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
-                                        {GROUP_OWNER}
-                                    </a>
-                                    <p class="meta">Group Admin</p>
-                                </div>
+        <section>
+            <div class="tabs-content">
+                <form action="/group/modifyForm.php"
+                      method="post"
+                      class="content active"
+                      id="members"
+                >
+                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                    <section>
+                        <fieldset class="content">
+                            <!-- BEGIN groupUnmanaged -->
+                            <div class="small-12 columns no-pad">
+                                <div class="alert-box">This group currently has no administrator.</div>
                             </div>
-                        </li>
-                        <!-- END groupOwner -->
+                            <!-- END groupUnmanaged -->
 
-                        <!-- BEGIN member -->
-                        <li>
-                            <div class="list-item">
-                                <div class="small-12 medium-6 columns">
-                                    <div class="row">
+                            <!-- BEGIN msg_enabled_followth -->
+
+                            <!-- END msg_enabled_followth -->
+
+                            <ul class="information-list">
+                                <!-- BEGIN groupOwner -->
+                                <li>
+                                    <div class="list-item">
                                         <div class="small-12 avatar card">
-                                            <a href="/search/user/{USER_ID}">
-                                                <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
+                                            <!-- BEGIN msg_enabled_followadmin -->
 
-                                                <!-- BEGIN msg_enabled_userfollow -->
-
-                                                <!-- END msg_enabled_userfollow -->
-                                                <!-- BEGIN msg_enabled_usermute -->
-                                                <span data-tooltip class="tip-top icon-mute" title="{USER_NAME} has muted messages from this group."></span>
-                                                <!-- END msg_enabled_usermute -->
-
-                                                {USER_NAME}
+                                            <!-- END msg_enabled_followadmin -->
+                                            <a href="/search/user/{OWNER_ID}">
+                                                <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
+                                                {GROUP_OWNER}
                                             </a>
+                                            <p class="meta">Group Admin</p>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="small-12 medium-6 columns">
-                                    <select name="accessType[{USER_ID}]">
-                                        <option value="0">Remove</option>
-                                        <option value="1" {READ_SELECTED}>Read-only</option>
-                                        <option value="2" {WRITE_SELECTED}>Write</option>
-                                        <!-- BEGIN make_owner -->
-                                        <option value="3">Group Admin</option>
-                                        <!-- END make_owner -->
-                                    </select>
-                                </div>
-                            </div>
-                        </li>
-                        <!-- END member -->
-                    </ul>
-                </fieldset>
+                                </li>
+                                <!-- END groupOwner -->
 
-                <!-- BEGIN authorisation -->
-                <fieldset class="content">
-                    <legend>
-                        Awaiting Members
-                        <span data-tooltip class="has-tip tip-top hint" title="These users are currently awaiting your authorisation to join this group.">?</span>
-                    </legend>
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>
-                                <input id="acceptCheck" type="checkbox" data-select-all data-select-all-for-group="accept" />
-                                <label for="acceptCheck" class="checkbox-label">Accept?</label>
-                            </th>
-                        </tr>
-                        </thead>
-                        <!-- BEGIN waiting -->
-                        <tr>
-                            <td><a href="/search/user/{WAITING_ID}">{WAITING_NAME}</a></td>
-                            <td>
-                                <input id="acceptCheck-{WAITING_ID}" type="checkbox" name="accept[]" value="{WAITING_ID}" data-select-all-group="accept" />
-                                <label for="acceptCheck-{WAITING_ID}" class="checkbox-label"></label>
-                            </td>
-                        </tr>
-                        <!-- END waiting -->
-                    </table>
-                </fieldset>
-                <!-- END authorisation -->
+                                <!-- BEGIN member -->
+                                <li>
+                                    <div class="list-item">
+                                        <div class="small-12 medium-6 columns">
+                                            <div class="row">
+                                                <div class="small-12 avatar card">
+                                                    <a href="/search/user/{USER_ID}">
+                                                        <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
 
-                <fieldset class="content">
-                    <legend>
-                        Add Members
-                        <span data-tooltip class="has-tip tip-top hint" title="You may add users individually by typing their name and selecting from the list.">?</span>
-                    </legend>
-                    <div class="small-12 columns">
-                        <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
-                    </div>
-                </fieldset>
+                                                        <!-- BEGIN msg_enabled_userfollow -->
 
-                <fieldset class="content">
-                    <div class="small-12 medium-6 columns">
-                        <fieldset class="content no-pad">
-                            <legend>Access</legend>
-                            <input id="type-1" name="type" type="radio" value="1" {GROUP_TYPE_1} />
-                            <label for="type-1" class="radio-label">
-                                Restricted
-                                <span data-tooltip class="has-tip tip-top hint" title="Membership is only by invitation from a group admin.">?</span>
-                            </label>
-                            <input id="type-2" name="type" type="radio" value="2" {GROUP_TYPE_2} />
-                            <label for="type-2" class="radio-label">
-                                Moderated
-                                <span data-tooltip class="has-tip tip-top hint" title="Users may request membership, but must be approved by a group admin.">?</span>
-                            </label>
-                            <input id="type-3" name="type" type="radio" value="3" {GROUP_TYPE_3} />
-                            <label for="type-3" class="radio-label">
-                                Free
-                                <span data-tooltip class="has-tip tip-top hint" title="Users may join and leave at any time, without approval.">?</span>
-                            </label>
+                                                        <!-- END msg_enabled_userfollow -->
+                                                        <!-- BEGIN msg_enabled_usermute -->
+                                                        <span data-tooltip class="tip-top icon-mute" title="{USER_NAME} has muted messages from this group."></span>
+                                                        <!-- END msg_enabled_usermute -->
+
+                                                        {USER_NAME}
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="small-12 medium-6 columns">
+                                            <select name="accessType[{USER_ID}]">
+                                                <option value="0">Remove</option>
+                                                <option value="1" {READ_SELECTED}>Read-only</option>
+                                                <option value="2" {WRITE_SELECTED}>Write</option>
+                                                <!-- BEGIN make_owner -->
+                                                <option value="3">Group Admin</option>
+                                                <!-- END make_owner -->
+                                            </select>
+                                        </div>
+                                    </div>
+                                </li>
+                                <!-- END member -->
+                            </ul>
                         </fieldset>
-                    </div>
-                    <!-- BEGIN msg_enabled -->
-                    <div class="small-12 medium-6 columns">
-                        <fieldset class="content no-pad">
-                            <legend>Messaging</legend>
-                            <input type="hidden" name="msg[enabled]" value="0" />
-                            <input id="msg-enabled" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} />
-                            <label for="msg-enabled" class="checkbox-label">Messages enabled</label>
+                    </section>
+                </form>
 
-                            <!-- Hide this if messaging isn't enabled -->
-                            <div data-hide-watch="#msg-enabled">
-                                <input name="msg[force_follow]" type="hidden" value="0" />
-                                <input id="msg-force-follow" name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} />
-                                <label for="msg-force-follow" class="checkbox-label">
-                                    Force Follow
-                                    <span data-tooltip class="has-tip tip-top hint" title="Group members may not opt out of receiving messages if Force Follow is enabled.">?</span>
+                <form action="/group/modifyForm.php"
+                      method="post"
+                      class="content"
+                      id="waitingList"
+                >
+                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                    <!-- BEGIN authorisation -->
+                    <fieldset>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>
+                                    <input id="acceptCheck" type="checkbox" data-select-all data-select-all-for-group="accept" />
+                                    <label for="acceptCheck" class="checkbox-label">Accept?</label>
+                                </th>
+                            </tr>
+                            </thead>
+                            <!-- BEGIN waiting -->
+                            <tr>
+                                <td><a href="/search/user/{WAITING_ID}">{WAITING_NAME}</a></td>
+                                <td>
+                                    <input id="acceptCheck-{WAITING_ID}" type="checkbox" name="accept[]" value="{WAITING_ID}" data-select-all-group="accept" />
+                                    <label for="acceptCheck-{WAITING_ID}" class="checkbox-label"></label>
+                                </td>
+                            </tr>
+                            <!-- END waiting -->
+                        </table>
+                    </fieldset>
+                    <!-- END authorisation -->
+                </form>
+
+                <form action="/group/modifyForm.php"
+                      method="post"
+                      class="content"
+                      id="addMembers"
+                >
+                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                    <fieldset class="content">
+                        <legend>
+                            Add Members
+                            <span data-tooltip class="has-tip tip-top hint" title="You may add users individually by typing their name and selecting from the list.">?</span>
+                        </legend>
+                        <div class="small-12 columns">
+                            <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
+                        </div>
+                    </fieldset>
+                </form>
+
+                <form action="/group/modifyForm.php"
+                      method="post"
+                      class="content"
+                      id="settings"
+                >
+                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                    <fieldset>
+                        <div class="small-12 medium-6 columns">
+                            <fieldset class="content no-pad">
+                                <legend>Access</legend>
+                                <input id="type-1" name="type" type="radio" value="1" {GROUP_TYPE_1} />
+                                <label for="type-1" class="radio-label">
+                                    Restricted
+                                    <span data-tooltip class="has-tip tip-top hint" title="Membership is only by invitation from a group admin.">?</span>
                                 </label>
-                            </div>
-                        </fieldset>
-                    </div>
-                </fieldset>
-                <!-- END msg_enabled -->
-            </section>
+                                <input id="type-2" name="type" type="radio" value="2" {GROUP_TYPE_2} />
+                                <label for="type-2" class="radio-label">
+                                    Moderated
+                                    <span data-tooltip class="has-tip tip-top hint" title="Users may request membership, but must be approved by a group admin.">?</span>
+                                </label>
+                                <input id="type-3" name="type" type="radio" value="3" {GROUP_TYPE_3} />
+                                <label for="type-3" class="radio-label">
+                                    Free
+                                    <span data-tooltip class="has-tip tip-top hint" title="Users may join and leave at any time, without approval.">?</span>
+                                </label>
+                            </fieldset>
+                        </div>
+                        <!-- BEGIN msg_enabled -->
+                        <div class="small-12 medium-6 columns">
+                            <fieldset class="content no-pad">
+                                <legend>Messaging</legend>
+                                <input type="hidden" name="msg[enabled]" value="0" />
+                                <input id="msg-enabled" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} />
+                                <label for="msg-enabled" class="checkbox-label">Messages enabled</label>
 
-            <div class="row">
-                <div class="small-12 column">
-                    <input type="submit" value="Update Group" />
-                </div>
+                                <!-- Hide this if messaging isn't enabled -->
+                                <div data-hide-watch="#msg-enabled">
+                                    <input name="msg[force_follow]" type="hidden" value="0" />
+                                    <input id="msg-force-follow" name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} />
+                                    <label for="msg-force-follow" class="checkbox-label">
+                                        Force Follow
+                                        <span data-tooltip class="has-tip tip-top hint" title="Group members may not opt out of receiving messages if Force Follow is enabled.">?</span>
+                                    </label>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </fieldset>
+                    <!-- END msg_enabled -->
+                </form>
             </div>
-        </form>
+        </section>
     </div>
 </div>
