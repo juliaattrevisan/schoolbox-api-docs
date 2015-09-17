@@ -183,6 +183,7 @@ $(document).ready(function() {
                             <!-- END waiting -->
                         </table>
                     </fieldset>
+                    <input type="submit" name="Submit" />
                     <!-- END authorisation -->
                 </form>
 
@@ -192,15 +193,12 @@ $(document).ready(function() {
                       id="addMembers"
                 >
                     <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-                    <fieldset class="content">
-                        <legend>
-                            Add Members
-                            <span data-tooltip class="has-tip tip-top hint" title="You may add users individually by typing their name and selecting from the list.">?</span>
-                        </legend>
-                        <div class="small-12 columns">
-                            <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
-                        </div>
-                    </fieldset>
+                    <label for="addUser">
+                        Add Members
+                        <span data-tooltip class="has-tip tip-top hint" title="You may add users individually by typing their name and selecting from the list.">?</span>
+                    </label>
+                    <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
+                    <input type="submit" name="Submit" />
                 </form>
 
                 <form action="/group/modifyForm.php"
@@ -209,9 +207,9 @@ $(document).ready(function() {
                       id="settings"
                 >
                     <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-                    <fieldset>
+                    <div class="row">
                         <div class="small-12 medium-6 columns">
-                            <fieldset class="content no-pad">
+                            <fieldset class="content">
                                 <legend>Access</legend>
                                 <input id="type-1" name="type" type="radio" value="1" {GROUP_TYPE_1} />
                                 <label for="type-1" class="radio-label">
@@ -232,7 +230,7 @@ $(document).ready(function() {
                         </div>
                         <!-- BEGIN msg_enabled -->
                         <div class="small-12 medium-6 columns">
-                            <fieldset class="content no-pad">
+                            <fieldset class="content">
                                 <legend>Messaging</legend>
                                 <input type="hidden" name="msg[enabled]" value="0" />
                                 <input id="msg-enabled" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} />
@@ -249,8 +247,9 @@ $(document).ready(function() {
                                 </div>
                             </fieldset>
                         </div>
-                    </fieldset>
+                    </div>
                     <!-- END msg_enabled -->
+                    <input type="submit" name="Submit" />
                 </form>
             </div>
         </section>
