@@ -952,7 +952,14 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getEnrolledStudents($externalUserId)
     {
-        // TODO: Implement getEnrolledStudents() method.
+        return $this->getDatabase()->trimAll(
+            $this->getDatabase()->getAll("
+                SELECT S.STUDENT# AS RelatedID
+                FROM STUDENT S
+                LEFT JOIN FAMILY AS S_FAMILY ON S.FAMILY_CODE = S_FAMILY.FAMKEY
+                WHERE F.IDENTITY_ID# = {$this->getDatabase()->smartQuote($externalUserId)}
+            ")
+        );
     }
 
     /**
