@@ -156,8 +156,8 @@ $(document).ready(function() {
                     <!-- END msg_enabled_followth -->
                     <ul class="information-list">
                         <!-- BEGIN groupOwner -->
-                        <li>
-                            <div class="list-item">
+                        <li class="actions" data-relation="member">
+                            <div class="small-12 medium-6 columns no-pad">
                                 <div class="avatar card">
                                     <!-- BEGIN msg_enabled_followadmin -->
 
@@ -169,6 +169,32 @@ $(document).ready(function() {
                                     <p class="meta icon-favourite">Group Admin</p>
                                 </div>
                             </div>
+                            <div class="small-12 medium-6 columns no-pad">
+                                <div class="actions-small-4">
+                                    <nav>
+                                        <form action="/group/modifyForm.php" method="post" class="no-margin">
+                                            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                                            <input id="accessLevel-{OWNER_ID}-1" type="radio" name="accessLevel[{OWNER_ID}]" value="1" />
+                                            <label for="accessLevel-{OWNER_ID}-1" class="radio-toggle">
+                                                <span class="icon-view" title="Grant Read Access"></span>
+                                            </label>
+                                            <input id="accessLevel-{OWNER_ID}-2" type="radio" name="accessLevel[{OWNER_ID}]" value="2" />
+                                            <label for="accessLevel-{OWNER_ID}-2" class="radio-toggle">
+                                                <span class="icon-modify" title="Grant Write Access"></span>
+                                            </label>
+                                            <input id="accessLevel-{OWNER_ID}-3" type="radio" name="accessLevel[{OWNER_ID}]" value="3" checked />
+                                            <label for="accessLevel-{OWNER_ID}-3" class="radio-toggle">
+                                                <span class="icon-favourite" title="Make Admin"></span>
+                                            </label>
+                                            <input id="accessLevel-{OWNER_ID}-0" type="radio" name="accessLevel[{OWNER_ID}]" value="0" />
+                                            <label for="accessLevel-{OWNER_ID}-0" class="radio-toggle">
+                                                <span class="icon-close alert" title="Remove From Group"></span>
+                                            </label>
+                                        </form>
+                                    </nav>
+                                </div>
+                            </div>
+                            <span class="label full-width hide" data-relation="save-label"></span>
                         </li>
                         <!-- END groupOwner -->
 
