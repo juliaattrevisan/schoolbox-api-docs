@@ -24,8 +24,7 @@ $(document).ready(function() {
         e.preventDefault();
         var waitingUser = $(this).closest('[data-relation="waiting-user"]');
         var label       = waitingUser.find('[data-relation="save-label"]');
-        var deleting    = $(this).is('[data-interaction="reject"]');
-        if (deleting) {
+        if ($(this).is('[data-interaction="reject"]')) {
             label.labelActivate({text: 'Rejecting', css: 'alert'});
         } else {
             label.labelActivate({text: 'Accepting'});
@@ -48,6 +47,41 @@ $(document).ready(function() {
     });
 
     // On change of group form - ajax submit
+    memberList.on('change', '[name^="accessLevel"]', function() {
+        // Admin? Throw the standard warning before allowing this to happen
+        var $this  = $(this);
+        var form   = $this.closest('form');
+        var member = $this.closest('[data-relation="member"]');
+        var label  = member.find('[data-relation="save-label"]');
+
+        // loading dialog
+        if (this.value == 0) {
+            label.labelActivate({text: 'Removing', css: 'alert'});
+        } else {
+            label.labelActivate({text: 'Updating'});
+        }
+
+        // Disable all other inputs
+        var data   = form.serializeArray();
+        var inputs = form.find(':input').not(':disabled').prop('disabled', true);
+
+        $.ajax({url: form.attr('action'), method: form.attr('method'), data: data})
+            .done(function(response) {
+                // success stuff. Reload memberlist and waitlist
+                label.labelTimeout({text: 'Done'});
+                label.one('hide.labelTimeout', function() {
+                    var $response = $(response);
+                    waitingList.empty().append($response.find('#waitingList').children());
+                    memberList.empty().append($response.find('#members').children());
+                });
+            })
+            .fail(function() {
+                // failure stuff
+                label.labelTimeout({text: 'Failed!', css: 'alert'});
+                inputs.prop('disabled', false);
+            });
+
+    });
 
     // Message when you change admin
     var isAdminChanged = false;
@@ -132,14 +166,14 @@ $(document).ready(function() {
                                         <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
                                         {GROUP_OWNER}
                                     </a>
-                                    <p class="meta">Group Admin</p>
+                                    <p class="meta icon-favourite">Group Admin</p>
                                 </div>
                             </div>
                         </li>
                         <!-- END groupOwner -->
 
                         <!-- BEGIN member -->
-                        <li class="actions">
+                        <li class="actions" data-relation="member">
                             <div class="small-12 medium-6 columns no-pad">
                                 <div class="avatar card">
                                     <a href="/search/user/{USER_ID}">
@@ -158,22 +192,25 @@ $(document).ready(function() {
                                     <nav>
                                         <!-- BEGIN make_owner -->
                                         <!-- END make_owner -->
-                                        <input id="accessLevel-{USER_ID}-1" type="radio" name="accessLevel[{USER_ID}]" value="1" {READ_CHECKED} />
-                                        <label for="accessLevel-{USER_ID}-1" class="radio-toggle">
-                                            <span class="icon-view" title="Grant Read Access"></span>
-                                        </label>
-                                        <input id="accessLevel-{USER_ID}-2" type="radio" name="accessLevel[{USER_ID}]" value="2" {WRITE_CHECKED} />
-                                        <label for="accessLevel-{USER_ID}-2" class="radio-toggle">
-                                            <span class="icon-modify" title="Grant Write Access"></span>
-                                        </label>
-                                        <input id="accessLevel-{USER_ID}-3" type="radio" name="accessLevel[{USER_ID}]" value="3" {ADMIN_ALLOWED} />
-                                        <label for="accessLevel-{USER_ID}-3" class="radio-toggle">
-                                            <span class="icon-favourite" title="Make Admin"></span>
-                                        </label>
-                                        <input id="accessLevel-{USER_ID}-0" type="radio" name="accessLevel[{USER_ID}]" value="0" />
-                                        <label for="accessLevel-{USER_ID}-0" class="radio-toggle">
-                                            <span class="icon-close alert" title="Remove From Group"></span>
-                                        </label>
+                                        <form action="/group/modifyForm.php" method="post" class="no-margin">
+                                            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                                            <input id="accessLevel-{USER_ID}-1" type="radio" name="accessLevel[{USER_ID}]" value="1" {READ_CHECKED} />
+                                            <label for="accessLevel-{USER_ID}-1" class="radio-toggle">
+                                                <span class="icon-view" title="Grant Read Access"></span>
+                                            </label>
+                                            <input id="accessLevel-{USER_ID}-2" type="radio" name="accessLevel[{USER_ID}]" value="2" {WRITE_CHECKED} />
+                                            <label for="accessLevel-{USER_ID}-2" class="radio-toggle">
+                                                <span class="icon-modify" title="Grant Write Access"></span>
+                                            </label>
+                                            <input id="accessLevel-{USER_ID}-3" type="radio" name="accessLevel[{USER_ID}]" value="3" {ADMIN_ALLOWED} />
+                                            <label for="accessLevel-{USER_ID}-3" class="radio-toggle">
+                                                <span class="icon-favourite" title="Make Admin"></span>
+                                            </label>
+                                            <input id="accessLevel-{USER_ID}-0" type="radio" name="accessLevel[{USER_ID}]" value="0" />
+                                            <label for="accessLevel-{USER_ID}-0" class="radio-toggle">
+                                                <span class="icon-close alert" title="Remove From Group"></span>
+                                            </label>
+                                        </form>
                                     </nav>
                                 </div>
 
@@ -187,6 +224,7 @@ $(document).ready(function() {
                                 </div>
                                 -->
                             </div>
+                            <span class="label full-width hide" data-relation="save-label"></span>
                         </li>
                         <!-- END member -->
                     </ul>
