@@ -397,6 +397,23 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 }
 
+/* Display a logo/background for non-authenticated screens
+ * like Forgotten Password, Privacy Policy, Feedback Form etc
+ *
+ * These require the logo to be present at all times, not vanish
+ * mysteriously based on viewport size (there's no side nav)
+ */
+.standard-bar {
+    padding: 0;
+    background-color: $tabbar-bg;
+    height: $tabbar-height;
+    img {
+      display: block;
+      max-height: 5rem;
+      max-width: none;
+    }
+}
+
 .hybrid-bar{
 	.left-small{
 		z-index: 100;
