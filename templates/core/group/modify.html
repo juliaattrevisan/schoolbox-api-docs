@@ -111,16 +111,13 @@ $(document).ready(function() {
                                 <div class="avatar card">
                                     <a href="/search/user/{USER_ID}">
                                         <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
-
-                                        <!-- BEGIN msg_enabled_userfollow -->
-
-                                        <!-- END msg_enabled_userfollow -->
-                                        <!-- BEGIN msg_enabled_usermute -->
-                                        <span data-tooltip class="tip-top icon-mute" title="{USER_NAME} has muted messages from this group."></span>
-                                        <!-- END msg_enabled_usermute -->
-
                                         {USER_NAME}
                                     </a>
+                                    <p class="meta {USER_ICON}">
+                                        {USER_LEVEL}<!-- BEGIN msg_enabled_usermute -->; Muted<!-- END msg_enabled_usermute -->
+                                        <!-- BEGIN msg_enabled_userfollow -->
+                                        <!-- END msg_enabled_userfollow -->
+                                    </p>
                                 </div>
                             </div>
                             <nav>

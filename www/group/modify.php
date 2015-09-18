@@ -162,6 +162,24 @@ if (is_numeric($this->arg[0])) {
                 $member['uid']
             );
 
+            $userLevel = 'icon-close';
+            $userIcon  = 'None';
+            switch ($member['type']) {
+                case UserAccess::ACCESS_READ:
+                    $userLevel = 'Read Access';
+                    $userIcon  = 'icon-view';
+                    break;
+                case UserAccess::ACCESS_WRITE:
+                    $userLevel = 'Write Access';
+                    $userIcon  = 'icon-modify';
+                    break;
+                case UserAccess::ACCESS_FULL:
+                    $userLevel = 'Group Admin';
+                    $userIcon  = 'icon-favourite';
+                    break;
+                default:
+                    break;
+            }
             $output = array(
                 'USER_NAME'           => $userHandler->formatName($member),
                 'USER_JAVA'           => addslashes($userHandler->formatName($member)),
@@ -174,6 +192,8 @@ if (is_numeric($this->arg[0])) {
                 'USER_FOLLOWING_ICON' => $following ? 'icon-tick' : 'icon-mute',
                 // Stylage
                 'ADMIN_ALLOWED'       => $groupHandler->allowOwner($member['uid']) ? '' : 'disabled',
+                'USER_LEVEL'          => $userLevel,
+                'USER_ICON'           => $userIcon,
             );
 
             $this->setVar($output);
