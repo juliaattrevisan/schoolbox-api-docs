@@ -160,7 +160,6 @@ $(document).ready(function() {
                 </div>
 
                 <div class="content" id="waitingList">
-                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
                     <!-- BEGIN authorisation -->
                     <ul class="information-list">
                         <!-- BEGIN waiting -->
@@ -174,8 +173,8 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             <nav>
-                                <a href="#" class="icon-add" title="Approve Membership"></a>
-                                <a href="#" class="icon-close alert" title="Reject Membership"></a>
+                                <a href="/group/modifyForm.php?categoryID={CATEGORY_ID}&amp;accept={WAITING_ID}" class="icon-add" title="Approve Membership"></a>
+                                <a href="/group/modifyForm.php?categoryID={CATEGORY_ID}&amp;reject={WAITING_ID}" class="icon-close alert" title="Reject Membership"></a>
                             </nav>
                         </li>
                         <!-- END waiting -->

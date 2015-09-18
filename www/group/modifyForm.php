@@ -126,7 +126,7 @@ if(isset($_REQUEST['delete'])) {
 	}
 }
 
-/* Accept user */
+/* Accept/reject user */
 if(isset($_REQUEST['accept'])) {
 	foreach((array)$_REQUEST['accept'] as $id) {
 		if (is_numeric($id)) {
@@ -134,6 +134,17 @@ if(isset($_REQUEST['accept'])) {
 			   ->setUser($userMapper->findById($id))
 			   ->setServiceIdentifier($categoryId);
 			$uaMapper->save($ua);
+		}
+	}
+}
+if (isset($_REQUEST['reject'])) {
+	foreach ((array)$_REQUEST['reject'] as $id) {
+		if (is_numeric($id)) {
+			$uaMapper->deleteByColumnList([
+				'service' => UserAccess::SERVICE_HOMEPAGE,
+				'uid'     => $id,
+				'sid'     => $categoryId,
+			]);
 		}
 	}
 }
