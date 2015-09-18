@@ -6,10 +6,15 @@ session_start();
 
 $page = new SitePage(false);
 
-$page->setFile(TEMPLATE_content, 'thank-you.html');
-$page->setTitle('Message Delivered');
+if (is_numeric($_SESSION['id'])) {
+    $page->setFile(TEMPLATE_content, 'feedback/thank-you-authenticated.html');
+    $page->setTitle('Message Delivered');
 
-$page->buildPage();
-$page->outputPage(true);
+    $page->outputPage();
+}
+else {
+    $page->setFile(TEMPLATE_body, 'feedback/thank-you-unauthenticated.html');
 
-?>
+    $page->setLite(true);
+    $page->outputPage(true);
+}
