@@ -3,4 +3,4 @@
  # Later on I might add ability to define the portrait position and size.
  #}
 {% set strategy = 'html' %}
-<a href="/search/user/{{ user.id }}"><img src="/portrait.php?userId={{ user.externalId|e('url') }}&amp;size=square32" />{{ user.formatName }}</a>
+<a href="/search/user/{{ user.id }}">{{ user.formatName }}</a>
