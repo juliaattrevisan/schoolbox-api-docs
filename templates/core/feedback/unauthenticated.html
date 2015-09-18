@@ -26,6 +26,7 @@
     <link rel="Shortcut Icon" href="/images/logo.php?logo=skin_logo_square&size=favicon" type="image/x-icon" />
     <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/chrome.css?v={SITE_VERSION}" />
     <link rel="stylesheet" type="text/css" media="screen" href="/css/foundation/chrome.css?v={SITE_VERSION}" />
+    <script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={SITE_VERSION}"></script>
     <script type="text/javascript">
         $(function () {
             $('#feedbackForm').submit(function ($event) {
@@ -41,7 +42,7 @@
                     message += 'Please enter a message.\n';
 
                 if ($('#recaptcha_response_field').val() == '')
-                    message += 'Please enter the two corrosponding words for the human checker.\n';
+                    message += 'Please enter the two corresponding words for the human checker.\n';
 
                 if (message != '') {
                     alert(message);
