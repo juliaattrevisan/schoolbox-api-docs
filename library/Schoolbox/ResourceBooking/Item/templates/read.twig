@@ -49,13 +49,13 @@
         var updateSeriesDialog = $('#dialog-bulk-update').dialog(dialogOptions);
         var deleteDialog = $('#dialog-delete').dialog(dialogOptions);
 
-        var height = '';
+//        var height = '';
+//
+//        if (isSmallDevice()) {
+//            height = 'auto';
+//        }
 
-        if (isSmallDevice()) {
-            height = 'auto';
-        }
-
-        var c = new Calendar('calendar', 'calendar-bubble', {
+        c = new Calendar('calendar', 'calendar-bubble', {
             filter: {
                 enabled: true,
                 ajax: false,
@@ -78,7 +78,7 @@
                     agendaDay:  'ddd D/M',
                     '':         'ddd D/M'
                 },
-                height: height,
+                height: 'auto',
                 defaultView: calendarView,
                 timeFormat: { month: 'h(:mm)a' },
                 eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
@@ -163,6 +163,9 @@
                         eventData.startTime   = date.format('HH:mm');
                         eventData.displayDate = date.format('ddd, Do MMMM, h(:mm)a')
                     }
+
+                    $('#calendar-create').foundation('reveal','open');
+
                     c.bubble.display('create', eventData, jsEvent, this)
                 },
                 eventStartEditable: false
@@ -181,7 +184,7 @@
         // For any AJAX event - open a dialog if this is a series event
         $('#calendar-bubble').find('#editEvent').on(
             'click',
-            'a.btn.booking-approve, a.btn.booking-reject, a.btn.booking-cancel',
+            '[booking-button=booking-approve], [booking-button=booking-reject], [booking-button=booking-cancel]',
             function(event) {
                 c.bubble.hide()
                 event.preventDefault()
@@ -199,7 +202,7 @@
                 if (seriesId) {
                     // Remove all previous change status events, and reapply to this
                     // dialog box.
-                    updateSeriesDialog.find('.action-text').text($(this).text().toLowerCase())
+                    updateSeriesDialog.find('[data-booking-action-text]').text($(this).text().toLowerCase())
                     updateSeriesDialog
                         .dialog('option', 'buttons', [{
                             text: "Only this booking",
@@ -320,73 +323,57 @@
     </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div id="calendar-loading">
-    <p><strong>Loading events...</strong></p>
+<div id="calendar-loading" class="reveal-modal tiny no-pad" data-reveal aria-hidden="true" role="dialog">
+    <div class='loader'></div>
+    <p>
+        <span class="label neutral full-width">
+        Loading events
+        </span>
+    </p>
 </div>
 
-{# Forms for calendar bubbles #}
-<div id="calendar-bubble" class="cal-bubble">
-    <div class="middle">
-        <div class="close">&times;</div>
-        <div class="js-data clearfix">
-            {##
-             # Create Event Form
-             # calendar adds a form listener, which I don't want.
-             # If this resource is managed and I'm not a moderator: I can't book
-             #}
-            <form id="createEvent" data-no-calendar-listener="" method="get" action="{{ routeLookup('resourceBooking.book', {id: item.id}) }}">
-                <input type="hidden" name="startDate" />
-                <input type="hidden" name="startTime" />
-                {# In this case, item ID is preset #}
-                {% if isRouteAuthorized('resourceBooking.book', {id: item.id, item: item}) %}
-                    Create booking for: <span data-event-modal-field="displayDate"></span>
-                    <div class="bookingActions">
-                        <input class="btn float-right modify no-icon" type="submit" value="Create Booking" />
-                    </div>
-                {% else %}
-                    This resource may only be booked by a resource moderator.
-                {% endif %}
-            </form>
+<div class="reveal-modal small" data-reveal aria-hidden="true" role="dialog" id="calendar-create">
+    <form id="createEvent" data-no-calendar-listener="" method="get" action="{{ routeLookup('resourceBooking.book', {id: item.id}) }}">
+        <input type="hidden" name="startDate" />
+        <input type="hidden" name="startTime" />
 
-            <form id="editEvent">
-                <input type="hidden" name="eventId" />
-                <dl>
-                    <dd><h3 class="note"></h3></dd>
-                    <dd><h4><span class="date"></span></h4></dd>
-                    <dd><p class="location"></p></dd>
-                    <dd><p class="detail wysiwyg" data-is-html="1"></p></dd>
-                    <dd class="post-by">Requested by <a class="author" href="#" data-is-user-link="1"></a></dd>
-                    <dd class="reviewed-by">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></dd>
-                </dl>
+        {% if isRouteAuthorized('resourceBooking.book', {id: item.id, item: item}) %}
+        <p>Create booking for: <span data-event-modal-field="displayDate"></span></p>
+
+        <input type="submit" class='expand' value="Create Booking" />
+        {% else %}
+        <p>This resource may only be booked by a resource moderator.</p>
+        {% endif %}
+    </form>
+</div>
+
+<div class="reveal-modal large" data-reveal aria-hidden="true" role="dialog" id="calendar-bubble" >
+    <!-- Edit Event Form -->
+    <form id="editEvent">
+        <input type="hidden" name="eventId" />
+
+        <div class="row">
+            <div class="small-12">
+                <h3 class="note"></h3>
+                <ul class="meta">
+                    <li class="icon-resource-booking" data-event-modal-field="bookingStatus"></li>
+                    <li class="icon-calendar date"></li>
+                    <li class="icon-location"></li>
+                    <li class="icon-staff-students" data-event-modal-field="post-by">Posted by <a class="author" href="#" data-is-user-link="1"></a></li>
+                    <li class="icon-staff-students" data-event-modal-field="reviewedBy">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></li>
+                </ul>
+
+                <article class="detail" data-is-html="1"></article>
+
                 <ul class="relatedBookings"></ul>
+
                 <div class="attendance">
                     <dl>
                         <dd><p class="attendanceIcon"></p></dd>
                         <dd class="rm"><p class="attendanceStatus"></p></dd>
                     </dl>
                 </div>
-                <div class="actions">
+                <div>
                     <dl>
                         <dd>
                             <span class="modifyLink" data-is-html="1"></span>
@@ -395,13 +382,21 @@
                         </dd>
                     </dl>
                 </div>
-                <div class="bookingActions" data-is-html="1">
-                </div>
-            </form>
+                <div class="bookingActions" data-is-html="1"></div>
+            </div>
         </div>
-        <div class="bottom"><strong></strong></div>
-    </div>
+    </form>
+
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
+
+
+
+
+
+
+
+
 
 {##
  # Calendar controls
@@ -438,7 +433,7 @@
 
 {# Dialog for changing bookings in series #}
 <div id="dialog-bulk-update" title="This booking is part of a series">
-    Would you like to <span class="action-text"></span> only this booking, or all in the series?
+    Would you like to <span data-booking-action-text></span> only this booking, or all in the series?
 </div>
 
 {# Dialog for deleting bookings #}
