@@ -188,6 +188,8 @@ if (is_numeric($this->arg[0])) {
                 'GROUP_CHECKED'       => $member['type'] > 1 ? 'checked=\'checked\'' : '',
                 'READ_SELECTED'       => $member['type'] == UserAccess::ACCESS_READ ? 'selected' : '',
                 'WRITE_SELECTED'      => $member['type'] == UserAccess::ACCESS_WRITE ? 'selected' : '',
+                'READ_CHECKED'        => $member['type'] == UserAccess::ACCESS_READ ? 'checked' : '',
+                'WRITE_CHECKED'       => $member['type'] == UserAccess::ACCESS_WRITE ? 'checked' : '',
                 'USER_FOLLOWING'      => $following ? 'Yes' : 'No',
                 'USER_FOLLOWING_ICON' => $following ? 'icon-tick' : 'icon-mute',
                 // Stylage
