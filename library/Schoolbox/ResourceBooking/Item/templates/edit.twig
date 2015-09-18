@@ -150,10 +150,20 @@
     {% endif %}
 </ul>
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>{{ item.name }}</h1>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>{{ item.name }}</h1>
+        </div>
     </div>
+    <nav>
+        <a class="icon-more" title="" data-dropdown="header-options"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        {% if item.id and isRouteAuthorized('resourceItem.delete:post', {id: item.id, item: item}) %}
+        <li><a id="resource-delete" title="Delete" class="icon-delete" data-action="{{ routeLookup('resourceItem.delete:post', {id: item.id}) }}">Delete</a></li>
+        {% endif %}
+    </ul>
 </div>
 
 <div class="row">
@@ -355,13 +365,6 @@
             <div class="row">
                 <div class="small-12 columns">
                     <input id="resource-save" type="submit" value="{% if item.id %}Update{% else %}Create{% endif %}" />
-                    {% if item.id and isRouteAuthorized('resourceItem.delete:post', {id: item.id, item: item}) %}
-                        <input id="resource-delete"
-                               type="submit"
-                               value="Delete"
-                               data-action="{{ routeLookup('resourceItem.delete:post', {id: item.id}) }}"
-                                />
-                    {% endif %}
                 </div>
             </div>
         </form>
