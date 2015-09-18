@@ -1,9 +1,20 @@
-<ul class="resourcecategory-list information-list">
-    {% for item in list %}
-        <li class="resourcecategory">
-            {{ include(linkTemplate|default('@resourceCategory/sub/link.twig')) }}
-        </li>
-    {% else %}
-        <li>There are no resource categories in the system.</li>
-    {% endfor %}
-</ul>
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            {% if list|length %}
+            <ul class="information-list">
+                {% for item in list %}
+                <li class="content">
+                    {{ include(linkTemplate|default('@resourceCategory/sub/link.twig')) }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="content">
+                <p>There are no resource categories in the system.</p>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+
