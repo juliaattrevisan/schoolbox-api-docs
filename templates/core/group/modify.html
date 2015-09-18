@@ -111,7 +111,7 @@ $(document).ready(function() {
                         <!-- END groupOwner -->
 
                         <!-- BEGIN member -->
-                        <li class="actions-small-4">
+                        <li class="actions-small-1 actions-medium-4">
                             <div class="list-item">
                                 <div class="small-12 avatar card">
                                     <a href="/search/user/{USER_ID}">
@@ -129,13 +129,20 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             <nav>
-                                <a href="#" class="icon-view" title="Read"></a>
-                                <a href="#" class="icon-modify" title="Write"></a>
+                                <a href="#" class="hide-for-small icon-view" title="Grant Read Access"></a>
+                                <a href="#" class="hide-for-small icon-modify" title="Grant Write Access"></a>
                                 <!-- BEGIN make_owner -->
-                                <a href="#" class="icon-favourite" title="Admin"></a>
+                                <a href="#" class="hide-for-small icon-favourite" title="Make Admin"></a>
                                 <!-- END make_owner -->
-                                <a href="#" class="icon-close alert" title="Remove"></a>
+                                <a href="#" class="hide-for-small icon-close alert" title="Remove From Group"></a>
+                                <a href="#" class="show-for-small icon-more" data-dropdown="tab-control-user-{USER_ID}"></a>
                             </nav>
+                            <ul id="tab-control-user-{USER_ID}" class="f-dropdown" data-dropdown-content>
+                                <li><a href="#" class="icon-view">Grant Read Access</a></li>
+                                <li><a href="#" class="icon-modify">Grant Write Access</a></li>
+                                <li><a href="#" class="icon-favourite">Make Admin</a></li>
+                                <li><a href="#" class="icon-close">Remove From Group</a></li>
+                            </ul>
                         </li>
                         <!-- END member -->
                     </ul>
