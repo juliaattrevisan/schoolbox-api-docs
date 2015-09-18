@@ -5,6 +5,7 @@
 <script type="text/javascript" src="/javascript/data-plugins/checkboxGroup.js"></script>
 <script type="text/javascript" src="/javascript/data-plugins/hideWatch.js"></script>
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
     // Confirm disbandment
@@ -15,6 +16,38 @@ $(document).ready(function() {
             confirmEvent: $.confirmDialog.followHref
         });
     });
+
+    // On accept/reject: ajax new group list in
+    var waitingList = $('#waitingList');
+    var memberList  = $('#members');
+    waitingList.on('click', '[data-interaction="accept"], [data-interaction="reject"]', function(e) {
+        e.preventDefault();
+        var waitingUser = $(this).closest('[data-relation="waiting-user"]');
+        var label       = waitingUser.find('[data-relation="save-label"]');
+        var deleting    = $(this).is('[data-interaction="reject"]');
+        if (deleting) {
+            label.labelActivate({text: 'Rejecting', css: 'alert'});
+        } else {
+            label.labelActivate({text: 'Accepting'});
+        }
+        // loading dialog
+        $.get(this.href)
+            .done(function(response) {
+                // success stuff. Reload memberlist and waitlist
+                label.labelTimeout({text: 'Done'});
+                label.one('hide.labelTimeout', function() {
+                    var $response = $(response);
+                    waitingList.empty().append($response.find('#waitingList').children());
+                    memberList.empty().append($response.find('#members').children());
+                });
+            })
+            .fail(function() {
+                // failure stuff
+                label.labelTimeout({text: 'Failed!', css: 'alert'});
+            });
+    });
+
+    // On change of group form - ajax submit
 
     // Message when you change admin
     var isAdminChanged = false;
@@ -163,7 +196,7 @@ $(document).ready(function() {
                     <!-- BEGIN authorisation -->
                     <ul class="information-list">
                         <!-- BEGIN waiting -->
-                        <li class="actions-small-2">
+                        <li class="actions-small-2" data-relation="waiting-user">
                             <div class="list-item">
                                 <div class="small-12 avatar card">
                                     <a href="/search/user/{WAITING_ID}">
@@ -173,9 +206,10 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             <nav>
-                                <a href="/group/modifyForm.php?categoryID={CATEGORY_ID}&amp;accept={WAITING_ID}" class="icon-add" title="Approve Membership"></a>
-                                <a href="/group/modifyForm.php?categoryID={CATEGORY_ID}&amp;reject={WAITING_ID}" class="icon-close alert" title="Reject Membership"></a>
+                                <a href="/group/modifyForm.php?categoryID={CATEGORY_ID}&amp;accept={WAITING_ID}" data-interaction="accept" class="icon-add" title="Approve Membership"></a>
+                                <a href="/group/modifyForm.php?categoryID={CATEGORY_ID}&amp;reject={WAITING_ID}" data-interaction="reject" class="icon-close alert" title="Reject Membership"></a>
                             </nav>
+                            <span class="label full-width hide" data-relation="save-label"></span>
                         </li>
                         <!-- END waiting -->
                     </ul>
