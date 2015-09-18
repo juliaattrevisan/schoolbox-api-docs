@@ -2,23 +2,25 @@
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
-
+<script type="text/javascript" src="/javascript/shared/jquery.device.js"></script>
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
 <script type="text/javascript">
 
-// once the DOM has loaded, punch a fancy calendar into it
-    $(document).ready(function() {
+    // once the DOM has loaded, punch a fancy calendar into it
+    $(function() {
 
         // Calendar setup
+        var calendarView = {{ calendar.view|json_encode|raw }};
         var calendarDate = moment({{ calendar.date|json_encode|raw }});
+
         if (calendarDate.isValid()) {
             calendarDate = calendarDate.toDate();
         }
         else {
             calendarDate = new Date();
         }
-        var calendarView = {{ calendar.view|json_encode|raw }};
+
         switch (calendarView) {
             case 'day':
                 calendarView = 'agendaDay';
@@ -47,6 +49,12 @@
         var updateSeriesDialog = $('#dialog-bulk-update').dialog(dialogOptions);
         var deleteDialog = $('#dialog-delete').dialog(dialogOptions);
 
+        var height = '';
+
+        if (isSmallDevice()) {
+            height = 'auto';
+        }
+
         var c = new Calendar('calendar', 'calendar-bubble', {
             filter: {
                 enabled: true,
@@ -70,6 +78,7 @@
                     agendaDay:  'ddd D/M',
                     '':         'ddd D/M'
                 },
+                height: height,
                 defaultView: calendarView,
                 timeFormat: { month: 'h(:mm)a' },
                 eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
@@ -265,42 +274,72 @@
     <a class="close-reveal-modal">&#215;</a>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-<div class="resource-info">
-    <div class="resource-img">
-        {% if item.image.hash %}
+<div class="row">
+    <div class="small-12 large-4 island">
+        <section class="content text-center">
+            {% if item.image.hash %}
             <img src="/storage/image.php?size=constrain200&hash={{ item.image.hash|e('url') }}" />
-        {% endif %}
-    </div>
-    <div class="resource-detail">
+            {% endif %}
 
-        {# Resource manager: could be set in the edit form, or the default resource manager #}
-        <p class="meta">
             {% if item.moderatorList is not empty %}
+            <p class="meta">
                 {% include '@resourceItem/sub/moderated.twig' with {item: item} %}
                 {% include '@resourceItem/sub/moderatorList.twig' with {moderatorList: item.moderatorList} %}
+            </p>
             {% endif %}
-        </p>
-        <p class="category">
-            Category: <a href="{{ routeLookup('resourceItem.browse') }}?category={{ item.category.id|e('url') }}" >{{ item.category.name }}</a>
-        </p>
 
-        {{ item.description|e("purify")|raw }}
+            <p class="meta">
+                Category: <a href="{{ routeLookup('resourceItem.browse') }}?category={{ item.category.id|e('url') }}" >{{ item.category.name }}</a>
+            </p>
+        </section>
     </div>
-    <div class="rules">
-        <h1>Rules</h1>
-        {% include '@resourceItem/sub/rules.twig' with {item: item} %}
+    <div class="small-12 large-4 island">
+        <h2 class="subheader">Description</h2>
+        <section class="content">
+            {# Resource manager: could be set in the edit form, or the default resource manager #}
+            {{ item.description|e("purify")|raw }}
+        </section>
+    </div>
+    <div class="small-12 large-4 island">
+        <h2 class="subheader">Rules</h2>
+        <section class="content">
+            {% include '@resourceItem/sub/rules.twig' with {item: item} %}
+        </section>
     </div>
 </div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">
+            Bookings
+            <span class="hint has-tip tip-top" data-tooltip title="Click the calendar to add a booking for that time.">?</span>
+        </h2>
+        <section class="content">
+            <div id="calendar"></div>
+        </section>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <div id="calendar-loading">
     <p><strong>Loading events...</strong></p>
@@ -396,9 +435,6 @@
         </div>
     </div>
 </div>
-
-<h2>Bookings - click the calendar to add a booking for that time</h2>
-<div id="calendar"></div>
 
 {# Dialog for changing bookings in series #}
 <div id="dialog-bulk-update" title="This booking is part of a series">
