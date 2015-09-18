@@ -36,9 +36,7 @@
         <dl class="sub-nav">
             <dd><a href="{{ routeLookup('resourceItem.browse') }}" class="{% if not categoryId %}current{% endif %}">All</a></dd>
             {% for item in categoryList %}
-            <dd>
-                {% include '@resourceItem/sub/searchLink.twig' with {currentId: categoryId} %}
-            </dd>
+            {% include '@resourceItem/sub/searchLink.twig' with {currentId: categoryId} %}
             {% endfor %}
         </dl>
     </div>
