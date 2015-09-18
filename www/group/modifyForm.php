@@ -165,43 +165,51 @@ if(isset($_POST['userID'])) {
 	}
 }
 
-/* Set new owner/administrator */
-if(is_numeric($_POST['owner'])) {
-	$ownerId = $_POST['owner'];
+// Change membership parameters
+if (!empty($_POST['accessLevel'])) {
+	foreach ($_POST['accessLevel'] as $userId => $accessLevel) {
+		/* Set new owner/administrator */
+		$user = new User();
+		$user->setId($userId);
+		if ($accessLevel == UserAccess::ACCESS_FULL) {
+			//check if member is allowed to become a owner
+			if (!$groupHandler->allowOwner($userId)) {
+				error(30);
+			}
 
-	//check if member is allowed to become a owner
-	if (!$groupHandler->allowOwner($ownerId)) {
-		error(30);
+			//if we are accessing group for first time create group
+			if (!$groupHandler->groupExists($categoryId)) {
+				$groupHandler->createGroup($categoryId);
+			}
+
+			// demote current owner
+			try {
+				/** @var UserAccess $ua */
+				$ua = $uaMapper->findOneByColumnList(array(
+					'service' => UserAccess::SERVICE_HOMEPAGE,
+					'sid'     => $folder->getId(),
+					'type'    => UserAccess::ACCESS_FULL
+				));
+
+				$ua->setAccessLevel(UserAccess::ACCESS_WRITE);
+				$uaMapper->save($ua);
+			} catch (Schoolbox\Mapper\Exception $e) {
+				// just ignore it, this kingdom had no king
+				$ua->setUser(new User())
+					->setServiceIdentifier($folder->getId());
+			}
+
+			// promote new owner
+			$ua->setAccessLevel(UserAccess::ACCESS_FULL)
+				->setUser($user);
+			$uaMapper->save($ua);
+		} else {
+			$ua->setServiceIdentifier($categoryId)
+				->setAccessLevel($accessLevel)
+				->setUser($user);
+			$uaMapper->save($ua);
+		}
 	}
-
-	//if we are accessing group for first time create group
-	if (!$groupHandler->groupExists($categoryId)) {
-		$groupHandler->createGroup($categoryId);
-	}
-
-	// demote current owner
-	try {
-		/** @var UserAccess $ua */
-		$ua = $uaMapper->findOneByColumnList(array(
-			'service' => UserAccess::SERVICE_HOMEPAGE,
-			'sid'     => $folder->getId(),
-			'type'    => UserAccess::ACCESS_FULL
-		));
-
-		$ua->setAccessLevel(UserAccess::ACCESS_WRITE);
-		$uaMapper->save($ua);
-	}
-	catch(Schoolbox\Mapper\Exception $e) {
-		// just ignore it, this kingdom had no king
-		$ua->setUser(new User())
-		   ->setServiceIdentifier($folder->getId());
-	}
-
-	// promote new owner
-	$ua->setAccessLevel(UserAccess::ACCESS_FULL)
-	   ->getUser()->setId($ownerId);
-
-	$uaMapper->save($ua);
 }
 
 /* Bulk-add users */
