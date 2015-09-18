@@ -203,6 +203,12 @@ if (!empty($_POST['accessLevel'])) {
 			$ua->setAccessLevel(UserAccess::ACCESS_FULL)
 				->setUser($user);
 			$uaMapper->save($ua);
+		} elseif ($accessLevel == UserAccess::ACCESS_DENY) {
+			$uaMapper->deleteByColumnList([
+				'service' => UserAccess::SERVICE_HOMEPAGE,
+				'uid'     => $userId,
+				'sid'     => $categoryId,
+			]);
 		} else {
 			$ua->setServiceIdentifier($categoryId)
 				->setAccessLevel($accessLevel)
