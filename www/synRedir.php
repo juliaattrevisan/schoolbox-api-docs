@@ -3,30 +3,45 @@
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php');
 $page = new SitePage;
 $userHandler = new User;
-$groupHandler = new Group;
-
-$user = $userHandler->getByID($_SESSION['id']);
-
-/* Setup form variable */
+$user = $_SESSION['user'];
 $url = new \Zend\Uri\Uri(Cfg::get('external_portal'));
-$url->setPath('/login.aspx');
-$form   = "Form1";
-$action = $url->toString();
-
-$method="POST";
-
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $action);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($ch, CURLOPT_USERAGENT, 'schoolbox/'.Cfg::get('site_version'));
-$login = curl_exec($ch);
-curl_close($ch);
-unset($ch);
 
 /* Handles deep linking */
-if($_GET['page'])
-    $action = $action . '?ReturnUrl='.$_GET['page'].'.aspx';
+if($_SESSION['communityLogin']) {
+	if($_GET['page']){
+		$url->setPath('/'.$_GET['page'].'.aspx');
+	}
 
+	if($_GET['menu']) {
+		$url->setQuery(array('menu'=>0));
+	}
+
+	header('Location: '.$url->toString());
+}
+else {
+	/* Setup form variable */
+	$url->setPath('/login.aspx');
+	$form   = "Form1";
+	$action = $url->toString();
+
+	$method="POST";
+
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $action);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_USERAGENT, 'schoolbox/'.Cfg::get('site_version'));
+	$login = curl_exec($ch);
+	curl_close($ch);
+	unset($ch);
+
+	if ($_GET['page']) {
+		if ($_GET['menu']) {
+			$action = $action . '?ReturnUrl=' . urlencode($_GET['page'] . '.aspx?menu=0');
+		} else {
+			$action = $action . '?ReturnUrl=' . $_GET['page'] . '.aspx';
+		}
+	}
+}
 
 preg_match('/id="__VIEWSTATE" value="(.*?)"/', $login, $viewState);
 preg_match('/id="__EVENTVALIDATION" value="(.*?)"/', $login, $eventValidation);
@@ -41,12 +56,13 @@ $formArray['__EVENTARGUMENT'] = '';
 $formArray['__EVENTTARGET'] = '';
 $formArray['__LASTFOCUS'] = '';
 $formArray[$loginButton[1]] = 'Login';
-$formArray[$loginUsername[1]] = $user['username'];
+$formArray[$loginUsername[1]] = $user->getUsername();
 $formArray[$loginPassword[1]] = $password;
 $formArray['loginButton'] = 'Login';
-$formArray['textBox1'] = $user['username'];
+$formArray['textBox1'] = $user->getUsername();
 $formArray['textBox2'] = $password;
 
+$_SESSION['communityLogin'] = true;
 ?>
 
 <html>
