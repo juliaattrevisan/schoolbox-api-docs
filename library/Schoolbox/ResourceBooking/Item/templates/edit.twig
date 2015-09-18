@@ -7,6 +7,7 @@
 <script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.hourpicker.js"></script>
 <script type="text/javascript" src="/javascript/jquery.minutepicker.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 
 <script type="text/javascript">
     (function($){
@@ -17,9 +18,17 @@
 
             // Hijack save form to allow delete
             var form = $('#resource-form');
-            form.on('click', '#resource-delete', function(event) {
+            $(document).on('click', '#resource-delete', function(event) {
                 event.preventDefault();
-                form.attr('action', $(this).data('action')).submit();
+
+                var element = $(this);
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this item?',
+                    confirmEvent: function() {
+                        form.attr('action', $(element).data('action')).submit();
+                    }
+                });
             })
 
             // Add selectize for user selection and selector for related items
