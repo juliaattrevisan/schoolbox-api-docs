@@ -1,0 +1,7 @@
+// Really generic link styles
+
+a[disabled], a.disabled {
+  // Make disabled links not clickable
+  pointer-events: none;
+  cursor: default;
+}
