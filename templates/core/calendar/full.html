@@ -451,7 +451,7 @@
         // Copypasted code for updating booking in series
         $('#calendar-bubble').find('#editEvent').on(
             'click',
-            'a.btn.booking-approve, a.btn.booking-reject, a.btn.booking-cancel',
+            '[booking-button=booking-approve], [booking-button=booking-reject], [booking-button=booking-cancel]',
             function(event) {
                 c.bubble.hide()
                 event.preventDefault()

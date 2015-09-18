@@ -11,6 +11,7 @@
     $(function() {
 
         // Calendar setup
+        var calendarLoadingElement = $('#calendar-loading');
         var calendarView = {{ calendar.view|json_encode|raw }};
         var calendarDate = moment({{ calendar.date|json_encode|raw }});
 
@@ -101,14 +102,18 @@
                     });
                 },
                 loading: function(isLoading) {
+                    /* Show loading div right in the middle
+                     */
                     if (isLoading === true) {
-                        $('#calendar-loading').css({
-                            top: ($('#calendar').height() - $('#calendar-loading').height())/2,
-                            left: ($('#calendar').width() - $('#calendar-loading').width())/2
-                        }).show();
+                        calendarLoadingElement.foundation('reveal','open');
                     }
+                    /* Has finished loading
+                     */
                     else {
-                        $('#calendar-loading').hide();
+
+                        /* Hide loading div
+                         */
+                        calendarLoadingElement.foundation('reveal','close');
                     }
                 },
                 /**
@@ -174,9 +179,10 @@
         }).init()
 
         // Event filter - reload events when the filter button is pressed.
-        $('#calendar-controls').on('click', 'a#applyFilters', function(event) {
+        $('#calendar-controls').on('click', '#applyFilters', function(event) {
             event.preventDefault()
             c.dom.fullCalendar('refetchEvents')
+            $('#calendar-controls').foundation('reveal','close');
         })
 
         // Approve, Reject, Cancel: all AJAX events
@@ -239,17 +245,30 @@
                 }
             }
         )
+
+        $('#fc-button-filter').click(function() { $('#calendar-controls').foundation('reveal','open') });
     });
 </script>
 <!-- END custom_header -->
 
+<ul class="breadcrumb">
+   <li><a href="{{ routeLookup('resourceItem.browse') }}">Resources</a></li>
+    <li><a href="{{ routeLookup('resourceItem.browse') }}?category={{ item.category.id|e('url') }}" >{{ item.category.name }}</a></li>
+    <li class="active"><a href="#">{% include '@resourceItem/sub/itemName.twig' with {item: item} %}</a></li>
+</ul>
 
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>Resource</h1>
+            <h1>{% include '@resourceItem/sub/itemName.twig' with {item: item} %}</h1>
+
             <ul class="meta">
-                <li class="icon-resource-booking">{% include '@resourceItem/sub/itemName.twig' with {item: item} %}</li>
+                {% if item.moderatorList is not empty %}
+                <li class="icon-staff-students">
+                    {% include '@resourceItem/sub/moderated.twig' with {item: item} %}
+                    {% include '@resourceItem/sub/moderatorList.twig' with {moderatorList: item.moderatorList} %}
+                </li>
+                {% endif %}
             </ul>
         </div>
     </div>
@@ -278,29 +297,24 @@
 </div>
 
 <div class="row">
-    <div class="small-12 large-4 island">
-        <section class="content text-center">
-            {% if item.image.hash %}
-            <img src="/storage/image.php?size=constrain200&hash={{ item.image.hash|e('url') }}" />
-            {% endif %}
+    <div class="small-12 large-8 island">
+        <section>
+            <div class="row">
+                <div class="small-12 medium-4 large-5 columns">
+                    <div class="content">
+                        {% if item.image.hash %}
+                        <img src="/storage/image.php?size=maxsize&hash={{ item.image.hash|e('url') }}" />
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="small-12 medium-8 large-7 columns">
+                    {# Resource manager: could be set in the edit form, or the default resource manager #}
 
-            {% if item.moderatorList is not empty %}
-            <p class="meta">
-                {% include '@resourceItem/sub/moderated.twig' with {item: item} %}
-                {% include '@resourceItem/sub/moderatorList.twig' with {moderatorList: item.moderatorList} %}
-            </p>
-            {% endif %}
-
-            <p class="meta">
-                Category: <a href="{{ routeLookup('resourceItem.browse') }}?category={{ item.category.id|e('url') }}" >{{ item.category.name }}</a>
-            </p>
-        </section>
-    </div>
-    <div class="small-12 large-4 island">
-        <h2 class="subheader">Description</h2>
-        <section class="content">
-            {# Resource manager: could be set in the edit form, or the default resource manager #}
-            {{ item.description|e("purify")|raw }}
+                    <article class="content">
+                        {{ item.description|e("purify")|raw }}
+                    </article>
+                </div>
+            </div>
         </section>
     </div>
     <div class="small-12 large-4 island">
@@ -312,14 +326,13 @@
 </div>
 
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12 columns">
         <h2 class="subheader">
             Bookings
             <span class="hint has-tip tip-top" data-tooltip title="Click the calendar to add a booking for that time.">?</span>
         </h2>
-        <section class="content">
-            <div id="calendar"></div>
-        </section>
+
+        <div id="calendar"></div>
     </div>
 </div>
 
@@ -390,45 +403,33 @@
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
-
-
-
-
-
-
-
-
 {##
  # Calendar controls
  # Add the popup event
  #}
-<div id="calendar-controls" class="calendar-controls no-height clearfix">
-    <div class="link-case">
-        <div class="filter-drop clearfix">
-            <div class="filter-list">
-                <form class="clearfix">
-                    <div class="filter-cat groups clearfix"><span class="filter-title">Status</span>
-                        <label title="Pending">
-                            <input type="checkbox" name="status[]" value="1" class="checkbox" checked />
-                            Pending
-                        </label>
-                        <label title="Approved">
-                            <input type="checkbox" name="status[]" value="2" class="checkbox" checked />
-                            Approved
-                        </label>
-                        <label title="Rejected">
-                            <input type="checkbox" name="status[]" value="3" class="checkbox"/>
-                            Rejected
-                        </label>
-                    </div>
-                </form>
-                <p class="clearfix">
-                    <a href="#" id="applyFilters" class="btn float-right"><span></span>Apply Filters</a>
-                </p>
-                <!--/filter-drop-->
-            </div>
-        </div>
-    </div>
+<div id="calendar-controls" class="reveal-modal tiny" data-reveal aria-hidden="true" role="dialog">
+    <form>
+        <section>
+            <fieldset class="content">
+                <legend>Status</legend>
+                <div class="small-12 columns">
+                    <label title="Pending">
+                        <input type="checkbox" id='status-1' name="status[]" value="1" class="checkbox" checked />
+                        <label for="status-1" class="checkbox-label">Pending</label>
+                    </label>
+                    <label title="Approved">
+                        <input type="checkbox" id='status-2' name="status[]" value="2" class="checkbox" checked />
+                        <label for="status-2" class="checkbox-label">Approved</label>
+                    </label>
+                    <label title="Rejected">
+                        <input type="checkbox" id='status-3' name="status[]" value="3" class="checkbox"/>
+                        <label for="status-3" class="checkbox-label">Rejected</label>
+                    </label>
+                </div>
+            </fieldset>
+        </section>
+    </form>
+    <a href="#" id="applyFilters" class="button">Apply Filters</a>
 </div>
 
 {# Dialog for changing bookings in series #}
