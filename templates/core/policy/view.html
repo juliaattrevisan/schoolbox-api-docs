@@ -28,28 +28,34 @@
     <link rel="stylesheet" type="text/css" media="screen" href="/css/foundation/chrome.css?v={SITE_VERSION}" />
 </head>
 <body>
-<div id="container">
-    <div id="content">
-        <div class="row">
-            <div class="small-12 island">
-                <h1>{SITE_NAME}: Guidelines of Use and Privacy Policy</h1>
+    <!-- The Schoolbox Hybrid Bar -->
+    <div class="standard-bar">
+        <a href="/" class="logo small-2 columns no-pad">
+            <img src="/images/logo.php?logo=skin_logo_square&size=normal" srcset="/images/logo.php?logo=skin_logo_square&size=normal 1x,/images/logo.php?logo=skin_logo_square&size=hidpi 2x" alt="{SITE_NAME}"/>
+        </a>
+    </div>
+    <div id="container">
+        <div id="content">
+            <div class="row">
+                <div class="small-12 island">
+                    <h1>{SITE_NAME}: Guidelines of Use and Privacy Policy</h1>
 
-                <section class="content">
-                    <article>
-                        {POLICY}
-                    </article>
-                </section>
+                    <section class="content">
+                        <article>
+                            {POLICY}
+                        </article>
+                    </section>
+                </div>
             </div>
         </div>
+        <div id="footer">
+            <ul>
+                <li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SCHOOL_ADDRESS}">{SITE_NAME}</a></li>
+                <li><a href="/policy.php">Terms of Use and Privacy Policy</a></li>
+                <li>Powered by <a href="http://www.schoolbox.com.au" title="Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a></li>
+                <li><a href="/feedback.php" title="Web Designers">Feedback and Support</a></li>
+            </ul>
+        </div>
     </div>
-    <div id="footer">
-        <ul>
-            <li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SCHOOL_ADDRESS}">{SITE_NAME}</a></li>
-            <li><a href="/policy.php">Terms of Use and Privacy Policy</a></li>
-            <li>Powered by <a href="http://www.schoolbox.com.au" title="Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a></li>
-            <li><a href="/feedback.php" title="Web Designers">Feedback and Support</a></li>
-        </ul>
-    </div>
-</div>
 </body>
 </html>
