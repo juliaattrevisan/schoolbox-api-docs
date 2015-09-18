@@ -46,9 +46,34 @@ $(document).ready(function() {
             });
     });
 
+    // Admin? Throw the standard warning before allowing this to happen
+    memberList.on('click', '[name^="accessLevel"][value="3"]', function(e) {
+        e.preventDefault();
+        var text = 'Are you sure you wish to change the group\'s admin?';
+        if (!(Number('{MAKEADMIN_SUPER}'))) {
+            text += ' If you make someone else group admin, you will lose your group admin privileges.'
+        }
+        $(this).confirmDialog({
+            text: text,
+            confirmEvent: function(element) {
+                element.prop('checked', !element.prop('checked')).trigger('change');
+            }
+        });
+    });
+
+    // Remove user from group? Another standard warning
+    memberList.on('click', '[name^="accessLevel"][value="0"]', function(e) {
+        e.preventDefault();
+        $(this).confirmDialog({
+            text: 'Are you sure you wish to remove this user from the group?',
+            confirmEvent: function(element) {
+                element.prop('checked', !element.prop('checked')).trigger('change');
+            }
+        });
+    });
+
     // On change of group form - ajax submit
     memberList.on('change', '[name^="accessLevel"]', function() {
-        // Admin? Throw the standard warning before allowing this to happen
         var $this  = $(this);
         var form   = $this.closest('form');
         var member = $this.closest('[data-relation="member"]');
@@ -81,25 +106,6 @@ $(document).ready(function() {
                 inputs.prop('disabled', false);
             });
 
-    });
-
-    // Message when you change admin
-    var isAdminChanged = false;
-    $('[data-checkbox-group="admin"]').click(function(event) {
-        if (!isAdminChanged) {
-            event.preventDefault();
-            var text = 'Are you sure you wish to change the group\'s admin?';
-            if (!(Number('{MAKEADMIN_SUPER}'))) {
-                text += ' If you make someone else group admin, you will lose your group admin privileges.'
-            }
-            $(this).confirmDialog({
-                text: text,
-                confirmEvent: function(element) {
-                    isAdminChanged = true;
-                    element.prop('checked', !element.prop('checked')).trigger('change');
-                }
-            });
-        }
     });
 
     var addUserSelector = $('#addUser');
@@ -186,7 +192,7 @@ $(document).ready(function() {
                                             <label for="accessLevel-{OWNER_ID}-3" class="radio-toggle">
                                                 <span class="icon-favourite" title="Make Admin"></span>
                                             </label>
-                                            <input id="accessLevel-{OWNER_ID}-0" type="radio" name="accessLevel[{OWNER_ID}]" value="0" />
+                                            <input id="accessLevel-{OWNER_ID}-0" type="radio" name="accessLevel[{OWNER_ID}]" value="0" disabled />
                                             <label for="accessLevel-{OWNER_ID}-0" class="radio-toggle">
                                                 <span class="icon-close alert" title="Remove From Group"></span>
                                             </label>
