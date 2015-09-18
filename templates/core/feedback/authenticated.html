@@ -39,7 +39,7 @@ $(function () {
             <input type="hidden" name="template" value="feedback.html" />
             <input type="hidden" name="confirmation" value="/thank-you.php" />
 
-            <h2 class="subheader">Feedback</h2>
+            <h2 class="subheader">Enquiry</h2>
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -54,7 +54,7 @@ $(function () {
                         </label>
 
                         <label>
-                            Type of Feedback
+                            Type of Enquiry
                             <select name="subject" id="subject">
                                 <option></option>
                                 <option value="Technical Issue">Technical Issue</option>
@@ -64,8 +64,8 @@ $(function () {
                         </label>
 
                         <label>
-                            Feedback
-                            <textarea id="message" name="message"></textarea>
+                            Enquiry
+                            <textarea id="message" name="message" rows="10"></textarea>
                         </label>
 
                         <!-- BEGIN recaptcha -->
@@ -80,7 +80,7 @@ $(function () {
             </section>
             <div class="row">
                 <div class="small-12 columns">
-                    <input type="submit" value="Submit Feedback"/>
+                    <input type="submit" value="Submit Enquiry"/>
                 </div>
             </div>
         </form>
