@@ -125,7 +125,8 @@
                         $(config.element)
                             .addClass('hide')
                             .removeClass(config.css)
-                            .addClass(config.initialCss);
+                            .addClass(config.initialCss)
+                            .trigger('hide.labelTimeout');
                     });
                 },
                 config.duration
