@@ -96,7 +96,7 @@ $(document).ready(function() {
                         <!-- BEGIN groupOwner -->
                         <li>
                             <div class="list-item">
-                                <div class="small-12 avatar card">
+                                <div class="avatar card">
                                     <!-- BEGIN msg_enabled_followadmin -->
 
                                     <!-- END msg_enabled_followadmin -->
@@ -113,7 +113,7 @@ $(document).ready(function() {
                         <!-- BEGIN member -->
                         <li class="actions-small-1 actions-medium-4">
                             <div class="list-item">
-                                <div class="small-12 avatar card">
+                                <div class="avatar card">
                                     <a href="/search/user/{USER_ID}">
                                         <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
 
@@ -159,7 +159,7 @@ $(document).ready(function() {
                     <!-- BEGIN authorisation -->
                     <ul class="information-list">
                         <!-- BEGIN waiting -->
-                        <li class="actions-small-2">
+                        <li class="actions-small-1 actions-medium-2">
                             <div class="list-item">
                                 <div class="small-12 avatar card">
                                     <a href="/search/user/{WAITING_ID}">
@@ -169,9 +169,16 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             <nav>
-                                <a href="#" class="icon-add" title="Approve"></a>
-                                <a href="#" class="icon-close alert" title="Reject"></a>
+                                <span class="hide-for-small">
+                                    <a href="#" class="icon-add" title="Approve Membership"></a>
+                                    <a href="#" class="icon-close alert" title="Reject Membership"></a>
+                                </span>
+                                <a href="#" class="show-for-small icon-more" data-dropdown="tab-control-waitlist-{WAITING_ID}"></a>
                             </nav>
+                            <ul id="tab-control-waitlist-{WAITING_ID}" class="f-dropdown" data-dropdown-content>
+                                <li><a href="#" class="icon-add">Approve Membership</a></li>
+                                <li><a href="#" class="icon-close alert">Reject Membership</a></li>
+                            </ul>
                         </li>
                         <!-- END waiting -->
                     </ul>
