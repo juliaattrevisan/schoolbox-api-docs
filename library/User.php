@@ -428,25 +428,6 @@ class User extends DeprecatedModel
         return $this->db->affectedRows();
     }
 
-
-    public function sendResetPasswordEmail($email)
-    {
-        if (false != ($user = $this->getByField('alt_email', $email))) {
-            $this->logUserPasswordChange($user['username'], 'email_reset_pwd', 'info');
-            $hash = substr(md5(uniqid() . time()), 0, 25);
-            $this->update(array('id' => $user['id'], 'hash' => $hash));
-            $mailHandler = new Mailer('reset-password.html', Cfg::get('title') . ' Password Reset', $user['alt_email']);
-            $mailHandler->setVar('NAME', $user['firstname']);
-            $mailHandler->setVar(
-                'RESET_LINK',
-                "http://" . $_SERVER['HTTP_HOST'] . "/reset.php?id={$user['id']}&h=" . $hash
-            );
-            return $mailHandler->send();
-        }
-        return false;
-    }
-
-
     /**
      * Sends a change password confirmation email.
      *
@@ -474,7 +455,6 @@ class User extends DeprecatedModel
         }
         return false;
     }
-
 
     /**
      * Sends a password change fail message to the Schoolbox admin, if there is
