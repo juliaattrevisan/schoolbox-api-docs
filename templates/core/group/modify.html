@@ -131,17 +131,17 @@ $(document).ready(function() {
                                 <!-- BEGIN make_owner -->
                                 <!-- END make_owner -->
                                 <span class="hide-for-small">
-                                    <a href="#" class="icon-view" title="Grant Read Access"></a>
-                                    <a href="#" class="icon-modify" title="Grant Write Access"></a>
-                                    <a href="#" class="icon-favourite" title="Make Admin"></a>
+                                    <a href="#" class="icon-view {READ_SELECTED}" title="Grant Read Access"></a>
+                                    <a href="#" class="icon-modify {WRITE_SELECTED}" title="Grant Write Access"></a>
+                                    <a href="#" class="icon-favourite {ADMIN_ALLOWED}" title="Make Admin"></a>
                                     <a href="#" class="icon-close alert" title="Remove From Group"></a>
                                 </span>
                                 <a href="#" class="show-for-small icon-more" data-dropdown="tab-control-user-{USER_ID}"></a>
                             </nav>
                             <ul id="tab-control-user-{USER_ID}" class="f-dropdown" data-dropdown-content>
-                                <li><a href="#" class="icon-view">Grant Read Access</a></li>
-                                <li><a href="#" class="icon-modify">Grant Write Access</a></li>
-                                <li><a href="#" class="icon-favourite">Make Admin</a></li>
+                                <li><a href="#" class="icon-view {READ_SELECTED}">Grant Read Access</a></li>
+                                <li><a href="#" class="icon-modify {WRITE_SELECTED}">Grant Write Access</a></li>
+                                <li><a href="#" class="icon-favourite {ADMIN_ALLOWED}">Make Admin</a></li>
                                 <li><a href="#" class="icon-close alert">Remove From Group</a></li>
                             </ul>
                         </li>

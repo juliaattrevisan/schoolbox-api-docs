@@ -172,6 +172,8 @@ if (is_numeric($this->arg[0])) {
                 'WRITE_SELECTED'      => $member['type'] == UserAccess::ACCESS_WRITE ? 'selected' : '',
                 'USER_FOLLOWING'      => $following ? 'Yes' : 'No',
                 'USER_FOLLOWING_ICON' => $following ? 'icon-tick' : 'icon-mute',
+                // Stylage
+                'ADMIN_ALLOWED'       => $groupHandler->allowOwner($member['uid']) ? '' : 'disabled',
             );
 
             $this->setVar($output);
