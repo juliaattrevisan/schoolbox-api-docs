@@ -8,244 +8,273 @@
 <script type="text/javascript">
 
 // once the DOM has loaded, punch a fancy calendar into it
-$(document).ready(function() {
+    $(document).ready(function() {
 
-    // Calendar setup
-    var calendarDate = moment({{ calendar.date|json_encode|raw }});
-    if (calendarDate.isValid()) {
-        calendarDate = calendarDate.toDate();
-    }
-    else {
-        calendarDate = new Date();
-    }
-    var calendarView = {{ calendar.view|json_encode|raw }};
-    switch (calendarView) {
-        case 'day':
-            calendarView = 'agendaDay';
-            break;
-        case 'month':
-            calendarView = 'month';
-            break;
-        case 'week':
-        default:
-            calendarView = 'agendaWeek';
-            break;
-    }
-
-    // Dialog for use when clicking an item that is in a series
-    var dialogOptions = {
-        autoOpen:false,
-        resizable:false,
-        height:180,
-        width:400,
-        modal:true,
-        draggable:false,
-        close: function () {
-            return false;
+        // Calendar setup
+        var calendarDate = moment({{ calendar.date|json_encode|raw }});
+        if (calendarDate.isValid()) {
+            calendarDate = calendarDate.toDate();
         }
-    };
-    var updateSeriesDialog = $('#dialog-bulk-update').dialog(dialogOptions);
-    var deleteDialog = $('#dialog-delete').dialog(dialogOptions);
+        else {
+            calendarDate = new Date();
+        }
+        var calendarView = {{ calendar.view|json_encode|raw }};
+        switch (calendarView) {
+            case 'day':
+                calendarView = 'agendaDay';
+                break;
+            case 'month':
+                calendarView = 'month';
+                break;
+            case 'week':
+            default:
+                calendarView = 'agendaWeek';
+                break;
+        }
 
-    var c = new Calendar('calendar', 'calendar-bubble', {
-        filter: {
-            enabled: true,
-            ajax: false,
-            // This AJAX lookup should always be a GET request
-            parentSelector: '#calendar-controls',
-            exportButtonSelector: false,
-            checkboxSelector: false,
-            applyFiltersSelector: false,
-            listViewButton: false
-        },
-        fullCalendar: {
-            firstHour: 9,
-            allDaySlot: false,
-            defaultDate: calendarDate,
-            columnFormat: {
-                month:      'ddd',
-                week:       'ddd D/M',
-                agendaWeek: 'ddd D/M',
-                day:        'ddd D/M',
-                agendaDay:  'ddd D/M',
-                '':         'ddd D/M'
-            },
-            defaultView: calendarView,
-            timeFormat: { month: 'h(:mm)a' },
-            eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
-            firstDay: Number({{ config.calendar_start_day }}),
-            events: function(start, end, timezone, callback) {
-                var data = [
-                    {name: 'start', value: Calendar.reOffsetTimestamp(start.unix())},
-                    {name: 'end',   value: Calendar.reOffsetTimestamp(end.unix())}
-                ];
-                $.ajax({
-                    data:     data.concat($('#calendar-controls').find('form').serializeArray()),
-                    dataType: 'json',
-                    url:      {{ routeLookup('resourceBooking.bookingCalendar', {id: item.id})|json_encode|raw }},
-                    success: function(data) {
-                        callback(data.filter(function(v) {
-                            return 'start' in v;
-                        }));
-                    },
-                    cache: false
-                });
-            },
-            loading: function(isLoading) {
-                if (isLoading === true) {
-                    $('#calendar-loading').css({
-                        top: ($('#calendar').height() - $('#calendar-loading').height())/2,
-                        left: ($('#calendar').width() - $('#calendar-loading').width())/2
-                    }).show();
-                }
-                else {
-                    $('#calendar-loading').hide();
-                }
-            },
-            /**
-             * Event rendering: put the event's start and end time into data
-             */
-            eventRender: function(event, element) {
-                if (!event.data) {
-                    return false;
-                }
-                // Set data as attributes, that way selectors can query them
-                // End of event might not be defined if it's the same as
-                // start, too.
-                element.attr({
-                    'data-start':  event.start.format(),
-                    'data-end':    (event.end || event.start).format(),
-                    'data-allday': event.allDay ? 1 : 0
-                })
+        // Dialog for use when clicking an item that is in a series
+        var dialogOptions = {
+            autoOpen:false,
+            resizable:false,
+            height:180,
+            width:400,
+            modal:true,
+            draggable:false,
+            close: function () {
+                return false;
+            }
+        };
+        var updateSeriesDialog = $('#dialog-bulk-update').dialog(dialogOptions);
+        var deleteDialog = $('#dialog-delete').dialog(dialogOptions);
 
-                // Add booking styles
-                element.addClass('booking');
-                if ('booking' in event.data) {
-                    if (event.data.booking.status.isRejected) {
-                        element.addClass('rejected');
-                    }
-                    if (event.data.booking.status.isApproved) {
-                        element.addClass('approved');
-                    }
-                    if (event.data.booking.status.isPending) {
-                        element.addClass('pending');
-                    }
-                }
-                return element
+        var c = new Calendar('calendar', 'calendar-bubble', {
+            filter: {
+                enabled: true,
+                ajax: false,
+                // This AJAX lookup should always be a GET request
+                parentSelector: '#calendar-controls',
+                exportButtonSelector: false,
+                checkboxSelector: false,
+                applyFiltersSelector: false,
+                listViewButton: false
             },
-
-            /**
-             * Event that is triggered when clicking on a calendar day or time.
-             *
-             * @param date
-             * @param jsEvent
-             * @param view
-             */
-            dayClick: function(date, jsEvent, view) {
-                // Bookings may not be made in the past.
-                var allDay = !date.hasTime();
-                var eventData = {
-                    allDay:    allDay ? 1 : 0,
-                    startDate: date.format('YYYY-MM-DD')
-                };
-                if (allDay) {
-                    eventData.displayDate = date.format('ddd, Do MMMM')
-                } else {
-                    eventData.startTime   = date.format('HH:mm');
-                    eventData.displayDate = date.format('ddd, Do MMMM, h(:mm)a')
-                }
-                c.bubble.display('create', eventData, jsEvent, this)
-            },
-            eventStartEditable: false
-        },
-        x: false
-    }).init()
-
-    // Event filter - reload events when the filter button is pressed.
-    $('#calendar-controls').on('click', 'a#applyFilters', function(event) {
-        event.preventDefault()
-        c.dom.fullCalendar('refetchEvents')
-    })
-
-    // Approve, Reject, Cancel: all AJAX events
-    // Modify: not AJAX
-    // For any AJAX event - open a dialog if this is a series event
-    $('#calendar-bubble').find('#editEvent').on(
-        'click',
-        'a.btn.booking-approve, a.btn.booking-reject, a.btn.booking-cancel',
-        function(event) {
-            c.bubble.hide()
-            event.preventDefault()
-            var href     = this.href
-            var callback = function(data) {
-                return $.ajax(href, {data: data})
-                    .done(function() {
-                        c.dom.fullCalendar('refetchEvents')
-                    })
-                    .fail(function() {
-                        // fail in some way, not yet sure how
+            fullCalendar: {
+                firstHour: 9,
+                allDaySlot: false,
+                defaultDate: calendarDate,
+                columnFormat: {
+                    month:      'ddd',
+                    week:       'ddd D/M',
+                    agendaWeek: 'ddd D/M',
+                    day:        'ddd D/M',
+                    agendaDay:  'ddd D/M',
+                    '':         'ddd D/M'
+                },
+                defaultView: calendarView,
+                timeFormat: { month: 'h(:mm)a' },
+                eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
+                firstDay: Number({{ config.calendar_start_day }}),
+                events: function(start, end, timezone, callback) {
+                    var data = [
+                        {name: 'start', value: Calendar.reOffsetTimestamp(start.unix())},
+                        {name: 'end',   value: Calendar.reOffsetTimestamp(end.unix())}
+                    ];
+                    $.ajax({
+                        data:     data.concat($('#calendar-controls').find('form').serializeArray()),
+                        dataType: 'json',
+                        url:      {{ routeLookup('resourceBooking.bookingCalendar', {id: item.id})|json_encode|raw }},
+                        success: function(data) {
+                            callback(data.filter(function(v) {
+                                return 'start' in v;
+                            }));
+                        },
+                        cache: false
                     });
-            }
-            var seriesId = $(this).data('seriesId')
-            if (seriesId) {
-                // Remove all previous change status events, and reapply to this
-                // dialog box.
-                updateSeriesDialog.find('.action-text').text($(this).text().toLowerCase())
-                updateSeriesDialog
-                    .dialog('option', 'buttons', [{
-                        text: "Only this booking",
-                        click: function() {
-                            updateSeriesDialog.dialog('close')
-                            callback({efficacy: 'self'})
-                        }
-                    }, {
-                        text: "All bookings in the series",
-                        click: function() {
-                            updateSeriesDialog.dialog('close')
-                            callback({efficacy: 'series', seriesId: seriesId})
-                        }
-                    }])
-                    .dialog('open')
-            } else if ($(this).hasClass('booking-cancel')) {
-                deleteDialog
-                    .dialog('option', 'buttons', [{
-                        text: "Yes",
-                        click: function() {
-                            deleteDialog.dialog('close')
-                            callback({})
-                        }
-                    }, {
-                        text: "No",
-                        click: function() {
-                            deleteDialog.dialog('close')
-                        }
-                    }])
-                    .dialog('open')
-            } else {
-                c.bubble.hide()
-                callback()
-            }
-        }
-    )
-})
-</script>
+                },
+                loading: function(isLoading) {
+                    if (isLoading === true) {
+                        $('#calendar-loading').css({
+                            top: ($('#calendar').height() - $('#calendar-loading').height())/2,
+                            left: ($('#calendar').width() - $('#calendar-loading').width())/2
+                        }).show();
+                    }
+                    else {
+                        $('#calendar-loading').hide();
+                    }
+                },
+                /**
+                 * Event rendering: put the event's start and end time into data
+                 */
+                eventRender: function(event, element) {
+                    if (!event.data) {
+                        return false;
+                    }
+                    // Set data as attributes, that way selectors can query them
+                    // End of event might not be defined if it's the same as
+                    // start, too.
+                    element.attr({
+                        'data-start':  event.start.format(),
+                        'data-end':    (event.end || event.start).format(),
+                        'data-allday': event.allDay ? 1 : 0
+                    })
 
+                    // Add booking styles
+                    element.addClass('booking');
+                    if ('booking' in event.data) {
+                        if (event.data.booking.status.isRejected) {
+                            element.addClass('rejected');
+                        }
+                        if (event.data.booking.status.isApproved) {
+                            element.addClass('approved');
+                        }
+                        if (event.data.booking.status.isPending) {
+                            element.addClass('pending');
+                        }
+                    }
+                    return element
+                },
+
+                /**
+                 * Event that is triggered when clicking on a calendar day or time.
+                 *
+                 * @param date
+                 * @param jsEvent
+                 * @param view
+                 */
+                dayClick: function(date, jsEvent, view) {
+                    // Bookings may not be made in the past.
+                    var allDay = !date.hasTime();
+                    var eventData = {
+                        allDay:    allDay ? 1 : 0,
+                        startDate: date.format('YYYY-MM-DD')
+                    };
+                    if (allDay) {
+                        eventData.displayDate = date.format('ddd, Do MMMM')
+                    } else {
+                        eventData.startTime   = date.format('HH:mm');
+                        eventData.displayDate = date.format('ddd, Do MMMM, h(:mm)a')
+                    }
+                    c.bubble.display('create', eventData, jsEvent, this)
+                },
+                eventStartEditable: false
+            },
+            x: false
+        }).init()
+
+        // Event filter - reload events when the filter button is pressed.
+        $('#calendar-controls').on('click', 'a#applyFilters', function(event) {
+            event.preventDefault()
+            c.dom.fullCalendar('refetchEvents')
+        })
+
+        // Approve, Reject, Cancel: all AJAX events
+        // Modify: not AJAX
+        // For any AJAX event - open a dialog if this is a series event
+        $('#calendar-bubble').find('#editEvent').on(
+            'click',
+            'a.btn.booking-approve, a.btn.booking-reject, a.btn.booking-cancel',
+            function(event) {
+                c.bubble.hide()
+                event.preventDefault()
+                var href     = this.href
+                var callback = function(data) {
+                    return $.ajax(href, {data: data})
+                        .done(function() {
+                            c.dom.fullCalendar('refetchEvents')
+                        })
+                        .fail(function() {
+                            // fail in some way, not yet sure how
+                        });
+                }
+                var seriesId = $(this).data('seriesId')
+                if (seriesId) {
+                    // Remove all previous change status events, and reapply to this
+                    // dialog box.
+                    updateSeriesDialog.find('.action-text').text($(this).text().toLowerCase())
+                    updateSeriesDialog
+                        .dialog('option', 'buttons', [{
+                            text: "Only this booking",
+                            click: function() {
+                                updateSeriesDialog.dialog('close')
+                                callback({efficacy: 'self'})
+                            }
+                        }, {
+                            text: "All bookings in the series",
+                            click: function() {
+                                updateSeriesDialog.dialog('close')
+                                callback({efficacy: 'series', seriesId: seriesId})
+                            }
+                        }])
+                        .dialog('open')
+                } else if ($(this).hasClass('booking-cancel')) {
+                    deleteDialog
+                        .dialog('option', 'buttons', [{
+                            text: "Yes",
+                            click: function() {
+                                deleteDialog.dialog('close')
+                                callback({})
+                            }
+                        }, {
+                            text: "No",
+                            click: function() {
+                                deleteDialog.dialog('close')
+                            }
+                        }])
+                        .dialog('open')
+                } else {
+                    c.bubble.hide()
+                    callback()
+                }
+            }
+        )
+    });
+</script>
 <!-- END custom_header -->
 
 
-<h1>Resource - {% include '@resourceItem/sub/itemName.twig' with {item: item} %}</h1>
-<span class="header_option">
-    {% if isRouteAuthorized('resourceItem.edit', {id: item.id, item: item}) %}
-        <a class="resource-name resource-edit-link btn modify float-left" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}">
-            <span></span>
-            Modify Resource
-        </a>
-    {% endif %}
-    <form action="{{ routeLookup('resourceItem.browse') }}" method="get" class="float-left">
-        <input type="search" id="resource-search-term" placeholder="Search Resources" name="search" value="{{ search|default('') }}" />
-        <input type="submit" id="resource-search" value="Search" class="submit-btn-plain" />
-    </form>
-</span>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Resource</h1>
+            <ul class="meta">
+                <li class="icon-resource-booking">{% include '@resourceItem/sub/itemName.twig' with {item: item} %}</li>
+            </ul>
+        </div>
+    </div>
+    <nav>
+        <a class="icon-search" data-reveal-id="search-modal" title="Search Resources"></a>
+        {% if isRouteAuthorized('resourceItem.edit', {id: item.id, item: item}) %}
+        <a class="resource-name resource-edit-link icon-modify" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"></a>
+        {% endif %}
+    </nav>
+</div>
+
+<div id="search-modal" class="reveal-modal" data-reveal>
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">Search Resources</h2>
+            <section>
+                <form action="{{ routeLookup('resourceItem.browse') }}" method="get">
+                    <input type="search" id="resource-search-term" placeholder="Search Resources" name="search" value="{{ search|default('') }}" />
+                    <input type="submit" id="resource-search" value="Search" class="expand" />
+                </form>
+            </section>
+        </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
+</div>
+
+
+
+
+
+
+
+
+
+
+
 <div class="resource-info">
     <div class="resource-img">
         {% if item.image.hash %}
