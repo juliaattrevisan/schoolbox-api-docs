@@ -106,8 +106,8 @@ $(document).ready(function() {
                         <!-- END groupOwner -->
 
                         <!-- BEGIN member -->
-                        <li class="actions-small-1 actions-medium-4">
-                            <div class="list-item">
+                        <li class="actions">
+                            <div class="small-12 medium-6 columns no-pad">
                                 <div class="avatar card">
                                     <a href="/search/user/{USER_ID}">
                                         <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
@@ -120,23 +120,40 @@ $(document).ready(function() {
                                     </p>
                                 </div>
                             </div>
-                            <nav>
-                                <!-- BEGIN make_owner -->
-                                <!-- END make_owner -->
-                                <span class="hide-for-small">
-                                    <a href="#" class="icon-view {READ_SELECTED}" title="Grant Read Access"></a>
-                                    <a href="#" class="icon-modify {WRITE_SELECTED}" title="Grant Write Access"></a>
-                                    <a href="#" class="icon-favourite {ADMIN_ALLOWED}" title="Make Admin"></a>
-                                    <a href="#" class="icon-close alert" title="Remove From Group"></a>
-                                </span>
-                                <a href="#" class="show-for-small icon-more" data-dropdown="tab-control-user-{USER_ID}"></a>
-                            </nav>
-                            <ul id="tab-control-user-{USER_ID}" class="f-dropdown" data-dropdown-content>
-                                <li><a href="#" class="icon-view {READ_SELECTED}">Grant Read Access</a></li>
-                                <li><a href="#" class="icon-modify {WRITE_SELECTED}">Grant Write Access</a></li>
-                                <li><a href="#" class="icon-favourite {ADMIN_ALLOWED}">Make Admin</a></li>
-                                <li><a href="#" class="icon-close alert">Remove From Group</a></li>
-                            </ul>
+                            <div class="small-12 medium-6 columns no-pad">
+                                <div class="actions-small-3">
+                                    <nav>
+                                        <!-- BEGIN make_owner -->
+                                        <!-- END make_owner -->
+                                        <input id="accessLevel-{USER_ID}-1" type="radio" name="accessLevel[{USER_ID}]" value="1" {READ_CHECKED} />
+                                        <label for="accessLevel-{USER_ID}-1" class="radio-toggle">
+                                            <span class="icon-view" title="Grant Read Access"></span>
+                                        </label>
+                                        <input id="accessLevel-{USER_ID}-2" type="radio" name="accessLevel[{USER_ID}]" value="2" {WRITE_CHECKED} />
+                                        <label for="accessLevel-{USER_ID}-2" class="radio-toggle">
+                                            <span class="icon-modify" title="Grant Write Access"></span>
+                                        </label>
+                                        <input id="accessLevel-{USER_ID}-3" type="radio" name="accessLevel[{USER_ID}]" value="3" {ADMIN_ALLOWED} />
+                                        <label for="accessLevel-{USER_ID}-3" class="radio-toggle">
+                                            <span class="icon-favourite" title="Make Admin"></span>
+                                        </label>
+                                        <input id="accessLevel-{USER_ID}-0" type="radio" name="accessLevel[{USER_ID}]" value="0" />
+                                        <label for="accessLevel-{USER_ID}-0" class="radio-toggle">
+                                            <span class="icon-close" title="Remove From Group"></span>
+                                        </label>
+                                    </nav>
+                                </div>
+
+                               <!--
+                               <div class="actions-small-3">
+                                    <nav>
+                                        <a href="#" class="icon-modify {WRITE_SELECTED}" title="Grant Write Access"></a>
+                                        <a href="#" class="icon-favourite {ADMIN_ALLOWED}" title="Make Admin"></a>
+                                        <a href="#" class="icon-close alert" title="Remove From Group"></a>
+                                    </nav>
+                                </div>
+                                -->
+                            </div>
                         </li>
                         <!-- END member -->
                     </ul>
