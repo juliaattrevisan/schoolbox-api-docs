@@ -352,8 +352,8 @@
                     <input type='hidden' name='page_id' value='{PAGE_ID}' />
                     <input type='hidden' name='update' value='page' />
 
-                    <section class="no-pad">
-                        <fieldset class="content">
+                    <section>
+                        <fieldset>
                             <div class="small-12 columns">
                                 <label>
                                     Page Name
@@ -379,10 +379,10 @@
                             </div>
                             <div class="small-12 large-4 columns">
                                 <label>
-                                    Student
+                                    Student Permissions
                                     <span class="hint has-tip tip-top" data-tooltip title="Allow certain students to view your ePortfolio page.">?</span>
+                                    <select id='addIndividualPermission' name="individual_permission[]" multiple  placeholder="Search Students"></select>
                                 </label>
-                                <select id='addIndividualPermission' name="individual_permission[]" multiple placeholder="Search Students"></select>
                             </div>
                             <div class="small-12 large-4 columns">
                                 <label for="parent-permission" class="checkbox-label">
