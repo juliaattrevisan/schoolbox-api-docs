@@ -1041,7 +1041,7 @@ class External_Pcschools_User implements External_UserInterface
     public function determineBoarderType($boarderValue)
     {
         // Non-core promise
-        return [];
+        return '';
 //        if (!strlen($boarderValue)) {
 //            return '';
 //        } else {
