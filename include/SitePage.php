@@ -1160,11 +1160,11 @@ class SitePage extends Page
         // choose a background picture
         $options = array(Config::get('skin_login_bg'));
 
-        if (count($options)) {
+        if (count($options) && $options[0] ) {
             $bg = $options[array_rand($options)];
             $this->setVar('LOGIN_BG', '/images/logo.php?logo=skin_login_bg&size=normal');
         } else {
-            $this->setVar('LOGIN_BG', '');
+            $this->setVar('LOGIN_BG', '/images/core/login-bg.jpg');
         }
 
         // is the login page sidebar-style?

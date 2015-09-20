@@ -15,6 +15,13 @@ use Alaress\Image\Transformation;
 
 require_once __DIR__.'/../../include/Bootstrap.php';
 
+$placeholders = array(
+    'skin_logo_login' => '/core/logo.png',
+    'skin_login_bg' => '/core/login-bg.jpg',
+    'skin_logo_square' => '/core/m-hercules.png',
+    'skin_logo_large' => '/core/hercules.png',
+);
+
 $logoSizes = array('skin_logo_square' => array(
                                             'normal'    => array(80,80),
                                             'hidpi'     => array(160,160),
@@ -59,21 +66,27 @@ if(!( array_key_exists($logo, $logoSizes) && array_key_exists($size, $logoSizes[
 try {
     /* Choose a caching method to use
      */
-    $key   = $logoSizes[$logo][$size][0] . 'x' . $logoSizes[$logo][$size][1];
-    $store  = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash(Config::get($logo));
+    $key = $logoSizes[$logo][$size][0] . 'x' . $logoSizes[$logo][$size][1];
+    $store = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash(Config::get($logo));
 
     /* Process and stream image
      */
     $imageProcessor = new Freeform(
         new Cache\Storage($store, $key),
-        new Transformation\MyImage( $logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]),
+        new Transformation\MyImage($logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]),
         new Imagine\Filetype\Factory(),
         new Imagine\Processor\Strategy\Factory()
     );
     $imageProcessor->load()->stream();
-} catch (Exception_Schoolbox_NotFound $e) {
-    SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
 }
 catch (Exception $e) {
-    SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 500);
+    $placeHolderFile = __DIR__ .$placeholders[$logo];
+    if (is_readable($placeHolderFile)) {
+        header('Content-type: image/png');
+        readfile($placeHolderFile);
+        exit;
+
+    } else {
+        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
+    }
 }
