@@ -50,6 +50,8 @@ interface External_UserInterface {
      * StudentStudiesCode,
      * AlertMessage,
      *
+     * @importance high - used on student profile page
+     *
      * @param $externalUserId
      * @return array
      */
@@ -84,6 +86,8 @@ interface External_UserInterface {
      * StudentContactSpouseDefaultEmail,
      * StudentContactType,
      * StudentContactSpouseRelation
+     *
+     * @importance high - used on student profile page, and the report card.
      *
      * @param $externalUserId
      * @return array
@@ -141,6 +145,8 @@ interface External_UserInterface {
      * Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
      * StudentParentsSeparatedFlag
      *
+     * @importance low - used only on the parent report.
+     *
      * @param $yearlevel
      * @param $name
      * @param $boardingStatus
@@ -166,6 +172,8 @@ interface External_UserInterface {
      * StudentBoardingHouse,
      * StudentCampus
      *
+     * @importance high - used in sync scripts.
+     *
      * @return array
      */
     public function getStudentUserAccountInfo();
@@ -174,6 +182,8 @@ interface External_UserInterface {
      * Returns a list of email parent email addresseses for students.
      *
      * @param array $synergyIds
+     *
+     * @importance medium - used in the class list to create a list of emails, and the report card.
      *
      * @return array
      */
@@ -206,6 +216,8 @@ interface External_UserInterface {
      * SpouseMobilePhone,
      * SpouseDirectoryIncludeFlag
      *
+     * @importance high - used on parent profile page.
+     *
      * @param $externalUserId
      * @return array
      */
@@ -220,9 +232,9 @@ interface External_UserInterface {
      * I think this was used to only update parents of current Schoolbox
      * students, rather than updating everyone blindly
      *
-     * Used in Synchronise
-     *
      * Accept array of Synergy IDs, or just an int
+     *
+     * @importance low - used in some sync scripts.
      *
      * @param $externalUserId
      * @return array (
@@ -275,6 +287,8 @@ interface External_UserInterface {
      * StudentCampus,
      * StudentGender
      *
+     * @importance high - used in sync script.
+     *
      * @return array
      */
     public function getParentUserAccountInfo();
@@ -295,6 +309,8 @@ interface External_UserInterface {
      * StaffDepartment,
      * StaffVoiceMail
      *
+     * @importance high - used on staff profile page.
+     *
      * @param $externalUserId
      * @return array
      */
@@ -303,7 +319,7 @@ interface External_UserInterface {
     /**
      * Get staff account information
      *
-     * Used in Synchronise
+     * @importance high - used in sync scripts.
      *
      * @return array(
      *     array(
@@ -349,12 +365,17 @@ interface External_UserInterface {
      *     )
      * )
      *
+     * @importance low - used on staff directory only.
+     *
      * @return array
      */
     public function getStaffContactListExtended();
 
     /**
      * Gets the current semester for the user.
+     *
+     * @importance low - used everywhere, but if you can't get it from the DB,
+     *             Jan-Jun: 1, Jul-Dec: 2
      *
      * @param string $externalUserId
      * @return string The current semester
@@ -365,6 +386,9 @@ interface External_UserInterface {
      * Gets the current year for the user.
      * Needs a method because a user could be set on file as being on a
      * previous year.
+     *
+     * @importance low - used everywhere, but if you can't get it from the DB,
+     *             return the current year.
      *
      * @param string $externalUserId
      * @return string The current file year for the user
@@ -388,6 +412,9 @@ interface External_UserInterface {
      *     ...
      * )
      *
+     * @importance high - used on student profile page, and for determining a
+     *             student's memberships.
+     *
      * @param $externalUserId
      * @param $userId
      * @return array
@@ -400,6 +427,8 @@ interface External_UserInterface {
      *
      * Returns an array of $externalId
      *
+     * @importance high - used to determine a parent's children, and related permissions.
+     *
      * @param $externalUserId
      * @return array
      */
@@ -407,6 +436,8 @@ interface External_UserInterface {
 
     /**
      * Get the email address as a string for a particular person
+     *
+     * @importance low - I'm not sure this is used anywhere yet?
      *
      * @param $externalUserId
      * @return string
@@ -417,6 +448,8 @@ interface External_UserInterface {
      * Get the portrait for a particular user
      * Returns a local file path to the user's portrait
      *
+     * @importance low - most schools manually upload portraits to `config.portrait_dir`.
+     *
      * @param $externalUserId
      * @return string
      */
@@ -424,6 +457,8 @@ interface External_UserInterface {
 
     /**
      * Determine whether someone is a day boarder or not
+     *
+     * @importance low - used on profile page, but only to show if student is a boarder
      *
      * @param $boarderValue
      * @return string
@@ -433,6 +468,8 @@ interface External_UserInterface {
     /**
      * Find the housemasterId for a particular house
      *
+     * @importance low - I'm not sure this is used anywhere yet?
+     *
      * @param $houseID
      * @return string
      */
@@ -441,6 +478,8 @@ interface External_UserInterface {
     /**
      * List of campuses a staff member is involved in based on timetable
      *
+     * @importance low - used in a few sync scripts.
+     *
      * @param int $staffID
      * @return array|bool
      */
@@ -448,6 +487,8 @@ interface External_UserInterface {
 
     /**
      * Retrieves a list of forms that a student may be in.
+     *
+     * @importance low - used on student report only.
      *
      * @return array [['Code' => string, 'Description' => string], ...]
      */
