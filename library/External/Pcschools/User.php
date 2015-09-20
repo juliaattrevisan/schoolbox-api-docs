@@ -58,6 +58,8 @@ class External_Pcschools_User implements External_UserInterface
      * StudentStudiesCode,
      * AlertMessage,
      *
+     * @importance high - used on student profile page
+     *
      * @param $externalUserId
      *
      * @return array
@@ -148,6 +150,8 @@ class External_Pcschools_User implements External_UserInterface
      * StudentContactSpouseDefaultEmail,
      * StudentContactType,
      * StudentContactSpouseRelation
+     *
+     * @importance high - used on student profile page, and the report card.
      *
      * @param $externalUserId
      *
@@ -395,6 +399,8 @@ class External_Pcschools_User implements External_UserInterface
      * SpouseDirectoryIncludeFlag,
      * StudentParentsSeparatedFlag
      *
+     * @importance low - used only on the parent report.
+     *
      * @param $yearlevel
      * @param $name
      * @param $boardingStatus
@@ -491,6 +497,8 @@ class External_Pcschools_User implements External_UserInterface
      * StudentBoardingHouse,
      * StudentCampus
      *
+     * @importance high - used in sync scripts.
+     *
      * @return array
      */
     public function getStudentUserAccountInfo()
@@ -519,6 +527,8 @@ class External_Pcschools_User implements External_UserInterface
 
     /**
      * Returns a list of email parent email addresseses for students.
+     *
+     * @importance medium - used in the class list to create a list of emails, and the report card.
      *
      * @param array $synergyIds
      *
@@ -597,6 +607,8 @@ class External_Pcschools_User implements External_UserInterface
      * SpouseMobilePhone,
      * SpouseDirectoryIncludeFlag
      *
+     * @importance high - used on parent profile page.
+     *
      * @param $externalUserId
      *
      * @return array
@@ -614,8 +626,9 @@ class External_Pcschools_User implements External_UserInterface
      * DirectoryIncludeFlag) are not included in the result set.
      * I think this was used to only update parents of current Schoolbox
      * students, rather than updating everyone blindly
-     * Used in Synchronise
      * Accept array of Synergy IDs, or just an int
+     *
+     * @importance low - used in some sync scripts.
      *
      * @param $externalUserId
      *
@@ -668,6 +681,8 @@ class External_Pcschools_User implements External_UserInterface
      * StudentYearLevel,
      * StudentCampus,
      * StudentGender
+     *
+     * @importance high - used in sync script.
      *
      * @return array
      */
@@ -790,6 +805,8 @@ class External_Pcschools_User implements External_UserInterface
      * StaffDepartment,
      * StaffVoiceMail
      *
+     * @importance high - used on staff profile page.
+     *
      * @param $externalUserId
      *
      * @return array
@@ -817,7 +834,8 @@ class External_Pcschools_User implements External_UserInterface
 
     /**
      * Get staff account information
-     * Used in Synchronise
+     *
+     * @importance high - used in sync scripts.
      *
      * @return array(
      *     array(
@@ -882,6 +900,8 @@ class External_Pcschools_User implements External_UserInterface
      *     )
      * )
      *
+     * @importance low - used on staff directory only.
+     *
      * @return array
      */
     public function getStaffContactListExtended()
@@ -892,6 +912,9 @@ class External_Pcschools_User implements External_UserInterface
 
     /**
      * Gets the current semester for the user.
+     *
+     * @importance low - used everywhere, but if you can't get it from the DB,
+     *             Jan-Jun: 1, Jul-Dec: 2
      *
      * @param string $externalUserId
      *
@@ -906,6 +929,9 @@ class External_Pcschools_User implements External_UserInterface
      * Gets the current year for the user.
      * Needs a method because a user could be set on file as being on a
      * previous year.
+     *
+     * @importance low - used everywhere, but if you can't get it from the DB,
+     *             return the current year.
      *
      * @param string $externalUserId
      *
@@ -931,6 +957,9 @@ class External_Pcschools_User implements External_UserInterface
      *     ...
      * )
      *
+     * @importance high - used on student profile page, and for determining a
+     *             student's memberships.
+     *
      * @param $externalUserId
      * @param $userId
      *
@@ -945,6 +974,8 @@ class External_Pcschools_User implements External_UserInterface
      * Get all the enrolled students belonging to $externalUserId
      * (usually a parent)
      * Returns an array of $externalId
+     *
+     * @importance high - used to determine a parent's children, and related permissions.
      *
      * @param $externalUserId
      *
@@ -965,6 +996,8 @@ class External_Pcschools_User implements External_UserInterface
     /**
      * Get the email address as a string for a particular person
      *
+     * @importance low - I'm not sure this is used anywhere yet?
+     *
      * @param $externalUserId
      *
      * @return string
@@ -978,6 +1011,8 @@ class External_Pcschools_User implements External_UserInterface
     /**
      * Get the portrait for a particular user
      * Returns a local file path to the user's portrait
+     *
+     * @importance low - most schools manually upload portraits to `config.portrait_dir`.
      *
      * @param $externalUserId
      *
@@ -996,6 +1031,8 @@ class External_Pcschools_User implements External_UserInterface
 
     /**
      * Determine whether someone is a day boarder or not
+     *
+     * @importance low - used on profile page, but only to show if student is a boarder
      *
      * @param $boarderValue
      *
@@ -1019,6 +1056,8 @@ class External_Pcschools_User implements External_UserInterface
     /**
      * Find the housemasterId for a particular house
      *
+     * @importance low - I'm not sure this is used anywhere yet?
+     *
      * @param $houseID
      *
      * @return string
@@ -1031,6 +1070,8 @@ class External_Pcschools_User implements External_UserInterface
 
     /**
      * List of campuses a staff member is involved in based on timetable
+     *
+     * @importance low - used in a few sync scripts.
      *
      * @param int $staffID
      *
@@ -1045,6 +1086,7 @@ class External_Pcschools_User implements External_UserInterface
     /**
      * Retrieves a list of forms that a student may be in.
      *
+     * @importance low - used on student report only.
      * @return array [['Code' => string, 'Description' => string], ...]
      */
     public function getStudentForms()
