@@ -346,56 +346,60 @@
             <!--------------------->
             <!-- Component Tab 3 -->
             <!--------------------->
-            <div id="eportfolio-page-controls-tab-3" class="content">
+            <div id="eportfolio-page-controls-tab-3" class="content small-12 island">
                 <form method='post' action='/eportfolio/configForm.php'>
                     <input type='hidden' name='user_id' value='{ID}' />
                     <input type='hidden' name='page_id' value='{PAGE_ID}' />
                     <input type='hidden' name='update' value='page' />
 
-                    <fieldset>
-                        <legend>Page</legend>
-                        <div class="small-12 columns">
-                            <label>
-                                Title
-                                <input type='text' name='pageTitle' value="{PAGE_TITLE}" />
-                            </label>
-                        </div>
-                    </fieldset>
+                    <section class="no-pad">
+                        <fieldset class="content">
+                            <div class="small-12 columns">
+                                <label>
+                                    Page Name
+                                    <input type='text' name='pageTitle' value="{PAGE_TITLE}" />
+                                </label>
+                            </div>
+                        </fieldset>
 
-                    <fieldset>
-                        <legend>Permissions</legend>
-                        <div class="small-12 large-6 columns">
-                            <label>
-                                Group
-                                <span class="hint has-tip tip-top" data-tooltip title="Allow predefined groups to view your ePortfolio page.">?</span>
-                            </label>
-                            <!-- BEGIN has_group_permissions -->
-                            <!-- BEGIN group_permission -->
-                            <input type="checkbox" name="group_permission[]" id="group-permission-{GROUP_PERMISSION_GROUP_ID}" value="{GROUP_PERMISSION_GROUP_ID}" {GROUP_PERMISSION_SELECTED}/>
-                            <label for="group-permission-{GROUP_PERMISSION_GROUP_ID}" class="checkbox-label">
-                                {GROUP_PERMISSION_NAME}
-                            </label>
-                            <!-- END group_permission -->
-                            <!-- END has_group_permissions -->
-                        </div>
-                        <div class="small-12 large-6 columns">
-                            <label>
-                                Student
-                                <span class="hint has-tip tip-top" data-tooltip title="Allow certain students to view your ePortfolio page.">?</span>
-                            </label>
-                            <select id='addIndividualPermission' name="individual_permission[]" multiple placeholder="Search Students"></select>
-
-                            <input type="hidden" name="parent_permission" value="0" />
-                            <input type="checkbox" id='parent_permission' name="parent_permission" value="1" {PARENT_PERMISSION_SELECTED} />
-                            <label for="parent_permission" class="checkbox-label">
-                                Allow Parents
-                                <span class="hint has-tip tip-top" data-tooltip title="Allow your parents to view your ePortfolio page.">?</span>
-                            </label>
-                        </div>
-                        <div class="small-12 columns">
-                            <input type="submit" value="Update Page" />
-                        </div>
-                    </fieldset>
+                        <fieldset>
+                            <div class="small-12 large-4 columns">
+                                <label>
+                                    Group Permissions
+                                    <span class="hint has-tip tip-top" data-tooltip title="Allow predefined groups to view your ePortfolio page.">?</span>
+                                </label>
+                                <!-- BEGIN has_group_permissions -->
+                                <!-- BEGIN group_permission -->
+                                <input type="checkbox" name="group_permission[]" id="group-permission-{GROUP_PERMISSION_GROUP_ID}" value="{GROUP_PERMISSION_GROUP_ID}" {GROUP_PERMISSION_SELECTED}/>
+                                <label for="group-permission-{GROUP_PERMISSION_GROUP_ID}" class="checkbox-label">
+                                    {GROUP_PERMISSION_NAME}
+                                </label>
+                                <!-- END group_permission -->
+                                <!-- END has_group_permissions -->
+                            </div>
+                            <div class="small-12 large-4 columns">
+                                <label>
+                                    Student
+                                    <span class="hint has-tip tip-top" data-tooltip title="Allow certain students to view your ePortfolio page.">?</span>
+                                </label>
+                                <select id='addIndividualPermission' name="individual_permission[]" multiple placeholder="Search Students"></select>
+                            </div>
+                            <div class="small-12 large-4 columns">
+                                <label for="parent-permission" class="checkbox-label">
+                                    Allow Parents
+                                    <span class="hint has-tip tip-top" data-tooltip title="Allow your parents to view your ePortfolio page.">?</span>
+                                </label>
+                                <div class="switch">
+                                    <input type="hidden" name="parent_permission" value="0" />
+                                    <input type="checkbox" id='parent-permission' name="parent_permission" value="1" {PARENT_PERMISSION_SELECTED} />
+                                    <label for='parent-permission'></label>
+                                </div>
+                            </div>
+                            <div class="small-12 columns">
+                                <input type="submit" value="Update Page" />
+                            </div>
+                        </fieldset>
+                    </section>
                 </form>
             </div>
         </section>
