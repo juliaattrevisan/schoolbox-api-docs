@@ -818,7 +818,19 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getSubjectList($externalUserId, $userId)
     {
-        // TODO: Implement getSubjectList() method.
+        return $this->getDatabase()->trimAll(
+            $this->getDatabase()->getAll("
+                SELECT
+                    R.SUBJECT_NO AS code,
+                    SU.[DESC] AS name,
+                    SU.KEYAREA AS classType,
+                    ST.CAMPUS AS campusCode
+                FROM ROLL R
+                INNER JOIN STUDENT ST ON R.STUDENT# = ST.STUDENT#
+                INNER JOIN [SUBJECT] SU ON R.SUBJECT_NO = SU.NO
+                WHERE R.STUDENT# = {$this->getDatabase()->smartQuote($externalUserId)}
+            ")
+        );
     }
 
     /**
