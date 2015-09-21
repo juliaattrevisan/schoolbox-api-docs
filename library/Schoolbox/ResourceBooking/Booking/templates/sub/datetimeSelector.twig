@@ -1,7 +1,7 @@
 <fieldset>
     {#{% include 'sub/errors.twig' with {errors: errors.start_datetime} %}#}
     {% include 'sub/datetimeInput.twig' with {
-    title: 'Start Date/Time',
+    title: 'Start Time',
     value: item.event.startDateTime,
     name:  'start_datetime',
     id:    'start_datetime'
@@ -10,7 +10,7 @@
 
 <fieldset>
     {% include 'sub/datetimeInput.twig' with {
-    title: 'End Date/Time',
+    title: 'End Time',
     value: item.event.endDateTime,
     name:  'end_datetime',
     id:    'end_datetime'

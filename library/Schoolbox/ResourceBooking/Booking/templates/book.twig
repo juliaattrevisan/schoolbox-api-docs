@@ -385,6 +385,7 @@ $(function() {
 
 <ul class="breadcrumb">
     <li><a href="/resource-booking/item">Resource Booking</a>
+    <li><a href="{{ routeLookup('resourceItem.browse', {id: item.resource.category.id}) }}">{{  item.resource.category.name }}</a></li>
     <li><a id="resource-booking-back" href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">{{ item.resource.name }}</a></li>
     <li class="active"><a href="#">Booking</a></li>
 </ul>
@@ -435,7 +436,6 @@ $(function() {
                     </div>
                 </fieldset>
                 <fieldset class="content">
-                    <legend>Booking Time</legend>
                     <div class="small-12 columns">
                         {% include '@resourceBooking/sub/datetimeSelector.twig' with {
                             select: select,
@@ -530,13 +530,15 @@ $(function() {
                                         <input id="related-item-{{ relatedItem.id }}" type="checkbox" name="related_item[{{ relatedItem.id }}][resource_id]" value="{{ relatedItem.id }}" data-interaction="display-notes" {% if relatedBooking is not empty %}checked{% endif %} />
                                         <label for="related-item-{{ relatedItem.id }}" class="checkbox-label"></label>
                                     </div>
-                                    <div class="small-11 info card">
-                                        <p>{{ relatedItem.name }}</p>
+                                    <div class="small-11 columns">
+                                        <label for="related-item-{{ relatedItem.id }}">{{ relatedItem.name }}</label>
+                                        <div data-relation="related-resource-notes" style="{% if relatedBooking is empty %}display:none{% endif %}">
+                                            <textarea name="related_item[{{ relatedItem.id }}][notes]">{{ relatedBooking.notes }}</textarea>
+                                        </div>
+
                                     </div>
 
-                                    <div data-relation="related-resource-notes" class="{% if relatedBooking is empty %}hide{% endif %}">
-                                        <textarea name="related_item[{{ relatedItem.id }}][notes]">{{ relatedBooking.notes }}</textarea>
-                                    </div>
+
                                 </div>
                                 <nav>
                                     <a href="{{ routeLookup('resourceItem.read', {id: relatedItem.id}) }}" class="icon-view" id="resource-read-{{relatedItem.id}}" title="View Bookings"></a>
