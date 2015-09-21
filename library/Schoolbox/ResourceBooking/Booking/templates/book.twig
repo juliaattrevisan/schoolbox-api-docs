@@ -411,6 +411,12 @@ $(function() {
 </script>
 <!-- END custom_header -->
 
+<ul class="breadcrumb">
+    <li><a href="/resource-booking/item">Resource Booking</a>
+    <li><a id="resource-booking-back" href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">{{ item.resource.name }}</a></li>
+    <li class="active"><a href="#">Booking</a></li>
+</ul>
+
 <div class="row">
     <div class="small-12 columns">
         <h1>
@@ -596,8 +602,6 @@ $(function() {
                     {% if item.id %}
                         <input id="resource-booking-cancel" type="submit" value="Cancel Booking" data-action="{{ routeLookup('resourceBooking.cancel', {id: item.id}) }}" />
                     {% endif %}
-
-                    <a id="resource-booking-back" href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">Back to list</a>
                 </div>
             </div>
         </form>
