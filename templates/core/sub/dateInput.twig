@@ -1,4 +1,7 @@
 <div class="small-12 large-3 columns">
-    <input type="text" name="{{ name }}[date]" data-datepicker="" {% if id %}id="{{ id }}"{% endif %} value="{{ value is empty ? "" : value|date(locale.date.localShortFormat) }}" />
+    <label>
+        Date
+        <input type="text" name="{{ name }}[date]" data-datepicker="" {% if id %}id="{{ id }}"{% endif %} value="{{ value is empty ? "" : value|date(locale.date.localShortFormat) }}" />
+    </label>
 </div>
 

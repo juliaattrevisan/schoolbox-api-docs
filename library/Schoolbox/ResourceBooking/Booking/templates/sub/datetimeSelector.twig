@@ -1,7 +1,5 @@
 <div class="row">
     <div class="small-12 columns">
-        <label>Start Time</label>
-
         {#{% include 'sub/errors.twig' with {errors: errors.start_datetime} %}#}
         {% include 'sub/datetimeInput.twig' with {
         value: item.event.startDateTime,
@@ -13,8 +11,6 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <label>End Time</label>
-
         {% include 'sub/datetimeInput.twig' with {
         value: item.event.endDateTime,
         name:  'end_datetime',
