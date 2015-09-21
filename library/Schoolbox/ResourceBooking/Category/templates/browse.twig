@@ -1,20 +1,25 @@
 {# rel="edit-form" and rel="create-form" - RFC 6861 #}
+<ul class="breadcrumb">
+    <li><a href="{{ routeLookup('resourceItem.browse') }}">Resources</a></li>
+    <li class="active"><a href="#">Resource Categories</a></li>
+</ul>
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Resource Category List</h1>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Resource Category List</h1>
+        </div>
     </div>
+    <nav>
+        {# New item: only if I have the permission to do this #}
+        {% if isRouteAuthorized('resourceCategory.add') %}
+         <a id="resourcecategory-create" rel="create-form" class="icon-add" href="{{ routeLookup('resourceCategory.add') }}" title="Add New"></a>
+        {% endif %}
+    </nav>
 </div>
 
 {% include '@resourceCategory/sub/list.twig' %}
 
 {% include 'sub/paginator.twig' with {paginator: paginator, currentPage: currentPage, class:'admin-nav'} %}
 
-{# New item: only if I have the permission to do this #}
-{% if isRouteAuthorized('resourceCategory.add') %}
-<div class="row">
-    <div class="small-12 columns">
-        <a id="resourcecategory-create" rel="create-form" class="button secondary" href="{{ routeLookup('resourceCategory.add') }}" title="Add New">Add New</a>
-    </div>
-</div>
-{% endif %}
+

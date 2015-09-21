@@ -27,11 +27,17 @@
         });
     })
 </script>
+{# rel="edit-form" and rel="create-form" - RFC 6861 #}
+<ul class="breadcrumb">
+    <li><a href="{{ routeLookup('resourceItem.browse') }}">Resources</a></li>
+    <li><a href="{{ routeLookup('resourceCategory.browse') }}">Resource Categories</a></li>
+    <li class="active"><a href="#">{% if item.id %}Edit{% else %}Add{% endif %}</a></li>
+</ul>
 
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>Resource Category - {% if item.id %}Edit{% else %}Add New{% endif %}</h1>
+            <h1>{% if item.id %}Edit{% else %}Add{% endif %} Resource Category</h1>
         </div>
     </div>
     {% if item.id and isRouteAuthorized('resourceCategory.delete:post', {id: item.id, item: item}) %}
