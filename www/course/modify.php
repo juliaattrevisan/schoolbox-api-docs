@@ -56,14 +56,12 @@ $course_list = UnitInstanceMapper::getInstance()->findByColumn(
 $this->setFile(TEMPLATE_content, "course/modify.html");
 $this->setBlock(TEMPLATE_content, 'course', 'course_block');
 $this->setBlock('course', 'course_breadcrumb', 'course_breadcrumb_block');
-$this->setBlock(TEMPLATE_content, 'class_breadcrumb', 'class_breadcrumb_block');
 $this->setBlock(TEMPLATE_content, 'unit', 'unit_block');
 $this->setBlock('unit', 'unit_update_open_date', 'unit_update_open_date_block');
 $this->setBlock('unit', 'unit_update_due_date', 'unit_update_due_date_block');
 
 $this->setVar(
     array(
-        'class_breadcrumb_block' => '',
         'course_block'           => '',
         'HOMEPAGE_ID'            => '',
         'COURSE_HOMEPAGE_ID'     => '',
@@ -72,15 +70,7 @@ $this->setVar(
 );
 
 // Output course and category breadcrumbs
-$homepage      = CategoryMapper::getInstance()->findById($component->getIdentifier());
-$homepage_path = CategoryMapper::getInstance()->findParents($homepage);
-$homepage_path->add($homepage);
-foreach ($homepage_path as $parent) {
-    /** @var Category $parent */
-    $this->setVar('CLASS_CATEGORY_ID', Scrub::text($parent->getId()));
-    $this->setVar('CLASS_CATEGORY_NAME', Scrub::text($parent->getName()));
-    $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
-}
+$homepage = CategoryMapper::getInstance()->findById($component->getIdentifier());
 
 // Output course breadcrumbs (for every course that is in this outline)
 $courseBaseHomepage = new Category();
