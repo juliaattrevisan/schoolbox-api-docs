@@ -830,6 +830,17 @@ class External_Pcschools_User implements External_UserInterface
                 INNER JOIN [SUBJECT] SU ON R.SUBJECT_NO = SU.NO
                 WHERE R.STUDENT# = {$this->getDatabase()->smartQuote($externalUserId)}
             ")
+//            $this->getDatabase()->getAll("
+//                SELECT
+//                    SU.ABBREV AS code,
+//                    SU.[DESC] AS name,
+//                    SU.KEYAREA AS classType,
+//                    ST.CAMPUS AS campusCode
+//                FROM SUB S
+//                INNER JOIN STUDENT ST ON S.STUDENT# = ST.STUDENT#
+//                INNER JOIN [SUBJECT] SU ON S.SUBJECT_NO = SU.NO
+//                WHERE S.STUDENT# = {$this->getDatabase()->smartQuote($externalUserId)}
+//            ")
         );
     }
 
