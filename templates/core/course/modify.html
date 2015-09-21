@@ -52,14 +52,13 @@
                 </fieldset>
                 <!-- END course -->
                 <fieldset class="content">
-                    <legend>Units</legend>
-                    <div class="small-12 columns">
-                        <p class="meta">
+                    <legend>
+                        Units
+                        <span data-tooltip class="hint has-tip tip-top" title="
                             Changing the open or due date of a unit will not change
                             the open or due date of any assessments in the unit,
-                            unless you check the <strong>Update</strong> checkbox below the open or due date for that unit.
-                        </p>
-                    </div>
+                            unless you check the <strong>Update Assessments</strong> checkbox.">?</span>
+                    </legend>
                     <div class="small-12 columns no-pad">
                         <ul class="information-list">
                             <!-- BEGIN unit -->
@@ -90,7 +89,7 @@
                                                type="checkbox"
                                                value="1"
                                                id="update_open_date-{UNIT_COUNT}" />
-                                        <label for="update_open_date-{UNIT_COUNT}" class="checkbox-label">Update?</label>
+                                        <label for="update_open_date-{UNIT_COUNT}" class="checkbox-label">Update Assessments?</label>
                                         <!-- END unit_update_open_date -->
                                     </div>
                                     <div class="small-12 medium-6 columns" data-hide-watch="#import-{UNIT_COUNT}">
@@ -109,7 +108,7 @@
                                                type="checkbox"
                                                value="1"
                                                id="update_due_date-{UNIT_COUNT}" />
-                                        <label for="update_due_date-{UNIT_COUNT}" class="checkbox-label">Update?</label>
+                                        <label for="update_due_date-{UNIT_COUNT}" class="checkbox-label">Update Assessments?</label>
                                         <!-- END unit_update_due_date -->
                                     </div>
                                 </div>
