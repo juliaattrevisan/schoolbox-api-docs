@@ -1,5 +1,5 @@
 <ul class='breadcrumb'>
-    <li>
+    <li data-breadcrumb>
         <a href='#' rel='0'>Home</a>
     </li>
     <!-- BEGIN breadcrumb -->
@@ -8,30 +8,33 @@
     </li>
     <!-- END breadcrumb -->
 </ul>
-<ul class="socialstream-node listing file-browser">
-
+<ul class="resource-list">
     <!-- BEGIN node_category -->
     <li data-node-category>
-        <a href="#" rel="{NODE_CATEGORY_ID}" title="{NODE_CATEGORY_NAME}">
-            <img src="/images/mime/22x22/{NODE_CATEGORY_TYPE}.png" alt="{NODE_CATEGORY_NAME}"/>
-            {NODE_CATEGORY_NAME}
-        </a>
+        <div class="avatar card small-12">
+            <a href="#" rel="{NODE_CATEGORY_ID}" title="{NODE_CATEGORY_NAME}">
+                <div class="icon-{NODE_CATEGORY_TYPE} icon-32"></div>
+                {NODE_CATEGORY_NAME}
+            </a>
+        </div>
     </li>
     <!-- END node_category -->
 
     <!-- BEGIN node_file -->
     <li data-node-file>
-        <a href="/send.php?id={NODE_FILE_ID}" title="{NODE_FILE_NAME}" data-mime="{NODE_MIME_TYPE}"
-           data-size="{NODE_FILE_SIZE}">
-            <img src="/images/mime/22x22/{NODE_FILE_ICON}" alt="{NODE_FILE_NAME}"/>
-            {NODE_FILE_NAME}
-        </a>
+        <div class="avatar card small-12">
+            <a href="/send.php?id={NODE_FILE_ID}" title="{NODE_FILE_NAME}" data-mime="{NODE_MIME_TYPE}"
+               data-size="{NODE_FILE_SIZE}">
+                <img src="/images/mime/60x60/{NODE_FILE_ICON}" alt="{NODE_FILE_NAME}" class="mime" />
+                {NODE_FILE_NAME}
+            </a>
+        </div>
     </li>
     <!-- END node_file -->
 </ul>
 
 <!-- BEGIN use_folder -->
-<a href="{NODE_LINK}" class="submit-btn-plain" data-use-folder data-filename_html="<img src=&quot;/images/mime/22x22/folder.png&quot; alt=&quot;{NODE_NAME}&quot; /> {NODE_NAME}">
+<a href="{NODE_LINK}" class="submit button" data-use-folder data-filename_html="<img src=&quot;/images/mime/22x22/folder.png&quot; alt=&quot;{NODE_NAME}&quot; /> {NODE_NAME}">
     Use this folder
 </a>
 <!-- END use_folder -->
