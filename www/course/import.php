@@ -47,7 +47,6 @@ $task_list     = TaskMapper::getInstance()->findGroupedListForCategoryList($chil
 // block setup (PHPLib sucks)
 $this->setFile(TEMPLATE_content, "course/import.html");
 $this->setBlock(TEMPLATE_content, 'course_breadcrumb', 'course_breadcrumb_block');
-$this->setBlock(TEMPLATE_content, 'class_breadcrumb',  'class_breadcrumb_block');
 $this->setBlock(TEMPLATE_content, 'importable',        'importable_block');
 $this->setBlock(TEMPLATE_content, 'submit',            'submit_block');
 $this->setBlock(TEMPLATE_content, 'unimportable',      'unimportable_block');
@@ -68,15 +67,7 @@ $this->setVar(
 );
 
 // Output course and category breadcrumbs
-$homepage      = CategoryMapper::getInstance()->findById($homepage_id);
-$homepage_path = CategoryMapper::getInstance()->findParents($homepage);
-$homepage_path->add($homepage);
-foreach ($homepage_path as $parent) {
-    /** @var Category $parent */
-    $this->setVar('CLASS_CATEGORY_ID',   Scrub::text($parent->getId()));
-    $this->setVar('CLASS_CATEGORY_NAME', Scrub::text($parent->getName()));
-    $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
-}
+$homepage = CategoryMapper::getInstance()->findById($homepage_id);
 
 $course_homepage = CategoryMapper::getInstance()->findById($course_homepage_id);
 $course_base_homepage = new Category();
