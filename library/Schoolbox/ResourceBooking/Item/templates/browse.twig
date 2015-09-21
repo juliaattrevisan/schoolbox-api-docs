@@ -1,15 +1,19 @@
 <ul class="breadcrumb">
-    <li><a href="#">Resources</a></li>
-    <li class="active"><a href="#">All</a></li>
+    <li><a href="{{ routeLookup('resourceItem.browse') }}">Resources</a></li>
+    <li class="active"><a href="#">{{  category.getName() }}</a></li>
 </ul>
 
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>All Resources</h1>
+            <h1>Resources</h1>
         </div>
     </div>
     <nav>
+        {# New item: only if I have the permission to do this #}
+        {% if isRouteAuthorized('resourceItem.add') %}
+            <a id="resource-create" rel="create-form" class="icon-add" href="{{ routeLookup('resourceItem.add') }}" title="Add Resource"></a>
+        {% endif %}
         <a class="icon-search" data-reveal-id="search-modal" title="Search Resources"></a>
     </nav>
 </div>
@@ -102,16 +106,8 @@
                 <p>There are no resources in the system.</p>
             </div>
             {% endif %}
-
-            {% include 'sub/paginator.twig' with {paginator: paginator, currentPage: currentPage, class:'admin-nav'} %}
-
-            {# New item: only if I have the permission to do this #}
-            {% if isRouteAuthorized('resourceItem.add') %}
-            <div class="content">
-                <a id="resource-create" rel="create-form" class="button icon-add" href="{{ routeLookup('resourceItem.add') }}">Add New</a>
-            </div>
-            {% endif %}
         </section>
+        {% include 'sub/paginator.twig' with {paginator: paginator, currentPage: currentPage, class:'pagination'} %}
     </div>
 </div>
 

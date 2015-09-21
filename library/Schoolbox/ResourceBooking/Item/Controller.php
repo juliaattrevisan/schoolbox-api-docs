@@ -71,6 +71,16 @@ class Controller extends Base
         } else {
             if ($catId) {
                 $query['resource_category_id'] = $catId;
+                try {
+                    $category = $this->getMapper()->getJoinMapper('category')->findById($catId);
+                } catch (\Exception_Schoolbox_NotFound $e) {
+                    $this->getResponse()->status->setCode(404);
+                }
+            }
+            else {
+                $catId = '';
+                $category = $this->getMapper()->getJoinMapper('category')->createModel();
+                $category->setName('All');
             }
 
             // Get count before running list
@@ -94,6 +104,7 @@ class Controller extends Base
                 'data'     => array(
                     'list'         => $list,
                     'categoryId'   => $catId,
+                    'category'     => $category,
                     'categoryList' => $this->getMapper()->getJoinMapper('category')->findAll(),
                     'search'       => $search,
                     'paginator'    => $this->paginator,
