@@ -1049,6 +1049,15 @@ $rotate-th-width: $square-grid-td-size;
 	}
 }
 
+.resource-list {
+	@extend .action-list;
+	.avatar.card {
+		.icon-32 {
+			padding-top: 1rem;
+		}
+	}
+}
+
 // Block Grid
 .grid{
 	//TODO: find block grid mixin
@@ -1229,7 +1238,7 @@ $rotate-th-width: $square-grid-td-size;
 		padding-top: 0;
 
 		&.avatar {
-			img {
+			img, [class*="icon-"] {
 				width: 2rem;
 				margin-right: 0.5rem;
 				margin-top: 0;
