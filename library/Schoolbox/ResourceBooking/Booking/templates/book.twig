@@ -414,6 +414,9 @@ $(function() {
 
 <div class="row">
     <div class="small-12 island">
+        <div class="alert-box">
+            {% include '@resourceItem/sub/rules.twig' with {item: item.resource} %}
+        </div>
         <form id="resource-booking-form" action="{{ saveAction }}" method="post" name="form">
             <input type="hidden" name="id" value="{{ item.id }}"/>
             <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}" />
@@ -428,11 +431,9 @@ $(function() {
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>
-                            Title
+                            Purpose
                             <input name="name" type="text" value="{{ item.name }}" />
                         </label>
-
-                        {% include '@resourceItem/sub/rules.twig' with {item: item.resource} %}
                     </div>
                 </fieldset>
                 <fieldset class="content">
@@ -445,8 +446,8 @@ $(function() {
                 </fieldset>
 
                 {% if item.event.id is empty %}
-                <fieldset class="content" id="repeatUntil">
-                    <legend>Repeat</legend>
+                <fieldset class="content">
+                    <legend>Recurrence</legend>
                     <div class="small-12 columns">
                         <label>
                             Repeat
@@ -463,7 +464,7 @@ $(function() {
                             </select>
                         </label>
 
-                        <label>
+                        <label id="repeatUntil"l>
                             Repeat Until
                             <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
                             <input data-datepicker name="repeat_until" id="repeat_until" type="text" size="15" maxlength="30" value=""/>
@@ -504,16 +505,13 @@ $(function() {
 
                 <fieldset>
                     <div class="small-12 columns">
-                        <div class="content">
-                            <label>
-                                Related Resources
-                                {% if item.resource.relatedResourceList|length %}
-                                <span class='hint has-tip tip-top' data-tooltip title="If you want to book any related resources, select them here.">?</span>
-                                {% endif %}
-                            </label>
-                        </div>
-                    </div>
-                    <div class="small-12 columns">
+                        <fieldset>
+                        <legend>
+                            Related Resources
+                            {% if item.resource.relatedResourceList|length %}
+                            <span class='hint has-tip tip-top' data-tooltip title="If you want to book any related resources, select them here.">?</span>
+                            {% endif %}
+                        </legend>
 
                         {% if item.resource.relatedResourceList|length %}
                         {# Related resources - not sure whether this list should be editable after save #}
@@ -551,6 +549,7 @@ $(function() {
                             <p>This resource has no related resources.</p>
                         </div>
                         {% endif %}
+                        </fieldset>
                     </div>
                 </fieldset>
             </section>
