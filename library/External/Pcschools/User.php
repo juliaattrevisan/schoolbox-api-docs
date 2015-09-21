@@ -569,10 +569,10 @@ class External_Pcschools_User implements External_UserInterface
             $row = $this->getDatabase()->trimRow($row);
             $id  = $row['IDENTITY_ID#'];
             if ($row['DAD_DOMICILE'] === 'Y') {
-                $result[$id.'-M'] = $row['DAD_EMAIL'];
+                $result[$id.'-F'] = $row['DAD_EMAIL'];
             }
             if ($row['MUM_DOMICILE'] === 'Y') {
-                $result[$id.'-F'] = $row['MUM_EMAIL'];
+                $result[$id.'-M'] = $row['MUM_EMAIL'];
             }
             if ($row['GUARD_DOMICILE'] === 'Y') {
                 $result[$id.'-G'] = $row['GUARD_EMAIL'];
