@@ -53,7 +53,7 @@
                     <div class="small-12 columns no-pad">
                         <ul class="information-list">
                             <!-- BEGIN unit -->
-                            <li class="actions-small-1">
+                            <li class="actions-small-1" data-type="unit_row">
                                 <input name="unit[{UNIT_COUNT}][unit_id]" type="hidden" value="{UNIT_ID}" />
                                 <input name="unit[{UNIT_COUNT}][import]" type="hidden" value="0" />
                                 <div class="list-item">
@@ -67,6 +67,7 @@
                                                name="unit[{UNIT_COUNT}][open_date]"
                                                type="text"
                                                value="{UNIT_OPEN_DATE}"
+                                               data-role="open_date"
                                                data-datepicker
                                                data-datepicker-sync
                                                data-datepicker-sync-enddate="#due_date-{UNIT_COUNT}" />
@@ -77,6 +78,7 @@
                                                name="unit[{UNIT_COUNT}][due_date]"
                                                type="text"
                                                value="{UNIT_DUE_DATE}"
+                                               data-role="due_date"
                                                data-datepicker />
                                     </div>
                                 </div>
