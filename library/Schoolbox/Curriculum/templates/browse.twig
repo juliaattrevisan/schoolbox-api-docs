@@ -265,7 +265,7 @@
             })
 
             // Create new curriculum
-            treePanel.on('click', '#create-curriculum-button', function(event) {
+            treePanel.on('click', '[data-interaction="create-curriculum"]', function(event) {
                 event.preventDefault();
                 buildForm({ save: createUri }, {});
             });
@@ -437,23 +437,37 @@
 </script>
 {% endverbatim %}
 
-<div class="row actions-small-1 actions-medium-2">
+<div class="row {% if not readonly %}actions-small-1 actions-medium-2{% endif %}">
     <div class="list-item">
         <div class="small-12 column">
             <h1>Curriculum Browser</h1>
         </div>
     </div>
+    {% if not readonly %}
     <nav>
-        {% if not readonly %}
+        <span class="hide-for-small">
             <a href="{{ routeLookup('curriculum.add')|escape('html_attr') }}"
-               id="create-curriculum-button"
+               data-interaction="create-curriculum"
                class="icon icon-add"
                title="Create New Curriculum"></a>
             <a href="{{ routeLookup('curriculumImport.browse')|escape('html_attr') }}"
                class="icon icon-upload"
                title="Import Curriculum"></a>
-        {% endif %}
+        </span>
+        <a href="#" class="icon-more show-for-small" data-dropdown="tab-control"></a>
     </nav>
+    <ul id="tab-control" class="f-dropdown" data-dropdown-content>
+        <li>
+            <a href="{{ routeLookup('curriculum.add')|escape('html_attr') }}"
+               data-interaction="create-curriculum"
+               class="icon icon-add">Create New Curriculum</a>
+        </li>
+        <li>
+            <a href="{{ routeLookup('curriculumImport.browse')|escape('html_attr') }}"
+               class="icon icon-upload">Import Curriculum</a>
+        </li>
+    </ul>
+    {% endif %}
 </div>
 
 <div class="template2 curriculum-browser">
