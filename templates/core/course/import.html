@@ -50,39 +50,43 @@
                     </div>
                     <!-- END unimportable -->
                     <!-- BEGIN importable -->
-                    <ul class="information-list">
-                        <li>
+                    <div class="small-12 columns no-pad">
+                        <ul class="information-list">
                             <!-- BEGIN unit -->
-                            <div class="small-12 columns">
+                            <li class="actions-small-1">
                                 <input name="unit[{UNIT_COUNT}][unit_id]" type="hidden" value="{UNIT_ID}" />
                                 <input name="unit[{UNIT_COUNT}][import]" type="hidden" value="0" />
-                                <fieldset class="switch" tabindex="0">
-                                    <input id="import-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" {UNIT_ENABLED_CHECKED} />
-                                    <label for="import-{UNIT_COUNT}"></label>
-                                </fieldset>
-                                <a href="/homepage/{UNIT_ID}" class="unit_name">{UNIT_NAME}</a>
-                            </div>
-                            <div class="small-12 medium-6 columns" data-hide-watch="#import-{UNIT_COUNT}">
-                                <label for="open_date-{UNIT_COUNT}">Open</label>
-                                <input id="open_date-{UNIT_COUNT}"
-                                       name="unit[{UNIT_COUNT}][open_date]"
-                                       type="text"
-                                       value="{UNIT_OPEN_DATE}"
-                                       data-datepicker
-                                       data-datepicker-sync
-                                       data-datepicker-sync-enddate="#due_date-{UNIT_COUNT}" />
-                            </div>
-                            <div class="small-12 medium-6 columns" data-hide-watch="#import-{UNIT_COUNT}">
-                                <label for="due_date-{UNIT_COUNT}">Due</label>
-                                <input id="due_date-{UNIT_COUNT}"
-                                       name="unit[{UNIT_COUNT}][due_date]"
-                                       type="text"
-                                       value="{UNIT_DUE_DATE}"
-                                       data-datepicker />
-                            </div>
+                                <div class="list-item">
+                                    <div class="avatar card small-12">
+                                        <input id="import-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" {UNIT_ENABLED_CHECKED} />
+                                        <label for="import-{UNIT_COUNT}" class="checkbox-label">{UNIT_NAME}</label>
+                                    </div>
+                                    <div class="small-12 medium-6 columns" data-hide-watch="#import-{UNIT_COUNT}">
+                                        <label for="open_date-{UNIT_COUNT}">Open</label>
+                                        <input id="open_date-{UNIT_COUNT}"
+                                               name="unit[{UNIT_COUNT}][open_date]"
+                                               type="text"
+                                               value="{UNIT_OPEN_DATE}"
+                                               data-datepicker
+                                               data-datepicker-sync
+                                               data-datepicker-sync-enddate="#due_date-{UNIT_COUNT}" />
+                                    </div>
+                                    <div class="small-12 medium-6 columns" data-hide-watch="#import-{UNIT_COUNT}">
+                                        <label for="due_date-{UNIT_COUNT}">Due</label>
+                                        <input id="due_date-{UNIT_COUNT}"
+                                               name="unit[{UNIT_COUNT}][due_date]"
+                                               type="text"
+                                               value="{UNIT_DUE_DATE}"
+                                               data-datepicker />
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a href="/homepage/{UNIT_ID}" title="View Unit Homepage" class="icon icon-view"></a>
+                                </nav>
+                            </li>
                             <!-- END unit -->
-                        </li>
-                    </ul>
+                        </ul>
+                    </div>
                 <!-- END importable -->
                 </fieldset>
             </section>
