@@ -174,6 +174,7 @@ class EventMapper extends Calendar\EventMapper {
 			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
 			LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+			WHERE e.start_datetime >= DATE_SUB(CURDATE(),INTERVAL 6 MONTH)
 			ORDER BY e.start_datetime
 		";
 
