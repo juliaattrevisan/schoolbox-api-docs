@@ -33,8 +33,20 @@ $(function() {
 
     // Set up tabz for the projector.
     // Always default to setting a date and time directly, though.
+
+    /* Prevent tab onchange from firing twice
+     * https://github.com/zurb/foundation/issues/6009
+     */
+    var lastTab = false;
+
     $('[data-interaction="tabs"]').on('toggled', function(event, tab) {
-        console.log(tab);
+        var id = tab.attr('id');
+
+        if (lastTab != id) {
+            lastTab = id;
+
+            console.log(tab, id);
+        }
     });
 
 //    var tabSelector = $('[data-interaction="tabs"]')
