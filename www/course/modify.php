@@ -182,3 +182,17 @@ foreach ($child_list as $unit) {
     );
     $this->parse('unit_block', 'unit', true);
 }
+
+$trail = new \Schoolbox\Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text'  => $homepage->getName(),
+        'href'  => "/homepage/{$homepage->getId()}",
+        'class' => '',
+    ],
+    [
+        'text'  => 'Modify Course',
+        'href'  => '',
+        'class' => 'active',
+    ]
+]);
