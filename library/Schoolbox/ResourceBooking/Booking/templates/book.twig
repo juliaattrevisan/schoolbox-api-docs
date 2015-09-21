@@ -51,27 +51,11 @@ $(function() {
                 $($(element).attr('href')).find('input, select').prop('disabled', true);
             });
 
-//            /* Enable all inputs in this tab
-//             */
-//            tab.find('input, select').prop('disabled', false);
+            /* Enable all inputs in this tab
+             */
+            tab.find('input, select').prop('disabled', false);
         }
     });
-
-//    var tabSelector = $('[data-interaction="tabs"]')
-//        .on('tabscreate', function(event, ui) {
-//            // Ensure that all inputs in inactive tabs are disabled
-//            $(this).find(':input').prop('disabled', true)
-//            ui.panel.find(':input').prop('disabled', false)
-//        })
-//        .on('tabsbeforeactivate', function(event, ui) {
-//            // Ensure that all inputs in inactive tabs are disabled
-//            ui.oldPanel.find(':input').prop('disabled', true)
-//            ui.newPanel.find(':input').prop('disabled', false)
-//        })
-//        .tabs({
-//            heightStyle: 'auto',
-//            active: 0
-//        })
 
     // Timetable selector
     {#var campusList         = {{ campusList|json_encode|raw }}#}
