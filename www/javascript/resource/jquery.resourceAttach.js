@@ -359,8 +359,10 @@ if(typeof window.location.origin == 'undefined') {
         $(document)
             .foundation('reveal', 'reflow')
             .on('closed.fndtn.reveal', '[data-reveal]', function () {
-                singletonModal.detach();
-                singletonModal = null;
+                if (singletonModal) {
+                    singletonModal.detach();
+                    singletonModal = null;
+                }
             });
 
 
