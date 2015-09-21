@@ -1,10 +1,21 @@
 {# I need some way of adding custom_head #}
 
-<h1>Resource Category - View</h1>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Resource Category - View</h1>
+    </div>
+</div>
 
-<dl>
-    <dt>ID</dt>
-    <dd>{{ item.id }}</dd>
-    <dt>Title</dt>
-    <dd>{{ item.name }}</dd>
-</dl>
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <dl>
+                <dt>ID</dt>
+                <dd>{{ item.id }}</dd>
+
+                <dt>Title</dt>
+                <dd>{{ item.name }}</dd>
+            </dl>
+        </section>
+    </div>
+</div>
