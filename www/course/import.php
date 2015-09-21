@@ -119,3 +119,17 @@ if ($count > 0) {
 else {
     $this->parse('unimportable_block', 'unimportable');
 }
+
+$trail = new \Schoolbox\Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text'  => $homepage->getName(),
+        'href'  => "/homepage/{$homepage->getId()}",
+        'class' => '',
+    ],
+    [
+        'text'  => 'Import Course',
+        'href'  => '',
+        'class' => 'active',
+    ]
+]);
