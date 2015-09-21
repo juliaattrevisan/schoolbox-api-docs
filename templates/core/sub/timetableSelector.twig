@@ -1,67 +1,70 @@
-<div class="timetable-picker" data-interaction="timetableSelector">
-<dl class="clearfix" >
-    <dt>Campus</dt>
-    <dd>
-        <select id="timetableCampus" name="timetable[campus]" data-role="campusSelector">
-            <option disabled>-- select campus --</option>
-            {% for campus in campusList %}
-                <option value="{{ campus.id }}"
-                        label="{{ campus.name }}"
-                        >{{ campus.name }}</option>
-            {% endfor %}
-        </select>
-    </dd>
-    <dt>Day</dt>
-    <dd>
-        <select id="timetableDay" name="timetable[day]" disabled data-role="daySelector">
-            <option disabled>-- select day --</option>
-        </select>
-    </dd>
-    <dt>Period</dt>
-    <dd>
-        <select id="timetablePeriod" name="timetable[period]" disabled data-role="periodSelector">
-            <option disabled>-- select period --</option>
-        </select>
-    </dd>
-</dl>
-<dl class="clearfix">
-    <dt>Date</dt>
-    <dd>
-        <time data-role="selectedDate" class="clearfix">Please select a campus and day.</time>
-        <a data-interaction="previousDate" class="btn go-back no-text float-left" title="Previous" href="#"><span></span></a>
-        <a data-interaction="nextDate" class="btn go-to no-text float-left" title="Next" href="#"><span></span></a>
-    </dd>
-    <dt>Start Time</dt>
-    <dd>
-        <label>
-            {% if select == 'radio' %}
-            <input type="radio" name="pickTime" id="pickTime-start" value="start" disabled="disabled" data-role="startTimeSelector" />
-            {% endif %}
-            <label for="pickTime-start" class="radio-label">
-                <time data-role="selectedTimeStart">Please select a period.</time>
+<div data-interaction="timetableSelector">
+    <dl>
+        <dt>Campus</dt>
+        <dd>
+            <select id="timetableCampus" name="timetable[campus]" data-role="campusSelector">
+                <option disabled>-- select campus --</option>
+                {% for campus in campusList %}
+                <option value="{{ campus.id }}" label="{{ campus.name }}">{{ campus.name }}</option>
+                {% endfor %}
+            </select>
+        </dd>
+
+        <dt>Day</dt>
+        <dd>
+            <select id="timetableDay" name="timetable[day]" disabled data-role="daySelector">
+                <option disabled>-- select day --</option>
+            </select>
+        </dd>
+
+        <dt>Period</dt>
+        <dd>
+            <select id="timetablePeriod" name="timetable[period]" disabled data-role="periodSelector">
+                <option disabled>-- select period --</option>
+            </select>
+        </dd>
+    </dl>
+    <dl>
+        <dt>Date</dt>
+        <dd data-date-message>Please select a period.</dd>
+        <dd class="hide" data-date-paginator>
+            <ul class="pagination">
+                <li><a data-interaction="previousDate" title="Previous" href="#">&lsaquo;</a></li>
+                <li><a href="#" data-disabled><time data-role="selectedDate"></time></a></li>
+                <li><a data-interaction="nextDate" title="Next" href="#">&rsaquo;</a></li>
+            </ul>
+        </dd>
+        <dt>Start Time</dt>
+        <dd>
+            <label>
+                {% if select == 'radio' %}
+                <input type="radio" name="pickTime" id="pickTime-start" value="start" disabled="disabled" data-role="startTimeSelector" />
+                {% endif %}
+
+                <label for="pickTime-start" class="radio-label">
+                    <time data-role="selectedTimeStart">Please select a period.</time>
+                </label>
+
+                {% if select == 'button' %}
+                <a href="#" data-interaction="pickStartTime">Use</a>
+                {% endif %}
             </label>
-            {% if select == 'button' %}
-            <a href="#"
-               class="submit-btn-plain inline-block"
-               data-interaction="pickStartTime">Use</a>
-            {% endif %}
-        </label>
-    </dd>
-    <dt>End Time</dt>
-    <dd>
-        <label>
-            {% if select == 'radio' %}
-            <input type="radio" name="pickTime" id="pickTime-end" value="end" disabled="disabled" data-role="endTimeSelector" />
-            {% endif %}
-            <label for="pickTime-end" class="radio-label">
-                <time data-role="selectedTimeEnd">Please select a period.</time>
+        </dd>
+        <dt>End Time</dt>
+        <dd>
+            <label>
+                {% if select == 'radio' %}
+                <input type="radio" name="pickTime" id="pickTime-end" value="end" disabled="disabled" data-role="endTimeSelector" />
+                {% endif %}
+
+                <label for="pickTime-end" class="radio-label">
+                    <time data-role="selectedTimeEnd">Please select a period.</time>
+                </label>
+
+                {% if select == 'button' %}
+                <a href="#" data-interaction="pickEndTime">Use</a>
+                {% endif %}
             </label>
-            {% if select == 'button' %}
-            <a href="#"
-               class="submit-btn-plain inline-block"
-               data-interaction="pickEndTime">Use</a>
-            {% endif %}
-        </label>
-    </dd>
-</dl>
+        </dd>
+    </dl>
 </div>

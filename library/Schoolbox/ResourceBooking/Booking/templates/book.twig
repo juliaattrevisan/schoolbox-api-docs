@@ -5,8 +5,9 @@
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
 <script type="text/javascript" src="/javascript/jquery.validate.extensions.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/timetablepicker.js"></script>
 <script type="text/javascript">
-$(document).ready(function() {
+$(function() {
     // A global variable
     var momentFormat = dateDisplayFormats.momentJs;
     $.fn.alaressTiny({
@@ -15,9 +16,6 @@ $(document).ready(function() {
 
     // Datepickers
     $('input[data-datepicker]').datepicker({
-        showOn:'both',
-        buttonImage:'/images/core/calendar/calendar-click.png',
-        buttonImageOnly:true,
         constrainInput:false,
         minDate: 0
 //        onClose:function (string) {
@@ -30,24 +28,6 @@ $(document).ready(function() {
     $('input[name="start_datetime[date]"]').syncDates({
         endDate: $('input[name="end_datetime[date]"]')
     })
-
-    // Set up tabz for the projector.
-    // Always default to setting a date and time directly, though.
-    var tabSelector = $('[data-interaction="tabs"]')
-        .on('tabscreate', function(event, ui) {
-            // Ensure that all inputs in inactive tabs are disabled
-            $(this).find(':input').prop('disabled', true)
-            ui.panel.find(':input').prop('disabled', false)
-        })
-        .on('tabsbeforeactivate', function(event, ui) {
-            // Ensure that all inputs in inactive tabs are disabled
-            ui.oldPanel.find(':input').prop('disabled', true)
-            ui.newPanel.find(':input').prop('disabled', false)
-        })
-        .tabs({
-            heightStyle: 'auto',
-            active: 0
-        })
 
     // Timetable selector
     {#var campusList         = {{ campusList|json_encode|raw }}#}
@@ -403,191 +383,188 @@ $(document).ready(function() {
 </script>
 <!-- END custom_header -->
 
-<h1>{% if item.id is empty %}Book Item{% else %}Update Booking{% endif %}: {% include '@resourceItem/sub/itemName.twig' with {item: item.resource} %}</h1>
+<ul class="breadcrumb">
+    <li><a href="/resource-booking/item">Resource Booking</a>
+    <li><a href="{{ routeLookup('resourceItem.browse', {id: item.resource.category.id}) }}">{{  item.resource.category.name }}</a></li>
+    <li><a id="resource-booking-back" href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">{{ item.resource.name }}</a></li>
+    <li class="active"><a href="#">Booking</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>
+            {% if item.id is empty %}
+                Book Item
+            {% else %}
+                Update Booking
+            {% endif %}
+        </h1>
+
+        <ul class="meta">
+            <li class="icon-resource-booking">{% include '@resourceItem/sub/itemName.twig' with {item: item.resource} %}</li>
+        </ul>
+    </div>
+</div>
 
 {# booking form #}
 {% set saveAction = item.id is empty ?
     routeLookup('resourceBooking.createBooking', {id: item.resource.id}) :
     routeLookup('resourceBooking.update:post',   {id: item.id})
 %}
-<form id="resource-booking-form"
-      action="{{ saveAction }}"
-      method="post"
-      name="form" class="clearfix"
->
-    <input type="hidden" name="id" value="{{ item.id }}"/>
-    <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}" />
-    <table class="standardForm table">
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Title</h4>
-            </td>
-            <td>
-                <label>
-                <input name="name" type="text" value="{{ item.name }}" />
-                </label>
-                {% include '@resourceItem/sub/rules.twig' with {item: item.resource} %}
-            </td>
-        </tr>
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Booking Time</h4>
-            </td>
-            <td>
-                {# Existing items - only show the date and time (for now) #}
-                {# New items - allow choice of timetable or date/time #}
-                {% if item.id %}
-                    {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
-                {% else %}
-                    <div data-interaction="tabs">
-                        <ul>
-                            <li><a href="#dateSelector">Choose a Time</a></li>
-                            <li><a href="#timetableSelector">Choose from Timetable</a></li>
-                        </ul>
-                        <div class="clearfix" id="timetableSelector">
-                            {% include '@resourceBooking/sub/timetableSelector.twig' with {campusList: campusList} %}
-                        </div>
-                        <div class="clearfix" id="dateSelector">
-                            {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
-                        </div>
+
+<div class="row">
+    <div class="small-12 island">
+        <div class="alert-box">
+            {% include '@resourceItem/sub/rules.twig' with {item: item.resource} %}
+        </div>
+        <form id="resource-booking-form" action="{{ saveAction }}" method="post" name="form">
+            <input type="hidden" name="id" value="{{ item.id }}"/>
+            <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}" />
+
+            {# Inputs for editing bookings in a series #}
+            <input type="hidden" name="efficacy" value="self" />
+
+            {# Input for determining which action to run #}
+            <input type="hidden" name="action" />
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Purpose
+                            <input name="name" type="text" value="{{ item.name }}" />
+                        </label>
                     </div>
-                {% endif %}
-            </td>
-        </tr>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        {% include '@resourceBooking/sub/datetimeSelector.twig' with {
+                            select: select,
+                            item: item
+                        } %}
+                    </div>
+                </fieldset>
 
-        {# Only a user who may moderate this item may ignore the rules. #}
-        {% if allowOverride %}
-        <tr>
-            <td class="formLabelWidth" valign="top">
-                <h4>Bypass Validation</h4>
-                <em>Only select this if you are certain you wish to override the system rules</em>
-            </td>
-            <td>
-                <input id="resource-booking-override-validation"
-                       type="checkbox"
-                       name="override_validation"
-                       value="1"
-                        />
-            </td>
-        </tr>
-        {% endif %}
-        {% if item.event.id is empty %}
-        <tr>
-        <td class="formLabelWidth" valign="top">
-            <h4>Repeat</h4>
-            <em>The frequency with which this booking recurs, if at all.</em>
-        </td>
-        <td>
-            <select name="repeat" id="repeatUntilSelect">
-                <option value="">Single Booking</option>
-                <optgroup label="Recurring">
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="fortnightly">Fortnightly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="timetable">Timetable Based</option>
-                </optgroup>
-            </select>
-        </td>
-        </tr>
-        <tr id="repeatUntil">
-            <td class="formLabelWidth" valign="top">
-                <h4>Repeat Until</h4>
-                <em>The date at which recurrence should cease.</em>
-            </td>
-            <td>
-                <input data-datepicker name="repeat_until" id="repeat_until" type="text" size="15" maxlength="30" value=""/>
-            </td>
-        </tr>
-        {% elseif recurrence %}
-        <tr>
-            <td class="formLabelWidth" valign="top">
-                <h4>Repeat</h4>
-                <em>This booking is part of a recurring series.</em>
-            </td>
-            <td>
-                <input name="repeat" type="hidden" value="{{ recurrence.freq }}" />
-                {% include 'sub/recurrence.twig' with {recurrence: recurrence} %}
-            </td>
-        </tr>
-        {% endif %}
-        <tr>
-            <td class="formLabelWidth"><h4>Notes</h4></td>
-            <td><textarea name="notes" style="width:100%;">{{ item.notes }}</textarea></td>
-        </tr>
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Related Resources</h4>
-                {% if item.resource.relatedResourceList|length %}
-                <em>If you want to book any related resources, select them here.</em>
+                {% if item.event.id is empty %}
+                <fieldset class="content">
+                    <legend>Recurrence</legend>
+                    <div class="small-12 columns">
+                        <label>
+                            Repeat
+                            <span class='hint has-tip tip-top' data-tooltip title="The frequency with which this booking recurs, if at all.">?</span>
+                            <select name="repeat" id="repeatUntilSelect">
+                                <option value="">Single Booking</option>
+                                <optgroup label="Recurring">
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="fortnightly">Fortnightly</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="timetable">Timetable Based</option>
+                                </optgroup>
+                            </select>
+                        </label>
+
+                        <label id="repeatUntil"l>
+                            Repeat Until
+                            <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
+                            <input data-datepicker name="repeat_until" id="repeat_until" type="text" size="15" maxlength="30" value=""/>
+                        </label>
+                    </div>
+                </fieldset>
+                {% elseif recurrence %}
+                <fieldset class="content">
+                    <legend>Repeat</legend>
+                    <div class="small-12 columns">
+                        <label>
+                            Repeat
+                            <span class='hint has-tip tip-top' data-tooltip title="This booking is part of a recurring series.">?</span>
+                            <input name="repeat" type="hidden" value="{{ recurrence.freq }}" />
+                            {% include 'sub/recurrence.twig' with {recurrence: recurrence} %}
+                        </label>
+                    </div>
+                </fieldset>
                 {% endif %}
-            </td>
-            <td>
-                {# Related resources - not sure whether this list should be editable after save #}
-                <ul class="information-list related-resource-list">
-                    {% for relatedItem in item.resource.relatedResourceList %}
-                        {% if item.hasRelatedBookingForResource(relatedItem.id) %}
-                            {% set relatedBooking = item.getRelatedBookingForResource(relatedItem.id) %}
-                        {% else %}
-                            {% set relatedBooking = {} %}
-                        {% endif %}
-                        <li class="resource" data-relation="related-resource">
-                            <label for="related-item-{{ relatedItem.id }}">
-                                <input id="related-item-{{ relatedItem.id }}"
-                                       type="checkbox"
-                                       name="related_item[{{ relatedItem.id }}][resource_id]"
-                                       value="{{ relatedItem.id }}"
-                                       data-interaction="display-notes"
-                                       {% if relatedBooking is not empty %}checked{% endif %}
-                                        />
-                                <span class="resource-name">{{ relatedItem.name }}</span>
-                                <a href="{{ routeLookup('resourceItem.read', {id: relatedItem.id}) }}"
-                                   class="resource-read-link btn no-text"
-                                   id="resource-read-{{relatedItem.id}}"
-                                   title="View Bookings"
-                                ><span></span></a>
+
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Notes
+                            <textarea name="notes">{{ item.notes }}</textarea>
+                        </label>
+
+                        {# Only a user who may moderate this item may ignore the rules. #}
+                        {% if allowOverride %}
+                            <input id="resource-booking-override-validation" type="checkbox" name="override_validation" value="1" />
+                            <label for="resource-booking-override-validation" class="checkbox-label">
+                                Bypass Validation
+                                <span class='hint has-tip tip-top' data-tooltip title="Only select this if you are certain you wish to override the system rules">?</span>
                             </label>
+                        {% endif %}
+                    </div>
+                </fieldset>
 
-                            <div data-relation="related-resource-notes" class="{% if relatedBooking is empty %}hide{% endif %}">
-                             <textarea name="related_item[{{ relatedItem.id }}][notes]" style="width:100%;">{{ relatedBooking.notes }}</textarea>
-                            </div>
-                        </li>
-                    {% else %}
-                        <li>This resource has no related resources.</li>
-                    {% endfor %}
-                </ul>
-            </td>
-        </tr>
-    </table>
+                <fieldset>
+                    <div class="small-12 columns">
+                        <fieldset>
+                        <legend>
+                            Related Resources
+                            {% if item.resource.relatedResourceList|length %}
+                            <span class='hint has-tip tip-top' data-tooltip title="If you want to book any related resources, select them here.">?</span>
+                            {% endif %}
+                        </legend>
 
-    {# Inputs for editing bookings in a series #}
-    <input name="efficacy" type="hidden" value="self" />
+                        {% if item.resource.relatedResourceList|length %}
+                        {# Related resources - not sure whether this list should be editable after save #}
+                        <ul class="action-list">
+                        {% for relatedItem in item.resource.relatedResourceList %}
+                            {% if item.hasRelatedBookingForResource(relatedItem.id) %}
+                                {% set relatedBooking = item.getRelatedBookingForResource(relatedItem.id) %}
+                            {% else %}
+                                {% set relatedBooking = {} %}
+                            {% endif %}
+                            <li class="actions-small-1" data-relation="related-resource">
+                                <div class="list-item">
+                                    <div class="small-1 columns">
+                                        <input id="related-item-{{ relatedItem.id }}" type="checkbox" name="related_item[{{ relatedItem.id }}][resource_id]" value="{{ relatedItem.id }}" data-interaction="display-notes" {% if relatedBooking is not empty %}checked{% endif %} />
+                                        <label for="related-item-{{ relatedItem.id }}" class="checkbox-label"></label>
+                                    </div>
+                                    <div class="small-11 columns">
+                                        <label for="related-item-{{ relatedItem.id }}">{{ relatedItem.name }}</label>
+                                        <div data-relation="related-resource-notes" style="{% if relatedBooking is empty %}display:none{% endif %}">
+                                            <textarea name="related_item[{{ relatedItem.id }}][notes]">{{ relatedBooking.notes }}</textarea>
+                                        </div>
 
-    {# Input for determining which action to run #}
-    <input name="action" type="hidden" />
+                                    </div>
 
-    <input id="resource-booking-save"
-           type="submit"
-           value="{% if item.id %}Update Booking{% else %}Book{% endif %}"
-           class="submit-btn-plain"
-           data-action="{{ saveAction }}"
-           data-loading-value="Validating..."
-    />
 
-    {% if item.id %}
-        <input id="resource-booking-cancel"
-               type="submit"
-               value="Cancel Booking"
-               class="submit-btn-plain"
-               data-action="{{ routeLookup('resourceBooking.cancel', {id: item.id}) }}"
-        />
-    {% endif %}
+                                </div>
+                                <nav>
+                                    <a href="{{ routeLookup('resourceItem.read', {id: relatedItem.id}) }}" class="icon-view" id="resource-read-{{relatedItem.id}}" title="View Bookings"></a>
+                                </nav>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <div class="content">
+                            <p>This resource has no related resources.</p>
+                        </div>
+                        {% endif %}
+                        </fieldset>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input id="resource-booking-save" type="submit" value="{% if item.id %}Update Booking{% else %}Book{% endif %}" data-action="{{ saveAction }}" data-loading-value="Validating..." />
 
-    <a id="resource-booking-back"
-       class="submit-btn-plain"
-       href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">Back to list</a>
-
-</form>
+                    {% if item.id %}
+                        <input id="resource-booking-cancel" type="submit" value="Cancel Booking" data-action="{{ routeLookup('resourceBooking.cancel', {id: item.id}) }}" />
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 {# Hidden form for cancelling a booking.
  # This should redirect to the last page I was on.

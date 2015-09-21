@@ -152,7 +152,12 @@
                     .text('');
                 self.endTimeSelector.prop('disabled', true);
             }
-        })
+
+            if (startTime.isValid() && endTime.isValid()) {
+                $('[data-date-paginator]').removeClass('hide');
+                $('[data-date-message]').addClass('hide');
+            }
+        });
 
         /**
          * Event when the next date button is clicked - skips ahead to the next

@@ -1,13 +1,36 @@
-<input type="text"
-       name="{{ name }}[hour]"
-       class="timeField"
-       value="{{ value is empty ? "" : value|date("h") }}" /> :
-<input type="text"
-       name="{{ name }}[minute]"
-       class="timeField"
-       value="{{ value is empty ? "" : value|date("i") }}" />
-<select name="{{ name }}[meridien]">
-    <option>--</option>
-    <option value="am" {% if value is not empty and value|date('A') == 'AM' %}selected{% endif %}>AM</option>
-    <option value="pm" {% if value is not empty and value|date('A') == 'PM' %}selected{% endif %}>PM</option>
-</select>
+
+<div class="small-3 large-2 columns">
+    <label>
+        Hour
+        <input id='{{ id }}_hour' type="text" name="{{ name }}[hour]" value="{{ value is empty ? "" : value|date("h") }}" />
+    </label>
+</div>
+<div class="small-3 large-2 columns">
+    <label>
+        Minute
+        <input id='{{ id }}_minute' type="text" name="{{ name }}[minute]" value="{{ value is empty ? "" : value|date("i") }}" />
+    </label>
+</div>
+<div class="small-3 large-2 columns">
+    <label>
+        Meridien
+        <select id='{{ id }}_period' name="{{ name }}[meridien]">
+            <option>--</option>
+            <option value="am" {% if value is not empty and value|date('A') == 'AM' %}selected{% endif %}>AM</option>
+            <option value="pm" {% if value is not empty and value|date('A') == 'PM' %}selected{% endif %}>PM</option>
+        </select>
+    </label>
+</div>
+<div class="small-2 large-2 columns">
+    <label>
+        Timetable<br />
+        <a data-timetablepicker
+           data-timetablepicker-date-field="#{{ id }}_date"
+           data-timetablepicker-hour-field="#{{ id }}_hour"
+           data-timetablepicker-minute-field="#{{ id }}_minute"
+           data-timetablepicker-period-field="#{{ id }}_period"
+           data-timetablepicker-timetable-selector="#timetableSelectorDialog"
+           class="button icon-timetable"
+           href="#"></a>
+    </label>
+</div>
