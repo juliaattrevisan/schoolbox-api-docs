@@ -79,13 +79,13 @@
         };
 
         // Switch off buttons by default
-        recorderButtons.start.css('display','inline-block').prop('disabled', false);
-        recorderButtons.recording.hide().prop('disabled', true);
-        recorderButtons.play.hide().prop('disabled', true);
-        recorderButtons.stop.hide().prop('disabled', true);
-        recorderButtons.upload.hide().prop('disabled', true);
-        recorderButtons.disabled.hide();
-        recorderButtons.uploading.hide();
+        recorderButtons.start.removeClass('hide').prop('disabled', false);
+        recorderButtons.recording.addClass('hide').prop('disabled', true);
+        recorderButtons.play.addClass('hide').prop('disabled', true);
+        recorderButtons.stop.addClass('hide').prop('disabled', true);
+        recorderButtons.upload.addClass('hide').prop('disabled', true);
+        recorderButtons.disabled.addClass('hide');
+        recorderButtons.uploading.addClass('hide');
 
         recorderContainer.recorder({
             upload: {
@@ -94,7 +94,7 @@
             flash: {
                 flashContainer: $('#flashContainer')[0],
                 onFlashSecurity: function() {
-                    $('#flashContainer').css('display','inline-block');
+                    $('#flashContainer').removeClass('hide');
                 },
                 session: {
                     name: '{SESSION_NAME}',
@@ -107,52 +107,52 @@
         // Set up button events
         recorderContainer.on('setupFailed.recorder, recordingStartFailed.recorder', function() {
             // Disable all buttons
-            recorderButtons.start.hide().prop('disabled', true);
-            recorderButtons.recording.hide().prop('disabled', true);
-            recorderButtons.play.hide().prop('disabled', true);
-            recorderButtons.stop.hide().prop('disabled', true);
-            recorderButtons.upload.hide().prop('disabled', true);
-            recorderButtons.disabled.css('display','inline-block');
+            recorderButtons.start.addClass('hide').prop('disabled', true);
+            recorderButtons.recording.addClass('hide').prop('disabled', true);
+            recorderButtons.play.addClass('hide').prop('disabled', true);
+            recorderButtons.stop.addClass('hide').prop('disabled', true);
+            recorderButtons.upload.addClass('hide').prop('disabled', true);
+            recorderButtons.disabled.removeClass('hide');
             recorderDisabledDialog.dialog('open');
         });
         recorderContainer.on('recordingReady.recorder', function() {
             // Allow record button to show
-            recorderButtons.start.css('display','inline-block').prop('disabled', false);
+            recorderButtons.start.removeClass('hide').prop('disabled', false);
         });
         recorderContainer.on('recordingStart.recorder', function() {
             // Show stop button only
-            recorderButtons.start.hide().prop('disabled', true);
-            recorderButtons.recording.css('display','inline-block').prop('disabled', true);
-            recorderButtons.play.hide().prop('disabled', true);
-            recorderButtons.stop.css('display','inline-block').prop('disabled', false);
-            recorderButtons.upload.hide().prop('disabled', true);
+            recorderButtons.start.addClass('hide').prop('disabled', true);
+            recorderButtons.recording.removeClass('hide').prop('disabled', true);
+            recorderButtons.play.addClass('hide').prop('disabled', true);
+            recorderButtons.stop.removeClass('hide').prop('disabled', false);
+            recorderButtons.upload.addClass('hide').prop('disabled', true);
         });
         recorderContainer.on('recordingStop.recorder', function() {
-            recorderButtons.start.css('display','inline-block').prop('disabled', false);
-            recorderButtons.recording.hide().prop('disabled', true);
-            recorderButtons.play.css('display','inline-block').prop('disabled', false);
-            recorderButtons.stop.hide().prop('disabled', true);
-            recorderButtons.upload.css('display','inline-block').prop('disabled', false);
+            recorderButtons.start.removeClass('hide').prop('disabled', false);
+            recorderButtons.recording.addClass('hide').prop('disabled', true);
+            recorderButtons.play.removeClass('hide').prop('disabled', false);
+            recorderButtons.stop.addClass('hide').prop('disabled', true);
+            recorderButtons.upload.removeClass('hide').prop('disabled', false);
         });
         recorderContainer.on('playbackStart.recorder', function() {
-            recorderButtons.start.css('display','inline-block').prop('disabled', true);
-            recorderButtons.play.hide().prop('disabled', true);
-            recorderButtons.stop.css('display','inline-block').prop('disabled', false);
-            recorderButtons.upload.css('display','inline-block').prop('disabled', false);
+            recorderButtons.start.removeClass('hide').prop('disabled', true);
+            recorderButtons.play.addClass('hide').prop('disabled', true);
+            recorderButtons.stop.removeClass('hide').prop('disabled', false);
+            recorderButtons.upload.removeClass('hide').prop('disabled', false);
         });
         recorderContainer.on('playbackStop.recorder', function() {
-            recorderButtons.start.css('display','inline-block').prop('disabled', false);
-            recorderButtons.play.css('display','inline-block').prop('disabled', false);
-            recorderButtons.stop.hide().prop('disabled', true);
-            recorderButtons.upload.css('display','inline-block').prop('disabled', false);
+            recorderButtons.start.removeClass('hide').prop('disabled', false);
+            recorderButtons.play.removeClass('hide').prop('disabled', false);
+            recorderButtons.stop.addClass('hide').prop('disabled', true);
+            recorderButtons.upload.removeClass('hide').prop('disabled', false);
         });
         recorderContainer.on('uploadStart.recorder', function() {
-            recorderButtons.start.hide().prop('disabled', true);
-            recorderButtons.recording.hide().prop('disabled', true);
-            recorderButtons.play.hide().prop('disabled', true);
-            recorderButtons.stop.hide().prop('disabled', true);
-            recorderButtons.upload.hide().prop('disabled', true);
-            recorderButtons.uploading.css('display','inline-block');
+            recorderButtons.start.addClass('hide').prop('disabled', true);
+            recorderButtons.recording.addClass('hide').prop('disabled', true);
+            recorderButtons.play.addClass('hide').prop('disabled', true);
+            recorderButtons.stop.addClass('hide').prop('disabled', true);
+            recorderButtons.upload.addClass('hide').prop('disabled', true);
+            recorderButtons.uploading.removeClass('hide');
         });
         recorderContainer.on('uploadComplete.recorder', function(event, recorder, filename, response) {
             // inform any listeners that a file was uploaded.
@@ -167,21 +167,21 @@
             window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
 
             // Go back to recordingReady state
-            recorderButtons.start.css('display','inline-block').prop('disabled', false);
-            recorderButtons.recording.hide().prop('disabled', true);
-            recorderButtons.play.hide().prop('disabled', true);
-            recorderButtons.stop.hide().prop('disabled', true);
-            recorderButtons.upload.css('display','inline-block').prop('disabled', false);
-            recorderButtons.uploading.hide();
+            recorderButtons.start.removeClass('hide').prop('disabled', false);
+            recorderButtons.recording.addClass('hide').prop('disabled', true);
+            recorderButtons.play.addClass('hide').prop('disabled', true);
+            recorderButtons.stop.addClass('hide').prop('disabled', true);
+            recorderButtons.upload.removeClass('hide').prop('disabled', false);
+            recorderButtons.uploading.addClass('hide');
         });
         recorderContainer.on('uploadFailed.recorder', function(event, recorder) {
             // Show some sort of failed message?
-            recorderButtons.start.hide().prop('disabled', true);
-            recorderButtons.recording.hide().prop('disabled', true);
-            recorderButtons.play.hide().prop('disabled', true);
-            recorderButtons.stop.hide().prop('disabled', true);
-            recorderButtons.upload.hide().prop('disabled', true);
-            recorderButtons.uploading.css('display','inline-block');
+            recorderButtons.start.addClass('hide').prop('disabled', true);
+            recorderButtons.recording.addClass('hide').prop('disabled', true);
+            recorderButtons.play.addClass('hide').prop('disabled', true);
+            recorderButtons.stop.addClass('hide').prop('disabled', true);
+            recorderButtons.upload.addClass('hide').prop('disabled', true);
+            recorderButtons.uploading.removeClass('hide');
         });
 
         // Button events
