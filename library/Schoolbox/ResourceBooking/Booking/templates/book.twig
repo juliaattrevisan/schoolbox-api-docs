@@ -33,21 +33,25 @@ $(function() {
 
     // Set up tabz for the projector.
     // Always default to setting a date and time directly, though.
-    var tabSelector = $('[data-interaction="tabs"]')
-        .on('tabscreate', function(event, ui) {
-            // Ensure that all inputs in inactive tabs are disabled
-            $(this).find(':input').prop('disabled', true)
-            ui.panel.find(':input').prop('disabled', false)
-        })
-        .on('tabsbeforeactivate', function(event, ui) {
-            // Ensure that all inputs in inactive tabs are disabled
-            ui.oldPanel.find(':input').prop('disabled', true)
-            ui.newPanel.find(':input').prop('disabled', false)
-        })
-        .tabs({
-            heightStyle: 'auto',
-            active: 0
-        })
+    $('[data-interaction="tabs"]').on('toggled', function(event, tab) {
+        console.log(tab);
+    });
+
+//    var tabSelector = $('[data-interaction="tabs"]')
+//        .on('tabscreate', function(event, ui) {
+//            // Ensure that all inputs in inactive tabs are disabled
+//            $(this).find(':input').prop('disabled', true)
+//            ui.panel.find(':input').prop('disabled', false)
+//        })
+//        .on('tabsbeforeactivate', function(event, ui) {
+//            // Ensure that all inputs in inactive tabs are disabled
+//            ui.oldPanel.find(':input').prop('disabled', true)
+//            ui.newPanel.find(':input').prop('disabled', false)
+//        })
+//        .tabs({
+//            heightStyle: 'auto',
+//            active: 0
+//        })
 
     // Timetable selector
     {#var campusList         = {{ campusList|json_encode|raw }}#}
@@ -444,31 +448,32 @@ $(function() {
                             Title
                             <input name="name" type="text" value="{{ item.name }}" />
                         </label>
+
                         {% include '@resourceItem/sub/rules.twig' with {item: item.resource} %}
 
                         <label>
                             Booking Time
                         </label>
-                        <label>
-                            {# Existing items - only show the date and time (for now) #}
-                            {# New items - allow choice of timetable or date/time #}
-                            {% if item.id %}
-                                {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
-                            {% else %}
-                                <div data-interaction="tabs">
-                                    <ul>
-                                        <li><a href="#dateSelector">Choose a Time</a></li>
-                                        <li><a href="#timetableSelector">Choose from Timetable</a></li>
-                                    </ul>
-                                    <div id="timetableSelector">
-                                        {% include '@resourceBooking/sub/timetableSelector.twig' with {campusList: campusList} %}
-                                    </div>
-                                    <div id="dateSelector">
-                                        {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
-                                    </div>
+
+                        {# Existing items - only show the date and time (for now) #}
+                        {# New items - allow choice of timetable or date/time #}
+                        {% if item.id %}
+                            {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
+                        {% else %}
+                            <dl class="tabs" data-tab data-interaction="tabs">
+                                <dd><a href="#dateSelector">Choose a Time</a></dd>
+                                <dd><a href="#timetableSelector">Choose from Timetable</a></dd>
+                            </dl>
+
+                            <div class="tabs-content">
+                                <div class="content" id="timetableSelector">
+                                    {% include '@resourceBooking/sub/timetableSelector.twig' with {campusList: campusList} %}
                                 </div>
-                            {% endif %}
-                        </label>
+                                <div class="content" id="dateSelector">
+                                    {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
+                                </div>
+                            </div>
+                        {% endif %}
 
                         {# Only a user who may moderate this item may ignore the rules. #}
                         {% if allowOverride %}
