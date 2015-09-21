@@ -31,8 +31,14 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
     $this->setBlock('student_list', 'name_without_link', 'name_without_link_block');
     $this->setBlock('student_list', 'actions', 'actions_block');
     $this->setBlock('actions', 'eportfolio', 'eportfolio_block');
+    $this->setBlock('actions', 'eportfolio_small', 'eportfolio_small_block');
+
     $this->setBlock('actions', 'pastoral_care', 'pastoral_care_block');
+    $this->setBlock('actions', 'pastoral_care_small', 'pastoral_care_small_block');
+
     $this->setBlock('actions', 'has_email', 'has_email_block');
+    $this->setBlock('actions', 'has_email_small', 'has_email_small_block');
+
     $this->setBlock(TEMPLATE_content, 'parent', 'parent_block');
     $this->setBlock(TEMPLATE_content, 'parent_email', 'parent_email_block');
 
@@ -121,10 +127,12 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
                 ));
 
                 $this->parse('has_email_block', 'has_email');
+                $this->parse('has_email_small_block', 'has_email_small');
+
             }
             else {
                 $this->setVar(array(
-                    'has_email_block' => ''
+                    'has_email_small_block' => ''
                 ));
             }
 
@@ -132,9 +140,12 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
             if($groupHandler->isStaff() && Config::get('external_type') == 'synergetic' && Config::get('external_staff_portal') ) {
                 $this->setVar('SYNWEB_URL', Config::get('external_staff_portal'));
                 $this->parse('pastoral_care_block', 'pastoral_care');
+                $this->parse('pastoral_care_small_block', 'pastoral_care_small');
+
             }
             else {
                 $this->setVar('pastoral_care_block', '');
+                $this->setVar('pastoral_care_small_block', '');
             }
 
             $this->setVar(array(
@@ -164,9 +175,11 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
              */
             if ($user->getEportfolioEnable()) {
                 $this->parse('eportfolio_block', 'eportfolio');
+                $this->parse('eportfolio_small_block', 'eportfolio_small');
             } else {
                 $this->setVar(array(
-                    'eportfolio_block' => ''
+                    'eportfolio_block' => '',
+                    'eportfolio_small_block' => ''
                 ));
             }
 
@@ -198,6 +211,9 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
                 'has_email_block' => '',
                 'eportfolio_block' => '',
                 'pastoral_care_block' => '',
+                'has_email_small_block' => '',
+                'eportfolio_small_block' => '',
+                'pastoral_care_small_block' => '',
             ));
         }
 
