@@ -7,6 +7,8 @@
 //ClassList object..displays class list with most recent visit
 
 use Schoolbox\Resource\Folder\Log\Model as Log;
+use \Schoolbox\Breadcrumbs;
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $groupHandler = new Group;
 
@@ -18,20 +20,24 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
     $userHandler = new User;
     $synergeticClass = new External_Class;
 
-    $this->setFile(TEMPLATE_content, 'class/classList.htm');
+    $this->setFile(TEMPLATE_content, 'class/classList.html');
     $this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
     $this->setBlock(TEMPLATE_content, 'email_class', 'email_class_block');
     $this->setBlock(TEMPLATE_content, 'select_all', 'select_all_block');
     $this->setBlock('student_list', 'select_student', 'select_student_block');
-    $this->setBlock('student_list', 'select_student_below', 'select_student_below_block');
     $this->setBlock('student_list', 'medical', 'medical_block');
     $this->setBlock('student_list', 'special', 'special_block');
-    $this->setBlock('student_list', 'eportfolio', 'eportfolio_block');
-    $this->setBlock('student_list', 'pastoral_care', 'pastoral_care_block');
-
     $this->setBlock('student_list', 'name_with_link', 'name_with_link_block');
     $this->setBlock('student_list', 'name_without_link', 'name_without_link_block');
     $this->setBlock('student_list', 'actions', 'actions_block');
+    $this->setBlock('actions', 'eportfolio', 'eportfolio_block');
+    $this->setBlock('actions', 'eportfolio_small', 'eportfolio_small_block');
+
+    $this->setBlock('actions', 'pastoral_care', 'pastoral_care_block');
+    $this->setBlock('actions', 'pastoral_care_small', 'pastoral_care_small_block');
+
+    $this->setBlock('actions', 'has_email', 'has_email_block');
+    $this->setBlock('actions', 'has_email_small', 'has_email_small_block');
 
     $this->setBlock(TEMPLATE_content, 'parent', 'parent_block');
     $this->setBlock(TEMPLATE_content, 'parent_email', 'parent_email_block');
@@ -108,29 +114,46 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
                 'SYNERGYID' => $student['synergy_id'],
                 'EMAIL' => $emailLink,
                 'EMAIL_ADDRESS' => $user->getEmail(),
-                'EMAIL_BTN' => $user->getEmail() ? sprintf('<a href="%s%s" title="Send email" class="btn email float-left"><span></span>Email</a>', $_SESSION['mailhandle'], $emailaddr) : '',
                 'MEDICAL_ALERT' => $student['StudentMedicalAlert'],
                 'ON_OFF' => ++$j % 2 ? '' : 'dark',
                 'SELECT' => $user->getEmail() ? sprintf('<input id="c%s" name="c%s" type="checkbox" value="%s"/>', $j, $j, $emailaddr) : '',
             ));
 
+            /* "Send Email" button
+             */
+            if ($user->getEmail()) {
+                $this->setVar(array(
+                    'HAS_EMAIL_URL' => $_SESSION['mailhandle'] . $emailaddr
+                ));
+
+                $this->parse('has_email_block', 'has_email');
+                $this->parse('has_email_small_block', 'has_email_small');
+
+            }
+            else {
+                $this->setVar(array(
+                    'has_email_small_block' => ''
+                ));
+            }
+
             // Show pastoral care link to Synergetic
             if($groupHandler->isStaff() && Config::get('external_type') == 'synergetic' && Config::get('external_staff_portal') ) {
                 $this->setVar('SYNWEB_URL', Config::get('external_staff_portal'));
                 $this->parse('pastoral_care_block', 'pastoral_care');
+                $this->parse('pastoral_care_small_block', 'pastoral_care_small');
+
             }
             else {
                 $this->setVar('pastoral_care_block', '');
+                $this->setVar('pastoral_care_small_block', '');
             }
 
             $this->setVar(array(
                 'select_student_block' => '',
-                'select_student_below_block' => '',
             ));
 
             if ($canEmail) {
                 $this->parse('select_student_block', 'select_student');
-                $this->parse('select_student_below_block', 'select_student_below');
             }
 
             $student['StudentMedicalAlert'] = trim($student['StudentMedicalAlert']);
@@ -152,9 +175,11 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
              */
             if ($user->getEportfolioEnable()) {
                 $this->parse('eportfolio_block', 'eportfolio');
+                $this->parse('eportfolio_small_block', 'eportfolio_small');
             } else {
                 $this->setVar(array(
-                    'eportfolio_block' => ''
+                    'eportfolio_block' => '',
+                    'eportfolio_small_block' => ''
                 ));
             }
 
@@ -179,6 +204,17 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
             }
 
             $this->parse("student_list_block", "student_list", true);
+
+            /* Clear children after parsing out the parent
+             */
+            $this->setVar(array(
+                'has_email_block' => '',
+                'eportfolio_block' => '',
+                'pastoral_care_block' => '',
+                'has_email_small_block' => '',
+                'eportfolio_small_block' => '',
+                'pastoral_care_small_block' => '',
+            ));
         }
 
         // Show the email view/select forms
@@ -207,6 +243,22 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
             'email_class_block' => '',
         ));
     }
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $category->getName(),
+            'href' => "/homepage/{$category->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Class List',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 } else {
     error(19);
 }
