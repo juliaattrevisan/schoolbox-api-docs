@@ -1,3 +1,28 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
+<script type="text/javascript" charset="utf-8" src="/javascript/components/datatables/media/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-datepicker]').datepicker();
+
+        /* Search Form
+         */
+        var form = $('form[data-action="search"]');
+        form.selectAll({
+            selector: form.find(':checkbox[data-selectall="category[]"]'),
+            checkboxes: form.find(':checkbox[name="category[]"]')
+        });
+
+        /* Results table
+         */
+        $('table[data-sortable]').DataTable({
+            paging: false,
+            searching: false
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 <div class="row">
     <div class="small-12 columns">
         <h1>Resource Booking Report</h1>
@@ -45,25 +70,28 @@
                     </div>
                 </fieldset>
                 <fieldset class="content">
-                    <legend>Categories</legend>
-                    <div class="small-12 columns">
-                        <input id='select-all' type="checkbox" data-selectall="category[]" {% if search.category|length == categoryList|length %}checked{% endif %} />
-                        <label for="select-all" class="checkbox-label">All</label>
+                    <div class="small-6 columns">
+                        <fieldset>
+                            <legend>Categories</legend>
+                            <input id='select-all' type="checkbox" data-selectall="category[]" {% if search.category|length == categoryList|length %}checked{% endif %} />
+                            <label for="select-all" class="checkbox-label">All</label>
 
-                        {% for category in categoryList %}
-                        <input id='category-checkbox-{{ category.getId() }}' type="checkbox" name="category[]" value="{{ category.getId() }}" {% if category.getId() in search.category %}checked{% endif %} />
-                        <label for='category-checkbox-{{ category.getId() }}' class="checkbox-label">
-                            {{ category.getName() }}
-                        </label>
-                        {% endfor %}
+                            {% for category in categoryList %}
+                            <input id='category-checkbox-{{ category.getId() }}' type="checkbox" name="category[]" value="{{ category.getId() }}" {% if category.getId() in search.category %}checked{% endif %} />
+                            <label for='category-checkbox-{{ category.getId() }}' class="checkbox-label">
+                                {{ category.getName() }}
+                            </label>
+                            {% endfor %}
+                        </fieldset>
                     </div>
-                </fieldset>
-                <fieldset class="content">
-                    <legend>Show Classes</legend>
-                    <div class="small-12 columns">
-                        <input type="hidden" name="classes" value="0" />
-                        <input id='show-classes-checkbox' type="checkbox" name="classes" value="1" {% if search.classes %}checked{% endif %} />
-                        <label for="show-classes-checkbox" class="checkbox-label">Show Classes</label>
+
+                    <div class="small-6 columns">
+                        <fieldset>
+                            <legend>Show Classes</legend>
+                            <input type="hidden" name="classes" value="0" />
+                            <input id='show-classes-checkbox' type="checkbox" name="classes" value="1" {% if search.classes %}checked{% endif %} />
+                            <label for="show-classes-checkbox" class="checkbox-label">Show Classes</label>
+                        </fieldset>
                     </div>
                 </fieldset>
             </section>
@@ -76,112 +104,62 @@
     </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="directory">
-    <table class="fullwidth table" data-sortable>
-        <thead>
-        <tr>
-            <th>Start</th>
-            <th>End</th>
-            <th>Name</th>
-            <th>Venue</th>
-            <th>Notes</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for event in eventList %}
-            {% set booking = event.getBooking() %}
-            <tr>
-                <td>
-                    <time datetime="{{ event.getStartTime().getDatabase() }}">
-                        {{ event.getStartTime().getLocal() }}
-                    </time>
-                </td>
-                <td>
-                    <time datetime="{{ event.getEndTime().getDatabase() }}">
-                        {{ event.getEndTime().getLocal() }}
-                    </time>
-                </td>
-                <td>
-                    {% if booking is empty %}
-                        {{ event.getTitle() }}
-                    {% else %}
-                        <a href="{{ routeLookup('resourceBooking.edit', {id: booking.getId()}) }}">
-                            {{ event.getTitle() }}
-                        </a>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if booking is empty %}
-                        {{ event.getLocation() }}
-                    {% else %}
-                        <a href="{{ routeLookup('resourceItem.read', {id: booking.getResource().getId()}) }}">
-                            {{ booking.getResource().getRoomCode() | default(booking.getResource.getName()) }}
-                        </a>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if booking is empty %}
-                        &nbsp;
-                    {% else %}
-                        {{ booking.getNotes()|purify }}
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<div class="row">
+    <div class="small-12 island">
+        <div class="scrollable">
+            <table data-sortable>
+                <thead>
+                <tr>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Name</th>
+                    <th>Venue</th>
+                    <th>Notes</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for event in eventList %}
+                    {% set booking = event.getBooking() %}
+                    <tr>
+                        <td>
+                            <time datetime="{{ event.getStartTime().getDatabase() }}">
+                                {{ event.getStartTime().getLocal() }}
+                            </time>
+                        </td>
+                        <td>
+                            <time datetime="{{ event.getEndTime().getDatabase() }}">
+                                {{ event.getEndTime().getLocal() }}
+                            </time>
+                        </td>
+                        <td>
+                            {% if booking is empty %}
+                                {{ event.getTitle() }}
+                            {% else %}
+                                <a href="{{ routeLookup('resourceBooking.edit', {id: booking.getId()}) }}">
+                                    {{ event.getTitle() }}
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if booking is empty %}
+                                {{ event.getLocation() }}
+                            {% else %}
+                                <a href="{{ routeLookup('resourceItem.read', {id: booking.getResource().getId()}) }}">
+                                    {{ booking.getResource().getRoomCode() | default(booking.getResource.getName()) }}
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if booking is empty %}
+                                &nbsp;
+                            {% else %}
+                                {{ booking.getNotes()|purify }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-
-<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
-<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.widgets.js"></script>
-<script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
-<script type="text/javascript">
-    $.tablesorter.addParser({
-        id: 'datetime',
-        is: function() { return false },
-        format: function(value, table, cell) {
-            return $(cell).find('time').attr('datetime')
-        },
-        type: 'text'
-    });
-    $(function() {
-        $('[data-sortable]').tablesorter({
-            headers:{
-                0:{sorter:'datetime'},
-                1:{sorter:'datetime'}
-            },
-            widgets:['zebra'],
-            widgetZebra:{
-                css:["", "dark"]
-            },
-            cssHeader:"directory-sorter"
-        });
-        $('[data-datepicker]').datepicker();
-
-        var form = $('form[data-action="search"]');
-        form.selectAll({
-            selector: form.find(':checkbox[data-selectall="category[]"]'),
-            checkboxes: form.find(':checkbox[name="category[]"]')
-        });
-    });
-</script>
