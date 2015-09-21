@@ -71,6 +71,7 @@ class Zone {
             'attachPrompt'     => 'Attach files',
             'attachmentsLabel' => 'Attachments',
             'modalTitle'       => 'Select files',
+            'fileVar'          => 'attachment[]'
         );
 
         $this->mapper      = $mapper ?: StorageMapper::getInstance();
@@ -207,6 +208,11 @@ class Zone {
     }
 
 
+    /**
+     * Return an array that represents a context that can be passed into Twig
+     *
+     * @return array
+     */
     public function getTwigContext() {
 
         // wrap in quotes
@@ -225,6 +231,7 @@ class Zone {
             'camelId'  => $this->delim2camel($this->id),
             'label'    => count($this->attachments) ? $this->text['attachmentsLabel'] : '',
             'prompt'   => $this->text['attachPrompt'],
+            'fileVar'  => $this->text['fileVar'],
             'mime'     => $filter,
             'readonly' => $this->readOnly,
             'multi'    => $this->multi,
@@ -248,58 +255,15 @@ class Zone {
 
 
     /**
+     * Twig it into SitePage
+     *
      * @param \SitePage $page
      * @param string $varname
      */
     public function renderIntoSitePage(\SitePage $page, $varname)
     {
-        $page->setFile(self::TPL, 'resources/attachzone.html');
-        $page->setBlock(self::TPL, 'can_drop', 'can_drop_block');
-        $page->setBlock(self::TPL, 'attachment_list', 'attachment_list_block');
-        $page->setBlock('attachment_list', 'attachment_editable', 'attachment_editable_block');
-
-        // wrap in quotes
-        $filter = "'$this->mimeFilter'";
-
-        if ($this->mimeFilter === null) {
-            $filter = 'null';
-        } elseif ($this->mimeFilter === false) {
-            $filter = 'false';
-        }
-
-        $page->setVar(array(
-            'AZ_ID'         => $this->id,
-            'AZ_ID_CAMEL'   => $this->delim2camel($this->id),
-            'AZ_THUMB_SIZE' => (int)$this->size,
-            'AZ_FILE_VAR'   => $this->text['fileVar'] ? $this->text['fileVar'] : 'attachment[]',
-            'AZ_ATTACH_PROMPT'     => $this->text['attachPrompt'],
-            'AZ_ATTACHMENTS_LABEL' => count($this->attachments) ? $this->text['attachmentsLabel'] : '',
-            'AZ_MODAL_TITLE'       => $this->text['modalTitle'],
-            'AZ_MIME_FILTER'       => $filter,
-            'AZ_MULTI'             => $this->multi ? 'true' : 'false',
-
-            'attachment_list_block' => '',
-        ));
-
-        if ($this->readOnly) {
-            $page->setVar('can_drop_block', '');
-        } else {
-            $page->parse('can_drop_block', 'can_drop');
-        }
-
-        foreach ($this->attachments as $file) {
-            $page->setVar('attachment_editable_block', '');
-            $page->setVar($this->deriveSitePageVars($file));
-
-            if (!$this->readOnly) {
-                $page->parse('attachment_editable_block', 'attachment_editable', false);
-            }
-
-
-            $page->parse('attachment_list_block', 'attachment_list', true);
-        }
-
-        $page->parse($varname, self::TPL);
+        // this is now just a twig shim
+        $page->setVar($varname, $page->getTwig()->render('sub/attachzone.twig', [ 'attachzone' => $this->getTwigContext() ]));
     }
 
 
