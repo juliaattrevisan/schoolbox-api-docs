@@ -607,7 +607,7 @@ class External_Pcschools_User implements External_UserInterface
      * SpouseMobilePhone,
      * SpouseDirectoryIncludeFlag
      *
-     * @importance high - used on parent profile page.
+     * @importance medium - used on parent profile page.
      *
      * @param $externalUserId
      *
