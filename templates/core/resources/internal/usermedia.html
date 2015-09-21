@@ -7,57 +7,26 @@
     $(function() {
         var recorderContainer      = $('#ab-usermedia'),
             recorderControls       = $('.recorderButtons'),
-            recorderNameDialog     = $('#recorderNameDialog'),
             recorderDisabledDialog = $('#recorderDisabledDialog'),
-            recorderNameInput      = recorderNameDialog.find('input[data-role="recording-name"]'),
+            recorderNameInput      = recorderContainer.find('input[data-role="recording-name"]'),
             recorderInterface; // Recording plugin
 
         // Call this when I want to actually upload recorded sounds
         var uploadRecorded = function() {
             recorderNameInput.blur();
-            recorderInterface.uploadRecorded(recorderNameInput.val() + '.' + recorderInterface.getFileExtension());
-            recorderNameDialog.dialog('close');
+            recorderInterface.uploadRecorded((recorderNameInput.val() || 'recording') + '.' + recorderInterface.getFileExtension());
         };
 
-        // Set up the recorder's dialogs
-        recorderNameDialog.dialog({
-            modal: true,
-            autoOpen: false,
-            buttons: [
-                {
-                    text:  'Upload',
-                    click: function() {
-                        uploadRecorded();
-                    }
-                },
-                {
-                    text:  'Cancel',
-                    click: function() {
-                        $(this).dialog('close');
-                    }
-                }
-            ]
-        }).on('open', function() {
-            recorderNameInput.focus();
-        });
-        recorderDisabledDialog.dialog({
-            modal: true,
-            autoOpen: false,
-            buttons: [
-                {
-                    text:  'Try it',
-                    click: function() {
-                        $('#attachment-browser').find('a[href="#internal/upload"]').click();
-                        $(this).dialog('close');
-                    }
-                },
-                {
-                    text:  'Cancel',
-                    click: function() {
-                        $(this).dialog('close');
-                    }
-                }
-            ]
+        recorderContainer.on('click', '[data-interaction="audio-fallback"]', function (e) {
+            e.preventDefault();
+
+            var selector = 'a[href="#' + this.href.split('#')[1] + '"]';
+            var picker   = $('#attachment-browser');
+            var target   = picker.find(selector)[0];
+
+            console.log(selector, target);
+
+            picker.find(target).trigger('click');
         });
 
         // Did I press enter on the recorder name? treat that as a form submit
@@ -87,6 +56,12 @@
         recorderButtons.disabled.addClass('hide');
         recorderButtons.uploading.addClass('hide');
 
+        // apply this listener pre-constructor
+        recorderContainer.on('setupFailed.recorder recordingStartFailed.recorder', function() {
+            recorderContainer.html(recorderDisabledDialog.html());
+        });
+
+
         recorderContainer.recorder({
             upload: {
                 url: '/storage/asyncUpload'
@@ -105,16 +80,6 @@
         recorderInterface = recorderContainer.data('recorder');
 
         // Set up button events
-        recorderContainer.on('setupFailed.recorder, recordingStartFailed.recorder', function() {
-            // Disable all buttons
-            recorderButtons.start.addClass('hide').prop('disabled', true);
-            recorderButtons.recording.addClass('hide').prop('disabled', true);
-            recorderButtons.play.addClass('hide').prop('disabled', true);
-            recorderButtons.stop.addClass('hide').prop('disabled', true);
-            recorderButtons.upload.addClass('hide').prop('disabled', true);
-            recorderButtons.disabled.removeClass('hide');
-            recorderDisabledDialog.dialog('open');
-        });
         recorderContainer.on('recordingReady.recorder', function() {
             // Allow record button to show
             recorderButtons.start.removeClass('hide').prop('disabled', false);
@@ -204,7 +169,7 @@
         recorderButtons.upload.click(function(event) {
             event.preventDefault();
             // prompt for a name
-            recorderNameDialog.dialog('open');
+            uploadRecorded();
         });
     });
 </script>
@@ -216,7 +181,12 @@
         * Should fall back to simple file upload for iPads
           (this supports usermedia natively)
     -->
-    <div class="dz-default"><span>Start recording audio</span></div>
+    <div class="dz-default">
+        <div class="icon-mic icon-64 text-center"></div>
+        <label>Recording Name
+            <input data-role="recording-name" type="text" value="" placeholder="recording" />
+        </label>
+    </div>
     <div class="recorderButtons">
         <a role="button" class="submit button record" data-interaction="audio-record-start" href="#">Start Recording</a>
         <a role="button" class="submit button recording hide" data-interaction="audio-record-recording" disabled href="#">Recording...</a>
@@ -224,17 +194,15 @@
         <a role="button" class="submit button play hide" data-interaction="audio-record-play" href="#">Play</a>
         <a role="button" class="submit button stop hide" data-interaction="audio-record-stop" href="#">Stop</a>
     </div>
-    <div id="flashContainer" class="hide"></div>
+    <div id="flashContainer" class="hide" style="position:absolute;"></div>
 </div>
 <div class="recorderButtons">
     <a role="button" class="submit button upload hide" data-interaction="audio-record-upload" href="#">Upload Audio</a>
     <a role="button" class="submit button uploading hide" data-interaction="audio-record-uploading" disabled href="#">Uploading...</a>
     <a role="button" class="button cancel" href="#">Cancel</a>
 </div>
-<div id="recorderNameDialog" title="Please enter a name for this recording" class="hide">
-    <input data-role="recording-name" type="text" value="recording" />
-</div>
-<div id="recorderDisabledDialog" title="Recording is not directly supported" class="hide">
-    Recording is not directly supported in your browser,
-    but creating and uploading a recording through the "Upload file" form might work.
+<div data-reveal id="recorderDisabledDialog" title="Recording is not directly supported" class="reveal-modal">
+    <p>Recording is not directly supported in your browser,
+    but creating and uploading a recording through "Upload files" might work.</p>
+    <a class="submit button" data-interaction="audio-fallback" href="#internal-upload">Try it</a>
 </div>
