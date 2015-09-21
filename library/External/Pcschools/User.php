@@ -470,6 +470,7 @@ class External_Pcschools_User implements External_UserInterface
         foreach ($this->getDatabase()->getAll($query) as $row) {
             $row = $this->getDatabase()->trimRow($row);
             $id  = $row['IDENTITY_ID#'];
+            // For now, I'm going to assume that parent IDs will be suffixed
             if ($row['DAD_DOMICILE'] === 'Y') {
                 $result[$id.'-F'] = $row['DAD_EMAIL'];
             }
