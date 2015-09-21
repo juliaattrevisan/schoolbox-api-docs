@@ -437,7 +437,10 @@ $(function() {
                 <fieldset class="content">
                     <legend>Booking Time</legend>
                     <div class="small-12 columns">
-                        {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
+                        {% include '@resourceBooking/sub/datetimeSelector.twig' with {
+                            select: select,
+                            item: item
+                        } %}
 
                         {# Only a user who may moderate this item may ignore the rules. #}
                         {% if allowOverride %}
