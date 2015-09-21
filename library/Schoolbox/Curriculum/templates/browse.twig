@@ -437,27 +437,28 @@
 </script>
 {% endverbatim %}
 
+<div class="row actions-small-1 actions-medium-2">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Curriculum Browser</h1>
+        </div>
+    </div>
+    <nav>
+        {% if not readonly %}
+            <a href="{{ routeLookup('curriculum.add')|escape('html_attr') }}"
+               id="create-curriculum-button"
+               class="icon icon-add"
+               title="Create New Curriculum"></a>
+            <a href="{{ routeLookup('curriculumImport.browse')|escape('html_attr') }}"
+               class="icon icon-upload"
+               title="Import Curriculum"></a>
+        {% endif %}
+    </nav>
+</div>
+
 <div class="template2 curriculum-browser">
     <div class="left">
         <div class="pane curriculum-selector">
-            <table id="category-head" class="table">
-                <thead>
-                    <tr>
-                        <th>
-                            Curricula
-                            {% if not readonly %}
-                            <a href="{{ routeLookup('curriculum.add')|escape('html_attr') }}"
-                               id="create-curriculum-button"
-                               class="submit-btn-plain float-right inline-block"
-                            >Create New Curriculum</a>
-                            <a href="{{ routeLookup('curriculumImport.browse')|escape('html_attr') }}"
-                               class="submit-btn-plain float-right inline-block"
-                            >Import Curriculum</a>
-                            {% endif %}
-                        </th>
-                    </tr>
-                </thead>
-            </table>
             <div class="scroller">
                 <div class="curriculum-tree"></div>
             </div>
