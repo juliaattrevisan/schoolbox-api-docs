@@ -36,38 +36,74 @@
             <input type="hidden" name="course_homepage" value="{COURSE_HOMEPAGE_ID}" />
             <input type="hidden" name="component"       value="{COMPONENT_ID}" />
 
-            <table class="standardForm table">
-
-                <tr>
-                    <td class="formLabelWidth">
-                        <h4>Course</h4>
-                        <em>The course that has been imported.</em>
-                    </td>
-                    <td>
-                        <!-- BEGIN course -->
+            <section>
+                <!-- BEGIN course -->
+                <fieldset class="content">
+                    <legend>Course</legend>
+                    <div class="small-12 columns">
                         <ul class="breadcrumb">
                             <!-- BEGIN course_breadcrumb -->
                             <li><a href="/homepage/{COURSE_CATEGORY_ID}/">{COURSE_CATEGORY_NAME}</a></li>
                             <!-- END course_breadcrumb -->
                         </ul>
-                        <!-- END course -->
-                    </td>
-                </tr>
+                    </div>
+                </fieldset>
+                <!-- END course -->
+                <fieldset class="content">
+                    <legend>Units</legend>
+                    <p class="meta">
+                        Changing the open or due date of a unit will not change
+                        the open or due date of any assessments in the unit,
+                        unless you check the <strong>Update</strong> checkbox next to the open or due date for that unit.
+                    </p>
+                    <div class="small-12 columns no-pad">
+                        <ul class="information-list">
+                            <!-- BEGIN unit -->
+                            <li class="actions-small-1" data-type="unit_row">
+                                <input name="unit[{UNIT_COUNT}][unit_id]" type="hidden" value="{UNIT_ID}" />
+                                <input name="unit[{UNIT_COUNT}][import]" type="hidden" value="0" />
+                                <div class="list-item">
+                                    <div class="avatar card small-12">
+                                        <input id="import-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" {UNIT_ENABLED_CHECKED} />
+                                        <label for="import-{UNIT_COUNT}" class="checkbox-label">{UNIT_NAME}</label>
+                                    </div>
+                                    <div class="small-12 medium-6 columns" data-hide-watch="#import-{UNIT_COUNT}">
+                                        <label for="open_date-{UNIT_COUNT}">Open</label>
+                                        <input id="open_date-{UNIT_COUNT}"
+                                               name="unit[{UNIT_COUNT}][open_date]"
+                                               type="text"
+                                               value="{UNIT_OPEN_DATE}"
+                                               data-role="open_date"
+                                               data-datepicker
+                                               data-datepicker-sync
+                                               data-datepicker-sync-enddate="#due_date-{UNIT_COUNT}" />
+                                    </div>
+                                    <!-- BEGIN unit_update_open_date -->
+                                    <!-- END unit_update_open_date -->
+                                    <div class="small-12 medium-6 columns" data-hide-watch="#import-{UNIT_COUNT}">
+                                        <label for="due_date-{UNIT_COUNT}">Due</label>
+                                        <input id="due_date-{UNIT_COUNT}"
+                                               name="unit[{UNIT_COUNT}][due_date]"
+                                               type="text"
+                                               value="{UNIT_DUE_DATE}"
+                                               data-role="due_date"
+                                               data-datepicker />
+                                    </div>
+                                    <!-- BEGIN unit_update_due_date -->
+                                    <!-- END unit_update_due_date -->
+                                </div>
+                                <nav>
+                                    <a href="/homepage/{UNIT_ID}" title="View Unit Homepage" class="icon icon-view"></a>
+                                </nav>
+                            </li>
+                            <!-- END unit -->
+                        </ul>
+                    </div>
+                </fieldset>
+            </section>
 
+            <table class="standardForm table">
                 <tr>
-                    <td class="formLabelWidth">
-                        <h4>Units</h4>
-                        <p>
-                            <em>You will need to set a start and end date for each unit that you want to import.</em>
-                        </p>
-                        <p>
-                            <em>
-                                Changing the open or due date of a unit will not change
-                                the open or due date of any assessments in the unit,
-                                unless you check the <strong>Update</strong> checkbox next to the open or due date for that unit.
-                            </em>
-                        </p>
-                    </td>
                     <td>
                         <table class="table">
                             <thead>
