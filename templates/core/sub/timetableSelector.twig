@@ -1,13 +1,3 @@
-<script type="text/javascript">
-    $(function() {
-        /* Disable placeholder behaviour
-         */
-        $('[data-disabled]').click(function(event) {
-            event.preventDefault();
-        });
-    });
-</script>
-
 <div data-interaction="timetableSelector">
     <dl>
         <dt>Campus</dt>
@@ -36,10 +26,11 @@
     </dl>
     <dl>
         <dt>Date</dt>
-        <dd>
+        <dd data-date-message>Please select a period.</dd>
+        <dd class="hide" data-date-paginator>
             <ul class="pagination">
                 <li><a data-interaction="previousDate" title="Previous" href="#">&lsaquo;</a></li>
-                <li><a href="#" data-disabled><time data-role="selectedDate">Please select</time></a></li>
+                <li><a href="#" data-disabled><time data-role="selectedDate"></time></a></li>
                 <li><a data-interaction="nextDate" title="Next" href="#">&rsaquo;</a></li>
             </ul>
         </dd>
