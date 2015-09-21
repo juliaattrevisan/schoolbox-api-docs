@@ -45,7 +45,15 @@ $(function() {
         if (lastTab != id) {
             lastTab = id;
 
-            console.log(tab, id);
+            /* Disable all inputs in all tabs
+             */
+            $.each($('[data-interaction="tabs"] a'), function(index, element) {
+                $($(element).attr('href')).find('input, select').prop('disabled', true);
+            });
+
+//            /* Enable all inputs in this tab
+//             */
+//            tab.find('input, select').prop('disabled', false);
         }
     });
 
