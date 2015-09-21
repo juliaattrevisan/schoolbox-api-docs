@@ -62,12 +62,20 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
     .content {
         &.preload {
             background: transparent url("/images/loading-bar.gif") no-repeat 50%;
+            height: 10rem;
         }
         iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
+    }
+}
+
+.ab-pane {
+    .submit.button {
+        float: left;
+        margin-right: 0.25rem;
     }
 }
 
@@ -538,17 +546,13 @@ ul.az-error-list {
 
 .dz-preview .dz-details,
 .dropzone-previews .dz-preview .dz-details {
-    width: 100px;
-    height: 100px;
     position: relative;
-    background: #ebebeb;
     padding: 5px;
     margin-bottom: 22px;
 }
 .dz-preview .dz-details .dz-filename,
 .dropzone-previews .dz-preview .dz-details .dz-filename {
     overflow: hidden;
-    height: 100%;
 }
 .dz-preview .dz-details img,
 .dropzone-previews .dz-preview .dz-details img {
