@@ -244,108 +244,10 @@ class External_Pcschools_User implements External_UserInterface
         ];
         $result = [];
         foreach ($rowset as $row) {
-            $row = $this->getDatabase()->trimRow($row);
-            // Father
-            // I'm going to assume on the DOMICILE field
-            if ($row['DAD_DOMICILE'] === 'Y') {
-                $result[] = array_merge(
-                    $base,
-                    [
-                        'StudentContactID'                 => $row['IDENTITY_ID#'],
-                        'StudentContactTitle'              => $row['FATHER_TITLE'],
-                        'StudentContactPreferred'          => $row['DAD_FIRSTNAME'],
-                        'StudentContactLegalFullName'      => $row['DAD_FIRSTNAME'].' '.$row['DAD_SURNAME'],
-                        'StudentContactSurname'            => $row['DAD_SURNAME'],
-                        'StudentContactDefaultEmail'       => $row['DAD_EMAIL'],
-                        'ValidAddressFlag'                 => '',
-                        'StudentContactAddress1'           => $row['COR_ADDRESS'],
-                        'StudentContactAddress2'           => $row['COR_ADDRESS1'],
-                        'StudentContactAddress3'           => '',
-                        'StudentContactSuburb'             => $row['COR_TOWN'],
-                        'StudentContactPostCode'           => $row['COR_POST_CODE'],
-                        'StudentContactState'              => $row['STATE_COR'],
-                        'StudentContactPhoneActual'        => $row['DAD_HOME_PHONE'],
-                        'StudentContactMobilePhone'        => $row['DAD_MOBILE'],
-                        'StudentContactOccupPhone'         => $row['DAD_BUSS_PHONE'],
-                        'StudentContactRelation'           => $row['DAD_STATUS'] ?: 'Father',
-                    ]
-                );
-            }
-            // Mother
-            if ($row['MUM_DOMICILE'] === 'Y') {
-                $result[] = array_merge(
-                    $base,
-                    [
-                        'StudentContactID'                 => $row['IDENTITY_ID#'],
-                        'StudentContactTitle'              => $row['MOTHER_TITLE'],
-                        'StudentContactPreferred'          => $row['MUM_FIRSTNAME'],
-                        'StudentContactLegalFullName'      => $row['MUM_FIRSTNAME'].' '.$row['MUM_SURNAME'],
-                        'StudentContactSurname'            => $row['MUM_SURNAME'],
-                        'StudentContactDefaultEmail'       => $row['MUM_EMAIL'],
-                        'ValidAddressFlag'                 => '',
-                        'StudentContactAddress1'           => $row['COR_ADDRESS'],
-                        'StudentContactAddress2'           => $row['COR_ADDRESS1'],
-                        'StudentContactAddress3'           => '',
-                        'StudentContactSuburb'             => $row['COR_TOWN'],
-                        'StudentContactPostCode'           => $row['COR_POST_CODE'],
-                        'StudentContactState'              => $row['STATE_COR'],
-                        'StudentContactPhoneActual'        => $row['MUM_HOME_PHONE'],
-                        'StudentContactMobilePhone'        => $row['MUM_MOBILE'],
-                        'StudentContactOccupPhone'         => $row['MUM_BUSS_PHONE'],
-                        'StudentContactRelation'           => $row['MUM_STATUS'] ?: 'Mother',
-                    ]
-                );
-            }
-            // Guardian
-            if ($row['GUARD_DOMICILE'] === 'Y') {
-                $result[] = array_merge(
-                    $base,
-                    [
-                        'StudentContactID'                 => $row['IDENTITY_ID#'],
-                        'StudentContactTitle'              => $row['GUARDIAN_TITLE'],
-                        'StudentContactPreferred'          => $row['GUARD_FIRSTNAME'],
-                        'StudentContactLegalFullName'      => $row['GUARD_FIRSTNAME'].' '.$row['GUARD_SURNAME'],
-                        'StudentContactSurname'            => $row['GUARD_SURNAME'],
-                        'StudentContactDefaultEmail'       => $row['GUARD_EMAIL'],
-                        'ValidAddressFlag'                 => '',
-                        'StudentContactAddress1'           => $row['COR_ADDRESS'],
-                        'StudentContactAddress2'           => $row['COR_ADDRESS1'],
-                        'StudentContactAddress3'           => '',
-                        'StudentContactSuburb'             => $row['COR_TOWN'],
-                        'StudentContactPostCode'           => $row['COR_POST_CODE'],
-                        'StudentContactState'              => $row['STATE_COR'],
-                        'StudentContactPhoneActual'        => $row['GUARD_HOME_PH'],
-                        'StudentContactMobilePhone'        => $row['GUARD_MOBILE'],
-                        'StudentContactOccupPhone'         => $row['GUARD_BUSS_PH'],
-                        'StudentContactRelation'           => $row['GUARD_STATUS'] ?: 'Guardian',
-                    ]
-                );
-            }
-            // Carer
-            if ($row['CGIVE_DOMICILE'] === 'Y') {
-                $result[] = array_merge(
-                    $base,
-                    [
-                        'StudentContactID'                 => $row['IDENTITY_ID#'],
-                        'StudentContactTitle'              => $row['CGIVE_TITLE'],
-                        'StudentContactPreferred'          => $row['CGIVE_FIRSTNAME'],
-                        'StudentContactLegalFullName'      => $row['CGIVE_FIRSTNAME'].' '.$row['CGIVE_SURNAME'],
-                        'StudentContactSurname'            => $row['CGIVE_SURNAME'],
-                        'StudentContactDefaultEmail'       => $row['CGIVE_EMAIL'],
-                        'ValidAddressFlag'                 => '',
-                        'StudentContactAddress1'           => $row['COR_ADDRESS'],
-                        'StudentContactAddress2'           => $row['COR_ADDRESS1'],
-                        'StudentContactAddress3'           => '',
-                        'StudentContactSuburb'             => $row['COR_TOWN'],
-                        'StudentContactPostCode'           => $row['COR_POST_CODE'],
-                        'StudentContactState'              => $row['STATE_COR'],
-                        'StudentContactPhoneActual'        => $row['CGIVE_HOME_PH'],
-                        'StudentContactMobilePhone'        => $row['CGIVE_MOBILE'],
-                        'StudentContactOccupPhone'         => $row['CGIVE_BUSS_PH'],
-                        'StudentContactRelation'           => $row['CGIVE_STATUS'] ?: 'Caregiver',
-                    ]
-                );
-            }
+            $result = array_merge(
+                $result,
+                $this->buildRecords($base, $this->getDatabase()->trimRow($row))
+            );
         }
         return $result;
     }
@@ -733,62 +635,10 @@ class External_Pcschools_User implements External_UserInterface
                 'StudentCampus'    => $row['StudentCampus'],
                 'StudentGender'    => $row['StudentGender'],
             ];
-            // I'm going to assume on the DOMICILE field
-            if ($row['DAD_DOMICILE'] === 'Y') {
-                $result[] = array_merge(
-                    $student,
-                    [
-                        'StudentContactID'                 => $row['IDENTITY_ID#'],
-                        'StudentContactTitle'              => $row['FATHER_TITLE'],
-                        'StudentContactPreferred'          => $row['DAD_FIRSTNAME'],
-                        'StudentContactLegalFullName'      => $row['DAD_FIRSTNAME'].' '.$row['DAD_SURNAME'],
-                        'StudentContactSurname'            => $row['DAD_SURNAME'],
-                        'StudentContactDefaultEmail'       => $row['DAD_EMAIL'],
-                    ]
-                );
-            }
-            // Mother
-            if ($row['MUM_DOMICILE'] === 'Y') {
-                $result[] = array_merge(
-                    $student,
-                    [
-                        'StudentContactID'                 => $row['IDENTITY_ID#'],
-                        'StudentContactTitle'              => $row['MOTHER_TITLE'],
-                        'StudentContactPreferred'          => $row['MUM_FIRSTNAME'],
-                        'StudentContactLegalFullName'      => $row['MUM_FIRSTNAME'].' '.$row['MUM_SURNAME'],
-                        'StudentContactSurname'            => $row['MUM_SURNAME'],
-                        'StudentContactDefaultEmail'       => $row['MUM_EMAIL'],
-                    ]
-                );
-            }
-            // Guardian
-            if ($row['GUARD_DOMICILE'] === 'Y') {
-                $result[] = array_merge(
-                    $student,
-                    [
-                        'StudentContactID'                 => $row['IDENTITY_ID#'],
-                        'StudentContactTitle'              => $row['GUARDIAN_TITLE'],
-                        'StudentContactPreferred'          => $row['GUARD_FIRSTNAME'],
-                        'StudentContactLegalFullName'      => $row['GUARD_FIRSTNAME'].' '.$row['GUARD_SURNAME'],
-                        'StudentContactSurname'            => $row['GUARD_SURNAME'],
-                        'StudentContactDefaultEmail'       => $row['GUARD_EMAIL'],
-                    ]
-                );
-            }
-            // Carer
-            if ($row['CGIVE_DOMICILE'] === 'Y') {
-                $result[] = array_merge(
-                    $student,
-                    [
-                        'StudentContactID'                 => $row['IDENTITY_ID#'],
-                        'StudentContactTitle'              => $row['CGIVE_TITLE'],
-                        'StudentContactPreferred'          => $row['CGIVE_FIRSTNAME'],
-                        'StudentContactLegalFullName'      => $row['CGIVE_FIRSTNAME'].' '.$row['CGIVE_SURNAME'],
-                        'StudentContactSurname'            => $row['CGIVE_SURNAME'],
-                        'StudentContactDefaultEmail'       => $row['CGIVE_EMAIL'],
-                    ]
-                );
-            }
+            $result = array_merge(
+                $result,
+                $this->buildRecords($student, $row)
+            );
         }
         return $result;
     }
@@ -1095,6 +945,8 @@ class External_Pcschools_User implements External_UserInterface
         return [];
     }
 
+    // Local methods
+
     /**
      * @return MSSQL
      */
@@ -1112,5 +964,108 @@ class External_Pcschools_User implements External_UserInterface
     {
         $this->database = $database;
         return $this;
+    }
+
+    /**
+     * Builds a parent record list from a row from `getStudentContactList()` or
+     * other method that returns a list.
+     *
+     * @param array $base
+     * @param array $row
+     *
+     * @return array
+     */
+    private function buildRecords($base, $row)
+    {
+        $results = array_filter([
+            $this->buildParentRecord($row, 'F'),
+            $this->buildParentRecord($row, 'M'),
+            $this->buildParentRecord($row, 'G'),
+            $this->buildParentRecord($row, 'C'),
+        ]);
+        foreach ($results as &$result) {
+            $result = array_merge($base, $result);
+        }
+        unset($result);
+        return $results;
+    }
+
+    /**
+     * Builds an individual parent record
+     *
+     * @param array  $row
+     * @param string $type
+     *
+     * @return array
+     */
+    private function buildParentRecord($row, $type)
+    {
+        switch ($type) {
+            case 'F':
+                $mainPrefix  = 'DAD';
+                $titlePrefix = 'FATHER';
+                $relation    = 'Father';
+                break;
+            case 'M':
+                $mainPrefix  = 'MUM';
+                $titlePrefix = 'MOTHER';
+                $relation    = 'Mother';
+                break;
+            case 'C':
+                $mainPrefix  = 'CGIVE';
+                $titlePrefix = 'CGIVE';
+                $relation    = 'Caregiver';
+                break;
+            case 'G':
+                $mainPrefix  = 'GUARD';
+                $titlePrefix = 'GUARDIAN';
+                $relation    = 'Guardian';
+                break;
+            default:
+                return [];
+        }
+
+        // Assumption: if $mainPrefix.'_DOMICILE' is empty, don't build this record
+        if ($row[$mainPrefix.'_DOMICILE'] !== 'Y') {
+            return [];
+        }
+
+        // Field mappings
+        $fieldMappings = [
+            // May suffix this field with $type
+            'StudentContactID'           => 'IDENTITY_ID#',
+            'StudentContactTitle'        => $titlePrefix . '_TITLE',
+            'StudentContactPreferred'    => $mainPrefix . '_FIRSTNAME',
+            'StudentContactSurname'      => $mainPrefix . '_SURNAME',
+            'StudentContactDefaultEmail' => $mainPrefix . '_EMAIL',
+            'StudentContactAddress1'     => 'COR_ADDRESS',
+            'StudentContactAddress2'     => 'COR_ADDRESS1',
+            'StudentContactSuburb'       => 'COR_TOWN',
+            'StudentContactPostCode'     => 'COR_POST_CODE',
+            'StudentContactState'        => 'STATE_COR',
+            'StudentContactPhoneActual'  => $mainPrefix . '_HOME_PHONE',
+            'StudentContactMobilePhone'  => $mainPrefix . '_MOBILE',
+            'StudentContactOccupPhone'   => $mainPrefix . '_BUSS_PHONE',
+            'StudentContactRelation'     => $mainPrefix . '_STATUS',
+            'StudentYearLevel'           => 'StudentYearLevel',
+            'StudentCampus'              => 'StudentCampus',
+            'StudentGender'              => 'StudentGender',
+        ];
+        $result = [];
+        foreach ($fieldMappings as $to => $from) {
+            if (array_key_exists($from, $row)) {
+                $result[$to] = $row[$from];
+            }
+        }
+        // Build fullname too if I can
+        if (array_key_exists($mainPrefix.'_FIRSTNAME', $row) || array_key_exists($mainPrefix.'_SURNAME', $row)) {
+            $result['StudentContactLegalFullName']
+                = $row[$mainPrefix.'_FIRSTNAME'] . ' ' . $row[$mainPrefix.'_SURNAME'];
+        }
+        // Build contact relation default value
+        if (array_key_exists('StudentContactRelation', $result)) {
+            $result['StudentContactRelation'] = $result['StudentContactRelation'] ?: $relation;
+        }
+        return $result;
     }
 }
