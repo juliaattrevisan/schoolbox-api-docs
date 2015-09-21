@@ -374,7 +374,7 @@
      */
     RecorderPlugin.prototype.stopPlaying = function() {
         this.triggerEvent('playbackStop', []);
-        if (self.isMediaRecorderUsed()) {
+        if (this.isMediaRecorderUsed()) {
             this.media.audioElement[0].pause();
         } else if (this.isWebRtcUsed()) {
             this.webrtc.audioElement[0].pause();
