@@ -1,19 +1,24 @@
-<dl>
-    <dt>Start Time</dt>
-    <dd>
+<div class="row">
+    <div class="small-12 columns">
+        <label>Start Time</label>
+
         {#{% include 'sub/errors.twig' with {errors: errors.start_datetime} %}#}
         {% include 'sub/datetimeInput.twig' with {
-            value: item.event.startDateTime,
-            name:  'start_datetime',
-            id:    'start_datetime'
+        value: item.event.startDateTime,
+        name:  'start_datetime',
+        id:    'start_datetime'
         } %}
-    </dd>
-    <dt>End Time</dt>
-    <dd>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <label>End Time</label>
+
         {% include 'sub/datetimeInput.twig' with {
-            value: item.event.endDateTime,
-            name:  'end_datetime',
-            id:    'end_datetime'
+        value: item.event.endDateTime,
+        name:  'end_datetime',
+        id:    'end_datetime'
         } %}
-    </dd>
-</dl>
+    </div>
+</div>
