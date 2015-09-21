@@ -441,15 +441,6 @@ $(function() {
                             select: select,
                             item: item
                         } %}
-
-                        {# Only a user who may moderate this item may ignore the rules. #}
-                        {% if allowOverride %}
-                        <input id="resource-booking-override-validation" type="checkbox" name="override_validation" value="1" />
-                        <label for="resource-booking-override-validation" class="checkbox-label">
-                            Bypass Validation
-                            <span class='hint has-tip tip-top' data-tooltip title="Only select this if you are certain you wish to override the system rules">?</span>
-                        </label>
-                        {% endif %}
                     </div>
                 </fieldset>
 
@@ -499,6 +490,15 @@ $(function() {
                             Notes
                             <textarea name="notes">{{ item.notes }}</textarea>
                         </label>
+
+                        {# Only a user who may moderate this item may ignore the rules. #}
+                        {% if allowOverride %}
+                            <input id="resource-booking-override-validation" type="checkbox" name="override_validation" value="1" />
+                            <label for="resource-booking-override-validation" class="checkbox-label">
+                                Bypass Validation
+                                <span class='hint has-tip tip-top' data-tooltip title="Only select this if you are certain you wish to override the system rules">?</span>
+                            </label>
+                        {% endif %}
                     </div>
                 </fieldset>
 
