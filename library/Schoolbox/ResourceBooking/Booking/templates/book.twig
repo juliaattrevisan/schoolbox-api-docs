@@ -5,6 +5,7 @@
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
 <script type="text/javascript" src="/javascript/jquery.validate.extensions.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/timetablepicker.js"></script>
 <script type="text/javascript">
 $(function() {
     // A global variable
@@ -27,32 +28,6 @@ $(function() {
     $('input[name="start_datetime[date]"]').syncDates({
         endDate: $('input[name="end_datetime[date]"]')
     })
-
-    // Set up tabz for the projector.
-    // Always default to setting a date and time directly, though.
-
-    /* Prevent tab onchange from firing twice
-     * https://github.com/zurb/foundation/issues/6009
-     */
-    var lastTab = false;
-
-    $('[data-interaction="tabs"]').on('toggled', function(event, tab) {
-        var id = tab.attr('id');
-
-        if (lastTab != id) {
-            lastTab = id;
-
-            /* Disable all inputs in all tabs
-             */
-            $.each($('[data-interaction="tabs"] a'), function(index, element) {
-                $($(element).attr('href')).find('input, select').prop('disabled', true);
-            });
-
-            /* Enable all inputs in this tab
-             */
-            tab.find('input, select').prop('disabled', false);
-        }
-    });
 
     // Timetable selector
     {#var campusList         = {{ campusList|json_encode|raw }}#}
@@ -462,25 +437,7 @@ $(function() {
                 <fieldset class="content">
                     <legend>Booking Time</legend>
                     <div class="small-12 columns">
-                        {# Existing items - only show the date and time (for now) #}
-                        {# New items - allow choice of timetable or date/time #}
-                        {% if item.id %}
-                            {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
-                        {% else %}
-                            <dl class="tabs" data-tab data-interaction="tabs">
-                                <dd class="active"><a href="#dateSelector">Choose a Time</a></dd>
-                                <dd><a href="#timetableSelector">Choose from Timetable</a></dd>
-                            </dl>
-
-                            <div class="tabs-content">
-                                <div class="content active no-pad" id="dateSelector">
-                                    {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
-                                </div>
-                                <div class="content no-pad" id="timetableSelector">
-                                    {% include '@resourceBooking/sub/timetableSelector.twig' with {campusList: campusList} %}
-                                </div>
-                            </div>
-                        {% endif %}
+                        {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
 
                         {# Only a user who may moderate this item may ignore the rules. #}
                         {% if allowOverride %}

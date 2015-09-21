@@ -116,6 +116,7 @@ class Controller extends Base
                 'template' => '@resourceBooking/book.twig',
                 'data'     => array(
                     'item'          => $item,
+                    'select'        => 'radio',
                     'campusList'    => $this->getCampusList(),
                     'callbackUrl'   => $this->getRequest()->query['callbackUrl'],
                     'allowOverride' => $item->getResource()->canUserModerateThisItem($this->getUser())

@@ -16,3 +16,25 @@
     id:    'end_datetime'
     } %}
 </fieldset>
+
+<fieldset>
+    <div class="small-12 columns">
+        <label>
+            Choose From Timetable<br />
+            <a data-timetablepicker
+               data-timetablepicker-hour-field="#{{ id }}_hour"
+               data-timetablepicker-minute-field="#{{ id }}_minute"
+               data-timetablepicker-period-field="#{{ id }}_period"
+               data-timetablepicker-timetable-selector="#timetableSelectorDialog"
+               class="button icon-timetable"
+               href="#"></a>
+        </label>
+    </div>
+    <div id="timetableSelectorDialog" data-role="timetable-selector" class="reveal-modal" data-reveal title="Choose a date from timetable">
+        {% include 'sub/timetableSelector.twig' with {
+            select: select
+        } %}
+        <a href="#" data-action="useTime" class="primary button">Use</a>
+        <a href="#" data-action="close" class="button">Cancel</a>
+    </div>
+</fieldset>
