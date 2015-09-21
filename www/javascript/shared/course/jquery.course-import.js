@@ -8,7 +8,7 @@
         // Setup enable/disable of courses within the form, and do initial setup
         var enableUnitClickEvent = function(element) {
             var row            = element.closest('[data-type="unit_row"]');
-            var inputs         = row.find(':input:visible').not(element);
+            var inputs         = row.find(':input').not(element);
             var is_now_enabled = element.prop('checked');
             inputs.prop('disabled', !is_now_enabled);
             row.data('enabled', is_now_enabled);
