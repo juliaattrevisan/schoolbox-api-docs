@@ -1,5 +1,5 @@
 {% for moderator in moderatorList %}
     {% spaceless %}
-    <span>{% include 'sub/userLink.twig' with {user: moderator} %}</span>{% if not loop.last %},{% endif %}
+    {% include 'sub/userLink.twig' with {user: moderator} %}{% if not loop.last %},{% endif %}
     {% endspaceless %}
 {% endfor %}

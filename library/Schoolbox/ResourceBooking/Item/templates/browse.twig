@@ -1,71 +1,115 @@
-<h1>Search Resources</h1>
-<span class="header_option">
-    <form action="{{ routeLookup('resourceItem.browse') }}" method="get">
-        <input type="search" id="resource-search-term" placeholder="Search Resources" name="search" value="{{ search|default('') }}" />
-        <input type="submit" id="resource-search" value="Search" class="submit-btn-plain" />
-    </form>
-</span>
-<div class="news left clearfix">
-    <ul class="information-list resource-list">
-        {% for item in list %}
-        <li class="resource">
-            {#
-            Is there some more semantically correct way of saying that this is a
-            resource, apart from adding classes?
-            #}
-            <span class="actions">
-                <a class="resource-read-link btn no-text" id="resource-read-{{item.id}}" title="View" href="{{ routeLookup('resourceItem.read', {id: item.id}) }}"><span></span></a>
-                {% if isRouteAuthorized('resourceBooking.book', {id: item.id, item: item}) %}
-                    <a class="resource-book-link btn report no-text" id="resource-book-{{item.id}}" title="Book" href="{{ routeLookup('resourceBooking.book', {id: item.id}) }}"><span></span></a>
-                {% endif %}
-                {% if isRouteAuthorized('resourceItem.edit', {id: item.id, item: item}) %}
-                    <a class="resource-name resource-edit-link btn modify no-text" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"><span></span></a>
-                {% endif %}
-            </span>
-            <a href="{{ routeLookup('resourceItem.read', {id: item.id}) }}" class="thumbnail">
-                {% if item.image.hash %}
-                    <img src="/storage/image.php?size=square64&hash={{ item.image.hash|e('url') }}" />
-                {% endif %}
-            </a>
-            <h3 class="resource-name">
-                <a href="{{ routeLookup('resourceItem.read', {id: item.id}) }}">
-                    {% include '@resourceItem/sub/itemName.twig' with {item: item} %}
-                </a>
-            </h3>
-            <p class="meta">
-                <a href="{{ routeLookup('resourceCategory.read', {id: item.category.id}) }}" >{{ item.category.name }}</a>
-                {% if item.moderatorList is not empty %}
-                    {% include '@resourceItem/sub/moderated.twig' with {item: item} %}
-                    {% include '@resourceItem/sub/moderatorList.twig' with {moderatorList: item.moderatorList} %}
-                {% endif %}
-            </p>
-            {{ item.description|e("purify")|raw }}
-        </li>
-        {% else %}
-        <li>There are no resources in the system.</li>
-        {% endfor %}
-    </ul>
+<ul class="breadcrumb">
+    <li><a href="{{ routeLookup('resourceItem.browse') }}">Resources</a></li>
+    <li class="active"><a href="#">{{  category.getName() }}</a></li>
+</ul>
 
-    {% include 'sub/paginator.twig' with {paginator: paginator, currentPage: currentPage, class:'admin-nav'} %}
-
-    {# New item: only if I have the permission to do this #}
-    {% if isRouteAuthorized('resourceItem.add') %}
-        <a id="resource-create" rel="create-form" class="btn add clear float-left" href="{{ routeLookup('resourceItem.add') }}"><span></span>Add New</a>
-    {% endif %}
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Resources</h1>
+        </div>
+    </div>
+    <nav>
+        {# New item: only if I have the permission to do this #}
+        {% if isRouteAuthorized('resourceItem.add') %}
+            <a id="resource-create" rel="create-form" class="icon-add" href="{{ routeLookup('resourceItem.add') }}" title="Add Resource"></a>
+        {% endif %}
+        <a class="icon-search" data-reveal-id="search-modal" title="Search Resources"></a>
+    </nav>
 </div>
 
-<div class="right">
-    <h2>Categories</h2>
-    <ul class="resourcecategory-list admin-nav vertical">
-        <li class="resourcecategory">
-            <a href="{{ routeLookup('resourceItem.browse') }}"
-               class="{% if not categoryId %}current{% endif %}"
-            >All</a>
-        </li>
-        {% for item in categoryList %}
-            <li class="resourcecategory">
-                {% include '@resourceItem/sub/searchLink.twig' with {currentId: categoryId} %}
-            </li>
-        {% endfor %}
-    </ul>
+<div id="search-modal" class="reveal-modal" data-reveal>
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">Search Resources</h2>
+            <form action="{{ routeLookup('resourceItem.browse') }}" method="get">
+                <section>
+                    <label>
+                        <input type="search" id="resource-search-term" placeholder="Search Resources" name="search" value="{{ search|default('') }}" />
+                    </label>
+                </section>
+            </form>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" id="resource-search" value="Search" class="expand" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a class="close-reveal-modal">&#215;</a>
 </div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <dl class="sub-nav">
+            <dd><a href="{{ routeLookup('resourceItem.browse') }}" class="{% if not categoryId %}current{% endif %}">All</a></dd>
+            {% for item in categoryList %}
+            {% include '@resourceItem/sub/searchLink.twig' with {currentId: categoryId} %}
+            {% endfor %}
+        </dl>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            {% if list|length %}
+            <ul class="action-list">
+                {% for item in list %}
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
+                            <a href="{{ routeLookup('resourceItem.read', {id: item.id}) }}">
+                                {% if item.image.hash %}
+                                <img src="/storage/image.php?size=square64&hash={{ item.image.hash|e('url') }}" />
+                                {% endif %}
+
+                                <p>
+                                    {% include '@resourceItem/sub/itemName.twig' with {item: item} %}
+                                </p>
+                            </a>
+
+                            <p class="meta">
+                                <a href="{{ routeLookup('resourceCategory.read', {id: item.category.id}) }}" >{{ item.category.name }}</a>
+
+                                {% if item.moderatorList is not empty %}
+                                    {% include '@resourceItem/sub/moderated.twig' with {item: item} %}
+                                    {% include '@resourceItem/sub/moderatorList.twig' with {moderatorList: item.moderatorList} %}
+                                {% endif %}
+                            </p>
+                        </div>
+                        <article>
+                            {{ item.description|e("purify")|raw }}
+                        </article>
+                    </div>
+                    <nav>
+                        {#
+                        Is there some more semantically correct way of saying that this is a
+                        resource, apart from adding classes?
+                        #}
+                        <a class="resource-read-link" id="resource-read-{{item.id}}" title="View" href="{{ routeLookup('resourceItem.read', {id: item.id}) }}"></a>
+
+                        {% if isRouteAuthorized('resourceBooking.book', {id: item.id, item: item}) %}
+                        <a class="resource-book-link" id="resource-book-{{item.id}}" title="Book" href="{{ routeLookup('resourceBooking.book', {id: item.id}) }}"></a>
+                        {% endif %}
+
+                        {% if isRouteAuthorized('resourceItem.edit', {id: item.id, item: item}) %}
+                        <a class="resource-name resource-edit-link" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"></a>
+                        {% endif %}
+                    </nav>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="content">
+                <p>There are no resources in the system.</p>
+            </div>
+            {% endif %}
+        </section>
+        {% include 'sub/paginator.twig' with {paginator: paginator, currentPage: currentPage, class:'pagination'} %}
+    </div>
+</div>
+
+
+

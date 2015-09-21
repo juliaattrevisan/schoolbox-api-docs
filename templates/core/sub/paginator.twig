@@ -8,9 +8,9 @@
                title="Next Page"
                {% if page == 1 %}disabled{% endif %}>‹</a></li>
         {% for currentPage, url in paginator.pageUrls %}
-            <li><a href="{{ url }}"
-                   title="Page {{ currentPage }}"
-                   {% if currentPage == page %}class="current"{% endif %}>{{ currentPage }}</a></li>
+            <li{% if currentPage == page %} class="active"{% endif %}>
+                <a href="{{ url }}" title="Page {{ currentPage }}">{{ currentPage }}</a>
+            </li>
         {% endfor %}
         <li><a href="{{ paginator.urlForPage(min(page+1, paginator.pageCount)) }}"
                title="Previous Page"

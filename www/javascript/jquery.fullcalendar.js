@@ -90,10 +90,14 @@ function Calendar(id, bubbleId, opts) {
 
                 // Prefix booking status for bookings
                 if (calEvent.data.booking) {
-                    data.note = '('+calEvent.data.booking.status.name+') '+calEvent.title
+                    data.bookingStatus = calEvent.data.booking.status.name;
+                    $('[data-event-modal-field="bookingStatus"]').show();
+
+                    data.note = calEvent.title
                 }
                 else {
-                    data.note = calEvent.title
+                    data.note = calEvent.title;
+                    $('[data-event-modal-field="bookingStatus"]').hide();
                 }
                 // Normalize note and title
                 data.title = data.note;
@@ -180,9 +184,9 @@ function Calendar(id, bubbleId, opts) {
                         $.each(calEvent.data.booking.buttons, function() {
                             if (this.href) {
                                 data.bookingActions.push(
-                                    $('<a class="btn float-left" />')
+                                    $('<a class="button" />')
                                         .data('seriesId', calEvent.data.meta.seriesId)
-                                        .addClass(this.class)
+                                        .data('booking-button', this.class)
                                         .attr('href', this.href)
                                         .text(this.label)
                                         .prepend('<span />')
