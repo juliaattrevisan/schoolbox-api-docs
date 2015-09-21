@@ -465,16 +465,16 @@ $(function() {
                             {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
                         {% else %}
                             <dl class="tabs" data-tab data-interaction="tabs">
-                                <dd><a href="#dateSelector">Choose a Time</a></dd>
+                                <dd class="active"><a href="#dateSelector">Choose a Time</a></dd>
                                 <dd><a href="#timetableSelector">Choose from Timetable</a></dd>
                             </dl>
 
                             <div class="tabs-content">
+                                <div class="content active" id="dateSelector">
+                                    {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
+                                </div>
                                 <div class="content" id="timetableSelector">
                                     {% include '@resourceBooking/sub/timetableSelector.twig' with {campusList: campusList} %}
-                                </div>
-                                <div class="content" id="dateSelector">
-                                    {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
                                 </div>
                             </div>
                         {% endif %}
