@@ -457,11 +457,11 @@ $(function() {
                         </label>
 
                         {% include '@resourceItem/sub/rules.twig' with {item: item.resource} %}
-
-                        <label>
-                            Booking Time
-                        </label>
-
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Booking Time</legend>
+                    <div class="small-12 columns">
                         {# Existing items - only show the date and time (for now) #}
                         {# New items - allow choice of timetable or date/time #}
                         {% if item.id %}
@@ -473,10 +473,10 @@ $(function() {
                             </dl>
 
                             <div class="tabs-content">
-                                <div class="content active" id="dateSelector">
+                                <div class="content active no-pad" id="dateSelector">
                                     {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
                                 </div>
-                                <div class="content" id="timetableSelector">
+                                <div class="content no-pad" id="timetableSelector">
                                     {% include '@resourceBooking/sub/timetableSelector.twig' with {campusList: campusList} %}
                                 </div>
                             </div>
