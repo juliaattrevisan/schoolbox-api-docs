@@ -1,75 +1,102 @@
-<h1>Resource Booking Report</h1>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Resource Booking Report</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <!-- Only show if printing -->
+        <h2 class="hide printable">
+            Bookings: {{ search.start.getLongDateOnly() }} – {{ search.end.getLongDateOnly() }},
+            categories:
+            {% if search.category|length == categoryList|length %}
+                All
+            {% else %}
+                {% spaceless %}
+                    {% for categoryId in search.category %}
+                        {{ categoryList[categoryId].getName() }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                {% endspaceless %}
+            {% endif %}
+        </h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <!-- Do not include search form in printable version -->
+        <form action="?" method="get" class="top" data-action="search">
+            <h2 class="subheader">Search Filter Options</h2>
+            <section>
+                <fieldset class="content">
+                    <legend>Dates</legend>
+                    <div class="small-12 large-6 columns">
+                        <label>
+                            From
+                            <input data-datepicker type='text' name="start" value="{{ search.start.getLocalShort() }}" />
+                        </label>
+                    </div>
+                    <div class="small-12 large-6 columns">
+                        <label>
+                            To
+                            <input data-datepicker type='text' name="end" value="{{ search.end.getLocalShort() }}" />
+                        </label>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Categories</legend>
+                    <div class="small-12 columns">
+                        <input id='select-all' type="checkbox" data-selectall="category[]" {% if search.category|length == categoryList|length %}checked{% endif %} />
+                        <label for="select-all" class="checkbox-label">All</label>
+
+                        {% for category in categoryList %}
+                        <input id='category-checkbox-{{ category.getId() }}' type="checkbox" name="category[]" value="{{ category.getId() }}" {% if category.getId() in search.category %}checked{% endif %} />
+                        <label for='category-checkbox-{{ category.getId() }}' class="checkbox-label">
+                            {{ category.getName() }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Show Classes</legend>
+                    <div class="small-12 columns">
+                        <input type="hidden" name="classes" value="0" />
+                        <input id='show-classes-checkbox' type="checkbox" name="classes" value="1" {% if search.classes %}checked{% endif %} />
+                        <label for="show-classes-checkbox" class="checkbox-label">Show Classes</label>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Search" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <div class="directory">
-
-    <!-- Only show if printing -->
-    <h2 class="hide printable">
-        Bookings: {{ search.start.getLongDateOnly() }} – {{ search.end.getLongDateOnly() }},
-        categories:
-        {% if search.category|length == categoryList|length %}
-            All
-        {% else %}
-            {% spaceless %}
-                {% for categoryId in search.category %}
-                    {{ categoryList[categoryId].getName() }}{% if not loop.last %}, {% endif %}
-                {% endfor %}
-            {% endspaceless %}
-        {% endif %}
-    </h2>
-
-    <form method='get' action='?' class="noprint" data-action="search">
-    <h2>Search Filter Options</h2>
-    <table class="standardForm table">
-        <colgroup>
-            <col width="250"/>
-        </colgroup>
-        <tr>
-            <td><h4>From Date</h4></td>
-            <td><input data-datepicker name="start" value="{{ search.start.getLocalShort() }}" /></td>
-        </tr>
-        <tr>
-            <td><h4>To Date</h4></td>
-            <td><input data-datepicker name="end" value="{{ search.end.getLocalShort() }}" />
-            </td>
-        </tr>
-        <tr>
-            <td><h4>Categories</h4></td>
-            <td>
-                <label>
-                    <input type="checkbox"
-                           data-selectall="category[]"
-                           {% if search.category|length == categoryList|length %}checked{% endif %}
-                    />
-                    All
-                </label>
-                {% for category in categoryList %}
-                <label>
-                    <input type="checkbox"
-                           name="category[]"
-                           value="{{ category.getId() }}"
-                           {% if category.getId() in search.category %}checked{% endif %}
-                    />
-                    {{ category.getName() }}
-                </label>
-                {% endfor %}
-            </td>
-        </tr>
-        <tr>
-            <td><h4>Show Classes?</h4></td>
-            <td>
-                <label>
-                    <input type="hidden" name="classes" value="0" />
-                    <input type="checkbox" name="classes" value="1" {% if search.classes %}checked{% endif %} />
-                </label>
-            </td>
-        </tr>
-        <tr>
-            <td></td>
-            <td><input class='submit-btn-plain' type='submit' value='Search' /></td>
-        </tr>
-    </table>
-    </form>
-
     <table class="fullwidth table" data-sortable>
         <thead>
         <tr>
