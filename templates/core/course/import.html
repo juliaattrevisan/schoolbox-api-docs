@@ -1,6 +1,9 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/shared/course/jquery.course-import.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
+<script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript">
 (function($) {
     $(function() {
@@ -26,74 +29,63 @@
             <input type="hidden" name="course_homepage" value="{COURSE_HOMEPAGE_ID}" />
             <input type="hidden" name="component"       value="{COMPONENT_ID}" />
 
-            <table class="standardForm table">
-
-                <tr>
-                    <td class="formLabelWidth">
-                        <h4>Course</h4>
-                        <em>The course that is being imported.</em>
-                    </td>
-                    <td>
+            <section>
+                <fieldset class="content">
+                    <legend>Course</legend>
+                    <div class="small-12 columns">
                         <ul class="breadcrumb">
                             <!-- BEGIN course_breadcrumb -->
                             <li><a href="/homepage/{COURSE_CATEGORY_ID}/">{COURSE_CATEGORY_NAME}</a></li>
                             <!-- END course_breadcrumb -->
                         </ul>
-                    </td>
-                </tr>
-
-                <!-- BEGIN unimportable -->
-                <tr>
-                    <td class="formLabelWidth">
-                        <h4>Units</h4>
-                    </td>
-                    <td>
-                        <em>
-                            The course you have selected contains no units. Please select a course with the
-                            "course" icon.
-                        </em>
-                        <em><a href="/homepage/{HOMEPAGE_ID}#component{COMPONENT_ID}">Return to the class page</a></em>
-                    </td>
-                </tr>
-                <!-- END unimportable -->
-                <!-- BEGIN importable -->
-                <tr>
-                    <td class="formLabelWidth">
-                        <h4>Units</h4>
-                        <em>You will need to set a start and end date for each unit that you want to import.</em>
-                    </td>
-                    <td>
-                        <table class="table">
-                            <tr>
-                                <td>Name</td>
-                                <td>Open Date</td>
-                                <td>Due Date</td>
-                            </tr>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Units</legend>
+                    <!-- BEGIN unimportable -->
+                    <div class="small-12 columns">
+                        <div class="alert-box">
+                            The course you have selected contains no units. Please select a course that has the "course" icon.
+                        </div>
+                    </div>
+                    <!-- END unimportable -->
+                    <!-- BEGIN importable -->
+                    <ul class="information-list">
+                        <li>
                             <!-- BEGIN unit -->
-                            <tr data-type="unit_row" data-enabled="{UNIT_ENABLED}" data-unit_id="{UNIT_ID}">
-                                <td>
-                                    <input name="unit[{UNIT_COUNT}][unit_id]" type="hidden" value="{UNIT_ID}" />
-                                    <input name="unit[{UNIT_COUNT}][import]" type="hidden" value="0" />
-                                    <label for="import-{UNIT_COUNT}">
-                                        <input id="import-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" {UNIT_ENABLED_CHECKED} />
-                                        {UNIT_NAME}
-                                        (<a href="/homepage/{UNIT_ID}" class="unit_name">View</a>)
-                                    </label>
-                                    <input name="unit[{UNIT_COUNT}][unit_instance_id]" type="hidden" value="{UNIT_INSTANCE_ID}" />
-                                </td>
-                                <td>
-                                    <input class="open_date" id="open_date-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][open_date]" type="text" size="15" maxlength="30" value="{UNIT_OPEN_DATE}" data-interaction="datepicker" />
-                                </td>
-                                <td>
-                                    <input class="due_date" id="due_date-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][due_date]" type="text" size="15" maxlength="30" value="{UNIT_DUE_DATE}" data-interaction="datepicker" />
-                                </td>
-                            </tr>
+                            <div class="small-12 columns">
+                                <input name="unit[{UNIT_COUNT}][unit_id]" type="hidden" value="{UNIT_ID}" />
+                                <input name="unit[{UNIT_COUNT}][import]" type="hidden" value="0" />
+                                <fieldset class="switch" tabindex="0">
+                                    <input id="import-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" {UNIT_ENABLED_CHECKED} />
+                                    <label for="import-{UNIT_COUNT}"></label>
+                                </fieldset>
+                                <a href="/homepage/{UNIT_ID}" class="unit_name">{UNIT_NAME}</a>
+                            </div>
+                            <div class="small-12 medium-6 columns" data-hide-watch="#import-{UNIT_COUNT}">
+                                <label for="open_date-{UNIT_COUNT}">Open</label>
+                                <input id="open_date-{UNIT_COUNT}"
+                                       name="unit[{UNIT_COUNT}][open_date]"
+                                       type="text"
+                                       value="{UNIT_OPEN_DATE}"
+                                       data-datepicker
+                                       data-datepicker-sync
+                                       data-datepicker-sync-enddate="#due_date-{UNIT_COUNT}" />
+                            </div>
+                            <div class="small-12 medium-6 columns" data-hide-watch="#import-{UNIT_COUNT}">
+                                <label for="due_date-{UNIT_COUNT}">Due</label>
+                                <input id="due_date-{UNIT_COUNT}"
+                                       name="unit[{UNIT_COUNT}][due_date]"
+                                       type="text"
+                                       value="{UNIT_DUE_DATE}"
+                                       data-datepicker />
+                            </div>
                             <!-- END unit -->
-                        </table>
-                    </td>
-                </tr>
+                        </li>
+                    </ul>
                 <!-- END importable -->
-            </table>
+                </fieldset>
+            </section>
 
             <!-- BEGIN submit -->
             <input type="submit" value="Import" class="submit-btn-plain" />
