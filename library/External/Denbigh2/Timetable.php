@@ -99,10 +99,16 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     {
         $dayNumber = 0;
 
-        $api = new External_Denbigh2_Api('CurrentDay', array());
+        $params = [];
+        if ($date) {
+            $params['Date'] = new Alaress_Date_Format($date, Alaress_Date_Format::TIMESTAMP);
+        } else {
+            $params['Date'] = new Alaress_Date_Format();
+        }
+        $api = new External_Denbigh2_Api('CurrentDay', $params);
 
         if (!$api->hasErrors()) {
-            $dayNumber = $api->getResult()->data[0]->{'Current Day of Cycle'};
+            $dayNumber = $api->getResult()->data[0]->{'Day of Cycle'};
         }
 
         /* Just highlight day 1 by default, I guess
