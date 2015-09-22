@@ -90,8 +90,8 @@
             var template     = doT.template($('script#node-template').html().trim());
             var editTemplate = doT.template($('script#node-edit-template').html().trim());
             var treePanel    = $('.curriculum-selector');
-            var formPanel    = $('.curriculum-editor');
-            var tree         = $('.curriculum-tree').jstree({
+            var formPanel    = $('[data-role="curriculum-editor"]');
+            var tree         = $('[data-role="curriculum-tree"]').jstree({
                 core: {
                     animation: 50,
                     data: treeData,
@@ -161,7 +161,7 @@
                         });
                 })
 
-            var jstree = $.jstree.reference('.curriculum-tree');
+            var jstree = $.jstree.reference('[data-role="curriculum-tree"]');
 
             // resizer - stolen from three panel
             var resizePanels = function() {
@@ -470,6 +470,17 @@
     {% endif %}
 </div>
 
+<div class="row">
+    <div class="small-12 large-6 columns">
+        <div data-role="curriculum-tree"></div>
+    </div>
+    <!-- Dialogs for small screens, separate pane for large -->
+    <div class="hide-for-medium-down large-6 columns">
+        <div data-role="curriculum-editor"></div>
+    </div>
+</div>
+
+{#
 <div class="template2 curriculum-browser">
     <div class="left">
         <div class="pane curriculum-selector">
@@ -483,6 +494,7 @@
         </div>
     </div>
 </div>
+#}
 
 <div data-role="add-area-dialog" title="Create New Learning Area">
     <form action="{{ routeLookup('curriculumLearningArea.create') }}" method="post" data-relation="[name='learningArea']">
