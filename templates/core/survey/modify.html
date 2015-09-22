@@ -100,21 +100,21 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">{ASSESS_ACTION} {ASSESS_KIND}</h2>
-
-        <form name="create" action="/survey/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" class='top' method="post">
+        <form name="create" action="/survey/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" method="post">
             <input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
             <input type="hidden" name="max_attempts" value="1" />
-
-            <section class="content">
-                <label>
-                    Title
-                    <input name="title" type="text" maxlength="100" value="{ASSESS_TITLE}" id="title"/>
-                </label>
-
-                <!-- BEGIN assess_timespan -->
-                <!-- Available from this time -->
-                <div class="row">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Title
+                            <input name="title" type="text" maxlength="100" value="{ASSESS_TITLE}" id="title"/>
+                        </label>
+                    </div>
+                </fieldset>
+                    <!-- BEGIN assess_timespan -->
+                    <!-- Available from this time -->
+                <fieldset class="content">
                     <div class="small-12 large-6 columns">
                         <label>
                             Open Date
@@ -148,10 +148,9 @@
                             </select>
                         </label>
                     </div>
-                </div>
-
-                <!-- Available until this time -->
-                <div class="row">
+                </fieldset>
+                <fieldset class="content">
+                    <!-- Available until this time -->
                     <div class="small-12 large-6 columns">
                         <label>
                             Due Date
@@ -185,36 +184,41 @@
                             </select>
                         </label>
                     </div>
-                </div>
+                </fieldset>
                 <!-- END assess_timespan -->
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Description
+                            <textarea id='description' name="description">{ASSESS_DESCRIPTION}</textarea>
+                        </label>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>
+                            Completion Message
+                            <textarea id='completion-message' name="completion_message">{ASSESS_COMPLETION_MESSAGE}</textarea>
+                        </label>
+                    </div>
+                    <div class="small-12 columns">
+                        <fieldset>
+                            <legend>Options</legend>
 
-                <label>
-                    Description
-                    <textarea id='description' name="description">{ASSESS_DESCRIPTION}</textarea>
-                </label>
+                            <input id="max_attempts" name="max_attempts" type="checkbox" value="0" {MAX_ATTEMPTS_CHECKED} />
+                            <label for="max_attempts" class="checkbox-label">
+                                Participants can submit multiple responses
+                            </label>
 
-                <label>
-                    Completion Message
-                    <textarea id='completion-message' name="completion_message">{ASSESS_COMPLETION_MESSAGE}</textarea>
-                </label>
+                            <input id='anonymous_result' name="anonymous_result" type="checkbox" value="1" {ASSESS_ANONYMOUS_RESULT_CHECKED} />
+                            <label for="anonymous_result" class="checkbox-label">
+                                Anonymise results
+                            </label>
 
-                <fieldset>
-                    <legend>Options</legend>
-
-                    <input id="max_attempts" name="max_attempts" type="checkbox" value="0" {MAX_ATTEMPTS_CHECKED} />
-                    <label for="max_attempts" class="checkbox-label">
-                        Participants can submit multiple responses
-                    </label>
-
-                    <input id='anonymous_result' name="anonymous_result" type="checkbox" value="1" {ASSESS_ANONYMOUS_RESULT_CHECKED} />
-                    <label for="anonymous_result" class="checkbox-label">
-                        Anonymise results
-                    </label>
-
-                    <input id='notify_author' name="notify_author" type="checkbox" value="1" {ASSESS_NOTIFY_AUTHOR_CHECKED} />
-                    <label for="notify_author" class="checkbox-label">
-                        Notify creator via email when response received
-                    </label>
+                            <input id='notify_author' name="notify_author" type="checkbox" value="1" {ASSESS_NOTIFY_AUTHOR_CHECKED} />
+                            <label for="notify_author" class="checkbox-label">
+                                Notify creator via email when response received
+                            </label>
+                        </fieldset>
+                    </div>
                 </fieldset>
             </section>
             <div class="row">
