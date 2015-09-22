@@ -1,6 +1,8 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
 <script type="text/javascript" charset="utf-8" src="/javascript/components/datatables/media/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/javascript/components/datatables/media/css/jquery.dataTables.min.css">
+
 <script type="text/javascript">
     $(function() {
         $('[data-datepicker]').datepicker();
@@ -16,6 +18,7 @@
         /* Results table
          */
         $('table[data-sortable]').DataTable({
+            info: false,
             paging: false,
             searching: false
         });
@@ -153,7 +156,9 @@
                             {% if booking is empty %}
                                 &nbsp;
                             {% else %}
+                            <article>
                                 {{ booking.getNotes()|purify }}
+                            </article>
                             {% endif %}
                         </td>
                     </tr>
