@@ -85,19 +85,20 @@ class MailNotifier extends WorkNotifier {
 
             try {
                 // explicitly an rfc822 email spec, so it sets, not adds
-                $email->setContext($context)->setTo(sprintf("%s <%s>", $user->formatName(), $user->getEmail()));
+                $address = sprintf("%s <%s>", $user->formatName(), $user->getEmail());
+                $email->setContext($context)->setTo($address);
 
                 // away she goes
                 $sent = $email->send();
 
                 // if email sent successfully, ACK, otherwise NACK
                 if($sent) {
-                    $this->log()->notice("Mail sent successfully to user {$user->getUsername()}, dropping messages from queue");
+                    $this->log()->notice("Mail sent successfully to $address, dropping messages from queue");
                     $uq->drain();
                     ++$result;
                 }
                 else {
-                    $this->log()->warning("Failed to email");
+                    $this->log()->warning("Failed to email to $address");
                 }
 
                 unset($uq, $decorator, $email, $user);
