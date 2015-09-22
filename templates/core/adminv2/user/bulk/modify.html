@@ -11,9 +11,13 @@
         /* Count number of things selected
          */
         $('table[data-users="true"] input[data-selectallgroup="users"], input[data-selectall="true"]').click(function(event) {
-            var num = $('table[data-users="true"] input[data-selectallgroup="users"]:checked').length;
-
-            $('span[data-selected="true"]').text(num);
+            setTimeout(
+                function() {
+                    var num = $('table[data-users="true"] input[data-selectallgroup="users"]:checked').length;
+                    $('span[data-selected="true"]').text(num);
+                },
+                10
+            );
         });
 
         $('input[data-action="delete"]').click(function(event) {
