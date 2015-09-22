@@ -130,7 +130,7 @@ class Csv extends Base {
             }
             /* Prescribed 24-hour format from csv, append :00 seconds
              */
-            elseif (preg_match('#^((0\d)|(1\d)|(2[0-3])):([0-5]\d)$#', $start_time)) {
+            elseif (preg_match('#^((0?\d)|(1\d)|(2[0-3])):([0-5]\d)$#', $start_time)) {
                 $startDatetime = new \Alaress_Date_Format("{$start_date} {$start_time}:00", 'd/m/Y H:i:s');
             }
             else {
@@ -150,7 +150,7 @@ class Csv extends Base {
             }
             /* Prescribed 24-hour format from csv, append :00 seconds
              */
-            elseif (preg_match('#^((0\d)|(1\d)|(2[0-3])):([0-5]\d)$#', $finish_time)) {
+            elseif (preg_match('#^((0?\d)|(1\d)|(2[0-3])):([0-5]\d)$#', $finish_time)) {
                 $finishDatetime = new \Alaress_Date_Format("{$finish_date} {$finish_time}:00", 'd/m/Y H:i:s');
             }
             else {
