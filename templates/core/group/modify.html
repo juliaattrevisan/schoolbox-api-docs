@@ -1,67 +1,114 @@
 <!-- BEGIN custom_head -->
-    <style type="text/css">
-        form.ajax {
-            position: relative;
-            min-height: 100%;
-        }
-        form.ajax label {
-            transition: opacity 200ms ease-out;
-        }
-        form.ajaxing {
-            padding-bottom: 32px;
-        }
-        form.ajaxing label {
-            opacity: 0.5;
-        }
-        form.ajax:after {
-            display: block;
-            content: " ";
-            padding: 0 8px;
-            height: 0;
-            border: solid 1px transparent;
-            opacity: 0;
-            transition: opacity 200ms ease-out;
-        }
-        form.ajax.ajaxing:after {
-            height: auto;
-            content: "Saving...";
-            padding: 7px 0;
-            background: #ffe;
-            border-color: #eed;
-            opacity: 1;
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            text-align: center;
-        }
-        .ajax fieldset {
-            margin-left: 32px;
-        }
-    </style>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-<script type="text/javascript" src="/javascript/admin/jquery.makeAdmin.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/selectAll.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/checkboxGroup.js"></script>
+<script type="text/javascript" src="/javascript/data-plugins/hideWatch.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-	$('.makeAdmin').makeAdmin({
-		currentUserId: '{MAKEADMIN_CURRENT_USER_ID}',
-		currentAdminId: '{MAKEADMIN_CURRENT_ADMIN_ID}',
-		super: '{MAKEADMIN_SUPER}'
-	});
+    // Confirm disbandment
+    $('[data-action="disband"]').click(function(event) {
+        event.preventDefault();
+        $(this).confirmDialog({
+            text: 'Are you sure you wish to disband this group? All members of the group will be removed, but all homepage content will remain.',
+            confirmEvent: $.confirmDialog.followHref
+        });
+    });
 
-    $('#members').on('change', '.greenCheck', function() {
-        var input = $(this),
-            data  = {
-                categoryID: '{CATEGORY_ID}',
-                userID: input.attr('rel'),
-                write: input.prop('checked') ? 2 : 1
-            };
+    // On accept/reject: ajax new group list in
+    var waitingList = $('#waitingList');
+    var memberList  = $('#members');
+    waitingList.on('click', '[data-interaction="accept"], [data-interaction="reject"]', function(e) {
+        e.preventDefault();
+        var waitingUser = $(this).closest('[data-relation="waiting-user"]');
+        var label       = waitingUser.find('[data-relation="save-label"]');
+        if ($(this).is('[data-interaction="reject"]')) {
+            label.labelActivate({text: 'Rejecting', css: 'alert'});
+        } else {
+            label.labelActivate({text: 'Accepting'});
+        }
+        // loading dialog
+        $.get(this.href)
+            .done(function(response) {
+                // success stuff. Reload memberlist and waitlist
+                label.labelTimeout({text: 'Done'});
+                label.one('hide.labelTimeout', function() {
+                    var $response = $(response);
+                    waitingList.empty().append($response.find('#waitingList').children());
+                    memberList.empty().append($response.find('#members').children());
+                });
+            })
+            .fail(function() {
+                // failure stuff
+                label.labelTimeout({text: 'Failed!', css: 'alert'});
+            });
+    });
 
-        $.get('/group/modifyForm.php', data);
+    // Admin? Throw the standard warning before allowing this to happen
+    memberList.on('click', '[name^="accessLevel"][value="3"]', function(e) {
+        e.preventDefault();
+        var text = 'Are you sure you wish to change the group\'s admin?';
+        if (!(Number('{MAKEADMIN_SUPER}'))) {
+            text += ' If you make someone else group admin, you will lose your group admin privileges.'
+        }
+        $(this).confirmDialog({
+            text: text,
+            confirmEvent: function(element) {
+                element.prop('checked', !element.prop('checked')).trigger('change');
+            }
+        });
+    });
+
+    // Remove user from group? Another standard warning
+    memberList.on('click', '[name^="accessLevel"][value="0"]', function(e) {
+        e.preventDefault();
+        $(this).confirmDialog({
+            text: 'Are you sure you wish to remove this user from the group?',
+            confirmEvent: function(element) {
+                element.prop('checked', !element.prop('checked')).trigger('change');
+            }
+        });
+    });
+
+    // On change of group form - ajax submit
+    memberList.on('change', '[name^="accessLevel"]', function() {
+        var $this  = $(this);
+        var form   = $this.closest('form');
+        var member = $this.closest('[data-relation="member"]');
+        var label  = member.find('[data-relation="save-label"]');
+
+        // loading dialog
+        if (this.value == 0) {
+            label.labelActivate({text: 'Removing', css: 'alert'});
+        } else {
+            label.labelActivate({text: 'Updating'});
+        }
+
+        // Disable all other inputs
+        var data   = form.serializeArray();
+        var inputs = form.find(':input').not(':disabled').prop('disabled', true);
+
+        $.ajax({url: form.attr('action'), method: form.attr('method'), data: data})
+            .done(function(response) {
+                // success stuff. Reload memberlist and waitlist
+                label.labelTimeout({text: 'Done'});
+                label.one('hide.labelTimeout', function() {
+                    var $response = $(response);
+                    waitingList.empty().append($response.find('#waitingList').children());
+                    memberList.empty().append($response.find('#members').children());
+                });
+            })
+            .fail(function() {
+                // failure stuff
+                label.labelTimeout({text: 'Failed!', css: 'alert'});
+                inputs.prop('disabled', false);
+            });
+
     });
 
     var addUserSelector = $('#addUser');
-    var addUserButton   = addUserSelector.closest('form').find(':submit');
     addUserSelector
         .selectizeSelector({
             multiple: true,
@@ -71,255 +118,283 @@ $(document).ready(function() {
                 data:     {groupID: 0},
                 dataType: 'json'
             }
-        })
-        .on('selectize.item_add', function(event, value) {
-            addUserButton.prop('disabled', false).removeClass('disabled');
-        })
-        .on('selectize.item_remove', function() {
-            // Disable only if empty
-            if ($(this).data('selectize').items.length === 0) {
-                addUserButton.prop('disabled', true).addClass('disabled');
-            }
         });
-
-    $('form.ajax').on('change', 'input', function (event) {
-
-        var input = $(this),
-            dataAttr, ajaxingClass, form, method, action, data;
-
-        updateFieldset(input, 120);
-
-//        if (this.type == 'radio') {
-            dataAttr     = 'wasdisabled';
-            ajaxingClass = 'ajaxing';
-            form         = event.delegateTarget;
-            method       = form.method || 'POST';
-            action       = form.action || '/';
-            data         = $(form).serialize();
-
-            $(form).addClass(ajaxingClass).find('input:not([type=hidden])').each(function () {
-                $(this).data(dataAttr, !!this.disabled).attr('disabled', 'disabled');
-//                console.log('in', this, $(this).data(dataAttr));
-            });
-
-            $.ajax({
-                type: method,
-                url: action,
-                data: data,
-                complete: function () {
-                    $(form).removeClass(ajaxingClass).find('input:not([type=hidden])').each(function () {
-                        var input = $(this);
-//                        console.log('out', this, input.data(dataAttr));
-                        if(!input.data(dataAttr)) {
-                            input.removeAttr('disabled');
-                        }
-                        input.data(dataAttr, undefined);
-                    });
-                }
-            });
-//        }
-
-    });
-
-    // tell all input to hide their fieldsets if appropriate
-    $('input[data-fieldset]').each(function () {
-        updateFieldset($(this), 0);
-    });
-
-
-	$('input.checkAll').each(function () {
-		$(this).mouseup(function () {
-			var node = $(this);
-			$("input." + $(this).attr("id")).each(function () {
-				$(this).prop("checked",  !(node.prop("checked")));
-			});
-		});
-	});
-
-	$('#deleteButton').click(function () {
-		if (confirm('Delete all selected users?'))
-			$('#deleteForm').submit();
-	});
-
-    /**
-     * @param {jQuery} input
-     * @param {Integer} transitionSpeed
-     */
-    function updateFieldset(input, transitionSpeed)
-    {
-        if (input.data('fieldset')) {
-            fieldset = $('#' + input.data('fieldset'));
-
-            if (input.is(':checked')) {
-                fieldset.fadeIn(transitionSpeed).find('input').removeAttr('disabled');
-            } else {
-                fieldset.fadeOut(transitionSpeed).find('input').attr('disabled', 'disabled');
-            }
-        }
-    }
 });
 </script>
 <!-- END custom_head -->
-<h1>User Group Maintenance - {CATEGORY_NAME} <a class="btn go-back" href="/homepage/{CATEGORY_ID}">Return to Homepage</a></h1>
-<div class="">
-	<table class="standardForm table" cellpadding="0" cellspacing="0">
-		<tr>
-			<td class="formLabelWidth"><h4>Group Admin</h4></td>
-			<td>
-				<!-- BEGIN groupOwner -->
-				<a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a>
-				<!-- END groupOwner -->
-				<!-- BEGIN groupUnmanaged -->
-				Unmanaged
-				<!-- END groupUnmanaged -->
-			</td>
-		</tr>
-		<tr>
-			<td valign="top"><h4>Add users</h4>
-				<em>You may add users individually by typing their name and selecting from the list.  Alternatively click the bulk link quickly add many members</em>
-				</td>
-			<td>
-				<form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
-                    <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
-					<input type="submit" value="Add Users" class="submit-btn-plain disabled" disabled />
-				</form>
 
+{BREADCRUMB}
 
+<div class="row actions-small-1">
+    <div class="list-item">
+        <h1>Manage Group</h1>
+    </div>
+    <nav>
+        <a href="#" class="icon-more" data-dropdown="tab-control"></a>
+    </nav>
+    <ul id="tab-control" class="f-dropdown" data-dropdown-content>
+        <!-- BEGIN mail_all -->
+        <li><a href="/mail/createMail.php?replyto=&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;&amp;bcc={EMAILALL}" class="icon-email">Email All Group Members</a></li>
+        <!-- END mail_all -->
+        <li><a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" class="icon-delete" data-action="disband">Disband Group</a></li>
+    </ul>
+</div>
 
-                <a href="/group/bulk/{CATEGORY_ID}" class="btn add float-left"><span></span>Add Bulk Members</a>
-			</td>
-		</tr>
-		<tr>
-			<td valign="top"><h4>Access Type</h4>
-				<em>Restricted groups are private. Moderated allows users to join, but only access once approved.  Free groups can be joined and left by anyone.  See the <a href="/group/join">group page</a> for available groups.</em>
-				</td>
-				<td>
-                    <form class="ajax" action="/group/modifyForm.php" method="post" id="type_form">
-                        <input type="hidden" name="categoryID" value="{CATEGORY_ID}">
-                        <label>
-                            <input name="type" type="radio" value="1" {GROUP_TYPE_1} /> Restricted
-                        </label>
-                        <label>
-                            <input name="type" type="radio" value="2" {GROUP_TYPE_2} /> Moderated
-                        </label>
-                        <label>
-                            <input name="type" type="radio" value="3" {GROUP_TYPE_3} /> Free
-                        </label>
-				    </form>
-                </td>
-		</tr>
-        <!-- BEGIN msg_enabled -->
-        <tr>
-            <td>
-                <h4>Messages</h4>
-                <em>
-                    Whether or not messages are enabled for this group.
-                    If 'force follow' is disabled, users can still opt in or out of receiving messages.
-                </em>
-            </td>
-            <td>
-                <form class="ajax" action="/group/modifyForm.php" method="post" id="follow_form">
-                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}">
-                    <input type="hidden" name="msg[enabled]" value="0" />
-                    <label>
-                        <input data-fieldset="ffollow" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} /> Messages enabled
-                    </label>
-                    <fieldset id="ffollow">
-                        <input name="msg[force_follow]" type="hidden" value="0" />
-                        <label>
-                            <input name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} /> Force Follow
-                        </label>
-                    </fieldset>
+<div class="row">
+    <div class="small-12 island">
+        <ul class="tabs" data-tab>
+            <li class="tab-title active"><a href="#members">Current Members</a></li>
+            <li class="tab-title"><a href="#waitingList">Waiting List</a></li>
+            <li class="tab-title"><a href="#addMembers">Add Members</a></li>
+            <li class="tab-title"><a href="#settings">Settings</a></li>
+        </ul>
 
-                    <!-- BEGIN default_follow -->
-                    <label>
-                        <input name="follow" type="radio" value="{FOLLOW_VALUE}" {FOLLOW_SELECTED} /> {FOLLOW_LABEL}
-                    </label>
-                    <!-- END default_follow -->
-                </form>
-            </td>
-        </tr>
-        <!-- END msg_enabled -->
-		<tr>
-			<td valign="top"><h4>Members</h4>
-				<em>You can give write access to any member of the group, this will enable them to post resources and moderate the forum.  Only one user may be the group admin and it cannot be a student.  Making another user the group admin will relinquish your control over the group.</em>
-				</td>
-				<td>
-				<form action="/group/modifyForm.php" method="post" id="deleteForm">
-					<table id="members" class="table ruler">
-						<tr>
-							<th style="width: 20px; text-align: center;"><input type="checkbox" class="checkAll" id="delCheck" /></th>
-							<th>Name</th>
-							<th style="text-align: center;">Write</th>
-							<th style="text-align: center;">Delete</th>
-                            <!-- BEGIN msg_enabled_followth -->
-							<th style="text-align: center;">Following</th>
-                            <!-- END msg_enabled_followth -->
-							<th style="text-align: center; white-space: nowrap;">Make Admin </th>
-						</tr>
-						<!-- BEGIN member -->
-						<tr>
-							<td style="text-align: center;"><input class="delCheck" type="checkbox" name="delete[]" value="{USER_ID}"  /></td>
-							<td style="white-space: nowrap;"><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
-							<td style="text-align: center;"><input class="greenCheck" type="checkbox" rel="{USER_ID}" {GROUP_CHECKED} /></td>
-							<td style="text-align: center;"><a href="/group/modifyForm.php?delete={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Remove {USER_JAVA}?');">Delete</a></td>
-                            <!-- BEGIN msg_enabled_userfollow -->
-                            <td style="text-align: center;">{USER_FOLLOWING}</td>
-                            <!-- END msg_enabled_userfollow -->
-							<td style="text-align: center; white-space: nowrap;">
-                                <!-- BEGIN make_owner -->
-								<a href='#' class='makeAdmin' data-userid='{USER_ID}' data-categoryid='{CATEGORY_ID}' data-username="{USER_JAVA}">Make Admin</a>
-								<!-- END make_owner -->
-                            </td>
-						</tr>
-						<!-- END member -->
-					</table>
-					<p class="clearfix">
-						<input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
-						<input type="button" id="deleteButton" value="Delete Selected" class="submit-btn-plain" />
+        <section>
+            <div class="tabs-content no-margin">
+                <div class="content active" id="members">
+                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                    <!-- BEGIN groupUnmanaged -->
+                    <div class="alert-box">This group currently has no administrator.</div>
+                    <!-- END groupUnmanaged -->
 
-					</p>
+                    <!-- BEGIN msg_enabled_followth -->
 
-				</form>
-                    <!-- BEGIN mail_all -->
-                    <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
-                        <input type="hidden" name="replyto" value="&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;"/>
-                        <input type="hidden" name="bcc"     value="{EMAILALL}"/>
-                        <a href="#" class="btn submit-this float-left email "><span></span>Email All</a>
+                    <!-- END msg_enabled_followth -->
+                    <ul class="information-list">
+                        <!-- BEGIN groupOwner -->
+                        <li class="actions" data-relation="member">
+                            <div class="small-12 medium-6 columns no-pad">
+                                <div class="avatar card">
+                                    <!-- BEGIN msg_enabled_followadmin -->
+
+                                    <!-- END msg_enabled_followadmin -->
+                                    <a href="/search/user/{OWNER_ID}">
+                                        <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
+                                        {GROUP_OWNER}
+                                    </a>
+                                    <p class="meta icon-favourite">Group Admin</p>
+                                </div>
+                            </div>
+                            <div class="small-12 medium-6 columns no-pad">
+                                <div class="actions-small-4">
+                                    <nav>
+                                        <form action="/group/modifyForm.php" method="post" class="no-margin">
+                                            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                                            <input id="accessLevel-{OWNER_ID}-1" type="radio" name="accessLevel[{OWNER_ID}]" value="1" />
+                                            <label for="accessLevel-{OWNER_ID}-1" class="radio-toggle">
+                                                <span class="icon-view" title="Grant Read Access"></span>
+                                            </label>
+                                            <input id="accessLevel-{OWNER_ID}-2" type="radio" name="accessLevel[{OWNER_ID}]" value="2" />
+                                            <label for="accessLevel-{OWNER_ID}-2" class="radio-toggle">
+                                                <span class="icon-modify" title="Grant Write Access"></span>
+                                            </label>
+                                            <input id="accessLevel-{OWNER_ID}-3" type="radio" name="accessLevel[{OWNER_ID}]" value="3" checked />
+                                            <label for="accessLevel-{OWNER_ID}-3" class="radio-toggle">
+                                                <span class="icon-favourite" title="Make Admin"></span>
+                                            </label>
+                                            <input id="accessLevel-{OWNER_ID}-0" type="radio" name="accessLevel[{OWNER_ID}]" value="0" disabled />
+                                            <label for="accessLevel-{OWNER_ID}-0" class="radio-toggle">
+                                                <span class="icon-close alert" title="Remove From Group"></span>
+                                            </label>
+                                        </form>
+                                    </nav>
+                                </div>
+                            </div>
+                            <span class="label full-width hide" data-relation="save-label"></span>
+                        </li>
+                        <!-- END groupOwner -->
+
+                        <!-- BEGIN member -->
+                        <li class="actions" data-relation="member">
+                            <div class="small-12 medium-6 columns no-pad">
+                                <div class="avatar card">
+                                    <a href="/search/user/{USER_ID}">
+                                        <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
+                                        {USER_NAME}
+                                    </a>
+                                    <p class="meta {USER_ICON}">
+                                        {USER_LEVEL}<!-- BEGIN msg_enabled_usermute -->; Muted<!-- END msg_enabled_usermute -->
+                                        <!-- BEGIN msg_enabled_userfollow -->
+                                        <!-- END msg_enabled_userfollow -->
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="small-12 medium-6 columns no-pad">
+                                <div class="actions-small-4">
+                                    <nav>
+                                        <!-- BEGIN make_owner -->
+                                        <!-- END make_owner -->
+                                        <form action="/group/modifyForm.php" method="post" class="no-margin">
+                                            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                                            <input id="accessLevel-{USER_ID}-1" type="radio" name="accessLevel[{USER_ID}]" value="1" {READ_CHECKED} />
+                                            <label for="accessLevel-{USER_ID}-1" class="radio-toggle">
+                                                <span class="icon-view" title="Grant Read Access"></span>
+                                            </label>
+                                            <input id="accessLevel-{USER_ID}-2" type="radio" name="accessLevel[{USER_ID}]" value="2" {WRITE_CHECKED} />
+                                            <label for="accessLevel-{USER_ID}-2" class="radio-toggle">
+                                                <span class="icon-modify" title="Grant Write Access"></span>
+                                            </label>
+                                            <input id="accessLevel-{USER_ID}-3" type="radio" name="accessLevel[{USER_ID}]" value="3" {ADMIN_ALLOWED} />
+                                            <label for="accessLevel-{USER_ID}-3" class="radio-toggle">
+                                                <span class="icon-favourite" title="Make Admin"></span>
+                                            </label>
+                                            <input id="accessLevel-{USER_ID}-0" type="radio" name="accessLevel[{USER_ID}]" value="0" />
+                                            <label for="accessLevel-{USER_ID}-0" class="radio-toggle">
+                                                <span class="icon-close alert" title="Remove From Group"></span>
+                                            </label>
+                                        </form>
+                                    </nav>
+                                </div>
+
+                               <!--
+                               <div class="actions-small-3">
+                                    <nav>
+                                        <a href="#" class="icon-modify {WRITE_SELECTED}" title="Grant Write Access"></a>
+                                        <a href="#" class="icon-favourite {ADMIN_ALLOWED}" title="Make Admin"></a>
+                                        <a href="#" class="icon-close alert" title="Remove From Group"></a>
+                                    </nav>
+                                </div>
+                                -->
+                            </div>
+                            <span class="label full-width hide" data-relation="save-label"></span>
+                        </li>
+                        <!-- END member -->
+                    </ul>
+                </div>
+
+                <div class="content" id="waitingList">
+                    <!-- BEGIN authorisation -->
+                    <ul class="information-list">
+                        <!-- BEGIN waiting -->
+                        <li class="actions-small-2" data-relation="waiting-user">
+                            <div class="list-item">
+                                <div class="small-12 avatar card">
+                                    <a href="/search/user/{WAITING_ID}">
+                                        <img src="/portrait.php?userId={WAITING_EXTERNAL_ID}&size=square64" />
+                                        {WAITING_NAME}
+                                    </a>
+                                </div>
+                            </div>
+                            <nav>
+                                <a href="/group/modifyForm.php?categoryID={CATEGORY_ID}&amp;accept={WAITING_ID}" data-interaction="accept" class="icon-add" title="Approve Membership"></a>
+                                <a href="/group/modifyForm.php?categoryID={CATEGORY_ID}&amp;reject={WAITING_ID}" data-interaction="reject" class="icon-close alert" title="Reject Membership"></a>
+                            </nav>
+                            <span class="label full-width hide" data-relation="save-label"></span>
+                        </li>
+                        <!-- END waiting -->
+                    </ul>
+                    <!-- END authorisation -->
+                </div>
+
+                <div class="content" id="addMembers">
+                    <ul class="tabs" data-tab>
+                        <li class="tab-title active"><a href="#userName">From Name</a></li>
+                        <li class="tab-title"><a href="#userGroups">From Group</a></li>
+                        <li class="tab-title"><a href="#userRoles">From Role</a></li>
+                        <li class="tab-title"><a href="#userList">From List</a></li>
+                    </ul>
+                    <section>
+                        <div class="tabs-content no-margin">
+                            <div class="content active" id="userName">
+                                <form action="/group/modifyForm.php" method="post" class="no-margin">
+                                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                                    <label for="addUser">
+                                        Add Members
+                                        <span data-tooltip class="has-tip tip-top hint" title="You may add users individually by typing their name and selecting from the list.">?</span>
+                                    </label>
+                                    <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
+                                    <input type="submit" value="Add Users" />
+                                </form>
+                            </div>
+
+                            <div class="content" id="userGroups">
+                                <form action="/group/addUserByGroup.php?type=individual&destinationID={CATEGORY_ID}" method="post" class="no-margin">
+                                    <input type="hidden" name="individualGroupID" id="individualGroupID" />
+                                    <label for="addUsersByIndividualGroup">
+                                        Group
+                                        <span data-tooltip class="has-tip tip-top hint" title="Add all users that belong to another group.">?</span>
+                                    </label>
+                                    <input id="addUsersByIndividualGroup" type="text" size="30" placeholder="Search User Groups" />
+                                    <input type="submit" value="Add Users" />
+                                </form>
+                            </div>
+
+                            <div class="content" id="userRoles">
+                                <form action="/group/addUserByGroup.php?type=system&destinationID={CATEGORY_ID}" method="post" class="no-margin">
+                                    <input type="hidden" name="systemGroupID" id="systemGroupID" />
+                                    <label for="addUsersBySystemGroup">
+                                        Role
+                                        <span data-tooltip class="has-tip tip-top hint" title="Add all users of a particular role in the system.">?</span>
+                                    </label>
+                                    <input id="addUsersBySystemGroup" type="text" size="30" placeholder="Search User Roles" />
+                                    <input type="submit" value="Add Users" />
+                                </form>
+                            </div>
+
+                            <div class="content" id="userList">
+                                <form action="/group/modifyForm.php" method="post" class="no-margin">
+                                    <label for="addUsersByList">
+                                        User List
+                                        <span data-tooltip class="has-tip tip-top hint" title="Add a list of users (either external user IDs or Schoolbox usernames).">?</span>
+                                    </label>
+                                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                                    <textarea name="bulkAdd" id="addUsersByList" cols="30" rows="20"></textarea>
+                                    <input type="submit" value="Add Users" />
+                                </form>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="content" id="settings">
+                    <form action="/group/modifyForm.php" method="post" class="no-margin">
+                        <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                        <div class="row">
+                            <div class="small-12 medium-6 columns">
+                                <fieldset class="content">
+                                    <legend>Access</legend>
+                                    <input id="type-1" name="type" type="radio" value="1" {GROUP_TYPE_1} />
+                                    <label for="type-1" class="radio-label">
+                                        Restricted
+                                        <span data-tooltip class="has-tip tip-top hint" title="Membership is only by invitation from a group admin.">?</span>
+                                    </label>
+                                    <input id="type-2" name="type" type="radio" value="2" {GROUP_TYPE_2} />
+                                    <label for="type-2" class="radio-label">
+                                        Moderated
+                                        <span data-tooltip class="has-tip tip-top hint" title="Users may request membership, but must be approved by a group admin.">?</span>
+                                    </label>
+                                    <input id="type-3" name="type" type="radio" value="3" {GROUP_TYPE_3} />
+                                    <label for="type-3" class="radio-label">
+                                        Free
+                                        <span data-tooltip class="has-tip tip-top hint" title="Users may join and leave at any time, without approval.">?</span>
+                                    </label>
+                                </fieldset>
+                            </div>
+                            <!-- BEGIN msg_enabled -->
+                            <div class="small-12 medium-6 columns">
+                                <fieldset class="content">
+                                    <legend>Messaging</legend>
+                                    <input type="hidden" name="msg[enabled]" value="0" />
+                                    <input id="msg-enabled" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} />
+                                    <label for="msg-enabled" class="checkbox-label">Messages enabled</label>
+
+                                    <!-- Hide this if messaging isn't enabled -->
+                                    <div data-hide-watch="#msg-enabled">
+                                        <input name="msg[force_follow]" type="hidden" value="0" />
+                                        <input id="msg-force-follow" name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} />
+                                        <label for="msg-force-follow" class="checkbox-label">
+                                            Force Follow
+                                            <span data-tooltip class="has-tip tip-top hint" title="Group members may not opt out of receiving messages if Force Follow is enabled.">?</span>
+                                        </label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <!-- END msg_enabled -->
+                        <input type="submit" name="Submit" />
                     </form>
-                    <!-- END mail_all -->
-				</td>
-		</tr>
-
-		<!-- BEGIN authorisation -->
-		<tr>
-			<td><h4>Awaiting Authorisation</h4>
-				<em>These users are currently awaiting your authorisation to join this group</em>
-				</td>
-				<td><form action="/group/modifyForm.php" method="post" id="acceptForm">
-					<table class="table">
-						<tr>
-							<th style="width: 20px; text-align: center;"><input type="checkbox" class="checkAll" id="acceptCheck" /></th>
-							<th>Name</th>
-							<th style="text-align: center;">Add</th>
-						</tr>
-						<!-- BEGIN waiting -->
-						<tr>
-							<td style="text-align: center;"><input class="acceptCheck" type="checkbox" name="accept[]" value="{WAITING_ID}" /></td>
-							<td><a href="/search/user/{WAITING_ID}">{WAITING_NAME}</a></td>
-							<td style="text-align: center;"><a href="/group/modifyForm.php?accept={WAITING_ID}&categoryID={CATEGORY_ID}">Add</a></td>
-						</tr>
-						<!-- END waiting -->
-					</table>
-					<input type="hidden" class="hide" name="categoryID" value="{CATEGORY_ID}" />
-					<input type="submit" value="Accept Selected" class="submit-btn-plain" />
-				</form></td>
-		</tr>
-		<!-- END authorisation -->
-		<tr>
-			<td valign="top"><h4>Disband Group</h4>
-				<em>Removes all members of the group including admin, but leaves all content</em></td>
-				<td><a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" onclick="return confirm('Disband this group?');">Disband Now</a></td>
-		</tr>
-	</table>
+                </div>
+            </div>
+        </section>
+    </div>
 </div>

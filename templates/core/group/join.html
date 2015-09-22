@@ -1,86 +1,64 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript">
-    $(document).ready(function () {
-        $('.greenCheck').click(function () {
-            var data;
-            if ($(this).is(':checked')) {
-                data = {
-                    join : $(this).attr('rel'),
-                    ajax : 1
-                }
+<div class="row">
+    <div class="list-item">
+        <h1>Join Groups</h1>
+    </div>
+</div>
 
-                $(this).prop('checked', true);
-            }
-            else {
-                data = {
-                    leave : $(this).attr('rel'),
-                    ajax : 1
-                }
+<div class="row">
+    <div class="small-12 island">
+        <form action="/group/joinForm.php" method="post">
+            <section>
+                <fieldset class="content">
+                    <legend>
+                        Free Access
+                        <span data-tooltip
+                              class="has-tip tip-top hint"
+                              title="These groups are free to join.
+                                     Once you have selected the group you will have access to the content available in the group.">?</span>
+                    </legend>
+                    <div class="small-12 columns">
+                        <fieldset class="checklist">
+                            <!-- BEGIN free_list -->
+                            <input name="group[{GROUP_ID}]" value="0" type="hidden" />
+                            <input id="freeList-{GROUP_ID}" name="group[{GROUP_ID}]" value="1" type="checkbox" {GROUP_CHECKED} />
+                            <label for="freeList-{GROUP_ID}">{GROUP_NAME}</label>
+                            <!-- END free_list -->
+                        </fieldset>
+                    </div>
+                </fieldset>
+            </section>
 
-                $(this).prop('checked', false);
-            }
+            <section>
+                <fieldset class="content">
+                    <legend>
+                        Moderated Access
+                        <span data-tooltip
+                              class="has-tip tip-top hint"
+                              title="These groups are moderated.
+                              Once you have selected the group you must wait for the group admin to authorise your application.">?</span>
+                    </legend>
+                    <div class="small-12 columns">
+                        <fieldset class="checklist">
+                            <!-- BEGIN moderated_list -->
+                            <input name="group[{GROUP_ID}]" value="0" type="hidden" />
+                            <input id="moderatedList-{GROUP_ID}" name="group[{GROUP_ID}]" value="1" type="checkbox" {GROUP_CHECKED} />
+                            <label for="moderatedList-{GROUP_ID}">
+                                {GROUP_NAME}
+                                <!-- BEGIN waiting -->
+                                <em>(Waiting on authorisation)</em>
+                                <!-- END waiting -->
+                            </label>
+                            <!-- END moderated_list -->
+                        </fieldset>
+                    </div>
+                </fieldset>
+            </section>
 
-            $.get('/group/joinForm.php', data);
-        });
-
-        $(':checkbox').each(function () {
-            if ($(this).is(':checked')) {
-                $(this).parent().addClass('active-checkbox');
-            }
-        })
-
-        $(':checkbox').click(function () {
-            if ($(this).parent().hasClass('active-checkbox')) {
-                $(this).parent().removeClass('active-checkbox')
-
-            } else {
-                $(this).parent().addClass('active-checkbox');
-            }
-        });
-    });
-</script>
-
-<!-- END custom_head -->
-<h1>Manage Groups</h1>
-<table class="standardForm table">
-    <tr>
-        <td class="formLabelWidth">
-            <h4>Free Access</h4>
-        </td>
-        <td>
-            <p>These groups are free to join. Once you have selected the group you will have access to the content
-                available in the group</p>
-            <ul>
-                <!-- BEGIN free_list -->
-                <li>
-                    <label>
-                        <input class="greenCheck" type="checkbox" rel="{GROUP_ID}" {GROUP_CHECKED} /> {GROUP_NAME}
-                    </label>
-                </li>
-                <!-- END free_list -->
-            </ul>
-        </td>
-    </tr>
-    <tr>
-        <td class="formLabelWidth">
-            <h4>Moderated Access </h4>
-        </td>
-        <td>
-
-            <p>These groups are moderated. Once you have selected the group you must wait for the group admin to
-                authorise your application. </p>
-            <ul>
-                <!-- BEGIN moderated_list -->
-                <li>
-                    <label>
-                        <input class="greenCheck" type="checkbox" rel="{GROUP_ID}" {GROUP_CHECKED} /> {GROUP_NAME}
-                    </label>
-                </li>
-                <!-- BEGIN waiting -->
-                <em>(Waiting on authorisation)</em><!-- END waiting --></li>
-                <!-- END moderated_list -->
-            </ul>
-        </td>
-    </tr>
-</table>
-	 
+            <div class="row">
+                <div class="small-12 column">
+                    <input type="submit" value="Join Selected Groups" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

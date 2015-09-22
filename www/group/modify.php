@@ -2,17 +2,19 @@
 
 
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 
 $this->setFile(TEMPLATE_content, 'group/modify.html');
 $this->setBlock(TEMPLATE_content, 'groupOwner', 'groupOwner_block');
+$this->setBlock('groupOwner', 'msg_enabled_followadmin', 'msg_enabled_followadmin_block');
 $this->setBlock(TEMPLATE_content, 'groupUnmanaged', 'groupUnmanaged_block');
 $this->setBlock(TEMPLATE_content, 'member', 'member_block');
 $this->setBlock('member', 'make_owner', 'make_owner_block');
 $this->setBlock('member', 'msg_enabled_userfollow', 'msg_enabled_userfollow_block');
+$this->setBlock('member', 'msg_enabled_usermute', 'msg_enabled_usermute_block');
 
 $this->setBlock(TEMPLATE_content, 'msg_enabled', 'msg_enabled_block');
-$this->setBlock('msg_enabled', 'default_follow', 'default_follow_block');
 
 $this->setBlock(TEMPLATE_content, 'msg_enabled_followth', 'msg_enabled_followth_block');
 
@@ -43,10 +45,11 @@ if (is_numeric($this->arg[0])) {
 
     $this->setVar(
         array(
-            'groupOwner_block'           => '',
-            'groupUnmanaged_block'       => '',
-            'msg_enabled_followth_block' => '',
-            'msg_enabled_block'          => ''
+            'groupOwner_block'              => '',
+            'groupUnmanaged_block'          => '',
+            'msg_enabled_followth_block'    => '',
+            'msg_enabled_followadmin_block' => '',
+            'msg_enabled_block'             => ''
         )
     );
 
@@ -59,8 +62,6 @@ if (is_numeric($this->arg[0])) {
                     );
 
     $this->setVar($output);
-
-    $this->setVar('default_follow_block', '');
 
     $search = array(
         'user_id'        => 0,
@@ -117,10 +118,12 @@ if (is_numeric($this->arg[0])) {
     if ($folderOwner instanceof \Schoolbox\Permission\Access\UserAccess) {
         $this->setVar(
             array(
-                'GROUP_OWNER' => $folderOwner->getUser()->formatName(),
-                'OWNER_ID'    => $folderOwner->getUser()->getId(),
+                'GROUP_OWNER'       => Scrub::text($folderOwner->getUser()->formatName()),
+                'OWNER_ID'          => Scrub::text($folderOwner->getUser()->getId()),
+                'OWNER_EXTERNAL_ID' => Scrub::text($folderOwner->getUser()->getExternalId()),
             )
         );
+        $this->parse('msg_enabled_followadmin_block', 'msg_enabled_followadmin');
         $this->parse('groupOwner_block', 'groupOwner');
     } else {
         $this->parse('groupUnmanaged_block', 'groupUnmanaged');
@@ -159,19 +162,49 @@ if (is_numeric($this->arg[0])) {
                 $member['uid']
             );
 
-            $output = array('USER_NAME'		=> $userHandler->formatName($member),
-                            'USER_JAVA'		=> addslashes($userHandler->formatName($member)),
-                            'USER_ID'		=> $member['uid'],
-                            'GROUP_CHECKED'	=> $member['type'] > 1 ? 'checked=\'checked\'' : '',
-                            'USER_FOLLOWING' => $following ? 'Yes' : 'No'
-                            );
+            $userLevel = 'icon-close';
+            $userIcon  = 'None';
+            switch ($member['type']) {
+                case UserAccess::ACCESS_READ:
+                    $userLevel = 'Read Access';
+                    $userIcon  = 'icon-view';
+                    break;
+                case UserAccess::ACCESS_WRITE:
+                    $userLevel = 'Write Access';
+                    $userIcon  = 'icon-modify';
+                    break;
+                case UserAccess::ACCESS_FULL:
+                    $userLevel = 'Group Admin';
+                    $userIcon  = 'icon-favourite';
+                    break;
+                default:
+                    break;
+            }
+            $output = array(
+                'USER_NAME'           => $userHandler->formatName($member),
+                'USER_JAVA'           => addslashes($userHandler->formatName($member)),
+                'USER_ID'             => $member['uid'],
+                'USER_EXTERNAL_ID'    => Scrub::text($member['synergy_id']),
+                'GROUP_CHECKED'       => $member['type'] > 1 ? 'checked=\'checked\'' : '',
+                'READ_SELECTED'       => $member['type'] == UserAccess::ACCESS_READ ? 'selected' : '',
+                'WRITE_SELECTED'      => $member['type'] == UserAccess::ACCESS_WRITE ? 'selected' : '',
+                'READ_CHECKED'        => $member['type'] == UserAccess::ACCESS_READ ? 'checked' : '',
+                'WRITE_CHECKED'       => $member['type'] == UserAccess::ACCESS_WRITE ? 'checked' : '',
+                'USER_FOLLOWING'      => $following ? 'Yes' : 'No',
+                'USER_FOLLOWING_ICON' => $following ? 'icon-tick' : 'icon-mute',
+                // Stylage
+                'ADMIN_ALLOWED'       => $groupHandler->allowOwner($member['uid']) ? '' : 'disabled',
+                'USER_LEVEL'          => $userLevel,
+                'USER_ICON'           => $userIcon,
+            );
 
             $this->setVar($output);
 
 
             $this->setVar(array(
                 'make_owner_block'             => '',
-                'msg_enabled_userfollow_block' => ''
+                'msg_enabled_userfollow_block' => '',
+                'msg_enabled_usermute_block'   => '',
             ));
 
             if ($groupHandler->allowOwner($member['uid'])) {
@@ -179,7 +212,11 @@ if (is_numeric($this->arg[0])) {
             }
 
             if ($messagingEnabled) {
-                $this->parse('msg_enabled_userfollow_block', 'msg_enabled_userfollow');
+                if ($following) {
+                    $this->parse('msg_enabled_userfollow_block', 'msg_enabled_userfollow');
+                } else {
+                    $this->parse('msg_enabled_usermute_block', 'msg_enabled_usermute');
+                }
             }
 
             $this->parse('member_block', 'member', true);
@@ -204,10 +241,11 @@ if (is_numeric($this->arg[0])) {
     $waitingList = $groupHandler->getWaitingList($category->getId());
     if (is_array($waitingList)) {
         foreach ($waitingList as $waiting) {
-            $output = array('WAITING_NAME' => $userHandler->formatName($waiting),
-                            'WAITING_ID' => $waiting['uid'],
-
-                            );
+            $output = array(
+                'WAITING_NAME'        => $userHandler->formatName($waiting),
+                'WAITING_ID'          => $waiting['uid'],
+                'WAITING_EXTERNAL_ID' => Scrub::text($waiting['synergy_id']),
+            );
             $this->setVar($output);
             $this->parse("waiting_block", "waiting", true);
         }
@@ -228,6 +266,20 @@ if (is_numeric($this->arg[0])) {
             : '',
         'MAKEADMIN_SUPER' => isset($_SESSION['su']) ? $_SESSION['su'] : 0
     ));
+
+    $trail = new \Schoolbox\Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $category->getName(),
+            'href' => "/homepage/{$category->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Manage Group',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 } else {
     error(2);
 }

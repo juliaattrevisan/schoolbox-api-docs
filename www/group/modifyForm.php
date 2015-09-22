@@ -22,30 +22,46 @@ $catMapper = CategoryMapper::getInstance();
 $userMapper = UserMapper::getInstance();
 $groupMapper = GroupMapper::getInstance();
 
-if(!is_numeric($_REQUEST['categoryID'])) {
+$categoryId = $_REQUEST['categoryID'];
+
+try {
+	$folder = $catMapper->findById($categoryId);
+} catch (\Schoolbox\Mapper\Exception $e) {
+	error(2);
+	exit;
+}
+
+if(!is_numeric($categoryId)) {
 	error(2);
 }
 
 /* Check access */
-if($groupHandler->getPermission($_REQUEST['categoryID']) < FULL_ACCESS) {
+if($groupHandler->getPermission($categoryId) < FULL_ACCESS) {
 	error(19);
+}
+
+// Handle disbandment before anything else
+if (isset($_GET['disband'])) {
+	$groupHandler->disbandGroup($_GET['categoryID']);
+	SitePage::localRedir('/');
 }
 
 if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
     /** @var \Schoolbox\Resource\Group $group */
     try {
-        $group = $groupMapper->findOneByColumn('cid', $_REQUEST['categoryID']);
+        $group = $groupMapper->findOneByColumn('cid', $categoryId);
     } catch (\Schoolbox\Mapper\Exception $e) {
         $group = $groupMapper->createModel();
         // yes, group category doesn't map to an actual category.
         // no, I'm not fixing it right now, but will at least check it exists.
-        try {
-            $catMapper->findById($_REQUEST['categoryID']);
-            $group->setCategory($_REQUEST['categoryID']);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            header(':', true, 404);
-            die("The specified folder ({$_REQUEST['categoryID']}) does not exist.");
-        }
+        $group->setCategory($categoryId);
+//        try {
+//            $catMapper->findById($categoryId);
+//            $group->setCategory($categoryId);
+//        } catch (\Schoolbox\Mapper\Exception $e) {
+//            header(':', true, 404);
+//            die("The specified folder ({$categoryId}) does not exist.");
+//        }
     }
 
     if (isset($_POST['type'])) {
@@ -87,52 +103,55 @@ if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
     }
 
     $groupMapper->save($group);
-//    header(':', true, $_POST['debug'] ? 200 : 204);
-    header(':', true, 204);
-    exit;
 }
 
-/* Change write permission */
-elseif(is_numeric($_GET['write']) && is_numeric($_GET['userID'])) {
-	$ua->setServiceIdentifier($_GET['categoryID'])
-	   ->setUser($userMapper->findById($_GET['userID']))
-	   ->setAccessLevel($_GET['write']);
-	$uaMapper->save($ua);
-}
+/* Change write permission - no longer done via link, always done via form */
+//elseif(is_numeric($_GET['write']) && is_numeric($_GET['userID'])) {
+//	$ua->setServiceIdentifier($_GET['categoryID'])
+//	   ->setUser($userMapper->findById($_GET['userID']))
+//	   ->setAccessLevel($_GET['write']);
+//	$uaMapper->save($ua);
+//}
 
 /* Delete user */
-elseif(isset($_REQUEST['delete'])) {
+if(isset($_REQUEST['delete'])) {
 	if(isset($_REQUEST['service'])) {
 		$groupHandler->setService($_REQUEST['service']);
 	}
 
 	foreach((array)$_REQUEST['delete'] as $id) {
 		if(is_numeric($id)) {
-			$groupHandler->deleteUser($_REQUEST['categoryID'], $id);
+			$groupHandler->deleteUser($categoryId, $id);
 		}
 	}
-
-	$page->backToTheFuture(1);
 }
 
-/* Accept user */
-elseif(isset($_REQUEST['accept'])) {
+/* Accept/reject user */
+if(isset($_REQUEST['accept'])) {
 	foreach((array)$_REQUEST['accept'] as $id) {
 		if (is_numeric($id)) {
 			$ua->setAccessLevel(UserAccess::ACCESS_READ)
 			   ->setUser($userMapper->findById($id))
-			   ->setServiceIdentifier($_REQUEST['categoryID']);
+			   ->setServiceIdentifier($categoryId);
 			$uaMapper->save($ua);
 		}
 	}
-
-	SitePage::localRedir('/group/modify/' . $_REQUEST['categoryID']);
+}
+if (isset($_REQUEST['reject'])) {
+	foreach ((array)$_REQUEST['reject'] as $id) {
+		if (is_numeric($id)) {
+			$uaMapper->deleteByColumnList([
+				'service' => UserAccess::SERVICE_HOMEPAGE,
+				'uid'     => $id,
+				'sid'     => $categoryId,
+			]);
+		}
+	}
 }
 
 /* Add user */
-elseif(isset($_POST['userID'])) {
-	$ua->setServiceIdentifier($_GET['categoryID']);
-    $folder = $catMapper->findById($_GET['categoryID']);
+if(isset($_POST['userID'])) {
+	$ua->setServiceIdentifier($categoryId);
 	/** @var Collection|User[] $userList */
 	$userList = $userMapper->findByColumn('id', $_POST['userID']);
 
@@ -144,78 +163,70 @@ elseif(isset($_POST['userID'])) {
             $uaMapper->save($ua);
         }
 	}
-	SitePage::localRedir('/group/modify/' . $_GET['categoryID']);
 }
 
-/* Set new owner/administrator */
-elseif(is_numeric($_GET['owner'])) {
-	try {
-		$category = $catMapper->findById($_REQUEST['categoryID']);
-	}
-	catch(Schoolbox\Mapper\Exception $e) {
-		error(2);
-		exit;
-	}
+// Change membership parameters
+if (!empty($_POST['accessLevel'])) {
+	foreach ($_POST['accessLevel'] as $userId => $accessLevel) {
+		/* Set new owner/administrator */
+		$user = new User();
+		$user->setId($userId);
+		if ($accessLevel == UserAccess::ACCESS_FULL) {
+			//check if member is allowed to become a owner
+			if (!$groupHandler->allowOwner($userId)) {
+				error(30);
+			}
 
-	//check if member is allowed to become a owner
-	if (!$groupHandler->allowOwner($_GET['owner'])) {
-		error(30);
+			//if we are accessing group for first time create group
+			if (!$groupHandler->groupExists($categoryId)) {
+				$groupHandler->createGroup($categoryId);
+			}
+
+			// demote current owner
+			try {
+				/** @var UserAccess $ua */
+				$ua = $uaMapper->findOneByColumnList(array(
+					'service' => UserAccess::SERVICE_HOMEPAGE,
+					'sid'     => $folder->getId(),
+					'type'    => UserAccess::ACCESS_FULL
+				));
+
+				$ua->setAccessLevel(UserAccess::ACCESS_WRITE);
+				$uaMapper->save($ua);
+			} catch (Schoolbox\Mapper\Exception $e) {
+				// just ignore it, this kingdom had no king
+				$ua->setUser(new User())
+					->setServiceIdentifier($folder->getId());
+			}
+
+			// promote new owner
+			$ua->setAccessLevel(UserAccess::ACCESS_FULL)
+				->setUser($user);
+			$uaMapper->save($ua);
+		} elseif ($accessLevel == UserAccess::ACCESS_DENY) {
+			$uaMapper->deleteByColumnList([
+				'service' => UserAccess::SERVICE_HOMEPAGE,
+				'uid'     => $userId,
+				'sid'     => $categoryId,
+			]);
+		} else {
+			$ua->setServiceIdentifier($categoryId)
+				->setAccessLevel($accessLevel)
+				->setUser($user);
+			$uaMapper->save($ua);
+		}
 	}
-
-	//if we are accessing group for first time create group
-	if (!$groupHandler->groupExists($_GET['categoryID'])) {
-		$groupHandler->createGroup($_GET['categoryID']);
-	}
-
-	// demote current owner
-	try {
-		/** @var UserAccess $ua */
-		$ua = $uaMapper->findOneByColumnList(array(
-			'service' => UserAccess::SERVICE_HOMEPAGE,
-			'sid'     => $category->getId(),
-			'type'    => UserAccess::ACCESS_FULL
-		));
-
-		$ua->setAccessLevel(UserAccess::ACCESS_WRITE);
-		$uaMapper->save($ua);
-	}
-	catch(Schoolbox\Mapper\Exception $e) {
-		// just ignore it, this kingdom had no king
-		$ua->setUser(new User())
-		   ->setServiceIdentifier($category->getId());
-	}
-
-	// promote new owner
-	$ua->setAccessLevel(UserAccess::ACCESS_FULL)
-	   ->getUser()->setId($_GET['owner']);
-
-	$uaMapper->save($ua);
-
-	// re-check permissions, redirect user changing ownership to homepage if they have lost ownership
-	$groupHandler->clearPermissionsCache();
-	if ($groupHandler->getPermission($_GET['categoryID']) < FULL_ACCESS) {
-		SitePage::localRedir("/homepage/" . $_GET['categoryID']);
-	}
-	else {
-		SitePage::localRedir("/group/modify/" . $_GET['categoryID']);
-	}
-}
-
-/* Disband group */
-elseif(isset($_GET['disband'])) {
-	$groupHandler->disbandGroup($_GET['categoryID']);
-	SitePage::localRedir('/');
 }
 
 /* Bulk-add users */
-elseif(isset($_POST['bulkAdd'])) {
+if(isset($_POST['bulkAdd'])) {
 	//get rid of newlines
 	$string = preg_replace('/(\r\n|\n|\r)/', ',', $_POST['bulkAdd']);
 
 	//split the list into an array
 	$list = preg_split('/[,; ]/', $string);
 
-	$ua->setServiceIdentifier($_REQUEST['categoryID'])
+	$ua->setServiceIdentifier($categoryId)
 	   ->setAccessLevel(UserAccess::ACCESS_READ);
 
 	foreach($list as $key) {
@@ -241,7 +252,13 @@ elseif(isset($_POST['bulkAdd'])) {
 			$uaMapper->save($ua);
 		}
 	}
-
-	SitePage::localRedir('/group/modify/' . $_REQUEST['categoryID']);
 }
 
+// Once all else is done
+// re-check permissions, redirect user changing ownership to homepage if they have lost ownership
+$groupHandler->clearPermissionsCache();
+if ($groupHandler->getPermission($_GET['categoryID']) < FULL_ACCESS) {
+	SitePage::localRedir("/homepage/" . $_GET['categoryID']);
+} else {
+	SitePage::localRedir('/group/modify/' . $categoryId);
+}

@@ -317,9 +317,10 @@ class Group extends DeprecatedModel
 
     function getWaitingList($relationID)
     {
-        $query = "SELECT title, firstname, lastname, uid
+        $query = "SELECT title, firstname, lastname, uid, synergy_id
 				  FROM userAccess, user
-				  WHERE service = " . $this->_service . " AND sid = $relationID AND type = " . DENY_ACCESS . " AND user.id = uid";
+				  WHERE service = " . $this->_service . " AND sid = $relationID AND type = " . DENY_ACCESS . " AND user.id = uid
+				  ORDER BY lastname, firstname";
         return $this->db->getAll($query);
     }
 

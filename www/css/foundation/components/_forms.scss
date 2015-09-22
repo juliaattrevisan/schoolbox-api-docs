@@ -302,8 +302,9 @@ input[type=radio]:not(.plain):disabled:checked + label{
   opacity: 0.5;
 }
 
-// Toggle Checkbox
-input[type=checkbox]:not(.plain) + label.checkbox-toggle{
+// Toggle Checkbox (VAPORWAVE)
+input[type=checkbox]:not(.plain) + label.checkbox-toggle,
+input[type=radio]:not(.plain) + label.radio-toggle {
 	background-color: $button-color;
 	font-weight: $font-weight-normal;
 	margin-left: 0;
@@ -313,11 +314,13 @@ input[type=checkbox]:not(.plain) + label.checkbox-toggle{
 	@include single-transition(background-color, 0.15s, linear);
 }
 
-input[type=checkbox]:not(.plain):hover + label.checkbox-toggle{
+input[type=checkbox]:not(.plain):hover + label.checkbox-toggle,
+input[type=radio]:not(.plain):hover + label.radio-toggle {
 	background-color: $button-bg-hover;
 }
 
-input[type=checkbox]:not(.plain):checked + label.checkbox-toggle{
+input[type=checkbox]:not(.plain):checked + label.checkbox-toggle,
+input[type=radio]:not(.plain):checked + label.radio-toggle {
 	background-color: $success-color;
 }
 
