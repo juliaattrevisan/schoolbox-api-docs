@@ -19,12 +19,13 @@
 <script type="text/javascript" src="/javascript/math/jqmath-0.4.0.js"></script>
 <script type="text/javascript" src="/javascript/components/foundation/js/vendor/modernizr.js"></script>
 <script type="text/javascript" src="/javascript/components/foundation/js/foundation.min.js"></script>
-
+<script type="text/javascript" src="/javascript/shared/jquery.scroll-to.js"></script>
 <script type="text/javascript">M.$mathQ = false; </script> <!-- Disables $ formula encoding -->
 <script type="text/javascript">
   $(document).ready(function() { $('#infoPanel').find('a[data-menu]').flyout(); });
   $(document).ready(function() {
       $('#nav').touchMenu();
+      $('#nav').scrollToTop();
 
       var s = $('#search');
       s.on('click', 'i', function () {
@@ -32,7 +33,6 @@
               s.submit();
           }
       });
-
   });
 
   // Date formats (global variable)
