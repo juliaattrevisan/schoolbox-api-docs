@@ -405,6 +405,7 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getStudentUserAccountInfo()
     {
+        // "Null" date: 1/1/1753
         // To reformat boarder status or not?
         return $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll("
@@ -423,6 +424,7 @@ class External_Pcschools_User implements External_UserInterface
                     S.CAMPUS AS StudentCampus
                 FROM STUDENT S
                 LEFT JOIN \"IDENTITY\" AS ID ON S.STUDENT# = ID.MEMBER#
+                WHERE DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0
             ")
         );
     }
@@ -628,6 +630,7 @@ class External_Pcschools_User implements External_UserInterface
                 FROM FAMILY AS F
                 LEFT JOIN \"IDENTITY\" AS ID ON F.IDENTITY_ID# = ID.MEMBER#
                 INNER JOIN STUDENT AS S ON F.FAMKEY = S.FAMILY_CODE
+                WHERE DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0
             ")
         );
         foreach ($rowset as $row) {
@@ -727,6 +730,7 @@ class External_Pcschools_User implements External_UserInterface
                 FROM TEACHER T
                 LEFT JOIN \"IDENTITY\" AS ID ON T.TEACHER# = ID.MEMBER#
                 LEFT JOIN CODEMAST AS T_CAMPUS ON T.CAMPUS = T_CAMPUS.CODE AND T_CAMPUS.TYPE = 'CAMPUS'
+                WHERE DATEDIFF(DAY, T.DATE_LEFT, '1753-01-01') = 0
             ")
         );
     }
