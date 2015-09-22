@@ -3,134 +3,146 @@
 <!--  Copyright {TEMPLATE_YEAR} Alaress Pty Ltd, Schoolbox -->
 <!--  Visit us at www.schoolbox.com.au -->
 <head>
-<title>{TITLE}</title>
-<meta charset="UTF-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta http-equiv="Content-Language" content="en-au" />
-<meta name="author" content="Alaress Pty Ltd"/>
-<meta name="application-name" content="Schoolbox" />
-<meta name="msapplication-TileColor" content="#0066b0" />
-<meta name="msapplication-square70x70logo" content="/images/logo.php?logo=skin_logo_square&size=tile70" />
-<meta name="msapplication-square150x150logo" content="/images/logo.php?logo=skin_logo_square&size=tile150" />
-<meta name="msapplication-wide310x150logo" content="/images/logo.php?logo=skin_logo_login&size=tile310" />
-<meta name="msapplication-square310x310logo" content="/images/logo.php?logo=skin_logo_large&size=tile310" />
-<meta name="viewport" content="initial-scale=1, maximum-scale=1">
-<link rel="apple-touch-icon" sizes="57x57" href="/images/logo.php?logo=skin_logo_square&size=apple57">
-<link rel="apple-touch-icon" sizes="60x60" href="/images/logo.php?logo=skin_logo_square&size=apple60">
-<link rel="apple-touch-icon" sizes="72x72" href="/images/logo.php?logo=skin_logo_square&size=apple72">
-<link rel="apple-touch-icon" sizes="76x76" href="/images/logo.php?logo=skin_logo_square&size=apple76">
-<link rel="apple-touch-icon" sizes="114x114" href="/images/logo.php?logo=skin_logo_square&size=apple114">
-<link rel="apple-touch-icon" sizes="120x120" href="/images/logo.php?logo=skin_logo_square&size=apple120">
-<link rel="apple-touch-icon" sizes="144x144" href="/images/logo.php?logo=skin_logo_square&size=apple144">
-<link rel="apple-touch-icon" sizes="152x152" href="/images/logo.php?logo=skin_logo_square&size=apple152">
-<link rel="apple-touch-icon" sizes="180x180" href="/images/logo.php?logo=skin_logo_square&size=apple180">
-{MAIN_HEADER_REGION}
-{CUSTOM_HEADER_REGION}
+    <title>{TITLE}</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Language" content="en-au" />
+    <meta name="author" content="Alaress Pty Ltd"/>
+    <meta name="application-name" content="Schoolbox" />
+    <meta name="msapplication-TileColor" content="#0066b0" />
+    <meta name="msapplication-square70x70logo" content="/images/logo.php?logo=skin_logo_square&size=tile70" />
+    <meta name="msapplication-square150x150logo" content="/images/logo.php?logo=skin_logo_square&size=tile150" />
+    <meta name="msapplication-wide310x150logo" content="/images/logo.php?logo=skin_logo_login&size=tile310" />
+    <meta name="msapplication-square310x310logo" content="/images/logo.php?logo=skin_logo_large&size=tile310" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <link rel="apple-touch-icon" sizes="57x57" href="/images/logo.php?logo=skin_logo_square&size=apple57">
+    <link rel="apple-touch-icon" sizes="60x60" href="/images/logo.php?logo=skin_logo_square&size=apple60">
+    <link rel="apple-touch-icon" sizes="72x72" href="/images/logo.php?logo=skin_logo_square&size=apple72">
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/logo.php?logo=skin_logo_square&size=apple76">
+    <link rel="apple-touch-icon" sizes="114x114" href="/images/logo.php?logo=skin_logo_square&size=apple114">
+    <link rel="apple-touch-icon" sizes="120x120" href="/images/logo.php?logo=skin_logo_square&size=apple120">
+    <link rel="apple-touch-icon" sizes="144x144" href="/images/logo.php?logo=skin_logo_square&size=apple144">
+    <link rel="apple-touch-icon" sizes="152x152" href="/images/logo.php?logo=skin_logo_square&size=apple152">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/logo.php?logo=skin_logo_square&size=apple180">
+
+    {MAIN_HEADER_REGION}
+    {CUSTOM_HEADER_REGION}
+
+    <script type="text/javascript" src="/javascript/shared/jquery.scroll-to.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('#nav').scrollToTop();
+        });
+    </script>
 </head>
 <body>
-	<div class="off-canvas-wrap docs-wrap" data-offcanvas>
-	  <div class="inner-wrap">
+    <div class="off-canvas-wrap docs-wrap" data-offcanvas>
+        <div class="inner-wrap">
 
-		<!-- The Schoolbox Hybrid Bar -->
-		<div class="hybrid-bar">
-	    <nav class="tab-bar">
-				<section class="left-small">
-					<a class="left-off-canvas-toggle menu-icon hide-for-large-up" href="#"><span></span></a>
-				</section>
+            <!-- The Schoolbox Hybrid Bar -->
+            <div class="hybrid-bar">
+                <nav class="tab-bar">
+                    <section class="left-small">
+                        <a class="left-off-canvas-toggle menu-icon hide-for-large-up" href="#"><span></span></a>
+                    </section>
 
-				<section class="row middle tab-bar-section">
-					<a href="/" class="logo small-2 columns no-pad">
-						<img src="/images/logo.php?logo=skin_logo_square&size=normal" srcset="/images/logo.php?logo=skin_logo_square&size=normal 1x,/images/logo.php?logo=skin_logo_square&size=hidpi 2x" alt="{SITE_NAME}"/>
-					</a>
+                    <section class="row middle tab-bar-section">
+                        <a href="/" class="logo small-2 columns no-pad">
+                            <img src="/images/logo.php?logo=skin_logo_square&size=normal" srcset="/images/logo.php?logo=skin_logo_square&size=normal 1x,/images/logo.php?logo=skin_logo_square&size=hidpi 2x" alt="{SITE_NAME}"/>
+                        </a>
 
-					<ul class="icon-nav small-10 columns">
-						{MAIN_TAB_REGION}
-					</ul>
+                        <ul class="icon-nav small-10 columns">
+                            {MAIN_TAB_REGION}
+                        </ul>
 
-					<form id="search"  action="/search" method="get">
-						<input id="search-field" type="text" name="keyword" placeholder="Search"/>
-						<i class="icon-search no-text"></i>
-					</form>
-				</section>
-				<!-- BEGIN instantmessage_toggle -->
-				<section class="right-small">
-					<a id="notifier" class="right-off-canvas-toggle icon-notifications" href="#" data-unread="{WEBSOCKET_UNREAD_COUNT}">
-						<span id="unread-count">{WEBSOCKET_UNREAD_LABEL}</span>
-					</a>
-				</section>
-				<!-- END instantmessage_toggle -->
-	    </nav>
-    </div>
+                        <form id="search" action="/search" method="get">
+                            <input id="search-field" type="text" name="keyword" placeholder="Search"/>
+                            <i class="icon-search no-text"></i>
+                        </form>
+                    </section>
+                    <!-- BEGIN instantmessage_toggle -->
+                    <section class="right-small">
+                        <a id="notifier" class="right-off-canvas-toggle icon-notifications" href="#" data-unread="{WEBSOCKET_UNREAD_COUNT}">
+                            <span id="unread-count">{WEBSOCKET_UNREAD_LABEL}</span>
+                        </a>
+                    </section>
+                    <!-- END instantmessage_toggle -->
+                </nav>
+            </div>
 
-		  {INSTANTMESSAGE_BLOCK}
+            {INSTANTMESSAGE_BLOCK}
 
-    <aside class="left-off-canvas-menu">
-    	<a href="/" class="logo">
-			<img src="/images/logo.php?logo=skin_logo_large&size=normal" srcset="/images/logo.php?logo=skin_logo_large&size=normal 1x,/images/logo.php?logo=skin_logo_large&size=hidpi 2x" alt="{SITE_NAME}"/>
-  		</a>
-			<!-- BEGIN banner_logged_in -->
-			<div class="row">
-				<a href="/search/user/{USER_ID}" class="account-menu button dropdown" title="View Profile" data-menu="account-menu" data-dropdown="avatar2">
-					<img height="80" width="80" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square80"/>
-					<span>{SITE_LOGINNAME}</span>
-				</a>
-				<ul class="flyout-menu f-dropdown" id="avatar2" data-dropdown-content>
-					<li><a class="icon-staff-students" href="/search/user/{USER_ID}">Profile</a></li>
-					<li><a class="icon-settings" href="/settings/messages">Settings</a></li>
-					<li><a class="icon-logout" href="/logout.php">Logout</a></li>
-					<!-- BEGIN can_switch -->
-					<li class="separator">Switch User</li>
-					<!-- END can_switch -->
-					<!-- BEGIN switch_user -->
-					<li class="switch-user">
-						<div class="avatar card">
-							<a class="no-pad" href="/user/switch/{MENU_SWITCH_USERID}" title="Switch to {MENU_SWITCH_USER_FULLNAME}">
-								<img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
-								<p>{MENU_SWITCH_USER_FULLNAME}</p>
-								<p class="meta">{MENU_SWITCH_USER_ROLE}</p>
-							</a>
-						</div>
-					</li>
-					<!-- END switch_user -->
-					<!-- BEGIN recover_user -->
-					<li class="switch-user">
-						<div class="avatar card">
-							<a class="no-pad" href="/user/recoverSession" title="Return to {MENU_SWITCH_USER_FULLNAME}">
-								<img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
-								<p>{MENU_SWITCH_USER_FULLNAME}</p>
-								<p class="meta">{MENU_SWITCH_USER_ROLE}</p>
-							</a>
-						</div>
-					</li>
-					<!-- END recover_user -->
-				</ul>
-			</div>
-			<!-- END banner_logged_in -->
-		<div class="row">
-			<ul class="off-canvas-list second-nav">
-				{MAIN_TAB_REGION}
-			</ul>
-		</div>
-    	{MAIN_NAV_REGION}
-    </aside>
+            <aside class="left-off-canvas-menu" data-side-nav>
+                <a href="/" class="logo">
+                    <img src="/images/logo.php?logo=skin_logo_large&size=normal" srcset="/images/logo.php?logo=skin_logo_large&size=normal 1x,/images/logo.php?logo=skin_logo_large&size=hidpi 2x" alt="{SITE_NAME}"/>
+                </a>
 
-		<!-- START CONTAINER -->
-	    <section class="main-section">
-			<div id="header" class="core">
-				{MAIN_BANNER_REGION}
-			</div>
+                <!-- BEGIN banner_logged_in -->
+                <div class="row">
+                    <a href="/search/user/{USER_ID}" class="account-menu button dropdown" title="View Profile" data-menu="account-menu" data-dropdown="avatar2">
+                        <img height="80" width="80" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square80"/>
+                        <span>{SITE_LOGINNAME}</span>
+                    </a>
+                    <ul class="flyout-menu f-dropdown" id="avatar2" data-dropdown-content>
+                        <li><a class="icon-staff-students" href="/search/user/{USER_ID}">Profile</a></li>
+                        <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
+                        <li><a class="icon-logout" href="/logout.php">Logout</a></li>
+                        <!-- BEGIN can_switch -->
+                        <li class="separator">Switch User</li>
+                        <!-- END can_switch -->
+                        <!-- BEGIN switch_user -->
+                        <li class="switch-user">
+                            <div class="avatar card">
+                                <a class="no-pad" href="/user/switch/{MENU_SWITCH_USERID}" title="Switch to {MENU_SWITCH_USER_FULLNAME}">
+                                    <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
+                                    <p>{MENU_SWITCH_USER_FULLNAME}</p>
+                                    <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
+                                </a>
+                            </div>
+                        </li>
+                        <!-- END switch_user -->
+                        <!-- BEGIN recover_user -->
+                        <li class="switch-user">
+                            <div class="avatar card">
+                                <a class="no-pad" href="/user/recoverSession" title="Return to {MENU_SWITCH_USER_FULLNAME}">
+                                    <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
+                                    <p>{MENU_SWITCH_USER_FULLNAME}</p>
+                                    <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
+                                </a>
+                            </div>
+                        </li>
+                        <!-- END recover_user -->
+                    </ul>
+                </div>
+                <!-- END banner_logged_in -->
 
-			<div id="container" class="clearfix">
-				<div id="content" class="clearfix"> {MAIN_CONTENT_REGION} </div>
-			</div>
-			{MAIN_FOOTER_REGION}
-			{DEBUGBAR_HEAD}
-			{DEBUGBAR}
-	    </section>
-		<!-- END CONTAINER -->
+                <div class="row">
+                    <ul class="off-canvas-list second-nav">
+                        {MAIN_TAB_REGION}
+                    </ul>
+                </div>
+                {MAIN_NAV_REGION}
+            </aside>
 
-		<!-- <a class="exit-off-canvas"></a> -->
-	  </div>
-	</div>
-</body>
+            <!-- START CONTAINER -->
+            <section class="main-section">
+                <div id="header">
+                    {MAIN_BANNER_REGION}
+                </div>
+
+                <div id="container">
+                    <div id="content">
+                        {MAIN_CONTENT_REGION}
+                    </div>
+                </div>
+                {MAIN_FOOTER_REGION}
+                {DEBUGBAR_HEAD}
+                {DEBUGBAR}
+            </section>
+            <!-- END CONTAINER -->
+
+            <!-- <a class="exit-off-canvas"></a> -->
+          </div>
+        </div>
+    </body>
 </html>
