@@ -96,6 +96,7 @@ ul.az-error-list {
         overflow: hidden;
         height: 0;
         @include easy-transition(
+            color $attachzone-overlay-duration $attachzone-overlay-timing,
             opacity $attachzone-duration-half $attachzone-overlay-timing,
             min-height $attachzone-duration-3quarter $attachzone-overlay-timing $attachzone-duration-quarter,
             height $attachzone-duration-3quarter $attachzone-overlay-timing $attachzone-duration-quarter,
@@ -208,10 +209,12 @@ ul.az-error-list {
     &.dz-max-files-reached {
         .dzone {
             border-color: transparent;
-            background-color: transparent;
-            background-image: none;
-            color: $black;
+            background: none;
             padding-left: 0;
+            color: rgba($white, 0);
+            &:before {
+                content: "";
+            }
             span {
                 padding: 0;
             }
@@ -272,6 +275,10 @@ ul.az-error-list {
     .progress {
         margin: 0;
         clear: both;
+        @media #{$small-only} {
+            position: relative;
+            top: -0.3125rem;
+        }
     }
     .dz-upload {
         background-color: $vapor;
