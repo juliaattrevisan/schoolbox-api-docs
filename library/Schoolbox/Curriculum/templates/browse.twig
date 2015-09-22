@@ -316,12 +316,12 @@
 <!-- Template for displaying of a curriculum node -->
 {% verbatim %}
 <script id="node-template" type="text/x-dot-template">
-    <h1>
+    <h2>
         {{? it.code }}
             [{{! it.code }}]
         {{?}}
         {{! it.name }}
-    </h1>
+    </h2>
 
     {{? it.reference }}
     <p>
@@ -366,7 +366,7 @@
         Also consider making these selectors selectized so I can add dynamically
         -->
         {{? !it.id && !it.parent }}
-        <h1>Create New Curriculum</h1>
+        <h2>Create New Curriculum</h2>
         <dl>
             <dt>Curriculum</dt>
             <dd>
@@ -397,10 +397,10 @@
         {{?}}
 
         {{? it.id }}
-        <h1>Edit Curriculum Subsection</h1>
+        <h2>Edit Curriculum Subsection</h2>
         {{?}}
         {{? !it.id && it.parent }}
-        <h1>Create New Curriculum Subsection</h1>
+        <h2>Create New Curriculum Subsection</h2>
         {{?}}
 
         <dl>
