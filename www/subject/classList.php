@@ -31,13 +31,13 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
     $this->setBlock('student_list', 'name_without_link', 'name_without_link_block');
     $this->setBlock('student_list', 'actions', 'actions_block');
     $this->setBlock('actions', 'eportfolio', 'eportfolio_block');
-    $this->setBlock('actions', 'eportfolio_small', 'eportfolio_small_block');
+    $this->setBlock('student_list', 'eportfolio_small', 'eportfolio_small_block');
 
     $this->setBlock('actions', 'pastoral_care', 'pastoral_care_block');
-    $this->setBlock('actions', 'pastoral_care_small', 'pastoral_care_small_block');
+    $this->setBlock('student_list', 'pastoral_care_small', 'pastoral_care_small_block');
 
     $this->setBlock('actions', 'has_email', 'has_email_block');
-    $this->setBlock('actions', 'has_email_small', 'has_email_small_block');
+    $this->setBlock('student_list', 'has_email_small', 'has_email_small_block');
 
     $this->setBlock(TEMPLATE_content, 'parent', 'parent_block');
     $this->setBlock(TEMPLATE_content, 'parent_email', 'parent_email_block');
