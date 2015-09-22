@@ -1,3 +1,109 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.hourpicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $.fn.alaressTiny({
+            mode: 'exact',
+            elements: "description, completion-message",
+            file_browser_category_id: '{ASSESS_CATEGORY_ID}'
+        });
+
+        /* date picker */
+        $('#start_date, #finish_date').datepicker({
+            constrainInput: false,
+            onClose: function (string) {
+                var input = $(this);
+                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
+
+        $('#start_date').syncDates({endDate: $('#finish_date')});
+
+        /* Timepicker
+         */
+        $('input[data-timepicker="hour"]').hourpicker({
+            hours: 12,
+            appendTo: function ($input) {
+                return $input.closest('.timepick');
+            }
+        });
+        $('input[data-timepicker="minute"]').minutepicker({
+            appendTo: function ($input) {
+                return $input.closest('.timepick');
+            }
+        });
+
+        $('[data-show-duration]').change(function() {
+            $('[data-edit-duration]').toggleClass('hide');
+
+            if ($('[data-edit-duration]').hasClass('hide')) {
+                $('#minDuration').val('15');
+            } else {
+                $('#minHours').val('0');
+                $('#minDuration').val('00');
+            }
+        });
+
+        if ($('[data-show-duration]').is(':checked')) {
+            $('[data-edit-duration]').show();
+        }
+
+        $('#createAssess').validate({
+            rules: {
+                title: {
+                    required: true,
+                    minlength: 2
+                },
+                weight: {
+                    required: true,
+                    maxlength: 3,
+                    digits: true
+                },
+                "finish[hour]": {
+                    required: true,
+                    '12hour': true
+                },
+                "finish[minute]": {
+                    required: true,
+                    minute: true
+                },
+                "start[hour]": {
+                    required: true,
+                    '12hour': true
+                },
+                "start[minute]": {
+                    required: true,
+                    minute: true
+                }
+            },
+            messages: {
+                title: "Please enter a title",
+                description: "Please enter a description",
+                weight: "Please add a numeric weight"
+            },
+            errorPlacement: function(error, element) {
+                var fieldset = element.closest('fieldset');
+                if (fieldset.length) {
+                    error.appendTo(fieldset);
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 {BREADCRUMB}
 
 <div class="actions-small-1 row">
@@ -208,107 +314,3 @@
         </label>
     </form>
 </div>
-
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
-<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/jquery.hourpicker.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $.fn.alaressTiny({
-            mode: 'exact',
-            elements: "description, completion-message",
-            file_browser_category_id: '{ASSESS_CATEGORY_ID}'
-        });
-
-        /* date picker */
-        $('#start_date, #finish_date').datepicker({
-            constrainInput: false,
-            onClose: function (string) {
-                var input = $(this);
-                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-                    input.val(data.time);
-                })
-            }
-        });
-
-        $('#start_date').syncDates({endDate: $('#finish_date')});
-
-        /* Timepicker
-         */
-        $('input[data-timepicker="hour"]').hourpicker({
-            hours: 12,
-            appendTo: function ($input) {
-                return $input.closest('.timepick');
-            }
-        });
-        $('input[data-timepicker="minute"]').minutepicker({
-            appendTo: function ($input) {
-                return $input.closest('.timepick');
-            }
-        });
-
-        $('[data-show-duration]').change(function() {
-            $('[data-edit-duration]').toggleClass('hide');
-
-            if ($('[data-edit-duration]').hasClass('hide')) {
-                $('#minDuration').val('15');
-            } else {
-                $('#minHours').val('0');
-                $('#minDuration').val('00');
-            }
-        });
-
-        if ($('[data-show-duration]').is(':checked')) {
-            $('[data-edit-duration]').show();
-        }
-
-        $('#createAssess').validate({
-            rules: {
-                title: {
-                    required: true,
-                    minlength: 2
-                },
-                weight: {
-                    required: true,
-                    maxlength: 3,
-                    digits: true
-                },
-                "finish[hour]": {
-                    required: true,
-                    '12hour': true
-                },
-                "finish[minute]": {
-                    required: true,
-                    minute: true
-                },
-                "start[hour]": {
-                    required: true,
-                    '12hour': true
-                },
-                "start[minute]": {
-                    required: true,
-                    minute: true
-                }
-            },
-            messages: {
-                title: "Please enter a title",
-                description: "Please enter a description",
-                weight: "Please add a numeric weight"
-            },
-            errorPlacement: function(error, element) {
-                var fieldset = element.closest('fieldset');
-                if (fieldset.length) {
-                    error.appendTo(fieldset);
-                } else {
-                    error.insertAfter(element);
-                }
-            }
-        });
-    });
-</script>
