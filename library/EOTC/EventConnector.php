@@ -317,7 +317,7 @@ class EventConnector extends EventMapper
                 }
             }
 
-            if ($isEOTCManager || $isAttendee) {
+            if ($isEOTCManager || $isAttendee || $eventItem->getMetadata()->getStatus()->isApproved()) {
                 /* Translate an \EOTC\Event type into a
                                  * Calendar_Event_Type_Abstract type
                                  */
