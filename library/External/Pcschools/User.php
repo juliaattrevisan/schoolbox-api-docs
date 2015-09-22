@@ -68,7 +68,7 @@ class External_Pcschools_User implements External_UserInterface
     {
         $row = $this->getDatabase()->getRow("
             SELECT
-                S.STUDENT# AS StudentID,
+                S.STUDKEY AS StudentID,
                 S.GIVEN_NAME AS StudentGiven1,
                 S.LEGAL_SURNAME AS StudentSurname,
                 S.BIRTH_DATE AS StudentBirthDate,
@@ -410,7 +410,7 @@ class External_Pcschools_User implements External_UserInterface
         return $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll("
                 SELECT
-                    S.STUDENT# AS StudentID,
+                    S.STUDKEY AS StudentID,
                     ID.LOGIN AS NetworkLogin,
                     S.GIVEN_NAME AS StudentPreferred,
                     S.LEGAL_SURNAME AS StudentSurname,
@@ -681,7 +681,7 @@ class External_Pcschools_User implements External_UserInterface
                     '' AS StaffVoiceMail
                 FROM TEACHER T
                 LEFT JOIN CODEMAST AS T_CAMPUS ON T.CAMPUS = T_CAMPUS.CODE AND T_CAMPUS.TYPE = 'CAMPUS'
-                WHERE T.TEACHER# = {$this->getDatabase()->smartQuote($externalUserId)}
+                WHERE T.TEACHER_CODE = {$this->getDatabase()->smartQuote($externalUserId)}
             ")
         );
     }
@@ -823,28 +823,28 @@ class External_Pcschools_User implements External_UserInterface
     public function getSubjectList($externalUserId, $userId)
     {
         return $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll("
-                SELECT
-                    R.SUBJECT_NO AS code,
-                    SU.[DESC] AS name,
-                    SU.KEYAREA AS classType,
-                    ST.CAMPUS AS campusCode
-                FROM ROLL R
-                INNER JOIN STUDENT ST ON R.STUDENT# = ST.STUDENT#
-                INNER JOIN [SUBJECT] SU ON R.SUBJECT_NO = SU.NO
-                WHERE R.STUDENT# = {$this->getDatabase()->smartQuote($externalUserId)}
-            ")
 //            $this->getDatabase()->getAll("
 //                SELECT
-//                    SU.ABBREV AS code,
+//                    R.SUBJECT_NO AS code,
 //                    SU.[DESC] AS name,
 //                    SU.KEYAREA AS classType,
 //                    ST.CAMPUS AS campusCode
-//                FROM SUB S
-//                INNER JOIN STUDENT ST ON S.STUDENT# = ST.STUDENT#
-//                INNER JOIN [SUBJECT] SU ON S.SUBJECT_NO = SU.NO
-//                WHERE S.STUDENT# = {$this->getDatabase()->smartQuote($externalUserId)}
+//                FROM ROLL R
+//                INNER JOIN STUDENT ST ON R.STUDENT# = ST.STUDENT#
+//                INNER JOIN [SUBJECT] SU ON R.SUBJECT_NO = SU.NO
+//                WHERE R.STUDENT# = {$this->getDatabase()->smartQuote($externalUserId)}
 //            ")
+            $this->getDatabase()->getAll("
+                SELECT
+                    SU.ABBREV AS code,
+                    SU.[DESC] AS name,
+                    SU.KEYAREA AS classType,
+                    ST.CAMPUS AS campusCode
+                FROM SUB S
+                INNER JOIN STUDENT ST ON S.STUDENT# = ST.STUDENT#
+                INNER JOIN [SUBJECT] SU ON S.SUBJECT_NO = SU.NO
+                WHERE S.STUDKEY = {$this->getDatabase()->smartQuote($externalUserId)}
+            ")
         );
     }
 
@@ -863,10 +863,10 @@ class External_Pcschools_User implements External_UserInterface
     {
         return $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll("
-                SELECT S.STUDENT# AS RelatedID
+                SELECT S.STUDKEY AS RelatedID
                 FROM STUDENT S
-                LEFT JOIN FAMILY AS S_FAMILY ON S.FAMILY_CODE = S_FAMILY.FAMKEY
-                WHERE F.IDENTITY_ID# = {$this->getDatabase()->smartQuote($externalUserId)}
+                INNER JOIN FAMILY AS S_FAMILY ON S.FAMILY_CODE = S_FAMILY.FAMKEY
+                WHERE S_FAMILY.FAMKEY = {$this->getDatabase()->smartQuote($externalUserId)}
             ")
         );
     }
