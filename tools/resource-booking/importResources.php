@@ -10,7 +10,7 @@ use Schoolbox\ResourceBooking\Item;
 use Schoolbox\Calendar;
 use Schoolbox\UserMapper;
 
-require_once __DIR__ . '/../../../include/Bootstrap.php';
+require_once __DIR__ . '/../../include/Bootstrap.php';
 
 if (!isset($argv[1])) {
     $filename = basename(__FILE__);
@@ -32,7 +32,6 @@ $dryRun  = isset($options['dry-run']);
 
 // Logging
 $log = new \Alaress\Lumberjack\Logger(STDOUT, STDERR);
-$log->setLevel(Monolog\Logger::INFO);
 
 // File - from last positional parameter
 $file = array_pop($argv);
@@ -89,12 +88,14 @@ foreach ($csv as $row) {
     }
 
     // Set its moderators
-    try {
-        $moderator = $userMapper->findOneByColumn('synergy_id', $row['ManagedBy_SynergeticID']);
-        $resource->addModerator($moderator);
-    } catch (\Schoolbox\Mapper\Exception $e) {
-        $log->warning("Moderator \"{$row['ManagedBy_SynergeticID']}\" not found - skipping");
-        continue;
+    if($row['ManagedBy_SynergeticID']) {
+        try {
+            $moderator = $userMapper->findOneByColumn('synergy_id', $row['ManagedBy_SynergeticID']);
+            $resource->addModerator($moderator);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $log->warning("Moderator \"{$row['ManagedBy_SynergeticID']}\" not found - skipping");
+            continue;
+        }
     }
 
     if ($dryRun) {

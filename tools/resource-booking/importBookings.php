@@ -9,7 +9,7 @@ use Schoolbox\ResourceBooking\Item;
 use Schoolbox\Calendar;
 use Schoolbox\UserMapper;
 
-require_once __DIR__ . '/../../../include/Bootstrap.php';
+require_once __DIR__ . '/../../include/Bootstrap.php';
 
 if (!isset($argv[1])) {
     $filename = basename(__FILE__);
