@@ -224,3 +224,42 @@
 		}
 	}
 }
+
+@mixin wide-switch($width: 4rem) {
+	label {
+		width: $width;
+	}
+	input:checked + label:after {
+		left: $width - 1.75rem;
+	}
+}
+
+@mixin switch-label($indent: 0.75rem) {
+	span {
+		&:first-child {
+			// this is the active state
+			left: $indent;
+			text-align: left;
+			color: calc-text-color($bg: $switch-active-color, $dark: $primary-color);
+			opacity: 0;
+		}
+		&:last-child {
+			// this is the inactive state
+			right: $indent;
+			text-align: right;
+			color: calc-text-color($bg: $switch-bg, $dark: $primary-color);
+			opacity: 1;
+		}
+		&[class^="icon-"]:before {
+			padding: 0 0.25rem;
+		}
+	}
+	input:checked + label span {
+		&:first-child {
+			opacity: 1;
+		}
+		&:last-child {
+			opacity: 0;
+		}
+	}
+}
