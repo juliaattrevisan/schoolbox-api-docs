@@ -3,7 +3,7 @@
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>{ASSESS_HEADING}</h1>
+            <h1>{ASSESS_ACTION} {ASSESS_KIND}</h1>
         </div>
     </div>
     <!-- BEGIN importXML -->
@@ -18,22 +18,23 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">{ASSESS_ACTION} {ASSESS_KIND}</h2>
-
         <form name="create" action="/assess/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" class="top" method="post">
             <input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
             <input name="is_task" type="hidden" value="{ASSESS_IS_TASK}" />
             <input name="unit_id" type="hidden" value="{ASSESS_UNIT_ID}" />
 
-            <section class="content">
-                <label>
-                    Title
-                    <input name="title" type="text" maxlength="100" value="{ASSESS_TITLE}" id="title"/>
-                </label>
-
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Title
+                            <input name="title" type="text" maxlength="100" value="{ASSESS_TITLE}" id="title"/>
+                        </label>
+                    </div>
+                </fieldset>
                 <!-- BEGIN assess_timespan -->
                 <!-- Available from this time -->
-                <div class="row">
+                <fieldset class="content">
                     <div class="small-12 large-6 columns">
                         <label>
                             Open Date
@@ -67,10 +68,10 @@
                             </select>
                         </label>
                     </div>
-                </div>
+                </fieldset>
 
                 <!-- Available until this time -->
-                <div class="row">
+                <fieldset class="content">
                     <div class="small-12 large-6 columns">
                         <label>
                             Due Date
@@ -104,83 +105,87 @@
                             </select>
                         </label>
                     </div>
-                </div>
+                </fieldset>
                 <!-- END assess_timespan -->
 
-                <label>
-                    Duration
-                    <span class="hint has-tip tip-top" data-tooltip title="To set a quiz duration, tick the box and fill out a time.">?</span>
-                </label>
-                <div class="switch">
-                    <input type="hidden" name="durationSelected" value="0" />
-                    <input type="checkbox" id='durationSelected' name='durationSelected' data-show-duration value='1' {ASSESS_DURATION_CHECKED} />
-                    <label for="durationSelected"></label>
-                </div>
-                <div data-edit-duration class="row hide">
-                    <div class="small-6 columns">
+                <fieldset class="content">
+                    <div class="small-12 columns">
                         <label>
-                            Hours
-                            <input name='duration[hour]' type='text' class="timeField" value='{DURATION_HOUR_VALUE}' maxlength='1'>
+                            Duration
+                            <span class="hint has-tip tip-top" data-tooltip title="To set a quiz duration, tick the box and fill out a time.">?</span>
                         </label>
-                    </div>
-                    <div class="small-6 columns">
+                        <div class="switch">
+                            <input type="hidden" name="durationSelected" value="0" />
+                            <input type="checkbox" id='durationSelected' name='durationSelected' data-show-duration value='1' {ASSESS_DURATION_CHECKED} />
+                            <label for="durationSelected"></label>
+                        </div>
+                        <div data-edit-duration class="row hide">
+                            <div class="small-6 columns">
+                                <label>
+                                    Hours
+                                    <input name='duration[hour]' type='text' class="timeField" value='{DURATION_HOUR_VALUE}' maxlength='1'>
+                                </label>
+                            </div>
+                            <div class="small-6 columns">
+                                <label>
+                                    Minutes
+                                    <input name='duration[minute]' type='text' class="timeField" value='{DURATION_MINUTE_VALUE}' maxlength='2'>
+                                </label>
+                            </div>
+                        </div>
+
                         <label>
-                            Minutes
-                            <input name='duration[minute]' type='text' class="timeField" value='{DURATION_MINUTE_VALUE}' maxlength='2'>
+                            Description
+                            <textarea id='description' name="description">{ASSESS_DESCRIPTION}</textarea>
                         </label>
+
+                        <label>
+                            Completion Message
+                            <textarea id='completion-message' name="completion_message">{ASSESS_COMPLETION_MESSAGE}</textarea>
+                        </label>
+
+                        <label>
+                            Maximum Attempts
+                            <span class="hint has-tip tip-top" data-tooltip title="The maximum number of times someone can attempt this quiz.">?</span>
+
+                            <select name='max_attempts'>
+                                <option value='0'>Unlimited</option>
+                                <!-- BEGIN max_attempts -->
+                                <option value='{MAX_ATTEMPTS_VALUE}' {MAX_ATTEMPTS_CHECKED}>{MAX_ATTEMPTS_VALUE}</option>
+                                <!-- END max_attempts -->
+                            </select>
+                        </label>
+
+                        <label>
+                            Visibility
+                            <span class="hint has-tip tip-top" data-tooltip title="Control who can view marks for this quiz.">?</span>
+
+                            <!-- BEGIN marktype -->
+                            <select name="mark_visibility" id="marktype">
+                                <!-- BEGIN mark_visibility_drop -->
+                                <option value="{MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_VALUE_SELECTED}>{MARK_VISIBILITY_TEXT}</option>
+                                <!-- END mark_visibility_drop -->
+                            </select>
+                            <!-- END marktype -->
+                        </label>
+
+                        <!-- BEGIN mark_weight -->
+                        <label>
+                            Weight
+                            <span class="hint has-tip tip-top" data-tooltip title="Control the weight of this quiz towards the student's overall grade average (default is 0).">?</span>
+                            <input name="weight" type="text" size="3" maxlength="3" value="{ASSESS_WEIGHT}" id="weight"/>
+                        </label>
+                        <!-- END mark_weight -->
+
+                        <!-- BEGIN curriculum_code_input -->
+                        <label>
+                            Curriculum Codes
+                            <span class="hint has-tip tip-top" data-tooltip title="If you want to associate curriculum codes with this assessment, enter them here. (By default, it will be associated with the same codes that its folder is.)">?</span>
+                            {CURRICULUM_CODE_INPUT}
+                        </label>
+                        <!-- END curriculum_code_input -->
                     </div>
-                </div>
-
-                <label>
-                    Description
-                    <textarea id='description' name="description">{ASSESS_DESCRIPTION}</textarea>
-                </label>
-
-                <label>
-                    Completion Message
-                    <textarea id='completion-message' name="completion_message">{ASSESS_COMPLETION_MESSAGE}</textarea>
-                </label>
-
-                <label>
-                    Maximum Attempts
-                    <span class="hint has-tip tip-top" data-tooltip title="The maximum number of times someone can attempt this quiz.">?</span>
-
-                    <select name='max_attempts'>
-                        <option value='0'>Unlimited</option>
-                        <!-- BEGIN max_attempts -->
-                        <option value='{MAX_ATTEMPTS_VALUE}' {MAX_ATTEMPTS_CHECKED}>{MAX_ATTEMPTS_VALUE}</option>
-                        <!-- END max_attempts -->
-                    </select>
-                </label>
-
-                <label>
-                    Visibility
-                    <span class="hint has-tip tip-top" data-tooltip title="Control who can view marks for this quiz.">?</span>
-
-                    <!-- BEGIN marktype -->
-                    <select name="mark_visibility" id="marktype">
-                        <!-- BEGIN mark_visibility_drop -->
-                        <option value="{MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_VALUE_SELECTED}>{MARK_VISIBILITY_TEXT}</option>
-                        <!-- END mark_visibility_drop -->
-                    </select>
-                    <!-- END marktype -->
-                </label>
-
-                <!-- BEGIN mark_weight -->
-                <label>
-                    Weight
-                    <span class="hint has-tip tip-top" data-tooltip title="Control the weight of this quiz towards the student's overall grade average (default is 0).">?</span>
-                    <input name="weight" type="text" size="3" maxlength="3" value="{ASSESS_WEIGHT}" id="weight"/>
-                </label>
-                <!-- END mark_weight -->
-
-                <!-- BEGIN curriculum_code_input -->
-                <label>
-                    Curriculum Codes
-                    <span class="hint has-tip tip-top" data-tooltip title="If you want to associate curriculum codes with this assessment, enter them here. (By default, it will be associated with the same codes that its folder is.)">?</span>
-                    {CURRICULUM_CODE_INPUT}
-                </label>
-                <!-- END curriculum_code_input -->
+                </fieldset>
             </section>
             <div class="row">
                 <div class="small-12 columns">
