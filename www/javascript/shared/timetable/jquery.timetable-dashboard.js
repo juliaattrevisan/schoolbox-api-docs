@@ -132,7 +132,7 @@
             /* Assemble island
              */
             var section = $(config.section).append(table);
-            var island = $(config.island).append(header).append(section)
+            var island = $(config.island).append(config.header).append(section)
 
             /* Inject and add a separator in case you have multiple timetables
              */
