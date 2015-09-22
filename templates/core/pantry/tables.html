@@ -5,6 +5,20 @@
 </ul>
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" href="/javascript/components/datatables/media/css/jquery.dataTables.min.css">
+<script type="text/javascript" charset="utf-8" src="/javascript/components/datatables/media/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+
+    $(function () {
+
+        $('table[data-sortable]').DataTable({
+            info: false,
+            paging: false,
+            searching: false
+        });
+
+    });
+
+</script>
 <!-- END custom_head -->
 <div class="row">
     <div class="small-12 island">
@@ -1558,16 +1572,3 @@ to use negative phrases correctly to say what traits characters don't have<br>(3
         </div>
     </div>
 </div>
-<script type="text/javascript" charset="utf-8" src="/javascript/components/datatables/media/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript">
-
-    $(function () {
-
-        $('table[data-sortable]').DataTable({
-            paging: false,
-            searching: false
-        });
-
-    });
-
-</script>
