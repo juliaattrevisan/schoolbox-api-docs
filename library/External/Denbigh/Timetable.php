@@ -75,7 +75,14 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             $date = time();
         }
 
-        if (empty($definition['reset'])) {
+        // Is this a Saturday or Sunday?
+        // I assume because we don't count non business days, then this is
+        // outside the timetable.
+        if (date('N', $date) >= 6) {
+            return 0;
+        }
+
+        if (empty($definition['reset']) || $definition['reset'] == '0000-00-00') {
             $start = strtotime($definition['start']);
         } else {
             $start = strtotime($definition['reset']);
@@ -104,6 +111,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
         $currentDay = $businessDays % $definition['cycle_length'];
 
+        // Last day of cycle? Show last day, instead of 0
         if ($currentDay == 0) {
             $currentDay = $definition['cycle_length'];
         }
