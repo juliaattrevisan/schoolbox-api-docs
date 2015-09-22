@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 /**
- * Script for importing MGGS' resource booking system into ours.
+ * Script for importing resource bookings from CSV into ours.
  */
 
 use Schoolbox\ResourceBooking\Booking;
