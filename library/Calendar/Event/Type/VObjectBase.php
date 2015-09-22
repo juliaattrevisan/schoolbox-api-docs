@@ -46,10 +46,12 @@ class VObjectBase extends RendererBase
         /* Show visible events only, in export
          */
         if ($this->isVisible()) {
-            /** @var VEvent $vevent */
-            $vevent = $this->vcalendar->create('VEVENT');
             // Generate a UID based on $this->getEvent()->getEventId()
-            $vevent->add('UID', $this->getEvent()->getEventId() . '/' . $this->getEvent()->getConnectorId());
+            /** @var VEvent $vevent */
+            $vevent = $this->vcalendar->create(
+                'VEVENT',
+                ['UID' => $this->getEvent()->getEventId() . '/' . $this->getEvent()->getConnectorId(),]
+            );
             $vevent->add('CATEGORIES', $this->getEvent()->getEventType());
             $vevent->add('LOCATION', $this->getEvent()->getLocation());
 

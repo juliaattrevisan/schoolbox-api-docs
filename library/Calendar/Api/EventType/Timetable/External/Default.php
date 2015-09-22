@@ -93,6 +93,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                                 continue;
                             }
                             $event = new Event();
+                            $event->setEventId(md5($key));
                             $event->setAllday(false);
                             $event->setLocation($period['room']);
                             $event->setStartTime(new Alaress_Date_Format($startTime, 'U'));

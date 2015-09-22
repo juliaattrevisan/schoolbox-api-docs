@@ -98,6 +98,7 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
                 $event->setEndTime(
                     new Alaress_Date_Format(strtotime('00:00:00', $currentTimestamp), 'U')
                 );
+                $event->setEventId(md5($campusId.$event->getStartTime()->getDatabaseDate()));
                 $event->setPublishDate(null);
                 $event->setTitle(sprintf("%s: %s", $campusName, $dayName));
                 $event->setCampusList($campusId);
