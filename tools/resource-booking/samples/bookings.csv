@@ -1,0 +1,6 @@
+bookingstart,bookingEnd,Bookingshortname,shortname,status,creationdate,bookingcreatoruserid,bookingdescription
+19/01/2015 8:00,19/01/2015 17:00,Exec Retreat,Library Classroom (26),CONFIRMED,17/12/2014 12:34,RebeccaP,
+19/01/2015 8:00,19/01/2015 17:00,Exec Retreat,Library Drum,CONFIRMED,19/12/2014 9:00,RebeccaP,
+19/01/2015 8:00,19/01/2015 17:00,Exec Retreat,Library General Study Area,CONFIRMED,19/12/2014 8:59,RebeccaP,
+20/01/2015 8:00,20/01/2015 17:00,Exec Retreat,Library General Study Area,CONFIRMED,19/12/2014 8:59,RebeccaP,
+20/01/2015 8:00,20/01/2015 17:00,Exec Retreat,Library Drum,CONFIRMED,19/12/2014 9:00,RebeccaP,
