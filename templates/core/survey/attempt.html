@@ -55,7 +55,9 @@
 <div class="row">
 	<div class="small-12 island">
 		<h2 class="subheader">{SECTION_TITLE}</h2>
-		<div class="content panel">{SECTION_DESCRIPTION}</div>
+		<section class="content">
+			<article>{SECTION_DESCRIPTION}</article>
+		</section>
 		<!-- BEGIN question -->
 		<section>
 			<form id="questionForm-{QUESTION_QUESTION_ID}" data-plugin="{QUESTION_PLUGIN}" action="/survey/saveResponse/{QUESTION_QUESTION_ID}" method="post" data-question="{QUESTION_QUESTION_ID}">
@@ -74,25 +76,26 @@
 			</form>
 		</section>
 		<!-- END question -->
-	</div>
-</div>
 
-<div class="row">
-	<div class="small-12 column">
 		<!-- BEGIN prevSection -->
-		<a href="/survey/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}" class="button icon-previous" data-evaluation-navigator>Previous Section</a>
+		<div class="small-6 column no-pad">
+			<a href="/survey/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}" class="button icon-previous expand" data-evaluation-navigator>Previous Section</a>
+		</div>
 		<!-- END prevSection -->
-
 		<!-- BEGIN nextSection -->
-		<a href="/survey/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}" class="button icon-next" data-evaluation-navigator>Next Section</a>
+		<div class="small-6 column no-pad">
+			<a href="/survey/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}" class="button icon-next expand" data-evaluation-navigator>Next Section</a>
+		</div>
 		<!-- END nextSection -->
-
 		<!-- BEGIN endAssess -->
-		<a href="/survey/end/{ASSESS_ASSESS_ID}" class="button secondary expand" data-evaluation-finish>Finish</a>
+		<div class="small-6 column no-pad">
+			<a href="/survey/end/{ASSESS_ASSESS_ID}" class="button secondary expand" data-evaluation-finish>Finish</a>
+		</div>
 		<!-- END endAssess -->
-
-        <div id='evaluation-saving' class="loader text-center hide">
-            <span class="success label full-width hide" data-evaluation-progress-saved>Progress Saved</span>
-        </div>
-    </div>
+		<div class="small-12 column no-pad">
+			<div id='evaluation-saving' class="loader text-center hide">
+				<span class="success label full-width hide" data-evaluation-progress-saved>Progress Saved</span>
+			</div>
+		</div>
+	</div>
 </div>
