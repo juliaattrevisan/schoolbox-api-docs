@@ -116,42 +116,42 @@ module.exports = function(grunt) {
                     // jQueryUI Touch Punch
                     'www/javascript/components/jqueryui-touch-punch-improved/jquery.ui.touch-punch-improved.js',
 
-                    // Magnific Popup (lightbox)
-                    'www/javascript/components/magnific-popup/dist/jquery.magnific-popup.js',
+                    // Foundation
+                    'www/javascript/components/foundation/js/foundation.min.js',
 
-                    // Moment
+                    // Side Navigation
+                    // This includes the Flyout menu, on user profile drop down
+                    // Also fixes touch on side navigation and adds scroll to top
+                    'www/javascript/shared/sidemenu/jquery.flyout.js',
+                    'www/javascript/shared/sidemenu/jquery.touch-menu.js',
+                    'www/javascript/shared/sidemenu/jquery.scroll-to.js',
+
+                    // DateTime
                     'www/javascript/components/moment/moment.js',
 
                     // Fullcalendar
                     'www/javascript/components/fullcalendar/dist/fullcalendar.min.js',
 
-                    // Dropzone
+                    // Files And Resource Browser
+                    'www/socialstream/browser/browser.js',
                     'www/javascript/components/dropzone/downloads/dropzone.js',
+
+                    // Magnific Popup Lightbox
+                    'www/javascript/components/magnific-popup/dist/jquery.magnific-popup.js',
 
                     // Notifier
                     'www/javascript/shared/notifications/jquery.notifier.js',
 
-                    // Socialstream browser
-                    'www/socialstream/browser/browser.js',
-
-                    // Flyout menu, on user profile drop down
-                    // Fix touch on side navigation
-                    // Scroll to top
-                    'www/javascript/shared/sidemenu/jquery.flyout.js',
-                    'www/javascript/shared/sidemenu/jquery.touch-menu.js',
-                    'www/javascript/shared/sidemenu/jquery.scroll-to.js',
-
-                    // Foundation
-                    'www/javascript/components/foundation/js/foundation.min.js',
-
-                    //Random scripts
-                    'www/javascript/shared/miscellaneous.js',
-
                     // Confirm Dialog
                     'www/javascript/shared/jquery.confirm-dialog.js',
 
-                    // Device dimensions
-                    'www/javascript/shared/jquery.device.js'
+                    // Device Dimensions
+                    'www/javascript/shared/jquery.device.js',
+
+                    // Random Scripts
+                    // Various javascripts that are so tiny they didn't get
+                    // their own files/plugins
+                    'www/javascript/shared/miscellaneous.js'
 
                     //Maths formulas
                     //'www/javascript/math/jscurry-0.3.0.js',
