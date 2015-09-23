@@ -30,9 +30,8 @@
                 return row;
             });
 
-            var dialogOptions = {autoOpen: false, modal: true};
-            var areaDialog    = $('[data-role="add-area-dialog"]').dialog(dialogOptions);
-            var levelDialog   = $('[data-role="add-level-dialog"]').dialog(dialogOptions);
+            var areaDialog  = $('[data-role="add-area-dialog"]');
+            var levelDialog = $('[data-role="add-level-dialog"]');
 
             /**
              * Builds a readonly view of the curriculum node
@@ -179,11 +178,11 @@
                 switch (interaction) {
                     case 'add-level-dialog-open':
                         event.preventDefault();
-                        levelDialog.dialog('open');
+                        levelDialog.foundation('reveal', 'open');
                         break;
                     case 'add-area-dialog-open':
                         event.preventDefault();
-                        areaDialog.dialog('open');
+                        areaDialog.foundation('reveal', 'open');
                         break;
                     default:
                         break;
@@ -271,7 +270,7 @@
             });
 
             // Create new level/area submit event
-            var allDialogs = $(areaDialog).add(levelDialog)
+            var allDialogs = $(areaDialog).add(levelDialog);
             allDialogs.on('submit', 'form', function(event) {
                 event.preventDefault();
                 formPanel.addClass('loading');
@@ -297,7 +296,7 @@
                                 .prop('selected', true)
                                 .text(name)
                         );
-                        allDialogs.dialog('close');
+                        allDialogs.foundation('reveal', 'close');
                     })
                     .fail(function() {
                         // Not sure?
@@ -514,16 +513,20 @@
 </div>
 #}
 
-<div data-role="add-area-dialog" title="Create New Learning Area">
+<div class="reveal-modal" data-reveal data-role="add-area-dialog" aria-labelledby="addAreaTitle" aria-hidden="true" role="dialog">
+    <h2 id="addAreaTitle">Create New Learning Area</h2>
     <form action="{{ routeLookup('curriculumLearningArea.create') }}" method="post" data-relation="[name='learningArea']">
         <input name="name" type="text" value="" />
         <input type="submit" class="submit-btn-plain float-right" value="Create" />
     </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
-<div data-role="add-level-dialog" title="Create New Learning Level">
+<div class="reveal-modal" data-reveal data-role="add-level-dialog" aria-labelledby="addLevelTitle" aria-hidden="true" role="dialog">
+    <h2 id="addLevelTitle">Create New Learning Level</h2>
     <form action="{{ routeLookup('curriculumLearningLevel.create') }}" method="post" data-relation="[name='learningLevel']">
         <input name="name" type="text" value="" />
         <input type="submit" class="submit-btn-plain float-right" value="Create" />
     </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
