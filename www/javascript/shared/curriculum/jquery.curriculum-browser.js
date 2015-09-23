@@ -18,6 +18,7 @@
         this.initTree();
         this.initDialogs();
         this.initResize();
+        this.initEvents();
     };
 
     CurriculumBrowser.prototype.configure = function(element, options)
@@ -123,66 +124,7 @@
     CurriculumBrowser.prototype.init = function()
     {
         var self   = this;
-        var config = self.config;
         var formPanel = self.viewPanel;
-
-        // Triggers for adding new levels or areas
-        formPanel.on('change', '#node-form select', function(event) {
-            var option      = $(this).find(':selected');
-            var interaction = option.data('interaction');
-            switch (interaction) {
-                case 'add-level-dialog-open':
-                    event.preventDefault();
-                    config.levels.dialog.foundation('reveal', 'open');
-                    break;
-                case 'add-area-dialog-open':
-                    event.preventDefault();
-                    config.areas.dialog.foundation('reveal', 'open');
-                    break;
-                default:
-                    break;
-            }
-        });
-
-        // Node save form submission
-        formPanel.on('submit', '#node-form', function(event) {
-            event.preventDefault();
-
-            // Do it via AJAX instead
-            var form     = $(this);
-            var formData = form.serializeArray();
-            formPanel
-                .addClass('loading')
-                .find(':input').prop('disabled', true);
-            $.ajax({
-                type:     this.method,
-                data:     formData,
-                dataType: 'json',
-                url:      this.action
-            })
-                .done(function(data) {
-                    // Is this a newly created node? If so, add it in.
-                    // self.tree has no comprehensive updateNode, so update what I can.
-                    formPanel.addClass('loaded');
-                    if (self.tree.get_node(data.item.id)) {
-                        self.tree.rename_node(data.item.id, data.tree.text);
-                    } else {
-                        self.tree.create_node(data.tree.parent, data.tree);
-                        self.tree.deselect_all(true);
-                        self.tree.select_node(data.tree.id);
-                    }
-                })
-                .fail(function() {
-                    formPanel.addClass('failed');
-                })
-                .always(function() {
-                    formPanel.removeClass('loading')
-                        .find(':input').prop('disabled', false);
-                    setTimeout(function() {
-                        formPanel.removeClass('loaded failed');
-                    }, 2000)
-                });
-        });
 
         // IE9 doesn't support form attribute on inputs.
         // Add a click delete button polyfill.
@@ -192,37 +134,6 @@
                 formPanel.find('#node-delete-form').submit();
             });
         }
-
-        // Delete node form
-        formPanel.on('submit', '#node-delete-form', function(event) {
-            event.preventDefault();
-            formPanel
-                .addClass('loading')
-                .find(':input').prop('disabled', true);
-            $.ajax({
-                type:     this.method,
-                dataType: 'json',
-                url:      this.action
-            })
-                .done(function(data) {
-                    formPanel.addClass('loaded');
-                    self.tree.delete_node(data.item.id);
-                    self.tree.select_node(data.tree.parent);
-                })
-                .fail(function() {
-                    formPanel.addClass('failed');
-                })
-                .always(function() {
-                    formPanel.removeClass('loading')
-                        .find(':input').prop('disabled', false);
-                });
-        });
-
-        // Create new curriculum
-        $('[data-interaction="create-curriculum"]').on('click', function(event) {
-            event.preventDefault();
-            self.buildForm({ save: config.view.createUri }, {});
-        });
     };
 
     /**
@@ -347,6 +258,103 @@
                     self.viewPanel.removeClass('loading');
                     submit.prop('disabled', false);
                 });
+        });
+    };
+
+    /**
+     * Sets up events on the curriculum browser
+     */
+    CurriculumBrowser.prototype.initEvents = function()
+    {
+        var self = this;
+
+        // Triggers for adding new levels or areas
+        self.viewPanel.on('change', '#node-form select', function(event) {
+            var option      = $(this).find(':selected');
+            var interaction = option.data('interaction');
+            switch (interaction) {
+                case 'add-level-dialog-open':
+                    event.preventDefault();
+                    config.levels.dialog.foundation('reveal', 'open');
+                    break;
+                case 'add-area-dialog-open':
+                    event.preventDefault();
+                    config.areas.dialog.foundation('reveal', 'open');
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        // Node save form submission
+        self.viewPanel.on('submit', '#node-form', function(event) {
+            event.preventDefault();
+
+            // Do it via AJAX instead
+            var form     = $(this);
+            var formData = form.serializeArray();
+            self.viewPanel
+                .addClass('loading')
+                .find(':input').prop('disabled', true);
+            $.ajax({
+                type:     this.method,
+                data:     formData,
+                dataType: 'json',
+                url:      this.action
+            })
+                .done(function(data) {
+                    // Is this a newly created node? If so, add it in.
+                    // self.tree has no comprehensive updateNode, so update what I can.
+                    self.viewPanel.addClass('loaded');
+                    if (self.tree.get_node(data.item.id)) {
+                        self.tree.rename_node(data.item.id, data.tree.text);
+                    } else {
+                        self.tree.create_node(data.tree.parent, data.tree);
+                        self.tree.deselect_all(true);
+                        self.tree.select_node(data.tree.id);
+                    }
+                })
+                .fail(function() {
+                    self.viewPanel.addClass('failed');
+                })
+                .always(function() {
+                    self.viewPanel.removeClass('loading')
+                        .find(':input').prop('disabled', false);
+                    setTimeout(function() {
+                        self.viewPanel.removeClass('loaded failed');
+                    }, 2000)
+                });
+        });
+        
+        // Delete node form
+        self.viewPanel.on('submit', '#node-delete-form', function(event) {
+            event.preventDefault();
+            self.viewPanel
+                .addClass('loading')
+                .find(':input').prop('disabled', true);
+            $.ajax({
+                type:     this.method,
+                dataType: 'json',
+                url:      this.action
+            })
+                .done(function(data) {
+                    self.viewPanel.addClass('loaded');
+                    self.tree.delete_node(data.item.id);
+                    self.tree.select_node(data.tree.parent);
+                })
+                .fail(function() {
+                    self.viewPanel.addClass('failed');
+                })
+                .always(function() {
+                    self.viewPanel.removeClass('loading')
+                        .find(':input').prop('disabled', false);
+                });
+        });
+
+        // Create new curriculum
+        $('[data-interaction="create-curriculum"]').on('click', function(event) {
+            event.preventDefault();
+            self.buildForm({ save: config.view.createUri }, {});
         });
     };
 
