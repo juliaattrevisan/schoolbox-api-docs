@@ -80,8 +80,7 @@
         // Add child to existing curriculum
         self.viewPanel.find('#create-child-button').click(function(event) {
             event.preventDefault();
-            var form = $(this).closest('form');
-            self.buildForm({ save:  self.config.view.createUri }, { parent: form.data('nodeid') }, data);
+            self.buildForm({ save:  self.config.view.createUri }, { parent: $(this).data('nodeid') }, data);
         });
     };
 
