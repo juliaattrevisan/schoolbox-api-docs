@@ -15,6 +15,7 @@
     {
         this.configure(element, options);
         this.init();
+        this.initTree();
         this.initDialogs();
         this.initResize();
     };
@@ -124,79 +125,7 @@
         var self   = this;
         var config = self.config;
         var formPanel = self.viewPanel;
-        var tree      = self.treePanel;
-
-        tree.jstree({
-            core: {
-                animation: 50,
-                data: config.tree.data,
-                force_text: true,
-                multiple: false,
-                check_callback: true,
-                themes: {
-                    variant: "resourcetree",
-                    dots: true,
-                    icons: true,
-                    responsive: false
-                }
-            },
-            plugins: ['sort', 'types'],
-            types: {
-                root: {
-                    icon: '/images/tree/server.gif'
-                },
-                'default': {
-                    icon: '/images/icons/22x22/folder.png'
-                },
-                folder: {
-                    icon: '/images/icons/22x22/folder.png'
-                },
-                code: {
-                    icon: '/images/famicons/star.png'
-                }
-            }
-        })
-            .on('select_node.jstree', function(event, jstree) {
-                // Open a node when you select it
-                jstree.instance.open_node(jstree.node.id);
-            })
-            .on('ready.jstree', function(event, jstree) {
-                // Is there a hash? If so, open all nodes below that hash.
-                // (but maybe not curriculum codes)
-                var match = window.location.hash.match(/^#(.*)/);
-                if (match) {
-                    jstree.instance.select_node(match[1]);
-                    jstree.instance.open_all(match[1]);
-                }
-            })
-            .on('select_node.jstree', function(event, jstree) {
-                // Load this node in the node browser
-                // read URL comes from the node I just clicked
-                formPanel
-                    .addClass('loading')
-                    .find(':input').prop('disabled', true);
-                $.getJSON(jstree.node.a_attr.href+'.json')
-                    .done(function(data) {
-                        self.buildView(
-                            {
-                                save:   jstree.node.a_attr['data-saveuri'],
-                                delete: jstree.node.a_attr['data-deleteuri']
-                            },
-                            data.item
-                        );
-                    })
-                    .fail(function() {
-                        formPanel.addClass('failed');
-                    })
-                    .always(function() {
-                        formPanel.removeClass('loading');
-                        setTimeout(function() {
-                            formPanel.removeClass('loaded failed');
-                        }, 2000)
-                    });
-            });
-
-        var jstree = $.jstree.reference('[data-role="curriculum-tree"]');
+        var jstree = $.jstree.reference(config.tree.selector);
 
         // Triggers for adding new levels or areas
         formPanel.on('change', '#node-form select', function(event) {
@@ -297,8 +226,86 @@
         });
     };
 
+    /**
+     * Sets up the JSTree
+     */
+    CurriculumBrowser.prototype.initTree = function()
+    {
+        var self = this;
+        self.treePanel.jstree({
+            core: {
+                animation: 50,
+                data: self.config.tree.data,
+                force_text: true,
+                multiple: false,
+                check_callback: true,
+                themes: {
+                    variant: "resourcetree",
+                    dots: true,
+                    icons: true,
+                    responsive: false
+                }
+            },
+            plugins: ['sort', 'types'],
+            types: {
+                root: {
+                    icon: '/images/tree/server.gif'
+                },
+                'default': {
+                    icon: '/images/icons/22x22/folder.png'
+                },
+                folder: {
+                    icon: '/images/icons/22x22/folder.png'
+                },
+                code: {
+                    icon: '/images/famicons/star.png'
+                }
+            }
+        })
+            .on('select_node.jstree', function(event, jstree) {
+                // Open a node when you select it
+                jstree.instance.open_node(jstree.node.id);
+            })
+            .on('ready.jstree', function(event, jstree) {
+                // Is there a hash? If so, open all nodes below that hash.
+                // (but maybe not curriculum codes)
+                var match = window.location.hash.match(/^#(.*)/);
+                if (match) {
+                    jstree.instance.select_node(match[1]);
+                    jstree.instance.open_all(match[1]);
+                }
+            })
+            .on('select_node.jstree', function(event, jstree) {
+                // Load this node in the node browser
+                // read URL comes from the node I just clicked
+                self.viewPanel
+                    .addClass('loading')
+                    .find(':input').prop('disabled', true);
+                $.getJSON(jstree.node.a_attr.href+'.json')
+                    .done(function(data) {
+                        self.buildView(
+                            {
+                                save:   jstree.node.a_attr['data-saveuri'],
+                                delete: jstree.node.a_attr['data-deleteuri']
+                            },
+                            data.item
+                        );
+                    })
+                    .fail(function() {
+                        self.viewPanel.addClass('failed');
+                    })
+                    .always(function() {
+                        self.viewPanel.removeClass('loading');
+                        setTimeout(function() {
+                            self.viewPanel.removeClass('loaded failed');
+                        }, 2000)
+                    });
+            });
+    };
 
-
+    /**
+     * Sets up dialog boxes
+     */
     CurriculumBrowser.prototype.initDialogs = function()
     {
         var self = this;
