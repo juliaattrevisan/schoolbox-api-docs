@@ -1,4 +1,7 @@
 /**
+ * Automatically apply a plugin to a predefined data attribute.
+ * This saves you from having to instantiate plugins manually.
+ *
  * Select all/none checkboxes within a fieldset.
  *
  * Options:
