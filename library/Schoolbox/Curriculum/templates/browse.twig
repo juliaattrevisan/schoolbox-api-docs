@@ -25,7 +25,7 @@
             });
 
             // Set up the browser
-            $('[data-role="curriculum-browser"]').curriculumBrowser({
+            var browser = $('[data-role="curriculum-browser"]').curriculumBrowser({
                 areas: {
                     data: {{ areas|json_encode|raw }},
                     dialog: $('[data-role="add-area-dialog"]')
@@ -47,6 +47,12 @@
                     data: treeData,
                     selector: '[data-role="curriculum-tree"]'
                 }
+            });
+
+            // Create new curriculum
+            $('[data-interaction="create-curriculum"]').on('click', function(event) {
+                event.preventDefault();
+                browser.curriculumBrowser('openCreateForm');
             });
         })
     })(jQuery);

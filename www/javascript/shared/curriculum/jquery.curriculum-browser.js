@@ -350,12 +350,6 @@
                         .find(':input').prop('disabled', false);
                 });
         });
-
-        // Create new curriculum
-        $('[data-interaction="create-curriculum"]').on('click', function(event) {
-            event.preventDefault();
-            self.buildForm({ save: config.view.createUri }, {});
-        });
     };
 
     /**
@@ -376,12 +370,31 @@
     };
 
     /**
+     * Opens the create form for this curriculum browser.
+     */
+    CurriculumBrowser.prototype.openCreateForm = function()
+    {
+        this.buildForm({ save: this.config.view.createUri }, {});
+    };
+
+    /**
      * Curriculum Browser
      *
-     * @param options
+     * @param options If a string: call this method (with arguments) on the CB already on this item
+     *                If an object: setup the CB
      */
     $.fn.curriculumBrowser = function(options) {
-        var element = $(this);
-        element.data('curriculumBrowser', new CurriculumBrowser(element, options || {}));
+        if (typeof options === 'string') {
+            var method  = options;
+            var browser = this.data('curriculumBrowser');
+            if (browser instanceof CurriculumBrowser) {
+                if (typeof browser[method] === 'function') {
+                    browser[method].call(browser, $.makeArray(arguments).slice(1));
+                }
+            }
+        } else {
+            this.data('curriculumBrowser', new CurriculumBrowser(this, options || {}));
+            return this;
+        }
     }
 })(jQuery);
