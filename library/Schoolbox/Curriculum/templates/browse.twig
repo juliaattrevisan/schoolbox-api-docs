@@ -67,7 +67,7 @@
              * @param previous If creating a subsection, fall back to this data
              */
             var buildForm = function(actions, data, previous) {
-                tinyMCE.execCommand('mceRemoveControl', true, 'node-description');
+                tinyMCE.execCommand('mceRemoveControl', true, 'curriculumDescription');
                 data.actions = actions;
                 data.areas   = areas;
                 data.levels  = levels;
@@ -84,7 +84,7 @@
                         buildView(actions, data);
                     }
                 });
-                tinyMCE.execCommand('mceAddControl', true, 'node-description');
+                tinyMCE.execCommand('mceAddControl', true, 'curriculumDescription');
             };
 
             var template     = doT.template($('script#node-template').html().trim());
@@ -398,20 +398,20 @@
         {{?}}
 
         <dl>
-            <dt>Name</dt>
-            <dd><input type="text" name="name" value="{{! it.name }}" /></dd>
+            <dt><label for="curriculumName">Name</label></dt>
+            <dd><input id="curriculumName" type="text" name="name" value="{{! it.name }}" /></dd>
         </dl>
         <dl>
-            <dt>Code</dt>
-            <dd><input type="text" name="code" value="{{! it.code }}" /></dd>
+            <dt><label for="curriculumCode">Code</label></dt>
+            <dd><input id="curriculumCode" type="text" name="code" value="{{! it.code }}" /></dd>
         </dl>
         <dl>
-            <dt>Reference</dt>
-            <dd><input type="text" name="reference" value="{{! it.reference }}" /></dd>
+            <dt><label for="curriculumReference">Reference</label></dt>
+            <dd><input id="curriculumReference" type="text" name="reference" value="{{! it.reference }}" /></dd>
         </dl>
         <dl>
-            <dt>Description</dt>
-            <dd><textarea id="node-description" name="description">{{! it.description }}</textarea>
+            <dt><label for="curriculumDescription">Description</label></dt>
+            <dd><textarea id="curriculumDescription" name="description">{{! it.description }}</textarea>
         </dl>
 
         <ul class="button-group even-2">
