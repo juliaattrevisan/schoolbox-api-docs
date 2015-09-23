@@ -69,6 +69,8 @@
      * depending on whether the view panel is visible.
      *
      * @param contents
+     *
+     * @return the panel/dialog that was updated, so that events may be attached to it.
      */
     CurriculumBrowser.prototype.updateViewPanel = function(contents)
     {
@@ -76,11 +78,13 @@
             this.viewPanel
                 .empty()
                 .append(contents);
+            return this.viewPanel;
         } else {
             this.config.view.dialog.children().not('.close-reveal-modal').remove();
             this.config.view.dialog
                 .append(contents)
                 .foundation('reveal', 'open');
+            return this.config.view.dialog;
         }
     };
 
@@ -98,15 +102,15 @@
         data.actions  = actions;
         data.readonly = self.config.readonly;
 
-        self.updateViewPanel(self.config.view.templates.view(data));
+        var viewPanel = self.updateViewPanel(self.config.view.templates.view(data));
 
         // Add an edit existing curriculum event to the edit button here
-        self.viewPanel.find('[data-interaction="edit"]').click(function(event) {
+        viewPanel.find('[data-interaction="edit"]').click(function(event) {
             event.preventDefault();
             self.buildForm(actions, data);
         });
         // Add child to existing curriculum
-        self.viewPanel.find('[data-interaction="add-subsection"]').click(function(event) {
+        viewPanel.find('[data-interaction="add-subsection"]').click(function(event) {
             event.preventDefault();
             self.buildForm({ save:  self.config.view.createUri }, { parent: $(this).data('nodeid') }, data);
         });
@@ -129,10 +133,10 @@
         data.areas   = self.config.areas.data;
         data.levels  = self.config.levels.data;
 
-        self.updateViewPanel(self.config.view.templates.edit(data));
+        var viewPanel = self.updateViewPanel(self.config.view.templates.edit(data));
 
         // Cancel editing event
-        self.viewPanel.find('[data-interaction="cancel"]').click(function(event) {
+        viewPanel.find('[data-interaction="cancel"]').click(function(event) {
             event.preventDefault();
             // Is data empty? Load data from whatever the current node is.
             if (!data.id) {
@@ -288,8 +292,10 @@
     {
         var self = this;
 
+        var viewPanels = $().add(self.viewPanel).add(self.config.view.dialog);
+
         // Triggers for adding new levels or areas
-        self.viewPanel.on('change', self.config.view.editFormSelector+' select', function(event) {
+        viewPanels.on('change', self.config.view.editFormSelector+' select', function(event) {
             var option      = $(this).find(':selected');
             var interaction = option.data('interaction');
             switch (interaction) {
