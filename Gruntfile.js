@@ -102,41 +102,59 @@ module.exports = function(grunt) {
                     // jQuery
                     'www/javascript/components/jquery/jquery.js',
                     'www/javascript/components/jquery/jquery-migrate.min.js',
+
                     // jQuery placeholder shim
                     'www/javascript/components/jquery-placeholder/jquery.placeholder.js',
+
                     // jQuery Validation
                     'www/javascript/components/jquery-validation/jquery.validate.js',
                     'www/javascript/jquery.validate.extensions.js',
+
                     // jQueryUI
                     'www/javascript/components/jquery.ui/dist/jquery-ui.js',
+
                     // jQueryUI Touch Punch
                     'www/javascript/components/jqueryui-touch-punch-improved/jquery.ui.touch-punch-improved.js',
+
                     // Magnific Popup (lightbox)
                     'www/javascript/components/magnific-popup/dist/jquery.magnific-popup.js',
+
                     // Moment
                     'www/javascript/components/moment/moment.js',
+
                     // Fullcalendar
                     'www/javascript/components/fullcalendar/dist/fullcalendar.min.js',
+
                     // Dropzone
                     'www/javascript/components/dropzone/downloads/dropzone.js',
+
                     // Notifier
                     'www/javascript/jquery.notifier.js',
+
                     // Socialstream browser
                     'www/socialstream/browser/browser.js',
+
                     // Flyout menu, on user profile drop down
                     'www/javascript/jquery.flyout.js',
+
                     // Fix touch on side navigation
                     'www/javascript/jquery.touchMenu.js',
+
                     // Foundation
                     'www/javascript/components/foundation/js/foundation.min.js',
+
                     //Random scripts
                     'www/javascript/scripts.js',
+
                     // Scroll to top
-                    'www/javascript/shared/jquery.scroll-to.js'
+                    'www/javascript/shared/jquery.scroll-to.js',
+
+                    // Device dimensions
+                    'www/javascript/shared/jquery.device.js'
+
                     //Maths formulas
                     //'www/javascript/math/jscurry-0.3.0.js',
                     //'www/javascript/math/jqmath-0.4.0.js'
-
                 ],
                 dest: 'www/javascript/components/<%= pkg.name %>.min.js'
             }
