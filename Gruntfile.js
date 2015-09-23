@@ -130,7 +130,9 @@ module.exports = function(grunt) {
                     // Foundation
                     'www/javascript/components/foundation/js/foundation.min.js',
                     //Random scripts
-                    'www/javascript/scripts.js'
+                    'www/javascript/scripts.js',
+                    // Scroll to top
+                    'www/javascript/shared/scroll-to.js'
                     //Maths formulas
                     //'www/javascript/math/jscurry-0.3.0.js',
                     //'www/javascript/math/jqmath-0.4.0.js'

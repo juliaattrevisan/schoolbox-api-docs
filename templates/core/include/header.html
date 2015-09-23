@@ -19,30 +19,30 @@
 <script type="text/javascript" src="/javascript/math/jqmath-0.4.0.js"></script>
 <script type="text/javascript" src="/javascript/components/foundation/js/vendor/modernizr.js"></script>
 <script type="text/javascript" src="/javascript/components/foundation/js/foundation.min.js"></script>
-
 <script type="text/javascript">M.$mathQ = false; </script> <!-- Disables $ formula encoding -->
 <script type="text/javascript">
-  $(document).ready(function() { $('#infoPanel').find('a[data-menu]').flyout(); });
-  $(document).ready(function() {
-      $('#nav').touchMenu();
+    $(function() {
+        $('#infoPanel').find('a[data-menu]').flyout();
+        $('#nav').touchMenu();
+        $('#nav').scrollToTop();
 
-      var s = $('#search');
-      s.on('click', 'i', function () {
-          if (s.find('input').val()) {
-              s.submit();
-          }
-      });
+        var s = $('#search');
+        s.on('click', 'i', function () {
+            if (s.find('input').val()) {
+                s.submit();
+            }
+        });
+    });
 
-  });
+    // Date formats (global variable)
+    var dateDisplayFormats = {
+        datepicker: {DATEPICKER_FORMAT},
+        momentJs:   {MOMENTJS_FORMAT}
+    };
 
-  // Date formats (global variable)
-  var dateDisplayFormats = {
-      datepicker: {DATEPICKER_FORMAT},
-      momentJs:   {MOMENTJS_FORMAT}
-  };
-  $.datepicker.setDefaults({
-      dateFormat: dateDisplayFormats.datepicker
-  })
+    $.datepicker.setDefaults({
+        dateFormat: dateDisplayFormats.datepicker
+    });
 </script>
 <!-- Classes on document for when IE < 11 -->
 <!--[if lt IE 10]>
