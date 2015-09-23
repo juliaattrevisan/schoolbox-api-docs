@@ -20,6 +20,12 @@
         this.initEvents();
     };
 
+    /**
+     * Does configuration of curriculum browser object.
+     *
+     * @param element
+     * @param options
+     */
     CurriculumBrowser.prototype.configure = function(element, options)
     {
         var defaults = {
@@ -59,6 +65,26 @@
     };
 
     /**
+     * Updates the contents of either the view panel or the dialog box,
+     * depending on whether the view panel is visible.
+     *
+     * @param contents
+     */
+    CurriculumBrowser.prototype.updateViewPanel = function(contents)
+    {
+        if (this.viewPanel.is(':visible')) {
+            this.viewPanel
+                .empty()
+                .append(contents);
+        } else {
+            this.config.view.dialog.children().not('.close-reveal-modal').remove();
+            this.config.view.dialog
+                .append(contents)
+                .foundation('reveal', 'open');
+        }
+    };
+
+    /**
      * Builds a readonly view of the curriculum node
      *
      * @param actions
@@ -72,16 +98,7 @@
         data.actions  = actions;
         data.readonly = self.config.readonly;
 
-        if (self.viewPanel.is(':visible')) {
-            self.viewPanel
-                .empty()
-                .append(self.config.view.templates.view(data));
-        } else {
-            self.config.view.dialog.children().not('.close-reveal-modal').remove();
-            self.config.view.dialog
-                .append(self.config.view.templates.view(data))
-                .foundation('reveal', 'open');
-        }
+        self.updateViewPanel(self.config.view.templates.view(data));
 
         // Add an edit existing curriculum event to the edit button here
         self.viewPanel.find('[data-interaction="edit"]').click(function(event) {
@@ -112,16 +129,7 @@
         data.areas   = self.config.areas.data;
         data.levels  = self.config.levels.data;
 
-        if (self.viewPanel.is(':visible')) {
-            self.viewPanel
-                .empty()
-                .append(self.config.view.templates.edit(data));
-        } else {
-            self.config.view.dialog.children().not('.close-reveal-modal').remove();
-            self.config.view.dialog
-                .append(self.config.view.templates.edit(data))
-                .foundation('reveal', 'open');
-        }
+        self.updateViewPanel(self.config.view.templates.edit(data));
 
         // Cancel editing event
         self.viewPanel.find('[data-interaction="cancel"]').click(function(event) {
