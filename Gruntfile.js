@@ -146,6 +146,9 @@ module.exports = function(grunt) {
                     //Random scripts
                     'www/javascript/scripts.js',
 
+                    // Confirm Dialog
+                    'www/javascript/shared/jquery.confirm-dialog.js',
+
                     // Scroll to top
                     'www/javascript/shared/jquery.scroll-to.js',
 
