@@ -346,14 +346,14 @@
     /**
      * Sets up resizing of the three panel browser
      *
-     * TODO fix panes so this isn't needed
+     * TODO include this in an external plugin somehow?
      */
     CurriculumBrowser.prototype.initResize = function()
     {
         var self = this;
         var resizePanels = function() {
             $().add(self.viewPanel).add(self.treePanel).outerHeight(
-                $('body').height() - 50
+                $('body').height() - $('#footer').height() - self.element.offset().top
             );
         };
         $(window).resize(resizePanels);
