@@ -50,14 +50,6 @@
             var config   = $.extend({}, defaults, options);
             config.view.templates.view = doT.template(config.view.templates.view);
             config.view.templates.edit = doT.template(config.view.templates.edit);
-            config.tree.data = config.tree.data.map(function(row) {
-                try {
-                    row.li_attr.class += ' curriculum-node';
-                } catch (e) {
-                    row.li_attr.class = 'curriculum-node';
-                }
-                return row;
-            });
             return config;
         }
 
