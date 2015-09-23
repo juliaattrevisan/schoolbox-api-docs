@@ -36,6 +36,8 @@
             view: {
                 readonly: false,
                 selector: '[data-role="curriculum-editor"]',
+                editFormSelector: '[data-role="node-form"]',
+                deleteFormSelector: '[data-role="node-delete-form"]',
                 createUri: '',
                 templates: {
                     view: '',
@@ -73,12 +75,12 @@
             .empty()
             .append(self.config.view.templates.view(data));
         // Add an edit existing curriculum event to the edit button here
-        self.viewPanel.find('#edit-button').click(function(event) {
+        self.viewPanel.find('[data-interaction="edit"]').click(function(event) {
             event.preventDefault();
             self.buildForm(actions, data);
         });
         // Add child to existing curriculum
-        self.viewPanel.find('#create-child-button').click(function(event) {
+        self.viewPanel.find('[data-interaction="add-subsection"]').click(function(event) {
             event.preventDefault();
             self.buildForm({ save:  self.config.view.createUri }, { parent: $(this).data('nodeid') }, data);
         });
@@ -105,7 +107,7 @@
             .append(self.config.view.templates.edit(data));
 
         // Cancel editing event
-        self.viewPanel.find('#cancel-button').click(function(event) {
+        self.viewPanel.find('[data-interaction="cancel"]').click(function(event) {
             event.preventDefault();
             // Is data empty? Load data from whatever the current node is.
             if (!data.id) {
@@ -125,14 +127,14 @@
         var self   = this;
         var formPanel = self.viewPanel;
 
-        // IE9 doesn't support form attribute on inputs.
-        // Add a click delete button polyfill.
-        if (!('form' in $('<input>')[0])) {
-            formPanel.on('click', '#delete-button', function(event) {
-                event.preventDefault();
-                formPanel.find('#node-delete-form').submit();
-            });
-        }
+        //// IE9 doesn't support form attribute on inputs.
+        //// Add a click delete button polyfill.
+        //if (!('form' in $('<input>')[0])) {
+        //    formPanel.on('click', '#delete-button', function(event) {
+        //        event.preventDefault();
+        //        formPanel.find('#node-delete-form').submit();
+        //    });
+        //}
     };
 
     /**
@@ -239,7 +241,7 @@
                     var nameInput = form.find('input[name="name"]');
                     var name      = nameInput.val();
                     nameInput.val('');
-                    self.viewPanel.find('#node-form').find(selector).append(
+                    self.viewPanel.find(self.config.view.editFormSelector).find(selector).append(
                         $('<option />')
                             .attr('value', data.item.id)
                             .attr('label', name)
@@ -268,7 +270,7 @@
         var self = this;
 
         // Triggers for adding new levels or areas
-        self.viewPanel.on('change', '#node-form select', function(event) {
+        self.viewPanel.on('change', self.config.view.editFormSelector+' select', function(event) {
             var option      = $(this).find(':selected');
             var interaction = option.data('interaction');
             switch (interaction) {
@@ -286,7 +288,7 @@
         });
 
         // Node save form submission
-        self.viewPanel.on('submit', '#node-form', function(event) {
+        self.viewPanel.on('submit', self.config.view.editFormSelector, function(event) {
             event.preventDefault();
 
             // Do it via AJAX instead
@@ -326,7 +328,7 @@
         });
         
         // Delete node form
-        self.viewPanel.on('submit', '#node-delete-form', function(event) {
+        self.viewPanel.on('submit', self.config.view.deleteFormSelector, function(event) {
             event.preventDefault();
             self.viewPanel
                 .addClass('loading')
