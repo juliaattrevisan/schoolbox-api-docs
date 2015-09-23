@@ -333,25 +333,19 @@
     <article>{{= it.description }}</article>
 
     {{? !it.readonly }}
-    <form id="node-form" method="post" action="{{! it.actions.save }}" data-nodeid="{{! it.id }}">
-        <input type="submit"
-               class="submit-btn-plain"
-               value="Edit"
-               id="edit-button"
-        />
-        <input type="submit"
-               class="submit-btn-plain"
-               value="Add Subsection"
-               id="create-child-button"
-        />
-    </form>
-    <form action="{{! it.actions.delete }}" method="post">
-        <input type="submit"
-               class="submit-btn-plain"
-               value="Delete"
-               id="delete-button"
-        />
-    </form>
+    <ul class="button-group even-3">
+        <li>
+            <button id="edit-button" class="button">Edit</button>
+        </li>
+        <li>
+            <button id="create-child-button" class="button secondary">Add Subsection</button>
+        </li>
+        <li>
+            <form method="post" action="{{! it.actions.delete }}">
+                <button type="submit" id="delete-button" class="alert">Delete</button>
+            </form>
+        </li>
+    </ul>
     {{?}}
 </script>
 {% endverbatim %}
