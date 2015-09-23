@@ -59,7 +59,7 @@
                     <form method="post">
                         <input name="event[id]" type="hidden" value="{{ event.eventId }}">
                         {% if renderer.attendanceStatus() %}
-                        <a class="button icon-reply" data-attendance-request href="#">Unattend</a>
+                        <a class="button icon-undo" data-attendance-request href="#">Unattend</a>
                         {% else %}
                         <a class="button icon-reply" data-attendance-request href="#">RSVP</a>
                         {% endif %}
