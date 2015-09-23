@@ -68,7 +68,17 @@ class External_Pcschools_Class implements External_ClassInterface
      */
     public function getTeacherName($classCode)
     {
-        // TODO: Implement getTeacherName() method.
+        return array_map(
+            function($v) { return $v['TEACHER']; },
+            $this->getDatabase()->trimAll(
+                $this->getDatabase()->getAll("
+                    SELECT DISTINCT S.TEACHER
+                    FROM SUB S
+                    INNER JOIN [SUBJECT] SU ON S.SUBJECT_NO = SU.NO
+                    WHERE (S.YEAR + SU.ABBREV + S.CLASS) = {$this->getDatabase()->smartQuote($classCode)}
+                ")
+            )
+        );
     }
 
     /**
