@@ -329,27 +329,36 @@
         
         // Delete node form
         self.viewPanel.on('submit', self.config.view.deleteFormSelector, function(event) {
+            var form = $(this);
             event.preventDefault();
-            self.viewPanel
-                .addClass('loading')
-                .find(':input').prop('disabled', true);
-            $.ajax({
-                type:     this.method,
-                dataType: 'json',
-                url:      this.action
-            })
-                .done(function(data) {
-                    self.viewPanel.addClass('loaded');
-                    self.tree.delete_node(data.item.id);
-                    self.tree.select_node(data.tree.parent);
-                })
-                .fail(function() {
-                    self.viewPanel.addClass('failed');
-                })
-                .always(function() {
-                    self.viewPanel.removeClass('loading')
-                        .find(':input').prop('disabled', false);
-                });
+            $(this).confirmDialog({
+                text: 'Are you sure? This will delete ALL curriculum sections underneath this one, too.',
+                confirmEvent: function() {
+                    self.viewPanel
+                        .addClass('loading')
+                        .find(':input').prop('disabled', true);
+                    $.ajax({
+                        type:     form.attr('method'),
+                        dataType: 'json',
+                        url:      form.attr('action')
+                    })
+                        .done(function(data) {
+                            self.viewPanel.addClass('loaded');
+                            self.tree.delete_node(data.item.id);
+                            self.tree.select_node(data.tree.parent);
+                        })
+                        .fail(function() {
+                            self.viewPanel.addClass('failed');
+                        })
+                        .always(function() {
+                            self.viewPanel.removeClass('loading')
+                                .find(':input').prop('disabled', false);
+                            setTimeout(function() {
+                                self.viewPanel.removeClass('loaded failed');
+                            }, 2000)
+                        });
+                }
+            });
         });
     };
 
