@@ -145,7 +145,7 @@ module.exports = function(grunt) {
                     'www/javascript/components/foundation/js/foundation.min.js',
 
                     //Random scripts
-                    'www/javascript/scripts.js',
+                    'www/javascript/shared/miscellaneous.js',
 
                     // Confirm Dialog
                     'www/javascript/shared/jquery.confirm-dialog.js',
