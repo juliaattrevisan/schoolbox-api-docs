@@ -132,7 +132,7 @@ module.exports = function(grunt) {
                     //Random scripts
                     'www/javascript/scripts.js',
                     // Scroll to top
-                    'www/javascript/shared/scroll-to.js'
+                    'www/javascript/shared/jquery.scroll-to.js'
                     //Maths formulas
                     //'www/javascript/math/jscurry-0.3.0.js',
                     //'www/javascript/math/jqmath-0.4.0.js'
