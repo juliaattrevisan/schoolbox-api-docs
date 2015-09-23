@@ -827,7 +827,7 @@ class External_Pcschools_User implements External_UserInterface
         return $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll("
                 SELECT DISTINCT
-                    SU.ABBREV AS code,
+                    S.YEAR + SU.ABBREV + S.CLASS AS code,
                     SU.[DESC] AS name,
                     SU.KEYAREA AS classType,
                     ST.CAMPUS AS campusCode
