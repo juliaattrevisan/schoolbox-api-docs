@@ -135,10 +135,11 @@ module.exports = function(grunt) {
                     'www/socialstream/browser/browser.js',
 
                     // Flyout menu, on user profile drop down
-                    'www/javascript/jquery.flyout.js',
-
                     // Fix touch on side navigation
-                    'www/javascript/jquery.touchMenu.js',
+                    // Scroll to top
+                    'www/javascript/shared/sidemenu/jquery.flyout.js',
+                    'www/javascript/shared/sidemenu/jquery.touch-menu.js',
+                    'www/javascript/shared/sidemenu/jquery.scroll-to.js',
 
                     // Foundation
                     'www/javascript/components/foundation/js/foundation.min.js',
@@ -148,9 +149,6 @@ module.exports = function(grunt) {
 
                     // Confirm Dialog
                     'www/javascript/shared/jquery.confirm-dialog.js',
-
-                    // Scroll to top
-                    'www/javascript/shared/jquery.scroll-to.js',
 
                     // Device dimensions
                     'www/javascript/shared/jquery.device.js'
