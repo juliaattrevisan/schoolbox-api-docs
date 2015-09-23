@@ -360,33 +360,30 @@
         -->
         {{? !it.id && !it.parent }}
         <h2>Create New Curriculum</h2>
-        <dl>
-            <dt>Curriculum</dt>
-            <dd>
-                <select name="learningLevel">
-                    <option value="">-- select a level --</option>
-                    {{~ it.levels :levelGroup }}
-                    <optgroup label="{{! levelGroup.name || 'Uncategorized' }}">
-                        {{~ levelGroup.list :level }}
-                        <option value="{{! level.id }}" label="{{! level.name }}">{{! level.name }}</option>
-                        {{~ }}
-                    </optgroup>
-                    {{~}}
-                    <option value="" data-interaction="add-level-dialog-open">Add New Level...</option>
-                </select>
-                <select name="learningArea">
-                    <option value="">-- select an area --</option>
-                    {{~ it.areas :areaGroup }}
-                    <optgroup label="{{! areaGroup.name || 'Uncategorized' }}">
-                        {{~ areaGroup.list :area }}
-                        <option value="{{! area.id }}" label="{{! area.name }}">{{! area.name }}</option>
-                        {{~ }}
-                    </optgroup>
-                    {{~}}
-                    <option value="" data-interaction="add-area-dialog-open">Add New Area...</option>
-                </select>
-            </dd>
-        </dl>
+        <label for="curriculumLearningLevel">Level</label>
+        <select name="learningLevel" id="curriculumLearningLevel">
+            <option value="">-- select a level --</option>
+            {{~ it.levels :levelGroup }}
+            <optgroup label="{{! levelGroup.name || 'Uncategorized' }}">
+                {{~ levelGroup.list :level }}
+                <option value="{{! level.id }}" label="{{! level.name }}">{{! level.name }}</option>
+                {{~ }}
+            </optgroup>
+            {{~}}
+            <option value="" data-interaction="add-level-dialog-open">Add New Level...</option>
+        </select>
+        <label for="curriculumLearningArea">Learning Area</label>
+        <select name="learningArea" id="curriculumLearningArea">
+            <option value="">-- select an area --</option>
+            {{~ it.areas :areaGroup }}
+            <optgroup label="{{! areaGroup.name || 'Uncategorized' }}">
+                {{~ areaGroup.list :area }}
+                <option value="{{! area.id }}" label="{{! area.name }}">{{! area.name }}</option>
+                {{~ }}
+            </optgroup>
+            {{~}}
+            <option value="" data-interaction="add-area-dialog-open">Add New Area...</option>
+        </select>
         {{?}}
 
         {{? it.id }}
@@ -396,22 +393,14 @@
         <h2>Create New Curriculum Subsection</h2>
         {{?}}
 
-        <dl>
-            <dt><label for="curriculumName">Name</label></dt>
-            <dd><input id="curriculumName" type="text" name="name" value="{{! it.name }}" /></dd>
-        </dl>
-        <dl>
-            <dt><label for="curriculumCode">Code</label></dt>
-            <dd><input id="curriculumCode" type="text" name="code" value="{{! it.code }}" /></dd>
-        </dl>
-        <dl>
-            <dt><label for="curriculumReference">Reference</label></dt>
-            <dd><input id="curriculumReference" type="text" name="reference" value="{{! it.reference }}" /></dd>
-        </dl>
-        <dl>
-            <dt><label for="curriculumDescription">Description</label></dt>
-            <dd><textarea id="curriculumDescription" name="description">{{! it.description }}</textarea>
-        </dl>
+        <label for="curriculumName">Name</label>
+        <input id="curriculumName" type="text" name="name" value="{{! it.name }}" />
+        <label for="curriculumCode">Code</label>
+        <input id="curriculumCode" type="text" name="code" value="{{! it.code }}" />
+        <label for="curriculumReference">Reference</label>
+        <input id="curriculumReference" type="text" name="reference" value="{{! it.reference }}" />
+        <label for="curriculumDescription">Description</label>
+        <textarea id="curriculumDescription" name="description">{{! it.description }}</textarea>
 
         <ul class="button-group even-2">
             <li>
