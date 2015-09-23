@@ -14,7 +14,6 @@
     var CurriculumBrowser = function(element, options)
     {
         this.configure(element, options);
-        this.init();
         this.initTree();
         this.initDialogs();
         this.initResize();
@@ -135,24 +134,6 @@
             }
         });
         tinyMCE.execCommand('mceAddControl', true, 'curriculumDescription');
-    };
-
-    /**
-     * Sets up the events and stuff on the curriculum browser
-     */
-    CurriculumBrowser.prototype.init = function()
-    {
-        var self   = this;
-        var formPanel = self.viewPanel;
-
-        //// IE9 doesn't support form attribute on inputs.
-        //// Add a click delete button polyfill.
-        //if (!('form' in $('<input>')[0])) {
-        //    formPanel.on('click', '#delete-button', function(event) {
-        //        event.preventDefault();
-        //        formPanel.find('#node-delete-form').submit();
-        //    });
-        //}
     };
 
     /**
