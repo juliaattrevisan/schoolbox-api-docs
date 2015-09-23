@@ -244,9 +244,8 @@
 
         function rs()
         {
-            $('#three-panel').height(
-                $(window).height() - $('#search').height() - $('#footer').height() - $('#meta').height() - 48
-            );
+            var calcd = $(window).height() - $('#search').height() - $('#footer').height() - $('#meta').height() - 48;
+            $('#three-panel').height(Math.max(200, calcd));
         }
 
         function loadPanel(panel, path, nodeId)
