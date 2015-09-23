@@ -14,7 +14,8 @@
     var CurriculumBrowser = function(element, options)
     {
         this.configure(element, options);
-        this.build();
+        this.init();
+        this.initDialogs();
     };
 
     CurriculumBrowser.prototype.configure = function(element, options)
@@ -52,65 +53,74 @@
         this.treePanel = config.element.find(config.tree.selector);
     };
 
-    CurriculumBrowser.prototype.build = function()
+    /**
+     * Builds a readonly view of the curriculum node
+     *
+     * @param actions
+     * @param data
+     */
+    CurriculumBrowser.prototype.buildView = function(actions, data)
+    {
+        var self = this;
+
+        // Update data
+        data.actions  = actions;
+        data.readonly = self.config.readonly;
+        self.viewPanel
+            .empty()
+            .append(self.config.view.templates.view(data));
+        // Add an edit existing curriculum event to the edit button here
+        self.viewPanel.find('#edit-button').click(function(event) {
+            event.preventDefault();
+            self.buildForm(actions, data);
+        });
+        // Add child to existing curriculum
+        self.viewPanel.find('#create-child-button').click(function(event) {
+            event.preventDefault();
+            var form = $(this).closest('form');
+            self.buildForm({ save:  self.config.view.createUri }, { parent: form.data('nodeid') }, data);
+        });
+    };
+
+    /**
+     * Builds a writable view of the curriculum node
+     *
+     * @param actions
+     * @param data
+     * @param previous If creating a subsection, fall back to this data
+     */
+    CurriculumBrowser.prototype.buildForm = function(actions, data, previous)
+    {
+        var self = this;
+        tinyMCE.execCommand('mceRemoveControl', true, 'curriculumDescription');
+
+        // Update data
+        data.actions = actions;
+        data.areas   = self.config.areas.data;
+        data.levels  = self.config.levels.data;
+        self.viewPanel
+            .empty()
+            .append(self.config.view.templates.edit(data));
+
+        // Cancel editing event
+        self.viewPanel.find('#cancel-button').click(function(event) {
+            event.preventDefault();
+            // Is data empty? Load data from whatever the current node is.
+            if (!data.id) {
+                self.buildView(actions, previous);
+            } else {
+                self.buildView(actions, data);
+            }
+        });
+        tinyMCE.execCommand('mceAddControl', true, 'curriculumDescription');
+    };
+
+    CurriculumBrowser.prototype.init = function()
     {
         var self   = this;
         var config = self.config;
         var formPanel = self.viewPanel;
         var tree      = self.treePanel;
-
-        /**
-         * Builds a readonly view of the curriculum node
-         *
-         * @param actions
-         * @param data
-         */
-        var buildView = function(actions, data) {
-            data.actions  = actions;
-            data.readonly = config.readonly;
-            formPanel
-                .empty()
-                .append(config.view.templates.view(data));
-            // Add an edit existing curriculum event to the edit button here
-            formPanel.find('#edit-button').click(function(event) {
-                event.preventDefault();
-                buildForm(actions, data);
-            });
-            // Add child to existing curriculum
-            formPanel.find('#create-child-button').click(function(event) {
-                event.preventDefault();
-                var form = $(this).closest('form');
-                buildForm({ save: config.view.createUri }, { parent: form.data('nodeid') }, data);
-            });
-        };
-
-        /**
-         * Builds a writable view of the curriculum node
-         *
-         * @param actions
-         * @param data
-         * @param previous If creating a subsection, fall back to this data
-         */
-        var buildForm = function(actions, data, previous) {
-            tinyMCE.execCommand('mceRemoveControl', true, 'curriculumDescription');
-            data.actions = actions;
-            data.areas   = config.areas.data;
-            data.levels  = config.levels.data;
-            formPanel
-                .empty()
-                .append(config.view.templates.edit(data));
-            // Cancel editing
-            formPanel.find('#cancel-button').click(function(event) {
-                event.preventDefault();
-                // Is data empty? Load data from whatever the current node is.
-                if (!data.id) {
-                    buildView(actions, previous);
-                } else {
-                    buildView(actions, data);
-                }
-            });
-            tinyMCE.execCommand('mceAddControl', true, 'curriculumDescription');
-        };
 
         tree.jstree({
             core: {
@@ -163,7 +173,7 @@
                     .find(':input').prop('disabled', true);
                 $.getJSON(jstree.node.a_attr.href+'.json')
                     .done(function(data) {
-                        buildView(
+                        self.buildView(
                             {
                                 save:   jstree.node.a_attr['data-saveuri'],
                                 delete: jstree.node.a_attr['data-deleteuri']
@@ -288,7 +298,7 @@
         // Create new curriculum
         $('[data-interaction="create-curriculum"]').on('click', function(event) {
             event.preventDefault();
-            buildForm({ save: config.view.createUri }, {});
+            self.buildForm({ save: config.view.createUri }, {});
         });
     };
 
@@ -296,11 +306,12 @@
 
     CurriculumBrowser.prototype.initDialogs = function()
     {
+        var self = this;
         // Create new level/area submit event
-        var allDialogs = $(config.areas.dialog).add(config.levels.dialog);
+        var allDialogs = $(self.config.areas.dialog).add(self.config.levels.dialog);
         allDialogs.on('submit', 'form', function(event) {
             event.preventDefault();
-            formPanel.addClass('loading');
+            self.viewPanel.addClass('loading');
             var form     = $(this);
             var selector = form.data('relation');
             var submit   = form.find(':submit').prop('disabled', true);
@@ -312,11 +323,11 @@
             ajax
                 .done(function(data) {
                     // Update what gets chosen
-                    formPanel.addClass('loaded');
+                    self.viewPanel.addClass('loaded');
                     var nameInput = form.find('input[name="name"]');
                     var name      = nameInput.val();
                     nameInput.val('');
-                    formPanel.find('#node-form').find(selector).append(
+                    self.viewPanel.find('#node-form').find(selector).append(
                         $('<option />')
                             .attr('value', data.item.id)
                             .attr('label', name)
@@ -327,11 +338,11 @@
                 })
                 .fail(function() {
                     // Not sure?
-                    formPanel.addClass('failed');
+                    self.viewPanel.addClass('failed');
                 })
                 .always(function() {
                     // Re-enable submit button no matter what
-                    formPanel.removeClass('loading');
+                    self.viewPanel.removeClass('loading');
                     submit.prop('disabled', false);
                 });
         });
