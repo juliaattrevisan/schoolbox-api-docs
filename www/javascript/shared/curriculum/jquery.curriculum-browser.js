@@ -42,7 +42,8 @@
                 templates: {
                     view: '',
                     edit: ''
-                }
+                },
+                dialog: $()
             },
             tree: {
                 data: [],
@@ -71,9 +72,18 @@
         // Update data
         data.actions  = actions;
         data.readonly = self.config.readonly;
-        self.viewPanel
-            .empty()
-            .append(self.config.view.templates.view(data));
+
+        if (self.viewPanel.is(':visible')) {
+            self.viewPanel
+                .empty()
+                .append(self.config.view.templates.view(data));
+        } else {
+            self.config.view.dialog.children().not('.close-reveal-modal').remove();
+            self.config.view.dialog
+                .append(self.config.view.templates.view(data))
+                .foundation('reveal', 'open');
+        }
+
         // Add an edit existing curriculum event to the edit button here
         self.viewPanel.find('[data-interaction="edit"]').click(function(event) {
             event.preventDefault();
@@ -102,9 +112,17 @@
         data.actions = actions;
         data.areas   = self.config.areas.data;
         data.levels  = self.config.levels.data;
-        self.viewPanel
-            .empty()
-            .append(self.config.view.templates.edit(data));
+
+        if (self.viewPanel.is(':visible')) {
+            self.viewPanel
+                .empty()
+                .append(self.config.view.templates.edit(data));
+        } else {
+            self.config.view.dialog.children().not('.close-reveal-modal').remove();
+            self.config.view.dialog
+                .append(self.config.view.templates.edit(data))
+                .foundation('reveal', 'open');
+        }
 
         // Cancel editing event
         self.viewPanel.find('[data-interaction="cancel"]').click(function(event) {
@@ -143,6 +161,38 @@
     CurriculumBrowser.prototype.initTree = function()
     {
         var self = this;
+
+        // The select node event
+        var selectNodeEvent = function(event, jstree) {
+            // Load this node in the node browser
+            // read URL comes from the node I just clicked
+            self.viewPanel
+                .addClass('loading')
+                .find(':input').prop('disabled', true);
+
+            $.getJSON(jstree.node.a_attr.href+'.json')
+                .done(function(data) {
+                    // On initial load: don't open this dialog!
+                    self.buildView(
+                        {
+                            save:   jstree.node.a_attr['data-saveuri'],
+                            delete: jstree.node.a_attr['data-deleteuri']
+                        },
+                        data.item
+                    );
+                })
+                .fail(function() {
+                    self.viewPanel.addClass('failed');
+                })
+                .always(function() {
+                    self.viewPanel.removeClass('loading');
+                    setTimeout(function() {
+                        self.viewPanel.removeClass('loaded failed');
+                    }, 2000)
+                });
+        };
+
+        var loaded = false;
         self.treePanel.jstree({
             core: {
                 animation: 50,
@@ -185,32 +235,12 @@
                     jstree.instance.select_node(match[1]);
                     jstree.instance.open_all(match[1]);
                 }
+                loaded = true;
             })
             .on('select_node.jstree', function(event, jstree) {
-                // Load this node in the node browser
-                // read URL comes from the node I just clicked
-                self.viewPanel
-                    .addClass('loading')
-                    .find(':input').prop('disabled', true);
-                $.getJSON(jstree.node.a_attr.href+'.json')
-                    .done(function(data) {
-                        self.buildView(
-                            {
-                                save:   jstree.node.a_attr['data-saveuri'],
-                                delete: jstree.node.a_attr['data-deleteuri']
-                            },
-                            data.item
-                        );
-                    })
-                    .fail(function() {
-                        self.viewPanel.addClass('failed');
-                    })
-                    .always(function() {
-                        self.viewPanel.removeClass('loading');
-                        setTimeout(function() {
-                            self.viewPanel.removeClass('loaded failed');
-                        }, 2000)
-                    });
+                if (self.viewPanel.is(':visible') || loaded) {
+                    selectNodeEvent(event, jstree);
+                }
             });
         self.tree = $.jstree.reference(self.config.tree.selector);
     };

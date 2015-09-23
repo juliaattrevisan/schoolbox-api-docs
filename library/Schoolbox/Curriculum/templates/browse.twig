@@ -44,7 +44,8 @@
                     templates: {
                         view: $('script#node-template').html().trim(),
                         edit: $('script#node-edit-template').html().trim()
-                    }
+                    },
+                    dialog: $('[data-role="node-dialog"]')
                 },
                 tree: {
                     data: treeData,
@@ -240,22 +241,6 @@
     </div>
 </div>
 
-{#
-<div class="template2 curriculum-browser">
-    <div class="left">
-        <div class="pane curriculum-selector">
-            <div class="scroller">
-                <div class="curriculum-tree"></div>
-            </div>
-        </div>
-    </div>
-    <div class="right">
-        <div class="pane curriculum-editor">
-        </div>
-    </div>
-</div>
-#}
-
 <div class="reveal-modal" data-reveal data-role="add-area-dialog" aria-labelledby="addAreaTitle" aria-hidden="true" role="dialog">
     <h2 id="addAreaTitle">Create New Learning Area</h2>
     <form action="{{ routeLookup('curriculumLearningArea.create') }}" method="post" data-relation="[name='learningArea']">
@@ -271,5 +256,10 @@
         <input name="name" type="text" value="" />
         <input type="submit" class="submit-btn-plain float-right" value="Create" />
     </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+{# Dialog that replaces the second panel on medium down - for now, readonly #}
+<div class="reveal-modal" data-reveal data-role="node-dialog" aria-hidden="true" role="dialog">
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
