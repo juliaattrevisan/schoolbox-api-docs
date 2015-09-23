@@ -59,7 +59,7 @@
 
                     $.magnificPopup.open({
                         items: {
-                            src: "<div class='preview loader'>Attempting to preview...</div>",
+                            src: "<div class='preview loader'></div>",
                             type: 'inline'
                         }
                     });
