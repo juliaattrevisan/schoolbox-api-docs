@@ -125,7 +125,6 @@
         var self   = this;
         var config = self.config;
         var formPanel = self.viewPanel;
-        var jstree = $.jstree.reference(config.tree.selector);
 
         // Triggers for adding new levels or areas
         formPanel.on('change', '#node-form select', function(event) {
@@ -163,14 +162,14 @@
             })
                 .done(function(data) {
                     // Is this a newly created node? If so, add it in.
-                    // jsTree has no comprehensive updateNode, so update what I can.
+                    // self.tree has no comprehensive updateNode, so update what I can.
                     formPanel.addClass('loaded');
-                    if (jstree.get_node(data.item.id)) {
-                        jstree.rename_node(data.item.id, data.tree.text);
+                    if (self.tree.get_node(data.item.id)) {
+                        self.tree.rename_node(data.item.id, data.tree.text);
                     } else {
-                        jstree.create_node(data.tree.parent, data.tree);
-                        jstree.deselect_all(true);
-                        jstree.select_node(data.tree.id);
+                        self.tree.create_node(data.tree.parent, data.tree);
+                        self.tree.deselect_all(true);
+                        self.tree.select_node(data.tree.id);
                     }
                 })
                 .fail(function() {
@@ -207,8 +206,8 @@
             })
                 .done(function(data) {
                     formPanel.addClass('loaded');
-                    jstree.delete_node(data.item.id);
-                    jstree.select_node(data.tree.parent);
+                    self.tree.delete_node(data.item.id);
+                    self.tree.select_node(data.tree.parent);
                 })
                 .fail(function() {
                     formPanel.addClass('failed');
@@ -301,6 +300,7 @@
                         }, 2000)
                     });
             });
+        self.tree = $.jstree.reference(self.config.tree.selector);
     };
 
     /**
