@@ -829,11 +829,12 @@ class External_Pcschools_User implements External_UserInterface
                 SELECT DISTINCT
                     S.YEAR + SU.ABBREV + S.CLASS AS code,
                     SU.[DESC] AS name,
-                    SU.KEYAREA AS classType,
+                    K.[DESC] AS classType,
                     ST.CAMPUS AS campusCode
                 FROM SUB S
                 INNER JOIN STUDENT ST ON S.STUDENT# = ST.STUDENT# AND S.YEAR = ST.CURRENT_YEAR
                 INNER JOIN [SUBJECT] SU ON S.SUBJECT_NO = SU.NO
+                INNER JOIN KEYAREA K ON SU.KEYAREA = K.KEYAREA
                 WHERE ST.STUDKEY = {$this->getDatabase()->smartQuote($externalUserId)}
             ")
         );
