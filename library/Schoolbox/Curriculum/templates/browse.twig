@@ -104,10 +104,6 @@
 <script id="node-edit-template" type="text/x-dot-template">
     <form method="post" action="{{! it.actions.save }}" data-nodeid="{{! it.id }}" data-role="node-form">
         <input type="hidden" name="parent" value="{{! it.parent }}" />
-        <!--
-        Only show curriculum selection for new base nodes
-        Also consider making these selectors selectized so I can add dynamically
-        -->
         {{? !it.id && !it.parent }}
         <h2>Create New Curriculum</h2>
         <label for="curriculumLearningLevel">Level</label>

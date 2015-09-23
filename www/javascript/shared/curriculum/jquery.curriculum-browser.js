@@ -74,16 +74,18 @@
      */
     CurriculumBrowser.prototype.updateViewPanel = function(contents)
     {
+        // Empty both the dialog and view panel
+        this.viewPanel.empty();
+        this.config.view.dialog.children().not('.close-reveal-modal').remove();
         if (this.viewPanel.is(':visible')) {
-            this.viewPanel
-                .empty()
-                .append(contents);
+            this.viewPanel.append(contents);
             return this.viewPanel;
         } else {
-            this.config.view.dialog.children().not('.close-reveal-modal').remove();
-            this.config.view.dialog
-                .append(contents)
-                .foundation('reveal', 'open');
+            // Don't reopen if already open, just replace
+            if (!this.config.view.dialog.is(':visible')) {
+                this.config.view.dialog.foundation('reveal', 'open');
+            }
+            this.config.view.dialog.append(contents);
             return this.config.view.dialog;
         }
     };
