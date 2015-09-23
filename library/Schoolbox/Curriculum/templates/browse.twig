@@ -65,7 +65,7 @@
 <!-- Template for displaying of a curriculum node -->
 {% verbatim %}
 <script id="node-template" type="text/x-dot-template">
-    <h2>
+    <h2 id="nodeTitle">
         {{? it.code }}
             [{{! it.code }}]
         {{?}}
@@ -105,7 +105,7 @@
     <form method="post" action="{{! it.actions.save }}" data-nodeid="{{! it.id }}" data-role="node-form">
         <input type="hidden" name="parent" value="{{! it.parent }}" />
         {{? !it.id && !it.parent }}
-        <h2>Create New Curriculum</h2>
+        <h2 id="nodeTitle">Create New Curriculum</h2>
         <label for="curriculumLearningLevel">Level</label>
         <select name="learningLevel" id="curriculumLearningLevel">
             <option value="">-- select a level --</option>
@@ -133,10 +133,10 @@
         {{?}}
 
         {{? it.id }}
-        <h2>Edit Curriculum Subsection</h2>
+        <h2 id="nodeTitle">Edit Curriculum Subsection</h2>
         {{?}}
         {{? !it.id && it.parent }}
-        <h2>Create New Curriculum Subsection</h2>
+        <h2 id="nodeTitle">Create New Curriculum Subsection</h2>
         {{?}}
 
         <label for="curriculumName">Name</label>
@@ -256,6 +256,6 @@
 </div>
 
 {# Dialog that replaces the second panel on medium down - for now, readonly #}
-<div class="reveal-modal" data-reveal data-role="node-dialog" aria-hidden="true" role="dialog">
+<div class="reveal-modal" data-reveal data-role="node-dialog" aria-labelledby="nodeTitle" aria-hidden="true" role="dialog">
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
