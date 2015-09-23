@@ -99,6 +99,12 @@ module.exports = function(grunt) {
                 // Bower files
                 src:  [
 
+                    // Modernizr
+                    'www/javascript/components/modernizr/modernizr.js',
+
+                    // Fastclick
+                    'www/javascript/components/fastclick/lib/fastclick.js',
+
                     // jQuery
                     'www/javascript/components/jquery/jquery.js',
                     'www/javascript/components/jquery/jquery-migrate.min.js',
@@ -116,8 +122,20 @@ module.exports = function(grunt) {
                     // jQueryUI Touch Punch
                     'www/javascript/components/jqueryui-touch-punch-improved/jquery.ui.touch-punch-improved.js',
 
-                    // Foundation
-                    'www/javascript/components/foundation/js/foundation.min.js',
+                    // Reforge The Shards of Foundation
+                    // Choose the specific things we are utilising, rather
+                    // than just including everything
+                    'www/javascript/components/foundation/js/foundation/foundation.js',
+                    'www/javascript/components/foundation/js/foundation/foundation.accordion.js',
+                    'www/javascript/components/foundation/js/foundation/foundation.alert.js',
+                    'www/javascript/components/foundation/js/foundation/foundation.clearing.js',
+                    'www/javascript/components/foundation/js/foundation/foundation.dropdown.js',
+                    'www/javascript/components/foundation/js/foundation/foundation.equalizer.js',
+                    'www/javascript/components/foundation/js/foundation/foundation.offcanvas.js',
+                    'www/javascript/components/foundation/js/foundation/foundation.reveal.js',
+                    'www/javascript/components/foundation/js/foundation/foundation.slider.js',
+                    'www/javascript/components/foundation/js/foundation/foundation.tab.js',
+                    'www/javascript/components/foundation/js/foundation/foundation.tooltip.js',
 
                     // Side Navigation
                     // This includes the Flyout menu, on user profile drop down
