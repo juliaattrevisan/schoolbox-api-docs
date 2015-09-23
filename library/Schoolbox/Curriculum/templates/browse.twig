@@ -89,7 +89,7 @@
 
             var template     = doT.template($('script#node-template').html().trim());
             var editTemplate = doT.template($('script#node-edit-template').html().trim());
-            var treePanel    = $('.curriculum-selector');
+//            var treePanel    = $('.curriculum-selector');
             var formPanel    = $('[data-role="curriculum-editor"]');
             var tree         = $('[data-role="curriculum-tree"]').jstree({
                 core: {
@@ -163,14 +163,14 @@
 
             var jstree = $.jstree.reference('[data-role="curriculum-tree"]');
 
-            // resizer - stolen from three panel
-            var resizePanels = function() {
-                $().add(formPanel).add(treePanel).outerHeight(
-                    $(window).height() - $('#header').height() - $('#footer').height() - 50
-                );
-            };
-            resizePanels();
-            $(window).resize(resizePanels);
+//            // resizer - stolen from three panel
+//            var resizePanels = function() {
+//                $().add(formPanel).add(treePanel).outerHeight(
+//                    $(window).height() - $('#header').height() - $('#footer').height() - 50
+//                );
+//            };
+//            resizePanels();
+//            $(window).resize(resizePanels);
 
             // Triggers for adding new levels or areas
             formPanel.on('change', '#node-form select', function(event) {
@@ -265,7 +265,7 @@
             })
 
             // Create new curriculum
-            treePanel.on('click', '[data-interaction="create-curriculum"]', function(event) {
+            $('[data-interaction="create-curriculum"]').on('click', function(event) {
                 event.preventDefault();
                 buildForm({ save: createUri }, {});
             });
