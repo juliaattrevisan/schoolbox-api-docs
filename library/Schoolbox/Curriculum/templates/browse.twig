@@ -470,13 +470,34 @@
     {% endif %}
 </div>
 
+{# Temporary stylage from 15.0 curriculum browser #}
+<style type="text/css">
+    /*
+    .curriculum-browser.jstree-default-resourcetree {
+        margin-left: -24px;
+    }
+    */
+    .curriculum-browser .jstree-node {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
 <div class="row">
-    <div class="small-12 large-6 columns">
-        <div data-role="curriculum-tree"></div>
+    <div class="small-12 large-6 island">
+        <section>
+            <div class="content">
+                <div data-role="curriculum-tree" class="curriculum-browser"></div>
+            </div>
+        </section>
     </div>
     <!-- Dialogs for small screens, separate pane for large -->
-    <div class="hide-for-medium-down large-6 columns">
-        <div data-role="curriculum-editor"></div>
+    <div class="hide-for-medium-down large-6 island">
+        <section>
+            <div class="content">
+                <div data-role="curriculum-editor"></div>
+            </div>
+        </section>
     </div>
 </div>
 
