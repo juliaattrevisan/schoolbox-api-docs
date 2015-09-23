@@ -35,7 +35,7 @@
                     {
                         timeFormat: leadingZero ? "h" : "g",
                         minTime: '01:00am',
-                        maxTime: '12:59pm',
+                        maxTime: '12:59pm'
                     }
                 );
                 break;
@@ -45,7 +45,7 @@
                     {
                         timeFormat: leadingZero ? "H" : "G",
                         minTime: '00:00',
-                        maxTime: '23:59',
+                        maxTime: '23:59'
                     }
                 );
                 break;
