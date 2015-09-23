@@ -17,6 +17,8 @@ $footer-margin-bottom: 1rem;
         margin: 0 3rem 8rem;
     }
 
+    clear: both;
+
     @include contrast-bg();
     ul {
         margin: 0 auto 1rem;
