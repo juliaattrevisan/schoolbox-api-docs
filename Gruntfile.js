@@ -108,7 +108,7 @@ module.exports = function(grunt) {
 
                     // jQuery Validation
                     'www/javascript/components/jquery-validation/jquery.validate.js',
-                    'www/javascript/jquery.validate.extensions.js',
+                    'www/javascript/shared/jquery.validate.extensions.js',
 
                     // jQueryUI
                     'www/javascript/components/jquery.ui/dist/jquery-ui.js',
