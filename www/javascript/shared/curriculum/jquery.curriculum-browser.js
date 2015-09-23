@@ -16,6 +16,7 @@
         this.configure(element, options);
         this.init();
         this.initDialogs();
+        this.initResize();
     };
 
     CurriculumBrowser.prototype.configure = function(element, options)
@@ -197,15 +198,6 @@
 
         var jstree = $.jstree.reference('[data-role="curriculum-tree"]');
 
-        // resizer - stolen from three panel
-        var resizePanels = function() {
-            $().add(formPanel).add(tree).outerHeight(
-                $(window).height() - $('#header').height() - $('#footer').height() - 50
-            );
-        };
-        resizePanels();
-        $(window).resize(resizePanels);
-
         // Triggers for adding new levels or areas
         formPanel.on('change', '#node-form select', function(event) {
             var option      = $(this).find(':selected');
@@ -351,6 +343,22 @@
         });
     };
 
+    /**
+     * Sets up resizing of the three panel browser
+     *
+     * TODO fix panes so this isn't needed
+     */
+    CurriculumBrowser.prototype.initResize = function()
+    {
+        var self = this;
+        var resizePanels = function() {
+            $().add(self.viewPanel).add(self.treePanel).outerHeight(
+                $('body').height() - 50
+            );
+        };
+        $(window).resize(resizePanels);
+        resizePanels();
+    };
 
     /**
      * Curriculum Browser
