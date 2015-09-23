@@ -38,7 +38,24 @@ class External_Pcschools_Class implements External_ClassInterface
      */
     public function getStudents($classCode)
     {
-        // TODO: Implement getStudents() method.
+        // Class code format: S.YEAR + SU.ABBREV + S.CLASS
+        return $this->getDatabase()->trimAll(
+            $this->getDatabase()->getAll("
+                SELECT DISTINCT
+                    ST.LEGAL_SURNAME AS lastname,
+                    ST.GIVEN_NAME AS firstname,
+                    ST.CURRENT_YEAR AS yearlevel,
+                    ST.HOUSE AS house,
+                    ST.ALERT AS StudentMedicalAlert,
+                    '' AS StudentSpecialNeedsFlag,
+                    ST.STUDKEY AS synergy_id,
+                    ST.CAMPUS AS campusCode
+                FROM SUB S
+                INNER JOIN STUDENT ST ON S.STUDENT# = ST.STUDENT# AND S.YEAR = ST.CURRENT_YEAR
+                INNER JOIN [SUBJECT] SU ON S.SUBJECT_NO = SU.NO
+                WHERE (S.YEAR + SU.ABBREV + S.CLASS) = {$this->getDatabase()->smartQuote($classCode)}
+            ")
+        );
     }
 
     /**
