@@ -313,13 +313,13 @@
         });
 
         // Node save form submission
-        self.viewPanel.on('submit', self.config.view.editFormSelector, function(event) {
+        viewPanels.on('submit', self.config.view.editFormSelector, function(event) {
             event.preventDefault();
 
             // Do it via AJAX instead
             var form     = $(this);
             var formData = form.serializeArray();
-            self.viewPanel
+            viewPanels
                 .addClass('loading')
                 .find(':input').prop('disabled', true);
             $.ajax({
@@ -331,7 +331,7 @@
                 .done(function(data) {
                     // Is this a newly created node? If so, add it in.
                     // self.tree has no comprehensive updateNode, so update what I can.
-                    self.viewPanel.addClass('loaded');
+                    viewPanels.addClass('loaded');
                     if (self.tree.get_node(data.item.id)) {
                         self.tree.rename_node(data.item.id, data.tree.text);
                     } else {
@@ -341,25 +341,28 @@
                     }
                 })
                 .fail(function() {
-                    self.viewPanel.addClass('failed');
+                    viewPanels.addClass('failed');
                 })
                 .always(function() {
-                    self.viewPanel.removeClass('loading')
+                    viewPanels.removeClass('loading')
                         .find(':input').prop('disabled', false);
                     setTimeout(function() {
-                        self.viewPanel.removeClass('loaded failed');
-                    }, 2000)
+                        viewPanels.removeClass('loaded failed');
+                    }, 2000);
+                    if (self.config.view.dialog.is(':visible')) {
+                        self.config.view.dialog.foundation('reveal', 'close');
+                    }
                 });
         });
         
         // Delete node form
-        self.viewPanel.on('submit', self.config.view.deleteFormSelector, function(event) {
+        viewPanels.on('submit', self.config.view.deleteFormSelector, function(event) {
             var form = $(this);
             event.preventDefault();
             $(this).confirmDialog({
                 text: 'Are you sure? This will delete ALL curriculum sections underneath this one, too.',
                 confirmEvent: function() {
-                    self.viewPanel
+                    viewPanels
                         .addClass('loading')
                         .find(':input').prop('disabled', true);
                     $.ajax({
@@ -368,19 +371,22 @@
                         url:      form.attr('action')
                     })
                         .done(function(data) {
-                            self.viewPanel.addClass('loaded');
+                            viewPanels.addClass('loaded');
                             self.tree.delete_node(data.item.id);
                             self.tree.select_node(data.tree.parent);
                         })
                         .fail(function() {
-                            self.viewPanel.addClass('failed');
+                            viewPanels.addClass('failed');
                         })
                         .always(function() {
-                            self.viewPanel.removeClass('loading')
+                            viewPanels.removeClass('loading')
                                 .find(':input').prop('disabled', false);
                             setTimeout(function() {
-                                self.viewPanel.removeClass('loaded failed');
-                            }, 2000)
+                                viewPanels.removeClass('loaded failed');
+                            }, 2000);
+                            if (self.config.view.dialog.is(':visible')) {
+                                self.config.view.dialog.foundation('reveal', 'close');
+                            }
                         });
                 }
             });
