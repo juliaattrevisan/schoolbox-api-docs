@@ -413,20 +413,23 @@
             <dt>Description</dt>
             <dd><textarea id="node-description" name="description">{{! it.description }}</textarea>
         </dl>
-        {{? it.id }}
-            <input type="submit" class="submit-btn-plain" value="Save Changes" />
-        {{?}}
-        {{? !it.id && it.parent }}
-            <input type="submit" class="submit-btn-plain" value="Create Subsection" />
-        {{?}}
-        {{? !it.id && !it.parent }}
-            <input type="submit" class="submit-btn-plain" value="Create Curriculum" />
-        {{?}}
-        <input type="submit"
-               class="submit-btn-plain"
-               value="Cancel"
-               id="cancel-button"
-        />
+
+        <ul class="button-group even-2">
+            <li>
+                {{? it.id }}
+                    <button type="submit" class="button">Save Changes</button>
+                {{?}}
+                {{? !it.id && it.parent }}
+                    <button type="submit" class="button">Create Subsection</button>
+                {{?}}
+                {{? !it.id && !it.parent }}
+                    <button type="submit" class="button">Create Curriculum</button>
+                {{?}}
+            </li>
+            <li>
+                <button type="submit" id="cancel-button" class="button secondary">Cancel</button>
+            </li>
+        </ul>
     </form>
 </script>
 {% endverbatim %}
