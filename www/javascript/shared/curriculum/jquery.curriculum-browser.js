@@ -115,6 +115,9 @@
         tinyMCE.execCommand('mceAddControl', true, 'curriculumDescription');
     };
 
+    /**
+     * Sets up the events and stuff on the curriculum browser
+     */
     CurriculumBrowser.prototype.init = function()
     {
         var self   = this;
