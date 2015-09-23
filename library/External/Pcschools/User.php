@@ -822,28 +822,19 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getSubjectList($externalUserId, $userId)
     {
+        // As far as I can tell:
+        // SUB stores enrolments AND class info in a denormalized form.
         return $this->getDatabase()->trimAll(
-//            $this->getDatabase()->getAll("
-//                SELECT
-//                    R.SUBJECT_NO AS code,
-//                    SU.[DESC] AS name,
-//                    SU.KEYAREA AS classType,
-//                    ST.CAMPUS AS campusCode
-//                FROM ROLL R
-//                INNER JOIN STUDENT ST ON R.STUDENT# = ST.STUDENT#
-//                INNER JOIN [SUBJECT] SU ON R.SUBJECT_NO = SU.NO
-//                WHERE R.STUDENT# = {$this->getDatabase()->smartQuote($externalUserId)}
-//            ")
             $this->getDatabase()->getAll("
-                SELECT
+                SELECT DISTINCT
                     SU.ABBREV AS code,
                     SU.[DESC] AS name,
                     SU.KEYAREA AS classType,
                     ST.CAMPUS AS campusCode
                 FROM SUB S
-                INNER JOIN STUDENT ST ON S.STUDENT# = ST.STUDENT#
+                INNER JOIN STUDENT ST ON S.STUDENT# = ST.STUDENT# AND S.YEAR = ST.CURRENT_YEAR
                 INNER JOIN [SUBJECT] SU ON S.SUBJECT_NO = SU.NO
-                WHERE S.STUDKEY = {$this->getDatabase()->smartQuote($externalUserId)}
+                WHERE ST.STUDKEY = {$this->getDatabase()->smartQuote($externalUserId)}
             ")
         );
     }
