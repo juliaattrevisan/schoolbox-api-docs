@@ -23,7 +23,30 @@
          * @returns {*}
          */
         function init(options, element) {
-            var defaults = {element: element};
+            var defaults = {
+                element: element,
+                areas: {
+                    data: [],
+                    dialog: $()
+                },
+                levels: {
+                    data: [],
+                    dialog: $()
+                },
+                view: {
+                    readonly: false,
+                    selector: '[data-role="curriculum-editor"]',
+                    createUri: '',
+                    templates: {
+                        view: '',
+                        edit: ''
+                    }
+                },
+                tree: {
+                    data: [],
+                    selector: '[data-role="curriculum-tree"]'
+                }
+            };
             var config   = $.extend({}, defaults, options);
             config.view.templates.view = doT.template(config.view.templates.view);
             config.view.templates.edit = doT.template(config.view.templates.edit);
@@ -262,7 +285,7 @@
                         jstree.delete_node(data.item.id);
                         jstree.select_node(data.tree.parent);
                     })
-                    .fail(function(jqXhr, textStatus, error) {
+                    .fail(function() {
                         formPanel.addClass('failed');
                     })
                     .always(function() {
