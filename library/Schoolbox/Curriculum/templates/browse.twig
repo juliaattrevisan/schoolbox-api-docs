@@ -330,7 +330,7 @@
     </p>
     {{?}}
 
-    {{= it.description }}
+    <article>{{= it.description }}</article>
 
     {{? !it.readonly }}
     <form id="node-form" method="post" action="{{! it.actions.save }}" data-nodeid="{{! it.id }}">
