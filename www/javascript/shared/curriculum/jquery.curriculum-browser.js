@@ -303,11 +303,11 @@
             switch (interaction) {
                 case 'add-level-dialog-open':
                     event.preventDefault();
-                    config.levels.dialog.foundation('reveal', 'open');
+                    self.config.levels.dialog.foundation('reveal', 'open');
                     break;
                 case 'add-area-dialog-open':
                     event.preventDefault();
-                    config.areas.dialog.foundation('reveal', 'open');
+                    self.config.areas.dialog.foundation('reveal', 'open');
                     break;
                 default:
                     break;
