@@ -1,22 +1,19 @@
 {% extends 'calendar/type/_base.twig' %}
 
 {% block eventBubbleSummary %}
-<h3>{{ event.getTitle() }}</h3>
-<h4>{{ event.getFullDate()|raw }}</h4>
-<em>{{ event.getCategory() }}</em>
-<p class="wysiwyg">{{ event.detail|purify}}</p>
-{% endblock eventBubbleSummary %}
-
-{% block eventBubbleMeta %}
-<div class="created meta">
-    {% if event.authorName %}
-        Requested by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a>
+<h3>{{ event.title }}</h3>
+<ul class="meta">
+    <li class="icon-calendar" title="Booking time"><time>{{ event.getFullDate()|raw }}</time></li>
+    <li class="icon-staff-students" title="Requester">Requested by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a></li>
+    <li class="icon-resource-booking" title="Resource"><a href="{{ routeLookup('resourceItem.read', {id: event.booking.resource.id}) }}?date={{ event.getStartTime().getURLDate() }}">{{ event.booking.resource.name }}</a></li>
+    {% if event.categoryId %}
+    <li class="icon-folder" title="Category"><a href='/resource-booking/item?category={{ event.booking.resource.category.id }}'>{{ event.category }}</a></li>
     {% endif %}
-</div>
+</ul>
+<article>{{ event.detail|purify}}</article>
 {% if event.booking.relatedBookingList is iterable %}
-    <br />
     <h3>Related Bookings</h3>
-    <ul class="relatedBookings">
+    <ul>
         {% for relatedBooking in event.booking.relatedBookingList %}
             <li>
                 ({{ relatedBooking.status.name }}) <a href="{{ routeLookup('resourceItem.read', {id: relatedBooking.resource.id}) }}?date={{ event.getStartTime().getURLDate() }}">{{ relatedBooking.resource.name }}</a>
@@ -24,7 +21,7 @@
         {% endfor %}
     </ul>
 {% endif %}
-{% endblock eventBubbleMeta %}
+{% endblock eventBubbleSummary %}
 
 {% block eventBubbleButtons %}
 <div>

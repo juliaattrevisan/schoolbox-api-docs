@@ -2,16 +2,15 @@
 
 <li class="row {{ event.getEventClasses() }} {% if renderer.isTranslucent() %}translucent{% endif %}">
     {% block eventSpan %}
-    <div class="three-column">
-        {{ event.getEventSpan()|raw }}
+    <div class="small-3 column">
+        {{ event.getEventSpan()|raw }}&nbsp;
     </div>
     {% endblock eventSpan %}
 
     {% block eventTitle %}
 
-    <div class="nine-column" data-reveal-id="modal{{ event.getEventId() }}{{ augmentedId }}" style="background-color:{{ event.colour }}">
+    <div class="small-9 column" data-reveal-id="modal{{ event.getEventId() }}{{ augmentedId }}" style="background-color:{{ event.colour }}">
         {{ event.title }}
-
         <span class="right" style="background-color:{{ event.colour }}">
             {% if event.attendance %}
                 A
@@ -26,27 +25,27 @@
             <h3>{{ event.title }}</h3>
 
             <ul class="meta">
-                <li class="icon-calendar"><time>{{ event.getFullDate()|raw }}</time></li>
+                <li class="icon-calendar" title="Date"><time>{{ event.getFullDate()|raw }}</time></li>
 
                 {% if event.eventType %}
-                <li class="icon-list">{{ event.eventType }}:</li>
+                <li class="icon-list" title="Type">{{ event.eventType }}</li>
                 {% endif %}
 
                 {% if event.location %}
-                <li class="icon-location">{{ event.location }}</li>
+                <li class="icon-location" title="Location">{{ event.location }}</li>
                 {% endif %}
 
                 {% block eventBubbleMeta %}
                 {% if event.authorName %}
-                <li class="icon-staff-students">Posted by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a></li>
+                <li class="icon-staff-students" title="Author">Posted by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a></li>
                 {% endif %}
 
                 {% if event.category %}
-                <li class="icon-home"><a href='/homepage/{{ event.categoryId }}'>{{ event.categoryName }}</a></li>
+                <li class="icon-home" title="Homepage"><a href='/homepage/{{ event.categoryId }}'>{{ event.categoryName }}</a></li>
                 {% endif %}
 
                 {% if event.attendance %}
-                <li class="icon-list">Attendance {{ renderer.attendanceStatus() }}</li>
+                <li class="icon-list" title="Attendance">Attendance {{ renderer.attendanceStatus() }}</li>
                 {% endif %}
                 {% endblock eventBubbleMeta %}
             </ul>
@@ -60,7 +59,7 @@
                     <form method="post">
                         <input name="event[id]" type="hidden" value="{{ event.eventId }}">
                         {% if renderer.attendanceStatus() %}
-                        <a class="button icon-reply" data-attendance-request href="#">Unattend</a>
+                        <a class="button icon-undo" data-attendance-request href="#">Unattend</a>
                         {% else %}
                         <a class="button icon-reply" data-attendance-request href="#">RSVP</a>
                         {% endif %}

@@ -2,13 +2,11 @@
 
 {% block eventSpan %}
 <div class="small-6 columns">
-    <strong>
     {% if not event.startTime.isAtStartOfDay() %}
         {{ event.startTime.getTimeOnly() }}
     {% endif %}
     {% if not event.endTime.isAtStartOfDay() %}
         : {{ event.endTime.getTimeOnly() }}
     {% endif %}
-    </strong>
 </div>
 {% endblock eventSpan %}
