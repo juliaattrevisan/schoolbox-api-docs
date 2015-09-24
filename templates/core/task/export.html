@@ -1,18 +1,5 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript">
-    $(function() {
-        // Greenerized checkbox
-        $('input[data-interaction="checkAll"]').on('change', function() {
-            var element         = $(this);
-            var otherCheckboxes = $('input[type="checkbox"]')
-                .not(element)
-                .filter(function() {
-                    return $(this).data('group') === element.data('group');
-                })
-            otherCheckboxes.prop('checked', element.prop('checked'));
-        });
-    });
-</script>
+<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 <!-- END custom_head -->
 
 {BREADCRUMB}
@@ -39,7 +26,10 @@
                         <ul class="information-list">
                             <li class="actions-small-1">
                                 <nav>
-                                    <input id="checkAll" type="checkbox" data-interaction="checkAll" data-group="unit_instance" />
+                                    <input id="checkAll"
+                                           type="checkbox"
+                                           data-select-all
+                                           data-select-all-for-group="unit-instance" />
                                     <label for="checkAll" class="checkbox-label"></label>
                                 </nav>
                             </li>
@@ -79,7 +69,7 @@
                                            id="import-{UNIT_INSTANCE_ID}"
                                            name="unit_instance[{UNIT_INSTANCE_ID}]"
                                            value="1"
-                                           data-group="unit_instance" />
+                                           data-select-all-group="unit-instance" />
                                     <label for="import-{UNIT_INSTANCE_ID}" class="checkbox-label"></label>
                                     <!-- END class_import_checkbox -->
                                 </nav>
