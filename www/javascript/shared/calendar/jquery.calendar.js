@@ -1,22 +1,3 @@
-/**
- * Decide whether the calendar is being displayed on a
- * device with a small screen. fullcalendar requires
- * two different mutually exclusive configuration settings
- * to display properly on both desktop and mobile devices
- *
- * 40em marks Small breakpoint
- * Multiply by 16px base font size, js doesn't support em units
- *
- * @returns {boolean}
- */
-function isCalendarSmall() {
-    if ($(window).width() <= 40*16) {
-        return true;
-    }
-
-    return false;
-}
-
 (function() {
 
     /**
@@ -93,7 +74,7 @@ function isCalendarSmall() {
             var dialog = $(config.exportElement);
             var dialogUrl = $(config.exportUrl);
 
-            dialogUrl.text($.getExportCalendarLink(
+            dialogUrl.text($.fn.getExportCalendarLink(
                 config.userToken,
                 {
                     'export': 'group',
@@ -217,4 +198,40 @@ function isCalendarSmall() {
             return button.parent('form').serialize();
         }
     }
+
+    /**
+     * Method for exporting a calendar link.
+     *
+     * @param token  The user's token
+     * @param values A plain object, or list from jQuery.fn.serializeArray
+     *
+     * @return string
+     */
+    $.fn.getExportCalendarLink = function(token, values) {
+
+        // If from serializeArray: convert to object
+        if ($.isArray(values)) {
+            var new_values = {};
+
+            $.each(values, function(k,v) {
+                new_values[v.name] = v.value;
+            });
+
+            values = new_values;
+        }
+
+        // Add token to object
+        values.token = token;
+
+        // remove unused fields
+        if (values['export'] !== 'group') {
+            delete values.group;
+        }
+
+        if (values['export'] !== 'campus') {
+            delete values.campus;
+        }
+
+        return window.location.protocol+'//'+window.location.host+'/calendar/export.php?'+$.param(values);
+    };
 }(jQuery));

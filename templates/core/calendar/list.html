@@ -1,8 +1,7 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
 <script type="text/javascript" src="/calendar/js/jquery.filterSelector.js"></script>
-<script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
-<script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
+<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
 <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
 <script type="text/javascript">
@@ -68,7 +67,7 @@
         $('#download-calendar-export').click(function(event) {
             event.preventDefault();
             var form = $(event.target).closest('form');
-            window.location = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
+            window.location = $.fn.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
         });
 
         //select all clicked
@@ -82,7 +81,7 @@
             exportActivator: '#open-calendar-export-dialog',
             onReady: function() {
                 var form = $('#calendar-export-form');
-                var url = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray());
+                var url = $.fn.getExportCalendarLink('{USER_TOKEN}', form.serializeArray());
 
                 var dialog = $('#calendar-export-dialog');
                 var dialogUrl = $('#calendar-export-dialog-url');

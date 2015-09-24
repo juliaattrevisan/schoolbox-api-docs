@@ -1,4 +1,7 @@
 /**
+ * Automatically apply a plugin to a predefined data attribute.
+ * This saves you from having to instantiate plugins manually.
+ *
  * Checkbox group - a group of checkboxes of which no more than one may be selected.
  *
  * Options:

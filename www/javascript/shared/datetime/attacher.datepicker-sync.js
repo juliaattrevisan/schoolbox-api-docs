@@ -1,4 +1,7 @@
 /**
+ * Automatically apply a plugin to a predefined data attribute.
+ * This saves you from having to instantiate plugins manually.
+ *
  * Generic datepicker sync setup, based on data attributes
  *
  * Usage:

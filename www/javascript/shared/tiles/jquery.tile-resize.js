@@ -18,7 +18,7 @@
             getSize: function(tile, settings) {
                 return tile.width() / 120;
             },
-            titleSelector: '.title',
+            titleSelector: '.title'
         };
         var settings = $.extend({}, defaults, options);
         $(this).each(function() {

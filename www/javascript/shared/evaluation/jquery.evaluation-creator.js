@@ -303,6 +303,10 @@
                     $(config.answerCollectionList).append($('[data-clone] [data-input]').clone());
 
                     refreshList();
+
+                    /* Bring focus to the new clone
+                     */
+                    $(config.answerCollectionList).find('[data-answer-description]').last().focus();
                 }
 
                 return false;
