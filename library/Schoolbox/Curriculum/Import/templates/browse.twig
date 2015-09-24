@@ -241,63 +241,73 @@
     </nav>
 </div>
 
+<div class="row">
+    <div class="small-12 island">
+        <ul class="tabs" data-tab>
+            <li class="tab-title active"><a href="#step-1">Source</a></li>
+            <li class="tab-title"><a href="#step-2">Curriculum</a></li>
+            <li class="tab-title"><a href="#step-3">Outcomes</a></li>
+        </ul>
+
+        <section>
+            <div class="tabs-content no-margin">
+                <div id="step-1" class="content active">
+                    <em>Curriculum Source:</em>
+                    <select name="source">
+                        <option value="">Select a source</option>
+                        {% for item in sourceList %}
+                            <option value="{{ item.id|e('html_attr') }}"
+                                    label="{{ item.name|e('html_attr') }}"
+                                    title="{{ item.description|e('html_attr') }}"
+                                    >{{ item.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="submit"
+                           value="Use This Source"
+                           class="submit-btn-plain inline"
+                           data-role="wizard-step-1-submit"
+                           disabled
+                    />
+                </div>
+                <div id="step-2" class="content">
+                    <em>Level:</em>
+                    <select name="learningLevel" disabled>
+                        <option value="">Select a level</option>
+                    </select>
+                    <em>Learning Area:</em>
+                    <select name="learningArea" disabled>
+                        <option value="">Select an area</option>
+                    </select>
+                    <input type="submit"
+                           value="Search"
+                           class="submit-btn-plain inline"
+                           data-role="wizard-step-2-submit"
+                           disabled
+                            />
+                </div>
+                <div id="step-3" class="content">
+                    <h4>Name of curriculum</h4>
+                    <input type="text" name="curriculumName" value="" />
+                    <h2>Preview</h2>
+
+                    <ul class="wysiwyg curriculum-import-widget-outcomes" id="outcomes"></ul>
+                    You can make changes after saving your curriculum.
+                    <input type="submit"
+                           value="Save Curriculum"
+                           class="submit-btn-plain inline"
+                           data-role="wizard-step-3-submit"
+                           disabled
+                            />
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
 <form id="curriculum-import-form"
       class="clearfix curriculum-import-widget"
       action="{{ routeLookup('curriculumImport.create')|e('html_attr') }}"
       method="post"
       name="form"
 >
-    <ul>
-        <li><a href="#step-1">Source</a></li>
-        <li><a href="#step-2">Curriculum</a></li>
-        <li><a href="#step-3">Outcomes</a></li>
-    </ul>
-    <section id="step-1">
-        <em>Curriculum Source:</em>
-        <select name="source">
-            <option value="">Select a source</option>
-            {% for item in sourceList %}
-                <option value="{{ item.id|e('html_attr') }}"
-                        label="{{ item.name|e('html_attr') }}"
-                        title="{{ item.description|e('html_attr') }}"
-                        >{{ item.name }}</option>
-            {% endfor %}
-        </select>
-        <input type="submit"
-               value="Use This Source"
-               class="submit-btn-plain inline"
-               data-role="wizard-step-1-submit"
-               disabled
-                />
-    </section>
-    <section id="step-2">
-        <em>Level:</em>
-        <select name="learningLevel" disabled>
-            <option value="">Select a level</option>
-        </select>
-        <em>Learning Area:</em>
-        <select name="learningArea" disabled>
-            <option value="">Select an area</option>
-        </select>
-        <input type="submit"
-               value="Search"
-               class="submit-btn-plain inline"
-               data-role="wizard-step-2-submit"
-               disabled
-                />
-    </section>
-    <section id="step-3">
-        <h4>Name of curriculum</h4>
-        <input type="text" name="curriculumName" value="" />
-        <h2>Preview</h2>
-
-        <ul class="wysiwyg curriculum-import-widget-outcomes" id="outcomes"></ul>
-        You can make changes after saving your curriculum.
-        <input type="submit"
-               value="Save Curriculum"
-               class="submit-btn-plain inline"
-               data-role="wizard-step-3-submit"
-               disabled
-                />
-    </section>
 </form>
