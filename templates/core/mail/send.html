@@ -1,15 +1,16 @@
 <!-- BEGIN custom_head -->
-<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
-<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+
 <script type="text/javascript">
 $(function() {
     $.fn.alaressTiny({
-        mode: 'textareas'
+        mode: 'exact',
+        elements: 'body'
     });
 
     var options = {
@@ -38,39 +39,20 @@ $(function() {
     $('label[data-role="copy-emails"]').click(function(event) {
         event.preventDefault();
         var element = $(this);
+
+        // Copy and paste button - show only when ready
+        var button = $('#copy-button').hide();
+        var client = new ZeroClipboard(button);
+        client.on('ready', function() {
+            button.show();
+        });
+
         var target  = $('#'+element.attr('for'));
         // get html-escaped version of text, really annoying
         var text = $('<div />').text(target.val()).html();
-        if (text.length > 0) {
-            element
-                .qtip({
-                    content: {
-                        title: target.attr('name'),
-                        text: text,
-                        button: true
-                    },
-                    position: {
-                        my: 'top right',
-                        at: 'bottom left'
-                    },
-                    style: {
-                        classes: 'qtip-light qtip-shadow'
-                    },
-                    show: {
-                        event: 'click'
-                    },
-                    hide: {
-                        event: 'unfocus'
-                    },
-                    events: {
-                        hide: function(event, api) {
-                            api.destroy();
-                        }
-                    }
-                })
-                .qtip('show');
-        }
-    })
+        $('#copy-email-text').html(text);
+        $('#email-modal').foundation('reveal','open');
+    });
 
     $('#mailForm').validate({
         ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input'
@@ -124,7 +106,7 @@ $(function() {
                             <input type="text" name="subject" value="{SUBJECT}" required />
                         </label>
                         <label>
-                            <textarea name="message" style="width:100%;height:350px">{BODY}</textarea>
+                            <textarea name="message" id="body">{BODY}</textarea>
                         </label>
                         <label>
                             Attachments
@@ -136,6 +118,12 @@ $(function() {
             <input type="submit" name="submit" value="Send" />
         </form>
     </div>
+</div>
 
+<div id="email-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <p>Use this to copy the addresses to your clipboard for us in other email programs</p>
+    <textarea readonly id="copy-email-text" rows="6"></textarea>
+    <button id="copy-button" data-clipboard-target="copy-email-text" class="icon-copy">Copy to Clipboard</button>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
