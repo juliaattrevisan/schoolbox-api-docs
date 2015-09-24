@@ -5,6 +5,7 @@
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
 <script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
 <script type="text/javascript">
 $(function() {
@@ -38,7 +39,7 @@ $(function() {
     // dialogs for copying email fields
 
     $('[data-role="copy-emails"]').each(function(index, element) {
-        $.fn.calendarExport({
+        $.fn.clipboardSelector({
             exportActivator: $(element),
             onReady: function() {
 
