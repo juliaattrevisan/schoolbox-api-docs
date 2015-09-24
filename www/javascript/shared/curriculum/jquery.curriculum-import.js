@@ -274,13 +274,6 @@
         $().add(levelSelect).add(areaSelect).on('change', function() {
             curriculumTab.find(':submit').prop('disabled', !(areaSelect.val() && levelSelect.val()));
         });
-
-        //// Fade out the loaded class on the new tab
-        //form.on('tabsactivate', function(event, ui) {
-        //    setTimeout(function() {
-        //        ui.newPanel.removeClass('loaded failed');
-        //    }, 2000)
-        //});
     };
 
     /**
@@ -331,7 +324,7 @@
     };
 
     /**
-     * Switches to this tab.
+     * Switches to this tab. Also removes any loaded or failed classes.
      *
      * @param tab
      * @returns {CurriculumImport}
@@ -339,6 +332,9 @@
     CurriculumImport.prototype.switchToTab = function(tab)
     {
         this._findTabTitle(tab).click();
+        setTimeout(function() {
+            tab.removeClass('loaded failed');
+        }, 2000);
         return this;
     };
 
