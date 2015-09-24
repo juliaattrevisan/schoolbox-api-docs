@@ -52,6 +52,7 @@
                 nameInput: {
                     selector: 'input[name="curriculumName"]'
                 },
+                containerSelector: '',
                 nodeTemplate: '',
                 outcomeUrl: '',
                 returnUrl: ''
@@ -195,7 +196,7 @@
                         levelSelect.find(':selected').text() + ' ' + areaSelect.find(':selected').text()
                     );
                     // Shove all of this into a tree
-                    makeTree(data.outcomes, form.find('#outcomes').empty());
+                    makeTree(data.outcomes, outcomesTab.find(self.config.outcomes.containerSelector).empty());
                     curriculumTab.next('section').addClass('loaded');
                     outcomesTab.find(':submit').prop('disabled', false);
                     self.enableTab(outcomesTab)

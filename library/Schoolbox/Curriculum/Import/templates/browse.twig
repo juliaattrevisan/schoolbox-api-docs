@@ -35,6 +35,7 @@
                 optionsUrl: {{ routeLookup('curriculumImport.learningLevels')|json_encode|raw }}
             },
             outcomes: {
+                containerSelector: '[data-role="outcomes-container"]',
                 tabSelector: '#step-3',
                 nodeTemplate: $('script#node-template').html().trim(),
                 outcomeUrl: {{ routeLookup('curriculumImport.outcomes')|json_encode|raw }},
@@ -101,10 +102,15 @@
                     <div id="step-3" class="content">
                         <label for="curriculumName">Name of curriculum</label>
                         <input type="text" name="curriculumName" id="curriculumName" value="" />
-                        <h2>Preview</h2>
-
-                        <ul class="wysiwyg curriculum-import-widget-outcomes" id="outcomes"></ul>
-                        You can make changes after saving your curriculum.
+                        <fieldset>
+                            <legend>
+                                Preview
+                                <span data-tooltip class="has-tip tip-top hint" title="You can make changes after saving your curriculum.">?</span>
+                            </legend>
+                            <article>
+                                <ul data-role="outcomes-container"></ul>
+                            </article>
+                        </fieldset>
                         <input type="submit"
                                value="Save Curriculum"
                                data-role="wizard-step-3-submit"
