@@ -205,6 +205,19 @@ foreach ($unit_list as $unit) {
     $semester = $unit->getOpenDate()->getYearHalf();
     $unit_year_list[$year][$semester][] = $unit;
 }
+
+// The doctor's context selector
+$contextSelector = new \Schoolbox\Assessment\StudentReportCard\ContextSelector('/task/progressReport');
+$contextSelector->setYears(array_keys($unit_year_list));
+$contextSelector->render(
+    $this,
+    'CONTEXT_SELECTOR',
+    array(
+        'year'     => $current_year,
+        'category' => $current_semester,
+    )
+);
+
 foreach (array_reverse($unit_year_list, true) as $year => $unit_semester_list) {
     foreach (array(1, 2) as $semester) {
         $this->setVar(
