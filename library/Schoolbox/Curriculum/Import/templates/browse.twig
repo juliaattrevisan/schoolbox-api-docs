@@ -3,14 +3,16 @@
 <!-- Template for the tree -->
 {% verbatim %}
 <script id="node-template" type="text/x-dot-template">
-    <li class="curriculum-node">
+    <li>
         {{?it.code }}
-        <span class="code">[{{!it.code }}]</span>
+        <strong>[{{!it.code }}]</strong>
         {{?}}
         {{?it.name }}
-        <span class="name">{{!it.name }}</span>
+        {{!it.name }}
         {{?}}
-        {{=it.description }}
+        {{?it.description }}
+        <article>{{=it.description }}</article>
+        {{?}}
     </li>
 </script>
 {% endverbatim %}
