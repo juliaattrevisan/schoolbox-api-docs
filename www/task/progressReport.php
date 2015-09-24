@@ -17,14 +17,13 @@ if (isset($_GET['category_id']) && isset($_GET['unit_id'])) {
     SitePage::localRedir(sprintf('/task/progressReport/%d/%d', $_GET['category_id'], $_GET['unit_id']));
 }
 
-use Schoolbox\User;
-use Schoolbox\UserMapper;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 // URL: task/progressReport/$classId/($unitId)
 // Alternate: task/progressReport/$classId/($year/$semester)
@@ -309,10 +308,20 @@ foreach ($task_list as $task) {
 }
 $this->parse('subheader_unit_block', 'subheader_unit', true);
 
+// Placeholder icons
 $status_list = array(
-    Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE => array('text'=>'Incomplete','class'=>'incomplete'),
-    Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION => array('text'=>'Self Assessed','class'=>'pending'),
-    Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE => array('text'=>'Complete','class'=>'complete'),
+    Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE            => array(
+        'text'  => 'Incomplete',
+        'class' => 'icon-time-value',
+    ),
+    Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION => array(
+        'text'  => 'Self Assessed',
+        'class' => 'icon-alert',
+    ),
+    Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE              => array(
+        'text'  => 'Complete',
+        'class' => 'icon-approve',
+    ),
 );
 
 // The students
