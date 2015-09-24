@@ -25,6 +25,8 @@ class ContextSelector {
 	protected $years = array();
 	/** @var Collection */
 	protected $categories;
+	/** @var Collection */
+	protected $units;
 	/** @var string */
 	protected $_template = 'submission/_contextSelector.html';
 	/** @var string */
@@ -63,6 +65,15 @@ class ContextSelector {
 		$this->categories = $categories;
 	}
 
+	/**
+	 * Set the units to display in the selector.
+	 * If this collection is empty, then the unit selector will be hidden.
+	 *
+	 * @param Collection $units
+	 */
+	public function setUnits($units) {
+		$this->units = $units;
+	}
 
 	/**
 	 * Add a category to the selector.
@@ -117,6 +128,7 @@ class ContextSelector {
 		$page->setFile($tpl, $this->_template);
 		$page->setBlock($tpl, 'semester_context', 'semester_context_block');
 		$page->setBlock($tpl, 'subject_context', 'subject_context_block');
+		$page->setBlock($tpl, 'unit_context', 'unit_context_block');
 		$page->setVar('PAGE_HREF',    $this->basePath);
 		$page->setVar('SUBJECT_PART', is_numeric($selectedValues['category']) ? ($selectedValues['category'].'/') : '');
         $page->setVar('SEMESTER_CONTEXT_CATEGORY_ID', isset($selectedValues['list']) ? '/'.($selectedValues['list']) : '');
@@ -135,6 +147,12 @@ class ContextSelector {
 		}
 		else {
 			$page->setVar('subject_context_block', '');
+		}
+
+		if ($this->units->count()) {
+			$this->renderUnitSelector($page, $selectedValues);
+		} else {
+			$page->setVar('unit_context_block', '');
 		}
 
 		// slam it in!
@@ -376,4 +394,25 @@ class ContextSelector {
 		$page->parse('subject_context_block', 'subject_context', false);
 	}
 
+	/**
+	 * Render the selector for units
+	 *
+	 * Used on the progress report
+	 *
+	 * @param SitePage $page
+	 * @param $selectedValues
+	 */
+	protected function renderUnitSelector($page, $selectedValues) {
+//		$page->setBlock('subject_context', 'subject_option', 'subject_option_block');
+//
+//		$subjects = $this->createSubjectSelectorValues($selectedValues);
+//
+//		foreach($subjects as $subject) {
+//			$page->setVar($subject);
+//			$page->parse('subject_option_block', 'subject_option', true);
+//		}
+//
+//		// make it so, number one
+//		$page->parse('subject_context_block', 'subject_context', false);
+	}
 } 

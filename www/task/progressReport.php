@@ -200,61 +200,65 @@ $this->setVar(
 $unit_year_list   = array();
 $current_year     = $current_unit->getOpenDate()->getYear();
 $current_semester = $current_unit->getOpenDate()->getYearHalf();
+$years            = [];
 foreach ($unit_list as $unit) {
     $year     = $unit->getOpenDate()->getYear();
     $semester = $unit->getOpenDate()->getYearHalf();
     $unit_year_list[$year][$semester][] = $unit;
+    $years[$year] = $year;
 }
 
 // The doctor's context selector
 $contextSelector = new \Schoolbox\Assessment\StudentReportCard\ContextSelector('/task/progressReport');
-$contextSelector->setYears(array_keys($unit_year_list));
+$contextSelector->setYears($years);
+$contextSelector->setUnits($unit_list);
 $contextSelector->render(
     $this,
     'CONTEXT_SELECTOR',
     array(
         'year'     => $current_year,
         'category' => $current_semester,
+        'unit'     => $unit_id,
     )
 );
 
-foreach (array_reverse($unit_year_list, true) as $year => $unit_semester_list) {
-    foreach (array(1, 2) as $semester) {
-        $this->setVar(
-            array(
-                'UNIT_SELECTOR_SEMESTER_SEMESTER' => $semester,
-                'UNIT_SELECTOR_SEMESTER_YEAR'     => $year,
-                'UNIT_SELECTOR_SEMESTER_SELECTED' => ($year == $current_year && $semester == $current_semester ? 'selected' : ''),
-            )
-        );
-        $this->parse('unit_selector_semester_block', 'unit_selector_semester', true);
-    }
-}
-// Yes it's the same loop again (PHPLib sucks)
-foreach ($unit_year_list as $year => $unit_semester_list) {
-    foreach (array(2, 1) as $semester) {
-        $this->setVar(
-            array(
-                'UNIT_SELECTOR_UNIT_SEMESTER' => $semester,
-                'UNIT_SELECTOR_UNIT_YEAR'     => $year,
-                'unit_selector_unit_block'    => '',
-            )
-        );
-        if (!empty($unit_semester_list[$semester])) {
-            foreach ($unit_semester_list[$semester] as $unit) {
-                $this->setVar(
-                    array(
-                        'UNIT_SELECTOR_UNIT_NAME'     => $unit->getTitle(),
-                        'UNIT_SELECTOR_UNIT_ID'       => $unit->getId(),
-                        'UNIT_SELECTOR_UNIT_SELECTED' => ($unit->getId() == $unit_id ? 'selected' : ''),
-                    )
-                );
-                $this->parse('unit_selector_unit_block', 'unit_selector_unit', true);
-            }
-        }
-        $this->parse('unit_selector_semester_unit_list_block', 'unit_selector_semester_unit_list', true);
-    }
-}
+//foreach (array_reverse($unit_year_list, true) as $year => $unit_semester_list) {
+//    foreach (array(1, 2) as $semester) {
+//        $this->setVar(
+//            array(
+//                'UNIT_SELECTOR_SEMESTER_SEMESTER' => $semester,
+//                'UNIT_SELECTOR_SEMESTER_YEAR'     => $year,
+//                'UNIT_SELECTOR_SEMESTER_SELECTED' => ($year == $current_year && $semester == $current_semester ? 'selected' : ''),
+//            )
+//        );
+//        $this->parse('unit_selector_semester_block', 'unit_selector_semester', true);
+//    }
+//}
+//// Yes it's the same loop again (PHPLib sucks)
+//foreach ($unit_year_list as $year => $unit_semester_list) {
+//    foreach (array(2, 1) as $semester) {
+//        $this->setVar(
+//            array(
+//                'UNIT_SELECTOR_UNIT_SEMESTER' => $semester,
+//                'UNIT_SELECTOR_UNIT_YEAR'     => $year,
+//                'unit_selector_unit_block'    => '',
+//            )
+//        );
+//        if (!empty($unit_semester_list[$semester])) {
+//            foreach ($unit_semester_list[$semester] as $unit) {
+//                $this->setVar(
+//                    array(
+//                        'UNIT_SELECTOR_UNIT_NAME'     => $unit->getTitle(),
+//                        'UNIT_SELECTOR_UNIT_ID'       => $unit->getId(),
+//                        'UNIT_SELECTOR_UNIT_SELECTED' => ($unit->getId() == $unit_id ? 'selected' : ''),
+//                    )
+//                );
+//                $this->parse('unit_selector_unit_block', 'unit_selector_unit', true);
+//            }
+//        }
+//        $this->parse('unit_selector_semester_unit_list_block', 'unit_selector_semester_unit_list', true);
+//    }
+//}
 
 // Store assessment and submission marks here
 $student_assess_list     = array();
