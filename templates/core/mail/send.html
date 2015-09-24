@@ -36,7 +36,7 @@ $(function() {
     $('#bcc').selectizeSelector($.extend({}, options, {value: {BCC}}))
 
     // dialogs for copying email fields
-    $('label[data-role="copy-emails"]').click(function(event) {
+    $('[data-role="copy-emails"]').click(function(event) {
         event.preventDefault();
         var element = $(this);
 
@@ -47,7 +47,7 @@ $(function() {
             button.show();
         });
 
-        var target  = $('#'+element.attr('for'));
+        var target  = $('#'+element.parent('label').attr('for'));
         // get html-escaped version of text, really annoying
         var text = $('<div />').text(target.val()).html();
         $('#copy-email-text').html(text);
@@ -58,10 +58,9 @@ $(function() {
         ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input'
     });
 });
-
-
 </script>
 <!-- END custom_head -->
+
 <div class="row">
     <div class="small-12 island">
         <h1>Compose Email</h1>
@@ -70,12 +69,14 @@ $(function() {
                 <fieldset class="content">
                     <div class="small-10 large-11 columns">
                         <label>To
-                        <input name="to" id="to" required />
+                            <input name="to" id="to" required />
                         </label>
                     </div>
                     <div class="small-2 large-1 columns">
-                        <label>Copy</label>
-                        <label for="to" data-role="copy-emails" class="button icon-modify" title="Show addresses for copy"></label>
+                        <label for="to">
+                            Copy
+                            <a data-role="copy-emails" class="button icon-modify" title="Show addresses for copy"></a>
+                        </label>
                     </div>
                 </fieldset>
                 <fieldset class="content">
@@ -85,8 +86,10 @@ $(function() {
                         </label>
                     </div>
                     <div class="small-2 large-1 columns">
-                        <label>Copy</label>
-                        <label for="cc" data-role="copy-emails" class="button icon-modify" title="Show addresses for copy"></label>
+                        <label for="cc">
+                            Copy
+                            <a data-role="copy-emails" class="button icon-modify" title="Show addresses for copy"></a>
+                        </label>
                     </div>
                     <div class="small-10 large-11 columns">
                         <label>
@@ -95,8 +98,10 @@ $(function() {
                         </label>
                     </div>
                     <div class="small-2 large-1 columns">
-                        <label>Copy</label>
-                        <label for="bcc" data-role="copy-emails" class="button icon-modify" title="Show addresses for copy"></label>
+                        <label for="bcc" >
+                            Copy
+                            <a data-role="copy-emails" class="button icon-modify" title="Show addresses for copy"></a>
+                        </label>
                     </div>
                 </fieldset>
                 <fieldset class="content">
