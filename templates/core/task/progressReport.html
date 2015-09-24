@@ -168,9 +168,13 @@
                 <tbody>
                 <!-- BEGIN student -->
                 <tr class="{ON_OFF} {STUDENT_REMOVED_CLASS}">
-                    <th class="avatar" scope="row">
-                        <img height="32" width="32" src="/portrait.php?userId={STUDENT_SYNERGY_ID}&amp;size=square32">
-                        {STUDENT_SURNAME}, {STUDENT_FIRSTNAME}
+                    <th scope="row" class="no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/{STUDENT_ID}" title="View Profile">
+                                <img src="/portrait.php?userId={STUDENT_SYNERGY_ID}&size=square64" alt="View Profile" />
+                                <p>{STUDENT_NAME}</p>
+                            </a>
+                        </div>
                     </th>
                     <!-- BEGIN student_unit -->
                     <!-- BEGIN student_unit_task -->

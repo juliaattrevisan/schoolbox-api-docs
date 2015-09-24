@@ -156,6 +156,7 @@ foreach ($userCollection as $userObject) {
         'synergy_id' => $userObject->getExternalId(),
         'firstname'  => $userObject->getFirstname(),
         'lastname'   => $userObject->getLastname(),
+        'name'       => $userObject->formatName(),
         'removed'    => in_array($userObject->getId(), $removedStudentIdList),
     );
 }
@@ -324,6 +325,7 @@ foreach ($student_list as $student) {
             'STUDENT_SYNERGY_ID'    => $student['synergy_id'],
             'STUDENT_SURNAME'       => $student['lastname'],
             'STUDENT_FIRSTNAME'     => $student['firstname'],
+            'STUDENT_NAME'          => $student['name'],
             'STUDENT_REMOVED_CLASS' => $student['removed'] ? 'removed-student' : '',
             'student_unit_block' => '',
         )
