@@ -34,64 +34,66 @@
                         <span data-tooltip class="hint has-tip tip-top" title="Only classes that have not closed yet are displayed.">?</span>
                     </legend>
 
-                    <!-- BEGIN exportable -->
-                    <table class="table">
-                        <tr>
-                            <td>Class</td>
-                            <td>Open Date</td>
-                            <td>Due Date</td>
-                            <td>Status</td>
-                            <td>
-                                <!-- check all button -->
-                                <input type="checkbox" data-interaction="checkAll" data-group="unit_instance" />
-                            </td>
-                        </tr>
-                        <!--
-                            The same class can actually be imported onto the same
-                            page more than once.
-                            Don't know why anyone would do this though!
-                        -->
-                        <!-- BEGIN class -->
-                        <tr>
-                            <td><a href="/homepage/{UNIT_CATEGORY_ID}">{UNIT_CATEGORY_NAME}</a></td>
-                            <td><time title="{CLASS_OPEN_TITLE}" datetime="{CLASS_OPEN_DATETIME}">{CLASS_OPEN_DATE}</time></td>
-                            <td><time title="{CLASS_DUE_TITLE}" datetime="{CLASS_DUE_DATETIME}">{CLASS_DUE_DATE}</time></td>
-                            <td>
-                                <!-- BEGIN class_import_allowed -->
-                                This task does not exist in this class.
-                                <!-- END class_import_allowed -->
-
-                                <!-- BEGIN class_import_forbidden -->
-                                You don't have write permission for this class.
-                                <!-- END class_import_forbidden -->
-
-                                <!-- BEGIN class_import_exists -->
-                                This task already exists in this class.
-                                <!-- END class_import_exists -->
-                            </td>
-                            <td>
-                                <!-- BEGIN class_import_checkbox -->
-                                <input name="unit_instance[{UNIT_INSTANCE_ID}]" type="hidden" value="0" />
-                                <input type="checkbox"
-                                       id="import-{UNIT_INSTANCE_ID}"
-                                       name="unit_instance[{UNIT_INSTANCE_ID}]"
-                                       value="1"
-                                       data-group="unit_instance"
-                                        />
-                                <!-- END class_import_checkbox -->
-                            </td>
-                        </tr>
-                        <!-- END class -->
-                    </table>
-                    <!-- END exportable -->
-
-                    <!-- BEGIN unexportable -->
                     <div class="small-12 columns">
+                        <!-- BEGIN exportable -->
+                        <ul class="information-list">
+                            <li class="actions-small-1">
+                                <nav>
+                                    <input id="checkAll" type="checkbox" data-interaction="checkAll" data-group="unit_instance" />
+                                    <label for="checkAll" class="checkbox-label"></label>
+                                </nav>
+                            </li>
+
+                            <!-- BEGIN class -->
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="avatar card small-12">
+                                        <a href="/homepage/{UNIT_CATEGORY_ID}">
+                                            <span class="icon-32 icon-home"></span>
+                                            <h3>{UNIT_CATEGORY_NAME}</h3>
+                                        </a>
+                                        <p class="meta">
+                                            <time title="{CLASS_OPEN_TITLE}" datetime="{CLASS_OPEN_DATETIME}">{CLASS_OPEN_DATE}</time>
+                                            -
+                                            <time title="{CLASS_DUE_TITLE}" datetime="{CLASS_DUE_DATETIME}">{CLASS_DUE_DATE}</time>
+                                        </p>
+                                        <p class="meta">
+                                            <!-- BEGIN class_import_allowed -->
+                                            This task does not exist in this class.
+                                            <!-- END class_import_allowed -->
+
+                                            <!-- BEGIN class_import_forbidden -->
+                                            You don't have write permission for this class.
+                                            <!-- END class_import_forbidden -->
+
+                                            <!-- BEGIN class_import_exists -->
+                                            This task already exists in this class.
+                                            <!-- END class_import_exists -->
+                                        </p>
+                                    </div>
+                                </div>
+                                <nav>
+                                    <!-- BEGIN class_import_checkbox -->
+                                    <input name="unit_instance[{UNIT_INSTANCE_ID}]" type="hidden" value="0" />
+                                    <input type="checkbox"
+                                           id="import-{UNIT_INSTANCE_ID}"
+                                           name="unit_instance[{UNIT_INSTANCE_ID}]"
+                                           value="1"
+                                           data-group="unit_instance" />
+                                    <label for="import-{UNIT_INSTANCE_ID}" class="checkbox-label"></label>
+                                    <!-- END class_import_checkbox -->
+                                </nav>
+                            </li>
+                            <!-- END class -->
+                        </ul>
+                        <!-- END exportable -->
+
+                        <!-- BEGIN unexportable -->
                         <div class="alert-box">
                             There are no open classes that currently use this unit.
                         </div>
+                        <!-- END unexportable -->
                     </div>
-                    <!-- END unexportable -->
                 </fieldset>
             </section>
             <!-- BEGIN submit -->
