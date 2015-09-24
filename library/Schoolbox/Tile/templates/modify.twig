@@ -84,7 +84,7 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label class="text">
-                            Title
+                            Title Text
                             <span class='hint has-tip tip-top' data-tooltip title="Add an optional title to appear above the tile background.">?</span>
                             <input type="text" name="title_text" value="{{ item.titleText|e('html_attr') }}" placeholder="enter text..." />
                         </label>
@@ -92,7 +92,7 @@
                 </fieldset>
                 <fieldset class="content">
                     <legend>
-                        Colour
+                        Title Colour
                     </legend>
                     <div class="small-6 columns">
                         <label for="title_color">
@@ -117,7 +117,7 @@
                 </fieldset>
                 <fieldset class="content">
                     <legend>
-                        Position
+                        Title Position
                     </legend>
                     <div class="small-12 columns">
                         <table>
@@ -242,9 +242,14 @@
                 </fieldset>
                 <fieldset class="content">
                     <legend>Background</legend>
+                    <div class="small-6 columns">
+                    </div>
+                    <div class="small-6 columns">
+                    </div>
+
                     <div class="small-12 columns">
                         <dl>
-                            <dt>Colour</dt>
+                            <dt></dt>
                             <dd class="background-color">
                                 <input type="text"
                                        id="background_color"
