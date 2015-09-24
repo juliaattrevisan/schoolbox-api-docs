@@ -50,8 +50,19 @@ $(function() {
         var target  = $('#'+element.parent('label').attr('for'));
         // get html-escaped version of text, really annoying
         var text = $('<div />').text(target.val()).html();
-        $('#copy-email-text').html(text);
-        $('#email-modal').foundation('reveal','open');
+
+        var dialog = $('#email-modal');
+        var dialogUrl = $('#copy-email-text');
+
+        dialogUrl.val(text);
+        dialog.foundation('reveal','open');
+
+        /* Bypass foundation bug
+         * https://github.com/zurb/foundation/issues/4746
+         */
+        dialog.on('opened', function() {
+            dialogUrl.select();
+        });
     });
 
     $('#mailForm').validate({
