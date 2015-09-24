@@ -93,11 +93,14 @@
         var areaSelect   = element.find(config.curriculum.areaSelect.selector);
         var nameInput    = element.find(config.outcomes.nameInput.selector);
 
-        form.on('click', 'input[data-role="wizard-step-1-submit"]', function(event) {
+        var sourceTab     = element.find(config.source.tabSelector);
+        var curriculumTab = element.find(config.curriculum.tabSelector);
+        var outcomesTab   = element.find(config.outcomes.tabSelector);
+
+        sourceTab.on('click', ':submit', function(event) {
             event.preventDefault();
             var value = sourceSelect.val();
-            var tab   = $(event.target).closest('section');
-            tab.addClass('loading').find(':input').prop('disabled', true);
+            sourceTab.addClass('loading').find(':input').prop('disabled', true);
 
             // Clear previous settings:
             // remember, if anything changes in a previous wizard step,
@@ -141,7 +144,7 @@
                                 .text(area.name)
                                 .appendTo(areaSelect);
                         });
-                        tab.next('section').addClass('loaded');
+                        sourceTab.next('section').addClass('loaded');
     //                            form.tabs('enable', 1)
     //                                .tabs('option', 'active', 1)
                         // Animate next tab?
@@ -151,10 +154,10 @@
     //                            form.tabs('disable', 1)
     //                                .tabs('disable', 2)
     //                                .tabs('option', 'active', 0);
-                        tab.addClass('failed');
+                        sourceTab.addClass('failed');
                     })
                     .always(function() {
-                        tab.removeClass('loading').find(':input').prop('disabled', false);
+                        sourceTab.removeClass('loading').find(':input').prop('disabled', false);
                     });
             } else {
                 // Remove all filled in levels
@@ -171,10 +174,9 @@
             }
         });
 
-        form.on('click', 'input[data-role="wizard-step-2-submit"]', function(event) {
+        curriculumTab.on('click', ':submit', function(event) {
             event.preventDefault();
-            var tab = $(event.target).closest('section');
-            tab.addClass('loading').find(':input').prop('disabled', true);
+            curriculumTab.addClass('loading').find(':input').prop('disabled', true);
             $.get(
                 outcomeUrl,
                 {
@@ -194,7 +196,7 @@
                     );
                     // Shove all of this into a tree
                     makeTree(data.outcomes, form.find('#outcomes').empty())
-                    tab.next('section').addClass('loaded');
+                    curriculumTab.next('section').addClass('loaded');
                     form.find('input[data-role="wizard-step-3-submit"]').prop('disabled', false);
     //                        form.tabs('enable', 2)
     //                            .tabs('option', 'active', 2);
@@ -205,14 +207,14 @@
                     form.find('input[data-role="wizard-step-3-submit"]').prop('disabled', true);
     //                        form.tabs('disable', 2)
     //                            .tabs('option', 'active', 1);
-                    tab.addClass('failed');
+                    curriculumTab.addClass('failed');
                 })
                 .always(function() {
-                    tab.removeClass('loading').find(':input').prop('disabled', false);
+                    curriculumTab.removeClass('loading').find(':input').prop('disabled', false);
                 });
         });
 
-        form.on('click', 'input[data-role="wizard-step-3-submit"]', function(event) {
+        outcomesTab.on('click', ':submit', function(event) {
             event.preventDefault();
             // Save this box
             // Craft a request, consisting of:
@@ -222,8 +224,7 @@
             // A map of outcomes
             // (Allow editing after the fact)
 
-            var tab = $(event.target).closest('section');
-            tab.addClass('loading').find(':input').prop('disabled', true);
+            outcomesTab.addClass('loading').find(':input').prop('disabled', true);
 
             var formData = {
                 id:     sourceSelect.val(),
@@ -240,36 +241,34 @@
             })
                 .done(function(data) {
                     // Save succeeded, redirect somewhere
-                    tab.addClass('loaded');
+                    outcomesTab.addClass('loaded');
                     window.location.href = browseUrl+'#'+data.outcomes[0].id;
                 })
                 .fail(function() {
                     // do something else
-                    tab.addClass('failed');
+                    outcomesTab.addClass('failed');
                 })
                 .always(function() {
-                    tab.removeClass('loading').find(':input').prop('disabled', false);
+                    outcomesTab.removeClass('loading').find(':input').prop('disabled', false);
                 });
         });
 
         // Ensure that I can't submit without selecting a source
-        form.on('change', 'select[name="source"]', function() {
-            form.find('input[data-role="wizard-step-1-submit"]').prop('disabled', !this.value);
+        sourceSelect.on('change', function() {
+            sourceTab.find(':submit').prop('disabled', !this.value);
         });
 
         // Ensure that I can't submit without selecting a learning area and level
-        form.on('change', 'select[name="learningArea"], select[name="learningLevel"]', function() {
-            var area  = form.find('select[name="learningArea"]').val();
-            var level = form.find('select[name="learningLevel"]').val();
-            form.find('input[data-role="wizard-step-2-submit"]').prop('disabled', !(area && level));
+        $().add(levelSelect).add(areaSelect).on('change', function() {
+            curriculumTab.find(':submit').prop('disabled', !(areaSelect.val() && levelSelect.val()));
         });
 
-        // Fade out the loaded class on the new tab
-        form.on('tabsactivate', function(event, ui) {
-            setTimeout(function() {
-                ui.newPanel.removeClass('loaded failed');
-            }, 2000)
-        });
+        //// Fade out the loaded class on the new tab
+        //form.on('tabsactivate', function(event, ui) {
+        //    setTimeout(function() {
+        //        ui.newPanel.removeClass('loaded failed');
+        //    }, 2000)
+        //});
     };
 
     /**
