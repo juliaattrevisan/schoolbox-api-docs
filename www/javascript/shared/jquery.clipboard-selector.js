@@ -89,7 +89,12 @@ $.fn.clipboardSelector = function(options) {
 
         $(config.copy).show();
 
-        dialogUrl.select();
+        /* Bypass foundation bug
+         * https://github.com/zurb/foundation/issues/4746
+         */
+        $(config.exportElement).on('opened', function() {
+            dialogUrl.select();
+        });
     }
 
     /**
