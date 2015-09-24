@@ -48,18 +48,18 @@
                     function(data) {
                         // Update something.
                         // I guess add the same class the update submission has.
-                        element.removeClass('incomplete pending complete').addClass('ajax-updated');
+                        element.removeClass('icon-time-value icon-alert icon-approve').addClass('ajax-updated');
                         form.find('input[name="current_status"]').val(data.status);
                         // Update name and class as well
                         switch (data.status) {
                             case 1: // incomplete
-                                element.addClass('incomplete').attr('title', 'Incomplete - click to update')
+                                element.addClass('icon-time-value').attr('title', 'Incomplete - click to update');
                                 break;
                             case 2: // pending
-                                element.addClass('pending').attr('title', 'Self Assessed - click to update')
+                                element.addClass('icon-alert').attr('title', 'Self Assessed - click to update');
                                 break;
                             case 3: // complete
-                                element.addClass('complete').attr('title', 'Complete - click to update')
+                                element.addClass('icon-approve').attr('title', 'Complete - click to update');
                                 break;
                         }
 
