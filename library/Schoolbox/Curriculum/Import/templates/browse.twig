@@ -15,7 +15,7 @@
 </script>
 {% endverbatim %}
 <script type="text/javascript">
-    (function($) {
+    $(function() {
         $('[data-role="curriculum-import"]').curriculumImport({
             formSelector: 'form',
             source: {
@@ -41,7 +41,7 @@
                 returnUrl: {{ routeLookup('curriculum.browse')|json_encode|raw }}
             }
         });
-    })(jQuery);
+    });
 </script>
 
 <div class="row actions-small-1">
