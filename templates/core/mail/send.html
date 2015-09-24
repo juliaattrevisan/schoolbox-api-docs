@@ -71,70 +71,71 @@ $(function() {
                 .qtip('show');
         }
     })
+
+    $('#mailForm').validate({
+        ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input'
+    });
 });
 
-function verify()
-{
-        var msg = ""
-        if(document.getElementById('mailForm').to.value == ""){
-                msg += "You need to have a recipient\n";
-        }
-        if(msg != ""){
-                alert(msg);
-                return false;
-        }
-        else
-	{
-                return true;
-	}
-}
-</script>
-<script type="text/javascript" src="/javascript/multifile.js"></script>
-<!-- END custom_head -->
 
-<h1>Compose Email</h1>
-<form class="standardForm" action="send.php" method="post" enctype="multipart/form-data" name="mailForm" id="mailForm">
-  <table class="table">
-    <tr>
-      <td class="formLabelWidth"><h4>To:</h4></td>
-	  <td>
-          <input name="to" id="to" size="90" class="email-input" />
-          <label for="to" data-role="copy-emails" class="btn modify no-text" title="Show addresses for copy"><span></span></label>
-      </td>
-    </tr>
-    <tr>
-      <td><h4>CC:</h4></td>
-	  <td>
-          <input name="cc" id="cc" size="90" class="email-input" />
-          <label for="cc" data-role="copy-emails" class="btn modify no-text" title="Show addresses for copy"><span></span></label>
-      </td>
-    </tr>
-    <tr>
-      <td><h4>BCC:</h4>
-	  </td>
-	  <td>
-          <input name="bcc" id="bcc" size="90" class="email-input" />
-          <label for="bcc" data-role="copy-emails" class="btn modify no-text" title="Show addresses for copy"><span></span></label>
-      </td>
-    </tr>
-    <tr>
-      <td><h4>Subject:</h4>
-	  </td>
-	  <td><input type="text" name="subject" size="90" value="{SUBJECT}" /></td>
-    </tr>
-    <tr>
-      <td colspan="2"><textarea name="message" style="width:100%;height:350px">{BODY}</textarea></td>
-    </tr>
-    <tr>
-      <td><h4>Attachments:</h4>
-	 </td>
-	 <td>
-        {ATTACH_ZONE}
-     </td>
-    </tr>
-    <tr>
-      <td></td>
-    </tr>
-  </table>
-  <input type="submit" name="submit" class="submit-btn-plain" value="Send" />
-</form>
+</script>
+<!-- END custom_head -->
+<div class="row">
+    <div class="small-12 island">
+        <h1>Compose Email</h1>
+        <form action="send.php" method="post" enctype="multipart/form-data" id="mailForm">
+            <section>
+                <fieldset class="content">
+                    <div class="small-10 large-11 columns">
+                        <label>To
+                        <input name="to" id="to" required />
+                        </label>
+                    </div>
+                    <div class="small-2 large-1 columns">
+                        <label>Copy</label>
+                        <label for="to" data-role="copy-emails" class="button icon-modify" title="Show addresses for copy"></label>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-10 large-11 columns">
+                        <label>CC
+                            <input name="cc" id="cc" />
+                        </label>
+                    </div>
+                    <div class="small-2 large-1 columns">
+                        <label>Copy</label>
+                        <label for="cc" data-role="copy-emails" class="button icon-modify" title="Show addresses for copy"></label>
+                    </div>
+                    <div class="small-10 large-11 columns">
+                        <label>
+                            BCC
+                            <input name="bcc" id="bcc"  />
+                        </label>
+                    </div>
+                    <div class="small-2 large-1 columns">
+                        <label>Copy</label>
+                        <label for="bcc" data-role="copy-emails" class="button icon-modify" title="Show addresses for copy"></label>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Subject
+                            <input type="text" name="subject" value="{SUBJECT}" required />
+                        </label>
+                        <label>
+                            <textarea name="message" style="width:100%;height:350px">{BODY}</textarea>
+                        </label>
+                        <label>
+                            Attachments
+                            {ATTACH_ZONE}
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+            <input type="submit" name="submit" value="Send" />
+        </form>
+    </div>
+
+</div>
+
