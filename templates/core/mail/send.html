@@ -5,7 +5,8 @@
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
-
+<script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
+<script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
 <script type="text/javascript">
 $(function() {
     $.fn.alaressTiny({
@@ -36,32 +37,41 @@ $(function() {
     $('#bcc').selectizeSelector($.extend({}, options, {value: {BCC}}))
 
     // dialogs for copying email fields
-    $('label[data-role="copy-emails"]').click(function(event) {
-        event.preventDefault();
-        var element = $(this);
 
-        // Copy and paste button - show only when ready
-        var button = $('#copy-button').hide();
-        var client = new ZeroClipboard(button);
-        client.on('ready', function() {
-            button.show();
+    $('[data-role="copy-emails"]').each(function(index, element) {
+        $.fn.clipboardSelector({
+            exportActivator: $(element),
+            onReady: function() {
+
+                // get html-escaped version of text, really annoying
+                var target = $('#'+$(element).parent('label').attr('for'));
+                var text = $('<div />').text(target.val()).html();
+
+                var dialog = $('#email-modal');
+                var dialogUrl = $('#copy-email-text');
+
+                dialogUrl.html(text);
+                dialog.foundation('reveal','open');
+
+                /* Bypass foundation bug
+                 * https://github.com/zurb/foundation/issues/4746
+                 */
+                dialog.on('opened', function() {
+                    dialogUrl.select();
+
+                    $('#copy-button').show();
+                });
+            }
         });
-
-        var target  = $('#'+element.attr('for'));
-        // get html-escaped version of text, really annoying
-        var text = $('<div />').text(target.val()).html();
-        $('#copy-email-text').html(text);
-        $('#email-modal').foundation('reveal','open');
     });
 
     $('#mailForm').validate({
         ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input'
     });
 });
-
-
 </script>
 <!-- END custom_head -->
+
 <div class="row">
     <div class="small-12 island">
         <h1>Compose Email</h1>
@@ -70,12 +80,14 @@ $(function() {
                 <fieldset class="content">
                     <div class="small-10 large-11 columns">
                         <label>To
-                        <input name="to" id="to" required />
+                            <input name="to" id="to" required />
                         </label>
                     </div>
                     <div class="small-2 large-1 columns">
-                        <label>Copy</label>
-                        <label for="to" data-role="copy-emails" class="button icon-modify" title="Show addresses for copy"></label>
+                        <label for="to">
+                            Copy
+                            <a data-role="copy-emails" class="button icon-modify" title="Show addresses for copy"></a>
+                        </label>
                     </div>
                 </fieldset>
                 <fieldset class="content">
@@ -85,18 +97,22 @@ $(function() {
                         </label>
                     </div>
                     <div class="small-2 large-1 columns">
-                        <label>Copy</label>
-                        <label for="cc" data-role="copy-emails" class="button icon-modify" title="Show addresses for copy"></label>
+                        <label for="cc">
+                            Copy
+                            <a data-role="copy-emails" class="button icon-modify" title="Show addresses for copy"></a>
+                        </label>
                     </div>
                     <div class="small-10 large-11 columns">
                         <label>
                             BCC
-                            <input name="bcc" id="bcc"  />
+                            <input name="bcc" id="bcc" />
                         </label>
                     </div>
                     <div class="small-2 large-1 columns">
-                        <label>Copy</label>
-                        <label for="bcc" data-role="copy-emails" class="button icon-modify" title="Show addresses for copy"></label>
+                        <label for="bcc">
+                            Copy
+                            <a data-role="copy-emails" class="button icon-modify" title="Show addresses for copy"></a>
+                        </label>
                     </div>
                 </fieldset>
                 <fieldset class="content">

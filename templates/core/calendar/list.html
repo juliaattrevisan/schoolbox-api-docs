@@ -3,6 +3,7 @@
 <script type="text/javascript" src="/calendar/js/jquery.filterSelector.js"></script>
 <script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
 <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
 <script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
 <script type="text/javascript">
 	$(function() {
@@ -77,7 +78,7 @@
 
         /* Export calendar
          */
-        $.fn.calendarExport({
+        $.fn.clipboardSelector({
             exportActivator: '#open-calendar-export-dialog',
             onReady: function() {
                 var form = $('#calendar-export-form');
