@@ -252,8 +252,8 @@
         <section>
             <div class="tabs-content no-margin">
                 <div id="step-1" class="content active">
-                    <em>Curriculum Source:</em>
-                    <select name="source">
+                    <label for="curriculumSource">Curriculum Source</label>
+                    <select name="source" id="curriculumSource">
                         <option value="">Select a source</option>
                         {% for item in sourceList %}
                             <option value="{{ item.id|e('html_attr') }}"
@@ -264,40 +264,34 @@
                     </select>
                     <input type="submit"
                            value="Use This Source"
-                           class="submit-btn-plain inline"
                            data-role="wizard-step-1-submit"
-                           disabled
-                    />
+                           disabled />
                 </div>
                 <div id="step-2" class="content">
-                    <em>Level:</em>
-                    <select name="learningLevel" disabled>
+                    <label for="curriculumLearningLevel">Level:</label>
+                    <select name="learningLevel" id="curriculumLearningLevel" disabled>
                         <option value="">Select a level</option>
                     </select>
-                    <em>Learning Area:</em>
-                    <select name="learningArea" disabled>
+                    <label for="curriculumLearningArea">Learning Area</label>
+                    <select name="learningArea" id="curriculumLearningArea" disabled>
                         <option value="">Select an area</option>
                     </select>
                     <input type="submit"
                            value="Search"
-                           class="submit-btn-plain inline"
                            data-role="wizard-step-2-submit"
-                           disabled
-                            />
+                           disabled />
                 </div>
                 <div id="step-3" class="content">
-                    <h4>Name of curriculum</h4>
-                    <input type="text" name="curriculumName" value="" />
+                    <label for="curriculumName">Name of curriculum</label>
+                    <input type="text" name="curriculumName" id="curriculumName" value="" />
                     <h2>Preview</h2>
 
                     <ul class="wysiwyg curriculum-import-widget-outcomes" id="outcomes"></ul>
                     You can make changes after saving your curriculum.
                     <input type="submit"
                            value="Save Curriculum"
-                           class="submit-btn-plain inline"
                            data-role="wizard-step-3-submit"
-                           disabled
-                            />
+                           disabled />
                 </div>
             </div>
         </section>
