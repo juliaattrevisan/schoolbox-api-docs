@@ -52,4 +52,13 @@ class WebdavController extends NavigatorController implements ExternalInterface 
         return self::RENDER_INLINE;
     }
 
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return 'network';
+    }
+
 }

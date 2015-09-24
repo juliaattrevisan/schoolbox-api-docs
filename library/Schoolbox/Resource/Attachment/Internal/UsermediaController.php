@@ -54,4 +54,12 @@ class UsermediaController extends AbstractController implements InternalInterfac
         return self::RENDER_INLINE;
     }
 
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return 'mic';
+    }
+
 }

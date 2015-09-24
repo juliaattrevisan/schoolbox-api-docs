@@ -19,49 +19,59 @@ $data = {
 
 #}
 <div class="attachzone s{{ attachzone.size }}" id="{{ attachzone.id }}-zone">
-    <span class="az-label">{{ attachzone.label }}</span>
-    <ul class="az-list">
+    <label>{{ attachzone.label }}</label>
+    <ul data-dz-previews class="az-list">
         {% for attachment in attachzone.attachments %}
-        <li class="dz-success">
+        <li class="dz-success {% if not attachzone.readonly %}actions-small-1{% endif %}">
+            <div class="list-item">
+                <div class="avatar card small-12">
+                    <img {% if not attachment.isImage %}class="mime"{% endif %} alt="{{ attachment.name }}" src="{{ attachment.preview }}" />
+                    <p class="filename" data-dz-name>{{ attachment.name }}</p>
+                </div>
+            </div>
             {% if not attachzone.readonly %}
-            <p class="actions">
-                <a href="#" data-dz-remove title="Detach" class="button no-text icon-delete"></a>
-            </p>
-            <input type="hidden" name="attachment[]" value="{{ attachment.hash }}" data-az-attachment />
+            <nav>
+                <a href="#" data-dz-remove title="Detach" class="icon-delete"></a>
+                <input type="hidden" name="{{ attachzone.fileVar }}" value="{{ attachment.hash }}" data-az-attachment />
+            </nav>
             {% endif %}
-            <img alt="{{ attachment.name }}" src="{{ attachment.preview }}" />
-            <p class="filename" data-dz-name>{{ attachment.name }}</p>
         </li>
         {% endfor %}
     </ul>
     {% if not attachzone.readonly %}
-    <ul class="az-error-list"></ul>
     <div class="dzone" id="{{ attachzone.camelId }}Zone">
-        <ul data-template>
-            <li>
-                <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
-                <p class="actions">
-                    <a title="Detach" data-dz-remove class="button no-text icon-delete"></a>
-                </p>
-                <img data-dz-thumbnail src="/images/emails/spacer.gif" />
-                <p class="filename" data-dz-name></p>
-                <input type="hidden" data-az-attachment name="attachment[]" value="" />
+        <ul data-template class="hide">
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="avatar card small-12">
+                        <img data-dz-thumbnail src="/images/emails/spacer.gif" class="mime" />
+                        <p class="filename" data-dz-name></p>
+                    </div>
+                </div>
+                <nav>
+                    <a href="#" data-dz-remove title="Detach" class="icon-delete"></a>
+                    <input type="hidden" data-az-attachment name="{{ attachzone.fileVar }}" value="" />
+                </nav>
+                <div class="progress"><span class="meter" style="width:0;" data-dz-uploadprogress></span></div>
             </li>
         </ul>
     </div>
+    <ul class="az-error-list"></ul>
     <script type="text/javascript">
         $(function () {
             $('#{{ attachzone.id }}-zone').resourceAttach({
                 url: '/storage/asyncUpload',
                 paramName: 'upload',
                 trigger: 'div.dzone',
+                detachSelector: '[data-dz-remove]',
                 dropzoneSelector: 'div.dzone',
                 dictDefaultMessage: '{{ attachzone.prompt }}',
                 allowedFiles: {{ attachzone.mime|raw ?: 'null' }},
                 multi: {{ attachzone.multi ? 'true' : 'false' }},
                 title: '{{ attachzone.title }}',
                 thumbnailSize: '{{ attachzone.size }}',
-                fallbackButtonSelector: 'a[data-attach-fallback]'
+                fallbackButtonSelector: 'a[data-attach-fallback]',
+                previewsContainerSelector: '[data-dz-previews]'
             });
         });
     </script>

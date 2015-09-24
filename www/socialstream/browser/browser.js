@@ -79,7 +79,14 @@ try {
 
                 /* An optional mime to be filtering on
                  */
-                mimeFilter: null
+                mimeFilter: null,
+
+                /* selectors */
+                browserSelector: '[data-socialstream-browser]',
+                breadcrumbSelector: '[data-breadcrumb]',
+                categoryNodeSelector: '[data-node-category]',
+                fileNodeSelector: '[data-node-file]',
+                useFolderSelector: '[data-use-folder]'
 			};
 
 			/* Type casting
@@ -122,7 +129,7 @@ try {
 			 /* Resize dialog proportionally to window
 			  */
 			$j(window).resize(function (event) {
-				$j('[data-socialstream-browser]').height($j(window).height() * 0.75);
+				$j(config.browserSelector).height($j(window).height() * 0.75);
 			});
 		}
 
@@ -167,7 +174,7 @@ try {
 
 				/* These allow new nodes to be loaded
 				 */
-				var allNavigators = $j(config.element).find('.breadcrumb, .socialstream-node-category'),
+				var allNavigators = $j(config.element).find([config.breadcrumbSelector, config.categoryNodeSelector].join(',')),
                     allFiles;
 
 				$j.each(allNavigators, function (index, element) {
@@ -179,7 +186,7 @@ try {
 
 				/* Assign event handlers to all the files
 				 */
-				allFiles = $j(config.element).find('.socialstream-node-file');
+				allFiles = $j(config.element).find(config.fileNodeSelector);
 
 				$j.each(allFiles, function (index, element) {
 					$j(element).find('a').click(function (event) {
@@ -208,7 +215,7 @@ try {
                 /* event handlers for selecting a folder to use
                  * Very similar to file event handler, but filename is contained in a data element instead.
                  */
-                $j(config.element).find('.socialstream-node-use-folder a').click(function (event) {
+                $j(config.element).find(config.useFolderSelector).click(function (event) {
                     var url, name, self;
 
                     event.preventDefault();

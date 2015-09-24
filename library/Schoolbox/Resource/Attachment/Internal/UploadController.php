@@ -52,4 +52,13 @@ class UploadController extends AbstractController implements InternalInterface {
         return self::RENDER_INLINE;
     }
 
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return 'upload';
+    }
+
 }

@@ -152,7 +152,7 @@ module.exports = function(grunt) {
 
                     // Files And Resource Browser
                     'www/socialstream/browser/browser.js',
-                    'www/javascript/components/dropzone/downloads/dropzone.js',
+                    'www/javascript/components/dropzone/dist/dropzone.js',
 
                     // Magnific Popup Lightbox
                     'www/javascript/components/magnific-popup/dist/jquery.magnific-popup.js',

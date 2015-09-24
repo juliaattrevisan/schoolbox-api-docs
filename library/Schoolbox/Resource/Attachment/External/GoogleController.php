@@ -196,4 +196,13 @@ class GoogleController extends AbstractController implements ExternalInterface {
         return self::RENDER_IFRAME;
     }
 
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return 'google-drive';
+    }
+
 }

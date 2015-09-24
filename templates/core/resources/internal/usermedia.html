@@ -7,57 +7,24 @@
     $(function() {
         var recorderContainer      = $('#ab-usermedia'),
             recorderControls       = $('.recorderButtons'),
-            recorderNameDialog     = $('#recorderNameDialog'),
             recorderDisabledDialog = $('#recorderDisabledDialog'),
-            recorderNameInput      = recorderNameDialog.find('input[data-role="recording-name"]'),
+            recorderNameInput      = recorderContainer.find('input[data-role="recording-name"]'),
             recorderInterface; // Recording plugin
 
         // Call this when I want to actually upload recorded sounds
         var uploadRecorded = function() {
             recorderNameInput.blur();
-            recorderInterface.uploadRecorded(recorderNameInput.val() + '.' + recorderInterface.getFileExtension());
-            recorderNameDialog.dialog('close');
+            recorderInterface.uploadRecorded((recorderNameInput.val() || 'recording') + '.' + recorderInterface.getFileExtension());
         };
 
-        // Set up the recorder's dialogs
-        recorderNameDialog.dialog({
-            modal: true,
-            autoOpen: false,
-            buttons: [
-                {
-                    text:  'Upload',
-                    click: function() {
-                        uploadRecorded();
-                    }
-                },
-                {
-                    text:  'Cancel',
-                    click: function() {
-                        $(this).dialog('close');
-                    }
-                }
-            ]
-        }).on('open', function() {
-            recorderNameInput.focus();
-        });
-        recorderDisabledDialog.dialog({
-            modal: true,
-            autoOpen: false,
-            buttons: [
-                {
-                    text:  'Try it',
-                    click: function() {
-                        $('#attachment-browser').find('a[href="#internal/upload"]').click();
-                        $(this).dialog('close');
-                    }
-                },
-                {
-                    text:  'Cancel',
-                    click: function() {
-                        $(this).dialog('close');
-                    }
-                }
-            ]
+        recorderContainer.on('click', '[data-interaction="audio-fallback"]', function (e) {
+            e.preventDefault();
+
+            var selector = 'a[href="#' + this.href.split('#')[1] + '"]';
+            var picker   = $('#attachment-browser');
+            var target   = picker.find(selector)[0];
+
+            picker.find(target).trigger('click');
         });
 
         // Did I press enter on the recorder name? treat that as a form submit
@@ -79,13 +46,19 @@
         };
 
         // Switch off buttons by default
-        recorderButtons.start.css('display','inline-block').prop('disabled', false);
-        recorderButtons.recording.hide().prop('disabled', true);
-        recorderButtons.play.hide().prop('disabled', true);
-        recorderButtons.stop.hide().prop('disabled', true);
-        recorderButtons.upload.hide().prop('disabled', true);
-        recorderButtons.disabled.hide();
-        recorderButtons.uploading.hide();
+        recorderButtons.start.removeClass('hide').prop('disabled', false);
+        recorderButtons.recording.addClass('hide').prop('disabled', true);
+        recorderButtons.play.addClass('hide').prop('disabled', true);
+        recorderButtons.stop.addClass('hide').prop('disabled', true);
+        recorderButtons.upload.addClass('hide').prop('disabled', true);
+        recorderButtons.disabled.addClass('hide');
+        recorderButtons.uploading.addClass('hide');
+
+        // apply this listener pre-constructor
+        recorderContainer.on('setupFailed.recorder recordingStartFailed.recorder', function() {
+            recorderContainer.html(recorderDisabledDialog.html());
+        });
+
 
         recorderContainer.recorder({
             upload: {
@@ -94,7 +67,7 @@
             flash: {
                 flashContainer: $('#flashContainer')[0],
                 onFlashSecurity: function() {
-                    $('#flashContainer').css('display','inline-block');
+                    $('#flashContainer').removeClass('hide');
                 },
                 session: {
                     name: '{SESSION_NAME}',
@@ -105,54 +78,44 @@
         recorderInterface = recorderContainer.data('recorder');
 
         // Set up button events
-        recorderContainer.on('setupFailed.recorder, recordingStartFailed.recorder', function() {
-            // Disable all buttons
-            recorderButtons.start.hide().prop('disabled', true);
-            recorderButtons.recording.hide().prop('disabled', true);
-            recorderButtons.play.hide().prop('disabled', true);
-            recorderButtons.stop.hide().prop('disabled', true);
-            recorderButtons.upload.hide().prop('disabled', true);
-            recorderButtons.disabled.css('display','inline-block');
-            recorderDisabledDialog.dialog('open');
-        });
         recorderContainer.on('recordingReady.recorder', function() {
             // Allow record button to show
-            recorderButtons.start.css('display','inline-block').prop('disabled', false);
+            recorderButtons.start.removeClass('hide').prop('disabled', false);
         });
         recorderContainer.on('recordingStart.recorder', function() {
             // Show stop button only
-            recorderButtons.start.hide().prop('disabled', true);
-            recorderButtons.recording.css('display','inline-block').prop('disabled', true);
-            recorderButtons.play.hide().prop('disabled', true);
-            recorderButtons.stop.css('display','inline-block').prop('disabled', false);
-            recorderButtons.upload.hide().prop('disabled', true);
+            recorderButtons.start.addClass('hide').prop('disabled', true);
+            recorderButtons.recording.removeClass('hide').prop('disabled', true);
+            recorderButtons.play.addClass('hide').prop('disabled', true);
+            recorderButtons.stop.removeClass('hide').prop('disabled', false);
+            recorderButtons.upload.addClass('hide').prop('disabled', true);
         });
         recorderContainer.on('recordingStop.recorder', function() {
-            recorderButtons.start.css('display','inline-block').prop('disabled', false);
-            recorderButtons.recording.hide().prop('disabled', true);
-            recorderButtons.play.css('display','inline-block').prop('disabled', false);
-            recorderButtons.stop.hide().prop('disabled', true);
-            recorderButtons.upload.css('display','inline-block').prop('disabled', false);
+            recorderButtons.start.removeClass('hide').prop('disabled', false);
+            recorderButtons.recording.addClass('hide').prop('disabled', true);
+            recorderButtons.play.removeClass('hide').prop('disabled', false);
+            recorderButtons.stop.addClass('hide').prop('disabled', true);
+            recorderButtons.upload.removeClass('hide').prop('disabled', false);
         });
         recorderContainer.on('playbackStart.recorder', function() {
-            recorderButtons.start.css('display','inline-block').prop('disabled', true);
-            recorderButtons.play.hide().prop('disabled', true);
-            recorderButtons.stop.css('display','inline-block').prop('disabled', false);
-            recorderButtons.upload.css('display','inline-block').prop('disabled', false);
+            recorderButtons.start.removeClass('hide').prop('disabled', true);
+            recorderButtons.play.addClass('hide').prop('disabled', true);
+            recorderButtons.stop.removeClass('hide').prop('disabled', false);
+            recorderButtons.upload.removeClass('hide').prop('disabled', false);
         });
         recorderContainer.on('playbackStop.recorder', function() {
-            recorderButtons.start.css('display','inline-block').prop('disabled', false);
-            recorderButtons.play.css('display','inline-block').prop('disabled', false);
-            recorderButtons.stop.hide().prop('disabled', true);
-            recorderButtons.upload.css('display','inline-block').prop('disabled', false);
+            recorderButtons.start.removeClass('hide').prop('disabled', false);
+            recorderButtons.play.removeClass('hide').prop('disabled', false);
+            recorderButtons.stop.addClass('hide').prop('disabled', true);
+            recorderButtons.upload.removeClass('hide').prop('disabled', false);
         });
         recorderContainer.on('uploadStart.recorder', function() {
-            recorderButtons.start.hide().prop('disabled', true);
-            recorderButtons.recording.hide().prop('disabled', true);
-            recorderButtons.play.hide().prop('disabled', true);
-            recorderButtons.stop.hide().prop('disabled', true);
-            recorderButtons.upload.hide().prop('disabled', true);
-            recorderButtons.uploading.css('display','inline-block');
+            recorderButtons.start.addClass('hide').prop('disabled', true);
+            recorderButtons.recording.addClass('hide').prop('disabled', true);
+            recorderButtons.play.addClass('hide').prop('disabled', true);
+            recorderButtons.stop.addClass('hide').prop('disabled', true);
+            recorderButtons.upload.addClass('hide').prop('disabled', true);
+            recorderButtons.uploading.removeClass('hide');
         });
         recorderContainer.on('uploadComplete.recorder', function(event, recorder, filename, response) {
             // inform any listeners that a file was uploaded.
@@ -167,21 +130,21 @@
             window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
 
             // Go back to recordingReady state
-            recorderButtons.start.css('display','inline-block').prop('disabled', false);
-            recorderButtons.recording.hide().prop('disabled', true);
-            recorderButtons.play.hide().prop('disabled', true);
-            recorderButtons.stop.hide().prop('disabled', true);
-            recorderButtons.upload.css('display','inline-block').prop('disabled', false);
-            recorderButtons.uploading.hide();
+            recorderButtons.start.removeClass('hide').prop('disabled', false);
+            recorderButtons.recording.addClass('hide').prop('disabled', true);
+            recorderButtons.play.addClass('hide').prop('disabled', true);
+            recorderButtons.stop.addClass('hide').prop('disabled', true);
+            recorderButtons.upload.removeClass('hide').prop('disabled', false);
+            recorderButtons.uploading.addClass('hide');
         });
         recorderContainer.on('uploadFailed.recorder', function(event, recorder) {
             // Show some sort of failed message?
-            recorderButtons.start.hide().prop('disabled', true);
-            recorderButtons.recording.hide().prop('disabled', true);
-            recorderButtons.play.hide().prop('disabled', true);
-            recorderButtons.stop.hide().prop('disabled', true);
-            recorderButtons.upload.hide().prop('disabled', true);
-            recorderButtons.uploading.css('display','inline-block');
+            recorderButtons.start.addClass('hide').prop('disabled', true);
+            recorderButtons.recording.addClass('hide').prop('disabled', true);
+            recorderButtons.play.addClass('hide').prop('disabled', true);
+            recorderButtons.stop.addClass('hide').prop('disabled', true);
+            recorderButtons.upload.addClass('hide').prop('disabled', true);
+            recorderButtons.uploading.removeClass('hide');
         });
 
         // Button events
@@ -204,7 +167,7 @@
         recorderButtons.upload.click(function(event) {
             event.preventDefault();
             // prompt for a name
-            recorderNameDialog.dialog('open');
+            uploadRecorded();
         });
     });
 </script>
@@ -216,25 +179,28 @@
         * Should fall back to simple file upload for iPads
           (this supports usermedia natively)
     -->
-    <div class="dz-default"><span>Start recording audio</span></div>
-    <div class="recorderButtons">
-        <a role="button" class="submit-btn-plain record" data-interaction="audio-record-start" href="#">Start Recording</a>
-        <a role="button" class="submit-btn-plain recording hide" data-interaction="audio-record-recording" disabled href="#">Recording...</a>
-        <a role="button" class="submit-btn-plain disabled" data-interaction="audio-record-disabled" disabled href="#">No recording devices available</a>
-        <a role="button" class="submit-btn-plain play hide" data-interaction="audio-record-play" href="#">Play</a>
-        <a role="button" class="submit-btn-plain stop hide" data-interaction="audio-record-stop" href="#">Stop</a>
+    <div class="dz-default">
+        <div class="icon-mic icon-64 text-center"></div>
+        <label>Recording Name
+            <input data-role="recording-name" type="text" value="" placeholder="recording" />
+        </label>
     </div>
-    <div id="flashContainer" class="hide"></div>
+    <div class="recorderButtons">
+        <a role="button" class="submit button record" data-interaction="audio-record-start" href="#">Start Recording</a>
+        <a role="button" class="submit button recording hide" data-interaction="audio-record-recording" disabled href="#">Recording...</a>
+        <a role="button" class="submit button disabled" data-interaction="audio-record-disabled" disabled href="#">No recording devices available</a>
+        <a role="button" class="submit button play hide" data-interaction="audio-record-play" href="#">Play</a>
+        <a role="button" class="submit button stop hide" data-interaction="audio-record-stop" href="#">Stop</a>
+    </div>
+    <div id="flashContainer" class="hide" style="position:absolute;"></div>
 </div>
 <div class="recorderButtons">
-    <a role="button" class="submit-btn-plain upload hide" data-interaction="audio-record-upload" href="#">Upload Audio</a>
-    <a role="button" class="submit-btn-plain uploading hide" data-interaction="audio-record-uploading" disabled href="#">Uploading...</a>
-    <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
+    <a role="button" class="submit button upload hide" data-interaction="audio-record-upload" href="#">Upload Audio</a>
+    <a role="button" class="submit button uploading hide" data-interaction="audio-record-uploading" disabled href="#">Uploading...</a>
+    <a role="button" class="button cancel" href="#">Cancel</a>
 </div>
-<div id="recorderNameDialog" title="Please enter a name for this recording" class="hide">
-    <input data-role="recording-name" type="text" value="recording" />
-</div>
-<div id="recorderDisabledDialog" title="Recording is not directly supported" class="hide">
-    Recording is not directly supported in your browser,
-    but creating and uploading a recording through the "Upload file" form might work.
+<div data-reveal id="recorderDisabledDialog" title="Recording is not directly supported" class="reveal-modal">
+    <p>Recording is not directly supported in your browser,
+    but creating and uploading a recording through "Upload files" might work.</p>
+    <a class="submit button" data-interaction="audio-fallback" href="#internal-upload">Try it</a>
 </div>

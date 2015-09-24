@@ -1,3 +1,10 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript">
+    Dropzone.autoDiscover = false;
+</script>
+<!-- END custom_head -->
+
 <ul class="breadcrumb">
     <li><a href="/">Schoolbox</a></li>
     <li><a href="/pantry">Pantry</a></li>
@@ -160,49 +167,8 @@
                         </script>
                     </div>
 
-                    <div class="column small-12 medium-10">
-                        <label>Attachments</label>
-                        <div class="attachzone s64" id="news-feature-zone">
-                            <span class="az-label"></span>
-                            <ul class="az-list">
-                            </ul>
-                            <div class="dzone" id="NewsFeatureZone">
-                                <ul data-template>
-                                    <li>
-                                        <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
-                                        <p class="actions">
-                                            <a title="Detach" data-dz-remove class="button no-text icon-delete"></a>
-                                        </p>
-                                        <img data-dz-thumbnail src="/images/emails/spacer.gif" />
-                                        <p class="filename" data-dz-name></p>
-                                        <input type="hidden" data-az-attachment name="attachment[]" value="" />
-                                    </li>
-                                </ul>
-                            </div>
-                            <ul class="az-error-list"></ul>
-
-                            <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
-                            <script type="text/javascript">
-                                $(function () {
-                                    $('#news-feature-zone').resourceAttach({
-                                        url: '/storage/asyncUpload',
-                                        paramName: 'upload',
-                                        trigger: 'div.dzone',
-                                        dropzoneSelector: 'div.dzone',
-                                        dictDefaultMessage: 'Attach feature image',
-                                        allowedFiles: 'image/*',
-                                        multi: false,
-                                        title: 'Select feature image',
-                                        thumbnailSize: '64',
-                                        fallbackButtonSelector: 'a[data-attach-fallback]',
-                                        onSelect: function (attachments) {
-                                            /* `this` will refer to $(element_that_was_clicked) */
-                                            /* multi or not, you will ALWAYS receive a [LIST] of documents to parse for attachment */
-                                        }
-                                    });
-                                });
-                            </script>
-                        </div>
+                    <div class="column small-12">
+                        {AFFIX_TWIG_LABEL_HERE}
                     </div>
                     <div class="column small-12 medium-2">
                         <label>Visibility

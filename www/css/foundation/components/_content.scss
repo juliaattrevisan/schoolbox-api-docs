@@ -764,9 +764,7 @@ $rotate-th-width: $square-grid-td-size;
 	@include single-transition(all, 0.15s, linear);
 }
 
-// The original list
-// All other lists include (@extend) these styles
-.information-list{
+@mixin information-list() {
 	@include responsive-sides(1, padding);
 	list-style: none;
 	margin: 0;
@@ -797,17 +795,17 @@ $rotate-th-width: $square-grid-td-size;
             @extend .icon-grip;
             @extend [class^="icon-"]; // (this is valid)
 
-            padding: 0;
-            text-align: center;
-            cursor: move;
+			padding: 0;
+			text-align: center;
+			cursor: move;
 
-            &:before {
-                line-height: 3rem;
-                padding: 0;
-                color: $primary-color;
-            }
-        }
-    }
+			&:before {
+				line-height: 3rem;
+				padding: 0;
+				color: $primary-color;
+			}
+		}
+	}
 	> li{
 		@include grid-row($behavior:nest); // there is no scenario in which .information-list > li will operate as anything other than a row
 		@include responsive-sides(-1, margin);
@@ -835,21 +833,21 @@ $rotate-th-width: $square-grid-td-size;
 		.three-column{
 			@media #{$small-up} { @include grid-column(3); }
 		}
-        .four-column{
-            @media #{$small-up} { @include grid-column(4); }
-        }
-        .five-column{
-            @media #{$small-up} { @include grid-column(5); }
-        }
-        .six-column{
-            @media #{$small-up} { @include grid-column(6); }
-        }
-        .seven-column{
-            @media #{$small-up} { @include grid-column(7); }
-        }
-        .eight-column{
-            @media #{$small-up} { @include grid-column(8); }
-        }
+		.four-column{
+			@media #{$small-up} { @include grid-column(4); }
+		}
+		.five-column{
+			@media #{$small-up} { @include grid-column(5); }
+		}
+		.six-column{
+			@media #{$small-up} { @include grid-column(6); }
+		}
+		.seven-column{
+			@media #{$small-up} { @include grid-column(7); }
+		}
+		.eight-column{
+			@media #{$small-up} { @include grid-column(8); }
+		}
 		.nine-column{
 			@media #{$small-up} { @include grid-column(9); }
 		}
@@ -891,23 +889,23 @@ $rotate-th-width: $square-grid-td-size;
 			}
 		}
 	}
-    .reply{
-        border-top: 1px solid $body-bg;
-        clear: both;
+	.reply{
+		border-top: 1px solid $body-bg;
+		clear: both;
 
-        @media #{$medium-up} {
-            margin-left: rem-calc((4.3 * $base-font-size));
-        }
+		@media #{$medium-up} {
+			margin-left: rem-calc((4.3 * $base-font-size));
+		}
 
-        @media #{$small-up} {
-            margin-left: rem-calc((2 * $base-font-size));
-        }
+		@media #{$small-up} {
+			margin-left: rem-calc((2 * $base-font-size));
+		}
 
-        li,
-        .component-form{
-            clear: both;
-        }
-    }
+		li,
+		.component-form{
+			clear: both;
+		}
+	}
 	form {
 		margin: 0;
 	}
@@ -916,9 +914,15 @@ $rotate-th-width: $square-grid-td-size;
 	}
 }
 
+// The original list
+// All other lists include (@extend) these styles
+.information-list{
+	@include information-list;
+}
+
 // Activity list
 .activity-list{
-	@extend .information-list;
+	@include information-list;
 	li{
 		.grade{
 			text-align: center;
@@ -930,7 +934,7 @@ $rotate-th-width: $square-grid-td-size;
 
 // Subject list
 .subject-list{
-	@extend .information-list;
+	@include information-list;
 	.subject-group{
 		border-bottom: 16px solid $body-bg;
 	}
@@ -949,7 +953,7 @@ $rotate-th-width: $square-grid-td-size;
 }
 
 .news-list {
-	@extend .information-list;
+	@include information-list;
 	padding-top: 0 !important;
 	padding-bottom: 0 !important;
 	@include responsive-sides($importance: !important);
@@ -958,12 +962,12 @@ $rotate-th-width: $square-grid-td-size;
 /* Weekly Weather display
  */
 .weather-list {
-    @extend .information-list;
+    @include information-list;
     &.active {
         background-color: $row-hover-background;
     }
     li {
-        border: 0px;
+        border: 0;
         border-right: 1px solid $body-bg;
         text-align: center;
 
@@ -979,7 +983,7 @@ $rotate-th-width: $square-grid-td-size;
 }
 
 .weather-list-summary {
-    @extend .information-list;
+    @include information-list;
     .active {
         background-color: $row-hover-background;
     }
@@ -1030,7 +1034,7 @@ $rotate-th-width: $square-grid-td-size;
 
 // Lists with action buttons
 .action-list{
-	@extend .information-list;
+	@include information-list;
 	> li{
 		&:hover{
 			background-color: $row-hover-background;
@@ -1042,6 +1046,15 @@ $rotate-th-width: $square-grid-td-size;
 	.expanded .task-list{
 		max-height: 100%;
 		@include single-transition(max-height, 0.3s, ease-in);
+	}
+}
+
+.resource-list {
+	@extend .action-list;
+	.avatar.card {
+		.icon-32 {
+			padding-top: 1rem;
+		}
 	}
 }
 
@@ -1225,7 +1238,7 @@ $rotate-th-width: $square-grid-td-size;
 		padding-top: 0;
 
 		&.avatar {
-			img {
+			img, [class*="icon-"] {
 				width: 2rem;
 				margin-right: 0.5rem;
 				margin-top: 0;
@@ -1344,7 +1357,7 @@ p{
 
 // Social Stream
 .social-stream{
-	@extend .information-list;
+	@include information-list;
 	.body{
 		margin: rem-calc(($base-font-size - 8)) 0 rem-calc(($base-font-size - 8)) 74px;
 		p{
@@ -1534,6 +1547,13 @@ dl {
 		margin: 1rem 0;
 	}
 
+}
+
+.progress {
+	@include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
+	span {
+		@include transition(inherit, unquote(''), unquote(''), unquote(''));
+	}
 }
 
 @media #{$small-only} {

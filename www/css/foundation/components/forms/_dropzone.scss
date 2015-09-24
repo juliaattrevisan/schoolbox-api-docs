@@ -1,12 +1,24 @@
 
-$overlay-duration: 800ms;
+$attachzone-resting-background: $body-bg;
+$attachzone-resting-color: darken($attachzone-resting-background, 30%);
+$attachzone-dragging-background: #f4dea0;
+$attachzone-dragging-color: darken($attachzone-dragging-background, 40%);
+$attachzone-can-accept-background: $input-focus-bg-color;
+$attachzone-can-accept-color: $input-focus-border-color;
+$attachzone-error-background: tint($alert-color, 96%);
+$attachzone-error-color: $alert-color;
+
+$attachzone-overlay-duration: 800ms;
+$attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 
 .dragging {
     .dropzone.overlay {
         opacity: 1;
         z-index: 2;
 
-        transition: opacity $overlay-duration cubic-bezier(0.14, 1.11, 0.07, 0.99);
+        @include easy-transition(
+            opacity $attachzone-overlay-duration $attachzone-overlay-timing
+        );
     }
 }
 
@@ -26,91 +38,80 @@ $overlay-duration: 800ms;
         display: block;
         z-index: -1;
 
-        transition: opacity $overlay-duration cubic-bezier(0.14, 1.11, 0.07, 0.99),
-        z-index 0s $overlay-duration linear;
-
+        @include easy-transition(
+            opacity $attachzone-overlay-duration $attachzone-overlay-timing,
+            z-index 0s $attachzone-overlay-duration linear
+        );
     }
 }
 
 .explorer .file-browser {
     overflow-y: auto;
-    height: 'calc(100% - 26px)';
+    height: calc(100% - 26px);
+}
+
+.reveal-modal.file-picker {
+    padding: 0;
+    h2 {
+        margin: 1rem;
+    }
 }
 
 // Attach Browser
 #attachment-browser {
-    margin: -0.2em -1em;
-    h3 {
-        width: 20%;
-        a {
-            display: block;
-            padding: 8px 12px;
-            border-radius: 4px;
-        }
-    }
-    .explorer {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 80%;
-        margin-left: 20%;
-        display: none;
-        padding: 4px;
-        box-sizing: border-box;
-        font-size: 0.91em; // undo parent .ui-widget 1.1em nonsense
+    .content {
         &.preload {
             background: transparent url("/images/loading-bar.gif") no-repeat 50%;
+            height: 10rem;
         }
         iframe {
             width: 100%;
             height: 100%;
+            border: none;
         }
     }
-    li[data-source].browsing {
-        h3 a {
-            color: $white;
-            background: $warning-color;
-            &:hover {
-                text-decoration: none;
-            }
-        }
-        .explorer {
-            display: block;
-        }
+}
+
+.ab-pane {
+    .submit.button {
+        float: left;
+        margin-right: 0.25rem;
     }
 }
 
 // Attachzone
 ul.az-list,
 ul.az-error-list {
-    position: relative;
-    margin: 0;
+    @extend .action-list;
+
+    // some helpful vars
+    $attachzone-duration-quarter: $attachzone-overlay-duration / 4;
+    $attachzone-duration-half: $attachzone-overlay-duration / 2;
+    $attachzone-duration-3quarter: $attachzone-overlay-duration * 3 / 4;
+
+    //position: relative;
+    //margin: 0;
     > li {
         clear: none;
-        //background-color: $monsoon;
-        @include transition( (
-                opacity 100ms ease-in,
-                height 150ms ease-out 50ms,
-                padding 150ms ease-out 50ms,
-                background-color 500ms ease-out
-        )
+        overflow: hidden;
+        height: 0;
+        @include easy-transition(
+            color $attachzone-overlay-duration $attachzone-overlay-timing,
+            opacity $attachzone-duration-half $attachzone-overlay-timing,
+            min-height $attachzone-duration-3quarter $attachzone-overlay-timing $attachzone-duration-quarter,
+            height $attachzone-duration-3quarter $attachzone-overlay-timing $attachzone-duration-quarter,
+            padding $attachzone-duration-3quarter $attachzone-overlay-timing $attachzone-duration-quarter,
+            background-color $attachzone-overlay-duration $attachzone-overlay-timing
         );
-        &:nth-child(2n) {
-            background-color: fade($monsoon, 5%);
-        }
         &.detach {
             opacity: 0;
+            min-height: 0 !important;
             height: 0;
             padding-top: 0;
             padding-bottom: 0;
-            .actions {
-                display: none;
-            }
         }
-        .actions {
-            float: right;
-            margin: 0;
+        .avatar.card {
+            min-height: rem-calc($base-font-size * 3 + 1);
         }
     }
     img {
@@ -128,50 +129,77 @@ ul.az-error-list {
 }
 
 ul.az-error-list {
-    background: #fee;
-    margin-top: rem-calc(($base-font-size - 12));
+    background: $attachzone-error-background;
     .dz-error {
-        height: 24px;
+        height: rem-calc($base-font-size * 3 + 1);
     }
     .filename {
-        line-height: 24px;
-        height: 24px;
-        text-decoration: underline;
+        line-height: 2rem;
+        height: 2rem;
         font-style: italic;
         cursor: pointer;
     }
-    .actions .btn {
-        margin-top: 0;
+    nav a {
+        color: $attachzone-error-color;
+        &:hover {
+            background-color: tint($attachzone-error-color, 74%);
+        }
     }
 }
 
 /* 64px version */
 .s64 {
-    li {
-        height: 64px;
-    }
-    img {
-        width: 64px;
-        height: 64px;
-    }
-    .dzone {
-        height: 72px;
-    }
     .filename {
-        line-height: 64px;
-        margin-left: 72px;
+        line-height: 2.5rem;
+        @media #{$medium-up} {
+            line-height: 3rem;
+        }
     }
     .dzone {
-        background-image: url("/images/core/files/paperclip-64.png");
-        background-size: 38px;
-        background-position: 10px;
-        padding-left: 58px;
+        @extend .icon-attach;
+        &:before {
+            position: absolute;
+            font-weight: $font-weight-normal;
+            @media #{$small-only} {
+                left: 0.625rem;
+                top: 0.75rem;
+                font-size: 1.5rem;
+            }
+            @media #{$medium-up} {
+                left: 1rem;
+                top: 1.25rem;
+                font-size: 2rem;
+            }
+        }
+        @media #{$small-only} {
+            background-size: 1.5rem;
+            height: 3rem;
+            padding-left: 3.5rem;
+            background-position: 0.75rem;
+        }
+        @media #{$medium-up} {
+            background-size: 2rem;
+            height: 4rem;
+            background-position: 0.875rem;
+            padding-left: 4.5rem;
+        }
     }
     .dz-upload {
         height: 72px;
     }
     .button{
         float: right;
+    }
+
+    ul.az-list {
+        > li {
+            @media #{$small-only} {
+                min-height: 3rem;
+            }
+            @media #{$medium-up} {
+                min-height: 4rem;
+            }
+        }
     }
 }
 
@@ -181,10 +209,12 @@ ul.az-error-list {
     &.dz-max-files-reached {
         .dzone {
             border-color: transparent;
-            background-color: transparent;
-            background-image: none;
-            color: $black;
+            background: none;
             padding-left: 0;
+            color: rgba($white, 0);
+            &:before {
+                content: "";
+            }
             span {
                 padding: 0;
             }
@@ -200,42 +230,15 @@ ul.az-error-list {
         //.transition(none);
         border-width: 0;
     }
-    &.dz-drag-hover .dzone {
-        border-color: $success-color;
-        background-color: $vapor;
-    }
     img[data-dz-thumbnail] {
-        background: url('/images/resources/ajax.gif') no-repeat 50%;
-        @include single-transition(opacity, 0.15s, ease-in);
+        background: url('/images/resources/ajax.gif') no-repeat center center;
+        @include easy-transition(opacity  0.15s  $attachzone-overlay-timing);
     }
     ul.az-list > li {
         position: relative;
     }
     .dzone {
-        position: relative;
-        overflow: hidden;
-        background-color: rgba($success-color, 0.3);
-        border: 2px dashed $success-color;
-        background-repeat: no-repeat;
-        display: block;
-        color: $success-color;
-        text-shadow: 0 1px 0 $white;
         width: 100%;
-        @include transition( (
-                background-color 150ms ease-out,
-                border-color 150ms ease-out,
-                color 150ms ease-out,
-                height 150ms ease-out 150ms
-        )
-        );
-        //@include single-transition(all, 0.15s, ease-out);
-        &:hover {
-            background-color: rgba($success-color, 0.2);
-            cursor: pointer;
-            span {
-                text-decoration: underline;
-            }
-        }
         span {
             display: inline-block;
             vertical-align: middle;
@@ -250,7 +253,7 @@ ul.az-error-list {
             opacity: 0;
         }
         .dz-upload {
-            background-color: $alert-color;
+            background-color: $attachzone-error-background;
         }
     }
     .dz-success {
@@ -264,8 +267,18 @@ ul.az-error-list {
             opacity: 1;
         }
     }
-    div.dz-progress {
+    .dz-error, .dz-success {
+        .progress {
+            height: 0;
+        }
+    }
+    .progress {
         margin: 0;
+        clear: both;
+        @media #{$small-only} {
+            position: relative;
+            top: -0.3125rem;
+        }
     }
     .dz-upload {
         background-color: $vapor;
@@ -274,20 +287,46 @@ ul.az-error-list {
     }
     .filename {
         opacity: 0.4;
-        @include single-transition(opacity, 0.15s, ease-out);
+        @include easy-transition(opacity 0.15s $attachzone-overlay-timing);
+    }
+}
+
+.dzone {
+    @extend %p;
+    overflow: hidden;
+    position: relative;
+    background-color: $attachzone-resting-background;
+    border: 2px dashed $attachzone-resting-color;
+    background-repeat: no-repeat;
+    display: block;
+    color: $attachzone-resting-color;
+    @include easy-transition(
+        background-color 360ms $attachzone-overlay-timing,
+        border-color 360ms $attachzone-overlay-timing,
+        color 360ms $attachzone-overlay-timing,
+        height 360ms $attachzone-overlay-timing 360ms
+    );
+    &:hover {
+        background-color: rgba($attachzone-resting-background, 0.2);
+        cursor: pointer;
+    }
+}
+
+// hover can be applied either to child or self
+.dz-drag-hover .dzone, .dz-drag-hover.dzone {
+    border-color: $attachzone-can-accept-color;
+    background-color: $attachzone-can-accept-background;
+    color: $attachzone-can-accept-color;
+    span {
+        color: inherit;
     }
 }
 
 // Attach-browser upload
 #ab-upload {
     .dzone {
-        min-height: 100%;
-        overflow: hidden;
-        background-color: rgba($success-color, 0.3);
-        border: 2px dashed $success-color;
-        box-sizing: border-box;
-        margin-right: 4px;
-        @include single-transition(all, 0.15s, ease-out);
+        min-height: 100px;
+
         &.dz-started, &.dz-browser-not-supported {
             border-color: transparent;
             background-color: transparent;
@@ -307,9 +346,6 @@ ul.az-error-list {
                 text-align: center;
             }
         }
-    }
-    form.dzone.dz-drag-hover {
-        background-color: rgba($success-color, 0.2);
     }
     .dz-error-mark, .dz-success-mark {
         display: none;
@@ -402,7 +438,7 @@ ul.az-error-list {
         position: absolute;
         top: 0;
         left: 0;
-        @include single-transition(all, 0.15s, ease-out);
+        @include easy-transition(all 0.15s $attachzone-overlay-timing);
     }
 
     .dz-success .dz-progress [data-dz-uploadprogress] {
@@ -413,23 +449,23 @@ ul.az-error-list {
 
 // Default Dropzone
 .dropzone{
-    background-color: rgba(193, 234, 193, 0.8); // TODO make a function of $success-color
-    border: 2px dashed $success-color;
+    background-color: $attachzone-resting-background;
+    border: 2px dashed $attachzone-resting-color;
     padding: rem-calc(($base-font-size - 6));
     position: relative;
     min-height: 72px;
     margin-bottom: rem-calc(($base-font-size - 2));
 
     &.dz-drag-hover {
-        border-color: $success-color;
-        background: $ocean-sunset;
+        border-color: $attachzone-can-accept-color;
+        background: $attachzone-can-accept-background;
     }
 
     .dz-default.dz-message {
         background-image: url('/images/foundation/dropzone.png');
         background-repeat: no-repeat;
         background-position: 0 0;
-        @include single-transition(opacity, 0.3s, ease-in-out);
+        @include easy-transition(opacity 0.3s $attachzone-overlay-timing);
         opacity: 1;
         -ms-filter: none;
         filter: none;
@@ -488,7 +524,7 @@ ul.az-error-list {
         opacity: 0;
         -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
         filter: alpha(opacity=0);
-        @include single-transition(opacity, 0.4s, ease-in-out);
+        @include easy-transition(opacity 0.4s $attachzone-overlay-timing);
     }
 
     .dz-preview .dz-success-mark,
@@ -517,17 +553,13 @@ ul.az-error-list {
 
 .dz-preview .dz-details,
 .dropzone-previews .dz-preview .dz-details {
-    width: 100px;
-    height: 100px;
     position: relative;
-    background: #ebebeb;
     padding: 5px;
     margin-bottom: 22px;
 }
 .dz-preview .dz-details .dz-filename,
 .dropzone-previews .dz-preview .dz-details .dz-filename {
     overflow: hidden;
-    height: 100%;
 }
 .dz-preview .dz-details img,
 .dropzone-previews .dz-preview .dz-details img {
@@ -660,7 +692,7 @@ ul.az-error-list {
     opacity: 0;
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
     filter: alpha(opacity=0);
-    @include single-transition(opacity, 0.4s, ease-in-out);
+    @include easy-transition(opacity 0.4s $attachzone-overlay-timing);
 }
 
 .dz-preview .dz-error-message,
@@ -669,7 +701,7 @@ ul.az-error-list {
     opacity: 0;
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
     filter: alpha(opacity=0);
-    @include single-transition(opacity, 0.3s, ease-in-out);
+    @include easy-transition(opacity 0.3s $attachzone-overlay-timing);
 }
 
 .dz-preview:hover.dz-error .dz-error-message,
@@ -682,7 +714,7 @@ ul.az-error-list {
 .dz-preview .dz-progress .dz-upload,
 .dropzone-previews .dz-preview .dz-progress .dz-upload {
     @include animation(loading 0.4s linear infinite);
-    @include single-transition(width, 0.3s, ease-in-out);
+    @include easy-transition(width 0.3s $attachzone-overlay-timing);
     -webkit-border-radius: 2px;
     border-radius: 2px;
     position: absolute;
