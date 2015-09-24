@@ -15,7 +15,7 @@
 {% endverbatim %}
 <script type="text/javascript">
     (function($) {
-        var template         = doT.template($('script#node-template').html().trim())
+        var template         = doT.template($('script#node-template').html().trim());
         var learningLevelUrl = {{ routeLookup('curriculumImport.learningLevels')|json_encode|raw }};
         var outcomeUrl       = {{ routeLookup('curriculumImport.outcomes')|json_encode|raw }};
         var browseUrl        = {{ routeLookup('curriculum.browse')|json_encode|raw }};
@@ -37,11 +37,11 @@
         $(function() {
             var form = $('form#curriculum-import-form');
 
-            // Tabs 1 and 2 get activated as you go through the wizard.
-            form.tabs({
-                active: 0,
-                disabled: [1, 2]
-            });
+//            // Tabs 1 and 2 get activated as you go through the wizard.
+//            form.tabs({
+//                active: 0,
+//                disabled: [1, 2]
+//            });
 
             var sourceSelect = form.find('select[name="source"]');
             var levelSelect  = form.find('select[name="learningLevel"]');
@@ -96,15 +96,15 @@
                                     .appendTo(areaSelect);
                             });
                             tab.next('section').addClass('loaded');
-                            form.tabs('enable', 1)
-                                .tabs('option', 'active', 1)
+//                            form.tabs('enable', 1)
+//                                .tabs('option', 'active', 1)
                             // Animate next tab?
                         })
-                        .fail(function(jqXhr, textStatus, error) {
+                        .fail(function() {
                             // do something else
-                            form.tabs('disable', 1)
-                                .tabs('disable', 2)
-                                .tabs('option', 'active', 0);
+//                            form.tabs('disable', 1)
+//                                .tabs('disable', 2)
+//                                .tabs('option', 'active', 0);
                             tab.addClass('failed');
                         })
                         .always(function() {
@@ -150,15 +150,15 @@
                         makeTree(data.outcomes, form.find('#outcomes').empty())
                         tab.next('section').addClass('loaded');
                         form.find('input[data-role="wizard-step-3-submit"]').prop('disabled', false);
-                        form.tabs('enable', 2)
-                            .tabs('option', 'active', 2);
+//                        form.tabs('enable', 2)
+//                            .tabs('option', 'active', 2);
                         // Enable the submit button
                     })
-                    .fail(function(jqXhr, textStatus, error) {
+                    .fail(function() {
                         // do something else
                         form.find('input[data-role="wizard-step-3-submit"]').prop('disabled', true);
-                        form.tabs('disable', 2)
-                            .tabs('option', 'active', 1);
+//                        form.tabs('disable', 2)
+//                            .tabs('option', 'active', 1);
                         tab.addClass('failed');
                     })
                     .always(function() {
@@ -179,12 +179,12 @@
                 var tab = $(event.target).closest('section');
                 tab.addClass('loading').find(':input').prop('disabled', true);
 
-                formData = {
+                var formData = {
                     id:     sourceSelect.val(),
                     area:   areaSelect.find(':selected').data('area').reference,
                     level:  levelSelect.find(':selected').data('level').reference,
                     name:   nameInput.val()
-                }
+                };
 
                 $.ajax({
                     url:       form.attr('action'),
@@ -197,7 +197,7 @@
                         tab.addClass('loaded');
                         window.location.href = browseUrl+'#'+data.outcomes[0].id;
                     })
-                    .fail(function(jqXhr, textStatus, error) {
+                    .fail(function() {
                         // do something else
                         tab.addClass('failed');
                     })
