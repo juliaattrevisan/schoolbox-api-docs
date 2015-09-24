@@ -228,7 +228,18 @@
     })(jQuery);
 </script>
 
-<h1>Import Curriculum</h1>
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Import Curriculum</h1>
+        </div>
+    </div>
+    <nav>
+        <a href="{{ routeLookup('curriculum.browse')|escape('html_attr') }}"
+           class="icon icon-undo"
+           title="Return to Curriculum"></a>
+    </nav>
+</div>
 
 <form id="curriculum-import-form"
       class="clearfix curriculum-import-widget"
