@@ -201,28 +201,10 @@
     {% endif %}
 </div>
 
-{# Temporary stylage from 15.0 curriculum browser #}
-<style type="text/css">
-    /*
-    .curriculum-browser.jstree-default-resourcetree {
-        margin-left: -24px;
-    }
-    */
-    .curriculum-tree,
-    .curriculum-editor {
-        overflow-x: hidden;
-        overflow-y: auto;
-    }
-    .curriculum-tree .jstree-node {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-</style>
-
 <div class="row" data-equalizer data-equalizer-mq="large-up" data-role="curriculum-browser">
     <div class="small-12 large-6 island">
         <section>
-            <div class="content no-pad" data-equalizer-watch>
+            <div class="content no-pad curriculum-tree-container" data-equalizer-watch>
                 <div data-role="curriculum-tree" class="curriculum-tree"></div>
             </div>
         </section>
@@ -230,7 +212,7 @@
     <!-- Dialogs for small screens, separate pane for large -->
     <div class="hide-for-medium-down large-6 island">
         <section>
-            <div class="content no-pad" data-equalizer-watch>
+            <div class="content no-pad curriculum-editor-container" data-equalizer-watch>
                 <div data-role="curriculum-editor" class="curriculum-editor"></div>
             </div>
         </section>

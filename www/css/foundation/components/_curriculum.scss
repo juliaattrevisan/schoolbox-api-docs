@@ -1,0 +1,24 @@
+/**
+ * Curriculum related styles
+ */
+
+// Hide top level elbows by offsetting
+.curriculum-tree-container {
+    overflow-x: hidden;
+    .curriculum-tree {
+        margin-left: -24px;
+    }
+}
+
+// Scrollable panes for both tree and editor
+.curriculum-tree,
+.curriculum-editor {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+// Attempt to overflow with ellipses. I haven't been able to get this to work.
+.curriculum-tree .jstree-node {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
