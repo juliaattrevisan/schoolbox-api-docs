@@ -1,62 +1,65 @@
-<style type="text/css">
-    table.ruler td.mark {
-        padding: 8px;
-    }
-    table.ruler th {
-        text-align: center;
-        padding-left: 0;
-        border-right: solid 1px #eeeeee;
-    }
-</style>
-<h1>Overview &ndash; <a href="/submission/viewSubmission/{{ box.id }}">{{ box.name }}</a> ({{ box.workType.name }})</h1>
-<span class="header_option">
-    <a href="/submission/overview/{{ box.id }}/csv" class="btn download"><span></span>Download CSV</a>
-</span>
-<div class="view-submission">
-<table class="table ruler">
-    <tbody>
-    <tr>
-    {% if box.markType.slug == 'rubric' %}
-        <th rowspan="2"></th>
-        {% for group, criteria in headers %}
-        <th colspan="{{ criteria | length }}">{{ group }}</th>
-        {% endfor %}
-        {#<th rowspan="2">Comment</th>#}
-        </tr>
-        <tr>
-            {% for criteria in headers %}
-                {% for criterion in criteria %}
-                    <th>{{ criterion }}</th>
-                {% endfor %}
-            {% endfor %}
-        {% else %}
-            <th></th>
-            <th>Marks</th>
-            {#<th>Comment</th>#}
-        {% endif %}
-        </tr>
-    {% for student in students %}
-        <tr class="user_{OWNER_ID} user">
-            <td class="nowrap student">
-                <img class="student-icon" src="/portrait?userId={{ student.externalId }}&size=square32" alt="{{ student.formatName('{lastname}, {firstname}') }}"/>
-                <div>
-                    <a href="/search/user/{{ student.id }}">{{ student.formatName('{lastname}, {firstname}') }}</a>
-                </div>
-            </td>
-            {% if box.markType.slug == 'rubric' %}
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Overview</h1>
+            <ul class="meta">
+                <li class="icon-due-work"><a href="/submission/viewSubmission/{{ box.id }}">{{ box.name }}</a></li>
+                <li class="icon-due-work">{{ box.workType.name }}</li>
+            </ul>
+        </div>
+    </div>
+    <nav>
+        <a href="/submission/overview/{{ box.id }}/csv" class="icon-download" title="Download CSV"></a>
+    </nav>
+</div>
 
-                {% for criteria in headers %}
-                    {% for id, criterion in criteria %}
-                        <td class="mark">{{ marks[student.id][id] }}</td>
+<div class="row">
+    <div class="small-12 columns">
+        <div class="scrollable">
+            <table>
+                <tbody>
+                    <tr>
+                        {% if box.markType.slug == 'rubric' %}
+                        <th rowspan="2"></th>
+                        {% for group, criteria in headers %}
+                            <th colspan="{{ criteria | length }}">{{ group }}</th>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        {% for criteria in headers %}
+                            {% for criterion in criteria %}
+                                <th>{{ criterion }}</th>
+                            {% endfor %}
+                        {% endfor %}
+                        {% else %}
+                            <th></th>
+                            <th>Marks</th>
+                        {% endif %}
+                    </tr>
+                    {% for student in students %}
+                    <tr>
+                        <td class="no-pad">
+                            <div class="avatar card">
+                                <a href="/search/user/{{ student.id }}" title="View Profile">
+                                    <img src="/portrait?userId={{ student.externalId }}&size=square64" alt="View Profile" />
+                                    <p>{{ student.formatName('{lastname}, {firstname}') }}</p>
+                                </a>
+                            </div>
+                        </td>
+                        {% if box.markType.slug == 'rubric' %}
+                            {% for criteria in headers %}
+                                {% for id, criterion in criteria %}
+                                    <td>{{ marks[student.id][id] }}</td>
+                                {% endfor %}
+                            {% endfor %}
+                        {% else %}
+                            <td>{{ box.marks[student.id].displayValue }}</td>
+                        {% endif %}
+                    </tr>
                     {% endfor %}
-                {% endfor %}
+                </tbody>
+            </table>
 
-            {% else %}
-            <td>{{ box.marks[student.id].displayValue }}</td>
-            {% endif %}
-            {#<td>(get comment for user[{{ student.id }}])</td>#}
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+        </div>
+    </div>
 </div>
