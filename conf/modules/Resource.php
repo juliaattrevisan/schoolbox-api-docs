@@ -28,11 +28,10 @@ class Resource implements ModuleConfigInterface
 
         $browserModule = new Schoolbox\Resource\Browser\Resources\Module($di);
 
-        $browserModule->init('/resourceses');
+        $browserModule->init('/resources');
 
-        $myBrowserModule = new Schoolbox\Resource\Browser\MyFiles\Module($di);
-
-        $myBrowserModule->init('/my-files');
+        // $myBrowserModule = new Schoolbox\Resource\Browser\MyFiles\Module($di);
+        // $myBrowserModule->init('/my-files');
 
     }
 
