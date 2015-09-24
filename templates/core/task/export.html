@@ -14,7 +14,14 @@
     });
 </script>
 <!-- END custom_head -->
-<h1>Export a task</h1>
+
+{BREADCRUMB}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>Export {TASK_TYPE_LABEL}: {TASK_TITLE}</h1>
+    </div>
+</div>
 
 <form method="post" action="/task/exportForm.php" id="importForm">
 

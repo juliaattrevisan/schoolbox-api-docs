@@ -155,3 +155,17 @@ if (count($unitList) > 0) {
 else {
     $this->parse('unexportable_block', 'unexportable');
 }
+
+$trail = new Schoolbox\Breadcrumbs();
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => $category->getName(),
+        'href' => "/homepage/{$category->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => 'Export Task',
+        'href' => '',
+        'class' => 'active',
+    ]
+]);
