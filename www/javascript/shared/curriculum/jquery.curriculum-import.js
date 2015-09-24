@@ -150,18 +150,12 @@
                         curriculumTab.addClass('loaded');
                         self.enableTab(curriculumTab)
                             .switchToTab(curriculumTab);
-    //                            form.tabs('enable', 1)
-    //                                .tabs('option', 'active', 1)
-                        // Animate next tab?
                     })
                     .fail(function() {
                         // do something else
                         self.disableTab(curriculumTab)
                             .disableTab(outcomesTab)
                             .switchToTab(sourceTab);
-    //                            form.tabs('disable', 1)
-    //                                .tabs('disable', 2)
-    //                                .tabs('option', 'active', 0);
                         sourceTab.addClass('failed');
                     })
                     .always(function() {
@@ -198,27 +192,20 @@
                 .done(function(data) {
                     // Create a default name
                     nameInput.val(
-                        form.find('select[name="learningLevel"] :selected').text()
-                        + ' '
-                        + form.find('select[name="learningArea"] :selected').text()
+                        levelSelect.find(':selected').text() + ' ' + areaSelect.find(':selected').text()
                     );
                     // Shove all of this into a tree
                     makeTree(data.outcomes, form.find('#outcomes').empty());
                     curriculumTab.next('section').addClass('loaded');
-                    form.find('input[data-role="wizard-step-3-submit"]').prop('disabled', false);
+                    outcomesTab.find(':submit').prop('disabled', false);
                     self.enableTab(outcomesTab)
                         .switchToTab(outcomesTab);
-    //                        form.tabs('enable', 2)
-    //                            .tabs('option', 'active', 2);
-                    // Enable the submit button
                 })
                 .fail(function() {
                     // do something else
-                    form.find('input[data-role="wizard-step-3-submit"]').prop('disabled', true);
+                    outcomesTab.find(':submit').prop('disabled', true);
                     self.disableTab(outcomesTab)
                         .switchToTab(curriculumTab);
-    //                        form.tabs('disable', 2)
-    //                            .tabs('option', 'active', 1);
                     curriculumTab.addClass('failed');
                 })
                 .always(function() {
