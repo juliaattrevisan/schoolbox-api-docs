@@ -66,8 +66,9 @@
      */
     CurriculumImport.prototype.init = function()
     {
-        var element = this.element;
-        var config  = this.config;
+        var self = this;
+        var element = self.element;
+        var config  = self.config;
         var template         = doT.template(config.outcomes.nodeTemplate);
         var learningLevelUrl = config.curriculum.optionsUrl;
         var outcomeUrl       = config.outcomes.outcomeUrl;
@@ -144,13 +145,20 @@
                                 .text(area.name)
                                 .appendTo(areaSelect);
                         });
-                        sourceTab.next('section').addClass('loaded');
+
+                        // Enable the curriculum tab, and switch to it
+                        curriculumTab.addClass('loaded');
+                        self.enableTab(curriculumTab)
+                            .switchToTab(curriculumTab);
     //                            form.tabs('enable', 1)
     //                                .tabs('option', 'active', 1)
                         // Animate next tab?
                     })
                     .fail(function() {
                         // do something else
+                        self.disableTab(curriculumTab)
+                            .disableTab(outcomesTab)
+                            .switchToTab(sourceTab);
     //                            form.tabs('disable', 1)
     //                                .tabs('disable', 2)
     //                                .tabs('option', 'active', 0);
@@ -195,9 +203,11 @@
                         + form.find('select[name="learningArea"] :selected').text()
                     );
                     // Shove all of this into a tree
-                    makeTree(data.outcomes, form.find('#outcomes').empty())
+                    makeTree(data.outcomes, form.find('#outcomes').empty());
                     curriculumTab.next('section').addClass('loaded');
                     form.find('input[data-role="wizard-step-3-submit"]').prop('disabled', false);
+                    self.enableTab(outcomesTab)
+                        .switchToTab(outcomesTab);
     //                        form.tabs('enable', 2)
     //                            .tabs('option', 'active', 2);
                     // Enable the submit button
@@ -205,6 +215,8 @@
                 .fail(function() {
                     // do something else
                     form.find('input[data-role="wizard-step-3-submit"]').prop('disabled', true);
+                    self.disableTab(outcomesTab)
+                        .switchToTab(curriculumTab);
     //                        form.tabs('disable', 2)
     //                            .tabs('option', 'active', 1);
                     curriculumTab.addClass('failed');
@@ -269,6 +281,65 @@
         //        ui.newPanel.removeClass('loaded failed');
         //    }, 2000)
         //});
+    };
+
+    /**
+     * Gets the title link for the given tab, so it can be enabled, disabled
+     * or switched to.
+     *
+     * @param tab
+     * @returns element
+     * @private
+     */
+    CurriculumImport.prototype._findTabTitle = function(tab)
+    {
+        return this.element
+            .find(this.config.formSelector)
+            .find('[data-tab] [href="#'+tab.attr('id')+'"]');
+    };
+
+    /**
+     * Enables this tab.
+     *
+     * @param tab
+     * @returns {CurriculumImport}
+     */
+    CurriculumImport.prototype.enableTab = function(tab)
+    {
+        // All the ways that disabled could be set
+        this._findTabTitle(tab)
+            .removeClass('disabled')
+            .removeAttr('disabled')
+            .prop('disabled', false);
+        return this;
+    };
+
+    /**
+     * Disables this tab.
+     *
+     * @param tab
+     * @returns {CurriculumImport}
+     */
+    CurriculumImport.prototype.disableTab = function(tab)
+    {
+        // All the ways that disabled could be set
+        this._findTabTitle(tab)
+            .addClass('disabled')
+            .attr('disabled', 'disabled')
+            .prop('disabled', true);
+        return this;
+    };
+
+    /**
+     * Switches to this tab.
+     *
+     * @param tab
+     * @returns {CurriculumImport}
+     */
+    CurriculumImport.prototype.switchToTab = function(tab)
+    {
+        this._findTabTitle(tab).click();
+        return this;
     };
 
     /**
