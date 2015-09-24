@@ -2,7 +2,7 @@
 .masonry-placeholder {
   display: none;
 }
-.empty-column .masonry-placeholder {
+.show-empty .empty-column .masonry-placeholder {
   display: inherit;
 }
 
