@@ -1,0 +1,29 @@
+/*
+* Preview
+*/
+.preview.loader {
+  width: 200px;
+  padding: 20px 20px 50px 20px;
+  margin: 0 auto;
+  background-color: #fff;
+  text-align: center;
+}
+
+.preview.fragment {
+  @media #{$medium-down} {
+    width: 100%;
+  }
+  @media #{$large-up} {
+    width: 70%;
+  }
+
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Special twitter formatting
+ */
+.preview.fragment iframe.twitter-tweet.twitter-tweet-rendered {
+  display: inline !important;
+}
+
