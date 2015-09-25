@@ -76,23 +76,13 @@
 
 <!-- END custom_head -->
 
-<div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1>Unit Progress Report</h1>
-            <ul class="meta">
-                <li class="icon-home"><a href="/homepage/{CID}">{CATEGORY} {CATEGORY_CODE}</a></li>
-            </ul>
-        </div>
+<div class="row">
+    <div class="small-12 column">
+        <h1>Unit Progress Report</h1>
+        <ul class="meta">
+            <li class="icon-home"><a href="/homepage/{CATEGORY_ID}">{CATEGORY} {CATEGORY_CODE}</a></li>
+        </ul>
     </div>
-    <nav>
-        <a class="icon-more" title="" data-dropdown="header-options"></a>
-    </nav>
-    <ul id="header-options" class="f-dropdown" data-dropdown-content>
-        <li><a href='/submission/createSubmission/new/{CID}/' class='icon-progress'>Post Due Work</a>
-        <li><a href='/assess/create/{CID}/' class='icon-quiz'>Create Quiz</a>
-        <li><a href='/submission/markSheet/{CID}/{WORK_YEAR}/{WORK_SEMESTER}/export' class='icon-download'>Download Spreadsheet</a>
-    </ul>
 </div>
 
 <div class="row">
