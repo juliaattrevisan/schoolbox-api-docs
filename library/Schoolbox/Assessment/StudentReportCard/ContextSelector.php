@@ -35,6 +35,8 @@ class ContextSelector {
 	/** @var bool */
 	protected $categoryFirst = false;
 
+	/** @var bool */
+	protected $usePlugin = true;
 
 	/**
 	 * @param string $basePath  The path to the page this selector is being used on (eg. "submission/allWork")
@@ -105,6 +107,17 @@ class ContextSelector {
 	}
 
 	/**
+	 * If false, don't setup the contextSelector plugin - allow the including
+	 * template to wire all events together.
+	 *
+	 * @param bool $usePlugin
+	 */
+	public function setUsePlugin($usePlugin)
+	{
+		$this->usePlugin = $usePlugin;
+	}
+
+	/**
 	 * Only override the template if you absolutely must.
 	 *
 	 * @param string $template
@@ -131,6 +144,7 @@ class ContextSelector {
 		$page->setBlock($tpl, 'semester_context', 'semester_context_block');
 		$page->setBlock($tpl, 'subject_context', 'subject_context_block');
 		$page->setBlock($tpl, 'unit_context', 'unit_context_block');
+		$page->setVar('USE_PLUGIN',   $this->usePlugin);
 		$page->setVar('PAGE_HREF',    $this->basePath);
 		$page->setVar('SUBJECT_PART', is_numeric($selectedValues['category']) ? ($selectedValues['category'].'/') : '');
         $page->setVar('SEMESTER_CONTEXT_CATEGORY_ID', isset($selectedValues['list']) ? '/'.($selectedValues['list']) : '');

@@ -1,11 +1,13 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/shared/jquery.context-selector.js"></script>
 <script type="text/javascript">
-    $(function () {
-        $.fn.contextSelector({
-            href: '{PAGE_HREF}'
+    if (Number('{USE_PLUGIN}')) {
+        $(function () {
+            $.fn.contextSelector({
+                href: '{PAGE_HREF}'
+            });
         });
-    });
+    }
 </script>
 <!-- END custom_head -->
 
