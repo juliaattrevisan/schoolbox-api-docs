@@ -5,6 +5,7 @@ $blogHandler = new Blog();
 $commentHandler = new Comment();
 
 $this->setFile(TEMPLATE_content, 'blog.html');
+$this->setBlock(TEMPLATE_content, 'modify_link', 'modify_link_block');
 
 $i = 0;
 if (is_numeric($this->arg[0])) {
@@ -13,14 +14,6 @@ if (is_numeric($this->arg[0])) {
 
     if (empty($blog)) {
         error(29);
-    }
-
-    if ($blog['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS) {
-        $this->setVar(
-            'MODIFY_BLOG', "<a class=\"btn modify\" href=\"/blog/modify/{$blog['id']}\"><span></span>Modify</a>"
-        );
-    } else {
-        $this->setVar('MODIFY_BLOG', '');
     }
 
     $adr = new Alaress_Date_Format($blog['created'], 'Y-m-d H:i:s');
@@ -35,10 +28,14 @@ if (is_numeric($this->arg[0])) {
             'BLOG_ID' => $blog['id'],
             'BLOG_CREATED' => $adr->getRelativeTime(),
             'BLOG_AUTHOR_ID' => $blog['owner'],
+            'BLOG_AUTHOR_EXTERNAL_ID' => $blog['synergy_id'],
             'BLOG_AUTHOR_NAME' => $userHandler->formatName($blog),
-            'BLOG_AUTHOR_THUMB' => sprintf('/portrait?userId=%s&size=square32', $blog['synergy_id']),
+            'modify_link_block' => '',
         )
     );
+    if ($blog['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS) {
+        $this->parse('modify_link_block', 'modify_link');
+    }
 
     $comments = $commentHandler->getByBID($blog['id']);
     $this->setBlock(TEMPLATE_content, 'comment', 'comment_block');
@@ -79,5 +76,3 @@ if (is_numeric($this->arg[0])) {
         $this->setVar('comment_block', '');
     }
 }
-
-?>
