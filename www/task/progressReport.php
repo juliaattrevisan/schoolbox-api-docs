@@ -100,8 +100,10 @@ if (!isset($unit_id)) {
     }
 }
 
+
+
 // Get list of students for this class, and group if it has one.
-$code         = implode(',', $category->getCodes()->getColumnValues('code'));
+$code         = $category->getCodeString();
 $student_list = array();
 $classStudentIdList   = array();
 $groupStudentIdList   = array();
@@ -180,15 +182,14 @@ $this->setBlock('student_unit_task', 'student_unit_task_online_assess', 'student
 $this->setBlock('student_unit_task_online_assess', 'student_unit_task_online_assess_mark', 'student_unit_task_online_assess_mark_block');
 $this->setBlock('student_unit_task_online_assess', 'student_unit_task_online_assess_no_mark', 'student_unit_task_online_assess_no_mark_block');
 
-$this->setTitle('Class Mark Sheet');
+$this->setTitle('Unit Progress Report');
 
-$codeString = $category->getCodeString();
 $this->setVar(
     array(
         'CATEGORY'      => $category->getName(),
         'CATEGORY_ID'   => $category->getId(),
-        'CATEGORY_CODE' => strlen($codeString) > 0
-            ? ('('.\Scrub::text($codeString).')')
+        'CATEGORY_CODE' => strlen($code) > 0
+            ? ('('.\Scrub::text($code).')')
             : '',
         'student_block' => '',
         'unit_selector_semester_block' => '',
@@ -203,6 +204,25 @@ foreach ($unit_list as $unit) {
     $year = $unit->getOpenDate()->getYear();
     $years[$year] = $year;
 }
+
+$trail = new \Schoolbox\Breadcrumbs();
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => 'Submissions',
+        'href' => "/submission/listSubmission",
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($category->getName().( strlen($code) > 0 ? ('('.$code.')') : '' )) ,
+        'href' => "/submission/listSubmission/$current_year/$current_semester/".$category->getId(),
+        'class' => '',
+    ],
+    [
+        'text' => $current_unit->getTitle(),
+        'href' => '',
+        'class' => 'active',
+    ]
+]);
 
 // The doctor's context selector
 $contextSelector = new \Schoolbox\Assessment\StudentReportCard\ContextSelector('task/progressReport/'.$class_id);
