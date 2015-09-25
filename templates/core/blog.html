@@ -1,42 +1,77 @@
 <script type="text/javascript">
 $(function() {
-    $('a.delete-comment').click(function(event) {
+    $('[data-interaction="delete"]').click(function(event) {
         event.preventDefault();
         $(this).confirmDialog({text:'Delete this comment?'});
     })
 });
-
-
 </script>
 
-<h1>{BLOG_HEADING}</h1>
-<span class="header_option">{MODIFY_BLOG}<a href="/homepage/{BLOG_CID}" class="btn go-back">Return to Homepage</a></span>
-<div class="clearfix"></div>
-<div class="blog blog-detail">
-    <p class="author">
-        <a href="/search/user/{BLOG_AUTHOR_ID}" class="author">
-            <img src="{BLOG_AUTHOR_THUMB}"/>
-            <span class="name">{BLOG_AUTHOR_NAME}</span>
-        </a>
-        <span class="subtitle">Posted {BLOG_CREATED}</span>
-    </p>
-	<p>{BLOG_BODY}</p>
+{BREADCRUMB}
 
-    <ul class="comments">
-        <!-- BEGIN comment -->
-        <li class="{ON_OFF}">{DELETE_COMMENT}
-            <a href="/search/user/{COMMENT_AUTHOR_ID}" class="author">
-                <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32"/>
-                <span class="name">{COMMENT_OWNER}</span>
-            </a>
-            <span class="subtitle">Commented {COMMENT_CREATED}</span>
-            <p class="comment-body">{COMMENT_BODY}</p>
-        </li>
-        <!-- END comment -->
-    </ul>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{BLOG_HEADING}</h1>
+        </div>
+    </div>
+    <nav>
+        <!-- BEGIN modify_link -->
+        <a class="icon icon-modify" href="/blog/modify/{BLOG_ID}" title="Modify"></a>
+        <!-- END modify_link -->
+    </nav>
+</div>
 
-    <form method="post" action="/blog/comment/new/{BLOG_ID}">
-        <p><textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
-            <input type="submit" class="submit-btn-plain" name="comment" value="Add comment"/></p>
-    </form>
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div class="avatar card">
+                <a href="/search/user/{BLOG_AUTHOR_ID}">
+                    <img src="/portrait.php?userId={BLOG_AUTHOR_EXTERNAL_ID}&size=square64" />
+                    <p>{BLOG_AUTHOR_NAME}</p>
+                </a>
+                <p class="meta">{BLOG_CREATED}</p>
+            </div>
+        </section>
+
+        <section>
+            <div class="content">
+                <article>{BLOG_BODY}</article>
+            </div>
+        </section>
+
+        <h2 class="subheader">{BLOG_COMMENTS}</h2>
+
+        <section>
+            <div class="content no-pad">
+                <ul class="information-list">
+                    <!-- BEGIN comment -->
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="avatar card">
+                                <a href="/search/user/{COMMENT_AUTHOR_ID}">
+                                    <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square64" />
+                                    <p>{COMMENT_OWNER}</p>
+                                </a>
+                                <p class="meta">{COMMENT_CREATED}</p>
+                            </div>
+                            <article>{COMMENT_BODY}</article>
+                        </div>
+                        <nav>
+                            <!-- BEGIN comment_delete_link -->
+                            <a class="icon icon-delete" href="/blog/comment/delete/{COMMENT_ID}" data-interaction="delete"></a>
+                            <!-- END comment_delete_link -->
+                        </nav>
+                    </li>
+                    <!-- END comment -->
+                    <li>
+                        <form method="post" action="/blog/comment/new/{BLOG_ID}" class="no-pad">
+                            <textarea name="body" class="no-margin" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                            <input type="submit" class="no-margin" name="comment" value="Add comment"/>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </div>
 </div>
