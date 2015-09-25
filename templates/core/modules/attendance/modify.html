@@ -25,7 +25,7 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">{ATTENDANCE_DATE_FORMATTED}</h2>
-        <form method='post' action='/modules/attendance/modifyForm' class='collectible'>
+        <form method='post' action='/modules/attendance/modifyForm'>
             <section>
                 <input name='classCode' type='hidden' value='{CLASS_CODE}' />
                 <input name='attendanceDate' type='hidden' value='{ATTENDANCE_DATE}' />
@@ -82,7 +82,7 @@
                         </td>
                         <td>
                             <input type="hidden" name="studentID[]" value="{STUDENT_SYNERGY_ID}" />
-                            <input id="attendanceOptions_{STUDENT_SYNERGY_ID}" class="attendanceOptions" type="checkbox" name="attending[]" value="{STUDENT_SYNERGY_ID}" {IS_ABSENT} />
+                            <input id="attendanceOptions_{STUDENT_SYNERGY_ID}" type="checkbox" name="attending[]" value="{STUDENT_SYNERGY_ID}" {IS_ABSENT} />
                             <label for="attendanceOptions_{STUDENT_SYNERGY_ID}" class="checkbox-label"></label>
                         </td>
                     </tr>
@@ -90,7 +90,7 @@
                     </tbody>
                 </table>
             </section>
-            <input type="submit" value="Submit Attendances" class="submit-btn-plain"/>
+            <input type="submit" value="Submit Attendances" />
         </form>
     </div>
 </div>
