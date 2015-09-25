@@ -182,11 +182,14 @@ $this->setBlock('student_unit_task_online_assess', 'student_unit_task_online_ass
 
 $this->setTitle('Class Mark Sheet');
 
+$codeString = $category->getCodeString();
 $this->setVar(
     array(
         'CATEGORY'      => $category->getName(),
         'CATEGORY_ID'   => $category->getId(),
-        'CATEGORY_CODE' => $category->getCodeString(),
+        'CATEGORY_CODE' => strlen($codeString) > 0
+            ? ('('.\Scrub::text($codeString).')')
+            : '',
         'student_block' => '',
         'unit_selector_semester_block' => '',
     )
