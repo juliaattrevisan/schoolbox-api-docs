@@ -205,7 +205,7 @@ foreach ($unit_list as $unit) {
 }
 
 // The doctor's context selector
-$contextSelector = new \Schoolbox\Assessment\StudentReportCard\ContextSelector('task/progressReport');
+$contextSelector = new \Schoolbox\Assessment\StudentReportCard\ContextSelector('task/progressReport/'.$class_id);
 $contextSelector->setYears($years);
 $contextSelector->setUnits($unit_list);
 $contextSelector->render(
