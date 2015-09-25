@@ -2,7 +2,7 @@
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript">
 $(function() {
-	$('#fileForm').validate();
+    $('#fileForm').validate();
 });
 </script>
 <!-- END custom_head -->
@@ -10,56 +10,56 @@ $(function() {
 {BREADCRUMB}
 
 <div class="row">
-	<div class="small-12 island">
-		<h1>{ACTION} File</h1>
+    <div class="small-12 island">
+        <h1>{ACTION} File</h1>
 
-		<form method="post" action="/cms/myFileForm.php" enctype="multipart/form-data" id="fileForm" class="clearfix">
-			<input type="hidden" name="parent" value="{PARENT_ID}"/>
-			<input type="hidden" name="user" value="{USER_ID}" />
-			<input type="hidden" name="component_instance_id" value="{COMPONENT_INSTANCE_ID}" />
+        <form method="post" action="/cms/myFileForm.php" enctype="multipart/form-data" id="fileForm" class="clearfix">
+            <input type="hidden" name="parent" value="{PARENT_ID}"/>
+            <input type="hidden" name="user" value="{USER_ID}" />
+            <input type="hidden" name="component_instance_id" value="{COMPONENT_INSTANCE_ID}" />
 
-			<section>
-				<fieldset class="content">
-					<div class="small-12 columns">
-						<label>
-							Title
-							<span data-tooltip class="hint has-tip tip-top" data-width="200" title="One line description of the file, this will be used for display">?</span>
-							<input type="text" name="description" maxlength="100" size="40" class="required" value="{DESCRIPTION}"/>
-						</label>
-						<!-- BEGIN browse_row -->
-						<label>
-							Attach File
-							{ATTACH_ZONE}
-						</label>
-						<!-- END browse_row -->
-						<label>
-							Location
-							<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select an appropriate location within the system that reflects the use of the file">?</span>
-							<select name="parent">
-								<!-- BEGIN folder_list -->
-								<option value="{FOLDER_ID}" {FOLDER_SELECTED}>{FOLDER_INDENT}&gt; {FOLDER_NAME}</option>
-								<!-- END folder_list -->
-							</select>
-						</label>
-						<fieldset>
-							<legend>
-								Publishing
-								<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Your file will also be published on the selected ePortfolio pages">?</span>
-							</legend>
-							<!-- BEGIN publish_page -->
-							<input id="published-{PUBLISH_PAGE_PAGE_OWNER_ID}-{PUBLISH_PAGE_PAGE_ID}"
-								   type="checkbox"
-								   value="true"
-								   name="published[{PUBLISH_PAGE_PAGE_OWNER_ID}][{PUBLISH_PAGE_PAGE_ID}]"
-								   {PUBLISHED} />
-							<label for="published-{PUBLISH_PAGE_PAGE_OWNER_ID}-{PUBLISH_PAGE_PAGE_ID}">{PUBLISH_PAGE_PAGE_NAME}</label>
-							<!-- END publish_page -->
-						</fieldset>
-					</div>
-				</fieldset>
-			</section>
-			<input type="hidden" name="fileID" value="{FILE_ID}"/>
-			<input type="submit" name="Submit" value="{ACTION} File" class="submit-btn-plain"/>
-		</form>
-	</div>
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Title
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="One line description of the file, this will be used for display">?</span>
+                            <input type="text" name="description" maxlength="100" size="40" class="required" value="{DESCRIPTION}"/>
+                        </label>
+                        <!-- BEGIN browse_row -->
+                        <label>
+                            Attach File
+                            {ATTACH_ZONE}
+                        </label>
+                        <!-- END browse_row -->
+                        <label>
+                            Location
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select an appropriate location within the system that reflects the use of the file">?</span>
+                            <select name="parent">
+                                <!-- BEGIN folder_list -->
+                                <option value="{FOLDER_ID}" {FOLDER_SELECTED}>{FOLDER_INDENT}&gt; {FOLDER_NAME}</option>
+                                <!-- END folder_list -->
+                            </select>
+                        </label>
+                        <fieldset>
+                            <legend>
+                                Publishing
+                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Your file will also be published on the selected ePortfolio pages">?</span>
+                            </legend>
+                            <!-- BEGIN publish_page -->
+                            <input id="published-{PUBLISH_PAGE_PAGE_OWNER_ID}-{PUBLISH_PAGE_PAGE_ID}"
+                                   type="checkbox"
+                                   value="true"
+                                   name="published[{PUBLISH_PAGE_PAGE_OWNER_ID}][{PUBLISH_PAGE_PAGE_ID}]"
+                                   {PUBLISHED} />
+                            <label for="published-{PUBLISH_PAGE_PAGE_OWNER_ID}-{PUBLISH_PAGE_PAGE_ID}">{PUBLISH_PAGE_PAGE_NAME}</label>
+                            <!-- END publish_page -->
+                        </fieldset>
+                    </div>
+                </fieldset>
+            </section>
+            <input type="hidden" name="fileID" value="{FILE_ID}"/>
+            <input type="submit" name="Submit" value="{ACTION} File" class="submit-btn-plain"/>
+        </form>
+    </div>
 </div>
