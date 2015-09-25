@@ -2,8 +2,7 @@
 <script type='text/javascript' src='/javascript/components/jquery-timepicker-jt/jquery.timepicker.js'></script>
 <script type='text/javascript'>
 	$(function() {
-
-        $('.timepicker').timepicker({
+        $('[data-timepicker]').timepicker({
             'timeFormat':'g:ia',
             'scrollDefaultNow': true,
             'step':5,
@@ -14,13 +13,7 @@
             }
         });
 	});
-
 </script>
-<style type='text/css'>
-	label {
-		float: left;
-	}
-</style>
 <!-- END custom_head -->
 
 <div class="row">
@@ -64,12 +57,12 @@
                         </th>
                         <td class="hide-for-small">
                             <div class="timepick">
-                                <input type='text' maxlength='10' size="8" name='LateArrivalTime[]' class="timepicker ui-timepicker-input" value="{STUDENT_ARRIVAL_TIME}" />
+                                <input type='text' maxlength='10' size="8" name='LateArrivalTime[]' data-timepicker value="{STUDENT_ARRIVAL_TIME}" />
                             </div>
                         </td>
                         <td class="hide-for-small">
                             <div class="timepick">
-                                <input type='text' maxlength='10' size="8" name='EarlyDepartureTime[]' class="timepicker ui-timepicker-input"  value="{STUDENT_DEPT_TIME}" />
+                                <input type='text' maxlength='10' size="8" name='EarlyDepartureTime[]' data-timepicker value="{STUDENT_DEPT_TIME}" />
                             </div>
                         </td>
                         <td class="hide-for-small">
