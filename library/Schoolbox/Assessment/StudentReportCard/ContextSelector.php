@@ -42,6 +42,7 @@ class ContextSelector {
 	public function __construct($basePath) {
 		$this->basePath = $basePath;
 		$this->categories = new Collection();
+		$this->units = new Collection();
 	}
 
 
