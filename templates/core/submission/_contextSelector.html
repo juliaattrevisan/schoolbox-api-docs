@@ -16,7 +16,7 @@
         <div class="context-switch">
             <!-- BEGIN semester_context -->
             <nav>
-                <a {SEMESTER_BACK_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_BACK}{SEMESTER_CONTEXT_CATEGORY_ID}"></a>
+                <a data-interaction="previous" {SEMESTER_BACK_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_BACK}{SEMESTER_CONTEXT_CATEGORY_ID}"></a>
             </nav>
             <div class="semester">
                 <select id="context-selector-semester">
@@ -26,7 +26,7 @@
                 </select>
             </div>
             <nav>
-                <a {SEMESTER_FWD_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_FWD}{SEMESTER_CONTEXT_CATEGORY_ID}"></a>
+                <a data-interaction="next" {SEMESTER_FWD_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_FWD}{SEMESTER_CONTEXT_CATEGORY_ID}"></a>
             </nav>
             <!-- END semester_context -->
             <!-- BEGIN subject_context -->
