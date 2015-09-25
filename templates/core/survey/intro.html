@@ -6,6 +6,10 @@
         <ul class="meta">
             <li class="icon-calendar"><time>{ASSESS_FINISH}</time></li>
             <li class="icon-time-value">Time allowed: <time>{ASSESS_DURATION}</time></li>
+            <li class="icon-home" title="Homepage"><a href="/homepage/{ASSESS_FOLDER_ID}">{ASSESS_FOLDER}</a> ({ASSESS_FOLDER_CODES})</li>
+            <li class="icon-staff-students" title="Author">
+                <a href="/search/user/{ASSESS_AUTHOR_ID}">{ASSESS_AUTHOR}</a>
+            </li>
         </ul>
     </div>
 </div>
@@ -48,41 +52,3 @@
     </div>
 </div>
 <!-- END startTest -->
-
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Subject</h2>
-        <section>
-            <ul class="action-list">
-                <li class="actions-small-1">
-                    <div class="list-item">
-                        <div class="info card small-12">
-                            <a href="/homepage/{ASSESS_FOLDER_ID}">
-                                <h3>{ASSESS_FOLDER}</h3>
-                                <p class="meta">{ASSESS_FOLDER_CODES}</p>
-                            </a>
-                        </div>
-                    </div>
-                    <nav>
-                        <a href="/homepage/{ASSESS_FOLDER_ID}" class="icon-next"></a>
-                    </nav>
-                </li>
-                <li class="actions-small-1">
-                    <div class="list-item">
-                        <div class="avatar card small-12">
-                            <a href="/search/user/{ASSESS_AUTHOR_ID}">
-                                <img src="/portrait.php?userId={ASSESS_AUTHOR_EXT_ID}&size=square64" />
-                                <h3>{ASSESS_AUTHOR}</h3>
-                                <p class="meta">{ASSESS_AUTHOR_ROLE}</p>
-                            </a>
-                        </div>
-                    </div>
-                    <nav>
-                        <a href="/search/user/{ASSESS_AUTHOR_ID}" class="icon-next"></a>
-                        <a href="#" class="icon-email"></a>
-                    </nav>
-                </li>
-            </ul>
-        </section>
-    </div>
-</div>
