@@ -73,8 +73,6 @@ if (is_numeric($this->arg[0])) {
 
             $this->parse('comment_block', 'comment', true);
         }
-    } else {
-        $this->setVar('comment_block', '');
     }
 
     $trail = new \Schoolbox\Breadcrumbs();
