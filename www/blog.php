@@ -11,7 +11,6 @@ $this->setBlock(TEMPLATE_content, 'modify_link', 'modify_link_block');
 $this->setBlock(TEMPLATE_content, 'comment', 'comment_block');
 $this->setBlock('comment', 'comment_delete_link', 'comment_delete_link_block');
 
-$i = 0;
 if (is_numeric($this->arg[0])) {
     /** @var \Schoolbox\Blog\Blog $blog */
     try {
@@ -52,14 +51,9 @@ if (is_numeric($this->arg[0])) {
     $comments = $commentMapper->findForBlog($blog);
 
     if (!empty($comments)) {
-        $this->setVar('BLOG_COMMENTS', count($comments) . ' Comments');
-
-
-        $j = 0;
-
+        $commentCount = count($comments);
+        $this->setVar('BLOG_COMMENTS', $commentCount . ($commentCount > 1 ? ' Comments' : ' Comment'));
         foreach ($comments as $comment) {
-//            $actionDate = new Alaress_Date_Format($comment['created'], 'Y-m-d H:i:s');
-
             $this->setVar(
                 array(
                     'COMMENT_ID' => $comment->getId(),
@@ -68,7 +62,6 @@ if (is_numeric($this->arg[0])) {
                     'COMMENT_CREATED' => $comment->getCreated()->getRelativeTime(),
                     'COMMENT_AUTHOR_ID' => $comment->getOwner()->getId(),
                     'COMMENT_AUTHOR_EXTERNAL_ID' => $comment->getOwner()->getExternalId(),
-//                    'DELETE_COMMENT' => "<a class=\"delete-comment btn delete no-text\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span></a>",
                     'comment_delete_link_block' => '',
                 )
             );
