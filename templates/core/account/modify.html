@@ -62,44 +62,47 @@ $(document).ready(function () {
 </script>
 <!-- END custom_head -->
 
-<h1>Change Password</h1>
+<div class="row">
+	<div class="small-12 island">
+		<h1>Change Password</h1>
+		<!-- BEGIN success -->
+		<div class="alert-box success">Your password was changed successfully</div>
+		<!-- END success -->
 
-<!-- BEGIN success -->
-<p>Your password was changed successfully</p>
-<!-- END success -->
+		<form id="accountForm"  method="post" action="/account/modifyForm.php">
+			<section>
+				<fieldset class="content">
+					<div class="small-12 column">
+						<div class="alert-box">
+							<p>Your new password must be at least 6 characters in length and contain at least one letter,
+							one number and one symbol or punctuation character.<br />
+							(examples of symbol characters: $, #, _, &amp;)</p>
+						</div>
 
-<form id="accountForm"  method="post" class="clearfix" action="/account/modifyForm.php">
-	<table class="standardForm table">
-		<tr>
-			<td class="formLabelWidth"><h4>Current Password</h4>
-				<em></em>
-			</td>
-			<td>
-				<input type="password" name="current_password" id="current_password" size="35" maxlength="50" />
-				<ul id="current_password_messages"></ul>
-			</td>
-		</tr>
-		<tr>
-			<td><h4>New Password</h4>
-				<em>Your new password must be at least 6 characters in length and contain at least one letter,
-					one number and one symbol or punctuation character.</em><br />
-				<em>(examples of symbol characters: $, #, _, &amp;)</em>
-			</td>
-			<td>
-				<input type="password" name="new_password" id="new_password" size="35" maxlength="50" />
-				<ul id="new_password_messages"></ul>
-			</td>
-		</tr>
-		<tr>
-			<td><h4>Confirm New Password</h4>
-				<em>Enter your new password again to confirm you typed it correctly.</em><br />
-			</td>
-			<td>
-				<input type="password" name="confirm_password" id="confirm_password" size="35" maxlength="50" />
-				<ul id="confirm_password_messages"></ul>
-			</td>
-		</tr>
+						<label>
+							Current Password
+							<input type="password" name="current_password" id="current_password" size="35" maxlength="50" />
+						</label>
+						<label>
+							New Password
+							<input type="password" name="new_password" id="new_password" size="35" maxlength="50" />
+							<ul id="new_password_messages"></ul>
+						</label>
+						<label>
+							Confirm New Password
+							<input type="password" name="confirm_password" id="confirm_password" size="35" maxlength="50" />
+						</label>
+					</div>
+				</fieldset>
+			</section>
+			<div class="row">
+				<div class="small-12 column">
+					<input type="submit" name="submit" value="Update Password" />
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
 
-	</table>
-	<input class="submit-btn-plain" type="submit" name="submit" value="Modify" />
-</form>
+
+
