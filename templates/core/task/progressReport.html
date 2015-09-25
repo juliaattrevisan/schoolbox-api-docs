@@ -2,43 +2,8 @@
 <script type="text/javascript">
     (function($) {
         $(function(){
-
-            // Semester selector:
-            // hides unit selectors that aren't for this semester.
-            $('select[data-interaction="select_semester"]').bind('change', function(event) {
-                var element = $(this);
-                var form    = element.closest('form');
-                var this_semester  = element.val();
-                var unit_selectors = form.find('select[data-interaction="select_unit"]');
-                var filter         = function() {
-                    return $(this).data('semester') === this_semester;
-                }
-                unit_selectors.not(filter).prop('disabled', true).hide();
-                unit_selectors.filter(filter).prop('disabled', false).show();
-            }).change();
-
-            // Previous/next semester selector
-            $('a[data-interaction="select_semester_prev"], a[data-interaction="select_semester_next"]').bind('click', function(event) {
-                event.preventDefault();
-                var element  = $(this);
-                var selector = element.closest('form').find('select[data-interaction="select_semester"]');
-                var current  = selector.find('option:selected');
-                var option   = (element.data('interaction') === 'select_semester_prev') ?
-                    current.prev():
-                    current.next();
-                if (option.length) {
-                    option.prop('selected', true);
-                    selector.change();
-                }
-            });
-
-            // Unit selector: on choosing a unit, jump to that unit
-            $('select[data-interaction="select_unit"]').bind('change', function(event) {
-                $(this).closest('form').submit();
-            });
-
             // Save form for updating a student's progress
-            $('a[data-interaction="update_progress"]').bind('click', function(event){
+            $('a[data-interaction="update_progress"]').on('click', function(event){
                 event.preventDefault()
                 var element = $(this);
                 var form    = element.closest('form');
@@ -48,18 +13,18 @@
                     function(data) {
                         // Update something.
                         // I guess add the same class the update submission has.
-                        element.removeClass('incomplete pending complete').addClass('ajax-updated');
+                        element.removeClass('icon-time-value icon-alert icon-approve').addClass('ajax-updated');
                         form.find('input[name="current_status"]').val(data.status);
                         // Update name and class as well
                         switch (data.status) {
                             case 1: // incomplete
-                                element.addClass('incomplete').attr('title', 'Incomplete - click to update')
+                                element.addClass('icon-time-value').attr('title', 'Incomplete - click to update');
                                 break;
                             case 2: // pending
-                                element.addClass('pending').attr('title', 'Self Assessed - click to update')
+                                element.addClass('icon-alert').attr('title', 'Self Assessed - click to update');
                                 break;
                             case 3: // complete
-                                element.addClass('complete').attr('title', 'Complete - click to update')
+                                element.addClass('icon-approve').attr('title', 'Complete - click to update');
                                 break;
                         }
 
@@ -75,116 +40,106 @@
 </script>
 
 <!-- END custom_head -->
+{BREADCRUMB}
 
-<h1>Unit Progress Report – <a href="/homepage/{CATEGORY_ID}/">{CATEGORY} {CATEGORY_CODE}</a></h1>
-
-<div id="context">
-	<form id="enrolment" action="/task/progressReport/" method="get">
-		<input type="hidden" name="category_id" value="{CATEGORY_ID}" />
-		<div id="semesters">
-			<a class="sem-back" data-interaction="select_semester_prev" href="#">&lsaquo;</a>
-			<select id="select_semester" data-interaction="select_semester">
-				<!-- BEGIN unit_selector_semester -->
-				<option value="{UNIT_SELECTOR_SEMESTER_SEMESTER}/{UNIT_SELECTOR_SEMESTER_YEAR}" label="Semester {UNIT_SELECTOR_SEMESTER_SEMESTER}, {UNIT_SELECTOR_SEMESTER_YEAR}" {UNIT_SELECTOR_SEMESTER_SELECTED}>
-				Semester {UNIT_SELECTOR_SEMESTER_SEMESTER}, {UNIT_SELECTOR_SEMESTER_YEAR}
-				</option>
-				<!-- END unit_selector_semester -->
-			</select>
-			<a class="sem-fwd" data-interaction="select_semester_next" href="#">&rsaquo;</a>
-		</div>
-		<div id="subjects" action="/submission/allWork/" method="get">
-			<span class="elbow">&#9492;</span>
-			<!-- BEGIN unit_selector_semester_unit_list -->
-			<select name="unit_id" id="enrolled-subject" class="hide" data-interaction="select_unit" data-semester="{UNIT_SELECTOR_UNIT_SEMESTER}/{UNIT_SELECTOR_UNIT_YEAR}">
-				<option disabled label="Select a unit">Select a unit</option>
-				<!-- BEGIN unit_selector_unit -->
-				<option label="{UNIT_SELECTOR_UNIT_NAME}" value="{UNIT_SELECTOR_UNIT_ID}" {UNIT_SELECTOR_UNIT_SELECTED}>
-				{UNIT_SELECTOR_UNIT_NAME}
-				</option>
-				<!-- END unit_selector_unit -->
-			</select>
-			<!-- END unit_selector_semester_unit_list -->
-		</div>
-	</form>
+<div class="row">
+    <div class="small-12 column">
+        <h1>Unit Progress Report</h1>
+    </div>
 </div>
 
-<!--Silly Scroll issue with IE9-->
-<!--[if gte IE 9]> <div class="ie9 mark-sheet-container"><![endif]-->
-    <table class="mark-sheet table angled">
-        <thead>
-            <tr>
-                <th>&nbsp;</th>
-                <!-- BEGIN subheader_unit -->
-                <!-- BEGIN subheader_unit_task -->
-    			<th scope="col" class="rotate">
-    				<div><span>
-                    <!-- BEGIN subheader_unit_task_submission_link -->
-                    <a href="/submission/viewSubmission/{SUBHEADER_UNIT_TASK_SUBMISSION_ID}">{SUBHEADER_UNIT_TASK_NAME}</a>
-                    <!-- END subheader_unit_task_submission_link -->
-                    <!-- BEGIN subheader_unit_task_assess_link -->
-                    <a href="/assess/results/{SUBHEADER_UNIT_TASK_ASSESS_ID}">{SUBHEADER_UNIT_TASK_NAME}</a>
-                    <!-- END subheader_unit_task_assess_link -->
-                    <!-- BEGIN subheader_unit_task_no_link -->
-                    {SUBHEADER_UNIT_TASK_NAME}
-                    <!-- END subheader_unit_task_no_link -->
-    					</span>
-    					</div>
-                </th>
-                <!-- END subheader_unit_task -->
-                <!-- END subheader_unit -->
-            </tr>
-        </thead>
-        <tbody>
-            <!-- BEGIN student -->
-            <tr class="{ON_OFF} {STUDENT_REMOVED_CLASS}">
-    			<th class="avatar" scope="row">
-    				<img height="32" width="32" src="/portrait.php?userId={STUDENT_SYNERGY_ID}&amp;size=square32">
-    				{STUDENT_SURNAME}, {STUDENT_FIRSTNAME}
-                </th>
-                <!-- BEGIN student_unit -->
-                <!-- BEGIN student_unit_task -->
-                <td>
-                    <!-- BEGIN student_unit_task_check -->
+<div class="row">
+    {CONTEXT_SELECTOR}
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <div class="scrollable">
+
+            <!--Silly Scroll issue with IE9-->
+            <!--[if gte IE 9]> <div class="ie9 mark-sheet-container"><![endif]-->
+            <table>
+                <thead>
+                <tr class="rotate-headers">
+                    <th>&nbsp;</th>
+                    <!-- BEGIN subheader_unit -->
+                    <!-- BEGIN subheader_unit_task -->
+                    <th scope="col" class="rotate">
+                        <div>
+                            <span>
+                                <!-- BEGIN subheader_unit_task_submission_link -->
+                                <a href="/submission/viewSubmission/{SUBHEADER_UNIT_TASK_SUBMISSION_ID}">{SUBHEADER_UNIT_TASK_NAME}</a>
+                                <!-- END subheader_unit_task_submission_link -->
+                                <!-- BEGIN subheader_unit_task_assess_link -->
+                                <a href="/assess/results/{SUBHEADER_UNIT_TASK_ASSESS_ID}">{SUBHEADER_UNIT_TASK_NAME}</a>
+                                <!-- END subheader_unit_task_assess_link -->
+                                <!-- BEGIN subheader_unit_task_no_link -->
+                                {SUBHEADER_UNIT_TASK_NAME}
+                                <!-- END subheader_unit_task_no_link -->
+                            </span>
+                        </div>
+                    </th>
+                    <!-- END subheader_unit_task -->
+                    <!-- END subheader_unit -->
+                </tr>
+                </thead>
+                <tbody>
+                <!-- BEGIN student -->
+                <tr class="{ON_OFF} {STUDENT_REMOVED_CLASS}">
+                    <th scope="row" class="no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/{STUDENT_ID}" title="View Profile">
+                                <img src="/portrait.php?userId={STUDENT_SYNERGY_ID}&size=square64" alt="View Profile" />
+                                <p>{STUDENT_NAME}</p>
+                            </a>
+                        </div>
+                    </th>
+                    <!-- BEGIN student_unit -->
+                    <!-- BEGIN student_unit_task -->
+                    <td>
+                        <!-- BEGIN student_unit_task_check -->
                         <form action="/task/progressForm.php" method="POST">
                             <input type="hidden" name="student_id" value="{STUDENT_ID}" />
                             <input type="hidden" name="task_id"    value="{STUDENT_UNIT_TASK_ID}" />
                             <input type="hidden" name="current_status" value="{STUDENT_UNIT_TASK_STATUS}" />
                             <a href="#"
-                               class="ticks {STUDENT_UNIT_TASK_STATUS_CLASS}"
+                               class="icon {STUDENT_UNIT_TASK_STATUS_CLASS}"
                                title="{STUDENT_UNIT_TASK_STATUS_TEXT} - click to update"
-                               data-interaction="update_progress"
-                            ><span></span></a>
+                               data-interaction="update_progress"></a>
                         </form>
-                    <!-- END student_unit_task_check -->
+                        <!-- END student_unit_task_check -->
 
-                    <!-- BEGIN student_unit_task_submission_box -->
+                        <!-- BEGIN student_unit_task_submission_box -->
                         <!-- BEGIN student_unit_task_submission_box_mark -->
-                            <a href="/submission/submissionHistory/{STUDENT_UNIT_TASK_SUBMISSION_ID}/{STUDENT_ID}/"
-                               title="View submission history for this student"
-                               class="gradient-{STUDENT_UNIT_TASK_SUBMISSION_GRADIENT}"
-                            >{STUDENT_UNIT_TASK_SUBMISSION_MARK}</a>
+                        <a href="/submission/submissionHistory/{STUDENT_UNIT_TASK_SUBMISSION_ID}/{STUDENT_ID}/"
+                           title="View submission history for this student"
+                           class="gradient-{STUDENT_UNIT_TASK_SUBMISSION_GRADIENT}"
+                                >{STUDENT_UNIT_TASK_SUBMISSION_MARK}</a>
                         <!-- END student_unit_task_submission_box_mark -->
                         <!-- BEGIN student_unit_task_submission_box_no_mark -->
-                            &nbsp;
+                        &nbsp;
                         <!-- END student_unit_task_submission_box_no_mark -->
-                    <!-- END student_unit_task_submission_box -->
+                        <!-- END student_unit_task_submission_box -->
 
-                    <!-- BEGIN student_unit_task_online_assess -->
+                        <!-- BEGIN student_unit_task_online_assess -->
                         <!-- BEGIN student_unit_task_online_assess_mark -->
-                            <a href="/assess/review/{STUDENT_UNIT_TASK_ASSESS_ID}/{STUDENT_UNIT_TASK_ASSESS_FIRST_SECTION_ID}/{STUDENT_UNIT_TASK_ASSESS_ATTEMPT_ID}/"
-                               class="gradient-{STUDENT_UNIT_TASK_ASSESS_GRADIENT}"
-                               title="Review assessment for this student"
-                            >{STUDENT_UNIT_TASK_ASSESS_TOTAL_MARKS} / {STUDENT_UNIT_TASK_ASSESS_TOTAL_AVAILABLE_MARKS}</a>
+                        <a href="/assess/review/{STUDENT_UNIT_TASK_ASSESS_ID}/{STUDENT_UNIT_TASK_ASSESS_FIRST_SECTION_ID}/{STUDENT_UNIT_TASK_ASSESS_ATTEMPT_ID}/"
+                           class="gradient-{STUDENT_UNIT_TASK_ASSESS_GRADIENT}"
+                           title="Review assessment for this student"
+                                >{STUDENT_UNIT_TASK_ASSESS_TOTAL_MARKS} / {STUDENT_UNIT_TASK_ASSESS_TOTAL_AVAILABLE_MARKS}</a>
                         <!-- END student_unit_task_online_assess_mark -->
                         <!-- BEGIN student_unit_task_online_assess_no_mark -->
-                            &nbsp;
+                        &nbsp;
                         <!-- END student_unit_task_online_assess_no_mark -->
-                    <!-- END student_unit_task_online_assess -->
-                </td>
-                <!-- END student_unit_task -->
-                <!-- END student_unit -->
-            </tr>
-            <!-- END student -->
-        </tbody>
-    </table>
-<!--[if gte IE 9]> </div><![endif]-->
+                        <!-- END student_unit_task_online_assess -->
+                    </td>
+                    <!-- END student_unit_task -->
+                    <!-- END student_unit -->
+                </tr>
+                <!-- END student -->
+                </tbody>
+            </table>
+            <!--[if gte IE 9]> </div><![endif]-->
+        </div>
+    </div>
+</div>

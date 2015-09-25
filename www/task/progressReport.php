@@ -17,14 +17,13 @@ if (isset($_GET['category_id']) && isset($_GET['unit_id'])) {
     SitePage::localRedir(sprintf('/task/progressReport/%d/%d', $_GET['category_id'], $_GET['unit_id']));
 }
 
-use Schoolbox\User;
-use Schoolbox\UserMapper;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 // URL: task/progressReport/$classId/($unitId)
 // Alternate: task/progressReport/$classId/($year/$semester)
@@ -101,8 +100,10 @@ if (!isset($unit_id)) {
     }
 }
 
+
+
 // Get list of students for this class, and group if it has one.
-$code         = implode(',', $category->getCodes()->getColumnValues('code'));
+$code         = $category->getCodeString();
 $student_list = array();
 $classStudentIdList   = array();
 $groupStudentIdList   = array();
@@ -156,16 +157,13 @@ foreach ($userCollection as $userObject) {
         'synergy_id' => $userObject->getExternalId(),
         'firstname'  => $userObject->getFirstname(),
         'lastname'   => $userObject->getLastname(),
+        'name'       => $userObject->formatName(),
         'removed'    => in_array($userObject->getId(), $removedStudentIdList),
     );
 }
 
 // Dumb <!-- blocks --> and {VARIABLES}
 $this->setFile(TEMPLATE_content, 'task/progressReport.html');
-
-$this->setBlock(TEMPLATE_content, 'unit_selector_semester', 'unit_selector_semester_block');
-$this->setBlock(TEMPLATE_content, 'unit_selector_semester_unit_list', 'unit_selector_semester_unit_list_block');
-$this->setBlock('unit_selector_semester_unit_list', 'unit_selector_unit', 'unit_selector_unit_block');
 
 $this->setBlock(TEMPLATE_content, 'subheader_unit', 'subheader_unit_block');
 $this->setBlock('subheader_unit', 'subheader_unit_task', 'subheader_unit_task_block');
@@ -184,64 +182,62 @@ $this->setBlock('student_unit_task', 'student_unit_task_online_assess', 'student
 $this->setBlock('student_unit_task_online_assess', 'student_unit_task_online_assess_mark', 'student_unit_task_online_assess_mark_block');
 $this->setBlock('student_unit_task_online_assess', 'student_unit_task_online_assess_no_mark', 'student_unit_task_online_assess_no_mark_block');
 
-$this->setTitle('Class Mark Sheet');
+$this->setTitle('Unit Progress Report');
 
 $this->setVar(
     array(
         'CATEGORY'      => $category->getName(),
         'CATEGORY_ID'   => $category->getId(),
-        'CATEGORY_CODE' => $category->getCodeString(),
+        'CATEGORY_CODE' => strlen($code) > 0
+            ? ('('.\Scrub::text($code).')')
+            : '',
         'student_block' => '',
         'unit_selector_semester_block' => '',
     )
 );
 
 // Unit dropdown, with semester optgroups
-$unit_year_list   = array();
 $current_year     = $current_unit->getOpenDate()->getYear();
 $current_semester = $current_unit->getOpenDate()->getYearHalf();
+$years            = [];
 foreach ($unit_list as $unit) {
-    $year     = $unit->getOpenDate()->getYear();
-    $semester = $unit->getOpenDate()->getYearHalf();
-    $unit_year_list[$year][$semester][] = $unit;
+    $year = $unit->getOpenDate()->getYear();
+    $years[$year] = $year;
 }
-foreach (array_reverse($unit_year_list, true) as $year => $unit_semester_list) {
-    foreach (array(1, 2) as $semester) {
-        $this->setVar(
-            array(
-                'UNIT_SELECTOR_SEMESTER_SEMESTER' => $semester,
-                'UNIT_SELECTOR_SEMESTER_YEAR'     => $year,
-                'UNIT_SELECTOR_SEMESTER_SELECTED' => ($year == $current_year && $semester == $current_semester ? 'selected' : ''),
-            )
-        );
-        $this->parse('unit_selector_semester_block', 'unit_selector_semester', true);
-    }
-}
-// Yes it's the same loop again (PHPLib sucks)
-foreach ($unit_year_list as $year => $unit_semester_list) {
-    foreach (array(2, 1) as $semester) {
-        $this->setVar(
-            array(
-                'UNIT_SELECTOR_UNIT_SEMESTER' => $semester,
-                'UNIT_SELECTOR_UNIT_YEAR'     => $year,
-                'unit_selector_unit_block'    => '',
-            )
-        );
-        if (!empty($unit_semester_list[$semester])) {
-            foreach ($unit_semester_list[$semester] as $unit) {
-                $this->setVar(
-                    array(
-                        'UNIT_SELECTOR_UNIT_NAME'     => $unit->getTitle(),
-                        'UNIT_SELECTOR_UNIT_ID'       => $unit->getId(),
-                        'UNIT_SELECTOR_UNIT_SELECTED' => ($unit->getId() == $unit_id ? 'selected' : ''),
-                    )
-                );
-                $this->parse('unit_selector_unit_block', 'unit_selector_unit', true);
-            }
-        }
-        $this->parse('unit_selector_semester_unit_list_block', 'unit_selector_semester_unit_list', true);
-    }
-}
+
+$trail = new \Schoolbox\Breadcrumbs();
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => 'Submissions',
+        'href' => "/submission/listSubmission",
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($category->getName().' '.( strlen($code) > 0 ? ('('.$code.')') : '' )) ,
+        'href' => "/submission/listSubmission/$current_year/$current_semester/".$category->getId(),
+        'class' => '',
+    ],
+    [
+        'text' => $current_unit->getTitle(),
+        'href' => '',
+        'class' => 'active',
+    ]
+]);
+
+// The doctor's context selector
+$contextSelector = new \Schoolbox\Assessment\StudentReportCard\ContextSelector('task/progressReport/'.$class_id);
+$contextSelector->setYears($years);
+$contextSelector->setUnits($unit_list);
+$contextSelector->render(
+    $this,
+    'CONTEXT_SELECTOR',
+    array(
+        'year'     => $current_year,
+        'semester' => $current_semester,
+        'subject'  => $class_id,
+        'unit'     => $unit_id,
+    )
+);
 
 // Store assessment and submission marks here
 $student_assess_list     = array();
@@ -308,10 +304,20 @@ foreach ($task_list as $task) {
 }
 $this->parse('subheader_unit_block', 'subheader_unit', true);
 
+// Placeholder icons
 $status_list = array(
-    Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE => array('text'=>'Incomplete','class'=>'incomplete'),
-    Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION => array('text'=>'Self Assessed','class'=>'pending'),
-    Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE => array('text'=>'Complete','class'=>'complete'),
+    Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE            => array(
+        'text'  => 'Incomplete',
+        'class' => 'icon-time-value',
+    ),
+    Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION => array(
+        'text'  => 'Self Assessed',
+        'class' => 'icon-alert',
+    ),
+    Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE              => array(
+        'text'  => 'Complete',
+        'class' => 'icon-approve',
+    ),
 );
 
 // The students
@@ -324,6 +330,7 @@ foreach ($student_list as $student) {
             'STUDENT_SYNERGY_ID'    => $student['synergy_id'],
             'STUDENT_SURNAME'       => $student['lastname'],
             'STUDENT_FIRSTNAME'     => $student['firstname'],
+            'STUDENT_NAME'          => $student['name'],
             'STUDENT_REMOVED_CLASS' => $student['removed'] ? 'removed-student' : '',
             'student_unit_block' => '',
         )
@@ -420,59 +427,3 @@ foreach ($student_list as $student) {
     $this->parse('student_unit_block', 'student_unit', true);
     $this->parse('student_block', 'student', true);
 }
-
-//// Possible setup of dropdown:
-//// split unit dropdown by semester
-//
-//// Initial block spam
-//$this->setBlock(TEMPLATE_content, 'semester_option', 'semester_option_block');
-//$this->setBlock(TEMPLATE_content, 'year_option',     'year_option_block');
-//
-//// Semesters can be hardcoded, no need to look anything up
-//// (may change if a school wants Term breakdowns rather than Semester)
-//$semesters = array(1, 2);
-//foreach ($semesters as $sem) {
-//    $this->setVar(array(
-//        'SEMESTER_SELECTED' => $sem == $semester ? ' selected' : '',
-//        'SEMESTER_VALUE'    => $sem
-//    ));
-//    $this->parse('semester_option_block', 'semester_option', true);
-//}
-//
-//// Years is trickier, because we first need to find out all the years in which the teacher has ...taught
-//// while we figure that out, let's go with "the past 6 years"
-//for ($y = $this_year; $y > $this_year - 6; --$y) {
-//    $this->setVar(array(
-//        'YEAR_SELECTED' => $y == $year ? ' selected' : '',
-//        'YEAR_VALUE'    => $y
-//    ));
-//    $this->parse('year_option_block', 'year_option', true);
-//}
-
-//// Get all the tasks for this class/year/semester, and order by start/end date.
-//// The finder methods for contexts should be fairly simple.
-//$class = \Schoolbox\Resource\Category\ClassContext::getInstance()->findById($class);
-//// Other contexts:
-//// Schoolbox\Resource\Category\CourseContext
-//// Schoolbox\Resource\Category\HomepageContext
-//// TeacherContext: a single course unit, viewed from the context of a teacher.
-//$unit_list = \Schoolbox\Assessment\Course\Instance\TeacherContext::getInstance()->findForClass($class_id, $year, $semester);
-//
-//// The header
-//foreach ($unit_list as $unit) {
-//    // output unit header
-//    foreach ($unit->getTaskList() as $task) {
-//        // output task header beneath unit header
-//    }
-//}
-//
-//foreach ($class->getStudentList() as $student) {
-//    // output a row for each student
-//    foreach ($unit_list as $unit) {
-//        foreach ($unit->getTaskList() as $task) {
-//            // output a cell for this student/class/row
-//            $student_completion = $task->getResultForStudent();
-//            // And spam out <!-- blocks --> and {VARIABLES}
-//        }
-//    }
-//}

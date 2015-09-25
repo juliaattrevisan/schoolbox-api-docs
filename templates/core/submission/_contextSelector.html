@@ -1,11 +1,13 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/shared/jquery.context-selector.js"></script>
 <script type="text/javascript">
-    $(function () {
-        $.fn.contextSelector({
-            href: '{PAGE_HREF}'
+    if (Number('{USE_PLUGIN}')) {
+        $(function () {
+            $.fn.contextSelector({
+                href: '{PAGE_HREF}'
+            });
         });
-    });
+    }
 </script>
 <!-- END custom_head -->
 
@@ -14,7 +16,7 @@
         <div class="context-switch">
             <!-- BEGIN semester_context -->
             <nav>
-                <a {SEMESTER_BACK_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_BACK}{SEMESTER_CONTEXT_CATEGORY_ID}"></a>
+                <a data-interaction="previous" {SEMESTER_BACK_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_BACK}{SEMESTER_CONTEXT_CATEGORY_ID}"></a>
             </nav>
             <div class="semester">
                 <select id="context-selector-semester">
@@ -24,7 +26,7 @@
                 </select>
             </div>
             <nav>
-                <a {SEMESTER_FWD_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_FWD}{SEMESTER_CONTEXT_CATEGORY_ID}"></a>
+                <a data-interaction="next" {SEMESTER_FWD_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_FWD}{SEMESTER_CONTEXT_CATEGORY_ID}"></a>
             </nav>
             <!-- END semester_context -->
             <!-- BEGIN subject_context -->
@@ -37,6 +39,21 @@
                 </select>
             </div>
             <!-- END subject_context -->
+            <!-- BEGIN unit_context -->
+            <div class="unit">
+                <!-- Unit selector is actually multiple selectors, which are shown/hidden when the semester context changes -->
+                <!-- BEGIN unit_select -->
+                <select data-interaction="select_unit" data-semester="{UNIT_KEY}" class="hide">
+                    <option disabled label="Select a unit">Select a unit</option>
+                    <!-- BEGIN unit_option -->
+                    <option label="{UNIT_NAME}" value="{UNIT_ID}" {UNIT_SELECTED}>
+                        {UNIT_NAME}
+                    </option>
+                    <!-- END unit_option -->
+                </select>
+                <!-- END unit_select -->
+            </div>
+            <!-- END unit_context -->
         </div>
     </div>
 </div>

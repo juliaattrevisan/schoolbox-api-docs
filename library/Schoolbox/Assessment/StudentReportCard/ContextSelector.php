@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\StudentReportCard;
 
+use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Category;
 use SitePage;
@@ -25,6 +26,8 @@ class ContextSelector {
 	protected $years = array();
 	/** @var Collection */
 	protected $categories;
+	/** @var Collection */
+	protected $units;
 	/** @var string */
 	protected $_template = 'submission/_contextSelector.html';
 	/** @var string */
@@ -32,6 +35,8 @@ class ContextSelector {
 	/** @var bool */
 	protected $categoryFirst = false;
 
+	/** @var bool */
+	protected $usePlugin = true;
 
 	/**
 	 * @param string $basePath  The path to the page this selector is being used on (eg. "submission/allWork")
@@ -39,6 +44,7 @@ class ContextSelector {
 	public function __construct($basePath) {
 		$this->basePath = $basePath;
 		$this->categories = new Collection();
+		$this->units = new Collection();
 	}
 
 
@@ -63,6 +69,15 @@ class ContextSelector {
 		$this->categories = $categories;
 	}
 
+	/**
+	 * Set the units to display in the selector.
+	 * If this collection is empty, then the unit selector will be hidden.
+	 *
+	 * @param Collection $units
+	 */
+	public function setUnits($units) {
+		$this->units = $units;
+	}
 
 	/**
 	 * Add a category to the selector.
@@ -92,6 +107,17 @@ class ContextSelector {
 	}
 
 	/**
+	 * If false, don't setup the contextSelector plugin - allow the including
+	 * template to wire all events together.
+	 *
+	 * @param bool $usePlugin
+	 */
+	public function setUsePlugin($usePlugin)
+	{
+		$this->usePlugin = $usePlugin;
+	}
+
+	/**
 	 * Only override the template if you absolutely must.
 	 *
 	 * @param string $template
@@ -117,6 +143,8 @@ class ContextSelector {
 		$page->setFile($tpl, $this->_template);
 		$page->setBlock($tpl, 'semester_context', 'semester_context_block');
 		$page->setBlock($tpl, 'subject_context', 'subject_context_block');
+		$page->setBlock($tpl, 'unit_context', 'unit_context_block');
+		$page->setVar('USE_PLUGIN',   $this->usePlugin);
 		$page->setVar('PAGE_HREF',    $this->basePath);
 		$page->setVar('SUBJECT_PART', is_numeric($selectedValues['category']) ? ($selectedValues['category'].'/') : '');
         $page->setVar('SEMESTER_CONTEXT_CATEGORY_ID', isset($selectedValues['list']) ? '/'.($selectedValues['list']) : '');
@@ -135,6 +163,12 @@ class ContextSelector {
 		}
 		else {
 			$page->setVar('subject_context_block', '');
+		}
+
+		if ($this->units->count()) {
+			$this->renderUnitSelector($page, $selectedValues);
+		} else {
+			$page->setVar('unit_context_block', '');
 		}
 
 		// slam it in!
@@ -376,4 +410,89 @@ class ContextSelector {
 		$page->parse('subject_context_block', 'subject_context', false);
 	}
 
-} 
+	/**
+	 * Render the selector for units
+	 *
+	 * Used on the progress report
+	 *
+	 * @param SitePage $page
+	 * @param $selectedValues
+	 */
+	protected function renderUnitSelector($page, $selectedValues) {
+		$page->setBlock('unit_context', 'unit_select', 'unit_select_block');
+		$page->setBlock('unit_select', 'unit_option', 'unit_option_block');
+
+		// Group units by year/semester
+		$unit_year_list = [];
+		$years          = [];
+		foreach ($this->units as $unit) {
+			/** @var UnitInstance $unit */
+			$open = $unit->getOpenDate();
+			$year = $open->getYear();
+			$years[$year] = $year;
+			switch ($this->granularity) {
+				case self::GRANULARITY_YEAR:
+					$key = $year;
+					break;
+				case self::GRANULARITY_TERM:
+					// Don't use this, I guarantee nothing about it working
+					$key = $year.'/'.ceil($open->getMonth() / 3);
+					break;
+				case self::GRANULARITY_SEMESTER:
+				default:
+					// should almost always be default (self::GRANULARITY_SEMESTER)
+					$key = $year.'/'.$open->getYearHalf();
+					break;
+			}
+			$unit_year_list[$key][] = $unit;
+		}
+
+		// Add empty lists for each semester that doesn't have a unit,
+		// so at least SOMETHING can show.
+		$semesters = [];
+		switch ($this->granularity) {
+			case self::GRANULARITY_YEAR:
+				break;
+			case self::GRANULARITY_TERM:
+				$semesters = [1,2,3,4];
+				break;
+			case self::GRANULARITY_SEMESTER:
+			default:
+				$semesters = [1, 2];
+				break;
+		}
+		if (!empty($semesters)) {
+			foreach ($years as $year) {
+				foreach ($semesters as $semester) {
+					$key = $year.'/'.$semester;
+					if (empty($unit_year_list[$key])) {
+						$unit_year_list[$key] = [];
+					}
+				}
+			}
+		}
+
+		foreach ($unit_year_list as $key => $unit_list) {
+			$page->setVar(
+				array(
+					'UNIT_KEY'          => $key,
+					'unit_option_block' => '',
+				)
+			);
+			foreach ($unit_list as $unit) {
+				$page->setVar(
+					array(
+						'UNIT_NAME'     => $unit->getTitle(),
+						'UNIT_ID'       => $unit->getId(),
+						'UNIT_SELECTED' => ($unit->getId() == $selectedValues['unit'] ? 'selected' : ''),
+					)
+				);
+				$page->parse('unit_option_block', 'unit_option', true);
+			}
+			$page->parse('unit_select_block', 'unit_select', true);
+		}
+
+		// make it so, number one
+		$page->parse('unit_context_block', 'unit_context', false);
+	}
+}
