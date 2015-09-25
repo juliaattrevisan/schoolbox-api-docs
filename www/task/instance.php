@@ -9,38 +9,12 @@
 
 /** @var SitePage $this */
 
-use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Course\Task;
-use Schoolbox\Assessment\Course\TaskMapper;
-use Schoolbox\Assessment\Course\UnitInstance;
-use Schoolbox\Assessment\Course\UnitInstanceMapper;
 
-// Wrangle arguments
-// Possible argument formats: /modify/{id}, /create/{unit_instance_id}/{type}/
-// call this file index.php
 $action       = $this->arg[0];
 $task_type    = 'task';
 $task_type_id = null;
-if ($action === 'create') {
-//    $category_id = $this->arg[1];
-//    $category    = CategoryMapper::getInstance()->findById($category_id);
-//    if (isset($this->arg[2])) {
-//        switch ($this->arg[2]) {
-//            case 'assessment':
-//                $this->localRedir('/assess/create/'.$category_id.'/unit:/');
-//                break;
-//            case 'due_work':
-//                $this->localRedir('/submission/createSubmission/new/'.$category_id.'/task/');
-//                break;
-//            case 'task':
-//            default:
-//                break;
-//        }
-//    }
-//    $task = new Task();
-//    $task->setCategory($category);
-}
-elseif ($action === 'modify') {
+if ($action === 'modify') {
     $task_instance_id = $this->arg[1];
     $task_instance    = Task\InstanceMapper::getInstance()->findById($task_instance_id);
     $task_type        = 'task';
@@ -57,54 +31,6 @@ elseif ($action === 'modify') {
         $this->localRedir('/submission/createSubmission/modify/'.$task_instance->getSubmissionBox()->getId());
     }
 }
-else {
-    error(2);
-}
 
-/**
- * @var Task\Instance      $task_instance
- * @var UnitInstance       $unit
- * @var Component_Instance $component
- */
-//$unit_id     = $task_instance->getUnitInstance()->getId();
-$unit        = UnitInstanceMapper::getInstance()->findById($task_instance->getUnitInstance()->getId());
-$component   = Component_InstanceMapper::getInstance()->findById($unit->getComponent()->getId());
-$category_id = $component->getIdentifier();
-
-// Dumb permission handling
-$group = new Group();
-if ($group->getPermission($category_id) < WRITE_ACCESS) {
-    error(6);
-}
-
-// Dumb block parsing
-$this->setFile(TEMPLATE_content, "task/instance.html");
-$this->setBlock(TEMPLATE_content, 'create_header', 'create_header_block');
-$this->setBlock(TEMPLATE_content, 'modify_header', 'modify_header_block');
-$this->setBlock(TEMPLATE_content, 'create_button', 'create_button_block');
-$this->setBlock(TEMPLATE_content, 'modify_button', 'modify_button_block');
-
-$this->setVar('create_header_block', '');
-$this->setVar('modify_header_block', '');
-$this->setVar('create_button_block', '');
-$this->setVar('modify_button_block', '');
-
-if ($task_instance->getId()) {
-    $this->parse('modify_header_block', 'modify_header');
-    $this->parse('modify_button_block', 'modify_button');
-}
-else {
-    $this->parse('create_header_block', 'create_header');
-    $this->parse('create_button_block', 'create_button');
-}
-
-$this->setVar(
-    array(
-        'TASK_ID'          => $task_instance->getId(),
-        'TASK_UNIT'        => $unit->getId(),
-        'TASK_TYPE'        => $task_type,
-        'TASK_LINK'        => $task_instance->getLink(),
-        'TASK_TITLE'       => $task_instance->getTitle(),
-        'TASK_SELF_ASSESS' => ($task_instance->getRequiresConfirmation() ? '' : 'checked'),
-    )
-);
+// Error out if you haven't redir'd by now
+error(2);
