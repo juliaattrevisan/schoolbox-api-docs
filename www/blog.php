@@ -1,43 +1,46 @@
 <?php
 
 $groupHandler = new Group();
-$blogHandler = new Blog();
+//$blogHandler = new Blog();
+$blogMapper = new \Schoolbox\Blog\BlogMapper();
 $commentHandler = new Comment();
+$commentMapper = new \Schoolbox\Blog\CommentMapper();
 
 $this->setFile(TEMPLATE_content, 'blog.html');
 $this->setBlock(TEMPLATE_content, 'modify_link', 'modify_link_block');
 
 $i = 0;
 if (is_numeric($this->arg[0])) {
-    $blog = $blogHandler->getByID($this->arg[0]);
-    $permission = $groupHandler->getPermission($blog['cid']);
-
-    if (empty($blog)) {
+    /** @var \Schoolbox\Blog\Blog $blog */
+    try {
+        $blog = $blogMapper->findById($this->arg[0]);
+    } catch (\Schoolbox\Mapper\Exception $e) {
         error(29);
     }
+    $permission = $groupHandler->getPermission($blog->getCategory()->getId());
 
-    $adr = new Alaress_Date_Format($blog['created'], 'Y-m-d H:i:s');
+//    $adr = new Alaress_Date_Format($blog['created'], 'Y-m-d H:i:s');
     $userHandler = new User();
 
     $this->setVar(
         array(
-            'BLOG_CID' => $blog['cid'],
-            'BLOG_HEADING' => Scrub::text($blog['heading']),
-            'BLOG_BODY' => Scrub::html($blog['body']),
+            'BLOG_CID' => $blog->getCategory()->getId(),
+            'BLOG_HEADING' => Scrub::text($blog->getHeading()),
+            'BLOG_BODY' => Scrub::html($blog->getBody()),
             'BLOG_COMMENTS' => 'No Comments',
-            'BLOG_ID' => $blog['id'],
-            'BLOG_CREATED' => $adr->getRelativeTime(),
-            'BLOG_AUTHOR_ID' => $blog['owner'],
-            'BLOG_AUTHOR_EXTERNAL_ID' => $blog['synergy_id'],
-            'BLOG_AUTHOR_NAME' => $userHandler->formatName($blog),
+            'BLOG_ID' => $blog->getId(),
+            'BLOG_CREATED' => $blog->getCreated()->getRelativeTime(),
+            'BLOG_AUTHOR_ID' => $blog->getOwner()->getId(),
+            'BLOG_AUTHOR_EXTERNAL_ID' => $blog->getOwner()->getExternalId(),
+            'BLOG_AUTHOR_NAME' => $blog->getOwner()->formatName(),
             'modify_link_block' => '',
         )
     );
-    if ($blog['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS) {
+    if ($blog->getOwner()->getId() == $_SESSION['id'] || $permission >= FULL_ACCESS) {
         $this->parse('modify_link_block', 'modify_link');
     }
 
-    $comments = $commentHandler->getByBID($blog['id']);
+    $comments = $commentHandler->getByBID($blog->getId());
     $this->setBlock(TEMPLATE_content, 'comment', 'comment_block');
 
     if (!empty($comments)) {
@@ -75,4 +78,18 @@ if (is_numeric($this->arg[0])) {
     } else {
         $this->setVar('comment_block', '');
     }
+
+//    $trail = new \Schoolbox\Breadcrumbs();
+//    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+//        [
+//            'text' => $category->getName(),
+//            'href' => "/homepage/{$category->getId()}",
+//            'class' => '',
+//        ],
+//        [
+//            'text' => 'Manage Group',
+//            'href' => '',
+//            'class' => 'active',
+//        ]
+//    ]);
 }
