@@ -1,11 +1,9 @@
 <?php
 
 $groupHandler = new Group();
-//$blogHandler = new Blog();
 $folderMapper = new Schoolbox\Resource\Folder\Mapper();
 $userMapper = new \Schoolbox\UserMapper();
 $blogMapper = new \Schoolbox\Blog\BlogMapper();
-$commentHandler = new Comment();
 $commentMapper = new \Schoolbox\Blog\CommentMapper();
 
 $this->setFile(TEMPLATE_content, 'blog.html');
@@ -28,7 +26,6 @@ if (is_numeric($this->arg[0])) {
     }
     $permission = $groupHandler->getPermission($blog->getCategory()->getId());
 
-//    $adr = new Alaress_Date_Format($blog['created'], 'Y-m-d H:i:s');
     $userHandler = new User();
 
     $this->setVar(
@@ -49,7 +46,8 @@ if (is_numeric($this->arg[0])) {
         $this->parse('modify_link_block', 'modify_link');
     }
 
-    $comments = $commentHandler->getByBID($blog->getId());
+    /** @var \Schoolbox\Blog\Comment[] $comments */
+    $comments = $commentMapper->findForBlog($blog);
     $this->setBlock(TEMPLATE_content, 'comment', 'comment_block');
 
     if (!empty($comments)) {
@@ -59,28 +57,29 @@ if (is_numeric($this->arg[0])) {
         $j = 0;
 
         foreach ($comments as $comment) {
-            $actionDate = new Alaress_Date_Format($comment['created'], 'Y-m-d H:i:s');
+//            $actionDate = new Alaress_Date_Format($comment['created'], 'Y-m-d H:i:s');
 
             $this->setVar(
                 array(
-                    'COMMENT_BODY' => Scrub::text($comment['body']),
-                    'COMMENT_OWNER' => $userHandler->formatName($comment),
-                    'COMMENT_CREATED' => $actionDate->getRelativeTime(),
-                    'COMMENT_AUTHOR_ID' => $comment['owner'],
-                    'COMMENT_AUTHOR_EXTERNAL_ID' => $comment['synergy_id'],
-                    'DELETE_COMMENT' => "<a class=\"delete-comment btn delete no-text\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span></a>",
+                    'COMMENT_ID' => $comment->getId(),
+                    'COMMENT_BODY' => Scrub::text($comment->getBody()),
+                    'COMMENT_OWNER' => $comment->getOwner()->formatName(),
+                    'COMMENT_CREATED' => $comment->getCreated()->getRelativeTime(),
+                    'COMMENT_AUTHOR_ID' => $comment->getOwner()->getId(),
+                    'COMMENT_AUTHOR_EXTERNAL_ID' => $comment->getOwner()->getExternalId(),
+//                    'DELETE_COMMENT' => "<a class=\"delete-comment btn delete no-text\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span></a>",
                     'ON_OFF' => ++$j % 2 ? 'dark' : ''
                 )
             );
 
-            if ($comment['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS) {
-                $this->setVar(
-                    'DELETE_COMMENT',
-                    "<a class=\"delete-comment btn delete no-text\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span></a>"
-                );
-            } else {
-                $this->setVar('DELETE_COMMENT', '');
-            }
+//            if ($comment->getOwner()->getId() == $_SESSION['id'] || $permission >= FULL_ACCESS) {
+//                $this->setVar(
+//                    'DELETE_COMMENT',
+//                    "<a class=\"delete-comment btn delete no-text\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span></a>"
+//                );
+//            } else {
+//                $this->setVar('DELETE_COMMENT', '');
+//            }
 
             $this->parse('comment_block', 'comment', true);
         }
