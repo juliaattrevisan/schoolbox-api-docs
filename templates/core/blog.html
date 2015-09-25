@@ -45,7 +45,11 @@ $(function() {
 <div class="blog blog-detail">
     <ul class="comments">
         <!-- BEGIN comment -->
-        <li class="{ON_OFF}">{DELETE_COMMENT}
+        <li>
+            <!-- BEGIN comment_delete_link -->
+            <a class="icon icon-delete" href="/blog/comment/delete/{COMMENT_ID}"></a>
+            <!-- END comment_delete_link -->
+
             <a href="/search/user/{COMMENT_AUTHOR_ID}" class="author">
                 <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32"/>
                 <span class="name">{COMMENT_OWNER}</span>

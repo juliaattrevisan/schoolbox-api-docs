@@ -8,6 +8,8 @@ $commentMapper = new \Schoolbox\Blog\CommentMapper();
 
 $this->setFile(TEMPLATE_content, 'blog.html');
 $this->setBlock(TEMPLATE_content, 'modify_link', 'modify_link_block');
+$this->setBlock(TEMPLATE_content, 'comment', 'comment_block');
+$this->setBlock('comment', 'comment_delete_link', 'comment_delete_link_block');
 
 $i = 0;
 if (is_numeric($this->arg[0])) {
@@ -48,7 +50,6 @@ if (is_numeric($this->arg[0])) {
 
     /** @var \Schoolbox\Blog\Comment[] $comments */
     $comments = $commentMapper->findForBlog($blog);
-    $this->setBlock(TEMPLATE_content, 'comment', 'comment_block');
 
     if (!empty($comments)) {
         $this->setVar('BLOG_COMMENTS', count($comments) . ' Comments');
@@ -68,18 +69,13 @@ if (is_numeric($this->arg[0])) {
                     'COMMENT_AUTHOR_ID' => $comment->getOwner()->getId(),
                     'COMMENT_AUTHOR_EXTERNAL_ID' => $comment->getOwner()->getExternalId(),
 //                    'DELETE_COMMENT' => "<a class=\"delete-comment btn delete no-text\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span></a>",
-                    'ON_OFF' => ++$j % 2 ? 'dark' : ''
+                    'comment_delete_link_block' => '',
                 )
             );
 
-//            if ($comment->getOwner()->getId() == $_SESSION['id'] || $permission >= FULL_ACCESS) {
-//                $this->setVar(
-//                    'DELETE_COMMENT',
-//                    "<a class=\"delete-comment btn delete no-text\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span></a>"
-//                );
-//            } else {
-//                $this->setVar('DELETE_COMMENT', '');
-//            }
+            if ($comment->getOwner()->getId() == $_SESSION['id'] || $permission >= FULL_ACCESS) {
+                $this->parse('comment_delete_link_block', 'comment_delete_link');
+            }
 
             $this->parse('comment_block', 'comment', true);
         }
