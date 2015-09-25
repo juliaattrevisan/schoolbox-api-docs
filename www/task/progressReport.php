@@ -210,7 +210,8 @@ $contextSelector->render(
     'CONTEXT_SELECTOR',
     array(
         'year'     => $current_year,
-        'category' => $current_semester,
+        'semester' => $current_semester,
+        'subject'  => $class_id,
         'unit'     => $unit_id,
     )
 );
@@ -403,59 +404,3 @@ foreach ($student_list as $student) {
     $this->parse('student_unit_block', 'student_unit', true);
     $this->parse('student_block', 'student', true);
 }
-
-//// Possible setup of dropdown:
-//// split unit dropdown by semester
-//
-//// Initial block spam
-//$this->setBlock(TEMPLATE_content, 'semester_option', 'semester_option_block');
-//$this->setBlock(TEMPLATE_content, 'year_option',     'year_option_block');
-//
-//// Semesters can be hardcoded, no need to look anything up
-//// (may change if a school wants Term breakdowns rather than Semester)
-//$semesters = array(1, 2);
-//foreach ($semesters as $sem) {
-//    $this->setVar(array(
-//        'SEMESTER_SELECTED' => $sem == $semester ? ' selected' : '',
-//        'SEMESTER_VALUE'    => $sem
-//    ));
-//    $this->parse('semester_option_block', 'semester_option', true);
-//}
-//
-//// Years is trickier, because we first need to find out all the years in which the teacher has ...taught
-//// while we figure that out, let's go with "the past 6 years"
-//for ($y = $this_year; $y > $this_year - 6; --$y) {
-//    $this->setVar(array(
-//        'YEAR_SELECTED' => $y == $year ? ' selected' : '',
-//        'YEAR_VALUE'    => $y
-//    ));
-//    $this->parse('year_option_block', 'year_option', true);
-//}
-
-//// Get all the tasks for this class/year/semester, and order by start/end date.
-//// The finder methods for contexts should be fairly simple.
-//$class = \Schoolbox\Resource\Category\ClassContext::getInstance()->findById($class);
-//// Other contexts:
-//// Schoolbox\Resource\Category\CourseContext
-//// Schoolbox\Resource\Category\HomepageContext
-//// TeacherContext: a single course unit, viewed from the context of a teacher.
-//$unit_list = \Schoolbox\Assessment\Course\Instance\TeacherContext::getInstance()->findForClass($class_id, $year, $semester);
-//
-//// The header
-//foreach ($unit_list as $unit) {
-//    // output unit header
-//    foreach ($unit->getTaskList() as $task) {
-//        // output task header beneath unit header
-//    }
-//}
-//
-//foreach ($class->getStudentList() as $student) {
-//    // output a row for each student
-//    foreach ($unit_list as $unit) {
-//        foreach ($unit->getTaskList() as $task) {
-//            // output a cell for this student/class/row
-//            $student_completion = $task->getResultForStudent();
-//            // And spam out <!-- blocks --> and {VARIABLES}
-//        }
-//    }
-//}
