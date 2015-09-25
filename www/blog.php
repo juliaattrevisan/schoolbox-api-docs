@@ -41,6 +41,7 @@ if (is_numeric($this->arg[0])) {
             'BLOG_AUTHOR_EXTERNAL_ID' => $blog->getOwner()->getExternalId(),
             'BLOG_AUTHOR_NAME' => $blog->getOwner()->formatName(),
             'modify_link_block' => '',
+            'comment_block'     => '',
         )
     );
     if ($blog->getOwner()->getId() == $_SESSION['id'] || $permission >= FULL_ACCESS) {
