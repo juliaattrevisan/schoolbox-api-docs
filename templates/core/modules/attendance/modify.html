@@ -39,52 +39,47 @@
                 <input name='attendanceDay' type='hidden' value='{ATTENDANCE_DAY}' />
                 <input name='attendancePeriod' type='hidden' value='{ATTENDANCE_PERIOD}' />
                 <table>
-                    <colgroup>
-                        <col width="54px">
-                        <col>
-                        <col width="64px">
-                        <col>
-                        <col>
-                        <col>
-                        <col>
-                    </colgroup>
                     <thead>
                     <tr>
-                        <th></th>
                         <th>Name</th>
-                        <th colspan="2">Attendance String</th>
-                        <th>Late Arrival</th>
-                        <th>Early Departure</th>
-                        <th>Type</th>
-                        <th>Reason</th>
+                        <th class="hide-for-small">Late Arrival</th>
+                        <th class="hide-for-small">Early Departure</th>
+                        <th class="hide-for-small">Type</th>
+                        <th class="hide-for-small">Reason</th>
                         <th>Absent</th>
                     </tr>
                     </thead>
                     <tbody>
                     <!-- BEGIN student -->
                     <tr class='{ON_OFF}'>
-                        <td><img src='/portrait.php?userId={STUDENT_SYNERGY_ID}&size=square64' width='32' height='32' alt="{STUDENT_NAME}" /></td>
-                        <td><a href='/search/user/{STUDENT_UID}'>{STUDENT_NAME}</a></td>
-                        <td><p style="font-size:12pt;white-space: nowrap;">{STUDENT_ATTENDANCESTRING}</p></td>
-                        <td><em>{STUDENT_NONATTENDREASON}</em></td>
-                        <td>
+                        <th scope="row" class="no-pad">
+                            <div class="avatar card">
+                                <a href="/search/user/{STUDENT_UID}" title="View Profile">
+                                    <img src="/portrait.php?userId={STUDENT_SYNERGY_ID}&size=square64" />
+                                    {STUDENT_NAME}
+                                </a>
+                                <p class="meta">{STUDENT_ATTENDANCESTRING}</p>
+                                <p class="meta">{STUDENT_NONATTENDREASON}</p>
+                            </div>
+                        </th>
+                        <td class="hide-for-small">
                             <div class="timepick">
                                 <input type='text' maxlength='10' size="8" name='LateArrivalTime[]' class="timepicker ui-timepicker-input" value="{STUDENT_ARRIVAL_TIME}" />
                             </div>
                         </td>
-                        <td>
+                        <td class="hide-for-small">
                             <div class="timepick">
                                 <input type='text' maxlength='10' size="8" name='EarlyDepartureTime[]' class="timepicker ui-timepicker-input"  value="{STUDENT_DEPT_TIME}" />
                             </div>
                         </td>
-                        <td>
+                        <td class="hide-for-small">
                             <select name='PossibleAbsenceCode[]'>
                                 <!-- BEGIN absence_options -->
                                 <option value='{ABSENCE_OPTIONS_VALUE}' {ABSENCE_OPTIONS_VALUE_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option>
                                 <!-- END absence_options -->
                             </select>
                         </td>
-                        <td>
+                        <td class="hide-for-small">
                             <select name='PossibleReasonCode[]'>
                                 <!-- BEGIN reason_options -->
                                 <option value='{REASON_OPTIONS_VALUE}' {REASON_OPTIONS_VALUE_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
