@@ -438,6 +438,9 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 'UNIT_TASK_COMPLETION_TITLE'      => $unit_task_title,
                 'UNIT_TASK_COMPLETE_CLASS'        => $unit_task_class,
                 'UNIT_TASK_SET_STATUS'            => '',
+                'UNIT_TASK_MODIFY_URL'            => $task->getType() == Task::TYPE_TASK
+                    ? '#'
+                    : '/task/instance/modify/' . $task->getId(),
                 'unit_task_count_block'           => '',
                 'unit_task_completion_block'      => '',
                 'unit_task_due_date_block'        => '',
@@ -477,12 +480,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 }
             }
         } else {
-            // Output task modify URL
-            $this->setVar('UNIT_TASK_MODIFY_URL', '#');
-            if ($task->getType() == Task::TYPE_DUE_WORK || $task->getType() == Task::TYPE_ONLINE_ASSESS) {
-                $this->setVar('UNIT_TASK_MODIFY_URL', '/task/instance/modify/' . $task->getId());
-            }
-
             $this->parse('unit_task_count_block', 'unit_task_count');
             $this->parse('unit_task_delete_block', 'unit_task_delete');
             $this->parse('unit_task_delete_form_block', 'unit_task_delete_form');
