@@ -23,75 +23,86 @@
 </style>
 <!-- END custom_head -->
 
-<h1>Student Attendances for {ATTENDANCE_PERIOD_LONG} on day {ATTENDANCE_DAY} - {CLASS_CODE}</h1>
-<h2>{ATTENDANCE_DATE_FORMATTED}</h2>
-<form method='post' action='/modules/attendance/modifyForm' class='collectible'>
-    <input name='classCode' type='hidden' value='{CLASS_CODE}' />
-    <input name='attendanceDate' type='hidden' value='{ATTENDANCE_DATE}' />
-    <input name='attendanceDay' type='hidden' value='{ATTENDANCE_DAY}' />
-    <input name='attendancePeriod' type='hidden' value='{ATTENDANCE_PERIOD}' />
-    <table class="table ruler">
-        <colgroup>
-            <col width="54px">
-            <col>
-            <col width="64px">
-            <col>
-            <col>
-            <col>
-            <col>
-        </colgroup>
-	<thead>
-        <tr>
-            <th></th>
-            <th>Name</th>
-            <th colspan="2">Attendance String</th>
-            <th>Late Arrival</th>
-            <th>Early Departure</th>
-            <th>Type</th>
-            <th>Reason</th>
-            <th>Absent</th>
-        </tr>
-	</thead>
-        <tbody>
-	<!-- BEGIN student -->
-	<tr class='{ON_OFF}'>
-		<td><img src='/portrait.php?userId={STUDENT_SYNERGY_ID}&size=square64' width='32' height='32' alt="{STUDENT_NAME}" /></td>
-		<td><a href='/search/user/{STUDENT_UID}'>{STUDENT_NAME}</a></td>
-        <td><p style="font-size:12pt;white-space: nowrap;">{STUDENT_ATTENDANCESTRING}</p></td>
-        <td><em>{STUDENT_NONATTENDREASON}</em></td>
-        <td>
-            <div class="timepick">
-                <input type='text' maxlength='10' size="8" name='LateArrivalTime[]' class="timepicker ui-timepicker-input" value="{STUDENT_ARRIVAL_TIME}" />
-            </div>
-        </td>
-		<td>
-            <div class="timepick">
-                <input type='text' maxlength='10' size="8" name='EarlyDepartureTime[]' class="timepicker ui-timepicker-input"  value="{STUDENT_DEPT_TIME}" />
-            </div>
-        </td>
-        <td>
-            <select name='PossibleAbsenceCode[]'>
-                <!-- BEGIN absence_options -->
-                <option value='{ABSENCE_OPTIONS_VALUE}' {ABSENCE_OPTIONS_VALUE_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option>
-                <!-- END absence_options -->
-            </select>
-        </td>
-        <td>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Student Attendances for {ATTENDANCE_PERIOD_LONG} on day {ATTENDANCE_DAY} - {CLASS_CODE}</h1>
+    </div>
+</div>
 
-            <select name='PossibleReasonCode[]'>
-                <!-- BEGIN reason_options -->
-                <option value='{REASON_OPTIONS_VALUE}' {REASON_OPTIONS_VALUE_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
-                <!-- END reason_options -->
-            </select>
-            <input type='text' maxlength='100' name='PossibleReasonDescription[]' value="{STUDENT_REASON_DESCRIPTION}" />
-        </td>
-        <td>
-            <input type="hidden" name="studentID[]" value="{STUDENT_SYNERGY_ID}" />
-            <input id="attendanceOptions_{STUDENT_SYNERGY_ID}" class="attendanceOptions" type="checkbox" name="attending[]" value="{STUDENT_SYNERGY_ID}" {IS_ABSENT} />
-        </td>
-	</tr>
-	<!-- END student -->
-    </tbody>
-</table>
-<input type="submit" value="Submit Attendances" class="submit-btn-plain"/>
-</form>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">{ATTENDANCE_DATE_FORMATTED}</h2>
+        <form method='post' action='/modules/attendance/modifyForm' class='collectible'>
+            <section>
+                <input name='classCode' type='hidden' value='{CLASS_CODE}' />
+                <input name='attendanceDate' type='hidden' value='{ATTENDANCE_DATE}' />
+                <input name='attendanceDay' type='hidden' value='{ATTENDANCE_DAY}' />
+                <input name='attendancePeriod' type='hidden' value='{ATTENDANCE_PERIOD}' />
+                <table>
+                    <colgroup>
+                        <col width="54px">
+                        <col>
+                        <col width="64px">
+                        <col>
+                        <col>
+                        <col>
+                        <col>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th colspan="2">Attendance String</th>
+                        <th>Late Arrival</th>
+                        <th>Early Departure</th>
+                        <th>Type</th>
+                        <th>Reason</th>
+                        <th>Absent</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- BEGIN student -->
+                    <tr class='{ON_OFF}'>
+                        <td><img src='/portrait.php?userId={STUDENT_SYNERGY_ID}&size=square64' width='32' height='32' alt="{STUDENT_NAME}" /></td>
+                        <td><a href='/search/user/{STUDENT_UID}'>{STUDENT_NAME}</a></td>
+                        <td><p style="font-size:12pt;white-space: nowrap;">{STUDENT_ATTENDANCESTRING}</p></td>
+                        <td><em>{STUDENT_NONATTENDREASON}</em></td>
+                        <td>
+                            <div class="timepick">
+                                <input type='text' maxlength='10' size="8" name='LateArrivalTime[]' class="timepicker ui-timepicker-input" value="{STUDENT_ARRIVAL_TIME}" />
+                            </div>
+                        </td>
+                        <td>
+                            <div class="timepick">
+                                <input type='text' maxlength='10' size="8" name='EarlyDepartureTime[]' class="timepicker ui-timepicker-input"  value="{STUDENT_DEPT_TIME}" />
+                            </div>
+                        </td>
+                        <td>
+                            <select name='PossibleAbsenceCode[]'>
+                                <!-- BEGIN absence_options -->
+                                <option value='{ABSENCE_OPTIONS_VALUE}' {ABSENCE_OPTIONS_VALUE_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option>
+                                <!-- END absence_options -->
+                            </select>
+                        </td>
+                        <td>
+                            <select name='PossibleReasonCode[]'>
+                                <!-- BEGIN reason_options -->
+                                <option value='{REASON_OPTIONS_VALUE}' {REASON_OPTIONS_VALUE_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
+                                <!-- END reason_options -->
+                            </select>
+                            <input type='text' maxlength='100' name='PossibleReasonDescription[]' value="{STUDENT_REASON_DESCRIPTION}" />
+                        </td>
+                        <td>
+                            <input type="hidden" name="studentID[]" value="{STUDENT_SYNERGY_ID}" />
+                            <input id="attendanceOptions_{STUDENT_SYNERGY_ID}" class="attendanceOptions" type="checkbox" name="attending[]" value="{STUDENT_SYNERGY_ID}" {IS_ABSENT} />
+                            <label for="attendanceOptions_{STUDENT_SYNERGY_ID}" class="checkbox-label"></label>
+                        </td>
+                    </tr>
+                    <!-- END student -->
+                    </tbody>
+                </table>
+            </section>
+            <input type="submit" value="Submit Attendances" class="submit-btn-plain"/>
+        </form>
+    </div>
+</div>
