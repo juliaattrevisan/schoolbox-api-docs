@@ -1,6 +1,6 @@
 <script type="text/javascript">
 $(function() {
-    $('a.delete-comment').click(function(event) {
+    $('[data-interaction="delete"]').click(function(event) {
         event.preventDefault();
         $(this).confirmDialog({text:'Delete this comment?'});
     })
@@ -39,29 +39,39 @@ $(function() {
                 <article>{BLOG_BODY}</article>
             </div>
         </section>
+
+        <h2 class="subheader">{BLOG_COMMENTS}</h2>
+
+        <section>
+            <div class="content no-pad">
+                <ul class="information-list">
+                    <!-- BEGIN comment -->
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="avatar card">
+                                <a href="/search/user/{COMMENT_AUTHOR_ID}">
+                                    <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square64" />
+                                    <p>{COMMENT_OWNER}</p>
+                                </a>
+                                <p class="meta">{COMMENT_CREATED}</p>
+                            </div>
+                            <article>{COMMENT_BODY}</article>
+                        </div>
+                        <nav>
+                            <!-- BEGIN comment_delete_link -->
+                            <a class="icon icon-delete" href="/blog/comment/delete/{COMMENT_ID}" data-interaction="delete"></a>
+                            <!-- END comment_delete_link -->
+                        </nav>
+                    </li>
+                    <!-- END comment -->
+                    <li>
+                        <form method="post" action="/blog/comment/new/{BLOG_ID}" class="no-pad">
+                            <textarea name="body" class="no-margin" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                            <input type="submit" class="no-margin" name="comment" value="Add comment"/>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </section>
     </div>
-</div>
-
-<div class="blog blog-detail">
-    <ul class="comments">
-        <!-- BEGIN comment -->
-        <li>
-            <!-- BEGIN comment_delete_link -->
-            <a class="icon icon-delete" href="/blog/comment/delete/{COMMENT_ID}"></a>
-            <!-- END comment_delete_link -->
-
-            <a href="/search/user/{COMMENT_AUTHOR_ID}" class="author">
-                <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32"/>
-                <span class="name">{COMMENT_OWNER}</span>
-            </a>
-            <span class="subtitle">Commented {COMMENT_CREATED}</span>
-            <p class="comment-body">{COMMENT_BODY}</p>
-        </li>
-        <!-- END comment -->
-    </ul>
-
-    <form method="post" action="/blog/comment/new/{BLOG_ID}">
-        <p><textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
-            <input type="submit" class="submit-btn-plain" name="comment" value="Add comment"/></p>
-    </form>
 </div>
