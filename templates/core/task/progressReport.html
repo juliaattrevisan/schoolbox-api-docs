@@ -95,48 +95,9 @@
     </ul>
 </div>
 
-<!-- context switcher -->
 <div class="row">
     {CONTEXT_SELECTOR}
 </div>
-
-<form id="enrolment" action="/task/progressReport/" method="get">
-    <div class="row">
-        <div class="small-12 medium-9 medium-offset-3 large-7 large-offset-5 columns">
-            <div class="content">
-                <div class="context-switch">
-                    <nav>
-                        <a class="sem-back" data-interaction="select_semester_prev" href="#"></a>
-                    </nav>
-                    <div class="semester">
-                        <select id="context-selector-semester">
-                            <!-- BEGIN unit_selector_semester -->
-                            <option value="{UNIT_SELECTOR_SEMESTER_SEMESTER}/{UNIT_SELECTOR_SEMESTER_YEAR}" label="Semester {UNIT_SELECTOR_SEMESTER_SEMESTER}, {UNIT_SELECTOR_SEMESTER_YEAR}" {UNIT_SELECTOR_SEMESTER_SELECTED}>
-                                Semester {UNIT_SELECTOR_SEMESTER_SEMESTER}, {UNIT_SELECTOR_SEMESTER_YEAR}
-                            </option>
-                            <!-- END unit_selector_semester -->
-                        </select>
-                    </div>
-                    <nav>
-                        <a class="sem-fwd" data-interaction="select_semester_next" href="#"></a>
-                    </nav>
-                    <div class="subject">
-                        <!-- BEGIN unit_selector_semester_unit_list -->
-                        <select name="unit_id" id="enrolled-subject" data-interaction="select_unit" data-semester="{UNIT_SELECTOR_UNIT_SEMESTER}/{UNIT_SELECTOR_UNIT_YEAR}">
-                            <option disabled label="Select a unit">Select a unit</option>
-                            <!-- BEGIN unit_selector_unit -->
-                            <option label="{UNIT_SELECTOR_UNIT_NAME}" value="{UNIT_SELECTOR_UNIT_ID}" {UNIT_SELECTOR_UNIT_SELECTED}>
-                                {UNIT_SELECTOR_UNIT_NAME}
-                            </option>
-                            <!-- END unit_selector_unit -->
-                        </select>
-                        <!-- END unit_selector_semester_unit_list -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</form>
 
 <div class="row">
     <div class="small-12 island">

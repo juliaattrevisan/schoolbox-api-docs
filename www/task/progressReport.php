@@ -163,10 +163,6 @@ foreach ($userCollection as $userObject) {
 // Dumb <!-- blocks --> and {VARIABLES}
 $this->setFile(TEMPLATE_content, 'task/progressReport.html');
 
-$this->setBlock(TEMPLATE_content, 'unit_selector_semester', 'unit_selector_semester_block');
-$this->setBlock(TEMPLATE_content, 'unit_selector_semester_unit_list', 'unit_selector_semester_unit_list_block');
-$this->setBlock('unit_selector_semester_unit_list', 'unit_selector_unit', 'unit_selector_unit_block');
-
 $this->setBlock(TEMPLATE_content, 'subheader_unit', 'subheader_unit_block');
 $this->setBlock('subheader_unit', 'subheader_unit_task', 'subheader_unit_task_block');
 $this->setBlock('subheader_unit_task', 'subheader_unit_task_submission_link', 'subheader_unit_task_submission_link_block');
@@ -197,14 +193,11 @@ $this->setVar(
 );
 
 // Unit dropdown, with semester optgroups
-$unit_year_list   = array();
 $current_year     = $current_unit->getOpenDate()->getYear();
 $current_semester = $current_unit->getOpenDate()->getYearHalf();
 $years            = [];
 foreach ($unit_list as $unit) {
-    $year     = $unit->getOpenDate()->getYear();
-    $semester = $unit->getOpenDate()->getYearHalf();
-    $unit_year_list[$year][$semester][] = $unit;
+    $year = $unit->getOpenDate()->getYear();
     $years[$year] = $year;
 }
 
@@ -221,44 +214,6 @@ $contextSelector->render(
         'unit'     => $unit_id,
     )
 );
-
-//foreach (array_reverse($unit_year_list, true) as $year => $unit_semester_list) {
-//    foreach (array(1, 2) as $semester) {
-//        $this->setVar(
-//            array(
-//                'UNIT_SELECTOR_SEMESTER_SEMESTER' => $semester,
-//                'UNIT_SELECTOR_SEMESTER_YEAR'     => $year,
-//                'UNIT_SELECTOR_SEMESTER_SELECTED' => ($year == $current_year && $semester == $current_semester ? 'selected' : ''),
-//            )
-//        );
-//        $this->parse('unit_selector_semester_block', 'unit_selector_semester', true);
-//    }
-//}
-//// Yes it's the same loop again (PHPLib sucks)
-//foreach ($unit_year_list as $year => $unit_semester_list) {
-//    foreach (array(2, 1) as $semester) {
-//        $this->setVar(
-//            array(
-//                'UNIT_SELECTOR_UNIT_SEMESTER' => $semester,
-//                'UNIT_SELECTOR_UNIT_YEAR'     => $year,
-//                'unit_selector_unit_block'    => '',
-//            )
-//        );
-//        if (!empty($unit_semester_list[$semester])) {
-//            foreach ($unit_semester_list[$semester] as $unit) {
-//                $this->setVar(
-//                    array(
-//                        'UNIT_SELECTOR_UNIT_NAME'     => $unit->getTitle(),
-//                        'UNIT_SELECTOR_UNIT_ID'       => $unit->getId(),
-//                        'UNIT_SELECTOR_UNIT_SELECTED' => ($unit->getId() == $unit_id ? 'selected' : ''),
-//                    )
-//                );
-//                $this->parse('unit_selector_unit_block', 'unit_selector_unit', true);
-//            }
-//        }
-//        $this->parse('unit_selector_semester_unit_list_block', 'unit_selector_semester_unit_list', true);
-//    }
-//}
 
 // Store assessment and submission marks here
 $student_assess_list     = array();
