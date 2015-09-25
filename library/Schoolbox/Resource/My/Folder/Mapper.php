@@ -26,6 +26,22 @@ class Mapper extends AbstractFolderMapper implements ILocator
 {
 
     /**
+     * {@inheritdoc}
+     */
+    public function findById($id)
+    {
+        // special case: 0 == root, but not in db
+        if ($id == 0) {
+            return $this->createModel()
+                        ->setId(0)
+                        ->setName('Root')
+                        ->setParent($this->createModel()->setId('#'));
+        }
+
+        return parent::findById($id);
+    }
+
+    /**
      * @return void
      */
     protected function mapping()

@@ -49,7 +49,7 @@ class Module extends AbstractModule
         return array_merge(parent::getSetterList(), [
             'setTreeBuilder'      => Resource\Browser\Resources\TreeBuilder::class,
             'setFolderMapper'     => Resource\Folder\Mapper::class,
-            'setFileMapper'       => Resource\FileMapper::class,
+            'setFileMapper'       => Resource\File\Mapper::class,
             'setUserAccessMapper' => UserAccessMapper::class,
             'setRoleAccessMapper' => RoleAccessMapper::class
         ]);
@@ -76,7 +76,10 @@ class Module extends AbstractModule
         );
 
         foreach ($setters as $method => $class) {
-            $injector->setters[$this->getControllerClass()][$method] = $injector->lazyNew($class);
+            // attempt to instantiate, but use literal if it's not a classname
+            $injectable = class_exists($class) ? $injector->lazyNew($class) : $class;
+
+            $injector->setters[$this->getControllerClass()][$method] = $injectable;
         }
 
     }

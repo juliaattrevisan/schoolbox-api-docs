@@ -24,17 +24,20 @@ abstract class AbstractController extends BaseController
     /** @var AbstractTreeBuilder */
     protected $treeBuilder;
 
-    /** @var Resource\FileMapper */
+    /** @var \Schoolbox\Mapper|Resource\File\ILocator */
     protected $fileMapper;
 
     /** @var Config\Loader */
     protected $conf;
 
-    /** @var Resource\Folder\Mapper */
+    /** @var \Schoolbox\Mapper|Resource\Folder\ILocator */
     protected $folderMapper;
 
     /** @var UserMapper */
     protected $userMapper;
+
+    /** @var string */
+    protected $namespace;
 
 
     /**
@@ -48,7 +51,7 @@ abstract class AbstractController extends BaseController
     }
 
     /**
-     * @param Resource\Folder\Mapper $folderMapper
+     * @param \Schoolbox\Mapper|Resource\Folder\ILocator $folderMapper
      * @return self
      */
     public function setFolderMapper($folderMapper)
@@ -81,12 +84,23 @@ abstract class AbstractController extends BaseController
 
 
     /**
-     * @param Resource\FileMapper $fileMapper
+     * @param \Schoolbox\Mapper|Resource\File\ILocator $fileMapper
      * @return self
      */
     public function setFileMapper($fileMapper)
     {
         $this->fileMapper = $fileMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param string $namespace
+     * @return self
+     */
+    public function setNamespace($namespace)
+    {
+        $this->namespace = $namespace;
         return $this;
     }
 
@@ -121,7 +135,7 @@ abstract class AbstractController extends BaseController
             $this->getSession()->set('resourcesID', $folderId);
 
             $this->getResponse()->redirect->to(
-                $this->getRouter()->generate('resourceBrowser.browse', array())
+                $this->getRouter()->generate("{$this->namespace}.browse", array())
             );
         }
 
@@ -132,6 +146,7 @@ abstract class AbstractController extends BaseController
         // add files to that
         $data['files']    = $this->fileMapper->findByFolderId($folderId)->getAll();
         $data['treedata'] = json_encode($this->treeBuilder->buildPartialTree($folderId));
+        $data['namespace'] = $this->namespace;
 
         $this->getResponse()->content->set([
             'template' => '@resourceBrowser/browse.twig',
@@ -148,7 +163,10 @@ abstract class AbstractController extends BaseController
      */
     public function listResources($folderId)
     {
-        $data = ['files' => $this->fileMapper->findByFolderId($folderId)->getAll()];
+        $data = [
+            'files' => $this->fileMapper->findByFolderId($folderId)->getAll(),
+            'namespace' => $this->namespace
+        ];
 
         $this->getResponse()->content->set([
             'template' => '@resourceBrowser/listResources.twig',
@@ -211,7 +229,8 @@ abstract class AbstractController extends BaseController
         $data = [
             'files'  => $fileIds,
             'user'   => $this->getUser(),
-            'access' => $this->getAccess($folderIds)
+            'access' => $this->getAccess($folderIds),
+            'namespace' => $this->namespace
         ];
 
         $this->getResponse()->content->set([

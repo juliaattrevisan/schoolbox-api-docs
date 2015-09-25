@@ -89,6 +89,7 @@ abstract class AbstractModule extends BaseModule
             'setUserMapper'       => UserMapper::class,
             'setTreeBuilder'      => null,
             'setFolderMapper'     => null,
+            'setNamespace'        => $this->basename,
         ];
     }
 

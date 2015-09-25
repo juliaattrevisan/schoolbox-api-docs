@@ -92,6 +92,13 @@
 <script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.three-panel.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
+
+{% if namespace == 'myFilesBrowser' %}
+    {% set treeController = 'MyFiles' %}
+{% elseif namespace == 'webDavBrowser' %}
+    {% set treeController = 'Webdav' %}
+{% endif %}
+
 <script type="text/javascript">
     $(function () {
 
@@ -110,7 +117,10 @@
 
         tree.resourceTree({
             data: {
-                cache: {{ treedata | raw }}
+                cache: {{ treedata | raw }},
+                ajaxParams: {
+                    url: '/ajax/jstree{{ treeController }}.php'
+                }
             }
         });
 
@@ -250,7 +260,7 @@
 
         function loadPanel(panel, path, nodeId)
         {
-            var uri = '/resourceses'+path.replace(':id', nodeId);
+            var uri = '{{ routeLookup(namespace ~ '.browse') }}'+path.replace(':id', nodeId);
 
             panel
                 .addClass('loading')

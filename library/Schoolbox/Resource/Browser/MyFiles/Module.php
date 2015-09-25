@@ -12,8 +12,7 @@ namespace Schoolbox\Resource\Browser\MyFiles;
 
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Schoolbox\MyFileMapper;
-use Schoolbox\MyFolderMapper;
+use Schoolbox\Resource\My;
 use Schoolbox\Resource\Browser\AbstractModule;
 
 class Module extends AbstractModule
@@ -35,8 +34,8 @@ class Module extends AbstractModule
     {
         return array_merge(parent::getSetterList(), [
             'setTreeBuilder'  => TreeBuilder::class,
-            'setFolderMapper' => MyFolderMapper::class,
-            'setFileMapper'   => MyFileMapper::class,
+            'setFolderMapper' => My\Folder\Mapper::class,
+            'setFileMapper'   => My\File\Mapper::class,
         ]);
     }
 
@@ -57,7 +56,10 @@ class Module extends AbstractModule
         );
 
         foreach ($setters as $method => $class) {
-            $injector->setters[$this->getControllerClass()][$method] = $injector->lazyNew($class);
+            // attempt to instantiate, but use literal if it's not a classname
+            $injectable = class_exists($class) ? $injector->lazyNew($class) : $class;
+
+            $injector->setters[$this->getControllerClass()][$method] = $injectable;
         }
 
     }
@@ -71,4 +73,4 @@ class Module extends AbstractModule
         return Controller::class;
     }
 
-} 
+}
