@@ -2,43 +2,8 @@
 <script type="text/javascript">
     (function($) {
         $(function(){
-
-            // Semester selector:
-            // hides unit selectors that aren't for this semester.
-            $('select[data-interaction="select_semester"]').bind('change', function(event) {
-                var element = $(this);
-                var form    = element.closest('form');
-                var this_semester  = element.val();
-                var unit_selectors = form.find('select[data-interaction="select_unit"]');
-                var filter         = function() {
-                    return $(this).data('semester') === this_semester;
-                }
-                unit_selectors.not(filter).prop('disabled', true).hide();
-                unit_selectors.filter(filter).prop('disabled', false).show();
-            }).change();
-
-            // Previous/next semester selector
-            $('a[data-interaction="select_semester_prev"], a[data-interaction="select_semester_next"]').bind('click', function(event) {
-                event.preventDefault();
-                var element  = $(this);
-                var selector = element.closest('form').find('select[data-interaction="select_semester"]');
-                var current  = selector.find('option:selected');
-                var option   = (element.data('interaction') === 'select_semester_prev') ?
-                    current.prev():
-                    current.next();
-                if (option.length) {
-                    option.prop('selected', true);
-                    selector.change();
-                }
-            });
-
-            // Unit selector: on choosing a unit, jump to that unit
-            $('select[data-interaction="select_unit"]').bind('change', function(event) {
-                $(this).closest('form').submit();
-            });
-
             // Save form for updating a student's progress
-            $('a[data-interaction="update_progress"]').bind('click', function(event){
+            $('a[data-interaction="update_progress"]').on('click', function(event){
                 event.preventDefault()
                 var element = $(this);
                 var form    = element.closest('form');
