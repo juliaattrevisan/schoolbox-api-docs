@@ -37,6 +37,21 @@
                 </select>
             </div>
             <!-- END subject_context -->
+            <!-- BEGIN unit_context -->
+            <div class="subject">
+                <!-- Unit selector is actually multiple selectors, which are shown/hidden when the semester context changes -->
+                <!-- BEGIN unit_select -->
+                <select data-interaction="select_unit" data-semester="{UNIT_KEY}">
+                    <option disabled label="Select a unit">Select a unit</option>
+                    <!-- BEGIN unit_option -->
+                    <option label="{UNIT_NAME}" value="{UNIT_ID}" {UNIT_SELECTED}>
+                        {UNIT_NAME}
+                    </option>
+                    <!-- END unit_option -->
+                </select>
+                <!-- END unit_select -->
+            </div>
+            <!-- END unit_context -->
         </div>
     </div>
 </div>

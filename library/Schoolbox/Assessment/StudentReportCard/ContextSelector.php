@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\StudentReportCard;
 
+use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Category;
 use SitePage;
@@ -403,16 +404,52 @@ class ContextSelector {
 	 * @param $selectedValues
 	 */
 	protected function renderUnitSelector($page, $selectedValues) {
-//		$page->setBlock('subject_context', 'subject_option', 'subject_option_block');
-//
-//		$subjects = $this->createSubjectSelectorValues($selectedValues);
-//
-//		foreach($subjects as $subject) {
-//			$page->setVar($subject);
-//			$page->parse('subject_option_block', 'subject_option', true);
-//		}
-//
-//		// make it so, number one
-//		$page->parse('subject_context_block', 'subject_context', false);
+		$page->setBlock('unit_context', 'unit_select', 'unit_select_block');
+		$page->setBlock('unit_select', 'unit_option', 'unit_option_block');
+
+		// Group units by year/semester
+		$unit_year_list = [];
+		foreach ($this->units as $unit) {
+			/** @var UnitInstance $unit */
+			$open = $unit->getOpenDate();
+			$year = $open->getYear();
+			switch ($this->granularity) {
+				case self::GRANULARITY_YEAR:
+					$key = $year;
+					break;
+				case self::GRANULARITY_TERM:
+					// Don't use this, I guarantee nothing about it working
+					$key = $year.'/'.ceil($open->getMonth() / 3);
+					break;
+				default:
+					// should almost always be default (self::GRANULARITY_SEMESTER)
+					$key = $year.'/'.$open->getYearHalf();
+					break;
+			}
+			$unit_year_list[$key][] = $unit;
+		}
+
+		foreach ($unit_year_list as $key => $unit_list) {
+			$page->setVar(
+				array(
+					'UNIT_KEY'          => $key,
+					'unit_option_block' => '',
+				)
+			);
+			foreach ($unit_list as $unit) {
+				$page->setVar(
+					array(
+						'UNIT_NAME'     => $unit->getTitle(),
+						'UNIT_ID'       => $unit->getId(),
+						'UNIT_SELECTED' => ($unit->getId() == $selectedValues['unit'] ? 'selected' : ''),
+					)
+				);
+				$page->parse('unit_option_block', 'unit_option', true);
+			}
+			$page->parse('unit_select_block', 'unit_select', true);
+		}
+
+		// make it so, number one
+		$page->parse('unit_context_block', 'unit_context', false);
 	}
-} 
+}
