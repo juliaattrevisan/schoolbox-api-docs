@@ -24,7 +24,8 @@
                 href: '',
                 selector: {
                     semester: '#context-selector-semester',
-                    subject: '#context-selector-enrolled-subjects'
+                    subject: '#context-selector-enrolled-subjects',
+                    units: '[data-interaction="select_unit"]'
                 }
             }
 
@@ -66,6 +67,20 @@
 
                 return false;
             });
+
+            // Bind to unit selectors
+            $(config.selector.units).bind('change', function () {
+                var url = $(this).val();
+                var elems = [config.href, url];
+                var redirect = elems.join('/');
+
+                if (url) {
+                    window.location = '/' + redirect;
+                }
+
+                return false;
+            });
+
         }
     }
 }(jQuery));
