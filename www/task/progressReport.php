@@ -213,7 +213,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         'class' => '',
     ],
     [
-        'text' => Scrub::text($category->getName().( strlen($code) > 0 ? ('('.$code.')') : '' )) ,
+        'text' => Scrub::text($category->getName().' '.( strlen($code) > 0 ? ('('.$code.')') : '' )) ,
         'href' => "/submission/listSubmission/$current_year/$current_semester/".$category->getId(),
         'class' => '',
     ],

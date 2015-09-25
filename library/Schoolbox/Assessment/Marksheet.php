@@ -483,6 +483,26 @@ class Marksheet
             )
         );
 
+        $trail = new \Schoolbox\Breadcrumbs();
+        $trail->renderIntoSitePage($page, 'BREADCRUMB', [
+            [
+                'text' => 'Submissions',
+                'href' => "/submission/listSubmission",
+                'class' => '',
+            ],
+            [
+                'text' => \Scrub::text($this->category->getName().' '.( strlen($codeString) > 0 ? ('('.$codeString.')') : '' )) ,
+                'href' => "/submission/listSubmission/{$this->year}/{$this->semester}/".$this->category->getId(),
+                'class' => '',
+            ],
+            [
+                'text' => 'Marksheet',
+                'href' => '#',
+                'class' => 'active',
+            ]
+        ]);
+
+
         // define blocks
         $page->setBlock(TEMPLATE_content, 'semester_option', 'semester_option_block');
         $page->setBlock(TEMPLATE_content, 'year_option', 'year_option_block');
