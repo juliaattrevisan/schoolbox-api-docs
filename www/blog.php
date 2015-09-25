@@ -2,6 +2,8 @@
 
 $groupHandler = new Group();
 //$blogHandler = new Blog();
+$folderMapper = new Schoolbox\Resource\Folder\Mapper();
+$userMapper = new \Schoolbox\UserMapper();
 $blogMapper = new \Schoolbox\Blog\BlogMapper();
 $commentHandler = new Comment();
 $commentMapper = new \Schoolbox\Blog\CommentMapper();
@@ -14,6 +16,13 @@ if (is_numeric($this->arg[0])) {
     /** @var \Schoolbox\Blog\Blog $blog */
     try {
         $blog = $blogMapper->findById($this->arg[0]);
+        $blog->setCategory($folderMapper->findById($blog->getCategory()->getId()));
+        // Load owner too
+        try {
+            $blog->setOwner($userMapper->findById($blog->getOwner()->getId()));
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // Unknown user is fine - noop
+        }
     } catch (\Schoolbox\Mapper\Exception $e) {
         error(29);
     }
@@ -79,17 +88,17 @@ if (is_numeric($this->arg[0])) {
         $this->setVar('comment_block', '');
     }
 
-//    $trail = new \Schoolbox\Breadcrumbs();
-//    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
-//        [
-//            'text' => $category->getName(),
-//            'href' => "/homepage/{$category->getId()}",
-//            'class' => '',
-//        ],
-//        [
-//            'text' => 'Manage Group',
-//            'href' => '',
-//            'class' => 'active',
-//        ]
-//    ]);
+    $trail = new \Schoolbox\Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $blog->getCategory()->getName(),
+            'href' => "/homepage/{$blog->getCategory()->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => $blog->getHeading(),
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }
