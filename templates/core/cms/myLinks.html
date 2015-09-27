@@ -27,26 +27,50 @@ $(function() {
 </script>
 <!-- END custom_head -->
 
-<h1>Manage My Links</h1>
+<div class="row actions-small-1">
+	<div class="list-item">
+		<h1>Manage My Links</h1>
+	</div>
+</div>
 
-<form id="form" method="post" action="/cms/myLinksForm.php" class="standardForm">
-	<table class="table">
-		<thead>
-			<tr>
-				<th width="38%" title="e.g. http://schoolbox.com/">Hyperlink</th>
-				<th width="38%"title="e.g. Schoolbox LMS">Name</th>
-				<th width="24%">Actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td><label><input name="url" type="text" class="required" placeholder="Hyperlink (http://schoolbox.com/)" /></label></td>
-				<td><label><input name="description" class="required " type="text" placeholder="Name (Schoolbox LMS)" /></label></td>
-				<td><input name="submit" type="submit" value="Add" class="submit-btn-plain" /></td>
-			</tr>
-		</tbody>
-	</table>
-</form>
+<div class="row">
+	<div class="small-12 island">
+		<section>
+			<div class="content">
+				<ul class="information-list">
+					<li class="actions-small-1">
+						<div class="list-item">
+
+						</div>
+					</li>
+					<nav>
+						<a href="#" class="icon icon-add" title="Add"></a>
+					</nav>
+				</ul>
+			</div>
+
+			<form id="form" method="post" action="/cms/myLinksForm.php" class="standardForm">
+				<table class="table">
+					<thead>
+					<tr>
+						<th width="38%" title="e.g. http://schoolbox.com/">Hyperlink</th>
+						<th width="38%"title="e.g. Schoolbox LMS">Name</th>
+						<th width="24%">Actions</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr>
+						<td><label><input name="url" type="text" class="required" placeholder="Hyperlink (http://schoolbox.com/)" /></label></td>
+						<td><label><input name="description" class="required " type="text" placeholder="Name (Schoolbox LMS)" /></label></td>
+						<td><input name="submit" type="submit" value="Add" class="submit-btn-plain" /></td>
+					</tr>
+					</tbody>
+				</table>
+			</form>
+		</section>
+	</div>
+</div>
+
 
 <form id='mylinks' class="clearfix" action='/cms/myLinksForm.php' method='post'>
 <table width="100%" class="table">
