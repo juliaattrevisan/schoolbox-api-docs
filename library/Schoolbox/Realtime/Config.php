@@ -259,13 +259,11 @@ class Config
             $mask    = $settings['mask'];
             $default = $settings['perm'];
 
-        } elseif ($settings['enabled']) {
+        } elseif (isset($settings['perm'])) {
             // grab existing mask if exists, or turn everything on
             $existing = $routePermission->getMask();
             $mask     = $existing ? $this->removeMap($existing) : [ 0, 1, 2, 4, 8 ];
-
-            // use mute as default if nothing specified
-            $default = isset($settings['perm']) ? $settings['perm'] : [ 0 ];
+            $default  = $settings['perm'];
 
         } else {
             // turn off
