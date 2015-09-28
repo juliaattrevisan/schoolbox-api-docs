@@ -592,13 +592,13 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			color: $off-canvas-hover-color;
 		}
 		li.has-submenu > a:after{
-			content: "\e645";
+			content: "\e64b";
 			font-family: 'schoolbox';
 			float: right;
 		}
 	}
 	.left-submenu .back > a:before{
-		content: "\e64d";
+		content: "\e655";
 		font-family: 'schoolbox';
 	}
 }
