@@ -6,27 +6,39 @@ $(function() {
 </script>
 <!-- END custom_head -->
 
-<h1>{ACTION} Folder</h1>
-<form action="/cms/myFolderForm.php" method="post" class="clearfix" id="folderForm" >
-<input type="hidden" name="parent" id="parent" value="{PARENT_ID}" />
-  <table class="standardForm table">
-    <tr>
-      <td class="formLabelWidth"><h4>Folder Name</h4></td>
-	  <td><label><input type="text" name="name" class="required" maxlength="100" size="40" value="{NAME}" /></label></td>
-    </tr>
-    <!-- BEGIN location -->
-    <tr>
-      <td><h4>Folder Parent</h4>
-        <em>Location at which this folder should be placed</em>
-		</td>
-		<td><select name="parent">
-          <!-- BEGIN parent_list -->
-          <option value="{PARENT_ID}" {PARENT_SELECTED}>{PARENT_INDENT}&gt; {PARENT_NAME}</option>
-          <!-- END parent_list -->
-        </select></td>
-    </tr>
-    <!-- END location --> 
-  </table>
-  <input type="hidden" name="folderID" value="{FOLDER_ID}" /> 
-  <input type="submit" label="Submit" name="submit" value="{ACTION} Folder" class="submit-btn-plain"/>
-</form>
+{BREADCRUMB}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>{ACTION} Folder</h1>
+
+        <form action="/cms/myFolderForm.php" method="post" class="clearfix" id="folderForm" >
+            <input type="hidden" name="parent" id="parent" value="{PARENT_ID}" />
+            <input type="hidden" name="folderID" value="{FOLDER_ID}" />
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label for="folder-name">Folder Name</label>
+                        <input id="folder-name" type="text" name="name" class="required" maxlength="100" size="40" value="{NAME}" />
+                    </div>
+
+                    <!-- BEGIN location -->
+                    <div class="small-12 columns">
+                        <label for="folder-parent">Parent</label>
+                        <select id="folder-parent" name="parent">
+                            <!-- BEGIN parent_list -->
+                            <option value="{PARENT_ID}" {PARENT_SELECTED}>{PARENT_INDENT}&gt; {PARENT_NAME}</option>
+                            <!-- END parent_list -->
+                        </select>
+                    </div>
+                    <!-- END location -->
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 column">
+                    <input type="submit" name="submit" value="{ACTION} Folder" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
