@@ -1,4 +1,7 @@
 <?php
+
+use \Schoolbox\Breadcrumbs;
+
 $folderHandler = new MyFolder();
 
 if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
@@ -83,9 +86,20 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         }
     }
 
-
+    // Users may currently only create folders for themselves.
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $_SESSION['user']->formatName()."'s Files",
+            'href' => "/homepage/",
+            'class' => '',
+        ],
+        [
+            'text' => 'Add Folder',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 } else {
     $this->error(2);
 }
-
-?>
