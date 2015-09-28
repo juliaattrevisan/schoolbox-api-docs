@@ -57,52 +57,51 @@ $(function() {
 						</div>
 					</div>
 					<nav>
-						<a href="#" class="icon-modify" data-interaction="show-open-form" title="Modify this link"></a>
+						<a href="#" data-reveal-id="modify-link-{MYLINK_ID}" class="icon-modify" data-interaction="show-open-form" title="Modify this link"></a>
 						<a href="/cms/myLinksForm.php?delete=41" class="icon-delete" data-interaction="delete" title="Delete this link"></a>
 					</nav>
-				</li>
-				<li class="actions-small-1 hide">
-					<div class="list-item">
+					<div id="modify-link-{MYLINK_ID}" data-reveal class="reveal-modal" aria-labelledby="modify-link-label-{MYLINK_ID}" aria-hidden="true" role="dialog">
 						<form method="post" action="/cms/myLinksForm.php">
 							<input type="hidden" readonly="readonly" name="linkID" value="{MYLINK_ID}" />
-							<div class="small-12 medium-6 columns">
-								<label for="url-{MYLINK_ID}">Link</label>
-								<input id="url-{MYLINK_ID}" name="url" type="text" required placeholder="Hyperlink (http://schoolbox.com/)" value="{MYLINK_URL}" />
-							</div>
-							<div class="small-12 medium-6 columns">
-								<label for="description-{MYLINK_ID}">Title</label>
-								<input id="description-{MYLINK_ID}" name="description" type="text" required placeholder="Name (Schoolbox LMS)" value="{MYLINK_DESCRIPTION}" />
-							</div>
-							<div class="small-12 columns">
-								<input type="submit" value="Update" />
+							<div class="row">
+								<div class="small-12 medium-6 columns">
+									<label for="url-{MYLINK_ID}">Link</label>
+									<input id="url-{MYLINK_ID}" name="url" type="text" required placeholder="Hyperlink (http://schoolbox.com/)" value="{MYLINK_URL}" />
+								</div>
+								<div class="small-12 medium-6 columns">
+									<label for="description-{MYLINK_ID}">Title</label>
+									<input id="description-{MYLINK_ID}" name="description" type="text" required placeholder="Name (Schoolbox LMS)" value="{MYLINK_DESCRIPTION}" />
+								</div>
+								<div class="small-12 columns">
+									<input type="submit" value="Modify" class="full-width" />
+								</div>
 							</div>
 						</form>
+						<a class="close-reveal-modal" aria-label="Close">&#215;</a>
 					</div>
-					<nav>
-						<a href="#" class="icon-close" data-interaction="cancel" title="Cancel"></a>
-					</nav>
 				</li>
 				<!-- END myLink -->
 			</ul>
 		</section>
-	</div>
-</div>
 
-<div id="add-link" data-reveal class="reveal-modal" aria-labelledby="add-link-label" aria-hidden="true" role="dialog">
-	<h2 id="add-link-label">Add Link</h2>
-	<form method="post" action="/cms/myLinksForm.php">
-		<div class="row">
-			<div class="small-12 medium-6 columns">
-				<label for="url-new">Link</label>
-				<input id="url-new" name="url" type="text" required />
-			</div>
-			<div class="small-12 medium-6 columns">
-				<label for="description-new">Title</label>
-				<input id="description-new" name="description" type="text" required />
-			</div>
-			<div class="small-12 columns">
-				<input type="submit" value="Add" class="full-width" />
-			</div>
+		<div id="add-link" data-reveal class="reveal-modal" aria-labelledby="add-link-label" aria-hidden="true" role="dialog">
+			<h2 id="add-link-label">Add Link</h2>
+			<form method="post" action="/cms/myLinksForm.php">
+				<div class="row">
+					<div class="small-12 medium-6 columns">
+						<label for="url-new">Link</label>
+						<input id="url-new" name="url" type="text" required />
+					</div>
+					<div class="small-12 medium-6 columns">
+						<label for="description-new">Title</label>
+						<input id="description-new" name="description" type="text" required />
+					</div>
+					<div class="small-12 columns">
+						<input type="submit" value="Add" class="full-width" />
+					</div>
+				</div>
+			</form>
+			<a class="close-reveal-modal" aria-label="Close">&#215;</a>
 		</div>
-	</form>
+	</div>
 </div>
