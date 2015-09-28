@@ -83,7 +83,8 @@ elseif ($_POST['modusername']) {
 
     /* Users require a campus array before they can be created successfully
 	 */
-    if (is_array($_POST['campus']) && count($_POST['campus'])) {
+    if (is_array($_POST['campus']) && count($_POST['campus']) || $_POST['defaultCampus']) {
+        $user['campus'] = $user['campus'] ?: [$user['defaultCampus']];
         $id = $userHandler->create($user);
 
         if (!$id) {
