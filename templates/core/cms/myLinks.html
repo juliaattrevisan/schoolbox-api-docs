@@ -61,6 +61,7 @@ $(function() {
 						<a href="/cms/myLinksForm.php?delete=41" class="icon-delete" data-interaction="delete" title="Delete this link"></a>
 					</nav>
 					<div id="modify-link-{MYLINK_ID}" data-reveal class="reveal-modal" aria-labelledby="modify-link-label-{MYLINK_ID}" aria-hidden="true" role="dialog">
+						<h2 id="modify-link-label-{MYLINK_ID}">Modify Link</h2>
 						<form method="post" action="/cms/myLinksForm.php">
 							<input type="hidden" readonly="readonly" name="linkID" value="{MYLINK_ID}" />
 							<div class="row">
