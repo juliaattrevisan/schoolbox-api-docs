@@ -38,57 +38,55 @@ $(function() {
 		<section>
 			<div class="content">
 				<ul class="information-list">
-					<li class="actions-small-1">
-						<div class="list-item">
-
+					<li>
+						<form method="post" action="/cms/myLinksForm.php">
+							<div class="row">
+								<div class="small-12 medium-6 columns">
+									<input name="url" type="text" required placeholder="Hyperlink (http://schoolbox.com/)" />
+								</div>
+								<div class="small-12 medium-6 columns">
+									<input name="description" type="text" required placeholder="Name (Schoolbox LMS)" />
+								</div>
+								<div class="small-12 columns">
+									<input name="submit" type="submit" value="Add" />
+								</div>
+							</div>
+						</form>
+					</li>
+					<!-- BEGIN myLink -->
+					<li>
+						<div class="row">
+							<div class="small-12 medium-6 columns">
+								<a href="{MYLINK_URL}">{MYLINK_URL}</a>
+							</div>
+							<div class="small-12 medium-6 columns">
+								{MYLINK_DESCRIPTION}
+							</div>
+							<div class="small-12 columns">
+								<input name="submit" type="submit" value="Modify" />
+							</div>
 						</div>
 					</li>
-					<nav>
-						<a href="#" class="icon icon-add" title="Add"></a>
-					</nav>
+					<li>
+						<form method="post" action="/cms/myLinksForm.php">
+							<div class="row">
+								<div class="small-12 medium-6 columns">
+									<input name="url" type="text" required placeholder="Hyperlink (http://schoolbox.com/)" value="{MYLINK_URL}" />
+								</div>
+								<div class="small-12 medium-6 columns">
+									<input name="description" type="text" required placeholder="Name (Schoolbox LMS)" value="{MYLINK_DESCRIPTION}" />
+								</div>
+								<div class="small-12 columns">
+									<input type="hidden" readonly="readonly" name="linkID" value="{MYLINK_ID}" />
+									<input name="submit" type="submit" value="Update" />
+									<input name="submit" type="submit" value="Delete" />
+								</div>
+							</div>
+						</form>
+					</li>
+					<!-- END myLink -->
 				</ul>
 			</div>
-
-			<form id="form" method="post" action="/cms/myLinksForm.php" class="standardForm">
-				<table class="table">
-					<thead>
-					<tr>
-						<th width="38%" title="e.g. http://schoolbox.com/">Hyperlink</th>
-						<th width="38%"title="e.g. Schoolbox LMS">Name</th>
-						<th width="24%">Actions</th>
-					</tr>
-					</thead>
-					<tbody>
-					<tr>
-						<td><label><input name="url" type="text" class="required" placeholder="Hyperlink (http://schoolbox.com/)" /></label></td>
-						<td><label><input name="description" class="required " type="text" placeholder="Name (Schoolbox LMS)" /></label></td>
-						<td><input name="submit" type="submit" value="Add" class="submit-btn-plain" /></td>
-					</tr>
-					</tbody>
-				</table>
-			</form>
 		</section>
 	</div>
 </div>
-
-
-<form id='mylinks' class="clearfix" action='/cms/myLinksForm.php' method='post'>
-<table width="100%" class="table">
-	<!-- BEGIN myLink -->
-	<tr class="row-holder">
-        <td width="38%"><a href="{MYLINK_URL}">{MYLINK_URL}</a></td>
-        <td width="38%">{MYLINK_DESCRIPTION}</td>
-        <td width="24%"><a href="#" class="btn modify no-marg"><span></span>Modify</a></td>
-    </tr>
-    <tr class="row form-holder">
-        <td width="38%"><label><input class="text-input" type="text" name="url" size="40" maxlength="250" value="{MYLINK_URL}" /></label></td>
-        <td width="38%"><label><input class="text-input" type="text" name="description" size="40" maxlength="100" value="{MYLINK_DESCRIPTION}" /></label></td>
-        <td width="24%">
-            <input type="hidden" readonly="readonly" name="linkID" value="{MYLINK_ID}" />
-            <a href="#" class="btn tick submit no-marg"><span></span>Save</a>
-            <a href="/cms/myLinksForm.php?delete={MYLINK_ID}" title="Delete link" class="btn delete no-marg no-text"><span></span></a>
-        </td>
-	</tr>
-    <!-- END myLink -->
-</table>
-</form>
