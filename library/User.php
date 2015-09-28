@@ -768,8 +768,11 @@ class User extends DeprecatedModel
                 }
             } else {
                 if ($id && $campusArray) {
-                    $campusquery = "INSERT INTO userCampus (uid, campus) VALUES ('$id', '$campusArray')";
-                    $this->db->query($campusquery);
+                    $this->db->insert('userCampus', [
+                        'uid'           => $id,
+                        'campus'        => $campusArray,
+                        'defaultCampus' => $campusArray == $defaultCampus ? 1 : 0,
+                    ]);
                 }
             }
             /* If ticked, add the new user into the Superusers table as well.
