@@ -40,29 +40,15 @@ $(function() {
 	<div class="list-item">
 		<h1>Manage My Links</h1>
 	</div>
+	<nav>
+		<a href="#" data-reveal-id="add-link" class="icon-add" title="Add new link"></a>
+	</nav>
 </div>
 
 <div class="row">
 	<div class="small-12 island">
 		<section>
 			<ul class="information-list">
-				<li>
-					<div class="list-item">
-						<form method="post" action="/cms/myLinksForm.php">
-							<div class="small-12 medium-6 columns">
-								<label for="url-new">Link</label>
-								<input id="url-new" name="url" type="text" required />
-							</div>
-							<div class="small-12 medium-6 columns">
-								<label for="description-new">Title</label>
-								<input id="description-new" name="description" type="text" required />
-							</div>
-							<div class="small-12 columns">
-								<input name="submit" type="submit" value="Add" />
-							</div>
-						</form>
-					</div>
-				</li>
 				<!-- BEGIN myLink -->
 				<li class="actions-small-2">
 					<div class="list-item">
@@ -89,18 +75,35 @@ $(function() {
 								<input id="description-{MYLINK_ID}" name="description" type="text" required placeholder="Name (Schoolbox LMS)" value="{MYLINK_DESCRIPTION}" />
 							</div>
 							<div class="small-12 columns">
-								<input name="submit" type="submit" value="Update" />
+								<input type="submit" value="Update" />
 							</div>
 						</form>
 					</div>
+					<nav>
+						<a href="#" class="icon-close" data-interaction="cancel" title="Cancel"></a>
+					</nav>
 				</li>
-				-->
 				<!-- END myLink -->
 			</ul>
-
-			<div class="content">
-				<a href="/task/createInstance/{UNIT_ID}" class="button" data-add-button data-form_class="for-task">Add Link</a>
-			</div>
 		</section>
 	</div>
+</div>
+
+<div id="add-link" data-reveal class="reveal-modal" aria-labelledby="add-link-label" aria-hidden="true" role="dialog">
+	<h2 id="add-link-label">Add Link</h2>
+	<form method="post" action="/cms/myLinksForm.php">
+		<div class="row">
+			<div class="small-12 medium-6 columns">
+				<label for="url-new">Link</label>
+				<input id="url-new" name="url" type="text" required />
+			</div>
+			<div class="small-12 medium-6 columns">
+				<label for="description-new">Title</label>
+				<input id="description-new" name="description" type="text" required />
+			</div>
+			<div class="small-12 columns">
+				<input type="submit" value="Add" />
+			</div>
+		</div>
+	</form>
 </div>
