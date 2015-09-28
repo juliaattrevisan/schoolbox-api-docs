@@ -36,56 +36,61 @@ $(function() {
 <div class="row">
 	<div class="small-12 island">
 		<section>
-			<div class="content">
-				<ul class="information-list">
-					<li>
+			<ul class="information-list">
+				<li>
+					<div class="list-item">
 						<form method="post" action="/cms/myLinksForm.php">
-							<div class="row">
-								<div class="small-12 medium-6 columns">
-									<input name="url" type="text" required placeholder="Hyperlink (http://schoolbox.com/)" />
-								</div>
-								<div class="small-12 medium-6 columns">
-									<input name="description" type="text" required placeholder="Name (Schoolbox LMS)" />
-								</div>
-								<div class="small-12 columns">
-									<input name="submit" type="submit" value="Add" />
-								</div>
-							</div>
-						</form>
-					</li>
-					<!-- BEGIN myLink -->
-					<li>
-						<div class="row">
 							<div class="small-12 medium-6 columns">
-								<a href="{MYLINK_URL}">{MYLINK_URL}</a>
+								<label for="url-new">Link</label>
+								<input id="url-new" name="url" type="text" required />
 							</div>
 							<div class="small-12 medium-6 columns">
-								{MYLINK_DESCRIPTION}
+								<label for="description-new">Title</label>
+								<input id="description-new" name="description" type="text" required />
 							</div>
 							<div class="small-12 columns">
-								<input name="submit" type="submit" value="Modify" />
-							</div>
-						</div>
-					</li>
-					<li>
-						<form method="post" action="/cms/myLinksForm.php">
-							<div class="row">
-								<div class="small-12 medium-6 columns">
-									<input name="url" type="text" required placeholder="Hyperlink (http://schoolbox.com/)" value="{MYLINK_URL}" />
-								</div>
-								<div class="small-12 medium-6 columns">
-									<input name="description" type="text" required placeholder="Name (Schoolbox LMS)" value="{MYLINK_DESCRIPTION}" />
-								</div>
-								<div class="small-12 columns">
-									<input type="hidden" readonly="readonly" name="linkID" value="{MYLINK_ID}" />
-									<input name="submit" type="submit" value="Update" />
-									<input name="submit" type="submit" value="Delete" />
-								</div>
+								<input name="submit" type="submit" value="Add" />
 							</div>
 						</form>
-					</li>
-					<!-- END myLink -->
-				</ul>
+					</div>
+				</li>
+				<!-- BEGIN myLink -->
+				<li class="actions-small-2">
+					<div class="list-item">
+						<div class="small-12 columns">
+							<a href="{MYLINK_URL}">{MYLINK_DESCRIPTION}</a>
+						</div>
+					</div>
+					<nav>
+						<a href="#" class="icon-modify" data-interaction="open-form" title="Modify this link"></a>
+						<a href="#" class="icon-close" data-interaction="delete" title="Delete this link"></a>
+					</nav>
+				</li>
+				<!--
+				<li>
+					<div class="list-item">
+						<form method="post" action="/cms/myLinksForm.php">
+							<input type="hidden" readonly="readonly" name="linkID" value="{MYLINK_ID}" />
+							<div class="small-12 medium-6 columns">
+								<label for="url-{MYLINK_ID}">Link</label>
+								<input id="url-{MYLINK_ID}" name="url" type="text" required placeholder="Hyperlink (http://schoolbox.com/)" value="{MYLINK_URL}" />
+							</div>
+							<div class="small-12 medium-6 columns">
+								<label for="description-{MYLINK_ID}">Title</label>
+								<input id="description-{MYLINK_ID}" name="description" type="text" required placeholder="Name (Schoolbox LMS)" value="{MYLINK_DESCRIPTION}" />
+							</div>
+							<div class="small-12 columns">
+								<input name="submit" type="submit" value="Update" />
+							</div>
+						</form>
+					</div>
+				</li>
+				-->
+				<!-- END myLink -->
+			</ul>
+
+			<div class="content">
+				<a href="/task/createInstance/{UNIT_ID}" class="button" data-add-button data-form_class="for-task">Add Link</a>
 			</div>
 		</section>
 	</div>
