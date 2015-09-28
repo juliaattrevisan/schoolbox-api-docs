@@ -503,7 +503,7 @@ class User extends DeprecatedModel
         $user_list    = $this->getAllByField('alt_email', $email);
         if (!empty($user_list)) {
             foreach ($user_list as $user) {
-                if ($groupHandler->isParent($user['id'])) {
+                if ($user['enabled'] && $groupHandler->isParent($user['id'])) {
                     $mailHandler = new Mailer(
                         'new-password.html',
                         Cfg::get('title') . ' Password Reminder',
