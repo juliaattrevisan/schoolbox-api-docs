@@ -207,7 +207,8 @@ abstract class AbstractController extends BaseController
         $data = [
             'file'   => $file,
             'host'   => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_HOST')),
-            'access' => $this->getAccess([ $file->getFolder()->getId() ])
+            'access' => $this->getAccess([ $file->getFolder()->getId() ]),
+            'namespace' => $this->namespace
         ];
 
         $this->getResponse()->content->set([
