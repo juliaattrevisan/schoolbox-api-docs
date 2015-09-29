@@ -73,10 +73,11 @@ if (strpos($remoteUrl, '?') === false) {
 }
 
 $remoteUrl = $remoteUrl . $glue . http_build_query([
-    'p1'   => $externalUserId,
-    'p2'   => $time,
-    'p3'   => $key,
-    'type' => $type
+    'school' => $schoolId,
+    'p1'     => $externalUserId,
+    'p2'     => $time,
+    'p3'     => $key,
+    'type'   => $type,
 ]);
 
 $this->setVar([
