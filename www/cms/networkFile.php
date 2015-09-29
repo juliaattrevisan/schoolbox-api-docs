@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Breadcrumbs;
+
 if (!Cfg::get('webdav_enable')) {
     error(2);
 }
@@ -7,6 +9,13 @@ if (!Cfg::get('webdav_enable')) {
 $fileHandler = PortfolioWebDAV::factory();
 $folderHandler = $fileHandler;
 
+//$zone = new GenericZone('cms', MyFileMapper::getInstance());
+//$zone->setAttachmentsLabel('')
+//    ->setAttachPrompt('Post file')
+//    ->setMimeFilter('*/*')
+//    ->setMulti(false)
+//    ->setThumbnailSize(64)
+//    ->setModalTitle('Select file');
 
 if (is_numeric($this->arg[0])) {
 
@@ -38,6 +47,19 @@ if (is_numeric($this->arg[0])) {
     $this->setBlock(TEMPLATE_content, 'location', 'location_block');
     $this->setVar('location_block', '');
 
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text'  => "Drives",
+            'href'  => "/cms/network/".$file['parent'],
+            'class' => '',
+        ],
+        [
+            'text' => 'Modify File',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }
 elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
@@ -54,7 +76,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     $this->setTab('mynetwork');
 
     $output = array(
-        'ACTION' => 'Add',
+        'ACTION' => 'Post',
         'FILE_ID' => '',
         'DESCRIPTION' => '',
         'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
@@ -67,6 +89,20 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     $this->setBlock(TEMPLATE_content, 'location', 'location_block');
     $this->setVar('desc_block', '');
     $this->setVar('location_block', '');
+
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text'  => "Drives",
+            'href'  => "/cms/network/".$parent['id'],
+            'class' => '',
+        ],
+        [
+            'text' => 'Post File',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }
 else {
     error(2);
