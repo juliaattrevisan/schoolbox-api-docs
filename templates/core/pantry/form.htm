@@ -178,10 +178,36 @@
 
                 </fieldset>
                 <fieldset class="content">
-                    <legend>File-Related Things</legend>
+                    <legend>
+                        Attachzone
+                        <span data-tooltip class="hint has-tip tip-top" title="{% include sub/attachzone.twig %}">?</span>
+                    </legend>
                     <div class="column small-12">
                         {AFFIX_TWIG_LABEL_HERE}
                     </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>
+                        You can drop things onto this list
+                        <span data-tooltip class="hint has-tip tip-top" title="$.fn.fileDrop();">?</span>
+                    </legend>
+                    <div class="column small-12">
+                        <ul class="action-list">
+                            <li class="small avatar card small-12">
+                                <img class="mime" src="/images/mime/128x128/pdf.png" />
+                                <p>It's a PDF!</p>
+                            </li>
+                            <li class="small avatar card small-12">
+                                <img class="mime" src="/images/mime/128x128/msexcel_xls.png" />
+                                <p>It's a spreadsheet!</p>
+                            </li>
+                            <li class="small avatar card small-12">
+                                <img class="mime" src="/images/mime/128x128/sound_mp3.png" />
+                                <p>It's an mp3!</p>
+                            </li>
+                        </ul>
+                    </div>
+
                 </fieldset>
                 <fieldset class="content">
                     <legend>Dates and Times</legend>
