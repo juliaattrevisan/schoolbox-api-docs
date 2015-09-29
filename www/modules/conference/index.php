@@ -14,8 +14,15 @@ if ($this->arg[0] == 'window') {
     $this->setFile(TEMPLATE_content, 'modules/remote/frame.html');
 }
 $remoteUrl = 'https://bookings.parentteacheronline.com.au';
+
 // Map file will depend on whether current user is a parent or a teacher.
-$mapFile = '/home/cispl/parent_map.csv';
+if ($_SESSION['user']->getRole()->isTeacher()) {
+    $mapFile = '/home/cispl/parent_map.csv';
+} elseif ($_SESSION['user']->getRole()->isStaff()) {
+    $mapFile = '/home/cispl/staff_map.csv';
+} else {
+    $this->error(2);
+}
 
 if(!file_exists($mapFile) || !is_readable($mapFile)) {
     $this->error(2);
