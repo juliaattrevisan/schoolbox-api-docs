@@ -16,9 +16,11 @@ if ($this->arg[0] == 'window') {
 $remoteUrl = 'https://bookings.parentteacheronline.com.au';
 
 // Map file will depend on whether current user is a parent or a teacher.
-if ($_SESSION['user']->getRole()->isTeacher()) {
+/** @var Schoolbox\User $user */
+$user = $_SESSION['user'];
+if ($user->getRole()->isParent()) {
     $mapFile = '/home/cispl/parent_map.csv';
-} elseif ($_SESSION['user']->getRole()->isStaff()) {
+} elseif ($user->getRole()->isStaff()) {
     $mapFile = '/home/cispl/staff_map.csv';
 } else {
     $this->error(2);
@@ -45,8 +47,8 @@ if(strpos($remoteUrl, 'zx_h=')) {
     }
 }
 
-// TODO implement for teachers as well
-$isamsID        = str_replace('P-','',$_SESSION['user']->getExternalId());
+// The teacher CSV doesn't have the T- prefix removed
+$isamsID        = str_replace('P-', '', $user->getExternalId());
 $externalUserId = $map[$isamsID];
 $schoolId       = Config::get('external_pto_conference_school_id');
 $secret         = Config::get('external_pto_conference_school_remote_secret');
