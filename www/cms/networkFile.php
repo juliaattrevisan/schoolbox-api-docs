@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Resource\Attachment\GenericZone;
 
 if (!Cfg::get('webdav_enable')) {
     error(2);
@@ -9,13 +10,15 @@ if (!Cfg::get('webdav_enable')) {
 $fileHandler = PortfolioWebDAV::factory();
 $folderHandler = $fileHandler;
 
-//$zone = new GenericZone('cms', MyFileMapper::getInstance());
-//$zone->setAttachmentsLabel('')
-//    ->setAttachPrompt('Post file')
-//    ->setMimeFilter('*/*')
-//    ->setMulti(false)
-//    ->setThumbnailSize(64)
-//    ->setModalTitle('Select file');
+// This goes into storage on its way into webdav.
+// Is that okay?
+$zone = new GenericZone('cms', Schoolbox\Resource\Storage\Mapper::getInstance());
+$zone->setAttachmentsLabel('')
+    ->setAttachPrompt('Post file')
+    ->setMimeFilter('*/*')
+    ->setMulti(false)
+    ->setThumbnailSize(64)
+    ->setModalTitle('Select file');
 
 if (is_numeric($this->arg[0])) {
 
@@ -43,6 +46,7 @@ if (is_numeric($this->arg[0])) {
         'PARENT_ID' => $file['parent'],
     );
     $this->setVar($output);
+    $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
     $this->setBlock(TEMPLATE_content, 'location', 'location_block');
     $this->setVar('location_block', '');
@@ -84,6 +88,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     );
 
     $this->setVar($output);
+    $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
     $this->setBlock(TEMPLATE_content, 'desc', 'desc_block');
     $this->setBlock(TEMPLATE_content, 'location', 'location_block');
