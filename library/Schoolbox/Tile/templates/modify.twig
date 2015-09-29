@@ -221,26 +221,23 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <dl>
-                            <dt>
-                                URL
-                                <span class='hint has-tip tip-top' data-tooltip title="Add an optional link to this tile, linking it to either an external page or existing resource.">?</span>
-                            </dt>
-                            <dd>
-                                <input name="link"
-                                       value="{{ item.link|e('html_attr') }}"
-                                       class="fullwidth"
-                                       placeholder="http://" />
-                                <a href="#" data-function="browse" class="btn folder float-left"><span></span>Browse Resources</a>
-                            </dd>
-                            <dt>Opens in</dt>
-                            <dd>
-                                <select name="link_target">
-                                    <option value="_self" {% if item.getLinkTarget() == '_self' %}selected{% endif %}>Same tab/window</option>
-                                    <option value="_blank" {% if item.getLinkTarget() == '_blank' %}selected{% endif %}>New tab/window</option>
-                                </select>
-                            </dd>
-                        </dl>
+                        <label>
+                            URL
+                            <span class='hint has-tip tip-top' data-tooltip title="Add an optional link to this tile, linking it to either an external page or existing resource.">?</span>
+                        </label>
+                        <input name="link"
+                               value="{{ item.link|e('html_attr') }}"
+                               class="fullwidth"
+                               placeholder="http://" />
+                        <a href="#" class="button icon-folder" data-function="browse">Browse Resources</a>
+
+                        <label>
+                            Opens In
+                            <select name="link_target">
+                                <option value="_self" {% if item.getLinkTarget() == '_self' %}selected{% endif %}>Same tab/window</option>
+                                <option value="_blank" {% if item.getLinkTarget() == '_blank' %}selected{% endif %}>New tab/window</option>
+                            </select>
+                        </label>
                     </div>
                 </fieldset>
             </section>
