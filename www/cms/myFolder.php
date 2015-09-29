@@ -42,7 +42,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
 
     } else {
 
-        $parentTree = $folderHandler->getFolderTree(0, 0, $folder['id']);
+        $parentTree = $folderHandler->getFolderTree(0, 0, $folder->getId());
         $parentTree = is_array($parentTree) ? $parentTree : array();
         array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
         foreach ($parentTree as $parent) {
@@ -50,7 +50,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
                 'PARENT_ID' => $parent['id'],
                 'PARENT_NAME' => $parent['name'],
                 'PARENT_INDENT' => str_repeat('&nbsp;', ($parent['depth'] + 1) * 4),
-                'PARENT_SELECTED' => $parent['id'] == $folder['parent'] ? 'selected="selected"' : '',
+                'PARENT_SELECTED' => $parent['id'] == $folder->getParent() ? 'selected="selected"' : '',
             );
             $this->setVar($output);
             $this->parse('parent_list_block', 'parent_list', true);
