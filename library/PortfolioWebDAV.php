@@ -79,6 +79,43 @@ class Sabre_DAV_Client_Extended extends Sabre\DAV\Client
     }
 
     /**
+     * Uploads a file resource via a PUT request
+     *
+     * @param string   $path     Destination path on the server
+     * @param resource $resource A resource that points to a stream
+     *
+     * @return array
+     */
+    public function putResource($path, $resource)
+    {
+        rewind($resource);
+        $metadata = stream_get_meta_data($resource);
+        $size     = $metadata['unread_bytes'];
+        $curl     = curl_init($this->getAbsoluteUrl($path));
+
+        $settings = array(
+            CURLOPT_HTTPAUTH   => Cfg::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC,
+            CURLOPT_USERPWD    => $this->userName . ':' . $this->password,
+            CURLOPT_COOKIEFILE => '',
+            CURLOPT_PUT        => true,
+            CURLOPT_INFILE     => $resource,
+            CURLOPT_INFILESIZE => $size,
+        );
+        if (Cfg::get('webdav_allow_insecure')) {
+            $settings[CURLOPT_SSL_VERIFYHOST] = false;
+            $settings[CURLOPT_SSL_VERIFYPEER] = false;
+        }
+        curl_setopt_array($curl, $settings);
+
+        return array(
+            curl_exec($curl),
+            curl_getinfo($curl),
+            curl_errno($curl),
+            curl_error($curl)
+        );
+    }
+
+    /**
      * Moves/renames a file or directory
      *
      * @param string $path Source path
