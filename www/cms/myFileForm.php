@@ -89,7 +89,16 @@ if (isset($_POST['description'])) {
     $file->setFolder(\Schoolbox\Resource\My\Folder\Mapper::getInstance()->createModel()->setId($_POST['parent']));
 
     try {
-        $affectedIds = MyFileMapper::getInstance()->create($file);
+
+        /* Spawn a new file if creating; reuse the existing one if modifying
+         */
+        if (!is_numeric($file->getId())) {
+            $affectedIds = MyFileMapper::getInstance()->create($file);
+        }
+        else {
+            $affectedIds = array($file->getId());
+            MyFileMapper::getInstance()->save($file);
+        }
 
         /* If any checkboxes were selected, publish to eportfolio My Files components on various pages
          */
