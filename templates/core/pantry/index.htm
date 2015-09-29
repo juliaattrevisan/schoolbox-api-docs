@@ -1647,19 +1647,31 @@ $(function () {
         <h2 class="subheader">fileDrop</h2>
         <section>
             <div class="dropzone-wrap">
-                <form class="dropzone overlay top"></form>
-                <ul data-dz-container class="information-list">
-                    <li class="row">
-                        <div class="info card"><h3>You can drop&hellip;</h3><p class="meta">(you really can)</p></div>
+                <form id="drop-here" class="dropzone overlay" action="#"></form>
+                <ul data-dz-container class="action-list">
+                    <li class="small avatar card small-12">
+                        <img class="mime" src="/images/mime/128x128/pdf.png" />
+                        <p>It's a PDF!</p>
                     </li>
-                    <li class="row">
-                        <div class="info card"><h3>&hellip;files&hellip;</h3><p class="meta">(they're the awesome)</p></div>
+                    <li class="small avatar card small-12">
+                        <img class="mime" src="/images/mime/128x128/msexcel_xls.png" />
+                        <p>It's a spreadsheet!</p>
                     </li>
-                    <li class="row">
-                        <div class="info card"><h3>&hellip;anywhere here.</h3><p class="meta">(like&mdash;for real)</p></div>
+                    <li class="small avatar card small-12">
+                        <img class="mime" src="/images/mime/128x128/sound_mp3.png" />
+                        <p>It's an mp3!</p>
                     </li>
                 </ul>
             </div>
+            <script type="text/javascript">
+                $(function () {
+                    $('#drop-here').fileDrop({
+                        wrapClass: 'dragging',
+                        previewsContainer: '#drop-here [data-dz-container]',
+                        tplWrap: '<li class="dz-preview" />'
+                    });
+                });
+            </script>
         </section>
     </div>
 </div>
