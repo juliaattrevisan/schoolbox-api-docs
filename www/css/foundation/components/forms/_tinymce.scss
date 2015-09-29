@@ -15,6 +15,18 @@
     }
 }
 
+body#tinymce {
+    padding: 1rem !important;
+}
+
+body#tinymce span.selected-word{
+    background: #CAE9B9;
+}
+
+.mceIframeContainer{
+    padding: 1rem;
+}
+
 .mceEditor {
     table tr {
         background: transparent;

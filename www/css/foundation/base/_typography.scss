@@ -8,7 +8,7 @@
 // $header-font-family: $body-font-family;
 $header-font-weight: $font-weight-normal;
 // $header-font-style: normal;
-// $header-font-color: $jet;
+$header-font-color: $jet;
 // $header-line-height: 1.4;
 // $header-top-margin: .2rem;
 // $header-bottom-margin: .5rem;
@@ -89,12 +89,12 @@ $paragraph-aside-font-size: rem-calc(($base-font-size - 4));
 // $definition-list-margin-bottom: rem-calc(12);
 
 // We use these to style blockquotes
-// $blockquote-font-color: scale-color($header-font-color, $lightness: 35%);
-// $blockquote-padding: rem-calc(9 20 0 19);
-// $blockquote-border: 1px solid $gainsboro;
-// $blockquote-cite-font-size: rem-calc(13);
-// $blockquote-cite-font-color: scale-color($header-font-color, $lightness: 23%);
-// $blockquote-cite-link-color: $blockquote-cite-font-color;
+$blockquote-font-color: scale-color($header-font-color, $lightness: 35%);
+$blockquote-padding: rem-calc(9 20 0 19);
+$blockquote-border: 10px solid $iron;
+$blockquote-cite-font-size: rem-calc(13);
+$blockquote-cite-font-color: scale-color($header-font-color, $lightness: 23%);
+$blockquote-cite-link-color: $blockquote-cite-font-color;
 
 // Acronym styles
 // $acronym-underline: 1px dotted $gainsboro;
@@ -212,6 +212,25 @@ a{
 	    color: $black !important;
 	    font-style: normal;
 	    font-weight: bold;
+	}
+}
+
+blockquote{
+	background-color: $silver;
+	font-size: 14px;
+	quotes: "\201C""\201D""\2018""\2019";
+
+	&:before {
+	    color: $blockquote-font-color;
+	    content: open-quote;
+	    font-size: 4rem;
+	    line-height: 0.1rem;
+	    margin-right: 0.15rem;
+	    vertical-align: -1.8rem;
+	}
+
+	cite:before {
+    	content: "\2014 \2009";
 	}
 }
 
