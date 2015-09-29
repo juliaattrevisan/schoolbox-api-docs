@@ -34,6 +34,7 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
         width: 100%;
         height: 100%;
         margin: 0;
+        padding: 0;
         opacity: 0;
         display: block;
         z-index: -1;
@@ -462,15 +463,13 @@ ul.az-error-list {
     }
 
     .dz-default.dz-message {
-        background-image: url('/images/foundation/dropzone.png');
-        background-repeat: no-repeat;
-        background-position: 0 0;
         @include easy-transition(opacity 0.3s $attachzone-overlay-timing);
         opacity: 1;
         -ms-filter: none;
         filter: none;
-        height: 48px;
         position: absolute;
+        height: 100%;
+        width: 100%;
     }
 
     .dz-preview,
@@ -638,11 +637,14 @@ ul.az-error-list {
 }
 
 .dz-default.dz-message span {
-    color: $success-color;
-    font-weight: 700;
-    margin-left: 170px;
+    color: $attachzone-resting-color;
+    display: block;
+    text-align: center;
+    font-weight: $body-font-weight;
+    width: 100%;
     position: relative;
     top: 35%;
+    @extend %p;
 }
 .dropzone.dz-square .dz-default.dz-message {
     background-position: 0 -123px;
