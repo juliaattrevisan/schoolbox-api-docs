@@ -39,7 +39,6 @@ if ($group->getPermission($categoryId) < WRITE_ACCESS) {
 
 // Shitty block parsing
 $this->setFile(TEMPLATE_content,  "task/export.html");
-$this->setBlock(TEMPLATE_content, 'unit_breadcrumb',  'unit_breadcrumb_block');
 $this->setBlock(TEMPLATE_content, 'exportable',       'exportable_block');
 $this->setBlock(TEMPLATE_content, 'unexportable',     'unexportable_block');
 $this->setBlock('exportable',     'class',            'class_block');
@@ -50,7 +49,6 @@ $this->setBlock('class',          'class_import_checkbox', 'class_import_checkbo
 $this->setBlock(TEMPLATE_content, 'submit',           'submit_block');
 $this->setVar(
     array(
-        'unit_breadcrumb_block' => '',
         'exportable_block'      => '',
         'submit_block'          => '',
         'unexportable_block'    => '',
@@ -66,18 +64,6 @@ $this->setVar(
         'CATEGORY_ID'     => Scrub::html($categoryId),
     )
 );
-
-// Fill in unit breadcrumb
-// TODO do this in a Twig template
-foreach (CategoryMapper::getInstance()->findParents($category) as $parent) {
-    /** @var Category $parent */
-    $this->setVar('UNIT_CATEGORY_ID',   $parent->getId());
-    $this->setVar('UNIT_CATEGORY_NAME', $parent->getName());
-    $this->parse('unit_breadcrumb_block', 'unit_breadcrumb', true);
-}
-$this->setVar('UNIT_CATEGORY_ID',   $category->getId());
-$this->setVar('UNIT_CATEGORY_NAME', $category->getName());
-$this->parse('unit_breadcrumb_block', 'unit_breadcrumb', true);
 
 // Get each class which uses the unit already.
 /** @var UnitInstance[]|Collection $unitList */
@@ -155,3 +141,17 @@ if (count($unitList) > 0) {
 else {
     $this->parse('unexportable_block', 'unexportable');
 }
+
+$trail = new Schoolbox\Breadcrumbs();
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => $category->getName(),
+        'href' => "/homepage/{$category->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => 'Export Task',
+        'href' => '',
+        'class' => 'active',
+    ]
+]);

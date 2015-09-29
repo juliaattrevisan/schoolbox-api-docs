@@ -1,119 +1,94 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript">
-    $(function() {
-        // Greenerized checkbox
-        $('input[data-interaction="checkAll"]').on('change', function() {
-            var element         = $(this);
-            var otherCheckboxes = $('input[type="checkbox"]')
-                .not(element)
-                .filter(function() {
-                    return $(this).data('group') === element.data('group');
-                })
-            otherCheckboxes.prop('checked', element.prop('checked'));
-        });
-    });
-</script>
+<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 <!-- END custom_head -->
-<h1>Export a task</h1>
 
-<form method="post" action="/task/exportForm.php" id="importForm">
+{BREADCRUMB}
 
-    <input type="hidden" name="task" value="{TASK_ID}" />
+<div class="row">
+    <div class="small-12 island">
+        <h1>Export {TASK_TYPE_LABEL}: {TASK_TITLE}</h1>
+    </div>
+</div>
 
-    <table class="standardForm table">
+<div class="row">
+    <div class="small-12 island">
+        <form method="post" action="/task/exportForm.php" id="importForm">
+            <input type="hidden" name="task" value="{TASK_ID}" />
+            <section>
+                <fieldset class="content">
+                    <legend>
+                        Classes
+                        <span data-tooltip class="hint has-tip tip-top" title="Only classes that have not closed yet are displayed.">?</span>
+                    </legend>
 
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Task</h4>
-                <em>The task that is being exported.</em>
-            </td>
-            <td>
-                {TASK_TYPE_LABEL}: {TASK_TITLE}
-            </td>
-        </tr>
+                    <div class="small-12 columns">
+                        <!-- BEGIN exportable -->
+                        <ul class="information-list">
+                            <li class="actions-small-1">
+                                <nav>
+                                    <input id="checkAll"
+                                           type="checkbox"
+                                           data-select-all
+                                           data-select-all-for-group="unit-instance" />
+                                    <label for="checkAll" class="checkbox-label"></label>
+                                </nav>
+                            </li>
 
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Unit</h4>
-                <em>The unit that this task belongs to.</em>
-            </td>
-            <td>
-                <ul class="breadcrumb">
-                    <!-- BEGIN unit_breadcrumb -->
-                    <li><a href="/homepage/{UNIT_CATEGORY_ID}">{UNIT_CATEGORY_NAME}</a></li>
-                    <!-- END unit_breadcrumb -->
-                </ul>
-            </td>
-        </tr>
+                            <!-- BEGIN class -->
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="avatar card small-12">
+                                        <a href="/homepage/{UNIT_CATEGORY_ID}">
+                                            <span class="icon-32 icon-home"></span>
+                                            <h3>{UNIT_CATEGORY_NAME}</h3>
+                                        </a>
+                                        <p class="meta">
+                                            <time title="{CLASS_OPEN_TITLE}" datetime="{CLASS_OPEN_DATETIME}">{CLASS_OPEN_DATE}</time>
+                                            -
+                                            <time title="{CLASS_DUE_TITLE}" datetime="{CLASS_DUE_DATETIME}">{CLASS_DUE_DATE}</time>
+                                        </p>
+                                        <p class="meta">
+                                            <!-- BEGIN class_import_allowed -->
+                                            This task does not exist in this class.
+                                            <!-- END class_import_allowed -->
 
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Classes</h4>
-                <em>Only classes that have not closed yet are displayed.</em>
-            </td>
-            <td>
-                <!-- BEGIN unexportable -->
-                <em>
-                    There are no open classes that currently use this unit.
-                </em>
-                <em><a href="/homepage/{CATEGORY_ID}">Return to the unit page</a></em>
-                <!-- END unexportable -->
-                <!-- BEGIN exportable -->
-                <table class="table">
-                    <tr>
-                        <td>Class</td>
-                        <td>Open Date</td>
-                        <td>Due Date</td>
-                        <td>Status</td>
-                        <td>
-                            <!-- check all button -->
-                            <input type="checkbox" data-interaction="checkAll" data-group="unit_instance" />
-                        </td>
-                    </tr>
-                    <!--
-                        The same class can actually be imported onto the same
-                        page more than once.
-                        Don't know why anyone would do this though!
-                    -->
-                    <!-- BEGIN class -->
-                    <tr>
-                        <td><a href="/homepage/{UNIT_CATEGORY_ID}">{UNIT_CATEGORY_NAME}</a></td>
-                        <td><time title="{CLASS_OPEN_TITLE}" datetime="{CLASS_OPEN_DATETIME}">{CLASS_OPEN_DATE}</time></td>
-                        <td><time title="{CLASS_DUE_TITLE}" datetime="{CLASS_DUE_DATETIME}">{CLASS_DUE_DATE}</time></td>
-                        <td>
-                            <!-- BEGIN class_import_allowed -->
-                            This task does not exist in this class.
-                            <!-- END class_import_allowed -->
+                                            <!-- BEGIN class_import_forbidden -->
+                                            You don't have write permission for this class.
+                                            <!-- END class_import_forbidden -->
 
-                            <!-- BEGIN class_import_forbidden -->
-                            You don't have write permission for this class.
-                            <!-- END class_import_forbidden -->
+                                            <!-- BEGIN class_import_exists -->
+                                            This task already exists in this class.
+                                            <!-- END class_import_exists -->
+                                        </p>
+                                    </div>
+                                </div>
+                                <nav>
+                                    <!-- BEGIN class_import_checkbox -->
+                                    <input name="unit_instance[{UNIT_INSTANCE_ID}]" type="hidden" value="0" />
+                                    <input type="checkbox"
+                                           id="import-{UNIT_INSTANCE_ID}"
+                                           name="unit_instance[{UNIT_INSTANCE_ID}]"
+                                           value="1"
+                                           data-select-all-group="unit-instance" />
+                                    <label for="import-{UNIT_INSTANCE_ID}" class="checkbox-label"></label>
+                                    <!-- END class_import_checkbox -->
+                                </nav>
+                            </li>
+                            <!-- END class -->
+                        </ul>
+                        <!-- END exportable -->
 
-                            <!-- BEGIN class_import_exists -->
-                            This task already exists in this class.
-                            <!-- END class_import_exists -->
-                        </td>
-                        <td>
-                            <!-- BEGIN class_import_checkbox -->
-                            <input name="unit_instance[{UNIT_INSTANCE_ID}]" type="hidden" value="0" />
-                            <input type="checkbox"
-                                   id="import-{UNIT_INSTANCE_ID}"
-                                   name="unit_instance[{UNIT_INSTANCE_ID}]"
-                                   value="1"
-                                   data-group="unit_instance"
-                            />
-                            <!-- END class_import_checkbox -->
-                        </td>
-                    </tr>
-                    <!-- END class -->
-                </table>
-                <!-- END exportable -->
-            </td>
-        </tr>
-    </table>
-
-    <!-- BEGIN submit -->
-    <input type="submit" value="Export to selected classes" class="submit-btn-plain" />
-    <!-- END submit -->
-    <a href="/homepage/{CATEGORY_ID}" class="submit-btn-plain">Back to unit homepage</a>
-</form>
+                        <!-- BEGIN unexportable -->
+                        <div class="alert-box">
+                            There are no open classes that currently use this unit.
+                        </div>
+                        <!-- END unexportable -->
+                    </div>
+                </fieldset>
+            </section>
+            <!-- BEGIN submit -->
+            <input type="submit" value="Export to selected classes" class="submit-btn-plain" />
+            <!-- END submit -->
+        </form>
+    </div>
+</div>
