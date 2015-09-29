@@ -21,30 +21,43 @@
                         <span data-tooltip class="hint has-tip tip-top" title="Only classes that have not closed yet are displayed.">?</span>
                     </legend>
 
-                    <div class="small-12 columns">
+                    <div class="small-12 columns no-pad">
                         <!-- BEGIN exportable -->
                         <ul class="information-list">
-                            <li class="actions-small-1">
-                                <nav>
-                                    <input id="checkAll"
-                                           type="checkbox"
-                                           data-select-all
-                                           data-select-all-for-group="unit-instance" />
-                                    <label for="checkAll" class="checkbox-label"></label>
-                                </nav>
+                            <li>
+                                <div class="list-item">
+                                    <div class="small-1 columns">
+                                        <input id="checkAll"
+                                               type="checkbox"
+                                               data-select-all
+                                               data-select-all-for-group="unit-instance" />
+                                        <label for="checkAll" class="checkbox-label"></label>
+                                    </div>
+                                </div>
                             </li>
 
                             <!-- BEGIN class -->
-                            <li class="actions-small-1">
+                            <li>
                                 <div class="list-item">
-                                    <div class="avatar card small-12">
+                                    <div class="small-1 columns">
+                                        <!-- BEGIN class_import_checkbox -->
+                                        <input name="unit_instance[{UNIT_INSTANCE_ID}]" type="hidden" value="0" />
+                                        <input type="checkbox"
+                                               id="import-{UNIT_INSTANCE_ID}"
+                                               name="unit_instance[{UNIT_INSTANCE_ID}]"
+                                               value="1"
+                                               data-select-all-group="unit-instance" />
+                                        <label for="import-{UNIT_INSTANCE_ID}" class="checkbox-label"></label>
+                                        <!-- END class_import_checkbox -->
+                                    </div>
+                                    <div class="avatar card small-11">
                                         <a href="/homepage/{UNIT_CATEGORY_ID}">
                                             <span class="icon-32 icon-home"></span>
                                             <h3>{UNIT_CATEGORY_NAME}</h3>
                                         </a>
                                         <p class="meta">
                                             <time title="{CLASS_OPEN_TITLE}" datetime="{CLASS_OPEN_DATETIME}">{CLASS_OPEN_DATE}</time>
-                                            -
+                                            &ndash;
                                             <time title="{CLASS_DUE_TITLE}" datetime="{CLASS_DUE_DATETIME}">{CLASS_DUE_DATE}</time>
                                         </p>
                                         <p class="meta">
@@ -62,17 +75,6 @@
                                         </p>
                                     </div>
                                 </div>
-                                <nav>
-                                    <!-- BEGIN class_import_checkbox -->
-                                    <input name="unit_instance[{UNIT_INSTANCE_ID}]" type="hidden" value="0" />
-                                    <input type="checkbox"
-                                           id="import-{UNIT_INSTANCE_ID}"
-                                           name="unit_instance[{UNIT_INSTANCE_ID}]"
-                                           value="1"
-                                           data-select-all-group="unit-instance" />
-                                    <label for="import-{UNIT_INSTANCE_ID}" class="checkbox-label"></label>
-                                    <!-- END class_import_checkbox -->
-                                </nav>
                             </li>
                             <!-- END class -->
                         </ul>
@@ -87,7 +89,7 @@
                 </fieldset>
             </section>
             <!-- BEGIN submit -->
-            <input type="submit" value="Export to selected classes" class="submit-btn-plain" />
+            <input type="submit" value="Export to selected classes" />
             <!-- END submit -->
         </form>
     </div>
