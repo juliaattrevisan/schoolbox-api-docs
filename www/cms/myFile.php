@@ -1,6 +1,7 @@
 <?php
 
 use Eportfolio\PageMapper;
+use Schoolbox\Breadcrumbs;
 use Schoolbox\MyFileMapper;
 use Schoolbox\Resource\Attachment\GenericZone;
 
@@ -25,6 +26,9 @@ $zone->setAttachmentsLabel('')
 
 // userId is always arg[1]
 $userId = $this->arg[1] ?: $_SESSION['id'];
+
+$userMapper = new \Schoolbox\UserMapper();
+$user       = $userMapper->findById($userId);
 
 // PERMISSION: must be either session user, or staff
 $groupHandler = new Group();
@@ -68,8 +72,24 @@ if ($this->arg[0] == 'new') {
     $folderTree = $folderHandler->getFolderTree();
     renderTreeSelect($this, $folderTree, $parent['id']);
     renderPublishingOptions($this, $userId, true, $publishComponent);
-} // modify an existing file
-elseif (is_numeric($this->arg[0])) {
+
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $user->formatName()."'s Files",
+            'href' => "/cms/myFile/{$user->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Post File',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
+} elseif (is_numeric($this->arg[0])) {
+    // modify an existing file
     $myFileId = $this->arg[0];
 
     $file = $fileHandler->getByID($myFileId);
@@ -99,8 +119,24 @@ elseif (is_numeric($this->arg[0])) {
     renderTreeSelect($this, $folderTree, $file['parent']);
     renderPublishingOptions($this, $userId, true);
 
-} // unknown case
-else {
+    /* Render out breadcrumbs
+     */
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $user->formatName()."'s Files",
+            'href' => "/cms/myFile/{$user->getId()}",
+            'class' => '',
+        ],
+        [
+            'text' => 'Modify File',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
+
+} else {
+    // unknown case
     error(2);
 }
 
