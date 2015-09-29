@@ -16,20 +16,11 @@ require_once __DIR__ . '/../../include/Bootstrap.php';
 // (Uploadify will die, but this is still needed for flash audio upload.)
 $session     = new Session();
 $sessionName = session_name();
-if (isset($_POST[$sessionName]) && $session->validateSessionId($_POST[$sessionName])) {
-    session_id($_POST[$sessionName]);
-    session_start();
+if (isset($_REQUEST[$sessionName]) && $session->validateSessionId($_REQUEST[$sessionName])) {
+    session_id($_REQUEST[$sessionName]);
 }
-if (isset($_GET[$sessionName]) && $session->validateSessionId($_GET[$sessionName])) {
-    session_id($_GET[$sessionName]);
-    session_start();
-}
-if (isset($_POST['fallback'])
-    && isset($_COOKIE[$sessionName])
-    && $session->validateSessionId($_COOKIE[$sessionName])
-) {
-    session_start();
-}
+
+session_start();
 
 $result = array(
     'success' => false,
