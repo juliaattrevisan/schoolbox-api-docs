@@ -1251,6 +1251,11 @@ $rotate-th-width: $square-grid-td-size;
 				padding: 0.25rem !important;
 			}
 
+			.progress {
+				width: calc(100% - 2.5rem);
+				left: 3.5rem;
+				height: 0.3125rem;
+			}
 		}
 
 	}

@@ -203,7 +203,7 @@ ul.az-error-list {
     }
 }
 
-.attachzone {
+.attachzone, .dropzone-wrap {
     min-width: 40px;
     &.dz-unsupported,
     &.dz-max-files-reached {
@@ -249,6 +249,8 @@ ul.az-error-list {
         }
     }
     .dz-error {
+        background-color: $attachzone-error-background;
+        color: $attachzone-error-color;
         img[data-dz-thumbnail] {
             opacity: 0;
         }
@@ -269,7 +271,7 @@ ul.az-error-list {
     }
     .dz-error, .dz-success {
         .progress {
-            height: 0;
+            height: 0 !important;
         }
     }
     .progress {
@@ -279,11 +281,9 @@ ul.az-error-list {
             position: relative;
             top: -0.3125rem;
         }
-    }
-    .dz-upload {
-        background-color: $vapor;
-        top: 0;
-        left: 0;
+        .meter {
+            padding: 0;
+        }
     }
     .filename {
         opacity: 0.4;
