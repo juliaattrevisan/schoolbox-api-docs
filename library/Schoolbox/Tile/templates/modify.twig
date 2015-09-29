@@ -41,7 +41,7 @@
         // Yes, this is a global variable, it's needed for the
         // social stream browser to work
         socialstreamSession = {categoryId: 0};
-        var socialstream_browser = form.find('.resource_browser');
+        var socialstream_browser = form.find('[data-resource-browser]');
         if (socialstream_browser.length && $.fn.socialstreamBrowser) {
             form.find('a[data-function="browse"]')
                 .click(
@@ -237,6 +237,9 @@
                                placeholder="http://" />
                         <a href="#" class="button icon-folder" data-function="browse">Browse Resources</a>
 
+                        {# Dialog for resource browser #}
+                        <div class="hide" data-resource-browser></div>
+
                         <label>
                             Opens In
                             <select name="link_target">
@@ -407,5 +410,3 @@
     </div>
 </div>
 
-{# Dialog for resource browser #}
-<div class="resource_browser hide"></div>
