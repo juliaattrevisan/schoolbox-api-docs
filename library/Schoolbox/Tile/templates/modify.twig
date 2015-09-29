@@ -68,10 +68,16 @@
 })(jQuery);
 </script>
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>{% if item.id %}Modify Tile{% else %}Add Tile{% endif %}</h1>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>{% if item.id %}Modify Tile{% else %}Add Tile{% endif %}</h1>
+        </div>
     </div>
+    <nav>
+        {# Link depends on identifier #}
+        <a href="{{ routeLookup('tile.layout', {componentId: component.id}) }}" class="icon-previous" title="Cancel"></a>
+    </nav>
 </div>
 
 <div class="row">
@@ -395,10 +401,6 @@
             <div class="row">
                 <div class="small-12 columns">
                     <input id="resource-save" type="submit" value="Save" />
-
-                    {# Link depends on identifier #}
-                    <a href="{{ routeLookup('tile.layout', {componentId: component.id}) }}" class="button">Cancel</a>
-
                 </div>
             </div>
         </form>
