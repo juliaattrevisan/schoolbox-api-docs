@@ -843,7 +843,11 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
         if ($file) {
             $path = $_SESSION['portfolioIdPathMap'][$data['parent']] . rawurlencode($file['name']);
-            $this->client->put($path, $file['tmp_name']);
+            if ($file['resource']) {
+                $this->client->putResource($path, $file['resource']);
+            } else {
+                $this->client->put($path, $file['tmp_name']);
+            }
         } else {
             $path = $_SESSION['portfolioIdPathMap'][$data['parent']] . rawurlencode($data['name']) . '/';
             $this->client->request('MKCOL', $path);

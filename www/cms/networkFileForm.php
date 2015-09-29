@@ -35,15 +35,12 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name']) || isset(
         if (isset($_POST['attachment'])) {
             $factory = new CollectorFactory();
             /** @var Model $result */
-            $result   = $factory->build($_POST['attachment'])->getFirst();
-            $filename = tempnam(Config::get('zip_dir'), '');
-            $fp       = fopen($filename, 'wb');
-            stream_copy_to_stream($result->readStream(), $fp);
+            $result = $factory->build($_POST['attachment'])->getFirst();
             $fileHandler->create(
                 $file,
                 [
                     'name'     => $result->getBasename(),
-                    'tmp_name' => $filename,
+                    'resource' => $result->readStream(),
                 ]
             );
         } elseif (isset($_FILES['file']['tmp_name'])) {
