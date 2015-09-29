@@ -4,7 +4,8 @@
 ;(function($, window, document, Dropzone, undefined) {
 
     var plugin = 'fileDrop',
-        drag = pending = 0,
+        drag = 0,
+        pending = 0,
         noop = function() {},
         defaults = {
             // filedrop detection options
