@@ -20,8 +20,10 @@ $remoteUrl = 'https://bookings.parentteacheronline.com.au';
 $user = $_SESSION['user'];
 if ($user->getRole()->isParent()) {
     $mapFile = '/home/cispl/parent_map.csv';
+    $type    = 'P';
 } elseif ($user->getRole()->isStaff()) {
     $mapFile = '/home/cispl/staff_map.csv';
+    $type    = 'T';
 } else {
     $this->error(2);
 }
@@ -71,9 +73,10 @@ if (strpos($remoteUrl, '?') === false) {
 }
 
 $remoteUrl = $remoteUrl . $glue . http_build_query([
-    'p1' => $externalUserId,
-    'p2' => $time,
-    'p3' => $key,
+    'p1'   => $externalUserId,
+    'p2'   => $time,
+    'p3'   => $key,
+    'type' => $type
 ]);
 
 $this->setVar([
