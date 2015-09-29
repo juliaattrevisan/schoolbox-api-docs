@@ -79,11 +79,12 @@
         <form id="tile-modify-form" name='form' action="{% if item.id %}{{ routeLookup('tile.update:post', {id: item.id}) }}{% else %}{{ routeLookup('tile.create', {componentId: component.id}) }}{% endif %}" method="post" enctype="multipart/form-data">
             <input type="hidden" name="id" value="{{ item.id|e('html_attr') }}"/>
 
+            <h2 class="subheader">Title</h2>
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label class="text">
-                            Title Text
+                            Text
                             <span class='hint has-tip tip-top' data-tooltip title="Add an optional title to appear above the tile background.">?</span>
                             <input type="text" name="title_text" value="{{ item.titleText|e('html_attr') }}" placeholder="enter text..." />
                         </label>
@@ -91,7 +92,7 @@
                 </fieldset>
                 <fieldset class="content">
                     <legend>
-                        Title Colour
+                        Colour
                     </legend>
                     <div class="small-6 columns">
                         <label for="title_color">
@@ -116,7 +117,7 @@
                 </fieldset>
                 <fieldset class="content">
                     <legend>
-                        Title Position
+                        Position
                     </legend>
                     <div class="small-12 columns">
                         <table>
@@ -214,14 +215,17 @@
                         </table>
                     </div>
                 </fieldset>
+            </section>
+
+            <h2 class="subheader">Link</h2>
+            <section>
                 <fieldset class="content">
-                    <legend>
-                        Link
-                        <span class='hint has-tip tip-top' data-tooltip title="Add an optional link to this tile, linking it to either an external page or existing resource.">?</span>
-                    </legend>
                     <div class="small-12 columns">
                         <dl>
-                            <dt>URL</dt>
+                            <dt>
+                                URL
+                                <span class='hint has-tip tip-top' data-tooltip title="Add an optional link to this tile, linking it to either an external page or existing resource.">?</span>
+                            </dt>
                             <dd>
                                 <input name="link"
                                        value="{{ item.link|e('html_attr') }}"
@@ -239,8 +243,12 @@
                         </dl>
                     </div>
                 </fieldset>
+            </section>
+
+            <h2 class="subheader">Background</h2>
+            <section>
                 <fieldset class="content">
-                    <legend>Background Colour</legend>
+                    <legend>Colour</legend>
                     <div class="small-6 columns">
                         <label for="background_color">
                             Background
@@ -264,7 +272,7 @@
                 </fieldset>
                 <fieldset class="content">
                     <legend>
-                        Background Image
+                        Image
                     </legend>
                     <div class="small-12 columns">
                         <label>
@@ -297,7 +305,7 @@
                 </fieldset>
                 <fieldset class="content {% if not item.backgroundImageContained %}hide{% endif %}" data-background-position>
                     <legend>
-                        Background Position
+                        Position
                     </legend>
                     <div class="small-12 columns {% if not item.backgroundImageContained %}hide{% endif %} background-position" data-background-position>
                         <table class="position-selector">
