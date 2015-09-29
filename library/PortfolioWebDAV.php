@@ -90,7 +90,7 @@ class Sabre_DAV_Client_Extended extends Sabre\DAV\Client
     {
         rewind($resource);
         $metadata = stream_get_meta_data($resource);
-        $size     = $metadata['unread_bytes'];
+        $size     = filesize($metadata['uri']);
         $curl     = curl_init($this->getAbsoluteUrl($path));
 
         $settings = array(
