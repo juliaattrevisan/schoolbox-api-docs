@@ -2,6 +2,7 @@
 
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 <script type="text/javascript">
     Dropzone.autoDiscover = false;
 </script>
@@ -1609,45 +1610,36 @@ $(function () {
     <div class="row">
         <div class="small-12 island">
             <h1 id="forms">Forms</h1>
-            <p><a href="form/pantry">See shelf</a></p>
+            <ul class="meta">
+                <li><a href="/pantry/form">See shelf</a></li>
+            </ul>
         </div>
     </div>
     <hr>
 <div class="row">
     <div class="small-12 island">
         <h1>Dropzones</h1>
+        <ul class="meta">
+            <li><a href="/pantry/form">See form shelf for attachzone implementation</a></li>
+        </ul>
     </div>
-    <div class="small-12 island">
-        <h2 class="subheader">Vanilla Dropzone</h2>
-        <section class="content">
-            <form class="dropzone" id="myAwesomeDropzone" action="/cms/myFileForm.php?ajax=1"></form>
-        </section>
-    </div>
-
-    <div class="small-12 island">
-        <h2 class="subheader">PHPlib Attachzone</h2>
-        <section class="content">
-            <form>
-                {AFFIX_LIB_LABEL_HERE}
-            </form>
-        </section>
-    </div>
-
-    <div class="small-12 island">
-        <h2 class="subheader">Twig Attachzone</h2>
-        <section>
-            <p class="meta content">(This should be identical to the one above)</p>
-            <form>
-                {AFFIX_TWIG_LABEL_HERE}
-            </form>
-        </section>
-    </div>
-
     <div class="small-12 island">
         <h2 class="subheader">fileDrop</h2>
+        <ul class="meta">
+            <li>You can drop things onto this list</li>
+        </ul>
         <section>
             <div class="dropzone-wrap">
-                <form id="drop-here" class="dropzone overlay" action="#"></form>
+                <form id="drop-here" class="dropzone overlay" action="/storage/asyncUpload.php"></form>
+                <ul data-dz-template class="hide">
+                    <li class="small avatar card small-12">
+                        <img data-dz-thumbnail class="mime" src="/images/resources/ajax.gif" />
+                        <p data-dz-name></p>
+                        <div class="progress dz-progress">
+                            <span class="meter dz-upload" style="width:0;"></span>
+                        </div>
+                    </li>
+                </ul>
                 <ul data-dz-container class="action-list">
                     <li class="small avatar card small-12">
                         <img class="mime" src="/images/mime/128x128/pdf.png" />
@@ -1666,9 +1658,13 @@ $(function () {
             <script type="text/javascript">
                 $(function () {
                     $('#drop-here').fileDrop({
-                        wrapClass: 'dragging',
-                        previewsContainer: '#drop-here [data-dz-container]',
-                        tplWrap: '<li class="dz-preview" />'
+                        previewsContainer: '#drop-here ~ [data-dz-container]',
+                        tplWrap: '<li class="dz-preview" />',
+                        previewTemplate: '#drop-here ~ [data-dz-template]',
+                        paramName: 'upload',
+                        complete: function (file) {
+                            $(file.previewElement).find('[data-dz-thumbnail]').attr('src', 'ajax/mime/' + file.type);
+                        }
                     });
                 });
             </script>
