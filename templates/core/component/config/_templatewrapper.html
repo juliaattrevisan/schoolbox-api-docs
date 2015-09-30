@@ -1,64 +1,66 @@
-<div class="row collapse">
-    <div class="small-12 columns">
-        <nav class="top-bar">
-            <ul class="title-area">
-                <!-- Title Area -->
-                <li class="name">
-                    <h2><a href="#">{component.definition.name}</a></h2>
-                </li>
-                <li class="toggle-topbar menu-icon"><a href="#"></a></li>
-            </ul>
-            <section class="top-bar-section">
-                <!-- Right Nav Section -->
-                <ul class="right">
-                    <!-- BEGIN settings_link -->
-                    <li><a data-target='settings' data-state='closed' href="#" class="component-control-button settings edit button icon-settings no-text" title="Settings"></a></li>
-                    <!-- END settings_link -->
-                    <!-- BEGIN settings_collapse -->
-                    <li><a data-collapser="true" href="#" class="component-control-button collapse button no-text {CONFIG_COLLAPSED_ICON}" title="Collapse Content"></a></li>
-                    <!-- END settings_collapse -->
-                    <!-- BEGIN settings_close -->
-                    <li><a data-target="delete" data-state='closed' href="#" class="button no-text icon-close" title="Close"></a></li>
-                    <!-- END settings_close -->
+<div data-component>
+    <div class="row collapse">
+        <div class="small-12 columns">
+            <nav class="top-bar">
+                <ul class="title-area">
+                    <!-- Title Area -->
+                    <li class="name">
+                        <h2><a href="#">{component.definition.name}</a></h2>
+                    </li>
+                    <li class="toggle-topbar menu-icon"><a href="#"></a></li>
                 </ul>
-            </section>
-        </nav>
+                <section class="top-bar-section">
+                    <!-- Right Nav Section -->
+                    <ul class="right">
+                        <!-- BEGIN settings_link -->
+                        <li><a data-target='settings' data-state='closed' href="#" class="component-control-button settings edit button icon-settings no-text" title="Settings"></a></li>
+                        <!-- END settings_link -->
+                        <!-- BEGIN settings_collapse -->
+                        <li><a data-collapser="true" href="#" class="component-control-button collapse button no-text {CONFIG_COLLAPSED_ICON}" title="Collapse Content"></a></li>
+                        <!-- END settings_collapse -->
+                        <!-- BEGIN settings_close -->
+                        <li><a data-target="delete" data-state='closed' href="#" class="button no-text icon-close" title="Close"></a></li>
+                        <!-- END settings_close -->
+                    </ul>
+                </section>
+            </nav>
 
-        <!-- BEGIN settings_panel -->
-        <div data-component-panel="settings" class="editPanel small-12 ">
-            <section>
-                <div>
-                    <form action="/homepage/configForm.php" method="GET">
-                        <input type="hidden" name="cid" value="{ID}" />
-                        <input type="hidden" name="type" value="config" />
-                        <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}" />
-                        <!-- BEGIN config_element -->
-                        <div class="{CONFIG_ELEMENT_CLASS}" {CONFIG_DISPLAY}>
-                        <span>{CONFIG_ELEMENT_LABEL}: </span>
-                        {CONFIG_ELEMENT_CONTENT}
-                    </div>
-                    <!-- END config_element -->
-                    <input type="submit" value="Update" />
-                    </form>
-            </div>
-            </section>
-        </div>
-        <!-- END settings_panel -->
-
-        <div data-component-panel='delete' class="editPanel small-12 ">
-            <section>
-                <div>
-                    <p>Are you sure you want to remove this component?</p>
-                    <form action="#" method="post">
-                        <input type="hidden" name="cid" value="{ID}" />
-                        <input type="hidden" name="delete" value="{COMPONENT_INSTANCE_ID}" />
-                        <input type="hidden" data-defn-id name="component" value="{COMPONENT_DEFINITION_ID}" />
-
-                        <a href="#" class="button secondary" data-remove="1">Yes</a>
-                        <a href="#" class="button" data-remove="0">No</a>
-                    </form>
+            <!-- BEGIN settings_panel -->
+            <div data-component-panel="settings" class="editPanel small-12 ">
+                <section>
+                    <div>
+                        <form action="/homepage/configForm.php" method="GET">
+                            <input type="hidden" name="cid" value="{ID}" />
+                            <input type="hidden" name="type" value="config" />
+                            <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}" />
+                            <!-- BEGIN config_element -->
+                            <div class="{CONFIG_ELEMENT_CLASS}" {CONFIG_DISPLAY}>
+                            <span>{CONFIG_ELEMENT_LABEL}: </span>
+                            {CONFIG_ELEMENT_CONTENT}
+                        </div>
+                        <!-- END config_element -->
+                        <input type="submit" value="Update" />
+                        </form>
                 </div>
-            </section>
+                </section>
+            </div>
+            <!-- END settings_panel -->
+
+            <div data-component-panel='delete' class="editPanel small-12 ">
+                <section>
+                    <div>
+                        <p>Are you sure you want to remove this component?</p>
+                        <form action="#" method="post">
+                            <input type="hidden" name="cid" value="{ID}" />
+                            <input type="hidden" name="delete" value="{COMPONENT_INSTANCE_ID}" />
+                            <input type="hidden" data-defn-id name="component" value="{COMPONENT_DEFINITION_ID}" />
+
+                            <a href="#" class="button secondary" data-remove="1">Yes</a>
+                            <a href="#" class="button" data-remove="0">No</a>
+                        </form>
+                    </div>
+                </section>
+            </div>
         </div>
     </div>
 </div>
