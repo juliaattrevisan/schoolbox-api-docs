@@ -65,45 +65,38 @@ if ($_POST['type'] == 'components') {
     } catch (Schoolbox\Mapper\Exception $e) {
     }
 } elseif (is_numeric($_POST['cid']) && (is_numeric($_POST['add']) || is_numeric($_POST['reload']))) {
-//    // POST new component to page and output render of component
-//    if (is_numeric($_POST['add'])) {
-//        $newComp = new Component_Instance();
-//        $newComp
-//            ->setDefinitionId($_POST['add'])
-//            ->setIdentifier($_POST['cid'])
-//            ->setModule('homepage')
-//            ->setSequence(0)
-//            ->setPosition('left');
-//
-//        // check perms
-//        if (($permission = $groupHandler->getPermission($_POST['cid'])) < WRITE_ACCESS) {
-//            exit;
-//        }
-//
-//        $ids        = $componentInstanceMapper->save($newComp);
-//        $instanceID = $ids[0];
-//
-//        $componentInstanceMapper->cascadeSequence($_POST['cid']);
-//    } else {
-//        $instanceID = $_POST['reload'];
-//    }
-//
-//    $factory = new Component_Homepage_Factory(new \Schoolbox\User(), $page);
-//
-//    // $component instanceof Component_ControllerAbstract
-//    $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
-//    $cList         = array_values($componentList);
-//
-//    $component = $factory->buildComponent($cList[0]);
-//
-//    if (!($component instanceof Component_ControllerAbstract)) {
-//        die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
-//    }
-//
-//    $folderMapper = new \Schoolbox\Resource\CategoryMapper();
-//    $folder = $folderMapper->findById($_POST['cid']);
-//    $renderer = new Component_Renderer();
-//    $renderer->renderHomepageComponent($folder, $component);
+    // POST new component to page and output render of component
+    if (is_numeric($_POST['add'])) {
+        $newComp = new Component_Instance();
+        $newComp
+            ->setDefinitionId($_POST['add'])
+            ->setIdentifier($_POST['cid'])
+            ->setModule($_POST['context'])
+            ->setSequence(0)
+            ->setPosition('left');
+
+        $ids        = $componentInstanceMapper->save($newComp);
+        $instanceID = $ids[0];
+
+        $componentInstanceMapper->cascadeSequence($_POST['cid']);
+    } else {
+        $instanceID = $_POST['reload'];
+    }
+
+    $factory = new Component_Homepage_Factory(new \Schoolbox\User(), $page);
+
+    // $component instanceof Component_ControllerAbstract
+    $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
+    $cList         = array_values($componentList);
+
+    $component = $factory->buildComponent($cList[0]);
+
+    if (!($component instanceof Component_ControllerAbstract)) {
+        die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
+    }
+
+    // Ghetto output
+    printf('<div data-component id="component%d"></div>', $component->getInstance()->getId());
 } elseif ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
 //    // GET config options from homepage
 //    $config = $_GET;
