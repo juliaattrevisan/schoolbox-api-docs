@@ -1,13 +1,35 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
 <script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
+
+<script type="text/javascript" src="/javascript/shared/masonry/jquery.masonry.js"></script>
 <script type="text/javascript">
     $(function() {
-        $('[data-definition-palette]').configurator({
-            context: 'homepage',
-            dropDownSelector: '[data-template-select]',
-            disabledMsg: 'This component can only be used once, and is already active for the template selected.'
-        }).start();
+        var url = '/adminv2/homepage/homepageForm.php';
+        $('[data-homepage-layout]').masonry({
+            component: {
+                url: url
+            },
+            column: {
+                leftColumnWidth: 6,
+                placeholderTpl: '<p class="masonry-placeholder alert-box" />'
+            },
+            palette: {
+                url: url,
+                selector: '[data-definition-palette]',
+                containerSelector: '.tabs-content',
+                handleSelector: '[data-component-palette]',
+                refreshItem: function () {
+                    this.find('[data-relation="count"]').text(this.data('count'));
+                }
+            }
+        });
+
+//        $('[data-definition-palette]').configurator({
+//            context: 'homepage',
+//            dropDownSelector: '[data-template-select]',
+//            disabledMsg: 'This component can only be used once, and is already active for the template selected.'
+//        }).start();
 
         $('[data-button=delete]').click(function(event) {
             event.preventDefault();
