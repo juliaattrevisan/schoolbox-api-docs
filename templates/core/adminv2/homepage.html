@@ -9,24 +9,6 @@
             disabledMsg: 'This component can only be used once, and is already active for the template selected.'
         }).start();
 
-        $("[data-form=new]").dialog({
-            autoOpen: false,
-            modal: true
-        });
-
-        $('[data-button=new]').click(function() {
-            $('[data-form=new]').dialog("open");
-        });
-
-        $("[data-form=rename]").dialog({
-            autoOpen: false,
-            modal: true
-        });
-
-        $('[data-button=rename]').click(function() {
-            $( '[data-form=rename]').dialog("open");
-        });
-
         $('[data-button=delete]').click(function(event) {
             event.preventDefault();
 
@@ -59,8 +41,8 @@
                     <!-- END template -->
                 </select>
 
-                <a data-button="new" class="button icon-add" href="#">Create</a>
-                <a data-button="rename" class="button icon-modify" href="#">Rename</a>
+                <a data-reveal-id="newDialog" class="button icon-add" href="#">Create</a>
+                <a data-reveal-id="renameDialog" class="button icon-modify" href="#">Rename</a>
                 <a data-button="delete" class="button icon-delete" href="#" >Delete</a>
             </form>
 
@@ -77,18 +59,21 @@
     </div>
 </div>
 
-<div data-form="new" title="Add new homepage template">
-    <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST">
+<div id="newDialog" class="reveal-modal" data-reveal aria-labelledby="newDialogLabel" aria-hidden="true" role="dialog">
+    <h2 id="newDialogLabel">Add new homepage template</h2>
+    <form action="/adminv2/homepage/homepageForm.php" method="POST">
         <label>
             Template name
             <input type="text" name="name" />
         </label>
         <input type="submit" name="action" value="Create" />
     </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
-<div data-form="rename" title="Rename existing homepage template">
-    <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST">
+<div id="renameDialog" class="reveal-modal" data-reveal aria-labelledby="renameDialogLabel" aria-hidden="true" role="dialog">
+    <h2 id="renameDialogLabel">Add new homepage template</h2>
+    <form action="/adminv2/homepage/homepageForm.php" method="POST">
         <label>
             Existing Template
             <select id="template-select" name="template" >
@@ -103,6 +88,7 @@
         </label>
         <input type="submit" name="action" value="Rename" />
     </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
 <div id="resource-browser" class="hide"></div>
