@@ -30,7 +30,6 @@ if ($group->getPermission($homepage_id) < WRITE_ACCESS) {
 
 // block setup (PHPLib sucks)
 $this->setFile(TEMPLATE_content, "course/importDeleted.html");
-$this->setBlock(TEMPLATE_content, 'class_breadcrumb',  'class_breadcrumb_block');
 $this->setBlock(TEMPLATE_content, 'importable',        'importable_block');
 $this->setBlock(TEMPLATE_content, 'submit',            'submit_block');
 $this->setBlock(TEMPLATE_content, 'unimportable',      'unimportable_block');
@@ -38,7 +37,6 @@ $this->setBlock('importable',     'unit',              'unit_block');
 
 $this->setVar(
     array(
-        'class_breadcrumb_block'  => '',
         'importable_block'        => '',
         'unimportable_block'      => '',
         'submit_block'            => '',
@@ -48,15 +46,7 @@ $this->setVar(
 );
 
 // Output course and category breadcrumbs
-$homepage      = CategoryMapper::getInstance()->findById($homepage_id);
-$homepage_path = CategoryMapper::getInstance()->findParents($homepage);
-$homepage_path->add($homepage);
-foreach ($homepage_path as $parent) {
-    /** @var Category $parent */
-    $this->setVar('CLASS_CATEGORY_ID',   Scrub::text($parent->getId()));
-    $this->setVar('CLASS_CATEGORY_NAME', Scrub::text($parent->getName()));
-    $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
-}
+$homepage = CategoryMapper::getInstance()->findById($homepage_id);
 
 $this->setVar('unit_block', '');
 $deletedUnitList = UnitInstanceMapper::getInstance()->findOrphanedForCategoryId($homepage_id);
@@ -85,3 +75,17 @@ if (count($deletedUnitList)) {
 else {
     $this->parse('unimportable_block', 'unimportable');
 }
+
+$trail = new \Schoolbox\Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text'  => $homepage->getName(),
+        'href'  => "/homepage/{$homepage->getId()}",
+        'class' => '',
+    ],
+    [
+        'text'  => 'Import Units from Deleted Courses',
+        'href'  => '',
+        'class' => 'active',
+    ]
+]);

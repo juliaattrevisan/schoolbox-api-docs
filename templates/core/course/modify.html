@@ -2,152 +2,127 @@
 <script type="text/javascript" src="/javascript/shared/course/jquery.course-import.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
 <script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
+<script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript">
 (function($) {
     $(function() {
         var form = $('form#modifyForm');
         form.setupCourseImport();
-        form.selectAll({
-            selector: form.find('#update_all_open_date'),
-            checkboxes: form.find(':checkbox[id^="update_open_date"]'),
-        })
-        form.selectAll({
-            selector: form.find('#update_all_due_date'),
-            checkboxes: form.find(':checkbox[id^="update_due_date"]'),
-        })
-
+//        form.selectAll({
+//            selector: form.find('#update_all_open_date'),
+//            checkboxes: form.find(':checkbox[id^="update_open_date"]'),
+//        });
+//        form.selectAll({
+//            selector: form.find('#update_all_due_date'),
+//            checkboxes: form.find(':checkbox[id^="update_due_date"]'),
+//        });
     });
 })(jQuery);
 </script>
 <!-- END custom_head -->
 
-<h1>Modify a course</h1>
+{BREADCRUMB}
 
-<form method="post" action="/course/modifyForm.php" id="modifyForm">
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Modify Course</h1>
+    </div>
+</div>
 
-    <input type="hidden" name="homepage"        value="{HOMEPAGE_ID}" />
-    <input type="hidden" name="course_homepage" value="{COURSE_HOMEPAGE_ID}" />
-    <input type="hidden" name="component"       value="{COMPONENT_ID}" />
+<div class="row">
+    <div class="small-12 island">
+        <form method="post" action="/course/modifyForm.php" id="modifyForm">
+            <input type="hidden" name="homepage"        value="{HOMEPAGE_ID}" />
+            <input type="hidden" name="course_homepage" value="{COURSE_HOMEPAGE_ID}" />
+            <input type="hidden" name="component"       value="{COMPONENT_ID}" />
 
-    <table class="standardForm table">
-
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Course</h4>
-                <em>The course that has been imported.</em>
-            </td>
-            <td>
+            <section>
                 <!-- BEGIN course -->
-                <ul class="breadcrumb">
-                    <!-- BEGIN course_breadcrumb -->
-                    <li><a href="/homepage/{COURSE_CATEGORY_ID}/">{COURSE_CATEGORY_NAME}</a></li>
-                    <!-- END course_breadcrumb -->
-                </ul>
+                <fieldset class="content">
+                    <legend>Course</legend>
+                    <div class="small-12 columns">
+                        <ul class="breadcrumb">
+                            <!-- BEGIN course_breadcrumb -->
+                            <li><a href="/homepage/{COURSE_CATEGORY_ID}/">{COURSE_CATEGORY_NAME}</a></li>
+                            <!-- END course_breadcrumb -->
+                        </ul>
+                    </div>
+                </fieldset>
                 <!-- END course -->
-            </td>
-        </tr>
+                <fieldset class="content">
+                    <legend>
+                        Units
+                        <span data-tooltip class="hint has-tip tip-top" title="
+                            Changing the open or due date of a unit will not change
+                            the open or due date of any assessments in the unit,
+                            unless you check the <strong>Update Assessments</strong> checkbox.">?</span>
+                    </legend>
+                    <div class="small-12 columns no-pad">
+                        <ul class="information-list">
+                            <!-- BEGIN unit -->
+                            <li class="actions-small-1">
+                                <input name="unit[{UNIT_COUNT}][unit_id]" type="hidden" value="{UNIT_ID}" />
+                                <input name="unit[{UNIT_COUNT}][import]" type="hidden" value="0" />
+                                <div class="list-item" data-type="unit_row">
+                                    <div class="avatar card small-12">
+                                        <input id="import-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" {UNIT_ENABLED_CHECKED} />
+                                        <label for="import-{UNIT_COUNT}" class="checkbox-label">{UNIT_NAME}</label>
+                                    </div>
+                                    <div class="small-12 medium-6 columns" data-hide-watch="#import-{UNIT_COUNT}">
+                                        <label for="open_date-{UNIT_COUNT}">Open</label>
+                                        <input id="open_date-{UNIT_COUNT}"
+                                               name="unit[{UNIT_COUNT}][open_date]"
+                                               type="text"
+                                               value="{UNIT_OPEN_DATE}"
+                                               data-role="open_date"
+                                               data-datepicker
+                                               data-datepicker-sync
+                                               data-datepicker-sync-enddate="#due_date-{UNIT_COUNT}" />
 
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Destination Class</h4>
-                <em>The class that the course was imported into.</em>
-            </td>
-            <td class="course_definition">
-                <ul class="breadcrumb">
-                    <!-- BEGIN class_breadcrumb -->
-                    <li><a href="/homepage/{CLASS_CATEGORY_ID}/">{CLASS_CATEGORY_NAME}</a></li>
-                    <!-- END class_breadcrumb -->
-                </ul>
-            </td>
-        </tr>
+                                        <!-- BEGIN unit_update_open_date -->
+                                        <input name="unit[{UNIT_COUNT}][update_open_date]"
+                                               type="hidden"
+                                               value="0" />
+                                        <input name="unit[{UNIT_COUNT}][update_open_date]"
+                                               type="checkbox"
+                                               value="1"
+                                               id="update_open_date-{UNIT_COUNT}" />
+                                        <label for="update_open_date-{UNIT_COUNT}" class="checkbox-label">Update Assessments?</label>
+                                        <!-- END unit_update_open_date -->
+                                    </div>
+                                    <div class="small-12 medium-6 columns" data-hide-watch="#import-{UNIT_COUNT}">
+                                        <label for="due_date-{UNIT_COUNT}">Due</label>
+                                        <input id="due_date-{UNIT_COUNT}"
+                                               name="unit[{UNIT_COUNT}][due_date]"
+                                               type="text"
+                                               value="{UNIT_DUE_DATE}"
+                                               data-role="due_date"
+                                               data-datepicker />
+                                        <!-- BEGIN unit_update_due_date -->
+                                        <input name="unit[{UNIT_COUNT}][update_due_date]"
+                                               type="hidden"
+                                               value="0" />
+                                        <input name="unit[{UNIT_COUNT}][update_due_date]"
+                                               type="checkbox"
+                                               value="1"
+                                               id="update_due_date-{UNIT_COUNT}" />
+                                        <label for="update_due_date-{UNIT_COUNT}" class="checkbox-label">Update Assessments?</label>
+                                        <!-- END unit_update_due_date -->
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a href="/homepage/{UNIT_ID}" title="View Unit Homepage" class="icon icon-view"></a>
+                                </nav>
+                            </li>
+                            <!-- END unit -->
+                        </ul>
+                    </div>
+                </fieldset>
+            </section>
 
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Units</h4>
-                <p>
-                    <em>You will need to set a start and end date for each unit that you want to import.</em>
-                </p>
-                <p>
-                    <em>
-                        Changing the open or due date of a unit will not change
-                        the open or due date of any assessments in the unit,
-                        unless you check the <strong>Update</strong> checkbox next to the open or due date for that unit.
-                    </em>
-                </p>
-            </td>
-            <td>
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Open Date</th>
-                        <th>
-                            <label for="update_all_open_date">
-                                <input type="checkbox"
-                                       id="update_all_open_date" />
-                                Update?
-                            </label>
-                        </th>
-                        <th>Due Date</th>
-                        <th>
-                            <label for="update_all_due_date">
-                                <input type="checkbox"
-                                       id="update_all_due_date" />
-                                Update?
-                            </label>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- BEGIN unit -->
-                    <tr data-type="unit_row" data-enabled="{UNIT_ENABLED}" data-unit_id="{UNIT_ID}">
-                        <td>
-                            <input name="unit[{UNIT_COUNT}][unit_id]" type="hidden" value="{UNIT_ID}" />
-                            <input name="unit[{UNIT_COUNT}][import]" type="hidden" value="0" />
-                            <input id="import-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" {UNIT_ENABLED_CHECKED} />
-                            <label for="import-{UNIT_COUNT}">{UNIT_NAME}</label>
-                            (<a href="/homepage/{UNIT_ID}" class="unit_name">View</a>)
-                            <input name="unit[{UNIT_COUNT}][unit_instance_id]" type="hidden" value="{UNIT_INSTANCE_ID}" />
-                        </td>
-                        <td>
-                            <input class="open_date" id="open_date-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][open_date]" type="text" size="10" maxlength="10" value="{UNIT_OPEN_DATE}" data-interaction="datepicker" />
-                        </td>
-                        <td>
-                            <!-- BEGIN unit_update_open_date -->
-                            <label for="update_open_date-{UNIT_COUNT}">
-                                <input name="unit[{UNIT_COUNT}][update_open_date]"
-                                       type="hidden"
-                                       value="0" />
-                                <input name="unit[{UNIT_COUNT}][update_open_date]"
-                                       type="checkbox"
-                                       value="1"
-                                       id="update_open_date-{UNIT_COUNT}" />
-                            </label>
-                            <!-- END unit_update_open_date -->
-                        </td>
-                        <td>
-                            <input class="due_date" id="due_date-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][due_date]" type="text" size="10" maxlength="10" value="{UNIT_DUE_DATE}" data-interaction="datepicker" />
-                        </td>
-                        <td>
-                            <!-- BEGIN unit_update_due_date -->
-                            <label for="update_due_date-{UNIT_COUNT}">
-                                <input name="unit[{UNIT_COUNT}][update_due_date]"
-                                       type="hidden"
-                                       value="0" />
-                                <input name="unit[{UNIT_COUNT}][update_due_date]"
-                                       type="checkbox"
-                                       value="1"
-                                       id="update_due_date-{UNIT_COUNT}" />
-                            </label>
-                            <!-- END unit_update_due_date -->
-                        </td>
-                    </tr>
-                    <!-- END unit -->
-                    </tbody>
-                </table>
-            </td>
-        </tr>
-    </table>
-
-    <input type="submit" value="Modify" class="submit-btn-plain" />
-</form>
+            <input type="submit" value="Modify" class="submit-btn-plain" />
+        </form>
+    </div>
+</div>
