@@ -9,7 +9,30 @@
                 context: 'homepage'
             },
             component: {
-                url: url
+                url: url,
+                calcSequenceData: function (columns) {
+                    var masonry = this,
+                        data    = { type: 'components', cid: $(masonry.options.templateSelector.selector).val() },
+                        order   = ['left','right','top','bottom'];
+
+                    $.each(columns, function (position, column) {
+                        var key = 'column' + (order.indexOf(position) + 1);
+
+                        data[key] = column.find(masonry.options.component.selector).map(function () {
+                            /*
+                             * Two components in ePorfolio have no id's (My Profile, Teacher Notes)
+                             * and always appear in the same positions. So we do a check to see if
+                             * an id is set. If it isn't, and we don't do the check, the script breaks
+                             * and components cannot be relocated successfully
+                             */
+                            if (this.id) {
+                                return this.id.substr(9);
+                            }
+                        }).toArray().join(',');
+                    });
+
+                    return data;
+                }
             },
             column: {
                 leftColumnWidth: 6,

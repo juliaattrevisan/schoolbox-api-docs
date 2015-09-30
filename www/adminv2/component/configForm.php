@@ -21,36 +21,36 @@ if (!($_SESSION['user']->isSuperuser())) {
 $componentInstanceMapper       = Component_InstanceMapper::getInstance();
 $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
-if ($_POST['cid'] && $_POST['type'] == 'components') {
-//    // AJAX request for drag and drop of components
-//    $columns = array(
-//        'left'  => $_POST['column1'],
-//        'right' => $_POST['column2'],
-//        'top'   => $_POST['column3']
-//    );
-//
-//    foreach ($columns as $position => $componentString) {
-//        // Explode the columns
-//        $components[$position] = explode(',', $componentString);
-//
-//        $instanceList = array();
-//
-//        // Update the db
-//        foreach ($components[$position] as $sequence => $componentID) {
-//            if ($componentID) {
-//                try {
-//                    /** @var $inst Component_Instance */
-//                    $inst = Component_InstanceMapper::getInstance()->findById($componentID);
-//                    $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database///
-//                    $inst->setPosition($position);
-//                    $instanceList[] = $inst;
-//                } catch (Schoolbox\Mapper\Exception $e) {
-//                }
-//            }
-//        }
-//
-//        Component_InstanceMapper::getInstance()->save($instanceList);
-//    }
+if ($_POST['type'] == 'components') {
+    // AJAX request for drag and drop of components
+    $columns = array(
+        'left'  => $_POST['column1'],
+        'right' => $_POST['column2'],
+        'top'   => $_POST['column3']
+    );
+
+    foreach ($columns as $position => $componentString) {
+        // Explode the columns
+        $components[$position] = explode(',', $componentString);
+
+        $instanceList = array();
+
+        // Update the db
+        foreach ($components[$position] as $sequence => $componentID) {
+            if ($componentID) {
+                try {
+                    /** @var $inst Component_Instance */
+                    $inst = Component_InstanceMapper::getInstance()->findById($componentID);
+                    $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database///
+                    $inst->setPosition($position);
+                    $instanceList[] = $inst;
+                } catch (Schoolbox\Mapper\Exception $e) {
+                }
+            }
+        }
+
+        Component_InstanceMapper::getInstance()->save($instanceList);
+    }
 } elseif (is_numeric($_POST['delete'])) {
     // AJAX request to delete component from homepage
     // locate the instance, locate its config instances, then blast them away
