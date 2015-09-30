@@ -15,7 +15,20 @@ class Component_Renderer
         $templateHandle = TEMPLATE_content;
 
         $component->setFile($templateHandle, 'component/config/_templatewrapper.html');
-        $component->parseConfig('CONFIGURATION', true);
+
+        // This whole sitepage rendering thing is WAY more complicated than it needs to be.
+        $instance_id = $component->getInstance()->getId();
+//        $position_no = $component->getInstance()->getPosition();
+//        $position    = "position_{$position_no}";
+        $component->setVar([
+            'COMPONENT_INSTANCE_ID'     => $instance_id,
+            'COMPONENT_HANDLE'          => $instance_id,
+            'component.instance.id'     => $instance_id,
+            'component.definition.id'   => $component->getInstance()->getDefinition()->getId(),
+            'component.definition.name' => Scrub::text($component->getInstance()->getDefinition()->getName()),
+        ]);
+
+        $component->parseConfig();
 
 //        if ($component->execute() !== false) {
 //
