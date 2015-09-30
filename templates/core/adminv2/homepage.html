@@ -1,7 +1,4 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
-<script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
-
 <script type="text/javascript" src="/javascript/shared/masonry/jquery.masonry.js"></script>
 <script type="text/javascript">
     $(function() {
@@ -37,12 +34,6 @@
                 url: '/adminv2/component/get/homepage'
             }
         });
-
-//        $('[data-definition-palette]').configurator({
-//            context: 'homepage',
-//            dropDownSelector: '[data-template-select]',
-//            disabledMsg: 'This component can only be used once, and is already active for the template selected.'
-//        }).start();
 
         $('[data-button=delete]').click(function(event) {
             event.preventDefault();
