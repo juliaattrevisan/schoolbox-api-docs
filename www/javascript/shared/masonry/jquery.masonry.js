@@ -397,9 +397,11 @@
             zIndex: 2000,
             start: function () {
                 // intentionally not cached, since we can AJAX components in/out
-                $(masonry.element).find('.' + comOpt.mceEditorClass).each(function () {
-                    tinyMCE.execCommand('mceRemoveControl', false, this.id);
-                });
+                if ('execCommand' in tinyMCE) {
+                    $(masonry.element).find('.' + comOpt.mceEditorClass).each(function () {
+                        tinyMCE.execCommand('mceRemoveControl', false, this.id);
+                    });
+                }
 
                 masonry.refreshColumns();
             },
@@ -488,9 +490,11 @@
         var page = $(this.element);
 
         // intentionally not cached, since we can AJAX components in/out
-        page.find('.' + this.options.component.mceEditorClass).each(function () {
-            tinyMCE.execCommand('mceAddControl', false, this.id);
-        });
+        if ('execCommand' in tinyMCE) {
+            page.find('.' + this.options.component.mceEditorClass).each(function () {
+                tinyMCE.execCommand('mceAddControl', false, this.id);
+            });
+        }
 
         page.sortable('refresh');
 
@@ -832,4 +836,4 @@
         });
     };
 
-})(jQuery, window, document, tinymce);
+})(jQuery, window, document, (typeof tinymce === 'object' ? tinymce : {}));
