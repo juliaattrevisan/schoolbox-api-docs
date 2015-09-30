@@ -798,7 +798,7 @@
                 var element = $(self.element);
                 element.children().fadeOut(function () {
                     element.empty().append($layout);
-                    self.fadeIn();
+                    element.fadeIn();
                 });
             });
         });
