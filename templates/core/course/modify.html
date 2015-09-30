@@ -66,11 +66,11 @@
                                 <input name="unit[{UNIT_COUNT}][unit_id]" type="hidden" value="{UNIT_ID}" />
                                 <input name="unit[{UNIT_COUNT}][import]" type="hidden" value="0" />
                                 <div class="list-item" data-type="unit_row">
-                                    <div class="avatar card small-12">
+                                    <div class="info card small-12 medium-6">
                                         <input id="import-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" {UNIT_ENABLED_CHECKED} />
                                         <label for="import-{UNIT_COUNT}" class="checkbox-label">{UNIT_NAME}</label>
                                     </div>
-                                    <div class="small-12 medium-6 columns" data-hide-watch="#import-{UNIT_COUNT}">
+                                    <div class="small-12 medium-3 columns" data-hide-watch="#import-{UNIT_COUNT}">
                                         <label for="open_date-{UNIT_COUNT}">Open</label>
                                         <input id="open_date-{UNIT_COUNT}"
                                                name="unit[{UNIT_COUNT}][open_date]"
@@ -92,7 +92,7 @@
                                         <label for="update_open_date-{UNIT_COUNT}" class="checkbox-label">Update Assessments?</label>
                                         <!-- END unit_update_open_date -->
                                     </div>
-                                    <div class="small-12 medium-6 columns" data-hide-watch="#import-{UNIT_COUNT}">
+                                    <div class="small-12 medium-3 columns" data-hide-watch="#import-{UNIT_COUNT}">
                                         <label for="due_date-{UNIT_COUNT}">Due</label>
                                         <input id="due_date-{UNIT_COUNT}"
                                                name="unit[{UNIT_COUNT}][due_date]"
@@ -122,7 +122,7 @@
                 </fieldset>
             </section>
 
-            <input type="submit" value="Modify" class="submit-btn-plain" />
+            <input type="submit" value="Modify" />
         </form>
     </div>
 </div>
