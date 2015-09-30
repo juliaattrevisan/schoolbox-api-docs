@@ -7,11 +7,20 @@
     $(function() {
         var url = '/adminv2/homepage/homepageForm.php';
         $('[data-homepage-layout]').masonry({
+            // Only create action goes through masonry
+            context: {
+                action: 'create'
+            },
             component: {
                 url: url
             },
             column: {
                 leftColumnWidth: 6,
+                position: {
+                    top: '[data-position=top]',
+                    left: '[data-position=left]',
+                    right: '[data-position=right]'
+                },
                 placeholderTpl: '<p class="masonry-placeholder alert-box" />'
             },
             palette: {
