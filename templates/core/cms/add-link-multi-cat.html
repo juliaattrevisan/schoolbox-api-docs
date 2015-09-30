@@ -1,31 +1,34 @@
 <!-- BEGIN custom_head -->
 <script language="JavaScript" type="text/javascript">
-function verify()
-{
-	var msg = ""
-	//check that description, url, location have been entered
-	if(document.getElementById('urlForm').description.value == ""){
-		msg += "You need to enter a description\n";
-	}
-	if(document.getElementById('urlForm').url.value == ""){
-		msg += "You need to enter a URL\n";
-	}
-	var ok = false;
-	$('input.category').each(function () {
-		if ($(this).prop("checked"))
-			ok = true;
-	});
-	if (!ok)
-		msg += "You need to select a location";
-
-	
-	if(msg != ""){
-		alert(msg);
-		return false;
-	}
-	else
-		return true;
-}
+    $(function() {
+        $('#urlForm').validate({
+            rules: {
+                description: {
+                    required: true
+                },
+                url: {
+                    required: true
+                },
+                'category[]': {
+                    minlength: 1,
+                    required: true
+                }
+            },
+            messages: {
+                description: "You need to enter a description",
+                url: "You need to enter a URL",
+                'category[]': "You need to select a location"
+            },
+            errorPlacement: function(error, element) {
+                if (element.is('[name="category[]"]')) {
+                    error.insertAfter($('[data-folder-list]'));
+                }
+                else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+    });
 </script>
 <!-- END custom_head -->
 
@@ -37,7 +40,7 @@ function verify()
 
 <div class="row">
     <div class="small-12 island">
-        <form action="/cms/linkForm.php" method="post" id="urlForm" onSubmit="return(verify());">
+        <form action="/cms/linkForm.php" method="post" id="urlForm">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -59,7 +62,7 @@ function verify()
                             <textarea name="comment" cols="40" rows="4"></textarea>
                         </label>
 
-                        <label>
+                        <label data-folder-list>
                             Location
                             <span class='hint has-tip tip-top' data-tooltip title="Select the locations where this file should be placed">?</span>
                         </label>
