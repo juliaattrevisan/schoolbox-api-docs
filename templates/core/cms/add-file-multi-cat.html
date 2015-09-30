@@ -62,15 +62,13 @@ $(function() {
                             <span class='hint has-tip tip-top' data-tooltip title="Select the locations where this file should be placed">?</span>
                         </label>
 
-                        <div class="checkboxes">
-                            <!-- BEGIN category_list -->
-                            <input type="checkbox" id="category-{CATEGORY_ID}" class="category" name="category[]" value="{CATEGORY_ID}">
-                            <label for="category-{CATEGORY_ID}" class="checkbox-label">{CATEGORY_NAME}</label>
-                            <!-- END category_list -->
-                            <!-- BEGIN no_categories -->
-                            <p class="alert-box">You must be involved in a Class/Group prior to using this.</p>
-                            <!-- END no_categories -->
-                        </div>
+                        <!-- BEGIN category_list -->
+                        <input type="checkbox" id="category-{CATEGORY_ID}" class="category" name="category[]" value="{CATEGORY_ID}">
+                        <label for="category-{CATEGORY_ID}" class="checkbox-label">{CATEGORY_NAME}</label>
+                        <!-- END category_list -->
+                        <!-- BEGIN no_categories -->
+                        <p class="alert-box">You must be involved in a Class/Group prior to using this.</p>
+                        <!-- END no_categories -->
 
                         <label>
                             Hidden
