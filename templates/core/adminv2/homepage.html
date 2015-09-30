@@ -31,6 +31,10 @@
                 refreshItem: function () {
                     this.find('[data-relation="count"]').text(this.data('count'));
                 }
+            },
+            templateSelector: {
+                selector: '[data-template-select]',
+                url: '/adminv2/component/get/homepage'
             }
         });
 

@@ -109,6 +109,9 @@
             saveBtnSelector: null,
             saveLabelSelector: null
         },
+        templateSelector: {
+            selector: null
+        },
         persist: {
             url: null,
             success: noop,
@@ -178,6 +181,10 @@
 
         if (this.options.spectrum && this.options.spectrum.selector) {
             this.initSpectrum();
+        }
+
+        if (this.options.templateSelector && this.options.templateSelector.selector) {
+            this.initTemplateSelector();
         }
 
         this.initForms();
@@ -778,6 +785,24 @@
         this.spectrum = $(this.options.spectrum.selector).masonrySpectrum(this);
     };
 
+    /**
+     * Initialise the template selector
+     */
+    Masonry.prototype.initTemplateSelector = function() {
+        var self = this;
+        $(self.options.templateSelector.selector).change(function () {
+            var groupID   = this.value;
+            location.hash = groupID;
+            $.get(self.options.templateSelector.url + '/' + groupID, function ($layout) {
+                // Update the components, and reinstall drag/drop
+                var element = $(self.element);
+                element.children().fadeOut(function () {
+                    element.empty().append($layout);
+                    self.fadeIn();
+                });
+            });
+        });
+    };
 
     /**
      * Refresh the empty/non-empty states of all columns
