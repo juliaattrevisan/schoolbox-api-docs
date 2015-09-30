@@ -1,14 +1,23 @@
+<style type="text/css">
+    svg {
+        float: left;
+    }
+</style>
+
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Message Delivery Options</h2>
         <section>
-            <ul class="action-list">
+            <ul class="information-list">
                 <li>
                     <div class="list-item">
                         <div class="small-12 avatar card">
-                            <img src="/images/core/messaging/muted.svg" alt="Muted" width="16" />
+                            <img src="/images/core/messaging/muted.svg" alt="Muted" width="32" />
                             <p>
-                                Muted: {{ who }} won't receive this message.
+                                Muted
+                            </p>
+                            <p class="meta">
+                                {{ who }} won't receive this message.
                             </p>
                         </div>
                     </div>
@@ -18,9 +27,12 @@
                 <li>
                     <div class="list-item">
                         <div class="small-12 avatar card">
-                            <img src="/images/core/messaging/digest.svg" alt="Digest" width="16" />
+                            <img src="/images/core/messaging/digest.svg" alt="Digest" width="32" />
                             <p>
-                                Digest: this message will be collated and emailed to {{ who }} in a digest{% if digest | length > 1 %} <strong>{{ digest | raw }}</strong>{% endif %}.<br/>
+                                Digest
+                            </p>
+                            <p class="meta">
+                                This message will be collated and emailed to {{ who }} in a digest{% if digest | length > 1 %} <strong>{{ digest | raw }}</strong>{% endif %}.<br/>
                                 It will not appear in {{ who }}{{ who == 'you' ? 'r' : "'" }} internal messages list.
                             </p>
                         </div>
@@ -31,9 +43,12 @@
                 <li>
                     <div class="list-item">
                         <div class="small-12 avatar card">
-                            <img src="/images/core/messaging/instant.svg" alt="Instant" width="16" />
+                            <img src="/images/core/messaging/instant.svg" alt="Instant" width="32" />
                             <p>
-                                Instant: this message will appear in {{ who }}{{ who == 'you' ? 'r' : "'" }} internal messages list.
+                                Instant
+                            </p>
+                            <p class="meta">
+                                This message will appear in {{ who }}{{ who == 'you' ? 'r' : "'" }} internal messages list.
                             </p>
                         </div>
                     </div>
@@ -53,9 +68,12 @@
                 <li>
                     <div class="list-item">
                         <div class="small-12 avatar card">
-                            <img src="/images/core/messaging/mobile.svg" alt="Mobile" width="16" />
+                            <img src="/images/core/messaging/mobile.svg" alt="Mobile" width="32" />
                             <p>
-                                Mobile: this message will be pushed to {{ who }}{{ who == 'you' ? 'r' : "'" }} mobile device{% if mobile | length > 1 %}s{% endif %}. <em><em>*</em>Requires Instant to be enabled.</em>
+                                Mobile
+                            </p>
+                            <p class="meta">
+                                This message will be pushed to {{ who }}{{ who == 'you' ? 'r' : "'" }} mobile device{% if mobile | length > 1 %}s{% endif %}. <em><em>*</em>Requires Instant to be enabled.</em>
                             </p>
                         </div>
                     </div>
@@ -65,9 +83,12 @@
                 <li>
                     <div class="list-item">
                         <div class="small-12 avatar card">
-                            <img src="/images/core/messaging/email.svg" alt="Email" width="16" />
+                            <img src="/images/core/messaging/email.svg" alt="Email" width="32" />
                             <p>
-                                Email: this message will be immediately emailed to {{ who }}. <em><em>*</em>Requires Instant to be enabled.</em>
+                                Email
+                            </p>
+                            <p class="meta">
+                                This message will be immediately emailed to {{ who }}. <em><em>*</em>Requires Instant to be enabled.</em>
                             </p>
                         </div>
                     </div>
