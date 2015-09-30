@@ -1,30 +1,37 @@
 <div class="row">
-  <div class="small-12 island">
-    <h1>Messages</h1>
-    <!-- BEGIN days -->
-      <!-- BEGIN day -->
-    <h2 class="subheader">{DAY}</h2>
-    <section>
-    <!-- BEGIN events -->
-    <ul class="events information-list">
-      <!-- BEGIN event -->
-      <li class="event row">
-        <div class="small-12 column no-pad">
-          <div class="avatar card no-wrap">
-            <a href="{EVENT_HREF}" class="time">
-              <img src="{EVENT_ICON}" alt="" width="24" height="24" />
-            </a>
-            <p class="body">{EVENT_BODY}<!-- BEGIN abstract -->: "{EVENT_ABSTRACT}"<!-- END abstract --></p>
-            <p class="meta"><time title="{EVENT_LONGTIME}">{EVENT_TIME}</time></p>
-          </div>
-          </a>
-        </div>
-      </li>
-      <!-- END event -->
-    </ul>
-    <!-- END events -->
-    </section>
-      <!-- END day -->
-    <!-- END days -->
-  </div>
+    <div class="small-12 island">
+        <h1>Messages</h1>
+        <!-- BEGIN days -->
+        <!-- BEGIN day -->
+        <h2 class="subheader">{DAY}</h2>
+        <section>
+            <!-- BEGIN events -->
+            <ul class="information-list">
+                <!-- BEGIN event -->
+                <li class="event row">
+                    <div class="small-12 column no-pad">
+                        <div class="avatar card no-wrap">
+                            <a href="{EVENT_HREF}">
+                                <img src="{EVENT_ICON}" alt="" width="24" height="24" />
+                            </a>
+
+                            <p class="body">
+                                {EVENT_BODY}
+                                <!-- BEGIN abstract -->: "{EVENT_ABSTRACT}"<!-- END abstract -->
+                            </p>
+
+                            <p class="meta">
+                                <time title="{EVENT_LONGTIME}">{EVENT_TIME}</time>
+                            </p>
+                        </div>
+                        </a>
+                    </div>
+                </li>
+                <!-- END event -->
+            </ul>
+            <!-- END events -->
+        </section>
+        <!-- END day -->
+        <!-- END days -->
+    </div>
 </div>
