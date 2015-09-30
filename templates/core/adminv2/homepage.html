@@ -5,11 +5,11 @@
 <script type="text/javascript" src="/javascript/shared/masonry/jquery.masonry.js"></script>
 <script type="text/javascript">
     $(function() {
-        var url = '/adminv2/homepage/homepageForm.php';
+        var url = '/adminv2/component/configForm.php';
         $('[data-homepage-layout]').masonry({
             // Only create action goes through masonry
             context: {
-                action: 'create'
+                context: 'homepage'
             },
             component: {
                 url: url
