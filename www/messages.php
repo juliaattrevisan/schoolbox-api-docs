@@ -22,6 +22,7 @@ if(!isset($this)) {
 
 $this->setFile(TEMPLATE_content, 'messages.html');
 
+$this->setBlock(TEMPLATE_content, 'no_messages', 'no_messages_block');
 $this->setBlock(TEMPLATE_content, 'days', 'days_block');
 $this->setBlock('days', 'day', 'day_block');
 $this->setBlock('day', 'events', 'events_block');
@@ -96,14 +97,20 @@ foreach($msgsByDay as $day => $timestamps) {
 		$this->parse('events_block', 'events', true);
 	}
 	$this->parse('day_block', 'day', true);
-
 }
 
 if(count($notifications)) {
 	$this->parse('days_block', 'days');
+    $this->setVar(array(
+        'no_messages_block' => ''
+    ));
 }
 else {
-	$this->setVar('days_block', 'You have no messages.');
+    $this->setVar(array(
+        'days_block' => ''
+    ));
+
+    $this->parse('no_messages_block', 'no_messages');
 }
 
 
