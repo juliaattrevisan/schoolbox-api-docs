@@ -3,6 +3,7 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\Model as File;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Link;
@@ -72,9 +73,17 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
 
     // if file was synchronously uploaded
     if ($_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
-        // do a storage upload, then wrap it in the SBFS file from earlier
-        $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->accept($_FILES['file']['name'], $_FILES['file']['tmp_name'], false);
-        $file->setStorage($storage);
+        try {
+            // fake this momentarily
+            $file->setFilename($_FILES['file']['name']);
+
+            // do a storage upload, then wrap it in the SBFS file from earlier
+            $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->accept($_FILES['file']['name'], $_FILES['file']['tmp_name'], false);
+
+            $file->setStorage($storage);
+        } catch (Exception $e) {
+            outputException($e, $file, $ajax);
+        }
     }
 
     // set attributes
@@ -134,27 +143,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
         }
 
     } catch (Exception $e) {
-        // Output errors
-        if ($e->getCode() == \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
-            $code = 11;
-            $msg  = "Your file, '{$file->getFilename()}' is not a valid filetype";
-
-        } elseif ($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE) {
-            $code = 10;
-            $msg  = 'The size of the uploaded file exceeds the file size restrictions of '
-                . Alaress_Byte_Format::bytesToString($file->getMimetype()->getMaxFileSize()) . '.';
-
-        } else {
-            $code = 9;
-            $msg  = $e->getMessage();
-        }
-
-        if ($ajax) {
-            header(':', true, 400);
-            die(json_encode(array('code' => $code, 'error' => $msg)));
-        } else {
-            error($code, $msg);
-        }
+        outputException($e, $file, $ajax);
     }
 } /* Move file from one category to another */
 elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
@@ -242,4 +231,36 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0 &
 } /* Unknown action */
 else {
     error(2);
+}
+
+
+/**
+ * @param Exception $e
+ * @param IFile     $file
+ * @param bool      $ajax
+ */
+function outputException(Exception $e, IFile $file, $ajax = false) {
+
+    // Output errors
+    if ($e->getCode() == \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
+        $code = 11;
+        $msg  = "Your file, '{$file->getFilename()}' is not a valid filetype";
+
+    } elseif ($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE) {
+        $code = 10;
+        $msg  = 'The size of the uploaded file exceeds the file size restrictions of '
+            . Alaress_Byte_Format::bytesToString($file->getMimetype()->getMaxFileSize()) . '.';
+
+    } else {
+        $code = 9;
+        $msg  = $e->getMessage();
+    }
+
+    if ($ajax) {
+        header(':', true, 400);
+        die(json_encode(array('code' => $code, 'error' => $msg)));
+    } else {
+        error($code, $msg);
+    }
+
 }
