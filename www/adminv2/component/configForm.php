@@ -94,9 +94,8 @@ if ($_POST['type'] == 'components') {
     if (!($component instanceof Component_ControllerAbstract)) {
         die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
     }
-
-    // Ghetto output
-    printf('<div data-component id="component%d"></div>', $component->getInstance()->getId());
+    $renderer = new Component_Renderer();
+    $renderer->renderAdminComponent($component);
 } elseif ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
 //    // GET config options from homepage
 //    $config = $_GET;

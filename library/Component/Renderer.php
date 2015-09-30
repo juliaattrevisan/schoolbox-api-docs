@@ -9,6 +9,46 @@
  
 class Component_Renderer
 {
+    public function renderAdminComponent(Component_ControllerAbstract $component)
+    {
+        $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
+        $templateHandle = TEMPLATE_content;
+
+        $component->setFile($templateHandle, 'component/config/_templatewrapper.html');
+        $component->parseConfig('CONFIGURATION', true);
+
+//        if ($component->execute() !== false) {
+//
+////            if (!$component->setFile($templateHandle, $templateFile)) {
+////                return false;
+////            }
+//
+////            $component->setConfigurationTemplate('component/config/_templatewrapper.html');
+////            $component->parseConfigForTemplate();
+//
+////            if ($component->execute() !== false) {
+////                $component->parseConfig();
+////                if ($component->renderTemplate($templateHandle) !== false) {
+////                    $component->parse($templateTarget, $templateHandle, true);
+////                }
+////            }
+////
+////            $output = array(
+////                'COMPONENT_INSTANCE_ID'   => $component->getInstance()->getId(),
+////                'COMPONENT_DEFINITION_ID' => $component->getInstance()->getDefinitionId(),
+////                'COMPONENT_HANDLE'        => $templateHandle . '_' . $component->getInstance()->getId()
+////            );
+////
+////            $component->setVar($output);
+//
+////            $component->parse($templateTarget, $templateHandle, true);
+////            if ($component->renderTemplate($templateHandle) !== false) {
+////                $component->parse($templateTarget, $templateHandle, true);
+////            }
+//        }
+        $component->getPageTemplate()->pparse($templateTarget, $templateHandle);
+    }
+
     /**
      * Renders a template into the Sitepage within $component.
      *
