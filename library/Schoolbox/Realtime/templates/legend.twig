@@ -71,7 +71,8 @@
                                 Mobile
                             </p>
                             <p class="meta">
-                                This message will be pushed to {{ who }}{{ who == 'you' ? 'r' : "'" }} mobile device{% if mobile | length > 1 %}s{% endif %}. <em><em>*</em>Requires Instant to be enabled.</em>
+                                This message will be pushed to {{ who }}{{ who == 'you' ? 'r' : "'" }} mobile device{% if mobile | length > 1 %}s{% endif %}. <br />
+                                <em>*</em>Requires Instant to be enabled.</em>
                             </p>
                         </div>
                     </div>
@@ -86,7 +87,8 @@
                                 Email
                             </p>
                             <p class="meta">
-                                This message will be immediately emailed to {{ who }}. <em><em>*</em>Requires Instant to be enabled.</em>
+                                This message will be immediately emailed to {{ who }}.<br />
+                                <em>*</em>Requires Instant to be enabled.</em>
                             </p>
                         </div>
                     </div>
