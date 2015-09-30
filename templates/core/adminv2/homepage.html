@@ -30,29 +30,39 @@
 {ADMIN_NAV}
         
 <div class="row">
-    <div class="small-12 large-3 columns">
-        <div data-definition-palette>
-            <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST">
-                <input type="hidden" name="action" value="delete" />
+    <div class="small-12 island">
+        <section>
+            <div data-definition-palette class="content">
+                <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST">
+                    <div class="actions-small-3">
+                        <div class="list-item">
+                            <input type="hidden" name="action" value="delete" />
 
-                <select data-template-select name="template">
-                    <!-- BEGIN template -->
-                    <option value="{template.id}">{template.name}</option>
-                    <!-- END template -->
-                </select>
+                            <label for="templateSelector">Template</label>
+                            <select id="templateSelector" data-template-select name="template">
+                                <!-- BEGIN template -->
+                                <option value="{template.id}">{template.name}</option>
+                                <!-- END template -->
+                            </select>
+                        </div>
+                        <nav>
+                            <a data-reveal-id="newDialog" class="icon-add" href="#" title="Create"></a>
+                            <a data-reveal-id="renameDialog" class="icon-modify" href="#" title="Rename"></a>
+                            <a data-button="delete" class="icon-delete" href="#" title="Delete"></a>
+                        </nav>
+                    </div>
+                </form>
 
-                <a data-reveal-id="newDialog" class="button icon-add" href="#">Create</a>
-                <a data-reveal-id="renameDialog" class="button icon-modify" href="#">Rename</a>
-                <a data-button="delete" class="button icon-delete" href="#" >Delete</a>
-            </form>
-
-            <!-- BEGIN definition -->
-            <div class="component definition-id-{definition.id} {definition.singleton}">{definition.name}</div>
-            <!-- END definition -->
-        </div>
+                <!-- BEGIN definition -->
+                <div class="component definition-id-{definition.id} {definition.singleton}">{definition.name}</div>
+                <!-- END definition -->
+            </div>
+        </section>
     </div>
+</div>
 
-    <div class="small-12 large-9 columns">
+<div class="row">
+    <div class="small-12 columns">
         <div data-homepage-layout>
             <!-- BEGIN layout --><!-- END layout -->
         </div>
