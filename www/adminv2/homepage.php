@@ -41,22 +41,27 @@ foreach ($homepageTemplateList as $currentTemplate) {
 /* Component Palette */
 $this->setBlock(TEMPLATE_content, 'definition', 'definition_block');
 
-$definitionCollection = Component_DefinitionMapper::getInstance()->findByColumnList(array(
-    'module' => 'homepage',
-    'visible' => 'true',
-));
+$componentFactory     = new Component_Homepage_Factory(new \Schoolbox\User(), $this);
+$definitionCollection = $componentFactory->getDefinitionList('component_category');
 
+// Group by category
+$groupedCollection = [];
 foreach ($definitionCollection as $definition) {
-    /* @var $definition Component_Definition */
-    $this->setVar(array(
-        'definition.id'          => $definition->getId(),
-        'definition.name'        => Scrub::text($definition->getName()),
-        // description deliberately not scrubbed
-        'definition.description' => $definition->getDescription(),
-        'definition.singleton'   => $definition->getMultiple() == 'true' ? '' : 'single-instance'
-    ));
+    $groupedCollection[$definition->getComponentCategory()][] = $definition;
+}
+foreach ($groupedCollection as $category => $categoryDefinitions) {
+    foreach ($categoryDefinitions as $definition) {
+        /* @var $definition Component_Definition */
+        $this->setVar(array(
+            'definition.id'          => $definition->getId(),
+            'definition.name'        => Scrub::text($definition->getName()),
+            // description deliberately not scrubbed
+            'definition.description' => $definition->getDescription(),
+            'definition.singleton'   => $definition->getMultiple() == 'true' ? '' : 'single-instance'
+        ));
 
-    $this->parse('definition_block', 'definition', true);
+        $this->parse('definition_block', 'definition', true);
+    }
 }
 
 /* Initial group placeholders */
