@@ -1197,6 +1197,7 @@ $rotate-th-width: $square-grid-td-size;
 		}
 
 		p, h3 {
+            line-height: 1.25rem;
             margin: 0 0 0 (3 * rem-calc($base-font-size));
             @media #{$medium-up} {
                 margin: 0 0 0 (4 * rem-calc($base-font-size));
