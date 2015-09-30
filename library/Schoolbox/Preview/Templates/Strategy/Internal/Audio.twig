@@ -1,17 +1,13 @@
-<div>
-    <link href="/javascript/components/mediaelement/build/mediaelementplayer.min.css" rel="stylesheet">
-    <script src="/javascript/components/mediaelement/build/mediaelement-and-player.min.js"></script>
-    <script type="text/javascript">
-        $(function(){
-            $("#schoolbox_video_preview").mediaelementplayer();
-        });
-    </script>
-    <div class="audioWrapper">
-        <audio id="schoolbox_video_preview"
-               controls
-               preload="none"
-               width="100%">
-            <source src="/cms/sendVideo.php?type={{ type }}&id={{ hash }}" type='audio/mp3'>
-        </audio>
-    </div>
-</div>
+<link href="/javascript/components/mediaelement/build/mediaelementplayer.min.css" rel="stylesheet">
+<script src="/javascript/components/mediaelement/build/mediaelement-and-player.min.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $("#schoolbox_video_preview").mediaelementplayer();
+    });
+</script>
+<audio id="schoolbox_video_preview"
+       controls
+       preload="none"
+       width="100%">
+    <source src="/cms/sendVideo.php?type={{ type }}&id={{ hash }}" type='audio/mp3'>
+</audio>
