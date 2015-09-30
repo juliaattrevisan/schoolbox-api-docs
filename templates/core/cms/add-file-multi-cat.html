@@ -20,20 +20,6 @@ $(function() {
 			}
 		}
 	});
-
-	$(':checkbox').each(function() {
-		if ($(this).is(':checked')) {
-			$(this).parent().addClass('active-checkbox');
-		}
-	});
-
-	$(':checkbox').click(function() {
-		if ($(this).parent().hasClass('active-checkbox')) {
-			$(this).parent().removeClass('active-checkbox')
-		} else {
-			$(this).parent().addClass('active-checkbox');
-		}
-	});
 });
 
 </script>
