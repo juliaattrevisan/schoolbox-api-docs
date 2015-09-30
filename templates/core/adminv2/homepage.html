@@ -5,8 +5,12 @@
         var url = '/adminv2/component/configForm.php';
         $('[data-homepage-layout]').masonry({
             // Only create action goes through masonry
-            context: {
-                context: 'homepage'
+            context: function(masonry) {
+//                console.log(masonry);
+                return {
+                    context: 'homepage_template',
+                    cid: $(masonry.options.templateSelector.selector).val()
+                }
             },
             component: {
                 url: url,

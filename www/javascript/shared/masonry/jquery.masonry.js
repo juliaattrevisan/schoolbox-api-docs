@@ -512,7 +512,7 @@
         // don't send an empty request, or to a blank resource
         if (data && this.options.component.url) {
             // append our context to the request and fire it off
-            $.post(this.options.component.url, $.extend({}, data, this.options.context));
+            $.post(this.options.component.url, $.extend({}, data, this.getContext()));
         }
     };
 
@@ -556,7 +556,7 @@
             data.from = rel[1];
         }
 
-        data = $.extend({}, data, this.options.context);
+        data = $.extend({}, data, this.getContext());
 
         if (!url) {
             // callback not called
@@ -570,6 +570,15 @@
             dataType: 'html'
         });
 
+    };
+
+    Masonry.prototype.getContext = function()
+    {
+        if (typeof this.options.context === 'function') {
+            return this.options.context(this);
+        } else {
+            return this.options.context;
+        }
     };
 
     /**
