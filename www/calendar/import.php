@@ -9,6 +9,9 @@
  */
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Breadcrumbs;
+
 $groupHandler = new Group();
 
 if ($groupHandler->getPermission($this->arg[0]) < WRITE_ACCESS) {
@@ -16,14 +19,39 @@ if ($groupHandler->getPermission($this->arg[0]) < WRITE_ACCESS) {
 }
 else {
 	try {
-		$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-		$category = $categoryMapper->findById($this->arg[0]);
+		$folderMapper = new FolderMapper();
+		$folder = $folderMapper->findById($this->arg[0]);
 
 		$this->setFile(TEMPLATE_content, 'calendar/import.html');
 
+		/* Render out breadcrumbs
+ 		*/
+		$trail = new Breadcrumbs();
+		$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+			[
+				'text' => $folder->getName(),
+				'href' => "/homepage/{$folder->getId()}",
+				'class' => '',
+			],
+			[
+				'text' => 'Import Calendar',
+				'href' => '',
+				'class' => 'active',
+			]
+		]);
+
+		$zone = new \Schoolbox\Resource\Attachment\Zone('upload-calendar');
+		$zone->setThumbnailSize(64);
+		$zone->setAttachPrompt('Upload calendar file');
+		$zone->setAttachmentsLabel('');
+		$zone->setMimeFilter('text/csv,text/calendar');
+		$zone->setModalTitle('Select zip file');
+
+		$zone->renderIntoSitePage($this, 'ATTACHZONE');
+
 		$this->setVar(array(
 			'HOMEPAGE_ID' => $this->arg[0],
-			'HOMEPAGE_NAME' => $category->getName()
+			'HOMEPAGE_NAME' => $folder->getName()
 		));
 	}
 	catch (\Exception $e) {

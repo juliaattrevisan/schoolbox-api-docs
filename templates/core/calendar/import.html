@@ -1,43 +1,38 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $('#uploadForm').find('input[type="file"].prettify').prettyFileInput({
-            additionalButtonClasses: 'up-arrow no-marg float-right',
-            buttonActiveClass: 'tick',
-            defaultText: '<span></span>Upload File',
-            defaultFileSelectedText: '<span></span>File selected'
-        });
-    });
-</script>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <!-- END custom_head -->
 
-<h2>Import events into Group Calendar for {HOMEPAGE_NAME}</h2>
-<form id='uploadForm' action="/calendar/importForm" method="post" enctype="multipart/form-data">
-	<input type="hidden" name="homepageId" value="{HOMEPAGE_ID}" />
-
-	<table class="standardForm">
-		<tbody>
-        <tr>
-            <td class="formLabelWidth">
-                <h4>CSV Template</h4>
-                <em>Download an example CSV template which you can edit and upload.</em>
-            </td>
-            <td>
-                <a href="/adminv2/csv/calendarBulkAdd.csv" class="btn report float-left"><span></span>Download</a>
-            </td>
-        </tr>
-			<tr>
-				<td class="formLabelWidth">
-					<h4>Import File</h4>
-                    <em>Upload a Microsoft Outlook .ics file or a CSV file.</em>
-				</td>
-				<td>
-					<input type="file" name="file" class="prettify" />
-				</td>
-			</tr>
-		</tbody>
-	</table>
-
-	<input type="submit" class='submit-btn-plain' value="Submit" />
-</form>
+{BREADCRUMB}
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 island">
+            <h1>Import Calendar Events</h1>
+        </div>
+    </div>
+    <nav>
+        <a href="#" class="icon-more" data-dropdown="header-options"></a>
+    </nav>
+    <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
+        <li><a href="/adminv2/csv/calendarBulkAdd.csv" class="icon-download">Download Sample CSV</a></li>
+    </ul>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <form id='uploadForm' action="/calendar/importForm" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="homepageId" value="{HOMEPAGE_ID}" />
+            
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Import File
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Upload a Microsoft Outlook .ics file or a CSV file, sample available in heading menu">?</span>
+                            {ATTACHZONE}
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+            <input type="submit"  value="Submit" />
+        </form>
+    </div>
+</div>
