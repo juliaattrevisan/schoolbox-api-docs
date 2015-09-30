@@ -4,20 +4,19 @@
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="island small-12">
             <section>
-                <div class="content">
-                    <div class="dropzone-wrap">
-                        <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post"
-                              data-accepts="image">
-                            <div class="float-left image-thumbnail dz-preview dz-file-preview">
-                                <a class="thumb dz-details" style="height:100px;">
-                                    <img class="dz-pending" width="16" height="16" src="/images/resources/ajax.gif" style="top:4px;left:0px;"/>
-                                    <img data-dz-thumbnail border="0" style="position:static;">
-                                </a>
-
-                                <div class="dz-progress"><span class="dz-upload" style="height:100%;position:absolute;top:0"></span>
+                <div class="dropzone-wrap">
+                    <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image"></form>
+                    <div class="content">
+                        <ul class="hide" data-dz-template>
+                            <li>
+                                <span class="th">
+                                    <img data-dz-thumbnail src="/images/resources/ajax.gif" />
+                                </span>
+                                <div class="progress dz-progress">
+                                    <span class="meter dz-upload" style="width:0;"></span>
                                 </div>
-                            </div>
-                        </form>
+                            </li>
+                        </ul>
                         <ul class="clearing-thumbs" data-dz-container>
                             <!-- BEGIN image_gallery -->
                             <li>
@@ -29,32 +28,36 @@
                             </li>
                             <!-- END image_gallery -->
                         </ul>
-                    </div>
-                    <!-- BEGIN submit_image -->
-                    <script type="text/javascript">
-                        $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                            wrapClass: 'dragging',
-                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
-                            acceptedFiles: 'image/*',
-                            createImageThumbnails: true,
-                            dictDefaultMessage: 'You can drag images into this space.',
-                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                            refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
 
-                            addedfile: function (file) {
-                                $(file.previewElement).addClass('category-{IMAGEGALLERY_CATEGORY_ID}').data('node', {IMAGEGALLERY_CATEGORY_ID});
-                            },
-                            sending: function (file, xhr, formData) {
-                                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                                formData.append('category', $(file.previewElement).data('node'));
-                                formData.append('comment', '');
-                                formData.append('hidden', 0);
-                            },
-                            complete: function (file) {
-                                $(file.previewElement).find('img.dz-pending').remove();
-                            }
-                        });
-                    </script>
+                        <!-- BEGIN submit_image -->
+                        <script type="text/javascript">
+                            $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                                wrapClass: 'dragging',
+                                previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                                previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                                acceptedFiles: 'image/*',
+                                createImageThumbnails: true,
+                                dictDefaultMessage: 'You can drag images into this space.',
+                                refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                                refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+
+                                addedfile: function (file) {
+                                    $(file.previewElement).addClass('category-{IMAGEGALLERY_CATEGORY_ID}').data('node', {IMAGEGALLERY_CATEGORY_ID});
+                                },
+                                sending: function (file, xhr, formData) {
+                                    formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                                    formData.append('category', $(file.previewElement).data('node'));
+                                    formData.append('comment', '');
+                                    formData.append('hidden', 0);
+                                },
+                                complete: function (file) {
+                                    $(file.previewElement).find('img.dz-pending').remove();
+                                }
+                            });
+                        </script>
+                    </div>
+                </div>
+                <div class="content">
                     <a href="/cms/file/multi/{IMAGEGALLERY_CATEGORY_ID}" class="button icon-add">Post Images</a>
                     <!-- END submit_image -->
                     <a href="/cms/imageGallery/{IMAGEGALLERY_CATEGORY_ID}/returnTo:{ID}" class="button icon-view">View Full Gallery</a>

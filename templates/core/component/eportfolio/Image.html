@@ -8,16 +8,18 @@
             <section>
                 <div class="content">
                     <div class="dz-wrap">
-                        <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post" data-accepts="image">
-                            <div class="text dz-preview dz-file-preview" style="text-align:{IMAGE_ALIGN};">
-                                <span class="dz-details">
-                                  <img class="dz-pending" width="16" height="16" src="/images/resources/ajax.gif" style="top:50%;left:50%;" />
-                                  <img data-dz-thumbnail border="0" style="position:static;height:{COMPONENT_CONFIG_PIXEL};opacity:0.5">
-                                </span>
-                                <div class="dz-progress"><span class="dz-upload" style="position:absolute;top:0;left:0;height:100%;"></span></div>
-                            </div>
-                        </form>
-                        <div class="dz-container">
+                        <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post" data-accepts="image"></form>
+                        <ul data-dz-template class="hide">
+                            <li class="full-width">
+                                <div style="text-align:{IMAGE_ALIGN};">
+                                    <img data-dz-thumbnail src="/images/resources/ajax.gif" />
+                                </div>
+                                <div class="progress dz-progress">
+                                    <span class="meter dz-upload" style="width:0;"></span>
+                                </div>
+                            </li>
+                        </ul>
+                        <div data-dz-container>
                             <!-- BEGIN image -->
                             <ul class="inline-list">
                                 <!-- for padding and synonymity with imageList -->
@@ -37,7 +39,8 @@
                     <script type="text/javascript">
                         $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
                             wrapClass: 'dragging',
-                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} .dz-container',
+                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                            previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
                             createImageThumbnails: true,
                             thumbnailHeight: {COMPONENT_CONFIG_PIXEL},
                             thumbnailWidth: null,

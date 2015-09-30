@@ -8,16 +8,16 @@
             <section>
                 <div class="content">
                     <div class="dz-wrap clearfix">
-                        <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post" data-accepts="image">
-                            <div class="float-left image-thumbnail dz-preview dz-file-preview">
-                                <a class="thumb dz-details" style="height:100px;">
-                                    <img class="dz-pending" width="16" height="16" src="/images/resources/ajax.gif" style="top:4px;left:0px;" />
-                                    <img data-dz-thumbnail border="0" style="position:static;">
-                                </a>
-                                <div class="dz-progress"><span class="dz-upload" style="height:100%;position:absolute;top:0"></span></div>
-                            </div>
-                        </form>
-                        <div class="dz-container">
+                        <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post" data-accepts="image"></form>
+                        <ul data-dz-template class="hide">
+                           <li>
+                               <img data-dz-thumbnail src="/images/resources/ajax.gif" />
+                               <div class="progress dz-progress">
+                                   <span class="meter dz-upload" style="width:0;"></span>
+                               </div>
+                           </li>
+                        </ul>
+                        <div data-dz-container>
                             <ul class="inline-list">
                                 <!-- BEGIN list_item -->
                                 <li>
@@ -36,7 +36,8 @@
                     <script type="text/javascript">
                         $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
                             wrapClass: 'dragging',
-                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} .dz-container',
+                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                            previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
                             createImageThumbnails: true,
                             dictDefaultMessage: 'You can drag images into this space',
                             refreshUrl: '/eportfolio/configForm.php',

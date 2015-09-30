@@ -13,7 +13,18 @@
             <section>
                 <div class="dropzone-wrap">
                     <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post"></form>
-
+                    <ul data-dz-template class="hide">
+                        <li>
+                            <div class="avatar card small-12">
+                                <img data-dz-thumbnail class="mime" src="/images/resources/ajax.gif" />
+                                <p data-dz-name></p>
+                                <p class="meta" data-dz-status>Uploading...</p>
+                                <div class="progress dz-progress">
+                                    <span class="meter dz-upload" style="width:0;"></span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
                     <ul data-dz-container class="action-list">
                         <!-- BEGIN files -->
                         <li class="actions-small-1">
@@ -21,13 +32,13 @@
                                 <div class="avatar card small-12">
                                     <!-- BEGIN file_url -->
                                     <a data-plugin="preview" href="{FILE_URL}" rel="external">
-                                        <img class="content" src="/images/mime/60x60/{FILE_MIME_IMAGE}" />
-                                        <h3>{FILE_DESCRIPTION}</h3>
+                                        <img class="mime" src="/images/mime/60x60/{FILE_MIME_IMAGE}" />
+                                        <p>{FILE_DESCRIPTION}</p>
                                     </a>
                                     <!-- END file_url -->
                                     <!-- BEGIN file_no_url -->
                                     <img src="/images/mime/60x60/{FILE_MIME_IMAGE}" />
-                                    <h3>{FILE_DESCRIPTION}</h3>
+                                    <p>{FILE_DESCRIPTION}</p>
                                     <!-- END file_no_url -->
 
                                     <p class="meta">
@@ -61,6 +72,7 @@
                             $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
                                 wrapClass: 'dragging',
                                 previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                                previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
                                 tplWrap: '<li class="dz-preview" />',
                                 refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
                                 refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
@@ -75,7 +87,20 @@
                                     formData.append('hidden', 0);
                                 },
                                 complete: function (file) {
-                                    $(file.previewElement).find('img').remove();
+                                    $(file.previewElement).find('[data-dz-thumbnail]').attr('src', '/ajax/mime/' + file.type);
+                                },
+                                success: function (file, response) {
+                                    var el = $(file.previewElement);
+
+                                    el.attr('data-file', response.id)
+                                        .removeClass('dz-processing')
+                                        .find('span.dz-upload')
+                                        .addClass('complete');
+
+                                    el.find('[data-dz-status]').text('Success');
+                                },
+                                error: function (file, response) {
+                                    $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text(response.error);
                                 }
                             });
                         });
