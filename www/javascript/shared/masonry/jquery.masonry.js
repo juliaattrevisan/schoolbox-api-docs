@@ -612,7 +612,7 @@
             /* Collapse content on components (if it exists)
              */
             var collapser = $(response).find('[data-collapser=true]');
-            if (collapser.length) {
+            if (collapser.length && 'collapsable' in collapser) {
                 collapser.collapsable();
             }
 
