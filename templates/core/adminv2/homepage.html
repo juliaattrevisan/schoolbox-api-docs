@@ -59,9 +59,39 @@
                     </div>
                 </form>
 
-                <!-- BEGIN definition -->
-                <div class="component definition-id-{definition.id} {definition.singleton}">{definition.name}</div>
-                <!-- END definition -->
+                <!-- Homepage editor style tabs -->
+                <ul class="tabs" data-tab>
+                    <!-- BEGIN component_tab -->
+                    <li class="tab-title {COMPONENT_CATEGORY_CLASS}">
+                        <a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">
+                            {COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})
+                        </a>
+                    </li>
+                    <!-- END component_tab -->
+                </ul>
+                <div class="tabs-content">
+                    <!-- BEGIN component_page -->
+                    <ul class="content grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {COMPONENT_CATEGORY_CLASS}" id="tabs-sub-{COMPONENT_CATEGORY_ID}">
+                        <!-- BEGIN component -->
+                        <li>
+                            <div class="{COMPONENT_MULTIPLE_STATE} no-margin"
+                                 data-count="{COMPONENT_COUNT}"
+                                 data-multi="{COMPONENT_MULTIPLE_STATE}"
+                                 data-component-palette>
+                                <div class="avatar card">
+                                    <a href="#" rel="{COMPONENT_ID}" title="{COMPONENT_DESCRIPTION}">
+                                        <span class="icon-32 icon-masonry icon-masonry-{COMPONENT_CLASS}"></span>
+                                        <p>{COMPONENT_NAME}</p>
+                                        <p class="meta">(<span data-relation="count">{COMPONENT_COUNT}</span>)</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                        <!-- END component -->
+                    </ul>
+                    <!-- END component_page -->
+                </div>
+
             </div>
         </section>
     </div>
