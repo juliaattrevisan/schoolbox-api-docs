@@ -176,18 +176,24 @@
             });
         });
     }
-
-
 </script>
-<div class="admin-contents clearfix">
-    <h2>Global Message Settings</h2>
-    <p class="clearfix">
-        <a class="btn go-back float-left" href="{{ '/adminv2/messages' }}"><span></span>Back to Messages</a>
-    </p>
-    <div class="level clearfix">
-        <p>Use this page to configure the messages the system will send to users.</p>
-        <h3>Settings</h3>
-        <div class="wysiwyg">
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Global Message Settings</h1>
+        </div>
+    </div>
+    <nav>
+        <a class="icon-previous" href="{{ '/adminv2/messages' }}" title="Back to Messages"></a>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <div class="alert-box">Use this page to configure the messages the system will send to users.</div>
+
+        <section class="content">
             <ul>
                 <li>
                     <em>Selected options</em> are way this message should be received (remembering users can personalise their settings).
@@ -202,31 +208,34 @@
                     To hide a message source from members of a role, lock that source to Muted
                 </li>
             </ul>
-        </div>
+        </section>
+
         {% include '@messages/legend.twig' with { digest: true, mobile: 'plural', who: 'users' } %}
-        <ul class="filter admin-nav clearfix">
-            <li>
-                <span>Filter messages relevant to:</span>
-            </li>
+
+        <h2 class="subheader" id="filter">Configure Settings</h2>
+        <ul class="sub-nav">
             {% for i, filter in filters.options %}
-            <li>
-                <a href="/adminv2/messages/configure{{ filter == 'all' ? '' : ('/' ~ filter) }}" class="{% if filters.selected == i %}current{% endif %}">{{ filter | capitalize }}</a>
-            </li>
+                <li class="{% if filters.selected == i %}active{% endif %}">
+                    <a href="/adminv2/messages/configure{{ filter == 'all' ? '' : ('/' ~ filter) }}#filter">{{ filter | capitalize }}</a>
+                </li>
             {% endfor %}
         </ul>
-        <div class="clearfix pad-it"></div>
-        <ul id="configurator" class="namespaces">
-            {% for namespace in config %}
-            <li class="namespace" data-namespace="{{ ns[namespace.id].slug }}">
-                <h3>{{ ns[namespace.id].label }}</h3>
-                <ul class="sources">
-                {% for source in namespace.sources %}
-                    {% include '@messages/source.twig' with { source: source } %}
+
+        <section class="content">
+            <ul id="configurator">
+                {% for namespace in config %}
+                <li data-namespace="{{ ns[namespace.id].slug }}">
+                    <h3>{{ ns[namespace.id].label }}</h3>
+                    <ul>
+                        {% for source in namespace.sources %}
+                            {% include '@messages/source.twig' with { source: source } %}
+                        {% endfor %}
+                    </ul>
+                </li>
                 {% endfor %}
-                </ul>
-            </li>
-            {% endfor %}
-        </ul>
+            </ul>
+        </section>
     </div>
 </div>
-<div id="slider-modal" class="namespaces" style="display:none;"></div>
+
+<div id="slider-modal" class="hide"></div>
