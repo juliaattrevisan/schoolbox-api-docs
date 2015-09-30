@@ -1,42 +1,53 @@
-<h1>Network Drives Login</h1>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Network Drives Login</h1>
 
-<p>
-	Please enter your password to access Network Drives.
-</p>
+        <div class="alert-box">
+            <p>
+                Please enter your password to access Network Drives.
+            </p>
+        </div>
+    </div>
+</div>
 
-<form action="{SELF}" method="post" id="network-login">
-	<table class="standardForm table">
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Username</h4>
-			</td>
-			<td>
-				{NETWORK_DRIVES_USERNAME}
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Password</h4>
-			</td>
-			<td>
-				<input type="password" name="password" value="" />
-			</td>
-		</tr>
-	</table>
+<div class="row">
+    <div class="small-12 columns">
+        <form action="{SELF}" method="post" id="network-login">
+            <section>
+                <fieldset class="content">
+                    <legend></legend>
+                    <div class="small-12 columns">
+                        <label>
+                            Username
+                            {NETWORK_DRIVES_USERNAME}
+                        </label>
 
-	<input type="submit" class='submit-btn-plain' value="Submit" />
-</form>
+                        <label>
+                            Password
+                            <input type="password" name="password" value="" />
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Submit" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- BEGIN lite -->
 <script type="text/javascript">
     $(function () {
-
         $('#network-login').on('submit', function (e) {
+            e.preventDefault();
+
             var form = $(this),
                 data = form.serialize();
 
-            e.preventDefault();
-
-            form.find('input').attr('disabled', 'disabled');
+            form.find('input').attr('disabled', true);
 
             $.post(this.action, data, function () {
                 var explorer = form.closest('.explorer');
