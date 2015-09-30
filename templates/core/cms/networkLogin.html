@@ -11,7 +11,7 @@
 </div>
 
 <div class="row">
-    <div class="small-12 columns">
+    <div class="small-12 island">
         <form action="{SELF}" method="post" id="network-login">
             <section>
                 <fieldset class="content">
@@ -19,8 +19,9 @@
                     <div class="small-12 columns">
                         <label>
                             Username
-                            {NETWORK_DRIVES_USERNAME}
                         </label>
+
+                        <p>{NETWORK_DRIVES_USERNAME}</p>
 
                         <label>
                             Password
@@ -29,11 +30,8 @@
                     </div>
                 </fieldset>
             </section>
-            <div class="row">
-                <div class="small-12 columns">
-                    <input type="submit" value="Submit" />
-                </div>
-            </div>
+
+            <input type="submit" value="Submit" />
         </form>
     </div>
 </div>
@@ -54,7 +52,6 @@
                 explorer.load(explorer.data('url'));
             });
         });
-
     });
 </script>
 <!-- END lite -->
