@@ -590,8 +590,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	h3,
 	h4{
 		padding: $off-canvas-label-padding;
-		color: $off-canvas-label-color;
-		text-transform: $off-canvas-label-text-transform;
 		font-weight: $off-canvas-label-font-weight;
 		background-color: $off-canvas-label-bg;
 		border-top: $off-canvas-label-border-top;
@@ -599,6 +597,8 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		margin: $off-canvas-label-margin;
 	}
 	h3{
+        color: $off-canvas-label-color;
+        text-transform: $off-canvas-label-text-transform;
 		font-size: $off-canvas-label-font-size;
 	}
 	h4{
