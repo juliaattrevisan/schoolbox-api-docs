@@ -31,13 +31,21 @@
         
 <div class="row">
     <div class="small-12 island">
+        <div class="actions-small-1">
+            <div class="list-item">
+                <h2 class="subheader">Homepage Templates</h2>
+            </div>
+            <nav>
+                <a data-reveal-id="newDialog" class="icon-add" href="#" title="Create"></a>
+            </nav>
+        </div>
+
         <section>
             <div data-definition-palette class="content">
                 <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST">
-                    <div class="actions-small-3">
+                    <div class="actions-small-2">
                         <div class="list-item">
                             <input type="hidden" name="action" value="delete" />
-
                             <label for="templateSelector">Template</label>
                             <select id="templateSelector" data-template-select name="template">
                                 <!-- BEGIN template -->
@@ -46,7 +54,6 @@
                             </select>
                         </div>
                         <nav>
-                            <a data-reveal-id="newDialog" class="icon-add" href="#" title="Create"></a>
                             <a data-reveal-id="renameDialog" class="icon-modify" href="#" title="Rename"></a>
                             <a data-button="delete" class="icon-delete" href="#" title="Delete"></a>
                         </nav>
