@@ -210,9 +210,17 @@
             </ul>
         </section>
 
-        {% include '@messages/legend.twig' with { digest: true, mobile: 'plural', who: 'users' } %}
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader" id="filter">Configure Settings</h2>
+                </div>
+            </div>
+            <nav>
+                <a href="#" data-reveal-id="legend-modal" class="icon-view" title="View Legend"></a>
+            </nav>
+        </div>
 
-        <h2 class="subheader" id="filter">Configure Settings</h2>
         <ul class="sub-nav">
             {% for i, filter in filters.options %}
                 <li class="{% if filters.selected == i %}active{% endif %}">
@@ -239,3 +247,9 @@
 </div>
 
 <div id="slider-modal" class="hide"></div>
+
+<div id="legend-modal" class="reveal-modal" data-reveal>
+    {% include '@messages/legend.twig' with { digest: true, mobile: 'plural', who: 'users' } %}
+
+    <a class="close-reveal-modal">&#215;</a>
+</div>
