@@ -39,14 +39,17 @@
                             <!-- BEGIN unit -->
                             <li class="actions-small-1">
                                 <div class="list-item">
-                                    <div class="avatar card small-12">
+                                    <div class="info card small-12">
                                         <input name="unit[{UNIT_ID}]" type="hidden" value="0" />
                                         <input id="import-{UNIT_ID}" name="unit[{UNIT_ID}]" type="checkbox" value="1" {UNIT_ENABLED_CHECKED} />
-                                        <label for="import-{UNIT_ID}" class="checkbox-label">{UNIT_NAME}</label>
-                                        <p class="meta">
-                                            Open <time datetime="{UNIT_OPEN_DATE}" title="{UNIT_OPEN_DATE_LABEL}">{UNIT_OPEN_DATE_REL}</time>,
-                                            due <time datetime="{UNIT_DUE_DATE}" title="{UNIT_DUE_DATE_LABEL}">{UNIT_DUE_DATE_REL}</time>
-                                        </p>
+                                        <label for="import-{UNIT_ID}" class="checkbox-label">
+                                            {UNIT_NAME}
+
+                                            <p class="meta">
+                                                Open <time datetime="{UNIT_OPEN_DATE}" title="{UNIT_OPEN_DATE_LABEL}">{UNIT_OPEN_DATE_REL}</time>,
+                                                due <time datetime="{UNIT_DUE_DATE}" title="{UNIT_DUE_DATE_LABEL}">{UNIT_DUE_DATE_REL}</time>
+                                            </p>
+                                        </label>
                                     </div>
                                 </div>
                                 <nav>
