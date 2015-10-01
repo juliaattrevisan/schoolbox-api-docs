@@ -19,15 +19,15 @@
         permSelector:   '[data-perm]',
 
         expand: {
-            selector: 'a.exp',
+            selector: '[data-collapser]',
             duration: 200,
             down: {
-                btnClass: 'darr',
-                arrow: "&#9660;"
+                btnClass: 'icon-add',
+                arrow: ""
             },
             up: {
-                btnClass: 'uarr',
-                arrow: "&#9650;"
+                btnClass: 'icon-collapse',
+                arrow: ""
             },
             target: function () { return this.closest('form').siblings('form').eq(0); }
         },
