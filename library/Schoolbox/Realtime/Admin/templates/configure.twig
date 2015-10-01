@@ -100,27 +100,32 @@
 
             },
             advanced: function () {
-                var row    = this.closest('tr'),
+                var row    = this.closest('[data-role]'),
                     dialog = $('#slider-modal'),
-                    query  = [
-                        'source='+row.closest('[data-source]').data('source'),
-                        'slug='+row.closest('[data-namespace]').data('namespace'),
-                        {% if filters.options[filters.selected] != 'all' %}'roletype={{ filters.options[filters.selected] }}',{% endif %}{# twig inside js... what could possibly go wrong... #}
-                        'role='+row.data('role')
-                    ].join('&');
+                    src = row.closest('[data-source]');
 
-                dialog.load('/adminv2/messages/configure/custom', query, function () {
-                    var src = row.closest('[data-source]');
+                var data = {
+                    source: row.closest('[data-source]').data('source'),
+                    slug: row.closest('[data-namespace]').data('namespace'),
 
-                    dialog.dialog({
-                        modal: true,
-                        resizable: false,
-                        width: 640,
-                        title: 'Advanced Settings',
-                        close: function () {
-                            configurator.msgconfig('describe', src);
-                        }
-                    });
+                    {# twig inside js... what could possibly go wrong... #}
+                    {% if filters.options[filters.selected] != 'all' %}
+                    roletype: '{{ filters.options[filters.selected] }}',
+                    {% endif %}
+
+                    role: row.data('role')
+                }
+
+                /* Replace with a foundation modal
+                 */
+                // url with extra parameters
+                dialog.foundation('reveal', 'open', {
+                    url: '/adminv2/messages/configure/custom',
+                    data: data
+                });
+
+                dialog.on('close', function() {
+                    configurator.msgconfig('describe', src);
                 });
             }
         });
@@ -246,7 +251,7 @@
     </div>
 </div>
 
-<div id="slider-modal" class="hide"></div>
+<div id="slider-modal" class="reveal-modal" data-reveal></div>
 
 <div id="legend-modal" class="reveal-modal" data-reveal>
     {% include '@messages/legend.twig' with { digest: true, mobile: 'plural', who: 'users' } %}
