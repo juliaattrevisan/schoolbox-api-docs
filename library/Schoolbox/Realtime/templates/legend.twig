@@ -12,7 +12,7 @@
                 <li>
                     <div class="list-item">
                         <div class="small-12 avatar card">
-                            <img src="/images/core/messaging/muted.svg" alt="Muted" width="32" />
+                            <span class="icon-mute icon-32"></span>
                             <p>
                                 Muted
                             </p>
@@ -27,7 +27,7 @@
                 <li>
                     <div class="list-item">
                         <div class="small-12 avatar card">
-                            <img src="/images/core/messaging/digest.svg" alt="Digest" width="32" />
+                            <span class="icon-news icon-32"></span>
                             <p>
                                 Digest
                             </p>
@@ -43,7 +43,7 @@
                 <li>
                     <div class="list-item">
                         <div class="small-12 avatar card">
-                            <img src="/images/core/messaging/instant.svg" alt="Instant" width="32" />
+                            <span class="icon-notifications icon-32"></span>
                             <p>
                                 Instant
                             </p>
@@ -57,7 +57,7 @@
                 <li>
                     <div class="list-item">
                         <div class="small-12 avatar card">
-                            <span class="icon-add"></span>
+                            <span class="icon-add icon-32"></span>
                         </div>
                     </div>
                 </li>
@@ -66,13 +66,13 @@
                 <li>
                     <div class="list-item">
                         <div class="small-12 avatar card">
-                            <img src="/images/core/messaging/mobile.svg" alt="Mobile" width="32" />
+                            <span class="icon-mobile icon-32"></span>
                             <p>
                                 Mobile
                             </p>
                             <p class="meta">
                                 This message will be pushed to {{ who }}{{ who == 'you' ? 'r' : "'" }} mobile device{% if mobile | length > 1 %}s{% endif %}. <br />
-                                <em>*</em>Requires Instant to be enabled.</em>
+                                * Requires Instant to be enabled.
                             </p>
                         </div>
                     </div>
@@ -82,13 +82,13 @@
                 <li>
                     <div class="list-item">
                         <div class="small-12 avatar card">
-                            <img src="/images/core/messaging/email.svg" alt="Email" width="32" />
+                            <span class="icon-email icon-32"></span>
                             <p>
                                 Email
                             </p>
                             <p class="meta">
                                 This message will be immediately emailed to {{ who }}.<br />
-                                <em>*</em>Requires Instant to be enabled.</em>
+                                * Requires Instant to be enabled.
                             </p>
                         </div>
                     </div>
