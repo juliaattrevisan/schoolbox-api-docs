@@ -24,9 +24,9 @@
         $('body').svgInline();
 
         configurator = $('#configurator').msgconfig({
-            sourceSelector: 'li.source',
+            sourceSelector: '[data-source]',
             tableSelector:  '[data-digest-settings]',
-            roleSelector:   'tr',
+            roleSelector:   '[data-role]',
             customSelector: '[data-custom]',
             permSelector:   '.perm',
             persist: function () {
@@ -53,7 +53,7 @@
                 rows.each(function () {
                     var row  = $(this),
                         ins  = row.find('input[data-perm]:checked'),
-                        role = row.children('th').text(),
+                        role = row.find('[data-role-title]').text(),
                         sum  = 0;
 
                     if (!role) {
@@ -136,11 +136,11 @@
 
             $.each(sources, function (source, roles) {
 
-                var $src = $ns.find('li[data-source='+source+']');
+                var $src = $ns.find('[data-source='+source+']');
 
                 $.each(roles, function (role, config) {
 
-                    var $role = $src.find('tr[data-role='+role+']'),
+                    var $role = $src.find('[data-role='+role+']'),
                         options,
                         inDefault = function () {
                             var p = $(this).data('perm');
