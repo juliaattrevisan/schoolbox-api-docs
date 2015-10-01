@@ -799,17 +799,37 @@
      */
     Masonry.prototype.initTemplateSelector = function() {
         var self = this;
-        $(self.options.templateSelector.selector).change(function () {
+
+        //var element          = $(self.element);
+        var templateSelector = $(self.options.templateSelector.selector);
+
+        // Check for a preselected template selector: if so, load it
+        var loadLayout   = self.reloadLayout.bind(self);
+        var hashStripped = location.href.split("#")[1];
+        if (hashStripped) {
+            templateSelector.val(hashStripped);
+            $.get(self.options.templateSelector.url + '/' + hashStripped, loadLayout);
+        }
+
+        // Set up the change event
+        templateSelector.change(function () {
             var groupID   = this.value;
             location.hash = groupID;
-            $.get(self.options.templateSelector.url + '/' + groupID, function ($layout) {
-                // Update the components, and reinstall drag/drop
-                var element = $(self.element);
-                element.children().fadeOut(function () {
-                    element.empty().append($layout);
-                    element.fadeIn();
-                });
-            });
+            $.get(self.options.templateSelector.url + '/' + groupID, loadLayout);
+        });
+    };
+
+    /**
+     * Reload the list of components
+     *
+     * @param newLayout
+     */
+    Masonry.prototype.reloadLayout = function(newLayout)
+    {
+        var element = $(this.element);
+        element.children().fadeOut(function () {
+            element.empty().append(newLayout);
+            element.fadeIn();
         });
     };
 
