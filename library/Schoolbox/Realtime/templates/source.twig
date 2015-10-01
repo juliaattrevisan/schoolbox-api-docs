@@ -13,22 +13,20 @@
         </div>
     </form>
     <form method="post" class="hide" action="{{ routeLookup('adminMessages.saveConfig') }}">
-        <div class="content">
-            <ul class="action-list" data-roles data-digest-settings>
-                {% for role in source.roles %}
-                <li class="actions-small-7" data-role="{{ role.id }}">
-                    <div class="list-item">
-                        <div class="info card small-12">
-                            <p data-role-title>{{ roles[role.id].name }}</p>
-                        </div>
+        <ul class="action-list" data-roles data-digest-settings>
+            {% for role in source.roles %}
+            <li class="actions-small-7" data-role="{{ role.id }}">
+                <div class="list-item">
+                    <div class="info card small-12">
+                        <p data-role-title>{{ roles[role.id].name }}</p>
                     </div>
-                    <nav data-custom>
-                        {% include '@messages/options.twig' with { mode: 'p' } %}
-                        <a href="#" class="icon-modify" title="Advanced" data-custom-advanced></a>
-                    </nav>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
+                </div>
+                <nav data-custom>
+                    {% include '@messages/options.twig' with { mode: 'p' } %}
+                    <a href="#" class="icon-modify" title="Advanced" data-custom-advanced></a>
+                </nav>
+            </li>
+            {% endfor %}
+        </ul>
     </form>
 </li>
