@@ -227,19 +227,25 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>
+                        <label for="link">
                             URL
                             <span class='hint has-tip tip-top' data-tooltip title="Add an optional link to this tile, linking it to either an external page or existing resource.">?</span>
                         </label>
-                        <input name="link"
+                    </div>
+                    <div class="small-12 medium-8 columns">
+                        <label>
+                        <input name="link" id="link" type="text"
                                value="{{ item.link|e('html_attr') }}"
-                               class="fullwidth"
                                placeholder="http://" />
+                        </label>
+                    </div>
+                    <div class="small-12 medium-4 columns">
                         <a href="#" class="button icon-folder" data-function="browse">Browse Resources</a>
 
                         {# Dialog for resource browser #}
                         <div class="hide" data-resource-browser></div>
-
+                    </div>
+                    <div class="small-12 columns">
                         <label>
                             Opens In
                             <select name="link_target">
