@@ -6,7 +6,6 @@
         $('[data-homepage-layout]').masonry({
             // Only create action goes through masonry
             context: function(masonry) {
-//                console.log(masonry);
                 return {
                     context: 'homepage_template',
                     cid: $(masonry.options.templateSelector.selector).val()
@@ -40,6 +39,7 @@
             },
             column: {
                 leftColumnWidth: 6,
+                selector: '[data-position]',
                 position: {
                     top: '[data-position=top]',
                     left: '[data-position=left]',
