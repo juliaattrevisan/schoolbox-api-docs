@@ -229,20 +229,20 @@
             {% endfor %}
         </ul>
 
-        <section class="content">
-            <ul id="configurator" class="information-list">
-                {% for namespace in config %}
-                <li data-namespace="{{ ns[namespace.id].slug }}">
-                    <h3>{{ ns[namespace.id].label }}</h3>
+        <div id="configurator">
+            {% for namespace in config %}
+            <h3 class="subheader">{{ ns[namespace.id].label }}</h3>
+            <section>
+                <div data-namespace="{{ ns[namespace.id].slug }}">
                     <ul class="information-list">
                         {% for source in namespace.sources %}
                             {% include '@messages/source.twig' with { source: source } %}
                         {% endfor %}
                     </ul>
-                </li>
-                {% endfor %}
-            </ul>
-        </section>
+                </div>
+            </section>
+            {% endfor %}
+        </div>
     </div>
 </div>
 
