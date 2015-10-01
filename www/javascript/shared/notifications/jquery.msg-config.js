@@ -79,7 +79,7 @@
         this.sources = $(this.element).find(this.sel('source'));
 
         if (self.options.customSelector) {
-            $(this.element).on('click', this.sel('custom', 'a'), function (e) {
+            $(this.element).on('click', this.sel('[data-custom]', '[data-custom-advanced]'), function (e) {
                 var link = $(this);
 
                 e.preventDefault();
