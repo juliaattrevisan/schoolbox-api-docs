@@ -322,7 +322,7 @@
             opt.component.controlPanelSelector+' form',
             function(event) {
                 var form       = $(this),
-                    formData   = form.serializeArray(),
+                    formData   = form.serialize()+'&'+$.param(masonry.getContext()),
                     formInputs = form.find(':input'),
                     panel      = form.closest(opt.component.controlPanelSelector),
                     existing   = panel.closest(opt.component.selector),
