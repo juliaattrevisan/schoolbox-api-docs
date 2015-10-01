@@ -97,70 +97,68 @@ if ($_POST['type'] == 'components') {
     $renderer = new Component_Renderer();
     $renderer->renderAdminComponent($component);
 } elseif ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
-//    // GET config options from homepage
-//    $config = $_GET;
-//
-//    /** @var Component_Instance $instance */
-//    $instance = reset($componentInstanceMapper->findByInstanceId($config['component']));
-//
-//    if (is_object($instance)) {
-//        $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
-//
-//        $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
-//            'component_definition_id', $instance->getDefinitionId()
-//        );
-//
-//        unset($config['cid'], $config['type'], $config['component']);
-//
-//        // Create a controller object for the config class to use when
-//        // dehydrating config values into database
-//        $cclass = $instance->getDefinition()->getClass();
-//        /** @var Component_ControllerAbstract $controller */
-//        $controller = new $cclass($instance, new \Schoolbox\User(), $page);
-//
-//        /** @var Component_ConfigDefinition $confD */
-//        foreach ($configDefinitionCollection as $confD) {
-//            $key = $confD->getKey();
-//            if (isset($config[$key])) {
-//                $configItem = Component_Config_Factory::build($key, $category, $config);
-//                $value      = $configItem->dehydrate($config[$key], $controller);
-//
-//                // this should be 1:1 relation, so return only the first instance of this definition
-//                /** @var Component_Config $confI */
-//                $confI = $componentConfigInstanceMapper->findByColumnList(
-//                    array(
-//                        'component_config_definition_id' => $confD->getId(),
-//                        'component_instance_id'          => $instance->getId()
-//                    )
-//                )->first();
-//                if (!($confI instanceof Component_Config)) {
-//                    $confI = new Component_Config();
-//                }
-//
-//                if (!($confI->getId())) {
-//                    $confI = new Component_Config();
-//                    $confI->setConfigDefinitionId($confD->getId());
-//                    $confI->setInstanceId($instance->getId());
-//                }
-//                $confI->setValue($value);
-//
-//                $componentConfigInstanceMapper->save($confI);
-//
-//            }
-//        }
-//        if (SitePage::detectAjax()) {
-//            // Just refetch the instance
-//            $instance   = reset($componentInstanceMapper->findByInstanceId($instance->getId()));
-//            $controller = new $cclass($instance, new \Schoolbox\User(), $page);
-//
-//            $folderMapper = new \Schoolbox\Resource\CategoryMapper();
-//            $folder = $folderMapper->findById($_GET['cid']);
-//            $renderer = new Component_Renderer();
-//            $renderer->renderHomepageComponent($folder, $controller);
-//            exit;
-//        } else {
+    // GET config options from homepage
+    $config = $_GET;
+
+    /** @var Component_Instance $instance */
+    $instance = reset($componentInstanceMapper->findByInstanceId($config['component']));
+
+    if (is_object($instance)) {
+        $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
+
+        $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
+            'component_definition_id', $instance->getDefinitionId()
+        );
+
+        unset($config['cid'], $config['type'], $config['component']);
+
+        // Create a controller object for the config class to use when
+        // dehydrating config values into database
+        $cclass = $instance->getDefinition()->getClass();
+        /** @var Component_ControllerAbstract $controller */
+        $controller = new $cclass($instance, new \Schoolbox\User(), $page);
+
+        /** @var Component_ConfigDefinition $confD */
+        foreach ($configDefinitionCollection as $confD) {
+            $key = $confD->getKey();
+            if (isset($config[$key])) {
+                $configItem = Component_Config_Factory::build($key, $category, $config);
+                $value      = $configItem->dehydrate($config[$key], $controller);
+
+                // this should be 1:1 relation, so return only the first instance of this definition
+                /** @var Component_Config $confI */
+                $confI = $componentConfigInstanceMapper->findByColumnList(
+                    array(
+                        'component_config_definition_id' => $confD->getId(),
+                        'component_instance_id'          => $instance->getId()
+                    )
+                )->first();
+                if (!($confI instanceof Component_Config)) {
+                    $confI = new Component_Config();
+                }
+
+                if (!($confI->getId())) {
+                    $confI = new Component_Config();
+                    $confI->setConfigDefinitionId($confD->getId());
+                    $confI->setInstanceId($instance->getId());
+                }
+                $confI->setValue($value);
+
+                $componentConfigInstanceMapper->save($confI);
+
+            }
+        }
+        if (SitePage::detectAjax()) {
+            // Just refetch the instance
+            $instance   = reset($componentInstanceMapper->findByInstanceId($instance->getId()));
+            $controller = new $cclass($instance, new \Schoolbox\User(), $page);
+
+            $renderer = new Component_Renderer();
+            $renderer->renderAdminComponent($controller);
+            exit;
+        } else {
 //            SitePage::localRedir("/homepage/" . $_GET['cid']);
-//        }
-//    }
+        }
+    }
 //    SitePage::localRedir("/homepage/" . $_GET['cid']);
 }
