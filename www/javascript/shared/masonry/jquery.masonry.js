@@ -572,6 +572,14 @@
 
     };
 
+    /**
+     * Gets the context (additional form parameters) for an AJAX request.
+     *
+     * If this.options.context is a callback, returns the result of that -
+     * otherwise just returns this.options.context.
+     *
+     * @returns {*}
+     */
     Masonry.prototype.getContext = function()
     {
         if (typeof this.options.context === 'function') {
@@ -827,9 +835,13 @@
     Masonry.prototype.reloadLayout = function(newLayout)
     {
         var element = $(this.element);
-        element.children().fadeOut(function () {
-            element.empty().append(newLayout);
-            element.fadeIn();
+        // Replace only the columns themselves
+        var layoutHtml = $(newLayout);
+        $.each(this.options.column.position, function(i, positionSelector) {
+            var oldPosition = element.find(positionSelector);
+            oldPosition.fadeOut(function () {
+                oldPosition.empty().append(layoutHtml.find(positionSelector).children()).fadeIn();
+            })
         });
     };
 
