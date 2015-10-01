@@ -23,38 +23,15 @@ $groupId = $this->arg[1];
 if (empty($context) || empty($groupId)) {
     httpError(400, 2); // info missing
 }
-$componentFactory = buildComponentFactory($context, new Schoolbox\User(), $this);
-if (!$componentFactory) {
+
+try {
+    $factoryFactory   = new Component_FactoryFactory();
+    $componentFactory = $factoryFactory->build($context, new Schoolbox\User(), $this, true);
+} catch (Exception $e) {
     httpError(400, 'Invalid context specified.');
+    exit;
 }
 $componentCollection = $componentFactory->buildComponentList($groupId);
 
 $renderer = new Component_Renderer();
 $renderer->renderAllAdminComponents($this, $componentCollection);
-
-/**
- * Factory function to produce...uh, a Factory -_-
- * @param $context
- * @param Schoolbox\User $user
- * @param SitePage $sitepage
- * @return Component_FactoryAbstract|null
- */
-function buildComponentFactory($context, Schoolbox\User $user, SitePage $sitepage)
-{
-    $contextMap = array(
-        'dashboard' => false,
-        'homepage' => true,
-        'eportfolio' => true
-    );
-
-    if (isset($contextMap[$context])) {
-        $class = sprintf('Component_%s_Factory', ucfirst(strtolower($context)));
-
-        if ($contextMap[$context]) {
-            return new $class($user, $sitepage, true);
-        } else {
-            return new $class($user, $sitepage);
-        }
-    }
-    return null;
-}
