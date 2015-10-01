@@ -25,9 +25,9 @@
 
         configurator = $('#configurator').msgconfig({
             sourceSelector: 'li.source',
-            tableSelector:  '.digest-settings',
+            tableSelector:  '[data-digest-settings]',
             roleSelector:   'tr',
-            customSelector: 'td.custom',
+            customSelector: '[data-custom]',
             permSelector:   '.perm',
             persist: function () {
                 var form = this.children('form[method=post]');
@@ -44,9 +44,9 @@
             },
             describe: function () {
 
-                var summary = this.find('h4 em.summary'),
-                    table   = this.find('table.roles'),
-                    rows    = table.find('tr.role'),
+                var summary = this.find('[data-summary]'),
+                    table   = this.find('[data-roles]'),
+                    rows    = table.find('[data-role]'),
                     text    = 'Sent to ',
                     count   = 0;
 
@@ -110,7 +110,7 @@
                     ].join('&');
 
                 dialog.load('/adminv2/messages/configure/custom', query, function () {
-                    var src = row.closest('.source');
+                    var src = row.closest('[data-source]');
 
                     dialog.dialog({
                         modal: true,

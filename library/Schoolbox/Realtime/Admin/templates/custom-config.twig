@@ -91,7 +91,7 @@
             <strong>Step 1:</strong> Select the settings that members of '{{ role.name }}' are <em>allowed to select</em> for this message when customizing their notifications.
             If you only select a single option, users will be locked to that option.
         </p>
-        <table class="roles digest-settings" id="adv-possibilities">
+        <table data-roles data-digest-settings id="adv-possibilities">
             <tr class="role">
                 {% for level, perm in perms %}
                     <td class="perm">
@@ -113,7 +113,7 @@
             </tr>
         </table>
         <p><strong>Step 2:</strong> Select the default setting for members of '{{ role.name }}' for this message.</p>
-        <table class="roles digest-settings" data-settings id="adv-selection">
+        <table data-roles data-digest-settings data-settings id="adv-selection">
             <tr class="role" data-role="{{ role.id }}">
                 {% include '@messages/options.twig' with { mode: 'def' } %}
             </tr>

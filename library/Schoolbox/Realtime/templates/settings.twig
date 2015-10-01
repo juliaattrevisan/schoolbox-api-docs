@@ -104,7 +104,7 @@
         <br/><em>Options that are unavailable have been disabled by your system administrator.</em>
     </p>
     {% include '@messages/legend.twig' with { who: 'you' } %}
-    <table id="msg-settings" class="digest-settings roles">
+    <table data-roles data-digest-settings id="msg-settings">
         {% for namespace in config %}
         <tr class="ns">
             <th colspan="2">Receive {{ namespace.label }} messages when&hellip;</th>
