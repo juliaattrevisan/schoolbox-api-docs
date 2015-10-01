@@ -41,7 +41,7 @@
         // Yes, this is a global variable, it's needed for the
         // social stream browser to work
         socialstreamSession = {categoryId: 0};
-        var socialstream_browser = form.find('.resource_browser');
+        var socialstream_browser = form.find('[data-resource-browser]');
         if (socialstream_browser.length && $.fn.socialstreamBrowser) {
             form.find('a[data-function="browse"]')
                 .click(
@@ -68,54 +68,65 @@
 })(jQuery);
 </script>
 
-<h1>{% if item.id %}Modify Tile{% else %}Add Tile{% endif %}</h1>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>{% if item.id %}Modify Tile{% else %}Add Tile{% endif %}</h1>
+        </div>
+    </div>
+    <nav>
+        {# Link depends on identifier #}
+        <a href="{{ routeLookup('tile.layout', {componentId: component.id}) }}" class="icon-previous" title="Cancel"></a>
+    </nav>
+</div>
 
-<form id="tile-modify-form"
-      action="{% if item.id %}{{ routeLookup('tile.update:post', {id: item.id}) }}{% else %}{{ routeLookup('tile.create', {componentId: component.id}) }}{% endif %}"
-      method="post"
-      name="form"
-      class="clearfix"
-      enctype="multipart/form-data"
->
-    <input type="hidden" name="id" value="{{ item.id|e('html_attr') }}"/>
-    <table class="standardForm table">
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Title</h4>
-                <em>
-                    Add an optional title to appear above the tile background.
-                </em>
-            </td>
-            <td>
-                <dl>
-                    <dt>Text</dt>
-                    <dd class="title-text">
-                        <input type="text"
-                               name="title_text"
-                               value="{{ item.titleText|e('html_attr') }}"
-                               class="fullwidth"
-                               placeholder="enter text..." />
-                    </dd>
-                    <dt>Colour</dt>
-                    <dd class="title-color">
+<div class="row">
+    <div class="small-12 island">
+        <form id="tile-modify-form" name='form' action="{% if item.id %}{{ routeLookup('tile.update:post', {id: item.id}) }}{% else %}{{ routeLookup('tile.create', {componentId: component.id}) }}{% endif %}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="{{ item.id|e('html_attr') }}"/>
+
+            <h2 class="subheader">Title</h2>
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label class="text">
+                            Text
+                            <span class='hint has-tip tip-top' data-tooltip title="Add an optional title to appear above the tile background.">?</span>
+                            <input type="text" name="title_text" value="{{ item.titleText|e('html_attr') }}" placeholder="enter text..." />
+                        </label>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>
+                        Colour
+                    </legend>
+                    <div class="small-6 columns">
+                        <label for="title_color">
+                            Text
+                        </label>
                         <input type="text"
                                id="title_color"
                                name="title_color"
                                data-colorpicker
                                value="{{ item.titleColor|e('html_attr') }}" />
-                        <label for="title_color">Text</label>
-                    </dd>
-                    <dd class="title-color">
+                    </div>
+                    <div class="small-6 columns">
+                        <label for="title_background_color">
+                            Background
+                        </label>
                         <input type="text"
                                id="title_background_color"
                                name="title_background_color"
                                data-colorpicker
                                value="{{ item.titleBackgroundColor|e('html_attr') }}" />
-                        <label for="title_background_color">Background</label>
-                    </dd>
-                    <dt>Position</dt>
-                    <dd class="title-position">
-                        <table class="table position-selector">
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>
+                        Position
+                    </legend>
+                    <div class="small-12 columns no-pad">
+                        <table>
                             <thead>
                             <tr>
                                 <th>&nbsp;</th>
@@ -133,6 +144,7 @@
                                            name="title_position"
                                            value="{{ constant('POSITION_TOPLEFT', item) }}"
                                            {% if item.isTitlePosition(constant('POSITION_TOPLEFT', item)) %}checked{% endif %} />
+                                    <label for="title_position_topleft" class="radio-label"></label>
                                 </td>
                                 <td>
                                     <input type="radio"
@@ -140,6 +152,7 @@
                                            name="title_position"
                                            value="{{ constant('POSITION_TOP', item) }}"
                                            {% if item.isTitlePosition(constant('POSITION_TOP', item)) %}checked{% endif %} />
+                                    <label for="title_position_top" class="radio-label"></label>
                                 </td>
                                 <td>
                                     <input type="radio"
@@ -147,6 +160,7 @@
                                            name="title_position"
                                            value="{{ constant('POSITION_TOPRIGHT', item) }}"
                                            {% if item.isTitlePosition(constant('POSITION_TOPRIGHT', item)) %}checked{% endif %} />
+                                    <label for="title_position_topright" class="radio-label"></label>
                                 </td>
                             </tr>
                             <tr>
@@ -157,6 +171,7 @@
                                            name="title_position"
                                            value="{{ constant('POSITION_LEFT', item) }}"
                                            {% if item.isTitlePosition(constant('POSITION_LEFT', item)) %}checked{% endif %} />
+                                    <label for="title_position_left" class="radio-label"></label>
                                 </td>
                                 <td>
                                     <input type="radio"
@@ -164,6 +179,7 @@
                                            name="title_position"
                                            value="{{ constant('POSITION_CENTER', item) }}"
                                            {% if item.isTitlePosition(constant('POSITION_CENTER', item)) %}checked{% endif %} />
+                                    <label for="title_position_center" class="radio-label"></label>
                                 </td>
                                 <td>
                                     <input type="radio"
@@ -171,6 +187,7 @@
                                            name="title_position"
                                            value="{{ constant('POSITION_RIGHT', item) }}"
                                            {% if item.isTitlePosition(constant('POSITION_RIGHT', item)) %}checked{% endif %} />
+                                    <label for="title_position_right" class="radio-label"></label>
                                 </td>
                             </tr>
                             <tr>
@@ -181,6 +198,7 @@
                                            name="title_position"
                                            value="{{ constant('POSITION_BOTTOMLEFT', item) }}"
                                            {% if item.isTitlePosition(constant('POSITION_BOTTOMLEFT', item)) %}checked{% endif %} />
+                                    <label for="title_position_bottomleft" class="radio-label"></label>
                                 </td>
                                 <td>
                                     <input type="radio"
@@ -188,6 +206,7 @@
                                            name="title_position"
                                            value="{{ constant('POSITION_BOTTOM', item) }}"
                                            {% if item.isTitlePosition(constant('POSITION_BOTTOM', item)) %}checked{% endif %} />
+                                    <label for="title_position_bottom" class="radio-label"></label>
                                 </td>
                                 <td>
                                     <input type="radio"
@@ -195,84 +214,113 @@
                                            name="title_position"
                                            value="{{ constant('POSITION_BOTTOMRIGHT', item) }}"
                                            {% if item.isTitlePosition(constant('POSITION_BOTTOMRIGHT', item)) %}checked{% endif %} />
+                                    <label for="title_position_bottomright" class="radio-label"></label>
                                 </td>
                             </tr>
                             </tbody>
                         </table>
-                    </dd>
-                </dl>
-            </td>
-        </tr>
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Link</h4>
-                <em>Add an optional link to this tile, linking it to either an external page or existing resource.</em>
-            </td>
-            <td>
-                <dl>
-                    <dt>URL</dt>
-                    <dd>
-                        <input name="link"
+                    </div>
+                </fieldset>
+            </section>
+
+            <h2 class="subheader">Link</h2>
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label for="link">
+                            URL
+                            <span class='hint has-tip tip-top' data-tooltip title="Add an optional link to this tile, linking it to either an external page or existing resource.">?</span>
+                        </label>
+                    </div>
+                    <div class="small-12 medium-8 columns">
+                        <label>
+                        <input name="link" id="link" type="text"
                                value="{{ item.link|e('html_attr') }}"
-                               class="fullwidth"
                                placeholder="http://" />
-                        <a href="#" data-function="browse" class="btn folder float-left"><span></span>Browse Resources</a>
-                    </dd>
-                    <dt>Opens in</dt>
-                    <dd>
-                        <select name="link_target">
-                            <option value="_self" {% if item.getLinkTarget() == '_self' %}selected{% endif %}>Same tab/window</option>
-                            <option value="_blank" {% if item.getLinkTarget() == '_blank' %}selected{% endif %}>New tab/window</option>
-                        </select>
-                    </dd>
-                </dl>
-            </td>
-        </tr>
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Background</h4>
-            </td>
-            <td>
-                <dl>
-                    <dt>Colour</dt>
-                    <dd class="background-color">
+                        </label>
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <a href="#" class="button icon-folder" data-function="browse">Browse Resources</a>
+
+                        {# Dialog for resource browser #}
+                        <div class="hide" data-resource-browser></div>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>
+                            Opens In
+                            <select name="link_target">
+                                <option value="_self" {% if item.getLinkTarget() == '_self' %}selected{% endif %}>Same tab/window</option>
+                                <option value="_blank" {% if item.getLinkTarget() == '_blank' %}selected{% endif %}>New tab/window</option>
+                            </select>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <h2 class="subheader">Background</h2>
+            <section>
+                <fieldset class="content">
+                    <legend>Colour</legend>
+                    <div class="small-6 columns">
+                        <label for="background_color">
+                            Background
+                        </label>
                         <input type="text"
                                id="background_color"
                                name="background_color"
                                data-colorpicker
                                value="{{ item.backgroundColor|e('html_attr') }}" />
-                        <label for="background_color">Background</label>
-                    </dd>
-                    <dd class="background-color">
+                    </div>
+                    <div class="small-6 columns">
+                        <label for="hover_color">
+                            Hover
+                        </label>
                         <input type="text"
                                id="hover_color"
                                name="hover_color"
                                data-colorpicker
                                value="{{ item.hoverColor|e('html_attr') }}" />
-                        <label for="hover_color">Hover</label>
-                    </dd>
-                    <dt>Image</dt>
-                    <dd class="background-upload">
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>
+                        Image
+                    </legend>
+                    <div class="small-12 columns">
+                        <label>
+                            Image
+                        </label>
                         {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-                    </dd>
-                    <dt>Image Size</dt>
-                    <dd class="title-position">
+
+                        <label>
+                            Image Size
+                        </label>
+
                         <input type="radio"
                                id="background_image_contained_0"
                                name="background_image_contained"
                                value="0"
                                {% if not item.backgroundImageContained %}checked{% endif %} />
-                        <label for="background_image_contained_0">Stretch to cover entire tile</label>
+                        <label for="background_image_contained_0" class="radio-label">
+                            Stretch to cover entire tile
+                        </label>
+
                         <input type="radio"
                                id="background_image_contained_1"
                                name="background_image_contained"
                                value="1"
                                {% if item.backgroundImageContained %}checked{% endif %} />
-                        <label for="background_image_contained_1">Resize to fit within tile</label>
-                    </dd>
-                    <dt {% if not item.backgroundImageContained %}class="hide"{% endif %} data-background-position>Position</dt>
-                    <dd class="{% if not item.backgroundImageContained %}hide{% endif %} background-position" data-background-position>
-                        <table class="table position-selector">
+                        <label for="background_image_contained_1" class="radio-label">
+                            Resize to fit within tile
+                        </label>
+                    </div>
+                </fieldset>
+                <fieldset class="content {% if not item.backgroundImageContained %}hide{% endif %}" data-background-position>
+                    <legend>
+                        Position
+                    </legend>
+                    <div class="small-12 columns {% if not item.backgroundImageContained %}hide{% endif %} background-position" data-background-position>
+                        <table class="position-selector">
                             <thead>
                             <tr>
                                 <th>&nbsp;</th>
@@ -356,21 +404,15 @@
                             </tr>
                             </tbody>
                         </table>
-                    </dd>
-                </dl>
-            </td>
-        </tr>
-    </table>
-
-    <input id="resource-save"
-           type="submit"
-           value="Save"
-           class="submit-btn-plain"
-    />
-    {# Link depends on identifier #}
-    <a href="{{ routeLookup('tile.layout', {componentId: component.id}) }}" class="btn no-icon float-left"><span></span>Cancel</a>
-
-    {# Dialog for resource browser #}
-    <div class="resource_browser hide">
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input id="resource-save" type="submit" value="Save" />
+                </div>
+            </div>
+        </form>
     </div>
-</form>
+</div>
+
