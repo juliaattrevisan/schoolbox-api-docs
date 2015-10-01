@@ -1,10 +1,16 @@
 <li data-source="{{ sources[source.id].key }}">
     <form> {# for some reason required for formatting and js targeting -_- #}
-        <h4>
-            <a data-collapser class="icon-add" href="#"></a>
-            <span class="label">"Send a message when {{ sources[source.id].description }}."</span>
-            <em data-summary>&nbsp;</em>
-        </h4>
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <p>"Send a message when {{ sources[source.id].description }}."</p>
+                    <p class="meta" data-summary></p>
+                </div>
+            </div>
+            <nav>
+                <a data-collapser class="icon-add" href="#"></a>
+            </nav>
+        </div>
     </form>
     <form method="post" style="display:none" action="{{ routeLookup('adminMessages.saveConfig') }}">
         <ul class="action-list" data-roles data-digest-settings>
