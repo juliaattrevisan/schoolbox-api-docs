@@ -230,11 +230,11 @@
         </ul>
 
         <section class="content">
-            <ul id="configurator">
+            <ul id="configurator" class="information-list">
                 {% for namespace in config %}
                 <li data-namespace="{{ ns[namespace.id].slug }}">
                     <h3>{{ ns[namespace.id].label }}</h3>
-                    <ul>
+                    <ul class="information-list">
                         {% for source in namespace.sources %}
                             {% include '@messages/source.twig' with { source: source } %}
                         {% endfor %}
