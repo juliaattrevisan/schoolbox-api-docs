@@ -12,7 +12,7 @@
             </nav>
         </div>
     </form>
-    <form method="post" style="display:none" action="{{ routeLookup('adminMessages.saveConfig') }}">
+    <form method="post" class="hide" action="{{ routeLookup('adminMessages.saveConfig') }}">
         <ul class="action-list" data-roles data-digest-settings>
             {% for role in source.roles %}
             <li class="actions-small-7" data-role="{{ role.id }}">

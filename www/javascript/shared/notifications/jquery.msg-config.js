@@ -20,7 +20,7 @@
 
         expand: {
             selector: '[data-collapser]',
-            duration: 200,
+            duration: 500,
             down: {
                 btnClass: 'icon-add',
                 arrow: ""
@@ -102,14 +102,15 @@
                 if (btn.hasClass(down.btnClass)) {
                     // change to uarr, expand content
                     btn.removeClass(down.btnClass).addClass(up.btnClass).html(down.arrow);
-                    form.show(self.options.expand.duration);
+                    form.stop().css({opacity: 0}).removeClass('hide').animate({opacity:1}, self.options.expand.duration);
 
                 } else {
                     // change to darr, contract content
                     btn.removeClass(up.btnClass).addClass(down.btnClass).html(up.arrow);
-                    form.hide(self.options.expand.duration);
+                    form.stop().css({opacity: 1}).animate({opacity:0}, self.options.expand.duration, function() {
+                        form.addClass('hide');
+                    })
                 }
-
             });
         }
 
