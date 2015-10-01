@@ -332,7 +332,7 @@
                 formInputs.prop('disabled', true);
                 $.ajax(
                     {
-                        url:  this.action,
+                        url:  masonry.options.component.url,
                         type: this.method,
                         data: formData
                     }
