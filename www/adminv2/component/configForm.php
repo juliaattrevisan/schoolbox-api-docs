@@ -149,7 +149,8 @@ if ($_POST['type'] == 'components') {
             }
         }
         if (SitePage::detectAjax()) {
-            $componentFactory = new Component_Homepage_Factory(new Schoolbox\User(), $page, true);
+            $factoryFactory   = new Component_FactoryFactory();
+            $componentFactory = $factoryFactory->build($instance->getModule(), new Schoolbox\User(), $page, true);
             $renderer         = new Component_Renderer();
             $renderer->renderAllAdminComponents($page, $componentFactory->buildComponentList($_GET['cid']));
             $page->outputPage(true);
