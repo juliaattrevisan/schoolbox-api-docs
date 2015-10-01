@@ -149,53 +149,9 @@ if ($_POST['type'] == 'components') {
             }
         }
         if (SitePage::detectAjax()) {
-            // Render all of the components, and let Marilyn Masonry figure it out
-            $page->setFile(TEMPLATE_body, 'adminv2/component/layout.html');
-            $page->setBlock(TEMPLATE_body, 'position_top', 'position_top_block');
-            $page->setBlock(TEMPLATE_body, 'position_left', 'position_left_block');
-            $page->setBlock(TEMPLATE_body, 'position_right', 'position_right_block');
-
-            $componentFactory = buildComponentFactory('homepage', new Schoolbox\User(), $page);
-
-            $componentCollection = $componentFactory->buildComponentList($_GET['cid']);
-
-            $occupiedPositionList = array();
-
-            foreach ($componentCollection as $component) {
-                /** @var Component_ControllerAbstract $component */
-                $instance_no = $component->getInstance()->getId();
-                $position_no = $component->getInstance()->getPosition();
-                $position    = "position_{$position_no}";
-
-                if (!$page->template->exists("{$position}_block")) {
-                    $page->setFile($position, 'adminv2/component/placeholder.html');
-                }
-
-                $component->setup(null, array());
-
-                $page->setVar(array(
-                    'COMPONENT_INSTANCE_ID'     => $instance_no,
-                    'COMPONENT_HANDLE'          => $instance_no,
-                    'component.instance.id'     => $instance_no,
-                    'component.definition.id'   => $component->getInstance()->getDefinition()->getId(),
-                    'component.definition.name' => $component->getInstance()->getDefinition()->getName(),
-                ));
-
-                $component->setConfigurationTemplate('component/config/_templatewrapper.html');
-                $component->parseConfigForTemplate();
-
-                $page->parse("{$position}_block", $position, true);
-
-                if (!in_array($position_no, $occupiedPositionList)) {
-                    $occupiedPositionList[] = $position_no;
-                }
-            }
-
-            $emptyPositionList = array_diff(array('top', 'left', 'right'), $occupiedPositionList);
-
-            foreach ($emptyPositionList as $emptyPosition) {
-                $page->setVar("position_{$emptyPosition}_block", '');
-            }
+            $componentFactory = new Component_Homepage_Factory(new Schoolbox\User(), $page, true);
+            $renderer         = new Component_Renderer();
+            $renderer->renderAllAdminComponents($page, $componentFactory->buildComponentList($_GET['cid']));
             $page->outputPage(true);
             exit;
         } else {
@@ -203,31 +159,4 @@ if ($_POST['type'] == 'components') {
         }
     }
 //    SitePage::localRedir("/homepage/" . $_GET['cid']);
-}
-
-/**
- * Factory function to produce...uh, a Factory -_-
- * @param $context
- * @param Schoolbox\User $user
- * @param SitePage $sitepage
- * @return Component_FactoryAbstract|null
- */
-function buildComponentFactory($context, Schoolbox\User $user, SitePage $sitepage)
-{
-    $contextMap = array(
-        'dashboard'  => false,
-        'homepage'   => true,
-        'eportfolio' => true
-    );
-
-    if (isset($contextMap[$context])) {
-        $class = sprintf('Component_%s_Factory', ucfirst(strtolower($context)));
-
-        if ($contextMap[$context]) {
-            return new $class($user, $sitepage, true);
-        } else {
-            return new $class($user, $sitepage);
-        }
-    }
-    return null;
 }
