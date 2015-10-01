@@ -133,7 +133,7 @@ $switch-negative-color: tint($secondary-color, 74%);
 form{
 	@include placeholder-color($input-border-color, $font-weight-normal);
 	@include placeholder-hover-color($input-border-color);
-	margin: $form-spacing / 2 0;
+	margin: 0 0 $form-spacing / 2 0;
 }
 
 input,
