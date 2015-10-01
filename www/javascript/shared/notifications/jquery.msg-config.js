@@ -12,10 +12,10 @@
         noop       = function () {};
 
     var defaults = {
-        sourceSelector: 'li[data-source]',
-        tableSelector:  'table[data-settings]',
-        roleSelector:   'tr',
-        customSelector: 'td[data-custom]',
+        sourceSelector: '[data-source]',
+        tableSelector:  '[data-settings]',
+        roleSelector:   '[data-role]',
+        customSelector: '[data-custom]',
         permSelector:   '[data-perm]',
 
         expand: {
