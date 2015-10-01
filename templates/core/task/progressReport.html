@@ -13,18 +13,18 @@
                     function(data) {
                         // Update something.
                         // I guess add the same class the update submission has.
-                        element.removeClass('icon-time-value icon-alert icon-approve').addClass('ajax-updated');
+                        element.removeClass('progress-tick pending complete').addClass('ajax-updated');
                         form.find('input[name="current_status"]').val(data.status);
                         // Update name and class as well
                         switch (data.status) {
                             case 1: // incomplete
-                                element.addClass('icon-time-value').attr('title', 'Incomplete - click to update');
+                                element.addClass('progress-tick').attr('title', 'Incomplete - click to update');
                                 break;
                             case 2: // pending
-                                element.addClass('icon-alert').attr('title', 'Self Assessed - click to update');
+                                element.addClass('progress-tick pending').attr('title', 'Self Assessed - click to update');
                                 break;
                             case 3: // complete
-                                element.addClass('icon-approve').attr('title', 'Complete - click to update');
+                                element.addClass('progress-tick complete').attr('title', 'Complete - click to update');
                                 break;
                         }
 
@@ -103,7 +103,7 @@
                             <input type="hidden" name="task_id"    value="{STUDENT_UNIT_TASK_ID}" />
                             <input type="hidden" name="current_status" value="{STUDENT_UNIT_TASK_STATUS}" />
                             <a href="#"
-                               class="icon {STUDENT_UNIT_TASK_STATUS_CLASS}"
+                               class="icon {STUDENT_UNIT_TASK_STATUS_CLASS} no-text"
                                title="{STUDENT_UNIT_TASK_STATUS_TEXT} - click to update"
                                data-interaction="update_progress"></a>
                         </form>

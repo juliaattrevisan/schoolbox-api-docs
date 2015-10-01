@@ -308,15 +308,15 @@ $this->parse('subheader_unit_block', 'subheader_unit', true);
 $status_list = array(
     Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE            => array(
         'text'  => 'Incomplete',
-        'class' => 'icon-time-value',
+        'class' => 'progress-tick',
     ),
     Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION => array(
         'text'  => 'Self Assessed',
-        'class' => 'icon-alert',
+        'class' => 'progress-tick pending',
     ),
     Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE              => array(
         'text'  => 'Complete',
-        'class' => 'icon-approve',
+        'class' => 'progress-tick complete',
     ),
 );
 
