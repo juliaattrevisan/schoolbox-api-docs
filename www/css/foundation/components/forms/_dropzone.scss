@@ -204,6 +204,62 @@ ul.az-error-list {
     }
 }
 
+/* 32 px version */
+.s32 {
+    .filename {
+        line-height: 1.25rem;
+        @media #{$medium-up} {
+            line-height: 1.5rem;
+        }
+    }
+    .dzone {
+        @extend .icon-attach;
+        &:before {
+            position: absolute;
+            font-weight: $font-weight-normal;
+            @media #{$small-only} {
+                left: 0.625rem;
+                top: 0.2rem;
+                font-size: 1rem;
+            }
+            @media #{$medium-up} {
+                left: 1rem;
+                top: 0.1rem;
+                font-size: 1rem;
+            }
+        }
+        @media #{$small-only} {
+            background-size: 0.75rem;
+            height: 1.5rem;
+            padding-left: 2.75rem;
+            background-position: 0.75rem;
+        }
+        @media #{$medium-up} {
+            background-size: 1rem;
+            height: 2rem;
+            background-position: 0.875rem;
+            padding-left: 2.75rem;
+        }
+    }
+    .dz-upload {
+        height: 40px;
+    }
+    .button{
+        float: right;
+    }
+
+    ul.az-list {
+        > li {
+            @media #{$small-only} {
+                min-height: 3rem;
+            }
+            @media #{$medium-up} {
+                min-height: 4rem;
+            }
+        }
+    }
+}
+
 .attachzone, .dropzone-wrap {
     min-width: 40px;
     &.dz-unsupported,
