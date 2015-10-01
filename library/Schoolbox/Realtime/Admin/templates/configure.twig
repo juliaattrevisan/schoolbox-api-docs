@@ -132,7 +132,7 @@
 
         $.each(data, function (slug, sources) {
 
-            var $ns = $('#configurator').find('li[data-namespace='+slug+']');
+            var $ns = $('#configurator').find('[data-namespace='+slug+']');
 
             $.each(sources, function (source, roles) {
 
