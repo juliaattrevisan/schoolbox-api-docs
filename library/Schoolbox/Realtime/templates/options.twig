@@ -10,7 +10,7 @@ set iconClassnames = {
 %}
 
 {% for level, perm in perms %}
-    <a class="icon-{{ iconClassnames[perm[1]] }}" title="{{ perm[1] }}" data-perm-container data-perm="{{ level }}">
+
         <input id="{{ mode }}-{{ ns[namespace.id].slug ?: 0 }}-{{ source.id ?: 0 }}{%if role %}-{{ role.id }}{% endif %}-{{ level }}"
                name="data[{{ ns[namespace.id].slug ?: 0 }}][{{ sources[source.id].key ?: 0 }}]{% if role %}[{{ role.id }}]{% endif %}[perm][]"
                value="{{ level }}" data-perm="{{ level }}" type="{{ level <= 1 or level > 4 ? 'radio' : 'checkbox' }}"
@@ -18,9 +18,11 @@ set iconClassnames = {
                {% if perm[1] | slice(0, 2) | upper not in role.mask %}disabled="disabled"{% endif %}
         />
         <label for="{{ mode }}-{{ ns[namespace.id].slug ?: 0 }}-{{ source.id ?: 0 }}{%if role %}-{{ role.id }}{% endif %}-{{ level }}"
-               title="{{ perm[1] }}{% if perm[1] | slice(0, 2) | upper not in role.mask %} (disabled){% endif %}">
+               title="{{ perm[1] }}{% if perm[1] | slice(0, 2) | upper not in role.mask %} (disabled){% endif %}"
+               class="no-margin">
+            <a class="icon-{{ iconClassnames[perm[1]] }}" title="{{ perm[1] }}" data-perm-container data-perm="{{ level }}"></a>
         </label>
-    </a>
+
     {% if level == 1 %}
     <span class="icon-add"></span>
     {% endif %}
