@@ -8,6 +8,7 @@
             $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
                 wrapClass: 'dragging',
                 previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
                 dictDefaultMessage: 'You can drag audio files into this space.',
                 refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
                 refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
@@ -23,6 +24,9 @@
                 },
                 complete: function (file) {
                     $(file.previewElement).find('img').remove();
+                },
+                error: function (file, response) {
+                    $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text(response.error);
                 }
             });
         });
@@ -48,6 +52,18 @@
 
                 <div data-dz-wrap class="dropzone-wrap">
                     <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
+                    <ul data-dz-template class="hide">
+                        <li>
+                            <div class="avatar card small-12">
+                                <div class="icon-audio icon-32"></div>
+                                <h3 data-dz-name></h3>
+                                <p class="meta" data-dz-status>Uploading...</p>
+                                <div class="progress dz-progress">
+                                    <span class="meter dz-upload" style="width:0;"></span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
                     <ul data-dz-container class="action-list">
                         <!-- BEGIN audio_list -->
                         <li>

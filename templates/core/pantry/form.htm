@@ -1,5 +1,6 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 <script type="text/javascript">
     Dropzone.autoDiscover = false;
 </script>
@@ -166,10 +167,6 @@
                             });
                         </script>
                     </div>
-
-                    <div class="column small-12">
-                        {AFFIX_TWIG_LABEL_HERE}
-                    </div>
                     <div class="column small-12 medium-2">
                         <label>Visibility
                             <select class="visibility">
@@ -180,6 +177,15 @@
                         </label>
                     </div>
 
+                </fieldset>
+                <fieldset class="content">
+                    <legend>
+                        Attachzone
+                        <span data-tooltip class="hint has-tip tip-top" title="{% include sub/attachzone.twig %}">?</span>
+                    </legend>
+                    <div class="column small-12">
+                        {AFFIX_TWIG_LABEL_HERE}
+                    </div>
                 </fieldset>
                 <fieldset class="content">
                     <legend>Dates and Times</legend>

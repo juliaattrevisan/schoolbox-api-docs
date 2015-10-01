@@ -4,7 +4,8 @@
 ;(function($, window, document, Dropzone, undefined) {
 
     var plugin = 'fileDrop',
-        drag = pending = 0,
+        drag = 0,
+        pending = 0,
         noop = function() {},
         defaults = {
             // filedrop detection options
@@ -22,10 +23,12 @@
             fallback: noop,
             forceFallback: false,
             maxFilesize: 2048,
+            paramName: 'file',
 
             // custom handling for dropzone
             navWarning: "You still have files uploading, which will be cancelled if you leave this page.",
             tplWrap: '<div class="dz-preview" />',
+            previewTemplate: null,
 
             // componentry
             refreshSelector: null,
@@ -141,10 +144,11 @@
             fallback: this.options.fallback,
             forceFallback: this.options.forceFallback,
             maxFilesize: this.options.maxFilesize,
+            paramName: this.options.paramName,
 
             dictDefaultMessage: this.options.dictDefaultMessage,
             dictFallbackMessage: this.options.dictFallbackMessage,
-            previewTemplate: this.createTemplate(this.options.tplWrap),
+            previewTemplate: this.options.previewTemplate ? $(this.options.previewTemplate).html() : this.createTemplate(this.options.tplWrap),
 
             // expose dropzone methods
             init: function() {
@@ -251,7 +255,7 @@
 
         // update wrapper with reference to what we're dragging around
         for (i = 0; i < fileItems.length || 0; ++i) {
-            mime = 'mime-' + (fileItems[i].type.match(/[^//]+/) || 'binary');
+            mime = 'mime-' + (fileItems[i].type.match(/[^/]+/) || 'binary');
             self._wrap.addClass(mime);
             dragging.push(mime);
         }

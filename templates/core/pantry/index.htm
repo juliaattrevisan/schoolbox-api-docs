@@ -2,6 +2,7 @@
 
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 <script type="text/javascript">
     Dropzone.autoDiscover = false;
 </script>
@@ -1609,57 +1610,65 @@ $(function () {
     <div class="row">
         <div class="small-12 island">
             <h1 id="forms">Forms</h1>
-            <p><a href="form/pantry">See shelf</a></p>
+            <ul class="meta">
+                <li><a href="/pantry/form">See shelf</a></li>
+            </ul>
         </div>
     </div>
     <hr>
 <div class="row">
     <div class="small-12 island">
         <h1>Dropzones</h1>
+        <ul class="meta">
+            <li><a href="/pantry/form">See form shelf for attachzone implementation</a></li>
+        </ul>
     </div>
-    <div class="small-12 island">
-        <h2 class="subheader">Vanilla Dropzone</h2>
-        <section class="content">
-            <form class="dropzone" id="myAwesomeDropzone" action="/cms/myFileForm.php?ajax=1"></form>
-        </section>
-    </div>
-
-    <div class="small-12 island">
-        <h2 class="subheader">PHPlib Attachzone</h2>
-        <section class="content">
-            <form>
-                {AFFIX_LIB_LABEL_HERE}
-            </form>
-        </section>
-    </div>
-
-    <div class="small-12 island">
-        <h2 class="subheader">Twig Attachzone</h2>
-        <section>
-            <p class="meta content">(This should be identical to the one above)</p>
-            <form>
-                {AFFIX_TWIG_LABEL_HERE}
-            </form>
-        </section>
-    </div>
-
     <div class="small-12 island">
         <h2 class="subheader">fileDrop</h2>
+        <ul class="meta">
+            <li>You can drop things onto this list</li>
+        </ul>
         <section>
             <div class="dropzone-wrap">
-                <form class="dropzone overlay top"></form>
-                <ul data-dz-container class="information-list">
-                    <li class="row">
-                        <div class="info card"><h3>You can drop&hellip;</h3><p class="meta">(you really can)</p></div>
+                <form id="drop-here" class="dropzone overlay" action="/storage/asyncUpload.php"></form>
+                <ul data-dz-template class="hide">
+                    <li class="small avatar card small-12">
+                        <img data-dz-thumbnail class="mime" src="/images/resources/ajax.gif" />
+                        <p data-dz-name></p>
+                        <div class="progress dz-progress">
+                            <span class="meter dz-upload" style="width:0;"></span>
+                        </div>
                     </li>
-                    <li class="row">
-                        <div class="info card"><h3>&hellip;files&hellip;</h3><p class="meta">(they're the awesome)</p></div>
+                </ul>
+                <ul data-dz-container class="action-list">
+                    <li class="small avatar card small-12">
+                        <img class="mime" src="/images/mime/128x128/pdf.png" />
+                        <p>It's a PDF!</p>
                     </li>
-                    <li class="row">
-                        <div class="info card"><h3>&hellip;anywhere here.</h3><p class="meta">(like&mdash;for real)</p></div>
+                    <li class="small avatar card small-12">
+                        <img class="mime" src="/images/mime/128x128/msexcel_xls.png" />
+                        <p>It's a spreadsheet!</p>
+                    </li>
+                    <li class="small avatar card small-12">
+                        <img class="mime" src="/images/mime/128x128/sound_mp3.png" />
+                        <p>It's an mp3!</p>
                     </li>
                 </ul>
             </div>
+            <script type="text/javascript">
+                $(function () {
+                    $('#drop-here').fileDrop({
+                        previewsContainer: '#drop-here ~ [data-dz-container]',
+                        tplWrap: '<li class="dz-preview" />',
+                        previewTemplate: '#drop-here ~ [data-dz-template]',
+                        paramName: 'upload',
+                        dictDefaultMessage: 'You can drag files into this space',
+                        complete: function (file) {
+                            $(file.previewElement).find('[data-dz-thumbnail]').attr('src', 'ajax/mime/' + file.type);
+                        }
+                    });
+                });
+            </script>
         </section>
     </div>
 </div>

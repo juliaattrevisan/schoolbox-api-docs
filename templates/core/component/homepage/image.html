@@ -5,21 +5,20 @@
         <div class="island small-12">
             <section>
                 <div class="dropzone-wrap">
-                    <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image">
-                        <div class="text dz-preview dz-file-preview" style="text-align:{IMAGE_ALIGN};">
-                            <span class="dz-details">
-                                <img class="dz-pending" width="16" height="16" src="/images/resources/ajax.gif" style="top:50%;left:50%;"/>
-                                <img data-dz-thumbnail border="0" style="position:static;height:{COMPONENT_CONFIG_PIXEL};opacity:0.5">
-                            </span>
+                    <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image"></form>
 
-                            <div class="dz-progress">
-                                <span class="dz-upload" style="position:absolute;top:0;left:0;height:100%;"></span>
+                    <div class="hide" data-dz-template>
+                        <div style="text-align:{IMAGE_ALIGN};">
+                            <img class="th" src="/images/resources/ajax.gif" data-dz-thumbnail border="0" style="position:static;height:{COMPONENT_CONFIG_PIXEL};opacity:0.5"/>
+                            <div class="progress dz-progress">
+                                <span class="meter dz-upload" style="width:0;"></span>
                             </div>
                         </div>
-                    </form>
+                    </div>
+
                     <div class="content" data-dz-container>
                         <!-- BEGIN previewimage -->
-                        <div style="text-align:{IMAGE_ALIGN};">
+                        <div id="img{COMPONENT_INSTANCE_ID}" style="text-align:{IMAGE_ALIGN};">
                             {CONTENT_URL_START}
                             <img class="th" src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}"/>
                             {CONTENT_URL_END}
@@ -38,10 +37,11 @@
                         wrapClass: 'dragging',
                         wrap: '#content',
                         previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                        previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
                         createImageThumbnails: true,
                         thumbnailHeight: {COMPONENT_CONFIG_PIXEL},
                         thumbnailWidth: null,
-                        dictDefaultMessage: 'You can drag images into this space.',
+                        dictDefaultMessage: 'You can drag an image into this space.',
                         acceptedFiles: 'image/*',
                         refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
                         refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
@@ -51,9 +51,9 @@
                         sending: function (file, xhr, formData) {
                             $(file.previewElement)
                                 .addClass('category-{ID}')
-                                .data('node', {ID})
-                                .closest('[data-dz-container]')
-                                .find('div.text:not(.dz-preview)').remove();
+                                .data('node', {ID});
+
+                            $('#img{COMPONENT_INSTANCE_ID}').remove();
 
                             formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
                             formData.append('category', $(file.previewElement).data('node'));
@@ -75,7 +75,7 @@
 
                             el.find('img.dz-pending').detach();
 
-                            var frm = $('#' + this.element.id.replace('dropzone', 'component') + ' > .settings > form');
+                            var frm = $('#component{COMPONENT_INSTANCE_ID}').find('form[action="/homepage/configForm.php"]');
                             frm.find('select[name=image]').remove();
                             frm.append($('<input/>').attr('name', 'image').val(file.name.substr(0, file.name.lastIndexOf('.'))));
 

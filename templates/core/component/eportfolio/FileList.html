@@ -21,8 +21,19 @@
             <section>
                 <div class="dz-wrap">
                     <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post"></form>
-
-                    <ul class="action-list dz-container">
+                    <ul class="hide" data-dz-template>
+                        <li>
+                            <div class="avatar card small-12">
+                                <img data-dz-thumbnail src="/images/resources/ajax.gif" />
+                                <p data-dz-name></p>
+                                <p class="meta" data-dz-status>Uploading...</p>
+                                <div class="progress dz-progress">
+                                    <span class="meter dz-upload" style="width:0;"></span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul class="action-list" data-dz-container>
                         <!-- BEGIN list_item -->
                         <li class="actions-small-1">
                             <div class="list-item">
@@ -55,7 +66,8 @@
                     <script type="text/javascript">
                         $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
                             wrapClass: 'dragging',
-                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
+                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                            previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
                             tplWrap: '<li class="dz-preview" />',
                             dictDefaultMessage: 'You can drag files into this space',
                             refreshUrl: '/eportfolio/configForm.php',

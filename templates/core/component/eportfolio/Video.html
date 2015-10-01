@@ -39,9 +39,18 @@
 
                 <div class="dropzone-wrap">
                     <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post" data-accepts="video"></form>
+                    <ul class="hide" data-dz-template>
+                        <li>
+                            <div class="avatar card">
+                                <img data-dz-thumbnail src="/images/resources/ajax.gif" />
+                                <h3 data-dz-name></h3>
+                                <p class="meta" data-dz-status>Uploading...</p>
+                            </div>
+                        </li>
+                    </ul>
                     <ul class="information-list" data-dz-container>
                         <!-- BEGIN video_list -->
-                        <li class="row">
+                        <li>
                             <div class="avatar card">
                                 <a data-videolink href="#" data-media-id="{VIDEO_LIST_ID}">
                                     <img src="/cms/videoThumb.php?type=myfile&id={VIDEO_LIST_ID}" />
@@ -81,6 +90,7 @@
                     $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
                         wrapClass: 'dragging',
                         previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                        previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
                         tplWrap: '<li class="dz-preview" />',
                         dictDefaultMessage: 'You can drag videos into this space',
                         refreshUrl: '/eportfolio/configForm.php',
