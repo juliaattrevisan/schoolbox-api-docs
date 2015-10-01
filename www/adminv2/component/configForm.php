@@ -155,7 +155,7 @@ if ($_POST['type'] == 'components') {
             $factoryFactory   = new Component_FactoryFactory();
             $componentFactory = $factoryFactory->build($instance->getModule(), new Schoolbox\User(), $page, true);
             $renderer         = new Component_Renderer();
-            $renderer->renderAllAdminComponents($page, $componentFactory->buildComponentList($_GET['cid']));
+            $renderer->renderAdminComponent($page, $componentFactory->buildComponent($instance));
             $page->outputPage(true);
             exit;
         } else {
