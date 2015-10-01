@@ -62,66 +62,6 @@ class Component_Renderer
     }
 
     /**
-     * Renders a single admin component.
-     *
-     * TODO fix this
-     *
-     * @param Component_ControllerAbstract $component
-     */
-    public function renderAdminComponent(Component_ControllerAbstract $component)
-    {
-        $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
-        $templateHandle = TEMPLATE_content;
-
-        $component->setFile($templateHandle, 'component/config/_templatewrapper.html');
-
-        // This whole sitepage rendering thing is WAY more complicated than it needs to be.
-        $instance_id = $component->getInstance()->getId();
-//        $position_no = $component->getInstance()->getPosition();
-//        $position    = "position_{$position_no}";
-        $component->setVar([
-            'COMPONENT_INSTANCE_ID'     => $instance_id,
-            'COMPONENT_HANDLE'          => $instance_id,
-            'component.instance.id'     => $instance_id,
-            'component.definition.id'   => $component->getInstance()->getDefinition()->getId(),
-            'component.definition.name' => Scrub::text($component->getInstance()->getDefinition()->getName()),
-        ]);
-
-        $component->parseConfig();
-
-//        if ($component->execute() !== false) {
-//
-////            if (!$component->setFile($templateHandle, $templateFile)) {
-////                return false;
-////            }
-//
-////            $component->setConfigurationTemplate('component/config/_templatewrapper.html');
-////            $component->parseConfigForTemplate();
-//
-////            if ($component->execute() !== false) {
-////                $component->parseConfig();
-////                if ($component->renderTemplate($templateHandle) !== false) {
-////                    $component->parse($templateTarget, $templateHandle, true);
-////                }
-////            }
-////
-////            $output = array(
-////                'COMPONENT_INSTANCE_ID'   => $component->getInstance()->getId(),
-////                'COMPONENT_DEFINITION_ID' => $component->getInstance()->getDefinitionId(),
-////                'COMPONENT_HANDLE'        => $templateHandle . '_' . $component->getInstance()->getId()
-////            );
-////
-////            $component->setVar($output);
-//
-////            $component->parse($templateTarget, $templateHandle, true);
-////            if ($component->renderTemplate($templateHandle) !== false) {
-////                $component->parse($templateTarget, $templateHandle, true);
-////            }
-//        }
-        $component->getPageTemplate()->pparse($templateTarget, $templateHandle);
-    }
-
-    /**
      * Renders a template into the Sitepage within $component.
      *
      * @param \Schoolbox\Resource\Folder\Model      $folder
