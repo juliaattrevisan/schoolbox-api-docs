@@ -83,7 +83,8 @@ if ($_POST['type'] == 'components') {
         $instanceID = $_POST['reload'];
     }
 
-    $factory = new Component_Homepage_Factory(new \Schoolbox\User(), $page);
+    $factoryFactory = new Component_FactoryFactory();
+    $factory        = $factoryFactory->build($_POST['context'], new Schoolbox\User(), $page, true);
 
     // $component instanceof Component_ControllerAbstract
     $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
@@ -94,8 +95,10 @@ if ($_POST['type'] == 'components') {
     if (!($component instanceof Component_ControllerAbstract)) {
         die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
     }
-    $renderer = new Component_Renderer();
-    $renderer->renderAdminComponent($component);
+    $factoryFactory = new Component_FactoryFactory();
+    $renderer       = new Component_Renderer();
+    $renderer->renderAdminComponent($page, $component);
+    $page->outputPage(true);
 } elseif ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
     // GET config options from homepage
     $config = $_GET;
