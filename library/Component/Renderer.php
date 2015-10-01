@@ -9,6 +9,65 @@
  
 class Component_Renderer
 {
+    /**
+     * Renders all components for an admin page.
+     *
+     * @param SitePage                       $page
+     * @param Component_ControllerAbstract[] $componentCollection
+     */
+    public function renderAllAdminComponents(SitePage $page, $componentCollection)
+    {
+        $page->setFile(TEMPLATE_body, 'adminv2/component/layout.html');
+
+        $page->setBlock(TEMPLATE_body, 'position_top', 'position_top_block');
+        $page->setBlock(TEMPLATE_body, 'position_left', 'position_left_block');
+        $page->setBlock(TEMPLATE_body, 'position_right', 'position_right_block');
+
+        $occupiedPositionList = array();
+
+        foreach ($componentCollection as $component) {
+            $instance_no = $component->getInstance()->getId();
+            $position_no = $component->getInstance()->getPosition();
+            $position    = "position_{$position_no}";
+
+            if (!$page->template->exists("{$position}_block")) {
+                $page->setFile($position, 'adminv2/component/placeholder.html');
+            }
+
+            $component->setup(null, array());
+
+            $page->setVar(array(
+                'COMPONENT_INSTANCE_ID'     => $instance_no,
+                'COMPONENT_HANDLE'          => $instance_no,
+                'component.instance.id'     => $instance_no,
+                'component.definition.id'   => $component->getInstance()->getDefinition()->getId(),
+                'component.definition.name' => $component->getInstance()->getDefinition()->getName(),
+            ));
+
+            $component->setConfigurationTemplate('component/config/_templatewrapper.html');
+            $component->parseConfigForTemplate();
+
+            $page->parse("{$position}_block", $position, true);
+
+            if (!in_array($position_no, $occupiedPositionList)) {
+                $occupiedPositionList[] = $position_no;
+            }
+        }
+
+        $emptyPositionList = array_diff(array('top', 'left', 'right'), $occupiedPositionList);
+
+        foreach ($emptyPositionList as $emptyPosition) {
+            $page->setVar("position_{$emptyPosition}_block", '');
+        }
+    }
+
+    /**
+     * Renders a single admin component.
+     *
+     * TODO fix this
+     *
+     * @param Component_ControllerAbstract $component
+     */
     public function renderAdminComponent(Component_ControllerAbstract $component)
     {
         $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
