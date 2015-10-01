@@ -1,9 +1,9 @@
 <li data-source="{{ sources[source.id].key }}">
     <form> {# for some reason required for formatting and js targeting -_- #}
-        <div class="actions-small-1 row">
+        <div class="actions-small-1">
             <div class="list-item">
-                <div class="small-12 columns">
-                    <p>"Send a message when {{ sources[source.id].description }}."</p>
+                <div class="info card small-12">
+                    <h3>Send a message when {{ sources[source.id].description }}.</h3>
                     <p class="meta" data-summary></p>
                 </div>
             </div>
@@ -13,20 +13,22 @@
         </div>
     </form>
     <form method="post" class="hide" action="{{ routeLookup('adminMessages.saveConfig') }}">
-        <ul class="action-list" data-roles data-digest-settings>
-            {% for role in source.roles %}
-            <li class="actions-small-7" data-role="{{ role.id }}">
-                <div class="list-item">
-                    <div class="small-12 info card">
-                        <p data-role-title>{{ roles[role.id].name }}</p>
+        <div class="content">
+            <ul class="action-list" data-roles data-digest-settings>
+                {% for role in source.roles %}
+                <li class="actions-small-7" data-role="{{ role.id }}">
+                    <div class="list-item">
+                        <div class="info card small-12">
+                            <p data-role-title>{{ roles[role.id].name }}</p>
+                        </div>
                     </div>
-                </div>
-                <nav data-custom>
-                    {% include '@messages/options.twig' with { mode: 'p' } %}
-                    <a href="#" class="icon-modify" title="Advanced"></a>
-                </nav>
-            </li>
-            {% endfor %}
-        </ul>
+                    <nav data-custom>
+                        {% include '@messages/options.twig' with { mode: 'p' } %}
+                        <a href="#" class="icon-modify" title="Advanced"></a>
+                    </nav>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
     </form>
 </li>
