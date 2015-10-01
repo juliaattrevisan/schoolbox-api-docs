@@ -193,11 +193,7 @@
         this.refreshColumns();
 
         // inject the placeholder entity
-        this.columns.each(function () {
-            $(this).prepend(
-                $(masonry.options.column.placeholderTpl).html(masonry.options.dict.placeholder)
-            );
-        });
+        this.injectPlaceholders();
     }
 
 
@@ -834,13 +830,17 @@
      */
     Masonry.prototype.reloadLayout = function(newLayout)
     {
-        var element = $(this.element);
+        var masonry = this;
+        var element = $(masonry.element);
         // Replace only the columns themselves
         var layoutHtml = $(newLayout);
-        $.each(this.options.column.position, function(i, positionSelector) {
+        $.each(masonry.options.column.position, function(i, positionSelector) {
             var oldPosition = element.find(positionSelector);
             oldPosition.fadeOut(function () {
-                oldPosition.empty().append(layoutHtml.find(positionSelector).children()).fadeIn();
+                oldPosition.empty().append(layoutHtml.find(positionSelector).children()).fadeIn(function() {
+                    // Re-inject placeholder, because it was removed.
+                    masonry.injectPlaceholders(positionSelector);
+                });
             })
         });
     };
@@ -887,6 +887,24 @@
         return this;
     };
 
+    /**
+     * Injects empty column placeholders ("you may drag components here") into each column.
+     *
+     * @param selector
+     */
+    Masonry.prototype.injectPlaceholders = function(selector)
+    {
+        var masonry = this;
+        var columns = masonry.columns;
+        if (selector) {
+            columns = masonry.columns.filter(selector);
+        }
+        columns.each(function () {
+            $(this).prepend(
+                $(masonry.options.column.placeholderTpl).html(masonry.options.dict.placeholder)
+            );
+        });
+    };
 
     /**
      * Register plugin with jquery
