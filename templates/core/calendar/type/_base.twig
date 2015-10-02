@@ -1,15 +1,15 @@
 {% set augmentedId = random(10000000000) %}
 
-<li class="row {{ event.getEventClasses() }} {% if renderer.isTranslucent() %}translucent{% endif %}">
+<li class="row {{ event.getEventClasses() }} {% if renderer.isTranslucent() %}translucent{% endif %}" style="background-color:{{ event.colour }}">
     {% block eventSpan %}
-    <div class="small-3 column">
+    <div class="small-3 column" >
         {{ event.getEventSpan()|raw }}&nbsp;
     </div>
     {% endblock eventSpan %}
 
     {% block eventTitle %}
 
-    <div class="small-9 column" data-reveal-id="modal{{ event.getEventId() }}{{ augmentedId }}" style="background-color:{{ event.colour }}">
+    <div class="small-9 column" data-reveal-id="modal{{ event.getEventId() }}{{ augmentedId }}">
         {{ event.title }}
         <span class="right" style="background-color:{{ event.colour }}">
             {% if event.attendance %}
