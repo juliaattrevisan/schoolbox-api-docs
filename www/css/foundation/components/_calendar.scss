@@ -7,5 +7,10 @@
   ul.action-list {
     margin-left: -1rem;
     margin-right: -1rem;
+
+    @media #{$medium-down} {
+   		margin-right: -0.75rem;
+        margin-left: -0.75rem;
+   	}
   }
 }
