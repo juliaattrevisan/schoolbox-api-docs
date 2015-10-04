@@ -305,90 +305,46 @@
                 </div>
             </section>
 
+            <h2 class="subheader">Tile Shape</h2>
+            <section>
+                <div class="content">
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label for="tile_shape">Layout Shape</label>
+                            <select id="tile_shape" name="tile_shape">
+                                <option value="landscape"
+                                        {% if item.isLandscapeShape() %}selected{% endif %}>Landscape (16:9)</option>
+                                <option value="portrait"
+                                        {% if item.isPortraitShape() %}selected{% endif %}>Portrait (9:16)</option>
+                                <option value="square"
+                                        {% if item.isSquareShape() %}selected{% endif %}>Square</option>
+                                <option value="panorama"
+                                        {% if item.isPanoramicShape() %}selected{% endif %}>Panorama (16:5)</option>
+                                <option value="custom"
+                                        {% if item.isCustomShape() %}selected{% endif %}>Custom Ratio</option>
+                            </select>
+                        </div>
+
+                        <div class="small-12 columns"
+                             data-hide-watch="#tile_shape"
+                             data-hide-watch-value="custom">
+                            <label for="aspect_ratio_x">Aspect Ratio</label>
+                            <input id="aspect_ratio_x"
+                                   name="aspect_ratio_x"
+                                   value="{{ item.aspectRatioX|e('html_attr') }}"
+                                   class="aspect-ratio"
+                                   data-function="update-layout" /> :
+                            <input id="aspect_ratio_y"
+                                   name="aspect_ratio_y"
+                                   value="{{ item.aspectRatioY|e('html_attr') }}"
+                                   class="aspect-ratio"
+                                   data-function="update-layout" />
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <table class="standardForm table">
-                <tr>
-                    <td class="formLabelWidth">
-                        <h4>Tile Shape</h4>
-                        <em>
-                            Select a tile shape. Consider the content going into them.
-                        </em>
-                    </td>
-                    <td class="shape-selector" data-role="pane-container">
-                        <div class="pane" data-role="pane">
-                            <input
-                                type="radio"
-                                id="tile_shape_landscape"
-                                name="tile_shape"
-                                value="landscape"
-                                data-function="update-layout"
-                                {% if item.isLandscapeShape() %}checked{% endif %} />
-                            <label for="tile_shape_landscape">Landscape</label>
-
-                            <div class="shape shape-landscape"></div>
-                        </div>
-
-                        <div class="pane" data-role="pane">
-                            <input
-                                type="radio"
-                                id="tile_shape_portrait"
-                                name="tile_shape"
-                                value="portrait"
-                                data-function="update-layout"
-                                {% if item.isPortraitShape() %}checked{% endif %} />
-                            <label for="tile_shape_portrait">Portrait</label>
-
-                            <div class="shape shape-portrait"></div>
-                        </div>
-
-                        <div class="pane" data-role="pane">
-                            <input
-                                type="radio"
-                                id="tile_shape_square"
-                                name="tile_shape"
-                                value="square"
-                                data-function="update-layout"
-                                {% if item.isSquareShape() %}checked{% endif %} />
-                            <label for="tile_shape_square">Square</label>
-
-                            <div class="shape shape-square"></div>
-                        </div>
-
-                        <div class="pane" data-role="pane">
-                            <input
-                                type="radio"
-                                id="tile_shape_panorama"
-                                name="tile_shape"
-                                value="panorama"
-                                data-function="update-layout"
-                                {% if item.isPanoramicShape() %}checked{% endif %} />
-                            <label for="tile_shape_panorama">Panorama</label>
-
-                            <div class="shape shape-panorama"></div>
-                        </div>
-
-                        <div class="pane" data-role="pane">
-                            <input
-                                type="radio"
-                                id="tile_shape_custom"
-                                name="tile_shape"
-                                value="custom"
-                                data-function="update-layout"
-                                {% if item.isCustomShape() %}checked{% endif %} />
-                            <label for="tile_shape_custom">Custom</label>
-
-                            <div class="hidden-content" data-role="hidden-content">
-                                <input name="aspect_ratio_x"
-                                       value="{{ item.aspectRatioX|e('html_attr') }}"
-                                       class="aspect-ratio"
-                                       data-function="update-layout" /> :
-                                <input name="aspect_ratio_y"
-                                       value="{{ item.aspectRatioY|e('html_attr') }}"
-                                       class="aspect-ratio"
-                                       data-function="update-layout" />
-                            </div>
-                        </div>
-                    </td>
-                </tr>
                 <tr>
                     <td class="formLabelWidth wysiwyg">
                         <h4>Modify Tiles</h4>
