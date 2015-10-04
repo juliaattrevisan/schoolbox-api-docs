@@ -1,4 +1,5 @@
 {# I need some way of adding custom_head #}
+<script type="text/javascript" src="/javascript/shared/jquery.confirm-dialog.js"></script>
 <script type="text/javascript" src="/javascript/shared/tiles/jquery.tile-resize.js"></script>
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript">
@@ -142,18 +143,6 @@
                         setTimeout(function() { reorderFeedbackFailed.hide(); }, 2000);
                     })
             }
-        })
-
-        // Confirm delete dialog
-        var confirmDeleteDialog = form.find('#dialog-confirm-delete').dialog({
-            autoOpen:false,
-            resizable:false,
-            width:400,
-            modal:true,
-            draggable:false,
-            close: function() {
-                return false;
-            }
         });
 
         // Delete buttons
@@ -164,36 +153,25 @@
             var tileTitle   = deletedTile.find('.title');
 
             // Add confirmation dialog
-            confirmDeleteDialog
-                .dialog('option', 'buttons', [
-                    {
-                        text: "Yes",
-                        click: function(event) {
-                            // Add some sort of deleting animation
-                            confirmDeleteDialog.dialog('close');
-                            deletedTile.addClass('marked-for-delete');
-                            tileTitle.text('Deleting...');
-                            // Send delete request
-                            $.post(element.attr('href'))
-                                .done(function() {
-                                    deletedTile.fadeOut('slow', function() {
-                                        deletedTile.remove();
-                                    })
-                                })
-                                .fail(function() {
-                                    deletedTile.removeClass('marked-for-delete');
-                                    tileTitle.text('Delete failed!');
-                                })
-                        }
-                    },
-                    {
-                        text: "No",
-                        click: function(event) {
-                            confirmDeleteDialog.dialog('close');
-                        }
-                    }
-                ])
-                .dialog('open');
+            element.confirmDialog({
+                text: "Are you sure you wish to delete this tile? You will not be able to undo this operation.",
+                confirmEvent: function() {
+                    // Add some sort of deleting animation
+                    deletedTile.addClass('marked-for-delete');
+                    tileTitle.text('Deleting...');
+                    // Send delete request
+                    $.post(element.attr('href'))
+                        .done(function() {
+                            deletedTile.fadeOut('slow', function() {
+                                deletedTile.remove();
+                            })
+                        })
+                        .fail(function() {
+                            deletedTile.removeClass('marked-for-delete');
+                            tileTitle.text('Delete failed!');
+                        })
+                }
+            });
         });
 
         // Panes with buttons inside them
@@ -364,10 +342,6 @@
             </section>
 
             <input id="resource-save" type="submit" value="Save" />
-
-            <div id="dialog-confirm-delete" title="Delete Tile" class="wysiwyg">
-                Are you sure you wish to delete this tile? You will not be able to undo this operation.
-            </div>
         </form>
     </div>
 </div>
