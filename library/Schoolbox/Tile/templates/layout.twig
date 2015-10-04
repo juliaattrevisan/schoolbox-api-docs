@@ -173,31 +173,6 @@
                 }
             });
         });
-
-        // Panes with buttons inside them
-        form.find('[data-role="pane-container"]').each(function() {
-            var element       = $(this);
-            var panes         = element.find('[data-role="pane"]');
-            var hiddenContent = panes.find('[data-role="hidden-content"]')
-            panes.find(':radio')
-                .change(function() {
-                    var element     = $(this);
-                    var thisPane    = element.closest('[data-role="pane"]');
-                    var thisContent = thisPane.find('[data-role="hidden-content"]');
-
-                    // Hide all hidden content not inside this pane
-                    thisContent.show();
-                    hiddenContent.not(thisContent).hide();
-
-                    // Toggle classes for selected pane
-                    thisPane.addClass('selected');
-                    panes.not(thisPane).removeClass('selected');
-                    validator.form();
-                })
-                // and switch on the ones for the selected shape
-                .filter(':checked').change();
-            ;
-        });
     })
 })(jQuery);
 </script>
