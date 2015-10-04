@@ -222,7 +222,22 @@
     })
 })(jQuery);
 </script>
-<h1>Modify Tile Component</h1>
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <h1>Modify Tile Component</h1>
+    </div>
+    <nav>
+        {# Link depends on module and identifier #}
+        {% if component.module == 'dashboard' %}
+            <a href="/adminv2/dashboard#{{ component.identifier }}" class="icon icon-previous" title="Return to dashboard template"></a>
+        {% elseif component.module == 'homepage_template' %}
+            <a href="/adminv2/homepage#{{ component.identifier }}" class="icon icon-previous" title="Return to homepage template"></a>
+        {% else %}
+            <a href="/homepage/{{ component.identifier }}" class="icon icon-previous" title="Return to homepage"></a>
+        {% endif %}
+    </nav>
+</div>
 
 <form id="tile-layout-form"
       action="{{ routeLookup('tile.layoutForm', {componentId: component.id}) }}"
@@ -406,15 +421,6 @@
            value="Save"
            class="submit-btn-plain"
     />
-    {# Link depends on module and identifier #}
-    {% if component.module == 'dashboard' %}
-        {% set href='/adminv2/dashboard#'~component.identifier %}
-    {% elseif component.module == 'homepage_template' %}
-        {% set href='/adminv2/homepage#'~component.identifier %}
-    {% else %}
-        {% set href='/homepage/'~component.identifier %}
-    {% endif %}
-    <a href="{{ href|e('html_attr') }}" class="btn no-icon float-left"><span></span>Cancel</a>
 
     <div id="dialog-confirm-delete" title="Delete Tile" class="wysiwyg">
         Are you sure you wish to delete this tile? You will not be able to undo this operation.
