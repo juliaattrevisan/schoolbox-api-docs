@@ -104,21 +104,25 @@
         })
 
         // Update x and y input based on selected shape
-        form.find('#tile_shape_landscape').change(function() {
-            xInput.val(16);
-            yInput.val(9).change();
-        });
-        form.find('#tile_shape_portrait').change(function() {
-            xInput.val(9);
-            yInput.val(16).change();
-        });
-        form.find('#tile_shape_square').change(function() {
-            xInput.val(1);
-            yInput.val(1).change();
-        });
-        form.find('#tile_shape_panorama').change(function() {
-            xInput.val(16);
-            yInput.val(5).change();
+        form.find('#tile_shape').change(function() {
+            switch (this.value) {
+                case 'landscape':
+                    xInput.val(16);
+                    yInput.val(9);
+                    break;
+                case 'portrait':
+                    xInput.val(9);
+                    yInput.val(16);
+                    break;
+                case 'square':
+                    xInput.val(1);
+                    yInput.val(1);
+                    break;
+                case 'panorama':
+                    xInput.val(16);
+                    yInput.val(5);
+                    break;
+            }
         });
 
         // Sortability
@@ -209,7 +213,7 @@
                     <div class="row">
                         <div class="small-12 large-6 columns">
                             <label for="layout_type">Layout Type</label>
-                            <select id="layout_type" name="layout_type">
+                            <select id="layout_type" name="layout_type" data-function="update-layout">
                                 <option value="{{ constant('LAYOUT_TYPE_GRID', item)|e('html_attr') }}"
                                         {% if item.isGridLayoutType() %}selected{% endif %}>Grid</option>
                                 <option value="{{ constant('LAYOUT_TYPE_COLUMN', item)|e('html_attr') }}"
@@ -264,7 +268,7 @@
                     <div class="row">
                         <div class="small-12 columns">
                             <label for="tile_shape">Layout Shape</label>
-                            <select id="tile_shape" name="tile_shape">
+                            <select id="tile_shape" name="tile_shape" data-function="update-layout">
                                 <option value="landscape"
                                         {% if item.isLandscapeShape() %}selected{% endif %}>Landscape (16:9)</option>
                                 <option value="portrait"
