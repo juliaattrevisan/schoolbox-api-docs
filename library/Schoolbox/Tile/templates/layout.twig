@@ -1,5 +1,6 @@
 {# I need some way of adding custom_head #}
 <script type="text/javascript" src="/javascript/shared/tiles/jquery.tile-resize.js"></script>
+<script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript">
 (function($) {
     $(function() {
@@ -239,34 +240,30 @@
     </nav>
 </div>
 
-<form id="tile-layout-form"
-      action="{{ routeLookup('tile.layoutForm', {componentId: component.id}) }}"
-      method="post"
-      name="form" class="clearfix"
-      enctype="multipart/form-data"
->
-    <input type="hidden" name="id" value="{{ item.id|e('html_attr') }}"/>
-    <input type="hidden" name="component_id" value="{{ component.id|e('html_attr') }}"/>
-    <table class="standardForm table">
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Tile Layout</h4>
-                <em>
-                    Arrange tiles in either a fixed-width grid or spanned across a number of columns.
-                </em>
-            </td>
-            <td class="layout-selector" data-role="pane-container">
-                <div class="pane" data-role="pane">
-                    <input
-                        type="radio"
-                        id="layout_type_grid"
-                        name="layout_type"
-                        value="{{ constant('LAYOUT_TYPE_GRID', item)|e('html_attr') }}"
-                        data-function="update-layout"
-                        {% if item.isGridLayoutType() %}checked{% endif %} />
-                    <label for="layout_type_grid">Grid</label>
+<div class="row">
+    <div class="small-12 island">
+        <form id="tile-layout-form"
+              action="{{ routeLookup('tile.layoutForm', {componentId: component.id}) }}"
+              method="post"
+              name="form" class="clearfix"
+              enctype="multipart/form-data">
+            <input type="hidden" name="id" value="{{ item.id|e('html_attr') }}"/>
+            <input type="hidden" name="component_id" value="{{ component.id|e('html_attr') }}"/>
 
-                    <div class="hidden-content" data-role="hidden-content">
+            <h2 class="subheader">Layout</h2>
+            <section>
+                <fieldset class="content">
+                    <label for="layout_type">Tile Layout</label>
+                    <select id="layout_type" name="layout_type">
+                        <option value="{{ constant('LAYOUT_TYPE_GRID', item)|e('html_attr') }}"
+                                {% if item.isGridLayoutType() %}selected{% endif %}>Grid</option>
+                        <option value="{{ constant('LAYOUT_TYPE_COLUMN', item)|e('html_attr') }}"
+                                {% if item.isColumnLayoutType() %}selected{% endif %}>Layout</option>
+                    </select>
+
+                    <fieldset data-hide-watch="#layout_type"
+                              data-hide-watch-value="{{ constant('LAYOUT_TYPE_GRID', item)|e('html_attr') }}">
+
                         <input name="grid_width"
                                value="{{ item.gridWidth|e('html_attr') }}"
                                class="layout-width"
@@ -278,151 +275,144 @@
                                class="layout-width"
                                data-function="update-layout" />
                         <label for="layout_type_grid">px padding</label>
-                    </div>
-                </div>
+                    </fieldset>
 
-                <div class="pane" data-role="pane">
-                    <input
-                        type="radio"
-                        id="layout_type_column"
-                        name="layout_type"
-                        value="{{ constant('LAYOUT_TYPE_COLUMN', item)|e('html_attr') }}"
-                        data-function="update-layout"
-                        {% if item.isColumnLayoutType() %}checked{% endif %} />
-                    <label for="layout_type_column">Columns</label>
-
-                    <div class="hidden-content" data-role="hidden-content">
+                    <fieldset data-hide-watch="#layout_type"
+                              data-hide-watch-value="{{ constant('LAYOUT_TYPE_COLUMN', item)|e('html_attr') }}">
+                        <label for="layout_type_column">tiles/row</label>
                         <input name="column_count"
                                value="{{ item.columnCount|e('html_attr') }}"
                                class="layout-width"
                                data-function="update-layout" />
-                        <label for="layout_type_column">tiles/row</label>
 
+                        <label for="layout_type_column">% padding</label>
                         <input name="column_padding"
                                value="{{ item.columnPadding|e('html_attr') }}"
                                class="layout-width"
                                data-function="update-layout" />
-                        <label for="layout_type_column">% padding</label>
-                    </div>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Tile Shape</h4>
-                <em>
-                    Select a tile shape. Consider the content going into them.
-                </em>
-            </td>
-            <td class="shape-selector" data-role="pane-container">
-                <div class="pane" data-role="pane">
-                    <input
-                        type="radio"
-                        id="tile_shape_landscape"
-                        name="tile_shape"
-                        value="landscape"
-                        data-function="update-layout"
-                        {% if item.isLandscapeShape() %}checked{% endif %} />
-                    <label for="tile_shape_landscape">Landscape</label>
+                    </fieldset>
+                </fieldset>
+            </section>
 
-                    <div class="shape shape-landscape"></div>
-                </div>
+            <table class="standardForm table">
+                <tr>
+                    <td class="formLabelWidth">
+                        <h4>Tile Shape</h4>
+                        <em>
+                            Select a tile shape. Consider the content going into them.
+                        </em>
+                    </td>
+                    <td class="shape-selector" data-role="pane-container">
+                        <div class="pane" data-role="pane">
+                            <input
+                                type="radio"
+                                id="tile_shape_landscape"
+                                name="tile_shape"
+                                value="landscape"
+                                data-function="update-layout"
+                                {% if item.isLandscapeShape() %}checked{% endif %} />
+                            <label for="tile_shape_landscape">Landscape</label>
 
-                <div class="pane" data-role="pane">
-                    <input
-                        type="radio"
-                        id="tile_shape_portrait"
-                        name="tile_shape"
-                        value="portrait"
-                        data-function="update-layout"
-                        {% if item.isPortraitShape() %}checked{% endif %} />
-                    <label for="tile_shape_portrait">Portrait</label>
+                            <div class="shape shape-landscape"></div>
+                        </div>
 
-                    <div class="shape shape-portrait"></div>
-                </div>
+                        <div class="pane" data-role="pane">
+                            <input
+                                type="radio"
+                                id="tile_shape_portrait"
+                                name="tile_shape"
+                                value="portrait"
+                                data-function="update-layout"
+                                {% if item.isPortraitShape() %}checked{% endif %} />
+                            <label for="tile_shape_portrait">Portrait</label>
 
-                <div class="pane" data-role="pane">
-                    <input
-                        type="radio"
-                        id="tile_shape_square"
-                        name="tile_shape"
-                        value="square"
-                        data-function="update-layout"
-                        {% if item.isSquareShape() %}checked{% endif %} />
-                    <label for="tile_shape_square">Square</label>
+                            <div class="shape shape-portrait"></div>
+                        </div>
 
-                    <div class="shape shape-square"></div>
-                </div>
+                        <div class="pane" data-role="pane">
+                            <input
+                                type="radio"
+                                id="tile_shape_square"
+                                name="tile_shape"
+                                value="square"
+                                data-function="update-layout"
+                                {% if item.isSquareShape() %}checked{% endif %} />
+                            <label for="tile_shape_square">Square</label>
 
-                <div class="pane" data-role="pane">
-                    <input
-                        type="radio"
-                        id="tile_shape_panorama"
-                        name="tile_shape"
-                        value="panorama"
-                        data-function="update-layout"
-                        {% if item.isPanoramicShape() %}checked{% endif %} />
-                    <label for="tile_shape_panorama">Panorama</label>
+                            <div class="shape shape-square"></div>
+                        </div>
 
-                    <div class="shape shape-panorama"></div>
-                </div>
+                        <div class="pane" data-role="pane">
+                            <input
+                                type="radio"
+                                id="tile_shape_panorama"
+                                name="tile_shape"
+                                value="panorama"
+                                data-function="update-layout"
+                                {% if item.isPanoramicShape() %}checked{% endif %} />
+                            <label for="tile_shape_panorama">Panorama</label>
 
-                <div class="pane" data-role="pane">
-                    <input
-                        type="radio"
-                        id="tile_shape_custom"
-                        name="tile_shape"
-                        value="custom"
-                        data-function="update-layout"
-                        {% if item.isCustomShape() %}checked{% endif %} />
-                    <label for="tile_shape_custom">Custom</label>
+                            <div class="shape shape-panorama"></div>
+                        </div>
 
-                    <div class="hidden-content" data-role="hidden-content">
-                        <input name="aspect_ratio_x"
-                               value="{{ item.aspectRatioX|e('html_attr') }}"
-                               class="aspect-ratio"
-                               data-function="update-layout" /> :
-                        <input name="aspect_ratio_y"
-                               value="{{ item.aspectRatioY|e('html_attr') }}"
-                               class="aspect-ratio"
-                               data-function="update-layout" />
-                    </div>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td class="formLabelWidth wysiwyg">
-                <h4>Modify Tiles</h4>
-                <em>
-                    Add, edit and remove tiles.
-                </em>
-                <ul>
-                    <li><em>Click and hold to drag and rearrange tiles.</em></li>
-                </ul>
-            </td>
-            <td class="checkboxes">
-                {# Feedback for saving order of tiles #}
-                <div class="hide" data-role="reorder-feedback-saving">Saving order...</div>
-                <div class="hide" data-role="reorder-feedback-saved">Saved!</div>
-                <div class="hide" data-role="reorder-feedback-failed">Failed!</div>
-                {% include '@tile/sub/tileList.twig'
-                    with {
-                        layout:   item,
-                        tileList: item.tileList,
-                        editable: true
-                    }
-                %}
-            </td>
-        </tr>
-    </table>
+                        <div class="pane" data-role="pane">
+                            <input
+                                type="radio"
+                                id="tile_shape_custom"
+                                name="tile_shape"
+                                value="custom"
+                                data-function="update-layout"
+                                {% if item.isCustomShape() %}checked{% endif %} />
+                            <label for="tile_shape_custom">Custom</label>
 
-    <input id="resource-save"
-           type="submit"
-           value="Save"
-           class="submit-btn-plain"
-    />
+                            <div class="hidden-content" data-role="hidden-content">
+                                <input name="aspect_ratio_x"
+                                       value="{{ item.aspectRatioX|e('html_attr') }}"
+                                       class="aspect-ratio"
+                                       data-function="update-layout" /> :
+                                <input name="aspect_ratio_y"
+                                       value="{{ item.aspectRatioY|e('html_attr') }}"
+                                       class="aspect-ratio"
+                                       data-function="update-layout" />
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="formLabelWidth wysiwyg">
+                        <h4>Modify Tiles</h4>
+                        <em>
+                            Add, edit and remove tiles.
+                        </em>
+                        <ul>
+                            <li><em>Click and hold to drag and rearrange tiles.</em></li>
+                        </ul>
+                    </td>
+                    <td class="checkboxes">
+                        {# Feedback for saving order of tiles #}
+                        <div class="hide" data-role="reorder-feedback-saving">Saving order...</div>
+                        <div class="hide" data-role="reorder-feedback-saved">Saved!</div>
+                        <div class="hide" data-role="reorder-feedback-failed">Failed!</div>
+                        {% include '@tile/sub/tileList.twig'
+                            with {
+                                layout:   item,
+                                tileList: item.tileList,
+                                editable: true
+                            }
+                        %}
+                    </td>
+                </tr>
+            </table>
 
-    <div id="dialog-confirm-delete" title="Delete Tile" class="wysiwyg">
-        Are you sure you wish to delete this tile? You will not be able to undo this operation.
+            <input id="resource-save"
+                   type="submit"
+                   value="Save"
+                   class="submit-btn-plain"
+            />
+
+            <div id="dialog-confirm-delete" title="Delete Tile" class="wysiwyg">
+                Are you sure you wish to delete this tile? You will not be able to undo this operation.
+            </div>
+        </form>
     </div>
-</form>
+</div>
