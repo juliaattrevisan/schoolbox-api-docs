@@ -1,66 +1,89 @@
 <!-- BEGIN custom_head -->
 <script language="JavaScript" type="text/javascript">
-function verify()
-{
-	var msg = ""
-	//check that description, url, location have been entered
-	if(document.getElementById('urlForm').description.value == ""){
-		msg += "You need to enter a description\n";
-	}
-	if(document.getElementById('urlForm').url.value == ""){
-		msg += "You need to enter a URL\n";
-	}
-	var ok = false;
-	$('input.category').each(function () {
-		if ($(this).prop("checked"))
-			ok = true;
-	});
-	if (!ok)
-		msg += "You need to select a location";
-
-	
-	if(msg != ""){
-		alert(msg);
-		return false;
-	}
-	else
-		return true;
-}
+    $(function() {
+        $('#urlForm').validate({
+            rules: {
+                description: {
+                    required: true
+                },
+                url: {
+                    required: true
+                },
+                'category[]': {
+                    minlength: 1,
+                    required: true
+                }
+            },
+            messages: {
+                description: "You need to enter a description",
+                url: "You need to enter a URL",
+                'category[]': "You need to select a location"
+            },
+            errorPlacement: function(error, element) {
+                if (element.is('[name="category[]"]')) {
+                    error.insertAfter($('[data-folder-list]'));
+                }
+                else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+    });
 </script>
 <!-- END custom_head -->
 
-<h1>Upload a Link to Multiple Locations</h1>
-<form method="post" id="urlForm" class="standardForm clearfix" onSubmit="return(verify());" action="/cms/linkForm.php">
-  <table class="table">
-    <tr>
-      <td><h4>Title</h4>
-        <em>One line description of the URL for the title </em></td>
-		<td><input type="text" name="description" maxlength="250" size="40" value="" /></td>
-    </tr>
-    <tr>
-      <td class="formLabelWidth"><h4>URL</h4>
-       <em>The internet address for the website, eg. http://www.google.com</em>
-	  </td>
-	  <td> <input type="text" name="url" size="40" maxlength="250" value="" /></td>
-    </tr>
-    <tr>
-      <td><h4>Description</h4>
-        <em>Any further details you wish to make about the URL, useful for enhancing search results</em></td>
-		<td><textarea name="comment" cols="40" rows="4"></textarea></td>
-    </tr>
-       <tr>
-      <td><h4>Location</h4>
-        <em>Select the locations where this file should be placed</em></td>
-		<td><!-- BEGIN category_list -->
-        <input type="checkbox" class="category" name="category[]" value="{CATEGORY_ID}">
-        {CATEGORY_NAME}<br />
-        <!-- END category_list --></td>
-    </tr>
-    <tr>
-      <td><h4>Hidden</h4>
-        <em>Hide this URL from students.</em></td>
-		<td><input type='checkbox' name='hidden' value='1' /></td>
-    </tr>
-  </table>
-  <input type="submit" name="Submit" value="Upload Link" class="submit-btn-plain" />
-</form>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Upload a Link to Multiple Locations</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form action="/cms/linkForm.php" method="post" id="urlForm">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Title
+                            <span class='hint has-tip tip-top' data-tooltip title="One line description of the URL for the title">?</span>
+                            <input type="text" name="description" maxlength="250" size="40" value="" />
+                        </label>
+
+                        <label>
+                            URL
+                            <span class='hint has-tip tip-top' data-tooltip title="The internet address for the website, eg. http://www.google.com">?</span>
+                            <input type="text" name="url" size="40" maxlength="250" value="" />
+                        </label>
+
+                        <label>
+                            Description
+                            <span class='hint has-tip tip-top' data-tooltip title="Any further details you wish to make about the URL, useful for enhancing search results">?</span>
+                            <textarea name="comment" cols="40" rows="4"></textarea>
+                        </label>
+
+                        <label data-folder-list>
+                            Location
+                            <span class='hint has-tip tip-top' data-tooltip title="Select the locations where this file should be placed">?</span>
+                        </label>
+
+                        <!-- BEGIN category_list -->
+                        <input type="checkbox" id='category-{CATEGORY_ID}' class="category" name="category[]" value="{CATEGORY_ID}">
+                        <label for="category-{CATEGORY_ID}" class="checkbox-label">{CATEGORY_NAME}</label>
+                        <!-- END category_list -->
+
+                        <label>
+                            Hidden
+                            <span class='hint has-tip tip-top' data-tooltip title="Hide this URL from students">?</span>
+                        </label>
+
+                        <input type='checkbox' id='hidden-checkbox' name='hidden' value='1' />
+                        <label for="hidden-checkbox" class="checkbox-label">Hide this url from students</label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Upload Link" />
+        </form>
+    </div>
+</div>
