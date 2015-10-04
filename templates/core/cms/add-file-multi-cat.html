@@ -1,9 +1,7 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript">
-
 $(function() {
-
 	$('#fileForm').validate({
 		rules: {
 			'category[]': {
@@ -15,97 +13,75 @@ $(function() {
 			'category[]': "Please tick at least one location"
 		},
 		errorPlacement: function(error, element) {
-            if (element.parent().parent().hasClass('checkboxes')) {
-				error.insertAfter(element.parent().parent().parent().children(':last-child'));
-			} else {
-				error.insertAfter(element);
-			}
+            if (element.is('[name="category[]"]')) {
+                error.insertAfter($('[data-folder-list]'));
+            }
+            else {
+                error.insertAfter(element);
+            }
 		}
 	});
-
-	$(':checkbox').each(function() {
-		if ($(this).is(':checked')) {
-			$(this).parent().addClass('active-checkbox');
-		}
-	});
-
-	$(':checkbox').click(function() {
-		if ($(this).parent().hasClass('active-checkbox')) {
-			$(this).parent().removeClass('active-checkbox')
-		} else {
-			$(this).parent().addClass('active-checkbox');
-		}
-	});
-
 });
 
 </script>
 <!-- END custom_head -->
 
-<h1>Post File to Multiple Locations</h1>
-<form method="post" enctype="multipart/form-data" id="fileForm" class="clearfix" action="/cms/fileForm.php">
-	<table class="standardForm table">
-     <colgroup>
-		<col width="250" />
-	</colgroup>
-        <tr>
-			<td>
-				<h4>Title</h4>
-				<em>One line description of the file for use as the title</em>
-			</td>
-			<td>
-				<label>
-					<input type="text" name="description" maxlength="250" size="40" class="required" />
-				</label>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>File</h4>
-				<em>Select a file to post.</em>
-			</td>
-			<td>
-                {ATTACH_ZONE}
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<h4>Description</h4>
-				<em>Any further details you wish to make about the file, useful for enhancing search results</em>
-			</td>
-			<td>
-				<textarea name="comment" cols="40" rows="4" style="width:100%"></textarea>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<h4>Location</h4>
-				<em>Select the locations where this file should be placed</em>
-			</td>
-			<td class="locations">
-				<div class="clearfix checkboxes">
-					<!-- BEGIN category_list -->
-					<label class="float-left clear">
-						<input type="checkbox" class="category" name="category[]" value="{CATEGORY_ID}">{CATEGORY_NAME}
-					</label>
-					<!-- END category_list -->
-					<!-- BEGIN no_categories -->
-					<p>You must be involved in a Class/Group prior to using this.</p>
-					<!-- END no_categories -->
-				</div>
-			</td>
-		</tr>
-        <tr>
-			<td>
-				<h4>Hidden</h4>
-				<em>Hide this file from students.</em>
-			</td>
-			<td>
-				<label class="float-left clear">
-					<input type='checkbox' name='hidden' value='1' {HIDDEN_SELECTED} />
-				</label>
-			</td>
-		</tr>
-	</table>
-	<input type="submit" name="Submit" value="Add File" class="submit-btn-plain" />
-</form>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Post File to Multiple Locations</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form action="/cms/fileForm.php" method="post" enctype="multipart/form-data" id="fileForm">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Title
+                            <span class='hint has-tip tip-top' data-tooltip title="One line description of the file for use as the title">?</span>
+                            <input type="text" name="description" maxlength="250" size="40" class="required" />
+                        </label>
+
+                        <label>
+                            File
+                            <span class='hint has-tip tip-top' data-tooltip title="Select a file to post">?</span>
+                        </label>
+
+                        {ATTACH_ZONE}
+
+                        <label>
+                            Description
+                            <span class='hint has-tip tip-top' data-tooltip title="Any further details you wish to make about the file, useful for enhancing search results">?</span>
+                            <textarea name="comment" cols="40" rows="4"></textarea>
+                        </label>
+
+                        <label data-folder-list>
+                            Location
+                            <span class='hint has-tip tip-top' data-tooltip title="Select the locations where this file should be placed">?</span>
+                        </label>
+
+                        <!-- BEGIN category_list -->
+                        <input type="checkbox" id="category-{CATEGORY_ID}" class="category" name="category[]" value="{CATEGORY_ID}">
+                        <label for="category-{CATEGORY_ID}" class="checkbox-label">{CATEGORY_NAME}</label>
+                        <!-- END category_list -->
+                        <!-- BEGIN no_categories -->
+                        <p class="alert-box">You must be involved in a Class/Group prior to using this.</p>
+                        <!-- END no_categories -->
+
+                        <label>
+                            Hidden
+                            <span class='hint has-tip tip-top' data-tooltip title="Hide this file from students">?</span>
+                        </label>
+
+                        <input type='checkbox' id='hidden-checkbox' name='hidden' value='1' {HIDDEN_SELECTED} />
+                        <label for="hidden-checkbox" class="checkbox-label">Hide this file from students</label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Add File" />
+        </form>
+    </div>
+</div>
