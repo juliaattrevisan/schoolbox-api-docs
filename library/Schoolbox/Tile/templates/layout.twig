@@ -344,38 +344,26 @@
                 </div>
             </section>
 
-            <table class="standardForm table">
-                <tr>
-                    <td class="formLabelWidth wysiwyg">
-                        <h4>Modify Tiles</h4>
-                        <em>
-                            Add, edit and remove tiles.
-                        </em>
-                        <ul>
-                            <li><em>Click and hold to drag and rearrange tiles.</em></li>
-                        </ul>
-                    </td>
-                    <td class="checkboxes">
-                        {# Feedback for saving order of tiles #}
-                        <div class="hide" data-role="reorder-feedback-saving">Saving order...</div>
-                        <div class="hide" data-role="reorder-feedback-saved">Saved!</div>
-                        <div class="hide" data-role="reorder-feedback-failed">Failed!</div>
-                        {% include '@tile/sub/tileList.twig'
-                            with {
+            <h2 class="subheader">Modify Tiles</h2>
+            <section>
+                <div class="content">
+                    <div class="row">
+                        <div class="small-12 columns">
+                            {# Feedback for saving order of tiles #}
+                            <div class="hide" data-role="reorder-feedback-saving">Saving order...</div>
+                            <div class="hide" data-role="reorder-feedback-saved">Saved!</div>
+                            <div class="hide" data-role="reorder-feedback-failed">Failed!</div>
+                            {% include '@tile/sub/tileList.twig' with {
                                 layout:   item,
                                 tileList: item.tileList,
                                 editable: true
-                            }
-                        %}
-                    </td>
-                </tr>
-            </table>
+                            } %}
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-            <input id="resource-save"
-                   type="submit"
-                   value="Save"
-                   class="submit-btn-plain"
-            />
+            <input id="resource-save" type="submit" value="Save" />
 
             <div id="dialog-confirm-delete" title="Delete Tile" class="wysiwyg">
                 Are you sure you wish to delete this tile? You will not be able to undo this operation.
