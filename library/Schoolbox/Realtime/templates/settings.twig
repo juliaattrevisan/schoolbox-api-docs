@@ -1,25 +1,10 @@
-<style type="text/css">
-    table.ruler tr th {
-        background-color: #f0f0f0;
-    }
-    #follow-settings label {
-        display: block;
-        padding: 8px 8px 8px 16px;
-        margin: 0;
-    }
-    #follow-settings td:first-of-type {
-        padding: 0;
-    }
-</style>
 <script type="text/javascript" src="/javascript/shared/notifications/jquery.msg-config.js"></script>
 <script type="text/javascript">
     $(function () {
-
         var iiCache = {};
 
         $('#msg-settings')
             .msgconfig({
-
                 sourceSelector: 'tr',
                 tableSelector:  'table.digest-settings',
     //            roleSelector:   '',
@@ -61,46 +46,89 @@
     });
 </script>
 
-<h1>Message Settings</h1>
-<form method="post" action="{{ routeLookup('messages.saveConfig') }}" class="namespaces">
-    {% if groups %}
-    <h2>Homepages</h2>
-    <p>
-        <br/>If you unfollow a homepage, you will receive <em>no</em> messages that come from it.
-    </p>
-    <table class="ruler table" id="follow-settings">
-        <thead>
-        <tr>
-            <th scope="col">Homepage</th>
-            <th scope="col">Following</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for groupId, group in groups %}
-        <tr>
-            <td>
-                <label for="follow-{{ groupId }}">{{ group.name }}</label>
-            </td>
-            <td>
-                <input type="hidden" name="follow[{{ groupId }}]" value="{{ group.force ? 1 : 0 }}">
-                <input id="follow-{{ groupId }}"
-                       type="checkbox"
-                       name="follow[{{ groupId }}]"
-                       value="1"
-                       {% if group.follow %}checked="checked"{% endif %}
-                       {% if group.force %}disabled="disabled"{% endif %}
-                />
-            </td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
-    <h2>Messages</h2>
-    <p>
-        <br/>Customise when and how you receive messages.
-        <br/><em>Options that are unavailable have been disabled by your system administrator.</em>
-    </p>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Message Settings</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form method="post" action="{{ routeLookup('messages.saveConfig') }}">
+            {% if groups %}
+            <h2 class="subheader">Homepages</h2>
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <p>
+                            If you unfollow a homepage, you will receive <em>no</em> messages that come from it.
+                        </p>
+                    </div>
+
+                    <table id="follow-settings">
+                        <thead>
+                            <tr>
+                                <th>Homepage</th>
+                                <th>Following</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for groupId, group in groups %}
+                            <tr>
+                                <td>
+                                    <label for="follow-{{ groupId }}">{{ group.name }}</label>
+                                </td>
+                                <td>
+                                    <input type="hidden" name="follow[{{ groupId }}]" value="{{ group.force ? 1 : 0 }}">
+                                    <input id="follow-{{ groupId }}"
+                                           type="checkbox"
+                                           name="follow[{{ groupId }}]"
+                                           value="1"
+                                           {% if group.follow %}checked="checked"{% endif %}
+                                           {% if group.force %}disabled="disabled"{% endif %} />
+                                    <label for="follow-{{ groupId }}" class="checkbox-label"></label>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% endif %}
+                </fieldset>
+            </section>
+
+            <h2 class="subheader">Messages</h2>
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <p>
+                            Customise when and how you receive messages.
+                        </p>
+                        <p>
+                            <em>Options that are unavailable have been disabled by your system administrator.</em>
+                        </p>
+                    </div>
+                </fieldset>
+            </section>
+
+            <h2 class="subheader">Messages</h2>
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
     {% include '@messages/legend.twig' with { who: 'you' } %}
     <table data-roles data-digest-settings id="msg-settings">
         {% for namespace in config %}
