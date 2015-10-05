@@ -44,24 +44,28 @@ if (is_array($templateList)) {
 }
 
 /* Component Palette */
-$this->setBlock(TEMPLATE_content, 'definition', 'definition_block');
+$this->setBlock(TEMPLATE_content, 'component', 'component_block');
 
 $definitionCollection = Component_DefinitionMapper::getInstance()->findByColumnList(array(
     'module' => 'eportfolio',
     'visible' => 'true',
 ));
 
+$this->setVar('component_block', '');
+$firstCategory = true;
 foreach ($definitionCollection as $definition) {
     /* @var $definition Component_Definition */
-    $this->setVar(array(
-        'definition.id'          => $definition->getId(),
-        'definition.name'        => Scrub::text($definition->getName()),
-        // description deliberately not scrubbed
-        'definition.description' => $definition->getDescription(),
-        'definition.singleton'   => $definition->getMultiple() == 'true' ? '' : 'single-instance'
-    ));
-
-    $this->parse('definition_block', 'definition', true);
+    $this->setVar([
+        'COMPONENT_ID'             => $definition->getId(),
+        'COMPONENT_DESCRIPTION'    => $definition->getDescription(),
+        'COMPONENT_CLASS'          => str_replace('\\', '_', $definition->getClass()),
+        'COMPONENT_MULTIPLE_STATE' => $definition->getMultiple() ? 'active' : '',
+        'COMPONENT_NAME'           => $definition->getName(),
+        'COMPONENT_CATEGORY_NAME'  => $definition->getComponentCategoryName(),
+        // Not known yet
+        'COMPONENT_COUNT'          => 0,
+    ]);
+    $this->parse('component_block', 'component', true);
 }
 
 /* Initial group placeholders */

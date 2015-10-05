@@ -1,30 +1,65 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
-<script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
+<script type="text/javascript" src="/javascript/shared/masonry/jquery.masonry.js"></script>
 <script type="text/javascript">
     $(function() {
-        $('[data-definition-palette]').configurator({
-            context: 'eportfolio',
-            dropDownSelector: '[data-template-select]',
-            disabledMsg: 'This component can only be used once, and is already active for the template selected.'
-        }).start();
+        var url = '/adminv2/component/configForm.php';
+        $('[data-homepage-layout]').masonry({
+            // Only create action goes through masonry
+            context: function(masonry) {
+                return {
+                    context: 'dashboard',
+                    cid: $(masonry.options.templateSelector.selector).val()
+                }
+            },
+            component: {
+                url: url,
+                calcSequenceData: function (columns) {
+                    var masonry = this,
+                            data    = { type: 'components', cid: $(masonry.options.templateSelector.selector).val() },
+                            order   = ['left','right','top','bottom'];
 
-        $("[data-form=new]").dialog({
-            autoOpen: false,
-            modal: true
-        });
+                    $.each(columns, function (position, column) {
+                        var key = 'column' + (order.indexOf(position) + 1);
 
-        $('[data-button=new]').click(function() {
-            $('[data-form=new]').dialog("open");
-        });
+                        data[key] = column.find(masonry.options.component.selector).map(function () {
+                            /*
+                             * Two components in ePorfolio have no id's (My Profile, Teacher Notes)
+                             * and always appear in the same positions. So we do a check to see if
+                             * an id is set. If it isn't, and we don't do the check, the script breaks
+                             * and components cannot be relocated successfully
+                             */
+                            if (this.id) {
+                                return this.id.substr(9);
+                            }
+                        }).toArray().join(',');
+                    });
 
-        $("[data-form=rename]").dialog({
-            autoOpen: false,
-            modal: true
-        });
-
-        $('[data-button=rename]').click(function() {
-            $( '[data-form=rename]').dialog("open");
+                    return data;
+                }
+            },
+            column: {
+                leftColumnWidth: 6,
+                selector: '[data-position]',
+                position: {
+                    top: '[data-position=top]',
+                    left: '[data-position=left]',
+                    right: '[data-position=right]'
+                },
+                placeholderTpl: '<p class="masonry-placeholder alert-box" />'
+            },
+            palette: {
+                url: url,
+                selector: '[data-definition-palette]',
+                containerSelector: '[data-component-list]',
+                handleSelector: '[data-component-palette]',
+                refreshItem: function () {
+                    this.find('[data-relation="count"]').text(this.data('count'));
+                }
+            },
+            templateSelector: {
+                selector: '[data-template-select]',
+                url: '/adminv2/component/get/eportfolio'
+            }
         });
 
         $('[data-button=delete]').click(function(event) {
@@ -47,54 +82,77 @@
 
 {ADMIN_NAV}
 
-<h2>
-    ePortfolio Templates
-    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You can drag and reorder the main components of the ePortfolio template here. Grab one from the left column and
-        move it to the right boxes or just reorganise the components that are already active.">?</span>
-</h2>
-
 <div class="row">
-    <div class="small-12 large-3 columns">
-        <div data-definition-palette>
-            <form id="template-action" action="/adminv2/eportfolio/eportfolioForm.php" method="POST">
-                <input type="hidden" name="action" value="delete" />
-
-                <select data-template-select name="template">
-                    <!-- BEGIN template -->
-                    <option value="{template.id}">{template.name}</option>
-                    <!-- END template -->
-                </select>
-
-                <a data-button="new" class="button icon-add" href="#">Create</a>
-                <a data-button="rename" class="button icon-modify" href="#">Rename</a>
-                <a data-button="delete" class="button icon-delete" href="#" >Delete</a>
-            </form>
-
-            <!-- BEGIN definition -->
-            <div class="component definition-id-{definition.id} {definition.singleton}">{definition.name}</div>
-            <!-- END definition -->
+    <div class="small-12 island">
+        <div class="actions-small-1">
+            <div class="list-item">
+                <h2 class="subheader">ePortfolio Templates</h2>
+            </div>
+            <nav>
+                <a data-reveal-id="newDialog" class="icon-add" href="#" title="Create"></a>
+            </nav>
         </div>
-    </div>
 
-    <div class="small-12 large-9 columns">
-        <div data-eportfolio-layout>
-            <!-- BEGIN layout --><!-- END layout -->
-        </div>
+        <section>
+            <div data-definition-palette class="content">
+                <form id="template-action" action="/adminv2/eportfolio/eportfolioForm.php" method="POST">
+                    <div class="actions-small-2">
+                        <div class="list-item">
+                            <input type="hidden" name="action" value="delete" />
+                            <select id="templateSelector" data-template-select name="template">
+                                <!-- BEGIN template -->
+                                <option value="{template.id}">{template.name}</option>
+                                <!-- END template -->
+                            </select>
+                        </div>
+                        <nav>
+                            <a data-reveal-id="renameDialog" class="icon-modify" href="#" title="Rename"></a>
+                            <a data-button="delete" class="icon-delete" href="#" title="Delete"></a>
+                        </nav>
+                    </div>
+                </form>
+
+                <ul data-component-list class="content grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {COMPONENT_CATEGORY_CLASS}">
+                    <!-- BEGIN component -->
+                    <li>
+                        <div class="{COMPONENT_MULTIPLE_STATE} no-margin"
+                             data-count="{COMPONENT_COUNT}"
+                             data-multi="{COMPONENT_MULTIPLE_STATE}"
+                             data-component-palette>
+                            <div class="avatar card">
+                                <a href="#" rel="{COMPONENT_ID}" title="{COMPONENT_DESCRIPTION}">
+                                    <span class="icon-32 icon-masonry icon-masonry-{COMPONENT_CLASS}"></span>
+                                    <p>{COMPONENT_NAME}</p>
+                                    <p class="meta">(<span data-relation="count">{COMPONENT_COUNT}</span>)</p>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <!-- END component -->
+                </ul>
+
+            </div>
+        </section>
     </div>
 </div>
 
-<div data-form="new" title="Add new ePortfolio template">
-    <form id="template-action" action="/adminv2/eportfolio/eportfolioForm.php" method="POST">
+<!-- BEGIN layout --><!-- END layout -->
+
+<div id="newDialog" class="reveal-modal" data-reveal aria-labelledby="newDialogLabel" aria-hidden="true" role="dialog">
+    <h2 id="newDialogLabel">Add new ePortfolio template</h2>
+    <form action="/adminv2/eportfolio/eportfolioForm.php" method="POST">
         <label>
             Template name
             <input type="text" name="name" />
         </label>
         <input type="submit" name="action" value="Create" />
     </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
-<div data-form="rename" title="Rename existing ePortfolio template">
-    <form id="template-action" action="/adminv2/eportfolio/eportfolioForm.php" method="POST">
+<div id="renameDialog" class="reveal-modal" data-reveal aria-labelledby="renameDialogLabel" aria-hidden="true" role="dialog">
+    <h2 id="renameDialogLabel">Modify ePortfolio template</h2>
+    <form action="/adminv2/eportfolio/eportfolioForm.php" method="POST">
         <label>
             Existing Template
             <select id="template-select" name="template" >
@@ -109,4 +167,5 @@
         </label>
         <input type="submit" name="action" value="Rename" />
     </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
