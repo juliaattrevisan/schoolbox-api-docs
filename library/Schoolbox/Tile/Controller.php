@@ -53,11 +53,7 @@ class Controller extends Base
      */
     public function layout(Component_Instance $component)
     {
-        // Load layout and context
-        $folder = null;
-        if ($component->getModule() === 'homepage') {
-            $folder = $this->getFolderMapper()->findById($component->getIdentifier());
-        }
+        // Load layout
         $this->getResponse()->content->set(
             array(
                 'title'    => 'Tile Component Layout',
@@ -65,7 +61,7 @@ class Controller extends Base
                 'data'     => array(
                     'item'      => $this->getLayoutFromComponent($component),
                     'component' => $component,
-                    'folder'    => $folder,
+                    'folder'    => $this->getFolderForComponent($component),
                 ),
             )
         );
@@ -155,10 +151,11 @@ class Controller extends Base
                 'title'    => 'Add Tile',
                 'template' => '@tile/modify.twig',
                 'data'     => array(
-                    'item'      => $model,
-                    'layout'    => $this->getLayoutFromComponent($component),
-                    'component' => $component,
-                    'attachzone' => $this->getAttachZoneData($model)
+                    'item'       => $model,
+                    'layout'     => $this->getLayoutFromComponent($component),
+                    'component'  => $component,
+                    'attachzone' => $this->getAttachZoneData($model),
+                    'folder'     => $this->getFolderForComponent($component),
                 ),
             )
         );
@@ -208,9 +205,10 @@ class Controller extends Base
                 'title'    => 'Add Tile',
                 'template' => '@tile/modify.twig',
                 'data'     => array(
-                    'item'      => $item,
-                    'component' => $component,
-                    'attachzone' => $this->getAttachZoneData($item)
+                    'item'       => $item,
+                    'component'  => $component,
+                    'attachzone' => $this->getAttachZoneData($item),
+                    'folder'     => $this->getFolderForComponent($component),
                 ),
             )
         );
@@ -463,5 +461,20 @@ class Controller extends Base
     {
         $this->folderMapper = $folderMapper;
         return $this;
+    }
+
+    /**
+     * Loads the folder that relates to this component, if there is one.
+     *
+     * @param Component_Instance $component
+     *
+     * @return Folder\Model|null
+     */
+    protected function getFolderForComponent(Component_Instance $component)
+    {
+        if ($component->getModule() === 'homepage') {
+            return $this->getFolderMapper()->findById($component->getIdentifier());
+        }
+        return null;
     }
 }
