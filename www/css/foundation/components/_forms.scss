@@ -169,7 +169,7 @@ select option{
 }
 
 // remove margins on forms inside tables
-td{
+th, td{
 	input[type],
 	textarea,
 	select{
