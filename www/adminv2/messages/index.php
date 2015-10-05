@@ -35,7 +35,6 @@ $this->setBlock(TEMPLATE_content, 'digest_offline', 'digest_offline_block');
 $this->setBlock(TEMPLATE_content, 'digest_online', 'digest_online_block');
 $this->setBlock('digest_online', 'role_digest', 'role_digest_block');
 $this->setBlock('role_digest', 'day_check', 'day_check_block');
-$this->setBlock('role_digest', 'time_select', 'time_select_block');
 
 // global setting
 
@@ -71,7 +70,8 @@ if($enabled) {
 
         $this->setVar(array(
             'ROLE_NAME' => Scrub::text($role->getName()),
-            'ROLE_ID'   => $role->getId()
+            'ROLE_ID'   => $role->getId(),
+            'TIME_VALUE' => '00:00'
         ));
 
         $schedule = $role->getDigestSchedule();
@@ -145,17 +145,15 @@ if($enabled) {
                 $selected = false;
             }
 
-            $this->setVar(array(
-                'TIME_VALUE' => sprintf("%02d:%02d", $time[0], $time[1]),
-                'TIME_SELECTED' => $selected ? 'selected="selected"' : ''
-            ));
-
-            $this->parse('time_select_block', 'time_select', true);
+            if ($selected) {
+                $this->setVar(array(
+                    'TIME_VALUE' => sprintf("%02d:%02d", $time[0], $time[1])
+                ));
+            }
         }
 
         $this->parse('role_digest_block', 'role_digest', true);
         $this->setVar('day_check_block', '');
-        $this->setVar('time_select_block', '');
     }
 
     $this->parse('digest_online_block', 'digest_online');
