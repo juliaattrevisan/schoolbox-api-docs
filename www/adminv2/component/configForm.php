@@ -152,6 +152,8 @@ if ($_POST['type'] == 'components') {
             }
         }
         if (SitePage::detectAjax()) {
+            // Just refetch the instance
+            $instance         = reset($componentInstanceMapper->findByInstanceId($instance->getId()));
             $factoryFactory   = new Component_FactoryFactory();
             $componentFactory = $factoryFactory->build($instance->getModule(), new Schoolbox\User(), $page, true);
             $renderer         = new Component_Renderer();
