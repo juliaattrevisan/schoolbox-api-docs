@@ -205,9 +205,7 @@
     <div class="small-12 island">
         <form id="tile-layout-form"
               action="{{ routeLookup('tile.layoutForm', {componentId: component.id}) }}"
-              method="post"
-              name="form" class="clearfix"
-              enctype="multipart/form-data">
+              method="post">
             <input type="hidden" name="id" value="{{ item.id|e('html_attr') }}"/>
             <input type="hidden" name="component_id" value="{{ component.id|e('html_attr') }}"/>
 
