@@ -171,17 +171,18 @@
                 confirmEvent: function() {
                     // Add some sort of deleting animation
                     deletedTile.addClass('marked-for-delete');
-                    tileTitle.text('Deleting...');
+                    reorderFeedback.labelActivate({text: 'Deleting...', 'css': 'alert'});
                     // Send delete request
                     $.post(element.attr('href'))
                         .done(function() {
+                            reorderFeedback.labelTimeout({text: 'Deleted!'});
                             deletedTile.fadeOut('slow', function() {
                                 deletedTile.remove();
                             })
                         })
                         .fail(function() {
+                            reorderFeedback.labelTimeout({text: 'Delete Failed!', 'css': 'alert'});
                             deletedTile.removeClass('marked-for-delete');
-                            tileTitle.text('Delete failed!');
                         })
                 }
             });
