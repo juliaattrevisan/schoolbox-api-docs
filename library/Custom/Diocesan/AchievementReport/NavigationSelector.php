@@ -99,7 +99,7 @@ class NavigationSelector {
 
         if (in_array($this->getUser()->getDefaultCampus()->getExtTimetableCode(), array('JNR', 'JS'))) {
             if (($this->getUser()->getYear() >= 1) && ($this->getUser()->getYear() <= 6)) {
-                $this->setDefaultReport(array('error' => 'Standardised Test Scores not available.'));
+                $this->setDefaultReport('comingSoon');
             }
         }
         elseif ($this->getUser()->getDefaultCampus()->getExtTimetableCode() == 'JH') {

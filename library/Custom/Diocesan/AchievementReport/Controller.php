@@ -83,6 +83,13 @@ class Controller extends Base {
                 die();
                 break;
 
+            case 'comingSoon':
+                $this->getResponse()->content->set(array(
+                    'template' => '@templates/ComingSoon.twig'
+                ));
+
+                break;
+
             /* Error state - render an error page and leave it
              * at that, I guess
              */
