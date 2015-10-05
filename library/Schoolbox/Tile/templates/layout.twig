@@ -159,11 +159,10 @@
         });
 
         // Delete buttons
-        form.find('[data-role="delete"]').click(function(event) {
+        tileList.find('[data-tile] [data-role="delete"]').click(function(event) {
             event.preventDefault();
             var element     = $(this);
-            var deletedTile = element.closest('.tile');
-            var tileTitle   = deletedTile.find('.title');
+            var deletedTile = element.closest('[data-tile]');
 
             // Add confirmation dialog
             element.confirmDialog({
