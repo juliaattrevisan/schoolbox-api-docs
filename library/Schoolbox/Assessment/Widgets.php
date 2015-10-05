@@ -68,17 +68,17 @@ class Widgets {
         $options = array(
             array(
                 'id'   => SubmissionBox::MARK_VISIBILITY_PRIVATE,
-                'name' => html_entity_decode('&#xe663;&nbsp;&nbsp;Staff Only'),
+                'name' => html_entity_decode('&#xe66b;&nbsp;&nbsp;Staff Only'),
                 'css' => 'icon-locked',
             ),
             array(
                 'id'   => SubmissionBox::MARK_VISIBILITY_STUDENT,
-                'name' => html_entity_decode('&#xe65f;&nbsp;&nbsp;Staff and Students'),
+                'name' => html_entity_decode('&#xe667;&nbsp;&nbsp;Staff and Students'),
                 'css' => 'icon-staff-students',
             ),
             array(
                 'id'   => SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
-                'name' => html_entity_decode('&#xe65e;&nbsp;&nbsp;Staff, Students and their Parents'),
+                'name' => html_entity_decode('&#xe666;&nbsp;&nbsp;Staff, Students and their Parents'),
                 'css' => 'icon-staff',
             ),
         );
