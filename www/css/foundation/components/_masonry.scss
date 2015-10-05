@@ -184,3 +184,65 @@
 .icon-masonry-Component_Eportfolio_VideoController:before {
   @extend .icon-video:before;
 }
+
+// Dashboard masonry icons
+.icon-masonry-Component_Dashboard_ActivityController:before {
+  @extend .icon-info:before;
+}
+.icon-masonry-Component_Dashboard_CalendarController:before {
+  @extend .icon-calendar:before;
+}
+.icon-masonry-Component_Dashboard_ChildSubjectController:before {
+  @extend .icon-progress:before;
+}
+.icon-masonry-Component_Dashboard_GreetingController:before {
+  @extend .icon-chat:before;
+}
+.icon-masonry-Component_Dashboard_HomepageNewsController:before {
+  @extend .icon-news:before;
+}
+.icon-masonry-Component_Dashboard_ImageGalleryController:before {
+  @extend .icon-image-gallery:before;
+}
+.icon-masonry-Component_Dashboard_ImageSliderController:before {
+  @extend .icon-image-slideshow:before;
+}
+.icon-masonry-Component_Dashboard_NewsController:before {
+  @extend .icon-news:before;
+}
+.icon-masonry-Component_Dashboard_RecentSubmissionsController:before {
+  @extend .icon-due-work:before;
+}
+.icon-masonry-Component_Dashboard_RssController:before {
+  @extend .icon-rss:before;
+}
+.icon-masonry-Component_Dashboard_ScrollerController:before {
+  @extend .icon-image-slideshow:before;
+}
+.icon-masonry-Component_Dashboard_SubjectController:before {
+  @extend .icon-progress:before;
+}
+.icon-masonry-Component_Dashboard_TextboxController:before {
+  @extend .icon-textbox:before;
+}
+.icon-masonry-Component_Dashboard_TimetableController:before {
+  @extend .icon-timetable:before;
+}
+.icon-masonry-Component_Dashboard_TwitterController:before {
+  @extend .icon-twitter:before;
+}
+.icon-masonry-Component_Dashboard_UpcomingWorkController:before {
+  @extend .icon-due-work:before;
+}
+.icon-masonry-Component_Dashboard_VideoController:before {
+  @extend .icon-video:before;
+}
+.icon-masonry-Component_Dashboard_WeatherController:before {
+  @extend .icon-weather:before;
+}
+.icon-masonry-Schoolbox_ResourceBooking_Booking_Component_ResourceManagement:before {
+  @extend .icon-resource-booking:before;
+}
+.icon-masonry-Schoolbox_Tile_Component_DashboardTileController:before {
+  @extend .icon-tiles:before;
+}
