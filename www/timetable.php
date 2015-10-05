@@ -29,6 +29,7 @@ $this->setTab('timetable');
 $this->setBlock(TEMPLATE_content, "no_timetable", "no_timetable_block");
 $this->setBlock(TEMPLATE_content, "timetable", "timetable_listing");
 $this->setBlock(TEMPLATE_content, 'timetable_selector', 'timetable_selector_block');
+$this->setBlock('timetable_selector', 'timetable_person', 'timetable_person_block');
 $this->setBlock("timetable", "period", "period_listing");
 $this->setBlock("period", "day", "day_listing");
 $this->setBlock('day', 'period_class', 'period_class_block');
@@ -94,7 +95,7 @@ foreach ($userList as $user) {
         );
 
         $this->setVar($outputUser);
-        $this->parse('timetable_selector_block', 'timetable_selector', true);
+        $this->parse('timetable_person_block', 'timetable_person', true);
 
         $staffFlag = $user->getRole()->isStaff();
 
@@ -292,6 +293,13 @@ foreach ($userList as $user) {
             $this->setVar('timetable_listing', '');
         }
     }
+}
+
+if(count($userList) > 1) {
+    $this->parse('timetable_selector_block', 'timetable_selector');
+}
+else {
+    $this->setVar('timetable_selector_block','');
 }
 
 if ($numTimetables) {

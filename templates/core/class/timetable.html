@@ -1,13 +1,14 @@
+<!-- BEGIN timetable_selector -->
 <div class="row">
     <div class="small-12 columns">
         <dl class="sub-nav">
-            <!-- BEGIN timetable_selector -->
+            <!-- BEGIN timetable_person -->
             <dd><a data-timetable-selector="{USER_ID}">{PERSON}</a></dd>
-            <!-- END timetable_selector -->
+            <!-- END timetable_person -->
         </dl>
     </div>
 </div>
-
+<!-- END timetable_selector -->
 <!-- BEGIN timetable -->
 <div class="row hide" data-timetable-wrapper="{USER_ID}">
     <div class="small-12 columns">
@@ -62,11 +63,9 @@
 <!-- END timetable -->
 <!-- BEGIN no_timetable -->
 <div class="row">
-    <div class="small-12 island">
-        <section class="content">
-            <p>This user has no timetables.</p>
-        </section>
-    </div>
+<div class="small-12 column">
+    <div class="alert-box">There is currently no timetable available.</div>
+</div>
 </div>
 <!-- END no_timetable -->
 
