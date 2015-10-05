@@ -1,3 +1,14 @@
+{# Translate into class names #}
+{%
+set iconClassnames = {
+    'Muted': 'mute',
+    'Digest': 'news',
+    'Instant': 'notifications',
+    'Mobile': 'mobile',
+    'Email': 'email'
+}
+%}
+
 <script type="text/javascript">
     $(function () {
 
@@ -90,9 +101,6 @@
                         <p class="meta" data-summary>Sends to {{ role.name }}</p>
                     </div>
                 </div>
-                <nav>
-                    <a class="icon-more" title="" data-dropdown="header-options"></a>
-                </nav>
             </div>
 
             <div class="content">
@@ -102,27 +110,25 @@
                 </p>
             </div>
 
-            <table id="adv-possibilities" data-roles data-digest-settings >
-                <tr data-role>
+            <ul class="information-list" id="adv-possibilities" data-roles data-digest-settings>
+                <li data-role>
                     {% for level, perm in perms %}
-                        <td data-perm-container>
+                        <span data-perm-container>
                             <input id="opt-{{ source.id }}-{{ role.id }}-{{ level }}"
                                    name="data[{{ ns[namespace.id].slug ?: 0 }}][{{ source.key ?: 0 }}][{{ role.id }}][mask][]"
                                    value="{{ level }}" type="checkbox"
                                    {% if perm[1] | slice(0, 2) | upper in role.mask %}checked="checked"{% endif %}
                             />
-                            <label for="opt-{{ source.id }}-{{ role.id }}-{{ level }}" title="{{ perm[1] }}">
-                                <span>
-                                    <img src="/images/core/messaging/{{ perm[1] | lower }}.svg" alt="{{ perm[1] }}" />
-                                    {#{% include '@adminMessages/icons/' ~ perm[1] | lower ~ '.svg' %}#}
-                                    {#{{ perm[1] | slice(0, 2) | upper }}#}
-                                </span>
+                            <label for="opt-{{ source.id }}-{{ role.id }}-{{ level }}" title="{{ perm[1] }}" class="no-margin">
+                                <a class="icon-{{ iconClassnames[perm[1]] }}" title="{{ perm[1] }}"></a>
                             </label>
-                        </td>
-                        {% if level == 1 %}<td>+</td>{% endif %}
+                        </span>
+                        {% if level == 1 %}
+                        <span class="icon-add"></span>
+                        {% endif %}
                     {% endfor %}
-                </tr>
-            </table>
+                </li>
+            </ul>
 
             <div class="content">
                 <p>
@@ -130,11 +136,12 @@
                 </p>
             </div>
 
-            <table data-roles data-digest-settings data-settings id="adv-selection">
-                <tr class="role" data-role="{{ role.id }}">
+            <ul class="information-list" id="adv-selection" data-roles data-digest-settings data-settings>
+                <li data-role="{{ role.id }}">
                     {% include '@messages/options.twig' with { mode: 'def' } %}
-                </tr>
-            </table>
+                </li>
+            </ul>
+
             <label class="float-right">
                 <input type="checkbox" name="copy-to" value="{{ roletype ?: 'all' }}" /> Copy these message settings for all {{ roletype }} roles
             </label>
