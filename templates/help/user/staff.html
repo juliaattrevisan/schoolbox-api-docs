@@ -1,0 +1,60 @@
+<h1>{NAME}</h1>
+<div class="profile-info">
+
+    <div class="profile-img">
+    <!-- BEGIN portrait -->
+    <img src="/portrait.php?userId={SYNERGY_ID}&size=constrain200"/>
+    <!-- END portrait -->
+    </div>
+    <div class="staff-detail">
+        <!-- <dl>
+            <dt class="dark"><strong>Email</strong></dt>
+            <dd class="dark mail-profile">{EMAIL}</dd>
+        </dl>-->
+        <!-- BEGIN staff_synergy -->
+        <dl>
+            <dt><strong>Department</strong></dt>
+            <dd>{DEPARTMENT}</dd>
+            <dt class="dark"><strong>Type</strong></dt>
+            <dd class="dark">{CATEGORY}</dd>
+            <dt><strong>Building</strong></dt>
+            <dd>{BUILDING}</dd>
+            <dt class="dark"><strong>Room</strong></dt>
+            <dd class="dark">{ROOM}</dd>
+            <dt><strong>Extension</strong></dt>
+            <dd>{EXTENSION}</dd>
+            <dt class="dark"><strong>Campus</strong></dt>
+            <dd class="dark">{CAMPUS}</dd>
+        </dl>
+        <!-- END staff_synergy -->
+        <p class="school-info">
+            <!-- BEGIN eportfolio -->
+            <a href="/eportfolio/{ID}/profile" class="btn eportfolio float-left"><span></span>ePortfolio</a>
+            <!-- END eportfolio -->
+
+            <!-- BEGIN user_calendar -->
+            <a href='/calendar/full/{USER_CALENDAR_CURRENTDATE}/{ID}' class="btn calendar float-left"><span></span>Calendar</a>
+            <!-- END user_calendar -->
+
+            <!-- BEGIN timetable_link -->
+            <a href="/timetable/{ID}" class="btn time-table float-left"><span></span>Timetable</a>
+            <!-- END timetable_link -->
+
+            <!-- BEGIN modify -->
+            <a href="/adminv2/modify-user/{ID}" class="btn modify float-left"><span></span>Modify User</a>
+            <!-- END modify -->
+        </p>
+    </div>
+</div>
+
+<!-- BEGIN subject -->
+	<!-- BEGIN subject_row -->
+		<!-- BEGIN subject_item -->
+			<!-- BEGIN subject_teacher -->
+			<!-- END subject_teacher -->
+		<!-- END subject_item -->
+	<!-- END subject_row -->
+	<!-- BEGIN subject_mail -->
+	<!-- END subject_mail -->
+<!-- END subject -->
+
