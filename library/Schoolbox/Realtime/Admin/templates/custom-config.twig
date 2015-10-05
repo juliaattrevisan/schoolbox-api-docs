@@ -142,9 +142,11 @@ set iconClassnames = {
                 </li>
             </ul>
 
-            <label class="float-right">
-                <input type="checkbox" name="copy-to" value="{{ roletype ?: 'all' }}" /> Copy these message settings for all {{ roletype }} roles
+            <input type="checkbox" id='copy-message-settings' name="copy-to" value="{{ roletype ?: 'all' }}" />
+            <label for="copy-message-settings" class="checkbox-label">
+                Copy these message settings for all {{ roletype }} roles
             </label>
+
             <input type="submit" class="submit-btn-plain" value="Save" />
         </form>
     </li>
