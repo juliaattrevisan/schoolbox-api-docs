@@ -106,7 +106,7 @@ class Event extends Day\Event implements EventInterface {
             $formattedTime = $this->getStartTime()->getTimeOnly();
 
             if(!$this->getEndTime()->isAtStartOfDay()) {
-                $formattedTime .= " &ndash; ". $this->getEndTime()->getTimeOnly();
+                $formattedTime .= "&ndash;". $this->getEndTime()->getTimeOnly();
             }
         }
 
