@@ -127,6 +127,7 @@ abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchroni
         */
 
         switch ($year) {
+            case '00':
             case '01':
             case '02':
                 return self::IS;
@@ -142,7 +143,6 @@ abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchroni
             case '11':
             case '12':
                 return self::HS;
-            case '00':
             case '20':
             case '30':
             case '40':
