@@ -18,6 +18,7 @@ use Scrub;
  */
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Resource\Folder;
 
 class Renderer extends Base
 {
@@ -62,7 +63,9 @@ class Renderer extends Base
             /* phplib
              */
             foreach ($mapperResult->getResult() as $currentFolder) {
-/* Manufacture a formatted name with codes, if any
+                /** @var Folder\Model $currentFolder */
+
+                /* Manufacture a formatted name with codes, if any
                  */
                 if ($currentFolder->getCodes()->count()) {
                     $allCodes = array();
