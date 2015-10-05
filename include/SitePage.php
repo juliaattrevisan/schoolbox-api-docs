@@ -714,20 +714,10 @@ class SitePage extends Page
         if ($this->site == 'shore') {
             $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
             if ($this->groupHandler->isStaff()) {
-                if (strpos(Session::getIP(), '192.168.') === false) {
-                    $this->setVar('MYFILES_LOCATION', 'https://mail.shore.nsw.edu.au/fileway');
-                } else {
-                    $this->setVar('MYFILES_LOCATION', 'http://shorexch01.shore.nsw.edu.au/fileway');
-                }
-
+                $this->setVar('MYFILES_LOCATION', 'https://myfiles.shore.nsw.edu.au/');
                 $this->parse('mf_tab', 'myfiles_tab');
             } elseif ($this->groupHandler->isStudent()) {
-                if (strpos(Session::getIP(), '192.168.') === false) {
-                    $this->setVar('MYFILES_LOCATION', 'https://mail.student.shore.nsw.edu.au/fileway');
-                } else {
-                    $this->setVar('MYFILES_LOCATION', 'http://cassandra.student.shore.nsw.edu.au/fileway');
-                }
-
+                $this->setVar('MYFILES_LOCATION', 'https://myfiles.student.shore.nsw.edu.au/');
                 $this->parse('mf_tab', 'myfiles_tab');
             } else {
                 $this->setVar('MYFILES_LOCATION', '#');
