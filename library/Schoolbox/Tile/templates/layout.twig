@@ -281,16 +281,21 @@
                             </select>
                         </div>
 
-                        <div class="small-12 columns"
+                        <div class="small-6 columns"
                              data-hide-watch="#tile_shape"
                              data-hide-watch-value="custom">
-                            <label for="aspect_ratio_x">Aspect Ratio</label>
+                            <label for="aspect_ratio_x">Width Ratio</label>
                             <input id="aspect_ratio_x"
                                    type="number"
                                    name="aspect_ratio_x"
                                    value="{{ item.aspectRatioX|e('html_attr') }}"
                                    class="aspect-ratio"
-                                   data-function="update-layout" /> :
+                                   data-function="update-layout" />
+                        </div>
+                        <div class="small-6 columns"
+                             data-hide-watch="#tile_shape"
+                             data-hide-watch-value="custom">
+                            <label for="aspect_ratio_y">Height Ratio</label>
                             <input id="aspect_ratio_y"
                                    type="number"
                                    name="aspect_ratio_y"
