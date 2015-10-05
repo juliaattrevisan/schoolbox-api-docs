@@ -108,37 +108,33 @@
                     <div class="small-12 columns">
                         <p>
                             Customise when and how you receive messages.
-                        </p>
-                        <p>
                             <em>Options that are unavailable have been disabled by your system administrator.</em>
                         </p>
                     </div>
                 </fieldset>
             </section>
 
-            <h2 class="subheader">Messages</h2>
+            {% for namespace in config %}
+            <h3 class="subheader">Receive {{ namespace.label }} messages when&hellip;</h3>
             <section>
                 <fieldset class="content">
-                    <div class="small-12 columns">
-                        <table id="msg-settings" data-roles data-digest-settings>
-                            {% for namespace in config %}
-                            <tr>
-                                <th colspan="2">Receive {{ namespace.label }} messages when&hellip;</th>
-                                <th colspan="6"></th>
-                            </tr>
-                            {% for source in namespace.sources %}
-                                <tr data-source="{{ source.id }}">
-                                    <th>&nbsp;</th>
-                                    <td width="100%">&hellip;{{ source.description }}.</td>
-                                    {% include '@messages/options.twig' with { mode: 'p', role: source } %}
-                                    <td width="32"></td>
-                                </tr>
-                            {% endfor %}
-                            {% endfor %}
-                        </table>
-                    </div>
+                    <ul class='information-list' id="msg-settings" data-roles data-digest-settings>
+                        {% for source in namespace.sources %}
+                        <li class="actions-small-7" data-source="{{ source.id }}">
+                            <div class="list-item">
+                                <div class="small-12 info card">
+                                    <p class="meta">&hellip;{{ source.description }}.</p>
+                                </div>
+                            </div>
+                            <nav>
+                                {% include '@messages/options.twig' with { mode: 'p', role: source } %}
+                            </nav>
+                        </li>
+                        {% endfor %}
+                    </ul>
                 </fieldset>
             </section>
+            {% endfor %}
 
             <input type="submit" value="Submit" />
         </form>
