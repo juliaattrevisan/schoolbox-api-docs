@@ -37,6 +37,7 @@ class Component_Renderer
             $component->setup(null, array());
 
             $page->setVar(array(
+                'ID'                        => $instance_no,
                 'COMPONENT_INSTANCE_ID'     => $instance_no,
                 'COMPONENT_HANDLE'          => $instance_no,
                 'component.instance.id'     => $instance_no,
@@ -75,6 +76,7 @@ class Component_Renderer
 
         $instance_no = $component->getInstance()->getId();
         $page->setVar(array(
+            'ID'                        => $instance_no,
             'COMPONENT_INSTANCE_ID'     => $instance_no,
             'COMPONENT_HANDLE'          => $instance_no,
             'component.instance.id'     => $instance_no,
