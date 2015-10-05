@@ -91,63 +91,69 @@ set iconClassnames = {
 
     });
 </script>
+
 <ul id="adv" class="information-list">
     <li data-source="{{ source.id }}">
         <form method="post" action="">
-            <div class="actions-small-1 row">
-                <div class="list-item">
+            <section>
+                <fieldset class="content">
                     <div class="small-12 columns">
                         <h4>Send a message when {{ source.description }}.</h4>
                         <p class="meta" data-summary>Sends to {{ role.name }}</p>
                     </div>
-                </div>
-            </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <p>
+                            <strong>Step 1:</strong> Select the settings that members of '{{ role.name }}' are <em>allowed to select</em> for this message when customizing their notifications.
+                            If you only select a single option, users will be locked to that option.
+                        </p>
 
-            <div class="content">
-                <p>
-                    <strong>Step 1:</strong> Select the settings that members of '{{ role.name }}' are <em>allowed to select</em> for this message when customizing their notifications.
-                    If you only select a single option, users will be locked to that option.
-                </p>
-            </div>
+                        <ul class="information-list" id="adv-possibilities" data-roles data-digest-settings>
+                            <li data-role>
+                                {% for level, perm in perms %}
+                                    <span data-perm-container>
+                                        <input id="opt-{{ source.id }}-{{ role.id }}-{{ level }}"
+                                               name="data[{{ ns[namespace.id].slug ?: 0 }}][{{ source.key ?: 0 }}][{{ role.id }}][mask][]"
+                                               value="{{ level }}" type="checkbox"
+                                               {% if perm[1] | slice(0, 2) | upper in role.mask %}checked="checked"{% endif %}
+                                        />
+                                        <label for="opt-{{ source.id }}-{{ role.id }}-{{ level }}" title="{{ perm[1] }}" class="no-margin">
+                                            <a class="icon-{{ iconClassnames[perm[1]] }}" title="{{ perm[1] }}"></a>
+                                        </label>
+                                    </span>
+                                    {% if level == 1 %}
+                                    <span class="icon-add"></span>
+                                    {% endif %}
+                                {% endfor %}
+                            </li>
+                        </ul>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <p>
+                            <strong>Step 2:</strong> Select the default setting for members of '{{ role.name }}' for this message.
+                        </p>
 
-            <ul class="information-list" id="adv-possibilities" data-roles data-digest-settings>
-                <li data-role>
-                    {% for level, perm in perms %}
-                        <span data-perm-container>
-                            <input id="opt-{{ source.id }}-{{ role.id }}-{{ level }}"
-                                   name="data[{{ ns[namespace.id].slug ?: 0 }}][{{ source.key ?: 0 }}][{{ role.id }}][mask][]"
-                                   value="{{ level }}" type="checkbox"
-                                   {% if perm[1] | slice(0, 2) | upper in role.mask %}checked="checked"{% endif %}
-                            />
-                            <label for="opt-{{ source.id }}-{{ role.id }}-{{ level }}" title="{{ perm[1] }}" class="no-margin">
-                                <a class="icon-{{ iconClassnames[perm[1]] }}" title="{{ perm[1] }}"></a>
-                            </label>
-                        </span>
-                        {% if level == 1 %}
-                        <span class="icon-add"></span>
-                        {% endif %}
-                    {% endfor %}
-                </li>
-            </ul>
+                        <ul class="information-list" id="adv-selection" data-roles data-digest-settings data-settings>
+                            <li data-role="{{ role.id }}">
+                                {% include '@messages/options.twig' with { mode: 'def' } %}
+                            </li>
+                        </ul>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <input type="checkbox" id='copy-message-settings' name="copy-to" value="{{ roletype ?: 'all' }}" />
+                        <label for="copy-message-settings" class="checkbox-label">
+                            Copy these message settings for all {{ roletype }} roles
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
 
-            <div class="content">
-                <p>
-                    <strong>Step 2:</strong> Select the default setting for members of '{{ role.name }}' for this message.
-                </p>
-            </div>
-
-            <ul class="information-list" id="adv-selection" data-roles data-digest-settings data-settings>
-                <li data-role="{{ role.id }}">
-                    {% include '@messages/options.twig' with { mode: 'def' } %}
-                </li>
-            </ul>
-
-            <input type="checkbox" id='copy-message-settings' name="copy-to" value="{{ roletype ?: 'all' }}" />
-            <label for="copy-message-settings" class="checkbox-label">
-                Copy these message settings for all {{ roletype }} roles
-            </label>
-
-            <input type="submit" class="submit-btn-plain" value="Save" />
+            <input type="submit" value="Save" />
         </form>
     </li>
 </ul>
