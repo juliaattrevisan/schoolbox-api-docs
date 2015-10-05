@@ -156,9 +156,25 @@ select{
 		outline: none;
 	}
 }
-input, textarea 			{ padding-left: 0.75rem; }
-select option				{
-	&:hover 				{ background: $input-hover-bg-color; }
+
+input,
+textarea{
+	padding-left: 0.75rem;
+}
+
+select option{
+	&:hover{
+		background: $input-hover-bg-color;
+	}
+}
+
+// remove margins on forms inside tables
+td{
+	input[type],
+	textarea,
+	select{
+		margin: 0;
+	}
 }
 
 
