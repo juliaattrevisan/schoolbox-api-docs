@@ -1,4 +1,5 @@
 {# I need some way of adding custom_head #}
+<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.confirm-dialog.js"></script>
 <script type="text/javascript" src="/javascript/shared/tiles/jquery.tile-resize.js"></script>
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
@@ -141,25 +142,18 @@
         });
 
         // Sortability
-        var reorderFeedbackSaving = form.find('[data-role="reorder-feedback-saving"]');
-        var reorderFeedbackSaved  = form.find('[data-role="reorder-feedback-saved"]');
-        var reorderFeedbackFailed = form.find('[data-role="reorder-feedback-failed"]');
+        var reorderFeedback = form.find('[data-relation="save-label"]');
         tileList.sortable({
             items:  '> li:not(.add)',
             stop: function(event, ui) {
                 // save this form
-                reorderFeedbackSaving.fadeIn('fast');
+                reorderFeedback.labelActivate({text: 'Saving order...'});
                 $.post(form.attr('action'), form.serializeArray())
-                    .always(function() {
-                        reorderFeedbackSaving.hide();
-                    })
                     .done(function() {
-                        reorderFeedbackSaved.show();
-                        setTimeout(function() { reorderFeedbackSaved.hide(); }, 2000);
+                        reorderFeedback.labelTimeout({text: 'Saved!', 'css': 'success'});
                     })
                     .fail(function() {
-                        reorderFeedbackFailed.show();
-                        setTimeout(function() { reorderFeedbackFailed.hide(); }, 2000);
+                        reorderFeedback.labelTimeout({text: 'Save Failed!', 'css': 'alert'});
                     })
             }
         });
@@ -317,10 +311,7 @@
                 <div class="content">
                     <div class="row">
                         <div class="small-12 columns">
-                            {# Feedback for saving order of tiles #}
-                            <div class="hide" data-role="reorder-feedback-saving">Saving order...</div>
-                            <div class="hide" data-role="reorder-feedback-saved">Saved!</div>
-                            <div class="hide" data-role="reorder-feedback-failed">Failed!</div>
+                            <span class="label full-width hide" data-relation="save-label"></span>
                             {% include '@tile/sub/tileList.twig' with {
                                 layout:   item,
                                 tileList: item.tileList,
