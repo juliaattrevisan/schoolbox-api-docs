@@ -110,7 +110,7 @@ $switch-font-size-med: 14px;
 // $switch-label-side-padding: 6px;
 
 // We use these to style the switch-paddle
-$switch-active-color: $success-color;
+$switch-active-color: $primary-color;
 // $switch-paddle-bg: $white;
 $switch-paddle-fade-to-color: tint($secondary-color, 74%);
 $switch-paddle-border-color: transparent;
@@ -177,6 +177,24 @@ th, td{
 	}
 }
 
+.switch {
+	&.long {
+		@include wide-switch(8rem);
+		@include switch-label;
+	}
+	@include switch-label(0.5rem);
+
+	span {
+		position: absolute;
+		top: 0.25rem;
+		line-height: 1.625rem;
+		font-weight: 100;
+		text-transform: uppercase;
+		font-size: rem-calc($base-font-size - 3);
+		text-indent: 0;
+		@include single-transition(opacity, $switch-paddle-transition-speed, $switch-paddle-transition-ease);
+	}
+}
 
 @mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem, $hover-color: $input-border-color, $active-color: $primary-color) {
 
