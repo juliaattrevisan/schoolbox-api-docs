@@ -209,10 +209,10 @@
 
             <section>
                 <fieldset class="content">
-                    <legend>Tile Layout</legend>
+                    <legend>Layout</legend>
                     <div class="row">
                         <div class="small-12 large-6 columns">
-                            <label for="layout_type">Layout Type</label>
+                            <label for="layout_type">Type</label>
                             <select id="layout_type" name="layout_type" data-function="update-layout">
                                 <option value="grid" {% if item.isGridLayoutType() %}selected{% endif %}>Grid</option>
                                 <option value="column" {% if item.isColumnLayoutType() %}selected{% endif %}>Column</option>
@@ -268,10 +268,10 @@
                 </fieldset>
 
                 <fieldset class="content">
-                    <legend>Tile Shape</legend>
+                    <legend>Shape</legend>
                     <div class="row">
                         <div class="small-12 columns">
-                            <label for="tile_shape">Layout Shape</label>
+                            <label for="tile_shape">Ratio</label>
                             <select id="tile_shape" name="tile_shape" data-function="update-layout">
                                 <option value="landscape"
                                         {% if item.isLandscapeShape() %}selected{% endif %}>Landscape (16:9)</option>
