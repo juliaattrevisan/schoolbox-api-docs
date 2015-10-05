@@ -1,0 +1,117 @@
+/* Tiles styles
+ */
+$tiles-add-background:       #8fd16b;
+$tiles-add-background-hover: #aeff83;
+$tiles-selected-background:  #ffffb2;
+
+/**
+ * Styles for the tile component.
+ */
+ul.tileList {
+    // Get rid of spacing between tiles
+    word-spacing: 0;
+    line-height: 0;
+    margin: 0;
+
+    &.ui-sortable li {
+        // Get rid of border and background on sortable tiles
+        background-image: none;
+        border: none;
+    }
+
+    // Styles for individual tiles
+    li.tile {
+        padding: 0;
+        position: relative;
+        display: inline-block;
+        height: auto;
+        // Styles for the tile's background image (if provided)
+        background-repeat: no-repeat;
+        // This tends to get clobbered by more specific styles which set a
+        // background as a color and nothing else.
+        background-size: cover;
+        background-position: center;
+        transition: background-color 0.1s;
+        &.contained {
+            background-size: contain;
+        }
+        &.background-top {
+            background-position-y: top;
+        }
+        &.background-middle {
+            background-position-y: center;
+        }
+        &.background-bottom {
+            background-position-y: bottom;
+        }
+        &.background-left {
+            background-position-x: left;
+        }
+        &.background-center {
+            background-position-x: center;
+        }
+        &.background-right {
+            background-position-x: right;
+        }
+        &.marked-for-delete {
+            // Fade out tiles marked for delete
+            filter: grayscale(1);
+            opacity: 0.3;
+        }
+        &.add {
+            // Add new tile link looks like a tile
+            background-color: $tiles-add-background;
+            &:hover {
+                background-color: $tiles-add-background-hover;
+            }
+            .title {
+                // its title is just a link in the middle of it
+                text-align: center;
+                vertical-align: middle;
+            }
+        }
+        .btn {
+            margin: 8px 8px 0 0;
+        }
+        .title {
+            // Title: revert spacing back to normal
+            position: absolute;
+            width: 100%;
+            word-spacing: normal;
+            line-height: normal;
+            // Font size: I assume some will want to change this and the font family
+            font-size: 2em;
+            padding: 1em;
+            box-sizing: border-box;
+            &.text-top {
+                top: 0;
+            }
+            &.text-middle {
+                // Yes, this works in IE9!
+                top: 50%;
+                left: 50%;
+                @include transform(translate(-50%, -50%));
+            }
+            &.text-bottom {
+                bottom: 0;
+            }
+            &.text-left {
+                text-align: left;
+            }
+            &.text-center {
+                text-align: center;
+            }
+            &.text-right {
+                text-align: right;
+            }
+        }
+        .tile-link, .edit {
+            // The tile's link and edit partition overlap the entire tile
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            transition: background-color 0.1s;
+        }
+    }
+}
