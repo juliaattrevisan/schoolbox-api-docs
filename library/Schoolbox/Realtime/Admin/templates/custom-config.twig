@@ -31,7 +31,7 @@ set iconClassnames = {
 
                 if (tgt.data('perm') == 1) {
                     // deselect the other perms
-                    src.closest('tr').find('input').filter(
+                    src.closest('[data-role]').find('input').filter(
                         function () {
                             return this.value > 1 && this.value < 8
                         }
@@ -61,15 +61,14 @@ set iconClassnames = {
         posTable.on('click preclick', 'input[value=2], input[value=4]', function (e) {
             if ($(this).prop('checked')) {
                 // ensure instant is checked
-                $(this).closest('tr').find('input[value=1]').prop('checked', true).trigger('preclick');
+                $(this).closest('[data-role]').find('input[value=1]').prop('checked', true).trigger('preclick');
             }
         });
 
         posTable.find('input').trigger('preclick');
 
-        // inlineify all SVGs and apply message admin constraints
+        // Apply message admin constraints
         $('#adv')
-            .svgInline()
             .msgconfig({
                 roleSelector: '[data-role]',
                 permSelector: '[data-perm-container]',
@@ -83,7 +82,6 @@ set iconClassnames = {
             $(this).find('input[type=submit]').attr('disabled', 'disabled').val('Saving');
 
             $.post('/adminv2/messages/configure', $(this).serialize(), function (data) {
-                console.log(data);
                 customiserCallback(data);
                 $('#slider-modal').dialog('close').dialog('destroy');
             });
