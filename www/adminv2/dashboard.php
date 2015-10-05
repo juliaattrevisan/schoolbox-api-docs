@@ -41,56 +41,26 @@ if (is_array($groupList)) {
 }
 
 /* Component Palette */
-//$this->setBlock(TEMPLATE_content, 'definition', 'definition_block');
-$this->setBlock(TEMPLATE_content, 'component_tab', 'component_tab_block');
-$this->setBlock(TEMPLATE_content, 'component_page', 'component_page_block');
-$this->setBlock('component_page', 'component', 'component_block');
+$this->setBlock(TEMPLATE_content, 'component', 'component_block');
 
 $componentFactory     = new Component_Dashboard_Factory(new \Schoolbox\User(), $this);
 $definitionCollection = $componentFactory->getDefinitionList('component_category');
 
-// Group by category
-$groupedCollection = [];
-foreach ($definitionCollection as $definition) {
-    $groupedCollection[$definition->getComponentCategory()][] = $definition;
-}
-
-$this->setVar([
-    'component_tab_block'  => '',
-    'component_page_block' => '',
-]);
+$this->setVar('component_block', '');
 $firstCategory = true;
-foreach ($groupedCollection as $category => $categoryDefinitions) {
-    $firstComponent = true;
-    foreach ($categoryDefinitions as $definition) {
-        /* @var $definition Component_Definition */
-        if ($firstComponent) {
-            // First component in category: parse tab
-            $this->setVar([
-                'COMPONENT_CATEGORY_CLASS' => $firstCategory ? 'active' : '',
-                'COMPONENT_CATEGORY_ID'    => $category,
-                'COMPONENT_CATEGORY_NAME'  => $definition->getComponentCategoryName(),
-                'COMPONENT_CATEGORY_COUNT' => count($categoryDefinitions),
-                'component_block'          => '',
-            ]);
-            $this->parse('component_tab_block', 'component_tab', true);
-            $firstComponent = false;
-            $firstCategory  = false;
-        }
-
-        $this->setVar([
-            'COMPONENT_ID'             => $definition->getId(),
-            'COMPONENT_DESCRIPTION'    => $definition->getDescription(),
-            'COMPONENT_CLASS'          => str_replace('\\', '_', $definition->getClass()),
-            'COMPONENT_MULTIPLE_STATE' => $definition->getMultiple() ? 'active' : '',
-            'COMPONENT_NAME'           => $definition->getName(),
-            'COMPONENT_CATEGORY_NAME'  => $definition->getComponentCategoryName(),
-            // Not known yet
-            'COMPONENT_COUNT'          => 0,
-        ]);
-        $this->parse('component_block', 'component', true);
-    }
-    $this->parse('component_page_block', 'component_page', true);
+foreach ($definitionCollection as $definition) {
+    /* @var $definition Component_Definition */
+    $this->setVar([
+        'COMPONENT_ID'             => $definition->getId(),
+        'COMPONENT_DESCRIPTION'    => $definition->getDescription(),
+        'COMPONENT_CLASS'          => str_replace('\\', '_', $definition->getClass()),
+        'COMPONENT_MULTIPLE_STATE' => $definition->getMultiple() ? 'active' : '',
+        'COMPONENT_NAME'           => $definition->getName(),
+        'COMPONENT_CATEGORY_NAME'  => $definition->getComponentCategoryName(),
+        // Not known yet
+        'COMPONENT_COUNT'          => 0,
+    ]);
+    $this->parse('component_block', 'component', true);
 }
 
 /* Initial group placeholders */
