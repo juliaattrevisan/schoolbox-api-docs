@@ -1,10 +1,10 @@
 .calendar-list {
     @include information-list;
 
-    .column {
-      padding-top: rem-calc(($base-font-size - 2));
-      padding-bottom: rem-calc(($base-font-size - 2));
-    }
+  .column {
+    padding-top: rem-calc(($base-font-size - 2));
+    padding-bottom: rem-calc(($base-font-size - 2));
+  }
 
 
   ul.action-list {
@@ -15,5 +15,9 @@
    		margin-right: -0.75rem;
         margin-left: -0.75rem;
    	}
+  }
+
+  li {
+    cursor: pointer;
   }
 }
