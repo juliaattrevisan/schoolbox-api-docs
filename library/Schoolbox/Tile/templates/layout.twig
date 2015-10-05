@@ -134,6 +134,7 @@
         // Sortability
         var reorderFeedback = form.find('[data-relation="save-label"]');
         tileList.sortable({
+            handle: '[data-tile-grip]',
             items:  '> li:not(.add)',
             stop: function(event, ui) {
                 // save this form
@@ -209,7 +210,10 @@
 
             <section>
                 <fieldset class="content">
-                    <legend>Layout</legend>
+                    <legend>
+                        Layout
+                        <span class='hint has-tip tip-top' data-tooltip title="Arrange tiles in either a fixed-width grid or spanned across a number of columns.">?</span>
+                    </legend>
                     <div class="row">
                         <div class="small-12 large-6 columns">
                             <label for="layout_type">Type</label>
@@ -312,7 +316,10 @@
                 </fieldset>
 
                 <fieldset class="content">
-                    <legend>Modify Tiles</legend>
+                    <legend>
+                        Tiles
+                        <span class='hint has-tip tip-top' data-tooltip title="You may add, edit, remove and rearrange tiles in this list.">?</span>
+                    </legend>
                     <div class="row">
                         <div class="small-12 columns">
                             <span class="label full-width hide" data-relation="save-label"></span>
