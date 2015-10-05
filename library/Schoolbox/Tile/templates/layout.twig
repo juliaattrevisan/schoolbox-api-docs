@@ -52,10 +52,21 @@
 
         // Updater for tile shape and layout
         form.find(':input[data-function="update-layout"]').change(function() {
-
             // Get aspect ratio. If it's invalid, don't resize anything
-            var xAspect = Math.max(rules.aspect_ratio_x.min, Math.min(rules.aspect_ratio_x.max, Number(xInput.val())));
-            var yAspect = Math.max(rules.aspect_ratio_y.min, Math.min(rules.aspect_ratio_y.max, Number(yInput.val())));
+            var xAspect = Math.max(
+                rules.aspect_ratio_x.min,
+                Math.min(
+                    rules.aspect_ratio_x.max,
+                    Number(xInput.val())
+                )
+            );
+            var yAspect = Math.max(
+                rules.aspect_ratio_y.min,
+                Math.min(
+                    rules.aspect_ratio_y.max,
+                    Number(yInput.val())
+                )
+            );
             if (xAspect > 0 && yAspect > 0) {
                 // start resizing
                 var aspect = yAspect / xAspect;
