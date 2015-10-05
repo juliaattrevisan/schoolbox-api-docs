@@ -1,10 +1,19 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
 <script type="text/javascript">
     $(function() {
         $('[data-preview]').click(function(event) {
             event.preventDefault();
 
             window.open($(this).attr('href'),'1396330261396','width=720,height=500,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=0,left=0,top=0');
+        });
+
+        $('[data-datepicker]').datepicker();
+
+        $('[data-timepicker]').timepicker({
+            appendTo: function ($input) {
+                return $input.closest('.timepick');
+            }
         });
     });
 </script>
@@ -75,24 +84,28 @@
                     <ul class="information-list">
                         <!-- BEGIN role_digest -->
                         <li>
-                            <h3>{ROLE_NAME}</h3>
-                            <ul class="inline-list">
-                                <!-- BEGIN day_check -->
-                                <li>
-                                    <input id="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" type="checkbox" name="role[{ROLE_ID}][day][]" value="{DAY_VALUE}" {DAY_CHECKED} />
-                                    <label for="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" class="checkbox-toggle">
-                                        <span title="{DAY_CHAR}">{DAY_CHAR}</span>
-                                    </label>
-                                </li>
-                                <!-- END day_check -->
-                                <li>
-                                    <select name="role[{ROLE_ID}][time]">
-                                        <!-- BEGIN time_select -->
-                                        <option value="{TIME_VALUE}" {TIME_SELECTED}>{TIME_VALUE}</option>
-                                        <!-- END time_select -->
-                                    </select>
-                                </li>
-                            </ul>
+                            <div class="small-12 columns">
+                                <h3>{ROLE_NAME}</h3>
+                            </div>
+
+                            <!-- BEGIN day_check -->
+                            <div class="small-1 columns">
+                                <input id="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" type="checkbox" name="role[{ROLE_ID}][day][]" value="{DAY_VALUE}" {DAY_CHECKED} />
+                                <label for="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" class="checkbox-toggle">
+                                    <span title="{DAY_CHAR}">{DAY_CHAR}</span>
+                                </label>
+
+                            </div>
+                            <!-- END day_check -->
+
+                            <div class="small-12 medium-5 columns">
+                                <div class="timepick">
+                                    <input name="role[{ROLE_ID}][time]" type="text" autocomplete="off" placeholder="{TIME_VALUE}" value="{TIME_VALUE}" data-timepicker />
+                                </div>
+
+                                <!-- BEGIN time_select -->
+                                <!-- END time_select -->
+                            </div>
                         </li>
                         <!-- END role_digest -->
                     </ul>
