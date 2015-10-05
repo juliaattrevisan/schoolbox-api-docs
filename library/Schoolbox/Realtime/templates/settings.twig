@@ -120,6 +120,22 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
+                        <table id="msg-settings" data-roles data-digest-settings>
+                            {% for namespace in config %}
+                            <tr>
+                                <th colspan="2">Receive {{ namespace.label }} messages when&hellip;</th>
+                                <th colspan="6"></th>
+                            </tr>
+                            {% for source in namespace.sources %}
+                                <tr data-source="{{ source.id }}">
+                                    <th>&nbsp;</th>
+                                    <td width="100%">&hellip;{{ source.description }}.</td>
+                                    {% include '@messages/options.twig' with { mode: 'p', role: source } %}
+                                    <td width="32"></td>
+                                </tr>
+                            {% endfor %}
+                            {% endfor %}
+                        </table>
                     </div>
                 </fieldset>
             </section>
@@ -129,32 +145,8 @@
     </div>
 </div>
 
-
-
 <div id="slider-modal" class="reveal-modal" data-reveal>
     {% include '@messages/legend.twig' with { who: 'you' } %}
 
     <a class="close-reveal-modal">&#215;</a>
 </div>
-
-
-
-
-
-
-    <table id="msg-settings" data-roles data-digest-settings>
-        {% for namespace in config %}
-        <tr>
-            <th colspan="2">Receive {{ namespace.label }} messages when&hellip;</th>
-            <th colspan="6"></th>
-        </tr>
-        {% for source in namespace.sources %}
-        <tr data-source="{{ source.id }}">
-            <th>&nbsp;</th>
-            <td width="100%">&hellip;{{ source.description }}.</td>
-            {% include '@messages/options.twig' with { mode: 'p', role: source } %}
-            <td width="32"></td>
-        </tr>
-        {% endfor %}
-        {% endfor %}
-    </table>
