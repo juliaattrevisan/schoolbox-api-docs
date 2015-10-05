@@ -220,7 +220,8 @@
                              data-hide-watch="#layout_type"
                              data-hide-watch-value="grid">
                             <label for="layout_type_grid">px</label>
-                            <input name="grid_width"
+                            <input type="number"
+                                   name="grid_width"
                                    value="{{ item.gridWidth|e('html_attr') }}"
                                    class="layout-width"
                                    data-function="update-layout" />
@@ -229,7 +230,8 @@
                              data-hide-watch="#layout_type"
                              data-hide-watch-value="grid">
                             <label for="layout_type_grid">px padding</label>
-                            <input name="grid_padding"
+                            <input type="number"
+                                   name="grid_padding"
                                    value="{{ item.gridPadding|e('html_attr') }}"
                                    class="layout-width"
                                    data-function="update-layout" />
@@ -239,7 +241,8 @@
                              data-hide-watch="#layout_type"
                              data-hide-watch-value="column">
                             <label for="layout_type_column">tiles/row</label>
-                            <input name="column_count"
+                            <input type="number"
+                                   name="column_count"
                                    value="{{ item.columnCount|e('html_attr') }}"
                                    class="layout-width"
                                    data-function="update-layout" />
@@ -248,7 +251,8 @@
                              data-hide-watch="#layout_type"
                              data-hide-watch-value="column">
                             <label for="layout_type_column">% padding</label>
-                            <input name="column_padding"
+                            <input type="number"
+                                   name="column_padding"
                                    value="{{ item.columnPadding|e('html_attr') }}"
                                    class="layout-width"
                                    data-function="update-layout" />
@@ -282,11 +286,13 @@
                              data-hide-watch-value="custom">
                             <label for="aspect_ratio_x">Aspect Ratio</label>
                             <input id="aspect_ratio_x"
+                                   type="number"
                                    name="aspect_ratio_x"
                                    value="{{ item.aspectRatioX|e('html_attr') }}"
                                    class="aspect-ratio"
                                    data-function="update-layout" /> :
                             <input id="aspect_ratio_y"
+                                   type="number"
                                    name="aspect_ratio_y"
                                    value="{{ item.aspectRatioY|e('html_attr') }}"
                                    class="aspect-ratio"
