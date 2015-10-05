@@ -39,17 +39,7 @@
                 max: 100
             }
         };
-        var validator = form.validate({
-            rules: rules,
-            errorPlacement: function(error, element) {
-                var closestPane = element.closest('.pane');
-                if (closestPane.length) {
-                    error.appendTo(closestPane);
-                } else {
-                    error.insertAfter(element);
-                }
-            }
-        });
+        form.validate({ rules: rules });
 
         // Updater for tile shape and layout
         form.find(':input[data-function="update-layout"]').change(function() {
