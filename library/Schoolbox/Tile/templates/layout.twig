@@ -5,10 +5,11 @@
 <script type="text/javascript">
 (function($) {
     $(function() {
-        var form     = $('form#tile-layout-form');
-        var tileList = form.find('.tileList');
-        var xInput   = form.find('input[name="aspect_ratio_x"]');
-        var yInput   = form.find('input[name="aspect_ratio_y"]');
+        var form        = $('form#tile-layout-form');
+        var tileList    = form.find('.tileList');
+        var layoutInput = form.find(':input[name="layout_type"]');
+        var xInput      = form.find(':input[name="aspect_ratio_x"]');
+        var yInput      = form.find(':input[name="aspect_ratio_y"]');
 
         // Validation -_-
         var rules = {
@@ -58,50 +59,52 @@
             if (xAspect > 0 && yAspect > 0) {
                 // start resizing
                 var aspect = yAspect / xAspect;
-                if (form.find('input#layout_type_grid').is(':checked')) {
-                    // grid layout - keep within min and max
-                    var gridWidth = Math.max(
-                        rules.grid_width.min,
-                        Math.min(
-                            rules.grid_width.max,
-                            Number(form.find('input[name="grid_width"]').val())
-                        )
-                    );
-                    // Grid padding: a set pixel count
-                    var gridPadding = Number(form.find('input[name="grid_padding"]').val());
-                    if (gridWidth > 0) {
-                        tileList.find('.tile').css({
-                            "width":          String(gridWidth)+"px",
-                            "margin":         String(gridPadding)+"px",
-                            "padding-bottom": String(gridWidth * aspect)+"px"
-                        });
-                    }
-                } else if (form.find('input#layout_type_column').is(':checked')) {
-                    // column layout - keep within min and max
-                    var colCount = Math.max(
-                        rules.column_count.min,
-                        Math.min(
-                            rules.column_count.max,
-                            Number(form.find('input[name="column_count"]').val())
-                        )
-                    );
-                    // Column padding: a % of the width of the tile is taken up with padding
-                    var columnPadding = Number(form.find('input[name="column_padding"]').val());
-                    if (colCount > 0) {
-                        var baseColumnWidth   = (100/colCount);
-                        var paddingProportion = columnPadding / 100;
-                        var tilePadding       = baseColumnWidth * paddingProportion;
-                        var tileWidth         = baseColumnWidth - tilePadding;
-                        tileList.find('.tile').css({
-                            "width":          String(tileWidth)+"%",
-                            "margin":         String(tilePadding / 2)+"%",
-                            "padding-bottom": String(tileWidth * (yAspect / xAspect))+"%"
-                        });
-                    }
+                switch (layoutInput.val()) {
+                    case 'grid':
+                        // grid layout - keep within min and max
+                        var gridWidth = Math.max(
+                            rules.grid_width.min,
+                            Math.min(
+                                    rules.grid_width.max,
+                                    Number(form.find('input[name="grid_width"]').val())
+                            )
+                        );
+                        // Grid padding: a set pixel count
+                        var gridPadding = Number(form.find('input[name="grid_padding"]').val());
+                        if (gridWidth > 0) {
+                            tileList.find('.tile').css({
+                                "width":          String(gridWidth)+"px",
+                                "margin":         String(gridPadding)+"px",
+                                "padding-bottom": String(gridWidth * aspect)+"px"
+                            });
+                        }
+                        break;
+                    case 'column':
+                        // column layout - keep within min and max
+                        var colCount = Math.max(
+                            rules.column_count.min,
+                            Math.min(
+                                    rules.column_count.max,
+                                    Number(form.find('input[name="column_count"]').val())
+                            )
+                        );
+                        // Column padding: a % of the width of the tile is taken up with padding
+                        var columnPadding = Number(form.find('input[name="column_padding"]').val());
+                        if (colCount > 0) {
+                            var baseColumnWidth   = (100/colCount);
+                            var paddingProportion = columnPadding / 100;
+                            var tilePadding       = baseColumnWidth * paddingProportion;
+                            var tileWidth         = baseColumnWidth - tilePadding;
+                            tileList.find('.tile').css({
+                                "width":          String(tileWidth)+"%",
+                                "margin":         String(tilePadding / 2)+"%",
+                                "padding-bottom": String(tileWidth * (yAspect / xAspect))+"%"
+                            });
+                        }
                 }
                 tileList.find('.tile').tileResize();
             }
-        })
+        });
 
         // Update x and y input based on selected shape
         form.find('#tile_shape').change(function() {
