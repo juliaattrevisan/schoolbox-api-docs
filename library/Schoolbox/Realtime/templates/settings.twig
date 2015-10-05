@@ -46,10 +46,15 @@
     });
 </script>
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Message Settings</h1>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Message Settings</h1>
+        </div>
     </div>
+    <nav>
+        <a href="#" data-reveal-id="slider-modal" class="icon-list" title="View Legend"></a>
+    </nav>
 </div>
 
 <div class="row">
@@ -126,13 +131,20 @@
 
 
 
-
-
-
+<div id="slider-modal" class="reveal-modal" data-reveal>
     {% include '@messages/legend.twig' with { who: 'you' } %}
-    <table data-roles data-digest-settings id="msg-settings">
+
+    <a class="close-reveal-modal">&#215;</a>
+</div>
+
+
+
+
+
+
+    <table id="msg-settings" data-roles data-digest-settings>
         {% for namespace in config %}
-        <tr class="ns">
+        <tr>
             <th colspan="2">Receive {{ namespace.label }} messages when&hellip;</th>
             <th colspan="6"></th>
         </tr>
@@ -146,4 +158,3 @@
         {% endfor %}
         {% endfor %}
     </table>
-</form>
