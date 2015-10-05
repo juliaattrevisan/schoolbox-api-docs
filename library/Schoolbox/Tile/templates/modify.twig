@@ -68,16 +68,26 @@
 })(jQuery);
 </script>
 
-<div class="actions-small-1 row">
+<ul class="breadcrumb">
+    {% if component.module == 'dashboard' %}
+        <li><a href="/adminv2/home">Admin</a></li>
+        <li><a href="/adminv2/dashboard#{{ component.identifier }}">Dashboard</a></li>
+    {% elseif component.module == 'homepage_template' %}
+        <li><a href="/adminv2/home">Admin</a></li>
+        <li><a href="/adminv2/homepage#{{ component.identifier }}">Homepages</a></li>
+    {% else %}
+        <li><a href="/homepage/{{ folder.getId() }}#component{{ component.getId() }}">{{ folder.getName() }}</a></li>
+    {% endif %}
+    <li><a href="{{ routeLookup('tile.layout', {componentId: component.id}) }}">Tiles</a></li>
+    <li class="active"><a href="#">Modify Tile</a></li>
+</ul>
+
+<div class="row">
     <div class="list-item">
         <div class="small-12 columns">
             <h1>{% if item.id %}Modify Tile{% else %}Add Tile{% endif %}</h1>
         </div>
     </div>
-    <nav>
-        {# Link depends on identifier #}
-        <a href="{{ routeLookup('tile.layout', {componentId: component.id}) }}" class="icon-previous" title="Cancel"></a>
-    </nav>
 </div>
 
 <div class="row">

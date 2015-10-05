@@ -42,7 +42,9 @@
 }
 
 </style>
-<li class="tile {{ tile.getBackgroundPositionStyle() }} {% if tile.backgroundImageContained %}contained{% endif %}" id="tile-{{ tile.id|e('html_attr') }}">
+<li data-tile
+    class="tile {{ tile.getBackgroundPositionStyle() }} {% if tile.backgroundImageContained %}contained{% endif %}"
+    id="tile-{{ tile.id|e('html_attr') }}">
     <span class="title {{ tile.getTitlePositionStyle() }}">{{ tile.titleText }}</span>
 
     {% if tile.link %}
@@ -53,6 +55,7 @@
 
     {% if editable and tile.id %}
     <div class="edit">
+        <span class="button left icon-grip" data-tile-grip></span>
         {# Hidden form input for this tile - used in sorting #}
         <input type="hidden" name="tile[]" value="{{ tile.id|e('html_attr') }}" />
         <a href="{{ routeLookup('tile.delete:post', {id: tile.id}) }}"

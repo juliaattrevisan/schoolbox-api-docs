@@ -1,12 +1,16 @@
 {# I need some way of adding custom_head #}
+<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.confirm-dialog.js"></script>
 <script type="text/javascript" src="/javascript/shared/tiles/jquery.tile-resize.js"></script>
+<script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript">
 (function($) {
     $(function() {
-        var form     = $('form#tile-layout-form');
-        var tileList = form.find('.tileList');
-        var xInput   = form.find('input[name="aspect_ratio_x"]');
-        var yInput   = form.find('input[name="aspect_ratio_y"]');
+        var form        = $('form[data-role="layoutForm"]');
+        var tileList    = form.find('[data-tile-list]');
+        var layoutInput = form.find(':input[name="layout_type"]');
+        var xInput      = form.find(':input[name="aspect_ratio_x"]');
+        var yInput      = form.find(':input[name="aspect_ratio_y"]');
 
         // Validation -_-
         var rules = {
@@ -35,388 +39,297 @@
                 max: 100
             }
         };
-        var validator = form.validate({
-            rules: rules,
-            errorPlacement: function(error, element) {
-                var closestPane = element.closest('.pane');
-                if (closestPane.length) {
-                    error.appendTo(closestPane);
-                } else {
-                    error.insertAfter(element);
-                }
-            }
-        });
+        form.validate({ rules: rules });
 
         // Updater for tile shape and layout
         form.find(':input[data-function="update-layout"]').change(function() {
-
             // Get aspect ratio. If it's invalid, don't resize anything
-            var xAspect = Math.max(rules.aspect_ratio_x.min, Math.min(rules.aspect_ratio_x.max, Number(xInput.val())));
-            var yAspect = Math.max(rules.aspect_ratio_y.min, Math.min(rules.aspect_ratio_y.max, Number(yInput.val())));
+            var xAspect = Math.max(
+                rules.aspect_ratio_x.min,
+                Math.min(
+                    rules.aspect_ratio_x.max,
+                    Number(xInput.val())
+                )
+            );
+            var yAspect = Math.max(
+                rules.aspect_ratio_y.min,
+                Math.min(
+                    rules.aspect_ratio_y.max,
+                    Number(yInput.val())
+                )
+            );
             if (xAspect > 0 && yAspect > 0) {
                 // start resizing
                 var aspect = yAspect / xAspect;
-                if (form.find('input#layout_type_grid').is(':checked')) {
-                    // grid layout - keep within min and max
-                    var gridWidth = Math.max(
-                        rules.grid_width.min,
-                        Math.min(
-                            rules.grid_width.max,
-                            Number(form.find('input[name="grid_width"]').val())
-                        )
-                    );
-                    // Grid padding: a set pixel count
-                    var gridPadding = Number(form.find('input[name="grid_padding"]').val());
-                    if (gridWidth > 0) {
-                        tileList.find('.tile').css({
-                            "width":          String(gridWidth)+"px",
-                            "margin":         String(gridPadding)+"px",
-                            "padding-bottom": String(gridWidth * aspect)+"px"
-                        });
-                    }
-                } else if (form.find('input#layout_type_column').is(':checked')) {
-                    // column layout - keep within min and max
-                    var colCount = Math.max(
-                        rules.column_count.min,
-                        Math.min(
-                            rules.column_count.max,
-                            Number(form.find('input[name="column_count"]').val())
-                        )
-                    );
-                    // Column padding: a % of the width of the tile is taken up with padding
-                    var columnPadding = Number(form.find('input[name="column_padding"]').val());
-                    if (colCount > 0) {
-                        var baseColumnWidth   = (100/colCount);
-                        var paddingProportion = columnPadding / 100;
-                        var tilePadding       = baseColumnWidth * paddingProportion;
-                        var tileWidth         = baseColumnWidth - tilePadding;
-                        tileList.find('.tile').css({
-                            "width":          String(tileWidth)+"%",
-                            "margin":         String(tilePadding / 2)+"%",
-                            "padding-bottom": String(tileWidth * (yAspect / xAspect))+"%"
-                        });
-                    }
+                switch (layoutInput.val()) {
+                    case 'grid':
+                        // grid layout - keep within min and max
+                        var gridWidth = Math.max(
+                            rules.grid_width.min,
+                            Math.min(
+                                    rules.grid_width.max,
+                                    Number(form.find('input[name="grid_width"]').val())
+                            )
+                        );
+                        // Grid padding: a set pixel count
+                        var gridPadding = Number(form.find('input[name="grid_padding"]').val());
+                        if (gridWidth > 0) {
+                            tileList.find('.tile').css({
+                                "width":          String(gridWidth)+"px",
+                                "margin":         String(gridPadding)+"px",
+                                "padding-bottom": String(gridWidth * aspect)+"px"
+                            });
+                        }
+                        break;
+                    case 'column':
+                        // column layout - keep within min and max
+                        var colCount = Math.max(
+                            rules.column_count.min,
+                            Math.min(
+                                    rules.column_count.max,
+                                    Number(form.find('input[name="column_count"]').val())
+                            )
+                        );
+                        // Column padding: a % of the width of the tile is taken up with padding
+                        var columnPadding = Number(form.find('input[name="column_padding"]').val());
+                        if (colCount > 0) {
+                            var baseColumnWidth   = (100/colCount);
+                            var paddingProportion = columnPadding / 100;
+                            var tilePadding       = baseColumnWidth * paddingProportion;
+                            var tileWidth         = baseColumnWidth - tilePadding;
+                            tileList.find('[data-tile]').css({
+                                "width":          String(tileWidth)+"%",
+                                "margin":         String(tilePadding / 2)+"%",
+                                "padding-bottom": String(tileWidth * (yAspect / xAspect))+"%"
+                            });
+                        }
                 }
                 tileList.find('.tile').tileResize();
             }
-        })
+        });
 
         // Update x and y input based on selected shape
-        form.find('#tile_shape_landscape').change(function() {
-            xInput.val(16);
-            yInput.val(9).change();
-        });
-        form.find('#tile_shape_portrait').change(function() {
-            xInput.val(9);
-            yInput.val(16).change();
-        });
-        form.find('#tile_shape_square').change(function() {
-            xInput.val(1);
-            yInput.val(1).change();
-        });
-        form.find('#tile_shape_panorama').change(function() {
-            xInput.val(16);
-            yInput.val(5).change();
+        form.find(':input[name="tile_shape"]').change(function() {
+            switch (this.value) {
+                case 'landscape':
+                    xInput.val(16);
+                    yInput.val(9);
+                    break;
+                case 'portrait':
+                    xInput.val(9);
+                    yInput.val(16);
+                    break;
+                case 'square':
+                    xInput.val(1);
+                    yInput.val(1);
+                    break;
+                case 'panorama':
+                    xInput.val(16);
+                    yInput.val(5);
+                    break;
+            }
+            yInput.change();
         });
 
         // Sortability
-        var reorderFeedbackSaving = form.find('[data-role="reorder-feedback-saving"]');
-        var reorderFeedbackSaved  = form.find('[data-role="reorder-feedback-saved"]');
-        var reorderFeedbackFailed = form.find('[data-role="reorder-feedback-failed"]');
+        var reorderFeedback = form.find('[data-relation="save-label"]');
         tileList.sortable({
+            handle: '[data-tile-grip]',
             items:  '> li:not(.add)',
             stop: function(event, ui) {
                 // save this form
-                reorderFeedbackSaving.fadeIn('fast');
+                reorderFeedback.labelActivate({text: 'Saving order...'});
                 $.post(form.attr('action'), form.serializeArray())
-                    .always(function() {
-                        reorderFeedbackSaving.hide();
-                    })
                     .done(function() {
-                        reorderFeedbackSaved.show();
-                        setTimeout(function() { reorderFeedbackSaved.hide(); }, 2000);
+                        reorderFeedback.labelTimeout({text: 'Saved!', 'css': 'success'});
                     })
                     .fail(function() {
-                        reorderFeedbackFailed.show();
-                        setTimeout(function() { reorderFeedbackFailed.hide(); }, 2000);
+                        reorderFeedback.labelTimeout({text: 'Save Failed!', 'css': 'alert'});
                     })
-            }
-        })
-
-        // Confirm delete dialog
-        var confirmDeleteDialog = form.find('#dialog-confirm-delete').dialog({
-            autoOpen:false,
-            resizable:false,
-            width:400,
-            modal:true,
-            draggable:false,
-            close: function() {
-                return false;
             }
         });
 
         // Delete buttons
-        form.find('[data-role="delete"]').click(function(event) {
+        tileList.find('[data-tile] [data-role="delete"]').click(function(event) {
             event.preventDefault();
             var element     = $(this);
-            var deletedTile = element.closest('.tile');
-            var tileTitle   = deletedTile.find('.title');
+            var deletedTile = element.closest('[data-tile]');
 
             // Add confirmation dialog
-            confirmDeleteDialog
-                .dialog('option', 'buttons', [
-                    {
-                        text: "Yes",
-                        click: function(event) {
-                            // Add some sort of deleting animation
-                            confirmDeleteDialog.dialog('close');
-                            deletedTile.addClass('marked-for-delete');
-                            tileTitle.text('Deleting...');
-                            // Send delete request
-                            $.post(element.attr('href'))
-                                .done(function() {
-                                    deletedTile.fadeOut('slow', function() {
-                                        deletedTile.remove();
-                                    })
-                                })
-                                .fail(function() {
-                                    deletedTile.removeClass('marked-for-delete');
-                                    tileTitle.text('Delete failed!');
-                                })
-                        }
-                    },
-                    {
-                        text: "No",
-                        click: function(event) {
-                            confirmDeleteDialog.dialog('close');
-                        }
-                    }
-                ])
-                .dialog('open');
-        });
-
-        // Panes with buttons inside them
-        form.find('[data-role="pane-container"]').each(function() {
-            var element       = $(this);
-            var panes         = element.find('[data-role="pane"]');
-            var hiddenContent = panes.find('[data-role="hidden-content"]')
-            panes.find(':radio')
-                .change(function() {
-                    var element     = $(this);
-                    var thisPane    = element.closest('[data-role="pane"]');
-                    var thisContent = thisPane.find('[data-role="hidden-content"]');
-
-                    // Hide all hidden content not inside this pane
-                    thisContent.show();
-                    hiddenContent.not(thisContent).hide();
-
-                    // Toggle classes for selected pane
-                    thisPane.addClass('selected');
-                    panes.not(thisPane).removeClass('selected');
-                    validator.form();
-                })
-                // and switch on the ones for the selected shape
-                .filter(':checked').change();
-            ;
+            element.confirmDialog({
+                text: "Are you sure you wish to delete this tile? You will not be able to undo this operation.",
+                confirmEvent: function() {
+                    // Add some sort of deleting animation
+                    deletedTile.addClass('marked-for-delete');
+                    reorderFeedback.labelActivate({text: 'Deleting...', 'css': 'alert'});
+                    // Send delete request
+                    $.post(element.attr('href'))
+                        .done(function() {
+                            reorderFeedback.labelTimeout({text: 'Deleted!'});
+                            deletedTile.fadeOut('slow', function() {
+                                deletedTile.remove();
+                            })
+                        })
+                        .fail(function() {
+                            reorderFeedback.labelTimeout({text: 'Delete Failed!', 'css': 'alert'});
+                            deletedTile.removeClass('marked-for-delete');
+                        })
+                }
+            });
         });
     })
 })(jQuery);
 </script>
-<h1>Modify Tile Component</h1>
 
-<form id="tile-layout-form"
-      action="{{ routeLookup('tile.layoutForm', {componentId: component.id}) }}"
-      method="post"
-      name="form" class="clearfix"
-      enctype="multipart/form-data"
->
-    <input type="hidden" name="id" value="{{ item.id|e('html_attr') }}"/>
-    <input type="hidden" name="component_id" value="{{ component.id|e('html_attr') }}"/>
-    <table class="standardForm table">
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Tile Layout</h4>
-                <em>
-                    Arrange tiles in either a fixed-width grid or spanned across a number of columns.
-                </em>
-            </td>
-            <td class="layout-selector" data-role="pane-container">
-                <div class="pane" data-role="pane">
-                    <input
-                        type="radio"
-                        id="layout_type_grid"
-                        name="layout_type"
-                        value="{{ constant('LAYOUT_TYPE_GRID', item)|e('html_attr') }}"
-                        data-function="update-layout"
-                        {% if item.isGridLayoutType() %}checked{% endif %} />
-                    <label for="layout_type_grid">Grid</label>
+<ul class="breadcrumb">
+    {% if component.module == 'dashboard' %}
+        <li><a href="/adminv2/home">Admin</a></li>
+        <li><a href="/adminv2/dashboard#{{ component.identifier }}">Dashboard</a></li>
+    {% elseif component.module == 'homepage_template' %}
+        <li><a href="/adminv2/home">Admin</a></li>
+        <li><a href="/adminv2/homepage#{{ component.identifier }}">Homepages</a></li>
+    {% else %}
+        <li><a href="/homepage/{{ folder.getId() }}#component{{ component.getId() }}">{{ folder.getName() }}</a></li>
+    {% endif %}
+    <li class="active"><a href="#">Tiles</a></li>
+</ul>
 
-                    <div class="hidden-content" data-role="hidden-content">
-                        <input name="grid_width"
+<div class="row">
+    <div class="small-12 column">
+        <h1>Modify Tile Layout</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form action="{{ routeLookup('tile.layoutForm', {componentId: component.id}) }}"
+              method="post"
+              data-role="layoutForm">
+            <input type="hidden" name="id" value="{{ item.id|e('html_attr') }}"/>
+            <input type="hidden" name="component_id" value="{{ component.id|e('html_attr') }}"/>
+
+            <section>
+                <fieldset class="content">
+                    <legend>
+                        Layout
+                        <span class='hint has-tip tip-top' data-tooltip title="Arrange tiles in either a fixed-width grid or spanned across a number of columns.">?</span>
+                    </legend>
+                    <div class="small-12 large-6 columns">
+                        <label for="layout_type">Type</label>
+                        <select id="layout_type" name="layout_type" data-function="update-layout">
+                            <option value="grid" {% if item.isGridLayoutType() %}selected{% endif %}>Grid</option>
+                            <option value="column" {% if item.isColumnLayoutType() %}selected{% endif %}>Column</option>
+                        </select>
+                    </div>
+
+                    <div class="small-6 large-3 columns"
+                         data-hide-watch="#layout_type"
+                         data-hide-watch-value="grid">
+                        <label for="grid_width">px</label>
+                        <input id="grid_width"
+                               type="number"
+                               name="grid_width"
                                value="{{ item.gridWidth|e('html_attr') }}"
                                class="layout-width"
                                data-function="update-layout" />
-                        <label for="layout_type_grid">px</label>
-
-                        <input name="grid_padding"
+                    </div>
+                    <div class="small-6 large-3 columns end"
+                         data-hide-watch="#layout_type"
+                         data-hide-watch-value="grid">
+                        <label for="grid_padding">px padding</label>
+                        <input id="grid_padding"
+                               type="number"
+                               name="grid_padding"
                                value="{{ item.gridPadding|e('html_attr') }}"
                                class="layout-width"
                                data-function="update-layout" />
-                        <label for="layout_type_grid">px padding</label>
                     </div>
-                </div>
 
-                <div class="pane" data-role="pane">
-                    <input
-                        type="radio"
-                        id="layout_type_column"
-                        name="layout_type"
-                        value="{{ constant('LAYOUT_TYPE_COLUMN', item)|e('html_attr') }}"
-                        data-function="update-layout"
-                        {% if item.isColumnLayoutType() %}checked{% endif %} />
-                    <label for="layout_type_column">Columns</label>
-
-                    <div class="hidden-content" data-role="hidden-content">
-                        <input name="column_count"
+                    <div class="small-6 large-3 columns"
+                         data-hide-watch="#layout_type"
+                         data-hide-watch-value="column">
+                        <label for="column_count">tiles/row</label>
+                        <input id="column_count"
+                               type="number"
+                               name="column_count"
                                value="{{ item.columnCount|e('html_attr') }}"
                                class="layout-width"
                                data-function="update-layout" />
-                        <label for="layout_type_column">tiles/row</label>
-
-                        <input name="column_padding"
+                    </div>
+                    <div class="small-6 large-3 columns end"
+                         data-hide-watch="#layout_type"
+                         data-hide-watch-value="column">
+                        <label for="column_padding">% padding</label>
+                        <input id="column_padding"
+                               type="number"
+                               name="column_padding"
                                value="{{ item.columnPadding|e('html_attr') }}"
                                class="layout-width"
                                data-function="update-layout" />
-                        <label for="layout_type_column">% padding</label>
                     </div>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Tile Shape</h4>
-                <em>
-                    Select a tile shape. Consider the content going into them.
-                </em>
-            </td>
-            <td class="shape-selector" data-role="pane-container">
-                <div class="pane" data-role="pane">
-                    <input
-                        type="radio"
-                        id="tile_shape_landscape"
-                        name="tile_shape"
-                        value="landscape"
-                        data-function="update-layout"
-                        {% if item.isLandscapeShape() %}checked{% endif %} />
-                    <label for="tile_shape_landscape">Landscape</label>
+                </fieldset>
 
-                    <div class="shape shape-landscape"></div>
-                </div>
+                <fieldset class="content">
+                    <legend>Shape</legend>
+                    <div class="small-12 columns">
+                        <label for="tile_shape">Ratio</label>
+                        <select id="tile_shape" name="tile_shape" data-function="update-layout">
+                            <option value="landscape"
+                                    {% if item.isLandscapeShape() %}selected{% endif %}>Landscape (16:9)</option>
+                            <option value="portrait"
+                                    {% if item.isPortraitShape() %}selected{% endif %}>Portrait (9:16)</option>
+                            <option value="square"
+                                    {% if item.isSquareShape() %}selected{% endif %}>Square</option>
+                            <option value="panorama"
+                                    {% if item.isPanoramicShape() %}selected{% endif %}>Panorama (16:5)</option>
+                            <option value="custom"
+                                    {% if item.isCustomShape() %}selected{% endif %}>Custom Ratio</option>
+                        </select>
+                    </div>
 
-                <div class="pane" data-role="pane">
-                    <input
-                        type="radio"
-                        id="tile_shape_portrait"
-                        name="tile_shape"
-                        value="portrait"
-                        data-function="update-layout"
-                        {% if item.isPortraitShape() %}checked{% endif %} />
-                    <label for="tile_shape_portrait">Portrait</label>
-
-                    <div class="shape shape-portrait"></div>
-                </div>
-
-                <div class="pane" data-role="pane">
-                    <input
-                        type="radio"
-                        id="tile_shape_square"
-                        name="tile_shape"
-                        value="square"
-                        data-function="update-layout"
-                        {% if item.isSquareShape() %}checked{% endif %} />
-                    <label for="tile_shape_square">Square</label>
-
-                    <div class="shape shape-square"></div>
-                </div>
-
-                <div class="pane" data-role="pane">
-                    <input
-                        type="radio"
-                        id="tile_shape_panorama"
-                        name="tile_shape"
-                        value="panorama"
-                        data-function="update-layout"
-                        {% if item.isPanoramicShape() %}checked{% endif %} />
-                    <label for="tile_shape_panorama">Panorama</label>
-
-                    <div class="shape shape-panorama"></div>
-                </div>
-
-                <div class="pane" data-role="pane">
-                    <input
-                        type="radio"
-                        id="tile_shape_custom"
-                        name="tile_shape"
-                        value="custom"
-                        data-function="update-layout"
-                        {% if item.isCustomShape() %}checked{% endif %} />
-                    <label for="tile_shape_custom">Custom</label>
-
-                    <div class="hidden-content" data-role="hidden-content">
-                        <input name="aspect_ratio_x"
+                    <div class="small-6 columns"
+                         data-hide-watch="#tile_shape"
+                         data-hide-watch-value="custom">
+                        <label for="aspect_ratio_x">Width Ratio</label>
+                        <input id="aspect_ratio_x"
+                               type="number"
+                               name="aspect_ratio_x"
                                value="{{ item.aspectRatioX|e('html_attr') }}"
                                class="aspect-ratio"
-                               data-function="update-layout" /> :
-                        <input name="aspect_ratio_y"
+                               data-function="update-layout" />
+                    </div>
+                    <div class="small-6 columns"
+                         data-hide-watch="#tile_shape"
+                         data-hide-watch-value="custom">
+                        <label for="aspect_ratio_y">Height Ratio</label>
+                        <input id="aspect_ratio_y"
+                               type="number"
+                               name="aspect_ratio_y"
                                value="{{ item.aspectRatioY|e('html_attr') }}"
                                class="aspect-ratio"
                                data-function="update-layout" />
                     </div>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td class="formLabelWidth wysiwyg">
-                <h4>Modify Tiles</h4>
-                <em>
-                    Add, edit and remove tiles.
-                </em>
-                <ul>
-                    <li><em>Click and hold to drag and rearrange tiles.</em></li>
-                </ul>
-            </td>
-            <td class="checkboxes">
-                {# Feedback for saving order of tiles #}
-                <div class="hide" data-role="reorder-feedback-saving">Saving order...</div>
-                <div class="hide" data-role="reorder-feedback-saved">Saved!</div>
-                <div class="hide" data-role="reorder-feedback-failed">Failed!</div>
-                {% include '@tile/sub/tileList.twig'
-                    with {
-                        layout:   item,
-                        tileList: item.tileList,
-                        editable: true
-                    }
-                %}
-            </td>
-        </tr>
-    </table>
+                </fieldset>
 
-    <input id="resource-save"
-           type="submit"
-           value="Save"
-           class="submit-btn-plain"
-    />
-    {# Link depends on module and identifier #}
-    {% if component.module == 'dashboard' %}
-        {% set href='/adminv2/dashboard#'~component.identifier %}
-    {% elseif component.module == 'homepage_template' %}
-        {% set href='/adminv2/homepage#'~component.identifier %}
-    {% else %}
-        {% set href='/homepage/'~component.identifier %}
-    {% endif %}
-    <a href="{{ href|e('html_attr') }}" class="btn no-icon float-left"><span></span>Cancel</a>
+                <fieldset class="content">
+                    <legend>
+                        Tiles
+                        <span class='hint has-tip tip-top' data-tooltip title="You may add, edit, remove and rearrange tiles in this list.">?</span>
+                    </legend>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <span class="label full-width hide" data-relation="save-label"></span>
+                            {% include '@tile/sub/tileList.twig' with {
+                                layout:   item,
+                                tileList: item.tileList,
+                                editable: true
+                            } %}
+                        </div>
+                    </div>
+                </fieldset>
+            </section>
 
-    <div id="dialog-confirm-delete" title="Delete Tile" class="wysiwyg">
-        Are you sure you wish to delete this tile? You will not be able to undo this operation.
+            <input id="resource-save" type="submit" value="Save" />
+        </form>
     </div>
-</form>
+</div>

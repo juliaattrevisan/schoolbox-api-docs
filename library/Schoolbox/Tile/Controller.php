@@ -16,6 +16,7 @@ use Component_Instance;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage;
 
 class Controller extends Base
@@ -41,6 +42,11 @@ class Controller extends Base
     protected $storageMapper;
 
     /**
+     * @var Folder\Mapper
+     */
+    protected $folderMapper;
+
+    /**
      * Displays a form for editing a tile layout.
      *
      * @param Component_Instance $component
@@ -55,6 +61,7 @@ class Controller extends Base
                 'data'     => array(
                     'item'      => $this->getLayoutFromComponent($component),
                     'component' => $component,
+                    'folder'    => $this->getFolderForComponent($component),
                 ),
             )
         );
@@ -70,7 +77,6 @@ class Controller extends Base
         $code   = 200;
         $layout = $this->getLayoutFromComponent($component);
         $layout
-            ->setLayoutType(intval($this->getRequest()->post['layout_type']))
             ->setGridWidth(intval($this->getRequest()->post['grid_width']))
             ->setGridPadding(intval($this->getRequest()->post['grid_padding']))
             ->setColumnCount(intval($this->getRequest()->post['column_count']))
@@ -78,6 +84,14 @@ class Controller extends Base
             ->setAspectRatioX(intval($this->getRequest()->post['aspect_ratio_x']))
             ->setAspectRatioY(intval($this->getRequest()->post['aspect_ratio_y']))
         ;
+        switch ($this->getRequest()->post['layout_type']) {
+            case 'grid':
+                $layout->setLayoutType(Layout\Model::LAYOUT_TYPE_GRID);
+                break;
+            case 'column':
+                $layout->setLayoutType(Layout\Model::LAYOUT_TYPE_COLUMN);
+                break;
+        }
 
         if ($this->getLayoutMapper()->save($layout)) {
             // Rearrange tiles
@@ -137,10 +151,11 @@ class Controller extends Base
                 'title'    => 'Add Tile',
                 'template' => '@tile/modify.twig',
                 'data'     => array(
-                    'item'      => $model,
-                    'layout'    => $this->getLayoutFromComponent($component),
-                    'component' => $component,
-                    'attachzone' => $this->getAttachZoneData($model)
+                    'item'       => $model,
+                    'layout'     => $this->getLayoutFromComponent($component),
+                    'component'  => $component,
+                    'attachzone' => $this->getAttachZoneData($model),
+                    'folder'     => $this->getFolderForComponent($component),
                 ),
             )
         );
@@ -190,9 +205,10 @@ class Controller extends Base
                 'title'    => 'Add Tile',
                 'template' => '@tile/modify.twig',
                 'data'     => array(
-                    'item'      => $item,
-                    'component' => $component,
-                    'attachzone' => $this->getAttachZoneData($item)
+                    'item'       => $item,
+                    'component'  => $component,
+                    'attachzone' => $this->getAttachZoneData($item),
+                    'folder'     => $this->getFolderForComponent($component),
                 ),
             )
         );
@@ -426,5 +442,39 @@ class Controller extends Base
     public function getStorageMapper()
     {
         return $this->storageMapper;
+    }
+
+    /**
+     * @return Folder\Mapper
+     */
+    public function getFolderMapper()
+    {
+        return $this->folderMapper;
+    }
+
+    /**
+     * @param  Folder\Mapper $folderMapper
+     *
+     * @return $this
+     */
+    public function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+        return $this;
+    }
+
+    /**
+     * Loads the folder that relates to this component, if there is one.
+     *
+     * @param Component_Instance $component
+     *
+     * @return Folder\Model|null
+     */
+    protected function getFolderForComponent(Component_Instance $component)
+    {
+        if ($component->getModule() === 'homepage') {
+            return $this->getFolderMapper()->findById($component->getIdentifier());
+        }
+        return null;
     }
 }

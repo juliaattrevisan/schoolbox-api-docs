@@ -237,6 +237,8 @@ class Module extends BaseModule
             = $injector->lazyNew('Component_ConfigMapper');
         $injector->setters['Schoolbox\\Tile\\Controller']['setStorageMapper']
             = $injector->lazyNew(Storage\Mapper::class);
+        $injector->setters['Schoolbox\\Tile\\Controller']['setFolderMapper']
+            = $this->getCategoryMapper();
         $injector->set(
             'controller:tile',
             $injector->lazyNew('Schoolbox\\Tile\\Controller')
