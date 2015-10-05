@@ -1,41 +1,122 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
-<script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
+<script type="text/javascript" src="/javascript/shared/masonry/jquery.masonry.js"></script>
 <script type="text/javascript">
     $(function() {
-        $('[data-definition-palette]').configurator().start();
+        var url = '/adminv2/component/configForm.php';
+        $('[data-homepage-layout]').masonry({
+            // Only create action goes through masonry
+            context: function(masonry) {
+                return {
+                    context: 'dashboard',
+                    cid: $(masonry.options.templateSelector.selector).val()
+                }
+            },
+            component: {
+                url: url,
+                calcSequenceData: function (columns) {
+                    var masonry = this,
+                            data    = { type: 'components', cid: $(masonry.options.templateSelector.selector).val() },
+                            order   = ['left','right','top','bottom'];
+
+                    $.each(columns, function (position, column) {
+                        var key = 'column' + (order.indexOf(position) + 1);
+
+                        data[key] = column.find(masonry.options.component.selector).map(function () {
+                            /*
+                             * Two components in ePorfolio have no id's (My Profile, Teacher Notes)
+                             * and always appear in the same positions. So we do a check to see if
+                             * an id is set. If it isn't, and we don't do the check, the script breaks
+                             * and components cannot be relocated successfully
+                             */
+                            if (this.id) {
+                                return this.id.substr(9);
+                            }
+                        }).toArray().join(',');
+                    });
+
+                    return data;
+                }
+            },
+            column: {
+                leftColumnWidth: 6,
+                selector: '[data-position]',
+                position: {
+                    top: '[data-position=top]',
+                    left: '[data-position=left]',
+                    right: '[data-position=right]'
+                },
+                placeholderTpl: '<p class="masonry-placeholder alert-box" />'
+            },
+            palette: {
+                url: url,
+                selector: '[data-definition-palette]',
+                containerSelector: '.tabs-content',
+                handleSelector: '[data-component-palette]',
+                refreshItem: function () {
+                    this.find('[data-relation="count"]').text(this.data('count'));
+                }
+            },
+            templateSelector: {
+                selector: '[data-template-select]',
+                url: '/adminv2/component/get/dashboard'
+            }
+        });
     });
 </script>
 <!-- END custom_head -->
 
 {ADMIN_NAV}
-        
-<h2>
-    Dashboard
-    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You can drag and reorder the main components of the dashboard here. Grab one
-        from the left column and move it to the right boxes or just reorganise the components that are already active.">?</span>
-</h2>
 
 <div class="row">
-    <div class="small-12 large-3 columns">
-        <div data-definition-palette>
-            <select data-group-select>
-                <!-- BEGIN group -->
-                <option value="{group.id}">{group.name}</option>
-                <!-- END group -->
-            </select>
+    <div class="small-12 island">
+        <h2 class="subheader">Dashboard</h2>
 
-            <!-- BEGIN definition -->
-            <div class="component definition-id-{definition.id} {definition.singleton}">{definition.name}</div>
-            <!-- END definition -->
-        </div>
-    </div>
+        <section>
+            <div data-definition-palette class="content">
+                <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST">
+                    <input type="hidden" name="action" value="delete" />
+                    <select id="templateSelector" data-template-select name="template">
+                        <!-- BEGIN group -->
+                        <option value="{group.id}">{group.name}</option>
+                        <!-- END group -->
+                    </select>
+                </form>
 
-    <div class="small-12 large-9 columns">
-        <div class="dashboard" data-dashboard-layout>
-            <!-- BEGIN layout --><!-- END layout -->
-        </div>
+                <ul class="tabs" data-tab>
+                    <!-- BEGIN component_tab -->
+                    <li class="tab-title {COMPONENT_CATEGORY_CLASS}">
+                        <a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">
+                            {COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})
+                        </a>
+                    </li>
+                    <!-- END component_tab -->
+                </ul>
+                <div class="tabs-content">
+                    <!-- BEGIN component_page -->
+                    <ul class="content grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {COMPONENT_CATEGORY_CLASS}" id="tabs-sub-{COMPONENT_CATEGORY_ID}">
+                        <!-- BEGIN component -->
+                        <li>
+                            <div class="{COMPONENT_MULTIPLE_STATE} no-margin"
+                                 data-count="{COMPONENT_COUNT}"
+                                 data-multi="{COMPONENT_MULTIPLE_STATE}"
+                                 data-component-palette>
+                                <div class="avatar card">
+                                    <a href="#" rel="{COMPONENT_ID}" title="{COMPONENT_DESCRIPTION}">
+                                        <span class="icon-32 icon-masonry icon-masonry-{COMPONENT_CLASS}"></span>
+                                        <p>{COMPONENT_NAME}</p>
+                                        <p class="meta">(<span data-relation="count">{COMPONENT_COUNT}</span>)</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                        <!-- END component -->
+                    </ul>
+                    <!-- END component_page -->
+                </div>
+
+            </div>
+        </section>
     </div>
 </div>
 
-<div id="resource-browser" class="hide"></div>
+<!-- BEGIN layout --><!-- END layout -->
