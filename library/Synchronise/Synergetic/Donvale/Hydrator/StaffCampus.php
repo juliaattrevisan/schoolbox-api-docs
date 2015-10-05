@@ -12,7 +12,7 @@ class Synchronise_Synergetic_Donvale_Hydrator_StaffCampus implements Synchronise
      * Hydrates user's campus and default campus.
      *
      * Years 7-12: Senior S (1)
-     * Otherwise: Primary P (2)
+     * Otherwise: Primary P (7)
      */
     public function hydrate($externalUser, $newUser) {
 
@@ -21,12 +21,13 @@ class Synchronise_Synergetic_Donvale_Hydrator_StaffCampus implements Synchronise
 		 */
 		if ($externalUser['StaffCampus'] == 'S') {
 			$campus = 1;
+			$newUser['campus'] = array('1','2','3','4','5','6');
 		}
 		else {
-			$campus = 2;
+			$campus = '7';
+			$newUser['campus'] = array('7','8','9','10','11','12','13');
 		}
 
-		$newUser['campus'] = array($campus);
 		$newUser['defaultCampus'] = $campus;
 
 		return $newUser;
