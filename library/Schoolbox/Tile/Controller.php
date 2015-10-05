@@ -70,7 +70,6 @@ class Controller extends Base
         $code   = 200;
         $layout = $this->getLayoutFromComponent($component);
         $layout
-            ->setLayoutType(intval($this->getRequest()->post['layout_type']))
             ->setGridWidth(intval($this->getRequest()->post['grid_width']))
             ->setGridPadding(intval($this->getRequest()->post['grid_padding']))
             ->setColumnCount(intval($this->getRequest()->post['column_count']))
@@ -78,6 +77,14 @@ class Controller extends Base
             ->setAspectRatioX(intval($this->getRequest()->post['aspect_ratio_x']))
             ->setAspectRatioY(intval($this->getRequest()->post['aspect_ratio_y']))
         ;
+        switch ($this->getRequest()->post['layout_type']) {
+            case 'grid':
+                $layout->setLayoutType(Layout\Model::LAYOUT_TYPE_GRID);
+                break;
+            case 'column':
+                $layout->setLayoutType(Layout\Model::LAYOUT_TYPE_COLUMN);
+                break;
+        }
 
         if ($this->getLayoutMapper()->save($layout)) {
             // Rearrange tiles

@@ -215,16 +215,14 @@
                         <div class="small-12 large-6 columns">
                             <label for="layout_type">Layout Type</label>
                             <select id="layout_type" name="layout_type" data-function="update-layout">
-                                <option value="{{ constant('LAYOUT_TYPE_GRID', item)|e('html_attr') }}"
-                                        {% if item.isGridLayoutType() %}selected{% endif %}>Grid</option>
-                                <option value="{{ constant('LAYOUT_TYPE_COLUMN', item)|e('html_attr') }}"
-                                        {% if item.isColumnLayoutType() %}selected{% endif %}>Column</option>
+                                <option value="grid" {% if item.isGridLayoutType() %}selected{% endif %}>Grid</option>
+                                <option value="column" {% if item.isColumnLayoutType() %}selected{% endif %}>Column</option>
                             </select>
                         </div>
 
                         <div class="small-12 medium-6 large-3 columns"
                              data-hide-watch="#layout_type"
-                             data-hide-watch-value="{{ constant('LAYOUT_TYPE_GRID', item)|e('html_attr') }}">
+                             data-hide-watch-value="grid">
                             <label for="layout_type_grid">px</label>
                             <input name="grid_width"
                                    value="{{ item.gridWidth|e('html_attr') }}"
@@ -233,7 +231,7 @@
                         </div>
                         <div class="small-12 medium-6 large-3 columns end"
                              data-hide-watch="#layout_type"
-                             data-hide-watch-value="{{ constant('LAYOUT_TYPE_GRID', item)|e('html_attr') }}">
+                             data-hide-watch-value="grid">
                             <label for="layout_type_grid">px padding</label>
                             <input name="grid_padding"
                                    value="{{ item.gridPadding|e('html_attr') }}"
@@ -243,7 +241,7 @@
 
                         <div class="small-12 medium-6 large-3 columns"
                              data-hide-watch="#layout_type"
-                             data-hide-watch-value="{{ constant('LAYOUT_TYPE_COLUMN', item)|e('html_attr') }}">
+                             data-hide-watch-value="column">
                             <label for="layout_type_column">tiles/row</label>
                             <input name="column_count"
                                    value="{{ item.columnCount|e('html_attr') }}"
@@ -252,7 +250,7 @@
                         </div>
                         <div class="small-12 medium-6 large-3 columns end"
                              data-hide-watch="#layout_type"
-                             data-hide-watch-value="{{ constant('LAYOUT_TYPE_COLUMN', item)|e('html_attr') }}">
+                             data-hide-watch-value="column">
                             <label for="layout_type_column">% padding</label>
                             <input name="column_padding"
                                    value="{{ item.columnPadding|e('html_attr') }}"
