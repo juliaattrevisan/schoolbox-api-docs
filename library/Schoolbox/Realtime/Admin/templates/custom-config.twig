@@ -83,7 +83,7 @@ set iconClassnames = {
 
             $.post('/adminv2/messages/configure', $(this).serialize(), function (data) {
                 customiserCallback(data);
-                $('#slider-modal').dialog('close').dialog('destroy');
+                $('#slider-modal').foundation('reveal', 'close');
             });
         });
 
