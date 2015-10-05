@@ -1,34 +1,65 @@
 {ADMIN_NAV}
 
 <div class="row">
-  <div class="small-12 island">
-    <h2 class="subheader">Messages</h2>
-    <section class="content">
+    <div class="small-12 medium-6 columns">
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">Status</h2>
+                <section class="content">
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <div class="alert-box">
+                                Messaging System is
+                                <strong>{MSG_SYS_ENABLED}</strong>
+                            </div>
 
-      <h3>Status</h3>
-      <p class="msg-sys-status">Messaging System is
-        <strong>{MSG_SYS_ENABLED}</strong>
-      </p>
-      <p>You can {MSG_SYS_TOGGLE} it <a href="/adminv2/setting/Policy">via the policy settings page</a>.</p>
+                            <p>
+                                You can {MSG_SYS_TOGGLE} it
+                                <a href="/adminv2/setting/Policy">via the policy settings page</a>.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
 
-      <h3>Global Message Settings</h3>
-      <!-- BEGIN global_online -->
-      <p><a href="/adminv2/messages/configure">Configure global message settings</a></p>
-      <!-- END global_online -->
-      <!-- BEGIN global_offline -->
-      <p><em>Enable messaging to set the global message settings.</em></p>
-      <!-- END global_offline -->
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">Global Message Settings</h2>
+                <section class="content">
+                    <!-- BEGIN global_online -->
+                    <p><a href="/adminv2/messages/configure">Configure global message settings</a></p>
+                    <!-- END global_online -->
+                    <!-- BEGIN global_offline -->
+                    <p><em>Enable messaging to set the global message settings.</em></p>
+                    <!-- END global_offline -->
+                </section>
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">Email Previews</h2>
+                <section class="content">
+                    <p>See how instant and digest emails will be sent to your users.</p>
+                    <p><em>Please remember that different email clients will render emails slightly differently.</em></p>
 
-      <h3>Email Previews</h3>
-      <p>See how instant and digest emails will be sent to your users.</p>
-      <p><em>Please remember that different email clients will render emails slightly differently.</em></p>
-      <a href="/adminv2/messages/preview/instant" class="button icon-eye"
-         onclick="window.open('/adminv2/messages/preview/instant','1396330261396','width=720,height=500,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=0,left=0,top=0');return false;">Preview Instant Emails</a>
-      <a href="/adminv2/messages/preview/digest" class="button icon-eye"
-         onclick="window.open('/adminv2/messages/preview/digest','1396330261396','width=720,height=500,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=0,left=0,top=0');return false;">Preview Digest Emails</a>
-    </section>
+                    <a href="/adminv2/messages/preview/instant" class="button secondary"
+                       onclick="window.open('/adminv2/messages/preview/instant','1396330261396','width=720,height=500,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=0,left=0,top=0');return false;">Preview Instant Emails</a>
+                    <a href="/adminv2/messages/preview/digest" class="button secondary"
+                       onclick="window.open('/adminv2/messages/preview/digest','1396330261396','width=720,height=500,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=0,left=0,top=0');return false;">Preview Digest Emails</a>
+                </section>
+            </div>
+        </div>
+    </div>
+    <div class="small-12 medium-6 columns">
 
-    <section class="small-12 island">
+    </div>
+</div>
+
+
+<div class="admin-contents clearfix">
+  <div class="two-thirds">
+    <div class="level">
       <h3>Adjust Digest Schedules</h3>
       <!-- BEGIN digest_online -->
       <p>You can modify which roles receive digest messages at which frequencies:</p>
@@ -58,11 +89,11 @@
           <!-- END role_digest -->
         </table>
         <input class="submit-btn-plain" type="submit" value="Save" />
+        <div class="clearfix"></div>
       </form>
       <!-- END digest_online -->
       <!-- BEGIN digest_offline -->
       <p><em>Enable messaging to set digest schedules.</em></p>
       <!-- END digest_offline -->
-    </section>
-  </div>
+    </div>
 </div>
