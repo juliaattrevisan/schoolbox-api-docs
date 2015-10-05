@@ -222,8 +222,9 @@
                         <div class="small-6 large-3 columns"
                              data-hide-watch="#layout_type"
                              data-hide-watch-value="grid">
-                            <label for="layout_type_grid">px</label>
-                            <input type="number"
+                            <label for="grid_width">px</label>
+                            <input id="grid_width"
+                                   type="number"
                                    name="grid_width"
                                    value="{{ item.gridWidth|e('html_attr') }}"
                                    class="layout-width"
@@ -232,8 +233,9 @@
                         <div class="small-6 large-3 columns end"
                              data-hide-watch="#layout_type"
                              data-hide-watch-value="grid">
-                            <label for="layout_type_grid">px padding</label>
-                            <input type="number"
+                            <label for="grid_padding">px padding</label>
+                            <input id="grid_padding"
+                                   type="number"
                                    name="grid_padding"
                                    value="{{ item.gridPadding|e('html_attr') }}"
                                    class="layout-width"
@@ -243,8 +245,9 @@
                         <div class="small-6 large-3 columns"
                              data-hide-watch="#layout_type"
                              data-hide-watch-value="column">
-                            <label for="layout_type_column">tiles/row</label>
-                            <input type="number"
+                            <label for="column_count">tiles/row</label>
+                            <input id="column_count"
+                                   type="number"
                                    name="column_count"
                                    value="{{ item.columnCount|e('html_attr') }}"
                                    class="layout-width"
@@ -253,8 +256,9 @@
                         <div class="small-6 large-3 columns end"
                              data-hide-watch="#layout_type"
                              data-hide-watch-value="column">
-                            <label for="layout_type_column">% padding</label>
-                            <input type="number"
+                            <label for="column_padding">% padding</label>
+                            <input id="column_padding"
+                                   type="number"
                                    name="column_padding"
                                    value="{{ item.columnPadding|e('html_attr') }}"
                                    class="layout-width"
