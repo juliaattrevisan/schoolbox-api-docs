@@ -11,11 +11,21 @@ echo "";
 if [ ! -f $conffile ];
 then
 	echo "New installation or conf file missing";
-	echo "No cache directories cleaned";
 	exit;
 fi
 
 echo "Using db credentials from: "`readlink -f $conffile`;
+
+
+if [ ! -z $1 ];
+then
+	if [ "$1" == "--test" ];
+	then
+		test='test';
+		echo "";
+		echo "Running in test mode - no changes will be made";
+	fi
+fi
 
 # Collect Credentials
 sqluser=`grep "\"SQL_user" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
@@ -60,8 +70,13 @@ do
 			u.group_id IN (SELECT id FROM groups WHERE group_type='staff')"`;
 	fullname=`$mysqldb -BNe "SELECT CONCAT(firstname,' ',lastname,' (',synergy_id,')') FROM user WHERE id = '$staffid'"`;
 	echo "Linking: $staffid to $parentid - $fullname";
-	$mysqldb -e "INSERT INTO user_link VALUES ('$staffid','$parentid',NULL,NULL)" >/dev/null 2>&1;
-	$mysqldb -e "INSERT INTO user_link VALUES ('$parentid','$staffid',NULL,NULL)" >/dev/null 2>&1;
+
+	# Check if running in test mode before making changes
+	if [ -z $test ];
+	then
+		$mysqldb -e "INSERT INTO user_link VALUES ('$staffid','$parentid',NULL,NULL)" >/dev/null 2>&1;
+		$mysqldb -e "INSERT INTO user_link VALUES ('$parentid','$staffid',NULL,NULL)" >/dev/null 2>&1;
+	fi
 done;
 
 echo "";
