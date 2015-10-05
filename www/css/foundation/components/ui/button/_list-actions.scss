@@ -46,6 +46,12 @@
 					    background-color: $content-ui-hover;
 					}
 				}
+				input:checked + label {
+					a {
+						background-color: $button-color;
+						color: calc-text-color($button-color);
+					}
+				}
 			}
 		}
 	}
