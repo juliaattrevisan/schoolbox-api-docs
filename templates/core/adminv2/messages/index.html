@@ -70,7 +70,9 @@
                                 <!-- BEGIN day_check -->
                                 <li>
                                     <input id="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" type="checkbox" name="role[{ROLE_ID}][day][]" value="{DAY_VALUE}" {DAY_CHECKED} />
-                                    <label for="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" class="checkbox-label">{DAY_CHAR}</label>
+                                    <label for="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" class="checkbox-toggle">
+                                        <span class="icon-view" title="{DAY_CHAR}"></span>
+                                    </label>
                                 </li>
                                 <!-- END day_check -->
                                 <li>
@@ -95,7 +97,6 @@
                 <p><em>Enable messaging to set digest schedules.</em></p>
             </section>
             <!-- END digest_offline -->
-
         </div>
     </div>
 </div>
