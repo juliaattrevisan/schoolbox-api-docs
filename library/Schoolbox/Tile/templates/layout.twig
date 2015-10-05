@@ -5,8 +5,8 @@
 <script type="text/javascript">
 (function($) {
     $(function() {
-        var form        = $('form#tile-layout-form');
-        var tileList    = form.find('.tileList');
+        var form        = $('form[data-role="layoutForm"]');
+        var tileList    = form.find('[data-tile-list]');
         var layoutInput = form.find(':input[name="layout_type"]');
         var xInput      = form.find(':input[name="aspect_ratio_x"]');
         var yInput      = form.find(':input[name="aspect_ratio_y"]');
@@ -106,7 +106,7 @@
                             var paddingProportion = columnPadding / 100;
                             var tilePadding       = baseColumnWidth * paddingProportion;
                             var tileWidth         = baseColumnWidth - tilePadding;
-                            tileList.find('.tile').css({
+                            tileList.find('[data-tile]').css({
                                 "width":          String(tileWidth)+"%",
                                 "margin":         String(tilePadding / 2)+"%",
                                 "padding-bottom": String(tileWidth * (yAspect / xAspect))+"%"
@@ -118,7 +118,7 @@
         });
 
         // Update x and y input based on selected shape
-        form.find('#tile_shape').change(function() {
+        form.find(':input[name="tile_shape"]').change(function() {
             switch (this.value) {
                 case 'landscape':
                     xInput.val(16);
@@ -214,9 +214,9 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form id="tile-layout-form"
-              action="{{ routeLookup('tile.layoutForm', {componentId: component.id}) }}"
-              method="post">
+        <form action="{{ routeLookup('tile.layoutForm', {componentId: component.id}) }}"
+              method="post"
+              data-role="layoutForm">
             <input type="hidden" name="id" value="{{ item.id|e('html_attr') }}"/>
             <input type="hidden" name="component_id" value="{{ component.id|e('html_attr') }}"/>
 

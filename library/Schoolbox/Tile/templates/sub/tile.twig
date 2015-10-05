@@ -42,7 +42,7 @@
 }
 
 </style>
-<li class="tile {{ tile.getBackgroundPositionStyle() }} {% if tile.backgroundImageContained %}contained{% endif %}" id="tile-{{ tile.id|e('html_attr') }}">
+<li data-tile class="tile {{ tile.getBackgroundPositionStyle() }} {% if tile.backgroundImageContained %}contained{% endif %}" id="tile-{{ tile.id|e('html_attr') }}">
     <span class="title {{ tile.getTitlePositionStyle() }}">{{ tile.titleText }}</span>
 
     {% if tile.link %}

@@ -45,14 +45,14 @@
 {# spaceless because spaces between inline-block elements split the element. WTF #}
 {% spaceless %}
 {% if (tileList|length > 0) or editable %}
-<ul id="tileList-{{ layout.id }}" class="tileList">
+<ul id="tileList-{{ layout.id }}" class="tileList" data-tile-list>
     {% for tile in tileList %}
         {% include '@tile/sub/tile.twig' with {layout: layout, tile: tile, editable: editable} %}
     {% endfor %}
 
     {% if editable %}
     {# This button should transparently save layout before adding tile #}
-    <li class="tile add">
+    <li class="tile add" data-tile>
         <span class="title position-middle">+ Add Tile</span>
         <a class="edit"
            href="{{ routeLookup('tile.add', {componentId: component.id}) }}"
