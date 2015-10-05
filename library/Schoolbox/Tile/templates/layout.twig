@@ -180,20 +180,23 @@
 })(jQuery);
 </script>
 
-<div class="row actions-small-1">
+<ul class="breadcrumb">
+    {% if component.module == 'dashboard' %}
+        <li><a href="/adminv2/home">Admin</a></li>
+        <li><a href="/adminv2/dashboard#{{ component.identifier }}">Dashboard</a></li>
+    {% elseif component.module == 'homepage_template' %}
+        <li><a href="/adminv2/home">Admin</a></li>
+        <li><a href="/adminv2/homepage#{{ component.identifier }}">Homepages</a></li>
+    {% else %}
+        <li><a href="/homepage/{{ folder.getId() }}#component{{ component.getId() }}">{{ folder.getName() }}</a></li>
+    {% endif %}
+    <li class="active"><a href="#">Tiles</a></li>
+</ul>
+
+<div class="row">
     <div class="list-item">
         <h1>Modify Tile Component</h1>
     </div>
-    <nav>
-        {# Link depends on module and identifier #}
-        {% if component.module == 'dashboard' %}
-            <a href="/adminv2/dashboard#{{ component.identifier }}" class="icon icon-previous" title="Return to dashboard template"></a>
-        {% elseif component.module == 'homepage_template' %}
-            <a href="/adminv2/homepage#{{ component.identifier }}" class="icon icon-previous" title="Return to homepage template"></a>
-        {% else %}
-            <a href="/homepage/{{ component.identifier }}" class="icon icon-previous" title="Return to homepage"></a>
-        {% endif %}
-    </nav>
 </div>
 
 <div class="row">

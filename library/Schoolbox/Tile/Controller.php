@@ -16,6 +16,7 @@ use Component_Instance;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage;
 
 class Controller extends Base
@@ -41,13 +42,22 @@ class Controller extends Base
     protected $storageMapper;
 
     /**
+     * @var Folder\Mapper
+     */
+    protected $folderMapper;
+
+    /**
      * Displays a form for editing a tile layout.
      *
      * @param Component_Instance $component
      */
     public function layout(Component_Instance $component)
     {
-        // Load layout
+        // Load layout and context
+        $folder = null;
+        if ($component->getModule() === 'homepage') {
+            $folder = $this->getFolderMapper()->findById($component->getIdentifier());
+        }
         $this->getResponse()->content->set(
             array(
                 'title'    => 'Tile Component Layout',
@@ -55,6 +65,7 @@ class Controller extends Base
                 'data'     => array(
                     'item'      => $this->getLayoutFromComponent($component),
                     'component' => $component,
+                    'folder'    => $folder,
                 ),
             )
         );
@@ -433,5 +444,24 @@ class Controller extends Base
     public function getStorageMapper()
     {
         return $this->storageMapper;
+    }
+
+    /**
+     * @return Folder\Mapper
+     */
+    public function getFolderMapper()
+    {
+        return $this->folderMapper;
+    }
+
+    /**
+     * @param  Folder\Mapper $folderMapper
+     *
+     * @return $this
+     */
+    public function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+        return $this;
     }
 }
