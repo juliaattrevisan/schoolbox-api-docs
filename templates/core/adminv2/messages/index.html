@@ -59,54 +59,47 @@
 </div>
 
 <div class="row">
-    <div class="small-12 medium-12 columns">
-        <div class="row">
-            <div class="small-12 island">
-                <h2 class="subheader">Adjust Digest Schedules</h2>
+    <div class="small-12 island">
+        <h2 class="subheader">Adjust Digest Schedules</h2>
 
-                <!-- BEGIN digest_online -->
-                <section class="content">
-                    <p>You can modify which roles receive digest messages at which frequencies:</p>
-                </section>
+        <!-- BEGIN digest_online -->
+        <form method="post" action="/adminv2/messages/digestForm.php">
+            <section class="content">
+                <p>You can modify which roles receive digest messages at which frequencies:</p>
 
-                <form method="post" action="/adminv2/messages/digestForm.php">
-                    <table>
-                        <!-- BEGIN role_digest -->
-                        <tr>
-                            <th colspan="6">{ROLE_NAME}</th>
-                        </tr>
-                        <tr>
+                <ul class="information-list">
+                    <!-- BEGIN role_digest -->
+                    <li>
+                        <h3>{ROLE_NAME}</h3>
+                        <ul class="inline-list">
                             <!-- BEGIN day_check -->
-                            <td>
-                                <input id="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" type="checkbox" name="role[{ROLE_ID}][day][]"
-                                       value="{DAY_VALUE}" {DAY_CHECKED} />
-                                <label for="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" class="checkbox-label">
-                                    {DAY_CHAR}
-                                </label>
-                            </td>
+                            <li>
+                                <input id="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" type="checkbox" name="role[{ROLE_ID}][day][]" value="{DAY_VALUE}" {DAY_CHECKED} />
+                                <label for="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" class="checkbox-label">{DAY_CHAR}</label>
+                            </li>
                             <!-- END day_check -->
-                            <td>
+                            <li>
                                 <select name="role[{ROLE_ID}][time]">
                                     <!-- BEGIN time_select -->
                                     <option value="{TIME_VALUE}" {TIME_SELECTED}>{TIME_VALUE}</option>
                                     <!-- END time_select -->
                                 </select>
-                            </td>
-                        </tr>
-                        <!-- END role_digest -->
-                    </table>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- END role_digest -->
+                </ul>
+            </section>
 
-                    <input type="submit" value="Save"/>
-                </form>
-                <!-- END digest_online -->
+            <input type="submit" value="Save"/>
+        </form>
+        <!-- END digest_online -->
 
-                <!-- BEGIN digest_offline -->
-                <section class="content">
-                    <p><em>Enable messaging to set digest schedules.</em></p>
-                </section>
-                <!-- END digest_offline -->
+        <!-- BEGIN digest_offline -->
+        <section class="content">
+            <p><em>Enable messaging to set digest schedules.</em></p>
+        </section>
+        <!-- END digest_offline -->
 
-            </div>
-        </div>
     </div>
 </div>
