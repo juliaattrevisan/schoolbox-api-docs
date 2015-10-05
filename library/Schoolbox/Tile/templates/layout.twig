@@ -214,104 +214,100 @@
                         Layout
                         <span class='hint has-tip tip-top' data-tooltip title="Arrange tiles in either a fixed-width grid or spanned across a number of columns.">?</span>
                     </legend>
-                    <div class="row">
-                        <div class="small-12 large-6 columns">
-                            <label for="layout_type">Type</label>
-                            <select id="layout_type" name="layout_type" data-function="update-layout">
-                                <option value="grid" {% if item.isGridLayoutType() %}selected{% endif %}>Grid</option>
-                                <option value="column" {% if item.isColumnLayoutType() %}selected{% endif %}>Column</option>
-                            </select>
-                        </div>
+                    <div class="small-12 large-6 columns">
+                        <label for="layout_type">Type</label>
+                        <select id="layout_type" name="layout_type" data-function="update-layout">
+                            <option value="grid" {% if item.isGridLayoutType() %}selected{% endif %}>Grid</option>
+                            <option value="column" {% if item.isColumnLayoutType() %}selected{% endif %}>Column</option>
+                        </select>
+                    </div>
 
-                        <div class="small-6 large-3 columns"
-                             data-hide-watch="#layout_type"
-                             data-hide-watch-value="grid">
-                            <label for="grid_width">px</label>
-                            <input id="grid_width"
-                                   type="number"
-                                   name="grid_width"
-                                   value="{{ item.gridWidth|e('html_attr') }}"
-                                   class="layout-width"
-                                   data-function="update-layout" />
-                        </div>
-                        <div class="small-6 large-3 columns end"
-                             data-hide-watch="#layout_type"
-                             data-hide-watch-value="grid">
-                            <label for="grid_padding">px padding</label>
-                            <input id="grid_padding"
-                                   type="number"
-                                   name="grid_padding"
-                                   value="{{ item.gridPadding|e('html_attr') }}"
-                                   class="layout-width"
-                                   data-function="update-layout" />
-                        </div>
+                    <div class="small-6 large-3 columns"
+                         data-hide-watch="#layout_type"
+                         data-hide-watch-value="grid">
+                        <label for="grid_width">px</label>
+                        <input id="grid_width"
+                               type="number"
+                               name="grid_width"
+                               value="{{ item.gridWidth|e('html_attr') }}"
+                               class="layout-width"
+                               data-function="update-layout" />
+                    </div>
+                    <div class="small-6 large-3 columns end"
+                         data-hide-watch="#layout_type"
+                         data-hide-watch-value="grid">
+                        <label for="grid_padding">px padding</label>
+                        <input id="grid_padding"
+                               type="number"
+                               name="grid_padding"
+                               value="{{ item.gridPadding|e('html_attr') }}"
+                               class="layout-width"
+                               data-function="update-layout" />
+                    </div>
 
-                        <div class="small-6 large-3 columns"
-                             data-hide-watch="#layout_type"
-                             data-hide-watch-value="column">
-                            <label for="column_count">tiles/row</label>
-                            <input id="column_count"
-                                   type="number"
-                                   name="column_count"
-                                   value="{{ item.columnCount|e('html_attr') }}"
-                                   class="layout-width"
-                                   data-function="update-layout" />
-                        </div>
-                        <div class="small-6 large-3 columns end"
-                             data-hide-watch="#layout_type"
-                             data-hide-watch-value="column">
-                            <label for="column_padding">% padding</label>
-                            <input id="column_padding"
-                                   type="number"
-                                   name="column_padding"
-                                   value="{{ item.columnPadding|e('html_attr') }}"
-                                   class="layout-width"
-                                   data-function="update-layout" />
-                        </div>
+                    <div class="small-6 large-3 columns"
+                         data-hide-watch="#layout_type"
+                         data-hide-watch-value="column">
+                        <label for="column_count">tiles/row</label>
+                        <input id="column_count"
+                               type="number"
+                               name="column_count"
+                               value="{{ item.columnCount|e('html_attr') }}"
+                               class="layout-width"
+                               data-function="update-layout" />
+                    </div>
+                    <div class="small-6 large-3 columns end"
+                         data-hide-watch="#layout_type"
+                         data-hide-watch-value="column">
+                        <label for="column_padding">% padding</label>
+                        <input id="column_padding"
+                               type="number"
+                               name="column_padding"
+                               value="{{ item.columnPadding|e('html_attr') }}"
+                               class="layout-width"
+                               data-function="update-layout" />
                     </div>
                 </fieldset>
 
                 <fieldset class="content">
                     <legend>Shape</legend>
-                    <div class="row">
-                        <div class="small-12 columns">
-                            <label for="tile_shape">Ratio</label>
-                            <select id="tile_shape" name="tile_shape" data-function="update-layout">
-                                <option value="landscape"
-                                        {% if item.isLandscapeShape() %}selected{% endif %}>Landscape (16:9)</option>
-                                <option value="portrait"
-                                        {% if item.isPortraitShape() %}selected{% endif %}>Portrait (9:16)</option>
-                                <option value="square"
-                                        {% if item.isSquareShape() %}selected{% endif %}>Square</option>
-                                <option value="panorama"
-                                        {% if item.isPanoramicShape() %}selected{% endif %}>Panorama (16:5)</option>
-                                <option value="custom"
-                                        {% if item.isCustomShape() %}selected{% endif %}>Custom Ratio</option>
-                            </select>
-                        </div>
+                    <div class="small-12 columns">
+                        <label for="tile_shape">Ratio</label>
+                        <select id="tile_shape" name="tile_shape" data-function="update-layout">
+                            <option value="landscape"
+                                    {% if item.isLandscapeShape() %}selected{% endif %}>Landscape (16:9)</option>
+                            <option value="portrait"
+                                    {% if item.isPortraitShape() %}selected{% endif %}>Portrait (9:16)</option>
+                            <option value="square"
+                                    {% if item.isSquareShape() %}selected{% endif %}>Square</option>
+                            <option value="panorama"
+                                    {% if item.isPanoramicShape() %}selected{% endif %}>Panorama (16:5)</option>
+                            <option value="custom"
+                                    {% if item.isCustomShape() %}selected{% endif %}>Custom Ratio</option>
+                        </select>
+                    </div>
 
-                        <div class="small-6 columns"
-                             data-hide-watch="#tile_shape"
-                             data-hide-watch-value="custom">
-                            <label for="aspect_ratio_x">Width Ratio</label>
-                            <input id="aspect_ratio_x"
-                                   type="number"
-                                   name="aspect_ratio_x"
-                                   value="{{ item.aspectRatioX|e('html_attr') }}"
-                                   class="aspect-ratio"
-                                   data-function="update-layout" />
-                        </div>
-                        <div class="small-6 columns"
-                             data-hide-watch="#tile_shape"
-                             data-hide-watch-value="custom">
-                            <label for="aspect_ratio_y">Height Ratio</label>
-                            <input id="aspect_ratio_y"
-                                   type="number"
-                                   name="aspect_ratio_y"
-                                   value="{{ item.aspectRatioY|e('html_attr') }}"
-                                   class="aspect-ratio"
-                                   data-function="update-layout" />
-                        </div>
+                    <div class="small-6 columns"
+                         data-hide-watch="#tile_shape"
+                         data-hide-watch-value="custom">
+                        <label for="aspect_ratio_x">Width Ratio</label>
+                        <input id="aspect_ratio_x"
+                               type="number"
+                               name="aspect_ratio_x"
+                               value="{{ item.aspectRatioX|e('html_attr') }}"
+                               class="aspect-ratio"
+                               data-function="update-layout" />
+                    </div>
+                    <div class="small-6 columns"
+                         data-hide-watch="#tile_shape"
+                         data-hide-watch-value="custom">
+                        <label for="aspect_ratio_y">Height Ratio</label>
+                        <input id="aspect_ratio_y"
+                               type="number"
+                               name="aspect_ratio_y"
+                               value="{{ item.aspectRatioY|e('html_attr') }}"
+                               class="aspect-ratio"
+                               data-function="update-layout" />
                     </div>
                 </fieldset>
 
