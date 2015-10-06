@@ -262,7 +262,7 @@ class Scrub
      *
      * Currently:
      * * adds "allowfullscreen=true" to iframes
-     * * wraps iframes in "div.flexbox"
+     * * wraps iframes in "div.flex-video"
      *
      * @param string $html
      * @return string
@@ -276,7 +276,7 @@ class Scrub
             /** @var DOMElement $iframe */
             $iframe->setAttribute('allowfullscreen', 'true');
             $container = $domDocument->createElement('div');
-            $container->setAttribute('class', 'flex-box');
+            $container->setAttribute('class', 'flex-video');
             $container->appendChild(clone $iframe);
             $iframe->parentNode->replaceChild($container, $iframe);
         }
