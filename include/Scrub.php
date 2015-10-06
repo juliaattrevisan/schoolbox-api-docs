@@ -271,9 +271,8 @@ class Scrub
     {
         $domDocument = new DOMDocument();
         $domDocument->loadHTML($html);
-        $xpath = new DOMXPath($domDocument);
         // Mangle iframes: add allowfullscreen, and wrap in div
-        foreach ($xpath->query('//iframe') as $iframe) {
+        foreach ($domDocument->getElementsByTagName('iframe') as $iframe) {
             /** @var DOMElement $iframe */
             $iframe->setAttribute('allowfullscreen', 'true');
             $container = $domDocument->createElement('div');
