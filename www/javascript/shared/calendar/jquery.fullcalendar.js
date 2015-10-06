@@ -742,6 +742,13 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
         $('[data-event-modal-field="reviewedBy"]').show();
     }
 
+    if (!eventData.location.length) {
+        $('[data-event-modal-field="location"]').hide();
+    }
+    else {
+        $('[data-event-modal-field="location"]').show();
+    }
+
     // Fill in resauce borking separately
     $('ul.relatedBookings').empty();
     if ('relatedBookings' in eventData && eventData.relatedBookings.length > 0) {
