@@ -1,7 +1,11 @@
 $footer-margin-bottom: 1rem;
 
 #footer {
-    margin: $footer-margin-bottom 2.5rem 0;
+
+    /* http://www.w3schools.com/cssref/pr_margin.asp
+     * Three-argument margin: third arg is margin-bottom
+     */
+    margin: 7rem 2.5rem $footer-margin-bottom;
     @include contrast-bg();
     ul {
         margin: 0 auto 1rem;
