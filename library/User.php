@@ -500,20 +500,18 @@ class User extends DeprecatedModel
             return false;
         }
         $groupHandler = new Group();
-        $user_list    = $this->getAllByField('alt_email', $email);
+	$user_list    = $this->getAllByField('alt_email', $email);
+	$result = array();
         if (!empty($user_list)) {
             foreach ($user_list as $user) {
-                if ($user['enabled'] && $groupHandler->isParent($user['id'])) {
-                    $mailHandler = new Mailer(
-                        'new-password.html',
-                        Cfg::get('title') . ' Password Reminder',
-                        $user['alt_email']
-                    );
-                    $mailHandler->setVar('NAME', $user['firstname']);
-                    $mailHandler->setVar('USERNAME', $user['username']);
-                    $mailHandler->setVar('PASSWORD', $user['email_pass']);
-                    $mailHandler->send();
-                    return true;
+                if ($user['enabled']) {
+                    $result['NAME'] = $user['firstname'];
+                    $result['USERNAME'] = $user['username'];
+		    $result['PASSWORD'] = $user['email_pass'];
+		    $result['EMAIL'] = $user['alt_email'];
+		    $result['FULLNAME'] = $user['firstname']." ".$user['lastname'];
+		    $result['FIRSTNAME'] = $user['firstname'];
+                    return $result;
                 }
             }
         }
