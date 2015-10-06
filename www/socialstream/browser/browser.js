@@ -161,6 +161,12 @@ try {
                 socialstreamSession.categoryId = node;
             }
 
+            /* For all the world to see
+             */
+            if (config.modal) {
+                modal.foundation('reveal', 'open', config.url);
+            }
+
 			/* Load data into the node container
 			 */
 			config.element.load(config.url, args, function (response, status, xhr) {
@@ -232,12 +238,6 @@ try {
                         modal.foundation('reveal', 'close');
                     }
                 });
-
-				/* For all the world to see
-				 */
-                if (config.modal) {
-                    modal.foundation('reveal', 'open');
-                }
 			});
 		}
 
