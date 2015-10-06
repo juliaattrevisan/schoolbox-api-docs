@@ -59,13 +59,15 @@ if ($firstTemplate instanceof \Schoolbox\Resource\HomepageTemplate) {
 }
 $componentCollection = $componentFactory->buildComponentList($cid);
 
-$occupiedPositionList = array();
-
+$occupiedPositionList = [];
+$componentCounts      = [];
 foreach ($componentCollection as $component) {
     /** @var Component_ControllerAbstract $component */
-    $instance_id = $component->getInstance()->getId();
-    $position_no = $component->getInstance()->getPosition();
-    $position    = "position_{$position_no}";
+    $instance_id   = $component->getInstance()->getId();
+    $position_no   = $component->getInstance()->getPosition();
+    $position      = "position_{$position_no}";
+    $defintionId   = $component->getInstance()->getDefinition()->getId();
+    $defintionName = $component->getInstance()->getDefinition()->getName();
 
     if (!$this->template->exists("{$position}_block")) {
         $this->setFile($position, 'adminv2/component/placeholder.html');
@@ -80,9 +82,10 @@ foreach ($componentCollection as $component) {
         'COMPONENT_INSTANCE_ID'     => $instance_id,
         'COMPONENT_HANDLE'          => $instance_id,
         'component.instance.id'     => $instance_id,
-        'component.definition.id'   => $component->getInstance()->getDefinition()->getId(),
-        'component.definition.name' => Scrub::text($component->getInstance()->getDefinition()->getName()),
+        'component.definition.id'   => $defintionId,
+        'component.definition.name' => Scrub::text($defintionName),
     ));
+    $componentCounts[$defintionId]++;
 
     $component->setConfigurationTemplate('component/config/_templatewrapper.html');
     $component->parseConfigForTemplate();
@@ -122,6 +125,8 @@ foreach ($groupedCollection as $category => $categoryDefinitions) {
     $firstComponent = true;
     foreach ($categoryDefinitions as $definition) {
         /* @var $definition Component_Definition */
+        $definitionId = $definition->getId();
+        $count        = $componentCounts[$definitionId] ?: 0;
         if ($firstComponent) {
             // First component in category: parse tab
             $this->setVar([
@@ -136,15 +141,22 @@ foreach ($groupedCollection as $category => $categoryDefinitions) {
             $firstCategory  = false;
         }
 
+        $multiState = '';
+        // Failse
+        if ($definition->getMultiple() == 'false') {
+            $multiState .= 'one-only';
+            if ($count >= 1) {
+                $multiState .= ' disabled';
+            }
+        }
         $this->setVar([
-            'COMPONENT_ID'             => $definition->getId(),
+            'COMPONENT_ID'             => $definitionId,
             'COMPONENT_DESCRIPTION'    => $definition->getDescription(),
             'COMPONENT_CLASS'          => str_replace('\\', '_', $definition->getClass()),
-            'COMPONENT_MULTIPLE_STATE' => $definition->getMultiple() ? 'one-only' : '',
+            'COMPONENT_MULTIPLE_STATE' => $multiState,
             'COMPONENT_NAME'           => $definition->getName(),
             'COMPONENT_CATEGORY_NAME'  => $definition->getComponentCategoryName(),
-            // Not known yet
-            'COMPONENT_COUNT'          => 0,
+            'COMPONENT_COUNT'          => $count,
         ]);
         $this->parse('component_block', 'component', true);
     }
