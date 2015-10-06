@@ -44,21 +44,12 @@
 
         }
     });
-</script>
-
-<div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 columns">
-            <h1>Message Settings</h1>
-        </div>
-    </div>
-    <nav>
-        <a href="#" data-reveal-id="legend-modal" class="icon-list" title="View Legend"></a>
-    </nav>
-</div>
+</script>GIT
 
 <div class="row">
     <div class="small-12 island">
+        <h1>Message Settings</h1>
+
         <form method="post" action="{{ routeLookup('messages.saveConfig') }}">
             {% if groups %}
             <h2 class="subheader">Homepages</h2>
@@ -102,17 +93,20 @@
                 </fieldset>
             </section>
 
-            <h2 class="subheader">Messages</h2>
-            <section>
-                <fieldset class="content">
+            <div class="actions-small-1 row">
+                <div class="list-item">
                     <div class="small-12 columns">
-                        <p>
-                            Customise when and how you receive messages.
-                            <em>Options that are unavailable have been disabled by your system administrator.</em>
-                        </p>
+                        <h2 class="subheader">Messages</h2>
                     </div>
-                </fieldset>
-            </section>
+                </div>
+                <nav>
+                    <a href="#" data-reveal-id="legend-modal" class="icon-help" title="View Help"></a>
+                </nav>
+            </div>
+            <div class="alert-box">
+               Customise when and how you receive messages.
+               <em>Options that are unavailable have been disabled by your system administrator.</em>
+            </div>
 
             {% for namespace in config %}
             <h3 class="subheader">Receive {{ namespace.label }} messages when&hellip;</h3>
@@ -122,8 +116,7 @@
                         {% for source in namespace.sources %}
                         <li class="actions-small-7" data-source="{{ source.id }}">
                             <div class="list-item">
-                                <div class="small-12 info card">
-                                    <p class="meta">&hellip;{{ source.description }}.</p>
+                                <div class="small-12 info card">&hellip;{{ source.description }}
                                 </div>
                             </div>
                             <nav>
