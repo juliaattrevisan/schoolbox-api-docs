@@ -625,6 +625,25 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
         )
     );
 
+    /* If there's a crocodoc document, display a link to it.
+     * Do this even if there's no returned file in storage.
+     */
+    if ($return->getUuid()) {
+        try {
+            $associatedSubmission = $submissionMapper->findOneByColumn('uuid', $return->getUuid());
+
+            $this->setVar(
+                array(
+                    'RETURNED_WORK_SUBMISSION_ID' => $associatedSubmission->getId(),
+                )
+            );
+        } catch (\Exception $e) {
+            error(44);
+        }
+
+        $this->parse('return_file_uuid_block', 'return_file_uuid');
+    }
+
     if($return->getStorage()->getHash() && !$parentOnly) {
         try{
 
@@ -647,25 +666,6 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
     }
     else {
         $this->setVar('return_file_block', '');
-    }
-
-    /* If there's a crocodoc document, display a link to it.
-     * Do this even if there's no returned file in storage.
-     */
-    if ($return->getUuid()) {
-        try {
-            $associatedSubmission = $submissionMapper->findOneByColumn('uuid', $return->getUuid());
-
-            $this->setVar(
-                array(
-                    'RETURNED_WORK_SUBMISSION_ID' => $associatedSubmission->getId(),
-                )
-            );
-        } catch (\Exception $e) {
-            error(44);
-        }
-
-        $this->parse('return_file_uuid_block', 'return_file_uuid');
     }
 
     $this->parse('returned_work_block', 'returned_work');
