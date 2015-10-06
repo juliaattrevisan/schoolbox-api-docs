@@ -166,6 +166,9 @@ module.exports = function(grunt) {
                     // Device Dimensions
                     'www/javascript/shared/jquery.device.js',
 
+                    // Data tables
+                    'www/javascript/components/datatables/media/js/jquery.dataTables.min.js',
+
                     // Random Scripts
                     // Various javascripts that are so tiny they didn't get
                     // their own files/plugins
