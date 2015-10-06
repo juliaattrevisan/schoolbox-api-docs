@@ -160,3 +160,9 @@ $timepicker-item-visible-count: 5;
         }
     }
 }
+
+/* Hide datepicker grid by default
+ */
+.ui-datepicker {
+    display: none;
+}
