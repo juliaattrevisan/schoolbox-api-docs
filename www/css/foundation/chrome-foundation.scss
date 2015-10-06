@@ -55,9 +55,6 @@
 // EOTC
 @import "components/eotc/eotc";
 
-// jQuery UI augmentation
-@import "components/jqueryui";
-
 // Needs to be included outside of container in order to work
 @import "../../javascript/components/foundation/scss/foundation/components/reveal";
 @import "../../javascript/components/foundation/scss/foundation/components/tooltips";
