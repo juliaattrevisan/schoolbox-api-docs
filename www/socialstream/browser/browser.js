@@ -33,6 +33,11 @@ try {
 		 */
 		var config;
 
+        /**
+         * Foundation's reveal modal
+         */
+        var modal;
+
 		/**
 		 * Initialise various configured params and determine a bunch
 		 * of ids and stuff that we'll probably use elsewhere
@@ -117,20 +122,17 @@ try {
                 return;
             }
 
-			$j(config.element).dialog({
-				width: 800,
-				height: $j(window).height() * 0.75,
-				autoOpen: false,
-				title: config.title,
-				modal: true,
-				resizable: false
-			});
-
-			 /* Resize dialog proportionally to window
-			  */
-			$j(window).resize(function (event) {
-				$j(config.browserSelector).height($j(window).height() * 0.75);
-			});
+            modal = $j('<div data-reveal class="reveal-modal file-picker" />')
+                .append(config.element.children());
+            $j('body').append(modal);
+            $j(document)
+                .foundation('reveal', 'reflow')
+                .on('closed.fndtn.reveal', '[data-reveal]', function () {
+                    if (modal) {
+                        modal.detach();
+                        modal = null;
+                    }
+                });
 		}
 
 		/**
@@ -207,7 +209,7 @@ try {
 						config.submitCallback(url, name, meta);
 
                         if (config.modal) {
-                            $j(config.element).dialog('close');
+                            modal.foundation('reveal', 'close');
                         }
 					});
 				});
@@ -227,14 +229,14 @@ try {
                     config.submitCallback(url, name, undefined);
 
                     if (config.modal) {
-                        $j(config.element).dialog('close');
+                        modal.foundation('reveal', 'close');
                     }
                 });
 
 				/* For all the world to see
 				 */
                 if (config.modal) {
-                    $j(config.element).dialog('open');
+                    modal.foundation('reveal', 'open');
                 }
 			});
 		}
