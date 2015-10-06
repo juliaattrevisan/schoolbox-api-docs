@@ -269,6 +269,12 @@ class Scrub
      */
     static protected function htmlDomModify($html)
     {
+        // Don't bother parsing anything if $html is empty
+        if (strlen($html) === 0) {
+            return $html;
+        }
+
+        // Now try loading into a document
         $domDocument = new DOMDocument();
         if ($domDocument->loadHTML($html)) {
             $touched = false;
@@ -303,8 +309,6 @@ class Scrub
                 }
             }
         }
-        // Loading DOM document failed, or it wasn't touched.
-        // Just return the original
         return $html;
     }
 
