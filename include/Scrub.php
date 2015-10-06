@@ -270,17 +270,21 @@ class Scrub
     static protected function htmlDomModify($html)
     {
         $domDocument = new DOMDocument();
-        $domDocument->loadHTML($html);
-        // Mangle iframes: add allowfullscreen, and wrap in div
-        foreach ($domDocument->getElementsByTagName('iframe') as $iframe) {
-            /** @var DOMElement $iframe */
-            $iframe->setAttribute('allowfullscreen', 'true');
-            $container = $domDocument->createElement('div');
-            $container->setAttribute('class', 'flex-video');
-            $container->appendChild(clone $iframe);
-            $iframe->parentNode->replaceChild($container, $iframe);
+        if ($domDocument->loadHTML($html)) {
+            // Mangle iframes: add allowfullscreen, and wrap in div
+            foreach ($domDocument->getElementsByTagName('iframe') as $iframe) {
+                /** @var DOMElement $iframe */
+                $iframe->setAttribute('allowfullscreen', 'true');
+                $container = $domDocument->createElement('div');
+                $container->setAttribute('class', 'flex-video');
+                $container->appendChild(clone $iframe);
+                $iframe->parentNode->replaceChild($container, $iframe);
+            }
+            // I only want the fragment content
+            return $domDocument->saveHTML();
         }
-        return $domDocument->saveHTML();
+        // Loading DOM document failed for some reason. Just return the original
+        return $html;
     }
 
     /**
