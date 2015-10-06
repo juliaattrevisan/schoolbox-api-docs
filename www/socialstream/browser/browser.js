@@ -33,6 +33,11 @@ try {
 		 */
 		var config;
 
+        /**
+         * Foundation's reveal modal (if options.modal is on)
+         */
+        var modal = $();
+
 		/**
 		 * Initialise various configured params and determine a bunch
 		 * of ids and stuff that we'll probably use elsewhere
@@ -117,20 +122,18 @@ try {
                 return;
             }
 
-			$j(config.element).dialog({
-				width: 800,
-				height: $j(window).height() * 0.75,
-				autoOpen: false,
-				title: config.title,
-				modal: true,
-				resizable: false
-			});
-
-			 /* Resize dialog proportionally to window
-			  */
-			$j(window).resize(function (event) {
-				$j(config.browserSelector).height($j(window).height() * 0.75);
-			});
+            modal = $j('<div data-reveal class="reveal-modal file-picker" />')
+                .append(config.element.children());
+            $j('body').append(modal);
+            $j(document)
+                .foundation('reveal', 'reflow')
+                .on('closed.fndtn.reveal', '[data-reveal]', function () {
+                    if (modal) {
+                        modal.detach();
+                        modal = null;
+                    }
+                });
+            modal.foundation('reveal', 'open');
 		}
 
 		/**
@@ -159,9 +162,16 @@ try {
                 socialstreamSession.categoryId = node;
             }
 
+            /* Where's the browser go? into a modal or not?
+             */
+            var container = config.element;
+            if (modal.length) {
+                container = modal;
+            }
+
 			/* Load data into the node container
 			 */
-			config.element.load(config.url, args, function (response, status, xhr) {
+            container.load(config.url, args, function (response, status, xhr) {
 
                 if (xhr.status >= 400) {
                     config.loadedCallback.call($j(this));
@@ -174,7 +184,7 @@ try {
 
 				/* These allow new nodes to be loaded
 				 */
-				var allNavigators = $j(config.element).find([config.breadcrumbSelector, config.categoryNodeSelector].join(',')),
+				var allNavigators = container.find([config.breadcrumbSelector, config.categoryNodeSelector].join(',')),
                     allFiles;
 
 				$j.each(allNavigators, function (index, element) {
@@ -186,7 +196,7 @@ try {
 
 				/* Assign event handlers to all the files
 				 */
-				allFiles = $j(config.element).find(config.fileNodeSelector);
+				allFiles = container.find(config.fileNodeSelector);
 
 				$j.each(allFiles, function (index, element) {
 					$j(element).find('a').click(function (event) {
@@ -207,7 +217,7 @@ try {
 						config.submitCallback(url, name, meta);
 
                         if (config.modal) {
-                            $j(config.element).dialog('close');
+                            modal.foundation('reveal', 'close');
                         }
 					});
 				});
@@ -215,7 +225,7 @@ try {
                 /* event handlers for selecting a folder to use
                  * Very similar to file event handler, but filename is contained in a data element instead.
                  */
-                $j(config.element).find(config.useFolderSelector).click(function (event) {
+                container.find(config.useFolderSelector).click(function (event) {
                     var url, name, self;
 
                     event.preventDefault();
@@ -227,15 +237,9 @@ try {
                     config.submitCallback(url, name, undefined);
 
                     if (config.modal) {
-                        $j(config.element).dialog('close');
+                        modal.foundation('reveal', 'close');
                     }
                 });
-
-				/* For all the world to see
-				 */
-                if (config.modal) {
-                    $j(config.element).dialog('open');
-                }
 			});
 		}
 
