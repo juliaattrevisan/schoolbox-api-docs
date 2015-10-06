@@ -120,6 +120,15 @@
                     data: data
                 });
 
+                /* Bypass foundation bug
+                 * https://github.com/zurb/foundation/issues/4746
+                 */
+                dialog.on('opened', function() {
+                    var closeButton = '<a class="close-reveal-modal">&#215;</a>';
+
+                    dialog.append(closeButton);
+                });
+
                 dialog.on('close.fndtn.reveal', function() {
                     configurator.msgconfig('describe', src);
                 });
