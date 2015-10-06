@@ -20,12 +20,22 @@ $this->setTitle('Admin - Homepage Templates');
 
 /* Group Selector */
 $this->setBlock(TEMPLATE_content, 'template', 'template_block');
+/* Layout */
+$this->setBlock(TEMPLATE_content, 'layout', 'layout_block');
+$this->setFile('layout', 'adminv2/component/layout.html');
+$this->setBlock('layout', 'position_top', 'position_top_block');
+$this->setBlock('layout', 'position_left', 'position_left_block');
+$this->setBlock('layout', 'position_right', 'position_right_block');
+/* Palette */
+$this->setBlock(TEMPLATE_content, 'component_tab', 'component_tab_block');
+$this->setBlock(TEMPLATE_content, 'component_page', 'component_page_block');
+$this->setBlock('component_page', 'component', 'component_block');
 
 // include the admin navigation
 $nav = new AdminV2_Nav();
 $nav->parse($this, 'homepage');
 
-
+// Get list of templates
 $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
 $homepageTemplateList = $homepageTemplateMapper->findAll();
 
@@ -34,40 +44,26 @@ foreach ($homepageTemplateList as $currentTemplate) {
         'template.id'   => $currentTemplate->getId(),
         'template.name' => $currentTemplate->getName()
     ));
-
     $this->parse('template_block', 'template', true);
 }
 
-/* Layout */
-$this->setBlock(TEMPLATE_content, 'layout', 'layout_block');
-$this->setFile('layout', 'adminv2/component/layout.html');
-$this->setBlock('layout', 'position_top', 'position_top_block');
-$this->setBlock('layout', 'position_left', 'position_left_block');
-$this->setBlock('layout', 'position_right', 'position_right_block');
-/* Component Palette */
-$this->setBlock(TEMPLATE_content, 'component_tab', 'component_tab_block');
-$this->setBlock(TEMPLATE_content, 'component_page', 'component_page_block');
-$this->setBlock('component_page', 'component', 'component_block');
-
+// Output the components for this template
 $componentFactory = new Component_Homepage_Factory(new \Schoolbox\User(), $this, true);
-
-// Output the templates for this page
 $cid = null;
 $firstTemplate = $homepageTemplateList->first();
 if ($firstTemplate instanceof \Schoolbox\Resource\HomepageTemplate) {
     $cid = $homepageTemplateList->first()->getId();
 }
-$componentCollection = $componentFactory->buildComponentList($cid);
-
 $occupiedPositionList = [];
 $componentCounts      = [];
-foreach ($componentCollection as $component) {
+foreach ($componentFactory->buildComponentList($cid) as $component) {
     /** @var Component_ControllerAbstract $component */
     $instance_id   = $component->getInstance()->getId();
     $position_no   = $component->getInstance()->getPosition();
     $position      = "position_{$position_no}";
     $defintionId   = $component->getInstance()->getDefinition()->getId();
     $defintionName = $component->getInstance()->getDefinition()->getName();
+    $componentCounts[$defintionId]++;
 
     if (!$this->template->exists("{$position}_block")) {
         $this->setFile($position, 'adminv2/component/placeholder.html');
@@ -85,7 +81,6 @@ foreach ($componentCollection as $component) {
         'component.definition.id'   => $defintionId,
         'component.definition.name' => Scrub::text($defintionName),
     ));
-    $componentCounts[$defintionId]++;
 
     $component->setConfigurationTemplate('component/config/_templatewrapper.html');
     $component->parseConfigForTemplate();
@@ -97,22 +92,18 @@ foreach ($componentCollection as $component) {
     }
 }
 
+// Empty positions
 $emptyPositionList = array_diff(array('top', 'left', 'right'), $occupiedPositionList);
-
 foreach ($emptyPositionList as $emptyPosition) {
     $this->setVar("position_{$emptyPosition}_block", '');
 }
-
 $this->parse('layout_block', 'layout');
 
 
-// Output the palette
-$componentFactory     = new Component_Homepage_Factory(new \Schoolbox\User(), $this);
-$definitionCollection = $componentFactory->getDefinitionList('component_category');
-
-// Group by category
+// Output the palette (grouped by category)
+$componentFactory  = new Component_Homepage_Factory(new \Schoolbox\User(), $this);
 $groupedCollection = [];
-foreach ($definitionCollection as $definition) {
+foreach ($componentFactory->getDefinitionList('component_category') as $definition) {
     $groupedCollection[$definition->getComponentCategory()][] = $definition;
 }
 
