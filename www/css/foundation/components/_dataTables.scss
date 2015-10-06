@@ -45,37 +45,16 @@ table.dataTable thead th,
 table.dataTable thead td {
   padding-right: 1.5rem;
 }
+
 table.dataTable thead th:active,
 table.dataTable thead td:active {
   outline: none;
 }
+
 table.dataTable thead .sorting,
 table.dataTable thead .sorting_asc,
 table.dataTable thead .sorting_desc {
   cursor: pointer;
-}
-table.dataTable thead .sorting,
-table.dataTable thead .sorting_asc,
-table.dataTable thead .sorting_desc,
-table.dataTable thead .sorting_asc_disabled,
-table.dataTable thead .sorting_desc_disabled {
-  background-repeat: no-repeat;
-  background-position: center right;
-}
-table.dataTable thead .sorting {
-  background-image: url("/images/core/datatables/sort_both.png");
-}
-table.dataTable thead .sorting_asc {
-  background-image: url("/images/core/datatables/sort_asc.png");
-}
-table.dataTable thead .sorting_desc {
-  background-image: url("/images/core/datatables/sort_desc.png");
-}
-table.dataTable thead .sorting_asc_disabled {
-  background-image: url("/images/core/datatables/sort_asc_disabled.png");
-}
-table.dataTable thead .sorting_desc_disabled {
-  background-image: url("/images/core/datatables/sort_desc_disabled.png");
 }
 
 div.dataTables_scrollHead table {
@@ -95,4 +74,42 @@ div.dataTables_scrollBody table tbody tr:first-child td {
 div.dataTables_scrollFoot table {
   margin-top: 0 !important;
   border-top: none;
+}
+
+/* Use glyphs instead of sprites
+ */
+table.dataTable thead th {
+    position: relative;
+}
+
+table.dataTable thead .sorting:after {
+    @extend .icon-view:before;
+    position: absolute;
+    right: 0;
+}
+
+table.dataTable thead .sorting_asc:after {
+    @extend .icon-upload:before;
+    position: absolute;
+    right: 0;
+}
+
+table.dataTable thead .sorting_desc:after {
+    @extend .icon-download:before;
+    position: absolute;
+    right: 0;
+}
+
+table.dataTable thead .sorting_asc_disabled:after {
+    @extend .icon-upload:before;
+    opacity: 0.25;
+    position: absolute;
+    right: 0;
+}
+
+table.dataTable thead .sorting_desc_disabled:after {
+    @extend .icon-download:before;
+    opacity: 0.25;
+    position: absolute;
+    right: 0;
 }
