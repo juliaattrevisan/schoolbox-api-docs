@@ -34,9 +34,9 @@ try {
 		var config;
 
         /**
-         * Foundation's reveal modal
+         * Foundation's reveal modal (if options.modal is on)
          */
-        var modal;
+        var modal = $();
 
 		/**
 		 * Initialise various configured params and determine a bunch
@@ -133,6 +133,7 @@ try {
                         modal = null;
                     }
                 });
+            modal.foundation('reveal', 'open');
 		}
 
 		/**
@@ -161,15 +162,16 @@ try {
                 socialstreamSession.categoryId = node;
             }
 
-            /* For all the world to see
+            /* Where's the browser go? into a modal or not?
              */
-            if (config.modal) {
-                modal.foundation('reveal', 'open', config.url);
+            var container = config.element;
+            if (modal.length) {
+                container = modal;
             }
 
 			/* Load data into the node container
 			 */
-			config.element.load(config.url, args, function (response, status, xhr) {
+            container.load(config.url, args, function (response, status, xhr) {
 
                 if (xhr.status >= 400) {
                     config.loadedCallback.call($j(this));
@@ -182,7 +184,7 @@ try {
 
 				/* These allow new nodes to be loaded
 				 */
-				var allNavigators = $j(config.element).find([config.breadcrumbSelector, config.categoryNodeSelector].join(',')),
+				var allNavigators = container.find([config.breadcrumbSelector, config.categoryNodeSelector].join(',')),
                     allFiles;
 
 				$j.each(allNavigators, function (index, element) {
@@ -194,7 +196,7 @@ try {
 
 				/* Assign event handlers to all the files
 				 */
-				allFiles = $j(config.element).find(config.fileNodeSelector);
+				allFiles = container.find(config.fileNodeSelector);
 
 				$j.each(allFiles, function (index, element) {
 					$j(element).find('a').click(function (event) {
@@ -223,7 +225,7 @@ try {
                 /* event handlers for selecting a folder to use
                  * Very similar to file event handler, but filename is contained in a data element instead.
                  */
-                $j(config.element).find(config.useFolderSelector).click(function (event) {
+                container.find(config.useFolderSelector).click(function (event) {
                     var url, name, self;
 
                     event.preventDefault();
