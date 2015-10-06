@@ -78,7 +78,7 @@ if (is_numeric($_POST['categoryID'])) {
 		 */
 
         $post->setOwner($_SESSION['user']);
-        $post->setBody(str_replace('<p>&nbsp;</p>', '', $_POST['body']));
+        $post->setBody($_POST['body']);
 
         PostMapper::getInstance()->save($post);
 	}
@@ -115,7 +115,7 @@ if (is_numeric($_POST['categoryID'])) {
          */
         $post = PostMapper::getInstance()->createModel();
         $post->setOwner($_SESSION['user']);
-        $post->setBody(str_replace('<p>&nbsp;</p>', '', $_POST['body']));
+        $post->setBody($_POST['body']);
         $post->setThread($thread);
 
         if ($_POST['quoteID']) {
