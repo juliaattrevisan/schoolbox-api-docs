@@ -31,86 +31,27 @@ $homepageTemplateList = $homepageTemplateMapper->findAll();
 
 foreach ($homepageTemplateList as $currentTemplate) {
     $this->setVar(array(
-            'template.id'   => $currentTemplate->getId(),
-            'template.name' => $currentTemplate->getName()
-        ));
+        'template.id'   => $currentTemplate->getId(),
+        'template.name' => $currentTemplate->getName()
+    ));
 
     $this->parse('template_block', 'template', true);
 }
 
+/* Layout */
+$this->setBlock(TEMPLATE_content, 'layout', 'layout_block');
+$this->setFile('layout', 'adminv2/component/layout.html');
+$this->setBlock('layout', 'position_top', 'position_top_block');
+$this->setBlock('layout', 'position_left', 'position_left_block');
+$this->setBlock('layout', 'position_right', 'position_right_block');
 /* Component Palette */
-//$this->setBlock(TEMPLATE_content, 'definition', 'definition_block');
 $this->setBlock(TEMPLATE_content, 'component_tab', 'component_tab_block');
 $this->setBlock(TEMPLATE_content, 'component_page', 'component_page_block');
 $this->setBlock('component_page', 'component', 'component_block');
 
-$componentFactory     = new Component_Homepage_Factory(new \Schoolbox\User(), $this);
-$definitionCollection = $componentFactory->getDefinitionList('component_category');
-
-// Group by category
-$groupedCollection = [];
-foreach ($definitionCollection as $definition) {
-    $groupedCollection[$definition->getComponentCategory()][] = $definition;
-}
-
-$this->setVar([
-    'component_tab_block'  => '',
-    'component_page_block' => '',
-]);
-$firstCategory = true;
-foreach ($groupedCollection as $category => $categoryDefinitions) {
-    $firstComponent = true;
-    foreach ($categoryDefinitions as $definition) {
-        /* @var $definition Component_Definition */
-        if ($firstComponent) {
-            // First component in category: parse tab
-            $this->setVar([
-                'COMPONENT_CATEGORY_CLASS' => $firstCategory ? 'active' : '',
-                'COMPONENT_CATEGORY_ID'    => $category,
-                'COMPONENT_CATEGORY_NAME'  => $definition->getComponentCategoryName(),
-                'COMPONENT_CATEGORY_COUNT' => count($categoryDefinitions),
-                'component_block'          => '',
-            ]);
-            $this->parse('component_tab_block', 'component_tab', true);
-            $firstComponent = false;
-            $firstCategory  = false;
-        }
-
-        $this->setVar([
-            'COMPONENT_ID'             => $definition->getId(),
-            'COMPONENT_DESCRIPTION'    => $definition->getDescription(),
-            'COMPONENT_CLASS'          => str_replace('\\', '_', $definition->getClass()),
-            'COMPONENT_MULTIPLE_STATE' => $definition->getMultiple() ? 'active' : '',
-            'COMPONENT_NAME'           => $definition->getName(),
-            'COMPONENT_CATEGORY_NAME'  => $definition->getComponentCategoryName(),
-            // Not known yet
-            'COMPONENT_COUNT'          => 0,
-        ]);
-        $this->parse('component_block', 'component', true);
-
-//        $this->setVar(array(
-//            'definition.id'          => $definition->getId(),
-//            'definition.name'        => Scrub::text($definition->getName()),
-//            // description deliberately not scrubbed
-//            'definition.description' => $definition->getDescription(),
-//            'definition.singleton'   => $definition->getMultiple() == 'true' ? '' : 'single-instance'
-//        ));
-//
-//        $this->parse('definition_block', 'definition', true);
-    }
-    $this->parse('component_page_block', 'component_page', true);
-}
-
-/* Initial group placeholders */
-$this->setBlock(TEMPLATE_content, 'layout', 'layout_block');
-$this->setFile('layout', 'adminv2/component/layout.html');
-
-$this->setBlock('layout', 'position_top', 'position_top_block');
-$this->setBlock('layout', 'position_left', 'position_left_block');
-$this->setBlock('layout', 'position_right', 'position_right_block');
-
 $componentFactory = new Component_Homepage_Factory(new \Schoolbox\User(), $this, true);
 
+// Output the templates for this page
 $cid = null;
 $firstTemplate = $homepageTemplateList->first();
 if ($firstTemplate instanceof \Schoolbox\Resource\HomepageTemplate) {
@@ -160,3 +101,52 @@ foreach ($emptyPositionList as $emptyPosition) {
 }
 
 $this->parse('layout_block', 'layout');
+
+
+// Output the palette
+$componentFactory     = new Component_Homepage_Factory(new \Schoolbox\User(), $this);
+$definitionCollection = $componentFactory->getDefinitionList('component_category');
+
+// Group by category
+$groupedCollection = [];
+foreach ($definitionCollection as $definition) {
+    $groupedCollection[$definition->getComponentCategory()][] = $definition;
+}
+
+$this->setVar([
+    'component_tab_block'  => '',
+    'component_page_block' => '',
+]);
+$firstCategory = true;
+foreach ($groupedCollection as $category => $categoryDefinitions) {
+    $firstComponent = true;
+    foreach ($categoryDefinitions as $definition) {
+        /* @var $definition Component_Definition */
+        if ($firstComponent) {
+            // First component in category: parse tab
+            $this->setVar([
+                'COMPONENT_CATEGORY_CLASS' => $firstCategory ? 'active' : '',
+                'COMPONENT_CATEGORY_ID'    => $category,
+                'COMPONENT_CATEGORY_NAME'  => $definition->getComponentCategoryName(),
+                'COMPONENT_CATEGORY_COUNT' => count($categoryDefinitions),
+                'component_block'          => '',
+            ]);
+            $this->parse('component_tab_block', 'component_tab', true);
+            $firstComponent = false;
+            $firstCategory  = false;
+        }
+
+        $this->setVar([
+            'COMPONENT_ID'             => $definition->getId(),
+            'COMPONENT_DESCRIPTION'    => $definition->getDescription(),
+            'COMPONENT_CLASS'          => str_replace('\\', '_', $definition->getClass()),
+            'COMPONENT_MULTIPLE_STATE' => $definition->getMultiple() ? 'one-only' : '',
+            'COMPONENT_NAME'           => $definition->getName(),
+            'COMPONENT_CATEGORY_NAME'  => $definition->getComponentCategoryName(),
+            // Not known yet
+            'COMPONENT_COUNT'          => 0,
+        ]);
+        $this->parse('component_block', 'component', true);
+    }
+    $this->parse('component_page_block', 'component_page', true);
+}
