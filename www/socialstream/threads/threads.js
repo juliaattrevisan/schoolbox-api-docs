@@ -152,7 +152,7 @@
 				 */
 				var clone = config.defaultForm.clone();
 				clone.attr('id', '');
-				clone.find('input[name=body]').val('');
+				clone.find('textarea[name=body]').val('');
 				clone.find('input[name=parentId]').val(parentId);
 				clone.find('input[name=rootId]').val(rootId);
 				clone.find('input[name=url]').val('');
