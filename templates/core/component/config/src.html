@@ -1,48 +1,48 @@
 <script type="text/javascript" src="/component/javascript/availableByCategory.js"></script>
 <script type="text/javascript">
-  $(function () {
-    /* Modal for URL homepage selection
-     */
-
-    $('#launch-browser-{COMPONENT_HANDLE}').on('click', function() {
-      var self = $(this);
-
-      $('#resource-browser').socialstreamBrowser({
-        title: 'Choose a source',
-        categoryId: Number('{COMPONENT_CONFIG_SRC_CID}') || Number('{ID}'),
-        mimeFilter: false,
-        submitCallback: function(url, filename) {
-
-          var src = $('#src-{COMPONENT_HANDLE}');
-          var lbl = $('#text-{COMPONENT_HANDLE}');
-
-          src.val(url);
-          lbl.attr('href', url).html($(filename).text());
-
-          // Update a select box.
-          // How that's done depends on exactly what type it is: textbox or tile
-          var select = $('#src-{COMPONENT_HANDLE}').closest('form')
-                  .find('select[data-uses-source]');
-
-          if (select.length) {
-              var categoryId = src.val().toString().replace('/homepage/', '');
-              select.each(function() {
-                  var element = $(this);
-                  src.availableByCategory({
-                      categoryId: categoryId,
-                      target: element,
-                      payload: {
-                          type: element.attr('name')
-                      }
-                  });
-              })
-          }
-        }
-      });
-    });
-
-
-  });
+//  $(function () {
+//    /* Modal for URL homepage selection
+//     */
+//
+//    $('#launch-browser-{COMPONENT_HANDLE}').on('click', function() {
+//      var self = $(this);
+//
+//      $('#resource-browser').socialstreamBrowser({
+//        title: 'Choose a source',
+//        categoryId: Number('{COMPONENT_CONFIG_SRC_CID}') || Number('{ID}'),
+//        mimeFilter: false,
+//        submitCallback: function(url, filename) {
+//
+//          var src = $('#src-{COMPONENT_HANDLE}');
+//          var lbl = $('#text-{COMPONENT_HANDLE}');
+//
+//          src.val(url);
+//          lbl.attr('href', url).html($(filename).text());
+//
+//          // Update a select box.
+//          // How that's done depends on exactly what type it is: textbox or tile
+//          var select = $('#src-{COMPONENT_HANDLE}').closest('form')
+//                  .find('select[data-uses-source]');
+//
+//          if (select.length) {
+//              var categoryId = src.val().toString().replace('/homepage/', '');
+//              select.each(function() {
+//                  var element = $(this);
+//                  src.availableByCategory({
+//                      categoryId: categoryId,
+//                      target: element,
+//                      payload: {
+//                          type: element.attr('name')
+//                      }
+//                  });
+//              })
+//          }
+//        }
+//      });
+//    });
+//
+//
+//  });
 </script>
 <span>
   <a id="text-{COMPONENT_HANDLE}" href="{COMPONENT_CONFIG_SRC_ID}" class="src-folder" title="{COMPONENT_CONFIG_SRC_NAME}">
@@ -50,6 +50,10 @@
   </a>
 </span>
 
-<a href="#" id="launch-browser-{COMPONENT_HANDLE}" class="button icon-folder">Select Source</a>
+<a href="#"
+   id="launch-browser-{COMPONENT_HANDLE}"
+   class="button icon-folder"
+   data-reveal-id="resource-browser"
+   data-reveal-ajax="/ajax/resource/tree/browse">Select Source</a>
 
 <input type="hidden" value="{COMPONENT_CONFIG_SRC_ID}" name="src" id="src-{COMPONENT_HANDLE}"/>

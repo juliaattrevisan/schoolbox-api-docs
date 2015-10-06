@@ -418,7 +418,15 @@
     -->
 </div>
 <input type="hidden" id="categoryID" value="{ID}" />
-<div id="resource-browser" class="hide"></div>
+
+<div id="resource-browser"
+     class="reveal-modal"
+     data-reveal
+     aria-hidden="true"
+     role="dialog">
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
 <script type="text/javascript">
     // all forms should submit without prevention
     $(".homepage form").submit(function() {
