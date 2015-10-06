@@ -19,7 +19,7 @@
     <!-- END no_crit_group -->
 
     <!-- BEGIN crit_group -->
-    <div class="small-12 columns" data-role="criterion-group">
+    <div class="criteria-group" data-role="criterion-group">
         <h5>{CRIT_GROUP}</h5>
         <!-- BEGIN criterion -->
         <div data-role="criterion" class="criterion">
@@ -32,10 +32,10 @@
                    data-role="criterion-selector"
             />
             <label for="c-{CRIT_ID}" class="checkbox-label">{CRIT_NAME}</label>
-            <table data-role="criterion-descriptors">
+            <table class="criterion-descriptors" data-role="criterion-descriptors">
                 <tr>
                     <!-- BEGIN crit_input -->
-                    <td data-role="criterion-descriptor" class="hide no-pad criterion-descriptor">
+                    <td data-role="criterion-descriptor" class="hide criterion-descriptor">
                         <textarea name="des[{CRIT_ID}][]"
                                   data-role="criterion-description"
                                   readonly>{CRIT_INPUT_VALUE}</textarea>
