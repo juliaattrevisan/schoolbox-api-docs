@@ -137,9 +137,12 @@
                             <li class="actions-small-3 interact {UNIT_TASK_COMPLETE_CLASS}" data-unit-task data-unit_task_id="{UNIT_TASK_ID}">
                                 <div class="list-item">
                                     <div class="grip"></div>
-                                    <div class="small-11 avatar card ">
+                                    <div class="small-11 avatar card">
                                         <a class="icon-32 {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}" {UNIT_TASK_PREVIEW} href="/task/start/{UNIT_TASK_ID}"></a>
-                                        <h3>{UNIT_TASK_NAME}</h3>
+
+                                        <h3>
+                                            <a title="{UNIT_TASK_TYPE_LABEL}" {UNIT_TASK_PREVIEW} href="/task/start/{UNIT_TASK_ID}">{UNIT_TASK_NAME}</a>
+                                        </h3>
 
                                         <!--
                                         Student: see buttons for starting/ending task
