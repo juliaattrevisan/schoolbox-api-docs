@@ -806,6 +806,7 @@
                     // Re-inject placeholder, because it was removed.
                     masonry.injectPlaceholders(positionSelector);
                     masonry.refreshPalette();
+                    masonry.refreshColumns();
                 });
             })
         });
