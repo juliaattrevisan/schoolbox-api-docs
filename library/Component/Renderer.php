@@ -26,9 +26,10 @@ class Component_Renderer
         $occupiedPositionList = array();
 
         foreach ($componentCollection as $component) {
-            $instance_no = $component->getInstance()->getId();
-            $position_no = $component->getInstance()->getPosition();
-            $position    = "position_{$position_no}";
+            $instance_no  = $component->getInstance()->getId();
+            $position_no  = $component->getInstance()->getPosition();
+            $position     = "position_{$position_no}";
+            $definitionId = $component->getInstance()->getDefinition()->getId();
 
             if (!$page->template->exists("{$position}_block")) {
                 $page->setFile($position, 'adminv2/component/placeholder.html');
@@ -39,9 +40,10 @@ class Component_Renderer
             $page->setVar(array(
                 'ID'                        => $instance_no,
                 'COMPONENT_INSTANCE_ID'     => $instance_no,
+                'COMPONENT_DEFINITION_ID'   => $definitionId,
                 'COMPONENT_HANDLE'          => $instance_no,
                 'component.instance.id'     => $instance_no,
-                'component.definition.id'   => $component->getInstance()->getDefinition()->getId(),
+                'component.definition.id'   => $definitionId,
                 'component.definition.name' => $component->getInstance()->getDefinition()->getName(),
             ));
 
@@ -74,13 +76,15 @@ class Component_Renderer
 
         $component->setup(null, array());
 
-        $instance_no = $component->getInstance()->getId();
+        $instance_no  = $component->getInstance()->getId();
+        $definitionId = $component->getInstance()->getDefinition()->getId();
         $page->setVar(array(
             'ID'                        => $instance_no,
             'COMPONENT_INSTANCE_ID'     => $instance_no,
+            'COMPONENT_DEFINITION_ID'   => $definitionId,
             'COMPONENT_HANDLE'          => $instance_no,
             'component.instance.id'     => $instance_no,
-            'component.definition.id'   => $component->getInstance()->getDefinition()->getId(),
+            'component.definition.id'   => $definitionId,
             'component.definition.name' => $component->getInstance()->getDefinition()->getName(),
         ));
 
