@@ -109,6 +109,9 @@
             saveBtnSelector: null,
             saveLabelSelector: null
         },
+        templateSelector: {
+            selector: null
+        },
         persist: {
             url: null,
             success: noop,
@@ -180,17 +183,17 @@
             this.initSpectrum();
         }
 
+        if (this.options.templateSelector && this.options.templateSelector.selector) {
+            this.initTemplateSelector();
+        }
+
         this.initForms();
 
         // set the appropriate classes on the columns
         this.refreshColumns();
 
         // inject the placeholder entity
-        this.columns.each(function () {
-            $(this).prepend(
-                $(masonry.options.column.placeholderTpl).html(masonry.options.dict.placeholder)
-            );
-        });
+        this.injectPlaceholders();
     }
 
 
@@ -319,7 +322,7 @@
             opt.component.controlPanelSelector+' form',
             function(event) {
                 var form       = $(this),
-                    formData   = form.serializeArray(),
+                    formData   = form.serialize()+'&'+$.param(masonry.getContext()),
                     formInputs = form.find(':input'),
                     panel      = form.closest(opt.component.controlPanelSelector),
                     existing   = panel.closest(opt.component.selector),
@@ -329,7 +332,7 @@
                 formInputs.prop('disabled', true);
                 $.ajax(
                     {
-                        url:  this.action,
+                        url:  masonry.options.component.url,
                         type: this.method,
                         data: formData
                     }
@@ -397,9 +400,11 @@
             zIndex: 2000,
             start: function () {
                 // intentionally not cached, since we can AJAX components in/out
-                $(masonry.element).find('.' + comOpt.mceEditorClass).each(function () {
-                    tinyMCE.execCommand('mceRemoveControl', false, this.id);
-                });
+                if ('execCommand' in tinyMCE) {
+                    $(masonry.element).find('.' + comOpt.mceEditorClass).each(function () {
+                        tinyMCE.execCommand('mceRemoveControl', false, this.id);
+                    });
+                }
 
                 masonry.refreshColumns();
             },
@@ -488,9 +493,11 @@
         var page = $(this.element);
 
         // intentionally not cached, since we can AJAX components in/out
-        page.find('.' + this.options.component.mceEditorClass).each(function () {
-            tinyMCE.execCommand('mceAddControl', false, this.id);
-        });
+        if ('execCommand' in tinyMCE) {
+            page.find('.' + this.options.component.mceEditorClass).each(function () {
+                tinyMCE.execCommand('mceAddControl', false, this.id);
+            });
+        }
 
         page.sortable('refresh');
 
@@ -501,7 +508,7 @@
         // don't send an empty request, or to a blank resource
         if (data && this.options.component.url) {
             // append our context to the request and fire it off
-            $.post(this.options.component.url, $.extend({}, data, this.options.context));
+            $.post(this.options.component.url, $.extend({}, data, this.getContext()));
         }
     };
 
@@ -545,7 +552,7 @@
             data.from = rel[1];
         }
 
-        data = $.extend({}, data, this.options.context);
+        data = $.extend({}, data, this.getContext());
 
         if (!url) {
             // callback not called
@@ -559,6 +566,23 @@
             dataType: 'html'
         });
 
+    };
+
+    /**
+     * Gets the context (additional form parameters) for an AJAX request.
+     *
+     * If this.options.context is a callback, returns the result of that -
+     * otherwise just returns this.options.context.
+     *
+     * @returns {*}
+     */
+    Masonry.prototype.getContext = function()
+    {
+        if (typeof this.options.context === 'function') {
+            return this.options.context(this);
+        } else {
+            return this.options.context;
+        }
     };
 
     /**
@@ -592,7 +616,7 @@
             /* Collapse content on components (if it exists)
              */
             var collapser = $(response).find('[data-collapser=true]');
-            if (collapser.length) {
+            if (collapser.length && 'collapsable' in collapser) {
                 collapser.collapsable();
             }
 
@@ -725,42 +749,7 @@
             item.data('count', count);
             masonry.options.palette.refreshItem.call(item);
         });
-
-        //// reapply <s>every 4 hours</s>never
-        //this.applyQTip(handles);
     };
-
-
-
-    ///**
-    // * Apply QTips to the given elements
-    // *
-    // * @param {$} elements
-    // */
-    //Masonry.prototype.applyQTip = function (elements) {
-    //    var masonry = this;
-    //
-    //    elements.each(function () {
-    //        var item    = $(this),
-    //            c       = item.data('count'),
-    //            string  = '<strong>' + (c == 0 ? 'no' : c) + '</strong> instance';
-    //            string += c == 1 ? '' : 's';
-    //
-    //        item.find('strong').qtip({
-    //            content: 'You have ' + string + ' of this component currently active',
-    //            style: {
-    //                classes: 'qtip-green qtip-shadow qtip-rounded'
-    //            },
-    //            position: {
-    //                my: 'bottom left',
-    //                at: 'top right'
-    //            }
-    //        });
-    //
-    //        masonry.options.palette.refreshItem.call(item);
-    //    });
-    //};
-
 
     /**
      * Initialise the Spectrum sub-library
@@ -774,6 +763,54 @@
         this.spectrum = $(this.options.spectrum.selector).masonrySpectrum(this);
     };
 
+    /**
+     * Initialise the template selector
+     */
+    Masonry.prototype.initTemplateSelector = function() {
+        var self = this;
+
+        //var element          = $(self.element);
+        var templateSelector = $(self.options.templateSelector.selector);
+
+        // Check for a preselected template selector: if so, load it
+        var loadLayout   = self.reloadLayout.bind(self);
+        var hashStripped = location.href.split("#")[1];
+        if (hashStripped) {
+            templateSelector.val(hashStripped);
+            $.get(self.options.templateSelector.url + '/' + hashStripped, loadLayout);
+        }
+
+        // Set up the change event
+        templateSelector.change(function () {
+            var groupID   = this.value;
+            location.hash = groupID;
+            $.get(self.options.templateSelector.url + '/' + groupID, loadLayout);
+        });
+    };
+
+    /**
+     * Reload the list of components
+     *
+     * @param newLayout
+     */
+    Masonry.prototype.reloadLayout = function(newLayout)
+    {
+        var masonry = this;
+        var element = $(masonry.element);
+        // Replace only the columns themselves
+        var layoutHtml = $(newLayout);
+        $.each(masonry.options.column.position, function(i, positionSelector) {
+            var oldPosition = element.find(positionSelector);
+            oldPosition.fadeOut(function () {
+                oldPosition.empty().append(layoutHtml.find(positionSelector).children()).fadeIn(function() {
+                    // Re-inject placeholder, because it was removed.
+                    masonry.injectPlaceholders(positionSelector);
+                    masonry.refreshPalette();
+                    masonry.refreshColumns();
+                });
+            })
+        });
+    };
 
     /**
      * Refresh the empty/non-empty states of all columns
@@ -817,6 +854,24 @@
         return this;
     };
 
+    /**
+     * Injects empty column placeholders ("you may drag components here") into each column.
+     *
+     * @param selector
+     */
+    Masonry.prototype.injectPlaceholders = function(selector)
+    {
+        var masonry = this;
+        var columns = masonry.columns;
+        if (selector) {
+            columns = masonry.columns.filter(selector);
+        }
+        columns.each(function () {
+            $(this).prepend(
+                $(masonry.options.column.placeholderTpl).html(masonry.options.dict.placeholder)
+            );
+        });
+    };
 
     /**
      * Register plugin with jquery
@@ -832,4 +887,4 @@
         });
     };
 
-})(jQuery, window, document, tinymce);
+})(jQuery, window, document, (typeof tinymce === 'object' ? tinymce : {}));
