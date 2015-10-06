@@ -257,6 +257,33 @@ class Scrub
     }
 
     /**
+     * Mangles HTML-purified DOM - this is needed for things that HTMLPurifier
+     * can't do, such as adding new nodes.
+     *
+     * Currently:
+     * * adds "allowfullscreen=true" to iframes
+     * * wraps iframes in "div.flex-video"
+     *
+     * @param string $html
+     * @return string
+     */
+    static protected function htmlDomModify($html)
+    {
+        $domDocument = new DOMDocument();
+        $domDocument->loadHTML($html);
+        // Mangle iframes: add allowfullscreen, and wrap in div
+        foreach ($domDocument->getElementsByTagName('iframe') as $iframe) {
+            /** @var DOMElement $iframe */
+            $iframe->setAttribute('allowfullscreen', 'true');
+            $container = $domDocument->createElement('div');
+            $container->setAttribute('class', 'flex-video');
+            $container->appendChild(clone $iframe);
+            $iframe->parentNode->replaceChild($container, $iframe);
+        }
+        return $domDocument->saveHTML();
+    }
+
+    /**
      * Cleans crap out of input using HTMLPurifier.
      * Now caches previous calls in Redis!
      *
@@ -266,12 +293,10 @@ class Scrub
      */
     static public function html($html)
     {
-        $classname = get_called_class();
         return Alaress\Redis::getInstance()->cacheFunctionCall(
             'scrub.html',
-            function ($param) use ($classname) {
-                $purifier = call_user_func(array($classname, 'getHtmlPurifierInstance'));
-                return $purifier->purify($param);
+            function ($param) {
+                return self::htmlDomModify(self::getHtmlPurifierInstance()->purify($param));
             },
             "$html",
             Config::get('scrub_html_cache_timeout')
