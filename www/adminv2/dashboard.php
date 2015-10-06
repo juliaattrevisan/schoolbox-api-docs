@@ -95,6 +95,7 @@ $this->parse('layout_block', 'layout');
 
 
 // Output the palette
+$this->setVar('component_block', '');
 foreach ($componentFactory->getDefinitionList('component_category') as $definition) {
     /* @var $definition Component_Definition */
     $definitionId = $definition->getId();
@@ -114,8 +115,7 @@ foreach ($componentFactory->getDefinitionList('component_category') as $definiti
         'COMPONENT_MULTIPLE_STATE' => $multiState,
         'COMPONENT_NAME'           => $definition->getName(),
         'COMPONENT_CATEGORY_NAME'  => $definition->getComponentCategoryName(),
-        // Not known yet
-        'COMPONENT_COUNT'          => 0,
+        'COMPONENT_COUNT'          => $count,
     ]);
     $this->parse('component_block', 'component', true);
 }
