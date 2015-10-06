@@ -1,42 +1,51 @@
-<span class="header-actions">
-    <a data-action='print' class="button icon-print" href="#">Print</a>
-</span>
-
-<h1>Staff Directory</h1>
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Staff Directory</h1>
+        </div>
+    </div>
+    <nav>
+        <a data-action='print' class="icon-print" title="Print" href="#"></a>
+    </nav>
+</div>
 
 <div class="row">
-    <table data-sortable>
-        <thead>
-            <tr>
-                <th>Image</th>
-                <th>Title</th>
-                <th>First name</th>
-                <th>Surname</th>
-                <th>Department</th>
-                <th>Role</th>
-                <th>Campus</th>
-                <th>Phone</th>
-                <th>Ext</th>
-                <th>Email</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- BEGIN staff -->
-            <tr>
-                <td><img src="/portrait.php?userId={STAFF_STAFFID}&size=square32"></td>
-                <td>{STAFF_TITLE}</td>
-                <td>{STAFF_FIRSTNAME}</td>
-                <td>{STAFF_SURNAME}</td>
-                <td>{STAFF_DEPARTMENT}</td>
-                <td>{STAFF_ROLE}</td>
-                <td>{STAFF_CAMPUS}</td>
-                <td><a href="tel:{STAFF_PHONE}">{STAFF_PHONE}</a></td>
-                <td>{STAFF_EXTENSION}</td>
-                <td><a href="mailto:{STAFF_EMAIL}">{STAFF_EMAIL}</a></td>
-            </tr>
-            <!-- END staff -->
-        </tbody>
-    </table>
+    <div class="small-12 columns">
+        <div class="scrollable">
+            <table data-sortable>
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Title</th>
+                        <th>First name</th>
+                        <th>Surname</th>
+                        <th>Department</th>
+                        <th>Role</th>
+                        <th>Campus</th>
+                        <th>Phone</th>
+                        <th>Ext</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- BEGIN staff -->
+                    <tr>
+                        <td><img src="/portrait.php?userId={STAFF_STAFFID}&size=square32"></td>
+                        <td>{STAFF_TITLE}</td>
+                        <td>{STAFF_FIRSTNAME}</td>
+                        <td>{STAFF_SURNAME}</td>
+                        <td>{STAFF_DEPARTMENT}</td>
+                        <td>{STAFF_ROLE}</td>
+                        <td>{STAFF_CAMPUS}</td>
+                        <td><a href="tel:{STAFF_PHONE}">{STAFF_PHONE}</a></td>
+                        <td>{STAFF_EXTENSION}</td>
+                        <td><a href="mailto:{STAFF_EMAIL}">{STAFF_EMAIL}</a></td>
+                    </tr>
+                    <!-- END staff -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
