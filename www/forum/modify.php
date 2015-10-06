@@ -13,7 +13,10 @@ $this->setFile(TEMPLATE_content, 'forum/modify.html');
 $this->setBlock(TEMPLATE_content, 'title', 'title_block');
 $this->setBlock(TEMPLATE_content, 'quote', 'quote_block');
 
-$this->setVar('title_block', '');
+$this->setVar(array(
+    'title_block' => '',
+    'quote_block' => '',
+));
 
 if (is_numeric($this->arg[0])) {
     /* Category exists
@@ -138,6 +141,31 @@ if (is_numeric($this->arg[0])) {
             error(19);
         }
 
+        /* Only inject a blockquote when creating a new reply
+         */
+        $quotePostID = $this->arg[3];
+
+        if (!is_numeric($quotePostID) && $this->arg[1]) {
+            //Gets the oldest post to use as a thread reply
+            $quotePostID = $thread->getFirstPost()->getId();
+        }
+
+        if (is_numeric($quotePostID) && $quotePostID > 0) {
+            try {
+                $quote = PostMapper::getInstance()->findById($quotePostID);
+
+                $this->setVar(array(
+                        'QUOTE_ID' => $quotePostID,
+                        'QUOTE_BODY' => Scrub::html($quote->getBody()),
+                        'QUOTE_AUTHOR' => $quote->getOwner()->formatName(),
+                        'QUOTE_AUTHOR_ID' => $quote->getOwner()->getId()
+                    ));
+                $this->parse('quote_block', 'quote');
+            }
+            catch (Exception $e) {
+            }
+        }
+
         $output['ACTION']       = 'Post';
         $output['ACTION_CLASS'] = 'icon-add';
         $output['THREAD_POST']  = 'Reply';
@@ -195,33 +223,6 @@ if (is_numeric($this->arg[0])) {
     }
 
     $this->setVar($output);
-
-    /* output quote
-     */
-    $quotePostID = $this->arg[3];
-
-    if (!is_numeric($quotePostID) && $this->arg[1]) {
-        //Gets the oldest post to use as a thread reply
-        $quotePostID = $thread->getFirstPost()->getId();
-    }
-
-    $this->setVar('quote_block', '');
-
-    if (is_numeric($quotePostID) && $quotePostID > 0) {
-        try {
-            $quote = PostMapper::getInstance()->findById($quotePostID);
-
-            $this->setVar(array(
-                'QUOTE_ID' => $quotePostID,
-                'QUOTE_BODY' => Scrub::html($quote->getBody()),
-                'QUOTE_AUTHOR' => $quote->getOwner()->formatName(),
-                'QUOTE_AUTHOR_ID' => $quote->getOwner()->getId()
-            ));
-            $this->parse('quote_block', 'quote');
-        }
-        catch (Exception $e) {
-        }
-    }
 }
 else {
     error(2);
