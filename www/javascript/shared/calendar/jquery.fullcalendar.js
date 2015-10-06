@@ -155,7 +155,7 @@ function Calendar(id, bubbleId, opts) {
                 try {
                     if (calEvent.data.links.category.id > 0) {
                         data.homepageLink =
-                            $('<a class="btn house float-left"><span></span>Go To Homepage</a>')
+                            $('<a class="button icon-home">Go To Homepage</a>')
                                 .attr('href', '/homepage/' + String(calEvent.data.links.category.id));
                     }
                 }
@@ -740,6 +740,13 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
     }
     else {
         $('[data-event-modal-field="reviewedBy"]').show();
+    }
+
+    if (!eventData.location.length) {
+        $('[data-event-modal-field="location"]').hide();
+    }
+    else {
+        $('[data-event-modal-field="location"]').show();
     }
 
     // Fill in resauce borking separately

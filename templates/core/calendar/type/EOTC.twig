@@ -1,7 +1,7 @@
 {% extends 'calendar/type/_base.twig' %}
 
 {% block eventSpan %}
-<div class="small-6 columns">
+<div class="small-4 column">
     {% if not event.startTime.isAtStartOfDay() %}
         {{ event.startTime.getTimeOnly() }}
     {% endif %}
