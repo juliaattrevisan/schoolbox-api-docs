@@ -290,11 +290,16 @@ class Scrub
                 /** @var DOMElement $body */
                 $body = $domDocument->getElementsByTagName('body')->item(0);
                 if ($body) {
-                    // I don't want any attributes on this
+                    // I don't want any attributes interfering with the regexp
                     foreach ($body->attributes as $attribute) {
                         $body->removeAttribute($attribute->name);
                     }
-                    return $domDocument->saveHTML($body);
+                    // And get rid of the actual body tag
+                    $html = preg_replace(
+                        ['|^<body\\s*>|i', '|</body\\s*>$|i'],
+                        '',
+                        $domDocument->saveHTML($body)
+                    );
                 }
             }
         }
