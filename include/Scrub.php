@@ -271,8 +271,11 @@ class Scrub
     {
         $domDocument = new DOMDocument();
         if ($domDocument->loadHTML($html)) {
+            $touched = false;
+
             // Mangle iframes: add allowfullscreen, and wrap in div
             foreach ($domDocument->getElementsByTagName('iframe') as $iframe) {
+                $touched = true;
                 /** @var DOMElement $iframe */
                 $iframe->setAttribute('allowfullscreen', 'true');
                 $container = $domDocument->createElement('div');
@@ -280,10 +283,23 @@ class Scrub
                 $container->appendChild(clone $iframe);
                 $iframe->parentNode->replaceChild($container, $iframe);
             }
-            // I only want the fragment content
-            return $domDocument->saveHTML();
+
+            // I only want the fragment content, but saveHTML loads doc into a
+            // full HTML document with doctype, body, etc.
+            if ($touched) {
+                /** @var DOMElement $body */
+                $body = $domDocument->getElementsByTagName('body')->item(0);
+                if ($body) {
+                    // I don't want any attributes on this
+                    foreach ($body->attributes as $attribute) {
+                        $body->removeAttribute($attribute->name);
+                    }
+                    return $domDocument->saveHTML($body);
+                }
+            }
         }
-        // Loading DOM document failed for some reason. Just return the original
+        // Loading DOM document failed, or it wasn't touched.
+        // Just return the original
         return $html;
     }
 
