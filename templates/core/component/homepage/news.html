@@ -11,16 +11,14 @@
                     <li class="actions-small-1">
                         <div class="list-item">
                             <div class="avatar card small-12">
-                                <h3>{NEWS_HEADING}</h3>
-
                                 <a href="/search/user/{AUTHOR_ID}">
                                     <img src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square64" alt="View Profile" />
-                                    <p>{AUTHOR}</p>
                                 </a>
-                                <p class="meta">Posted {POSTED_DATE}</p>
+                                <h3>{NEWS_HEADING}</h3>
+                                <p class="meta one">Posted by <a href="/user/profile/{AUTHOR_ID}">{AUTHOR}</a> {POSTED_DATE}</p>
 
                                 <!-- BEGIN has_publish_date -->
-                                <p class="meta">(Published on {NEWS_PUBLISH_DATE})</p>
+                                <p class="meta two">(Published on {NEWS_PUBLISH_DATE})</p>
                                 <!-- END has_publish_date -->
                             </div>
 
