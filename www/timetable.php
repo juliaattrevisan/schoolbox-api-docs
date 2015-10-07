@@ -40,8 +40,9 @@ $colourList = Timetable_ColourMapper::getInstance()->findAll();
 
 /** @var Schoolbox\User[] $userList */
 $userList = [];
-
+$numTimetables = 0;
 $child_id = $this->arg[0];
+
 if ($groupHandler->isParent()) {
     if (is_array($_SESSION['children'])) {
         foreach ($_SESSION['children'] as $child) {
