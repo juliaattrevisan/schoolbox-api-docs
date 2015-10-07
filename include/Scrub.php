@@ -269,18 +269,47 @@ class Scrub
      */
     static protected function htmlDomModify($html)
     {
-        $domDocument = new DOMDocument();
-        $domDocument->loadHTML($html);
-        // Mangle iframes: add allowfullscreen, and wrap in div
-        foreach ($domDocument->getElementsByTagName('iframe') as $iframe) {
-            /** @var DOMElement $iframe */
-            $iframe->setAttribute('allowfullscreen', 'true');
-            $container = $domDocument->createElement('div');
-            $container->setAttribute('class', 'flex-video');
-            $container->appendChild(clone $iframe);
-            $iframe->parentNode->replaceChild($container, $iframe);
+        // Don't bother parsing anything if $html is empty
+        if (strlen($html) === 0) {
+            return $html;
         }
-        return $domDocument->saveHTML();
+
+        // Now try loading into a document
+        $domDocument = new DOMDocument();
+        if ($domDocument->loadHTML($html)) {
+            $touched = false;
+
+            // Mangle iframes: add allowfullscreen, and wrap in div
+            foreach ($domDocument->getElementsByTagName('iframe') as $iframe) {
+                $touched = true;
+                /** @var DOMElement $iframe */
+                $iframe->setAttribute('allowfullscreen', 'true');
+                $container = $domDocument->createElement('div');
+                $container->setAttribute('class', 'flex-video');
+                $container->appendChild(clone $iframe);
+                $iframe->parentNode->replaceChild($container, $iframe);
+            }
+
+            // I only want the fragment content, but saveHTML loads doc into a
+            // full HTML document with doctype, body, etc.
+            if ($touched) {
+                /** @var DOMElement $body */
+                $body = $domDocument->getElementsByTagName('body')->item(0);
+                if ($body) {
+                    // I don't want any attributes interfering with the regexp
+                    foreach ($body->attributes as $attribute) {
+                        $body->removeAttribute($attribute->name);
+                    }
+                    // And get rid of the actual body tag
+                    $html = preg_replace(
+                        ['|^<body\\s*>|i', '|</body\\s*>$|i'],
+                        '',
+                        $domDocument->saveHTML($body)
+                    );
+                }
+            }
+        }
+        return $html;
     }
 
     /**
