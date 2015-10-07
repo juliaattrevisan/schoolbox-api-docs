@@ -151,52 +151,48 @@
 
         <!-- BEGIN cleanup -->
         <div class="row">
-            <div class="small-12 columns">
-                <h2 class="subheader">Select Dates</h2>
-            </div>
-        </div>
-        <div class="row">
             <div class="small-12 island">
-                <section>
-                    <div class="content">
-                        <p>Display a list of events between two dates.</p>
-                        <form action="/adminv2/calendar/Cleanup" method="get">
-                            <input type="hidden" name='action' value='cleanup' />
-                            <div class="row">
-                                <div class="medium-6 columns">
-                                    <label>
-                                        From
-                                        <input type="text" data-date='start_date' name="cleanupFrom" value="{CLEANUP_HAS_DATES_FROM}" />
-                                    </label>
-                                </div>
-                                <div class="medium-6 columns">
-                                    <label>
-                                        Until
-                                        <input type="text" data-date='finish_date' name="cleanupTo" size="15" maxlength="30" value="{CLEANUP_HAS_DATES_TO}" />
-                                    </label>
-                                </div>
-                                <div class="large-12 columns">
-                                    <input type="submit" value="Search" />
-                                </div>
+                <h2 class="subheader">Select Dates</h2>
+                <div class="alert-box">Display a list of events between two dates.</div>
+                <form action="/adminv2/calendar/Cleanup" method="get">
+                    <input type="hidden" name='action' value='cleanup' />
+
+                    <section class="content">
+                        <fieldset class="content">
+                            <div class="medium-6 columns">
+                                <label>
+                                    From
+                                    <input type="text" data-date='start_date' name="cleanupFrom" value="{CLEANUP_HAS_DATES_FROM}" />
+                                </label>
                             </div>
-                        </form>
-                    </div>
-                </section>
+                            <div class="medium-6 columns">
+                                <label>
+                                    Until
+                                    <input type="text" data-date='finish_date' name="cleanupTo" size="15" maxlength="30" value="{CLEANUP_HAS_DATES_TO}" />
+                                </label>
+                            </div>
+                        </fieldset>
+                    </section>
+
+                    <input type="submit" value="Search" />
+                </form>
             </div>
 
             <div class="small-12 island">
                 <h2 class="subheader">Events</h2>
-                <section>
-                    <div class="content">
-                        <!-- BEGIN cleanup_has_events -->
-                        <input id="check-personal" type="checkbox" data-modifier-control="true" value="personal" />
-                        <label for="check-personal" class="checkbox-label">Select Personal Events</label>
-                        <input id="check-group" type="checkbox" data-modifier-control="true" value="group" />
-                        <label for="check-group" class="checkbox-label">Select Group Events</label>
-                    </div>
-                    <form action="/adminv2/calendar/modifyForm" method="post">
-                        <input type="hidden" name='action' value='cleanup' />
 
+                <!-- BEGIN cleanup_has_events -->
+                <section class="content">
+                    <input id="check-personal" type="checkbox" data-modifier-control="true" value="personal" />
+                    <label for="check-personal" class="checkbox-label">Select Personal Events</label>
+                    <input id="check-group" type="checkbox" data-modifier-control="true" value="group" />
+                    <label for="check-group" class="checkbox-label">Select Group Events</label>
+                </section>
+
+                <form action="/adminv2/calendar/modifyForm" method="post">
+                    <input type="hidden" name='action' value='cleanup' />
+
+                    <section>
                         <div class="scrollable">
                             <table>
                                 <thead>
@@ -235,17 +231,17 @@
                                 </tbody>
                             </table>
                         </div>
+                    </section>
 
-                        <div class="content">
-                            <input type="submit" value="Remove Selected Events" />
-                        </div>
-                    </form>
-                    <!-- END cleanup_has_events -->
+                    <input type="submit" value="Remove Selected Events" />
+                </form>
+                <!-- END cleanup_has_events -->
 
-                    <!-- BEGIN cleanup_has_no_events -->
-                    <p>No events found within the selected date range.</p>
-                    <!-- END cleanup_has_no_events -->
-                </section>
+                <!-- BEGIN cleanup_has_no_events -->
+                <div class="alert-box">
+                    No events found within the selected date range.
+                </div>
+                <!-- END cleanup_has_no_events -->
             </div>
         </div>
         <!-- END cleanup -->
