@@ -2,66 +2,67 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Bulk Add Folders</h2>
-        <section>
-            <form action="/adminv2/bulkAddFolders" method="post" enctype="multipart/form-data" name="form" id="form">
-                <div class="content">
-                    <h3>Upload Bulk Folder CSV</h3>
-                    <p>Download the template first, then fill it out and upload it here.</p>
-                    <a href="/adminv2/csv/folderBulkAdd.csv" class="button icon-download">Download Template</a>
+        <form action="/adminv2/bulkAddFolders" method="post" enctype="multipart/form-data" name="form" id="form">
+            <h2 class="subheader">Bulk Add Folders</h2>
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <h3>Upload Bulk Folder CSV</h3>
+                        <p>Download the template first, then fill it out and upload it here.</p>
+                        <a href="/adminv2/csv/folderBulkAdd.csv" class="button icon-download">Download Template</a>
 
-                    <label>
-                        <input name="bulkadd" type="file" />
-                    </label>
-                    <h3>Role Permissions</h3>
-                </div>
+                        <label>
+                            <input name="bulkadd" type="file" />
+                        </label>
 
-                <div class="scrollable">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Role</th>
-                                <th>None</th>
-                                <th>Read</th>
-                                <th>Write</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- BEGIN group -->
-                            <tr>
-                                <td>{GROUP_NAME}</td>
-                                <td>
-                                    <input id="sel-{GROUP_ID}-0" type="radio" class="no_permission required" name="groupPerm[{GROUP_ID}]" value="0" />
-                                    <label for="sel-{GROUP_ID}-0" class="radio-label"></label>
-                                </td>
-                                <td>
-                                    <input id="sel-{GROUP_ID}-1" type="radio" name="groupPerm[{GROUP_ID}]" value="1" />
-                                    <label for="sel-{GROUP_ID}-1" class="radio-label"></label>
-                                </td>
-                                <td>
-                                    <input id="sel-{GROUP_ID}-2" type="radio" name="groupPerm[{GROUP_ID}]" value="2" />
-                                    <label for="sel-{GROUP_ID}-2" class="radio-label"></label>
-                                </td>
-                            </tr>
-                            <!-- END group -->
-                        </tbody>
-                    </table>
-                </div>
+                        <h3>Role Permissions</h3>
+                        <div class="scrollable">
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>Role</th>
+                                    <th>None</th>
+                                    <th>Read</th>
+                                    <th>Write</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- BEGIN group -->
+                                <tr>
+                                    <td>{GROUP_NAME}</td>
+                                    <td>
+                                        <input id="sel-{GROUP_ID}-0" type="radio" class="no_permission required" name="groupPerm[{GROUP_ID}]" value="0" />
+                                        <label for="sel-{GROUP_ID}-0" class="radio-label"></label>
+                                    </td>
+                                    <td>
+                                        <input id="sel-{GROUP_ID}-1" type="radio" name="groupPerm[{GROUP_ID}]" value="1" />
+                                        <label for="sel-{GROUP_ID}-1" class="radio-label"></label>
+                                    </td>
+                                    <td>
+                                        <input id="sel-{GROUP_ID}-2" type="radio" name="groupPerm[{GROUP_ID}]" value="2" />
+                                        <label for="sel-{GROUP_ID}-2" class="radio-label"></label>
+                                    </td>
+                                </tr>
+                                <!-- END group -->
+                                </tbody>
+                            </table>
+                        </div>
 
-                <div class="content">
-                    <h3>
-                        Homepage Template
-                        <span data-tooltip class="hint has-tip tip-right" title="This homepage template will be applied to each uploaded folder.">?</span>
-                    </h3>
-                    <select name='template'>
-                        <option value='0'>No template</option>
-                        <!-- BEGIN homepage_template -->
-                        <option value="{HOMEPAGE_TEMPLATE_ID}">{HOMEPAGE_TEMPLATE_NAME}</option>
-                        <!-- END homepage_template -->
-                    </select>
-                    <input type="submit" value="Import" />
-                </div>
-            </form>
-        </section>
+                        <h3>
+                            Homepage Template
+                            <span data-tooltip class="hint has-tip tip-right" title="This homepage template will be applied to each uploaded folder.">?</span>
+                        </h3>
+                        <select name='template'>
+                            <option value='0'>No template</option>
+                            <!-- BEGIN homepage_template -->
+                            <option value="{HOMEPAGE_TEMPLATE_ID}">{HOMEPAGE_TEMPLATE_NAME}</option>
+                            <!-- END homepage_template -->
+                        </select>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Import" />
+        </form>
     </div>
 </div>
