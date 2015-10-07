@@ -91,6 +91,9 @@ $mapper = new Schoolbox\Resource\CategoryLogMapper();
 $mapper->incrementHitcount($_SESSION['user'], $category->getId());
 $categoryMapper->logPageView($category);
 
+// Color mangling
+$colorFactory = new \Alaress\Color\ColorFactory();
+
 /* BUILD PAGE */
 $this->setFile(TEMPLATE_content, 'homepage/index.html');
 $this->setTitle($category->getName());
@@ -236,7 +239,7 @@ if ($virtualPermission >= WRITE_ACCESS) {
 
 
     // Colors (original)
-    $listColor = $homepageHandler->getColorList();
+    $listColor = array_map([$colorFactory, 'build'], $homepageHandler->getColorList());
 
     $this->setVar('COLOUR_ARRAY', 'original');
     $this->setVar($listColor);
@@ -335,7 +338,7 @@ $this->setVar(array(
 ));
 
 // Colors (original)
-$listColor = $homepageHandler->getColorList();
+$listColor = array_map([$colorFactory, 'build'], $homepageHandler->getColorList());
 
 $this->setVar('COLOUR_ARRAY', 'original');
 $this->setVar($listColor);
@@ -381,7 +384,7 @@ $this->setVar(array(
     'TEMPLATE_RIGHT_COLUMN_WIDTH' => 12 - $leftWidth,
 ));
 
-$colours = $homepageHandler->getColorList();
+$colours = array_map([$colorFactory, 'build'], $homepageHandler->getColorList());
 $this->setVar($colours);
 
 // output MIMEs
