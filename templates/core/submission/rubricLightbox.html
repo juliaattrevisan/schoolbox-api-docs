@@ -48,10 +48,10 @@
             <th>{RUBRIC_CRIT_LABEL}</th>
             <!-- BEGIN rubric_crit_rating -->
             <td class="{RUBRIC_CRIT_RATING_CLASS}">
-                <input id="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_RATING_VALUE}" type="radio"
+                <input id="rubric-{RUBRIC_CRIT_ID}-{RUBRIC_CRIT_RATING_VALUE}" type="radio"
                        name="rubric[{RUBRIC_CRIT_ID}]" data-index="{RUBRIC_CRIT_INDEX}" {RUBRIC_CRIT_EDITABLE}
                        value="{RUBRIC_CRIT_RATING_VALUE}" {RUBRIC_CRIT_RATING_SELECTED} />
-                <label for="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_RATING_VALUE}">
+                <label for="rubric-{RUBRIC_CRIT_ID}-{RUBRIC_CRIT_RATING_VALUE}">
                     <span>{RUBRIC_CRIT_RATING_LABEL}<br />({RUBRIC_CRIT_RATING_VALUE} pts)</span>
                 </label>
             </td>
