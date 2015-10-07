@@ -1,3 +1,13 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/timetable/jquery.timetable-resize.js"></script>
+<script type="text/javascript" src="/javascript/shared/timetable/jquery.timetable-grid.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $.fn.timetableStart();
+    });
+</script>
+<!-- END custom_head -->
+
 <!-- BEGIN timetable_selector -->
 <div class="row">
     <div class="small-12 columns">
@@ -9,6 +19,7 @@
     </div>
 </div>
 <!-- END timetable_selector -->
+        
 <!-- BEGIN timetable -->
 <div class="row hide" data-timetable-wrapper="{USER_ID}">
     <div class="small-12 columns">
@@ -63,18 +74,10 @@
 <!-- END timetable -->
 <!-- BEGIN no_timetable -->
 <div class="row">
-<div class="small-12 column">
-    <div class="alert-box">There is currently no timetable available.</div>
-</div>
+    <div class="small-12 column">
+        <div class="alert-box">There is currently no timetable available.</div>
+    </div>
 </div>
 <!-- END no_timetable -->
 
 <div class="row timetable-small show-for-small-only" data-smaller></div>
-
-<script type="text/javascript" src="/javascript/shared/timetable/jquery.timetable-resize.js"></script>
-<script type="text/javascript" src="/javascript/shared/timetable/jquery.timetable-grid.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $.fn.timetableStart();
-    });
-</script>
