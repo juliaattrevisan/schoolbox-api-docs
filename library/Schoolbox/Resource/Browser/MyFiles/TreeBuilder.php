@@ -53,7 +53,7 @@ class TreeBuilder extends AbstractTreeBuilder
      * @param int $nodeId
      * @return Collection|IFolder[]
      */
-    protected function getNodeChildren($nodeId)
+    protected function getNodeFolders($nodeId)
     {
         /** @var Mapper $locator */
         $locator = $this->folderLocator;

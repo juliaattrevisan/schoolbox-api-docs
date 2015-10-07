@@ -107,7 +107,7 @@ abstract class AbstractTreeBuilder
 
         } else {
             // Child nodes
-            foreach ($this->getNodeChildren($folderId) as $folder) {
+            foreach ($this->getNodeFolders($folderId) as $folder) {
                 try {
                     $output[] = $this->buildNode($folder);
                 } catch (Resource\Exception $e) {
@@ -173,7 +173,7 @@ abstract class AbstractTreeBuilder
      */
     protected function getNodeHasChildren($nodeId)
     {
-        return $this->getNodeChildren($nodeId)->count() > 0;
+        return $this->getNodeFolders($nodeId)->count() > 0;
     }
 
 
@@ -181,7 +181,7 @@ abstract class AbstractTreeBuilder
      * @param int $nodeId
      * @return Collection|IFolder[]
      */
-    protected abstract function getNodeChildren($nodeId);
+    protected abstract function getNodeFolders($nodeId);
 
 
     /**

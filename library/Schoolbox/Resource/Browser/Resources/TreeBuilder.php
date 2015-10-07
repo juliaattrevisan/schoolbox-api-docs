@@ -156,7 +156,7 @@ class TreeBuilder extends AbstractTreeBuilder
      * @param int $nodeId
      * @return Collection|IFolder[]
      */
-    protected function getNodeChildren($nodeId)
+    protected function getNodeFolders($nodeId)
     {
         // TODO cache this
         return $this->folderLocator->findByParentId($nodeId);
