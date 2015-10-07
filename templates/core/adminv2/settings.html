@@ -61,108 +61,112 @@
     <div class="small-12 island">
         <!-- BEGIN setting_group -->
         <form data-action="saveSettings" id="settings" method="post" action="/adminv2/settingForm.php">
-            <section class="content">
-                <!-- BEGIN setting_group_localisation -->
-                <h3>Date Format special characters</h3>
-                <dl class="clearfix">
-                    <dt>d</dt>
-                    <dd>Day of month, leading zero (01 to 31)</dd>
-                    <dt>j</dt>
-                    <dd>Day of month, no leading zero (1 to 31)</dd>
-                    <dt>S</dt>
-                    <dd>Suffix for day of month ("st" in "1st")</dd>
-                    <dt>D</dt>
-                    <dd>Day name, 3 letters (Mon to Sun)</dd>
-                    <dt>l</dt>
-                    <dd>Day name in full (Monday to Sunday)</dd>
-                    <dt>M</dt>
-                    <dd>Month name, 3 letters (Jan to Dec)</dd>
-                    <dt>F</dt>
-                    <dd>Month name in full (January to December)</dd>
-                    <dt>m</dt>
-                    <dd>Month number, leading zero (01 to 12)</dd>
-                    <dt>n</dt>
-                    <dd>Month number, no leading zero (1 to 12)</dd>
-                    <dt>y</dt>
-                    <dd>Year, 2 digits</dd>
-                    <dt>Y</dt>
-                    <dd>Year, 4 digits</dd>
-                </dl>
-                <h3>Time Format special characters</h3>
-                <dl class="clearfix">
-                    <dt>h</dt>
-                    <dd>12 hour time, leading zero (01 to 12)</dd>
-                    <dt>g</dt>
-                    <dd>12 hour time, no leading zero (1 to 12)</dd>
-                    <dt>a</dt>
-                    <dd>am/pm of time, lower case</dd>
-                    <dt>A</dt>
-                    <dd>AM/PM of time, upper case</dd>
-                    <dt>H</dt>
-                    <dd>24 hour time, leading zero (00 to 23)</dd>
-                    <dt>G</dt>
-                    <dd>24 hour time, no leading zero (0 to 23)</dd>
-                    <dt>i</dt>
-                    <dd>Minutes, leading zero (00 to 59)</dd>
-                    <dt>s</dt>
-                    <dd>Seconds, leading zero (00 to 59)</dd>
-                </dl>
-                <!-- END setting_group_localisation -->
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <!-- BEGIN setting_group_localisation -->
+                        <h3>Date Format special characters</h3>
+                        <dl class="clearfix">
+                            <dt>d</dt>
+                            <dd>Day of month, leading zero (01 to 31)</dd>
+                            <dt>j</dt>
+                            <dd>Day of month, no leading zero (1 to 31)</dd>
+                            <dt>S</dt>
+                            <dd>Suffix for day of month ("st" in "1st")</dd>
+                            <dt>D</dt>
+                            <dd>Day name, 3 letters (Mon to Sun)</dd>
+                            <dt>l</dt>
+                            <dd>Day name in full (Monday to Sunday)</dd>
+                            <dt>M</dt>
+                            <dd>Month name, 3 letters (Jan to Dec)</dd>
+                            <dt>F</dt>
+                            <dd>Month name in full (January to December)</dd>
+                            <dt>m</dt>
+                            <dd>Month number, leading zero (01 to 12)</dd>
+                            <dt>n</dt>
+                            <dd>Month number, no leading zero (1 to 12)</dd>
+                            <dt>y</dt>
+                            <dd>Year, 2 digits</dd>
+                            <dt>Y</dt>
+                            <dd>Year, 4 digits</dd>
+                        </dl>
+                        <h3>Time Format special characters</h3>
+                        <dl class="clearfix">
+                            <dt>h</dt>
+                            <dd>12 hour time, leading zero (01 to 12)</dd>
+                            <dt>g</dt>
+                            <dd>12 hour time, no leading zero (1 to 12)</dd>
+                            <dt>a</dt>
+                            <dd>am/pm of time, lower case</dd>
+                            <dt>A</dt>
+                            <dd>AM/PM of time, upper case</dd>
+                            <dt>H</dt>
+                            <dd>24 hour time, leading zero (00 to 23)</dd>
+                            <dt>G</dt>
+                            <dd>24 hour time, no leading zero (0 to 23)</dd>
+                            <dt>i</dt>
+                            <dd>Minutes, leading zero (00 to 59)</dd>
+                            <dt>s</dt>
+                            <dd>Seconds, leading zero (00 to 59)</dd>
+                        </dl>
+                        <!-- END setting_group_localisation -->
 
-                <!-- BEGIN setting -->
-                <label for="{SETTING_NAME}">
-                    {SETTING_TITLE}
-                    <span data-tooltip class="has-tip tip-top hint" title="{SETTING_DESC}">?</span>
-                </label>
+                        <!-- BEGIN setting -->
+                        <label for="{SETTING_NAME}">
+                            {SETTING_TITLE}
+                            <span data-tooltip class="has-tip tip-top hint" title="{SETTING_DESC}">?</span>
+                        </label>
 
-                <!-- BEGIN setting_type_noneditable -->
-                <p>{SETTING_VALUE}</p>
-                <!-- END setting_type_noneditable -->
+                        <!-- BEGIN setting_type_noneditable -->
+                        <p>{SETTING_VALUE}</p>
+                        <!-- END setting_type_noneditable -->
 
-                <!-- BEGIN setting_type_input -->
-                <input id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
-                <!-- END setting_type_input -->
+                        <!-- BEGIN setting_type_input -->
+                        <input id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
+                        <!-- END setting_type_input -->
 
-                <!-- BEGIN setting_type_textarea -->
-                <textarea id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
-                <!-- END setting_type_textarea -->
+                        <!-- BEGIN setting_type_textarea -->
+                        <textarea id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
+                        <!-- END setting_type_textarea -->
 
-                <!-- BEGIN setting_type_html -->
-                <textarea id="{SETTING_NAME}" class="mceEditor {OPTION_REQUIRED}" {OPTION_REQUIRED} name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
-                <!-- END setting_type_html -->
+                        <!-- BEGIN setting_type_html -->
+                        <textarea id="{SETTING_NAME}" class="mceEditor {OPTION_REQUIRED}" {OPTION_REQUIRED} name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
+                        <!-- END setting_type_html -->
 
-                <!-- BEGIN setting_type_resource -->
-                <input id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
-                <a href="#" class="button" data-interaction="homepage_selector" data-input_name="{SETTING_NAME}">Select Source</a>
-                <!-- END setting_type_resource -->
+                        <!-- BEGIN setting_type_resource -->
+                        <input id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
+                        <a href="#" class="button" data-interaction="homepage_selector" data-input_name="{SETTING_NAME}">Select Source</a>
+                        <!-- END setting_type_resource -->
 
-                <!-- BEGIN setting_type_boolean -->
-                <fieldset tabindex="0">
-                    <div class="switch">
-                        <input name="{SETTING_NAME}" value="0" type="hidden">
-                        <input id="{SETTING_NAME}" name="{SETTING_NAME}" {SETTING_CHECKED} value="1" type="checkbox">
-                        <label for="{SETTING_NAME}"></label>
+                        <!-- BEGIN setting_type_boolean -->
+                        <fieldset tabindex="0">
+                            <div class="switch">
+                                <input name="{SETTING_NAME}" value="0" type="hidden">
+                                <input id="{SETTING_NAME}" name="{SETTING_NAME}" {SETTING_CHECKED} value="1" type="checkbox">
+                                <label for="{SETTING_NAME}"></label>
+                            </div>
+                        </fieldset>
+                        <!-- END setting_type_boolean -->
+
+                        <!-- BEGIN setting_type_select -->
+                        <select name="{SETTING_NAME}">
+                            <!-- BEGIN setting_select -->
+                            <option value="{SELECT_VALUE}" {SETTING_OPTION_SELECTED}>{SELECT_OPTION}</option>
+                            <!-- END setting_select -->
+                        </select>
+                        <!-- END setting_type_select -->
+
+                        <!-- BEGIN setting_type_colour -->
+                        <input type="text" value="{SETTING_VALUE}" name="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} data-colour-picker />
+                        <!-- END setting_type_colour -->
+
+                        <!-- BEGIN setting_type_file -->
+                        {ATTACH_ZONE}
+                        <!-- END setting_type_file -->
+
+                        <!-- END setting -->
                     </div>
                 </fieldset>
-                <!-- END setting_type_boolean -->
-
-                <!-- BEGIN setting_type_select -->
-                <select name="{SETTING_NAME}">
-                    <!-- BEGIN setting_select -->
-                    <option value="{SELECT_VALUE}" {SETTING_OPTION_SELECTED}>{SELECT_OPTION}</option>
-                    <!-- END setting_select -->
-                </select>
-                <!-- END setting_type_select -->
-
-                <!-- BEGIN setting_type_colour -->
-                <input type="text" value="{SETTING_VALUE}" name="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} data-colour-picker />
-                <!-- END setting_type_colour -->
-
-                <!-- BEGIN setting_type_file -->
-                {ATTACH_ZONE}
-                <!-- END setting_type_file -->
-
-                <!-- END setting -->
             </section>
 
             <!-- BEGIN setting_save -->
