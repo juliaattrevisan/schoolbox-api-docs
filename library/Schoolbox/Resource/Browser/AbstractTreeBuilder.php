@@ -13,6 +13,7 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder\IFolder;
 
 
@@ -20,6 +21,9 @@ abstract class AbstractTreeBuilder
 {
     /** @var Folder\ILocator */
     protected $folderLocator;
+
+    /** @var File\ILocator */
+    protected $fileLocator;
 
     /** @var string */
     protected $rootNodeLabel;
@@ -34,6 +38,14 @@ abstract class AbstractTreeBuilder
         $this->rootNodeLabel = 'Root';
     }
 
+
+    /**
+     * @param File\ILocator $locator
+     */
+    public function setFileLocator(File\ILocator $locator)
+    {
+        $this->fileLocator = $locator;
+    }
 
 
     /**
@@ -116,6 +128,14 @@ abstract class AbstractTreeBuilder
                     continue;
                 }
             }
+            // include files (which only works if a file locator was given)
+            foreach ($this->getNodeFiles($folderId) as $file) {
+                try {
+                    $output[] = $this->buildFileNode($file);
+                } catch (Resource\Exception $e) {
+                    continue;
+                }
+            }
         }
 
         return $output;
@@ -137,6 +157,14 @@ abstract class AbstractTreeBuilder
      * @return array
      */
     protected abstract function buildFolderNode(IFolder $folder);
+
+
+    /**
+     * @param File\IFile $file
+     * @throws Resource\Exception
+     * @return array
+     */
+    protected abstract function buildFileNode(File\IFile $file);
 
 
     /**
@@ -178,7 +206,7 @@ abstract class AbstractTreeBuilder
             'id'       => $nodeId,
             'parent'   => $parentId ?: '0',
             'text'     => $name,
-            'children' => $this->getNodeHasChildren($nodeId),
+            'children' => $type == 'file' ? 0 : $this->getNodeHasChildren($nodeId),
             'type'     => $type,
         );
 
@@ -200,7 +228,13 @@ abstract class AbstractTreeBuilder
      */
     protected function getNodeHasChildren($nodeId)
     {
-        return $this->getNodeFolders($nodeId)->count() > 0;
+        $count = $this->getNodeFolders($nodeId)->count();
+
+        if ($this->fileLocator) {
+            $count += $this->getNodeFiles($nodeId)->count();
+        }
+
+        return $count > 0;
     }
 
 
@@ -213,8 +247,22 @@ abstract class AbstractTreeBuilder
 
     /**
      * @param int $nodeId
+     * @return Collection|File\IFile[]
+     */
+    protected abstract function getNodeFiles($nodeId);
+
+
+    /**
+     * @param int $nodeId
      * @return string
      */
     protected abstract function getFolderPermission($nodeId);
 
-} 
+
+    /**
+     * @param int $nodeId
+     * @return string
+     */
+    protected abstract function getFilePermission($nodeId);
+
+}

@@ -41,7 +41,7 @@
                             callback(children);
                         }
                         else {
-                            var ajaxParams = self.options.data.ajaxParams;
+                            var ajaxParams = $.extend(true, {}, self.options.data.ajaxParams);
 
                             if (ajaxParams.token) {
                                 ajaxParams.url = ajaxParams.url.replace(new RegExp(ajaxParams.token), node.id);
@@ -98,7 +98,10 @@
                         icon: 'icon-folder'
                     },
                     'default': {
-                        icon: 'icon-folder'
+                        icon: 'icon-unknown'
+                    },
+                    file: {
+                        icon: 'icon-document'
                     },
                     folder: {
                         icon: 'icon-folder'

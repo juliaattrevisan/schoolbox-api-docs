@@ -48,6 +48,7 @@ class Module extends AbstractModule
     {
         $setters = $this->getSetterList();
 
+        $injector->setters[TreeBuilder::class]['setFileLocator']  = $injector->lazyNew($setters['setFileMapper']);
         $injector->params[TreeBuilder::class]['locator'] = $injector->lazyNew($setters['setFolderMapper']);
         $injector->params[TreeBuilder::class]['user']    = $injector->lazy(
             function () use ($injector) {

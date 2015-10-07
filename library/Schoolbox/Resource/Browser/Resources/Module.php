@@ -68,6 +68,7 @@ class Module extends AbstractModule
         $injector->params[TreeBuilder::class]['taskMapper']       = $injector->lazyNew(TaskMapper::class);
         $injector->params[TreeBuilder::class]['userAccessMapper'] = $injector->lazyNew($setters['setUserAccessMapper']);
         $injector->params[TreeBuilder::class]['roleAccessMapper'] = $injector->lazyNew($setters['setRoleAccessMapper']);
+        $injector->setters[TreeBuilder::class]['setFileLocator']  = $injector->lazyNew($setters['setFileMapper']);
 
         $injector->params[TreeBuilder::class]['user'] = $injector->lazy(
             function () use ($injector) {

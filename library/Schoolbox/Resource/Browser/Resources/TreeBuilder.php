@@ -17,6 +17,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
+use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\User;
@@ -100,6 +101,31 @@ class TreeBuilder extends AbstractTreeBuilder
 
     /**
      * @param Resource\File\Model $file
+     * @throws Resource\Exception
+     * @return array
+     */
+    protected function buildFileNode(File\IFile $file)
+    {
+        $permission = $this->getFilePermission($file->getId());
+        if (empty($permission)) {
+            throw new Resource\Exception("No permission for this node");
+        }
+
+        return $this->generateFileArray($file, $file->getTitle(),
+            [
+                'data-permission' => $permission,
+                'data-mime'       => $file->getMime()
+            ],
+            [
+                'href' => '/send.php?id=' . $file->getId(),
+//                'style' => "background-image:url('/ajax/mime/{$file->getMime()}')"
+            ]
+        );
+    }
+
+
+    /**
+     * @param Resource\File\Model $file
      * @param string              $name
      * @param array               $liAttributes
      * @param array               $aAttributes
@@ -107,7 +133,7 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     protected function generateFileArray(Resource\File\IFile $file, $name = null, array $liAttributes = null, array $aAttributes = null)
     {
-        return $this->generateNodeArray($file->getId(), $file->getFolder()->getId(), 'file', $name, $liAttributes, $aAttributes);
+        return $this->generateNodeArray($file->getId(), $file->getFolder()->getId(), 'file', $name ?: $file->getTitle(), $liAttributes, $aAttributes);
     }
 
 
@@ -135,6 +161,31 @@ class TreeBuilder extends AbstractTreeBuilder
         }
 
         return $this->getPermissionString($access);
+    }
+
+
+    /**
+     * @param int $nodeId
+     * @return string
+     */
+    protected function getFilePermission($nodeId)
+    {
+        if (!$this->fileLocator) {
+            return $this->getPermissionString(UserAccess::ACCESS_DENY);
+        }
+
+        /** @var File\Model $file */
+        $file = $this->fileLocator->findById($nodeId);
+
+        // retrieve the folder permission
+        $folderPerm = $this->getFolderPermission($file->getFolder()->getId());
+
+        // if read and hidden, cast to none; otherwise leave as-is
+        if ($folderPerm == 'read' && $file->isHidden()) {
+            $folderPerm = '';
+        }
+
+        return $folderPerm;
     }
 
 
@@ -173,6 +224,20 @@ class TreeBuilder extends AbstractTreeBuilder
     {
         // TODO cache this
         return $this->folderLocator->findByParentId($nodeId);
+    }
+
+
+    /**
+     * @param int $nodeId
+     * @return Collection|File\IFile[]
+     */
+    protected function getNodeFiles($nodeId)
+    {
+        // TODO cache this
+        if ($this->fileLocator) {
+            return $this->fileLocator->findByFolderId($nodeId);
+        }
+        return new Collection();
     }
 
 }
