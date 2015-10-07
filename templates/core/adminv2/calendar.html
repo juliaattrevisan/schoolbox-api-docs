@@ -101,6 +101,8 @@
 
         <!-- BEGIN subscribe -->
         <form method='post' action='/adminv2/calendar/modifyForm'>
+            <input type="hidden" name='action' value='subscribe' />
+
             <!-- BEGIN eventType -->
             <div class='eventList'>
                 <h2 class="subheader">{EVENTTYPE_LABEL}</h2>
@@ -141,10 +143,9 @@
                     </div>
                 </div>
             </div>
-                <!-- END eventType -->
+            <!-- END eventType -->
 
-            <input type="hidden" name='action' value='subscribe' />
-            <input type="submit" class="button" value='Save changes' />
+            <input type="submit" value='Save Changes' />
         </form>
         <!-- END subscribe -->
 
