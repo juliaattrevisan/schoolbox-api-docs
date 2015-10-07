@@ -156,6 +156,21 @@ abstract class AbstractController extends BaseController
 
 
     /**
+     * @api GET /resources/:folderId/nodes
+     * @level 155
+     *
+     * @param int $folderId
+     */
+    public function listNodes($folderId)
+    {
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data'   => $this->treeBuilder->buildChildNodes($folderId)
+        ]);
+    }
+
+
+    /**
      * @api GET /resources/:folderId/children
      * @level 150
      *
