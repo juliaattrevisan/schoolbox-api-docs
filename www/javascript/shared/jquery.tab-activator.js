@@ -38,6 +38,8 @@
                 activator: 'data-tab-activator',
                 onTabOpen: function(tabActivator) {
                 },
+                onTabSwitch: function(tabActivator) {
+                },
                 onTabClose: function(tabActivator) {
                 }
             }
@@ -56,6 +58,7 @@
          */
         function tabActivator() {
             $('['+config.activator+']').click(function() {
+                config.onTabOpen($(this));
 
                 /* Tab corresponding to this activator
                  */
@@ -85,7 +88,7 @@
                     }
                 }
                 else {
-                    config.onTabOpen($(this));
+                    config.onTabSwitch($(this));
 
                     /* Clear out every other activator's setting
                      */
