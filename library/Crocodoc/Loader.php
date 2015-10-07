@@ -100,6 +100,14 @@ class Loader
         }
     }
 
+    /**
+     * Just gets whatever the Crocodoc download URL is for this UUID.
+     */
+    public function getDownloadUrl()
+    {
+        return "https://crocodoc.com/api/v2/download/document?token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&annotated=true";
+    }
+
     /* Getters/Setters
      */
 
