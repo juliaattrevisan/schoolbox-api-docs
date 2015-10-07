@@ -119,7 +119,7 @@ class Facade
 
         try {
             $loader = new Loader($submission->getUuid(), $this->getUser());
-            header('Location: '.$loader->getDownloadUrl());
+            header('Location: '.$loader->getDownloadUrl('return_'.$submission->getFilename().'.pdf'));
             exit;
         } catch (Exception $e) {
             echo "Error encountered: ".$e->getMessage();
