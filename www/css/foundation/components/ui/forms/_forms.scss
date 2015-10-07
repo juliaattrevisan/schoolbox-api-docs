@@ -388,6 +388,19 @@ input[type=checkbox]:not(.plain) {
 	@include vaporwave('checkbox-toggle');
 }
 
+// Win7/IE11 fix for size of checkboxes
+// For now I'm just going to guess a pixel value
+html.no-pseudoelementlineheightinrems {
+  input[type=radio]:not(.plain),
+  input[type=checkbox]:not(.plain) {
+    + label {
+      &:after {
+        line-height: ($base-font-size * 1.25);
+      }
+    }
+  }
+}
+
 input[type=radio]:not(.plain) + label {
     &:before, &:after {
         @include border-radius(1rem);
