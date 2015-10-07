@@ -5,7 +5,18 @@ $footer-margin-bottom: 1rem;
     /* http://www.w3schools.com/cssref/pr_margin.asp
      * Three-argument margin: third arg is margin-bottom
      */
-    margin: 7rem 2.5rem $footer-margin-bottom;
+    @media #{$small-up} {
+        margin: 0 2rem 8rem;
+    }
+
+    @media #{$medium-up} {
+        margin: 0 2.5rem 8rem;
+    }
+
+    @media #{$large-up} {
+        margin: 0 3rem 8rem;
+    }
+
     @include contrast-bg();
     ul {
         margin: 0 auto 1rem;
