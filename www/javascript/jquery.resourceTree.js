@@ -23,7 +23,8 @@
                     url:      '/ajax/jstree.php',
                     type:     'GET',
                     data:     {},
-                    dataType: 'json'
+                    dataType: 'json',
+                    token:    null
                 },
                 ajaxDataParam: 'parent'
             },
@@ -41,7 +42,13 @@
                         }
                         else {
                             var ajaxParams = self.options.data.ajaxParams;
-                            ajaxParams.data[self.options.data.ajaxDataParam] = node.id;
+
+                            if (ajaxParams.token) {
+                                ajaxParams.url = ajaxParams.url.replace(new RegExp(ajaxParams.token), node.id);
+                            } else {
+                                ajaxParams.data[self.options.data.ajaxDataParam] = node.id;
+                            }
+
                             $.ajax(ajaxParams)
                                 .done(function(data) {
                                     self.cache = self.cache.concat(data);

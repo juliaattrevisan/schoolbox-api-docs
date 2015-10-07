@@ -119,7 +119,8 @@
             data: {
                 cache: {{ treedata | raw }},
                 ajaxParams: {
-                    url: '/ajax/jstree{{ treeController }}.php'
+                    url: '{{ routeLookup(namespace ~ '.listNodes') }}',
+                    token: '{folderId}'
                 }
             }
         });
