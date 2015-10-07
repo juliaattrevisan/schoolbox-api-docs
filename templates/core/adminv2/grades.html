@@ -11,6 +11,7 @@
             var gradeTemplate = doT.template($('script#submission-grade-template').html().trim());
 
             var form = $('form[data-action="saveGradeLevels"]');
+            form.validate();
 
             /**
              * Adds a new grade to the given group.
@@ -113,14 +114,18 @@
                    name="group[{{! it.group.id }}][grade][{{! it.id }}][id]"
                    value="{{! it.id }}"
             />
-            <input type="text"
+            <input type="number"
+                   min="0"
+                   max="100"
                    name="group[{{! it.group.id }}][grade][{{! it.id }}][lower_bound]"
                    value="{{! it.lowerBound }}"
                    placeholder="Lower Bound"
             />
         </td>
         <td>
-            <input type="text"
+            <input type="number"
+                   min="0"
+                   max="100"
                    name="group[{{! it.group.id }}][grade][{{! it.id }}][raw_grade]"
                    value="{{! it.rawGrade }}"
                    placeholder="Normalised Grade"
@@ -187,7 +192,7 @@
                             <input type="hidden" name="group[{SUBMISSION_GRADE_GROUP_ID}][id]" value="{SUBMISSION_GRADE_GROUP_ID}" />
                             <label for="groupName{SUBMISSION_GRADE_GROUP_ID}">
                                 Grade Group
-                                <input type="text" id="groupName{SUBMISSION_GRADE_GROUP_ID}" name="group[{SUBMISSION_GRADE_GROUP_ID}][name]" value="{SUBMISSION_GRADE_GROUP_NAME}" placeholder="Grade Group" />
+                                <input type="text" required id="groupName{SUBMISSION_GRADE_GROUP_ID}" name="group[{SUBMISSION_GRADE_GROUP_ID}][name]" value="{SUBMISSION_GRADE_GROUP_NAME}" placeholder="Grade Group" />
                             </label>
                         </div>
                         <table>
@@ -202,14 +207,20 @@
                                 <!-- BEGIN submission_grade -->
                                 <tr data-gradeid="{SUBMISSION_GRADE_ID}">
                                     <td>
-                                        <input type="text"
+                                        <input type="number"
+                                               min="0"
+                                               max="100"
+                                               required
                                                name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][lower_bound]"
                                                value="{SUBMISSION_GRADE_LOWER_BOUND}"
                                                placeholder="Lower Bound"
                                                 />
                                     </td>
                                     <td>
-                                        <input type="text"
+                                        <input type="number"
+                                               min="0"
+                                               max="100"
+                                               required
                                                name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][raw_grade]"
                                                value="{SUBMISSION_GRADE_RAW_GRADE}"
                                                placeholder="Normalised Grade"
@@ -217,6 +228,7 @@
                                     </td>
                                     <td>
                                         <input type="text"
+                                               required
                                                name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][caption]"
                                                value="{SUBMISSION_GRADE_CAPTION}"
                                                placeholder="Caption"
