@@ -306,20 +306,6 @@
                     $('#userid').val('')
                 })
 
-        $('h3 span').each(function() {
-            var activeContent = $(this).siblings('em').html();
-            $(this).qtip({
-                content: activeContent,
-                style: {
-                    classes: 'qtip-green qtip-shadow'
-                },
-                position: {
-                    my: 'bottom left',
-                    at: 'top left'
-                }
-            });
-        });
-
         /* date picker */
         $('[data-date=start_date], [data-date=finish_date]').datepicker({
             constrainInput: false,
