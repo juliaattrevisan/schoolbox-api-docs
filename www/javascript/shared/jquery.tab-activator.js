@@ -56,7 +56,6 @@
                 /* Tab corresponding to this activator
                  */
                 var tab = $(this).attr('href');
-                $(tab).css({opacity:1});
 
                 /* If this tab activator wasn't already active,
                  * just use default tab-switching behaviour.
@@ -74,9 +73,7 @@
                          * then surreptitiously do our own crazy crap
                          */
                         setTimeout(function() {
-                            $(tab).stop().animate({opacity:0}, 250, function() {
-                                $(tab).toggleClass('active');
-                            });
+                            $(tab).toggleClass('active');
                         }, 100);
                     }
                 }
