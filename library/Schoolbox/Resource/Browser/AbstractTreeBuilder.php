@@ -19,7 +19,7 @@ use Schoolbox\Resource\Folder\IFolder;
 abstract class AbstractTreeBuilder
 {
     /** @var Folder\ILocator */
-    protected $locator;
+    protected $folderLocator;
 
     /** @var string */
     protected $rootNodeLabel;
@@ -30,7 +30,7 @@ abstract class AbstractTreeBuilder
      */
     public function __construct(Folder\ILocator $locator)
     {
-        $this->locator       = $locator;
+        $this->folderLocator = $locator;
         $this->rootNodeLabel = 'Root';
     }
 
@@ -57,7 +57,7 @@ abstract class AbstractTreeBuilder
                 break;
             }
             try {
-                $parentList[] = $parentId = $this->locator->findById($parentId)->getParent()->getId();
+                $parentList[] = $parentId = $this->folderLocator->findById($parentId)->getParent()->getId();
             } catch (Mapper\Exception $e) {
                 break;
             }
@@ -99,7 +99,7 @@ abstract class AbstractTreeBuilder
         // Did I ask for the root node? get it
         if ($folderId === '#') {
             $output[] = $this->generateNodeArray(
-                $this->locator->findById(0),
+                $this->folderLocator->findById(0),
                 'root',
                 $this->getRootNodeLabel(),
                 [ 'data-permission' => $this->getNodePermission($folderId) ]

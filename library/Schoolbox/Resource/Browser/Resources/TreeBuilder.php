@@ -73,7 +73,7 @@ class TreeBuilder extends AbstractTreeBuilder
 
         // Type: homepage or folder
         // Could be a course as well, if any child has tasks.
-        $childIds = $this->locator
+        $childIds = $this->folderLocator
                          ->findByParentId($folder->getId())
                          ->getColumnValues('id');
 
@@ -159,7 +159,7 @@ class TreeBuilder extends AbstractTreeBuilder
     protected function getNodeChildren($nodeId)
     {
         // TODO cache this
-        return $this->locator->findByParentId($nodeId);
+        return $this->folderLocator->findByParentId($nodeId);
     }
 
 }

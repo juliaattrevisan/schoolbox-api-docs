@@ -56,7 +56,7 @@ class TreeBuilder extends AbstractTreeBuilder
     protected function getNodeChildren($nodeId)
     {
         /** @var Mapper $locator */
-        $locator = $this->locator;
+        $locator = $this->folderLocator;
 
         // TODO cache this
         return $locator->findByColumnList([
