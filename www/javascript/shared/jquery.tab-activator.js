@@ -35,7 +35,9 @@
         function init(options, element) {
             var defaults = {
                 element: element,
-                activator: 'data-tab-activator'
+                activator: 'data-tab-activator',
+                onComplete: function() {
+                }
             }
 
             var derived = {
@@ -74,6 +76,8 @@
                          */
                         setTimeout(function() {
                             $(tab).toggleClass('active');
+
+                            config.onComplete();
                         }, 100);
                     }
                 }
