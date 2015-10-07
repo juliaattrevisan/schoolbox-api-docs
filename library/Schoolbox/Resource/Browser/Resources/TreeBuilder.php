@@ -66,7 +66,7 @@ class TreeBuilder extends AbstractTreeBuilder
     {
         // Get the permission this user has on this folder.
         // No permission: don't show it at all!
-        $permission = $this->getNodePermission($folder->getId());
+        $permission = $this->getFolderPermission($folder->getId());
         if (empty($permission)) {
             throw new Resource\Exception("No permission for this node");
         }
@@ -102,7 +102,7 @@ class TreeBuilder extends AbstractTreeBuilder
      * @param int $folderId
      * @return string
      */
-    protected function getNodePermission($folderId)
+    protected function getFolderPermission($folderId)
     {
         // check user access first, then role access if that fails
         try {

@@ -70,7 +70,7 @@ class TreeBuilder extends AbstractTreeBuilder
      * @param int $nodeId
      * @return string
      */
-    protected function getNodePermission($nodeId)
+    protected function getFolderPermission($nodeId)
     {
         return 'full';
     }

@@ -102,7 +102,7 @@ abstract class AbstractTreeBuilder
                 $this->folderLocator->findById(0),
                 'root',
                 $this->getRootNodeLabel(),
-                [ 'data-permission' => $this->getNodePermission($folderId) ]
+                [ 'data-permission' => $this->getFolderPermission($folderId) ]
             );
 
         } else {
@@ -188,6 +188,6 @@ abstract class AbstractTreeBuilder
      * @param int $nodeId
      * @return string
      */
-    protected abstract function getNodePermission($nodeId);
+    protected abstract function getFolderPermission($nodeId);
 
 } 
