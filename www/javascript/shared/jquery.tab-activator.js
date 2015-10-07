@@ -53,13 +53,17 @@
         function tabActivator() {
             $('['+config.activator+']').click(function() {
 
+                /* Tab corresponding to this activator
+                 */
+                var tab = $(this).attr('href');
+                $(tab).css({opacity:1});
+
                 /* If this tab activator wasn't already active,
                  * just use default tab-switching behaviour.
                  *
                  * Otherwise, toggle tab
                  */
                 if ($(this).data(config.activator) == true) {
-                    var tab = $(this).attr('href');
 
                     /* Close this tab if it's open
                      * Otherwise just use default behaviour
@@ -70,7 +74,9 @@
                          * then surreptitiously do our own crazy crap
                          */
                         setTimeout(function() {
-                            $(tab).toggleClass('active');
+                            $(tab).stop().animate({opacity:0}, 250, function() {
+                                $(tab).toggleClass('active');
+                            });
                         }, 100);
                     }
                 }
