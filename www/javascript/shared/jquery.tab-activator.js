@@ -36,6 +36,8 @@
             var defaults = {
                 element: element,
                 activator: 'data-tab-activator',
+                onTabOpen: function(tabActivator) {
+                },
                 onTabClose: function() {
                 }
             }
@@ -54,6 +56,7 @@
          */
         function tabActivator() {
             $('['+config.activator+']').click(function() {
+                config.onTabOpen($(this));
 
                 /* Tab corresponding to this activator
                  */
