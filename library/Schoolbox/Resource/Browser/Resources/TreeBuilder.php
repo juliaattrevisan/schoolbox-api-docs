@@ -91,10 +91,23 @@ class TreeBuilder extends AbstractTreeBuilder
         }
 
         // Output something.
-        return $this->generateNodeArray($folder, $type, $name,
+        return $this->generateFolderArray($folder, $type, $name,
             [ 'data-permission' => $permission ],
             [ 'href' => '/homepage/' . $folder->getId() ]
         );
+    }
+
+
+    /**
+     * @param Resource\File\Model $file
+     * @param string              $name
+     * @param array               $liAttributes
+     * @param array               $aAttributes
+     * @return array
+     */
+    protected function generateFileArray(Resource\File\IFile $file, $name = null, array $liAttributes = null, array $aAttributes = null)
+    {
+        return $this->generateNodeArray($file->getId(), $file->getFolder()->getId(), 'file', $name, $liAttributes, $aAttributes);
     }
 
 

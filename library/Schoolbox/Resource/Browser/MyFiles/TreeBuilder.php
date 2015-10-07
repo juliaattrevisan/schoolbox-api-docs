@@ -43,9 +43,22 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     protected function buildFolderNode(IFolder $folder)
     {
-        return $this->generateNodeArray($folder, 'folder', null, [
+        return $this->generateFolderArray($folder, 'folder', null, [
             'data-permission' => 'full'
         ]);
+    }
+
+
+    /**
+     * @param Resource\My\File\Model $file
+     * @param string                 $name
+     * @param array                  $liAttributes
+     * @param array                  $aAttributes
+     * @return array
+     */
+    protected function generateFileArray(Resource\File\IFile $file, $name = null, array $liAttributes = null, array $aAttributes = null)
+    {
+        return $this->generateNodeArray($file->getId(), $file->getFolder()->getId(), 'file', $name, $liAttributes, $aAttributes);
     }
 
 

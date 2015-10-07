@@ -98,8 +98,10 @@ abstract class AbstractTreeBuilder
 
         // Did I ask for the root node? get it
         if ($folderId === '#') {
+            $folder = $this->folderLocator->findById(0);
             $output[] = $this->generateNodeArray(
-                $this->folderLocator->findById(0),
+                $folder->getId(),
+                $folder->getParent()->getId(),
                 'root',
                 $this->getRootNodeLabel(),
                 [ 'data-permission' => $this->getFolderPermission($folderId) ]
@@ -145,13 +147,38 @@ abstract class AbstractTreeBuilder
      * @param array   $aAttributes
      * @return array
      */
-    protected function generateNodeArray(IFolder $folder, $type, $name = null, array $liAttributes = null, array $aAttributes = null)
+    protected function generateFolderArray(IFolder $folder, $type, $name = null, array $liAttributes = null, array $aAttributes = null)
+    {
+        return $this->generateNodeArray($folder->getId(), $folder->getParent()->getId(), $type, $name, $liAttributes, $aAttributes);
+    }
+
+
+    /**
+     * @param Resource\File\IFile $file
+     * @param string              $name
+     * @param array               $liAttributes
+     * @param array               $aAttributes
+     * @return array
+     */
+    protected abstract function generateFileArray(Resource\File\IFile $file, $name = null, array $liAttributes = null, array $aAttributes = null);
+
+
+    /**
+     * @param int     $nodeId
+     * @param int     $parentId
+     * @param string  $type
+     * @param string  $name
+     * @param array   $liAttributes
+     * @param array   $aAttributes
+     * @return array
+     */
+    protected function generateNodeArray($nodeId, $parentId, $type, $name, array $liAttributes = null, array $aAttributes = null)
     {
         $array = array(
-            'id'       => $folder->getId(),
-            'parent'   => $folder->getParent() instanceof IFolder ? $folder->getParent()->getId() : '0',
-            'text'     => $name ?: $folder->getName(),
-            'children' => $this->getNodeHasChildren($folder->getId()),
+            'id'       => $nodeId,
+            'parent'   => $parentId ?: '0',
+            'text'     => $name,
+            'children' => $this->getNodeHasChildren($nodeId),
             'type'     => $type,
         );
 
