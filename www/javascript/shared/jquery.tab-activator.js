@@ -38,7 +38,7 @@
                 activator: 'data-tab-activator',
                 onTabOpen: function(tabActivator) {
                 },
-                onTabClose: function() {
+                onTabClose: function(tabActivator) {
                 }
             }
 
@@ -80,7 +80,7 @@
                         setTimeout(function() {
                             $(tab).toggleClass('active');
 
-                            config.onTabClose();
+                            config.onTabClose($(tab));
                         }, 100);
                     }
                 }
