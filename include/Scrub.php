@@ -276,7 +276,7 @@ class Scrub
 
         // Now try loading into a document
         $domDocument = new DOMDocument();
-        if ($domDocument->loadHTML($html)) {
+        if ($domDocument->loadHTML('<?xml encoding="UTF-8">'.$html)) {
             $touched = false;
 
             // Mangle iframes: add allowfullscreen, and wrap in div
