@@ -62,7 +62,7 @@ class TreeBuilder extends AbstractTreeBuilder
      * @throws Resource\Exception
      * @return array
      */
-    protected function buildNode(IFolder $folder)
+    protected function buildFolderNode(IFolder $folder)
     {
         // Get the permission this user has on this folder.
         // No permission: don't show it at all!

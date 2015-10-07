@@ -109,7 +109,7 @@ abstract class AbstractTreeBuilder
             // Child nodes
             foreach ($this->getNodeFolders($folderId) as $folder) {
                 try {
-                    $output[] = $this->buildNode($folder);
+                    $output[] = $this->buildFolderNode($folder);
                 } catch (Resource\Exception $e) {
                     continue;
                 }
@@ -134,7 +134,7 @@ abstract class AbstractTreeBuilder
      * @throws Resource\Exception
      * @return array
      */
-    protected abstract function buildNode(IFolder $folder);
+    protected abstract function buildFolderNode(IFolder $folder);
 
 
     /**

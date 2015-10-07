@@ -41,7 +41,7 @@ class TreeBuilder extends AbstractTreeBuilder
      * @throws Resource\Exception
      * @return array
      */
-    protected function buildNode(IFolder $folder)
+    protected function buildFolderNode(IFolder $folder)
     {
         return $this->generateNodeArray($folder, 'folder', null, [
             'data-permission' => 'full'
