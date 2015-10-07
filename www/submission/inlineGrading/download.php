@@ -8,15 +8,6 @@
  * @version     SVN: $Id$
  */
 
-$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper();
-$submission = $submissionMapper->findById($this->arg[0]);
-
-$returnMapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
-/** @var \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $return */
-$return = $returnMapper->findOneByColumn('box_id', $this->arg[0]);
-
-// What's the latest return
-$downloader = new Crocodoc\Download($submission, $return);
-$downloader->start();
-
-$this->localRedir('/storage/fetch.php?save=1&hash='.$return->getStorage()->getHash());
+$crocodoc = new \Crocodoc\Facade($this->arg[0], $_SESSION['user']);
+$crocodoc->download();
+exit();
