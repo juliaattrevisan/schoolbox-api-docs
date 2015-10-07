@@ -173,6 +173,46 @@
 <script type="text/javascript" src="/javascript/components/mediaelement/build/mediaelement-and-player.min.js"></script>
 <!-- END custom_head -->
 
+<script type="text/javascript">
+    $(function() {
+        $('[data-tab-activator]').click(function() {
+
+            /* If this tab activator wasn't already active,
+             * just use default tab-switching behaviour.
+             *
+             * Otherwise, toggle tab
+             */
+            if ($(this).data('data-tab-activator') == true) {
+                var tab = $(this).attr('href');
+
+                /* Close this tab if it's open
+                 * Otherwise just use default behaviour
+                 */
+                if ($(tab).hasClass('active')) {
+
+                    /* Wait a little bit for foundation to do its crazy crap,
+                     * then surreptitiously do our own crazy crap
+                     */
+                    setTimeout(function() {
+                        $(tab).toggleClass('active');
+                    }, 100);
+                }
+            }
+            else {
+
+                /* Clear out every other activator's setting
+                 */
+                $('[data-tab-activator]').data('data-tab-activator', false);
+
+                /* Add a flag to remember this tab activator is active,
+                 * so toggling can take place
+                 */
+                $(this).data('data-tab-activator', true);
+            }
+        });
+    });
+</script>
+
 <div class="row actions-small-4">
     <div class="list-item">
         <div class="small-12 column">
@@ -183,10 +223,10 @@
         <!-- BEGIN edit_page -->
         <span data-tab>
             <span class="tab-title">
-                <a class="icon-components" href="#tabs-1" title="Add components"></a>
+                <a class="icon-components" href="#tabs-1" title="Add components" data-tab-activator></a>
             </span>
             <span class="tab-title">
-                <a class="icon-edit-columns" href="#tabs-2" title="Edit columns"></a>
+                <a class="icon-edit-columns" href="#tabs-2" title="Edit columns" data-tab-activator></a>
             </span>
         </span>
         <!-- END edit_page -->
