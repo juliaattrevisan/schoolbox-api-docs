@@ -168,8 +168,28 @@
         });
 
         /* Tab toggler
+         * Deal with special components placeholder
          */
-        $.fn.tabActivator();
+        $.fn.tabActivator({
+            onTabOpen: function(tabActivator) {
+                if ($(tabActivator).attr('href') == '#tabs-1') {
+                    $('.masonry-placeholder').show();
+                }
+            },
+            onTabSwitch: function(tabActivator) {
+                if ($(tabActivator).attr('href') == '#tabs-1') {
+                    $('.masonry-placeholder').show();
+                }
+                else if ($(tabActivator).attr('href') == '#tabs-2') {
+                    $('.masonry-placeholder').hide();
+                }
+            },
+            onTabClose: function(tabActivator) {
+                if ($(tabActivator).attr('href') == '#tabs-1') {
+                    $('.masonry-placeholder').hide();
+                }
+            }
+        });
     });
 </script>
 <!-- END modify_layout -->
