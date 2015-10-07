@@ -83,7 +83,7 @@ foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
         unset($studentData['user']);
 
         $submit = !!count($studentData['submissions']);
-        $ontime = $submit ? $submitClass == 'submit-ok' : false;
+        $ontime = $submit ? $submitClass = 'submit-ok' : false;
         $marked = isset($studentData['return']['id']) && $studentData['return']['id'] > 0;
 
         if ($marked) {
