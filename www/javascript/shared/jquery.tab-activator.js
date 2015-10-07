@@ -56,10 +56,10 @@
          */
         function tabActivator() {
             $('['+config.activator+']').click(function() {
-                config.onTabOpen($(this));
 
                 /* Tab corresponding to this activator
                  */
+                var activator = $(this);
                 var tab = $(this).attr('href');
 
                 /* If this tab activator wasn't already active,
@@ -80,11 +80,12 @@
                         setTimeout(function() {
                             $(tab).toggleClass('active');
 
-                            config.onTabClose($(tab));
+                            config.onTabClose(activator);
                         }, 100);
                     }
                 }
                 else {
+                    config.onTabOpen($(this));
 
                     /* Clear out every other activator's setting
                      */
