@@ -1,5 +1,4 @@
 {ADMIN_NAV}
-
 <div class="row">
     <div class="small-12 columns">
         <dl class="sub-nav">
@@ -9,60 +8,61 @@
             </dd>
             <!-- END setting_tab -->
         </dl>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+
         <!-- BEGIN import -->
-        <div>
-            <form action="/adminv2/bulkAddCalendar" method="post" enctype="multipart/form-data" name="form" id="importForm">
-                <h2 class="subheader">
-                    Source
-                    <span class="hint has-tip tip-right"
-                          data-tooltip
-                          title="The file that contains the calendar information can either be a CSV file
-                                 matching the format in the template below, or a Microsoft Outlook ICS file">?</span>
-                </h2>
-                <div class="row">
-                    <div class="island small-12 medium-6">
-                        <section>
-                            <div class="content">
-                                <h3>CSV</h3>
-                                <p>
-                                    <a href="/adminv2/csv/calendarBulkAdd.csv" class="button icon-download">Download Template</a>
-                                </p>
-                                <ol>
-                                    <li>Download the template file using the above button</li>
-                                    <li>Edit the file in Microsoft Excel or equivalent editor</li>
-                                    <li>Save the file</li>
-                                    <li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
-                                </ol>
-                            </div>
-                        </section>
-                    </div>
-                    <div class="island small-12 medium-6">
-                        <section>
-                            <div class="content">
-                                <h3>Microsoft Outlook ICS</h3>
-                                <ol>
-                                    <li>In Outlook, click calendar in the bottom left</li>
-                                    <li>Go to File, Save As</li>
-                                    <li>Choose iCalendar format (*.ics)</li>
-                                    <li>Click 'More Options'</li>
-                                    <li>Change Detail from Availability Only to Full Details</li>
-                                    <li>Click OK</li>
-                                    <li>Save it</li>
-                                    <li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
-                                </ol>
-                            </div>
-                        </section>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="island small-12">
-                        <h2 class="subheader">Select file (CSV or ICS)</h2>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="island small-12">
-                        <section>
-                            <div class="content">
+        <h2 class="subheader">
+            Source
+        <span class="hint has-tip tip-right"
+              data-tooltip
+              title="The file that contains the calendar information can either be a CSV file
+                     matching the format in the template below, or a Microsoft Outlook ICS file">?</span>
+        </h2>
+
+        <div class="row">
+            <div class="island small-12 medium-6">
+                <section class="content">
+                    <h3>CSV</h3>
+                    <p>
+                        <a href="/adminv2/csv/calendarBulkAdd.csv" class="button icon-download">Download Template</a>
+                    </p>
+                    <ol>
+                        <li>Download the template file using the above button</li>
+                        <li>Edit the file in Microsoft Excel or equivalent editor</li>
+                        <li>Save the file</li>
+                        <li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
+                    </ol>
+                </section>
+            </div>
+            <div class="island small-12 medium-6">
+                <section class="content">
+                    <h3>Microsoft Outlook ICS</h3>
+                    <ol>
+                        <li>In Outlook, click calendar in the bottom left</li>
+                        <li>Go to File, Save As</li>
+                        <li>Choose iCalendar format (*.ics)</li>
+                        <li>Click 'More Options'</li>
+                        <li>Change Detail from Availability Only to Full Details</li>
+                        <li>Click OK</li>
+                        <li>Save it</li>
+                        <li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
+                    </ol>
+                </section>
+            </div>
+        </div>
+
+        <h2 class="subheader">Select file (CSV or ICS)</h2>
+
+        <div class="row">
+            <div class="small-12 island">
+                <form action="/adminv2/bulkAddCalendar" method="post" enctype="multipart/form-data" name="form" id="importForm">
+                    <section>
+                        <fieldset class="content">
+                            <div class="island small-12">
                                 <h3>Select File</h3>
                                 <input type="file" name="bulkadd" />
                                 <h3>
@@ -89,15 +89,16 @@
                                     <input name="name" id="name" type="text" placeholder="Search Users" />
                                 </label>
                                 <input name="userid" type="hidden" id="userid" size="6" maxlength="6" />
-
-                                <a class="button secondary expand" href="#">Import</a>
                             </div>
-                        </section>
-                    </div>
-                </div>
-            </form>
+                        </fieldset>
+                    </section>
+
+                    <a class="button secondary expand" href="#">Import</a>
+                </form>
+            </div>
         </div>
         <!-- END import -->
+
         <!-- BEGIN subscribe -->
         <form method='post' action='/adminv2/calendar/modifyForm'>
             <!-- BEGIN eventType -->
