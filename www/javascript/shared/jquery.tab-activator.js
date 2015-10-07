@@ -36,10 +36,19 @@
             var defaults = {
                 element: element,
                 activator: 'data-tab-activator',
+
+                /* Occurs whenever you click a tab activator
+                 */
                 onTabOpen: function(tabActivator) {
                 },
+
+                /* Occurs when you change active tabs
+                 */
                 onTabSwitch: function(tabActivator) {
                 },
+
+                /* Occurs when a tab is closed
+                 */
                 onTabClose: function(tabActivator) {
                 }
             }
