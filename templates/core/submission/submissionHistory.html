@@ -9,69 +9,20 @@
          */
         $('#publish-to-eportfolio-form').eportfolio_publish();
 
-        var x = 1, i = x - 1,
-                $historyMore = $('#history-more'),
-                $historyClose = $('#history-close'),
-                $viewHistory = $('#view-history'),
-                $history = $('#history');
-
-        $history.find('li:gt(' + i + ')').hide();
-
-        if ($history.find('li:hidden').length) {
-            $historyMore.show();
-        }
-
-        $historyMore.click(function (e) {
-            e.preventDefault();
-            i += 2 * x + 1;
-            $history.find('li:lt(' + i + ')').slideDown(100);
-            if (!$history.find('li:hidden').length) {
-                $historyMore.hide();
-            }
-        });
-
-        /* Modal
-         */
-        $viewHistory.on('click', function(event) {
-            var modal = $('#history-wrap');
-
-            modal.foundation('reveal', 'open');
-
-            $historyClose.click(function(event) {
-                modal.foundation('reveal', 'close');
-            });
-
-            /* Execute modal, then stop
-             */
-            event.preventDefault();
-
-            /* Hide "Show More" if nothing to show
-             */
-            if (!$history.find('li:hidden').length) {
-                $historyMore.hide();
-            }
-        });
     });
 </script>
 <!-- END custom_head -->
 
 <div class="row">
     <div class="small-12 columns">
-        <div class="actions-small-1">
-            <div class="list-item">
-                <h1>{BOX_NAME}</h1>
-                <ul class="meta">
-                    <li class="icon-calendar">Due <span class="gradient-{BOX_DUEDATE_GRADIENT}" title="{BOX_DUETIME}">{BOX_DUEDATE}</span></li>
-                    <!-- BEGIN show_owner -->
-                    <li class="icon-staff-students"><a href="/search/user/{BOX_OWNER_ID}">{BOX_OWNER}</a></li>
-                    <!-- END show_owner -->
-                    <li class="icon-due-work">{BOX_TYPE}</li>
-                </ul>
-            </div>
-            <nav>
-                <a href="#" id="view-history" class="icon-history" title="View History"></a>
-            </nav>
-        </div>
+        <h1>{BOX_NAME}</h1>
+        <ul class="meta">
+            <li class="icon-calendar">Due <span class="gradient-{BOX_DUEDATE_GRADIENT}" title="{BOX_DUETIME}">{BOX_DUEDATE}</span></li>
+            <!-- BEGIN show_owner -->
+            <li class="icon-staff-students"><a href="/search/user/{BOX_OWNER_ID}">{BOX_OWNER}</a></li>
+            <!-- END show_owner -->
+            <li class="icon-due-work">{BOX_TYPE}</li>
+        </ul>
         <span class="label {STATUS_HEALTH} secondary full-width">{STATUS_LABEL}</span>
     </div>
 </div>
@@ -103,7 +54,6 @@
             </ul>
             <!-- END attachments -->
         </section>
-
     </div>
     <div class="small-12 large-5 xlarge-4 island">
 
@@ -154,15 +104,15 @@
         <h2 class="subheader">Return</h2>
         <section>
             <div class="content">
-                <p class="grade">
+                <span class="grade">
                     <span class="gradient-{RETURNED_WORK_GRADIENT}" title="{RETURNED_WORK_MARK_TIP}">{RETURNED_WORK_MARK}</span><br/>
-                </p>
+                </span>
                 <p class="comment">{RETURNED_WORK_COMMENT}</p>
             </div>
 
             <ul class="action-list">
                 <!-- BEGIN return_file -->
-                <li class="actions-small-1">
+                <li>
                     <div class="list-item">
                         <div class="small-12 avatar card">
                             <a href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1">
@@ -173,16 +123,28 @@
                             </a>
                         </div>
                     </div>
-                    <nav>
-                        <!-- BEGIN return_file_uuid -->
-                        <a class='icon-view' href="/submission/inlineGrading/viewStudent/{RETURNED_WORK_SUBMISSION_ID}"></a>
-                        <!-- END return_file_uuid -->
-                    </nav>
                 </li>
                 <!-- END return_file -->
+                <!-- BEGIN return_file_uuid -->
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
+                            <a href="/submission/inlineGrading/viewStudent/{RETURNED_WORK_SUBMISSION_ID}">
+                                <div class="icon-comment icon-32"></div>
+                                <h3>View Annotations</h3>
+                            </a>
+                        </div>
+                    </div>
+                    <nav>
+                        <a href='/submission/inlineGrading/download/{RETURNED_WORK_SUBMISSION_ID}' class='icon-download' title="Download"></a>
+                    </nav>
+                </li>
+                <!-- END return_file_uuid -->
             </ul>
         </section>
+        <a href="#" id="view-history" class="button icon-history" title="View History" data-reveal-id="history-wrap">View History</a>
         <!-- END returned_work -->
+
     </div>
 </div>
 
@@ -304,8 +266,6 @@
                     </div>
                 </li>
             </ul>
-
-            <a href="#" class="button icon-add" id="history-more">Show More</a>
             <a href="#" class="close-reveal-modal" id="history-close">&#215;</a>
         </div>
     </div>
