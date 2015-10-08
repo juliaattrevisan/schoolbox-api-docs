@@ -7,7 +7,8 @@
  * @link      http://www.alaress.com.au/
  */
 
-require_once __DIR__ . '/../../include/Bootstrap.php';
+/** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
+$kernel = require_once __DIR__ . '/../../include/Bootstrap.php';
 
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
@@ -18,6 +19,7 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder;
 
 $page = new SitePage();
+$page->setDi($kernel->getDependencyInjector());
 
 $category_id = $_POST['category'];
 $category    = Folder\Mapper::getInstance()->findById($category_id);
@@ -147,7 +149,7 @@ if ($page->detectAjax()) {
 
         if ($component instanceof Component_Instance) {
             // Dump out template contents
-            $chf = new Component_Homepage_Factory(new \Schoolbox\User(), new SitePage(false));
+            $chf = new Component_Homepage_Factory(new \Schoolbox\User(), $page);
 
             /** @var Component_Homepage_CourseBuilderController $controller */
             $controller = $chf->buildComponent($component);
