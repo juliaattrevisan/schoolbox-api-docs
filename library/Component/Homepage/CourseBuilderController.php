@@ -1,6 +1,6 @@
 <?php
 /**
- * Task list course component for heads of curriculum.
+ * Course builder component for heads of curriculum.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
@@ -15,7 +15,7 @@ use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Collection;
 
-class Component_Homepage_CourseTaskListController extends Component_Homepage_ControllerAbstract
+class Component_Homepage_CourseBuilderController extends Component_Homepage_ControllerAbstract
 {
     /**
      * @var Group

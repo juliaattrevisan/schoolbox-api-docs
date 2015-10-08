@@ -149,7 +149,7 @@ if ($page->detectAjax()) {
             // Dump out template contents
             $chf = new Component_Homepage_Factory(new \Schoolbox\User(), new SitePage(false));
 
-            /** @var Component_Homepage_CourseTaskListController $controller */
+            /** @var Component_Homepage_CourseBuilderController $controller */
             $controller = $chf->buildComponent($component);
             $controller->setup(
                 $category,
