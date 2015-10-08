@@ -251,6 +251,8 @@
                 // Is this a new form?
                 var is_new = !(form.find('input[name="id"]').val());
 
+                $(this).find("input[type=submit]").attr('disabled', true);
+                
                 $.post(form.attr('action'), form.serialize(), function(data) {
                     label.labelTimeout({
                         text: 'Saved',
