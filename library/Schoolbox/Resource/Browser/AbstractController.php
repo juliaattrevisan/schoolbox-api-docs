@@ -12,8 +12,8 @@ namespace Schoolbox\Resource\Browser;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Collection;
 use Schoolbox\Config;
-use Schoolbox\FileInterface;
-use Schoolbox\FolderInterface;
+use Schoolbox\Resource\File\IFile as FileInterface;
+use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Resource;
 use Schoolbox\UserMapper;
@@ -38,6 +38,9 @@ abstract class AbstractController extends BaseController
 
     /** @var string */
     protected $namespace;
+
+    /** @var NodeFactory */
+    protected $nodeFactory;
 
 
     /**
@@ -106,18 +109,39 @@ abstract class AbstractController extends BaseController
 
 
     /**
+     * @param NodeFactory $nodeFactory
+     * @return self
+     */
+    public function setNodeFactory($nodeFactory)
+    {
+        $this->nodeFactory = $nodeFactory;
+        return $this;
+    }
+
+
+    /**
      * @param int $folderId
      * @return array
      */
     protected function getFolderData($folderId)
     {
+        $folder = $this->getFolder($folderId);
+
         return [
-            'folder' => $this->getFolder($folderId),
+            'tree'   => $this->getBreadcrumbs($folder),
+            'folder' => $folder,
             'access' => $this->getAccess([ $folderId ]),
             'user'   => $this->getUser(),
             'conf'   => $this->conf
         ];
     }
+
+
+    /**
+     * @param FolderInterface $folder
+     * @return array
+     */
+    protected abstract function getBreadcrumbs(FolderInterface $folder);
 
 
     /**
@@ -217,12 +241,18 @@ abstract class AbstractController extends BaseController
     {
         $file = $this->getFile($fileId);
 
+        $folderId = $file->getFolder()->getId();
+
         $server = $this->getRequest()->server;
+
+        $node = new Resource\Browser\Resources\Node($folderId);
+        $tree = $node->render();
 
         $data = [
             'file'   => $file,
+            'tree'   => $tree['breadcrumbs'],
             'host'   => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_HOST')),
-            'access' => $this->getAccess([ $file->getFolder()->getId() ]),
+            'access' => $this->getAccess([ $folderId ]),
             'namespace' => $this->namespace
         ];
 

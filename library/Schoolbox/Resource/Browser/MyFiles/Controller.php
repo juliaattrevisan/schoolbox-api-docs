@@ -10,7 +10,8 @@
 namespace Schoolbox\Resource\Browser\MyFiles;
 
 
-use Schoolbox\FolderInterface;
+use Schoolbox\Resource\Browser\NodeFactory;
+use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Browser\AbstractController;
@@ -35,6 +36,19 @@ class Controller extends AbstractController
             return $this->folderMapper->createModel()->setId(0);
 
         }
+    }
+
+
+    /**
+     * @param FolderInterface $folder
+     * @return array
+     */
+    protected function getBreadcrumbs(FolderInterface $folder)
+    {
+        $node = $this->nodeFactory->build(NodeFactory::MYFILE, $folder->getParent()->getId());
+        $tree = $node->render();
+
+        return $tree['breadcrumbs'];
     }
 
 

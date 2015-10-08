@@ -88,6 +88,7 @@ abstract class AbstractModule extends BaseModule
             'setFileMapper'       => null,
             'setConfig'           => Config\Loader::class,
             'setUserMapper'       => UserMapper::class,
+            'setNodeFactory'      => NodeFactory::class,
             'setTreeBuilder'      => null,
             'setFolderMapper'     => null,
             'setNamespace'        => $this->basename,

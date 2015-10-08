@@ -16,6 +16,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractController;
 use Schoolbox\Mapper;
+use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\User;
 
 class Controller extends AbstractController
@@ -70,6 +71,19 @@ class Controller extends AbstractController
         }
 
         return $data;
+    }
+
+
+    /**
+     * @param FolderInterface $folder
+     * @return array
+     */
+    protected function getBreadcrumbs(FolderInterface $folder)
+    {
+        $node = $this->nodeFactory->build(Resource\Browser\NodeFactory::SBFS, $folder->getParent()->getId());
+        $tree = $node->render();
+
+        return $tree['breadcrumbs'];
     }
 
 
