@@ -100,6 +100,25 @@ class Loader
         }
     }
 
+    /**
+     * Just gets whatever the Crocodoc download URL is for this UUID.
+     *
+     * @param string $filename If provided, download with this filename
+     * @return string
+     */
+    public function getDownloadUrl($filename = null)
+    {
+        $parts = [
+            'token'     => $this->getAuthenticator()->getApiToken(),
+            'uuid'      => $this->getUuid(),
+            'annotated' => 'true',
+        ];
+        if ($filename) {
+            $parts['filename'] = $filename;
+        }
+        return "https://crocodoc.com/api/v2/download/document?".http_build_query($parts);
+    }
+
     /* Getters/Setters
      */
 

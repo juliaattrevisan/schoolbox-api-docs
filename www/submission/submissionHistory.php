@@ -3,6 +3,7 @@
 use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\Component;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Breadcrumbs;
 
 // not in sitepage context, redirect
 if (!isset($this)) {
@@ -26,7 +27,7 @@ $this->setBlock('has_rubric', 'rubric', 'rubric_block');
 $this->setBlock(TEMPLATE_content, 'action_submit', 'action_submit_block');
 $this->setBlock(TEMPLATE_content, 'attachments', 'attachments_block');
 $this->setBlock('returned_work', 'return_file', 'return_file_block');
-$this->setBlock('return_file', 'return_file_uuid', 'return_file_uuid_block');
+$this->setBlock('returned_work', 'return_file_uuid', 'return_file_uuid_block');
 $this->setBlock('recent_submission', 'plag_score', 'plag_score_block');
 $this->setBlock('recent_submission', 'recent_submission_download', 'recent_submission_download_block');
 $this->setBlock('subject', 'work', 'work_block');
@@ -220,6 +221,28 @@ $this->setVar(
         'BOX_CREATED'          => $createdDate->getRelativeTime()
     )
 );
+
+
+/* Render out breadcrumbs
+ */
+$trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => 'Due Work',
+        'href' => "/submission/dueWork",
+        'class' => '',
+    ],
+    [
+        'text' => $box->getCategory()->getName(),
+        'href' => "/homepage/".$box->getCategory()->getId(),
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($box->getName()),
+        'href' => "#",
+        'class' => 'active',
+    ]
+]);
 
 // determine whether to display the name of the user we're looking at
 if ($userID == $currentUserId) {
@@ -625,6 +648,25 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
         )
     );
 
+    /* If there's a crocodoc document, display a link to it.
+     * Do this even if there's no returned file in storage.
+     */
+    if ($return->getUuid()) {
+        try {
+            $associatedSubmission = $submissionMapper->findOneByColumn('uuid', $return->getUuid());
+
+            $this->setVar(
+                array(
+                    'RETURNED_WORK_SUBMISSION_ID' => $associatedSubmission->getId(),
+                )
+            );
+        } catch (\Exception $e) {
+            error(44);
+        }
+
+        $this->parse('return_file_uuid_block', 'return_file_uuid');
+    }
+
     if($return->getStorage()->getHash() && !$parentOnly) {
         try{
 
@@ -647,25 +689,6 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
     }
     else {
         $this->setVar('return_file_block', '');
-    }
-
-    /* If there's a crocodoc document, display a link to it.
-     * Do this even if there's no returned file in storage.
-     */
-    if ($return->getUuid()) {
-        try {
-            $associatedSubmission = $submissionMapper->findOneByColumn('uuid', $return->getUuid());
-
-            $this->setVar(
-                array(
-                    'RETURNED_WORK_SUBMISSION_ID' => $associatedSubmission->getId(),
-                )
-            );
-        } catch (\Exception $e) {
-            error(44);
-        }
-
-        $this->parse('return_file_uuid_block', 'return_file_uuid');
     }
 
     $this->parse('returned_work_block', 'returned_work');

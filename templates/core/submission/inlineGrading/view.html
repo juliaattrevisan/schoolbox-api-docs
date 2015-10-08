@@ -113,10 +113,14 @@
         </ul>
     </div>
     <nav>
-        <a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="icon-history" title="View History"></a>
+        <a class="icon-more" title="View Options" data-dropdown="header-options"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li><a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="icon-history">View History</a></li>
+        <li><a href='/submission/inlineGrading/download/{INLINE_GRADING_SUBMISSION_ID}' class='icon-download'>Download Annotated</a></li>
         <!-- BEGIN report_btn -->
         <!-- END report_btn -->
-    </nav>
+    </ul>
 </div>
 
 <div class="row collapse">

@@ -25,6 +25,13 @@ class Facade
     private $submissionId = '';
 
     /**
+     * The submission object itself
+     *
+     * @var Submission\File
+     */
+    private $submission;
+
+    /**
      * @var User
      */
     private $user = null;
@@ -38,7 +45,36 @@ class Facade
     public function __construct($submissionId, User $user)
     {
         $this->setSubmissionId($submissionId);
+        $this->loadSubmission($submissionId);
         $this->setUser($user);
+    }
+
+    /**
+     * Loads a submission box from the supplied submission ID.
+     *
+     * @param $submissionId
+     */
+    protected function loadSubmission($submissionId)
+    {
+        $submissionMapper = new Submission\FileMapper();
+        $this->setSubmission($submissionMapper->findById($submissionId));
+    }
+
+    /**
+     * Uploads the submission box to Crocodoc
+     */
+    protected function upload()
+    {
+        try {
+            $document = new Document($this->getSubmission());
+            $response = $document->upload();
+        } catch (\RangeException $e) {
+            echo "Error encountered: ".$e->getMessage();
+        }
+
+        if ($response['error']) {
+            echo json_encode($response);
+        }
     }
 
 	/**
@@ -47,25 +83,13 @@ class Facade
 	 * @throws Exception
 	 */
 	public function start() {
-		$submissionMapper = new Submission\FileMapper();
-
-        /** @var Submission\File $submission */
-		$submission = $submissionMapper->findById($this->getSubmissionId());
 
         /* If this was previously uploaded in the past, resume scribbling
          * Otherwise upload it and start a new scribble
          */
+        $submission = $this->getSubmission();
         if (!strlen($submission->getUuid())) {
-            try {
-                $document = new Document($submission);
-                $response = $document->upload();
-            } catch (\RangeException $e) {
-                echo "Error encountered: ".$e->getMessage();
-            }
-
-            if ($response['error']) {
-                echo json_encode($response);
-            }
+            $this->upload();
         }
 
         try {
@@ -74,6 +98,30 @@ class Facade
             exit;
         }
         catch (Exception $e) {
+            echo "Error encountered: ".$e->getMessage();
+        }
+    }
+
+    /**
+     * Redirects to a PDF download link for this object.
+     *
+     * @throws Exception
+     */
+    public function download()
+    {
+        /* If this was previously uploaded in the past, resume scribbling
+         * Otherwise upload it and start a new scribble
+         */
+        $submission = $this->getSubmission();
+        if (!strlen($submission->getUuid())) {
+            $this->upload();
+        }
+
+        try {
+            $loader = new Loader($submission->getUuid(), $this->getUser());
+            header('Location: '.$loader->getDownloadUrl('return_'.$submission->getFilename().'.pdf'));
+            exit;
+        } catch (Exception $e) {
             echo "Error encountered: ".$e->getMessage();
         }
     }
@@ -99,6 +147,25 @@ class Facade
     private function getSubmissionId()
     {
         return $this->submissionId;
+    }
+
+    /**
+     * @return Submission\File
+     */
+    private function getSubmission()
+    {
+        return $this->submission;
+    }
+
+    /**
+     * @param  Submission\File $submission
+     *
+     * @return $this
+     */
+    private function setSubmission($submission)
+    {
+        $this->submission = $submission;
+        return $this;
     }
 
     /**
