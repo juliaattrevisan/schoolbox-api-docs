@@ -2,7 +2,7 @@
  * Event listeners for the course instance component.
  */
 (function($) {
-    $.fn.setupCourseInstance = function(options) {
+    $.fn.setupCourseOutline = function(options) {
         var defaults = {
             course_homepage: '',
             import_base_url: '',
