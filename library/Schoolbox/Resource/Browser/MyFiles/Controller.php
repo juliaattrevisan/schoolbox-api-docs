@@ -45,10 +45,15 @@ class Controller extends AbstractController
      */
     protected function getBreadcrumbs(FolderInterface $folder)
     {
-        $node = $this->nodeFactory->build(NodeFactory::MYFILE, $folder->getParent()->getId());
-        $tree = $node->render();
+        try {
+            $node = $this->nodeFactory->build(NodeFactory::MYFILE, $folder->getParent()->getId());
+            $tree = $node->render();
 
-        return $tree['breadcrumbs'];
+            return $tree['breadcrumbs'];
+
+        } catch (\InvalidArgumentException $e) {
+            return [];
+        }
     }
 
 
