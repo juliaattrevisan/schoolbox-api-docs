@@ -98,8 +98,10 @@
 			<td>
                 <input class="{NULLABLE_CLASS}" name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="{TYPE}" {READONLY} value="{VALUE}" />
                 <!-- BEGIN newInput_null -->
+            </td>
+            <td>
                 <input id="{TABLE_COLUMN}-new-null" type="checkbox" name="{TABLE_COLUMN}[{ROW_NUMBER}]" value="NULL" />
-                <label for="{TABLE_COLUMN}-new-null">Null?</label>
+                <label for="{TABLE_COLUMN}-new-null" class="checkbox-label">Null?</label>
                 <!-- END newInput_null -->
             </td>
 			<!-- END newInput -->
@@ -115,7 +117,7 @@
             <!-- BEGIN newCheckbox -->
             <td>
                 <input name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="hidden" value="0" />
-                <input name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="checkbox" {READONLY} value="1" />
+                <input name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="checkbox" {READONLY} value="1" class="checkbox-label" />
             </td>
             <!-- END newCheckbox -->
 		</tr>
