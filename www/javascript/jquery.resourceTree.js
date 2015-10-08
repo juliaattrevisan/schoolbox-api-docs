@@ -68,6 +68,11 @@
                             if (!(permission == 'write' || permission == 'full')) {
                                 return false;
                             }
+
+                            // also check that you're not trying to drag onto a file
+                            if (node_parent.original.type == 'file') {
+                                return false;
+                            }
                         }
                         return true;
                     },
@@ -80,6 +85,7 @@
                 },
                 plugins : ['dnd', 'sort', 'types', 'wholerow'],
                 dnd: {
+                    touch: false, // no dragging on touch screen thanks
                     copy: false,
                     is_draggable: function(nodes) {
                         var isDraggable = true;
