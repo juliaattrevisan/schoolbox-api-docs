@@ -2,7 +2,7 @@
  * Event listeners for the course task list.
  */
 (function($) {
-    $.fn.setupCourseTaskList = function(options) {
+    $.fn.setupCourseBuilder = function(options) {
         var defaults = {
             units:        [],
             previewSelector: '[data-plugin=preview]'

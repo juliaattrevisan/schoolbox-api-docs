@@ -142,7 +142,7 @@ if ($page->detectAjax()) {
             // There ought to be a method which does this.
             $chf = new Component_Homepage_Factory(new \Schoolbox\User(), new SitePage(false));
 
-            /** @var Component_Homepage_CourseInstanceController $controller */
+            /** @var Component_Homepage_CourseOutlineController $controller */
             $controller = $chf->buildComponent($component);
             $controller->setup(
                 $category,

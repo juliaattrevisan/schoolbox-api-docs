@@ -18,7 +18,7 @@ use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class Component_Homepage_CourseInstanceController extends Component_Homepage_ControllerAbstract
+class Component_Homepage_CourseOutlineController extends Component_Homepage_ControllerAbstract
 {
 
     /**
@@ -138,7 +138,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
      */
     public function renderTemplate($templateHandle)
     {
-        if (!parent::loadTemplate($templateHandle, 'courseInstance')) {
+        if (!parent::loadTemplate($templateHandle, 'courseOutline')) {
             return false;
         }
 
