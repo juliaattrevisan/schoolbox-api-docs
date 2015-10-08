@@ -82,8 +82,11 @@ foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
 
         unset($studentData['user']);
 
-        $submit = !!count($studentData['submissions']);
-        $ontime = $submit ? $submitClass = 'submit-ok' : false;
+        $submit = count($studentData['submissions']) > 0;
+        $ontime = false;
+        if ($submit) {
+            $ontime = $submitClass == DueWork_Detail::CLASS_ON_TIME;
+        }
         $marked = isset($studentData['return']['id']) && $studentData['return']['id'] > 0;
 
         if ($marked) {
