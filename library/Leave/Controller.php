@@ -60,6 +60,7 @@ class Leave_Controller extends Controller
      * used in the Leave Time/Return Time dropdowns
      */
     private $timeMap = array(
+        '00:00:00' => '12:00 AM',
         '00:30:00' => '12:30 AM',
         '01:00:00' => '1:00 AM',
         '01:30:00' => '1:30 AM',
