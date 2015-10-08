@@ -6,7 +6,12 @@
 
             var newRow = $('[data-clone]').find('tr').clone();
 
-            $('[data-list]').find('tbody').append(newRow).find('input[name="name[{ROW_NUMBER}]"]').last().focus();
+            $('[data-list]')
+                    .find('tbody')
+                    .append(newRow)
+                    .find('input[name="name[{ROW_NUMBER}]"]')
+                    .last()
+                    .focus();
 
             return false;
         });
@@ -117,7 +122,8 @@
             <!-- BEGIN newCheckbox -->
             <td>
                 <input name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="hidden" value="0" />
-                <input name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="checkbox" {READONLY} value="1" class="checkbox-label" />
+                <input id="checkbox-{TABLE_COLUMN}[{ROW_NUMBER}]" name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="checkbox" {READONLY} value="1" />
+                <label for="checkbox-{TABLE_COLUMN}[{ROW_NUMBER}]" class="checkbox-label"></label>
             </td>
             <!-- END newCheckbox -->
 		</tr>
