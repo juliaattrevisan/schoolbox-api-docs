@@ -1,10 +1,15 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript">
     (function($) {
         $(function(){
             // Save form for updating a student's progress
             $('a[data-interaction="update_progress"]').on('click', function(event){
                 event.preventDefault()
+
+                var label = $('[data-save-progress-state]');
+                label.labelActivate();
+
                 var element = $(this);
                 var form    = element.closest('form');
                 $.post(
@@ -28,6 +33,11 @@
                                 break;
                         }
 
+                        label.labelTimeout({
+                            text: 'Saved',
+                            css: 'success'
+                        });
+
                         setTimeout(function() {
                             element.removeClass('ajax-updated');
                         }, 1000)
@@ -38,8 +48,8 @@
         });
     })(jQuery);
 </script>
-
 <!-- END custom_head -->
+
 {BREADCRUMB}
 
 <div class="row">
@@ -141,5 +151,6 @@
             </table>
             <!--[if gte IE 9]> </div><![endif]-->
         </div>
+        <span class="label full-width hide" data-save-progress-state></span>
     </div>
 </div>

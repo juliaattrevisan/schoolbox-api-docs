@@ -47,6 +47,7 @@
          */
         function apply() {
             $(config.element)
+                .stop()
                 .text(config.text)
                 .removeClass('alert success hide')
                 .addClass(config.css)
@@ -118,10 +119,11 @@
                 .text(config.text)
                 .removeClass(config.initialCss)
                 .addClass(config.css)
+                .stop();
 
             setTimeout(
                 function() {
-                    $(config.element).animate({opacity: 0}, config.fadeDuration, function() {
+                    $(config.element).stop().animate({opacity: 0}, config.fadeDuration, function() {
                         $(config.element)
                             .addClass('hide')
                             .removeClass(config.css)
