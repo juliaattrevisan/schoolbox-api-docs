@@ -354,7 +354,7 @@ class UnitInstanceMapper extends Mapper {
 
         // Load tasks into each unit
         /** @var Task\Instance[]|Collection $task_list */
-        $task_list = $this->findJoinedModelList('task', $unit_instance_list);
+        $task_list = $this->findJoinedModelList('task', $unit_instance_list, ['order' => ['order' => 'asc',],]);
 
         // Load completions for each unit, and load into task list
         /** @var Task\InstanceCompletion[]|Collection $completion_list */
