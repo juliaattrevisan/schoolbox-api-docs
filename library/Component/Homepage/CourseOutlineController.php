@@ -138,7 +138,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
      */
     public function renderTemplate($templateHandle)
     {
-        if (!parent::loadTemplate($templateHandle, 'courseInstance')) {
+        if (!parent::loadTemplate($templateHandle, 'courseOutline')) {
             return false;
         }
 
