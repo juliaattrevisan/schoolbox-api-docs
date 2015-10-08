@@ -3,6 +3,7 @@
 use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\Component;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Breadcrumbs;
 
 // not in sitepage context, redirect
 if (!isset($this)) {
@@ -220,6 +221,28 @@ $this->setVar(
         'BOX_CREATED'          => $createdDate->getRelativeTime()
     )
 );
+
+
+/* Render out breadcrumbs
+ */
+$trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => 'Due Work',
+        'href' => "/submission/dueWork",
+        'class' => '',
+    ],
+    [
+        'text' => $box->getCategory()->getName(),
+        'href' => "/homepage/".$box->getCategory()->getId(),
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($box->getName()),
+        'href' => "#",
+        'class' => 'active',
+    ]
+]);
 
 // determine whether to display the name of the user we're looking at
 if ($userID == $currentUserId) {

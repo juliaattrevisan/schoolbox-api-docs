@@ -10,6 +10,7 @@
 
 use Schoolbox\Assessment\Component;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use Schoolbox\Breadcrumbs;
 
 /* /submission/inline/viewStudent/<submission_id>
  */
@@ -62,6 +63,33 @@ unset($groupHandler);
 /* Rendering things out
  */
 $this->setFile(TEMPLATE_content, 'submission/inlineGrading/viewStudent.html');
+
+
+/* Render out breadcrumbs
+ */
+$trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => 'Due Work',
+        'href' => "/submission/dueWork",
+        'class' => '',
+    ],
+    [
+        'text' => $submissionBox->getCategory()->getName(),
+        'href' => "/homepage/".$submissionBox->getCategory()->getId(),
+        'class' => '',
+    ],
+    [
+        'text' => Scrub::text($submissionBox->getName()),
+        'href' => "/submission/submissionHistory/{$submissionBox->getId()}/{$currentStudent->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => 'Annotations',
+        'href' => "#",
+        'class' => 'active',
+    ]
+]);
 
 /* Render injectable views
  */

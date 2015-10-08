@@ -1,12 +1,13 @@
-<div class="row actions-small-2">
+{BREADCRUMB}
+
+<div class="row actions-small-1">
     <div class="small-12 columns list-item">
-        <h1>Grade for {INLINE_GRADING_SUBMISSION_BOX_NAME}</h1>
+        <h1>Annotations for {INLINE_GRADING_SUBMISSION_BOX_NAME}</h1>
         <ul class="meta">
             <li class="icon-staff-students"><a href="/search/user/{INLINE_GRADING_STUDENT_ID}" title="View Profile">{INLINE_GRADING_STUDENT_FULL_NAME}</a></li>
         </ul>
     </div>
     <nav>
-        <a href='/submission/submissionHistory/{INLINE_GRADING_SUBMISSION_BOX_ID}/{INLINE_GRADING_STUDENT_ID}' class='icon-history' title="View History"></a>
         <a href='/submission/inlineGrading/download/{INLINE_GRADING_SUBMISSION_ID}' class='icon-download' title="Download"></a>
     </nav>
 </div>
