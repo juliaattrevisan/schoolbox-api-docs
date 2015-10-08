@@ -76,7 +76,7 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
      */
     public function renderTemplate($templateHandle)
     {
-        if (!parent::loadTemplate($templateHandle, 'courseTaskList')) {
+        if (!parent::loadTemplate($templateHandle, 'courseBuilder')) {
             return false;
         }
 
