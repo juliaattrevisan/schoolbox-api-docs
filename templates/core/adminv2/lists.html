@@ -6,6 +6,16 @@
 
             var newRow = $('[data-clone]').find('tr').clone();
 
+            /* Randomise ids for every cloned checkbox
+             */
+            var uniqueNull = 'checkbox-clone-' + Math.random(0, 100000);
+            newRow.find('[data-null]').find('input[type=checkbox]').attr('id', uniqueNull);
+            newRow.find('[data-null]').find('.checkbox-label').attr('for', uniqueNull);
+
+            var uniqueDefault = 'checkbox-clone-' + Math.random(0, 100000);
+            newRow.find('[data-default]').find('input[type=checkbox]').attr('id', uniqueDefault);
+            newRow.find('[data-default]').find('.checkbox-label').attr('for', uniqueDefault);
+
             $('[data-list]')
                     .find('tbody')
                     .append(newRow)
@@ -104,7 +114,7 @@
                 <input class="{NULLABLE_CLASS}" name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="{TYPE}" {READONLY} value="{VALUE}" />
                 <!-- BEGIN newInput_null -->
             </td>
-            <td>
+            <td data-null>
                 <input id="{TABLE_COLUMN}-new-null" type="checkbox" name="{TABLE_COLUMN}[{ROW_NUMBER}]" value="NULL" />
                 <label for="{TABLE_COLUMN}-new-null" class="checkbox-label">Null?</label>
                 <!-- END newInput_null -->
@@ -120,7 +130,7 @@
             </td>
 			<!-- END newSelect -->
             <!-- BEGIN newCheckbox -->
-            <td>
+            <td data-default>
                 <input name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="hidden" value="0" />
                 <input id="checkbox-{TABLE_COLUMN}[{ROW_NUMBER}]" name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="checkbox" {READONLY} value="1" />
                 <label for="checkbox-{TABLE_COLUMN}[{ROW_NUMBER}]" class="checkbox-label"></label>
