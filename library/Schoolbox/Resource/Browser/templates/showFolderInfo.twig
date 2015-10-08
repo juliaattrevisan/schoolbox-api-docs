@@ -1,6 +1,12 @@
 {#<ul class="information-list">#}
 {% if access > 0 or user.isSuperuser %}
 
+<ul class="breadcrumb">
+    {% for node in tree %}
+        <li><a data-selectnode="{{ node.categoryId }}" href="/resources/{{ node.categoryId }}">{{ node.name }}</a></li>
+    {% endfor %}
+</ul>
+
 <div class="row">
     <div class="small-4 column text-center">
         <a{% if folder.hasHomepage %} title="View Homepage" href="/homepage/{{ folder.id }}"{% endif %}>
@@ -8,14 +14,21 @@
         </a>
     </div>
     <div class="small-8 column">
-        <a{% if folder.hasHomepage %} title="View Homepage" href="/homepage/{{ folder.id }}"{% endif %}>
-            <h3>
-                {{ folder.name }}
-                {% if folder.codeString %}
-                    ({{ folder.codeString }})
-                {% endif %}
-            </h3>
-        </a>
+        <div class="actions-small-1">
+            <div class="list-item">
+                <a{% if folder.hasHomepage %} title="View Homepage" href="/homepage/{{ folder.id }}"{% endif %}>
+                    <h3>
+                        {{ folder.name }}
+                        {% if folder.codeString %}
+                            ({{ folder.codeString }})
+                        {% endif %}
+                    </h3>
+                </a>
+            </div>
+            <nav>
+                <a href="#" class="icon-eye" data-reveal-id="modal-folder-{{ folder.id }}"></a>
+            </nav>
+        </div>
         <ul class="inline-list">
 
         {% if folder.group.category %}
@@ -36,8 +49,16 @@
 
         {% elseif folder.codeString and folder.teachers|length > 0 %}
             <li>Class</li>
+        {% else %}
+            <li>Folder</li>
         {% endif %}
         </ul>
+
+
+
+
+
+
 
         {% set actionBarList %}
 
@@ -60,8 +81,7 @@
                 {% if access >= 2 or user.isSuperuser %}
                     <li><a class="icon-delete"   data-action="delete"   href="#">Delete</a></li>
                 {% endif %}
-        {% endif %}
-
+            {% endif %}
             {% if folder.group.category %}
                 <li>
 
@@ -86,32 +106,42 @@
 
         {% include '@resourceBrowser/actionBar.twig' with { id: 'folder-actions', list: actionBarList, sizing: { small: 1, medium: 2, large: 2, xlarge: 4, xxlarge: 2 } } %}
 
+    <div class="reveal-modal" id="modal-folder-{{ folder.id }}" data-reveal>
 
+        <h2>{{ folder.name }}</h2>
 
+        <dl class="inline-dl">
 
     {% if (folder.codeString and folder.teachers|length > 0) or folder.group.category %}
-        <ul class="inline-list">
         {% if folder.group.category %}
-            <li class="avatar card tiny">
-                <a {% if admin.id %}href="/search/user/{{ admin.id }}"{% endif %}>
-                    <img src="/portrait.php?size=square64&userId={{ admin.externalId }}" alt="{{ admin.formatName }}" />
-                    <p>{{ admin.formatName }} (Admin)</p>
-                </a>
-            </li>
+            <dt class="small-12 medium-4">Group Administrator</dt>
+            <dd class="small-12 medium-8">
+                <div class="avatar card tiny">
+                    <a {% if admin.id %}href="/search/user/{{ admin.id }}"{% endif %}>
+                        <img src="/portrait.php?size=square64&userId={{ admin.externalId }}" alt="{{ admin.formatName }}" />
+                        <p>{{ admin.formatName }}</p>
+                    </a>
+                </div>
+            </dd>
         {% endif %}
-        {% for teacher in folder.teachers %}
-            <li class="avatar card tiny">
-                <a href="/search/user/{{ teacher.id }}">
-                    <img src="/portrait.php?size=square48&userId={{ teacher.externalId }}" alt="{{ teacher.formatName }}" />
-                    <p>{{ teacher.formatName }}</p>
-                </a>
-            </li>
-        {% endfor %}
-        </ul>
+        {% if folder.teachers %}
+        <dt class="small-12 medium-4">Teacher{{ folder.teachers.count == 1 ? '' : 's' }}</dt>
+            {% for i, teacher in folder.teachers %}
+            <dd class="small-12 medium-8{% if i > 0 %} medium-offset-4{% endif %}">
+                <div class="avatar card tiny">
+                    <a href="/search/user/{{ teacher.id }}">
+                        <img src="/portrait.php?size=square48&userId={{ teacher.externalId }}" alt="{{ teacher.formatName }}" />
+                        <p>{{ teacher.formatName }}</p>
+                    </a>
+                </div>
+            </dd>
+            {% endfor %}
+        {% endif %}
     {% endif %}
-
-    {% if user.role.type == 'staff' and folder.id > 0 %}
+        </dl>
+        <h3>Permissions</h3>
         <dl class="inline-dl">
+    {% if user.role.type == 'staff' and folder.id > 0 %}
         {% for access in roles %}
             <dt class="small-8">{{ access.role.name }}</dt>
             <dd class="small-4">
@@ -120,11 +150,13 @@
                 {%- if access.type == 2 %}Write{% endif -%}
             </dd>
         {% endfor %}
-        </dl>
     {% endif %}
 
+        </dl>
 
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 
+    </div>
 
 
 

@@ -16,6 +16,13 @@
 
 
 {% if access > 0 %}
+
+<ul class="breadcrumb" id="breadcrumbs">
+    {% for node in tree %}
+        <li><a data-selectnode="{{ node.categoryId }}" href="/resources/{{ node.categoryId }}">{{ node.name }}</a></li>
+    {% endfor %}
+</ul>
+
 <div class="row">
     <div class="small-4 column text-center">
         {% if file.mimetype.isImage %}
@@ -25,10 +32,20 @@
         {% endif %}
     </div>
     <div class="small-8 column">
-        <h3>{{ file.title }}</h3>
-        {% if namespace == 'resourceBrowser' %}
+        <div class="actions-small-1">
+            <div class="list-item">
+                <h3>{{ file.title }}</h3>
+            </div>
+            <nav>
+                <a href="#" class="icon-eye" data-reveal-id="modal-file-{{ file.id }}"></a>
+            </nav>
+        </div>
+        {% if namespace == 'resourceBrowser' and file.description %}
             <p>{{ file.description }}</p>
+        {% else %}
+            <p>{{ file.mimetype.description }}</p>
         {% endif %}
+
 
         {% set fileActionList %}
 
@@ -42,6 +59,10 @@
         {% endset %}
 
         {% include '@resourceBrowser/actionBar.twig' with { id: 'file-actions', list: fileActionList, sizing: { small: 1, medium: 2, large: 2, xlarge: 4, xxlarge: 2 } } %}
+
+        <div class="reveal-modal" data-reveal id="modal-file-{{ file.id }}">
+
+            <h2>{{ file.title }}</h2>
 
         <dl class="inline-dl">
             {% if namespace == 'resourceBrowser' %}
@@ -84,6 +105,10 @@
                 <a href="{{ send ~ file.id }}">{{ host ~ send ~ file.id }}</a>
             </dd>
         </dl>
+
+            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+
+        </div>
 
     </div>
 </div>

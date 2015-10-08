@@ -22,7 +22,7 @@
         background-color: rgba(255,255,255,0.8);
         text-align: center;
         box-sizing: border-box;
-        padding-top: 45%;
+        padding-top: 10%;
     }
     [data-ajax].loading:before {
         display: block;
@@ -65,9 +65,12 @@
         height: 100%;
     }
     #tree {
-        overflow-x: hidden;
+        /*overflow-x: hidden;*/
     }
-
+    .scroller {
+        overflow: auto;
+        height: 20rem;
+    }
     @media only screen and (min-width:64.0625em) and (max-width:120em) {
         .folder-panel, .file-panel {
             height: 100%;
@@ -104,14 +107,10 @@
 
         {# TODO put this in a new module #}
         var tree = $('#tree'),
-            fileList         = $('#file-list'),
             metaData         = $('#meta'),
             listItem         = 'li',
-            anchor           = 'a',
             selected         = 'selected',
-            current          = 'jstree-clicked',
             hovered          = 'jstree-hovered',
-            childrenUri      = '/:id/children',
             folderInfoUri    = '/:id/info',
             fileInfoUri      = '/file/:id/info';
 
@@ -131,88 +130,16 @@
         {% endif %}
 
         tree.on('select_node.jstree', function(event, jstree) {
-            loadPanel(fileList, childrenUri, jstree.node.id);
-            loadPanel(metaData, folderInfoUri, jstree.node.id);
+
+            if (jstree.node.type == 'file') {
+                loadPanel(metaData, fileInfoUri, jstree.node.id);
+            } else {
+                loadPanel(metaData, folderInfoUri, jstree.node.id);
+            }
         });
 
-        fileList.on(
-            'click', anchor,
-            function (e) {
-
-                var node1, node2, len, files,
-                    link = $(this),
-                    item = link.closest(listItem);
-
-                e.preventDefault();
-
-                // just click
-                if (!event.ctrlKey && !event.shiftKey) {
-                    fileList.children('.'+selected).removeClass(selected);
-                }
-
-                // ctrl click
-                if (event.ctrlKey) {
-                    item.toggleClass(selected);
-
-                } else {
-                    item.addClass(selected);
-                }
-
-                // shift click
-                if (event.shiftKey) {
-                    node1 = fileList.children(listItem).index(fileList.children('.'+current));
-                    node2 = fileList.children(listItem).index(item);
-
-                    if (node1 > node2) {
-                        fileList.children(listItem).slice(node2, node1).addClass(selected);
-                    } else {
-                        fileList.children(listItem).slice(node1, node2).addClass(selected);
-                    }
-                }
-
-                fileList.children('.'+current).removeClass(current);
-                item.addClass(current);
-
-                len = fileList.children('.'+selected).length;
-
-                if (len == 1) {
-                    loadPanel(metaData, fileInfoUri, link.data('id'));
-                } else {
-                    files = $('#file-list').children('.selected').map(function(k, v) { return $(v).children('a').data('id'); });
-                    loadPanel(metaData, fileInfoUri, files.toArray().join(','));
-                }
-
-            }
-//        ).on(
-//            'dblclick', 'a',
-//            function (e) {
-//                // fire the single-click action
-//                console.log(e);
-//                $(this).trigger('click');
-//            }
-        ).on(
-            'mousedown', anchor,
-            function (e) {
-                var len = fileList.children('.'+selected).length,
-                    txt = len > 1
-                        ? '(' + String(len) + ' files)'
-                        : $(this).text();
-
-                return $.vakata.dnd.start(
-                    e, {
-                        jstree: true,
-                        obj: $(this),
-                        nodes: []
-                    },
-                    '<div id="jstree-dnd" class="jstree-default"><i class="jstree-icon jstree-er"></i>'
-                        + txt
-                        + '</div>'
-                );
-            }
-        );
-
         $(document).on('dnd_stop.vakata', function (event, data) {
-            var target, node, nodes;
+            var target;
 
             if (!tree.find('.'+hovered).length) {
                 return;
@@ -220,43 +147,20 @@
 
             target = tree.find('.'+hovered).closest(listItem).attr('id');
 
-            // Am I dragging onto the jstree, and is there a hovered ID?
-            if (data.data.jstree && $(data.element).is(anchor)) {
-                // This is a file, do the drag/drop thing
-                node = $(data.element).closest(listItem);
-
-                // Move all files, not just the one selected
-                nodes = node.add(fileList.children('.'+selected));
-
-                nodes.each(function () {
-                    var node   = $(this),
-                        nodeId = node.children(anchor).data('id');
-
-                    console.log(nodeId, target);
-
-                    $.ajax(
-                        {
-                            type: 'POST',
-                            url:  '/cms/fileForm.php',
-                            data: {
-                                move: nodeId,
-                                categoryID: target
-                            },
-                            dataType: 'json'
-                        }
-                    ).done(
-                        function (data) {
-                            node.remove();
-                        }
-                    );
-                });
-            }
+            console.log(target, event, data);
         });
+
+        var $window    = $(window),
+            $hybrid    = $('#hybrid-bar'),
+            $footer    = $('#footer'),
+            $resources = $('#resources');
+
 
         function rs()
         {
-            var calcd = $(window).height() - $('#search').height() - $('#footer').height() - $('#meta').height() - 48;
-            $('#three-panel').height(Math.max(200, calcd));
+            var calcd = $window.height() - $hybrid.height() - $footer.height() - metaData.height() - 120;
+
+            $resources.height(Math.max(200, calcd));
         }
 
         function loadPanel(panel, path, nodeId)
@@ -266,6 +170,8 @@
             panel
                 .addClass('loading')
                 .data('nodeId', nodeId)
+
+                {# TODO cache this #}
                 .load(uri, function () {
                     $(this).removeClass('loading');
                     $('#container').foundation('tooltip', 'reflow');
@@ -278,66 +184,29 @@
 
         $(window).on('resize', rs);
 
+        metaData.on('click', '[data-selectnode]', function (e) {
+            e.preventDefault();
 
-        $('#drop-center').fileDrop({
-            previewsContainer: '#file-list',
-            tplWrap: '<li class="dz-preview" />',
+            var $anchor = $(this),
+                node    = $anchor.data('selectnode'),
+                target  = tree.find('a[id=' + node + '_anchor]');
 
-            addedfile: function(file) {
-                var nodeId = $('#tree').jstree('get_selected')[0];
-                $(file.previewElement).data('node', nodeId);
-            },
-
-            // callbacks
-            sending: function (file, xhr, formData) {
-                var el = $(file.previewElement);
-
-                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                formData.append('category', el.data('node'));
-                formData.append('comment', '');
-                formData.append('hidden', 0);
-            },
-
-            complete: function (file, response) {
-                $(file.previewElement).find('img').attr('src', '');
-                if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
-                    loadPanel($('#file-list'), '/:id/children', $('#tree').jstree('get_selected')[0]);
-                }
-            }
-
+            target.trigger('click');
         });
+
     });
 </script>
 {# /HEAD #}
 
 <div id="three-panel" class="three-panels row" style="max-width:100%;">
-    <div class="small-12 large-7 xxlarge-4 island folder-panel">
-        {#<h2 class="subheader">Folders</h2>#}
+    <div class="small-12 island folder-panel">
         <section>
-            <div class="scroller">
+            <div class="scroller" id="resources">
                 <div id="tree"></div>
             </div>
         </section>
     </div>
-    <div class="small-12 large-5 xxlarge-4 island file-panel">
-        {#<h2 class="subheader">Files</h2>#}
-        <section>
-            <!--
-            <form class="dropzone" action="/cms/fileForm.php?ajax=1" id="drop-center" method="post" >
-                <div class="dz-default dz-message">
-                    <span>Drop files here to upload</span>
-                </div>
-            </form>
-            -->
-            <div class="scroller">
-                <ul data-ajax id="file-list" class="jstree-default jstree-default-resourcetree">
-                    {% include '@resourceBrowser/listResources.twig' with { files: files } %}
-                </ul>
-            </div>
-        </section>
-    </div>
-    <div class="small-12 xxlarge-4 island property-panel">
-        {#<h2 class="subheader">Properties</h2>#}
+    <div class="small-12 island property-panel">
         <section>
             <div data-ajax id="meta" class="content">
                 {% include '@resourceBrowser/showFolderInfo.twig' %}
