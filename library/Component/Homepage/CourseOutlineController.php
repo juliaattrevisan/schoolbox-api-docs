@@ -389,7 +389,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
             if ($completion_item instanceof Task\InstanceCompletion) {
                 switch ($completion_item->getCompletionStatus()) {
                     case Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE:
-                        $unit_task_class  = 'progress-tick complete complete';
+                        $unit_task_class  = 'progress-tick complete';
                         $unit_task_status = 'Approved';
                         $unit_task_title  = 'Approved';
                         break;
