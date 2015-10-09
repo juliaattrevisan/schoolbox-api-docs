@@ -104,7 +104,7 @@ class TreeBuilder extends AbstractTreeBuilder
         /** @var Mapper $locator */
         $locator = $this->fileLocator;
 
-        return $locator->findIdsByColumnList([
+        return $locator->findByColumnList([
             'owner' => $this->user->getId(),
             'parent' => $nodeId
         ]);
