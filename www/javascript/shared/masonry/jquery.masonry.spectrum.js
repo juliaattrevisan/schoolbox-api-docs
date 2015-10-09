@@ -90,7 +90,7 @@
                     throw Error("Invalid selector");
                 }
 
-                mspec.resetWidth();
+                //mspec.resetWidth();
                 mspec.resetColours(colourSet);
 
                 // copy values from defaults into pickers and reload
@@ -232,6 +232,8 @@
      * @returns {boolean}
      */
     MasonrySpectrum.prototype.resetWidth = function () {
+        // Note: foundation slider's set_value is buggy and causes the slider
+        // to stop sending change events.
         this.masonry.slider.foundation(
             'slider',
             'set_value',
