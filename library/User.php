@@ -441,17 +441,12 @@ class User extends DeprecatedModel
             $this->logUserPasswordChange($user['username'], 'email_change_pwd', 'info');
             $hash = substr(md5(uniqid() . time()), 0, 25);
             $this->update(array('id' => $user['id'], 'hash' => $hash));
-            $mailHandler = new Mailer('change-password.html', Cfg::get(
-                'password_change_email_subject'
-            ), $user['alt_email']);
-            $from        = Cfg::get('password_change_email_from');
-            if ($from) {
-                $mailHandler->setFrom($from);
-            }
-            $mailHandler->setVar('NAME', $user['firstname']);
-            $mailHandler->setVar('DATE', date('j F Y', $_SERVER['REQUEST_TIME']));
-            $mailHandler->setVar('TIME', date('g:i a', $_SERVER['REQUEST_TIME']));
-            return $mailHandler->send();
+            $result['EMAIL'] = $user['alt_email'];
+            $result['FULLNAME'] = $user['firstname']." ".$user['lastname'];
+            $result['FIRSTNAME'] = $user['firstname'];
+            $result['DATE'] = date('j F Y', $_SERVER['REQUEST_TIME']);
+            $result['TIME'] = date('g:i a', $_SERVER['REQUEST_TIME']);
+            return $result;
         }
         return false;
     }
