@@ -13,7 +13,7 @@ INSERT IGNORE INTO `config`(
 )
 VALUES (
 	    'forgotten_password',
-	    (IF ((SELECT COUNT(*) FROM `config` `c` WHERE `c`.`name` = 'site_location' AND `c`.`value` = 'sheldon' LIMIT 1), '1', '0')),
+	    (IF ((SELECT COUNT(*) FROM `config` `c` WHERE `c`.`name` = 'site_location' AND `c`.`value` IN ('shore','sheldon') LIMIT 1), '1', '0')),
 	    'Forgotten Password Email Content',
 	    'Choose what information will be provided in the forgotten password email',
 	    (select id from lu_config_field where field='selectKey'),
