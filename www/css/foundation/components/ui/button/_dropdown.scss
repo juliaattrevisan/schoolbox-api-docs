@@ -37,6 +37,20 @@ $dropdown-button-pip-color-alt: $primary-color;
 // $dropdown-button-pip-opposite-lrg: $button-pip-lrg * 2.5;
 // $dropdown-button-pip-top-lrg: (-$button-pip-lrg / 2) + rem-calc(3);
 
+@import "../../../../../javascript/components/foundation/scss/foundation/components/dropdown-buttons";
+
+
+
+
+
+
+
+
+
+
+
+
+
 //
 // DROPDOWN
 //
@@ -61,8 +75,8 @@ $f-dropdown-margin-top: 0px;
 // $f-dropdown-margin-bottom: $f-dropdown-margin-top;
 
 // We use this to control the background color
-$f-dropdown-bg: $button-color;
-$f-dropdown-content-bg: $vapor;
+$f-dropdown-bg: $content-ui-background;
+$f-dropdown-content-bg: #ff0000;
 
 // We use this to set the border styles for dropdowns.
 // $f-dropdown-border-style: solid;
@@ -76,12 +90,12 @@ $f-dropdown-triangle-size: 0px;
 
 // We use these to control styles for the list elements.
 // $f-dropdown-list-style: none;
-$f-dropdown-font-color: calc-text-color($f-dropdown-bg, $white, $primary-color);
+$f-dropdown-font-color: $content-ui-foreground;
 $f-dropdown-font-size: rem-calc(($base-font-size));
 $f-dropdown-list-padding: rem-calc(($base-font-size - 6));
 // $f-dropdown-line-height: rem-calc(18);
-$f-dropdown-list-hover-bg: tint($f-dropdown-bg, 32%);
-$f-dropdown-list-separator-bg: darken($f-dropdown-bg, 7%);
+$f-dropdown-list-hover-bg: $content-ui-hover;
+$f-dropdown-list-separator-bg: $content-ui-foreground;
 // $dropdown-mobile-default-float: 0;
 
 // We use this to control the styles for when the dropdown has custom content.
@@ -90,7 +104,6 @@ $f-dropdown-content-padding: rem-calc(($base-font-size - 4));
 // Default radius for dropdown.
 // $f-dropdown-radius: $global-radius;
 
-@import "../../../../../javascript/components/foundation/scss/foundation/components/dropdown-buttons";
 @import "../../../../../javascript/components/foundation/scss/foundation/components/dropdown";
 
 $f-dropdown-list-padding: rem-calc(($base-font-size - 6)) rem-calc(($base-font-size - 3));
