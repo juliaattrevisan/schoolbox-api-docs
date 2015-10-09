@@ -1,8 +1,9 @@
+
+$include-html-button-classes: $include-html-classes;
+
 //
 // BUTTONS
 //
-
-$include-html-button-classes: $include-html-classes;
 
 // We use these to build padding for buttons.
 // $button-tny: rem-calc(10);
@@ -69,7 +70,7 @@ $button-disabled-opacity: 0.5;
 
 
 
-@import "../../../javascript/components/foundation/scss/foundation/components/buttons";
+
 @import "../../../javascript/components/foundation/scss/foundation/components/button-groups";
 
 
