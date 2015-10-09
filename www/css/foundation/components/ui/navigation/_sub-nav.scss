@@ -12,21 +12,15 @@ $sub-nav-font-size: rem-calc(($base-font-size - 2));
 // $sub-nav-text-decoration: none;
 $sub-nav-padding: rem-calc(($base-font-size - 6));
 $sub-nav-border-radius: 0px;
-$sub-nav-font-color-hover: $sub-nav-font-color;
-
 
 // We use these to control the active item styles
 $sub-nav-active-font-weight: $font-weight-normal;
-
 $sub-nav-active-padding: $sub-nav-padding;
 $sub-nav-active-cursor: default;
 
 // $sub-nav-item-divider: "";
 // $sub-nav-item-divider-margin: rem-calc(12);
 
-$sub-nav-font-color: $primary-color;
-$sub-nav-secondary-bg-color: tint($secondary-color, 60%);
-$sub-nav-secondary-bg-active-color: $white;
 
 /* Somehow all those vars above get fed into the import below
  * which is an alternative to overrides to get what you want
@@ -36,11 +30,15 @@ $sub-nav-secondary-bg-active-color: $white;
 
 /* What the hell do these colour settings mean?
  */
-$sub-nav-active-bg: $white;
-$sub-nav-active-bg-hover: tint($tertiary, 87%);
-$sub-nav-active-color: $sub-nav-font-color;
-$sub-nav-bg-color: $secondary-color;
-$sub-nav-bg-active-color: $white;
+//$sub-nav-font-color: $primary-color;
+//$sub-nav-secondary-bg-color: tint($secondary-color, 60%);
+//$sub-nav-secondary-bg-active-color: $white;
+
+//$sub-nav-active-bg: $white;
+//$sub-nav-active-bg-hover: tint($tertiary, 87%);
+//$sub-nav-active-color: $sub-nav-font-color;
+//$sub-nav-bg-color: $secondary-color;
+//$sub-nav-bg-active-color: $white;
 
 // Sub Navigation
 .sub-nav {
@@ -48,10 +46,12 @@ $sub-nav-bg-active-color: $white;
 		margin: 0 1px 1px 0;
 	}
 	a {
-		background-color: $sub-nav-bg-color;
+	    color: $content-ui-foreground;
+		background-color: $content-ui-background;
 		display: inline-block;
 		&:hover {
-			background-color: $sub-nav-active-bg-hover;
+		    color: $content-ui-foreground;
+			background-color: $content-ui-hover;
 		}
 	}
 
@@ -59,9 +59,11 @@ $sub-nav-bg-active-color: $white;
      */
 	&.secondary {
 		a {
-			background-color: $sub-nav-secondary-bg-color;
+		    color: $content-ui-foreground;
+			background-color: $content-ui-background;
 			&:hover{
-				background-color: $sub-nav-active-bg-hover;
+			    color: $content-ui-foreground;
+				background-color: $content-ui-hover;
 			}
 		}
 	}
