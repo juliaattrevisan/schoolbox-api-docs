@@ -4,7 +4,10 @@
   &.move-right {
     .hybrid-bar, .main-section {
       -webkit-filter: blur(.125rem) grayscale(50%);
+      filter: blur(.125rem) grayscale(50%);
+
       -webkit-transition: -webkit-filter 300ms ease;
+      transition: filter 300ms ease;
     }
   }
 }
