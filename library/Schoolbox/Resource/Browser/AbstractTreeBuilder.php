@@ -180,7 +180,7 @@ abstract class AbstractTreeBuilder
      */
     protected function generateFolderArray(IFolder $folder, $type, $name = null, array $liAttributes = null, array $aAttributes = null)
     {
-        return $this->generateNodeArray($folder->getId(), $folder->getParent()->getId(), $type, $name, $liAttributes, $aAttributes);
+        return $this->generateNodeArray($folder->getId(), $folder->getParent()->getId(), $type, $name ?: $folder->getName(), $liAttributes, $aAttributes);
     }
 
 

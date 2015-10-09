@@ -74,7 +74,7 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     protected function generateFileArray(Resource\File\IFile $file, $name = null, array $liAttributes = null, array $aAttributes = null)
     {
-        return $this->generateNodeArray($file->getId(), $file->getFolder()->getId(), 'file', $name, $liAttributes, $aAttributes);
+        return $this->generateNodeArray($file->getId(), $file->getFolder()->getId(), 'file', $name ?: $file->getTitle(), $liAttributes, $aAttributes);
     }
 
 
