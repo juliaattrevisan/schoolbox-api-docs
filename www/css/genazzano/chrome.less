@@ -152,174 +152,175 @@ body.login{
   }
 }
 
-#header{
-  background: #a50532 url('../../images/genazzano/crest.png') 98.5% 18px no-repeat;
-  .logo{
-    top: 45px;
-    left: 49px;
-  }
-  #tabs{
-    background: @tab-background;
-    height: 59px;
-    li{
-      border-right: 1px solid #6d0423;
-      margin: 0;
+body {
+  #header{
+    background: #a50532 url('../../images/genazzano/crest.png') 98.5% 18px no-repeat;
+    .logo{
+      top: 45px;
+      left: 49px;
+    }
+    #tabs{
+      background: @tab-background;
+      height: 59px;
+      li{
+        border-right: 1px solid #6d0423;
+        margin: 0;
+        a{
+          height: 44px;
+          padding: 15px 22px 0 22px;
+        }
+      }
+      margin-left: 214px;
+    }
+    #search{
+      right: 125px;
+      top: 25px;
+      width: 253px;
+
+      #search-field{
+        background: transparent;
+        border: 1px solid #bc5a5f;
+        float: left;
+        padding: 2px 0 0 12px;
+        width: 240px;
+        height: 30px
+      }
+
+      #search-button{
+        background: url("/images/genazzano/search-button.png") no-repeat 3px 4px;
+        right: 0;
+        left: auto;
+        width: 30px;
+      }
+    }
+    #infoPanel{
+      right: 379px;
+      top: 26px;
+      margin-bottom: 68px;
       a{
-        height: 44px;
-        padding: 15px 22px 0 22px;
+        text-decoration: none;
       }
-    }
-    margin-left: 214px;
-  }
-  #search{
-    right: 125px;
-    top: 25px;
-    width: 253px;
-
-    #search-field{
-      background: transparent;
-      border: 1px solid #bc5a5f;
-      float: left;
-      padding: 2px 0 0 12px;
-      width: 240px;
-      height: 30px
-    }
-
-    #search-button{
-      background: url("/images/genazzano/search-button.png") no-repeat 3px 4px;
-      right: 0;
-      left: auto;
-      width: 30px;
-    }
-  }
-  #infoPanel{
-    right: 379px;
-    top: 26px;
-	margin-bottom: 68px;
-    a{
-      text-decoration: none;
-    }
-	.bell {
-		background-image: url('/images/genazzano/bell.png');
-		> a {
-			color: @banner-background;
-		}
-	}
-  }
-}
-
-#nav{
-  width: 214px;
-  margin: 41px 0 0 0;
-  h3{
-    padding: 0 0 0 24px;
-  }
-  ul{
-    width: 190px;
-    border-bottom: 1px solid #b8b6b6;
-    margin-left: 24px;
-    li{
-      h4{ padding: 0; }
-      a{
-        background: url("/images/genazzano/arrow.png") no-repeat 1px 6px;
-        width: 100%;
-        padding: 4px 11px;
-        span strong {display:none;}
-      }
-    }
-  }
-  ul ul{
-    left: 190px;
-    li{
-      background: url("/images/genazzano/arrow.png") no-repeat 10px 6px;
-      padding-left: 10px;
-    }
-  }
-}
-
-#container{
-  margin-left: 214px;
-  padding: 40px;
-  -webkit-box-shadow:  -1px 0px 3px 0px rgba(0, 0, 0, 0.5);
-  box-shadow:  -1px 0px 3px 0px rgba(0, 0, 0, 0.5);
-
-  h1{
-    color: #525252;
-    font-size: 20px;
-    font-style: italic;
-    font-family: Georgia, serif;
-  }
-
-  h2{
-    min-height: 38px;
-    line-height: 40px;
-    font-family: Georgia, serif;
-    font-size: 13px;
-  }
-
-  .box{
-    border: 1px solid @module-background;
-    #category{
-      background: #fafaf8;
-      li a{
-        background: #f7f6f3 url("/images/genazzano/arrow.png") 90% 7px no-repeat;
-        border: 1px solid #e4e1d6;
-        color: #433b3d;
-        padding: 0 24px 0 16px;
-      }
-      .current{
-        background: @link;
-        color: #ffffff;
+      .bell {
+        background-image: url('/images/genazzano/bell.png');
+        > a {
+          color: @banner-background;
+        }
       }
     }
   }
 
-  .information-list{
-    margin: 0;
-    padding: 0 18px;
-    li{
-      padding: 18px 0px;
-      border-bottom: 1px solid #e9e6dd;
+  #nav{
+    width: 214px;
+    margin: 41px 0 0 0;
+    h3{
+      padding: 0 0 0 24px;
     }
-  }
-
-  .news-wrapper{
-    border: 1px solid @module-background;
     ul{
+      width: 190px;
+      border-bottom: 1px solid #b8b6b6;
+      margin-left: 24px;
+      li{
+        h4{ padding: 0; }
+        a{
+          background: url("/images/genazzano/arrow.png") no-repeat 1px 6px;
+          width: 100%;
+          padding: 4px 11px;
+          span strong {display:none;}
+        }
+      }
+    }
+    ul ul{
+      left: 190px;
+      li{
+        background: url("/images/genazzano/arrow.png") no-repeat 10px 6px;
+        padding-left: 10px;
+      }
+    }
+  }
+
+  #container{
+    margin-left: 214px;
+    padding: 40px;
+    -webkit-box-shadow:  -1px 0px 3px 0px rgba(0, 0, 0, 0.5);
+    box-shadow:  -1px 0px 3px 0px rgba(0, 0, 0, 0.5);
+
+    h1{
+      color: #525252;
+      font-size: 20px;
+      font-style: italic;
+      font-family: Georgia, serif;
+    }
+
+    h2{
+      min-height: 38px;
+      line-height: 40px;
+      font-family: Georgia, serif;
+      font-size: 13px;
+    }
+
+    .box{
+      border: 1px solid @module-background;
+      #category{
+        background: #fafaf8;
+        li a{
+          background: #f7f6f3 url("/images/genazzano/arrow.png") 90% 7px no-repeat;
+          border: 1px solid #e4e1d6;
+          color: #433b3d;
+          padding: 0 24px 0 16px;
+        }
+        .current{
+          background: @link;
+          color: #ffffff;
+        }
+      }
+    }
+
+    .information-list{
+      margin: 0;
       padding: 0 18px;
       li{
-        padding: 18px 0px 0px 0;
+        padding: 18px 0px;
+        border-bottom: 1px solid #e9e6dd;
       }
+    }
+
+    .news-wrapper{
+      border: 1px solid @module-background;
+      ul{
+        padding: 0 18px;
+        li{
+          padding: 18px 0px 0px 0;
+        }
+      }
+    }
+
+    .right{
+      .admin-nav{
+        li a{
+          background-color: #f7f6f3;
+          border: 1px solid #e4e1d6;
+          color: #433b3d;
+        }
+        .current{
+          background: @link;
+          color: #ffffff;
+        }
+      }
+    }
+
+    #category-head, #file-head{
+      font-family: Georgia, serif;
+      font-size: 13px;
     }
   }
 
-  .right{
-    .admin-nav{
-      li a{
-        background-color: #f7f6f3;
-        border: 1px solid #e4e1d6;
-        color: #433b3d;
-      }
-      .current{
-        background: @link;
-        color: #ffffff;
-      }
-    }
-  }
-
-  #category-head, #file-head{
-    font-family: Georgia, serif;
-    font-size: 13px;
-  }
-}
-
-/* ---- Mobile ---- */
-@media screen and (max-width: 768px) {
-  body.login{
+  /* ---- Mobile ---- */
+  @media screen and (max-width: 768px) {
+    body.login{
       #container #content{
-      width: 100%;
-      box-sizing: border-box;
-      top: 40px;
+        width: 100%;
+        box-sizing: border-box;
+        top: 40px;
         #login-logo{ margin-bottom: 15px; }
       }
       #footer{
@@ -330,47 +331,48 @@ body.login{
           color: @white;
         }
       }
-    #login-bg{ display: none; }
+      #login-bg{ display: none; }
+    }
   }
-}
 
-/*
- * Demo Dashboards
- */
+  /*
+   * Demo Dashboards
+   */
 
-.demo-dash{
-	li{ float: left;
-		padding: 7px 4px !important;
-		height: 135px;
-		list-style: none;
-	}
-	a{  display: block;
-		float: left;
-		text-align: center;
-		padding: 92px 0 0 0;
-		font-weight: bold;
-		width: 88px;
-		-webkit-transition: opacity 0.5s;
-		-moz-transition: opacity 0.5s;
-		-ms-transition: opacity 0.5s;
-		-o-transition: opacity 0.5s;
-		transition: opacity 0.5s;
-		&:hover{
-			cursor: pointer;
-			opacity: 0.8;
-		}
-	}
-	.parents-friends{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
-	.due-work{ background: url('/images/demo/dashboard-icons.png') -88px 0px no-repeat; }
-	.manage-users{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
-	.timetable{ background: url('/images/demo/dashboard-icons.png') -176px 0px no-repeat; }
-	.synergetic{ background: url('/images/demo/dashboard-icons.png') -264px 0px no-repeat; }
-	.admin{ background: url('/images/demo/dashboard-icons.png') -352px 0px no-repeat; }
-	.eportfolio{ background: url('/images/demo/dashboard-icons.png') -440px 0px no-repeat; }
-	.hr{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
-	.services{ background: url('/images/demo/dashboard-icons.png') -616px 0px no-repeat; }
-	.leave{ background: url('/images/demo/dashboard-icons.png') -528px 0px no-repeat; }
-	.parent-dir{ background: url('/images/demo/dashboard-icons.png') -704px 0px no-repeat; }
-	.payments{ background: url('/images/demo/dashboard-icons.png') -792px 0px no-repeat; }
-	.online-forms{ background: url('/images/demo/dashboard-icons.png') -880px 0px no-repeat; }
+  .demo-dash{
+    li{ float: left;
+      padding: 7px 4px !important;
+      height: 135px;
+      list-style: none;
+    }
+    a{  display: block;
+      float: left;
+      text-align: center;
+      padding: 92px 0 0 0;
+      font-weight: bold;
+      width: 88px;
+      -webkit-transition: opacity 0.5s;
+      -moz-transition: opacity 0.5s;
+      -ms-transition: opacity 0.5s;
+      -o-transition: opacity 0.5s;
+      transition: opacity 0.5s;
+      &:hover{
+        cursor: pointer;
+        opacity: 0.8;
+      }
+    }
+    .parents-friends{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+    .due-work{ background: url('/images/demo/dashboard-icons.png') -88px 0px no-repeat; }
+    .manage-users{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+    .timetable{ background: url('/images/demo/dashboard-icons.png') -176px 0px no-repeat; }
+    .synergetic{ background: url('/images/demo/dashboard-icons.png') -264px 0px no-repeat; }
+    .admin{ background: url('/images/demo/dashboard-icons.png') -352px 0px no-repeat; }
+    .eportfolio{ background: url('/images/demo/dashboard-icons.png') -440px 0px no-repeat; }
+    .hr{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+    .services{ background: url('/images/demo/dashboard-icons.png') -616px 0px no-repeat; }
+    .leave{ background: url('/images/demo/dashboard-icons.png') -528px 0px no-repeat; }
+    .parent-dir{ background: url('/images/demo/dashboard-icons.png') -704px 0px no-repeat; }
+    .payments{ background: url('/images/demo/dashboard-icons.png') -792px 0px no-repeat; }
+    .online-forms{ background: url('/images/demo/dashboard-icons.png') -880px 0px no-repeat; }
+  }
 }
