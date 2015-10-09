@@ -222,8 +222,8 @@ $off-canvas-back-hover-border-top: 0px;
 $off-canvas-back-hover-border-bottom: none;
 
 // Off Canvas Menu Icon Variables
-$tabbar-menu-icon-color: contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color);
-$tabbar-menu-icon-hover: tint($tabbar-menu-icon-color, 20%);
+//$tabbar-menu-icon-color: contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color);
+//$tabbar-menu-icon-hover: tint($tabbar-menu-icon-color, 20%);
 
 $tabbar-menu-icon-text-indent: rem-calc(35);
 $tabbar-menu-icon-width: $tabbar-icon-width;
