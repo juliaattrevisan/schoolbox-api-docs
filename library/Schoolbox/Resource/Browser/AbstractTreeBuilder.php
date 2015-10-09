@@ -221,6 +221,10 @@ abstract class AbstractTreeBuilder
             $array['a_attr'] = $aAttributes;
         }
 
+        if (empty($liAttributes['data-id'])) {
+            $array['li_attr']['data-id'] = $nodeId;
+        }
+
         return $array;
     }
 

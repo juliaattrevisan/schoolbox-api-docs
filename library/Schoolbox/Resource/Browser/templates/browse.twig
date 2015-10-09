@@ -37,9 +37,9 @@
         tree.on('select_node.jstree', function(event, jstree) {
 
             if (jstree.node.type == 'file') {
-                loadPanel(metaData, fileInfoUri, jstree.node.id);
+                loadPanel(metaData, fileInfoUri, jstree.node.li_attr['data-id']);
             } else {
-                loadPanel(metaData, folderInfoUri, jstree.node.id);
+                loadPanel(metaData, folderInfoUri, jstree.node.li_attr['data-id']);
             }
         });
 
@@ -48,10 +48,10 @@
             var $dragged       = $(data.element).closest(listItem),
                 draggedType    = $dragged.data('type'),
                 draggedTypeGen = draggedType == 'file' ? 'file' : 'category',
-                draggedId      = data.data.nodes[0],
+                draggedId      = $dragged.data('id'),
 
                 $dropTarget    = $(data.event.srcElement).closest(listItem),
-                dropTargetId   = $dropTarget.attr('id'),
+                dropTargetId   = $dropTarget.data('id'),
                 dropTargetType = $dropTarget.data('type'),
                 dropTargetPerm = $dropTarget.data('permission');
 
