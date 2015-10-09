@@ -33,7 +33,7 @@ $anyslider-color-hover: $steel;
         &:before {
             // Previous
             font-family: 'schoolbox';
-            content: "\e655";
+            @extend .icon-previous;
         }
     }
     .as-next-arrow {
@@ -41,7 +41,7 @@ $anyslider-color-hover: $steel;
         &:before {
             // Next
             font-family: 'schoolbox';
-            content: "\e64b";
+            @extend .icon-next;
         }
     }
     .as-nav{
