@@ -52,7 +52,6 @@ if (isset($_POST['current_password'])) {
             $context['recipient'] = $result['FIRSTNAME'];
             $context['date'] = $result['DATE'];
             $context['time'] = $result['TIME'];
-            $context['title'] = Cfg::get('title');
             $email->setContext($context)->send(array(
                                 'name' => $result['FULLNAME'],
                                 'email' => $result['EMAIL']

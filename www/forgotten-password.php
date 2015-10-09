@@ -38,7 +38,6 @@ if (isset($_POST['email'])) {
 	    $context['recipient'] = $result['FIRSTNAME'];
 	    $context['username'] = $result['USERNAME'];
 	    $context['password'] = $result['PASSWORD'];
-	    $context['title'] = Cfg::get('title');
 	    $email->setContext($context)->send(array(
                                 'name' => $result['FULLNAME'],
                                 'email' => $result['EMAIL']
