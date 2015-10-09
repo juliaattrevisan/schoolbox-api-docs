@@ -22,11 +22,11 @@ $alert-function-factor: 89%;
 // We use these to control border styles.
 $alert-border-style: solid;
 $alert-border-width: 0px;
-$alert-border-color: scale-color($primary-color, $lightness: $alert-function-factor);
+//$alert-border-color: scale-color($primary-color, $lightness: $alert-function-factor);
 $alert-bottom-margin: rem-calc(($base-font-size + 4));
 
 // We use these to style the close buttons
-$alert-close-color: $primary-color;
+//$alert-close-color: $primary-color;
 $alert-close-top: 50%;
 $alert-close-position: rem-calc(($base-font-size - 12));
 $alert-close-font-size: rem-calc(($base-font-size + 14));
@@ -41,7 +41,7 @@ $alert-radius: $global-radius;
 $alert-transition-speed: 300ms;
 $alert-transition-ease: ease-out;
 
-.alert-box { background-color: scale-color($primary-color, $lightness: $alert-function-factor); }
+//.alert-box { background-color: scale-color($primary-color, $lightness: $alert-function-factor); }
 
 @import "../../../javascript/components/foundation/scss/foundation/components/alert-boxes";
 
@@ -54,29 +54,21 @@ $alert-tint-amount: 90%;
 $alert-default-background: darken($body-bg, 10%);
 
 .alert-box {
-  background-color: $alert-default-background;
-  color: calc-text-color($alert-default-background, tint($alert-default-background, $alert-tint-amount), darken($alert-default-background, $alert-tint-amount));
+    background-color: $alert-default-background;
+    color: calc-text-color($alert-default-background, tint($alert-default-background, $alert-tint-amount), darken($alert-default-background, $alert-tint-amount));
 
-  .close { color: inherit; }
+    .close { color: inherit; }
 
-  &.primary {
-    background-color: $primary-color;
-    color: calc-text-color($primary-color, tint($primary-color, $alert-tint-amount), darken($primary-color, $alert-tint-amount));
-  }
-  &.secondary {
-    background-color: $secondary-color;
-    color: calc-text-color($secondary-color, tint($secondary-color, $alert-tint-amount), darken($secondary-color, $alert-tint-amount));
-  }
-  &.success {
-    background-color: $success-color;
-    color: calc-text-color($success-color, tint($success-color, $alert-tint-amount), darken($success-color, $alert-tint-amount));
-  }
-  &.warning {
-    background-color: $warning-color;
-    color: calc-text-color($warning-color, tint($warning-color, $alert-tint-amount), darken($warning-color, $alert-tint-amount));
-  }
-  &.alert {
-    background-color: $alert-color;
-    color: calc-text-color($alert-color, tint($alert-color, $alert-tint-amount), darken($alert-color, $alert-tint-amount));
-  }
+    &.success {
+        background-color: $success-color;
+        color: calc-text-color($success-color, tint($success-color, $alert-tint-amount), darken($success-color, $alert-tint-amount));
+    }
+    &.warning {
+        background-color: $warning-color;
+        color: calc-text-color($warning-color, tint($warning-color, $alert-tint-amount), darken($warning-color, $alert-tint-amount));
+    }
+    &.alert {
+        background-color: $alert-color;
+        color: calc-text-color($alert-color, tint($alert-color, $alert-tint-amount), darken($alert-color, $alert-tint-amount));
+    }
 }
