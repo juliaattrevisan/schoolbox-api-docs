@@ -16,7 +16,6 @@ $sub-nav-border-radius: 0px;
 // We use these to control the active item styles
 $sub-nav-active-font-weight: $font-weight-normal;
 $sub-nav-active-padding: $sub-nav-padding;
-$sub-nav-active-cursor: default;
 
 // $sub-nav-item-divider: "";
 // $sub-nav-item-divider-margin: rem-calc(12);
@@ -40,31 +39,34 @@ $sub-nav-active-cursor: default;
 //$sub-nav-bg-color: $secondary-color;
 //$sub-nav-bg-active-color: $white;
 
+//$sub-nav-active-cursor: default;
+
 // Sub Navigation
-.sub-nav {
+// .secondary is the sub-sub nav that first appeared in adminv2/setting
+// I've temporarily made it the same as the regular sub-nav style
+.sub-nav, .sub-nav.secondary {
 	li, dd {
 		margin: 0 1px 1px 0;
-	}
-	a {
-	    color: $content-ui-foreground;
-		background-color: $content-ui-background;
-		display: inline-block;
-		&:hover {
-		    color: $content-ui-foreground;
-			background-color: $content-ui-hover;
-		}
-	}
-
-    /* This is the sub-sub nav that first appeared in admin/settings
-     */
-	&.secondary {
-		a {
-		    color: $content-ui-foreground;
-			background-color: $content-ui-background;
-			&:hover{
-			    color: $content-ui-foreground;
-				background-color: $content-ui-hover;
-			}
-		}
+        a {
+            color: $content-ui-foreground;
+            background-color: $content-ui-background;
+            display: inline-block;
+            &:hover {
+                color: $content-ui-foreground;
+                background-color: $content-ui-hover;
+            }
+        }
+        &.active {
+            a {
+                cursor: default;
+                color: $content-ui-foreground;
+                background-color: $content-ui-selected;
+                &:hover {
+                    cursor: default;
+                    color: $content-ui-foreground;
+                    background-color: $content-ui-selected;
+                }
+            }
+        }
 	}
 }
