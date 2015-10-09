@@ -4,9 +4,14 @@
 <script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
 
 {% if namespace == 'myFilesBrowser' %}
-    {% set treeController = 'MyFiles' %}
+    {% set fileController   = 'myFile' %}
+    {% set folderController = 'myFolder' %}
 {% elseif namespace == 'webDavBrowser' %}
-    {% set treeController = 'Webdav' %}
+    {% set fileController   = 'networkFile' %}
+    {% set folderController = 'networkFolder' %}
+{% else %}
+    {% set fileController   = 'file' %}
+    {% set folderController = 'category' %}
 {% endif %}
 
 <script type="text/javascript">
@@ -47,7 +52,7 @@
 
             var $dragged       = $(data.element).closest(listItem),
                 draggedType    = $dragged.data('type'),
-                draggedTypeGen = draggedType == 'file' ? 'file' : 'category',
+                draggedTypeGen = draggedType == 'file' ? '{{ fileController }}' : '{{ folderController }}',
                 draggedId      = $dragged.data('id'),
 
                 $dropTarget    = $(data.event.srcElement).closest(listItem),
