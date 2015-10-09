@@ -25,11 +25,6 @@ $sub-nav-active-cursor: default;
 // $sub-nav-item-divider-margin: rem-calc(12);
 
 $sub-nav-font-color: $primary-color;
-$sub-nav-active-bg: $white;
-$sub-nav-active-bg-hover: tint($tertiary, 87%);
-$sub-nav-active-color: $sub-nav-font-color;
-$sub-nav-bg-color: $secondary-color;
-$sub-nav-bg-active-color: $white;
 $sub-nav-secondary-bg-color: tint($secondary-color, 60%);
 $sub-nav-secondary-bg-active-color: $white;
 
@@ -38,6 +33,14 @@ $sub-nav-secondary-bg-active-color: $white;
  */
 
 @import "../../../../../javascript/components/foundation/scss/foundation/components/sub-nav";
+
+/* What the hell do these colour settings mean?
+ */
+$sub-nav-active-bg: $white;
+$sub-nav-active-bg-hover: tint($tertiary, 87%);
+$sub-nav-active-color: $sub-nav-font-color;
+$sub-nav-bg-color: $secondary-color;
+$sub-nav-bg-active-color: $white;
 
 // Sub Navigation
 .sub-nav {
