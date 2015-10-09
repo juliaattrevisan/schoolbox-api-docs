@@ -297,6 +297,9 @@ $tabs-content-padding: rem-calc(($base-font-size - 8));
 // CUSTOM OVERRIDES
 //
 .button{
+
+  	@extend .hide-for-print;
+
 	&.secondary{
 		background-color: $primary-color;
 		color: $white;
@@ -477,7 +480,8 @@ $breadcrumb-active-bg-color: $white;
 
 // Custom breadcrumbs
 .breadcrumb{
-	margin: 0 0 rem-calc(($base-font-size)) 0;
+  @extend .hide-for-print;
+  margin: 0 0 rem-calc(($base-font-size)) 0;
 	list-style: none;
 	overflow: hidden;
 	li{
