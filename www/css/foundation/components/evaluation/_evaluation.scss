@@ -38,6 +38,14 @@
     }
 }
 
+/* Divide Matching Pairs questions
+ */
+#answerCollection{
+    li ~ li{
+        padding-top: rem-calc($base-font-size);
+    }
+}
+
 /* Quiz: Fillgap/Cloze Exercises
  *
  * Reuse label styles I guess?
@@ -70,13 +78,5 @@
     input {
         width: auto;
         display: inline;
-    }
-}
-
-/* Divide Matching Pairs questions
- */
-#answerCollection{
-    li ~ li{
-        padding-top: rem-calc($base-font-size);
     }
 }
