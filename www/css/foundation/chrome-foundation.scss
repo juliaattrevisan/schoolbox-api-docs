@@ -29,7 +29,7 @@
 @import "components/notification";
 @import "components/masonry";
 @import "components/preview";
-@import "components/dataTables";
+
 
 // Refined UI Elements
 // These override defaults in @import components/buttons
@@ -38,6 +38,7 @@
 @import "components/ui/button";
     @import "components/ui/list-actions";           // requires _button.scss
         @import "components/ui/header-actions";     // requires _list-actions.scss
+@import "components/ui/data-tables";
 
 // Layout
 @import "layout/footer";
