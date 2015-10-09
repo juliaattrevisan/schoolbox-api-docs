@@ -31,6 +31,8 @@ $breadcrumb-bg-color: $content-ui-background;
 $breadcrumb-hover-bg-color: $content-ui-hover;
 $breadcrumb-active-bg-color: $content-ui-selected;
 
+@import "../../../../../javascript/components/foundation/scss/foundation/components/breadcrumbs";
+
 // Custom breadcrumbs
 .breadcrumb {
 	margin: 0 0 rem-calc(($base-font-size)) 0;
