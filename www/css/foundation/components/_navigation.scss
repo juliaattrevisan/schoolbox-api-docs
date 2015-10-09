@@ -530,9 +530,12 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
             @extend .hide-for-medium-down;
         }
 	}
-	// Profile
+
+	/* Profile Flyout Menu
+	 * Appears when you click a guy's username in the left menu
+	 */
 	.account-menu{
-		color: $off-canvas-link-color;
+		color: $primary-background;
 		background-color: transparent;
 		padding: 0 2.5rem 0 0;
 		font-weight: $font-weight-bold;
@@ -549,11 +552,28 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			display: inline-block;
 			padding-left: 0.5rem;
 		}
+
+		/* Little triangle icon next to username
+		 */
+        &:after {
+            border-color: $primary-background transparent transparent transparent;
+        }
 	}
+
+    /* Custom link styles for off-canvas account menu
+     */
 	.f-dropdown{
 		box-shadow: none;
 		max-width: none;
+		a {
+		    color: $primary-foreground;
+		    background-color: $primary-background;
+            &:hover {
+                background-color: $primary-hover;
+            }
+        }
 	}
+
 	// H3 & H4 to replicate the off-canvas label styles
 	h3,
 	h4{
