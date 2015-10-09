@@ -26,7 +26,7 @@ VALUES ('skin_colour_navigation_foreground',
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_colour_navigation_background',
         'Navigation Background Colour',
-        'rgb(76, 102, 176)',
+        'rgb(76, 0, 176)',
         'Used for main navigation background. This inverts with Primary Foreground colour in the Search panel.',
         '11',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
