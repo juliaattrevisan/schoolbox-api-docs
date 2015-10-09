@@ -16,6 +16,7 @@ use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Resource;
+use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\UserMapper;
 
 abstract class AbstractController extends BaseController
@@ -127,8 +128,10 @@ abstract class AbstractController extends BaseController
     {
         $folder = $this->getFolder($folderId);
 
+        $tree = $folder->getParent() instanceof IFolder ? $this->getBreadcrumbs($folder->getParent()) : [];
+
         return [
-            'tree'   => $this->getBreadcrumbs($folder->getParent()),
+            'tree'   => $tree,
             'folder' => $folder,
             'access' => $this->getAccess([ $folderId ]),
             'user'   => $this->getUser(),
