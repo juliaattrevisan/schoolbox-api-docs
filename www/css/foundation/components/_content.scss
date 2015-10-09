@@ -764,6 +764,10 @@ $rotate-th-width: $square-grid-td-size;
 	@include single-transition(all, 0.15s, linear);
 }
 
+nav {
+  @extend .hide-for-print;
+}
+
 @mixin information-list() {
 	@include responsive-sides(1, padding);
 	list-style: none;
