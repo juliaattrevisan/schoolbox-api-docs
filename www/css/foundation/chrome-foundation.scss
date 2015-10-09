@@ -35,9 +35,10 @@
 // These override defaults in @import components/buttons
 // We have refined these elements
 @import "components/ui/button/button";
-@import "components/ui/button/dropdown";
 @import "components/ui/button/list-actions";       // requires _button.scss
 @import "components/ui/button/header-actions";     // requires _list-actions.scss
+@import "components/ui/button/button-groups";
+@import "components/ui/button/dropdown";
 @import "components/ui/button/tabs";
 @import "components/ui/navigation/breadcrumb";
 @import "components/ui/navigation/pagination";
