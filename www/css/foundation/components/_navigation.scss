@@ -574,8 +574,12 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 	// Left nav arrow override
 	ul.off-canvas-list {
+	    a {
+	        color: $primary-background;
+        }
 		a:hover {
-			color: $off-canvas-hover-color;
+		    color: $primary-foreground;
+			background-color: $primary-hover;
 		}
 		li.has-submenu > a:after{
 			content: "\e64b";
