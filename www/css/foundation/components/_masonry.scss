@@ -9,6 +9,14 @@
 // Disabled components in the palette
 .component-palette .disabled {
   opacity: 0.3;
+
+  pointer-events: none;
+  cursor: not-allowed;
+
+  a {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
 }
 
 // Homepage masonry icons
