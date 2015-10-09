@@ -42,8 +42,10 @@
 						color: $content-ui-selected;
 						background-color: $button-color;
 					}
+					&:hover {
+					    background-color: $content-ui-hover;
+					}
 				}
-
 			}
 		}
 	}
