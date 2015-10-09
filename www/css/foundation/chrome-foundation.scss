@@ -21,6 +21,10 @@
 @import "components/anyslider";
 @import "components/links";
 @import "components/content";
+
+// Must import before forms, as forms reimports buttons.scss
+@import "components/buttons";
+
 @import "components/forms";
 //@import "components/joyride";
 @import "components/navigation";
@@ -28,7 +32,7 @@
 @import "components/notification";
 @import "components/masonry";
 @import "components/preview";
-@import "components/buttons";
+
 
 // Refined UI Elements
 // These override defaults in @import components/buttons

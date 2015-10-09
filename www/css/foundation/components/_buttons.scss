@@ -1,3 +1,59 @@
 /* Because forms.scss reimports this file
  */
 $include-html-button-classes: $include-html-classes;
+
+//
+// BUTTONS
+//
+
+// We use these to build padding for buttons.
+// $button-tny: rem-calc(10);
+// $button-sml: rem-calc(14);
+// $button-med: rem-calc(12);
+$button-med: rem-calc(($base-font-size - 8));
+// $button-lrg: rem-calc(18);
+
+// We use this to control the display property.
+// $button-display: inline-block;
+$button-margin-bottom: rem-calc(($base-font-size - 8));
+
+// We use these to control button text styles.
+// $button-font-family: $body-font-family;
+$button-font-color: $white;
+$button-font-color-alt: $primary-color;
+// $button-font-tny: rem-calc(11);
+// $button-font-sml: rem-calc(13);
+$button-font-med: rem-calc(($base-font-size - 2));
+//$button-font-tny: rem-calc(11);
+//$button-font-sml: rem-calc(13);
+//$button-font-lrg: rem-calc(20);
+
+// $button-font-lrg: rem-calc(20);
+$button-font-weight: $font-weight-normal;
+// $button-font-align: center;
+
+// We use these to control various hover effects.
+ $button-function-factor: 11%;
+
+// We use these to control button border and hover styles.
+// $button-border-width: 0px;
+// $button-border-style: solid;
+$button-bg-color: $button-color;
+$button-bg-hover: tint($button-bg-color, 20%);
+$submit-button-bg-color: $submit-button-color;
+$submit-button-bg-hover: tint($submit-button-color, 20%);
+$button-border-color: transparent;
+$secondary-button-bg-hover: tint($submit-button-color, 20%);
+$secondary-button-border-color: transparent;
+$success-button-bg-hover: tint($success-color, 20%);
+$success-button-border-color: transparent;
+$alert-button-bg-hover: tint($alert-color, 20%);
+$alert-button-border-color: transparent;
+
+// We use this to set the default radius used throughout the core.
+// $button-radius: $global-radius;
+// $button-round: $global-rounded;
+
+// We use this to set default opacity and cursor for disabled buttons.
+$button-disabled-opacity: 0.5;
+// $button-disabled-cursor: $cursor-default-value;
