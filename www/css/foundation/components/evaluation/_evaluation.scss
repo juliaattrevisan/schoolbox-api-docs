@@ -72,3 +72,11 @@
         display: inline;
     }
 }
+
+/* Divide Matching Pairs questions
+ */
+#answerCollection{
+    li ~ li{
+        padding-top: rem-calc($base-font-size);
+    }
+}

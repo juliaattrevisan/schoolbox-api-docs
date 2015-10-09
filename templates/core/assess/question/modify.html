@@ -16,13 +16,16 @@
             <input name="type_id" type="hidden" value="{QUESTIONTYPE_TYPE_ID}" />
 
             <h2 class="subheader">Modify Question</h2>
-            <section class="content">
-                <h3>{QUESTIONTYPE_DESCRIPTION}</h3>
-
-                <label>
-                    Question
-                    <textarea name="question" id="question">{QUESTION}</textarea>
-                </label>
+            <section>
+                <fieldset class="content">
+                    <div class="column small-12">
+                        <h3>{QUESTIONTYPE_DESCRIPTION}</h3>
+                        <label>
+                            Question
+                            <textarea name="question" id="question">{QUESTION}</textarea>
+                        </label>
+                    </div>
+                </fieldset>
 
                 <!-- BEGIN has_answer_configuration -->
                 <fieldset>
@@ -34,17 +37,19 @@
                     </div>
                 </fieldset>
                 <!-- END has_answer_configuration -->
+                
+                <fieldset class="content">
+                    <div class="column small-12">
+                        <label>
+                            Marks
+                            <input name="marks" type="text" size="3" value="{MARKS}"/>
+                        </label>
+                    </div>
+                </fieldset>
 
-                <label>
-                    Marks
-                    <input name="marks" type="text" size="3" value="{MARKS}"/>
-                </label>
+                <!-- BEGIN answerInputs -->
 
-                <div>
-                    <!-- BEGIN answerInputs -->
-
-                    <!-- END answerInputs -->
-                </div>
+                <!-- END answerInputs -->
             </section>
             <div class="row">
                 <div class="small-12 columns">
