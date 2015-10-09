@@ -139,6 +139,8 @@
         {% endif %}
     {% endif %}
         </dl>
+
+    {% if namespace == 'resourceBrowser' %}
         <h3>Permissions</h3>
         <dl class="inline-dl">
     {% if user.role.type == 'staff' and folder.id > 0 %}
@@ -153,7 +155,7 @@
     {% endif %}
 
         </dl>
-
+    {% endif %}
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 
     </div>
