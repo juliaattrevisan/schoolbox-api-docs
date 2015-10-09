@@ -40,11 +40,10 @@ $sub-nav-secondary-bg-active-color: $white;
 
 // Sub Navigation
 .sub-nav{
-	li,
-	dd{
+	li, dd{
 		margin: 0 1px 1px 0;
 	}
-	a{
+	a {
 		background-color: $sub-nav-bg-color;
 		display: inline-block;
 		&:hover{
@@ -52,6 +51,8 @@ $sub-nav-secondary-bg-active-color: $white;
 		}
 	}
 
+    /* This is the sub-sub nav that first appeared in admin/settings
+     */
 	&.secondary {
 		a {
 			background-color: $sub-nav-secondary-bg-color;
