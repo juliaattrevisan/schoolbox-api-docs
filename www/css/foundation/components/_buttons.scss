@@ -473,10 +473,10 @@ $f-dropdown-icon-align: 0.25rem;
 }
 
 
-$breadcrumb-color: $anchor-font-color;
-$breadcrumb-bg-color: tint($anchor-font-color, 74%);
-$breadcrumb-hover-bg-color: tint($tertiary, 87%);
-$breadcrumb-active-bg-color: $white;
+$breadcrumb-color: $content-ui-foreground;
+$breadcrumb-bg-color: $content-ui-background;
+$breadcrumb-hover-bg-color: $content-ui-hover;
+$breadcrumb-active-bg-color: $content-ui-selected;
 
 // Custom breadcrumbs
 .breadcrumb{
