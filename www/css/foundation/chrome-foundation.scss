@@ -36,7 +36,8 @@
 // We have refined these elements
 @import "components/ui/breadcrumb";
 @import "components/ui/button";
-@import "components/ui/header-actions";     // requires _button.scss
+    @import "components/ui/list-actions";           // requires _button.scss
+        @import "components/ui/header-actions";     // requires _list-actions.scss
 
 // Layout
 @import "layout/footer";
