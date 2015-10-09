@@ -81,7 +81,7 @@ class Controller extends AbstractController
     protected function getBreadcrumbs(FolderInterface $folder)
     {
         try {
-            $node = $this->nodeFactory->build(Resource\Browser\NodeFactory::SBFS, $folder->getParent()->getId());
+            $node = $this->nodeFactory->build(Resource\Browser\NodeFactory::SBFS, $folder->getId());
             $tree = $node->render();
 
             return $tree['breadcrumbs'];

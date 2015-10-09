@@ -128,7 +128,7 @@ abstract class AbstractController extends BaseController
         $folder = $this->getFolder($folderId);
 
         return [
-            'tree'   => $this->getBreadcrumbs($folder),
+            'tree'   => $this->getBreadcrumbs($folder->getParent()),
             'folder' => $folder,
             'access' => $this->getAccess([ $folderId ]),
             'user'   => $this->getUser(),
@@ -245,12 +245,9 @@ abstract class AbstractController extends BaseController
 
         $server = $this->getRequest()->server;
 
-        $node = new Resource\Browser\Resources\Node($folderId);
-        $tree = $node->render();
-
         $data = [
             'file'   => $file,
-            'tree'   => $tree['breadcrumbs'],
+            'tree'   => $this->getBreadcrumbs($file->getFolder()),
             'host'   => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_HOST')),
             'access' => $this->getAccess([ $folderId ]),
             'namespace' => $this->namespace
