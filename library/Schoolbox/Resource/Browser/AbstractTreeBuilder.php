@@ -116,7 +116,10 @@ abstract class AbstractTreeBuilder
                 $folder->getParent()->getId(),
                 'root',
                 $this->getRootNodeLabel(),
-                [ 'data-permission' => $this->getFolderPermission($folderId) ]
+                [
+                    'data-permission' => $this->getFolderPermission($folderId),
+                    'data-type'       => 'folder'
+                ]
             );
 
         } else {

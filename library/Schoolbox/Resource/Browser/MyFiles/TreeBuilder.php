@@ -45,7 +45,8 @@ class TreeBuilder extends AbstractTreeBuilder
     protected function buildFolderNode(IFolder $folder)
     {
         return $this->generateFolderArray($folder, 'folder', null, [
-            'data-permission' => 'full'
+            'data-permission' => 'full',
+            'data-type'       => 'folder'
         ]);
     }
 
@@ -58,7 +59,8 @@ class TreeBuilder extends AbstractTreeBuilder
     protected function buildFileNode(File\IFile $file)
     {
         return $this->generateFileArray($file, null, [
-            'data-permission' => 'full'
+            'data-permission' => 'full',
+            'data-type'       => 'file'
         ]);
     }
 

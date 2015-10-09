@@ -93,7 +93,10 @@ class TreeBuilder extends AbstractTreeBuilder
 
         // Output something.
         return $this->generateFolderArray($folder, $type, $name,
-            [ 'data-permission' => $permission ],
+            [
+                'data-permission' => $permission,
+                'data-type'       => $type
+            ],
             [ 'href' => '/homepage/' . $folder->getId() ]
         );
     }
@@ -114,7 +117,7 @@ class TreeBuilder extends AbstractTreeBuilder
         return $this->generateFileArray($file, $file->getTitle(),
             [
                 'data-permission' => $permission,
-                'data-mime'       => $file->getMime()
+                'data-type'       => 'file'
             ],
             [
                 'href' => '/send.php?id=' . $file->getId(),
