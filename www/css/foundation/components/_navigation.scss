@@ -499,9 +499,9 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 
 .left-off-canvas-toggle,
 .right-off-canvas-toggle {
-	@include contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color);
+	color: $primary-foreground;
 	&:hover {
-		color: calc-text-color($tabbar-bg, $white, $primary-color);
+		color: $primary-foreground;
 	}
 }
 
@@ -509,9 +509,9 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	//@extend .hide-for-xlarge-up;
 
 	&:before{
-		text-align: center;
-	  display: block;
-	  padding: 0;
+        text-align: center;
+        display: block;
+        padding: 0;
 	}
 }
 
