@@ -206,4 +206,8 @@ if ($_POST['name']) {
     error(2);
 }
 
-$page->backToTheFuture(1);
+if ($_REQUEST['ajax']) {
+    die(json_encode(['result' => 'success']));
+} else {
+    $page->backToTheFuture(1);
+}
