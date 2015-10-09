@@ -24,7 +24,7 @@ VALUES ('skin_colour_primary_foreground',
         'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
-VALUES ('skin_colour_primary_foreground',
+VALUES ('skin_colour_primary_background',
         'Primary Background Colour',
         'rgb(76, 102, 176)',
         'Used for main navigation',
