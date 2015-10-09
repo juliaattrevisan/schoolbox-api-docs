@@ -599,7 +599,23 @@ ul.pagination .active a{
 						background-color: $button-color;
 					}
 				}
+				
+				.progress-tick{
+					width: 32px;
+					position: relative;
+    				top: 15px;
+    				right: 15px;
+    				&:hover{
+    					background-color: $base;
+    				}
+    				&.pending:hover {
+				        background-color: $warning-color;
+				    }
 
+				    &.complete:hover {
+				        background-color: $success-color;
+				    }
+				}
 			}
 
 		}
