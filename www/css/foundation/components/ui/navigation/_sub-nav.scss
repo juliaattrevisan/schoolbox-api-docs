@@ -1,45 +1,18 @@
-// $include-html-nav-classes: $include-html-classes;
-
-// We use these to control margin and padding
-$sub-nav-list-margin: 0 0 rem-calc(($base-font-size)) 0;
-$sub-nav-list-padding-top: rem-calc(0);
-
-// We use this to control the definition
-// $sub-nav-font-family: $body-font-family;
-$sub-nav-font-size: rem-calc(($base-font-size - 2));
-
-// $sub-nav-font-weight: $font-weight-normal;
-// $sub-nav-text-decoration: none;
-$sub-nav-padding: rem-calc(($base-font-size - 6));
 $sub-nav-border-radius: 0px;
 
-// We use these to control the active item styles
-$sub-nav-active-font-weight: $font-weight-normal;
+$sub-nav-list-margin: 0 0 rem-calc(($base-font-size)) 0;
+
+$sub-nav-padding: rem-calc(($base-font-size - 6));
 $sub-nav-active-padding: $sub-nav-padding;
+$sub-nav-list-padding-top: rem-calc(0);
 
-// $sub-nav-item-divider: "";
-// $sub-nav-item-divider-margin: rem-calc(12);
-
+$sub-nav-font-size: rem-calc(($base-font-size - 2));
+$sub-nav-active-font-weight: $font-weight-normal;
 
 /* Somehow all those vars above get fed into the import below
  * which is an alternative to overrides to get what you want
  */
-
 @import "../../../../../javascript/components/foundation/scss/foundation/components/sub-nav";
-
-/* What the hell do these colour settings mean?
- */
-//$sub-nav-font-color: $primary-color;
-//$sub-nav-secondary-bg-color: tint($secondary-color, 60%);
-//$sub-nav-secondary-bg-active-color: $white;
-
-//$sub-nav-active-bg: $white;
-//$sub-nav-active-bg-hover: tint($tertiary, 87%);
-//$sub-nav-active-color: $sub-nav-font-color;
-//$sub-nav-bg-color: $secondary-color;
-//$sub-nav-bg-active-color: $white;
-
-//$sub-nav-active-cursor: default;
 
 // Sub Navigation
 // .secondary is the sub-sub nav that first appeared in adminv2/setting
