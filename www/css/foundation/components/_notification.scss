@@ -1,6 +1,6 @@
 $notification-unread-background: $alert-color !default;
-$notification-unread-color: calc-text-color($notification-unread-background);
-$notification-header-background: $tabbar-bg !default;
+$notification-unread-color: $primary-foreground;
+$notification-header-background: $primary-background !default;
 
 // where data-unread != 0
 .right-off-canvas-toggle {
@@ -15,6 +15,7 @@ $notification-header-background: $tabbar-bg !default;
         padding-left: 1.75rem;
 
         &:before {
+            color: $primary-hover;
             display: inline-block;
             width: 1.5rem;
         }
