@@ -93,8 +93,6 @@
 </style>
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
-<script type="text/javascript" src="/javascript/jquery.three-panel.js"></script>
-<script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 
 {% if namespace == 'myFilesBrowser' %}
     {% set treeController = 'MyFiles' %}
@@ -139,15 +137,36 @@
         });
 
         $(document).on('dnd_stop.vakata', function (event, data) {
-            var target;
 
-            if (!tree.find('.'+hovered).length) {
+            var $dragged       = $(data.element).closest(listItem),
+                draggedType    = $dragged.data('type'),
+                draggedTypeGen = draggedType == 'file' ? 'file' : 'category',
+                draggedId      = data.data.nodes[0],
+
+                $dropTarget    = $(data.event.srcElement).closest(listItem),
+                dropTargetId   = $dropTarget.attr('id'),
+                dropTargetType = $dropTarget.data('type'),
+                dropTargetPerm = $dropTarget.data('permission');
+
+            if (dropTargetType == 'file' || (!(dropTargetPerm == 'write' || dropTargetPerm == 'full'))) {
                 return;
             }
 
-            target = tree.find('.'+hovered).closest(listItem).attr('id');
+            /*
+            console.log([
+                'Move', draggedType, draggedId, 'to', dropTargetType, dropTargetId
+            ].join(' '));
+            */
 
-            console.log(target, event, data);
+            $.post(
+                '/cms/' + draggedTypeGen + 'Form.php',
+                {
+                    move: draggedId,
+                    categoryID: dropTargetId,
+                    ajax: 1
+                }
+            );
+
         });
 
         var $window    = $(window),
