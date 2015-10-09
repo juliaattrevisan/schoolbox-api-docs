@@ -39,6 +39,7 @@
     @import "components/ui/list-actions";           // requires _button.scss
         @import "components/ui/header-actions";     // requires _list-actions.scss
 @import "components/ui/data-tables";
+@import "components/ui/navigation/sub-nav";
 
 // Layout
 @import "layout/footer";
