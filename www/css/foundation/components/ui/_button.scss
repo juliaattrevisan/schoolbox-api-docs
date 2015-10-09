@@ -1,12 +1,14 @@
 /* All generic buttons
  */
-.button{
+.button {
+    color: $content-ui-foreground;
+    background-color: $content-ui-background;
 
     /* This should be renamed to .primary
      */
 	&.secondary{
-		background-color: $primary-color;
-		color: $white;
+		background-color: $content-ui-background;
+		color: $content-ui-foreground;
 	}
 
 	&.alert{
@@ -30,7 +32,7 @@
 	&:empty {
 		@extend .no-text;
 	}
-	
+
 	// Fat button - for when you need a button larger than Steve's mama
 	// Like Steve's mama, fits best in a block-grid
 	&.fat {
