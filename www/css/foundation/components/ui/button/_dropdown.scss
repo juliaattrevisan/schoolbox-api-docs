@@ -22,7 +22,7 @@ $f-dropdown-icon-align: 0.25rem;
 .f-dropdown{
 	@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
 	.separator, .meta {
-		color: contrast-bg($background: $f-dropdown-bg, $dark: $primary-color);
+		color: contrast-bg($background: $content-ui-background, $dark: $content-ui-foreground);
 	}
 	.separator {
 		padding: $f-dropdown-list-padding;
@@ -32,7 +32,7 @@ $f-dropdown-icon-align: 0.25rem;
 		cursor: default;
 		font-size: rem-calc($base-font-size - 3);
 		&:hover {
-			background-color: $f-dropdown-bg;
+			background-color: $content-ui-background;
 		}
 	}
 	[class*="icon-"]:before {
