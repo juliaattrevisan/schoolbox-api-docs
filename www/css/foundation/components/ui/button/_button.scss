@@ -4,22 +4,32 @@
     color: $content-ui-foreground;
     background-color: $content-ui-background;
 
+	&:hover {
+	    color: $content-ui-foreground;
+	    background-color: $content-ui-hover;
+    }
+
     /* This should be renamed to .primary
      */
 	&.secondary{
-		background-color: $content-ui-background;
 		color: $content-ui-foreground;
+		background-color: $content-ui-background;
+
+		&:hover {
+            color: $content-ui-foreground;
+            background-color: $content-ui-hover;
+        }
 	}
 
 	&.alert{
-		&:hover{
+		&:hover {
 			color: $white !important;
 		}
 	}
 
 	&.warning{
 		background-color: $warning-color;
-		&:hover{
+		&:hover {
 			background-color: tint($warning-color, 20%);
 		}
 	}
