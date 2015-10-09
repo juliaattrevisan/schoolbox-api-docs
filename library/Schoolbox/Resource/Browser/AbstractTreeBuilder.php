@@ -31,11 +31,12 @@ abstract class AbstractTreeBuilder
 
     /**
      * @param Folder\ILocator $locator
+     * @param string          $rootNodeLabel
      */
-    public function __construct(Folder\ILocator $locator)
+    public function __construct(Folder\ILocator $locator, $rootNodeLabel = 'Root')
     {
         $this->folderLocator = $locator;
-        $this->rootNodeLabel = 'Root';
+        $this->rootNodeLabel = $rootNodeLabel;
     }
 
 

@@ -48,9 +48,8 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     public function __construct(Folder\ILocator $locator, TaskMapper $taskMapper, $userAccessMapper, $roleAccessMapper, $user)
     {
-        parent::__construct($locator);
+        parent::__construct($locator, 'Resources');
 
-        $this->rootNodeLabel    = 'Resources';
         $this->taskMapper       = $taskMapper;
         $this->userAccessMapper = $userAccessMapper;
         $this->roleAccessMapper = $roleAccessMapper;
