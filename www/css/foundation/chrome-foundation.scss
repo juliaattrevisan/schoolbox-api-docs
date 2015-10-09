@@ -17,7 +17,6 @@
 @import "base/typography";
 
 // Components
-@import "components/alert-boxes";
 @import "components/anyslider";
 @import "components/links";
 @import "components/content";
@@ -33,7 +32,6 @@
 @import "components/masonry";
 @import "components/preview";
 
-
 // Refined UI Elements
 // These override defaults in @import components/buttons
 // We have refined these elements
@@ -47,6 +45,7 @@
 @import "components/ui/navigation/pagination";
 @import "components/ui/navigation/sub-nav";
 @import "components/ui/data-tables";
+@import "components/ui/alert-boxes";
 
 // Layout
 @import "layout/footer";

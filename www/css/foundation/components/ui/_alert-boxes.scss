@@ -43,7 +43,7 @@ $alert-transition-ease: ease-out;
 
 //.alert-box { background-color: scale-color($primary-color, $lightness: $alert-function-factor); }
 
-@import "../../../javascript/components/foundation/scss/foundation/components/alert-boxes";
+@import "../../../../javascript/components/foundation/scss/foundation/components/alert-boxes";
 
 //
 // Custom overrides
