@@ -108,7 +108,15 @@ class Homepage
 				  FROM homepage_config
 				  WHERE cid = '{$this->cid}'";
 
-        return $this->db->getRow($query);
+        // Defaults: 70/30
+        $result = $this->db->getRow($query);
+        if (!isset($result['left_column_width'])) {
+            $result['left_column_width'] = 70;
+        }
+        if (!isset($result['right_column_width'])) {
+            $result['right_column_width'] = 30;
+        }
+        return $result;
     }
 
     /**

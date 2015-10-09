@@ -194,10 +194,18 @@ class Eportfolio {
 	 * @return array
 	 */
 	public function getColumnWidths() {
-		return array(
+		$result = array(
 			'left_column_width' => $this->getPageInstance()->getLeftColumnWidth(),
 			'right_column_width' => $this->getPageInstance()->getRightColumnWidth(),
 		);
+		// Defaults: 70/30
+		if (!isset($result['left_column_width'])) {
+			$result['left_column_width'] = 70;
+		}
+		if (!isset($result['right_column_width'])) {
+			$result['right_column_width'] = 30;
+		}
+		return $result;
 	}
 
 	/**
