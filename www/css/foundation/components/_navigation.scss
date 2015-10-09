@@ -476,7 +476,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		margin: 0;
 		z-index: 1;
 		&:before{
-			@include contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color);
+			color: $primary-foreground;
 		}
 	}
 	[type="text"]:focus,
@@ -494,6 +494,9 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	&:hover .icon-search{
 		@include absolute (0, auto, auto, 16px);
 	}
+	&:hover .icon-search:before {
+	    color: $primary-background;
+    }
 }
 }
 
