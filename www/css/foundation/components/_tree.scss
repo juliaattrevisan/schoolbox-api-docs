@@ -66,8 +66,10 @@ div.jstree-default, ul.jstree-default {
         color: $tree-homepage-icon-color;
     }
 
-    .icon-course:before {
-        color: $tree-course-icon-color;
+    .icon-course-builder, .icon-course {
+        &:before {
+            color: $tree-course-icon-color;
+        }
     }
 
     .jstree-hovered {
@@ -75,5 +77,50 @@ div.jstree-default, ul.jstree-default {
             //color: $tree-node-hover-color;
         }
     }
+
+}
+
+.resource-browser {
+    @include grid-row;
+    max-width: 100%;
+
+    .scroller {
+        overflow: auto;
+    }
+
+    .meta-panel {
+        @extend .content;
+        position: relative;
+        &:before {
+            display: none;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba($white, 0.8);
+            text-align: center;
+            box-sizing: border-box;
+            padding-top: 10%;
+        }
+
+        &.loading:before {
+            display: block;
+            position: absolute;
+            content: "Loading...";
+            z-index: 1;
+        }
+    }
+
+    .resource-tree {
+        > ul > li {
+            > i {
+                visibility: hidden;
+            }
+            > a {
+                margin-left: -7px; // compensate for jstree styles (px on purpose)
+            }
+        }
+    }
+
 
 }
