@@ -2,16 +2,8 @@
     <script type="text/javascript" src="//az523909.vo.msecnd.net/cv-events-api/1.0.0/cv-events-api.min.js"></script>
     <script type="text/javascript">
         $(function() {
-            $('#plugin{COMPONENT_INSTANCE_ID}').dialog({
-                autoOpen: false,
-                width: 721,
-                height: 458,
-                resizable: false,
-                modal: true
-            });
-
-            $('#videoadd{COMPONENT_INSTANCE_ID}').click(function (e) {
-                event.preventDefault();
+            var dialog = $('#plugin{COMPONENT_INSTANCE_ID}');
+            dialog.on('opened.fndtn.reveal', function() {
 
                 // Use the ClickView Events API to catch the cv-lms-addvideo event
                 var eventsApi = new CVEventsApi(document.getElementById('plugin-frame{COMPONENT_INSTANCE_ID}').contentWindow);
@@ -29,15 +21,13 @@
                         }
                     });
 
-                    $('#plugin{COMPONENT_INSTANCE_ID}').dialog('close');
+                    dialog.foundation('reveal', 'close');
                     //The plugin should be reinitialised to be used again, to do this simply reload the iframe.
                     $('#plugin-frame{COMPONENT_INSTANCE_ID}').attr('src', $('#plugin-frame{COMPONENT_INSTANCE_ID}').attr('src'));
 
                     // We are done with this listener
                     eventsApi.off("cv-lms-addvideo");
                 });
-
-                $('#plugin{COMPONENT_INSTANCE_ID}').dialog("open");
             });
         })
     </script>
@@ -59,13 +49,14 @@
                     <!-- END iframe_clickview -->
                 </div>
                 <!-- BEGIN select_video -->
-                <div id="plugin{COMPONENT_INSTANCE_ID}" >
-                    <iframe frameborder="0" id="plugin-frame{COMPONENT_INSTANCE_ID}" src="//online.clickview.com.au/lmsplugin?consumerKey=79fph239f0b7&sizeSelector=false&amp;schoolId={CLICKVIEW_SCHOOL_ID}" width="100%" height="401" style="border: 0;"></iframe>
-                </div>
-
-                <a href="#" class="button icon-add" id="videoadd{COMPONENT_INSTANCE_ID}">Select Video</a>
+                <a href="#" class="button icon-add" id="videoadd{COMPONENT_INSTANCE_ID}" data-reveal-id="plugin{COMPONENT_INSTANCE_ID}">Select Video</a>
                 <!-- END select_video -->
             </section>
         </div>
+    </div>
+
+    <div id="plugin{COMPONENT_INSTANCE_ID}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+        <iframe frameborder="0" id="plugin-frame{COMPONENT_INSTANCE_ID}" src="//online.clickview.com.au/lmsplugin?consumerKey=79fph239f0b7&sizeSelector=false&amp;schoolId={CLICKVIEW_SCHOOL_ID}" width="100%" height="401" style="border: 0;"></iframe>
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
 </div>
