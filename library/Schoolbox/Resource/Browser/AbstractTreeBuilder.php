@@ -28,15 +28,20 @@ abstract class AbstractTreeBuilder
     /** @var string */
     protected $rootNodeLabel;
 
+    /** @var string */
+    protected $namespace;
+
 
     /**
      * @param Folder\ILocator $locator
+     * @param string          $namespace
      * @param string          $rootNodeLabel
      */
-    public function __construct(Folder\ILocator $locator, $rootNodeLabel = 'Root')
+    public function __construct(Folder\ILocator $locator, $namespace, $rootNodeLabel = 'Root')
     {
         $this->folderLocator = $locator;
         $this->rootNodeLabel = $rootNodeLabel;
+        $this->namespace     = $namespace;
     }
 
 
@@ -164,11 +169,11 @@ abstract class AbstractTreeBuilder
 
 
     /**
-     * @param File\IFile $file
+     * @param Resource\AbstractFile $file
      * @throws Resource\Exception
      * @return array
      */
-    protected abstract function buildFileNode(File\IFile $file);
+    protected abstract function buildFileNode(Resource\AbstractFile $file);
 
 
     /**
@@ -186,13 +191,16 @@ abstract class AbstractTreeBuilder
 
 
     /**
-     * @param Resource\File\IFile $file
-     * @param string              $name
-     * @param array               $liAttributes
-     * @param array               $aAttributes
+     * @param Resource\AbstractFile $file
+     * @param string                $name
+     * @param array                 $liAttributes
+     * @param array                 $aAttributes
      * @return array
      */
-    protected abstract function generateFileArray(Resource\File\IFile $file, $name = null, array $liAttributes = null, array $aAttributes = null);
+    protected function generateFileArray(Resource\AbstractFile $file, $name = null, array $liAttributes = null, array $aAttributes = null)
+    {
+        return $this->generateNodeArray("{$this->namespace}-{$file->getId()}", $file->getFolder()->getId(), 'file', $name ?: $file->getTitle(), $liAttributes, $aAttributes);
+    }
 
 
     /**
@@ -255,7 +263,7 @@ abstract class AbstractTreeBuilder
 
     /**
      * @param int $nodeId
-     * @return Collection|File\IFile[]
+     * @return Collection|Resource\AbstractFile[]
      */
     protected abstract function getNodeFiles($nodeId);
 

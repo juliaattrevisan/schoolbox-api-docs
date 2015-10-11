@@ -32,7 +32,7 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     public function __construct(Folder\ILocator $locator, User $user)
     {
-        parent::__construct($locator);
+        parent::__construct($locator, 'myfile');
         $this->user = $user;
     }
 
@@ -52,33 +52,16 @@ class TreeBuilder extends AbstractTreeBuilder
 
 
     /**
-     * @param File\IFile $file
+     * @param Resource\AbstractFile $file
      * @throws Resource\Exception
      * @return array
      */
-    protected function buildFileNode(File\IFile $file)
+    protected function buildFileNode(Resource\AbstractFile $file)
     {
         return $this->generateFileArray($file, null, [
             'data-permission' => 'full',
             'data-type'       => 'file'
         ]);
-    }
-
-
-    /**
-     * @param Resource\My\File\Model $file
-     * @param string                 $name
-     * @param array                  $liAttributes
-     * @param array                  $aAttributes
-     * @return array
-     */
-    protected function generateFileArray(Resource\File\IFile $file, $name = null, array $liAttributes = null, array $aAttributes = null)
-    {
-        if (empty($liAttributes['data-id'])) {
-            $liAttributes['data-id'] = $file->getId();
-        }
-
-        return $this->generateNodeArray("myfile-{$file->getId()}", $file->getFolder()->getId(), 'file', $name ?: $file->getTitle(), $liAttributes, $aAttributes);
     }
 
 
@@ -101,7 +84,7 @@ class TreeBuilder extends AbstractTreeBuilder
 
     /**
      * @param int $nodeId
-     * @return Collection|File\IFile[]
+     * @return Collection|Resource\AbstractFile[]
      */
     protected function getNodeFiles($nodeId)
     {

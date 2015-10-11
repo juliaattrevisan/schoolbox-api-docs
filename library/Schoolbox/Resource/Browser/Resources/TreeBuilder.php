@@ -48,7 +48,7 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     public function __construct(Folder\ILocator $locator, TaskMapper $taskMapper, $userAccessMapper, $roleAccessMapper, $user)
     {
-        parent::__construct($locator, 'Resources');
+        parent::__construct($locator, 'sbfsfile', 'Resources');
 
         $this->taskMapper       = $taskMapper;
         $this->userAccessMapper = $userAccessMapper;
@@ -102,11 +102,11 @@ class TreeBuilder extends AbstractTreeBuilder
 
 
     /**
-     * @param Resource\File\Model $file
+     * @param Resource\AbstractFile $file
      * @throws Resource\Exception
      * @return array
      */
-    protected function buildFileNode(File\IFile $file)
+    protected function buildFileNode(Resource\AbstractFile $file)
     {
         $permission = $this->getFilePermission($file->getId());
         if (empty($permission)) {
@@ -122,23 +122,6 @@ class TreeBuilder extends AbstractTreeBuilder
                 'href' => '/send.php?id=' . $file->getId(),
             ]
         );
-    }
-
-
-    /**
-     * @param Resource\File\Model $file
-     * @param string              $name
-     * @param array               $liAttributes
-     * @param array               $aAttributes
-     * @return array
-     */
-    protected function generateFileArray(Resource\File\IFile $file, $name = null, array $liAttributes = null, array $aAttributes = null)
-    {
-        if (empty($liAttributes['data-id'])) {
-            $liAttributes['data-id'] = $file->getId();
-        }
-
-        return $this->generateNodeArray("sbfsfile-{$file->getId()}", $file->getFolder()->getId(), 'file', $name ?: $file->getTitle(), $liAttributes, $aAttributes);
     }
 
 
@@ -234,7 +217,7 @@ class TreeBuilder extends AbstractTreeBuilder
 
     /**
      * @param int $nodeId
-     * @return Collection|File\IFile[]
+     * @return Collection|Resource\AbstractFile[]
      */
     protected function getNodeFiles($nodeId)
     {
