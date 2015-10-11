@@ -452,7 +452,7 @@
                 if (seriesId) {
                     // Remove all previous change status events, and reapply to this
                     // dialog box.
-                    updateSeriesDialog.find('.action-text').text($(this).text().toLowerCase());
+                    updateSeriesDialog.find('[data-booking-action-text]').text($(this).text().toLowerCase());
                     updateSeriesDialog.foundation('reveal', 'open');
                     updateSeriesDialog.off('click', '[data-efficacy="self"]');
                     updateSeriesDialog.on('click', '[data-efficacy="self"]', function(e) {
@@ -793,9 +793,7 @@
 
 <div class="reveal-modal" data-reveal aria-labelledby="dialog-booking-bulk-update-title" aria-hidden="true" role="dialog" id="dialog-booking-bulk-update">
     <h2 id="dialog-booking-bulk-update-title">This booking is part of a series</h2>
-    <p>
-        Would you like to <span class="action-text"></span> only this booking, or all in the series?
-    </p>
+    <p>Would you like to <span data-booking-action-text></span> only this booking, or all in the series?</p>
     <ul class="stack-for-small button-group even-3">
         <li><a href="#" class="button" data-efficacy="self">Only this booking</a></li>
         <li><a href="#" class="button" data-efficacy="series">All bookings in the series</a></li>
