@@ -47,6 +47,11 @@ $selectize-padding-item-y: 0;
 
 @import "../../../core/selectize/src/selectize.scss";
 
+/* selectize.scss uses a whole bunch of !important vars
+ * so you have to bring a bigger bang to the party
+ */
+
+.selectize-control.single .selectize-input > div,
 .selectize-control.multi .selectize-input > div {
 	background: $content-ui-background;
 	padding: 0 0 0 0.5rem;
@@ -58,15 +63,23 @@ $selectize-padding-item-y: 0;
 	}
 }
 
+/* Because there should be an x next to the element, but isn't?
+ */
+.selectize-control.single .selectize-input > div {
+    padding: 0 0.5rem 0 0.5rem;
+}
+
 .selectize-input {
     line-height: 2rem;
     input {
         height: auto;
+
         .remove {
             color: $content-ui-foreground;
         }
 
-        // !important because of chrome.css
+        /* !important because of chrome.css
+         */
         &[placeholder] {
             margin-left: 0.5rem !important;
         }
