@@ -35,8 +35,16 @@ if($fp) {
     $newSha = sha1_file(SKIN_FILE);
 }
 
-if($origSha != $newSha || $force) {
-    exec('cd ' . SITE_root . '; grunt sass');
+if ($origSha != $newSha || $force) {
+    // Compile the new sass file.
+    $infile  = SITE_root . '/www/css/foundation/chrome-foundation.scss';
+    $outfile = SITE_root . '/www/css/foundation/chrome.css';
+    $tmpfile = tempnam(sys_get_temp_dir(), 'css');
+    $cmd     = sprintf('sass %s > %s', escapeshellarg($infile), escapeshellarg($tmpfile));
+    exec($cmd, $output, $outputCode);
+    if ($outputCode === 0) {
+        copy($tmpfile, $outfile);
+    } else {
+        // something went wrong
+    }
 }
-
-

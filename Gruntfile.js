@@ -1,12 +1,5 @@
 var glob  = require('glob');
 var shell = require('shelljs');
-var fs    = require('fs');
-
-// Before anything else: ensure /www/css/foundation/utils/_skin.scss exists
-var skinFile = __dirname+'/www/css/foundation/utils/_skin.scss';
-if (!fs.existsSync(skinFile)) {
-    fs.writeFileSync(skinFile, '');
-}
 
 module.exports = function(grunt) {
 
