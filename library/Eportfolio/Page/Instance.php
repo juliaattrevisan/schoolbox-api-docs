@@ -18,11 +18,18 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
     protected $templateFile = 'eportfolio/instance.html';
 
     /**
-	 * An instance of Component_FactoryAbstract
-	 *
-	 * @var Component_FactoryAbstract
-	 */
+     * An instance of Component_FactoryAbstract
+     *
+     * @var Component_FactoryAbstract
+     */
     private $componentFactory = null;
+
+    /**
+     * An object which builds color objects from color strings
+     *
+     * @var \Alaress\Color\ColorFactory
+     */
+    private $colorFactory = null;
 
     /**
 	 * An instance of Collection
@@ -59,6 +66,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 
         /* Page colours
 		 */
+        $this->setColorFactory(new \Alaress\Color\ColorFactory());
         $this->setColours($this->getEportfolioHandler()->getColorList());
     }
 
@@ -335,8 +343,13 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
      */
     private function renderColourSet($set, $key) {
         foreach ($set as $field => $colour) {
+            try {
+                $colorObject = $this->getColorFactory()->build($colour);
+            } catch (InvalidArgumentException $e) {
+                $colorObject = $this->getColorFactory()->build('000000');
+            }
             $vars = array(
-                $field => $colour
+                $field => $colorObject
             );
 
             $this->getPage()->setVar($vars);
@@ -628,5 +641,23 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
     private function getTabList()
     {
         return $this->tabList;
+    }
+
+    /**
+     * @return \Alaress\Color\ColorFactory
+     */
+    private function getColorFactory()
+    {
+        return $this->colorFactory;
+    }
+
+    /**
+     * @param  \Alaress\Color\ColorFactory $colorFactory
+     * @return $this
+     */
+    private function setColorFactory($colorFactory)
+    {
+        $this->colorFactory = $colorFactory;
+        return $this;
     }
 }

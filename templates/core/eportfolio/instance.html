@@ -1,34 +1,37 @@
 <!-- BEGIN custom_head -->
 <style type="text/css">
     /** Make these styles more specific than topbar styles  **/
-    #component-layout .column-top .component.information-list,
+    #component-layout .column-top .component.information-list {
+        background-color: {top_head_bg};
+    }
     #component-layout .column-top .component.information-list a {
-        color: #{top_head_font};
-        background-color: #{top_head_bg};
+        color: {top_head_font};
     }
     #component-layout .column-top .island section {
-        color: #{top_font};
-        background-color: #{top_bg_primary};
+        color: {top_font};
+        background-color: {top_bg_primary};
     }
 
-    #component-layout .column-left .component.information-list,
+    #component-layout .column-left .component.information-list {
+        background-color: {left_head_bg};
+    }
     #component-layout .column-left .component.information-list a {
-        color: #{left_head_font};
-        background-color: #{left_head_bg};
+        color: {left_head_font};
     }
     #component-layout .column-left .island section {
-        color: #{left_font};
-        background-color: #{left_bg_primary};
+        color: {left_font};
+        background-color: {left_bg_primary};
     }
 
-    #component-layout .column-right .component.information-list,
+    #component-layout .column-right .component.information-list {
+        background-color: {right_head_bg};
+    }
     #component-layout .column-right .component.information-list a {
-        color: #{right_head_font};
-        background-color: #{right_head_bg};
+        color: {right_head_font};
     }
     #component-layout .column-right .island section {
-        color: #{right_font};
-        background-color: #{right_bg_primary};
+        color: {right_font};
+        background-color: {right_bg_primary};
     }
 
     /* wrap mimetypes in classes */
@@ -50,34 +53,35 @@
 <script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.device.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.tab-activator.js"></script>
 <script type="text/javascript">
 
     var colours = {};
     <!-- BEGIN colour_list -->
     colours['{COLOUR_ARRAY}'] = {
-        'top_head_font'      : '#{top_head_font}',
-        'top_head_bg'        : '#{top_head_bg}',
-        'top_font'           : '#{top_font}',
-        'top_bg_primary'     : '#{top_bg_primary}',
-        'top_bg_secondary'   : '#{top_bg_secondary}',
-        'top_link'           : '#{top_link}',
-        'top_hover'          : '#{top_hover}',
+        'top_head_font'      : '{top_head_font}',
+        'top_head_bg'        : '{top_head_bg}',
+        'top_font'           : '{top_font}',
+        'top_bg_primary'     : '{top_bg_primary}',
+        'top_bg_secondary'   : '{top_bg_secondary}',
+        'top_link'           : '{top_link}',
+        'top_hover'          : '{top_hover}',
 
-        'left_head_font'     : '#{left_head_font}',
-        'left_head_bg'       : '#{left_head_bg}',
-        'left_font'          : '#{left_font}',
-        'left_bg_primary'    : '#{left_bg_primary}',
-        'left_bg_secondary'  : '#{left_bg_secondary}',
-        'left_link'          : '#{left_link}',
-        'left_hover'         : '#{left_hover}',
+        'left_head_font'     : '{left_head_font}',
+        'left_head_bg'       : '{left_head_bg}',
+        'left_font'          : '{left_font}',
+        'left_bg_primary'    : '{left_bg_primary}',
+        'left_bg_secondary'  : '{left_bg_secondary}',
+        'left_link'          : '{left_link}',
+        'left_hover'         : '{left_hover}',
 
-        'right_head_font'    : '#{right_head_font}',
-        'right_head_bg'      : '#{right_head_bg}',
-        'right_font'         : '#{right_font}',
-        'right_bg_primary'   : '#{right_bg_primary}',
-        'right_bg_secondary' : '#{right_bg_secondary}',
-        'right_link'         : '#{right_link}',
-        'right_hover'        : '#{right_hover}'
+        'right_head_font'    : '{right_head_font}',
+        'right_head_bg'      : '{right_head_bg}',
+        'right_font'         : '{right_font}',
+        'right_bg_primary'   : '{right_bg_primary}',
+        'right_bg_secondary' : '{right_bg_secondary}',
+        'right_link'         : '{right_link}',
+        'right_hover'        : '{right_hover}'
     };
     <!-- END colour_list -->
 
@@ -85,7 +89,8 @@
 
         var url = '/eportfolio/configForm.php';
 
-        $('#component-layout').masonry({
+        var eportfolio = $('#component-layout');
+        eportfolio.masonry({
             context: {
                 page_id: '{PAGE_ID}'
             },
@@ -173,6 +178,15 @@
                 confirmEvent: $.confirmDialog.submitForm
             })
         });
+
+        /* Tab toggler
+         * Deal with special components placeholder
+         */
+        $.fn.tabActivator({
+            onTabClose: function(tabActivator) {
+                eportfolio.removeClass('show-empty');
+            }
+        });
     });
 </script>
 <!-- END modify_layout -->
@@ -187,13 +201,13 @@
             <!-- BEGIN edit_page -->
             <span data-tab>
                 <span class="tab-title">
-                    <a class="icon-components" href="#eportfolio-page-controls-tab-1" title="Add components"></a>
+                    <a class="icon-components" href="#eportfolio-page-controls-tab-1" title="Add components" data-tab-activator></a>
                 </span>
                 <span class="tab-title">
-                    <a class="icon-edit-columns" href="#eportfolio-page-controls-tab-2" title="Edit columns"></a>
+                    <a class="icon-edit-columns" href="#eportfolio-page-controls-tab-2" title="Edit columns" data-tab-activator></a>
                 </span>
                 <span class="tab-title">
-                    <a class="icon-modify" href="#eportfolio-page-controls-tab-3" title="Edit the page and its permissions"></a>
+                    <a class="icon-modify" href="#eportfolio-page-controls-tab-3" title="Edit the page and its permissions" data-tab-activator></a>
                 </span>
             </span>
             <!-- END edit_page -->
