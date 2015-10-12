@@ -14,7 +14,7 @@ $magellan-padding: rem-calc(0);
 // Off Canvas Tab Bar Variables
 $include-html-off-canvas-classes: $include-html-classes !default;
 
-$tabbar-bg: $body-bg !default;
+$tabbar-bg: $navigation-background;
 $tabbar-height: rem-calc(80);
 $tabbar-icon-width: $tabbar-height;
 $tabbar-line-height: $tabbar-height;
