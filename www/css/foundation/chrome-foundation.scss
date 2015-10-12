@@ -85,5 +85,6 @@
 @import "../../javascript/components/foundation/scss/foundation/components/reveal";
 @import "../../javascript/components/foundation/scss/foundation/components/tooltips";
 @import "selectize.customisation";
+
 // combobox relies on selectize styles
-@import "components/combobox";
+@import "components/ui/combobox";
