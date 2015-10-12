@@ -162,12 +162,6 @@ textarea{
 	padding-left: 0.75rem;
 }
 
-select option{
-	&:hover{
-		background: $input-hover-bg-color;
-	}
-}
-
 // remove margins on forms inside tables
 th, td{
 	input[type],
