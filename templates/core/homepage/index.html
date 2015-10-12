@@ -171,23 +171,8 @@
          * Deal with special components placeholder
          */
         $.fn.tabActivator({
-            onTabOpen: function(tabActivator) {
-                if ($(tabActivator).attr('href') == '#tabs-1') {
-                    $('.masonry-placeholder').show();
-                }
-            },
-            onTabSwitch: function(tabActivator) {
-                if ($(tabActivator).attr('href') == '#tabs-1') {
-                    $('.masonry-placeholder').show();
-                }
-                else if ($(tabActivator).attr('href') == '#tabs-2') {
-                    $('.masonry-placeholder').hide();
-                }
-            },
             onTabClose: function(tabActivator) {
-                if ($(tabActivator).attr('href') == '#tabs-1') {
-                    $('.masonry-placeholder').hide();
-                }
+                homepage.removeClass('show-empty');
             }
         });
     });
