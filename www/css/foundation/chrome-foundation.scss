@@ -22,7 +22,7 @@
 // Must import before forms, as forms reimports buttons.scss
 @import "components/buttons";
 
-@import "components/forms";
+@import "components/ui/forms/forms";
 //@import "components/joyride";
 @import "components/navigation";
 @import "components/tree";

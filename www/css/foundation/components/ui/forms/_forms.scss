@@ -124,8 +124,8 @@ $switch-negative-color: tint($secondary-color, 74%);
 // Outline Style for tabbing through switches
 // $switch-label-outline: 1px dotted $jumbo;
 
-@import "../../../javascript/components/foundation/scss/foundation/components/forms";
-@import "../../../javascript/components/foundation/scss/foundation/components/switches";
+@import "../../../../../javascript/components/foundation/scss/foundation/components/forms";
+@import "../../../../../javascript/components/foundation/scss/foundation/components/switches";
 
 //
 // Custom overrides
@@ -479,6 +479,6 @@ section > fieldset {
 	}
 }
 
-@import 'forms/dropzone';
-@import 'forms/datetime';
-@import 'forms/tinymce';
+@import 'dropzone';
+@import 'datetime';
+@import 'tinymce';
