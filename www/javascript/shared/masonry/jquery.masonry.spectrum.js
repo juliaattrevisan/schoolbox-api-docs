@@ -252,21 +252,23 @@
      */
     MasonrySpectrum.prototype.updateColor = function (element, color) {
         // 1: column, 2: element to update
+        var tinyColor   = new tinycolor(color);
+        var colorString = tinyColor.toRgbString();
         var matches = element.match(/^(.*?)_(.*)/);
         if (matches) {
             var column = this.masonry.columns.filter('[data-position="'+matches[1]+'"]');
             switch (matches[2]) {
                 case 'font':
-                    column.find('.island section').css({color: color});
+                    column.find('.island section').css({color: colorString});
                     break;
                 case 'bg_primary':
-                    column.find('.island section').css({backgroundColor: color});
+                    column.find('.island section').css({backgroundColor: colorString});
                     break;
                 case 'head_font':
-                    column.find('.component.information-list, .component.information-list a').css({color: color});
+                    column.find('.component.information-list a').css({color: colorString});
                     break;
                 case 'head_bg':
-                    column.find('.component.information-list, .component.information-list a').css({backgroundColor: color});
+                    column.find('.component.information-list').css({backgroundColor: colorString});
                     break;
             }
         }

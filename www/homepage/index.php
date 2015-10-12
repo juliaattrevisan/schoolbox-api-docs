@@ -81,6 +81,30 @@ if ($actualPermission > READ_ACCESS && $_GET['readonly']) {
 // setup the homepage handler
 $homepageHandler = new Homepage($category->getId());
 
+// Color mangling
+$colorFactory = new \Alaress\Color\ColorFactory();
+
+// Colors (defaults)
+$defaultColour = array(
+    'head_font' => Cfg::get('homepage_colour_head_font'),
+    'head_bg' => Cfg::get('homepage_colour_head_bg'),
+    'font' => Cfg::get('homepage_colour_font'),
+    'bg_primary' => Cfg::get('homepage_colour_bg_primary'),
+    'bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
+    'link' => Cfg::get('homepage_colour_link'),
+    'hover' => Cfg::get('homepage_colour_hover')
+);
+
+// Load this homepage's color list, falling back to defaults as required
+$listColor = [];
+foreach ($homepageHandler->getColorList() as $key => $color) {
+    try {
+        $listColor[$key] = $colorFactory->build($color);
+    } catch (InvalidArgumentException $e) {
+        $listColor[$key] = $colorFactory->build('000000');
+    }
+}
+
 // this category doesn't have a template, therefore doesn't have a homepage: redirect to resource browser.
 if (!$homepageHandler->getTemplate()) {
     $this->localRedir('/resources/'.$category->getId());
@@ -90,9 +114,6 @@ if (!$homepageHandler->getTemplate()) {
 $mapper = new Schoolbox\Resource\CategoryLogMapper();
 $mapper->incrementHitcount($_SESSION['user'], $category->getId());
 $categoryMapper->logPageView($category);
-
-// Color mangling
-$colorFactory = new \Alaress\Color\ColorFactory();
 
 /* BUILD PAGE */
 $this->setFile(TEMPLATE_content, 'homepage/index.html');
@@ -237,10 +258,7 @@ if ($virtualPermission >= WRITE_ACCESS) {
         }
     }
 
-
     // Colors (original)
-    $listColor = array_map([$colorFactory, 'build'], $homepageHandler->getColorList());
-
     $this->setVar('COLOUR_ARRAY', 'original');
     $this->setVar($listColor);
     $this->parse('colour_list_block', 'colour_list', true);
@@ -251,16 +269,6 @@ if ($virtualPermission >= WRITE_ACCESS) {
     $this->parse('colour_list_block', 'colour_list', true);
 
     // Defaults
-    $defaultColour = array(
-        'head_font' => Cfg::get('homepage_colour_head_font'),
-        'head_bg' => Cfg::get('homepage_colour_head_bg'),
-        'font' => Cfg::get('homepage_colour_font'),
-        'bg_primary' => Cfg::get('homepage_colour_bg_primary'),
-        'bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
-        'link' => Cfg::get('homepage_colour_link'),
-        'hover' => Cfg::get('homepage_colour_hover')
-    );
-
     $columns = array('top', 'left', 'right');
     $this->setVar('COLOUR_ARRAY', 'defaults');
 
@@ -338,8 +346,6 @@ $this->setVar(array(
 ));
 
 // Colors (original)
-$listColor = array_map([$colorFactory, 'build'], $homepageHandler->getColorList());
-
 $this->setVar('COLOUR_ARRAY', 'original');
 $this->setVar($listColor);
 $this->parse('colour_list_block', 'colour_list', true);
@@ -384,8 +390,7 @@ $this->setVar(array(
     'TEMPLATE_RIGHT_COLUMN_WIDTH' => 12 - $leftWidth,
 ));
 
-$colours = array_map([$colorFactory, 'build'], $homepageHandler->getColorList());
-$this->setVar($colours);
+$this->setVar($listColor);
 
 // output MIMEs
 $allowedFiles = new AllowedFile;

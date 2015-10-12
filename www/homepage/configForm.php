@@ -104,16 +104,12 @@ if (is_numeric($_REQUEST['cid'])) {
     } // AJAX Save homepage colours
     elseif ($_POST['cid'] && is_array($_POST['colors'])) {
         $homepage = new Homepage($_POST['cid']);
-        $color    = array();
-        foreach ($_POST['colors'] as $key => $value) {
-            $color[$key] = substr($value, 1);
-        }
         // Also try to save width
         if (!empty($_POST['width'])) {
             // Mangle width into percentages
             $homepage->updateGrid($_POST['width']);
         }
-        $homepage->saveDisplayProperties($color);
+        $homepage->saveDisplayProperties($_POST['colors']);
     } // GET config options from homepage
     elseif ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
         $config = $_GET;
