@@ -31,6 +31,11 @@
 @import "components/preview";
 @import "components/dataTables";
 
+// Refined UI Elements
+// These override defaults in @import components/buttons
+// We have refined these elements
+@import "components/ui/breadcrumb";
+@import "components/ui/button";
 
 // Layout
 @import "layout/footer";
@@ -42,8 +47,6 @@
 @import "layout/login";
 @import "layout/tiles";
 
-// UI Elements
-@import "components/ui/breadcrumb";
 
 // Schoolbox Areas
 @import "components/quiz-survey";

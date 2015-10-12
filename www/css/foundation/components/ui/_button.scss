@@ -1,0 +1,84 @@
+/* All generic buttons
+ */
+.button{
+
+    /* This should be renamed to .primary
+     */
+	&.secondary{
+		background-color: $primary-color;
+		color: $white;
+	}
+
+	&.alert{
+		&:hover{
+			color: $white !important;
+		}
+	}
+
+	&.warning{
+		background-color: $warning-color;
+		&:hover{
+			background-color: tint($warning-color, 20%);
+		}
+	}
+
+	&.expand {
+		padding: 1rem;
+		font-weight: 700;
+	}
+
+	&:empty {
+		@extend .no-text;
+	}
+	
+	// Fat button - for when you need a button larger than Steve's mama
+	// Like Steve's mama, fits best in a block-grid
+	&.fat {
+		display: block;
+		min-height: 5rem;
+		padding-top: 0.875rem;
+		font-size: rem-calc($base-font-size - 3);
+		&:before {
+			margin-bottom: 0.25rem;
+		}
+	}
+}
+
+/* Anchor tags pretending to be input elements
+ */
+a[role="button"] {
+	@extend .button;
+}
+
+/* Form submits have a unique styling
+ */
+input[type="submit"]{
+	@extend .button;
+	border: none;
+	background-color: $submit-button-color;
+	color: calc-text-color($submit-button-color);
+	&:hover, &:focus {
+		background-color: tint($submit-button-color, 20%);
+		color: $white;
+	}
+	&:disabled {
+		opacity: $button-disabled-opacity;
+		background-color: $submit-button-color;
+		color: calc-text-color($submit-button-color);
+	}
+}
+
+a.submit {
+	@extend input[type="submit"];
+}
+
+/* Expand buttons, for collapsable behaviours
+ */
+.expand-link {
+	color: $anchor-font-color;
+	margin: 0 rem-calc(($base-font-size / 2)) 0 0;
+	padding: 0;
+	&:before{
+		padding: 0;
+	}
+}
