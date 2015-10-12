@@ -7,15 +7,17 @@
  * @link      http://www.alaress.com.au/
  */
 
-require_once __DIR__ . '/../../include/Bootstrap.php';
+/** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
+$kernel = require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
+
+$page = new SitePage();
+$page->setDi($kernel->getDependencyInjector());
 
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder;
-
-$page = new SitePage();
 
 $course_instance_id = $_POST['unit_id'];
 /** @var UnitInstance $course_instance */
@@ -140,7 +142,7 @@ if ($page->detectAjax()) {
         if ($component instanceof Component_Instance) {
             // Dump out template contents
             // There ought to be a method which does this.
-            $chf = new Component_Homepage_Factory(new \Schoolbox\User(), new SitePage(false));
+            $chf = new Component_Homepage_Factory(new \Schoolbox\User(), $page);
 
             /** @var Component_Homepage_CourseOutlineController $controller */
             $controller = $chf->buildComponent($component);

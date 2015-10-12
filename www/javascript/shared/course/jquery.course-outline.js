@@ -243,13 +243,27 @@
             function(event) {
                 var form = $(this);
                 event.preventDefault();
+
+                var label = form.find('[data-create-task-indicator]');
+
+                label.labelActivate();
+
                 // Is this a new form?
                 var is_new = !(form.find('input[name="id"]').val());
+
+                $(this).find("input[type=submit]").attr('disabled', true);
+                
                 $.post(form.attr('action'), form.serialize(), function(data) {
+                    label.labelTimeout({
+                        text: 'Saved',
+                        css: 'success'
+                    });
+
                     // Do validation stuff here eventually.
                     if (is_new) {
                         form.get(0).reset();
                     }
+
                     postCallback(form, data);
                 }, 'json');
             }
