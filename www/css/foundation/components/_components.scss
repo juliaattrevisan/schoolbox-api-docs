@@ -160,6 +160,35 @@ ul.countdown {
     cursor: move;
 }
 
+/* Homepage Statistics
+ */
+.tally {
+    float: right;
+}
+
+/* Eportfolio
+ */
+.eportfolio {
+    &.cover-photo {
+        height: auto;
+    }
+    &.cover-photo-controls {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+    }
+    &.profile-image {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+    }
+    &.profile-name {
+        margin-bottom: 2rem;
+    }
+}
 /*********************************************************
  * Custom Components
  *********************************************************/
@@ -378,32 +407,3 @@ ul.countdown {
     }
 }
 
-/* Homepage Statistics
- */
-.tally {
-    float: right;
-}
-
-/* Eportfolio
- */
-.eportfolio {
-    &.cover-photo {
-        height: auto;
-    }
-    &.cover-photo-controls {
-        position: absolute;
-        top: 0px;
-        right: 0px;
-    }
-    &.profile-image {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        margin: auto;
-    }
-    &.profile-name {
-        margin-bottom: 2rem;
-    }
-}
