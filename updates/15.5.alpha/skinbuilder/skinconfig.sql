@@ -1,6 +1,18 @@
 INSERT INTO `lu_config_type` (`type`) VALUES ('Skin Config');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES (
+    'skin_builder',
+    'Use Skin Builder?',
+    0,
+    'Do you wish to use the skin builder to style your Schoolbox? If this is switched on, your custom skin and any custom templates will be ignored.',
+    5, -- checkbox
+    (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+    'true',
+    'false'
+);
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_primary_colour',
         'Primary Colour',
         'rgb(0, 102, 176)',
