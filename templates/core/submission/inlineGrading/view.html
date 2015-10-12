@@ -123,24 +123,28 @@
     </ul>
 </div>
 
-<div class="row collapse">
-    <div class="small-1 columns">
-        <a class="button icon-previous" rel="prev" href="" title=""></a>
-    </div>
-    <div class="small-10 medium-6 columns">
-        <select name="student-select"></select>
-    </div>
-    <div class="small-1 columns">
-        <a class="button icon-next" rel="next" href="" title=""></a>
-    </div>
-    <div class="small-12 medium-4 columns">
-        <form action="/submission/inlineGrading/configForm.php" method="post">
-            <input type="hidden" name='boxId' value="{BOX_ID}" />
-            <input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
-            <input type="hidden" name="skipUnsubmitted" value="0" />
-            <input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' />
-            <label for="skipUnsubmitted" class="checkbox-label">Skip Unsubmitted</label>
-        </form>
+<div class="row">
+    <div class="small-12 column">
+        <div class="row collapse">
+            <div class="small-1 columns">
+                <a class="button icon-previous" rel="prev" href="" title=""></a>
+            </div>
+            <div class="small-10 medium-6 columns">
+                <select name="student-select"></select>
+            </div>
+            <div class="small-1 columns">
+                <a class="button icon-next" rel="next" href="" title=""></a>
+            </div>
+            <div class="small-12 medium-4 columns">
+                <form action="/submission/inlineGrading/configForm.php" method="post">
+                    <input type="hidden" name='boxId' value="{BOX_ID}" />
+                    <input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
+                    <input type="hidden" name="skipUnsubmitted" value="0" />
+                    <input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' />
+                    <label for="skipUnsubmitted" class="checkbox-label">Skip Unsubmitted</label>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -154,116 +158,120 @@
     </div>
 </div>
 
-<!-- One Giant Form -->
-<form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" id="returnWorkForm" class="top">
-    <input name="uid" type="hidden" id="uid" value="{INLINE_GRADING_STUDENT_ID}" />
-    <input name="box_id" type="hidden" id="box_id" value="{INLINE_GRADING_SUBMISSION_BOX_ID}" />
-    <input type="hidden" name="redirect" value="{INLINE_GRADING_SUBMISSION_NAVIGATION_NEXT_URL}" />
-    <input type="hidden" name="clearAttachments" value="1" />
+<div class="row">
+    <div class="small-12 columns">
+        <!-- One Giant Form -->
+        <form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" id="returnWorkForm" class="top">
+            <input name="uid" type="hidden" id="uid" value="{INLINE_GRADING_STUDENT_ID}" />
+            <input name="box_id" type="hidden" id="box_id" value="{INLINE_GRADING_SUBMISSION_BOX_ID}" />
+            <input type="hidden" name="redirect" value="{INLINE_GRADING_SUBMISSION_NAVIGATION_NEXT_URL}" />
+            <input type="hidden" name="clearAttachments" value="1" />
 
-    <div class="row">
-        <div class="small-12 large-6 island">
-            <!-- BEGIN student_row -->
-            <h2 class="subheader">Grade</h2>
-            <section>
-                <div class="content">
-                    <div class="row">
-
-                        <div class="small-12 columns">
+            <div class="row">
+                <div class="small-12 large-6 island">
+                    <!-- BEGIN student_row -->
+                    <h2 class="subheader">Grade</h2>
+                    <section>
+                        <div class="content">
                             <div class="row">
-                                {OWNER_MARKING}
+
+                                <div class="small-12 columns">
+                                    <div class="row">
+                                        {OWNER_MARKING}
+                                    </div>
+                                </div>
+
+                                <div class="small-12 columns">
+                                    <!-- BEGIN submission_after_mark -->
+                                    <!-- END submission_after_mark -->
+
+                                </div>
                             </div>
                         </div>
+                        <ul class="action-list">
+                            <!-- BEGIN submission_row -->
+                            <li class="actions-small-1 actions-medium-3">
+                                <div class="list-item {SUBMISSION_SELECTED}">
+                                    <div class="small-12 avatar card">
+                                        <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" title="Download submission">
+                                            <img src="/images/mime/60x60/{SUBMISSION_MIMEICON}" class="mime" alt="{SUBMISSION_FILENAME}" />
+                                            <p>{SUBMISSION_FILENAME}</p>
+                                        </a>
+                                        <p class="meta">{SUBMISSION_TIME} ({SUBMISSION_TIME_DESCRIPTION})</p>
+                                    </div>
 
-                        <div class="small-12 columns">
-                            <!-- BEGIN submission_after_mark -->
-                            <!-- END submission_after_mark -->
+                                    <!-- BEGIN plag_enabled -->
+                                    <div class="list-item-content grade no-pad">
+                                        <span class="plag-score" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report"><a href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a></span>
+                                        <p class="meta">Plagiarism Check</p>
+                                    </div>
+                                    <!-- END plag_enabled -->
 
-                        </div>
-                    </div>
-                </div>
-                <ul class="action-list">
-                    <!-- BEGIN submission_row -->
-                    <li class="actions-small-1 actions-medium-3">
-                        <div class="list-item {SUBMISSION_SELECTED}">
-                            <div class="small-12 avatar card">
-                                <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" title="Download submission">
-                                    <img src="/images/mime/60x60/{SUBMISSION_MIMEICON}" class="mime" alt="{SUBMISSION_FILENAME}" />
-                                    <p>{SUBMISSION_FILENAME}</p>
-                                </a>
-                                <p class="meta">{SUBMISSION_TIME} ({SUBMISSION_TIME_DESCRIPTION})</p>
-                            </div>
+                                    <!-- BEGIN plag_pending -->
+                                    <div class="list-item-content grade no-pad">
+                                        <span class="{SUBMISSION_PLAG_CLASS}" title="Plagscan Pending">Pending</span>
+                                        <p class="meta">Plagiarism Check</p>
+                                    </div>
+                                    <!-- END plag_pending -->
 
-                            <!-- BEGIN plag_enabled -->
-                            <div class="list-item-content grade no-pad">
-                                <span class="plag-score" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report"><a href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a></span>
-                                <p class="meta">Plagiarism Check</p>
-                            </div>
-                            <!-- END plag_enabled -->
+                                    <!-- BEGIN plag_deleted -->
+                                    <div class="list-item-content grade no-pad">
+                                        <span class="{SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism">{SUBMISSION_PLAG_SCORE}</span>
+                                        <p class="meta">Plagiarism Check</p>
+                                    </div>
+                                    <!-- END plag_deleted -->
 
-                            <!-- BEGIN plag_pending -->
-                            <div class="list-item-content grade no-pad">
-                                <span class="{SUBMISSION_PLAG_CLASS}" title="Plagscan Pending">Pending</span>
-                                <p class="meta">Plagiarism Check</p>
-                            </div>
-                            <!-- END plag_pending -->
-
-                            <!-- BEGIN plag_deleted -->
-                            <div class="list-item-content grade no-pad">
-                                <span class="{SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism">{SUBMISSION_PLAG_SCORE}</span>
-                                <p class="meta">Plagiarism Check</p>
-                            </div>
-                            <!-- END plag_deleted -->
-
-                        </div>
-                        <nav>
-                            <span class="show-for-medium-up">
-                                <a href="/submission/send.php?id={SUBMISSION_ID}&save=1" class="icon-download" title="Download submission"></a>
-                                <!-- BEGIN delete_action -->
-                                <a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" class="icon-delete" title="Delete submission" data-delete-submission></a>
-                                <!-- END delete_action -->
-                                <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" class="icon-view" title="View Submission"></a>
-                            </span>
-                            <span class="show-for-small-only">
-                                <a href="#" class="icon-more" data-dropdown="action-buttons-{SUBMISSION_ID}"></a>
-                            </span>
-                        </nav>
-                        <ul class="f-dropdown" id="action-buttons-{SUBMISSION_ID}" data-dropdown-content>
-                            <li>
-                                <a href="/submission/send.php?id={SUBMISSION_ID}&save=1" class="icon-download">Download submission</a>
+                                </div>
+                                <nav>
+                                    <span class="show-for-medium-up">
+                                        <a href="/submission/send.php?id={SUBMISSION_ID}&save=1" class="icon-download" title="Download submission"></a>
+                                        <!-- BEGIN delete_action -->
+                                        <a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" class="icon-delete" title="Delete submission" data-delete-submission></a>
+                                        <!-- END delete_action -->
+                                        <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" class="icon-view" title="View Submission"></a>
+                                    </span>
+                                    <span class="show-for-small-only">
+                                        <a href="#" class="icon-more" data-dropdown="action-buttons-{SUBMISSION_ID}"></a>
+                                    </span>
+                                </nav>
+                                <ul class="f-dropdown" id="action-buttons-{SUBMISSION_ID}" data-dropdown-content>
+                                    <li>
+                                        <a href="/submission/send.php?id={SUBMISSION_ID}&save=1" class="icon-download">Download submission</a>
+                                    </li>
+                                    <!-- BEGIN dropdown_delete_action -->
+                                    <li>
+                                        <a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" class="icon-delete" data-delete-submission>Delete submission</a>
+                                    </li>
+                                    <!-- END dropdown_delete_action -->
+                                    <li>
+                                        <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" class="icon-view">View Submission</a>
+                                    </li>
+                                </ul>
                             </li>
-                            <!-- BEGIN dropdown_delete_action -->
-                            <li>
-                                <a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" class="icon-delete" data-delete-submission>Delete submission</a>
-                            </li>
-                            <!-- END dropdown_delete_action -->
-                            <li>
-                                <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" class="icon-view">View Submission</a>
-                            </li>
+                            <!-- END submission_row -->
                         </ul>
-                    </li>
-                    <!-- END submission_row -->
-                </ul>
 
-            </section>
-            <!-- END student_row -->
-        </div>
-        <div class="small-12 large-6 island">
-            {INJECTED_MARK_TEMPLATE}
-        </div>
-        <div class="small-12 island">
-            {INJECTED_MARK_RUBRIC}
+                    </section>
+                    <!-- END student_row -->
+                </div>
+                <div class="small-12 large-6 island">
+                    {INJECTED_MARK_TEMPLATE}
+                </div>
+                <div class="small-12 island">
+                    {INJECTED_MARK_RUBRIC}
 
-            {INJECTED_INTERFACE_CONTROL}
-        </div>
+                    {INJECTED_INTERFACE_CONTROL}
+                </div>
 
-        <div class="small-12 column">
-            <input type="submit" class='expand' value="Save and Continue" />
-        </div>
-        <span class="label success full-width hide" data-relation="success-message">Saved</span>
-        <span class="label alert full-width hide" data-relation="error-message">Error</span>
+                <div class="small-12 column">
+                    <input type="submit" class='expand' value="Save and Continue" />
+                </div>
+                <span class="label success full-width hide" data-relation="success-message">Saved</span>
+                <span class="label alert full-width hide" data-relation="error-message">Error</span>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 
 <!-- BEGIN download_btn -->
 
