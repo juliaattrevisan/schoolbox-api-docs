@@ -12,7 +12,6 @@ namespace Schoolbox\Resource\Browser\MyFiles;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\File;
@@ -93,26 +92,5 @@ class TreeBuilder extends AbstractTreeBuilder
             'parent' => $nodeId
         ]);
     }
-
-
-    /**
-     * @param int $nodeId
-     * @return string
-     */
-    protected function getFolderPermission($nodeId)
-    {
-        return $this->getPermissionString(UserAccess::ACCESS_FULL);
-    }
-
-
-    /**
-     * @param int $nodeId
-     * @return string
-     */
-    protected function getFilePermission($nodeId)
-    {
-        return $this->getPermissionString(UserAccess::ACCESS_FULL);
-    }
-
 
 }

@@ -347,6 +347,26 @@ abstract class AbstractTreeBuilder
 
 
     /**
+     * @param int $nodeId
+     * @return string
+     */
+    protected function getFolderPermission($nodeId)
+    {
+        return $this->getPermissionString(UserAccess::ACCESS_FULL);
+    }
+
+
+    /**
+     * @param int $nodeId
+     * @return string
+     */
+    protected function getFilePermission($nodeId)
+    {
+        return $this->getPermissionString(UserAccess::ACCESS_FULL);
+    }
+
+
+    /**
      * Return the given folder's href
      *
      * @param IFolder $folder
@@ -376,19 +396,5 @@ abstract class AbstractTreeBuilder
      * @return Collection|Resource\AbstractFile[]
      */
     protected abstract function getNodeFiles($nodeId);
-
-
-    /**
-     * @param int $nodeId
-     * @return string
-     */
-    protected abstract function getFolderPermission($nodeId);
-
-
-    /**
-     * @param int $nodeId
-     * @return string
-     */
-    protected abstract function getFilePermission($nodeId);
 
 }
