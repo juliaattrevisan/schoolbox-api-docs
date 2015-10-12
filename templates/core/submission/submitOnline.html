@@ -85,6 +85,12 @@
             }
         });
 
+        var emptyDialog = $('#empty-dialog');
+        emptyDialog.on('click', '[data-interaction="close"]', function(e) {
+            e.preventDefault();
+            emptyDialog.foundation('reveal', 'close');
+        });
+
         $("[data-action-save]").click(function(e) {
             var form      = $(this).closest('form'),
                     dialog    = $('#confirm-dialog'),
@@ -95,15 +101,7 @@
             if (!inlineLen && !filesLen) {
                 // prevent submission without SOMETHING to submit
                 e.preventDefault();
-                $('<div/>').html("You haven't supplied any content for your submission. Provide files and/or edit online and try again.").dialog({
-                    modal: true,
-                    title: 'Nothing to submit',
-                    buttons: {
-                        Ok: function () {
-                            $(this).dialog("close");
-                        }
-                    }
-                });
+                emptyDialog.foundation('reveal', 'open');
             }
             else if (dialog.length) {
                 // wait! display confirm modal
@@ -184,6 +182,13 @@
             <span class="label full-width hide" data-save-draft></span>
         </form>
     </div>
+</div>
+
+<div id="empty-dialog" class="reveal-modal" data-reveal role="dialog">
+    <h2 id="empty-dialog-title">Nothing to submit</h2>
+    You haven't supplied any content for your submission. Provide files and/or edit online and try again.
+    <a class="button full-width" data-interaction="close">OK</a>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
 <!-- BEGIN confirm_terms -->

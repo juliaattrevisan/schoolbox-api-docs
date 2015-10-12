@@ -12,28 +12,21 @@
             form.slideDown();
         });
 
-        $('#dialog').dialog({
-            modal:true,
-            width:650,
-            autoOpen:false
-
-        });
-
-        $(document).on('click', '.open-dialog', function (event) {
+        // Keep track of the file I'm selecting an icon for
+        var selectingIconId = null;
+        $(document).on('click', '[data-reveal-id="allowed-file-dialog"]', function(event) {
             event.preventDefault();
-            $('#dialog').dialog('open');
-            $('#dialog').children('.store-here').html($(this).siblings('.chosen-one').attr('ID'));
+            selectingIconId = $(this).data('fileId');
         });
 
-        $('.new-button').click(function () {
-
-            var currentID = '#' + $(this).siblings('.store-here').html();
-
-            $(currentID).val($(this).children('img').attr('alt'));
-            $(currentID).siblings('.open-dialog').children('img').attr('src', $(this).children('img').attr('src'));
-
-            $('#dialog').dialog('close');
-
+        // On choosing a new icon
+        $('[data-interaction="select-icon"]').click(function () {
+            // Update the button
+            $('#icon-choice-'+selectingIconId).empty().append($(this).children().clone());
+            // and the form
+            $('#button-'+selectingIconId).val(this.value);
+            // and close dialog
+            $('#allowed-file-dialog').foundation('reveal', 'close');
         });
 
 		$('form[data-action="createNewFileType"], form[data-action="updateFileType"]').each(function() {
@@ -158,10 +151,10 @@
     <div class="row allowed-files add-new">
         <div class="column small-6">
             <label>Icon <span data-tooltip class="hint has-tip tip-bottom" title="The icon used to represent this type of file">?</span></label>
-            <a href="#" class="button no-text open-dialog" id="icon-choice">
+            <a href="#" class="button no-text" id="icon-choice-new" data-reveal-id="allowed-file-dialog" data-file-id="new">
                 <img src="/images/mime/22x22/txt.png">
             </a>
-            <input type="hidden" name="iconFile" id="button{FILE_ID}" class="chosen-one" value="{FILE_ICON}"/>
+            <input type="hidden" name="iconFile" id="button-new" class="chosen-one" value="{FILE_ICON}"/>
         </div>
         <div class="column small-6">
             <label>Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Controls if files of this type can be uploaded">?</span></label>
@@ -265,10 +258,10 @@
                             <div class="row">
                                 <div class="column">
                                     <label for="icon-choice-{FILE_ID}">Icon</label>
-                                    <a href="#" class="button no-text open-dialog" id="icon-choice-{FILE_ID}">
+                                    <a href="#" class="button no-text" id="icon-choice-{FILE_ID}" data-reveal-id="allowed-file-dialog" data-file-id="{FILE_ID}">
                                         <img src="/images/mime/22x22/{FILE_ICON}" alt="{FILE_ICON}" />
                                     </a>
-                                    <input type="hidden" name="iconFile" id="button{FILE_ID}" class="chosen-one" value="{FILE_ICON}"/>
+                                    <input type="hidden" name="iconFile" id="button-{FILE_ID}" class="chosen-one" value="{FILE_ICON}"/>
                                 </div>
                                 <div class="description column">
                                     <div>
@@ -323,11 +316,13 @@
         </section>
     </div>
 </div>
-<div id="dialog" title="Select an Icon">
-    <div style="display:none;" class="store-here"></div>
+
+<div id="allowed-file-dialog" class="reveal-modal" data-reveal aria-hidden="true" aria-labelledby="allowed-file-dialog-title" role="dialog">
+    <h2 id="allowed-file-dialog-title">Select an icon</h2>
     <!-- BEGIN image -->
-    <button class="new-button">
-        <img src="/images/mime/22x22/{IMAGE_FILE}" alt="{IMAGE_FILE}"/>
+    <button data-interaction="select-icon" value="{IMAGE_FILE}">
+        <img src="/images/mime/22x22/{IMAGE_FILE}" alt="{IMAGE_FILE}" />
     </button>
     <!-- END image -->
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>

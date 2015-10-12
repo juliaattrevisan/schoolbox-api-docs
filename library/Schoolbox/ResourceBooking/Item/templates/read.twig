@@ -36,19 +36,11 @@
         }
 
         // Dialog for use when clicking an item that is in a series
-        var dialogOptions = {
-            autoOpen:false,
-            resizable:false,
-            height:180,
-            width:400,
-            modal:true,
-            draggable:false,
-            close: function () {
-                return false;
-            }
-        };
-        var updateSeriesDialog = $('#dialog-bulk-update').dialog(dialogOptions);
-        var deleteDialog = $('#dialog-delete').dialog(dialogOptions);
+        var updateSeriesDialog = $('#dialog-bulk-update');
+        updateSeriesDialog.on('click', '[data-interaction="close"]', function(e) {
+            e.preventDefault();
+            updateSeriesDialog.foundation('reveal', 'close');
+        });
 
 //        var height = '';
 //
@@ -190,9 +182,8 @@
         // For any AJAX event - open a dialog if this is a series event
         $('#calendar-bubble').find('#editEvent').on(
             'click',
-            '[booking-button=booking-approve], [booking-button=booking-reject], [booking-button=booking-cancel]',
+            '[data-booking-button]',
             function(event) {
-                c.bubble.hide()
                 event.preventDefault()
                 var href     = this.href
                 var callback = function(data) {
@@ -208,37 +199,27 @@
                 if (seriesId) {
                     // Remove all previous change status events, and reapply to this
                     // dialog box.
-                    updateSeriesDialog.find('[data-booking-action-text]').text($(this).text().toLowerCase())
-                    updateSeriesDialog
-                        .dialog('option', 'buttons', [{
-                            text: "Only this booking",
-                            click: function() {
-                                updateSeriesDialog.dialog('close')
-                                callback({efficacy: 'self'})
-                            }
-                        }, {
-                            text: "All bookings in the series",
-                            click: function() {
-                                updateSeriesDialog.dialog('close')
-                                callback({efficacy: 'series', seriesId: seriesId})
-                            }
-                        }])
-                        .dialog('open')
+                    updateSeriesDialog.find('[data-booking-action-text]').text($(this).text().toLowerCase());
+                    updateSeriesDialog.foundation('reveal', 'open');
+                    updateSeriesDialog.off('click', '[data-efficacy="self"]');
+                    updateSeriesDialog.on('click', '[data-efficacy="self"]', function(e) {
+                        e.preventDefault();
+                        updateSeriesDialog.foundation('reveal', 'close');
+                        callback({efficacy: 'self'});
+                    });
+                    updateSeriesDialog.off('click', '[data-efficacy="series"]');
+                    updateSeriesDialog.on('click', '[data-efficacy="series"]', function(e) {
+                        e.preventDefault();
+                        updateSeriesDialog.foundation('reveal', 'close');
+                        callback({efficacy: 'series', seriesId: seriesId});
+                    });
                 } else if ($(this).hasClass('booking-cancel')) {
-                    deleteDialog
-                        .dialog('option', 'buttons', [{
-                            text: "Yes",
-                            click: function() {
-                                deleteDialog.dialog('close')
-                                callback({})
-                            }
-                        }, {
-                            text: "No",
-                            click: function() {
-                                deleteDialog.dialog('close')
-                            }
-                        }])
-                        .dialog('open')
+                    $(this).confirmDialog({
+                        text: 'Are you sure you want to delete this booking?',
+                        confirmEvent: function() {
+                            callback({});
+                        }
+                    });
                 } else {
                     c.bubble.hide()
                     callback()
@@ -433,11 +414,13 @@
 </div>
 
 {# Dialog for changing bookings in series #}
-<div id="dialog-bulk-update" title="This booking is part of a series">
-    Would you like to <span data-booking-action-text></span> only this booking, or all in the series?
-</div>
-
-{# Dialog for deleting bookings #}
-<div id="dialog-delete" title="Confirm deletion">
-    Are you sure you want to delete this booking?
+<div class="reveal-modal" data-reveal aria-labelledby="dialog-booking-bulk-update-title" aria-hidden="true" role="dialog" id="dialog-bulk-update">
+    <h2 id="dialog-booking-bulk-update-title">This booking is part of a series</h2>
+    <p>Would you like to <span data-booking-action-text></span> only this booking, or all in the series?</p>
+    <ul class="stack-for-small button-group even-3">
+        <li><a href="#" class="button" data-efficacy="self">Only this booking</a></li>
+        <li><a href="#" class="button" data-efficacy="series">All bookings in the series</a></li>
+        <li><a href="#" class="button" data-interaction="close">Cancel</a></li>
+    </ul>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
