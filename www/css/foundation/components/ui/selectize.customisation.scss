@@ -43,9 +43,8 @@ $selectize-padding-item-y: 0;
 
 .selectize-control.multi .selectize-input > div {
 	background: $content-ui-background;
-	border: 1px solid $gainsboro;
-	padding: 0.5rem 0rem 0.5rem 0.5rem;
-	margin: 0;
+	padding: 0 0 0 0.5rem;
+	margin: 1px;
 	a {
 		padding: 0.5rem !important;
 		width: 1.5rem !important;
@@ -54,12 +53,19 @@ $selectize-padding-item-y: 0;
 }
 
 .selectize-input {
+    line-height: 2rem;
     input {
         height: auto;
         .remove {
             color: $content-ui-foreground;
         }
+
+        // !important because of chrome.css
+        &[placeholder] {
+            margin-left: 0.5rem !important;
+        }
     }
+
 }
 
 .selectize-dropdown .row[data-selectable] {
