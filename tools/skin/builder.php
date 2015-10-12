@@ -13,13 +13,18 @@ define('SKIN_FILE', dirname(__FILE__) .'/../../www/css/foundation/utils/_skin.sc
 $opts  = getopt('f', ['force']);
 $force = isset($opts['f']) || isset($opts['force']);
 
-$vars = array(  'primary-color'     => Config::get('skin_primary_colour'),
-                'secondary-color'   => Config::get('skin_secondary_colour'),
-                'tertiary-color'    => Config::get('skin_tertiary_colour'),
-                'body-bg'           => Config::get('skin_body_bg_colour'),
-                'tabbar-bg'         => Config::get('skin_tab_bg_colour'),
-                'off-canvas-bg'     => Config::get('skin_off_canvas_bg_colour'),
-);
+// Skin builder is off? don't set any vars
+$vars = [];
+if (Config::get('skin_builder')) {
+    $vars = [
+        'primary-color'     => Config::get('skin_primary_colour'),
+        'secondary-color'   => Config::get('skin_secondary_colour'),
+        'tertiary-color'    => Config::get('skin_tertiary_colour'),
+        'body-bg'           => Config::get('skin_body_bg_colour'),
+        'tabbar-bg'         => Config::get('skin_tab_bg_colour'),
+        'off-canvas-bg'     => Config::get('skin_off_canvas_bg_colour'),
+    ];
+}
 
 $origSha = sha1_file(SKIN_FILE);
 $newSha  = null;
