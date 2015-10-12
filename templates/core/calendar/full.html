@@ -408,6 +408,10 @@
 
         // Dialog for use when clicking an item that is in a series
         var updateSeriesDialog = $('#dialog-booking-bulk-update');
+        updateSeriesDialog.on('click', '[data-interaction="close"]', function(e) {
+            e.preventDefault();
+            updateSeriesDialog.foundation('reveal', 'close');
+        });
 
         $('#download-calendar-export').click(function(event) {
             event.preventDefault();

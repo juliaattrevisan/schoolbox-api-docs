@@ -4,6 +4,10 @@
         var component = $('#component{{ component.instance.id }}');
 
         var updateSeriesDialog = component.find('[data-role="bulk-update-dialog"]');
+        updateSeriesDialog.on('click', '[data-interaction="close"]', function(e) {
+            e.preventDefault();
+            updateSeriesDialog.foundation('reveal', 'close');
+        });
 
         // Series bookings
         component.on('click', '[data-set-status]', function(event) {
