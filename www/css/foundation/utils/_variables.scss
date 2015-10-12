@@ -34,8 +34,13 @@ $tertiary:						$tertiary-color;
 $input-border-color:			$content-ui-background;
 $off-canvas-bg:					$white;
 
-$row-hover-background: tint($secondary-color, 87%);
-$row-action-hover-background: darken($row-hover-background, 7%);
+/* Hover colour for the row
+ */
+$row-hover-background: tint($content-ui-hover, 87%);
+
+/* Hover colour for the action button in the row
+ */
+$row-action-hover-background: darken($content-ui-hover, 7%);
 
 // Dimensions
 // $search-width: 					256px;
