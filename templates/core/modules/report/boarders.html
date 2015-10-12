@@ -1,24 +1,32 @@
-<span class="header-actions">
-    <a data-action='print' class="button icon-print" href="#">Print</a>
-</span>
-
-<h1>Boarders List</h1>
+<div class="row">
+    <div class="small-12 columns">
+        <div class="actions-small-1">
+            <div class="list-item">
+                <h1>Boarders List</h1>
+            </div>
+            <nav>
+                <a data-action='print' class="icon-print" href="#" title="Print"></a>
+            </nav>
+        </div>
+    </div>
+</div>
 
 <!-- BEGIN student -->
 <div class="row">
-    <h2>
-        <!-- BEGIN private -->
-        {STUDENT_FIRSTNAME} {STUDENT_SURNAME} {STUDENT_HOUSE} - Year {STUDENT_YEAR}
-        <span data-tooltip="demo" class="hint has-tip tip-top" data-width="200" title="Details have not been made available">?</span>
-        <!-- END private -->
-        <!-- BEGIN public -->
-        {STUDENT_FIRSTNAME} {STUDENT_SURNAME} {STUDENT_HOUSE} - Year {STUDENT_YEAR}
-        <!-- END public -->
-    </h2>
-
+    <div class="small-12 columns">
+        <h2 class="subheader">
+            <!-- BEGIN private -->
+            {STUDENT_FIRSTNAME} {STUDENT_SURNAME} {STUDENT_HOUSE} - Year {STUDENT_YEAR}
+            <span data-tooltip="demo" class="hint has-tip tip-top" data-width="200" title="Details have not been made available">?</span>
+            <!-- END private -->
+            <!-- BEGIN public -->
+            {STUDENT_FIRSTNAME} {STUDENT_SURNAME} {STUDENT_HOUSE} - Year {STUDENT_YEAR}
+            <!-- END public -->
+        </h2>
+    </div>
     <!-- BEGIN contact -->
     <!-- BEGIN primary -->
-    <div class="large-6 columns">
+    <div class="small-12 large-6 columns">
         <table>
             <tbody>
                 <tr>
@@ -46,7 +54,7 @@
     </div>
     <!-- END primary -->
     <!-- BEGIN spouse -->
-    <div class="large-6 columns">
+    <div class="small-12 large-6 columns">
         <table>
             <tbody>
             <tr>
