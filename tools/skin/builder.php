@@ -10,6 +10,8 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 define('SKIN_FILE', dirname(__FILE__) .'/../../www/css/foundation/utils/_skin.scss');
 
+$opts  = getopt('f', ['force']);
+$force = isset($opts['f']) || isset($opts['force']);
 
 $vars = array(  'primary-color'     => Config::get('skin_primary_colour'),
                 'secondary-color'   => Config::get('skin_secondary_colour'),
@@ -20,9 +22,8 @@ $vars = array(  'primary-color'     => Config::get('skin_primary_colour'),
 );
 
 $origSha = sha1_file(SKIN_FILE);
-
-$fp = fopen(SKIN_FILE, 'w');
-
+$newSha  = null;
+$fp      = fopen(SKIN_FILE, 'w');
 if($fp) {
     fputs($fp, "// Do not edit, automatically created by tools/skin/builder.php\n");
 
@@ -34,7 +35,7 @@ if($fp) {
     $newSha = sha1_file(SKIN_FILE);
 }
 
-if($origSha != $newSha) {
+if($origSha != $newSha || $force) {
     exec('cd ' . SITE_root . '; grunt sass');
 }
 
