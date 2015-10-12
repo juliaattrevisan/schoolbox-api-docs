@@ -50,6 +50,7 @@
 <script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.device.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.tab-activator.js"></script>
 <script type="text/javascript">
 
     var colours = {};
@@ -85,7 +86,8 @@
 
         var url = '/eportfolio/configForm.php';
 
-        $('#component-layout').masonry({
+        var eportfolio = $('#component-layout');
+        eportfolio.masonry({
             context: {
                 page_id: '{PAGE_ID}'
             },
@@ -173,6 +175,15 @@
                 confirmEvent: $.confirmDialog.submitForm
             })
         });
+
+        /* Tab toggler
+         * Deal with special components placeholder
+         */
+        $.fn.tabActivator({
+            onTabClose: function(tabActivator) {
+                eportfolio.removeClass('show-empty');
+            }
+        });
     });
 </script>
 <!-- END modify_layout -->
@@ -187,13 +198,13 @@
             <!-- BEGIN edit_page -->
             <span data-tab>
                 <span class="tab-title">
-                    <a class="icon-components" href="#eportfolio-page-controls-tab-1" title="Add components"></a>
+                    <a class="icon-components" href="#eportfolio-page-controls-tab-1" title="Add components" data-tab-activator></a>
                 </span>
                 <span class="tab-title">
-                    <a class="icon-edit-columns" href="#eportfolio-page-controls-tab-2" title="Edit columns"></a>
+                    <a class="icon-edit-columns" href="#eportfolio-page-controls-tab-2" title="Edit columns" data-tab-activator></a>
                 </span>
                 <span class="tab-title">
-                    <a class="icon-modify" href="#eportfolio-page-controls-tab-3" title="Edit the page and its permissions"></a>
+                    <a class="icon-modify" href="#eportfolio-page-controls-tab-3" title="Edit the page and its permissions" data-tab-activator></a>
                 </span>
             </span>
             <!-- END edit_page -->
