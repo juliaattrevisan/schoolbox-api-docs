@@ -375,17 +375,25 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	ul.off-canvas-list {
 	    a {
 	        color: $navigation-background;
+            &:hover {
+                color: $navigation-foreground;
+                background-color: $navigation-hover;
+            }
         }
-		a:hover {
-		    color: $navigation-foreground;
-			background-color: $navigation-hover;
-		}
+
 		li.has-submenu > a:after{
 			content: "\e64b";
 			font-family: 'schoolbox';
 			float: right;
 		}
 	}
+	.left-submenu .back > a {
+	    color: $navigation-foreground;
+	    background-color: $navigation-background;
+	    &:hover {
+	        background-color: $navigation-hover;
+        }
+    }
 	.left-submenu .back > a:before{
 		content: "\e655";
 		font-family: 'schoolbox';
