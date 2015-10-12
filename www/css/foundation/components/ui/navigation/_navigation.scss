@@ -150,9 +150,9 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
     background-color: $tabbar-bg;
     height: $tabbar-height;
     img {
-      display: block;
-      max-height: 5rem;
-      max-width: none;
+        display: block;
+        max-height: 5rem;
+        max-width: none;
     }
 }
 
@@ -199,16 +199,16 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 
 // Logo - Top Bar
 .hybrid-bar{
-  .logo{
-    @media #{$mediumwide-up} {
-        display: none !important;
+    .logo {
+        @media #{$mediumwide-up} {
+            display: none !important;
+        }
+        img{
+            display: block;
+            max-height: 5rem;
+            max-width: none;
+        }
     }
-    img{
-      display: block;
-      max-height: 5rem;
-      max-width: none;
-    }
-  }
 }
 
 .tab-bar {
@@ -264,17 +264,17 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 
 // Logo - Side Bar
 .left-off-canvas-menu{
-  .logo{
-    @media #{$medium-down} {
-      display: none !important;
+    .logo {
+        @media #{$medium-down} {
+            display: none !important;
+        }
+        display: block;
+        margin: (($base-font-size * 2)) 0;
+        img {
+            display: block;
+            margin: 0 auto;
+        }
     }
-    display: block;
-    margin: (($base-font-size * 2)) 0;
-    img{
-      display: block;
-      margin: 0 auto;
-    }
-  }
 }
 
 .left-off-canvas-toggle,
@@ -429,21 +429,21 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 // Only show left nav on large-up screens
 // 1024px >
 @media #{$mediumwide-up} {
-  .left-off-canvas-menu{
-    position: relative;
-    @include transform(none);
-    float: left;
-    top: -5rem;
-  }
-  .move-right > .inner-wrap {
-    transform: none;
-  }
-  .main-section {
-    overflow: hidden;
-  }
-	.tab-bar-section.middle{
-		padding-left: 11.25rem;
-	}
+    .left-off-canvas-menu {
+        position: relative;
+        @include transform(none);
+        float: left;
+        top: -5rem;
+    }
+    .move-right > .inner-wrap {
+        transform: none;
+    }
+    .main-section {
+        overflow: hidden;
+    }
+    .tab-bar-section.middle {
+        padding-left: 11.25rem;
+    }
 }
 
 // Large
