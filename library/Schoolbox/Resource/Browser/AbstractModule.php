@@ -92,6 +92,7 @@ abstract class AbstractModule extends BaseModule
             'setTreeBuilder'      => null,
             'setFolderMapper'     => null,
             'setNamespace'        => $this->basename,
+            'setNodeType'         => '',
         ];
     }
 

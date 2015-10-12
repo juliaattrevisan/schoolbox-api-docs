@@ -17,6 +17,7 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractModule;
+use Schoolbox\Resource\Browser\FullAccessController;
 
 class Module extends AbstractModule
 {
@@ -51,7 +52,8 @@ class Module extends AbstractModule
             'setFolderMapper'     => Resource\Folder\Mapper::class,
             'setFileMapper'       => Resource\File\Mapper::class,
             'setUserAccessMapper' => UserAccessMapper::class,
-            'setRoleAccessMapper' => RoleAccessMapper::class
+            'setRoleAccessMapper' => RoleAccessMapper::class,
+            'setNodeType'         => Resource\Browser\NodeFactory::SBFS,
         ]);
     }
 

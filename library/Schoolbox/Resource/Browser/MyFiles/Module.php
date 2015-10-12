@@ -12,6 +12,8 @@ namespace Schoolbox\Resource\Browser\MyFiles;
 
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Resource\Browser\FullAccessController;
+use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\My;
 use Schoolbox\Resource\Browser\AbstractModule;
 
@@ -36,6 +38,7 @@ class Module extends AbstractModule
             'setTreeBuilder'  => TreeBuilder::class,
             'setFolderMapper' => My\Folder\Mapper::class,
             'setFileMapper'   => My\File\Mapper::class,
+            'setNodeType'     => NodeFactory::MYFILE,
         ]);
     }
 
@@ -71,7 +74,7 @@ class Module extends AbstractModule
      */
     protected function getControllerClass()
     {
-        return Controller::class;
+        return FullAccessController::class;
     }
 
 }

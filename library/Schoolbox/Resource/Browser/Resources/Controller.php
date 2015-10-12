@@ -16,7 +16,6 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractController;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\User;
 
 class Controller extends AbstractController
@@ -75,42 +74,14 @@ class Controller extends AbstractController
 
 
     /**
-     * @param FolderInterface $folder
-     * @return array
-     */
-    protected function getBreadcrumbs(FolderInterface $folder)
-    {
-        try {
-            $node = $this->nodeFactory->build(Resource\Browser\NodeFactory::SBFS, $folder->getId());
-            $tree = $node->render();
-
-            return $tree['breadcrumbs'];
-
-        } catch (\InvalidArgumentException $e) {
-            return [];
-        }
-    }
-
-
-    /**
      * @param int $folderId
      * @return Resource\Folder\IFolder|Resource\Folder\Model
      * @throws Mapper\Exception
      */
     protected function getFolder($folderId)
     {
-        try {
-            $folder = $this->folderMapper->findById($folderId);
-            $folder->loadTeachers();
-
-        } catch (Mapper\Exception\Deleted $e) {
-            // Deleted: load the parent (recursively)
-            return $this->getFolder($e->getDeletedObject()->getParent()->getId());
-
-        } catch (Mapper\Exception $e) {
-            $folder = $this->folderMapper->createModel();
-            $folder->setId(0);
-        }
+        $folder = $this->folderMapper->findById($folderId);
+        $folder->loadTeachers();
 
         return $folder;
     }

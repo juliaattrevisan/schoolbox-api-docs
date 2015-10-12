@@ -10,6 +10,7 @@
 namespace Schoolbox\Resource\Browser;
 
 use Alaress\Web\Controller\Base as BaseController;
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Config;
 use Schoolbox\Resource\File\IFile as FileInterface;
@@ -42,6 +43,9 @@ abstract class AbstractController extends BaseController
 
     /** @var NodeFactory */
     protected $nodeFactory;
+
+    /** @var string */
+    protected $nodeType;
 
 
     /**
@@ -121,6 +125,17 @@ abstract class AbstractController extends BaseController
 
 
     /**
+     * @param string $nodeType
+     * @return self
+     */
+    public function setNodeType($nodeType)
+    {
+        $this->nodeType = $nodeType;
+        return $this;
+    }
+
+
+    /**
      * @param int $folderId
      * @return array
      */
@@ -144,7 +159,18 @@ abstract class AbstractController extends BaseController
      * @param FolderInterface $folder
      * @return array
      */
-    protected abstract function getBreadcrumbs(FolderInterface $folder);
+    protected function getBreadcrumbs(FolderInterface $folder)
+    {
+        try {
+            $node = $this->nodeFactory->build($this->nodeType, $folder->getId());
+            $tree = $node->render();
+
+            return $tree['breadcrumbs'];
+
+        } catch (InvalidArgumentException $e) {
+            return [];
+        }
+    }
 
 
     /**
@@ -308,12 +334,35 @@ abstract class AbstractController extends BaseController
         return $file;
     }
 
-
     /**
      * @param int $folderId
      * @return FolderInterface
      */
-    protected abstract function getFolder($folderId);
+    protected function findFolder($folderId)
+    {
+        try {
+            return $this->getFolder($folderId);
+
+        } catch (Mapper\Exception\Deleted $e) {
+            // Deleted: load the parent (recursively)
+            return $this->findFolder($e->getDeletedObject()->getParent()->getId());
+
+        } catch (Mapper\Exception $e) {
+            return $this->folderMapper->createModel()->setId(0);
+
+        }
+    }
+
+
+    /**
+     * @param int $folderId
+     * @return FolderInterface
+     * @throws Mapper\Exception
+     */
+    protected function getFolder($folderId)
+    {
+        return $this->folderMapper->findById($folderId);
+    }
 
     /**
      * @param array $folderIds
