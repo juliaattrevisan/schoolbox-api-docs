@@ -444,7 +444,6 @@
             'click',
             '[booking-button=booking-approve], [booking-button=booking-reject], [booking-button=booking-cancel]',
             function(event) {
-                c.bubble.hide()
                 event.preventDefault()
                 var href     = this.href
                 var callback = function(data) {
