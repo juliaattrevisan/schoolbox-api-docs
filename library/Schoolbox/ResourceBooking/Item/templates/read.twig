@@ -182,7 +182,7 @@
         // For any AJAX event - open a dialog if this is a series event
         $('#calendar-bubble').find('#editEvent').on(
             'click',
-            '[booking-button=booking-approve], [booking-button=booking-reject], [booking-button=booking-cancel]',
+            '[data-booking-button]',
             function(event) {
                 c.bubble.hide()
                 event.preventDefault()
