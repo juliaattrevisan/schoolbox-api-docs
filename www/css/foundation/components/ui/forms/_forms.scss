@@ -22,14 +22,14 @@ $input-height: 2.5rem;
 
 $input-bg-color: $white;
 
-$input-focus-bg-color: tint($primary-color, 95%);
+$input-focus-bg-color: $content-ui-hover;
 $input-focus-color: calc-text-color($input-focus-bg-color);
 
-$input-border-color: tint($tertiary-color, 66%) !default;
-$input-focus-border-color: darken($input-border-color, 33%);
+$input-border-color: $content-ui-foreground !default;
+$input-focus-border-color: $content-ui-foreground;
 
-$input-hover-bg-color: tint($tertiary-color, 87%);
-$input-hover-color: calc-text-color($input-hover-bg-color);
+$input-hover-bg-color: $content-ui-hover;
+$input-hover-color: $content-ui-hover;
 
 $input-border-style: solid;
 $input-border-width: 0.125rem;
