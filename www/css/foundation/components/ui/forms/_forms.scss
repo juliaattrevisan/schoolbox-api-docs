@@ -354,7 +354,7 @@ input[type=radio]:not(.plain):disabled:checked + label{
 // Toggle Checkbox (VAPORWAVE)
 input[type=checkbox]:not(.plain) + label.checkbox-toggle,
 input[type=radio]:not(.plain) + label.radio-toggle {
-	background-color: $button-color;
+	background-color: $content-ui-foreground;
 	font-weight: $font-weight-normal;
 	margin-left: 0;
 	height: 1.5rem;
