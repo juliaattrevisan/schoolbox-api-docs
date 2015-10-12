@@ -63,6 +63,12 @@ $notification-header-background: $navigation-background !default;
         }
     }
     .button {
+        color: $navigation-foreground;
+        background-color: $navigation-background;
+        &:hover {
+            color: $navigation-foreground;
+            background-color: $navigation-hover;
+        }
         height: 3rem;
         margin-bottom: 0;
         overflow: hidden;
