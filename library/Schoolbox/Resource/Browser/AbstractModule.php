@@ -39,7 +39,7 @@ abstract class AbstractModule extends BaseModule
         $routes->addGet("$this->basename.listNodes", $basePath.'/{folderId}/nodes')->addTokens([ 'folderId' => '\d+' ]);
         $routes->addGet("$this->basename.showFolderInfo", $basePath.'/{folderId}/info')->addTokens([ 'folderId' => '\d+' ]);
         $routes->addGet("$this->basename.showFileInfo", $basePath.'/file/{fileId}/info')->addTokens([ 'fileId' => '\d+' ]);
-        $routes->addGet("$this->basename.showMultiFileInfo", $basePath.'/file/{fileIds}/info')->addTokens([ 'folderId' => '(\d+,)+(\d+)' ]);
+        $routes->addGet("$this->basename.showMultiFileInfo", $basePath.'/file/{fileIds}/info')->addTokens([ 'fileIds' => '(\d+,)+(\d+)' ]);
     }
 
 
