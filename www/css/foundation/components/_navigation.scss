@@ -482,6 +482,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
   }
 }
 
+.tab-bar {
 #search{
 	margin: 0;
 	position: absolute;
@@ -489,7 +490,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	top: 0;
 	height: $tabbar-height;
 	@include placeholder-color(transparent, $font-weight-normal);
-	#search-field{
+	input[type="text"]{
 		border: 0;
 		background-color: transparent;
 		color: $body-bg;
@@ -514,21 +515,22 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			@include contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color);
 		}
 	}
-	#search-field:focus,
-	#search-field:active,
-	&:hover #search-field,
-	&:hover #search-field:focus{
+	[type="text"]:focus,
+	[type="text"]:active,
+	&:hover [type="text"],
+	&:hover [type="text"]:focus{
 		background-color: $white;
 		border: 2px solid $secondary-color;
 		color: $black;
 		width: 99.7%;
 		opacity: 1;
 	}
-	#search-field:focus + .icon-search,
-	#search-field:active + .icon-search,
+	[type="text"]:focus + .icon-search,
+	[type="text"]:active + .icon-search,
 	&:hover .icon-search{
 		@include absolute (0, auto, auto, 16px);
 	}
+}
 }
 
 .left-off-canvas-toggle,

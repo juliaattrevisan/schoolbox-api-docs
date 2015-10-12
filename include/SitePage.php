@@ -176,6 +176,9 @@ class SitePage extends Page
 
     function setSite()
     {
+        // detect responsiveness: if there's no override for body.html, that school has gone responsive
+        $this->responsive = !file_exists(SITE_root . '/templates/' . Cfg::get('site_location') . '/include/body.html');
+
         if (Cfg::get('site_detect') == 'domain') {
             //Get site templates via domain name
             if (preg_match('/([\w]+)\./', $_SERVER['HTTP_HOST'], $match)) {
@@ -356,7 +359,7 @@ class SitePage extends Page
         $this->parse('MAIN_HEADER_REGION', 'headerTpl');
         $this->parse('MAIN_FOOTER_REGION', 'footerTpl');
 
-        $this->setBlock(TEMPLATE_body, 'banner_logged_in', 'banner_logged_in_block');
+        $this->setBlock($this->responsive ? TEMPLATE_body : 'bannerTpl', 'banner_logged_in', 'banner_logged_in_block');
 
         if ($_SESSION['id']) {
 
@@ -364,7 +367,11 @@ class SitePage extends Page
 
             /* Output switch user options */
             $this->setBlock('banner_logged_in', 'switch_user', 'switch_user_block');
-            $this->setBlock('banner_logged_in', 'can_switch', 'can_switch_block');
+
+            if ($this->responsive) {
+                $this->setBlock('banner_logged_in', 'can_switch', 'can_switch_block');
+            }
+
             $this->setVar([
                 'switch_user_block' => '',
                 'can_switch_block'  => ''
@@ -415,7 +422,7 @@ class SitePage extends Page
                 $canSwitch = true;
             }
 
-            if ($canSwitch) {
+            if ($canSwitch && $this->responsive) {
                 $this->parse('can_switch_block', 'can_switch');
             }
 
@@ -899,14 +906,20 @@ class SitePage extends Page
 
     function renderInstantMessages()
     {
-        $this->setBlock(TEMPLATE_body, 'instantmessage_toggle', 'instantmessage_toggle_block');
+        if ($this->responsive) {
+            $this->setBlock(TEMPLATE_body, 'instantmessage_toggle', 'instantmessage_toggle_block');
+
+            if (Cfg::get('messaging_enabled')) {
+                $this->parse('instantmessage_toggle_block', 'instantmessage_toggle');
+            } else {
+                $this->setVar('instantmessage_toggle_block', '');
+            }
+        }
 
         if (Cfg::get('messaging_enabled')) {
             $this->parse('INSTANTMESSAGE_BLOCK', 'instantTpl');
-            $this->parse('instantmessage_toggle_block', 'instantmessage_toggle');
         } else {
             $this->setVar('INSTANTMESSAGE_BLOCK', '');
-            $this->setVar('instantmessage_toggle_block', '');
         }
     }
 
