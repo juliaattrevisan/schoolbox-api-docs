@@ -81,11 +81,18 @@ class MailNotifier extends WorkNotifier {
 
             $this->log()->debug(sprintf("Digesting %d item%s for user %s", $decorator->count(), $decorator->count() == 1 ? '' : 's', $user->getUsername()));
 
+            $emailAddress = $user->getEmail();
+            if (strlen($emailAddress) === 0) {
+                $this->log()->warning("{$user->getUsername()} has no email address");
+                unset($uq, $decorator, $email, $user);
+                continue;
+            }
+
 			$context = $decorator->renderAsTwigContext($core->getContext(), 0, $dir);
 
             try {
                 // explicitly an rfc822 email spec, so it sets, not adds
-                $address = sprintf("%s <%s>", $user->formatName(), $user->getEmail());
+                $address = sprintf("%s <%s>", $user->formatName(), $emailAddress);
                 $email->setContext($context)->setTo($address);
 
                 // away she goes
