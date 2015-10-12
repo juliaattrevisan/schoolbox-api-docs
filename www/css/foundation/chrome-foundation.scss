@@ -17,7 +17,7 @@
 @import "base/typography";
 
 // Components
-@import "components/anyslider";
+
 @import "components/links";
 @import "components/content";
 
@@ -32,9 +32,12 @@
 @import "components/masonry";
 @import "components/preview";
 
+//////////////////////////////////////////////////////////
 // Refined UI Elements
+//
 // These override defaults in @import components/buttons
 // We have refined these elements
+//////////////////////////////////////////////////////////
 @import "components/ui/button/button";
 @import "components/ui/button/list-actions";       // requires _button.scss
 @import "components/ui/button/header-actions";     // requires _list-actions.scss
@@ -44,8 +47,15 @@
 @import "components/ui/navigation/breadcrumb";
 @import "components/ui/navigation/pagination";
 @import "components/ui/navigation/sub-nav";
+
+//////////////////////////////////////////////////////////
+// Common UI Elements
+//
+// Specialist elements, plugins and widgets
+//////////////////////////////////////////////////////////
 @import "components/ui/data-tables";
 @import "components/ui/alert-boxes";
+@import "components/ui/anyslider";
 
 // Layout
 @import "layout/footer";
