@@ -383,12 +383,13 @@
             masonry = this,
             columns = this.getIndexedColumns();
 
-        $(this.element).sortable({
+        $(this.columns).sortable({
             helper: function (event, ui) {
                 var cl = ui.clone();
                 ui.addClass(sortingClass);
                 return cl;
             },
+            connectWith: this.columns,
             cursorAt: { top: 16 },
             cursor: typeof palOpt.cursor == 'undefined' ? 'move' : palOpt.cursor,
             distance: 0,
@@ -499,7 +500,7 @@
             });
         }
 
-        page.sortable('refresh');
+        this.columns.sortable('refresh');
 
         this.refreshColumns();
 
@@ -686,7 +687,7 @@
 
         if (palOpt.dragToInsert) {
             this.palette.find(palOpt.handleSelector).draggable({
-                connectToSortable: this.element,
+                connectToSortable: this.columns,
                 revert: 'invalid',
                 helper: function () {
                     var cl = $(this).clone();
