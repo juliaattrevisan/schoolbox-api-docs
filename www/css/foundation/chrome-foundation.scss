@@ -17,8 +17,6 @@
 @import "base/typography";
 
 // Components
-
-@import "components/links";
 @import "components/content";
 
 // Must import before forms, as forms reimports buttons.scss

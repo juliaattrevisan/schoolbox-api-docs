@@ -62,6 +62,13 @@ a[role="button"] {
 	@extend .button;
 }
 
+// Really generic link styles
+a[disabled], a.disabled {
+    // Make disabled links not clickable
+    pointer-events: none;
+    cursor: default;
+}
+
 /* Form submits have a unique styling
  */
 input[type="submit"]{
