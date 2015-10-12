@@ -33,7 +33,7 @@ $anchor-font-color:             $primary-color;
 // for BC
 $tertiary:						$tertiary-color;
 
-$input-border-color:			tint($tertiary, 66%);
+$input-border-color:			$content-ui-background;
 $tabbar-bg:						$navigation-background;
 $off-canvas-bg:					$white;
 

@@ -25,7 +25,7 @@ $input-bg-color: $white;
 $input-focus-bg-color: $content-ui-hover;
 $input-focus-color: calc-text-color($input-focus-bg-color);
 
-$input-border-color: $content-ui-foreground !default;
+$input-border-color: $content-ui-background !default;
 $input-focus-border-color: $content-ui-foreground;
 
 $input-hover-bg-color: $content-ui-hover;
