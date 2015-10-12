@@ -211,6 +211,57 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
   }
 }
 
+.tab-bar {
+    #search{
+        margin: 0;
+        position: absolute;
+        right: 10rem;
+        top: 0;
+        height: $tabbar-height;
+        @include placeholder-color(transparent, $font-weight-normal);
+        input[type="text"]{
+            border: 0;
+            background-color: transparent;
+            color: $body-bg;
+            float: right;
+            height: $tabbar-height;
+            width: $tabbar-height;
+            padding: $base-font-size;
+            margin: 0;
+            opacity: 0;
+        }
+        &:hover, &.focus {
+            width: 100%;
+            padding-left: 22rem;
+            @include placeholder-color($black, $font-weight-normal);
+        }
+        .icon-search{
+            @include absolute (0, auto, auto, 32px);
+            @include transition(all, 0.3s, ease-in);
+            margin: 0;
+            z-index: 1;
+            &:before{
+                @include contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color);
+            }
+        }
+        [type="text"]:focus,
+        [type="text"]:active,
+        &:hover [type="text"],
+        &:hover [type="text"]:focus{
+            background-color: $white;
+            border: 2px solid $secondary-color;
+            color: $black;
+            width: 99.7%;
+            opacity: 1;
+        }
+        [type="text"]:focus + .icon-search,
+        [type="text"]:active + .icon-search,
+        &:hover .icon-search{
+            @include absolute (0, auto, auto, 16px);
+        }
+    }
+}
+
 // Logo - Side Bar
 .left-off-canvas-menu{
   .logo{
