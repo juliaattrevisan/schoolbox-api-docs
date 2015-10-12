@@ -2,15 +2,6 @@
  * Component styles for Dashboard, Homepage, Eportfolio
  *********************************************************/
 
-/* Component Headings
- */
-[data-component]{
-    margin-bottom: rem-calc(($base-font-size));
-    section{
-        margin-bottom: 0;
-    }
-}
-
 /* Dashboard, Homepage: Calendar Events
  */
 .translucent {
