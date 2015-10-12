@@ -1,3 +1,19 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $('[data-action="print"]').artificialPrint();
+
+        $('[data-tablesorter]').DataTable({
+            info: false,
+            paging: false,
+            order: [[2,'asc']],
+            searching: false
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 <div class="row actions-small-1">
     <div class="list-item">
         <div class="small-12 columns">
@@ -12,16 +28,15 @@
 <div class="row">
     <div class="small-12 columns">
         <div class="scrollable">
-            <table data-sortable>
+            <table data-tablesorter>
                 <thead>
                     <tr>
-                        <th>Image</th>
-                        <th>Title</th>
+                        <th class="hide-for-small" data-orderable="false">Image</th>
                         <th>First name</th>
                         <th>Surname</th>
-                        <th>Department</th>
-                        <th>Role</th>
-                        <th>Campus</th>
+                        <th class="hide-for-medium-down">Department</th>
+                        <th class="hide-for-small">Role</th>
+                        <th class="hide-for-medium-down">Campus</th>
                         <th>Phone</th>
                         <th>Ext</th>
                         <th>Email</th>
@@ -30,13 +45,12 @@
                 <tbody>
                     <!-- BEGIN staff -->
                     <tr>
-                        <td><img src="/portrait.php?userId={STAFF_STAFFID}&size=square32"></td>
-                        <td>{STAFF_TITLE}</td>
+                        <td class="hide-for-small"><img src="/portrait.php?userId={STAFF_STAFFID}&size=square32"></td>
                         <td>{STAFF_FIRSTNAME}</td>
                         <td>{STAFF_SURNAME}</td>
-                        <td>{STAFF_DEPARTMENT}</td>
-                        <td>{STAFF_ROLE}</td>
-                        <td>{STAFF_CAMPUS}</td>
+                        <td class="hide-for-medium-down">{STAFF_DEPARTMENT}</td>
+                        <td class="hide-for-small">{STAFF_ROLE}</td>
+                        <td class="hide-for-medium-down">{STAFF_CAMPUS}</td>
                         <td><a href="tel:{STAFF_PHONE}">{STAFF_PHONE}</a></td>
                         <td>{STAFF_EXTENSION}</td>
                         <td><a href="mailto:{STAFF_EMAIL}">{STAFF_EMAIL}</a></td>
@@ -47,26 +61,3 @@
         </div>
     </div>
 </div>
-
-<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
-<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.widgets.js"></script>
-<script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $('[data-action="print"]').artificialPrint();
-
-        $('[data-sortable]').tablesorter({
-            headers:{
-                0:{sorter:false},
-                1:{sorter:false},
-                7:{sorter:false},
-                8:{sorter:false}
-            },
-            widgets:['zebra'],
-            widgetZebra:{
-                css:["", "dark"]
-            },
-            cssHeader:"directory-sorter"
-        });
-    });
-</script>
