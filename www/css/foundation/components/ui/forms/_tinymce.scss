@@ -77,10 +77,10 @@ table.mceLayout tr td {
         width: 2rem;
         height: 2rem;
         &.mceButtonActive {
-            background-color: $secondary-color !important;
+            background-color: $content-ui-foreground !important;
         }
         &:hover {
-            background-color: tint($secondary-color, 40%) !important;
+            background-color: $content-ui-hover !important;
         }
     }
 }
