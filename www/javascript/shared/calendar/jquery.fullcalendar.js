@@ -742,7 +742,7 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
         $('[data-event-modal-field="reviewedBy"]').show();
     }
 
-    if (!eventData.location.length) {
+    if (!eventData.location || !eventData.location.length) {
         $('[data-event-modal-field="location"]').hide();
     }
     else {
