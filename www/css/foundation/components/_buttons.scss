@@ -264,70 +264,7 @@ $tabs-content-padding: rem-calc(($base-font-size - 8));
 // CUSTOM OVERRIDES
 //
 
-// Header Actions - for when you need buttons inline with the heading
-.header-actions {
 
-	position: absolute;
-	right: 0;
-	overflow-y: visible;
-	height: 0;
-
-	@media #{$medium-only} {
-		padding-right: 2.5rem;
-	}
-	@media #{$large-up} {
-		padding-right: 1rem;
-	}
-
-	form {
-		margin: 0; // srsly. shouldn't have to do this...
-	}
-
-	.button {
-		margin-bottom: 0;
-		padding: 0.625rem;
-		position: relative;
-
-		// no text? be subtle
-		&.no-text {
-			//@include contrast-bg();
-			background: transparent;
-		}
-
-		&:hover {
-			color: $primary-color;
-			background-color: tint($secondary-color, 20%);
-		}
-		&[aria-expanded=true] {
-			@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
-			background-color: $secondary-color;
-			color: $primary-color;
-		}
-
-		@media #{$large-up} {
-			padding: 0.75rem;
-		}
-	}
-}
-
-h1, h2 {
-	&:hover + .header-actions .button {
-		background-color: $secondary-color;
-		color: $primary-color;
-	}
-}
-
-// make this more concise
-@mixin header-action-button($mq, $h1, $h2) {
-	@media #{$mq} {
-		h1 + .header-actions .button { bottom: $h1; }
-		h2 + .header-actions .button { bottom: $h2; }
-	}
-}
-
-@include header-action-button($small-up,    42px, 42px);
-@include header-action-button($large-up,    50px, 42px);
-@include header-action-button($xlarge-only, 71px, 42px);
 
 
 $f-dropdown-list-padding: rem-calc(($base-font-size - 6)) rem-calc(($base-font-size - 3));
@@ -368,6 +305,9 @@ $f-dropdown-icon-align: 0.25rem;
 	background-color: $f-dropdown-content-bg;
 }
 
+
+
+
 // Pagination
 ul.pagination li a,
 ul.pagination li button{
@@ -382,82 +322,5 @@ ul.pagination .active a{
 }
 
 
-@mixin action-html-classes($size, $button-size: 3rem, $button-color: $primary-color) {
-
-	@for $i from 1 through $total-columns {
-
-		.actions-#{$size}-#{$i} {
-
-			position: relative;
-			min-width: $button-size * $i;
-			min-height: $button-size;
-
-			> .list-item {
-				padding-right: 0.5 + ($i * $button-size) !important;
-			}
-
-			.subheader {
-				margin-top: rem-calc($base-font-size - 6);
-			}
-
-			> nav {
-				@include button-group-glow();
-				display: inline-block;
-				margin: 0;
-				padding: 0;
-				position: absolute;
-				top: 0;
-				right: 0;
-				height: $button-size;
-
-				a {
-					display: inline-block;
-					text-align: center;
-					width: $button-size;
-					line-height: $button-size;
-					color: $button-color;
-
-					&:before {
-						padding-right: 0;
-					}
-					&[disabled], &.disabled {
-						@include contrast-bg();
-					}
-					&.selected {
-						color: $white;
-						background-color: $button-color;
-					}
-				}
-				
-				.progress-tick{
-					width: 32px;
-					position: relative;
-    				top: 15px;
-    				right: 15px;
-    				&:hover{
-    					background-color: $base;
-    				}
-    				&.pending:hover {
-				        background-color: $warning-color;
-				    }
-
-				    &.complete:hover {
-				        background-color: $success-color;
-				    }
-				}
-			}
-
-		}
-	}
-
-}
 
 
-@media #{$small-up}  { @include action-html-classes($size:small);  }
-@media #{$medium-up} { @include action-html-classes($size:medium); }
-@media #{$large-up}  { @include action-html-classes($size:large);  }
-
-@if $include-xl-html-grid-classes {
-	@media #{$xlarge-up}  { @include action-html-classes($size:xlarge);  }
-	@media #{$xxlarge-up} { @include action-html-classes($size:xxlarge); }
-}
