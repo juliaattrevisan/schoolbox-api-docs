@@ -1,5 +1,6 @@
 <?php
 use Alaress\File\Remote\FetcherInterface;
+use Schoolbox\Collection;
 use Schoolbox\Resource;
 use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\File\ILocator as FileLocatorInterface;
@@ -935,11 +936,11 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
      * Return the files contained within the folder with the given ID
      *
      * @param int $nodeId
-     * @return FileInterface[]
+     * @return Collection|FileInterface[]
      */
     public function findByFolderId($nodeId)
     {
-        $files = array();
+        $files = new Collection();
         $data  = $this->getAllInFolder($nodeId);
 
         if (!is_array($data)) {
@@ -947,7 +948,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         }
 
         foreach ($data as $node) {
-            $files[] = $this->parseFile($node);
+            $files->add($this->parseFile($node));
         }
 
         return $files;
@@ -957,11 +958,11 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
      * Return the folders contained within the folder with the given ID
      *
      * @param int $nodeId
-     * @return FolderInterface[]
+     * @return Collection|FolderInterface[]
      */
     public function findByParentId($nodeId)
     {
-        $folders = array();
+        $folders = new Collection();
         $data    = $this->getFolderList($nodeId);
 
         if (!is_array($data)) {
@@ -969,7 +970,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         }
 
         foreach ($data as $node) {
-            $folders[] = $this->parseFolder($node);
+            $folders->add($this->parseFolder($node));
         }
 
         return $folders;
