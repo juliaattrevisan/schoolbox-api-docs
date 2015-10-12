@@ -5,7 +5,7 @@
 //$include-html-form-classes: $include-html-classes;
 
 // We use this to set the base for lots of form spacing and positioning styles
-$form-spacing: rem-calc(($base-font-size));
+$form-spacing: rem-calc(($base-font-size + 6));
 
 // We use these to style the labels in different ways
 // $form-label-pointer: pointer;
@@ -160,12 +160,6 @@ select{
 input,
 textarea{
 	padding-left: 0.75rem;
-}
-
-select option{
-	&:hover{
-		background: $input-hover-bg-color;
-	}
 }
 
 // remove margins on forms inside tables
