@@ -229,16 +229,14 @@
                 <div class="small-12 avatar card">
                     <img src="/portrait.php?userId={SESSION_USER_EXTID}&amp;size=square64" alt="{SESSION_USER_NAME}" />
                     <textarea name="comment"></textarea>
-                    <div class="row collapse">
-                        <div class="small-12 medium-6 column">
-                            <input id="vis-student" type="checkbox" name="visibility[student]" value="1" {COMMENT_VIS_STUDENT_CHECKED} />
-                            <label for="vis-student" class="checkbox-label">Visible To Student</label>
-                        </div>
-                        <div class="small-12 medium-6 column">
-                            <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" {COMMENT_VIS_PARENT_CHECKED} />
-                            <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
-                        </div>
-                    </div>
+                </div>
+                <div class="small-12 medium-6 column">
+                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1" {COMMENT_VIS_STUDENT_CHECKED} />
+                    <label for="vis-student" class="checkbox-label">Visible To Student</label>
+                </div>
+                <div class="small-12 medium-6 column">
+                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" {COMMENT_VIS_PARENT_CHECKED} />
+                    <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
                 </div>
                 <div class="small-12 column">
                     <a class="button secondary" data-comment-post="new">Post</a>
