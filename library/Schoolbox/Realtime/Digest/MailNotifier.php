@@ -83,8 +83,7 @@ class MailNotifier extends WorkNotifier {
 
             $emailAddress = $user->getEmail();
             if (strlen($emailAddress) === 0) {
-                $this->log()->warning("{$user->getUsername()} has no email address - emptying digest as it cannot be sent");
-                $uq->drain();
+                $this->log()->warning("{$user->getUsername()} has no email address");
                 unset($uq, $decorator, $email, $user);
                 continue;
             }
