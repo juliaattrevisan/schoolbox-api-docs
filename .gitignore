@@ -10,6 +10,7 @@ mchrome.css
 jquery-ui.css
 chrome.css
 chrome.css.map
+chrome-ie9*.css
 legacy.css
 variables.css
 mixins.css
