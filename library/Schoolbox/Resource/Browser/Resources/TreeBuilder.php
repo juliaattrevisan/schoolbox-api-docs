@@ -58,24 +58,18 @@ class TreeBuilder extends AbstractTreeBuilder
 
 
     /**
+     * Return the folder type for the given node. By default is simply 'folder'.
+     *
      * @param IFolder|Folder\Model $folder
-     * @throws Resource\Exception
-     * @return array
+     * @return string
      */
-    protected function buildFolderNode(IFolder $folder)
+    protected function getFolderType(IFolder $folder)
     {
-        // Get the permission this user has on this folder.
-        // No permission: don't show it at all!
-        $permission = $this->getFolderPermission($folder->getId());
-        if (empty($permission)) {
-            throw new Resource\Exception("No permission for this node");
-        }
-
         // Type: homepage or folder
         // Could be a course as well, if any child has tasks.
         $childIds = $this->folderLocator
-                         ->findByParentId($folder->getId())
-                         ->getColumnValues('id');
+            ->findByParentId($folder->getId())
+            ->getColumnValues('id');
 
         if ($this->taskMapper->countByColumn('category_id', $childIds)) {
             $type = 'course';
@@ -83,45 +77,50 @@ class TreeBuilder extends AbstractTreeBuilder
             $type = $folder->hasHomepage() ? 'homepage' : 'folder';
         }
 
-        // Build the name of the category
-        $name       = $folder->getName();
-        $codeString = $folder->getCodeString();
-        if ($codeString != '' && $codeString != $name) {
-            $name .= ' (' . $codeString . ')';
-        }
-
-        // Output something.
-        return $this->generateFolderArray($folder, $type, $name,
-            [
-                'data-permission' => $permission,
-                'data-type'       => $type
-            ],
-            [ 'href' => '/homepage/' . $folder->getId() ]
-        );
+        return  $type;
     }
 
 
     /**
-     * @param Resource\AbstractFile $file
-     * @throws Resource\Exception
-     * @return array
+     * Return the given folder's name. By default is just its name...
+     *
+     * @param IFolder|Folder\Model $folder
+     * @return string
      */
-    protected function buildFileNode(Resource\AbstractFile $file)
+    protected function getFolderName(IFolder $folder)
     {
-        $permission = $this->getFilePermission($file->getId());
-        if (empty($permission)) {
-            throw new Resource\Exception("No permission for this node");
+        // Build the name of the category
+        $name       = $folder->getName();
+        $codeString = $folder->getCodeString();
+        if ($codeString != '' && $codeString != $name) {
+            $name .= " ($codeString)";
         }
 
-        return $this->generateFileArray($file, $file->getTitle(),
-            [
-                'data-permission' => $permission,
-                'data-type'       => 'file'
-            ],
-            [
-                'href' => '/send.php?id=' . $file->getId(),
-            ]
-        );
+        return $name;
+    }
+
+
+    /**
+     * Return the given folder's href
+     *
+     * @param IFolder $folder
+     * @return string
+     */
+    protected function getFolderHref(IFolder $folder)
+    {
+        return '/homepage/' . $folder->getId();
+    }
+
+
+    /**
+     * Return the given file's href
+     *
+     * @param Resource\AbstractFile $file
+     * @return string
+     */
+    protected function getFileHref(Resource\AbstractFile $file)
+    {
+        return '/send.php?id=' . $file->getId();
     }
 
 
@@ -144,7 +143,7 @@ class TreeBuilder extends AbstractTreeBuilder
                     ->getType();
 
             } catch (Mapper\Exception $e) {
-                $access = 0;
+                $access = UserAccess::ACCESS_DENY;
             }
         }
 
@@ -174,33 +173,6 @@ class TreeBuilder extends AbstractTreeBuilder
         }
 
         return $folderPerm;
-    }
-
-
-    /**
-     * Gets a permission string out of a permission code returned from
-     * $this->handler->getPermission().
-     *
-     * @param  $code
-     *
-     * @return string
-     */
-    protected function getPermissionString($code)
-    {
-        switch ($code) {
-            case UserAccess::ACCESS_FULL:
-                return 'full';
-                break;
-            case UserAccess::ACCESS_WRITE:
-                return 'write';
-                break;
-            case UserAccess::ACCESS_READ:
-                return 'read';
-                break;
-            default:
-                break;
-        }
-        return '';
     }
 
 

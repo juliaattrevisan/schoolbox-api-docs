@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Browser;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\File;
@@ -165,7 +166,31 @@ abstract class AbstractTreeBuilder
      * @throws Resource\Exception
      * @return array
      */
-    protected abstract function buildFolderNode(IFolder $folder);
+    protected function buildFolderNode(IFolder $folder)
+    {
+        // Get the permission this user has on this folder.
+        // No permission: don't show it at all!
+        $permission = $this->getFolderPermission($folder->getId());
+        if (empty($permission)) {
+            throw new Resource\Exception("No permission for this node");
+        }
+
+        // this seems so trivial, but it's so these can be overridden
+        $type = $this->getFolderType($folder);
+        $name = $this->getFolderName($folder);
+        $href = $this->getFolderHref($folder);
+
+        // Output something.
+        return $this->generateFolderArray($folder, $type, $name,
+            [
+                'data-permission' => $permission,
+                'data-type'       => $type
+            ],
+            [
+                'href' => $href
+            ]
+        );
+    }
 
 
     /**
@@ -173,7 +198,23 @@ abstract class AbstractTreeBuilder
      * @throws Resource\Exception
      * @return array
      */
-    protected abstract function buildFileNode(Resource\AbstractFile $file);
+    protected function buildFileNode(Resource\AbstractFile $file)
+    {
+        $permission = $this->getFilePermission($file->getId());
+        if (empty($permission)) {
+            throw new Resource\Exception("No permission for this node");
+        }
+
+        return $this->generateFileArray($file, $file->getTitle(),
+            [
+                'data-permission' => $permission,
+                'data-type'       => 'file'
+            ],
+            [
+                'href' => $this->getFileHref($file),
+            ]
+        );
+    }
 
 
     /**
@@ -252,6 +293,75 @@ abstract class AbstractTreeBuilder
 
         return $count > 0;
     }
+
+
+    /**
+     * Return the given folder's type. By default is simply 'folder'.
+     *
+     * @param IFolder $folder
+     * @return string
+     */
+    protected function getFolderType(IFolder $folder)
+    {
+        return 'folder';
+    }
+
+
+    /**
+     * Return the given folder's name. By default is just its name...
+     *
+     * @param IFolder $folder
+     * @return string
+     */
+    protected function getFolderName(IFolder $folder)
+    {
+        return $folder->getName();
+    }
+
+
+    /**
+     * Gets a permission string out of a permission code returned from
+     * $this->handler->getPermission().
+     *
+     * @param  $code
+     *
+     * @return string
+     */
+    protected function getPermissionString($code)
+    {
+        switch ($code) {
+            case UserAccess::ACCESS_FULL:
+                return 'full';
+                break;
+            case UserAccess::ACCESS_WRITE:
+                return 'write';
+                break;
+            case UserAccess::ACCESS_READ:
+                return 'read';
+                break;
+            default:
+                break;
+        }
+        return '';
+    }
+
+
+    /**
+     * Return the given folder's href
+     *
+     * @param IFolder $folder
+     * @return string
+     */
+    protected abstract function getFolderHref(IFolder $folder);
+
+
+    /**
+     * Return the given file's href
+     *
+     * @param Resource\AbstractFile $file
+     * @return string
+     */
+    protected abstract function getFileHref(Resource\AbstractFile $file);
 
 
     /**

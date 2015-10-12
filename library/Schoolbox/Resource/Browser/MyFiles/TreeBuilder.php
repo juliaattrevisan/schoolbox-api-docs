@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Browser\MyFiles;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\File;
@@ -38,30 +39,26 @@ class TreeBuilder extends AbstractTreeBuilder
 
 
     /**
+     * Return the given folder's href
+     *
      * @param IFolder $folder
-     * @throws Resource\Exception
-     * @return array
+     * @return string
      */
-    protected function buildFolderNode(IFolder $folder)
+    protected function getFolderHref(IFolder $folder)
     {
-        return $this->generateFolderArray($folder, 'folder', null, [
-            'data-permission' => 'full',
-            'data-type'       => 'folder'
-        ]);
+        return '/cms/portfolio/' . $folder->getId();
     }
 
 
     /**
+     * Return the given file's href
+     *
      * @param Resource\AbstractFile $file
-     * @throws Resource\Exception
-     * @return array
+     * @return string
      */
-    protected function buildFileNode(Resource\AbstractFile $file)
+    protected function getFileHref(Resource\AbstractFile $file)
     {
-        return $this->generateFileArray($file, null, [
-            'data-permission' => 'full',
-            'data-type'       => 'file'
-        ]);
+        return '/cms/sendMyFile.php?id=' . $file->getId();
     }
 
 
@@ -104,7 +101,7 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     protected function getFolderPermission($nodeId)
     {
-        return 'full';
+        return $this->getPermissionString(UserAccess::ACCESS_FULL);
     }
 
 
@@ -114,7 +111,7 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     protected function getFilePermission($nodeId)
     {
-        return 'full';
+        return $this->getPermissionString(UserAccess::ACCESS_FULL);
     }
 
 
