@@ -1,6 +1,6 @@
 # default settings for vagrant box.
 # To modify, copy to vagrant.yaml and modify settings as needed.
-vagrant_box: "ubuntu-1204-gold-PHP55"
+vagrant_box: "ubuntu-1404-gold"
 download_url: "vagrant.alaress-dev.com.au"
 memory: 1024
 public_network: true
