@@ -28,16 +28,11 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 		 */
         if (is_array($_POST['colors'])) {
             $color = array();
-
-            foreach ($_POST['colors'] as $key => $value) {
-                $color[$key] = substr($value, 1);
-            }
-
             // Also try to save width
             if (!empty($_POST['width'])) {
                 $eportfolioHandler->updateGrid($_POST['width']);
             }
-            $eportfolioHandler->saveDisplayProperties($color);
+            $eportfolioHandler->saveDisplayProperties($_POST['colors']);
         } /* Ajax request for drag and drop of components
 		 */
         elseif ($_POST['type'] == 'components') {
