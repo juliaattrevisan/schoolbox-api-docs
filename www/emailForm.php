@@ -1,16 +1,19 @@
 <?php
 
-//This script is a generic email handler which can email the values of a form to an email address
-//Also now supports handling of files which are attached to the email
-//Typically this script would be used for contact forms and enquiry forms on a website
-//It requires the following variables;
-//			template - template filename to be used
-//			email - email address of sender
-//The following are optional but recommended variables
-//			subject - subject of email to be sent
-//			name - name of sender
-//			confirmation - location to redirect user to after submission, ie a confirmation page
+/* This form used to be for generic emails, now only used for the feedback form
+   It requires the following variables;
+			template - template filename to be used
+			email - email address of sender
+   The following are optional but recommended variables
+			subject - subject of email to be sent
+			name - name of sender
+			confirmation - location to redirect user to after submission, ie a confirmation page
+*/
 
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Mail\CoreContext;
+use Schoolbox\Mail\TwigEmail;
 
 require_once dirname(__FILE__) . '/../include/Bootstrap.php';
 
@@ -25,38 +28,35 @@ if ( !isset($_SESSION['id']) && !$recaptcha->check_answer($_SERVER['REMOTE_ADDR'
 
 if(validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template'])) {
 
-	$mailHandler = new Mailer($_POST['template'], Cfg::get('title').' Feedback - ' . $_POST['subject'], Cfg::get('mail_support_address'));
-
 	foreach($_POST as $key => $var) {
 		if(!checkSpamHeaders($var))
 			SitePage::localRedir('/');
 
 		$key = strtoupper($key);
 		if(is_array($var))
-			$output[$key] = implode(', ',$var);
+			$context[$key] = implode(', ',$var);
 		else
-			$output[$key] = $var;
+			$context[$key] = $var;
 	}
 
-	foreach($_FILES as $file) {
-		$mailHandler->addFile($file['tmp_name'], $file['type'], $file['name']);
-	}
+        $myconf = ConfigMapper::getInstance();
+        $core = new CoreContext($myconf);
+        $email = new TwigEmail('feedback.twig');
+        $email->setCoreContext($core->getContext());
+        $email->setFrom($_POST['email'], $_POST['name']);
+        $email->setSubject(Cfg::get('title') . ' Feedback - ' . $_POST['subject']);
+        $email->setContext($context)->send(array(
+                            'name' => Cfg::get('mail_from_name'),
+                            'email' => Cfg::get('mail_support_address')
+                    ));
 
-	$mailHandler->setVar($output);
-	$mailHandler->setFrom($_POST['email'], $_POST['name']);
-
-	$mailHandler->setVar('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
-    $mailHandler->setVar('SITE_TITLE',  Cfg::get('title'));
-	$mailHandler->send();
-
-	if($_POST['receipt']) {
+/*	if($_POST['receipt']) {
         $receiptHandler = new Mailer($_POST['receipt'], $_POST['receipt_subject'], $_POST['email']);
 		$receiptHandler->setVar($output);
 		$receiptHandler->setVar('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
 		$receiptHandler->send();
-
-
 	}
+*/
 }
 
 if(preg_match("/^[a-zA-Z0-9\/\-\_]+/", $_POST['confirmation']) ) {
