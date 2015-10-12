@@ -20,38 +20,33 @@ $page->setVar('not_found_block', '');
 $page->setVar('parents_only_block', '');
 
 if (isset($_POST['email'])) {
-	
-	$userHandler = new User;
-	
-	$result = $userHandler->sendPassword($_POST['email']);
+    $userHandler = new User;
+    
+    $result = $userHandler->sendPassword($_POST['email']);
 
-	if (!is_array($result)) {
+    if (!is_array($result)) {
             $page->parse('not_found_block', 'not_found');
-	}
-	else if (array_key_exists('USERNAME',$result)) {
-	    $myconf = ConfigMapper::getInstance();
+    } elseif (array_key_exists('USERNAME', $result)) {
+        $myconf = ConfigMapper::getInstance();
             $core = new CoreContext($myconf);
-	    $email = new TwigEmail('forgotpassword.twig');
-	    $email->setCoreContext($core->getContext());
-	    $email->setFrom(Cfg::get('password_change_email_from'), Cfg::get('mail_from_name'));
-	    $email->setSubject(Cfg::get('title') . ' Password Reminder');
-	    $context['recipient'] = $result['FIRSTNAME'];
-	    $context['username'] = $result['USERNAME'];
-	    $context['password'] = $result['PASSWORD'];
+        $email = new TwigEmail('forgotpassword.twig');
+        $email->setCoreContext($core->getContext());
+        $email->setFrom(Cfg::get('password_change_email_from'), Cfg::get('mail_from_name'));
+        $email->setSubject(Cfg::get('title') . ' Password Reminder');
+        $context['recipient'] = $result['FIRSTNAME'];
+        $context['username'] = $result['USERNAME'];
+        $context['password'] = $result['PASSWORD'];
             $context['forgotten_password'] = Cfg::get('forgotten_password');
-	    $email->setContext($context)->send(array(
+        $email->setContext($context)->send(array(
                                 'name' => $result['FULLNAME'],
                                 'email' => $result['EMAIL']
-			));
+            ));
 
-	    $page->parse('email_sent_block', 'email_sent');
-	}
-	else {
+        $page->parse('email_sent_block', 'email_sent');
+    } else {
             $page->parse('not_found_block', 'not_found');
-	}
+    }
 
 }
 
 $page->outputPage(true);
-
-?>

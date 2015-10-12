@@ -189,7 +189,7 @@ class User extends DeprecatedModel
 
         //If parent search policy is disabled, only staff will see parents in search results
         //Guests never see parents
-        if( $_SESSION['user']->getRole()->isGuest() ||
+        if ($_SESSION['user']->getRole()->isGuest() ||
             (!$_SESSION['user']->getRole()->isStaff() && Cfg::get('parent_search_enable') != 1)
         ) {
             $wherePart .= " AND `groups`.`group_type` != 'parent' ";
@@ -227,7 +227,7 @@ class User extends DeprecatedModel
 
         //If parent search policy is disabled, only staff will see parents in search results
         //Guests never see parents
-        if( $_SESSION['user']->getRole()->isGuest() ||
+        if ($_SESSION['user']->getRole()->isGuest() ||
             (!$_SESSION['user']->getRole()->isStaff() && Cfg::get('parent_search_enable') != 1)
         ) {
             $wherePart = " AND `groups`.`group_type` != 'parent' ";
@@ -495,17 +495,17 @@ class User extends DeprecatedModel
             return false;
         }
         $groupHandler = new Group();
-	$user_list    = $this->getAllByField('alt_email', $email);
-	$result = array();
+        $user_list    = $this->getAllByField('alt_email', $email);
+        $result = array();
         if (!empty($user_list)) {
             foreach ($user_list as $user) {
                 if ($user['enabled']) {
                     $result['NAME'] = $user['firstname'];
                     $result['USERNAME'] = $user['username'];
-		    $result['PASSWORD'] = $user['email_pass'];
-		    $result['EMAIL'] = $user['alt_email'];
-		    $result['FULLNAME'] = $user['firstname']." ".$user['lastname'];
-		    $result['FIRSTNAME'] = $user['firstname'];
+                    $result['PASSWORD'] = $user['email_pass'];
+                    $result['EMAIL'] = $user['alt_email'];
+                    $result['FULLNAME'] = $user['firstname']." ".$user['lastname'];
+                    $result['FIRSTNAME'] = $user['firstname'];
                     return $result;
                 }
             }

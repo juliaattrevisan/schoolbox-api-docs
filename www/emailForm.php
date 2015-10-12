@@ -19,25 +19,26 @@ require_once dirname(__FILE__) . '/../include/Bootstrap.php';
 
 session_start();
 
-$recaptcha = new ReCaptcha( Config::get('recaptcha_public_api_key'), Config::get('recaptcha_private_api_key') );
+$recaptcha = new ReCaptcha(Config::get('recaptcha_public_api_key'), Config::get('recaptcha_private_api_key'));
 
-if ( !isset($_SESSION['id']) && !$recaptcha->check_answer($_SERVER['REMOTE_ADDR'], $_POST['recaptcha_challenge_field'], $_POST['recaptcha_response_field']) ) {
-    $page = new SitePage( false );
-    error(105,"The Human Checker (reCAPTCHA) words you entered did not match.");
+if (!isset($_SESSION['id']) && !$recaptcha->check_answer($_SERVER['REMOTE_ADDR'], $_POST['recaptcha_challenge_field'], $_POST['recaptcha_response_field'])) {
+    $page = new SitePage(false);
+    error(105, "The Human Checker (reCAPTCHA) words you entered did not match.");
 }
 
-if(validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template'])) {
+if (validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template'])) {
+    foreach ($_POST as $key => $var) {
+        if (!checkSpamHeaders($var)) {
+            SitePage::localRedir('/');
+        }
 
-	foreach($_POST as $key => $var) {
-		if(!checkSpamHeaders($var))
-			SitePage::localRedir('/');
-
-		$key = strtoupper($key);
-		if(is_array($var))
-			$context[$key] = implode(', ',$var);
-		else
-			$context[$key] = $var;
-	}
+        $key = strtoupper($key);
+        if (is_array($var)) {
+            $context[$key] = implode(', ', $var);
+        } else {
+            $context[$key] = $var;
+        }
+    }
 
         $myconf = ConfigMapper::getInstance();
         $core = new CoreContext($myconf);
@@ -59,45 +60,48 @@ if(validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.ht
 */
 }
 
-if(preg_match("/^[a-zA-Z0-9\/\-\_]+/", $_POST['confirmation']) ) {
-	SitePage::localRedir($_POST['confirmation']);
-}
-else {
-	SitePage::localRedir('/thank-you');
+if (preg_match("/^[a-zA-Z0-9\/\-\_]+/", $_POST['confirmation'])) {
+    SitePage::localRedir($_POST['confirmation']);
+} else {
+    SitePage::localRedir('/thank-you');
 }
 
 function checkSpamHeaders($text)
 {
-	//checks for common spammer injected headers
-	if(stristr($text, 'Content-Type:') !== FALSE)
-		return FALSE;
-	if(stristr($text, 'MIME-Version:') !== FALSE)
-		return FALSE;
-	if(stristr($text, 'Bcc:') !== FALSE)
-		return FALSE;
+    //checks for common spammer injected headers
+    if (stristr($text, 'Content-Type:') !== false) {
+        return false;
+    }
+    if (stristr($text, 'MIME-Version:') !== false) {
+        return false;
+    }
+    if (stristr($text, 'Bcc:') !== false) {
+        return false;
+    }
 
-	return TRUE;
+    return true;
 }
 
 
 function validateEmailAddress($email)
 {
-	//check from contains valid email
-	if(!preg_match('/^([0-9a-zA-Z]+[-._+&])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}$/', $email))
-		return FALSE;
+    //check from contains valid email
+    if (!preg_match('/^([0-9a-zA-Z]+[-._+&])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}$/', $email)) {
+        return false;
+    }
 
-	//do domain lookup
-	list($alias, $domain) = explode('@', $email);
+    //do domain lookup
+    list($alias, $domain) = explode('@', $email);
 
-	//this prevents appending of localhost to lookup
-	$domain = $domain.'.';
+    //this prevents appending of localhost to lookup
+    $domain = $domain.'.';
 
-	//check for mx records or that it resolves
-	if(getmxrr($domain, $temp))
-		return TRUE;
-	else if(checkdnsrr($domain, 'ANY') )
-		return TRUE;
-	else
-		return FALSE;
+    //check for mx records or that it resolves
+    if (getmxrr($domain, $temp)) {
+        return true;
+    } elseif (checkdnsrr($domain, 'ANY')) {
+        return true;
+    } else {
+        return false;
+    }
 }
-?>
