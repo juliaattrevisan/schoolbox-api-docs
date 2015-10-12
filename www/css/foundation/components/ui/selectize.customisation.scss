@@ -4,31 +4,31 @@ $selectize-font-size: 14px;
 $selectize-line-height: 18px !default;
 
 // None of this is being used?
-//$selectize-color-text: #ff0000;
-//$selectize-color-border: tint($tertiary, 66%);
-//$selectize-color-highlight: $ocean-sunset;
-//$selectize-color-input: $white !default;
-//$selectize-color-input-full: $selectize-color-input !default;
-//$selectize-color-disabled: $snow;
-//$selectize-color-item: $snow;
-//$selectize-color-item-text: $selectize-color-text !default;
-//$selectize-color-item-border: $white-smoke;
-//$selectize-color-item-active: $vapor;
-//$selectize-color-item-active-text: $selectize-color-text !default;
-//$selectize-color-item-active-border: $selectize-color-border;
-//$selectize-color-dropdown: $white;
-//$selectize-color-dropdown-border: $selectize-color-border !default;
-//$selectize-color-dropdown-border-top: $selectize-color-border;
-//$selectize-color-dropdown-item-active: tint($tertiary, 87%);
-//$selectize-color-dropdown-item-active-text: $selectize-color-text;
-//$selectize-color-dropdown-item-create-text: rgba(red($selectize-color-text), green($selectize-color-text), blue($selectize-color-text), .5) !default;
-//$selectize-color-dropdown-item-create-active-text: $selectize-color-dropdown-item-active-text !default;
-//$selectize-color-optgroup: $selectize-color-dropdown !default;
-//$selectize-color-optgroup-text: $selectize-color-text !default;
+$selectize-color-text: $content-ui-foreground;
+$selectize-color-border: tint($tertiary, 66%);
+$selectize-color-highlight: $content-ui-hover;
+$selectize-color-input: $white !default;
+$selectize-color-input-full: $selectize-color-input !default;
+$selectize-color-disabled: $content-ui-hover;
+$selectize-color-item: $content-ui-hover;
+$selectize-color-item-text: $selectize-color-text !default;
+$selectize-color-item-border: transparent;
+$selectize-color-item-active: $vapor;
+$selectize-color-item-active-text: $selectize-color-text !default;
+$selectize-color-item-active-border: $selectize-color-border;
+$selectize-color-dropdown: $white;
+$selectize-color-dropdown-border: $selectize-color-border !default;
+$selectize-color-dropdown-border-top: $selectize-color-border;
+$selectize-color-dropdown-item-active: tint($tertiary, 87%);
+$selectize-color-dropdown-item-active-text: $selectize-color-text;
+$selectize-color-dropdown-item-create-text: rgba(red($selectize-color-text), green($selectize-color-text), blue($selectize-color-text), .5) !default;
+$selectize-color-dropdown-item-create-active-text: $selectize-color-dropdown-item-active-text !default;
+$selectize-color-optgroup: $selectize-color-dropdown !default;
+$selectize-color-optgroup-text: $selectize-color-text !default;
 
 $selectize-shadow-input: none;
 $selectize-shadow-input-focus: none;
-//$selectize-border: 2px solid $selectize-color-border;
+$selectize-border: 2px solid $selectize-color-border;
 $selectize-border-radius: 0px;
 
 $selectize-width-item-border: 1px !default;
@@ -41,17 +41,25 @@ $selectize-padding-item-y: 0;
 
 @import "../../../core/selectize/src/selectize.scss";
 
-.selectize-control.multi .selectize-input > div{
-	background: $white-smoke;
+.selectize-control.multi .selectize-input > div {
+	background: $content-ui-background;
 	border: 1px solid $gainsboro;
-	a{
+	padding: 0.5rem 0rem 0.5rem 0.5rem;
+	margin: 0;
+	a {
 		padding: 0.5rem !important;
 		width: 1.5rem !important;
+		color: $content-ui-foreground;
 	}
 }
 
-.selectize-input input{
-	height: auto;
+.selectize-input {
+    input {
+        height: auto;
+        .remove {
+            color: $content-ui-foreground;
+        }
+    }
 }
 
 .selectize-dropdown .row[data-selectable] {
