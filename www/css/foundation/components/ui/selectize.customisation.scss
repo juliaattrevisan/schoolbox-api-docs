@@ -38,7 +38,7 @@ $selectize-padding-y: 0;
 $selectize-padding-item-x: 0;
 $selectize-padding-item-y: 0;
 
-@import "../core/selectize/src/selectize.scss";
+@import "../../../core/selectize/src/selectize.scss";
 
 .selectize-control.multi .selectize-input > div{
 	background: $white-smoke;
