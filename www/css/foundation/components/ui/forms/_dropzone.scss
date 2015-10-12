@@ -1,10 +1,13 @@
 
-$attachzone-resting-background: $body-bg;
-$attachzone-resting-color: darken($attachzone-resting-background, 30%);
-$attachzone-dragging-background: #f4dea0;
-$attachzone-dragging-color: darken($attachzone-dragging-background, 40%);
-$attachzone-can-accept-background: $input-focus-bg-color;
+$attachzone-resting-color: $accent-foreground;
+$attachzone-resting-background: $accent-background;
+
+$attachzone-dragging-color: $accent-foreground;
+$attachzone-dragging-background: $accent-hover;
+
 $attachzone-can-accept-color: $input-focus-border-color;
+$attachzone-can-accept-background: $input-focus-bg-color;
+
 $attachzone-error-background: tint($alert-color, 96%);
 $attachzone-error-color: $alert-color;
 
