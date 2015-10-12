@@ -284,6 +284,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		text-align: left;
 		&:hover,
 		&.open{
+		    color: $navigation-hover;
 			background-color: $white;
 		}
 		span{
