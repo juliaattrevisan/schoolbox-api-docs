@@ -5,9 +5,10 @@
  *                                                           *
  ************************************************************/
 //enable users to send email
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
+$kernel = require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 $page = new SitePage();
+$page->setDi($kernel->getDependencyInjector());
 
 $groupHandler = new Group;
 
