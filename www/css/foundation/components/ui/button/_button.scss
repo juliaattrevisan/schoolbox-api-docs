@@ -85,16 +85,16 @@ a[role="button"] {
 input[type="submit"]{
 	@extend .button;
 	border: none;
-	background-color: $submit-button-color;
-	color: calc-text-color($submit-button-color);
+	color: $submit-button-color;
+	background-color: $submit-button-bg-color;
 	&:hover, &:focus {
-		background-color: tint($submit-button-color, 20%);
-		color: $white;
+		color: $submit-button-color;
+		background-color: $submit-button-bg-color;
 	}
 	&:disabled {
 		opacity: $button-disabled-opacity;
-		background-color: $submit-button-color;
-		color: calc-text-color($submit-button-color);
+		color: $submit-button-color;
+		background-color: $submit-button-bg-color;
 	}
 }
 
