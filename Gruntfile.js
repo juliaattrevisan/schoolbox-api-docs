@@ -204,7 +204,7 @@ module.exports = function(grunt) {
         if (result.code === 0) {
             grunt.log.writeln('Skin built successfully');
         } else {
-            grunt.fail.warn("Skin may not have been built successfully!");
+            grunt.fail.warn("Skin may not have been built successfully! (error code: "+String(result.code)+')');
         }
     });
     grunt.registerTask('build.css.current', 'Builds CSS for current skin', function() {
