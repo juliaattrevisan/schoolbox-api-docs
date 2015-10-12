@@ -87,20 +87,6 @@ $menu-slide: "transform 500ms ease";
 @import "../../../javascript/components/foundation/scss/foundation/components/magellan";
 @import "../../../javascript/components/foundation/scss/foundation/components/offcanvas";
 
-
-
-//
-// CUSTOM OVERRIDES
-//
-
-// Top bar
-[data-component]{
-  margin-bottom: rem-calc(($base-font-size));
-  section{
-  	margin-bottom: 0;
-  }
-}
-
 $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($background: $tabbar-bg, $opacity: 0.65));
 
 // Hybrid Bar
