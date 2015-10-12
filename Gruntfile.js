@@ -1,12 +1,5 @@
 var glob  = require('glob');
 var shell = require('shelljs');
-var fs    = require('fs');
-
-// Before anything else: ensure /www/css/foundation/utils/_skin.scss exists
-var skinFile = __dirname+'/www/css/foundation/utils/_skin.scss';
-if (!fs.existsSync(skinFile)) {
-    fs.writeFileSync(skinFile, '');
-}
 
 module.exports = function(grunt) {
 
@@ -186,17 +179,6 @@ module.exports = function(grunt) {
             css: ['www/css/*/chrome.css']
         },
         less: buildTasks,
-        sass: {
-            // Don't run from bundle for now, as installing bundle runs out of memory
-            //options: {
-            //    bundleExec: true
-            //},
-            dist: {
-                files: {
-                    'www/css/foundation/chrome.css': 'www/css/foundation/chrome-foundation.scss'
-                }
-            }
-        },
         watch: watchTasks
     });
 
@@ -215,6 +197,15 @@ module.exports = function(grunt) {
             task += ':'+skin;
         }
         grunt.task.run(task)
+    });
+    grunt.registerTask('sass', 'Builds SASS stylesheet (through tools/skin/builder.php)', function() {
+        // Run sass build
+        var result = shell.exec('php ./tools/skin/builder.php --force');
+        if (result.code === 0) {
+            grunt.log.writeln('Skin built successfully');
+        } else {
+            grunt.fail.warn("Skin may not have been built successfully! (error code: "+String(result.code)+')');
+        }
     });
     grunt.registerTask('build.css.current', 'Builds CSS for current skin', function() {
         var task = 'less';

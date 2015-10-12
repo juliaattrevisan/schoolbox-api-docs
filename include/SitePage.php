@@ -176,6 +176,12 @@ class SitePage extends Page
 
     function setSite()
     {
+        // If config.skin_builder is on - set $site to core, thus bypassing all custom templates.
+        if (Config::get('skin_builder')) {
+            $this->site       = 'demo';
+            $this->responsive = true;
+            return true;
+        }
         // detect responsiveness: if there's no override for body.html, that school has gone responsive
         $this->responsive = !file_exists(SITE_root . '/templates/' . Cfg::get('site_location') . '/include/body.html');
 
@@ -209,6 +215,7 @@ class SitePage extends Page
         }
 
         $this->site = Cfg::get('site_location');
+        return true;
     }
 
 
