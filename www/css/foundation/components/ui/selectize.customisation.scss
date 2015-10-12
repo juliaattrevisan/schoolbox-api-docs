@@ -16,7 +16,7 @@ $selectize-color-item-border: transparent;
 $selectize-color-item-active: $vapor;
 $selectize-color-item-active-text: $selectize-color-text !default;
 $selectize-color-item-active-border: $selectize-color-border;
-$selectize-color-dropdown: $white;
+$selectize-color-dropdown: $content-ui-background;
 $selectize-color-dropdown-border: $selectize-color-border !default;
 $selectize-color-dropdown-border-top: $selectize-color-border;
 $selectize-color-dropdown-item-active: tint($tertiary, 87%);
@@ -68,8 +68,13 @@ $selectize-padding-item-y: 0;
 
 }
 
-.selectize-dropdown .row[data-selectable] {
-	padding: 0;
+.selectize-dropdown {
+    .row[data-selectable] {
+        padding: 0;
+    }
+    .active {
+        background-color: $content-ui-hover;
+    }
 }
 
 .selectize-control .progress-tick {
