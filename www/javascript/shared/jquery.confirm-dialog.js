@@ -52,38 +52,29 @@
     $.fn.confirmDialog = function(options) {
         var element  = $(this);
         var defaults = {
-            dialog: $('<div />'),
             text: 'Are you sure?',
-            dialogOptions: {
-                modal: true,
-                title: 'Confirm',
-                close: function() {
-                    if (settings.destroyDialog) {
-                        $(this).dialog('destroy');
-                    }
-                }
-            },
             confirmLabel: 'Yes',
             confirmEvent: $.confirmDialog.followHref,
-            cancelLabel: 'No',
-            destroyDialog: true
+            cancelLabel: 'No'
         };
         var settings = $.extend(true, {}, defaults, options);
-        settings.dialogOptions.buttons = [
-            {
-                text:  settings.confirmLabel,
-                click: function() {
-                    settings.confirmEvent(element);
-                    $(this).dialog('close');
-                }
-            },
-            {
-                text:  settings.cancelLabel,
-                click: function() {
-                    $(this).dialog('close');
-                }
-            }
-        ];
-        $(settings.dialog).text(settings.text).dialog(settings.dialogOptions);
+
+        var modal        = $('<div data-reveal class="reveal-modal" />');
+        var okayButton   = $('<a href="#" class="button" />').text(settings.confirmLabel).on('click.confirmDialog', function(e) {
+            e.preventDefault();
+            settings.confirmEvent(element);
+            modal.foundation('reveal', 'close');
+        });
+        var cancelButton = $('<a href="#" class="button" />').text(settings.cancelLabel).on('click.confirmDialog', function(e) {
+            e.preventDefault();
+            modal.foundation('reveal', 'close');
+        });
+        modal
+            .append($('<p />').text(settings.text))
+            .append(okayButton)
+            .append(cancelButton)
+            .append('<a class="close-reveal-modal" aria-label="Close">&#215;</a>');
+        modal.appendTo($('body'));
+        modal.foundation('reveal', 'reflow').foundation('reveal', 'open');
     }
 })(jQuery);
