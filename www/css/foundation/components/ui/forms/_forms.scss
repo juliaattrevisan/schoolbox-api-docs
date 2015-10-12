@@ -175,7 +175,19 @@ th, td{
 	&.long {
 		@include wide-switch(8rem);
 		@include switch-label;
+
+        /* The label inside the paddle
+		 */
+		span {
+            &:first-child {
+                color: $content-ui-background;
+            }
+            &:last-child {
+                color: $content-ui-foreground;
+            }
+        }
 	}
+
 	@include switch-label(0.5rem);
 
 	span {
@@ -187,6 +199,15 @@ th, td{
 		font-size: rem-calc($base-font-size - 3);
 		text-indent: 0;
 		@include single-transition(opacity, $switch-paddle-transition-speed, $switch-paddle-transition-ease);
+
+		/* The x label inside the paddle
+		 */
+        &:first-child {
+            color: $content-ui-background;
+        }
+        &:last-child {
+            color: $content-ui-foreground;
+        }
 	}
 }
 
