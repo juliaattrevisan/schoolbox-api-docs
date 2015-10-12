@@ -39,7 +39,7 @@ $off-canvas-hover-color: $off-canvas-bg;
 
 // Off Canvas Menu List Variables
 $off-canvas-label-padding: rem-calc(($base-font-size));
-$off-canvas-label-color: contrast-bg(0.4, $off-canvas-bg);
+$off-canvas-label-color: $accent-foreground;;
 $off-canvas-label-text-transform: uppercase;
 $off-canvas-label-font-size: rem-calc(($base-font-size - 2));
 $off-canvas-label-font-weight: $font-weight-light;
