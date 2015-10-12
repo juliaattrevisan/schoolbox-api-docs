@@ -1,0 +1,68 @@
+$breadcrumb-color: $content-ui-foreground;
+$breadcrumb-bg-color: $content-ui-background;
+$breadcrumb-hover-bg-color: $content-ui-hover;
+$breadcrumb-active-bg-color: $content-ui-selected;
+
+// Custom breadcrumbs
+.breadcrumb {
+	margin: 0 0 rem-calc(($base-font-size)) 0;
+	list-style: none;
+	overflow: hidden;
+	li{
+		a{
+			color: $breadcrumb-color;
+			text-decoration: none;
+			line-height: rem-calc($base-font-size);
+			padding: rem-calc(($base-font-size / 2));
+			padding-left: rem-calc($base-font-size);
+			background-color: $breadcrumb-bg-color;
+			position: relative;
+			display: block;
+			float: left;
+			margin-right: 0;
+			white-space: nowrap;
+			border: none;
+			@include single-transition(all, 0.15s, linear);
+
+			&:before,
+			&:after{
+				content: " ";
+				display: block;
+				width: 0;
+				height: 0;
+				border-top: rem-calc($base-font-size) solid transparent;
+				@include single-transition(all, 0.15s, linear);
+				border-bottom: rem-calc($base-font-size) solid transparent;
+				position: absolute;
+				top: 50%;
+				margin-top: rem-calc($base-font-size) * -1;
+				left: 100%;
+				z-index: 2;
+			}
+			&:before{
+				margin-left: 1px;
+				border-left: rem-calc($base-font-size * .4) solid $breadcrumb-active-bg-color;
+			}
+			&:after{
+				border-left: rem-calc($base-font-size * .4) solid $breadcrumb-bg-color;
+			}
+			&:hover{
+				background-color: $breadcrumb-hover-bg-color;
+			}
+			&:hover:after{
+				border-left-color: $breadcrumb-hover-bg-color !important;
+			}
+		}
+		&.active a,
+		&.active a:after{
+			background-color: $breadcrumb-active-bg-color;
+			border-left: 0px solid $breadcrumb-active-bg-color;
+		}
+		&.active a:before{
+			margin-left: 0px;
+		}
+	}
+	li:first-child a{
+		padding-left: rem-calc(($base-font-size));
+	}
+}

@@ -42,6 +42,9 @@
 @import "layout/login";
 @import "layout/tiles";
 
+// UI Elements
+@import "components/ui/breadcrumb";
+
 // Schoolbox Areas
 @import "components/quiz-survey";
 @import "components/submissions/inline-grading";
