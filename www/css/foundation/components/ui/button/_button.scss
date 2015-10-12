@@ -1,3 +1,21 @@
+/* Link Styles
+ * These are actually bleeding through from chrome.css
+ * so we specify them again here, for Skin Builder
+ */
+#content a {
+    color: $content-ui-foreground;
+    &:hover {
+        color: $content-ui-foreground;
+    }
+}
+
+a[disabled], a.disabled {
+    // Make disabled links not clickable
+    pointer-events: none;
+    cursor: default;
+}
+
+
 /* All generic buttons
  */
 .button {
@@ -60,13 +78,6 @@
  */
 a[role="button"] {
 	@extend .button;
-}
-
-// Really generic link styles
-a[disabled], a.disabled {
-    // Make disabled links not clickable
-    pointer-events: none;
-    cursor: default;
 }
 
 /* Form submits have a unique styling
