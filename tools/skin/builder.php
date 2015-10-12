@@ -47,4 +47,6 @@ if ($origSha != $newSha || $force) {
     } else {
         // something went wrong
     }
+    exit($outputCode);
 }
+exit(0);
