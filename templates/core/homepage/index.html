@@ -89,10 +89,10 @@
 <script type="text/javascript" src="/javascript/shared/masonry/jquery.masonry.spectrum.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.device.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.tab-activator.js"></script>
 
 <script type="text/javascript">
     $(function() {
-
         var url = '/homepage/configForm.php';
 
         var homepage = $('#component-layout');
@@ -166,6 +166,15 @@
                 homepage.addClass('show-empty');
             }
         });
+
+        /* Tab toggler
+         * Deal with special components placeholder
+         */
+        $.fn.tabActivator({
+            onTabClose: function(tabActivator) {
+                homepage.removeClass('show-empty');
+            }
+        });
     });
 </script>
 <!-- END modify_layout -->
@@ -183,10 +192,10 @@
         <!-- BEGIN edit_page -->
         <span data-tab>
             <span class="tab-title">
-                <a class="icon-components" href="#tabs-1" title="Add components"></a>
+                <a class="icon-components" href="#tabs-1" title="Add components" data-tab-activator></a>
             </span>
             <span class="tab-title">
-                <a class="icon-edit-columns" href="#tabs-2" title="Edit columns"></a>
+                <a class="icon-edit-columns" href="#tabs-2" title="Edit columns" data-tab-activator></a>
             </span>
         </span>
         <!-- END edit_page -->
