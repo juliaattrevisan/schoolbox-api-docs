@@ -189,7 +189,7 @@ class User extends DeprecatedModel
 
         //If parent search policy is disabled, only staff will see parents in search results
         //Guests never see parents
-        if( $_SESSION['user']->getRole()->isGuest() ||
+        if ($_SESSION['user']->getRole()->isGuest() ||
             (!$_SESSION['user']->getRole()->isStaff() && Cfg::get('parent_search_enable') != 1)
         ) {
             $wherePart .= " AND `groups`.`group_type` != 'parent' ";
@@ -227,7 +227,7 @@ class User extends DeprecatedModel
 
         //If parent search policy is disabled, only staff will see parents in search results
         //Guests never see parents
-        if( $_SESSION['user']->getRole()->isGuest() ||
+        if ($_SESSION['user']->getRole()->isGuest() ||
             (!$_SESSION['user']->getRole()->isStaff() && Cfg::get('parent_search_enable') != 1)
         ) {
             $wherePart = " AND `groups`.`group_type` != 'parent' ";
@@ -441,17 +441,12 @@ class User extends DeprecatedModel
             $this->logUserPasswordChange($user['username'], 'email_change_pwd', 'info');
             $hash = substr(md5(uniqid() . time()), 0, 25);
             $this->update(array('id' => $user['id'], 'hash' => $hash));
-            $mailHandler = new Mailer('change-password.html', Cfg::get(
-                'password_change_email_subject'
-            ), $user['alt_email']);
-            $from        = Cfg::get('password_change_email_from');
-            if ($from) {
-                $mailHandler->setFrom($from);
-            }
-            $mailHandler->setVar('NAME', $user['firstname']);
-            $mailHandler->setVar('DATE', date('j F Y', $_SERVER['REQUEST_TIME']));
-            $mailHandler->setVar('TIME', date('g:i a', $_SERVER['REQUEST_TIME']));
-            return $mailHandler->send();
+            $result['EMAIL'] = $user['alt_email'];
+            $result['FULLNAME'] = $user['firstname']." ".$user['lastname'];
+            $result['FIRSTNAME'] = $user['firstname'];
+            $result['DATE'] = date('j F Y', $_SERVER['REQUEST_TIME']);
+            $result['TIME'] = date('g:i a', $_SERVER['REQUEST_TIME']);
+            return $result;
         }
         return false;
     }
@@ -501,19 +496,17 @@ class User extends DeprecatedModel
         }
         $groupHandler = new Group();
         $user_list    = $this->getAllByField('alt_email', $email);
+        $result = array();
         if (!empty($user_list)) {
             foreach ($user_list as $user) {
-                if ($user['enabled'] && $groupHandler->isParent($user['id'])) {
-                    $mailHandler = new Mailer(
-                        'new-password.html',
-                        Cfg::get('title') . ' Password Reminder',
-                        $user['alt_email']
-                    );
-                    $mailHandler->setVar('NAME', $user['firstname']);
-                    $mailHandler->setVar('USERNAME', $user['username']);
-                    $mailHandler->setVar('PASSWORD', $user['email_pass']);
-                    $mailHandler->send();
-                    return true;
+                if ($user['enabled']) {
+                    $result['NAME'] = $user['firstname'];
+                    $result['USERNAME'] = $user['username'];
+                    $result['PASSWORD'] = $user['email_pass'];
+                    $result['EMAIL'] = $user['alt_email'];
+                    $result['FULLNAME'] = $user['firstname']." ".$user['lastname'];
+                    $result['FIRSTNAME'] = $user['firstname'];
+                    return $result;
                 }
             }
         }
