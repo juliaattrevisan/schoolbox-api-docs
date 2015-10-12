@@ -159,6 +159,42 @@ class Healthcheck
         }
     }
 
+    private function MazeCheckTables()
+    {
+        echo "\nMaze Permission Check - Tables\n";
+        $list[] = 'DF';
+        $list[] = 'KCT';
+        $list[] = 'KCY';
+        $list[] = 'KGC';
+        $list[] = 'KGH';
+        $list[] = 'KSC';
+        $list[] = 'SF';
+        $list[] = 'ST';
+        $list[] = 'STMA';
+        $list[] = 'SU';
+        $list[] = 'TCTD';
+        $list[] = 'TCTQ';
+        $list[] = 'TH';
+        $list[] = 'THTQ';
+        $list[] = 'TT';
+        $list[] = 'TTTG';
+        $list[] = 'UM';
+        sort($list);
+
+        foreach ($list as $table) {
+            echo "  $table : ";
+            $db = new MSSQL();
+            $db->debug = true;
+            $result = $db->query("SELECT TOP 1 * FROM $table");
+            if ($result) {
+                echo "OK\n";
+            } else {
+                echo "\n    Failed - ".mssql_get_last_message()."\n";
+            }
+            unset($db,$result);
+        }
+    }
+
     private function SynergeticCheckTables()
     {
         echo "\nSynergetic Permission Check - Tables\n";
@@ -404,7 +440,7 @@ class Healthcheck
     */
     private function MazeCheckStoredProcedures()
     {
-        echo "\nSchoolpro Permission Check - Stored Procedures\n";
+        echo "\nMaze Permission Check - Stored Procedures\n";
         $db = new MSSQL();
         $db->debug = true;
         $splist[] = array(
