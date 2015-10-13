@@ -33,6 +33,7 @@ if (Config::get('skin_builder')) {
         'accent-foreground' => Config::get('skin_colour_accent_foreground'),
         'accent-background' => Config::get('skin_colour_accent_background'),
         'accent-hover' => Config::get('skin_colour_accent_hover'),
+        'logo-background' => Config::get('skin_colour_logo_background'),
 
         'primary-color'   => Config::get('skin_primary_colour'),
         'secondary-color' => Config::get('skin_secondary_colour'),

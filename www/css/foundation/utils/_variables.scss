@@ -29,6 +29,8 @@ $accent-foreground:                #ffac00 !default;
 $accent-background:                #ffe9bd !default;
 $accent-hover:                     #fff4de !default;
 
+$logo-background:                  #ffffff !default;
+
 /*****************************
  Constants
  ****************************/
@@ -52,9 +54,6 @@ $input-border-color:			   $content-ui-background;
  */
 $row-hover-background:             tint($content-ui-hover, 87%);
 $row-action-hover-background:      darken($content-ui-hover, 7%);
-
-
-
 
 // Colours
 $primary-color:					#0066b0 !default;

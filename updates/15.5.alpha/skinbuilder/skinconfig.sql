@@ -173,7 +173,15 @@ VALUES ('skin_colour_accent_hover',
         'true',
         'false');
 
-
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_logo_background',
+        'Crest Background',
+        'rgb(255, 255, 255)',
+        'The background for your school crest.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
 
 
 
