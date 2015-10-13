@@ -336,16 +336,18 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		&.open {
 		    color: $navigation-hover;
 			background-color: $white;
+
+            /* Little triangle icon next to username
+             */
+            &.dropdown.button::after {
+                border-color: $navigation-hover transparent transparent transparent;
+            }
 		}
 
         /* Little triangle icon next to username
          */
-        &:hover {
-            &.dropdown.button::after {
-                border-color: $navigation-hover transparent transparent transparent;
-            }
-        }
         &.dropdown.button::after {
+            margin-top: -0.625rem;
             border-color: $navigation-background transparent transparent transparent;
         }
 
