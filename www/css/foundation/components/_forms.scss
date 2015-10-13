@@ -340,6 +340,11 @@ input[type=radio]:not(.plain) + label.radio-toggle {
 	width: 1.5rem;
 	text-align: center;
 	@include single-transition(background-color, 0.15s, linear);
+	span:before{
+		@extend .no-text;
+		display: block;
+		float: none;
+	}
 }
 
 input[type=checkbox]:not(.plain):hover + label.checkbox-toggle,
@@ -350,6 +355,10 @@ input[type=radio]:not(.plain):hover + label.radio-toggle {
 input[type=checkbox]:not(.plain):checked + label.checkbox-toggle,
 input[type=radio]:not(.plain):checked + label.radio-toggle {
 	background-color: $success-color;
+	color: $white;
+	[class^="icon-"]{
+		color: $white;
+	}
 }
 
 select.visibility {
