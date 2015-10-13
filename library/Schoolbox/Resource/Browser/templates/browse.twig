@@ -1,0 +1,147 @@
+{# TODO PUT THIS IN THE HEAD SOMEHOW #}
+<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
+
+{% if namespace == 'myFilesBrowser' %}
+    {% set fileController   = 'myFile' %}
+    {% set folderController = 'myFolder' %}
+{% elseif namespace == 'webDavBrowser' %}
+    {% set fileController   = 'networkFile' %}
+    {% set folderController = 'networkFolder' %}
+{% else %}
+    {% set fileController   = 'file' %}
+    {% set folderController = 'category' %}
+{% endif %}
+
+<script type="text/javascript">
+    $(function () {
+
+        {# TODO put this in a new module #}
+        var tree = $('#tree'),
+            metaData         = $('#meta'),
+            listItem         = 'li',
+            folderInfoUri    = '/:id/info',
+            fileInfoUri      = '/file/:id/info';
+
+        tree.resourceTree({
+            data: {
+                cache: {{ treedata | raw }},
+                ajaxParams: {
+                    url: '{{ routeLookup(namespace ~ '.listNodes') }}',
+                    token: '{folderId}'
+                }
+            }
+        });
+
+        {# TODO this will only work if put inside a promise at the end of jstree loading #}
+        {% if folder.id == 0 %}
+        tree.data('jstree').open_node(0);
+        {% endif %}
+
+        tree.on('select_node.jstree', function(event, jstree) {
+
+            if (jstree.node.type == 'file') {
+                loadPanel(metaData, fileInfoUri, jstree.node.li_attr['data-id']);
+            } else {
+                loadPanel(metaData, folderInfoUri, jstree.node.li_attr['data-id']);
+            }
+        });
+
+        $(document).on('dnd_stop.vakata', function (event, data) {
+
+            var $dragged       = $(data.element).closest(listItem),
+                draggedType    = $dragged.data('type'),
+                draggedTypeGen = draggedType == 'file' ? '{{ fileController }}' : '{{ folderController }}',
+                draggedId      = $dragged.data('id'),
+
+                $dropTarget    = $(data.event.srcElement).closest(listItem),
+                dropTargetId   = $dropTarget.data('id'),
+                dropTargetType = $dropTarget.data('type'),
+                dropTargetPerm = $dropTarget.data('permission');
+
+            if (dropTargetType == 'file' || (!(dropTargetPerm == 'write' || dropTargetPerm == 'full'))) {
+                return;
+            }
+
+            /*
+            console.log([
+                'Move', draggedType, draggedId, 'to', dropTargetType, dropTargetId
+            ].join(' '));
+            */
+
+            $.post(
+                '/cms/' + draggedTypeGen + 'Form.php',
+                {
+                    move: draggedId,
+                    categoryID: dropTargetId,
+                    ajax: 1
+                }
+            );
+
+        });
+
+        var $window    = $(window),
+            $hybrid    = $('#hybrid-bar'),
+            $footer    = $('#footer'),
+            $resources = $('#resources');
+
+
+        function rs()
+        {
+            var calcd = $window.height() - $hybrid.height() - $footer.height() - metaData.height() - 120;
+
+            $resources.height(Math.max(200, calcd));
+        }
+
+        function loadPanel(panel, path, nodeId)
+        {
+            var uri = '{{ routeLookup(namespace ~ '.browse') }}'+path.replace(':id', nodeId);
+
+            panel
+                .addClass('loading')
+                .data('nodeId', nodeId)
+
+                {# TODO cache this #}
+                .load(uri, function () {
+                    $(this).removeClass('loading');
+                    $('#container').foundation('tooltip', 'reflow');
+                    rs();
+                });
+
+        }
+
+        rs();
+
+        $(window).on('resize', rs);
+
+        metaData.on('click', '[data-selectnode]', function (e) {
+            e.preventDefault();
+
+            var $anchor = $(this),
+                node    = $anchor.data('selectnode'),
+                target  = tree.find('a[id=' + node + '_anchor]');
+
+            target.trigger('click');
+        });
+
+    });
+</script>
+{# /HEAD #}
+
+<div class="resource-browser row">
+    <div class="small-12 island">
+        <section>
+            <div class="scroller" id="resources">
+                <div id="tree" class="resource-tree"></div>
+            </div>
+        </section>
+    </div>
+    <div class="small-12 island">
+        <section>
+            <div data-ajax id="meta" class="meta-panel">
+                {% include '@resourceBrowser/showFolderInfo.twig' %}
+            </div>
+        </section>
+    </div>
+</div>

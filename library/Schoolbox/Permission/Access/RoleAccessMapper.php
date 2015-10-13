@@ -13,7 +13,9 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
+use Schoolbox\User;
 
 class RoleAccessMapper extends Mapper
 {
@@ -68,7 +70,17 @@ class RoleAccessMapper extends Mapper
      * @return Collection|RoleAccess[]
      * @throws Mapper\Exception
      */
-    public function getGroupPermissions(CategoryModel $category)
+    public function getGroupPermissions(CategoryModel $category) 
+    {
+        return $this->findAllForFolder($category);
+    }
+
+    /**
+     * @param CategoryModel $category
+     * @return Collection|RoleAccess[]
+     * @throws Mapper\Exception
+     */
+    public function findAllForFolder(CategoryModel $category)
     {
         // Get permissions for all roles, regardless of whether there's one in
         // the database for this category.
@@ -169,4 +181,28 @@ class RoleAccessMapper extends Mapper
         // noop
         return false;
     }
+
+
+    /**
+     * @param User $user
+     * @param int  $serviceIdentifier
+     * @param int  $service
+     * @return RoleAccess
+     */
+    public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE)
+    {
+        // let's avoid fatal errors in the face of unexpected failure
+        if (!$user->getRole() instanceof Role) {
+            $ra = new RoleAccess();
+            $ra->setType(UserAccess::ACCESS_DENY);
+            return $ra;
+        }
+        return $this->findOneByColumnList(
+            array(
+                'cid' => $serviceIdentifier,
+                'gid' => $user->getRole()->getId()
+            )
+        );
+    }
+
 }

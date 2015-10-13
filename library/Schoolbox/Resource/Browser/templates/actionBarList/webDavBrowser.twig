@@ -1,0 +1,13 @@
+{% if folder.id == 0 %}
+    <li><a class="icon-folder"   data-action="folder"   href="/cms/networkFolder/new/{{ folder.id }}">Add Folder</a></li>
+{% else %}
+    {% if access >= 2 or user.isSuperuser %}
+        <li><a class="icon-modify"   data-action="modify"   href="/cms/networkFolder/{{ folder.id }}">Modify</a></li>
+        <li><a class="icon-drop-box" data-action="file"     href="/cms/networkFile/new/{{ folder.id }}">Post File</a></li>
+        <li><a class="icon-folder"   data-action="folder"   href="/cms/networkFolder/new/{{ folder.id }}">Add Folder</a></li>
+        <li><a class="icon-download" data-action="download" href="#">Download</a></li>
+    {% endif %}
+    {% if access >= 2 or user.isSuperuser %}
+        <li><a class="icon-delete"   data-action="delete"   href="#">Delete</a></li>
+    {% endif %}
+{% endif %}

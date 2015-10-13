@@ -1,0 +1,145 @@
+{#<ul class="information-list">#}
+{% if access > 0 or user.isSuperuser %}
+
+<ul class="breadcrumb">
+    {% for node in tree %}
+        <li><a data-selectnode="{{ node.categoryId }}" href="/resources/{{ node.categoryId }}">{{ node.name }}</a></li>
+    {% endfor %}
+</ul>
+
+<div class="row">
+    <div class="small-4 column text-center">
+        <a{% if folder.hasHomepage %} title="View Homepage" href="/homepage/{{ folder.id }}"{% endif %}>
+        <img class="icon" src="/images/icons/128x128/{{ folder.folderType }}.png" alt="{{ folder.name }}"/>
+        </a>
+    </div>
+    <div class="small-8 column">
+        <div class="actions-small-1">
+            <div class="list-item">
+                <a{% if folder.hasHomepage %} title="View Homepage" href="/homepage/{{ folder.id }}"{% endif %}>
+                    <h3>
+                        {{ folder.name }}
+                        {% if folder.codeString %}
+                            ({{ folder.codeString }})
+                        {% endif %}
+                    </h3>
+                </a>
+            </div>
+            <nav>
+                <a href="#" class="icon-eye" data-reveal-id="modal-folder-{{ folder.id }}"></a>
+            </nav>
+        </div>
+        <ul class="inline-list">
+
+        {% if folder.group.category %}
+
+            {% if folder.codeString and folder.teachers|length > 0 %}
+                {% set type = 'class' %}
+            {% else %}
+                {% set type = 'group' %}
+            {% endif %}
+
+            {#<h4>Group</h4>#}
+            {#<h5 class="subheader">Administrator</h5>#}
+            <li>
+                {% if folder.group.private   %}<span data-tooltip aria-haspopup="true" class="has-tip" title="Users cannot see or join this {{ type }} unless added by an admin">Private {{ type | capitalize }}</span>{% endif %}
+                {% if folder.group.moderated %}<span data-tooltip aria-haspopup="true" class="has-tip" title="Users can join, but only once access is approved by an admin">Moderated {{ type | capitalize }}</span>{% endif %}
+                {% if folder.group.free      %}<span data-tooltip aria-haspopup="true" class="has-tip" title="Can be joined or left by anyone at any time">Open {{ type | capitalize }}</span>{% endif %}
+            </li>
+
+        {% elseif folder.codeString and folder.teachers|length > 0 %}
+            <li>Class</li>
+        {% else %}
+            <li>Folder</li>
+        {% endif %}
+        </ul>
+
+
+
+
+
+
+
+        {% set actionBarList %}
+            {# Actions differ by namespace #}
+            {% if namespace == 'myFilesBrowser' %}
+                {% include '@resourceBrowser/actionBarList/myFilesBrowser.twig' %}
+            {% elseif namespace == 'webDavBrowser' %}
+                {% include '@resourceBrowser/actionBarList/webDavBrowser.twig' %}
+            {% else %}
+                {% include '@resourceBrowser/actionBarList/resourceBrowser.twig' %}
+            {% endif %}
+        {% endset %}
+
+        {% include '@resourceBrowser/actionBar.twig' with { id: 'folder-actions', list: actionBarList, sizing: { small: 1, medium: 2, large: 2, xlarge: 4, xxlarge: 2 } } %}
+
+    <div class="reveal-modal" id="modal-folder-{{ folder.id }}" data-reveal>
+
+        <h2>{{ folder.name }}</h2>
+
+        <dl class="inline-dl">
+
+    {% if (folder.codeString and folder.teachers|length > 0) or folder.group.category %}
+        {% if folder.group.category %}
+            <dt class="small-12 medium-4">Group Administrator</dt>
+            <dd class="small-12 medium-8">
+                <div class="avatar card tiny">
+                    <a {% if admin.id %}href="/search/user/{{ admin.id }}"{% endif %}>
+                        <img src="/portrait.php?size=square64&userId={{ admin.externalId }}" alt="{{ admin.formatName }}" />
+                        <p>{{ admin.formatName }}</p>
+                    </a>
+                </div>
+            </dd>
+        {% endif %}
+        {% if folder.teachers %}
+        <dt class="small-12 medium-4">Teacher{{ folder.teachers.count == 1 ? '' : 's' }}</dt>
+            {% for i, teacher in folder.teachers %}
+            <dd class="small-12 medium-8{% if i > 0 %} medium-offset-4{% endif %}">
+                <div class="avatar card tiny">
+                    <a href="/search/user/{{ teacher.id }}">
+                        <img src="/portrait.php?size=square48&userId={{ teacher.externalId }}" alt="{{ teacher.formatName }}" />
+                        <p>{{ teacher.formatName }}</p>
+                    </a>
+                </div>
+            </dd>
+            {% endfor %}
+        {% endif %}
+    {% endif %}
+        </dl>
+
+    {% if namespace == 'resourceBrowser' %}
+        <h3>Permissions</h3>
+        <dl class="inline-dl">
+    {% if user.role.type == 'staff' and folder.id > 0 %}
+        {% for access in roles %}
+            <dt class="small-8">{{ access.role.name }}</dt>
+            <dd class="small-4">
+                {%- if access.type == 0 %}None{% endif -%}
+                {%- if access.type == 1 %}Read{% endif -%}
+                {%- if access.type == 2 %}Write{% endif -%}
+            </dd>
+        {% endfor %}
+    {% endif %}
+
+        </dl>
+    {% endif %}
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+
+    </div>
+
+
+
+
+    </div>
+</div>
+
+
+{% else %}
+<li>
+    <img class="icon" src="/images/core/icons/error-icon.png" alt="No access"/>
+    <h3>No access</h3>
+</li>
+{% endif %}
+{#</ul>#}
+{#{{ dump(admin) | raw }}#}
+

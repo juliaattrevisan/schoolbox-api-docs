@@ -27,6 +27,17 @@ class Portrait extends BaseTransformation
                 'method' => 'Sharpen'
             ),
         ),
+        'square48' => array(
+            array(
+                'method' => 'Square',
+                'args' => array(
+                    'width' => 48,
+                )
+            ),
+            array(
+                'method' => 'Sharpen'
+            ),
+        ),
         'square64' => array(
             array(
                 'method' => 'Square',

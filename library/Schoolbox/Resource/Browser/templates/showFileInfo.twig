@@ -1,0 +1,125 @@
+{% set portrait = '/portrait.php?size=square48&userId=' %}
+{% set mime     = '/images/mime/128x128/' %}
+
+
+{% if namespace == 'resourceBrowser' %}
+    {% set send   = '/send.php?id=' %}
+    {% set image  = '/cms/image.php?id=' %}
+    {% set modify = '/cms/file/' %}
+
+{% elseif namespace == 'myFilesBrowser' %}
+    {% set send   = '/cms/sendMyFile.php?id=' %}
+    {% set image  = '/cms/myImage.php?id=' %}
+    {% set modify = '/cms/myFile/' %}
+
+{% else %}
+    {% set send   = '/cms/sendNetworkFile.php?id=' %}
+    {% set image  = '/cms/networkImage.php?id=' %}
+    {% set modify = '/cms/networkFile/' %}
+
+{% endif %}
+
+
+{% if access > 0 %}
+
+<ul class="breadcrumb" id="breadcrumbs">
+    {% for node in tree %}
+        <li><a data-selectnode="{{ node.categoryId }}" href="/resources/{{ node.categoryId }}">{{ node.name }}</a></li>
+    {% endfor %}
+</ul>
+
+<div class="row">
+    <div class="small-4 column text-center">
+        {% if file.mimetype.isImage %}
+            <img class="icon" src="{{ image ~ file.id }}&width=128&height=128" alt="{{ file.title }}" />
+        {% else %}
+            <img class="icon" src="{{ mime ~ file.mimetype.iconFile }}" alt="{{ file.title }}" />
+        {% endif %}
+    </div>
+    <div class="small-8 column">
+        <div class="actions-small-1">
+            <div class="list-item">
+                <h3>{{ file.title }}</h3>
+            </div>
+            <nav>
+                <a href="#" class="icon-eye" data-reveal-id="modal-file-{{ file.id }}"></a>
+            </nav>
+        </div>
+        {% if namespace == 'resourceBrowser' and file.description %}
+            <p>{{ file.description }}</p>
+        {% else %}
+            <p>{{ file.mimetype.description }}</p>
+        {% endif %}
+
+
+        {% set fileActionList %}
+
+            <li><a class="icon-document" data-action="open"     href="{{ send ~ file.id }}" target="_blank">Open</a></li>
+            <li><a class="icon-download" data-action="download" href="{{ send ~ file.id }}&save=1">Download</a></li>
+            {% if access >= 2 %}
+                <li><a class="icon-modify"   data-action="modify"   href="{{ modify ~ file.id }}">Modify</a></li>
+                <li><a class="icon-delete"   data-action="delete"   href="#">Delete</a></li>
+            {% endif %}
+
+        {% endset %}
+
+        {% include '@resourceBrowser/actionBar.twig' with { id: 'file-actions', list: fileActionList, sizing: { small: 1, medium: 2, large: 2, xlarge: 4, xxlarge: 2 } } %}
+
+        <div class="reveal-modal" data-reveal id="modal-file-{{ file.id }}">
+
+            <h2>{{ file.title }}</h2>
+
+        <dl class="inline-dl">
+            {% if namespace == 'resourceBrowser' %}
+            <dt class="small-12 medium-4">Uploaded by</dt>
+            <dd class="small-12 medium-8">
+                <div class="avatar card tiny">
+                    <a href="/search/user/{{ file.owner.id }}">
+                        <img src="{{ portrait ~ file.owner.externalId }}" alt="{{ file.owner.formatName }}" />
+                        <p>{{ file.owner.formatName }}</p>
+                    </a>
+                </div>
+            </dd>
+            {% endif %}
+
+            <dt class="small-12 medium-4">Filesize</dt>
+            <dd class="small-12 medium-8">{{ file.size | bytes }}</dd>
+
+            <dt class="small-12 medium-4">Created</dt>
+            <dd class="small-12 medium-8">{{ file.createdAt.dateOnly }}</dd>
+
+            {% if namespace == 'resourceBrowser' %}
+                {% if file.createdAt.unixTimestamp != file.modifiedAt.unixTimestamp %}
+                    <dt class="small-12 medium-4">Last modified</dt>
+                    <dd class="small-12 medium-8">{{ file.modifiedAt.dateOnly }}</dd>
+                {% endif %}
+            {% endif %}
+
+            <dt class="small-12 medium-4">Original File</dt>
+            <dd class="small-12 medium-8">{{ file.filename }} ({{ file.mime }})</dd>
+
+            {% if namespace == 'resourceBrowser' %}
+                <dt class="small-12 medium-4">Hidden</dt>
+                <dd class="small-12 medium-8">
+                    <span data-tooltip aria-haspopup="true" class="has-tip" title="Visible to users with {{ file.hidden ? 'write' : 'read' }} access to the folder">{{ file.hidden ? 'Yes' : 'No' }}</span>
+                </dd>
+            {% endif %}
+
+            <dt class="small-12 medium-4">Direct Link</dt>
+            <dd class="small-12 medium-8">
+                <a href="{{ send ~ file.id }}">{{ host ~ send ~ file.id }}</a>
+            </dd>
+        </dl>
+
+            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+
+        </div>
+
+    </div>
+</div>
+{% else %}
+<li>
+    <img class="icon" src="/images/core/icons/error-icon.png" alt="No access"/>
+    <h3>No access</h3>
+</li>
+{% endif %}

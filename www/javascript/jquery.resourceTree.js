@@ -23,7 +23,8 @@
                     url:      '/ajax/jstree.php',
                     type:     'GET',
                     data:     {},
-                    dataType: 'json'
+                    dataType: 'json',
+                    token:    null
                 },
                 ajaxDataParam: 'parent'
             },
@@ -40,8 +41,14 @@
                             callback(children);
                         }
                         else {
-                            var ajaxParams = self.options.data.ajaxParams;
-                            ajaxParams.data[self.options.data.ajaxDataParam] = node.id;
+                            var ajaxParams = $.extend(true, {}, self.options.data.ajaxParams);
+
+                            if (ajaxParams.token) {
+                                ajaxParams.url = ajaxParams.url.replace(new RegExp(ajaxParams.token), node.id);
+                            } else {
+                                ajaxParams.data[self.options.data.ajaxDataParam] = node.id;
+                            }
+
                             $.ajax(ajaxParams)
                                 .done(function(data) {
                                     self.cache = self.cache.concat(data);
@@ -61,6 +68,11 @@
                             if (!(permission == 'write' || permission == 'full')) {
                                 return false;
                             }
+
+                            // also check that you're not trying to drag onto a file
+                            if (node_parent.original.type == 'file') {
+                                return false;
+                            }
                         }
                         return true;
                     },
@@ -71,8 +83,9 @@
                         responsive: false
                     }
                 },
-                plugins : ['dnd', 'sort', 'types'],
+                plugins : ['dnd', 'sort', 'types', 'wholerow'],
                 dnd: {
+                    touch: false, // no dragging on touch screen thanks
                     copy: false,
                     is_draggable: function(nodes) {
                         var isDraggable = true;
@@ -88,19 +101,22 @@
                 },
                 types: {
                     root: {
-                        icon: '/images/tree/server.gif'
+                        icon: 'icon-folder'
                     },
                     'default': {
-                        icon: '/images/icons/22x22/folder.png'
+                        icon: 'icon-unknown'
+                    },
+                    file: {
+                        icon: 'icon-document'
                     },
                     folder: {
-                        icon: '/images/icons/22x22/folder.png'
+                        icon: 'icon-folder'
                     },
                     homepage: {
-                        icon: '/images/icons/22x22/home.png'
+                        icon: 'icon-home'
                     },
                     course: {
-                        icon: '/images/famicons/chart_curve.png'
+                        icon: 'icon-course-builder'
                     }
                 }
             }

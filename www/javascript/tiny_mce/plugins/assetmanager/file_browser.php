@@ -1,4 +1,10 @@
 <?php
+
+use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 $page = new SitePage;
@@ -12,8 +18,7 @@ if (!is_numeric($_GET['categoryID'])) {
     die('Invalid category id');
 }
 
-$groupHandler = new Group;
-$categoryMapper = Schoolbox\Resource\Folder\Mapper::getInstance();
+$categoryMapper = Folder\Mapper::getInstance();
 $fileMapper = Schoolbox\Resource\File\Mapper::getInstance();
 
 $output = array('FILE_CATEGORY_ID'	=> $_GET['categoryID'],
@@ -21,10 +26,12 @@ $output = array('FILE_CATEGORY_ID'	=> $_GET['categoryID'],
                 );
 $page->setVar($output);
 
-$treeBuilder = new Schoolbox\Resource\Folder\TreeBuilder(
-    $categoryMapper,
-    Schoolbox\Assessment\Course\TaskMapper::getInstance(),
-    $groupHandler
+$treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
+    Folder\Mapper::getInstance(),
+    TaskMapper::getInstance(),
+    UserAccessMapper::getInstance(),
+    RoleAccessMapper::getInstance(),
+    $_SESSION['user']
 );
 $page->setVar('TREEDATA', json_encode($treeBuilder->buildPartialTree($_GET['categoryID'])));
 

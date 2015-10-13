@@ -1,16 +1,24 @@
 <?php
 
+/**
+ * @deprecated this file is deprecated in favour of Schoolbox\Resource\Browser\AbstractController::listNodes()
+ */
+
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 // Open session after bootstrap, otherwise $_SESSION[user] won't be a user.
 $page = new SitePage;
 
-use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
 
-$treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
-    CategoryMapper::getInstance(),
+$treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
+    Folder\Mapper::getInstance(),
     TaskMapper::getInstance(),
-    new Group()
+    UserAccessMapper::getInstance(),
+    RoleAccessMapper::getInstance(),
+    $_SESSION['user']
 );
 
 header('Content-Type: application/json');

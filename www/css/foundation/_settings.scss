@@ -113,6 +113,7 @@ $xlarge-down: "#{$screen} and (max-width:#{upper-bound($xlarge-range)})" !defaul
 
 $xxlarge-up: "#{$screen} and (min-width:#{lower-bound($xxlarge-range)})";
 $xxlarge-only: "#{$screen} and (min-width:#{lower-bound($xxlarge-range)}) and (max-width:#{upper-bound($xxlarge-range)})";
+$xxlarge-down: "#{$screen} and (max-width:#{upper-bound($xxlarge-range)})" !default;
 
 // Legacy
 // $small: $medium-up;

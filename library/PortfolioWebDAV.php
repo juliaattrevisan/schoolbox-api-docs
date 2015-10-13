@@ -1,5 +1,7 @@
 <?php
 use Alaress\File\Remote\FetcherInterface;
+use Schoolbox\Collection;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\File\ILocator as FileLocatorInterface;
@@ -126,6 +128,9 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     /** @var Resource\File\Mapper */
     protected $fileMapper;
 
+    /** @var MimetypeMapper */
+    protected $mimeMapper;
+
     /**
      * @param \Sabre_DAV_Client_Extended $client
      * @param array $paths List of paths from the baseUri to access
@@ -141,6 +146,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
         $this->folderMapper = Resource\Folder\Mapper::getInstance();
         $this->fileMapper   = Resource\File\Mapper::getInstance();
+        $this->mimeMapper   = MimetypeMapper::getInstance();
 
         $this->buildTree();
     }
@@ -898,7 +904,9 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $folder = $this->folderMapper->createModel();
 
         $parent = $this->folderMapper->createModel();
-        $parent->setId($data['parent']);
+
+        // if no parent, cast to '#'
+        $parent->setId($data['parent'] === false ? '#' : $data['parent']);
 
         $folder->setId($data['id']);
         $folder->setParent($parent);
@@ -927,6 +935,11 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $file->setTitle($data['description']);
         $file->setSize($data['file_size']);
         $file->setOwner($owner);
+        try {
+            $file->setMimetype($this->mimeMapper->getByFilename($data['name']));
+        } catch (\Schoolbox\File\Exception $e) {
+            $file->setMimetype($this->mimeMapper->getUnknownMime());
+        }
 
         return $file;
     }
@@ -935,11 +948,11 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
      * Return the files contained within the folder with the given ID
      *
      * @param int $nodeId
-     * @return FileInterface[]
+     * @return Collection|FileInterface[]
      */
     public function findByFolderId($nodeId)
     {
-        $files = array();
+        $files = new Collection();
         $data  = $this->getAllInFolder($nodeId);
 
         if (!is_array($data)) {
@@ -947,7 +960,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         }
 
         foreach ($data as $node) {
-            $files[] = $this->parseFile($node);
+            $files->add($this->parseFile($node));
         }
 
         return $files;
@@ -957,11 +970,11 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
      * Return the folders contained within the folder with the given ID
      *
      * @param int $nodeId
-     * @return FolderInterface[]
+     * @return Collection|FolderInterface[]
      */
     public function findByParentId($nodeId)
     {
-        $folders = array();
+        $folders = new Collection();
         $data    = $this->getFolderList($nodeId);
 
         if (!is_array($data)) {
@@ -969,7 +982,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         }
 
         foreach ($data as $node) {
-            $folders[] = $this->parseFolder($node);
+            $folders->add($this->parseFolder($node));
         }
 
         return $folders;

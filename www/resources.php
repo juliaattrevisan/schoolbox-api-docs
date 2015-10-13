@@ -2,8 +2,10 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
-use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
 
 $this->setFile(TEMPLATE_content, 'resources.html');
 $this->setBlock(TEMPLATE_content, 'file_list', 'file_list_block');
@@ -48,7 +50,7 @@ $this->parse('multi_file_detail_block', 'multi_file_detail', false);
 $groupHandler = new Group;
 $allowedFiles = new AllowedFile;
 
-$categoryMapper = CategoryMapper::getInstance();
+$categoryMapper = Folder\Mapper::getInstance();
 
 if (is_numeric($this->arg[0])) {
     $_SESSION['resourcesID'] = $this->arg[0];
@@ -73,15 +75,17 @@ try {
     $openCategory = $e->getDeletedObject()->getParent();
 }
 catch (Schoolbox\Mapper\Exception $e) {
-    $openCategory = new \Schoolbox\Resource\Category();
+    $openCategory = $categoryMapper->createModel();
     $openCategory->setId(0);
 }
 
 // Build a tree up to the last resource we looked at
-$treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
-    $categoryMapper,
+$treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
+    Folder\Mapper::getInstance(),
     TaskMapper::getInstance(),
-    $groupHandler
+    UserAccessMapper::getInstance(),
+    RoleAccessMapper::getInstance(),
+    $_SESSION['user']
 );
 
 // output folders, column 1 - now done via jsTree and TREEDATA

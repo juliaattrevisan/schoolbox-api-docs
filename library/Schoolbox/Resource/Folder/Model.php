@@ -10,12 +10,14 @@
 namespace Schoolbox\Resource\Folder;
 
 
+use Schoolbox\RoleMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\CategoryCode;
 use Schoolbox\Resource\HomepageConfig;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -69,7 +71,7 @@ class Model extends AbstractFolder implements ISoftDeletable
     /**
      * A collection of user instances
      *
-     * @var Collection
+     * @var Collection|User[]
      */
     protected $teacher_collection;
 

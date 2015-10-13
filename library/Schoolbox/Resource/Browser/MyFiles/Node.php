@@ -15,8 +15,8 @@ namespace Schoolbox\Resource\Browser\MyFiles;
 
 
 use Schoolbox\Mapper;
-use Schoolbox\MyFileMapper;
-use Schoolbox\MyFolderMapper;
+use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
+use Schoolbox\Resource\My\Folder\Mapper as MyFolderMapper;
 use Schoolbox\Resource\Browser\AbstractNode;
 
 /**

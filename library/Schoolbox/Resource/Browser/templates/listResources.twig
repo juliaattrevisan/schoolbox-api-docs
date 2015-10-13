@@ -1,0 +1,9 @@
+{% for file in files %}
+<li style="background-image: url(/images/mime/22x22/{{ file.mimetype.iconFile }})">
+    <a data-id="{{ file.id }}" href="/send.php?id={{ file.id }}" title="{{ file.filename }}">
+        {{ file.title }}
+    </a>
+</li>
+{% else %}
+<li><a>No files</a></li>
+{% endfor %}

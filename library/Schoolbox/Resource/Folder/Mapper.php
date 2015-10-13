@@ -612,6 +612,14 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      */
     public function findById($id)
     {
+        // special case: 0 == root, but not in db
+        if ($id == 0) {
+            return $this->createModel()
+                        ->setId(0)
+                        ->setName('Root')
+                        ->setParent($this->createModel()->setId('#'));
+        }
+
         $query = $this->getFindQuery();
         $query .= 'WHERE c.id=?';
         $statement = $this->database->prepare($query);

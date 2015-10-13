@@ -181,4 +181,28 @@ class Session extends BaseSession {
         return $this->requestTime;
     }
 
+
+    /**
+     * @param string $key
+     * @param mixed  $alt
+     * @param string $namespace
+     * @return mixed
+     */
+    public function get($key, $alt = null, $namespace = null)
+    {
+        return $this->getSegment($namespace)->get($key, $alt);
+    }
+
+
+    /**
+     * @param string $key
+     * @param string $value
+     * @param string $namespace
+     * @return void
+     */
+    public function set($key, $value, $namespace = null)
+    {
+        $this->getSegment($namespace)->set($key, $value);
+    }
+
 }
