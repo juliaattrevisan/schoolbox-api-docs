@@ -19,6 +19,7 @@ if (Config::get('skin_builder')) {
     $vars = [
         'primary-foreground' => Config::get('skin_colour_primary_foreground'),
         'primary-background' => Config::get('skin_colour_primary_background'),
+        'primary-hover' => Config::get('skin_colour_primary_hover'),
         
         'primary-color'     => Config::get('skin_primary_colour'),
         'secondary-color'   => Config::get('skin_secondary_colour'),

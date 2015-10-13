@@ -17,7 +17,7 @@ INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_
 VALUES ('skin_colour_primary_foreground',
         'Primary Foreground Colour',
         'rgb(255, 255, 255)',
-        'Used for main navigation',
+        'Used for main navigation icon colours and label colours.',
         '11',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
@@ -27,13 +27,21 @@ INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_
 VALUES ('skin_colour_primary_background',
         'Primary Background Colour',
         'rgb(76, 102, 176)',
-        'Used for main navigation',
+        'Used for main navigation background. This inverts with Primary Foreground colour in the Search panel.',
         '11',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
         'false');
 
-
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_primary_hover',
+        'Primary Hover/Accent Colour',
+        'rgb(133, 82, 201)',
+        'Used for main navigation hover and accent (border) colours in the Search field.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
 
 
 
