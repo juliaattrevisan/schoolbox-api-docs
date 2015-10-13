@@ -332,7 +332,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		&:hover,
 		&.open {
 		    color: $off-canvas-hover;
-			background-color: $white;
+			background-color: $off-canvas-bg;
 
             /* Little triangle icon next to username
              */
