@@ -23,6 +23,7 @@ if (Config::get('skin_builder')) {
         'off-canvas-foreground' => Config::get('skin_colour_offcanvas_foreground'),
         'off-canvas-background' => Config::get('skin_colour_offcanvas_background'),
         'off-canvas-hover' => Config::get('skin_colour_offcanvas_hover'),
+        'off-canvas' => Config::get('skin_colour_off_canvas'),
         'content-ui-foreground' => Config::get('skin_colour_content_ui_foreground'),
         'content-ui-background' => Config::get('skin_colour_content_ui_background'),
         'content-ui-hover' => Config::get('skin_colour_content_ui_hover'),

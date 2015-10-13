@@ -74,9 +74,9 @@ VALUES ('skin_colour_offcanvas_hover',
         'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
-VALUES ('skin_off_canvas_bg_colour',
+VALUES ('skin_colour_off_canvas',
         'Off-Canvas Colour',
-        'rgb(255, 255, 255)',
+        'rgb(1, 52, 0)',
         'Set the colour behind the left and right columns',
         '11',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
