@@ -117,16 +117,15 @@ if (count($unitList) > 0) {
             $this->parse('class_import_forbidden_block', 'class_import_forbidden');
         }
         else {
-            try {
-                Task\InstanceMapper::getInstance()->findOneByColumnList(
-                    array(
-                        'task_id'                 => $task->getId(),
-                        'course_unit_instance_id' => $unit->getId(),
-                    )
-                );
+            $taskList = Task\InstanceMapper::getInstance()->findByColumnList(
+                array(
+                    'task_id'                 => $task->getId(),
+                    'course_unit_instance_id' => $unit->getId(),
+                )
+            );
+            if ($taskList->count() > 0) {
                 $this->parse('class_import_exists_block', 'class_import_exists');
-            }
-            catch (Exception $e) {
+            } else {
                 $exportableCount++;
                 $this->parse('class_import_allowed_block', 'class_import_allowed');
                 $this->parse('class_import_checkbox_block', 'class_import_checkbox');
