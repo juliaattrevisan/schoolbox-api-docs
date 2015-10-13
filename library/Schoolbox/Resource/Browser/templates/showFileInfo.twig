@@ -7,10 +7,15 @@
     {% set image  = '/cms/image.php?id=' %}
     {% set modify = '/cms/file/' %}
 
-{% else %}
+{% elseif namespace == 'myFilesBrowser' %}
     {% set send   = '/cms/sendMyFile.php?id=' %}
     {% set image  = '/cms/myImage.php?id=' %}
     {% set modify = '/cms/myFile/' %}
+
+{% else %}
+    {% set send   = '/cms/sendNetworkFile.php?id=' %}
+    {% set image  = '/cms/networkImage.php?id=' %}
+    {% set modify = '/cms/networkFile/' %}
 
 {% endif %}
 
