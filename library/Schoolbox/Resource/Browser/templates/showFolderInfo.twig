@@ -62,7 +62,13 @@
 
         {% set actionBarList %}
             {# Actions differ by namespace #}
-            {% include '@resourceBrowser/actionBarList/resourceBrowser.twig' %}
+            {% if namespace == 'myFilesBrowser' %}
+                {% include '@resourceBrowser/actionBarList/myFilesBrowser.twig' %}
+            {% elseif namespace == 'webDavBrowser' %}
+                {% include '@resourceBrowser/actionBarList/webDavBrowser.twig' %}
+            {% else %}
+                {% include '@resourceBrowser/actionBarList/resourceBrowser.twig' %}
+            {% endif %}
         {% endset %}
 
         {% include '@resourceBrowser/actionBar.twig' with { id: 'folder-actions', list: actionBarList, sizing: { small: 1, medium: 2, large: 2, xlarge: 4, xxlarge: 2 } } %}
