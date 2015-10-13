@@ -12,9 +12,9 @@ $navigation-foreground:            #ffffff !default;
 $navigation-background:            #4c00b0 !default;
 $navigation-hover:                 #8552c9 !default;
 
-$off-canvas-foreground:             #00ce0a !default;
-$off-canvas-background:             #028900 !default;
-$off-canvas-hover:                  #9effab !default;
+$off-canvas-foreground:            #00ce0a !default;
+$off-canvas-background:            #028900 !default;
+$off-canvas-hover:                 #9effab !default;
 
 $content-ui-foreground:            #ff39a8 !default;
 $content-ui-background:            #ffcce8 !default;
@@ -32,11 +32,11 @@ $accent-hover:                     #fff4de !default;
  Constants
  ****************************/
 
-/* Off Canvas Background is always white
+/*
  * Islands are also always white
  * Content text is always black
  */
-$off-canvas-bg:				       $white !default;
+
 
 /* A specific var for input element borders
  * By default this is connected to the skin builder var
