@@ -6,6 +6,20 @@
 <script type="text/javascript">
     Dropzone.autoDiscover = false;
 </script>
+
+<style type="text/css">
+    .component {
+        background-color: #a0a0a0;
+    }
+</style>
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
+<script type="text/javascript">
+    $(function() {
+        /* Collapse content on components
+         */
+        $('[data-component]').find('[data-collapser=true]').collapsable();
+    });
+</script>
 <!-- END custom_head -->
 
     <div class="row">
@@ -26,30 +40,28 @@
                             (see markup for examples). These stack in the same way as column sizings, so you can have different
                             numbers of actions on different viewports.
                         </li>
+                        <li>
+                            Component title bars inherit from Masonry configuration on all
+                            component-based pages (Dashboard, Homepage, ePortfolio)
+                            A colour has been hardcoded in the pantry to demonstrate usage.
+                        </li>
                     </ul>
-
                 </li>
             </ul>
-            <nav class="top-bar" data-topbar>
-                <ul class="title-area">
-                    <!-- Title Area -->
-                    <li class="name">
-                        <h2>
-                            <a href="#">English Unit 1 Files</a>
-                        </h2>
-                    </li>
-                    <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
-                </ul>
-                <section class="top-bar-section">
-                    <!-- Right Nav Section -->
-                    <ul class="right">
-                        <li class="divider"></li>
-                        <li><a href="#" class="component-control-button settings edit button icon-settings no-text" title="Settings"></a></li>
-                        <li class="divider"></li>
-                        <li><a href="#" class="button no-text icon-close" data-target="delete-it" title="Remove"></a></li>
-                    </ul>
-                </section>
-            </nav>
+            <ul class="component information-list">
+                <li class="actions-small-3">
+                    <div class="list-item">
+                        <div class="small-12 card">
+                            <h2><a href="">Example Component Titlebar</a></h2>
+                        </div>
+                    </div>
+                    <nav>
+                        <a data-target='settings' data-state='closed' href="#" class="icon-settings settings edit" title="Settings"></a>
+                        <a data-collapser="true" href="#" class="icon-collapse collapse" title="Collapse Content"></a>
+                        <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
+                    </nav>
+                </li>
+            </ul>
             <div data-component>
                 <div class="row">
                     <div class="small-12 island">
@@ -625,24 +637,20 @@ $(function () {
     <div class="row">
         <div class="small-12 columns">
             <h1>Social Stream - action-list</h1>
-            <nav class="top-bar" data-topbar>
-                <ul class="title-area">
-                    <!-- Title Area -->
-                    <li class="name">
-                        <h2><a href="#">Social Stream</a></h2>
-                    </li>
-                    <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
-                </ul>
-                <section class="top-bar-section">
-                    <!-- Right Nav Section -->
-                    <ul class="right">
-                        <li class="divider"></li>
-                        <li><a href="#" class="component-control-button settings edit button icon-settings" title="SS Settings">Settings</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#" class="button icon-close no-text" data-target="delete-it" title="Close"></a></li>
-                    </ul>
-                </section>
-            </nav>
+            <ul class="component information-list">
+                <li class="actions-small-3">
+                    <div class="list-item">
+                        <div class="small-12 card">
+                            <h2><a href="">Example Component Titlebar</a></h2>
+                        </div>
+                    </div>
+                    <nav>
+                        <a data-target='settings' data-state='closed' href="#" class="icon-settings settings edit" title="Settings"></a>
+                        <a data-collapser="true" href="#" class="icon-collapse collapse" title="Collapse Content"></a>
+                        <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
+                    </nav>
+                </li>
+            </ul>
             <div class="delete-it">
                 <p>Are you sure you want to remove this component? <a href="#" class="success button">Yes</a> <a href="#" class="button">No</a></p>
             </div>
