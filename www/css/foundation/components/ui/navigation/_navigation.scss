@@ -273,6 +273,10 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 
 // Logo - Side Bar
 .left-off-canvas-menu{
+    .logo-wrapper {
+        padding: 2rem 0;
+        background-color: $logo-background;
+    }
     .logo {
         @media #{$medium-down} {
             display: none !important;
