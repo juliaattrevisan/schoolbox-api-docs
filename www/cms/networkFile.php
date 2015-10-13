@@ -1,5 +1,8 @@
 <?php
 
+use Schoolbox\Breadcrumbs;
+use Schoolbox\Resource\Attachment\GenericZone;
+
 if (!Cfg::get('webdav_enable')) {
     error(2);
 }
@@ -7,6 +10,15 @@ if (!Cfg::get('webdav_enable')) {
 $fileHandler = PortfolioWebDAV::factory();
 $folderHandler = $fileHandler;
 
+// This goes into storage on its way into webdav.
+// Is that okay?
+$zone = new GenericZone('cms', Schoolbox\Resource\Storage\Mapper::getInstance());
+$zone->setAttachmentsLabel('')
+    ->setAttachPrompt('Post file')
+    ->setMimeFilter('*/*')
+    ->setMulti(false)
+    ->setThumbnailSize(64)
+    ->setModalTitle('Select file');
 
 if (is_numeric($this->arg[0])) {
 
@@ -34,10 +46,24 @@ if (is_numeric($this->arg[0])) {
         'PARENT_ID' => $file['parent'],
     );
     $this->setVar($output);
+    $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
     $this->setBlock(TEMPLATE_content, 'location', 'location_block');
     $this->setVar('location_block', '');
 
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text'  => "Drives",
+            'href'  => "/cms/network/".$file['parent'],
+            'class' => '',
+        ],
+        [
+            'text' => 'Modify File',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }
 elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
@@ -54,7 +80,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     $this->setTab('mynetwork');
 
     $output = array(
-        'ACTION' => 'Add',
+        'ACTION' => 'Post',
         'FILE_ID' => '',
         'DESCRIPTION' => '',
         'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
@@ -62,11 +88,26 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     );
 
     $this->setVar($output);
+    $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
     $this->setBlock(TEMPLATE_content, 'desc', 'desc_block');
     $this->setBlock(TEMPLATE_content, 'location', 'location_block');
     $this->setVar('desc_block', '');
     $this->setVar('location_block', '');
+
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text'  => "Drives",
+            'href'  => "/cms/network/".$parent['id'],
+            'class' => '',
+        ],
+        [
+            'text' => 'Post File',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
 }
 else {
     error(2);

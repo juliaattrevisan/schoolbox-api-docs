@@ -1,55 +1,52 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript">
-
-    $(function () {
-        $('.prettify').prettyFileInput({
-            additionalButtonClasses:'no-marg float-left',
-            buttonActiveClass:'tick',
-            defaultText:'<span></span>Choose file',
-            defaultFileSelectedText:'<span></span>File selected'
-        });
-
-        $('#fileForm').validate();
+    $(function() {
+        $('form[data-role="upload"]').validate();
     });
 </script>
 <!-- END custom_head -->
 
-<h1>{ACTION} File </h1>
-<form method="post" action="/cms/networkFileForm.php" enctype="multipart/form-data" id="fileForm" class="clearfix">
-    <input type="hidden" name="parent" value="{PARENT_ID}"/>
-    <table class="standardForm table">
-        <!-- BEGIN browse_row -->
-        <tr>
-            <td><h4>File</h4>
-            </td>
-            <td><input type="file" name="file" class="prettify"/>
-                <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}"/></td>
-        </tr>
-        <!-- END browse_row -->
-        <!-- BEGIN desc -->
-        <tr>
-            <td class="formLabelWidth"><h4>Description</h4>
-                <em>One line description of the file for use as the title</em></td>
-            <td><label><input type="text" name="description" maxlength="250" size="40" class="required"
-                              value="{DESCRIPTION}"/></label></td>
-        </tr>
-        <!-- END desc -->
+{BREADCRUMB}
 
-        <!-- BEGIN location -->
-        <tr>
-            <td><h4>Location</h4>
-                <em>Select an appropriate location within the system that reflects the use of the file</em></td>
-            <td><select name="parent">
-                <!-- BEGIN folder_list -->
-                <option value="{FOLDER_ID}"
-                {FOLDER_SELECTED}>{FOLDER_INDENT}&gt; {FOLDER_NAME}</option>
-                <!-- END folder_list -->
-            </select></td>
-        </tr>
-        <!-- END location -->
+<div class="row">
+    <div class="small-12 island">
+        <h1>{ACTION} File</h1>
 
-    </table>
-    <input type="hidden" name="fileID" value="{FILE_ID}"/>
-    <input type="submit" name="Submit" value="{ACTION} File" class="submit-btn-plain"/>
-</form>
+        <form method="post" action="/cms/networkFileForm.php" enctype="multipart/form-data" id="fileForm" class="clearfix">
+            <input type="hidden" name="parent" value="{PARENT_ID}"/>
+            <input type="hidden" name="fileID" value="{FILE_ID}"/>
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <!-- BEGIN browse_row -->
+                        <label>
+                            Attach File
+                            {ATTACH_ZONE}
+                        </label>
+                        <!-- END browse_row -->
+                        <!-- BEGIN desc -->
+                        <label>
+                            Description
+                            <input type="text" name="description" required value="{DESCRIPTION}"/>
+                        </label>
+                        <!-- END desc -->
+                        <!-- BEGIN location -->
+                        <label>
+                            Location
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select an appropriate location within the system that reflects the use of the file">?</span>
+                            <select name="parent">
+                                <!-- BEGIN folder_list -->
+                                <option value="{FOLDER_ID}" {FOLDER_SELECTED}>{FOLDER_INDENT}&gt; {FOLDER_NAME}</option>
+                                <!-- END folder_list -->
+                            </select>
+                        </label>
+                        <!-- END location -->
+                    </div>
+                </fieldset>
+            </section>
+            <input type="submit" name="Submit" value="{ACTION} File" />
+        </form>
+    </div>
+</div>

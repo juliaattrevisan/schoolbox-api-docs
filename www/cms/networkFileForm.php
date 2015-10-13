@@ -1,6 +1,9 @@
 <?php
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Storage\Model;
+
 $page = new SitePage();
 
 if (!Cfg::get('webdav_enable')) {
@@ -10,7 +13,7 @@ if (!Cfg::get('webdav_enable')) {
 $fileHandler = PortfolioWebDAV::factory();
 
 
-if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
+if (isset($_POST['description']) || isset($_FILES['file']['tmp_name']) || isset($_POST['attachment'])) {
 
     $file = array(
         'parent' => $_POST['parent'],
@@ -28,10 +31,23 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
         $file['id'] = $_POST['fileID'];
         $fileHandler->update($file);
     } else {
-        $allowedFileHandler = new AllowedFile;
-        $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
-
-        $fileHandler->create($file, $_FILES['file']);
+        // if file was ajax-uploaded
+        if (isset($_POST['attachment'])) {
+            $factory = new CollectorFactory();
+            /** @var Model $result */
+            $result = $factory->build($_POST['attachment'])->getFirst();
+            $fileHandler->create(
+                $file,
+                [
+                    'name'     => $result->getBasename(),
+                    'resource' => $result->readStream(),
+                ]
+            );
+        } elseif (isset($_FILES['file']['tmp_name'])) {
+            $allowedFileHandler = new AllowedFile;
+            $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
+            $fileHandler->create($file, $_FILES['file']);
+        }
     }
 
     SitePage::localRedir('/cms/network/' . $_POST['parent']);
