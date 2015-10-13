@@ -157,7 +157,7 @@ INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_
 VALUES ('skin_colour_accent_background',
         'Accent Background Colour',
         'rgb(255, 233, 189)',
-        'Background colour for dropzones.',
+        'Background colour for dropzones. This is also the colour of text you select with your mouse/keyboard in browser.',
         '11',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',

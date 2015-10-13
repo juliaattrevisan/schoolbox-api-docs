@@ -200,7 +200,7 @@
 	color: contrast-bg($opacity, $background, $saturation, $light, $dark);
 }
 
-@mixin selection($color: $primary-color) {
+@mixin selection($color: $accent-background) {
 	::-moz-selection {
 		color: calc-text-color($color);
 		background-color: $color;
