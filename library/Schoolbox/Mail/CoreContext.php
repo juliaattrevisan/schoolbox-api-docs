@@ -29,6 +29,7 @@ class CoreContext {
             'site_hostname',
             'site_location',
             'site_domain',
+            'skin_builder',
         );
 
         foreach($required as $key) {
