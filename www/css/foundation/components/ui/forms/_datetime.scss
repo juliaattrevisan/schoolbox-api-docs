@@ -80,7 +80,7 @@ $timepicker-item-visible-count: 5;
         a {
             @include datepicker-cell();
             display: block;
-            color: inherit;
+            color: $content-ui-foreground;
         }
     }
 }
@@ -94,12 +94,13 @@ $timepicker-item-visible-count: 5;
 
     .ui-datepicker-prev, .ui-datepicker-next {
         @include datepicker-cell();
+        color: $content-ui-foreground;
         display: block;
         &:hover {
+            color: $content-ui-foreground;
             background: $datepicker-hover-background;
         }
     }
-
 }
 
 .ui-datepicker-title{
