@@ -344,21 +344,11 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		&:before{
 			text-align: center;
 			float: none;
-
-			color: calc-text-color(
-				$tabbar-bg,
-				contrast-bg(0.50, $white, 0%, $primary-color, $primary-color),
-				contrast-bg(0.25, $black, 0%, $primary-color, $primary-color)
-			);
-
+			color: $primary-foreground;
 		}
 		span {
 			font-weight: $font-weight-normal;
-			color: calc-text-color(
-				$tabbar-bg,
-				contrast-bg(0.25, $white, 0%, $primary-color, $primary-color),
-				contrast-bg(0.50, $black, 0%, $primary-color, $primary-color)
-			);
+			color: $primary-foreground;
 			display: block;
 			line-height: rem-calc($base-font-size);
 		}
