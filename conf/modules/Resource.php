@@ -27,12 +27,13 @@ class Resource implements ModuleConfigInterface
         $di = $kernel->getDependencyInjector();
 
         $browserModule = new Schoolbox\Resource\Browser\Resources\Module($di);
-
         $browserModule->init('/resources');
 
         $myBrowserModule = new Schoolbox\Resource\Browser\MyFiles\Module($di);
         $myBrowserModule->init('/my-files');
 
+        $webDavBrowserModule = new Schoolbox\Resource\Browser\WebDav\Module($di);
+        $webDavBrowserModule->init('/drives');
     }
 
 } 
