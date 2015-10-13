@@ -2,7 +2,7 @@
 $login-html-styles: true;
 
 $login-background-position: top right;
-$login-overlay: $primary-color;
+$login-overlay: $content-ui-foreground;
 $login-overlay-opacity: 0;
 
 $login-form-background-color: rgba($black, 0.4);
@@ -20,7 +20,6 @@ $login-img-max-height: 12rem; // 192px
     $login-footer-height: (1.5 * 4 * 1rem) + (2 * $footer-margin-bottom); // 4 lines, 1.5 line height
 
     body.login {
-
         margin: 0;
         padding: 0;
 
@@ -97,7 +96,7 @@ $login-img-max-height: 12rem; // 192px
         }
 
         a, label, #footer {
-            color: inherit;
+            color: $content-ui-foreground;
             font-size: inherit;
         }
 
