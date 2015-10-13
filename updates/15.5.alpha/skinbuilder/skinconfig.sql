@@ -220,16 +220,6 @@ VALUES ('skin_body_bg_colour',
         'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
-VALUES ('skin_tab_bg_colour',
-        'Tab Background Colour',
-        'rgb(0, 102, 176)',
-        'Set the colour behind the top tab bar behind icons',
-        '11',
-        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
-        'true',
-        'false');
-
-INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_logo_square',
         'Logo Square',
         '',

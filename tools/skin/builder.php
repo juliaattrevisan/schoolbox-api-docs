@@ -33,12 +33,10 @@ if (Config::get('skin_builder')) {
         'accent-background' => Config::get('skin_colour_accent_background'),
         'accent-hover' => Config::get('skin_colour_accent_hover'),
 
-        'primary-color'     => Config::get('skin_primary_colour'),
-        'secondary-color'   => Config::get('skin_secondary_colour'),
-        'tertiary-color'    => Config::get('skin_tertiary_colour'),
-        'body-bg'           => Config::get('skin_body_bg_colour'),
-        'tabbar-bg'         => Config::get('skin_tab_bg_colour'),
-        'off-canvas-bg'     => Config::get('skin_off_canvas_bg_colour'),
+        'primary-color'   => Config::get('skin_primary_colour'),
+        'secondary-color' => Config::get('skin_secondary_colour'),
+        'tertiary-color'  => Config::get('skin_tertiary_colour'),
+        'body-bg'         => Config::get('skin_body_bg_colour'),
     ];
 }
 
