@@ -17,6 +17,9 @@
 		margin: 0; // srsly. shouldn't have to do this...
 	}
 
+    /* I think .header-actions .button usage is deprecated in favour
+     * of repaired h1/h2 html structure. If you see cyan, kill it
+     */
 	.button {
 		margin-bottom: 0;
 		padding: 0.625rem;
@@ -29,13 +32,13 @@
 		}
 
 		&:hover {
-			color: $primary-color;
-			background-color: tint($secondary-color, 20%);
+			color: #0ff;
+			background-color: tint(#0ff, 20%);
 		}
 		&[aria-expanded=true] {
 			@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
-			background-color: $secondary-color;
-			color: $primary-color;
+			background-color: #0ff;
+			color: #0ff;
 		}
 
 		@media #{$large-up} {
@@ -44,10 +47,13 @@
 	}
 }
 
+/* I think .header-actions .button usage is deprecated in favour
+ * of repaired h1/h2 html structure. If you see cyan, kill it
+ */
 h1, h2 {
 	&:hover + .header-actions .button {
-		background-color: $secondary-color;
-		color: $primary-color;
+		background-color: #0ff;
+		color: #0ff;
 	}
 }
 
