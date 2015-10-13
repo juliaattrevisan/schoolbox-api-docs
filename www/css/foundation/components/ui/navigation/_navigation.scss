@@ -11,7 +11,7 @@ $magellan-padding: rem-calc(0);
 // OFF CANVAS
 //
 
-// Off Canvas Tab Bar Variables
+// Main Navigation Tab Bar Variables
 $include-html-off-canvas-classes: $include-html-classes !default;
 
 $tabbar-bg: $navigation-background;
@@ -21,17 +21,14 @@ $tabbar-line-height: $tabbar-height;
 $tabbar-color: $black;
 $tabbar-middle-padding: 0 rem-calc(($base-font-size - 4));
 
-// Off Canvas Divider Styles
 $tabbar-left-section-border: 0;
 $tabbar-right-section-border: 0;
 
-// Off Canvas Tab Bar Headers
 $tabbar-header-color: $black;
 $tabbar-header-weight: $font-weight-bold;
 $tabbar-header-line-height: $tabbar-height;
 $tabbar-header-margin: 0;
 
-// Off Canvas Menu Icon Variables
 //$tabbar-menu-icon-color: contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color);
 //$tabbar-menu-icon-hover: tint($tabbar-menu-icon-color, 20%);
 
