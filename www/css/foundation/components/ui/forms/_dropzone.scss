@@ -440,6 +440,7 @@ ul.az-error-list {
         text-align: center;
     }
     .dz-remove {
+        color: $content-ui-foreground;
         position: absolute;
         bottom: 0;
         left: 0;
@@ -487,7 +488,7 @@ ul.az-error-list {
             top: 45%;
             left: 50%;
             @include transform(translate(-50%, -50%));
-            color: $monsoon;
+            color: $attachzone-resting-color;
             text-shadow: 0 1px 0 $white;
         }
     }
@@ -605,7 +606,7 @@ ul.az-error-list {
         display: block;
         padding: 4px 5px;
         text-align: center;
-        color: $primary-color;
+        color: #0ff;
     }
 }
 
