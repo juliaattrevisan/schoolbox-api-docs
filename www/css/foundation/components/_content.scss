@@ -127,7 +127,11 @@ $label-font-weight: $font-weight-bold;
 
 // We use this to set the progress bar height
 $progress-bar-height: rem-calc(($base-font-size - 2));
-$progress-bar-color: tint($tertiary, 87%);
+
+/* This is the track colour for the progress bar.
+ * The progress bar expands to cover this colour.
+ */
+$progress-bar-color: $accent-background;
 
 // We use these to control the border styles
 // $progress-bar-border-color: scale-color($white, $lightness: 20%);
@@ -139,8 +143,12 @@ $progress-bar-border-radius: 0px;
 $progress-bar-pad: rem-calc(0);
 // $progress-bar-margin-bottom: rem-calc(10);
 
+/* The actual coloured bar inside that increases
+ * as "progress is made"
+ */
+$progress-meter-color: $accent-foreground;
+
 // We use these to set the meter colors
-// $progress-meter-color: $primary-color;
 // $progress-meter-secondary-color: $secondary-color;
 // $progress-meter-success-color: $success-color;
 // $progress-meter-alert-color: $alert-color;
@@ -1230,7 +1238,7 @@ ul.flex-list {
 			padding: nth($label-padding, 1) 1rem;
 		}
 
-		.label, .progress {
+		.label {
 			margin: 0 -0.5rem 0 -1rem;
 			text-align: left;
 			position: absolute;
@@ -1259,6 +1267,23 @@ ul.flex-list {
 				padding: 0.75rem !important;
 			}
 		}
+    }
+
+    /* Progress Meters for List Items
+     * This is no longer inside .card constructs
+     * They are adjacent (siblings) to .card constructs
+     */
+    & + .progress {
+        width: calc(100% - 4rem);
+        margin: 0 -0.5rem 0 -1rem;
+        position: absolute;
+        bottom: 0;
+        left: 5rem;
+
+        @media #{$small-only} {
+            width: calc(100% - 3rem);
+            left: 4rem;
+        }
     }
 
     &.info {
