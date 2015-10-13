@@ -245,19 +245,22 @@ blockquote{
 	margin-bottom: rem-calc(($base-font-size - 3));
 }
 
-// Add colours
+/* These should now be obsoleted
+ */
 .primary{
-	color: $primary-color;
+  color: $primary-color;
 }
 
 .secondary{
-	color: $secondary-color;
+  color: $secondary-color;
 }
 
 .tertiary{
-	color: $tertiary;
+  color: $tertiary;
 }
 
+
+// Add colours
 .success{
 	color: $success-color;
 }
