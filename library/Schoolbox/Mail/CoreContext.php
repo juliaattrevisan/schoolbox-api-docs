@@ -70,6 +70,19 @@ class CoreContext {
             SITE_root . "/www/css/core/variables.less",
             SITE_root . "/www/css/$site/chrome.less"
         ));
+
+        // Extract skin builder colors
+        $skinColors = [
+            "skin_body_bg_colour",
+            "skin_off_canvas_bg_colour",
+            "skin_primary_colour",
+            "skin_secondary_colour",
+            "skin_tab_bg_colour",
+            "skin_tertiary_colour",
+        ];
+        foreach ($skinColors as $skinColor) {
+            $this->context['colours'][$skinColor] = $conf->get($skinColor);
+        }
     }
 
 
