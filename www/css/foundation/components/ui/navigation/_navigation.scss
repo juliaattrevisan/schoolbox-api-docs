@@ -333,23 +333,29 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		width: 100%;
 		text-align: left;
 		&:hover,
-		&.open{
+		&.open {
 		    color: $navigation-hover;
 			background-color: $white;
 		}
-		span{
+
+        /* Little triangle icon next to username
+         */
+        &:hover {
+            &.dropdown.button::after {
+                border-color: $navigation-hover transparent transparent transparent;
+            }
+        }
+        &.dropdown.button::after {
+            border-color: $navigation-background transparent transparent transparent;
+        }
+
+		span {
 			overflow: hidden;
 			text-overflow: ellipsis;
 			max-width: 135px;
 			display: inline-block;
 			padding-left: 0.5rem;
 		}
-
-		/* Little triangle icon next to username
-		 */
-        &:after {
-            border-color: $navigation-background transparent transparent transparent;
-        }
 	}
 
     /* Custom link styles for off-canvas account menu
