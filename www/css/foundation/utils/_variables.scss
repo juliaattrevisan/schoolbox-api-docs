@@ -8,21 +8,21 @@ $charset: "utf-8";
  Refined Colour Application
  (these are Skin Builder vars)
  ****************************/
-$navigation-foreground:            #ffffff;
-$navigation-background:            #4c00b0;
-$navigation-hover:                 #8552c9;
+$navigation-foreground:            #ffffff !default;
+$navigation-background:            #4c00b0 !default;
+$navigation-hover:                 #8552c9 !default;
 
-$content-ui-foreground:            #ff39a8;
-$content-ui-background:            #ffcce8;
-$content-ui-hover:                 #ffe5f4;
-$content-ui-selected:              #ffffff;
+$content-ui-foreground:            #ff39a8 !default;
+$content-ui-background:            #ffcce8 !default;
+$content-ui-hover:                 #ffe5f4 !default;
+$content-ui-selected:              #ffffff !default;
 
-$content-ui-submit-foreground:     #ff0000;
-$content-ui-submit-background:     #000000;
+$content-ui-submit-foreground:     #ff0000 !default;
+$content-ui-submit-background:     #000000 !default;
 
-$accent-foreground:                #ffac00;
-$accent-background:                #ffe9bd;
-$accent-hover:                     #fff4de;
+$accent-foreground:                #ffac00 !default;
+$accent-background:                #ffe9bd !default;
+$accent-hover:                     #fff4de !default;
 
 /*****************************
  Constants
