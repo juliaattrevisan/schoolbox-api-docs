@@ -72,7 +72,7 @@ abstract class AbstractModule extends BaseModule
         // set
         $injector->set(
             "controller:$this->basename",
-            $injector->lazyNew($this->getControllerClass())
+            $injector->lazyNew($this->getControllerClass(), [], $this->getSetterList($injector))
         );
 
         $this->initSetters($injector);
@@ -80,15 +80,16 @@ abstract class AbstractModule extends BaseModule
 
 
     /**
+     * @param Container $ci
      * @return array
      */
-    protected function getSetterList()
+    protected function getSetterList(Container $ci)
     {
         return [
             'setFileMapper'       => null,
-            'setConfig'           => Config\Loader::class,
-            'setUserMapper'       => UserMapper::class,
-            'setNodeFactory'      => NodeFactory::class,
+            'setConfig'           => $ci->lazyNew(Config\Loader::class),
+            'setUserMapper'       => $ci->lazyNew(UserMapper::class),
+            'setNodeFactory'      => $ci->lazyNew(NodeFactory::class),
             'setTreeBuilder'      => null,
             'setFolderMapper'     => null,
             'setNamespace'        => $this->basename,
