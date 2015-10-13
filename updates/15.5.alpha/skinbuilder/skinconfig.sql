@@ -4,7 +4,8 @@ INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_
 VALUES (
     'skin_builder',
     'Use Skin Builder?',
-    0,
+    -- On for demo, off for all others
+    (IF ((SELECT COUNT(*) FROM `config` `c` WHERE `c`.`name` = 'site_location' AND `c`.`value` = 'demo'), '1', '0')),
     'Do you wish to use the skin builder to style your Schoolbox? If this is switched on, your custom skin and any custom templates will be ignored.',
     5, -- checkbox
     (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
