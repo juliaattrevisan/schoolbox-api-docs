@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Breadcrumbs;
+
 if (!Cfg::get('webdav_enable')) {
     error(2);
 }
@@ -36,6 +38,20 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     $this->setBlock(TEMPLATE_content, 'location', 'location_block');
     $this->setVar('location_block', '');
 
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => 'Drives',
+            'href' => "/cms/network/".$folder['parent'],
+            'class' => '',
+        ],
+        [
+            'text' => 'Modify Folder',
+            'href' => '',
+            'class' => 'active',
+        ]
+    ]);
+
 } else {
     if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
@@ -57,6 +73,19 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         $this->setBlock(TEMPLATE_content, 'location', 'location_block');
         $this->setVar('location_block', '');
 
+        $trail = new Breadcrumbs();
+        $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+            [
+                'text' => 'Drives',
+                'href' => "/cms/network/".$this->arg[1],
+                'class' => '',
+            ],
+            [
+                'text' => 'Add Folder',
+                'href' => '',
+                'class' => 'active',
+            ]
+        ]);
     } else {
         $this->error(2);
     }
