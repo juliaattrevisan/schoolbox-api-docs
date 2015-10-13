@@ -1,13 +1,13 @@
 
 $tree-node-height: 3rem;
 
-$tree-node-hover-background: tint($secondary-color, 30%);
-$tree-node-hover-color: calc-text-color($tree-node-hover-background);
+$tree-node-hover-background: $accent-hover;
+$tree-node-hover-color: $accent-foreground;
 
-$tree-node-selected-background: $secondary-color;
-$tree-node-selected-color: calc-text-color($tree-node-selected-background);
+$tree-node-selected-background: $accent-background;
+$tree-node-selected-color: $accent-foreground;
 
-$tree-folder-icon-color: $primary-color;
+$tree-folder-icon-color: $content-ui-foreground;
 $tree-homepage-icon-color: darkorange;
 $tree-course-icon-color: #008600;
 
