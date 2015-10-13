@@ -564,11 +564,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         // Retrieve all codes for category, not just $code
         $query .= "
             WHERE c.deleted_at IS NULL
-            AND c.id IN (
-                SELECT cj.categoryID FROM {$this->getJoinMapper('codes')->getTable()} cj
-                WHERE cj.deleted_at IS NULL
-                AND (cj.code=:code OR cj.code LIKE :codeLike)
-            )
+            AND (cc.code = :code OR cc.code LIKE :codeLike)
         ";
         $statement = $this->database->prepare($query);
         $statement->execute(
@@ -577,7 +573,15 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                 'codeLike' => '%/' . $this->database->quoteForLike($code),
             )
         );
-        return $this->hydrateFromFindQuery($statement);
+        $model = $this->hydrateFromFindQuery($statement);
+
+        // Re-load codes into the model,
+        // because the above query won't fetch codes for this category that
+        // don't match the above where part.
+        $model->setCodes(
+            $this->getJoinMapper('codes')->findByColumn('categoryID', $model->getId())
+        );
+        return $model;
     }
 
     /**
