@@ -738,7 +738,7 @@ $rotate-th-width: $square-grid-td-size;
 
 // Hints
 .hint {
-	color: calc-text-color($input-border-color) !important;
+	color: $content-ui-foreground !important;
 	top: -1px;
 	margin-left: 4px;
 	width: 1rem;
@@ -751,7 +751,7 @@ $rotate-th-width: $square-grid-td-size;
 	position: relative;
 	margin-bottom: auto;
 	font-size: 0.75rem;
-	background-color: $input-border-color;
+	background-color: $content-ui-background;
 	border-radius: 0.5rem;
 
 	&.icon-help:before{

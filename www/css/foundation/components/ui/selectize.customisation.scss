@@ -5,7 +5,7 @@ $selectize-line-height: 18px !default;
 
 // None of this is being used?
 $selectize-color-text: $content-ui-foreground;
-$selectize-color-border: $content-ui-background;
+$selectize-color-border: $input-border-color;
 $selectize-color-highlight: $content-ui-hover;
 $selectize-color-input: $white !default;
 $selectize-color-input-full: $selectize-color-input !default;

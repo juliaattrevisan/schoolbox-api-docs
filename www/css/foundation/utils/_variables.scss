@@ -4,8 +4,10 @@ $charset: "utf-8";
 // These will be overridden by skin values
 // =============================================================================
 
-/* Refined Colour Application
- */
+/*****************************
+ Refined Colour Application
+ (these are Skin Builder vars)
+ ****************************/
 $navigation-foreground:            #ffffff;
 $navigation-background:            #4c00b0;
 $navigation-hover:                 #8552c9;
@@ -22,6 +24,21 @@ $accent-foreground:                #ffac00;
 $accent-background:                #ffe9bd;
 $accent-hover:                     #fff4de;
 
+/*****************************
+ Constants
+ ****************************/
+
+/* Off Canvas Background is always white
+ * Islands are also always white
+ * Content text is always black
+ */
+$off-canvas-bg:				       $white;
+
+/* A specific var that's used for input element borders
+ */
+//$input-border-color:			   $content-ui-background;
+$input-border-color:			   $black;
+
 // Colours
 $primary-color:					#0066b0 !default;
 $secondary-color:				#bdd7ea !default;
@@ -31,8 +48,7 @@ $body-bg:						#ededed !default;
 // for BC
 $tertiary:						$tertiary-color;
 
-$input-border-color:			$content-ui-background;
-$off-canvas-bg:					$white;
+
 
 /* Hover colour for the row
  */
