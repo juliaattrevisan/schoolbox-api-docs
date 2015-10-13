@@ -64,6 +64,26 @@ VALUES ('skin_colour_content_ui_background',
         'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_content_ui_submit_foreground',
+        'Submit Button Foreground Colour',
+        'rgb(255, 255, 255)',
+        'Foreground text colour used in Submit buttons commonly found in Components and Form actions.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_content_ui_submit_background',
+        'Submit Background Colour',
+        'rgb(255, 57, 168)',
+        'Background colour used in Submit buttons commonly found in Components and Form actions.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_colour_content_ui_hover',
         'Content Interface Hover/Accent Colour',
         'rgb(255, 229, 244)',

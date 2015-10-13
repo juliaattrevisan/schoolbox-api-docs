@@ -24,6 +24,8 @@ if (Config::get('skin_builder')) {
         'content-ui-background' => Config::get('skin_colour_content_ui_background'),
         'content-ui-hover' => Config::get('skin_colour_content_ui_hover'),
         'content-ui-selected' => Config::get('skin_colour_content_ui_selected'),
+        'content-ui-submit-foreground' => Config::get('skin_colour_content_ui_submit_foreground'),
+        'content-ui-submit-background' => Config::get('skin_colour_content_ui_submit_background'),
         'accent-foreground' => Config::get('skin_colour_accent_foreground'),
         'accent-background' => Config::get('skin_colour_accent_background'),
         'accent-hover' => Config::get('skin_colour_accent_hover'),
