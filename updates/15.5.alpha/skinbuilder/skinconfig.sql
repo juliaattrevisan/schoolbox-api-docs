@@ -83,6 +83,35 @@ VALUES ('skin_colour_content_ui_selected',
         'true',
         'false');
 
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_accent_foreground',
+        'Accent Foreground Colour',
+        'rgb(255, 172, 0)',
+        'Foreground colour for dropzones. This also controls heading colours in the left off-canvas menu.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_accent_background',
+        'Accent Background Colour',
+        'rgb(255, 233, 189)',
+        'Background colour for dropzones.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_accent_hover',
+        'Accent Hover Colour',
+        'rgb(255, 244, 222)',
+        'Miscellaneous hover effect for dropzones. This also controls shadow colour on flyout menus.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
 
 
 
