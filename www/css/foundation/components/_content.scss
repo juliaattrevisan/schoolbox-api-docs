@@ -341,12 +341,13 @@ $tooltip-font-color: $white;
 // $range-slider-bar-width: 100%;
 // $range-slider-bar-height: rem-calc(16);
 
-// $range-slider-bar-border-width: 1px;
+$range-slider-bar-border-width: 0px;
 // $range-slider-bar-border-style: solid;
 // $range-slider-bar-border-color: $gainsboro;
 // $range-slider-radius: $global-radius;
 // $range-slider-round: $global-rounded;
-// $range-slider-bar-bg-color: $ghost;
+$range-slider-bar-bg-color: #eee;
+$range-slider-active-segment-bg-color: $content-ui-hover;
 
 // Vertical bar styles
 // $range-slider-vertical-bar-width: rem-calc(16);
@@ -356,14 +357,16 @@ $tooltip-font-color: $white;
 // $range-slider-handle-width: rem-calc(32);
 // $range-slider-handle-height: rem-calc(22);
 // $range-slider-handle-position-top: rem-calc(-5);
-// $range-slider-handle-bg-color: $primary-color;
+$range-slider-handle-bg-color: $content-ui-background;
 // $range-slider-handle-border-width: 1px;
 // $range-slider-handle-border-style: solid;
 // $range-slider-handle-border-color: none;
 // $range-slider-handle-radius: $global-radius;
 // $range-slider-handle-round: $global-rounded;
-// $range-slider-handle-bg-hover-color: scale-color($primary-color, $lightness: -12%);
+$range-slider-handle-bg-hover-color: $content-ui-foreground;
 // $range-slider-handle-cursor: pointer;
+
+@import "../../../javascript/components/foundation/scss/foundation/components/range-slider";
 
 //
 // CLEARING LIGHTBOX
@@ -405,7 +408,6 @@ $clearing-carousel-thumb-active-border: 4px solid tint($tertiary, 26%);
 @import "../../../javascript/components/foundation/scss/foundation/components/tables";
 @import "../../../javascript/components/foundation/scss/foundation/components/thumbs";
 @import "../../../javascript/components/foundation/scss/foundation/components/flex-video";
-@import "../../../javascript/components/foundation/scss/foundation/components/range-slider";
 @import "../../../javascript/components/foundation/scss/foundation/components/visibility";
 @import "../../../javascript/components/foundation/scss/foundation/components/thumbs";
 @import "../../../javascript/components/foundation/scss/foundation/components/clearing";
