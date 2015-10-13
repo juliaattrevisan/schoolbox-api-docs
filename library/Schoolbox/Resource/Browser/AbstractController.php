@@ -201,9 +201,6 @@ abstract class AbstractController extends BaseController
         $data['treedata'] = json_encode($this->treeBuilder->buildPartialTree($folderId));
         $data['namespace'] = $this->namespace;
 
-//        header('Content-Type: application/json');
-//        die($data['treedata']);
-
         $this->getResponse()->content->set([
             'template' => '@resourceBrowser/browse.twig',
             'data'     => $data,
