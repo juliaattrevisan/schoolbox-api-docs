@@ -306,34 +306,6 @@ $menu-slide: "transform 500ms ease";
   }
 }
 
-.top-bar{
-	.name h2 a{
-		width: auto;
-	}
-}
-
-.top-bar-section{
-	.button{
-		padding: rem-calc(($base-font-size / 2));
-		height: $topbar-height;
-		top: 0;
-		line-height: 26px;
-	}
-	.dropdown label{
-		font-style: $topbar-dropdown-label-font-style;
-	}
-	.dropdown li a{
-		line-height: rem-calc(($base-font-size - 2));
-	}
-	.right a,
-	.right a:before{
-		@media #{$small-only} {
-			text-align: right;
-			float: right;
-		}
-	}
-}
-
 $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($background: $tabbar-bg, $opacity: 0.65));
 
 // Hybrid Bar

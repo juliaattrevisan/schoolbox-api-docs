@@ -17,7 +17,7 @@ $force = isset($opts['f']) || isset($opts['force']);
 $vars = [];
 if (Config::get('skin_builder')) {    
     $vars = [
-        'primary-foreground' => Config::get('skin_primary_foreground'),
+        'primary-foreground' => Config::get('skin_colour_primary_foreground'),
         
         'primary-color'     => Config::get('skin_primary_colour'),
         'secondary-color'   => Config::get('skin_secondary_colour'),
