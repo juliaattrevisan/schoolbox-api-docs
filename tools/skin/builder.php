@@ -15,8 +15,10 @@ $force = isset($opts['f']) || isset($opts['force']);
 
 // Skin builder is off? don't set any vars
 $vars = [];
-if (Config::get('skin_builder')) {
+if (Config::get('skin_builder')) {    
     $vars = [
+        'primary-foreground' => Config::get('skin_primary_foreground'),
+        
         'primary-color'     => Config::get('skin_primary_colour'),
         'secondary-color'   => Config::get('skin_secondary_colour'),
         'tertiary-color'    => Config::get('skin_tertiary_colour'),
