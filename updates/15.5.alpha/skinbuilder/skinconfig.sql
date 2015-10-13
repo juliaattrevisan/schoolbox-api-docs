@@ -15,7 +15,7 @@ VALUES (
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_colour_navigation_foreground',
-        'Primary Foreground Colour',
+        'Navigation Foreground Colour',
         'rgb(255, 255, 255)',
         'Used for main navigation icon colours and label colours.',
         '11',
@@ -183,41 +183,6 @@ VALUES ('skin_colour_logo_background',
         'true',
         'false');
 
-
-
-
-
-
-INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
-VALUES ('skin_primary_colour',
-        'Primary Colour',
-        'rgb(0, 102, 176)',
-        'Used for headers buttons, navigation and links',
-        '11',
-        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
-        'true',
-        'false');
-
-INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
-VALUES ('skin_secondary_colour',
-        'Secondary Colour',
-        'rgb(189, 215, 234)',
-        'Used for actions and form elements',
-        '11',
-        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
-        'true',
-        'false');
-
-INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
-VALUES ('skin_tertiary_colour',
-        'Tertiary Colour',
-        'rgb(0, 102, 176)',
-        'Used for background colours and outlines',
-        '11',
-        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
-        'true',
-        'false');
-
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_body_bg_colour',
         'Body Background Colour',
@@ -266,3 +231,33 @@ VALUES ('skin_login_bg',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
         'false');
+
+--INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+--VALUES ('skin_primary_colour',
+--        'Primary Colour',
+--        'rgb(0, 102, 176)',
+--        'Used for headers buttons, navigation and links',
+--        '11',
+--        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+--        'true',
+--        'false');
+--
+--INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+--VALUES ('skin_secondary_colour',
+--        'Secondary Colour',
+--        'rgb(189, 215, 234)',
+--        'Used for actions and form elements',
+--        '11',
+--        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+--        'true',
+--        'false');
+--
+--INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+--VALUES ('skin_tertiary_colour',
+--        'Tertiary Colour',
+--        'rgb(0, 102, 176)',
+--        'Used for background colours and outlines',
+--        '11',
+--        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+--        'true',
+--        'false');
