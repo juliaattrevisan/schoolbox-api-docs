@@ -139,11 +139,11 @@
                         <!-- BEGIN recent_blog -->
                         <li class="actions-small-1">
                             <div class="list-item">
-                                <div class="small-3 columns">
-                                    {RECENT_BLOG_CREATED_AT}
-                                </div>
-                                <div class="info card small-9">
-                                    <a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{RECENT_BLOG_PAGE_ID}#blog_{RECENT_BLOG_BLOG_ID}' title="{RECENT_BLOG_TITLE}">{RECENT_BLOG_TITLE}</a>
+                                <div class="info card small-12">
+                                    <h3>
+                                        <a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{RECENT_BLOG_PAGE_ID}#blog_{RECENT_BLOG_BLOG_ID}' title="{RECENT_BLOG_TITLE}">{RECENT_BLOG_TITLE}</a>
+                                    </h3>
+                                    <p class="meta">{RECENT_BLOG_CREATED_AT}</p>
                                 </div>
                             </div>
                             <nav>
@@ -188,18 +188,20 @@
                 <section>
                     <ul class="action-list">
                         <!-- BEGIN subject -->
-                        <li class="row">
-                            <div class="eleven-column">
-                                <!-- BEGIN subject_linked -->
-                                <a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a>
-                                <!-- END subject_linked -->
-                                <!-- BEGIN subject_unlinked -->
-                                {SUBJECT_NAME}
-                                <!-- END subject_unlinked -->
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="info card small-12">
+                                    <!-- BEGIN subject_linked -->
+                                    <a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a>
+                                    <!-- END subject_linked -->
+                                    <!-- BEGIN subject_unlinked -->
+                                    {SUBJECT_NAME}
+                                    <!-- END subject_unlinked -->
+                                </div>
                             </div>
-                            <div class="one actions">
+                            <nav>
                                 <a href='/homepage/{SUBJECT_ID}' class="icon-next no-text"></a>
-                            </div>
+                            </nav>
                         </li>
                         <!-- END subject -->
                     </ul>
@@ -215,18 +217,20 @@
                 <section>
                     <ul class="action-list">
                         <!-- BEGIN group -->
-                        <li class="row">
-                            <div class="eleven-column">
-                                <!-- BEGIN group_linked -->
-                                <a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a>
-                                <!-- END group_linked -->
-                                <!-- BEGIN group_unlinked -->
-                                {GROUP_NAME}
-                                <!-- END group_unlinked -->
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="info card small-12">
+                                    <!-- BEGIN group_linked -->
+                                    <a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a>
+                                    <!-- END group_linked -->
+                                    <!-- BEGIN group_unlinked -->
+                                    {GROUP_NAME}
+                                    <!-- END group_unlinked -->
+                                </div>
                             </div>
-                            <div class="one actions">
+                            <nav>
                                 <a href='/homepage/{GROUP_ID}' class="icon-next no-text"></a>
-                            </div>
+                            </nav>
                         </li>
                         <!-- END group -->
                     </ul>
