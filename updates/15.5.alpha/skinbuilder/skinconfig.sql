@@ -46,7 +46,7 @@ VALUES ('skin_colour_navigation_hover',
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_colour_offcanvas_foreground',
         'Off-Canvas Foreground Colour',
-        'rgb(255, 255, 255)',
+        'rgb(0, 206, 10)',
         'Used for off-canvas navigation icon colours and label colours.',
         '11',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),

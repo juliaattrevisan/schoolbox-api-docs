@@ -322,8 +322,8 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	/* Profile Flyout Menu
 	 * Appears when you click a guy's username in the left menu
 	 */
-	.account-menu{
-		color: $navigation-background;
+	.account-menu {
+		color: $off-canvas-foreground;
 		background-color: transparent;
 		padding: 0 2.5rem 0 0;
 		font-weight: $font-weight-bold;
@@ -337,7 +337,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
             /* Little triangle icon next to username
              */
             &.dropdown.button::after {
-                border-color: $navigation-hover transparent transparent transparent;
+                border-color: $off-canvas-hover transparent transparent transparent;
             }
 		}
 
@@ -345,7 +345,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
          */
         &.dropdown.button::after {
             margin-top: -0.625rem;
-            border-color: $navigation-background transparent transparent transparent;
+            border-color: $off-canvas-background transparent transparent transparent;
         }
 
 		span {
@@ -364,9 +364,9 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		max-width: none;
 		a {
 		    color: $navigation-foreground;
-		    background-color: $navigation-background;
+		    background-color: $off-canvas-background;
             &:hover {
-                background-color: $navigation-hover;
+                background-color: $off-canvas-hover;
             }
         }
 	}
