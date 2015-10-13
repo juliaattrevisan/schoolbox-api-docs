@@ -34,10 +34,22 @@ $accent-hover:                     #fff4de;
  */
 $off-canvas-bg:				       $white;
 
-/* A specific var that's used for input element borders
+/* A specific var for input element borders
+ * By default this is connected to the skin builder var
+ * but if for some reason you need different border colours
+ * you can choose that here
  */
-//$input-border-color:			   $content-ui-background;
-$input-border-color:			   $black;
+$input-border-color:			   $content-ui-background;
+
+/* Action-list specific colouring:
+ * Hover colour for action-list rows
+ * Hover colour for the action button in the action-list row
+ */
+$row-hover-background:             tint($content-ui-hover, 87%);
+$row-action-hover-background:      darken($content-ui-hover, 7%);
+
+
+
 
 // Colours
 $primary-color:					#0066b0 !default;
@@ -47,16 +59,6 @@ $body-bg:						#ededed !default;
 
 // for BC
 $tertiary:						$tertiary-color;
-
-
-
-/* Hover colour for the row
- */
-$row-hover-background: tint($content-ui-hover, 87%);
-
-/* Hover colour for the action button in the row
- */
-$row-action-hover-background: darken($content-ui-hover, 7%);
 
 // Dimensions
 // $search-width: 					256px;
