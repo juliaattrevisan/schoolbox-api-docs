@@ -339,7 +339,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 // Hybrid Bar
 .icon-nav{
 	@include inline-list;
-	@extend .no-pad;
+	//@extend .no-pad;
 	margin: 0;
 	height: inherit;
 	li{
@@ -388,7 +388,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 				contrast-bg(0.50, $black, 0%, $primary-color, $primary-color)
 			);
 			display: block;
-			line-height: 1.5rem;
+			line-height: rem-calc($base-font-size);
 		}
 
 		&:before, span {
@@ -426,8 +426,8 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			height: $tabbar-height * 2;
 			.icon-nav{
 				position: absolute;
-  			left: -5rem;
-			  top: 80px;
+  				left: -5rem;
+			  	top: 80px;
 				width: 100%;
 				li{
 					width: 25%;
@@ -440,6 +440,8 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		position: relative;
 	}
 	.icon-nav{
+		padding: 0 0 0 rem-calc(($base-font-size - 2));
+
 		li:nth-child(n+5){
 			@extend .show-for-large-up;
 		}
@@ -447,7 +449,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			@extend .show-for-xlarge-up;
 		}
 		a {
-			padding: 1.25rem 0;
+			padding: rem-calc(($base-font-size - 2)) 0;
 		}
 
 	}
