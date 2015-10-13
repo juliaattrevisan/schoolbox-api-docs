@@ -647,9 +647,17 @@ $rotate-th-width: $square-grid-td-size;
 
 
 // Labels
-.label{
+.label {
 	text-transform: uppercase;
 	margin: 0 rem-calc(($base-font-size - 8)) rem-calc(($base-font-size - 8)) 0;
+
+    /* A generic label used to indicate something is taking place
+     * Used mainly in label-timeout indicators
+     */
+    &.highlight {
+        color: $accent-foreground;
+        background-color: $accent-background;
+    }
 }
 .submitted {
 	@include label(

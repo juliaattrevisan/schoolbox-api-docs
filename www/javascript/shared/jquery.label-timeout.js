@@ -31,7 +31,7 @@
 
                 /* The style at the end of labelActivate
                  */
-                css: 'secondary'
+                css: 'highlight'
             }
 
             var derived = {
@@ -92,7 +92,7 @@
 
                 /* The style at the end of labelActivate
                  */
-                initialCss: 'secondary',
+                initialCss: 'highlight',
 
                 /* The style to use after labelActivate
                  */
