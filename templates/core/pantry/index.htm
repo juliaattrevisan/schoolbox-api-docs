@@ -2140,7 +2140,7 @@ $(function () {
 
         });
 
-        $('aside.right-off-canvas-menu').prepend(toc).prepend($('<h2 class="subheader"/>').text('Pantry TOC'));
+        $('aside.right-off-canvas-menu').append($('<h2 class="subheader"/>').text('Pantry TOC')).append(toc);
 
         $('#toc').on('click', 'a', function (e) {
 
