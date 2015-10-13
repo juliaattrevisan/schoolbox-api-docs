@@ -235,29 +235,42 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
             padding-left: 22rem;
             @include placeholder-color($black, $font-weight-normal);
         }
-        .icon-search{
+
+        /* Search icon in its idle state
+         */
+        .icon-search {
             @include absolute (0, auto, auto, 32px);
             @include transition(all, 0.3s, ease-in);
             margin: 0;
             z-index: 1;
-            &:before{
-                @include contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color);
+            &:before {
+                color: $navigation-foreground;
             }
         }
+
+        /* Input field when Search feature is activated
+         */
         [type="text"]:focus,
         [type="text"]:active,
         &:hover [type="text"],
         &:hover [type="text"]:focus{
             background-color: $white;
-            border: 2px solid $secondary-color;
+            border: 2px solid $navigation-hover;
             color: $black;
             width: 99.7%;
             opacity: 1;
         }
+
         [type="text"]:focus + .icon-search,
         [type="text"]:active + .icon-search,
-        &:hover .icon-search{
+        &:hover .icon-search {
             @include absolute (0, auto, auto, 16px);
+
+            /* Search icon when Search feature is activated
+             */
+            &:before {
+                color: $navigation-background;
+            }
         }
     }
 }
