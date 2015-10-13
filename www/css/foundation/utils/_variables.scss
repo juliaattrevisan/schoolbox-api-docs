@@ -32,7 +32,7 @@ $accent-hover:                     #fff4de !default;
  * Islands are also always white
  * Content text is always black
  */
-$off-canvas-bg:				       $white;
+$off-canvas-bg:				       $white !default;
 
 /* A specific var for input element borders
  * By default this is connected to the skin builder var
