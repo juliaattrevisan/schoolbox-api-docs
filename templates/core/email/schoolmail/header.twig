@@ -2,9 +2,13 @@
 <tr>
   {{ fn.spacer(config.fqdn, 32, 4) }}
   <td colspan="2" valign="middle">
-    <img src="http://{{ config.fqdn }}/images/{{ config.site_location }}/{{ config.logo }}.png"
-         alt="{{ config.title }}" border="0" height="32"
-    />
+    {% if config.skin_builder %}
+      <img src="http://{{ config.fqdn }}/images/logo.php?logo=skin_logo_square&amp;size=normal"
+           alt="{{ config.title }}" border="0" height="32" />
+    {% else %}
+      <img src="http://{{ config.fqdn }}/images/{{ config.site_location }}/{{ config.logo }}.png"
+           alt="{{ config.title }}" border="0" height="32" />
+    {% endif %}
   </td>
 </tr>
 <tr>{{ fn.spacer(config.fqdn, 8, 4, 3) }}</tr>
