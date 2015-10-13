@@ -74,6 +74,16 @@ VALUES ('skin_colour_offcanvas_hover',
         'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_off_canvas_bg_colour',
+        'Off-Canvas Colour',
+        'rgb(255, 255, 255)',
+        'Set the colour behind the left and right columns',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_colour_content_ui_foreground',
         'Content Interface Foreground Colour',
         'rgb(255, 57, 168)',
@@ -214,16 +224,6 @@ VALUES ('skin_tab_bg_colour',
         'Tab Background Colour',
         'rgb(0, 102, 176)',
         'Set the colour behind the top tab bar behind icons',
-        '11',
-        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
-        'true',
-        'false');
-
-INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
-VALUES ('skin_off_canvas_bg_colour',
-        'Off Canvas Colour',
-        'rgb(255, 255, 255)',
-        'Set the colour behind the left and right columns',
         '11',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
