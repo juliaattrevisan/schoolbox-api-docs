@@ -1,6 +1,7 @@
 <?php
 use Alaress\File\Remote\FetcherInterface;
 use Schoolbox\Collection;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\File\ILocator as FileLocatorInterface;
@@ -127,6 +128,9 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     /** @var Resource\File\Mapper */
     protected $fileMapper;
 
+    /** @var MimetypeMapper */
+    protected $mimeMapper;
+
     /**
      * @param \Sabre_DAV_Client_Extended $client
      * @param array $paths List of paths from the baseUri to access
@@ -142,6 +146,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
         $this->folderMapper = Resource\Folder\Mapper::getInstance();
         $this->fileMapper   = Resource\File\Mapper::getInstance();
+        $this->mimeMapper   = MimetypeMapper::getInstance();
 
         $this->buildTree();
     }
@@ -930,6 +935,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $file->setTitle($data['description']);
         $file->setSize($data['file_size']);
         $file->setOwner($owner);
+        $file->setMimetype($this->mimeMapper->getByFilename($data['name']));
 
         return $file;
     }
