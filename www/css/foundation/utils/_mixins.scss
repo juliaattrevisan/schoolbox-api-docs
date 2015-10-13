@@ -236,20 +236,27 @@
 
 @mixin switch-label($indent: 0.75rem) {
 	span {
+
+        /* The label inside the paddle
+         */
 		&:first-child {
 			// this is the active state
 			left: $indent;
 			text-align: left;
-			color: calc-text-color($bg: $switch-active-color, $dark: $primary-color);
+			color: $content-ui-background;
 			opacity: 0;
 		}
+
+        /* The label inside the paddle
+         */
 		&:last-child {
 			// this is the inactive state
 			right: $indent;
 			text-align: right;
-			color: calc-text-color($bg: $switch-bg, $dark: $primary-color);
+			color: $content-ui-foreground;
 			opacity: 1;
 		}
+
 		&[class^="icon-"]:before {
 			padding: 0 0.25rem;
 		}
