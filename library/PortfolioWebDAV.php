@@ -935,7 +935,11 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $file->setTitle($data['description']);
         $file->setSize($data['file_size']);
         $file->setOwner($owner);
-        $file->setMimetype($this->mimeMapper->getByFilename($data['name']));
+        try {
+            $file->setMimetype($this->mimeMapper->getByFilename($data['name']));
+        } catch (\Schoolbox\File\Exception $e) {
+            $file->setMimetype($this->mimeMapper->getUnknownMime());
+        }
 
         return $file;
     }
