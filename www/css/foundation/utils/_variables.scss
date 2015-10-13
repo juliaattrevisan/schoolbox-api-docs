@@ -31,6 +31,8 @@ $accent-hover:                     #fff4de !default;
 
 $logo-background:                  #ffffff !default;
 
+$body-bg:						   #ededed !default;
+
 /*****************************
  Constants
  ****************************/
@@ -58,7 +60,6 @@ $row-action-hover-background:      darken($content-ui-hover, 7%);
 $primary-color:					#f0f !default;
 $secondary-color:				#ff0 !default;
 $tertiary-color:				#0ff !default;
-$body-bg:						#ededed !default;
 
 // for BC
 $tertiary:						$tertiary-color;
