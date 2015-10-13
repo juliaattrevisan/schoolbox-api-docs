@@ -64,6 +64,13 @@ $body-bg:						#ededed !default;
 // for BC
 $tertiary:						$tertiary-color;
 
+/* These are hardcoded colours for jsTree
+ * They represent Homepage and Course icons
+ * Their actual usage can be found in _tree.scss
+ */
+//$tree-homepage-icon-color: darkorange !default;
+//$tree-course-icon-color: #008600 !default;
+
 // Dimensions
 // $search-width: 					256px;
 // $logo-width: 					172px;
