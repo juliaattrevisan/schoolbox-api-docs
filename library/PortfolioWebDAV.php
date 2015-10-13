@@ -899,7 +899,9 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $folder = $this->folderMapper->createModel();
 
         $parent = $this->folderMapper->createModel();
-        $parent->setId($data['parent']);
+
+        // if no parent, cast to '#'
+        $parent->setId($data['parent'] === false ? '#' : $data['parent']);
 
         $folder->setId($data['id']);
         $folder->setParent($parent);
