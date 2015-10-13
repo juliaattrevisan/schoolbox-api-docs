@@ -84,8 +84,8 @@ $off-canvas-overlay-background-hover: transparent; //rgba(#FFF, 0.05);
 // Transition Variables
 $menu-slide: "transform 500ms ease";
 
-@import "../../../javascript/components/foundation/scss/foundation/components/magellan";
-@import "../../../javascript/components/foundation/scss/foundation/components/offcanvas";
+@import "../../../../../javascript/components/foundation/scss/foundation/components/magellan";
+@import "../../../../../javascript/components/foundation/scss/foundation/components/offcanvas";
 
 $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($background: $tabbar-bg, $opacity: 0.65));
 
