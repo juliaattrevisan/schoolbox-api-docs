@@ -2113,7 +2113,7 @@ $(function () {
 
 
         // auto TOC
-        var toc = $('<ol id="toc" style="padding:1rem;" />');
+        var toc = $('<ol id="toc" style="padding:0 1rem;" />');
 
         $('#content').find('h1').each(function () {
 
@@ -2140,7 +2140,7 @@ $(function () {
 
         });
 
-        $('aside.right-off-canvas-menu').append($('<h2 class="subheader"/>').text('Pantry TOC')).append(toc);
+        $('aside.right-off-canvas-menu').append($('<h2 class="subheader" style="padding:0;margin-top:1rem;min-height:1rem;"/>').text('Pantry TOC')).append(toc);
 
         $('#toc').on('click', 'a', function (e) {
 
