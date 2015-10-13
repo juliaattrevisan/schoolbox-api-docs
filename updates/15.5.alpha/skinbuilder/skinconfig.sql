@@ -44,6 +44,36 @@ VALUES ('skin_colour_navigation_hover',
         'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_offcanvas_foreground',
+        'Off-Canvas Foreground Colour',
+        'rgb(255, 255, 255)',
+        'Used for off-canvas navigation icon colours and label colours.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_offcanvas_background',
+        'Off-Canvas Background Colour',
+        'rgb(2, 137, 0)',
+        'Used for off-canvas navigation background.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_offcanvas_hover',
+        'Off-Canvas Hover/Accent Colour',
+        'rgb(158, 255, 171)',
+        'Used for off-canvas navigation hover.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_colour_content_ui_foreground',
         'Content Interface Foreground Colour',
         'rgb(255, 57, 168)',
