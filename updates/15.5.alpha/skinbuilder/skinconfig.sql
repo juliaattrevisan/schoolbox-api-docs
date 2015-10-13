@@ -14,7 +14,7 @@ VALUES (
 );
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
-VALUES ('skin_colour_primary_foreground',
+VALUES ('skin_colour_navigation_foreground',
         'Primary Foreground Colour',
         'rgb(255, 255, 255)',
         'Used for main navigation icon colours and label colours.',
@@ -24,8 +24,8 @@ VALUES ('skin_colour_primary_foreground',
         'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
-VALUES ('skin_colour_primary_background',
-        'Primary Background Colour',
+VALUES ('skin_colour_navigation_background',
+        'Navigation Background Colour',
         'rgb(76, 102, 176)',
         'Used for main navigation background. This inverts with Primary Foreground colour in the Search panel.',
         '11',
@@ -34,14 +34,59 @@ VALUES ('skin_colour_primary_background',
         'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
-VALUES ('skin_colour_primary_hover',
-        'Primary Hover/Accent Colour',
+VALUES ('skin_colour_navigation_hover',
+        'Navigation Hover/Accent Colour',
         'rgb(133, 82, 201)',
         'Used for main navigation hover and accent (border) colours in the Search field.',
         '11',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
         'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_content_ui_foreground',
+        'Content Interface Foreground Colour',
+        'rgb(255, 57, 168)',
+        'Used for foreground colours in interface elements in the main content area.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_content_ui_background',
+        'Content Interface Background Colour',
+        'rgb(255, 204, 232)',
+        'Used for background colours in interface elements in the main content area.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_content_ui_hover',
+        'Content Interface Hover/Accent Colour',
+        'rgb(255, 229, 244)',
+        'Used for hover colours in some interface elements in the main content area.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_content_ui_selected',
+        'Content Interface Selected/Active Colour',
+        'rgb(255, 255, 255)',
+        'Used to indicate a currently active, or selected, state. Applies to elements in the main content area.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+
+
+
+
 
 
 

@@ -17,9 +17,13 @@ $force = isset($opts['f']) || isset($opts['force']);
 $vars = [];
 if (Config::get('skin_builder')) {    
     $vars = [
-        'primary-foreground' => Config::get('skin_colour_primary_foreground'),
-        'primary-background' => Config::get('skin_colour_primary_background'),
-        'primary-hover' => Config::get('skin_colour_primary_hover'),
+        'navigation-foreground' => Config::get('skin_colour_navigation_foreground'),
+        'navigation-background' => Config::get('skin_colour_navigation_background'),
+        'navigation-hover' => Config::get('skin_colour_navigation_hover'),
+        'content-ui-foreground' => Config::get('skin_colour_content_ui_foreground'),
+        'content-ui-background' => Config::get('skin_colour_content_ui_background'),
+        'content-ui-hover' => Config::get('skin_colour_content_ui_hover'),
+        'content-ui-selected' => Config::get('skin_colour_content_ui_selected'),
         
         'primary-color'     => Config::get('skin_primary_colour'),
         'secondary-color'   => Config::get('skin_secondary_colour'),

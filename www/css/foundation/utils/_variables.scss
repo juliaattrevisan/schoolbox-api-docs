@@ -6,9 +6,15 @@ $charset: "utf-8";
 
 /* Refined Colour Application
  */
-$primary-foreground:            #ffffff;
-$primary-background:            #4c00b0;
-$primary-hover:                 #8552c9;
+$navigation-foreground:            #ffffff;
+$navigation-background:            #4c00b0;
+$navigation-hover:                 #8552c9;
+
+$content-ui-foreground:            #ff39a8;
+$content-ui-background:            #ffcce8;
+$content-ui-hover:                 #ffe5f4;
+$content-ui-selected:              #ffffff;
+
 
 // Colours
 $primary-color:					#0066b0 !default;
@@ -25,7 +31,7 @@ $anchor-font-color:             $primary-color;
 $tertiary:						$tertiary-color;
 
 $input-border-color:			tint($tertiary, 66%);
-$tabbar-bg:						$primary-background;
+$tabbar-bg:						$navigation-background;
 $off-canvas-bg:					$white;
 
 $row-hover-background: tint($secondary-color, 87%);

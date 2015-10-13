@@ -277,17 +277,17 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		}
 
 		&:hover{
-		    background-color: $primary-hover;
+		    background-color: $navigation-hover;
 		}
 
 		&:before{
 			text-align: center;
 			float: none;
-			color: $primary-foreground;
+			color: $navigation-foreground;
 		}
 		span {
 			font-weight: $font-weight-normal;
-			color: $primary-foreground;
+			color: $navigation-foreground;
 			display: block;
 			line-height: rem-calc($base-font-size);
 		}
@@ -385,65 +385,11 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
   }
 }
 
-.tab-bar {
-    #search{
-        margin: 0;
-        position: absolute;
-        right: 10rem;
-        top: 0;
-        height: $tabbar-height;
-        @include placeholder-color(transparent, $font-weight-normal);
-	    input[type="text"]{
-            border: 0;
-            background-color: transparent;
-            color: $body-bg;
-            float: right;
-            height: $tabbar-height;
-            width: $tabbar-height;
-            padding: $base-font-size;
-            margin: 0;
-            opacity: 0;
-        }
-        &:hover, &.focus {
-            width: 100%;
-            padding-left: 22rem;
-            @include placeholder-color($black, $font-weight-normal);
-        }
-        .icon-search{
-            @include absolute (0, auto, auto, 32px);
-            @include transition(all, 0.3s, ease-in);
-            margin: 0;
-            z-index: 1;
-            &:before{
-                color: $primary-foreground;
-            }
-        }
-        [type="text"]:focus,
-        [type="text"]:active,
-        &:hover [type="text"],
-        &:hover [type="text"]:focus{
-            background-color: $white;
-		border: 2px solid $primary-hover;
-            color: $black;
-            width: 99.7%;
-            opacity: 1;
-        }
-	[type="text"]:focus + .icon-search,
-	[type="text"]:active + .icon-search,
-	&:hover .icon-search{
-            @include absolute (0, auto, auto, 16px);
-        }
-        &:hover .icon-search:before {
-            color: $primary-background;
-        }
-    }
-}
-
 .left-off-canvas-toggle,
 .right-off-canvas-toggle {
-	color: $primary-foreground;
+	color: $navigation-foreground;
 	&:hover {
-		color: $primary-foreground;
+		color: $navigation-foreground;
 	}
 }
 
@@ -475,7 +421,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	 * Appears when you click a guy's username in the left menu
 	 */
 	.account-menu{
-		color: $primary-background;
+		color: $navigation-background;
 		background-color: transparent;
 		padding: 0 2.5rem 0 0;
 		font-weight: $font-weight-bold;
@@ -496,7 +442,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		/* Little triangle icon next to username
 		 */
         &:after {
-            border-color: $primary-background transparent transparent transparent;
+            border-color: $navigation-background transparent transparent transparent;
         }
 	}
 
@@ -506,10 +452,10 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		box-shadow: none;
 		max-width: none;
 		a {
-		    color: $primary-foreground;
-		    background-color: $primary-background;
+		    color: $navigation-foreground;
+		    background-color: $navigation-background;
             &:hover {
-                background-color: $primary-hover;
+                background-color: $navigation-hover;
             }
         }
 	}
@@ -535,11 +481,11 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	// Left nav arrow override
 	ul.off-canvas-list {
 	    a {
-	        color: $primary-background;
+	        color: $navigation-background;
         }
 		a:hover {
-		    color: $primary-foreground;
-			background-color: $primary-hover;
+		    color: $navigation-foreground;
+			background-color: $navigation-hover;
 		}
 		li.has-submenu > a:after{
 			content: "\e64b";
