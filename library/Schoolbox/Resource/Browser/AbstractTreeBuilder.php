@@ -240,7 +240,7 @@ abstract class AbstractTreeBuilder
      */
     protected function generateFileArray(Resource\AbstractFile $file, $name = null, array $liAttributes = null, array $aAttributes = null)
     {
-        return $this->generateNodeArray("{$this->namespace}-{$file->getId()}", $file->getFolder()->getId(), 'file', $name ?: $file->getTitle(), $liAttributes, $aAttributes);
+        return $this->generateNodeArray($file->getId(), $file->getFolder()->getId(), 'file', $name ?: $file->getTitle(), $liAttributes, $aAttributes);
     }
 
 
@@ -256,7 +256,7 @@ abstract class AbstractTreeBuilder
     protected function generateNodeArray($nodeId, $parentId, $type, $name, array $liAttributes = null, array $aAttributes = null)
     {
         $array = array(
-            'id'       => $nodeId,
+            'id'       => $type == 'file' ? "{$this->namespace}-$nodeId" :$nodeId,
             'parent'   => $parentId ?: '0',
             'text'     => $name,
             'children' => $type == 'file' ? 0 : $this->getNodeHasChildren($nodeId),
