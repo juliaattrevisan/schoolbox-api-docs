@@ -404,6 +404,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 
 	/* Profile Flyout Menu
+	 * This is the currently-logged-in user's dom element
 	 * Appears when you click a guy's username in the left menu
 	 */
 	.account-menu {
@@ -421,8 +422,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
             border-color: $off-canvas-foreground transparent transparent transparent;
         }
 
-        /* This is the currently-logged-in user's dom element
-         */
         &:hover {
             color: $off-canvas-foreground;
             background-color: $off-canvas-hover;
