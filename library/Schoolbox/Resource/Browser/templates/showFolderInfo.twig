@@ -42,9 +42,9 @@
             {#<h4>Group</h4>#}
             {#<h5 class="subheader">Administrator</h5>#}
             <li>
-                {% if folder.group.private   %}<span data-tooltip aria-haspopup="true" class="has-tip" title="Users cannot see or join this {{ type }} unless added by an admin">Private {{ type | capitalize }}</span>{% endif %}
-                {% if folder.group.moderated %}<span data-tooltip aria-haspopup="true" class="has-tip" title="Users can join, but only once access is approved by an admin">Moderated {{ type | capitalize }}</span>{% endif %}
-                {% if folder.group.free      %}<span data-tooltip aria-haspopup="true" class="has-tip" title="Can be joined or left by anyone at any time">Open {{ type | capitalize }}</span>{% endif %}
+                {% if folder.group.private   %}Private {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Users cannot see or join this {{ type }} unless added by an admin">?</span>{% endif %}
+                {% if folder.group.moderated %}Moderated {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Users can join, but only once access is approved by an admin">?</span>{% endif %}
+                {% if folder.group.free      %}Open {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Can be joined or left by anyone at any time">?</span>{% endif %}
             </li>
 
         {% elseif folder.codeString and folder.teachers|length > 0 %}
