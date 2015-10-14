@@ -19,7 +19,7 @@ if (strlen($_POST['password'])) {
 	 */
     $redir = isset($this->arg[0]) && $this->arg[0] == 'lite'
         ? '/ajax/resource/tree/webdav'
-        : '/cms/network';
+        : '/drives';
 
 	$this->localRedir($redir);
 }

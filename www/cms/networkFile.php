@@ -55,7 +55,7 @@ if (is_numeric($this->arg[0])) {
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text'  => "Drives",
-            'href'  => "/cms/network/".$file['parent'],
+            'href'  => "/drives/".$file['parent'],
             'class' => '',
         ],
         [
@@ -99,7 +99,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text'  => "Drives",
-            'href'  => "/cms/network/".$parent['id'],
+            'href'  => "/drives/".$parent['id'],
             'class' => '',
         ],
         [

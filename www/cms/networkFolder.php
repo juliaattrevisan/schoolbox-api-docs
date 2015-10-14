@@ -42,7 +42,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text' => 'Drives',
-            'href' => "/cms/network/".$folder['parent'],
+            'href' => "/drives/".$folder['parent'],
             'class' => '',
         ],
         [
@@ -77,7 +77,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         $trail->renderIntoSitePage($this, 'BREADCRUMB', [
             [
                 'text' => 'Drives',
-                'href' => "/cms/network/".$this->arg[1],
+                'href' => "/drives/".$this->arg[1],
                 'class' => '',
             ],
             [
