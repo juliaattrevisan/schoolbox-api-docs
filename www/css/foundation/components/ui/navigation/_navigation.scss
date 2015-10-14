@@ -29,9 +29,8 @@ $tabbar-header-weight: $font-weight-bold;
 $tabbar-header-line-height: $tabbar-height;
 $tabbar-header-margin: 0;
 
-//$tabbar-menu-icon-color: contrast-bg(0.25, $body-bg, 0%, $primary-color, $primary-color);
-//$tabbar-menu-icon-hover: tint($tabbar-menu-icon-color, 20%);
-
+$tabbar-menu-icon-color: $navigation-foreground;
+$tabbar-menu-icon-hover: $navigation-hover;
 $tabbar-menu-icon-text-indent: rem-calc(35);
 $tabbar-menu-icon-width: $tabbar-icon-width;
 $tabbar-menu-icon-height: $tabbar-height;
