@@ -1,3 +1,22 @@
-<h1>Curriculum - {{ item.name }}</h1>
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Curriculum - {{ item.name }}</h1>
+        </div>
+    </div>
+    <nav>
+        <a href="{{ routeLookup('curriculum.browse')|escape('html_attr') }}"
+           class="icon icon-undo"
+           title="Return to Curriculum"></a>
+    </nav>
+</div>
 
-{{ item.description|purify }}
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div class="content">
+                <article>{{ item.description|purify }}</article>
+            </div>
+        </section>
+    </div>
+</div>
