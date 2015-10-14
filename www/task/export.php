@@ -68,14 +68,6 @@ $this->setVar(
 // Get each class which uses the unit already.
 /** @var UnitInstance[]|Collection $unitList */
 $unitList = UnitInstanceMapper::getInstance()->findByUnitCategoryId($categoryId);
-/** @var Category[]|Collection $classWithUnitList */
-$classWithUnitList = CategoryMapper::getInstance()->findByColumn(
-    'id',
-    $unitList->map(function($unit) {
-        /** @var UnitInstance $unit */
-        return $unit->getComponent()->getIdentifier();
-    })
-);
 
 // Iterate units instead of folders, because it's possible for a unit to exist
 // more than once in the same folder.
