@@ -166,12 +166,14 @@ ul.az-error-list {
             font-weight: $font-weight-normal;
             @media #{$small-only} {
                 left: 0.625rem;
-                top: 0.25rem;
+                top: 50%;
+                margin-top: -18px;
                 font-size: 1.5rem;
             }
             @media #{$medium-up} {
                 left: 1rem;
-                top: 0.5rem;
+                top: 50%;
+                margin-top: -24px;
                 font-size: 2rem;
             }
         }
