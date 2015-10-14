@@ -66,6 +66,12 @@ $notification-header-background: $navigation-background !default;
             background: $notification-unread-background;
             color: $notification-unread-color;
         }
+
+        /* This is the list of messages you've received.
+         */
+        .action-list li {
+            margin-left: 0;
+        }
     }
     .button {
         color: $navigation-foreground;
