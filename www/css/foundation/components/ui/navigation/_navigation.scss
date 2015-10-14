@@ -291,16 +291,19 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
     /* Used to separate areas in the flyout menu
      * Notably, "Switch User" and its list of users
      *
+     * This usually inherits from the content-ui colour set
+     * where flyout colours were generically defined
+     *
      * To override .f-dropdown default colours,
      * use background not background-color
      */
     .f-dropdown {
         .separator {
-            color: $off-canvas-foreground;
-            background: $off-canvas;
+            color: contrast-bg($background: $off-canvas-background, $dark: $off-canvas-foreground);
+            background: $off-canvas-background;
 
             &:hover {
-                background: $off-canvas;
+                background: $off-canvas-background;
             }
         }
 
