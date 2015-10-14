@@ -275,10 +275,10 @@ OR ml.name        LIKE :keyword
                         $actionString .= 'link <a href="/redir.php?id=' . $log['l_cid'] . '">' . $log['l_description'] . '</a> in <a href=/homepage/'. $log['l_cid'] .'>'.$log['l_catname'].'</a>';
                         break;
                     case 'myfile':
-                        $actionString .= 'myFile <a href="/cms/portfolio/' . $log['mf_id'] . '">' . $log['mf_description'] . '</a>';
+                        $actionString .= 'myFile <a href="/my-files/' . $log['mf_id'] . '">' . $log['mf_description'] . '</a>';
                         break;
                     case 'myfolder':
-                        $actionString .= 'myFolder <a href="/cms/portfolio/' . $log['ml_id'] . '">' . $log['ml_name'] . '</a>';
+                        $actionString .= 'myFolder <a href="/my-files/' . $log['ml_id'] . '">' . $log['ml_name'] . '</a>';
                         break;
                     case 'content':
                         $actionString .= 'textbox <a href="/homepage/'.$log['textbox_cid'].'">'.$log['textbox_heading'].'</a>';

@@ -45,7 +45,7 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     protected function getFolderHref(IFolder $folder)
     {
-        return '/cms/portfolio/' . $folder->getId();
+        return '/my-files/' . $folder->getId();
     }
 
 

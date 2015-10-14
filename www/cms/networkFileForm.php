@@ -50,7 +50,7 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name']) || isset(
         }
     }
 
-    SitePage::localRedir('/cms/network/' . $_POST['parent']);
+    SitePage::localRedir('/drives/' . $_POST['parent']);
 } elseif (is_numeric($_GET['delete'])) {
 
     if (!$file = $fileHandler->getByID($_GET['delete'])) {
@@ -63,7 +63,7 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name']) || isset(
 
     $fileHandler->delete($_GET['delete']);
 
-    SitePage::localRedir('/cms/network/' . $file['parent']);
+    SitePage::localRedir('/drives/' . $file['parent']);
 } else {
     if (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
         /* Move file from one category to another, after checking permission on both from and to categories

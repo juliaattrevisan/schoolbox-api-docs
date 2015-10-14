@@ -26,7 +26,7 @@ if (isset($_POST['name'])) {
         $folder['id'] = $folderHandler->create($folder);
     }
 
-    SitePage::localRedir('/cms/portfolio/' . $folder['id']);
+    SitePage::localRedir('/my-files/' . $folder['id']);
 }
 elseif (is_numeric($_GET['delete'])) {
 
@@ -40,7 +40,7 @@ elseif (is_numeric($_GET['delete'])) {
 
     $folderHandler->delete($_GET['delete']);
 
-    SitePage::localRedir('/cms/portfolio/' . $folder['parent']);
+    SitePage::localRedir('/my-files/' . $folder['parent']);
 }
 elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
     /* Move file from one category to another, after checking permission on both from and to categories */

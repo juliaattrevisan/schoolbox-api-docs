@@ -183,7 +183,7 @@ elseif (is_numeric($_GET['delete'])) {
     } catch (Schoolbox\Resource\Exception $e) {
         error($e->getCode());
     }
-    SitePage::localRedir("/cms/portfolio/$parent");
+    SitePage::localRedir("/my-files/$parent");
 } // delete multiple files
 elseif (isset($_GET['fileList']) && is_numeric($_GET['deleteList'])) {
     $fileList = array_values(array_filter(explode(',', $_GET['fileList'])));
@@ -201,7 +201,7 @@ elseif (isset($_GET['fileList']) && is_numeric($_GET['deleteList'])) {
         if (count($errorList)) {
             error($errorList[0]);
         }
-        SitePage::localRedir("/cms/portfolio/$parent");
+        SitePage::localRedir("/my-files/$parent");
     } else {
         error(2);
     }
