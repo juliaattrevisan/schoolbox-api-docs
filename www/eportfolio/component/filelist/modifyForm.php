@@ -11,7 +11,7 @@ require_once dirname(__FILE__) . '/../../../../include/Bootstrap.php';
 
 $page = new SitePage();
 
-/* All these are accessed via get from /cms/portfolio (My Files)
+/* All these are accessed via get from /my-files (My Files)
  */
 $action = $_GET['action'];
 $ownerId = $_GET['userId'];

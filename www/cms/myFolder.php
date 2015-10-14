@@ -62,7 +62,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text' => $folder->getOwner()->formatName()."'s Files",
-            'href' => "/cms/portfolio/".$folder->getId(),
+            'href' => "/my-files/".$folder->getId(),
             'class' => '',
         ],
         [
@@ -134,7 +134,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text' => $owner->formatName()."'s Files",
-            'href' => "/cms/portfolio/",
+            'href' => "/my-files/",
             'class' => '',
         ],
         [
