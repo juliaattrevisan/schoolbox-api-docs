@@ -4,9 +4,11 @@
     #component-layout .column-top .component-titlebar {
         background-color: {top_head_bg};
     }
+
     #component-layout .column-top .component-titlebar a {
         color: {top_head_font};
     }
+
     #component-layout .column-top .island section {
         color: {top_font};
         background-color: {top_bg_primary};
@@ -15,9 +17,11 @@
     #component-layout .column-left .component-titlebar {
         background-color: {left_head_bg};
     }
+
     #component-layout .column-left .component-titlebar a {
         color: {left_head_font};
     }
+
     #component-layout .column-left .island section {
         color: {left_font};
         background-color: {left_bg_primary};
@@ -26,12 +30,29 @@
     #component-layout .column-right .component-titlebar {
         background-color: {right_head_bg};
     }
+
     #component-layout .column-right .component-titlebar a {
         color: {right_head_font};
     }
     #component-layout .column-right .island section {
         color: {right_font};
         background-color: {right_bg_primary};
+    }
+
+    <!-- Special Effects for Action Buttons -->
+    #component-layout .column-top .component-titlebar nav a,
+    #component-layout .column-left .component-titlebar nav a,
+    #component-layout .column-right .component-titlebar nav a
+    {
+        opacity: 0.5;
+    }
+
+    #component-layout .column-top .component-titlebar nav a:hover,
+    #component-layout .column-left .component-titlebar nav a:hover,
+    #component-layout .column-right .component-titlebar nav a:hover
+    {
+        opacity: 1;
+        background-color: transparent;
     }
 
     /* wrap mimetypes in classes */
