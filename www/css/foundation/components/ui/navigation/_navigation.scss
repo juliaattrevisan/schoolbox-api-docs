@@ -272,7 +272,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 }
 
 // Logo - Side Bar
-.left-off-canvas-menu{
+.left-off-canvas-menu {
     .logo-wrapper {
         padding: 2rem 0;
         background-color: $logo-background;
@@ -285,6 +285,22 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
         img {
             display: block;
             margin: 0 auto;
+        }
+    }
+
+    /* Used to separate areas in the flyout menu
+     * Notably, "Switch User"
+     */
+    .f-dropdown .separator {
+        color: $off-canvas-foreground;
+
+        /* To override .f-dropdown default colours,
+         * use background not background-color
+         */
+        background: $off-canvas;
+
+        &:hover {
+            background: $off-canvas;
         }
     }
 }
