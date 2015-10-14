@@ -128,4 +128,12 @@ div.jstree-default, ul.jstree-default {
             }
         }
     }
+
+    /* Tooltip span elements should display:inline-block, rather
+     * than inherit the display:block property from elsewhere
+     * which forces it to fall down
+     */
+    .inline-list > li > span.hint {
+        display: inline-block;
+    }
 }
