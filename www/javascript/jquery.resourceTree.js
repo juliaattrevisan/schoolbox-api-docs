@@ -5,6 +5,46 @@
  */
 (function($) {
     /**
+     * Helper method for determining whether a node is a folder, for sort purposes.
+     *
+     * @param jstree
+     * @param nodeId
+     * @returns {boolean}
+     */
+    var isFolder = function(jstree, nodeId) {
+        switch (jstree.get_type(nodeId)) {
+            case 'folder':
+            case 'homepage':
+            case 'course':
+                return true;
+            case 'link':
+            case 'file':
+            default:
+                return false;
+        }
+    };
+
+    /**
+     * Sort callback
+     *
+     * @param jstree
+     * @param a
+     * @param b
+     * @returns {number}
+     */
+    var resourceTreeSort = function(jstree, a, b) {
+        var isAFolder = isFolder(jstree, a);
+        var isBFolder = isFolder(jstree, b);
+        if (isAFolder && !isBFolder) {
+            return -1;
+        }
+        if (isBFolder && !isAFolder) {
+            return 1;
+        }
+        return jstree.get_text(a) > jstree.get_text(b) ? 1 : -1;
+    };
+
+    /**
      * @param element The jQuery element to tie this resource tree to.
      * @param options
      *   data:
@@ -118,6 +158,9 @@
                     course: {
                         icon: 'icon-course-builder'
                     }
+                },
+                sort: function(a, b) {
+                    return resourceTreeSort(this, a, b);
                 }
             }
         }
