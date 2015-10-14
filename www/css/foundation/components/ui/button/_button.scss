@@ -1,6 +1,9 @@
 /* Link Styles
+ * Really hammer out the $primary-color assumption
+ * as clicking on a link then hovering away reveals
+ * another unseen usage of this var
  */
-a {
+a, a:link, a:visited, a:hover, a:active {
     color: $content-ui-foreground;
     &:hover {
         color: $content-ui-foreground;
@@ -12,7 +15,6 @@ a[disabled], a.disabled {
     pointer-events: none;
     cursor: default;
 }
-
 
 /* All generic buttons
  */
