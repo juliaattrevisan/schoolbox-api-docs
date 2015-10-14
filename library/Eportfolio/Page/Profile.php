@@ -262,10 +262,13 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
      */
     private function renderRecentPhotos()
     {
-
         /* Gather everything
          */
         $allImages = \Component\Eportfolio\FileListMapper::getInstance()->findRecent($this->getUserId(), $this->getNumRecentPhotos());
+        $allImages = $allImages->filter(function($image) {
+            /** @var \Component\Eportfolio\FileList $image */
+            return $this->canUserViewPage($image->getPageId());
+        });
 
         if ($allImages->count()) {
             foreach ($allImages as $currentImage) {
@@ -291,6 +294,10 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
     private function renderRecentBlogs()
     {
         $allBlogs = \Component\Eportfolio\BlogMapper::getInstance()->findRecent($this->getUserId(), $this->getNumRecentBlogs());
+        $allBlogs = $allBlogs->filter(function($blog) {
+            /** @var \Component\Eportfolio\Blog $blog */
+            return $this->canUserViewPage($blog->getPageId());
+        });
 
         if ($allBlogs->count()) {
             $j = 0;
@@ -313,6 +320,17 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
             $this->getPage()->parse('no_recent_blog_block', 'no_recent_blog');
             $this->getPage()->setVar('has_recent_blog_block', '');
         }
+    }
+
+    /**
+     * Can the current user view this page?
+     *
+     * @return bool
+     */
+    private function canUserViewPage($pageId)
+    {
+        $auth = new Eportfolio_Authenticator($this->getCurrentUser()->getId(), $this->getUserId(), $pageId);
+        return $auth->canView();
     }
 
     /**
