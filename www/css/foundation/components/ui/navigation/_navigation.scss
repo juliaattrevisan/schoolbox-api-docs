@@ -314,15 +314,9 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
         }
     }
 
-    /* Separator: used to separate areas in the flyout menu
-     * Notably, "Switch User" and its list of users
-     * These elements have no hover styling
-     *
-     * This usually inherits from the content-ui colour set
-     * where flyout colours were generically defined
-     *
-     * To override .f-dropdown default colours,
-     * use background not background-color
+    /* f-dropdown
+     * This is used to summon the user-specific flyout menu,
+     * by clicking their name in the Off-Canvas
      */
     .f-dropdown {
         box-shadow: none;
@@ -338,6 +332,16 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
             }
         }
 
+        /* Separator: used to separate areas in the flyout menu
+         * Notably, "Switch User" and its list of users
+         * These elements have no hover styling
+         *
+         * This usually inherits from the content-ui colour set
+         * where flyout colours were generically defined
+         *
+         * To override .f-dropdown default colours,
+         * use background not background-color
+         */
         .separator {
             color: contrast-bg($background: $off-canvas-background, $dark: $off-canvas-foreground);
             background: $off-canvas-background;
