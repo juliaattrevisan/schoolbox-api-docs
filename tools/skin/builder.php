@@ -67,11 +67,15 @@ if ($origSha != $newSha || $force) {
     // Compile the new sass file.
     $infile  = SITE_root . '/www/css/foundation/chrome-foundation.scss';
     $outfile = SITE_root . '/www/css/foundation/chrome.css';
+    $ie9file = SITE_root . '/www/css/foundation/chrome-ie9.css';
     $tmpfile = tempnam(sys_get_temp_dir(), 'css');
     $cmd     = sprintf('sass %s > %s', escapeshellarg($infile), escapeshellarg($tmpfile));
     exec($cmd, $output, $outputCode);
     if ($outputCode === 0) {
         copy($tmpfile, $outfile);
+        // Run bless
+        $blessCmd = sprintf('node_modules/.bin/blessc %s %s', escapeshellarg($outfile), escapeshellarg($ie9file));
+        exec($blessCmd, $output, $outputCode);
     } else {
         // something went wrong
     }
