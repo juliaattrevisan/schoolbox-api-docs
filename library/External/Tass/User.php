@@ -208,7 +208,7 @@ class External_Tass_User implements External_UserInterface
 		 */
 
         // id has to have a [P]arent prefix (or [S]pouse)
-        if (!preg_match('#(?:P|S)[0-9]+#s', $tassID)) {
+        if (!preg_match('#(?:P|S)[0-9A-Za-z]+#s', $tassID)) {
             return array();
         }
 
