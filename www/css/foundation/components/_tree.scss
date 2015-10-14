@@ -1,6 +1,10 @@
 
 $tree-node-height: 3rem;
 
+/* Default idle state of a node anchor
+ */
+$tree-node-color: $content-ui-foreground;
+
 $tree-node-hover-background: $content-ui-hover;
 $tree-node-hover-color: $content-ui-foreground;
 
@@ -51,6 +55,10 @@ div.jstree-default, ul.jstree-default {
 
     .jstree-wholerow, .jstree-anchor, .jstree-default, .jstree-icon:empty {
         line-height: $tree-node-height;
+    }
+
+    .jstree-anchor {
+        color: $tree-node-color;
     }
 
     .jstree-ocl {
