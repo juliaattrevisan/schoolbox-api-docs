@@ -80,7 +80,7 @@ if (count($unitList) > 0) {
 
         // Load category and hierarchy for this unit
         try {
-            $unitCategory = CategoryMapper::getInstance()->findById($unit->getComponent()->getIdentifier());
+            $unitCategory = CategoryMapper::getInstance()->findById($unit->getCategory()->getId());
         } catch (\Schoolbox\Mapper\Exception $e) {
             // Most likely deleted - ignore
             continue;
