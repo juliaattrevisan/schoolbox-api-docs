@@ -24,41 +24,36 @@
                         {% endif %}
                     </h3>
                 </a>
+
+                <ul class="inline-list">
+
+                    {% if folder.group.category %}
+
+                        {% if folder.codeString and folder.teachers|length > 0 %}
+                            {% set type = 'class' %}
+                        {% else %}
+                            {% set type = 'group' %}
+                        {% endif %}
+
+                        {#<h4>Group</h4>#}
+                        {#<h5 class="subheader">Administrator</h5>#}
+                        <li>
+                            {% if folder.group.private   %}Private {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Users cannot see or join this {{ type }} unless added by an admin">?</span>{% endif %}
+                            {% if folder.group.moderated %}Moderated {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Users can join, but only once access is approved by an admin">?</span>{% endif %}
+                            {% if folder.group.free      %}Open {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Can be joined or left by anyone at any time">?</span>{% endif %}
+                        </li>
+
+                    {% elseif folder.codeString and folder.teachers|length > 0 %}
+                        <li>Class</li>
+                    {% else %}
+                        <li>Folder</li>
+                    {% endif %}
+                </ul>
             </div>
             <nav>
                 <a href="#" class="icon-eye" data-reveal-id="modal-folder-{{ folder.id }}"></a>
             </nav>
         </div>
-        <ul class="inline-list">
-
-        {% if folder.group.category %}
-
-            {% if folder.codeString and folder.teachers|length > 0 %}
-                {% set type = 'class' %}
-            {% else %}
-                {% set type = 'group' %}
-            {% endif %}
-
-            {#<h4>Group</h4>#}
-            {#<h5 class="subheader">Administrator</h5>#}
-            <li>
-                {% if folder.group.private   %}Private {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Users cannot see or join this {{ type }} unless added by an admin">?</span>{% endif %}
-                {% if folder.group.moderated %}Moderated {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Users can join, but only once access is approved by an admin">?</span>{% endif %}
-                {% if folder.group.free      %}Open {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Can be joined or left by anyone at any time">?</span>{% endif %}
-            </li>
-
-        {% elseif folder.codeString and folder.teachers|length > 0 %}
-            <li>Class</li>
-        {% else %}
-            <li>Folder</li>
-        {% endif %}
-        </ul>
-
-
-
-
-
-
 
         {% set actionBarList %}
             {# Actions differ by namespace #}
