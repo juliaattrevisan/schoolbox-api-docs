@@ -369,7 +369,7 @@ ul.az-error-list {
         height 360ms $attachzone-overlay-timing 360ms
     );
     &:hover {
-        background-color: rgba($attachzone-resting-background, 0.2);
+        background-color: $accent-hover;
         cursor: pointer;
     }
 }
