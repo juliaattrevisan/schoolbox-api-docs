@@ -289,8 +289,10 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 }
 
-// Left Side Menu
-.left-off-canvas-menu{
+/* Off Canvas Menu
+ * This can be summoned using the hamburger if it's not already visible
+ */
+.left-off-canvas-menu {
 
     /* A background colour specifically for the logo/crest
      * so a school logo won't be mashed by the off-canvas colour
@@ -323,6 +325,19 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
      * use background not background-color
      */
     .f-dropdown {
+        box-shadow: none;
+        max-width: none;
+
+        /* Custom link styles for off-canvas account menu
+         */
+        a {
+            color: $off-canvas-foreground;
+            background-color: $off-canvas-background;
+            &:hover {
+                background-color: $off-canvas-hover;
+            }
+        }
+
         .separator {
             color: contrast-bg($background: $off-canvas-background, $dark: $off-canvas-foreground);
             background: $off-canvas-background;
@@ -420,20 +435,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			display: inline-block;
 			padding-left: 0.5rem;
 		}
-	}
-
-    /* Custom link styles for off-canvas account menu
-     */
-	.f-dropdown{
-		box-shadow: none;
-		max-width: none;
-		a {
-		    color: $off-canvas-foreground;
-		    background-color: $off-canvas-background;
-            &:hover {
-                background-color: $off-canvas-hover;
-            }
-        }
 	}
 
 	// H3 & H4 to replicate the off-canvas label styles
