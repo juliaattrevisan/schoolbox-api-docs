@@ -435,13 +435,13 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
         }
 
 		&.open {
-		    color: $off-canvas-hover;
+		    color: $off-canvas-foreground;
 			background-color: $off-canvas-bg;
 
             /* Little triangle icon next to username
              */
             &.dropdown.button::after {
-                border-color: $off-canvas-hover transparent transparent transparent;
+                border-color: $off-canvas-foreground transparent transparent transparent;
             }
 		}
 
