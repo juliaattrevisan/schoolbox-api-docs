@@ -1402,11 +1402,23 @@ abstract class Mapper implements IMapper, Serializable
                 'order'   => $order,
             )
         );
+        if ($result_collection->count() === 0) {
+            throw new Exception('Instance of object not found');
+        }
+
+        // Use the first non-deleted model
         foreach ($result_collection as $model) {
-            $this->throwIfDeleted($model);
+            if ($model instanceof ISoftDeletable && $model->isDeleted()) {
+                continue;
+            }
             return $model;
         }
-        throw new Exception('Instance of object not found');
+
+        // Were all items deleted?
+        // If so, throw a deleted exception with the first item in the list.
+        $e = new Exception\Deleted();
+        $e->setDeletedObject($result_collection->first());
+        throw $e;
     }
 
     /**
