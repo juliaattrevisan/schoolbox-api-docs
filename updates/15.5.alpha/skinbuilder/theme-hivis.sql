@@ -1,0 +1,24 @@
+--    UPDATE config SET `value` = 'rgb(255, 185, 185)' WHERE `name` = 'skin_colour_navigation_foreground';
+--    UPDATE config SET `value` = 'rgb(255, 0, 0)' WHERE `name` = 'skin_colour_navigation_background';
+--    UPDATE config SET `value` = 'rgb(255, 64, 64)' WHERE `name` = 'skin_colour_navigation_hover';
+--
+--    UPDATE config SET `value` = 'rgb(202, 255, 217)' WHERE `name` = 'skin_colour_offcanvas_foreground';
+--    UPDATE config SET `value` = 'rgb(0, 178, 51)' WHERE `name` = 'skin_colour_offcanvas_background';
+--    UPDATE config SET `value` = 'rgb(0, 203, 58)' WHERE `name` = 'skin_colour_offcanvas_hover';
+--    UPDATE config SET `value` = 'rgb(0, 178, 51)' WHERE `name` = 'skin_colour_off_canvas';
+--
+--    UPDATE config SET `value` = 'rgb(80, 9, 236)' WHERE `name` = 'skin_colour_content_ui_foreground';
+--    UPDATE config SET `value` = 'rgb(203, 179, 255)' WHERE `name` = 'skin_colour_content_ui_background';
+--    UPDATE config SET `value` = 'rgb(227, 215, 255)' WHERE `name` = 'skin_colour_content_ui_hover';
+--    UPDATE config SET `value` = 'rgb(241, 234, 255)' WHERE `name` = 'skin_colour_content_ui_selected';
+--
+--    UPDATE config SET `value` = 'rgb(255, 229, 169)' WHERE `name` = 'skin_colour_content_ui_submit_foreground';
+--    UPDATE config SET `value` = 'rgb(251, 174, 0)' WHERE `name` = 'skin_colour_content_ui_submit_background';
+--
+--    UPDATE config SET `value` = 'rgb(213, 54, 255)' WHERE `name` = 'skin_colour_accent_foreground';
+--    UPDATE config SET `value` = 'rgb(243, 200, 255)' WHERE `name` = 'skin_colour_accent_background';
+--    UPDATE config SET `value` = 'rgb(249, 225, 255)' WHERE `name` = 'skin_colour_accent_hover';
+--
+--    UPDATE config SET `value` = 'rgb(0, 178, 51)' WHERE `name` = 'skin_colour_logo_background';
+--
+--    UPDATE config SET `value` = 'rgb(237, 237, 237)' WHERE `name` = 'skin_body_bg_colour';
