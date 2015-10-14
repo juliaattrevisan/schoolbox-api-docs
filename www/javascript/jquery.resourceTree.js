@@ -41,7 +41,18 @@
         if (isBFolder && !isAFolder) {
             return 1;
         }
-        return jstree.get_text(a) > jstree.get_text(b) ? 1 : -1;
+
+        // locales and options aren't supported by garbage browsers like IE < 11 and Safari,
+        // they will just ignore these parameters.
+        return jstree.get_text(a).localeCompare(
+            jstree.get_text(b),
+            window.navigator.language || 'en',
+            {
+                usage: 'sort',
+                sensitivity: 'accent',
+                numeric: true
+            }
+        );
     };
 
     /**
