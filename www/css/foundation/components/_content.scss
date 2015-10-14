@@ -61,7 +61,7 @@ $label-padding: rem-calc(($base-font-size - 10)) rem-calc(($base-font-size - 2))
 // We use these to style the label text
 $label-font-sizing: rem-calc(($base-font-size - 4));
 $label-font-weight: $font-weight-bold;
-$label-font-color: $primary-color;
+//$label-font-color: $primary-color;
 // $label-font-color-alt: $white;
 // $label-font-family: $body-font-family;
 
@@ -127,7 +127,11 @@ $label-font-color: $primary-color;
 
 // We use this to set the progress bar height
 $progress-bar-height: rem-calc(($base-font-size - 2));
-$progress-bar-color: tint($tertiary, 87%);
+
+/* This is the track colour for the progress bar.
+ * The progress bar expands to cover this colour.
+ */
+$progress-bar-color: $accent-background;
 
 // We use these to control the border styles
 // $progress-bar-border-color: scale-color($white, $lightness: 20%);
@@ -139,8 +143,12 @@ $progress-bar-border-radius: 0px;
 $progress-bar-pad: rem-calc(0);
 // $progress-bar-margin-bottom: rem-calc(10);
 
+/* The actual coloured bar inside that increases
+ * as "progress is made"
+ */
+$progress-meter-color: $accent-foreground;
+
 // We use these to set the meter colors
-// $progress-meter-color: $primary-color;
 // $progress-meter-secondary-color: $secondary-color;
 // $progress-meter-success-color: $success-color;
 // $progress-meter-alert-color: $alert-color;
@@ -167,7 +175,7 @@ $reveal-modal-padding: rem-calc(($base-font-size - 2));
 // $reveal-close-font-size: rem-calc(40);
 // $reveal-close-top: rem-calc(8);
 // $reveal-close-side: rem-calc(11);
-$reveal-close-color: $primary-color;
+$reveal-close-color: $content-ui-foreground;
 // $reveal-close-weight: $font-weight-bold;
 
 // We use this to set the default radius used throughout the core.
@@ -189,10 +197,10 @@ $reveal-border-width: 9;
 // $include-html-accordion-classes: $include-html-classes;
 
 $accordion-navigation-padding: rem-calc(($base-font-size - 4));
-$accordion-navigation-bg-color: tint($tertiary, 74%);
-$accordion-navigation-hover-bg-color: tint($tertiary, 87%);
-$accordion-navigation-active-bg-color: $white;
-// $accordion-navigation-font-color: $jet;
+$accordion-navigation-bg-color: $content-ui-background;
+$accordion-navigation-hover-bg-color: $content-ui-hover;
+$accordion-navigation-active-bg-color: $content-ui-background;
+$accordion-navigation-font-color: $content-ui-foreground;
 $accordion-navigation-font-size: rem-calc(($base-font-size));
 // $accordion-navigation-font-family: $body-font-family;
 
@@ -332,40 +340,6 @@ $tooltip-font-color: $white;
 // $icon-bar-item-padding: 1.25rem;
 
 //
-// RANGE SLIDER
-//
-
-// $include-html-range-slider-classes: $include-html-classes;
-
-// These variabels define the slider bar styles
-// $range-slider-bar-width: 100%;
-// $range-slider-bar-height: rem-calc(16);
-
-// $range-slider-bar-border-width: 1px;
-// $range-slider-bar-border-style: solid;
-// $range-slider-bar-border-color: $gainsboro;
-// $range-slider-radius: $global-radius;
-// $range-slider-round: $global-rounded;
-// $range-slider-bar-bg-color: $ghost;
-
-// Vertical bar styles
-// $range-slider-vertical-bar-width: rem-calc(16);
-// $range-slider-vertical-bar-height: rem-calc(200);
-
-// These variabels define the slider handle styles
-// $range-slider-handle-width: rem-calc(32);
-// $range-slider-handle-height: rem-calc(22);
-// $range-slider-handle-position-top: rem-calc(-5);
-// $range-slider-handle-bg-color: $primary-color;
-// $range-slider-handle-border-width: 1px;
-// $range-slider-handle-border-style: solid;
-// $range-slider-handle-border-color: none;
-// $range-slider-handle-radius: $global-radius;
-// $range-slider-handle-round: $global-rounded;
-// $range-slider-handle-bg-hover-color: scale-color($primary-color, $lightness: -12%);
-// $range-slider-handle-cursor: pointer;
-
-//
 // CLEARING LIGHTBOX
 //
 
@@ -405,7 +379,6 @@ $clearing-carousel-thumb-active-border: 4px solid tint($tertiary, 26%);
 @import "../../../javascript/components/foundation/scss/foundation/components/tables";
 @import "../../../javascript/components/foundation/scss/foundation/components/thumbs";
 @import "../../../javascript/components/foundation/scss/foundation/components/flex-video";
-@import "../../../javascript/components/foundation/scss/foundation/components/range-slider";
 @import "../../../javascript/components/foundation/scss/foundation/components/visibility";
 @import "../../../javascript/components/foundation/scss/foundation/components/thumbs";
 @import "../../../javascript/components/foundation/scss/foundation/components/clearing";
@@ -682,9 +655,17 @@ $rotate-th-width: $square-grid-td-size;
 
 
 // Labels
-.label{
+.label {
 	text-transform: uppercase;
 	margin: 0 rem-calc(($base-font-size - 8)) rem-calc(($base-font-size - 8)) 0;
+
+    /* A generic label used to indicate something is taking place
+     * Used mainly in label-timeout indicators
+     */
+    &.highlight {
+        color: $accent-foreground;
+        background-color: $accent-background;
+    }
 }
 .submitted {
 	@include label(
@@ -738,12 +719,11 @@ $rotate-th-width: $square-grid-td-size;
 
 // Hints
 .hint {
-	color: calc-text-color($input-border-color) !important;
+	color: $content-ui-foreground !important;
 	top: -1px;
 	margin-left: 4px;
 	width: 1rem;
 	height: 1rem;
-
 	text-align: center;
 	text-decoration: none;
 	line-height: 1rem;
@@ -751,9 +731,8 @@ $rotate-th-width: $square-grid-td-size;
 	display: inline-block;
 	position: relative;
 	margin-bottom: auto;
-	padding: 1px 6px;
 	font-size: 0.75rem;
-	background-color: $input-border-color;
+	background-color: $content-ui-background;
 	border-radius: 0.5rem;
 
 	&.icon-help:before{
@@ -778,21 +757,6 @@ nav {
 	margin: 0;
 	padding: 0;
 
-    /* Topbar replacement
-     */
-    &.component {
-        .card {
-            min-height: 1rem;
-        }
-        /* Weird extra pixel that comes out of nowhere
-         */
-        nav {
-            overflow: hidden;
-        }
-        h2 {
-            font-size: 1.3125rem;
-        }
-    }
     &.sortable {
         .ui-sortable-helper {
             border-bottom: none;
@@ -810,7 +774,7 @@ nav {
 			&:before {
 				line-height: 3rem;
 				padding: 0;
-				color: $primary-color;
+				color: $content-ui-foreground;
 			}
 		}
 	}
@@ -1125,10 +1089,19 @@ ul.flex-list {
 	}
 }
 
+/* Resource List in File Picker Accordion
+ * You can get to this list via a File Picker Accordion, by clicking
+ * on any dropzone. This is a differently-styled list than the one in
+ * Resource Browser from the Main Navigation (that's a jstree)
+ */
 .resource-list {
 	@extend .action-list;
 	.avatar.card {
+        a {
+            color: $content-ui-foreground;
+        }
 		.icon-32 {
+            color: $content-ui-foreground;
 			padding-top: 1rem;
 		}
 	}
@@ -1259,7 +1232,7 @@ ul.flex-list {
 			padding: nth($label-padding, 1) 1rem;
 		}
 
-		.label, .progress {
+		.label {
 			margin: 0 -0.5rem 0 -1rem;
 			text-align: left;
 			position: absolute;
@@ -1288,6 +1261,23 @@ ul.flex-list {
 				padding: 0.75rem !important;
 			}
 		}
+    }
+
+    /* Progress Meters for List Items
+     * This is no longer inside .card constructs
+     * They are adjacent (siblings) to .card constructs
+     */
+    & + .progress {
+        width: calc(100% - 4rem);
+        margin: 0 -0.5rem 0 -1rem;
+        position: absolute;
+        bottom: 0;
+        left: 5rem;
+
+        @media #{$small-only} {
+            width: calc(100% - 3rem);
+            left: 4rem;
+        }
     }
 
     &.info {
@@ -1514,20 +1504,6 @@ tr:hover{
     overflow: auto;
 }
 
-// Admin Component Dashboard
-.dashboard{
-	.component{
-	    .top-bar{
-	    	margin-bottom: rem-calc(($base-font-size));
-	    	&:hover{
-	    		cursor: move;
-	    	}
-	    }
-	    &:last-child .top-bar{
-			margin: 0;
-		}
-	}
-}
 
 .marker{
 	border: 4px dashed $success-color;

@@ -1,0 +1,49 @@
+/* This is used for the ltitle triangle in the
+ * Account Menu in the off-canvas nav
+ */
+
+// We use these to set the color of the pip in dropdown buttons
+$dropdown-button-pip-color: transparent;
+$dropdown-button-pip-color-alt: transparent;
+$f-dropdown-triangle-color: transparent;
+
+@import "../../../../../javascript/components/foundation/scss/foundation/components/dropdown-buttons";
+
+/* Jelly Tot Menu dropdowns
+ */
+$f-dropdown-max-width: 242px;
+$f-dropdown-margin-top: 0px;
+$f-dropdown-bg: $content-ui-background;
+$f-dropdown-border-width: 0px;
+$f-dropdown-border-color: transparent;
+$f-dropdown-font-color: $content-ui-foreground;
+$f-dropdown-font-size: rem-calc(($base-font-size));
+$f-dropdown-list-padding: rem-calc(($base-font-size - 6)) rem-calc(($base-font-size - 3));
+$f-dropdown-list-hover-bg: $content-ui-hover;
+$f-dropdown-list-separator-bg: $content-ui-foreground;
+$f-dropdown-content-padding: rem-calc(($base-font-size - 4));
+$f-dropdown-icon-align: 0.25rem;
+
+@import "../../../../../javascript/components/foundation/scss/foundation/components/dropdown";
+
+// Dropdown
+.f-dropdown{
+	@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
+	.separator, .meta {
+		color: contrast-bg($background: $content-ui-background, $dark: $content-ui-foreground);
+	}
+	.separator {
+		padding: $f-dropdown-list-padding;
+		font-weight: 100;
+		text-transform: uppercase;
+		background-color: transparent;
+		cursor: default;
+		font-size: rem-calc($base-font-size - 3);
+		&:hover {
+			background-color: $content-ui-background;
+		}
+	}
+	[class*="icon-"]:before {
+		padding: 0 (0.5rem + $f-dropdown-icon-align) 0 $f-dropdown-icon-align;
+	}
+}

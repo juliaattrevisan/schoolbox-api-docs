@@ -15,14 +15,30 @@ $force = isset($opts['f']) || isset($opts['force']);
 
 // Skin builder is off? don't set any vars
 $vars = [];
-if (Config::get('skin_builder')) {
+if (Config::get('skin_builder')) {    
     $vars = [
-        'primary-color'     => Config::get('skin_primary_colour'),
-        'secondary-color'   => Config::get('skin_secondary_colour'),
-        'tertiary-color'    => Config::get('skin_tertiary_colour'),
-        'body-bg'           => Config::get('skin_body_bg_colour'),
-        'tabbar-bg'         => Config::get('skin_tab_bg_colour'),
-        'off-canvas-bg'     => Config::get('skin_off_canvas_bg_colour'),
+        'navigation-foreground' => Config::get('skin_colour_navigation_foreground'),
+        'navigation-background' => Config::get('skin_colour_navigation_background'),
+        'navigation-hover' => Config::get('skin_colour_navigation_hover'),
+        'off-canvas-foreground' => Config::get('skin_colour_offcanvas_foreground'),
+        'off-canvas-background' => Config::get('skin_colour_offcanvas_background'),
+        'off-canvas-hover' => Config::get('skin_colour_offcanvas_hover'),
+        'off-canvas' => Config::get('skin_colour_off_canvas'),
+        'content-ui-foreground' => Config::get('skin_colour_content_ui_foreground'),
+        'content-ui-background' => Config::get('skin_colour_content_ui_background'),
+        'content-ui-hover' => Config::get('skin_colour_content_ui_hover'),
+        'content-ui-selected' => Config::get('skin_colour_content_ui_selected'),
+        'content-ui-submit-foreground' => Config::get('skin_colour_content_ui_submit_foreground'),
+        'content-ui-submit-background' => Config::get('skin_colour_content_ui_submit_background'),
+        'accent-foreground' => Config::get('skin_colour_accent_foreground'),
+        'accent-background' => Config::get('skin_colour_accent_background'),
+        'accent-hover' => Config::get('skin_colour_accent_hover'),
+        'logo-background' => Config::get('skin_colour_logo_background'),
+        'body-bg'         => Config::get('skin_body_bg_colour'),
+
+//        'primary-color'   => Config::get('skin_primary_colour'),
+//        'secondary-color' => Config::get('skin_secondary_colour'),
+//        'tertiary-color'  => Config::get('skin_tertiary_colour'),
     ];
 }
 

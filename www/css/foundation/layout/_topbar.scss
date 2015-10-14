@@ -1,9 +1,0 @@
-// Customizations for topbar
-.top-bar {
-  // Homepage topbars use .icon-menu instead of .menu-icon,
-  // as .icon-menu respects our color settings.
-  .toggle-topbar:not(.menu-icon) {
-    line-height: $topbar-height;
-    height: $topbar-height;
-  }
-}

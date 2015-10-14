@@ -1,22 +1,29 @@
 // Hide the placeholders for non-empty columns
 .masonry-placeholder {
-  display: none;
+    display: none;
+
+    /* Special colour for masonry placeholder alert-box div
+     * into which you can drop Components
+     */
+    &.alert-box {
+        color: $accent-foreground;
+        background-color: $accent-background;
+    }
 }
+
 .show-empty .empty-column .masonry-placeholder {
-  display: inherit;
+    display: inherit;
 }
 
 // Disabled components in the palette
 .component-palette .disabled {
-  opacity: 0.3;
-
-  pointer-events: none;
-  cursor: not-allowed;
-
-  a {
+    opacity: 0.3;
     pointer-events: none;
     cursor: not-allowed;
-  }
+    a {
+        pointer-events: none;
+        cursor: not-allowed;
+    }
 }
 
 // Homepage masonry icons

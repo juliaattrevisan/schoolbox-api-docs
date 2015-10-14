@@ -16,44 +16,45 @@
     </section>
 </div>
 
-<div id="statistics-date-range" class="f-dropdown content content-drop medium">
+<div id="statistics-date-range" class="reveal-modal" data-reveal>
     <div class="row">
         <form action="/statistics/homepage/{ID}" method="GET">
-            <div class="small-4 columns">
-                <label for="date_start">
-                    From
-                    <select id="date_start" name="date_start">
-                        <!-- BEGIN date_start_option -->
-                        <option value="{DATE_START_VALUE}"{DATE_START_SELECTED}>{DATE_START_NAME}</option>
-                        <!-- END date_start_option -->
-                    </select>
-                </label>
-            </div>
-            <div class="small-4 columns">
-                <label for="date_end">
-                    To
-                    <select id="date_end" name="date_end">
-                        <!-- BEGIN date_end_option -->
-                        <option value="{DATE_END_VALUE}"{DATE_END_SELECTED}>{DATE_END_NAME}</option>
-                        <!-- END date_end_option -->
-                    </select>
-                </label>
-            </div>
-            <div class="small-4 columns">
-                <label for="drop">
-                    Role
-                    <select id="drop" name="drop">
-                        <!-- BEGIN drop_option -->
-                        <option value="{DROP_VALUE}"{DROP_SELECTED}>{DROP_NAME}</option>
-                        <!-- END drop_option -->
-                    </select>
-                </label>
-            </div>
-            <div class="small-12 columns">
-                <label>
-                    <input type="submit" value="Update" />
-                </label>
-            </div>
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 medium-4 columns">
+                        <label for="date_start">
+                            From
+                            <select id="date_start" name="date_start">
+                                <!-- BEGIN date_start_option -->
+                                <option value="{DATE_START_VALUE}"{DATE_START_SELECTED}>{DATE_START_NAME}</option>
+                                <!-- END date_start_option -->
+                            </select>
+                        </label>
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <label for="date_end">
+                            To
+                            <select id="date_end" name="date_end">
+                                <!-- BEGIN date_end_option -->
+                                <option value="{DATE_END_VALUE}"{DATE_END_SELECTED}>{DATE_END_NAME}</option>
+                                <!-- END date_end_option -->
+                            </select>
+                        </label>
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <label for="drop">
+                            Role
+                            <select id="drop" name="drop">
+                                <!-- BEGIN drop_option -->
+                                <option value="{DROP_VALUE}"{DROP_SELECTED}>{DROP_NAME}</option>
+                                <!-- END drop_option -->
+                            </select>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" class='expand' value="Update" />
         </form>
     </div>
 </div>

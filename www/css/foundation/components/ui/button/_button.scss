@@ -1,0 +1,126 @@
+/* Link Styles
+ * Really hammer out the $primary-color assumption
+ * as clicking on a link then hovering away reveals
+ * another unseen usage of this var
+ */
+a, a:link, a:visited, a:hover, a:active {
+    color: $content-ui-foreground;
+    &:hover {
+        color: $content-ui-foreground;
+    }
+}
+
+a[disabled], a.disabled {
+    // Make disabled links not clickable
+    pointer-events: none;
+    cursor: default;
+}
+
+/* All generic buttons
+ */
+.button {
+    color: $content-ui-foreground;
+    background-color: $content-ui-background;
+
+	&:hover {
+	    color: $content-ui-foreground;
+	    background-color: $content-ui-hover;
+    }
+
+    /* This should be renamed to .primary
+     */
+	&.secondary{
+		color: $content-ui-foreground;
+		background-color: $content-ui-background;
+
+		&:hover {
+            color: $content-ui-foreground;
+            background-color: $content-ui-hover;
+        }
+	}
+
+	&.alert{
+		&:hover {
+			color: $white !important;
+		}
+	}
+
+	&.warning{
+		background-color: $warning-color;
+		&:hover {
+			background-color: tint($warning-color, 20%);
+		}
+	}
+
+	&.expand {
+		padding: 1rem;
+		font-weight: 700;
+	}
+
+	&:empty {
+		@extend .no-text;
+	}
+
+	// Fat button - for when you need a button larger than Steve's mama
+	// Like Steve's mama, fits best in a block-grid
+	&.fat {
+		display: block;
+		min-height: 5rem;
+		padding-top: 0.875rem;
+		font-size: rem-calc($base-font-size - 3);
+		&:before {
+			margin-bottom: 0.25rem;
+		}
+	}
+}
+
+/* Anchor tags pretending to be input elements
+ */
+a[role="button"] {
+	@extend .button;
+}
+
+/* Form submits have a unique styling
+ */
+input[type="submit"]{
+	@extend .button;
+	border: none;
+	color: $submit-button-color;
+	background-color: $submit-button-bg-color;
+	&:hover, &:focus {
+		color: $submit-button-color;
+		background-color: $submit-button-bg-color;
+	}
+	&:disabled {
+		opacity: $button-disabled-opacity;
+		color: $submit-button-color;
+		background-color: $submit-button-bg-color;
+	}
+}
+
+a.submit {
+	@extend input[type="submit"];
+}
+
+/* Expand buttons, for collapsable behaviours
+ */
+.expand-link {
+	margin: 0 rem-calc(($base-font-size / 2)) 0 0;
+	padding: 0;
+	&:before{
+	    color: $content-ui-foreground;
+		padding: 0;
+	}
+}
+
+/* Flex List Action Buttons
+ * This can be found in the meta-panel of Resource Browser
+ * I don't think this should be such a strange number; maybe
+ * the actual flex-list button dimensions aren't right.
+ *
+ * 0.9375rem vertically aligns the button text/icon in its
+ * native dimensions. Something to investigate.
+ */
+ul.flex-list.buttons li a {
+    padding-top: 0.9375rem;
+}

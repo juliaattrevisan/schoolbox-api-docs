@@ -1,11 +1,11 @@
 //  DATEPICKER
 
 $datepicker-cell-width: (2.125rem, 2.5rem);
-$datepicker-cell-color: $black;
-$datepicker-background: $secondary-color;
-$datepicker-hover-background: tint($tertiary, 87%);
-$datepicker-selected-background: $white;
-$datepicker-header-color: $primary-color;
+$datepicker-cell-color: $content-ui-foreground;
+$datepicker-background: $content-ui-background;
+$datepicker-hover-background: $content-ui-hover;
+$datepicker-selected-background: $content-ui-selected;
+$datepicker-header-color: $content-ui-foreground;
 $timepicker-item-visible-count: 5;
 
 @mixin datepicker-cell($sizing: $datepicker-cell-width) {
@@ -80,7 +80,7 @@ $timepicker-item-visible-count: 5;
         a {
             @include datepicker-cell();
             display: block;
-            color: inherit;
+            color: $content-ui-foreground;
         }
     }
 }
@@ -94,12 +94,13 @@ $timepicker-item-visible-count: 5;
 
     .ui-datepicker-prev, .ui-datepicker-next {
         @include datepicker-cell();
+        color: $content-ui-foreground;
         display: block;
         &:hover {
+            color: $content-ui-foreground;
             background: $datepicker-hover-background;
         }
     }
-
 }
 
 .ui-datepicker-title{

@@ -1,0 +1,16 @@
+.calendar-list {
+    @include information-list;
+
+    .column, .columns {
+        @extend .no-pad;
+    }
+
+    label {
+        @extend .content;
+    }
+
+    li.row {
+        cursor: pointer;
+        @extend .content;
+    }
+}

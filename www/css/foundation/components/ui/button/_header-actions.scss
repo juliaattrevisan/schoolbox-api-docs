@@ -1,0 +1,70 @@
+// Header Actions - for when you need buttons inline with the heading
+.header-actions {
+
+	position: absolute;
+	right: 0;
+	overflow-y: visible;
+	height: 0;
+
+	@media #{$medium-only} {
+		padding-right: 2.5rem;
+	}
+	@media #{$large-up} {
+		padding-right: 1rem;
+	}
+
+	form {
+		margin: 0; // srsly. shouldn't have to do this...
+	}
+
+    /* I think .header-actions .button usage is deprecated in favour
+     * of repaired h1/h2 html structure. If you see cyan, kill it
+     */
+	.button {
+		margin-bottom: 0;
+		padding: 0.625rem;
+		position: relative;
+
+		// no text? be subtle
+		&.no-text {
+			//@include contrast-bg();
+			background: transparent;
+		}
+
+		&:hover {
+			color: #0ff;
+			background-color: tint(#0ff, 20%);
+		}
+		&[aria-expanded=true] {
+			@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
+			background-color: #0ff;
+			color: #0ff;
+		}
+
+		@media #{$large-up} {
+			padding: 0.75rem;
+		}
+	}
+}
+
+/* I think .header-actions .button usage is deprecated in favour
+ * of repaired h1/h2 html structure. If you see cyan, kill it
+ */
+h1, h2 {
+	&:hover + .header-actions .button {
+		background-color: #0ff;
+		color: #0ff;
+	}
+}
+
+// make this more concise
+@mixin header-action-button($mq, $h1, $h2) {
+	@media #{$mq} {
+		h1 + .header-actions .button { bottom: $h1; }
+		h2 + .header-actions .button { bottom: $h2; }
+	}
+}
+
+@include header-action-button($small-up,    42px, 42px);
+@include header-action-button($large-up,    50px, 42px);
+@include header-action-button($xlarge-only, 71px, 42px);

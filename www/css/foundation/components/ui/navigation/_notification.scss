@@ -1,6 +1,6 @@
 $notification-unread-background: $alert-color !default;
-$notification-unread-color: calc-text-color($notification-unread-background);
-$notification-header-background: $tabbar-bg !default;
+$notification-unread-color: $navigation-foreground;
+$notification-header-background: $navigation-background !default;
 
 // where data-unread != 0
 .right-off-canvas-toggle {
@@ -10,15 +10,22 @@ $notification-header-background: $tabbar-bg !default;
 
     background: $notification-header-background;
 
+    /* The Notification Bell
+     */
     &[data-unread] {
-
         padding-left: 1.75rem;
 
+        /* The colour of the bell in its idle state
+         */
         &:before {
+            color: $navigation-foreground;
             display: inline-block;
             width: 1.5rem;
         }
 
+        /* The colour of the bell when there are items
+         * to read (when the unread count is not zero)
+         */
         &:not([data-unread="0"]) {
             background-color: $notification-unread-background;
             color: $notification-unread-color;
@@ -32,7 +39,6 @@ $notification-header-background: $tabbar-bg !default;
         span {
             opacity: 0;
         }
-
     }
 }
 
@@ -60,8 +66,20 @@ $notification-header-background: $tabbar-bg !default;
             background: $notification-unread-background;
             color: $notification-unread-color;
         }
+
+        /* This is the list of messages you've received.
+         */
+        .action-list li {
+            margin-left: 0;
+        }
     }
     .button {
+        color: $navigation-foreground;
+        background-color: $navigation-background;
+        &:hover {
+            color: $navigation-foreground;
+            background-color: $navigation-hover;
+        }
         height: 3rem;
         margin-bottom: 0;
         overflow: hidden;

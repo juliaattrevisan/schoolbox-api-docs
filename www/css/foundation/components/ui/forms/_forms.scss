@@ -22,14 +22,14 @@ $input-height: 2.5rem;
 
 $input-bg-color: $white;
 
-$input-focus-bg-color: tint($primary-color, 95%);
+$input-focus-bg-color: $content-ui-hover;
 $input-focus-color: calc-text-color($input-focus-bg-color);
 
-$input-border-color: tint($tertiary-color, 66%) !default;
-$input-focus-border-color: darken($input-border-color, 33%);
+$input-border-color: $content-ui-background !default;
+$input-focus-border-color: $content-ui-foreground;
 
-$input-hover-bg-color: tint($tertiary-color, 87%);
-$input-hover-color: calc-text-color($input-hover-bg-color);
+$input-hover-bg-color: $content-ui-hover;
+$input-hover-color: $black;
 
 $input-border-style: solid;
 $input-border-width: 0.125rem;
@@ -87,7 +87,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
 // $include-html-form-classes: $include-html-classes;
 
 // Controlling background color for the switch container
-$switch-bg: tint($secondary-color, 26%);
+$switch-bg: $content-ui-background;
 
 // Controlling border styles and background colors for the switch container
 $switch-border-color: transparent;
@@ -110,7 +110,7 @@ $switch-font-size-med: 14px;
 // $switch-label-side-padding: 6px;
 
 // We use these to style the switch-paddle
-$switch-active-color: $primary-color;
+$switch-active-color: $content-ui-foreground;
 // $switch-paddle-bg: $white;
 $switch-paddle-fade-to-color: tint($secondary-color, 74%);
 $switch-paddle-border-color: transparent;
@@ -124,15 +124,15 @@ $switch-negative-color: tint($secondary-color, 74%);
 // Outline Style for tabbing through switches
 // $switch-label-outline: 1px dotted $jumbo;
 
-@import "../../../javascript/components/foundation/scss/foundation/components/forms";
-@import "../../../javascript/components/foundation/scss/foundation/components/switches";
+@import "../../../../../javascript/components/foundation/scss/foundation/components/forms";
+@import "../../../../../javascript/components/foundation/scss/foundation/components/switches";
 
 //
 // Custom overrides
 //
-form{
-	@include placeholder-color($input-border-color, $font-weight-normal);
-	@include placeholder-hover-color($input-border-color);
+form {
+	@include placeholder-color($content-ui-foreground, $font-weight-normal);
+	@include placeholder-hover-color($content-ui-foreground);
 	margin: 0 0 $form-spacing / 2 0;
 }
 
@@ -176,6 +176,7 @@ th, td{
 		@include wide-switch(8rem);
 		@include switch-label;
 	}
+
 	@include switch-label(0.5rem);
 
 	span {
@@ -190,7 +191,7 @@ th, td{
 	}
 }
 
-@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem, $hover-color: $input-border-color, $active-color: $primary-color) {
+@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem, $hover-color: $input-border-color, $active-color: $content-ui-foreground) {
 
     $checkbox-inner-size: $checkbox-size - (2 * $input-border-width);
 
@@ -255,8 +256,8 @@ th, td{
     &:checked {
         + #{$label-selector} {
             &:before, &:after {
-                color: $active-color !important;
-                background-color: tint($active-color, 70%) !important;
+                color: $content-ui-foreground !important;
+                background-color: $content-ui-background !important;
             }
         }
     }
@@ -265,7 +266,7 @@ th, td{
         + #{$label-selector} {
             &:hover {
                 &:before, &:after {
-                    background-color: tint($hover-color, 50%);
+                    background-color: $hover-color;
                 }
 
                 &:after {
@@ -333,7 +334,7 @@ input[type=radio]:not(.plain):disabled:checked + label{
 // Toggle Checkbox (VAPORWAVE)
 input[type=checkbox]:not(.plain) + label.checkbox-toggle,
 input[type=radio]:not(.plain) + label.radio-toggle {
-	background-color: $button-color;
+	background-color: $content-ui-foreground;
 	font-weight: $font-weight-normal;
 	margin-left: 0;
 	height: 1.5rem;
@@ -479,6 +480,7 @@ section > fieldset {
 	}
 }
 
-@import 'forms/dropzone';
-@import 'forms/datetime';
-@import 'forms/tinymce';
+@import 'dropzone';
+@import 'datetime';
+@import 'tinymce';
+@import 'rangeslider';

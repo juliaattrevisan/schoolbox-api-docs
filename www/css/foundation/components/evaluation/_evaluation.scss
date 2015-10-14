@@ -32,8 +32,8 @@
     }
 
     .sortable {
-        background-color: $secondary-color;
-        color: $primary-color;
+        color: $content-ui-foreground;
+        background-color: $content-ui-background;
         font-weight: $alert-font-weight;
     }
 }

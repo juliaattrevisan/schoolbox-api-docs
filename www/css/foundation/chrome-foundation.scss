@@ -17,38 +17,61 @@
 @import "base/typography";
 
 // Components
-@import "components/alert-boxes";
-@import "components/anyslider";
-@import "components/links";
-@import "components/buttons";
 @import "components/content";
-@import "components/forms";
-//@import "components/joyride";
-@import "components/navigation";
-@import "components/tree";
-@import "components/notification";
-@import "components/masonry";
-@import "components/preview";
-@import "components/dataTables";
 
+// Must import before forms, as forms reimports buttons.scss
+@import "components/buttons";
+
+@import "components/ui/forms/forms";
+//@import "components/joyride";
+@import "components/ui/navigation/navigation";
+@import "components/tree";
+@import "components/ui/navigation/notification";
+@import "components/masonry";
+@import "components/ui/preview";
+
+//////////////////////////////////////////////////////////
+// Refined UI Elements
+//
+// These override defaults in @import components/buttons
+// We have refined these elements
+//////////////////////////////////////////////////////////
+@import "components/ui/button/button";
+@import "components/ui/button/list-actions";       // requires _button.scss
+@import "components/ui/button/header-actions";     // requires _list-actions.scss
+@import "components/ui/button/button-groups";
+@import "components/ui/button/dropdown";
+@import "components/ui/button/tabs";
+@import "components/ui/navigation/breadcrumb";
+@import "components/ui/navigation/pagination";
+@import "components/ui/navigation/sub-nav";
+
+//////////////////////////////////////////////////////////
+// Common UI Elements
+//
+// Specialist elements, plugins and widgets
+//////////////////////////////////////////////////////////
+@import "components/ui/data-tables";
+@import "components/ui/alert-boxes";
+@import "components/ui/anyslider";
 
 // Layout
 @import "layout/footer";
 @import "layout/grid";
 @import "layout/header";
 @import "layout/sidebar";
-@import "layout/topbar";
 @import "layout/container";
 @import "layout/login";
 @import "layout/tiles";
 
+
 // Schoolbox Areas
-@import "components/quiz-survey";
+@import "components/evaluation/evaluation";
 @import "components/submissions/inline-grading";
 @import "components/submissions/submissions";
-@import "components/wiki";
+@import "components/wiki/wiki";
 @import "components/timetable/timetable";
-@import "components/calendar";
+@import "components/calendar/calendar";
 
 // Dashboard/Homepage/Eportfolio component styles
 @import "components/components";
@@ -59,6 +82,7 @@
 // Needs to be included outside of container in order to work
 @import "../../javascript/components/foundation/scss/foundation/components/reveal";
 @import "../../javascript/components/foundation/scss/foundation/components/tooltips";
-@import "selectize.customisation";
+@import "components/ui/selectize.customisation";
+
 // combobox relies on selectize styles
-@import "components/combobox";
+@import "components/ui/combobox";

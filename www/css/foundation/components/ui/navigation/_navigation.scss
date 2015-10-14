@@ -1,0 +1,567 @@
+//
+// MAGELLAN
+//
+
+// $include-html-magellan-classes: $include-html-classes;
+
+$magellan-bg: $white;
+$magellan-padding: rem-calc(0);
+
+//
+// OFF CANVAS
+//
+
+// Main Navigation Tab Bar Variables
+$include-html-off-canvas-classes: $include-html-classes !default;
+
+$tabbar-bg: $navigation-background;
+$tabbar-height: rem-calc(80);
+$tabbar-icon-width: $tabbar-height;
+$tabbar-line-height: $tabbar-height;
+$tabbar-color: $black;
+$tabbar-middle-padding: 0 rem-calc(($base-font-size - 4));
+
+$tabbar-left-section-border: 0;
+$tabbar-right-section-border: 0;
+
+$tabbar-header-color: $black;
+$tabbar-header-weight: $font-weight-bold;
+$tabbar-header-line-height: $tabbar-height;
+$tabbar-header-margin: 0;
+
+$tabbar-menu-icon-color: $navigation-foreground;
+$tabbar-menu-icon-hover: $navigation-hover;
+$tabbar-menu-icon-text-indent: rem-calc(35);
+$tabbar-menu-icon-width: $tabbar-icon-width;
+$tabbar-menu-icon-height: $tabbar-height;
+$tabbar-menu-icon-padding: 0;
+
+$tabbar-hamburger-icon-width: rem-calc(($base-font-size));
+$tabbar-hamburger-icon-left: false;
+$tabbar-hamburger-icon-top: false;
+$tabbar-hamburger-icon-thickness: 1px;
+$tabbar-hamburger-icon-gap: 4px;
+
+// Off Canvas Menu Variables
+$off-canvas-width: rem-calc(260);
+$off-canvas-bg: $off-canvas !default;
+//$off-canvas-bg-hover: darken($tabbar-bg, 10%);
+$off-canvas-hover-color: $off-canvas-bg;
+
+// Off Canvas Menu List Variables
+$off-canvas-label-padding: rem-calc(($base-font-size));
+$off-canvas-label-color: $accent-foreground;;
+$off-canvas-label-text-transform: uppercase;
+$off-canvas-label-font-size: rem-calc(($base-font-size - 2));
+$off-canvas-label-font-weight: $font-weight-light;
+$off-canvas-label-bg: transparent !default;
+$off-canvas-label-border-top: 0px; //1px solid scale-color($off-canvas-label-bg, $lightness: 14%);
+$off-canvas-label-border-bottom: none;
+$off-canvas-label-margin:0;
+
+$off-canvas-link-padding: rem-calc(($base-font-size));
+//$off-canvas-link-color: contrast-bg(0.7, $off-canvas-bg, 0%, $primary-color, $primary-color);
+$off-canvas-link-border-bottom: 0px; //1px solid scale-color($off-canvas-bg, $lightness: -25%);
+
+//$off-canvas-back-bg: $off-canvas-bg-hover;
+$off-canvas-back-border-top: $off-canvas-label-border-top;
+$off-canvas-back-border-bottom: $off-canvas-label-border-bottom;
+$off-canvas-back-hover-bg: $tabbar-bg;
+$off-canvas-back-hover-border-top: 0px;
+$off-canvas-back-hover-border-bottom: none;
+
+// Off Canvas Back-Link Overlay
+$off-canvas-overlay-transition: background 300ms ease;
+$off-canvas-overlay-cursor: pointer;
+$off-canvas-overlay-box-shadow: none; //-4px 0 4px rgba(#000, 0.5), 4px 0 4px rgba(#000, 0.5);
+$off-canvas-overlay-background: transparent; //rgba(#FFF, 0.3);
+$off-canvas-overlay-background-hover: transparent; //rgba(#FFF, 0.05);
+
+// Transition Variables
+$menu-slide: "transform 500ms ease";
+
+@import "../../../../../javascript/components/foundation/scss/foundation/components/magellan";
+@import "../../../../../javascript/components/foundation/scss/foundation/components/offcanvas";
+
+$icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($background: $tabbar-bg, $opacity: 0.65));
+
+// Hybrid Bar
+.icon-nav{
+	@include inline-list;
+	//@extend .no-pad;
+	margin: 0;
+	height: inherit;
+	li{
+		margin: 0;
+		width: 5rem;
+	}
+	a{
+		height: 5rem;
+		padding: rem-calc(($base-font-size / 2)) rem-calc(($base-font-size));
+		text-align: center;
+		@extend .icon-32;
+		@extend .no-text;
+
+		&.navthis {
+			background-color: calc-text-color(
+				$tabbar-bg,
+				tint($tabbar-bg, 4%),
+				darken($tabbar-bg, 4%)
+			);
+			&:before, span {
+				color: $icon-nav-highlight-color;
+			}
+		}
+
+		&:hover{
+		    background-color: $navigation-hover;
+		}
+
+		&:before{
+			text-align: center;
+			float: none;
+			color: $navigation-foreground;
+		}
+		span {
+			font-weight: $font-weight-normal;
+			color: $navigation-foreground;
+			display: block;
+			line-height: rem-calc($base-font-size);
+		}
+
+		&:before, span {
+			@include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
+		}
+	}
+}
+
+/* Display a logo/background for non-authenticated screens
+ * like Forgotten Password, Privacy Policy, Feedback Form etc
+ *
+ * These require the logo to be present at all times, not vanish
+ * mysteriously based on viewport size (there's no side nav)
+ */
+.standard-bar {
+    padding: 0;
+    background-color: $tabbar-bg;
+    height: $tabbar-height;
+    img {
+        display: block;
+        max-height: 5rem;
+        max-width: none;
+    }
+}
+
+.hybrid-bar{
+	.left-small{
+		z-index: 100;
+		.menu-icon{
+			height: $tabbar-height;
+		}
+	}
+	@media #{$small-only} {
+		.tab-bar{
+			height: $tabbar-height * 2;
+			.icon-nav{
+				position: absolute;
+  				left: -5rem;
+			  	top: 80px;
+				width: 100%;
+				li{
+					width: 25%;
+				}
+			}
+		}
+	}
+	.tab-bar-section{
+		padding: 0 rem-calc(($base-font-size * 10)) 0 0;
+		position: relative;
+	}
+	.icon-nav{
+		padding: 0 0 0 rem-calc(($base-font-size - 2));
+
+		li:nth-child(n+5){
+			@extend .show-for-large-up;
+		}
+		li:nth-child(n+7){
+			@extend .show-for-xlarge-up;
+		}
+		a {
+			padding: rem-calc(($base-font-size - 2)) 0;
+		}
+	}
+}
+
+// Logo - Top Bar
+.hybrid-bar{
+    .logo {
+        @media #{$mediumwide-up} {
+            display: none !important;
+        }
+        img{
+            display: block;
+            max-height: 5rem;
+            max-width: none;
+        }
+    }
+}
+
+.tab-bar {
+    #search {
+        margin: 0;
+        position: absolute;
+        right: 10rem;
+        top: 0;
+        height: $tabbar-height;
+        @include placeholder-color(transparent, $font-weight-normal);
+        input[type="text"]{
+            border: 0;
+            background-color: transparent;
+            color: $body-bg;
+            float: right;
+            height: $tabbar-height;
+            width: $tabbar-height;
+            padding: $base-font-size;
+            margin: 0;
+            opacity: 0;
+        }
+        &:hover, &.focus {
+            width: 100%;
+            padding-left: 22rem;
+            @include placeholder-color($black, $font-weight-normal);
+        }
+
+        /* Search icon in its idle state
+         */
+        .icon-search {
+            @include absolute (0, auto, auto, 32px);
+            @include transition(all, 0.3s, ease-in);
+            margin: 0;
+            z-index: 1;
+            &:before {
+                color: $navigation-foreground;
+            }
+        }
+
+        /* Input field when Search feature is activated
+         */
+        [type="text"]:focus,
+        [type="text"]:active,
+        &:hover [type="text"],
+        &:hover [type="text"]:focus{
+            background-color: $white;
+            border: 2px solid $navigation-hover;
+            color: $black;
+            width: 99.7%;
+            opacity: 1;
+        }
+
+        [type="text"]:focus + .icon-search,
+        [type="text"]:active + .icon-search,
+        &:hover .icon-search {
+            @include absolute (0, auto, auto, 16px);
+
+            /* Search icon when Search feature is activated
+             */
+            &:before {
+                color: $navigation-background;
+            }
+        }
+    }
+}
+
+.left-off-canvas-toggle,
+.right-off-canvas-toggle {
+	color: $navigation-foreground;
+	&:hover {
+		color: $navigation-foreground;
+	}
+}
+
+.right-off-canvas-toggle{
+	//@extend .hide-for-xlarge-up;
+
+	&:before{
+        text-align: center;
+        display: block;
+        padding: 0;
+	}
+}
+
+/* Off Canvas Menu
+ * This can be summoned using the hamburger if it's not already visible
+ */
+.left-off-canvas-menu {
+
+    /* A background colour specifically for the logo/crest
+     * so a school logo won't be mashed by the off-canvas colour
+     * set selections they are allowed to make
+     */
+    .logo-wrapper {
+        padding: 2rem 0;
+        background-color: $logo-background;
+
+        .logo {
+            @media #{$medium-down} {
+                display: none !important;
+            }
+            display: block;
+            img {
+                display: block;
+                margin: 0 auto;
+            }
+        }
+    }
+
+    /* f-dropdown
+     * This is used to summon the user-specific flyout menu,
+     * by clicking their name in the Off-Canvas
+     */
+    .f-dropdown {
+        box-shadow: none;
+        max-width: none;
+
+        /* Custom link styles for off-canvas account menu
+         */
+        a {
+            color: $off-canvas-foreground;
+            background-color: $off-canvas-background;
+            &:hover {
+                background-color: $off-canvas-hover;
+            }
+        }
+
+        /* Separator: used to separate areas in the flyout menu
+         * Notably, "Switch User" and its list of users
+         * These elements have no hover styling
+         *
+         * This usually inherits from the content-ui colour set
+         * where flyout colours were generically defined
+         *
+         * To override .f-dropdown default colours,
+         * use background not background-color
+         */
+        .separator {
+            color: contrast-bg($background: $off-canvas-background, $dark: $off-canvas-foreground);
+            background: $off-canvas-background;
+
+            &:hover {
+                background: $off-canvas-background;
+            }
+        }
+
+        /* Avatar Cards have to fight against a different colour set
+         * when in the off-canvas account-menu, making its anchor
+         * region extremely obvious (especially on hover)
+         *
+         * Have to make a unique item for this particular region, by
+         * secretly making all ".card a" effects transparent
+         *
+         * Sledgehammer the Shards of Narsil for now
+         */
+        .switch-user {
+            background: $off-canvas-background;
+
+            &:hover {
+                background: $off-canvas-hover;
+            }
+
+            .avatar {
+                &.card {
+                    padding: 0.5rem 0rem 0rem 1rem;
+                    .meta {
+                        color: contrast-bg($background: $off-canvas-background, $dark: $off-canvas-foreground);
+                    }
+                    a {
+                        background-color: transparent;
+                        &:hover {
+                            background-color: transparent;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+	/* Second Nav
+	 * This appears when you're on medium displays and you have to
+	 * summon the Off-Canvas menu manually, by using the hamburger.
+	 *
+	 * Main Navigation elements from the top bar wrap down into an
+     * additional area in Off Canvas called Second Nav. These elements
+     * precede the Side Menu
+     */
+	.second-nav{
+		@extend .hide-for-xlarge-up;
+
+		li:nth-child(-n+6){
+			@extend .hide-for-large-only;
+		}
+        li:nth-child(-n+4){
+            @extend .hide-for-medium-down;
+        }
+	}
+
+	/* Profile Flyout Menu
+	 * This is the currently-logged-in user's dom element
+	 * Appears when you click a guy's username in the left menu
+	 */
+	.account-menu {
+		color: $off-canvas-foreground;
+		background-color: transparent;
+		padding: 0 2.5rem 0 0;
+		font-weight: $font-weight-bold;
+		width: 100%;
+		text-align: left;
+
+        /* Little triangle icon next to username
+         */
+        &.dropdown.button::after {
+            margin-top: -0.625rem;
+            border-color: $off-canvas-foreground transparent transparent transparent;
+        }
+
+        &:hover {
+            color: $off-canvas-foreground;
+            background-color: $off-canvas-hover;
+
+            /* Little triangle icon next to username
+             */
+            &.dropdown.button::after {
+                border-color: $off-canvas-foreground transparent transparent transparent;
+            }
+        }
+
+		&.open {
+		    color: $off-canvas-foreground;
+			background-color: $off-canvas-bg;
+
+            /* Little triangle icon next to username
+             */
+            &.dropdown.button::after {
+                border-color: $off-canvas-foreground transparent transparent transparent;
+            }
+		}
+
+		span {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 135px;
+			display: inline-block;
+			padding-left: 0.5rem;
+		}
+	}
+
+    /* These are used to style implicit separators within My Groups etc.
+     * as opposed to explicit .separator elements
+     *
+     * Not sure why there's a distinction between the two. That requires
+     * some additional investigation
+     */
+    h3, h4 {
+        font-weight: $off-canvas-label-font-weight;
+        padding: $off-canvas-label-padding;
+        margin: $off-canvas-label-margin;
+        font-size: $off-canvas-label-font-size;
+
+        /* Use adaptive for separators
+         */
+        color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
+    }
+
+    h3 {
+        text-transform: $off-canvas-label-text-transform;
+    }
+
+	h4 {
+		@extend %p;
+	}
+
+	// Left nav arrow override
+	ul.off-canvas-list {
+	    a {
+	        color: $off-canvas-foreground;
+            &:hover {
+                color: $off-canvas-foreground;
+                background-color: $off-canvas-hover;
+            }
+        }
+
+		li.has-submenu > a:after{
+			content: "\e64b";
+			font-family: 'schoolbox';
+			float: right;
+		}
+	}
+	.left-submenu .back > a {
+	    color: $off-canvas-foreground;
+	    background-color: $off-canvas-background;
+	    &:hover {
+	        background-color: $off-canvas-hover;
+        }
+    }
+	.left-submenu .back > a:before{
+		content: "\e655";
+		font-family: 'schoolbox';
+	}
+}
+
+// Only show notifications sidebar on x-large-up screens
+// 1440px >
+@media #{$xlarge-up} {
+    .tab-bar {
+        #search{
+            right: 22.22rem;
+            &:hover{
+                padding-left: 34.22rem;
+            }
+        }
+	}
+    .right-off-canvas-menu {
+        position: relative;
+        transform: none;
+        float: right;
+        top: -5rem;
+    }
+    .move-right > .inner-wrap {
+        transform: none;
+    }
+    .main-section {
+        overflow: hidden;
+    }
+	.tab-bar-section.middle{
+		padding-right: 20.625rem;
+	}
+}
+
+// Only show left nav on large-up screens
+// 1024px >
+@media #{$mediumwide-up} {
+    .left-off-canvas-menu {
+        position: relative;
+        @include transform(none);
+        float: left;
+        top: -5rem;
+    }
+    .move-right > .inner-wrap {
+        transform: none;
+    }
+    .main-section {
+        overflow: hidden;
+    }
+    .tab-bar-section.middle {
+        padding-left: 11.25rem;
+    }
+}
+
+// Large
+// < 1024px
+@media #{$medium-down} {
+    .tab-bar {
+        #search{
+            &:hover{
+                padding-left: 10rem;
+            }
+        }
+    }
+}

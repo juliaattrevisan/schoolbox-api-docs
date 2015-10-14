@@ -1,13 +1,17 @@
 
 $tree-node-height: 3rem;
 
-$tree-node-hover-background: tint($secondary-color, 30%);
-$tree-node-hover-color: calc-text-color($tree-node-hover-background);
+/* Default idle state of a node anchor
+ */
+$tree-node-color: $content-ui-foreground;
 
-$tree-node-selected-background: $secondary-color;
-$tree-node-selected-color: calc-text-color($tree-node-selected-background);
+$tree-node-hover-background: $content-ui-hover;
+$tree-node-hover-color: $content-ui-foreground;
 
-$tree-folder-icon-color: $primary-color;
+$tree-node-selected-background: $content-ui-background;
+$tree-node-selected-color: $content-ui-foreground;
+
+$tree-folder-icon-color: $content-ui-foreground;
 $tree-homepage-icon-color: darkorange;
 $tree-course-icon-color: #008600;
 
@@ -51,6 +55,10 @@ div.jstree-default, ul.jstree-default {
 
     .jstree-wholerow, .jstree-anchor, .jstree-default, .jstree-icon:empty {
         line-height: $tree-node-height;
+    }
+
+    .jstree-anchor {
+        color: $tree-node-color;
     }
 
     .jstree-ocl {
@@ -121,5 +129,11 @@ div.jstree-default, ul.jstree-default {
         }
     }
 
-
+    /* Tooltip span elements should display:inline-block, rather
+     * than inherit the display:block property from elsewhere
+     * which forces it to fall down
+     */
+    .inline-list > li > span.hint {
+        display: inline-block;
+    }
 }

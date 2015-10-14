@@ -4,26 +4,72 @@ $charset: "utf-8";
 // These will be overridden by skin values
 // =============================================================================
 
-// Colours
-$primary-color:					#0066b0 !default;
-$secondary-color:				#bdd7ea !default;
-$tertiary-color:				#0066b0 !default;
-$body-bg:						#ededed !default;
+/*****************************
+ Refined Colour Application
+ (these are Skin Builder vars)
+ ****************************/
+$navigation-foreground:            #ffffff !default;
+$navigation-background:            #4c00b0 !default;
+$navigation-hover:                 #8552c9 !default;
 
-$button-color:					$secondary-color;
-$secondary-button-color:		$secondary-color;
-$submit-button-color:			$primary-color;
-$anchor-font-color:             $primary-color;
+$off-canvas-foreground:            #00ce0a !default;
+$off-canvas-background:            #028900 !default;
+$off-canvas-hover:                 #9effab !default;
+$off-canvas:				       #013400 !default;
+
+$content-ui-foreground:            #ff39a8 !default;
+$content-ui-background:            #ffcce8 !default;
+$content-ui-hover:                 #ffe5f4 !default;
+$content-ui-selected:              #ffffff !default;
+
+$content-ui-submit-foreground:     #ff0000 !default;
+$content-ui-submit-background:     #000000 !default;
+
+$accent-foreground:                #ffac00 !default;
+$accent-background:                #ffe9bd !default;
+$accent-hover:                     #fff4de !default;
+
+$logo-background:                  #ffffff !default;
+
+$body-bg:						   #ededed !default;
+
+/*****************************
+ Constants
+ ****************************/
+
+/*
+ * Islands are also always white
+ * Content text is always black
+ */
+
+/* A specific var for input element borders
+ * By default this is connected to the skin builder var
+ * but if for some reason you need different border colours
+ * you can choose that here
+ */
+$input-border-color:			   $content-ui-background;
+
+/* Action-list specific colouring:
+ * Hover colour for action-list rows
+ * Hover colour for the action button in the action-list row
+ */
+$row-hover-background:             tint($content-ui-hover, 87%);
+$row-action-hover-background:      darken($content-ui-hover, 7%);
+
+// Colours
+$primary-color:					#f0f !default;
+$secondary-color:				#ff0 !default;
+$tertiary-color:				#0ff !default;
 
 // for BC
 $tertiary:						$tertiary-color;
 
-$input-border-color:			tint($tertiary, 66%);
-$tabbar-bg:						$primary-color;
-$off-canvas-bg:					$white;
-
-$row-hover-background: tint($secondary-color, 87%);
-$row-action-hover-background: darken($row-hover-background, 7%);
+/* These are hardcoded colours for jsTree
+ * They represent Homepage and Course icons
+ * Their actual usage can be found in _tree.scss
+ */
+//$tree-homepage-icon-color: darkorange !default;
+//$tree-course-icon-color: #008600 !default;
 
 // Dimensions
 // $search-width: 					256px;

@@ -3,19 +3,26 @@
 $selectize-font-size: 14px;
 $selectize-line-height: 18px !default;
 
-$selectize-color-text: $black;
-$selectize-color-border: tint($tertiary, 66%);
-$selectize-color-highlight: $ocean-sunset;
+// None of this is being used?
+$selectize-color-text: $content-ui-foreground;
+$selectize-color-border: $input-border-color;
+$selectize-color-highlight: $content-ui-hover;
 $selectize-color-input: $white !default;
 $selectize-color-input-full: $selectize-color-input !default;
-$selectize-color-disabled: $snow;
-$selectize-color-item: $snow;
+$selectize-color-disabled: $content-ui-hover;
+
+// When you add an element from the dropdown
+$selectize-color-item: $content-ui-hover;
 $selectize-color-item-text: $selectize-color-text !default;
-$selectize-color-item-border: $white-smoke;
-$selectize-color-item-active: $vapor;
+$selectize-color-item-border: transparent;
+
+// Occurs when you click and hold over a selectized element
+$selectize-color-item-active: $content-ui-hover;
 $selectize-color-item-active-text: $selectize-color-text !default;
 $selectize-color-item-active-border: $selectize-color-border;
-$selectize-color-dropdown: $white;
+
+// Suggestions for what you just typed in
+$selectize-color-dropdown: $content-ui-background;
 $selectize-color-dropdown-border: $selectize-color-border !default;
 $selectize-color-dropdown-border-top: $selectize-color-border;
 $selectize-color-dropdown-item-active: tint($tertiary, 87%);
@@ -38,23 +45,55 @@ $selectize-padding-y: 0;
 $selectize-padding-item-x: 0;
 $selectize-padding-item-y: 0;
 
-@import "../core/selectize/src/selectize.scss";
+@import "../../../core/selectize/src/selectize.scss";
 
-.selectize-control.multi .selectize-input > div{
-	background: $white-smoke;
-	border: 1px solid $gainsboro;
-	a{
+/* selectize.scss uses a whole bunch of !important vars
+ * so you have to bring a bigger bang to the party
+ */
+
+.selectize-control.single .selectize-input > div,
+.selectize-control.multi .selectize-input > div {
+	background: $content-ui-background;
+	padding: 0 0 0 0.5rem;
+	margin: 1px;
+	a {
 		padding: 0.5rem !important;
 		width: 1.5rem !important;
+		color: $content-ui-foreground;
 	}
 }
 
-.selectize-input input{
-	height: auto;
+/* Because there should be an x next to the element, but isn't?
+ */
+.selectize-control.single .selectize-input > div {
+    padding: 0 0.5rem 0 0.5rem;
 }
 
-.selectize-dropdown .row[data-selectable] {
-	padding: 0;
+.selectize-input {
+    line-height: 2rem;
+    input {
+        height: auto;
+
+        .remove {
+            color: $content-ui-foreground;
+        }
+
+        /* !important because of chrome.css
+         */
+        &[placeholder] {
+            margin-left: 0.5rem !important;
+        }
+    }
+
+}
+
+.selectize-dropdown {
+    .row[data-selectable] {
+        padding: 0;
+    }
+    .active {
+        background-color: $content-ui-hover;
+    }
 }
 
 .selectize-control .progress-tick {

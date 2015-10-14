@@ -14,30 +14,170 @@ VALUES (
 );
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
-VALUES ('skin_primary_colour',
-        'Primary Colour',
-        'rgb(0, 102, 176)',
-        'Used for headers buttons, navigation and links',
+VALUES ('skin_colour_navigation_foreground',
+        'Navigation Foreground Colour',
+        '',
+        'Used for main navigation icon colours and label colours.',
         '11',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
         'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
-VALUES ('skin_secondary_colour',
-        'Secondary Colour',
-        'rgb(189, 215, 234)',
-        'Used for actions and form elements',
+VALUES ('skin_colour_navigation_background',
+        'Navigation Background Colour',
+        '',
+        'Used for main navigation background. This inverts with Primary Foreground colour in the Search panel.',
         '11',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
         'false');
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
-VALUES ('skin_tertiary_colour',
-        'Tertiary Colour',
-        'rgb(0, 102, 176)',
-        'Used for background colours and outlines',
+VALUES ('skin_colour_navigation_hover',
+        'Navigation Hover/Accent Colour',
+        '',
+        'Used for main navigation hover and accent (border) colours in the Search field.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_offcanvas_foreground',
+        'Off-Canvas Foreground Colour',
+        '',
+        'Used for off-canvas navigation icon colours and label colours.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_offcanvas_background',
+        'Off-Canvas Background Colour',
+        '',
+        'Used for off-canvas navigation background.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_offcanvas_hover',
+        'Off-Canvas Hover/Accent Colour',
+        '',
+        'Used for off-canvas navigation hover.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_off_canvas',
+        'Off-Canvas Colour',
+        '',
+        'Set the colour behind the left and right columns',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_content_ui_foreground',
+        'Content Interface Foreground Colour',
+        '',
+        'Used for foreground colours in interface elements in the main content area.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_content_ui_background',
+        'Content Interface Background Colour',
+        '',
+        'Used for background colours in interface elements in the main content area.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_content_ui_submit_foreground',
+        'Submit Button Foreground Colour',
+        '',
+        'Foreground text colour used in Submit buttons commonly found in Components and Form actions.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_content_ui_submit_background',
+        'Submit Background Colour',
+        '',
+        'Background colour used in Submit buttons commonly found in Components and Form actions.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_content_ui_hover',
+        'Content Interface Hover/Accent Colour',
+        '',
+        'Used for hover colours in some interface elements in the main content area.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_content_ui_selected',
+        'Content Interface Selected/Active Colour',
+        '',
+        'Used to indicate a currently active, or selected, state. Applies to elements in the main content area.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_accent_foreground',
+        'Accent Foreground Colour',
+        '',
+        'Foreground colour for dropzones. This also controls heading colours in the left off-canvas menu.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_accent_background',
+        'Accent Background Colour',
+        '',
+        'Background colour for dropzones. This is also the colour of text you select with your mouse/keyboard in browser.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_accent_hover',
+        'Accent Hover Colour',
+        '',
+        'Miscellaneous hover effect for dropzones. This also controls shadow colour on flyout menus.',
+        '11',
+        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+        'true',
+        'false');
+
+INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+VALUES ('skin_colour_logo_background',
+        'Crest Background',
+        '',
+        'The background for your school crest.',
         '11',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
@@ -46,29 +186,9 @@ VALUES ('skin_tertiary_colour',
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
 VALUES ('skin_body_bg_colour',
         'Body Background Colour',
-        'rgb(237, 237, 237)',
+        '',
         'Used for background colours and outlines',
         '11',(SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
-        'true',
-        'false');
-
-INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
-VALUES ('skin_tab_bg_colour',
-        'Tab Background Colour',
-        'rgb(0, 102, 176)',
-        'Set the colour behind the top tab bar behind icons',
-        '11',
-        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
-        'true',
-        'false');
-
-INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
-VALUES ('skin_off_canvas_bg_colour',
-        'Off Canvas Colour',
-        'rgb(255, 255, 255)',
-        'Set the colour behind the left and right columns',
-        '11',
-        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
         'false');
 
@@ -111,3 +231,33 @@ VALUES ('skin_login_bg',
         (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
         'true',
         'false');
+
+-- INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+-- VALUES ('skin_primary_colour',
+--        'Primary Colour',
+--        'rgb(0, 102, 176)',
+--        'Used for headers buttons, navigation and links',
+--        '11',
+--        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+--        'true',
+--        'false');
+--
+-- INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+-- VALUES ('skin_secondary_colour',
+--        'Secondary Colour',
+--        'rgb(189, 215, 234)',
+--        'Used for actions and form elements',
+--        '11',
+--        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+--        'true',
+--        'false');
+--
+-- INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
+-- VALUES ('skin_tertiary_colour',
+--        'Tertiary Colour',
+--        'rgb(0, 102, 176)',
+--        'Used for background colours and outlines',
+--        '11',
+--        (SELECT `id` FROM lu_config_type WHERE type = 'Skin Config'),
+--        'true',
+--        'false');
