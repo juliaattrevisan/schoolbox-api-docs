@@ -1519,20 +1519,6 @@ tr:hover{
     overflow: auto;
 }
 
-// Admin Component Dashboard
-.dashboard{
-	.component{
-	    .top-bar{
-	    	margin-bottom: rem-calc(($base-font-size));
-	    	&:hover{
-	    		cursor: move;
-	    	}
-	    }
-	    &:last-child .top-bar{
-			margin: 0;
-		}
-	}
-}
 
 .marker{
 	border: 4px dashed $success-color;

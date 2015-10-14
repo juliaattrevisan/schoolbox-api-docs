@@ -5,8 +5,28 @@
 /* This is used in Masonry, in admin, to configure where your
  * components are on Dashboard/Homepage/ePortfolio
  */
-.component {
-    background-color: $content-ui-background;
+.component-configurator {
+
+    /* Apply margin between components
+     * Don't colour the margin
+     */
+    .component {
+        margin-bottom: rem-calc(($base-font-size));
+        &:hover{
+            cursor: move;
+        }
+
+        /* Absorb from Skin Builder colour set
+         *
+         * wow nested identical css names - that's a really bad
+         * outcome. I shall rename .component.information-list
+         * into component-titlebar
+         */
+        .component.information-list {
+            background-color: $content-ui-background;
+            margin-bottom: 0px;
+        }
+    }
 }
 
 /* Dashboard, Homepage: Calendar Events
