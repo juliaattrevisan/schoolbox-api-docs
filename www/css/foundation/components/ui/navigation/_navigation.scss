@@ -271,76 +271,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
     }
 }
 
-// Logo - Side Bar
-.left-off-canvas-menu {
-    .logo-wrapper {
-        padding: 2rem 0;
-        background-color: $logo-background;
-    }
-    .logo {
-        @media #{$medium-down} {
-            display: none !important;
-        }
-        display: block;
-        img {
-            display: block;
-            margin: 0 auto;
-        }
-    }
-
-    /* Used to separate areas in the flyout menu
-     * Notably, "Switch User" and its list of users
-     *
-     * This usually inherits from the content-ui colour set
-     * where flyout colours were generically defined
-     *
-     * To override .f-dropdown default colours,
-     * use background not background-color
-     */
-    .f-dropdown {
-        .separator {
-            color: contrast-bg($background: $off-canvas-background, $dark: $off-canvas-foreground);
-            background: $off-canvas-background;
-
-            &:hover {
-                background: $off-canvas-background;
-            }
-        }
-
-        .switch-user {
-            background: $off-canvas-background;
-
-            &:hover {
-                background: $off-canvas-hover;
-            }
-
-            /* Avatar Cards have to fight against a different colour set
-             * when in the off-canvas account-menu, making its anchor
-             * region extremely obvious (especially on hover)
-             *
-             * Have to make a unique item for this particular region, by
-             * secretly making all ".card a" effects transparent
-             *
-             * Sledgehammer the Shards of Narsil for now
-             */
-            .avatar {
-                &.card {
-                    padding: 0.5rem 0rem 0rem 1rem;
-                    .meta {
-                        color: contrast-bg($background: $off-canvas-background, $dark: $off-canvas-foreground);
-                    }
-                    a {
-                        background-color: transparent;
-                        &:hover {
-                            background-color: transparent;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 .left-off-canvas-toggle,
 .right-off-canvas-toggle {
 	color: $navigation-foreground;
@@ -361,6 +291,80 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 
 // Left Side Menu
 .left-off-canvas-menu{
+
+    /* A background colour specifically for the logo/crest
+     * so a school logo won't be mashed by the off-canvas colour
+     * set selections they are allowed to make
+     */
+    .logo-wrapper {
+        padding: 2rem 0;
+        background-color: $logo-background;
+
+        .logo {
+            @media #{$medium-down} {
+                display: none !important;
+            }
+            display: block;
+            img {
+                display: block;
+                margin: 0 auto;
+            }
+        }
+    }
+
+    /* Separator: used to separate areas in the flyout menu
+     * Notably, "Switch User" and its list of users
+     * These elements have no hover styling
+     *
+     * This usually inherits from the content-ui colour set
+     * where flyout colours were generically defined
+     *
+     * To override .f-dropdown default colours,
+     * use background not background-color
+     */
+    .f-dropdown {
+        .separator {
+            color: contrast-bg($background: $off-canvas-background, $dark: $off-canvas-foreground);
+            background: $off-canvas-background;
+
+            &:hover {
+                background: $off-canvas-background;
+            }
+        }
+
+        /* Avatar Cards have to fight against a different colour set
+         * when in the off-canvas account-menu, making its anchor
+         * region extremely obvious (especially on hover)
+         *
+         * Have to make a unique item for this particular region, by
+         * secretly making all ".card a" effects transparent
+         *
+         * Sledgehammer the Shards of Narsil for now
+         */
+        .switch-user {
+            background: $off-canvas-background;
+
+            &:hover {
+                background: $off-canvas-hover;
+            }
+
+            .avatar {
+                &.card {
+                    padding: 0.5rem 0rem 0rem 1rem;
+                    .meta {
+                        color: contrast-bg($background: $off-canvas-background, $dark: $off-canvas-foreground);
+                    }
+                    a {
+                        background-color: transparent;
+                        &:hover {
+                            background-color: transparent;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 	// Sidebar Main Nav
 	.second-nav{
 		@extend .hide-for-xlarge-up;
