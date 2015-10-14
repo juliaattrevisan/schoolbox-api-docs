@@ -68,16 +68,9 @@ $this->setVar(
 // Get each class which uses the unit already.
 /** @var UnitInstance[]|Collection $unitList */
 $unitList = UnitInstanceMapper::getInstance()->findByUnitCategoryId($categoryId);
-/** @var Category[]|Collection $classWithUnitList */
-$classWithUnitList = CategoryMapper::getInstance()->findByColumn(
-    'id',
-    $unitList->map(function($unit) {
-        /** @var UnitInstance $unit */
-        return $unit->getComponent()->getIdentifier();
-    })
-);
 
-
+// Iterate units instead of folders, because it's possible for a unit to exist
+// more than once in the same folder.
 if (count($unitList) > 0) {
     $this->parse('exportable_block', 'exportable');
     $this->setVar('class_block', '');
@@ -86,7 +79,12 @@ if (count($unitList) > 0) {
     foreach ($unitList as $unit) {
 
         // Load category and hierarchy for this unit
-        $unitCategory = CategoryMapper::getInstance()->findById($unit->getComponent()->getIdentifier());
+        try {
+            $unitCategory = CategoryMapper::getInstance()->findById($unit->getCategory()->getId());
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // Most likely deleted - ignore
+            continue;
+        }
 
         // Block setup
         $this->setVar('class_import_allowed_block', '');
@@ -117,16 +115,15 @@ if (count($unitList) > 0) {
             $this->parse('class_import_forbidden_block', 'class_import_forbidden');
         }
         else {
-            try {
-                Task\InstanceMapper::getInstance()->findOneByColumnList(
-                    array(
-                        'task_id'                 => $task->getId(),
-                        'course_unit_instance_id' => $unit->getId(),
-                    )
-                );
+            $taskList = Task\InstanceMapper::getInstance()->findByColumnList(
+                array(
+                    'task_id'                 => $task->getId(),
+                    'course_unit_instance_id' => $unit->getId(),
+                )
+            );
+            if ($taskList->count() > 0) {
                 $this->parse('class_import_exists_block', 'class_import_exists');
-            }
-            catch (Exception $e) {
+            } else {
                 $exportableCount++;
                 $this->parse('class_import_allowed_block', 'class_import_allowed');
                 $this->parse('class_import_checkbox_block', 'class_import_checkbox');

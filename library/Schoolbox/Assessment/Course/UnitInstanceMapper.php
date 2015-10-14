@@ -449,8 +449,10 @@ class UnitInstanceMapper extends Mapper {
         $query = "
             SELECT
                 {$this->getColumnString('ui')},
+                {$this->getJoinColumnString('category', 'uc')},
                 {$this->getJoinColumnString('component', 'ci')}
             FROM `{$this->getTable()}` `ui`
+            INNER JOIN {$this->getJoinSql('category', 'ui', 'uc')}
             INNER JOIN {$this->getJoinSql('component', 'ui', 'ci')}
             WHERE `ui`.`unit_category_id` = :categoryId
             AND `ci`.`module` = 'homepage'
@@ -470,6 +472,7 @@ class UnitInstanceMapper extends Mapper {
                  * @var UnitInstanceMapper $mapper
                  * @var UnitInstance       $model
                  */
+                $model->setCategory($mapper->getJoinMapper('category')->hydrate($row, 'uc'));
                 $model->setComponent($mapper->getJoinMapper('component')->hydrate($row, 'ci'));
                 return $model;
             }
