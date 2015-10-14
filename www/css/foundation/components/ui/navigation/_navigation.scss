@@ -306,6 +306,34 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 
         .switch-user {
             background: $off-canvas-background;
+
+            &:hover {
+                background: $off-canvas-hover;
+            }
+
+            /* Avatar Cards have to fight against a different colour set
+             * when in the off-canvas account-menu, making its anchor
+             * region extremely obvious (especially on hover)
+             *
+             * Have to make a unique item for this particular region, by
+             * secretly making all ".card a" effects transparent
+             *
+             * Sledgehammer the Shards of Narsil for now
+             */
+            .avatar {
+                &.card {
+                    padding: 0.5rem 0rem 0rem 1rem;
+                    .meta {
+                        color: contrast-bg($background: $off-canvas-background, $dark: $off-canvas-foreground);
+                    }
+                    a {
+                        background-color: transparent;
+                        &:hover {
+                            background-color: transparent;
+                        }
+                    }
+                }
+            }
         }
     }
 }
