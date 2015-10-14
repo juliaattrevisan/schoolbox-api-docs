@@ -10,16 +10,22 @@ $notification-header-background: $navigation-background !default;
 
     background: $notification-header-background;
 
+    /* The Notification Bell
+     */
     &[data-unread] {
-
         padding-left: 1.75rem;
 
+        /* The colour of the bell in its idle state
+         */
         &:before {
-            color: $navigation-hover;
+            color: $navigation-foreground;
             display: inline-block;
             width: 1.5rem;
         }
 
+        /* The colour of the bell when there are items
+         * to read (when the unread count is not zero)
+         */
         &:not([data-unread="0"]) {
             background-color: $notification-unread-background;
             color: $notification-unread-color;
@@ -33,7 +39,6 @@ $notification-header-background: $navigation-background !default;
         span {
             opacity: 0;
         }
-
     }
 }
 
