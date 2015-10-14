@@ -365,7 +365,13 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
         }
     }
 
-	// Sidebar Main Nav
+	/* Second Nav
+	 * This appears when you're on medium displays and you have to
+	 * summon the off-canvas menu manually, by using the hamburger
+	 * Main Navigation elements from the top bar wrap down into an
+     * additional area in Off Canvas called Second Nav. These elements
+     * precede the Side Menu
+     */
 	.second-nav{
 		@extend .hide-for-xlarge-up;
 
