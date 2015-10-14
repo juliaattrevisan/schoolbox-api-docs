@@ -1104,10 +1104,19 @@ ul.flex-list {
 	}
 }
 
+/* Resource List in File Picker Accordion
+ * You can get to this list via a File Picker Accordion, by clicking
+ * on any dropzone. This is a differently-styled list than the one in
+ * Resource Browser from the Main Navigation (that's a jstree)
+ */
 .resource-list {
 	@extend .action-list;
 	.avatar.card {
+        a {
+            color: $content-ui-foreground;
+        }
 		.icon-32 {
+            color: $content-ui-foreground;
 			padding-top: 1rem;
 		}
 	}
