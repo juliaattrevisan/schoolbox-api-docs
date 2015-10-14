@@ -757,21 +757,6 @@ nav {
 	margin: 0;
 	padding: 0;
 
-    /* Topbar replacement
-     */
-    &.component {
-        .card {
-            min-height: 1rem;
-        }
-        /* Weird extra pixel that comes out of nowhere
-         */
-        nav {
-            overflow: hidden;
-        }
-        h2 {
-            font-size: 1.3125rem;
-        }
-    }
     &.sortable {
         .ui-sortable-helper {
             border-bottom: none;

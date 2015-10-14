@@ -22,10 +22,30 @@
          * outcome. I shall rename .component.information-list
          * into component-titlebar
          */
-        .component.information-list {
+        .component-titlebar {
             background-color: $content-ui-background;
             margin-bottom: 0px;
         }
+    }
+}
+
+/* Component Title Bar
+ * This is a topbar replacement - topbar is too heavy for
+ * what it needs to be, so we use a universal information list
+ */
+.component-titlebar {
+    @include information-list;
+
+    .card {
+        min-height: 1rem;
+    }
+    /* Weird extra pixel that comes out of nowhere
+     */
+    nav {
+        overflow: hidden;
+    }
+    h2 {
+        font-size: 1.3125rem;
     }
 }
 
