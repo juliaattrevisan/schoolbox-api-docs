@@ -13,46 +13,49 @@
             <input name="sequence" type="hidden" value="{SEQUENCE}" />
 
             <h2 class="subheader">Create Question</h2>
-            <section class="content">
-                <label>
-                    Question Type
-                    <select name="type_id" id="type_id" data-question-type-select>
-                        <option disabled {DISABLED_SELECTED} value='-1'>-- Select Type --</option>
-                        <!-- BEGIN questionType -->
-                        <option value="{QUESTIONTYPE_TYPE_ID}" {QUESTIONTYPE_SELECTED}>{QUESTIONTYPE_DESCRIPTION}</option>
-                        <!-- END questionType -->
-                    </select>
-                </label>
+            <section>
+                <fieldset class="content">
+                    <div class="column small-12">
+                        <legend>Question Type</legend>
+                        <select name="type_id" id="type_id" data-question-type-select>
+                            <option disabled {DISABLED_SELECTED} value='-1'>-- Select Type --</option>
+                            <!-- BEGIN questionType -->
+                            <option value="{QUESTIONTYPE_TYPE_ID}" {QUESTIONTYPE_SELECTED}>{QUESTIONTYPE_DESCRIPTION}</option>
+                            <!-- END questionType -->
+                        </select>
+                    </div>
+                </fieldset>
 
                 <!-- BEGIN type_selected -->
-                <label>
-                    Question
-                    <textarea name="question" id="question" />{QUESTION}</textarea>
-                </label>
+                <fieldset class="content">
+                    <div class="column small-12">
+                        <legend>Question</legend>
+                        <textarea name="question" id="question" />{QUESTION}</textarea>
+                    </div>
+                </fieldset>
 
                 <!-- BEGIN has_answer_configuration -->
-                <fieldset>
-                    <legend>Configuration Options</legend>
+                <fieldset classs="content">
                     <div class="small-12 column">
-                    <!-- BEGIN answer_configuration -->
-
-                    <!-- END answer_configuration -->
+                        <legend>Configuration Options</legend>
+                        <!-- BEGIN answer_configuration -->
+                        <!-- END answer_configuration -->
                     </div>
                 </fieldset>
                 <!-- END has_answer_configuration -->
 
                 <!-- BEGIN has_marks -->
-                <label>
-                    Marks
-                    <input data-marks name="marks" type="text" size="3" value="{MARKS}" />
-                </label>
+                <fieldset class="content">
+                    <div class="column small-12">
+                        <legend>Marks</legend>
+                        <input data-marks name="marks" type="text" size="3" value="{MARKS}" />
+                    </div>
+                </fieldset>
                 <!-- END has_marks -->
+                
+                <!-- BEGIN answerInputs -->
+                <!-- END answerInputs -->
 
-                <div>
-                    <!-- BEGIN answerInputs -->
-
-                    <!-- END answerInputs -->
-                </div>
                 <!-- END type_selected -->
             </section>
             <label>
