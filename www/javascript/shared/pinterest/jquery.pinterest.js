@@ -36,7 +36,7 @@
 			}
 
 			var derived = {
-				availableColumnWidth: $(defaults.element).parent('div').width(),
+				availableColumnWidth: $(defaults.element).closest('[data-pinterest-content]').width(),
 				maxWidth: 518,
 				maxHeight: 300
 			}
@@ -78,7 +78,7 @@
 			}
 
 			var derived = {
-				availableColumnWidth: $(defaults.element).parent('div').parent('div').width(),
+				availableColumnWidth: $(defaults.element).closest('[data-pinterest-content]').width(),
 				maxWidth: 750,
 				maxHeight: 300
 			}
