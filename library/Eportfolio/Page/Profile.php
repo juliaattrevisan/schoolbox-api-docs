@@ -9,6 +9,12 @@
  */
 class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 {
+    /**
+     * The current user (used for authenticating whether a user can view something)
+     *
+     * @var \Schoolbox\User
+     */
+    protected $currentUser;
 
     /**
      * Number of Recent Showcased Items to display
@@ -46,6 +52,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         $this->setNumShowcasedItems(3);
         $this->setNumRecentBlogs(3);
         $this->setNumRecentPhotos(3);
+        $this->setCurrentUser($_SESSION['user']);
     }
 
     /**
@@ -517,5 +524,23 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
     private function getNumRecentPhotos()
     {
         return $this->numRecentPhotos;
+    }
+
+    /**
+     * @return \Schoolbox\User
+     */
+    private function getCurrentUser()
+    {
+        return $this->currentUser;
+    }
+
+    /**
+     * @param  \Schoolbox\User $currentUser
+     * @return $this
+     */
+    private function setCurrentUser($currentUser)
+    {
+        $this->currentUser = $currentUser;
+        return $this;
     }
 }
