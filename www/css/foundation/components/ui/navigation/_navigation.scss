@@ -413,7 +413,27 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		font-weight: $font-weight-bold;
 		width: 100%;
 		text-align: left;
-		&:hover,
+
+        /* Little triangle icon next to username
+         */
+        &.dropdown.button::after {
+            margin-top: -0.625rem;
+            border-color: $off-canvas-foreground transparent transparent transparent;
+        }
+
+        /* This is the currently-logged-in user's dom element
+         */
+        &:hover {
+            color: $off-canvas-foreground;
+            background-color: $off-canvas-hover;
+
+            /* Little triangle icon next to username
+             */
+            &.dropdown.button::after {
+                border-color: $off-canvas-foreground transparent transparent transparent;
+            }
+        }
+
 		&.open {
 		    color: $off-canvas-hover;
 			background-color: $off-canvas-bg;
@@ -424,13 +444,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
                 border-color: $off-canvas-hover transparent transparent transparent;
             }
 		}
-
-        /* Little triangle icon next to username
-         */
-        &.dropdown.button::after {
-            margin-top: -0.625rem;
-            border-color: $off-canvas-foreground transparent transparent transparent;
-        }
 
 		span {
 			overflow: hidden;
