@@ -121,6 +121,21 @@ $block-grid-default-spacing: rem-calc(16);
                 padding-right: $wide-margin;
             }
         }
+        .timetable-small{
+            margin-left: 0;
+            margin-right: 0;
+            table {
+                td:first-child, th:first-child {
+                    padding-left: $wide-margin;
+                }
+                td:last-child, th:last-child {
+                    padding-right: 0;
+                    .timetable-subject{
+                        padding-right: $wide-margin;
+                    }
+                }
+            }
+        }
     }
 
     @media #{$medium-only} {
