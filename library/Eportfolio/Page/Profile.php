@@ -154,7 +154,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
         /* Control button
          */
-        if ($_SESSION['id'] == $this->getUserId()) {
+        if ($this->getCurrentUser()->getId() == $this->getUserId()) {
             if ($coverPhotoCollection->count()) {
                 $this->getPage()->parse('has_cover_photo_control_block', 'has_cover_photo_control');
                 $this->getPage()->setVar('no_cover_photo_control_block', '');
@@ -183,8 +183,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
             $previousCategory = null;
             $j = 0;
 
-            /** @var Schoolbox\User $currentUser */
-            $currentUser = $_SESSION['user'];
+            $currentUser = $this->getCurrentUser();
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 $currentBox = $currentShowcasedItem->getSubmissionBox();
 
