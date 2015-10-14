@@ -77,7 +77,8 @@ $classWithUnitList = CategoryMapper::getInstance()->findByColumn(
     })
 );
 
-
+// Iterate units instead of folders, because it's possible for a unit to exist
+// more than once in the same folder.
 if (count($unitList) > 0) {
     $this->parse('exportable_block', 'exportable');
     $this->setVar('class_block', '');
@@ -86,7 +87,12 @@ if (count($unitList) > 0) {
     foreach ($unitList as $unit) {
 
         // Load category and hierarchy for this unit
-        $unitCategory = CategoryMapper::getInstance()->findById($unit->getComponent()->getIdentifier());
+        try {
+            $unitCategory = CategoryMapper::getInstance()->findById($unit->getComponent()->getIdentifier());
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // Most likely deleted - ignore
+            continue;
+        }
 
         // Block setup
         $this->setVar('class_import_allowed_block', '');
