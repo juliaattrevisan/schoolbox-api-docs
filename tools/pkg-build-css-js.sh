@@ -13,6 +13,11 @@
 #
 #
 
+sass=0
+if [ "$1" == "--sass" ]; then
+    sass=1
+fi
+
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*}
 instdir=`readlink -f $fullpath/../`;
@@ -36,5 +41,7 @@ grunt build.js;
 # Building CSS files via LessCSS
 grunt build.css;
 
-# Build SASS files
-grunt sass;
+# Build SASS files (Vagrant provision only, not package build)
+if [ $sass = 1 ]; then
+    grunt sass;
+fi

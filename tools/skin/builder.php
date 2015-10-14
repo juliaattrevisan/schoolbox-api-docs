@@ -42,7 +42,14 @@ if (Config::get('skin_builder')) {
     ];
 }
 
-$origSha = sha1_file(SKIN_FILE);
+if(is_readable(SKIN_FILE)) {
+    $origSha = sha1_file(SKIN_FILE);
+}
+else {
+    // File doesnt exist, force the build
+    $force = true;
+    $origSha = null;
+}
 $newSha  = null;
 $fp      = fopen(SKIN_FILE, 'w');
 if($fp) {

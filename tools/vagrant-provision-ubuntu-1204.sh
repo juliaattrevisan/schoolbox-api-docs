@@ -168,7 +168,7 @@ echo "$vag Installing grunt-cli if not already installed";
 /vagrant/tools/grunt.sh;
 
 echo "$vag Building CSS and JS";
-/vagrant/tools/pkg-build-css-js.sh;
+/vagrant/tools/pkg-build-css-js.sh --sass;
 
 echo "$vag Starting watcher for changes to CSS files";
 grunt --no-color watch > /vagrant/data/watch.output.txt &
