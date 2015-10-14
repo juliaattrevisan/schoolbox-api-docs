@@ -1,24 +1,24 @@
---    UPDATE config SET skin_colour_navigation_foreground = '';
---    UPDATE config SET skin_colour_navigation_background = '';
---    UPDATE config SET skin_colour_navigation_hover = '';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_navigation_foreground';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_navigation_background';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_navigation_hover';
 --
---    UPDATE config SET skin_colour_offcanvas_foreground = '';
---    UPDATE config SET skin_colour_offcanvas_background = '';
---    UPDATE config SET skin_colour_offcanvas_hover = '';
---    UPDATE config SET skin_colour_off_canvas = '';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_offcanvas_foreground';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_offcanvas_background';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_offcanvas_hover';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_off_canvas';
 --
---    UPDATE config SET skin_colour_content_ui_foreground = '';
---    UPDATE config SET skin_colour_content_ui_background = '';
---    UPDATE config SET skin_colour_content_ui_hover = '';
---    UPDATE config SET skin_colour_content_ui_selected = '';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_content_ui_foreground';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_content_ui_background';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_content_ui_hover';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_content_ui_selected';
 --
---    UPDATE config SET skin_colour_content_ui_submit_foreground = '';
---    UPDATE config SET skin_colour_content_ui_submit_background = '';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_content_ui_submit_foreground';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_content_ui_submit_background';
 --
---    UPDATE config SET skin_colour_accent_foreground = '';
---    UPDATE config SET skin_colour_accent_background = '';
---    UPDATE config SET skin_colour_accent_hover = '';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_accent_foreground';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_accent_background';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_accent_hover';
 --
---    UPDATE config SET skin_colour_logo_background = '';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_colour_logo_background';
 --
---    UPDATE config SET skin_body_bg_colour = '';
+--    UPDATE config SET `value` = '' WHERE `name` = 'skin_body_bg_colour';
