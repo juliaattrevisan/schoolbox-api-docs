@@ -7,6 +7,9 @@
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+use Alaress\Lumberjack\Logger;
+
+$logger = new Logger();
 
 define('SKIN_FILE', dirname(__FILE__) .'/../../www/css/foundation/utils/_skin.scss');
 
@@ -15,7 +18,8 @@ $force = isset($opts['f']) || isset($opts['force']);
 
 // Skin builder is off? don't set any vars
 $vars = [];
-if (Config::get('skin_builder')) {    
+if (Config::get('skin_builder')) {
+    $logger->info('Skin builder is on - building using color settings from skin builder');
     $vars = [
         'navigation-foreground' => Config::get('skin_colour_navigation_foreground'),
         'navigation-background' => Config::get('skin_colour_navigation_background'),
@@ -40,19 +44,24 @@ if (Config::get('skin_builder')) {
 //        'secondary-color' => Config::get('skin_secondary_colour'),
 //        'tertiary-color'  => Config::get('skin_tertiary_colour'),
     ];
+} else {
+    $logger->info('Skin builder is off - building using default color settings');
 }
 
 if(is_readable(SKIN_FILE)) {
     $origSha = sha1_file(SKIN_FILE);
+    $logger->info("Skin has been built before (hash: $origSha)");
 }
 else {
     // File doesnt exist, force the build
+    $logger->info('Skin has not been built before - forcing build');
     $force = true;
     $origSha = null;
 }
 $newSha  = null;
 $fp      = fopen(SKIN_FILE, 'w');
 if($fp) {
+    $logger->info('Creating skin file...');
     fputs($fp, "// Do not edit, automatically created by tools/skin/builder.php\n");
 
     foreach ($vars as $var => $val) {
@@ -61,24 +70,55 @@ if($fp) {
     fclose($fp);
 
     $newSha = sha1_file(SKIN_FILE);
+    $logger->info("Skin file created (hash: $newSha)");
 }
 
 if ($origSha != $newSha || $force) {
+    $logger->info('Skin has changed, or build was forced - rebuilding');
     // Compile the new sass file.
     $infile  = SITE_root . '/www/css/foundation/chrome-foundation.scss';
     $outfile = SITE_root . '/www/css/foundation/chrome.css';
     $ie9file = SITE_root . '/www/css/foundation/chrome-ie9.css';
     $tmpfile = tempnam(sys_get_temp_dir(), 'css');
     $cmd     = sprintf('sass %s > %s', escapeshellarg($infile), escapeshellarg($tmpfile));
+    $logger->info("Building SASS...");
     exec($cmd, $output, $outputCode);
     if ($outputCode === 0) {
+        $logger->info("SASS built - copying to CSS location");
         copy($tmpfile, $outfile);
-        // Run bless
-        $blessCmd = sprintf('node_modules/.bin/blessc %s %s', escapeshellarg($outfile), escapeshellarg($ie9file));
+
+        $logger->info("Splitting for IE < 10 using blessc...");
+        $blessCmd = 'blessc';
+        exec('which '.escapeshellarg($blessCmd), $output, $outputCode);
+        if ($outputCode !== 0) {
+            $logger->info("blessc doesn't exist - assuming in node_modules");
+            $blessCmd = SITE_root.'/node_modules/.bin/blessc';
+        }
+        $blessCmd = sprintf('%s %s %s', escapeshellarg($blessCmd), escapeshellarg($outfile), escapeshellarg($ie9file));
         exec($blessCmd, $output, $outputCode);
+        if ($outputCode === 0) {
+            $logger->info("Splitting for IE < 10 complete");
+            $logger->info("Skin built successfully");
+        } else {
+            // Something went wrong through blessc
+            $logger->error("Something went wrong during blessc (exit code: $outputCode)");
+            $logger->info("Command: $cmd");
+            $logger->info("Output:");
+            foreach ($output as $line) {
+                $logger->info($line);
+            }
+        }
     } else {
         // something went wrong
+        $logger->error("Something went wrong during SASS build process! (exit code: $outputCode)");
+        $logger->info("Command: $cmd");
+        $logger->info("Output:");
+        foreach ($output as $line) {
+            $logger->info($line);
+        }
     }
     exit($outputCode);
+} else {
+    $logger->info('Skin has not changed, and build was not forced');
 }
 exit(0);
