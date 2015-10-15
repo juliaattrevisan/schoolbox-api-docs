@@ -384,7 +384,7 @@
             <ul class="action-list">
                 <li class="row row-header">
                     <div class="small-4 columns"><div class="content">Service</div></div>
-                    <div class="small-4 columns"><div class="content">Campus</div></div>
+                    <div class="small-4 columns"><div class="content">Service Identifier</div></div>
                     <div class="small-3 columns end"><div class="content">Access</div></div>
                 </li>
                 <!-- BEGIN user_calendar -->
@@ -397,7 +397,7 @@
                         </div>
                         <div class="small-4 columns">
                             <div class="content">
-                                {PERM_CAMPUS_NAME}
+                                Campus: {PERM_CAMPUS_NAME}
                             </div>
                         </div>
                         <div class="small-4 columns">
@@ -430,7 +430,7 @@
                         </div>
                         <div class="small-4 columns">
                             <div class="content">
-                                {PERM_CAMPUS_NAME}
+                                Campus: {PERM_CAMPUS_NAME}
                             </div>
                         </div>
                         <div class="small-4 columns">
@@ -489,9 +489,14 @@
                 <!-- BEGIN user_housemaster -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="small-8 columns">
+                        <div class="small-4 columns">
                             <div class="content">
                                 Housemaster
+                            </div>
+                        </div>
+                        <div class="small-4 columns">
+                            <div class="content">
+                                Residential House: {PERM_RESIDENT_HOUSE_NAME}
                             </div>
                         </div>
                         <div class="small-4 columns">
@@ -591,6 +596,14 @@
                             <option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED}>{PERM_CAMPUS_NAME}</option>
                             <!-- END perm_campus -->
                             <!-- END campusPermsList -->
+                        </select>
+                        <select data-service-type="residentialHouse" name="sid" id="residentialHouseSelect" class="hide" disabled>
+                            <option value="">&lt;- Select residential house -&gt;</option>
+                            <!-- BEGIN residentialHousePermsList -->
+                            <!-- BEGIN perm_residential_house -->
+                            <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
+                            <!-- END perm_residential_house -->
+                            <!-- END residentialHousePermsList -->
                         </select>
                     </div>
                     <div class="small-3 columns end">

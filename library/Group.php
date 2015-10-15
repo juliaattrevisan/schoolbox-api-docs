@@ -437,12 +437,14 @@ class Group extends DeprecatedModel
             return FULL_ACCESS;
         }
         // check individual access
+        $query = "SELECT type FROM userAccess WHERE uid = "
+            . $this->db->smartQuote($userID)
+            . " AND ( ( service = " . $this->db->smartQuote($this->_service) . " ";
 
-        $query = "SELECT type FROM userAccess WHERE uid = " . $this->db->smartQuote(
-            $userID
-        ) . " AND ( ( service = " . $this->db->smartQuote($this->_service) . " ";
-
-        if (in_array($this->_service, array(HOMEPAGE_SERVICE, CALENDAR_SERVICE))) {
+        if (in_array(
+            $this->_service,
+            array(HOMEPAGE_SERVICE, CALENDAR_SERVICE, HOUSEMASTER_SERVICE)
+        )) {
             $query .= "AND sid = " . $this->db->smartQuote($relationID) . " ";
         }
 
@@ -459,9 +461,9 @@ class Group extends DeprecatedModel
 
         // check group access (HOMEPAGE_SERVICE only)
         if ($permission < WRITE_ACCESS && $this->_service == HOMEPAGE_SERVICE) {
-            $query = "SELECT type FROM perms WHERE cid=" . $this->db->smartQuote(
-                $relationID
-            ) . " AND gid=" . $this->db->smartQuote($user['group_id']) . " ORDER BY type DESC";
+            $query = "SELECT type FROM perms WHERE cid="
+                . $this->db->smartQuote($relationID)
+                . " AND gid=" . $this->db->smartQuote($user['group_id']) . " ORDER BY type DESC";
             $groupPermission = $this->db->getOne($query);
             if ($groupPermission) {
                 $permission = $groupPermission;
@@ -483,8 +485,10 @@ class Group extends DeprecatedModel
         }
 
         // allow staff write access to NEWS_SERVICE by default except at shore...
-        if (($this->_service == NEWS_SERVICE) && $permission < WRITE_ACCESS &&
-            Cfg::get('news_staff_post_enabled') == '1' && $this->isStaff($userID)
+        if ($this->isStaff($userID)
+            && (Cfg::get('news_staff_post_enabled') == '1')
+            && ($this->_service == NEWS_SERVICE)
+            && ($permission < WRITE_ACCESS)
         ) {
             $permission = WRITE_ACCESS;
         }

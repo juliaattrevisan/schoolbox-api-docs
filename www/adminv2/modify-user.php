@@ -14,6 +14,7 @@ if(is_numeric($this->arg[0])) {
     /* Permissions clone
 	 */
     $this->setBlock(TEMPLATE_content, 'campusPermsList','campusPermsList_block');
+    $this->setBlock(TEMPLATE_content, 'residentialHousePermsList','residentialHousePermsList_block');
 
     /* Output permissions
 	 */
@@ -91,8 +92,10 @@ if(is_numeric($this->arg[0])) {
         $this->dropDown('system_group', $userHandler->getGroupList(), $user['group_id'], TEMPLATE_content, array('id'=>'GROUP_ID','name'=>'SYSTEM_GROUP_NAME'));
 
         /* Output house lists */
+        /** @var HouseResidential[]|Schoolbox\Collection $residentialHouseList */
+        $residentialHouseList = HouseResidentialMapper::getInstance()->findAll();
         $this->dropDown('house', HouseMapper::getInstance()->findAll(), $user['house'], TEMPLATE_content, array('id'=>'HOUSE_ID','house'=>'HOUSE_NAME'));
-        $this->dropDown('residential_house', HouseResidentialMapper::getInstance()->findAll(), $user['residential_house'], TEMPLATE_content, array('id' => 'RESIDENT_HOUSE_ID', 'house' => 'RESIDENT_HOUSE_NAME'));
+        $this->dropDown('residential_house', $residentialHouseList, $user['residential_house'], TEMPLATE_content, array('id' => 'RESIDENT_HOUSE_ID', 'house' => 'RESIDENT_HOUSE_NAME'));
 
         /* Output campus list */
         $this->setBlock(TEMPLATE_content, 'campus','campus_block');
@@ -164,6 +167,19 @@ if(is_numeric($this->arg[0])) {
 
         $this->parse('campusPermsList_block', 'campusPermsList');
 
+        // arcane block magick for residential hice
+        $this->dropDown(
+            'perm_residential_house',
+            $residentialHouseList,
+            0,
+            'residentialHousePermsList',
+            array(
+                'id'    => 'RESIDENT_HOUSE_ID',
+                'house' => 'RESIDENT_HOUSE_NAME',
+            )
+        );
+        $this->parse('residentialHousePermsList_block', 'residentialHousePermsList');
+
 
         if (is_array($permList)) {
             foreach($permList as $perm) {
@@ -181,14 +197,35 @@ if(is_numeric($this->arg[0])) {
                     'SID'            => $perm['sid']
                 ));
 
-                /* Show campus name
-				 */
-                foreach($campusList as $campus) {
-                    if ($campus['id'] == $perm['sid']) {
-                        $this->setVar(array(
-                            'PERM_CAMPUS_NAME' => $campus['name'],
-                        ));
-                    }
+                /* Show identifier name
+                 * Housemaster: sid = res house ID
+                 * Calendar, News: sid = campus ID
+                 * Others: not used
+                 */
+                switch ($perm['service']) {
+                    case CALENDAR_SERVICE:
+                    case NEWS_SERVICE:
+                        foreach ($campusList as $campus) {
+                            if ($campus['id'] == $perm['sid']) {
+                                $this->setVar('PERM_CAMPUS_NAME', $campus['name']);
+                                break;
+                            }
+                        }
+                        break;
+
+                    case HOUSEMASTER_SERVICE:
+                        foreach ($residentialHouseList as $residentialHouse) {
+                            if ($residentialHouse->getId() == $perm['sid']) {
+                                $this->setVar('PERM_RESIDENT_HOUSE_NAME', $residentialHouse->getHouse());
+                                break;
+                            }
+                        }
+                        break;
+
+                    case CMS_SERVICE:
+                    case RESOURCE_BOOKING_SERVICE:
+                    default:
+                        break;
                 }
 
                 /* Render out service blocx

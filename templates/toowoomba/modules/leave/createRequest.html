@@ -37,7 +37,11 @@
                 ajax: {
                     url:      '/ajax/user.php',
                     type:     'GET',
-                    data:     {groupID: "{STUDENT_GROUP_IDS}", showCampus: true},
+                    data:     {
+                        groupID: "{STUDENT_GROUP_IDS}",
+                        residentialHouseID: "{RESIDENTIAL_HOUSE_IDS}",
+                        showCampus: true
+                    },
                     dataType: 'json'
                 }
             })

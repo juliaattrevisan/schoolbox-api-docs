@@ -284,6 +284,46 @@ class UserAccessMapper extends Mapper
         // merge the two collections
         $extUserCollection->mergeUnique($userCollection, 'id');
         return $extUserCollection;
+	}
+
+    /**
+     * Gets users that belong to a given user access type.
+     *
+     * @param int $service    The service to check - one of the UserAccess::SERVICE_* constants
+     * @param int $serviceId  The identifier of the service to check
+     * @param int $accessType The minimum access level to retrieve users for.
+     *                        Defaults to UserAccess::ACCESS_READ
+     *
+     * @return User[]|Collection
+     */
+    public function findUsersForService($service, $serviceId, $accessType = UserAccess::ACCESS_READ)
+    {
+        $stmt = $this->getDatabase()->prepare("
+            SELECT
+                {$this->getJoinColumnString('user', 'u')}
+            FROM
+                `{$this->getTable()}` ua
+                LEFT JOIN {$this->getJoinSql('user', 'ua', 'u')}
+                LEFT JOIN groups g on u.group_id = g.id
+            WHERE ua.service = :service
+            AND ua.sid = :serviceId
+            AND ua.type >= :minAccess
+            ORDER BY u.id DESC
+        ");
+        $stmt->execute(
+            array(
+                'service'   => $service,
+                'serviceId' => $serviceId,
+                'minAccess' => $accessType,
+            )
+        );
+        $userCollection = $this->createCollection();
+        foreach ($stmt as $row) {
+            $userCollection->add(
+                $this->hydrateJoin($row, 'user', 'u')
+            );
+        }
+        return $userCollection;
     }
 
 
