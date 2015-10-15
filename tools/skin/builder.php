@@ -80,7 +80,7 @@ if ($origSha != $newSha || $force) {
     $outfile = SITE_root . '/www/css/foundation/chrome.css';
     $ie9file = SITE_root . '/www/css/foundation/chrome-ie9.css';
     $tmpfile = tempnam(sys_get_temp_dir(), 'css');
-    $cmd     = sprintf('sass %s > %s', escapeshellarg($infile), escapeshellarg($tmpfile));
+    $cmd     = sprintf('sass %s %s', escapeshellarg($infile), escapeshellarg($tmpfile));
     $logger->info("Building SASS...");
     exec($cmd, $output, $outputCode);
     if ($outputCode === 0) {
