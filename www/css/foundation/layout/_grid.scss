@@ -169,7 +169,4 @@ $block-grid-default-spacing: rem-calc(16);
 
 [data-component] {
     @include top-content-alignment();
-    .button {
-        margin-bottom: 0;
-    }
 }
