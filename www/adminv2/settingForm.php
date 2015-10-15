@@ -34,8 +34,13 @@ if ($groupHandler->isSuperuser()) {
         }
         else if ($record['field_id'] == Config::FIELD_FILE) {
             $factory = new \Schoolbox\Resource\Attachment\Collector\CollectorFactory();
-            $result = $factory->build(array($_POST[$currentRow]))->getFirst();
-            $newValue = $result->getHash();
+            try {
+                $result   = $factory->build(array($_POST[$currentRow]))->getFirst();
+                $newValue = $result->getHash();
+            } catch (\Schoolbox\Resource\Exception $e) {
+                // File is empty or not found. Delete the record completely
+                $newValue = '';
+            }
         }
         else {
             $newValue = $_POST[$currentRow];
