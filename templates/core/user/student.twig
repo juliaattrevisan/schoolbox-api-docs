@@ -34,7 +34,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <section class="no-pad no-margin">
+        <section class="no-pad">
             <div class="content no-pad">
                 <div class="row no-margin">
                     <div class="small-12 medium-6 large-4 columns no-pad">
@@ -176,94 +176,94 @@
                     </div>
                 </div>
             </div>
+            
+            {% block buttons_island %}
+            <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8">
+
+                {% block buttons %}
+                    {% if showButtons %}
+                        {% block buttons_dueWork %}
+                            {% if not (config.restrict_parent_duework_access and session.user.isParent()) %}
+                                <li class="no-pad">
+                                    <a href="/submission/dueWork/0/{{ user.getId() }}"
+                                       class="no-margin fat button icon-fat icon-32 icon-due-work"
+                                      >Due Work</a>
+                                </li>
+                            {% endif %}
+                        {% endblock buttons_dueWork %}
+                    {% endif %}
+
+                    {% if showButtons %}
+                        {% block buttons_grades %}
+                            {% if not (config.restrict_parent_grades and session.user.isParent()) %}
+                                <li class="no-pad">
+                                    <a href="/submission/allWork/{{ user.getId() }}"
+                                       class="no-margin fat button icon-fat icon-32 icon-tick"
+                                      >Grades</a>
+                                </li>
+                            {% endif %}
+                        {% endblock buttons_grades %}
+                    {% endif %}
+
+                    {% if eportfolioAuth %}
+                        {% block buttons_eportfolio %}
+                            <li class="no-pad">
+                                <a href="/eportfolio/{{ user.getId() }}/profile"
+                                   class="no-margin fat button icon-fat icon-32 icon-eportfolio"
+                                  >ePortfolio</a>
+                            </li>
+                        {% endblock buttons_eportfolio %}
+                    {% endif %}
+
+                    {% if showButtons %}
+                        {% block buttons_calendar %}
+                            <li class="no-pad">
+                                <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
+                                   class="no-margin fat button icon-fat icon-32 icon-calendar"
+                                  >Calendar</a>
+                            </li>
+                        {% endblock buttons_calendar %}
+                    {% endif %}
+
+                    {% if showButtons %}
+                        {% block buttons_timetable %}
+                            <li class="no-pad">
+                                <a href="/timetable/{{ user.getId() }}"
+                                   class="no-margin fat button icon-fat icon-32 icon-timetable"
+                                  >Timetable</a>
+                            </li>
+                        {% endblock buttons_timetable %}
+                    {% endif %}
+
+                    {% if showButtons %}
+                        {% block buttons_boarderLeave %}
+                            {% if config.boarder_leave_enabled and user.getResidentialHouse() %}
+                                <li class="no-pad">
+                                    <a href="/modules/leave/student/{{ user.getId() }}"
+                                       class="no-margin fat button icon-fat icon-32 icon-boarder-leave"
+                                      >Boarder Leave</a>
+                                </li>
+                            {% endif %}
+                        {% endblock buttons_boarderLeave %}
+                    {% endif %}
+
+                    {% if showButtons %}
+                        {% block buttons_pastoralCare %}
+                            {% if isStaff and config.external_type == 'synergetic' and config.external_staff_portal %}
+                                <li class="no-pad">
+                                    <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.getExternalId() }}"
+                                       class="no-margin fat button icon-fat icon-32 icon-modify"
+                                       target="_blank"
+                                      >Pastoral Care</a>
+                                </li>
+                            {% endif %}
+                        {% endblock buttons_pastoralCare %}
+                    {% endif %}
+
+                {% endblock buttons %}
+            </ul>
+            {% endblock buttons_island %}
         </section>
-
-        {% block buttons_island %}
-        <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8">
-
-            {% block buttons %}
-                {% if showButtons %}
-                    {% block buttons_dueWork %}
-                        {% if not (config.restrict_parent_duework_access and session.user.isParent()) %}
-                            <li class="no-pad">
-                                <a href="/submission/dueWork/0/{{ user.getId() }}"
-                                   class="no-margin fat button icon-fat icon-32 icon-due-work"
-                                  >Due Work</a>
-                            </li>
-                        {% endif %}
-                    {% endblock buttons_dueWork %}
-                {% endif %}
-
-                {% if showButtons %}
-                    {% block buttons_grades %}
-                        {% if not (config.restrict_parent_grades and session.user.isParent()) %}
-                            <li class="no-pad">
-                                <a href="/submission/allWork/{{ user.getId() }}"
-                                   class="no-margin fat button icon-fat icon-32 icon-tick"
-                                  >Grades</a>
-                            </li>
-                        {% endif %}
-                    {% endblock buttons_grades %}
-                {% endif %}
-
-                {% if eportfolioAuth %}
-                    {% block buttons_eportfolio %}
-                        <li class="no-pad">
-                            <a href="/eportfolio/{{ user.getId() }}/profile"
-                               class="no-margin fat button icon-fat icon-32 icon-eportfolio"
-                              >ePortfolio</a>
-                        </li>
-                    {% endblock buttons_eportfolio %}
-                {% endif %}
-
-                {% if showButtons %}
-                    {% block buttons_calendar %}
-                        <li class="no-pad">
-                            <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
-                               class="no-margin fat button icon-fat icon-32 icon-calendar"
-                              >Calendar</a>
-                        </li>
-                    {% endblock buttons_calendar %}
-                {% endif %}
-
-                {% if showButtons %}
-                    {% block buttons_timetable %}
-                        <li class="no-pad">
-                            <a href="/timetable/{{ user.getId() }}"
-                               class="no-margin fat button icon-fat icon-32 icon-timetable"
-                              >Timetable</a>
-                        </li>
-                    {% endblock buttons_timetable %}
-                {% endif %}
-
-                {% if showButtons %}
-                    {% block buttons_boarderLeave %}
-                        {% if config.boarder_leave_enabled and user.getResidentialHouse() %}
-                            <li class="no-pad">
-                                <a href="/modules/leave/student/{{ user.getId() }}"
-                                   class="no-margin fat button icon-fat icon-32 icon-boarder-leave"
-                                  >Boarder Leave</a>
-                            </li>
-                        {% endif %}
-                    {% endblock buttons_boarderLeave %}
-                {% endif %}
-
-                {% if showButtons %}
-                    {% block buttons_pastoralCare %}
-                        {% if isStaff and config.external_type == 'synergetic' and config.external_staff_portal %}
-                            <li class="no-pad">
-                                <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.getExternalId() }}"
-                                   class="no-margin fat button icon-fat icon-32 icon-modify"
-                                   target="_blank"
-                                  >Pastoral Care</a>
-                            </li>
-                        {% endif %}
-                    {% endblock buttons_pastoralCare %}
-                {% endif %}
-
-            {% endblock buttons %}
-        </ul>
-        {% endblock buttons_island %}
     </div>
 </div>
 
