@@ -86,6 +86,10 @@ if ($origSha != $newSha || $force) {
     if ($outputCode === 0) {
         $logger->info("SASS built - copying to CSS location");
         copy($tmpfile, $outfile);
+        // Copy the sourcemap
+        if (is_readable($tmpfile.'.map')) {
+            copy($tmpfile.'.map', $outfile.'.map');
+        }
 
         $logger->info("Splitting for IE < 10 using blessc...");
         $blessCmd = 'blessc';
