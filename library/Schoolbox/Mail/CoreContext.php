@@ -73,12 +73,24 @@ class CoreContext {
 
         // Extract skin builder colors
         $skinColors = [
-            "skin_body_bg_colour",
-            "skin_off_canvas_bg_colour",
-            "skin_primary_colour",
-            "skin_secondary_colour",
-            "skin_tab_bg_colour",
-            "skin_tertiary_colour",
+            'skin_colour_navigation_foreground',
+            'skin_colour_navigation_background',
+            'skin_colour_navigation_hover',
+            'skin_colour_offcanvas_foreground',
+            'skin_colour_offcanvas_background',
+            'skin_colour_offcanvas_hover',
+            'skin_colour_off_canvas',
+            'skin_colour_content_ui_foreground',
+            'skin_colour_content_ui_background',
+            'skin_colour_content_ui_hover',
+            'skin_colour_content_ui_selected',
+            'skin_colour_content_ui_submit_foreground',
+            'skin_colour_content_ui_submit_background',
+            'skin_colour_accent_foreground',
+            'skin_colour_accent_background',
+            'skin_colour_accent_hover',
+            'skin_colour_logo_background',
+            'skin_body_bg_colour',
         ];
         foreach ($skinColors as $skinColor) {
             $this->context['colours'][$skinColor] = $conf->get($skinColor);
