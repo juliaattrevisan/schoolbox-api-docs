@@ -90,7 +90,7 @@ class CoreContext {
             'skin_colour_accent_background',
             'skin_colour_accent_hover',
             'skin_colour_logo_background',
-            'skin_body_bg_colour',
+            'skin_colour_body_bg',
         ];
         foreach ($skinColors as $skinColor) {
             $this->context['colours'][$skinColor] = $conf->get($skinColor);
