@@ -13,7 +13,7 @@
 MAILTO="support@schoolbox.com.au"
 
 # Video Processing
-* */4 * * *	www-data	php /usr/share/schoolboxdev/tools/video/video-scanner.php >/dev/null 2>&1
+#* */4 * * *	www-data	php /usr/share/schoolboxdev/tools/video/video-scanner.php >/dev/null 2>&1
 */2 * * * *	www-data	php /usr/share/schoolboxdev/tools/video/processor.php >/dev/null 2>&1
 
 # Cleanup cache  files (minify,zip,stream) (once a week on a Sunday)
