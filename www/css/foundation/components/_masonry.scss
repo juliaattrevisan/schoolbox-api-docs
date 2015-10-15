@@ -5,10 +5,10 @@
     /* Special colour for masonry placeholder alert-box div
      * into which you can drop Components
      */
-    &.alert-box {
-        color: $accent-foreground;
-        background-color: $accent-background;
-    }
+  background-color: darken($body-bg, 10%);
+  color: $black;
+  padding: rem-calc(14);
+
 }
 
 .show-empty .empty-column .masonry-placeholder {
