@@ -14,3 +14,19 @@
         @extend .content;
     }
 }
+
+/* Force FullCalendar control buttons to absorb
+ * Skin Builder choices
+ */
+#calendar {
+    .calendar-controls {
+        button {
+            color: $content-ui-foreground;
+            background-color: $content-ui-background;
+            &:hover {
+                color: $content-ui-foreground;
+                background-color: $content-ui-hover;
+            }
+        }
+    }
+}
