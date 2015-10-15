@@ -190,7 +190,7 @@ VALUES ('skin_colour_logo_background',
 
 
 INSERT INTO `config` (`name`, `title`,`value`, `description`, `field_id`, `type_id`,`editable`,`required`)
-VALUES ('skin_body_bg_colour',
+VALUES ('skin_colour_body_bg',
         'Body Background Colour',
         '',
         'Sets the background colour in the main content area.',
