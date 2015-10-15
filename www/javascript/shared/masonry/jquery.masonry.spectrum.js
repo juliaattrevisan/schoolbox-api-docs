@@ -265,10 +265,10 @@
                     column.find('.island section').css({backgroundColor: colorString});
                     break;
                 case 'head_font':
-                    column.find('.component.information-list a').css({color: colorString});
+                    column.find('.component-titlebar a').css({color: colorString});
                     break;
                 case 'head_bg':
-                    column.find('.component.information-list').css({backgroundColor: colorString});
+                    column.find('.component-titlebar').css({backgroundColor: colorString});
                     break;
             }
         }
