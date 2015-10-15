@@ -81,7 +81,17 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
-        // TODO: Implement getDayNumber() method.
+        if ($date) {
+            $day = date('Y-m-d', $date);
+        } else {
+            $day = date('Y-m-d');
+        }
+        $result = $this->getDatabase()->getOne("
+            SELECT TIMETABLE_DAY
+            FROM CALENDAR
+            WHERE [DATE] = {$this->getDatabase()->smartQuote($day)}
+        ");
+        return intval($result) ?: 0;
     }
 
     /**
