@@ -126,11 +126,9 @@ $masonry-drop-background: $input-focus-bg-color;
 .icon-masonry-Component_Homepage_BlogController:before {
   @extend .icon-comment:before;
 }
-.icon-masonry-Component_Homepage_TranslateController:before {
-  // Doesn't yet exist and probably never will. Could make something up
-  //@extend .icon-add:before;
-  //content: 'Ω';
-}
+// Doesn't yet exist and probably never will
+//.icon-masonry-Component_Homepage_TranslateController:before {
+//}
 .icon-masonry-Component_Homepage_ScrollerController:before {
   @extend .icon-image-slideshow:before;
 }
