@@ -13,6 +13,7 @@ $this->setBlock(TEMPLATE_content, 'setting_tab', 'setting_tab_block');
 $this->setBlock(TEMPLATE_content, 'setting', 'setting_block');
 $this->setBlock('setting', 'setting_type_noneditable', 'setting_type_noneditable_block');
 $this->setBlock(TEMPLATE_content, 'setting_group_localisation', 'setting_group_localisation_block');
+$this->setBlock(TEMPLATE_content, 'setting_group_skin_config', 'setting_group_skin_config_block');
 $this->setBlock('setting', 'setting_type_input', 'setting_type_input_block');
 $this->setBlock('setting', 'setting_type_textarea', 'setting_type_textarea_block');
 $this->setBlock('setting', 'setting_type_html', 'setting_type_html_block');
@@ -79,6 +80,7 @@ if(is_array($optionList)) {
             'setting_type_colour_block'      => '',
             'setting_type_file_block'      => '',
             'setting_group_localisation_block' => '',
+            'setting_group_skin_config_block' => '',
         );
 
         $this->setVar($output);
@@ -213,6 +215,8 @@ if(is_array($optionList)) {
         // Show the help block if applicable.
         if ($selectedType == 'Localisation') {
             $this->parse('setting_group_localisation_block', 'setting_group_localisation');
+        } elseif ($selectedType == 'Skin Config') {
+            $this->parse('setting_group_skin_config_block', 'setting_group_skin_config');
         }
         $this->parse('setting_block', 'setting', true);
     }
