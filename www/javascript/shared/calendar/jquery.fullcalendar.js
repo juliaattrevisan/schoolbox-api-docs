@@ -696,7 +696,7 @@ function Bubble(calendar, bubbleDomId) {
  * @param bubbleDomId
  */
 Bubble.prototype.initForms = function() {
-    var bbl = $(document)
+    var bbl = $('#content');
 
     // define a way for the each loop to reach the parent
     var self = this
