@@ -103,7 +103,8 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     function getDayName($dayNumber)
     {
-        // TODO: Implement getDayName() method.
+        // I don't think that PCSchools stores a day name.
+        return 'Day '.$dayNumber;
     }
 
     /**
