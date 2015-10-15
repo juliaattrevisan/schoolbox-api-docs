@@ -73,12 +73,18 @@ $notification-header-background: $navigation-background !default;
             margin-left: 0;
         }
     }
+
+    /* The button that allows you to view your notifications
+     * Says "No Messages" or "Connecting"
+     *
+     * This is also the Mark All Read button.
+     */
     .button {
-        color: $navigation-foreground;
-        background-color: $navigation-background;
+        color: $content-ui-foreground;
+        background-color: $content-ui-background;
         &:hover {
-            color: $navigation-foreground;
-            background-color: $navigation-hover;
+            color: $content-ui-foreground;
+            background-color: $content-ui-hover;
         }
         height: 3rem;
         margin-bottom: 0;
