@@ -5,10 +5,8 @@
     /* Special colour for masonry placeholder alert-box div
      * into which you can drop Components
      */
-    &.alert-box {
-        color: $accent-foreground;
-        background-color: $accent-background;
-    }
+    color: $accent-foreground;
+    background-color: $accent-background;
 }
 
 .show-empty .empty-column .masonry-placeholder {
