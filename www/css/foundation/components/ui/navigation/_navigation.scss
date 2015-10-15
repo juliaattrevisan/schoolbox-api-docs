@@ -493,7 +493,12 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			float: right;
 		}
 	}
+
+    /* The Back button in the Off-Canvas Menu
+     */
 	.left-submenu .back > a {
+        height: 5rem;
+        padding-top: 1.625rem;
 	    color: $off-canvas-foreground;
 	    background-color: $off-canvas-background;
 	    &:hover {
