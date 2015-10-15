@@ -47,6 +47,8 @@ case "$1" in
         service schoolbox-rerouted restart 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
         # belld for mggs only, please configure manually
         #service schoolbox-belld restart 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+	# Build Skin
+	/usr/bin/php /usr/share/schoolbox/tools/skin/builder.php --force 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
