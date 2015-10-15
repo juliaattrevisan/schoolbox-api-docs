@@ -21,4 +21,4 @@ UPDATE config SET `value` = 'rgb(255, 255, 255)' WHERE `name` = 'skin_colour_acc
 
 UPDATE config SET `value` = 'rgb(255, 255, 255)' WHERE `name` = 'skin_colour_logo_background';
 
-UPDATE config SET `value` = 'rgb(232, 232, 232)' WHERE `name` = 'skin_body_bg_colour';
+UPDATE config SET `value` = 'rgb(232, 232, 232)' WHERE `name` = 'skin_colour_body_bg';
