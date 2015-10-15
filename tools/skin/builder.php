@@ -80,12 +80,16 @@ if ($origSha != $newSha || $force) {
     $outfile = SITE_root . '/www/css/foundation/chrome.css';
     $ie9file = SITE_root . '/www/css/foundation/chrome-ie9.css';
     $tmpfile = tempnam(sys_get_temp_dir(), 'css');
-    $cmd     = sprintf('sass %s > %s', escapeshellarg($infile), escapeshellarg($tmpfile));
+    $cmd     = sprintf('sass %s %s', escapeshellarg($infile), escapeshellarg($tmpfile));
     $logger->info("Building SASS...");
     exec($cmd, $output, $outputCode);
     if ($outputCode === 0) {
         $logger->info("SASS built - copying to CSS location");
         copy($tmpfile, $outfile);
+        // Copy the sourcemap
+        if (is_readable($tmpfile.'.map')) {
+            copy($tmpfile.'.map', $outfile.'.map');
+        }
 
         $logger->info("Splitting for IE < 10 using blessc...");
         $blessCmd = 'blessc';
