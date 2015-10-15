@@ -74,7 +74,12 @@ if ($origSha != $newSha || $force) {
     if ($outputCode === 0) {
         copy($tmpfile, $outfile);
         // Run bless
-        $blessCmd = sprintf(SITE_root.'/node_modules/.bin/blessc %s %s', escapeshellarg($outfile), escapeshellarg($ie9file));
+        $blessCmd = 'blessc';
+        exec('which '.escapeshellarg($blessCmd), $output, $outputCode);
+        if ($outputCode !== 0) {
+            $blessCmd = SITE_root.'/node_modules/.bin/blessc';
+        }
+        $blessCmd = sprintf('%s %s %s', escapeshellarg($blessCmd), escapeshellarg($outfile), escapeshellarg($ie9file));
         exec($blessCmd, $output, $outputCode);
     } else {
         // something went wrong
