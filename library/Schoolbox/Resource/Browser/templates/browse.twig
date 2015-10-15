@@ -40,7 +40,7 @@
         {% endif %}
 
         tree.on('select_node.jstree', function(event, jstree) {
-
+            jstree.instance.open_node(jstree.node.id);
             if (jstree.node.type == 'file') {
                 loadPanel(metaData, fileInfoUri, jstree.node.li_attr['data-id']);
             } else {
