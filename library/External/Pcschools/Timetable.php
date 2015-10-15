@@ -39,7 +39,35 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
     {
-        // TODO: Implement getTimetableDefinition() method.
+        // TIMEPDHD looks like the timetable start/end time
+        // It can be restricted on student's year, though.
+        // MVP: don't bother with any of this, Cornerstone doesn't.
+        $timetableDays = $this->getDatabase()->getAll("
+            SELECT
+                HEADING,
+                TIME_START,
+                TIME_END,
+                SORT_ORDER
+            FROM TIMEPDHD
+            ORDER BY SORT_ORDER ASC
+        ");
+        $result = [
+            'desc'        => [],
+            'start'       => [],
+            'end'         => [],
+            'number'      => [],
+            'sequence'    => [],
+            'dayCount'    => $this->getDatabase()->getOne('SELECT MAX(DAY) FROM TIMEFILE'),
+            'periodCount' => count($timetableDays),
+        ];
+        foreach ($timetableDays as $timetableDay) {
+            $result['desc'][]     = $timetableDay['HEADING'];
+            $result['start'][]    = $timetableDay['TIME_START'];
+            $result['end'][]      = $timetableDay['TIME_END'];
+            $result['number'][]   = $timetableDay['SORT_ORDER'];
+            $result['sequence'][] = 1;
+        }
+        return $result;
     }
 
     /**
