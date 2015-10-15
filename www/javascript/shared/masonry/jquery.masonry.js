@@ -60,7 +60,7 @@
             selector: '> .column',
             leftColumnWidth: 50,
             emptyClass: 'empty-column',
-            placeholderTpl: '<p/>',
+            placeholderTpl: '<div/>',
             position: {
                 top: '.column[data-position=top]',
                 left: '.column[data-position=left]',
@@ -849,7 +849,7 @@
                 column.addClass(opts.column.emptyClass);
             }
 
-            column.children('.marker').html($('<span/>').text(opts.dict.dropHere)).css('height', markerHeight);
+            column.children('.marker').html($('<span/>').text(opts.dict.dropHere));
         });
 
         return this;

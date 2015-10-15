@@ -1,18 +1,28 @@
-// Hide the placeholders for non-empty columns
-.masonry-placeholder {
-    display: none;
+$masonry-background-color: $accent-background;
+$masonry-color: $accent-foreground;
+$masonry-drop-background: $input-focus-bg-color;
 
-    /* Special colour for masonry placeholder alert-box div
-     * into which you can drop Components
-     */
-  background-color: darken($body-bg, 10%);
-  color: $black;
+// Hide the placeholders for non-empty columns
+.masonry-placeholder, .marker {
+  display: none;
+  border: 2px dashed $masonry-color;
+  background-color: $masonry-background-color;
+  color: $masonry-color;
   padding: rem-calc(14);
+  margin-bottom: rem-calc(($base-font-size));
+  font-size: rem-calc(13);
 
 }
 
 .show-empty .empty-column .masonry-placeholder {
     display: inherit;
+}
+
+//Used when hovering a component over column
+.marker{
+  display: inherit;
+  color: $masonry-color;
+  background-color: $masonry-drop-background;
 }
 
 // Disabled components in the palette
