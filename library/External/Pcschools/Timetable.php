@@ -121,7 +121,26 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
     {
-        // TODO: Implement getPeriodNumber() method.
+        // Assume that definition doesn't vary per student
+        // Should this use getFullTimetable then?
+        $definition = $this->getTimetableDefinition(null, $campus, $now);
+        foreach ($definition['number'] as $i => $number) {
+            $sequence = $definition[$i]['sequence'];
+            if ($now) {
+                $start = strtotime($definition[$i]['start'], $now);
+                $end   = strtotime($definition[$i]['end'], $now);
+            } else {
+                $start = strtotime($definition[$i]['start']);
+                $end   = strtotime($definition[$i]['end']);
+            }
+            if ($start < $now && $now <= $end) {
+                return [
+                    'PeriodNumber'    => $number,
+                    'PeriodNumberSeq' => $sequence,
+                ];
+            }
+        }
+        return [];
     }
 
     /**
