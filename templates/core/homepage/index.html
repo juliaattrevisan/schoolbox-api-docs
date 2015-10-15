@@ -356,87 +356,89 @@
             </div>
             <!--/tabs-1-->
 
-            <div id="tabs-2" class="content" data-hide-empty>
-                <form method="POST" action="" name="saveColours">
-
-                    <!-- don't show a slider for screens which don't have multiple columns -->
-                    <fieldset class="hide-for-medium-down">
-                        <legend>
-                            Column Width
-                            <span data-tooltip class="has-tip tip-top hint" title="Drag the slider to change the width of the left and right columns. (On small screens, the right column will drop below the left.)">?</span>
-                        </legend>
-
-                        <div class="small-6 small-offset-3 end columns">
-                            <div class="range-slider"
-                                 data-original-value="{TEMPLATE_LEFT_COLUMN_WIDTH}"
-                                 data-slider="{TEMPLATE_LEFT_COLUMN_WIDTH}"
-                                 data-interaction="column-width"
-                                 data-options="start: 3; end: 9"
-                            >
-                                <span class="range-slider-handle" role="slider" tabindex="0"></span>
-                                <span class="range-slider-active-segment"></span>
-                                <input type="hidden" name="width" value="{TEMPLATE_LEFT_COLUMN_WIDTH}">
+            <div id="tabs-2" data-hide-empty>
+                <form method="POST" action="" name="saveColours" class="no-margin">
+                    <section class="no-margin">
+                        <!-- don't show a slider for screens which don't have multiple columns -->
+                        <fieldset class="content hide-for-medium-down">
+                            <legend>
+                                Column Width
+                                <span data-tooltip class="has-tip tip-top hint" title="Drag the slider to change the width of the left and right columns. (On small screens, the right column will drop below the left.)">?</span>
+                            </legend>
+                            <div class="small-12 columns">
+                                <div class="small-6 small-offset-3 end columns">
+                                    <div class="range-slider"
+                                         data-original-value="{TEMPLATE_LEFT_COLUMN_WIDTH}"
+                                         data-slider="{TEMPLATE_LEFT_COLUMN_WIDTH}"
+                                         data-interaction="column-width"
+                                         data-options="start: 3; end: 9"
+                                    >
+                                        <span class="range-slider-handle" role="slider" tabindex="0"></span>
+                                        <span class="range-slider-active-segment"></span>
+                                        <input type="hidden" name="width" value="{TEMPLATE_LEFT_COLUMN_WIDTH}">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </fieldset>
+                        </fieldset>
 
-                    <!-- BEGIN homepage_color_selector -->
-                    <fieldset>
-                        <legend>Colours</legend>
-                        <div class="small-12 columns">
-                            <fieldset class="hide-for-medium-down">
-                                <legend>
-                                    Columns
-                                    <span data-tooltip class="has-tip tip-top hint" title="Select a column to modify colours for.">?</span>
-                                </legend>
-                                <div class="small-12 columns">
-                                    <input id="top" type="checkbox" data-column-selector checked />
-                                    <label for="top" class="checkbox-label">Top</label>
-                                </div>
-                                <div class="small-12 large-6 columns">
-                                    <input id="left" type="checkbox" data-column-selector checked />
-                                    <label for="left" class="checkbox-label">
-                                        <span class="hide-for-medium-down">Left</span>
-                                        <span class="show-for-medium-down">Middle</span>
-                                    </label>
-                                </div>
-                                <div class="small-12 large-6 columns">
-                                    <input id="right" type="checkbox" data-column-selector checked />
-                                    <label for="right" class="checkbox-label">
-                                        <span class="hide-for-medium-down">Right</span>
-                                        <span class="show-for-medium-down">Bottom</span>
-                                    </label>
-                                </div>
-                            </fieldset>
-                        </div>
-                        <div class="small-12 medium-6 columns">
-                            <fieldset>
-                                <legend>Heading</legend>
-                                <label for="head_font">Text</label>
-                                <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
-                                <label for="head_bg">Background</label>
-                                <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
-                            </fieldset>
-                        </div>
-                        <div class="small-12 medium-6 columns">
-                            <fieldset>
-                                <legend>Content</legend>
-                                <label for="font">Text</label>
-                                <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
-                                <label for="bg_primary">Background</label>
-                                <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
-                            </fieldset>
-                        </div>
-                    </fieldset>
-                    <!-- END homepage_color_selector -->
+                        <!-- BEGIN homepage_color_selector -->
+                        <fieldset class="content">
+                            <legend>Colours</legend>
+                            <div class="small-12 columns">
+                                <fieldset class="hide-for-medium-down">
+                                    <legend>
+                                        Columns
+                                        <span data-tooltip class="has-tip tip-top hint" title="Select a column to modify colours for.">?</span>
+                                    </legend>
+                                    <div class="small-12 columns">
+                                        <input id="top" type="checkbox" data-column-selector checked />
+                                        <label for="top" class="checkbox-label">Top</label>
+                                    </div>
+                                    <div class="small-12 large-6 columns">
+                                        <input id="left" type="checkbox" data-column-selector checked />
+                                        <label for="left" class="checkbox-label">
+                                            <span class="hide-for-medium-down">Left</span>
+                                            <span class="show-for-medium-down">Middle</span>
+                                        </label>
+                                    </div>
+                                    <div class="small-12 large-6 columns">
+                                        <input id="right" type="checkbox" data-column-selector checked />
+                                        <label for="right" class="checkbox-label">
+                                            <span class="hide-for-medium-down">Right</span>
+                                            <span class="show-for-medium-down">Bottom</span>
+                                        </label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="small-12 medium-6 columns">
+                                <fieldset>
+                                    <legend>Heading</legend>
+                                    <label for="head_font">Text</label>
+                                    <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
+                                    <label for="head_bg">Background</label>
+                                    <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
+                                </fieldset>
+                            </div>
+                            <div class="small-12 medium-6 columns">
+                                <fieldset>
+                                    <legend>Content</legend>
+                                    <label for="font">Text</label>
+                                    <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
+                                    <label for="bg_primary">Background</label>
+                                    <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
+                                </fieldset>
+                            </div>
+                        </fieldset>
+                        <!-- END homepage_color_selector -->
 
-                    <ul class="button-group even-3">
-                        <li><a href="#" class="button secondary" data-role="save">Save</a></li>
-                        <li><a href="#" class="button" data-role="reset-to-default">Reset</a></li>
-                        <li><a href="#" class="button" data-role="undo">Undo Changes</a></li>
-                    </ul>
+                        <div class="content">
+                            <a href="#" class="button icon-approve submit no-margin" data-role="save">Save</a>
+                            <a href="#" class="button icon-refresh no-margin" data-role="reset-to-default">Reset</a>
+                            <a href="#" class="button icon-undo no-margin" data-role="undo">Undo Changes</a>
+                        </div>
 
-                    <span class="label full-width hide" data-relation="saveLayout"></span>
+                        <span class="label full-width hide" data-relation="saveLayout"></span>
+                    </section>
                 </form>
             </div>
         </section>
