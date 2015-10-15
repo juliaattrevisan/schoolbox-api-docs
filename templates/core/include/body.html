@@ -137,7 +137,13 @@
             </section>
             <!-- END CONTAINER -->
 
-            <!-- <a class="exit-off-canvas"></a> -->
+            <!-- Blur filter for off canvas exit -->
+            <svg height="0" xmlns="http://www.w3.org/2000/svg" id="exit-off-canvas-filter" class="hide">
+                <filter id="svgBlur" x="-5%" y="-5%" width="110%" height="110%">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="5"/>
+                </filter>
+            </svg>
+            <a href="#" class="exit-off-canvas"></a>
           </div>
         </div>
     </body>
