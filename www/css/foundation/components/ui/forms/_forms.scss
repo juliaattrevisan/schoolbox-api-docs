@@ -465,7 +465,13 @@ section > fieldset {
 			color: inherit;
 			width: auto;
 			text-indent: rem-calc(-26px);
-			margin-left: rem-calc(26px);
+
+			@media #{$small-only} {
+				margin-left: 0;
+			}
+			@media #{$medium-up} {
+				margin-left: rem-calc(26px);
+			}
 
 			&:before {
 				@extend a;
