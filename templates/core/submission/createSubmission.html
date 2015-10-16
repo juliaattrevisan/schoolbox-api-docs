@@ -113,26 +113,26 @@
                     <div class="small-12 columns">
                         <label>
                             Type
+                            <select name="type">
+                                <!-- BEGIN type_drop -->
+                                <option value="{TYPE_VALUE}" {TYPE_VALUE_SELECTED}>{TYPE_TEXT}</option>
+                                <!-- END type_drop -->
+                            </select>
                         </label>
-                        <select name="type">
-                            <!-- BEGIN type_drop -->
-                            <option value="{TYPE_VALUE}" {TYPE_VALUE_SELECTED}>{TYPE_TEXT}</option>
-                            <!-- END type_drop -->
-                        </select>
                     </div>
 
                     <div class="small-12 columns">
                         <label>
                             Title
-                        </label>
-                        <input class="required" name="name" type="text" value="{NAME}" />
+                            <input class="required" name="name" type="text" value="{NAME}" />
+                        </label> 
                     </div>
 
                     <div class="small-12 columns">
                         <label>
-                            Description  
+                            Description
+                            <textarea id="description-box" name="description">{DESCRIPTION}</textarea>
                         </label>
-                        <textarea id="description-box" name="description">{DESCRIPTION}</textarea>
                     </div>
 
                     <div class="small-12 columns">
