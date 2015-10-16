@@ -361,10 +361,10 @@ input[type=radio]:not(.plain):hover + label.radio-toggle {
 
 input[type=checkbox]:not(.plain):checked + label.checkbox-toggle,
 input[type=radio]:not(.plain):checked + label.radio-toggle {
-	background-color: $success-color;
-	color: $white;
+	background-color: $primary-color;
+	color: calc-text-color($primary-color);
 	[class^="icon-"]{
-		color: $white;
+		color: calc-text-color($primary-color);
 	}
 }
 
@@ -456,6 +456,23 @@ section > fieldset {
 	}
 	@media #{$medium-only} {
 		padding: 0 0.25rem;
+	}
+
+	&.collapsible {
+
+		> legend {
+
+			color: inherit;
+			width: auto;
+			text-indent: rem-calc(-26px);
+			margin-left: rem-calc(26px);
+
+			&:before {
+				@extend a;
+			}
+
+		}
+
 	}
 
 	// second sibling onwards

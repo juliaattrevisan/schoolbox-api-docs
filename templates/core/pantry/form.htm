@@ -1,4 +1,5 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 <script type="text/javascript">
@@ -158,7 +159,7 @@
                 <fieldset class="content">
                     <legend>
                         Group your forms into logical sections with fieldsets&hellip;
-                        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="&hellip;for example, this section contains examples of heavily-custom elements">?</span>
+                        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="&hellip;for example, this section contains examples of Selectize">?</span>
                     </legend>
 
                     <div class="column small-12">
@@ -205,6 +206,39 @@
                     </div>
 
                 </fieldset>
+                <fieldset class="content collapsible">
+                    <legend data-collapser="optional-section" class="icon-add">You can make advanced or optional sections collapsible, and this heading is really long to show you that the text wraps with respect to the collapse icon</legend>
+                    <div class="column small-12 hide" data-collapsable="optional-section" data-collapse-state="collapsed">
+                        <p>Note <code>&lt;fieldset class="collapsible"/&gt;</code></p>
+                    </div>
+                    <div class="small-12 columns hide" data-collapsable="optional-section" data-collapse-state="collapsed">
+                        <label>Input Label
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
+                            <input type="text" placeholder="Put some text here" />
+                        </label>
+                    </div>
+                    <div class="small-12 columns hide" data-collapsable="optional-section" data-collapse-state="collapsed">
+                        <label>Select Box
+                            <select>
+                                <option value="husker">Husker</option>
+                                <option value="starbuck">Starbuck</option>
+                                <option value="hotdog">Hot Dog</option>
+                                <option value="apollo">Apollo</option>
+                            </select>
+                        </label>
+                    </div>
+                </fieldset>
+                <fieldset class="content collapsible">
+                    <legend data-collapser="second-collapse" class="icon-collapse">Here's another collapsible section, but it's open by default</legend>
+                    <div class="small-12 columns" data-collapsable="second-collapse">
+                        <p>This section collapses separately to the one above, as it should</p>
+                    </div>
+                </fieldset>
+                <script type="text/javascript">
+                    $(function () {
+                        $('[data-collapser]').collapsable();
+                    });
+                </script>
                 <fieldset class="content">
                     <legend>
                         Attachzone
