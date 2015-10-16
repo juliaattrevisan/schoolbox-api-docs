@@ -308,7 +308,8 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     public function getRoomTimetable($roomCodes)
     {
-        // TODO: Implement getRoomTimetable() method.
+        // Not yet implemented
+        return [];
     }
 
     /**
