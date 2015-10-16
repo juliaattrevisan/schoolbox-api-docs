@@ -975,7 +975,27 @@ nav {
     }
 }
 
+.permission-list {
+	@include information-list;
 
+	[class*="icon-"]:before {
+		padding: 0;
+	}
+
+	input + label {
+		width: rem-calc(38px);
+		height: rem-calc(38px);
+		line-height: rem-calc(38px);
+		text-align: center;
+	}
+
+	input:checked + label {
+		background-color: $content-ui-submit-background;
+		a {
+			color: $content-ui-submit-foreground;
+		}
+	}
+}
 
 @mixin hide-n($size, $media-down, $media-up, $count: $total-columns) {
 	@for $i from 1 through $count {
