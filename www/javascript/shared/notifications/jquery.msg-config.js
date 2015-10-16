@@ -18,20 +18,6 @@
         customSelector: '[data-custom]',
         permSelector:   '[data-perm]',
 
-        expand: {
-            selector: '[data-collapser]',
-            duration: 500,
-            down: {
-                btnClass: 'icon-add',
-                arrow: ""
-            },
-            up: {
-                btnClass: 'icon-collapse',
-                arrow: ""
-            },
-            target: function () { return this.closest('form').siblings('form').eq(0); }
-        },
-
         disabledClass:     'disable',
         simpleClass:       'modify',
         advancedClass:     'cross',
@@ -86,31 +72,6 @@
                 e.stopPropagation();
 
                 self.options.advanced.call(link);
-            });
-        }
-
-        if (self.options.expand) {
-            $(this.element).on('click', self.options.expand.selector, function (e) {
-                var btn  = $(this),
-                    form = self.options.expand.target.call(btn),
-                    up   = self.options.expand.up,
-                    down = self.options.expand.down;
-
-                e.preventDefault();
-                e.stopPropagation();
-
-                if (btn.hasClass(down.btnClass)) {
-                    // change to uarr, expand content
-                    btn.removeClass(down.btnClass).addClass(up.btnClass).html(down.arrow);
-                    form.stop().css({opacity: 0}).removeClass('hide').animate({opacity:1}, self.options.expand.duration);
-
-                } else {
-                    // change to darr, contract content
-                    btn.removeClass(up.btnClass).addClass(down.btnClass).html(up.arrow);
-                    form.stop().css({opacity: 1}).animate({opacity:0}, self.options.expand.duration, function() {
-                        form.addClass('hide');
-                    })
-                }
             });
         }
 
