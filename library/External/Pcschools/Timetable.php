@@ -14,11 +14,17 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     private $database;
 
     /**
+     * @var \Schoolbox\UserMapper
+     */
+    private $userMapper;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
+        $this->userMapper = new \Schoolbox\UserMapper();
     }
 
     /**
@@ -67,6 +73,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             $result['number'][]   = $timetableDay['SORT_ORDER'];
             $result['sequence'][] = 1;
         }
+        // Do something with sysfile.TIME_PERIOD?
         return $result;
     }
 
@@ -171,6 +178,38 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
         // TODO: Implement getDayTimetable() method.
+
+        // I need to know if $userId is a teacher or student
+        try {
+            $user = $this->userMapper->findById($userId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            return [];
+        }
+        if ($user->getRole()->isStudent()) {
+            // use current PERIOD_ID?
+            $query = "
+                SELECT
+                    SUB.CLASS,
+                    SUB.TEACHER,
+                    SUB.[YEAR],
+                    SUB.SUBJECT_NO
+                FROM SUB
+                INNER JOIN TIMEFILE
+                    ON SUB.SUBJECT_NO = TIMEFILE.SUBJECT
+                    AND SUB.[YEAR] = TIMEFILE.[YEAR]
+                    AND SUB.CLASS = TIMEFILE.CLASS
+                INNER JOIN CALENDAR
+                    ON TIMEFILE.TIME_PERIOD = CALENDAR.TIME_PERIOD
+                INNER JOIN TIMEPDHD
+                    ON TIMEFILE.TIME_PERIOD = TIMEPDHD.CODE
+                WHERE TIMEFILE.DAY = {$this->getDatabase()->smartQuote($dayNumber)}
+                AND   SUB.STUDKEY = {$this->getDatabase()->smartQuote($externalUserId)}
+            ";
+        } elseif ($user->getRole()->isStaff()) {
+
+        } else {
+            return [];
+        }
     }
 
     /**
