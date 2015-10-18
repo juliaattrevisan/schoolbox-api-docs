@@ -6,5 +6,5 @@ memory: 1024
 public_network: true
 private_network_ip: "192.168.36.10"
 external_db: "synergetic"
-external_db_host: "192.168.1.20"
+external_db_host: "172.31.15.10"
 demo_data_version: "latest"
