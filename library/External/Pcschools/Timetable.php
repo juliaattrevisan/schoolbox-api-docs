@@ -63,7 +63,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             'end'         => [],
             'number'      => [],
             'sequence'    => [],
-            'dayCount'    => $this->getDatabase()->getOne('SELECT MAX(DAY) FROM TIMEFILE'),
+            'dayCount'    => $this->getDatabase()->getOne(
+                "SELECT MAX(DAY) FROM TIMEFILE WHERE TIME_PERIOD = (SELECT TIME_PERIOD from sysfile)"
+            ),
             'periodCount' => count($timetableDays),
         ];
         foreach ($timetableDays as $timetableDay) {
@@ -73,7 +75,6 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             $result['number'][]   = $timetableDay['SORT_ORDER'];
             $result['sequence'][] = 1;
         }
-        // Do something with sysfile.TIME_PERIOD?
         return $result;
     }
 
