@@ -181,36 +181,44 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         // TODO: Implement getDayTimetable() method.
 
         // I need to know if $userId is a teacher or student
+        $result = [];
         try {
             $user = $this->userMapper->findById($userId);
         } catch (\Schoolbox\Mapper\Exception $e) {
-            return [];
+            return $result;
         }
         if ($user->getRole()->isStudent()) {
             // use current PERIOD_ID?
             $query = "
                 SELECT
-                    SUB.CLASS,
-                    SUB.TEACHER,
-                    SUB.[YEAR],
-                    SUB.SUBJECT_NO
+                    SUB.STUDKEY AS Student,
+                    SUB.TEACHER AS Teacher,
+                    '' AS Room,
+                    [SUBJECT].[DESC] AS Description,
+--                    TIMEPDHD.SORT_ORDER AS PeriodNumber,
+                    '' AS ClassCampus,
+                    [SUBJECT].ABBREV AS ClassCode,
+                    SUB.TEACHER AS StaffID
                 FROM SUB
                 INNER JOIN TIMEFILE
                     ON SUB.SUBJECT_NO = TIMEFILE.SUBJECT
                     AND SUB.[YEAR] = TIMEFILE.[YEAR]
                     AND SUB.CLASS = TIMEFILE.CLASS
-                INNER JOIN CALENDAR
-                    ON TIMEFILE.TIME_PERIOD = CALENDAR.TIME_PERIOD
-                INNER JOIN TIMEPDHD
-                    ON TIMEFILE.TIME_PERIOD = TIMEPDHD.CODE
+                INNER JOIN [SUBJECT]
+                    ON SUB.SUBJECT_NO = [SUBJECT].NO
+--                INNER JOIN TIMEPDHD
+--                    ON [SUBJECT].ABBREV = TIMEPDHD.CODE
                 WHERE TIMEFILE.DAY = {$this->getDatabase()->smartQuote($dayNumber)}
                 AND   SUB.STUDKEY = {$this->getDatabase()->smartQuote($externalUserId)}
             ";
         } elseif ($user->getRole()->isStaff()) {
 
         } else {
-            return [];
+            return $result;
         }
+
+        // Run the query
+        return $this->getDatabase()->getAll($query);
     }
 
     /**
