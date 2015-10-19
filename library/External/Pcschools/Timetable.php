@@ -192,10 +192,10 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         $query = "
             SELECT
-                SUB.TEACHER AS Teacher,
+                TIMEPDHD.SORT_ORDER AS PeriodSequence,
+                SUB.TEACHER AS StaffID,
                 TIMEFILE.ROOM AS Room,
                 [SUBJECT].[DESC] AS Description,
-                TIMEFILE.DAY AS DayNumber,
                 TIMEPDHD.SORT_ORDER AS PeriodNumber,
                 [SUBJECT].ABBREV AS ClassCode
             FROM SUB
