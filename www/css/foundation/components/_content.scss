@@ -1108,14 +1108,16 @@ ul.flex-list {
 }
 
 // Block Grid
-.grid{
+.grid {
+    margin: 0 !important; // It really *is* too specific :'(
+
 	//TODO: find block grid mixin
 	//@media #{$large-up} { @include block-grid(4); }
 	//@media #{$medium-up} { @include block-grid(2); }
 	//@media #{$small-up} { @include block-grid(2); }
 	//@extend .information-list;
-	> li{
-        padding-bottom: 0 !important; // SORRY! foundation's selector is just too specific :'(
+	> li {
+        padding: 0 !important; // SORRY! foundation's selector is just too specific :'(
 		border-right: 1px solid $body-bg;
 		border-bottom: 1px solid $body-bg;
 		//&:last-child{
