@@ -198,10 +198,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
                     SUB.TEACHER AS Teacher,
                     TIMEFILE.ROOM AS Room,
                     [SUBJECT].[DESC] AS Description,
---                    TIMEPDHD.SORT_ORDER AS PeriodNumber,
-                    '' AS ClassCampus,
-                    [SUBJECT].ABBREV AS ClassCode,
-                    SUB.TEACHER AS StaffID
+                    TIMEFILE.DAY AS DayNumber,
+                    TIMEPDHD.SORT_ORDER AS PeriodNumber,
+                    [SUBJECT].ABBREV AS ClassCode
                 FROM SUB
                 INNER JOIN TIMEFILE
                     ON SUB.SUBJECT_NO = TIMEFILE.SUBJECT
@@ -209,8 +208,8 @@ class External_Pcschools_Timetable implements External_TimetableInterface
                     AND SUB.CLASS = TIMEFILE.CLASS
                 INNER JOIN [SUBJECT]
                     ON SUB.SUBJECT_NO = [SUBJECT].NO
---                INNER JOIN TIMEPDHD
---                    ON [SUBJECT].ABBREV = TIMEPDHD.CODE
+                INNER JOIN TIMEPDHD
+                    ON TIMEFILE.PERIOD = TIMEPDHD.RECNUM
                 WHERE TIMEFILE.DAY = {$this->getDatabase()->smartQuote($dayNumber)}
                 AND   SUB.STUDKEY = {$this->getDatabase()->smartQuote($externalUserId)}
             ";
