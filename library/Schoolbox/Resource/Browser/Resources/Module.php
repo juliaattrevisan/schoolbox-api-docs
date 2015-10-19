@@ -87,7 +87,10 @@ class Module extends AbstractModule
         $injector->params[TreeBuilder::class]['locator']          = $setters['setFolderMapper'];
         $injector->params[TreeBuilder::class]['userAccessMapper'] = $setters['setUserAccessMapper'];
         $injector->params[TreeBuilder::class]['roleAccessMapper'] = $setters['setRoleAccessMapper'];
-        $injector->setters[TreeBuilder::class]['setFileLocator']  = $setters['setFileMapper'];
+        $injector->setters[TreeBuilder::class]['setFileLocator']  = $injector->lazyNew(
+            Resource\File\CompositeLocator::class,
+            [$setters['setFileMapper'], $setters['setLinkMapper']]
+        );
 
         $injector->params[TreeBuilder::class]['user'] = $injector->lazy(
             function () use ($injector) {
