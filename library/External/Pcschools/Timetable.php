@@ -353,7 +353,54 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
-        // TODO: Implement getFullTimetable() method.
+        // I need to know if $userId is a teacher or student
+        try {
+            $user = $this->userMapper->findById($userId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            return [];
+        }
+
+        $query = $this->getTimetableQuery($user);
+        if (empty($query)) {
+            return [];
+        }
+
+        // Mangle into the format getDayTimetable expects
+        $timetable           = [];
+        $timetableDefinition = $this->getTimetableDefinition($externalUserId, $campus);
+        $dayCount            = $timetableDefinition['dayCount'];
+        foreach ($timetableDefinition['desc'] as $x => $name) {
+            $timetable[$x]['periodName']     = $timetableDefinition['desc'][$x];
+            $timetable[$x]['periodStart']    = $timetableDefinition['start'][$x];
+            $timetable[$x]['periodEnd']      = $timetableDefinition['end'][$x];
+            $timetable[$x]['periodNumber']   = $timetableDefinition['number'][$x];
+            $timetable[$x]['periodSequence'] = $timetableDefinition['sequence'][$x];
+            $timetable[$x]['day']            = array_fill(1, $dayCount, array());
+        }
+
+        // Add classes for each day into it
+        $result = $this->getDatabase()->query($query);
+        while ($desc = $this->getDatabase()->getNextArray($result)) {
+            foreach ($timetable as $x => $timetablePeriod) {
+                if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
+                    && $timetablePeriod['periodSequence'] != 2
+                    && !isset($timetable[$x]['day'][$desc['DayNumber']][$desc['ClassCode']])
+                ) {
+                    $timetable[$x]['day'][$desc['DayNumber']][$desc['ClassCode']] = array(
+                        'description'    => $desc['Description'],
+                        'code'           => $desc['ClassCode'],
+                        'campus'         => $desc['ClassCampus'],
+                        'room'           => $desc['Room'],
+                        'staffID'        => $desc['StaffID'],
+//                        'staffFirstname' => $desc['StaffPreferredName'],
+//                        'staffSurname'   => $desc['StaffSurname'],
+//                        'staffTitle'     => $desc['StaffTitle'],
+                    );
+                    break;
+                }
+            }
+        }
+        return $timetable;
     }
 
     /**
