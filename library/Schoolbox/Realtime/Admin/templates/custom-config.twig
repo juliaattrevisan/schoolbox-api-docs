@@ -107,7 +107,7 @@ set iconClassnames = {
                             If you only select a single option, users will be locked to that option.
                         </p>
 
-                        <ul class="information-list" id="adv-possibilities" data-roles data-digest-settings>
+                        <ul class="permission-list" id="adv-possibilities" data-roles data-digest-settings>
                             <li data-role>
                                 {% for level, perm in perms %}
                                     <span data-perm-container>
@@ -133,8 +133,7 @@ set iconClassnames = {
                         <p>
                             <strong>Step 2:</strong> Select the default setting for members of '{{ role.name }}' for this message.
                         </p>
-
-                        <ul class="information-list" id="adv-selection" data-roles data-digest-settings data-settings>
+                        <ul class="permission-list" id="adv-selection" data-roles data-digest-settings data-settings>
                             <li data-role="{{ role.id }}">
                                 {% include '@messages/options.twig' with { mode: 'def' } %}
                             </li>
@@ -143,6 +142,9 @@ set iconClassnames = {
                 </fieldset>
                 <fieldset class="content">
                     <div class="small-12 columns">
+                        <p>
+                            <strong>Copy settings?</strong>
+                        </p>
                         <input type="checkbox" id='copy-message-settings' name="copy-to" value="{{ roletype ?: 'all' }}" />
                         <label for="copy-message-settings" class="checkbox-label">
                             Copy these message settings for all {{ roletype }} roles
