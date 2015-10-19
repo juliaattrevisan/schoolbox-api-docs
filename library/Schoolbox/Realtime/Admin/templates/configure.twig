@@ -1,3 +1,4 @@
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/notifications/jquery.msg-config.js"></script>
 <!--suppress NonShortCircuitBooleanExpressionJS -->
 <script type="text/javascript">
@@ -26,7 +27,7 @@
             customSelector: '[data-custom]',
             permSelector:   '[data-perm-container]',
             persist: function () {
-                var form = this.children('form[method=post]');
+                var form = this.find('form[method=post]');
 
                 // clear any previous cache-timeout
                 if (ii) {
@@ -34,7 +35,7 @@
                 }
 
                 ii = setTimeout(function () {
-                    $.post(form.attr('action'), form.serialize(), customiserCallback);
+                    $.post(form.attr('action'), form.serialize()).done(customiserCallback);
                 }, 1000);
 
             },
@@ -134,6 +135,8 @@
                 });
             }
         });
+
+        $('[data-collapser]').collapsable();
     });
 
     function customiserCallback(data) {
@@ -204,12 +207,11 @@
 
 <div class="row">
     <div class="small-12 island">
-        <div class="alert-box">Use this page to configure the messages the system will send to users.</div>
-
         <section class="content">
+            <p>Use this page to configure the messages the system will send to users.</p>
             <ul>
                 <li>
-                    <em>Selected options</em> are way this message should be received (remembering users can personalise their settings).
+                    <em>Selected options</em> are way this message should be received by default (remembering users can personalise their settings).
                 </li>
                 <li>
                     <em>Disabled options</em> will not be selectable by users of the given role
@@ -237,7 +239,7 @@
         <ul class="sub-nav">
             {% for i, filter in filters.options %}
                 <li class="{% if filters.selected == i %}active{% endif %}">
-                    <a href="/adminv2/messages/configure{{ filter == 'all' ? '' : ('/' ~ filter) }}#filter">{{ filter | capitalize }}</a>
+                    <a href="/adminv2/messages/configure{{ filter == 'all' ? '' : ('/' ~ filter) }}">{{ filter | capitalize }}</a>
                 </li>
             {% endfor %}
         </ul>
@@ -245,14 +247,10 @@
         <div id="configurator">
             {% for namespace in config %}
             <h3 class="subheader">{{ ns[namespace.id].label }}</h3>
-            <section>
-                <div data-namespace="{{ ns[namespace.id].slug }}">
-                    <ul class="information-list">
-                        {% for source in namespace.sources %}
-                            {% include '@messages/source.twig' with { source: source } %}
-                        {% endfor %}
-                    </ul>
-                </div>
+            <section data-namespace="{{ ns[namespace.id].slug }}">
+                {% for source in namespace.sources %}
+                    {% include '@messages/source.twig' with { source: source } %}
+                {% endfor %}
             </section>
             {% endfor %}
         </div>
