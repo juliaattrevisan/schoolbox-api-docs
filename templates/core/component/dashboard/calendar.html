@@ -9,25 +9,25 @@
     {CONFIGURATION}
 
     <div class="row">
+        <!-- BEGIN day -->
         <div class="small-12 island">
-            <!-- BEGIN day -->
             <h2 class="subheader">
                 <a href="/calendar/full/{CALENDAR_DATE}/#week">{LIST_DATE}</a>
             </h2>
             <section>
+                <!-- BEGIN has_events -->
                 <ul class="calendar-list">
-                    <!-- BEGIN note_block -->
+                    <!-- BEGIN event -->
                     <!-- twig calendar events go here -->
-                    <!-- END note_block -->
-                    <!-- BEGIN no_events -->
-                    <li>
-                        <div class="small-12 columns content">
-                            There are no upcoming events.
-                        </div>
-                    </li>
-                    <!-- END no_events -->
+                    <!-- END event -->
                 </ul>
-                <!-- END day -->
+                <!-- END has_events -->
+
+                <!-- BEGIN no_events -->
+                <div class="alert-box">
+                    There are no upcoming events.
+                </div>
+                <!-- END no_events -->
             </section>
         </div>
         <!-- END day -->

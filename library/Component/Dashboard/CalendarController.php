@@ -78,49 +78,57 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
         }
 
         $this->setBlock($templateHandle, 'day', 'day_block');
-        $this->setBlock('day', 'note_block', 'note_listing');
+        $this->setBlock('day', 'has_events', 'has_events_block');
+        $this->setBlock('has_events', 'event', 'event_block');
         $this->setBlock('day', 'no_events', 'no_events_block');
-        $this->setVar('no_events_block','');
+        $this->setVar('','');
 
-        $this->setVar(
-            array(
-                'day_block'      => '',
-                'LIST_DATE'      => $this->start->getLongDateOnly(),
-                'DATE'           => $this->start->getLongDateOnly(),
-                'CALENDAR_DATE'  => $this->start->getURLDate(),
-            )
-        );
+        $this->setVar(array(
+            'day_block'        => '',
+            'has_events_block' => '',
+            'no_events_block'  => '',
+            'event_block'      => '',
+
+            'LIST_DATE'        => $this->start->getLongDateOnly(),
+            'DATE'             => $this->start->getLongDateOnly(),
+            'CALENDAR_DATE'    => $this->start->getURLDate(),
+        ));
 
         /** @var Alaress_Date_Format $prevDay */
         $prevDay = false;
 
         if (count($this->eventRenderer->getAllEvents()) === 0) {
-            $this->setVar('note_listing', '');
             $this->parse('no_events_block', 'no_events');
-
         }
-        foreach ($this->eventRenderer->getAllEvents() as $currentEvent) {
+        else {
+            foreach ($this->eventRenderer->getAllEvents() as $currentEvent) {
 
-            //
-            // Current day: will never be before the start time
-            $currentDay = $currentEvent->getStartTime();
-            if ($this->start->compare($currentDay) > 0) {
-                $currentDay = $this->start;
+                //
+                // Current day: will never be before the start time
+                $currentDay = $currentEvent->getStartTime();
+                if ($this->start->compare($currentDay) > 0) {
+                    $currentDay = $this->start;
+                }
+
+                if ($prevDay != false && $currentDay->getDateOnly() != $prevDay->getDateOnly()) {
+                    $this->parse('day_block', 'day', true);
+
+                    /* Clear children after parsing out the parent
+                     */
+                    $this->setVar('event', '');
+                }
+
+                $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
+
+                $this->setVar('event', $this->eventRenderer->renderEvent($currentEvent, 'html'));
+
+                $this->parse("event_block", "event", true);
+
+                $prevDay = $currentDay;
             }
-            if ($prevDay != false && $currentDay->getDateOnly() != $prevDay->getDateOnly()) {
-                $this->parse('day_block', 'day', true);
-                $this->setVar('note_listing', '');
-            }
 
-            $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
-
-            $this->setVar('note_block', $this->eventRenderer->renderEvent($currentEvent, 'html'));
-
-            $this->parse("note_listing", "note_block", true);
-
-            $prevDay = $currentDay;
+            $this->parse('has_events_block', 'has_events');
         }
-
 
         $this->parse('day_block', 'day', true);
 
