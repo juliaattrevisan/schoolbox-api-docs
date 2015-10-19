@@ -196,7 +196,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
                 SELECT
                     SUB.STUDKEY AS Student,
                     SUB.TEACHER AS Teacher,
-                    '' AS Room,
+                    TIMEFILE.ROOM AS Room,
                     [SUBJECT].[DESC] AS Description,
 --                    TIMEPDHD.SORT_ORDER AS PeriodNumber,
                     '' AS ClassCampus,
