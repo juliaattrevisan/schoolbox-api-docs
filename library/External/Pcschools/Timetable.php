@@ -178,7 +178,6 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
-        // TODO: Implement getDayTimetable() method.
         if (!$dayNumber) {
             $dayNumber = $this->getDayNumber($campus);
         }
@@ -218,8 +217,38 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             return [];
         }
 
-        // Run the query
-        return $this->getDatabase()->getAll($query);
+        // Mangle into the format getDayTimetable expects
+        $timetable           = [];
+        $timetableDefinition = $this->getTimetableDefinition($externalUserId, $campus);
+        foreach ($timetableDefinition['desc'] as $x => $name) {
+            $timetable[$x]['periodName']     = $timetableDefinition['desc'][$x];
+            $timetable[$x]['periodStart']    = $timetableDefinition['start'][$x];
+            $timetable[$x]['periodEnd']      = $timetableDefinition['end'][$x];
+            $timetable[$x]['periodNumber']   = $timetableDefinition['number'][$x];
+            $timetable[$x]['periodSequence'] = $timetableDefinition['sequence'][$x];
+            $timetable[$x]['class']          = array();
+        }
+
+        // Add classes into it
+        $result = $this->getDatabase()->query($query);
+        while ($desc = $this->getDatabase()->getNextArray($result)) {
+            foreach ($timetable as $x => $timetablePeriod) {
+                if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
+                    && $timetablePeriod['periodSequence'] != 2
+                    && !isset($timetable[$x]['class'][$desc['ClassCode']])
+                ) {
+                    $timetable[$x]['class'][$desc['ClassCode']] = array(
+                        'description' => $desc['Description'],
+                        'code'        => $desc['ClassCode'],
+                        'campus'      => $desc['ClassCampus'],
+                        'room'        => $desc['Room'],
+                        'staffID'     => $desc['StaffID'],
+                    );
+                    break;
+                }
+            }
+        }
+        return $timetable;
     }
 
     /**
