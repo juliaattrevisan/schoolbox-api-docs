@@ -44,15 +44,29 @@ $masonry-drop-background: $input-focus-bg-color;
             cursor: not-allowed;
         }
     }
+
+    /* The Component avatar representations you can drag/drop into
+     * component-based pages like Dashboard, Homepage and ePortfolio
+     *
+     * For compatibility in block grid
+     */
+    .avatar {
+        &.card {
+            .icon-masonry {
+                padding-top: 1rem;
+            }
+        }
+    }
 }
 
 // Disabled components in the palette
 
 // Homepage masonry icons
 .icon-masonry:before {
-  // default icon
-  @extend .icon-add:before;
+    // default icon
+    @extend .icon-add:before;
 }
+
 .icon-masonry-Component_Homepage_BreadcrumbController:before {
   @extend .icon-breadcrumbs:before;
 }
