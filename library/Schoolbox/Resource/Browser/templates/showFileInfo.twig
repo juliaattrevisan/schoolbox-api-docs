@@ -69,47 +69,11 @@
 
             <h2>{{ file.title }}</h2>
 
-        <dl class="inline-dl">
-            {% if namespace == 'resourceBrowser' %}
-            <dt class="small-12 medium-4">Uploaded by</dt>
-            <dd class="small-12 medium-8">
-                <div class="avatar card tiny">
-                    <a href="/search/user/{{ file.owner.id }}">
-                        <img src="{{ portrait ~ file.owner.externalId }}" alt="{{ file.owner.formatName }}" />
-                        <p>{{ file.owner.formatName }}</p>
-                    </a>
-                </div>
-            </dd>
+            {% if type == 'link' %}
+                {% include '@resourceBrowser/fileInfo/link.twig' %}
+            {% else %}
+                {% include '@resourceBrowser/fileInfo/file.twig' %}
             {% endif %}
-
-            <dt class="small-12 medium-4">Filesize</dt>
-            <dd class="small-12 medium-8">{{ file.size | bytes }}</dd>
-
-            <dt class="small-12 medium-4">Created</dt>
-            <dd class="small-12 medium-8">{{ file.createdAt.dateOnly }}</dd>
-
-            {% if namespace == 'resourceBrowser' %}
-                {% if file.createdAt.unixTimestamp != file.modifiedAt.unixTimestamp %}
-                    <dt class="small-12 medium-4">Last modified</dt>
-                    <dd class="small-12 medium-8">{{ file.modifiedAt.dateOnly }}</dd>
-                {% endif %}
-            {% endif %}
-
-            <dt class="small-12 medium-4">Original File</dt>
-            <dd class="small-12 medium-8">{{ file.filename }} ({{ file.mime }})</dd>
-
-            {% if namespace == 'resourceBrowser' %}
-                <dt class="small-12 medium-4">Hidden</dt>
-                <dd class="small-12 medium-8">
-                    <span data-tooltip aria-haspopup="true" class="has-tip" title="Visible to users with {{ file.hidden ? 'write' : 'read' }} access to the folder">{{ file.hidden ? 'Yes' : 'No' }}</span>
-                </dd>
-            {% endif %}
-
-            <dt class="small-12 medium-4">Direct Link</dt>
-            <dd class="small-12 medium-8">
-                <a href="{{ send ~ file.id }}">{{ host ~ send ~ file.id }}</a>
-            </dd>
-        </dl>
 
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 

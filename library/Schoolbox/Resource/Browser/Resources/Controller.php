@@ -87,6 +87,7 @@ class Controller extends AbstractController
 
         $data = [
             'file'      => $link,
+            'type'      => 'link',
             'tree'      => $this->getBreadcrumbs($link->getFolder()),
             'host'      => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_HOST')),
             'access'    => $this->getAccess([ $folderId ]),
