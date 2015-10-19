@@ -211,6 +211,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
                 INNER JOIN TIMEPDHD
                     ON TIMEFILE.PERIOD = TIMEPDHD.RECNUM
                 WHERE TIMEFILE.DAY = {$this->getDatabase()->smartQuote($dayNumber)}
+                AND   SUB.PERIOD_ID = (SELECT TIME_PERIOD from sysfile)
                 AND   SUB.STUDKEY = {$this->getDatabase()->smartQuote($externalUserId)}
             ";
         } elseif ($user->getRole()->isStaff()) {
