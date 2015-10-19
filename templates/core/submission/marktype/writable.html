@@ -1,15 +1,13 @@
         <div class="small-12 columns">
 
             <!-- BEGIN mark_type_percent -->
-            <div class="row">
-                <div class="list-item-content">
+            <div class="row content">
                     <div class="small-11 medium-8 columns">
                         <input class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" value="{MARK}" data-mark-input data-combobox />
                     </div>
                     <div class="small-1 medium-4 columns ">
                         <label for="mark-{OWNER_ID}" class="inline no-margin">%</label>
                     </div>
-                </div>
             </div>
             <!-- END mark_type_percent -->
 
@@ -79,10 +77,9 @@
         </div>
     </div>
 </div>
-<div class="small-12 columns">
-    <div class="row">
-        <div class="small-12 columns">
-            <label>
+<div class="{COLUMN_DIMENSIONS} columns">
+    <div>
+        <label class="{LABEL_CLASS}">
     	        <textarea class="comment" name="comment" rows="4" data-comment>{COMMENT}</textarea>
             </label>
             <input type="hidden" class="uid" name="uid" value="{OWNER_ID}" />

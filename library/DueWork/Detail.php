@@ -39,6 +39,9 @@ class DueWork_Detail
     protected $marksheet;
     protected $sitepageData;
 
+    const MARKSHEET = 0;
+    const INLINE_GRADER = 1;
+
     /**
      * @var SubmissionBox
      */
@@ -144,11 +147,15 @@ class DueWork_Detail
         }
     }
 
-
     /**
+     * $location is used to determine a context in which the DueWork_Detail
+     * operates. This context is passed to renderMarking() to reconfigure
+     * column dimensions for a slightly different layout in Inline Grader.
+     *
      * @param SitePage $page
+     * @param null $location
      */
-    public function renderDetails(SitePage $page)
+    public function renderDetails(SitePage $page, $location = null)
     {
         // setup blocks, etc
         $page->setTab('submission');
@@ -229,7 +236,7 @@ class DueWork_Detail
                 )
             );
 
-            $this->renderMarking($page, 'OWNER_MARKING', $record['user']['instance']->getId() . $this->submissionBox->getId(), $record['mark']);
+            $this->renderMarking($page, 'OWNER_MARKING', $record['user']['instance']->getId() . $this->submissionBox->getId(), $record['mark'], $location);
 
             //
             // Reset the contents of the submission row block, so that each student starts with a fresh row
@@ -398,14 +405,16 @@ class DueWork_Detail
         }
     }
 
-
     /**
+     * $location is used to reconfigure column dimensions.
+     *
      * @param SitePage $page
      * @param $handle
      * @param $htmlFormID
      * @param $markArray
+     * @param null $location
      */
-    public function renderMarking(SitePage $page, $handle, $htmlFormID, $markArray)
+    private function renderMarking(SitePage $page, $handle, $htmlFormID, $markArray, $location)
     {
         $templateFile = $this->isReadOnly() ? 'readonly' : 'writable';
         $page->setFile('markTpl', "submission/marktype/$templateFile.html");
@@ -424,9 +433,24 @@ class DueWork_Detail
         $slug = $this->marksheet->getSlug();
         $page->parse("mark_type_{$slug}_block", "mark_type_{$slug}");
 
+        /* Column dimensions
+         */
+        if ($location == self::INLINE_GRADER) {
+            $columnDimensions = 'small-12';
+            $labelClass = '';
+        }
+        else {
+            $columnDimensions = 'small-12 medium-6 xlarge-8';
+            $labelClass = 'list-item-content';
+        }
+
+        $page->setVar(array(
+            'COLUMN_DIMENSIONS' => $columnDimensions,
+            'LABEL_CLASS' => $labelClass,
+        ));
+
         $page->parse($handle, 'markTpl');
     }
-
 
     /**
      * @return bool
