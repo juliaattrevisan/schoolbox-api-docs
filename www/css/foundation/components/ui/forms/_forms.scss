@@ -353,7 +353,15 @@ input[type=checkbox].plain {
     }
 }
 
-.vaporwave {
+.toggle-set {
+	@include flex;
+	justify-content: space-between;
+	max-width: 20rem;
+
+	> div {
+		display: inline; // this is purely to appease IE 9, you can kill it once we drop support
+	}
+
 	input[type=radio]:not(.plain),
 	input[type=checkbox]:not(.plain) {
 		@include vaporwave();

@@ -1,3 +1,13 @@
+
+@mixin flex {
+	// see https://css-tricks.com/using-flexbox/
+	display: -webkit-box;      // iOS 6-, Safari 3.1-6
+	display: -moz-box;         // Firefox 19- (buggy but mostly works)
+	display: -ms-flexbox;      // IE 10
+	display: -webkit-flex;     // Chrome
+	display: flex;             // Opera 12.1, Firefox 20+
+}
+
 // Link hovers
 @mixin link-bg-transition{
 	-webkit-transition: background-color 0.3s;
