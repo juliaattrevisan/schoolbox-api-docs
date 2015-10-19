@@ -25,16 +25,27 @@ $masonry-drop-background: $input-focus-bg-color;
   background-color: $masonry-drop-background;
 }
 
-// Disabled components in the palette
-.component-palette .disabled {
-    opacity: 0.3;
-    pointer-events: none;
-    cursor: not-allowed;
-    a {
+/* The drag/drop in Component tab
+ */
+.component-palette {
+
+    /* To overcome the !important from .grid, which overcomes
+     * the too-powerful Foundation defaults
+     */
+    margin-top: -1rem !important;
+
+    &.disabled {
+        opacity: 0.3;
         pointer-events: none;
         cursor: not-allowed;
+        a {
+            pointer-events: none;
+            cursor: not-allowed;
+        }
     }
 }
+
+// Disabled components in the palette
 
 // Homepage masonry icons
 .icon-masonry:before {
