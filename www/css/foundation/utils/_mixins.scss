@@ -200,6 +200,34 @@
 	color: contrast-bg($opacity, $background, $saturation, $light, $dark);
 }
 
+@mixin rotate-color-list($prefix: 'gradient', $count: 10, $start: $alert-color, $end: $success-color, $light: $white, $dark: $black) {
+
+	$iHue: hue($start);
+	$iSat: saturation($start);
+	$iLight: lightness($start);
+
+	$dHue: (hue($end) - $iHue) / ($count - 1);
+	$dSat: (saturation($end) - $iSat) / ($count - 1);
+	$dLight: (lightness($end) - $iLight) / ($count - 1);
+
+	@for $i from 1 through $count {
+
+		$derived: hsl(
+						$iHue + ($i - 1) * $dHue,
+						$iSat + ($i - 1) * $dSat,
+						$iLight + ($i - 1) * $dLight
+		);
+
+		.#{$prefix}-#{$i} {
+			color: $derived;
+		}
+		.#{$prefix}-bg-#{$i} {
+			@include test-lum($derived, $light, $dark);
+
+		}
+	}
+}
+
 @mixin selection($color: $accent-background) {
 	::-moz-selection {
 		color: calc-text-color($color);
