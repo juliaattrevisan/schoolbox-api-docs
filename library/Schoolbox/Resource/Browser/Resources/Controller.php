@@ -26,6 +26,14 @@ class Controller extends AbstractController
     /** @var UserAccessMapper */
     protected $userAccessMapper;
 
+    /**
+     * @var Resource\LinkMapper
+     */
+    protected $linkMapper;
+
+
+    // Injectables
+
 
     /**
      * @param RoleAccessMapper $roleAccessMapper
@@ -45,6 +53,17 @@ class Controller extends AbstractController
     public function setUserAccessMapper($userAccessMapper)
     {
         $this->userAccessMapper = $userAccessMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param Resource\LinkMapper $linkMapper
+     * @return self
+     */
+    public function setLinkMapper($linkMapper)
+    {
+        $this->linkMapper = $linkMapper;
         return $this;
     }
 

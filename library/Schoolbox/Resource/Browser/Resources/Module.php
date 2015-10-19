@@ -67,6 +67,7 @@ class Module extends AbstractModule
             'setTreeBuilder'      => $ci->lazyNew(Resource\Browser\Resources\TreeBuilder::class),
             'setFolderMapper'     => $ci->lazyNew(Resource\Folder\Mapper::class),
             'setFileMapper'       => $ci->lazyNew(Resource\File\Mapper::class),
+            'setLinkMapper'       => $ci->lazyNew(Resource\LinkMapper::class),
             'setUserAccessMapper' => $ci->lazyNew(UserAccessMapper::class),
             'setRoleAccessMapper' => $ci->lazyNew(RoleAccessMapper::class),
             'setNodeType'         => Resource\Browser\NodeFactory::SBFS,
