@@ -200,4 +200,46 @@ class TreeBuilder extends AbstractTreeBuilder
         return new Collection();
     }
 
+
+    /**
+     * @param Resource\AbstractFile $file
+     * @throws Resource\Exception
+     * @return array
+     */
+    protected function buildFileNode($file)
+    {
+        $permission = $this->getFilePermission($file->getId());
+        if (empty($permission)) {
+            throw new Resource\Exception("No permission for this node");
+        }
+        if ($file instanceof Resource\AbstractFile) {
+            return $this->generateFileArray($file, $file->getTitle(),
+                [
+                    'data-permission' => $permission,
+                    'data-type'       => 'file'
+                ],
+                [
+                    'href' => $this->getFileHref($file),
+                ]
+            );
+        } elseif ($file instanceof Resource\Link) {
+            return $this->generateNodeArray(
+                $file->getId(),
+                $file->getFolder()->getId(),
+                'link',
+                $file->getDescription(),
+                [
+                    'data-id'         => $file->getId(),
+                    'data-permission' => $permission,
+                    'data-type'       => 'link'
+                ],
+                [
+                    'href' => $file->getHref(),
+                ]
+            );
+        } else {
+            return [];
+        }
+    }
+
 }

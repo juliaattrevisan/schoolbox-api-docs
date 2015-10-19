@@ -256,12 +256,18 @@ abstract class AbstractTreeBuilder
     protected function generateNodeArray($nodeId, $parentId, $type, $name, array $liAttributes = null, array $aAttributes = null)
     {
         $array = array(
-            'id'       => $type == 'file' ? "{$this->namespace}-$nodeId" :$nodeId,
+            'id'       => $nodeId,
             'parent'   => $parentId ?: '0',
             'text'     => $name,
-            'children' => $type == 'file' ? 0 : $this->getNodeHasChildren($nodeId),
+            'children' => 0,
             'type'     => $type,
         );
+
+        if ($type == 'file' || $type == 'link') {
+            $array['id'] = "{$this->namespace}-$type-$nodeId";
+        } else {
+            $array['children'] = $this->getNodeHasChildren($nodeId);
+        }
 
         if ($liAttributes) {
             $array['li_attr'] = $liAttributes;
