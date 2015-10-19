@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Browser\Resources;
 
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Aura\Router\Router;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -30,6 +31,21 @@ class Module extends AbstractModule
         $this->basename = 'resourceBrowser';
     }
 
+    /**
+     * Add a link route as well
+     *
+     * @param Router $router
+     * @param string $basePath
+     */
+    public function initRoutes(Router $router, $basePath)
+    {
+        parent::initRoutes($router, $basePath);
+        $routes = $router->getRoutes();
+        $routes->addGet(
+            "$this->basename.showLinkInfo",
+            $basePath.'/link/{linkId}/info'
+        )->addTokens([ 'linkId' => '\d+' ]);
+    }
 
     /**
      * @return string
