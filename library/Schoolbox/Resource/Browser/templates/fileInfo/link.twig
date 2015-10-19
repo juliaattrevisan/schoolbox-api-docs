@@ -12,7 +12,7 @@
     {% endif %}
 
     <dt class="small-12 medium-4">URL</dt>
-    <a href="{{ file.getHref() }}">{{ file.getUrl() }}</a>
+    <dd class="small-12 medium-8"><a href="{{ file.getHref() }}">{{ file.getUrl() }}</a></dd>
 
     {% if namespace == 'resourceBrowser' %}
         {% if file.createdAt.unixTimestamp != file.modifiedAt.unixTimestamp %}
