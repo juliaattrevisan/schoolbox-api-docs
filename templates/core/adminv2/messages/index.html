@@ -72,52 +72,51 @@
         </div>
     </div>
 
-    <div class="small-12 medium-8 columns">
-        <div class="small-12 island">
-            <h2 class="subheader">Adjust Digest Schedules</h2>
+    <div class="small-12 medium-8 island">
+        <h2 class="subheader">Adjust Digest Schedules</h2>
 
-            <!-- BEGIN digest_online -->
-            <form method="post" action="/adminv2/messages/digestForm.php">
-                <section class="content">
-                    <p>You can modify which roles receive digest messages at which frequencies:</p>
+        <!-- BEGIN digest_online -->
+        <form method="post" action="/adminv2/messages/digestForm.php">
+            <section>
+                <p class="content">You can modify which roles receive digest messages at which frequencies:</p>
 
-                    <ul class="information-list">
-                        <!-- BEGIN role_digest -->
-                        <li>
-                            <div class="small-12 columns">
-                                <h3>{ROLE_NAME}</h3>
-                            </div>
-
+                <ul class="information-list no-pad">
+                    <!-- BEGIN role_digest -->
+                    <li class="row content">
+                        <div class="small-12 columns">
+                            <h3>{ROLE_NAME}</h3>
+                        </div>
+                        <div class="small-12 large-8 columns">
+                            <div class="toggle-set">
                             <!-- BEGIN day_check -->
-                            <div class="small-1 columns">
+                            <div>
                                 <input id="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" type="checkbox" name="role[{ROLE_ID}][day][]" value="{DAY_VALUE}" {DAY_CHECKED} />
                                 <label for="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" class="checkbox-toggle">
                                     <span title="{DAY_CHAR}">{DAY_CHAR}</span>
                                 </label>
-
                             </div>
                             <!-- END day_check -->
-
-                            <div class="small-12 medium-5 columns">
-                                <div class="timepick">
-                                    <input name="role[{ROLE_ID}][time]" type="text" autocomplete="off" placeholder="{TIME_VALUE}" value="{TIME_VALUE}" data-timepicker />
-                                </div>
                             </div>
-                        </li>
-                        <!-- END role_digest -->
-                    </ul>
-                </section>
-
-                <input type="submit" value="Save"/>
-            </form>
-            <!-- END digest_online -->
-
-            <!-- BEGIN digest_offline -->
-            <section class="content">
-                <p><em>Enable messaging to set digest schedules.</em></p>
+                        </div>
+                        <div class="small-12 large-4 columns">
+                            <div class="timepick">
+                                <input name="role[{ROLE_ID}][time]" type="text" autocomplete="off" placeholder="{TIME_VALUE}" value="{TIME_VALUE}" data-timepicker />
+                            </div>
+                        </div>
+                    </li>
+                    <!-- END role_digest -->
+                </ul>
             </section>
-            <!-- END digest_offline -->
-        </div>
+
+            <input type="submit" value="Save"/>
+        </form>
+        <!-- END digest_online -->
+
+        <!-- BEGIN digest_offline -->
+        <section class="content">
+            <p><em>Enable messaging to set digest schedules.</em></p>
+        </section>
+        <!-- END digest_offline -->
     </div>
 </div>
 
