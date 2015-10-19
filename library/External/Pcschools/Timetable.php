@@ -184,40 +184,38 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         }
 
         // I need to know if $userId is a teacher or student
-        $result = [];
         try {
             $user = $this->userMapper->findById($userId);
         } catch (\Schoolbox\Mapper\Exception $e) {
-            return $result;
+            return [];
         }
-        if ($user->getRole()->isStudent()) {
-            // use current PERIOD_ID?
-            $query = "
-                SELECT
-                    SUB.STUDKEY AS Student,
-                    SUB.TEACHER AS Teacher,
-                    TIMEFILE.ROOM AS Room,
-                    [SUBJECT].[DESC] AS Description,
-                    TIMEFILE.DAY AS DayNumber,
-                    TIMEPDHD.SORT_ORDER AS PeriodNumber,
-                    [SUBJECT].ABBREV AS ClassCode
-                FROM SUB
-                INNER JOIN TIMEFILE
-                    ON SUB.SUBJECT_NO = TIMEFILE.SUBJECT
-                    AND SUB.[YEAR] = TIMEFILE.[YEAR]
-                    AND SUB.CLASS = TIMEFILE.CLASS
-                INNER JOIN [SUBJECT]
-                    ON SUB.SUBJECT_NO = [SUBJECT].NO
-                INNER JOIN TIMEPDHD
-                    ON TIMEFILE.PERIOD = TIMEPDHD.RECNUM
-                WHERE TIMEFILE.DAY = {$this->getDatabase()->smartQuote($dayNumber)}
-                AND   SUB.PERIOD_ID = (SELECT TIME_PERIOD from sysfile)
-                AND   SUB.STUDKEY = {$this->getDatabase()->smartQuote($externalUserId)}
-            ";
-        } elseif ($user->getRole()->isStaff()) {
 
+        $query = "
+            SELECT
+                SUB.TEACHER AS Teacher,
+                TIMEFILE.ROOM AS Room,
+                [SUBJECT].[DESC] AS Description,
+                TIMEFILE.DAY AS DayNumber,
+                TIMEPDHD.SORT_ORDER AS PeriodNumber,
+                [SUBJECT].ABBREV AS ClassCode
+            FROM SUB
+            INNER JOIN TIMEFILE
+                ON SUB.SUBJECT_NO = TIMEFILE.SUBJECT
+                AND SUB.[YEAR] = TIMEFILE.[YEAR]
+                AND SUB.CLASS = TIMEFILE.CLASS
+            INNER JOIN [SUBJECT]
+                ON SUB.SUBJECT_NO = [SUBJECT].NO
+            INNER JOIN TIMEPDHD
+                ON TIMEFILE.PERIOD = TIMEPDHD.RECNUM
+            WHERE TIMEFILE.DAY = {$this->getDatabase()->smartQuote($dayNumber)}
+            AND   SUB.PERIOD_ID = (SELECT TIME_PERIOD from sysfile)
+        ";
+        if ($user->getRole()->isStudent()) {
+            $query .= 'AND SUB.STUDKEY = '.$this->getDatabase()->smartQuote($externalUserId);
+        } elseif ($user->getRole()->isStaff()) {
+            $query .= 'AND SUB.TEACHER = '.$this->getDatabase()->smartQuote($externalUserId);
         } else {
-            return $result;
+            return [];
         }
 
         // Run the query
