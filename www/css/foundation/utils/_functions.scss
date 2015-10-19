@@ -24,7 +24,7 @@
 }
 
 @function calc-text-color($bg, $light: $white, $dark: $black) {
-	@if (perceptive-luminance($bg) < 0.5) {
+	@if (perceptive-luminance($bg) < 0.45) {
 		@return $dark; // Lighter background, return dark color
 	} @else {
 		@return $light; // Darker background, return light color
