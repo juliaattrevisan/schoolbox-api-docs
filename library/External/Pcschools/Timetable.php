@@ -179,6 +179,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
         // TODO: Implement getDayTimetable() method.
+        if (!$dayNumber) {
+            $dayNumber = $this->getDayNumber($campus);
+        }
 
         // I need to know if $userId is a teacher or student
         $result = [];
