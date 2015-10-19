@@ -9,6 +9,8 @@
 
 namespace Schoolbox\Resource;
 
+use PDO;
+use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Searchable;
@@ -139,6 +141,39 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         );
 
         $this->hasSoftDeleteDateField('deleted_at');
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        // much join.
+        $table = $this->getTable();
+        return "
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('user', 'u')},
+                   {$this->getJoinColumnString('category', 'c')}
+            FROM `$table`
+            LEFT JOIN {$this->getJoinSql('user', $table, 'u')}
+            LEFT JOIN {$this->getJoinSql('category', $table, 'c')}
+        ";
+    }
+
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $c = $this->createCollection();
+        while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $link = $this->hydrate($r);
+            $link->setOwner($this->hydrateJoin($r, 'user', 'u'));
+            $link->setFolder($this->hydrateJoin($r, 'category', 'c'));
+            $c->add($link);
+        }
+        return $c;
     }
 
     /**
