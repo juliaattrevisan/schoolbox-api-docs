@@ -12,7 +12,6 @@ namespace Schoolbox\Resource\File;
 
 use InvalidArgumentException;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\Searchable;
 use Schoolbox\Resource;
 use Schoolbox\User;
 
