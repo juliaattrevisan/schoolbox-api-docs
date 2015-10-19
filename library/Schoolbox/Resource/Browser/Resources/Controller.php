@@ -68,6 +68,39 @@ class Controller extends AbstractController
     }
 
 
+    // API methods
+
+
+    /**
+     * @api GET /resources/link/:linkId/info
+     * @level 150
+     *
+     * @param int $linkId
+     */
+    public function showLinkInfo($linkId)
+    {
+        $link = $this->linkMapper->findById($linkId);
+
+        $folderId = $link->getFolder()->getId();
+
+        $server = $this->getRequest()->server;
+
+        $data = [
+            'file'      => $link,
+            'tree'      => $this->getBreadcrumbs($link->getFolder()),
+            'host'      => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_HOST')),
+            'access'    => $this->getAccess([ $folderId ]),
+            'namespace' => $this->namespace
+        ];
+
+        $this->getResponse()->content->set([
+            'template' => '@resourceBrowser/showFileInfo.twig',
+            'format'   => 'nochrome',
+            'data'     => $data,
+        ]);
+    }
+
+
     /**
      * @param int $folderId
      * @return array
