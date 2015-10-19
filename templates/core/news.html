@@ -24,16 +24,25 @@
                 <section class="content">
                     <h3>Filter By Month</h3>
 
-                    <!-- BEGIN year -->
-                    <a class="button dropdown {YEAR_CLASS}" data-dropdown="drop{YEAR}">{YEAR}</a>
-                    <ul class="f-dropdown" data-dropdown-content="" id="drop{YEAR}">
-                        <!-- BEGIN month -->
-                        <li>
-                            <a class="{MONTH_CLASS}" href="/news-archive/{MENU_TOPIC_CLEAN}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
+                    <ul class="sub-nav">
+                        <!-- BEGIN year -->
+                        <li class="{YEAR_CLASS}">
+                            <a class="button " data-reveal-id="drop{YEAR}">{YEAR}</a>
+
+                            <div class="reveal-modal" data-reveal id="drop{YEAR}">
+                                <h3>News Archives for {YEAR}</h3>
+                                <ul class="information-list">
+                                    <!-- BEGIN month -->
+                                    <li>
+                                        <a class="{MONTH_CLASS}" href="/news-archive/{MENU_TOPIC_CLEAN}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
+                                    </li>
+                                    <!-- END month -->
+                                </ul>
+                                <a class="close-reveal-modal">&#215;</a>
+                            </div>
                         </li>
-                        <!-- END month -->
+                        <!-- END year -->
                     </ul>
-                <!-- END year -->
                 </section>
             </div>
         </div>
