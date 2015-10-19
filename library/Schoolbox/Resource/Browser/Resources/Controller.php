@@ -95,7 +95,7 @@ class Controller extends AbstractController
         ];
 
         $this->getResponse()->content->set([
-            'template' => '@resourceBrowser/showFileInfo.twig',
+            'template' => '@resourceBrowser/showLinkInfo.twig',
             'format'   => 'nochrome',
             'data'     => $data,
         ]);
