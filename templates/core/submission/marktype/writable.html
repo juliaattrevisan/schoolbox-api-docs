@@ -3,32 +3,7 @@
 
 
 
-            <!-- BEGIN mark_type_rubric -->
-            <div class="actions-small-1">
-                <div class="list-item row">
-                    <div class="column small-12">
-                        <div class="list-item-content">
-                            <select class="no-margin" id="rubricmark" name="mark[{OWNER_ID}]" data-mark-input>
-                                <!-- BEGIN rubric_marked -->
-                                <option value="{MARK} / {MAX_MARK}">{MARK}&nbsp;/&nbsp;{MAX_MARK}</option>
-                                <!-- END rubric_marked -->
 
-                                <!-- BEGIN rubric_unmarked -->
-                                <option value="-1">(none)</option>
-                                <!-- END rubric_unmarked -->
-
-                                <!-- BEGIN rubric_grade_drop -->
-                                <option value="{RUBRIC_GRADE_VALUE}" {RUBRIC_GRADE_VALUE_SELECTED}>{RUBRIC_GRADE_TEXT}</option>
-                                <!-- END rubric_grade_drop -->
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <nav>
-                    <a class="icon-modify no-text" title="Mark Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}"></a>
-                </nav>
-            </div>
-            <!-- END mark_type_rubric -->
         </div>
     </div>
 </div>
@@ -90,7 +65,28 @@
         -->
         <!-- END mark_type_none -->
 
+        <!-- BEGIN mark_type_rubric -->
+        <div class="row marking-input">
+            <div class="small-11 medium-10 columns">
+                <select class="no-margin" id="rubricmark" name="mark[{OWNER_ID}]" data-mark-input>
+                    <!-- BEGIN rubric_marked -->
+                    <option value="{MARK} / {MAX_MARK}">{MARK}&nbsp;/&nbsp;{MAX_MARK}</option>
+                    <!-- END rubric_marked -->
 
+                    <!-- BEGIN rubric_unmarked -->
+                    <option value="-1">(none)</option>
+                    <!-- END rubric_unmarked -->
+
+                    <!-- BEGIN rubric_grade_drop -->
+                    <option value="{RUBRIC_GRADE_VALUE}" {RUBRIC_GRADE_VALUE_SELECTED}>{RUBRIC_GRADE_TEXT}</option>
+                    <!-- END rubric_grade_drop -->
+                </select>
+            </div>
+            <div class="small-1 medium-2 columns" style="border:1px solid #f00;">
+                <a class="icon-modify no-text" title="Mark Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}"></a>
+            </div>
+        </div>
+        <!-- END mark_type_rubric -->
 
         <div class="row marking-input">
             <div class="small-11 medium-10 columns">
