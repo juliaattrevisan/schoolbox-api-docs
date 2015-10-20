@@ -152,20 +152,25 @@
                 <label for="curriculumDescription">Description</label>
                 <textarea id="curriculumDescription" name="description">{{! it.description }}</textarea>
 
-                <ul class="button-group even-2">
+                <ul class="flex-list buttons small-1 medium-2 large-2 xlarge-4 xxlarge-2">
                     <li>
                         {{? it.id }}
-                            <button type="submit" class="button">Save Changes</button>
+                            <input type="submit" value="Save Changes" />
                         {{?}}
                         {{? !it.id && it.parent }}
-                            <button type="submit" class="button">Create Subsection</button>
+                            <input type="submit" value="Create Subsection" />
                         {{?}}
                         {{? !it.id && !it.parent }}
-                            <button type="submit" class="button">Create Curriculum</button>
+                            <input type="submit" value="Create Curriculum" />
                         {{?}}
                     </li>
-                    <li>
-                        <button type="submit" data-interaction="cancel" class="button secondary">Cancel</button>
+                    <li><a href="#" data-interaction="cancel" class="icon-cancel">Cancel</a></li>
+                    <li class="overflow">
+                        <a class="icon-more" data-dropdown="node-template-dropdown"></a>
+                        <ul class="f-dropdown" id="node-template-dropdown" data-dropdown-content>
+                            <li><input type="submit" value="Save Changes" /></li>
+                            <li><a href="#" data-interaction="cancel" class="icon-cancel">Cancel</a></li>
+                        </ul>
                     </li>
                 </ul>
             </form>
