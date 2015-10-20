@@ -1,13 +1,6 @@
         <div class="small-12 columns">
 
 
-            <!-- BEGIN mark_type_letter -->
-            <select id="mark" name="mark[{OWNER_ID}]" data-mark-input data-marktype="letter">
-                <!-- BEGIN grade_drop -->
-                <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED} data-groupId="{GRADE_GROUP_ID}">{GRADE_TEXT}</option>
-                <!-- END grade_drop -->
-            </select>
-            <!-- END mark_type_letter -->
 
             <!-- BEGIN mark_type_raw -->
             <div class="row">
@@ -83,6 +76,18 @@
             </div>
         </div>
         <!-- END mark_type_percent -->
+
+        <!-- BEGIN mark_type_letter -->
+        <div class="row marking-input">
+            <div class="small-11 medium-10 columns">
+                <select class="no-margin" id="mark" name="mark[{OWNER_ID}]" data-mark-input data-marktype="letter">
+                    <!-- BEGIN grade_drop -->
+                    <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED} data-groupId="{GRADE_GROUP_ID}">{GRADE_TEXT}</option>
+                    <!-- END grade_drop -->
+                </select>
+            </div>
+        </div>
+        <!-- END mark_type_letter -->
 
         <div class="row marking-input">
             <div class="small-11 medium-10 columns">
