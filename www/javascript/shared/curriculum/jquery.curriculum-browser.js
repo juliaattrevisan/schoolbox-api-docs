@@ -403,9 +403,8 @@
     {
         var self = this;
         var resizePanels = function() {
-            $().add(self.viewPanel).add(self.treePanel).outerHeight(
-                $('body').height() - $('#footer').height() - self.element.offset().top
-            );
+            var calcd = $(window).height() - $('#hybrid-bar').height() - $('#footer').height() - self.viewPanel.height() - 120;
+            self.treePanel.height(Math.max(200, calcd));
         };
         $(window).resize(resizePanels);
         resizePanels();
