@@ -17,10 +17,16 @@
     } %}
 </fieldset>
 
-<div id="timetableSelectorDialog" data-role="timetable-selector" class="reveal-modal" data-reveal title="Choose a date from timetable">
-    {% include 'sub/timetableSelector.twig' with {
-    select: select
-    } %}
+<div id="timetableSelectorDialog"
+     data-role="timetable-selector"
+     class="reveal-modal"
+     data-reveal
+     aria-labelledby="timetableSelectorDialogLabel"
+     aria-hidden="true"
+     role="dialog">
+    <h2 id="timetableSelectorDialogLabel">Choose a date from timetable</h2>
+    {% include 'sub/timetableSelector.twig' with {select: select} %}
     <a href="#" data-action="useTime" class="primary button">Use</a>
     <a href="#" data-action="close" class="button">Cancel</a>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
