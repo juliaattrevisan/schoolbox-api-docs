@@ -3,10 +3,11 @@ $notification-unread-color: calc-text-color($notification-unread-background);
 $notification-header-background: $navigation-background !default;
 
 // where data-unread != 0
-.right-off-canvas-toggle {
+a.right-off-canvas-toggle {
     width: 5rem;
     height: 5rem;
     display: block;
+    cursor: pointer;
 
     background: $notification-header-background;
 
