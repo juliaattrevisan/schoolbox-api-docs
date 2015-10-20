@@ -414,11 +414,16 @@ class DueWork_Detail
     /**
      * $location is used to reconfigure column dimensions.
      *
+     * $tabindex is passed in from above; each student is parsed individually
+     * here, but the loop is further up. Passed here to ensure the tabindexes
+     * continue to increment correctly.
+     *
      * @param SitePage $page
      * @param $handle
      * @param $htmlFormID
      * @param $markArray
-     * @param null $location
+     * @param $location
+     * @param $tabindex
      */
     private function renderMarking(SitePage $page, $handle, $htmlFormID, $markArray, $location, $tabindex)
     {
