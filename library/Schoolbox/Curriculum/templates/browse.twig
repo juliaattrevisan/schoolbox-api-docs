@@ -13,17 +13,6 @@
                 mode: 'none'
             });
 
-            // add classes to tree, because jstree doesn't allow me to define
-            // a base style for trees
-            var treeData = {{ tree|json_encode|raw }}.map(function(row) {
-                try {
-                    row.li_attr.class += ' curriculum-node';
-                } catch (e) {
-                    row.li_attr.class = 'curriculum-node';
-                }
-                return row;
-            });
-
             // Set up the browser
             var browser = $('[data-role="curriculum-browser"]').curriculumBrowser({
                 areas: {
@@ -47,7 +36,7 @@
                     dialog: $('[data-role="node-dialog"]')
                 },
                 tree: {
-                    data: treeData,
+                    data: {{ tree|json_encode|raw }},
                     selector: '[data-role="curriculum-tree"]'
                 }
             });
