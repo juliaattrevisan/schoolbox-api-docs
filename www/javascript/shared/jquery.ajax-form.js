@@ -33,15 +33,56 @@
      * Handles when the form doesn't save.
      */
     AjaxForm.prototype.handleFailure = function() {
-        var self = this;
-        if (confirm('form did not save. retry?')) {
-            self.form.trigger('retry.ajaxForm');
-            self.submitForm();
-        } else {
-            // set it back the way it was
-            self.form.trigger('reset');
-            self.form.trigger('abort.ajaxForm');
-        }
+        this.buildRevealModal().foundation('reveal', 'open');
+    };
+
+    /**
+     * Attempts to submit the form again
+     */
+    AjaxForm.prototype.retrySubmit = function() {
+        this.form.trigger('retry.ajaxForm');
+        this.submitForm();
+    };
+
+    /**
+     * Aborts submission, and resets form
+     */
+    AjaxForm.prototype.abortSubmit = function() {
+        this.form
+            .trigger('reset.ajaxForm')
+            .trigger('abort.ajaxForm');
+    };
+
+    /**
+     * Creates a reveal modal for asking whether to retry or cancel
+     *
+     * @returns {jQuery} The reveal modal
+     */
+    AjaxForm.prototype.buildRevealModal = function() {
+        var self  = this;
+        var modal = $(
+            '<div class="reveal-modal" data-reveal aria-hidden="true" role="dialog">' +
+            '<h2>Save failed</h2>' +
+            '<p>Do you wish to retry?</p>' +
+            '<ul class="button-group even-2">' +
+            '<li><a href="#" class="button" data-action="retry">Retry</a></li>' +
+            '<li><a href="#" class="button" data-action="abort">Cancel</a></li>' +
+            '</ul>' +
+            '</div>'
+        );
+        return modal
+            .on('click', '[data-action="retry"]', function(e) {
+                modal.foundation('reveal', 'close');
+                modal.remove();
+                e.preventDefault();
+                self.retrySubmit();
+            })
+            .on('click', '[data-action="abort"]', function(e) {
+                modal.foundation('reveal', 'close');
+                modal.remove();
+                e.preventDefault();
+                self.abortSubmit();
+            });
     };
 
     /**
