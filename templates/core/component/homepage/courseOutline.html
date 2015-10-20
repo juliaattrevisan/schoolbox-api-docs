@@ -107,26 +107,11 @@
                             <!-- END unit_actions -->
                         </nav>
 
-                        <div id="unit_delete_form" class="reveal-modal" data-reveal aria-hidden="true" data-form-container data-interaction="delete_unit_container" role="dialog">
-                            <p><span class="label alert full-width">Are you sure you wish to delete this unit?</span></p>
-                            <p>All tasks, linked due work and quizzes within the unit will be deleted.</p>
-
-                            <form action="/course/modifyForm.php" method="post" data-form_type="delete_unit">
-                                <input type="hidden" name="action"    value="delete" />
-                                <input type="hidden" name="id"        value="{UNIT_ID}" />
-                                <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
-
-                                <div class="row">
-                                    <div class="small-6 columns no-pad">
-                                        <input type="submit" class="button expand" data-interaction="delete_confirm" value="Yes">
-                                    </div>
-                                    <div class="small-6 columns no-pad">
-                                        <a href="#" class="button expand" data-interaction="delete_reject">No</a>
-                                    </div>
-                                </div>
-                            </form>
-                            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-                        </div>
+                        <form action="/course/modifyForm.php" method="post" data-form_type="delete_unit" class="hide">
+                            <input type="hidden" name="action"    value="delete" />
+                            <input type="hidden" name="id"        value="{UNIT_ID}" />
+                            <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                        </form>
 
                         <ul class="action-list sortable ui-sortable task-list {UNIT_LIST_CLASS}" data-task-list>
                             <!-- BEGIN unit_task -->
