@@ -1,35 +1,40 @@
+
+    </div>
+</div>
+<div class="small-12 medium-6 xlarge-8 columns">
+    <div class="row">
         <div class="small-12 columns no-pad">
-            <div class="list-item-content">
-            <!-- BEGIN mark_type_percent -->
-            <p class="grade">
-                <span>{MARK}{MARK_SYMBOL}</span>
-            </p>
-            <!-- END mark_type_percent -->
+            <div class="avatar card">
+                <!-- BEGIN mark_type_percent -->
+                <p class="grade">
+                    <span>{MARK}{MARK_SYMBOL}</span>
+                </p>
+                <!-- END mark_type_percent -->
 
-            <!-- BEGIN mark_type_letter -->
-            <select class="no-margin" id="mark" name="mark[{OWNER_ID}]" disabled>
-                <!-- BEGIN grade_drop -->
-                <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED}>{GRADE_TEXT}</option>
-                <!-- END grade_drop -->
-            </select>
-            <!-- END mark_type_letter -->
+                <!-- BEGIN mark_type_letter -->
+                <select class="no-margin" id="mark" name="mark[{OWNER_ID}]" disabled>
+                    <!-- BEGIN grade_drop -->
+                    <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED}>{GRADE_TEXT}</option>
+                    <!-- END grade_drop -->
+                </select>
+                <!-- END mark_type_letter -->
 
-            <!-- BEGIN mark_type_raw -->
-            <p class="grade">
-                <span>{MARK}/{MAX_MARK}</span>
-            </p>
-            <!-- END mark_type_raw -->
+                <!-- BEGIN mark_type_raw -->
+                <p class="grade">
+                    <span>{MARK}/{MAX_MARK}</span>
+                </p>
+                <!-- END mark_type_raw -->
 
-            <!-- BEGIN mark_type_free -->
-            <p class="grade">
-                <span>{MARK}</span>
-            </p>
-            <!-- END mark_type_free -->
+                <!-- BEGIN mark_type_free -->
+                <p class="grade">
+                    <span>{MARK}</span>
+                </p>
+                <!-- END mark_type_free -->
 
-            <!-- BEGIN mark_type_none -->
-            <!-- END mark_type_none -->
+                <!-- BEGIN mark_type_none -->
+                <!-- END mark_type_none -->
 
-            <!-- BEGIN mark_type_rubric -->
+                <!-- BEGIN mark_type_rubric -->
                 <!-- BEGIN rubric_marked -->
                 <p class="grade">
                     <span><a title="View Rubric" href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}">{MARK}/{MAX_MARK}</a></span>
@@ -39,11 +44,10 @@
                 <!-- END rubric_unmarked -->
                 <!-- BEGIN rubric_grade_drop -->
                 <!-- END rubric_grade_drop -->
-            <!-- END mark_type_rubric -->
+                <!-- END mark_type_rubric -->
+
+                <p class="comment">
+                    {COMMENT}
+                </p>
             </div>
         </div>
-    </div>
-</div>
-<div class="small-12 medium-6 xlarge-8 columns">
-    <div class="row">
-        <div class="list-item-content comment">{COMMENT}</div>
