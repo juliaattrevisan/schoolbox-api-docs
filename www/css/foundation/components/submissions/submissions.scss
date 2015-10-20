@@ -208,14 +208,28 @@ table.rubric {
     opacity: 0.3;
 }
 
-/* Marksheet Styles
+/* Marksheet Input
+ * This is a very particular kind of information-list, designed
+ * to house the input field and comment elements in a
+ * uniformly-behaving structure so it displays predictably in
+ * both the Marksheet and the Inline Grader.
+ *
+ * This removes the estuary between li elements.
  */
+.marking-input-list {
+    @include information-list;
+    padding-top: 1rem;
 
-/* This pads out the mark type input field (typically this
- * gets converted into a combobox) in the Marksheet and the
- * Inline Grader views. It also pads out the comment textarea
- */
-.marking-input {
-    padding-top: 0.5rem;
-    padding-left: 0.5rem;
+    li {
+        /* Turn off estuary between input and comment
+         */
+        border: 0px;
+
+        /* Move rubric pencil icon in line with View Submission
+         * and History buttons in outer nav element
+         */
+        nav a {
+            margin-top: -1rem;
+        }
+    }
 }
