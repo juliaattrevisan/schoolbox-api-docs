@@ -53,7 +53,7 @@ if (($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS) {
 
 /* Create the feed url
  */
-$urlString = "{$_SERVER['HTTP_HOST']}/feed/news-school-rss.php?user={$_SESSION['user']->getKey()}";
+$urlString = "/feed/news-school-rss.php?user={$_SESSION['user']->getKey()}";
 
 // generate news and topic lists
 $topicMapper = new \Schoolbox\News\TopicMapper();
