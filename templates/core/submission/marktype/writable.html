@@ -2,34 +2,6 @@
 
 
 
-            <!-- BEGIN mark_type_raw -->
-            <div class="row">
-                <div class="list-item-content">
-                    <div class="small-10 medium-7 columns">
-                        <input class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" maxlength="15" value="{MARK}" data-mark-input data-combobox />
-                    </div>
-                    <div class="small-2 medium-5 columns">
-                        <label for="mark-{OWNER_ID}" class="inline no-margin">
-                            / <span data-validation-limit>{MAX_MARK}</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <!-- END mark_type_raw -->
-
-            <!-- BEGIN mark_type_free -->
-            <div class="list-item-content">
-                <input class="no-margin" name="mark[{OWNER_ID}]" type="text" size="4" maxlength="15" value="{MARK}" data-mark-input data-combobox />
-            </div>
-            <!-- END mark_type_free -->
-
-            <!-- BEGIN mark_type_none -->
-            <!--
-            <div class="list-item-content">
-                <label class="inline no-margin">N/A</label>
-            </div>
-            -->
-            <!-- END mark_type_none -->
 
             <!-- BEGIN mark_type_rubric -->
             <div class="actions-small-1">
@@ -88,6 +60,37 @@
             </div>
         </div>
         <!-- END mark_type_letter -->
+
+        <!-- BEGIN mark_type_raw -->
+        <div class="row marking-input">
+            <div class="small-11 medium-10 columns">
+                <input class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" maxlength="15" value="{MARK}" data-mark-input data-combobox />
+            </div>
+            <div class="small-1 medium-2 columns">
+                <label for="mark-{OWNER_ID}" class="inline no-margin">
+                    / <span data-validation-limit>{MAX_MARK}</span>
+                </label>
+            </div>
+        </div>
+        <!-- END mark_type_raw -->
+
+        <!-- BEGIN mark_type_free -->
+        <div class="row marking-input">
+            <div class="small-11 medium-10 columns">
+                <input class="no-margin" name="mark[{OWNER_ID}]" type="text" size="4" maxlength="15" value="{MARK}" data-mark-input data-combobox />
+            </div>
+        </div>
+        <!-- END mark_type_free -->
+
+        <!-- BEGIN mark_type_none -->
+        <!--
+        <div class="list-item-content">
+            <label class="inline no-margin">N/A</label>
+        </div>
+        -->
+        <!-- END mark_type_none -->
+
+
 
         <div class="row marking-input">
             <div class="small-11 medium-10 columns">
