@@ -14,6 +14,7 @@ $tree-node-selected-color: $content-ui-foreground;
 $tree-folder-icon-color: $content-ui-foreground;
 $tree-homepage-icon-color: darkorange;
 $tree-course-icon-color: #008600;
+$tree-favorite-icon-color: darkorange;
 
 
 // a whole bushel of jstree overrides.....
@@ -78,6 +79,10 @@ div.jstree-default, ul.jstree-default {
         &:before {
             color: $tree-course-icon-color;
         }
+    }
+
+    .icon-favourite:before {
+        color: $tree-favorite-icon-color;
     }
 
     .jstree-hovered {
