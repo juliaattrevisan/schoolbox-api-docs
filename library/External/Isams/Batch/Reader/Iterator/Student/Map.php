@@ -28,7 +28,7 @@ class External_Isams_Batch_Reader_Iterator_Student_Map extends External_Isams_Ba
                 'StudentID'            => "$result->SchoolId",
                 'NetworkLogin'         => "$result->UserName",
                 'StudentTitle'         => "$result->Title",
-                'StudentPreferred'     => "$result->Preferredname",
+                'StudentPreferred'     => "$result->Forename",
                 'StudentSurname'       => "$result->Surname",
                 'StudentGender'        => "$result->Gender",
                 'StudentEmail'         => "$result->EmailAddress",
