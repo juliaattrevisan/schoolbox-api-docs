@@ -79,56 +79,22 @@
         );
 
         // Delete unit - "are you sure?"
-        // (write the expand/collapse stuff into its own plugin)
         component.on(
             'click.courseInstance',
             'a[data-interaction="open_delete_unit_form"]',
             function(event) {
                 event.preventDefault();
-                var element      = $(this);
-                var unit_element = element.closest('[data-unit]');
-                var container    = unit_element.find('[data-interaction="delete_unit_container"]');
-
-                container.toggleClass('hide');
-                component.find('[data-form-container]').not(container).addClass('hide');
-
-                ///* Hide all other forms first
-                // */
-                //var allForms = component.find('[data-form-container]');
-                //allForms.removeClass('hide').not(container).slideUp('fast');
-                //
-                //if (container.hasClass('hide')) {
-                //    container.stop().removeClass('hide').slideUp(1).slideDown('fast');
-                //}
-                //else {
-                //    container.stop().slideToggle('fast');
-                //}
-            }
-        );
-
-        // "Yes, I am"
-        component.on(
-            'submit.courseInstance',
-            'form[data-form_type="delete_unit"]',
-            function(event) {
-                event.preventDefault();
-                // Submit form via Ajax
-                var form = $(this);
-                $.post(form.attr('action'), form.serialize(), function(data) {
-                    postCallback(form, data);
-                }, 'json');
-            }
-        );
-
-        // "No, I am not"
-        component.on(
-            'click.courseInstance',
-            'form[data-form_type="delete_unit"] [data-interaction="delete_reject"]',
-            function(event) {
-                event.preventDefault();
-                var container = $(this).closest('[data-interaction="delete_unit_container"]');
-                //container.slideToggle('fast');
-                container.toggleClass('hide');
+                var element = $(this);
+                element.confirmDialog({
+                    text: 'Are you sure you wish to delete this unit? All tasks, linked due work and quizzes within the unit will be deleted.',
+                    confirmEvent: function(element) {
+                        var unit_element = element.closest('[data-unit]');
+                        var form         = unit_element.find('[data-form_type="delete_unit"]');
+                        $.post(form.attr('action'), form.serialize(), function(data) {
+                            postCallback(form, data);
+                        }, 'json');
+                    }
+                });
             }
         );
 
