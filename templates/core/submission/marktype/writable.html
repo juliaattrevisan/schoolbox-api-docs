@@ -6,9 +6,10 @@
     <input type="hidden" class="mark-update" name="markUpdate" value="true" />
 
     <div>
-        <!-- BEGIN mark_type_percent -->
-        <ul class="action-list">
+
+        <ul class="information-list">
             <li class="actions-small-1">
+                <!-- BEGIN mark_type_percent -->
                 <div class="list-item">
                     <div class="small-12 columns">
                         <input class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" value="{MARK}" data-mark-input data-combobox />
@@ -17,13 +18,9 @@
                 <nav>
                     <label for="mark-{OWNER_ID}" class="inline no-margin">%</label>
                 </nav>
-            </li>
-        </ul>
-        <!-- END mark_type_percent -->
+                <!-- END mark_type_percent -->
 
-        <!-- BEGIN mark_type_letter -->
-        <ul class="action-list">
-            <li class="actions-small-1">
+                <!-- BEGIN mark_type_letter -->
                 <div class="list-item">
                     <div class="small-12 columns">
                         <select class="no-margin" id="mark" name="mark[{OWNER_ID}]" data-mark-input data-marktype="letter">
@@ -33,13 +30,9 @@
                         </select>
                     </div>
                 </div>
-            </li>
-        </ul>
-        <!-- END mark_type_letter -->
+                <!-- END mark_type_letter -->
 
-        <!-- BEGIN mark_type_raw -->
-        <ul class="action-list">
-            <li class="actions-small-1">
+                <!-- BEGIN mark_type_raw -->
                 <div class="list-item">
                     <div class="small-12 columns">
                         <input class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" maxlength="15" value="{MARK}" data-mark-input data-combobox />
@@ -50,33 +43,27 @@
                         / <span data-validation-limit>{MAX_MARK}</span>
                     </label>
                 </nav>
-            </li>
-        </ul>
-        <!-- END mark_type_raw -->
+                <!-- END mark_type_raw -->
 
-        <!-- BEGIN mark_type_free -->
-        <ul class="action-list">
-            <li class="actions-small-1">
+                <!-- BEGIN mark_type_free -->
                 <div class="list-item">
                     <div class="small-12 columns">
                         <input class="no-margin" name="mark[{OWNER_ID}]" type="text" size="4" maxlength="15" value="{MARK}" data-mark-input data-combobox />
                     </div>
                 </div>
-            </li>
-        </ul>
-        <!-- END mark_type_free -->
+                <!-- END mark_type_free -->
 
-        <!-- BEGIN mark_type_none -->
-        <!--
-        <div class="list-item-content">
-            <label class="inline no-margin">N/A</label>
-        </div>
-        -->
-        <!-- END mark_type_none -->
+                <!-- BEGIN mark_type_none -->
+                <!--
+                <div class="list-item">
+                    <div class="small-12 columns">
+                        <label class="inline no-margin">N/A</label>
+                    </div>
+                </div>
+                -->
+                <!-- END mark_type_none -->
 
-        <!-- BEGIN mark_type_rubric -->
-        <ul class="action-list">
-            <li class="actions-small-1">
+                <!-- BEGIN mark_type_rubric -->
                 <div class="list-item">
                     <div class="small-12 columns">
                         <select class="no-margin" id="rubricmark" name="mark[{OWNER_ID}]" data-mark-input>
@@ -97,13 +84,13 @@
                 <nav>
                     <a class="icon-modify no-text" title="Mark Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}"></a>
                 </nav>
+                <!-- END mark_type_rubric -->
+            </li>
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="small-12 columns">
+                        <textarea name="comment" rows="4" data-comment>{COMMENT}</textarea>
+                    </div>
+                </div>
             </li>
         </ul>
-        <!-- END mark_type_rubric -->
-
-        <div class="row marking-input">
-            <div class="small-11 medium-10 columns">
-                <textarea name="comment" rows="4" data-comment>{COMMENT}</textarea>
-            </div>
-        </div>
-
