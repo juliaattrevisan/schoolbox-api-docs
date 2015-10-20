@@ -1,6 +1,5 @@
 <?php
 
-use Schoolbox\Realtime\Message\RerouteOverride;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 
 class SitePage extends Page
@@ -113,6 +112,9 @@ class SitePage extends Page
 
     function loadContent($pageFile, $execute = true)
     {
+        // quasi-localisation
+        $this->localise();
+
         $this->pageName = $pageFile;
 
         /* sanitise data, force all 404s through pageNotFound() */
@@ -1410,6 +1412,24 @@ class SitePage extends Page
         if ($currentLimit !== 0) {
             // Don't touch if there is no max execution time
             set_time_limit($currentLimit + $seconds);
+        }
+    }
+
+
+    /**
+     * Jam localisation vars into the template. Uncomment / modify the list as required
+     */
+    protected function localise()
+    {
+        while ($r = $this->getDi()->get('l10n')->fetch(PDO::FETCH_ASSOC)) {
+            $term = strtoupper($r['term']);
+
+            $this->setVar([
+                "TPL_LOCAL_$term" => $r['display_as'],
+//                "TPL_LOCAL_{$term}_UC" => strtoupper($r['display_as']),
+//                "TPL_LOCAL_{$term}_LC" => strtolower($r['display_as']),
+                "TPL_LOCAL_{$term}_PC" => ucwords($r['display_as']),
+            ]);
         }
     }
 }

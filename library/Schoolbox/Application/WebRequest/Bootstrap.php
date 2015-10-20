@@ -24,6 +24,7 @@ use Autoloader;
 use Config;
 use Database;
 use DeprecatedDatabase;
+use PDO;
 use Scrub;
 use Twig_Extension_Debug;
 use Twig_Extensions_Extension_Text;
@@ -211,6 +212,15 @@ class Bootstrap implements BootstrapInterface {
             )
         );
 
+		$di->set(
+			'l10n',
+			$di->lazy(
+				function () {
+					return Database::getInstance()->query("SELECT term, display_as FROM localisation");
+				}
+			)
+		);
+
 		// Preload of route parameters
 		$di->set('preloader', $di->lazyNew('Alaress\\Web\\Router\\PathMatcher'));
 
@@ -357,11 +367,18 @@ class Bootstrap implements BootstrapInterface {
 						)
 					);
 
-					// Global access to config object and a date locale object
+					// Global access to config object and localisation
 					$twig->addGlobal('config', $config);
-					$twig->addGlobal('locale', array(
-						'date' => new Alaress_Date_Locale_Config()
-					));
+
+					$l10n = [];
+
+					while ($r = $di->get('l10n')->fetch(PDO::FETCH_ASSOC)) {
+						$l10n[$r['term']] = $r['display_as'];
+					}
+
+					$l10n['date'] = new Alaress_Date_Locale_Config();
+
+					$twig->addGlobal('locale', $l10n);
 
 					// Add the route lookup and authorization methods
 					$twig->addFunction(
