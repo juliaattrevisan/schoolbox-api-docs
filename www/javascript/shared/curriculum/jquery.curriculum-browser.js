@@ -202,19 +202,19 @@
                     responsive: false
                 }
             },
-            plugins: ['sort', 'types'],
+            plugins : ['sort', 'types', 'wholerow'],
             types: {
                 root: {
-                    icon: '/images/tree/server.gif'
+                    icon: 'icon-folder'
                 },
                 'default': {
-                    icon: '/images/icons/22x22/folder.png'
+                    icon: 'icon-unknown'
                 },
                 folder: {
-                    icon: '/images/icons/22x22/folder.png'
+                    icon: 'icon-folder'
                 },
                 code: {
-                    icon: '/images/famicons/star.png'
+                    icon: 'icon-favourite'
                 }
             }
         })
