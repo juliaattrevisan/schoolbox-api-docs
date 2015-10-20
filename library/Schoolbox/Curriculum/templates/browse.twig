@@ -64,21 +64,24 @@
 <!-- Template for displaying of a curriculum node -->
 {% verbatim %}
 <script id="node-template" type="text/x-dot-template">
-    <h2 id="nodeTitle">
-        {{? it.code }}
-            [{{! it.code }}]
-        {{?}}
-        {{! it.name }}
-    </h2>
+    <div class="row">
+        <div class="small-12 column">
+            <h3 id="nodeTitle">
+                {{? it.code }}
+                    [{{! it.code }}]
+                {{?}}
+                {{! it.name }}
+            </h3>
 
-    {{? it.reference }}
-    <p>
-        <strong>Reference:</strong>
-        <a href="{{! it.reference }}">{{! it.reference }}</a>
-    </p>
-    {{?}}
+            {{? it.reference }}
+            <p class="meta">
+                Reference: <a href="{{! it.reference }}">{{! it.reference }}</a>
+            </p>
+            {{?}}
 
-    <article>{{= it.description }}</article>
+            <article>{{= it.description }}</article>
+        </div>
+    </div>
 
     {{? !it.readonly }}
     <ul class="button-group even-3">
