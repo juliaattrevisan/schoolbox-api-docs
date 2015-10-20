@@ -42,7 +42,6 @@
                 readonly: false,
                 selector: '[data-role="curriculum-editor"]',
                 editFormSelector: '[data-role="node-form"]',
-                deleteFormSelector: '[data-role="node-delete-form"]',
                 createUri: '',
                 templates: {
                     view: '',
@@ -358,19 +357,19 @@
         });
         
         // Delete node form
-        viewPanels.on('submit', self.config.view.deleteFormSelector, function(event) {
-            var form = $(this);
+        viewPanels.on('click', '[data-interaction="delete"]', function(event) {
             event.preventDefault();
-            $(this).confirmDialog({
+            var element = $(this);
+            element.confirmDialog({
                 text: 'Are you sure? This will delete ALL curriculum sections underneath this one, too.',
                 confirmEvent: function() {
                     viewPanels
                         .addClass('loading')
                         .find(':input').prop('disabled', true);
                     $.ajax({
-                        type:     form.attr('method'),
+                        type:     'post',
                         dataType: 'json',
-                        url:      form.attr('action')
+                        url:      element.data('action')
                     })
                         .done(function(data) {
                             viewPanels.addClass('loaded');
