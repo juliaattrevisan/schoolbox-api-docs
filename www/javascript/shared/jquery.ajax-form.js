@@ -10,6 +10,9 @@
  * * always.ajaxForm:       After either done.ajaxForm or fail.ajaxForm
  * * retry.ajaxForm:        After fail.ajaxForm, and user opts to retry
  * * abort.ajaxForm:        After fail.ajaxForm, and user opts to not retry
+ *
+ * TODO: investigate whether this needs to be renamed.
+ *       jQuery validation defines $.fn.ajaxForm, but Schoolbox doesn't use it.
  */
 (function($){
     "use strict";
