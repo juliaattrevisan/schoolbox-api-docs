@@ -82,7 +82,7 @@ $filter = array(
 );
 
 // set an appropriate title based on news context
-$title = $archive ? 'News Archive' : 'News';
+$title = $this->getVar('TPL_LOCAL_NEWS_PC') . ($archive ? ' Archive' : '');
 $this->setTitle($title);
 $this->setVar('PAGE_TITLE', $title);
 

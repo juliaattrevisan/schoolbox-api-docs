@@ -40,8 +40,8 @@ if (is_numeric($this->arg[1])) {
     $page = 1;
 }
 
-$this->setTitle('News');
-$this->setVar('PAGE_TITLE', 'News');
+$this->setTitle($this->getVar('TPL_LOCAL_NEWS_PC'));
+$this->setVar('PAGE_TITLE', $this->getVar('TPL_LOCAL_NEWS_PC'));
 
 
 // display add news button if user is allowed to
