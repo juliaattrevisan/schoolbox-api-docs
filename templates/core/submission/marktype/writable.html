@@ -12,12 +12,9 @@
                 <!-- BEGIN mark_type_percent -->
                 <div class="list-item">
                     <div class="small-12 columns">
-                        <input class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" value="{MARK}" data-mark-input data-combobox />
+                        <input placeholder='%' class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" value="{MARK}" data-mark-input data-combobox />
                     </div>
                 </div>
-                <nav>
-                    <label for="mark-{OWNER_ID}" class="inline no-margin">%</label>
-                </nav>
                 <!-- END mark_type_percent -->
 
                 <!-- BEGIN mark_type_letter -->
@@ -35,14 +32,10 @@
                 <!-- BEGIN mark_type_raw -->
                 <div class="list-item">
                     <div class="small-12 columns">
-                        <input class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" maxlength="15" value="{MARK}" data-mark-input data-combobox />
+                        <input placeholder='/ {MAX_MARK}' class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" maxlength="15" value="{MARK}" data-mark-input data-combobox />
+                        <span class="hide" data-validation-limit>{MAX_MARK}</span>
                     </div>
                 </div>
-                <nav>
-                    <label for="mark-{OWNER_ID}" class="inline no-margin">
-                        / <span data-validation-limit>{MAX_MARK}</span>
-                    </label>
-                </nav>
                 <!-- END mark_type_raw -->
 
                 <!-- BEGIN mark_type_free -->
