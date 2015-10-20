@@ -436,17 +436,17 @@ class DueWork_Detail
         /* Column dimensions
          */
         if ($location == self::INLINE_GRADER) {
-            $columnDimensionsComment = 'small-12';
-            $labelClass = '';
+            $columnDimensionsWritable = 'small-12';
+            $columnDimensionsReadonly = 'small-12';
         }
         else {
-            $columnDimensionsComment = 'small-12 medium-6 xlarge-8';
-            $labelClass = 'list-item-content';
+            $columnDimensionsWritable = 'small-12 medium-6 xlarge-8';
+            $columnDimensionsReadonly = 'small-12 medium-6 xlarge-8';
         }
 
         $page->setVar(array(
-            'COLUMN_DIMENSIONS_COMMENT' => $columnDimensionsComment,
-            'LABEL_CLASS' => $labelClass,
+            'COLUMN_DIMENSIONS_WRITABLE' => $columnDimensionsWritable,
+            'COLUMN_DIMENSIONS_READONLY' => $columnDimensionsReadonly,
         ));
 
         $page->parse($handle, 'markTpl');
