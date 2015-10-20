@@ -78,6 +78,7 @@
         this.config.view.dialog.children().not('.close-reveal-modal').remove();
         if (this.viewPanel.is(':visible')) {
             this.viewPanel.append(contents);
+            this.resizePanels();
             return this.viewPanel;
         } else {
             // Don't reopen if already open, just replace
@@ -395,19 +396,27 @@
     };
 
     /**
+     * Resizes the tree panel.
+     */
+    CurriculumBrowser.prototype.resizePanels = function()
+    {
+        var calcd = $(window).height()
+            - $('#hybrid-bar').height()
+            - $('#footer').height()
+            - this.viewPanel.height()
+            - 120;
+        this.treePanel.height(Math.max(200, calcd));
+    };
+
+    /**
      * Sets up resizing of the three panel browser
      *
      * TODO include this in an external plugin somehow?
      */
     CurriculumBrowser.prototype.initResize = function()
     {
-        var self = this;
-        var resizePanels = function() {
-            var calcd = $(window).height() - $('#hybrid-bar').height() - $('#footer').height() - self.viewPanel.height() - 120;
-            self.treePanel.height(Math.max(200, calcd));
-        };
-        $(window).resize(resizePanels);
-        resizePanels();
+        $(window).resize(this.resizePanels.bind(this));
+        this.resizePanels();
     };
 
     /**
