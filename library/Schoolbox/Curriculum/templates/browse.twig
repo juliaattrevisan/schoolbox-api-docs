@@ -109,7 +109,7 @@
             <form method="post" action="{{! it.actions.save }}" data-nodeid="{{! it.id }}" data-role="node-form">
                 <input type="hidden" name="parent" value="{{! it.parent }}" />
                 {{? !it.id && !it.parent }}
-                <h2 id="nodeTitle">Create New Curriculum</h2>
+                <h3 id="nodeTitle">Create New Curriculum</h3>
                 <label for="curriculumLearningLevel">Level</label>
                 <select name="learningLevel" id="curriculumLearningLevel">
                     <option value="">-- select a level --</option>
@@ -137,10 +137,10 @@
                 {{?}}
 
                 {{? it.id }}
-                <h2 id="nodeTitle">Edit Curriculum Subsection</h2>
+                <h3 id="nodeTitle">Edit Curriculum Subsection</h3>
                 {{?}}
                 {{? !it.id && it.parent }}
-                <h2 id="nodeTitle">Create New Curriculum Subsection</h2>
+                <h3 id="nodeTitle">Create New Curriculum Subsection</h3>
                 {{?}}
 
                 <label for="curriculumName">Name</label>
