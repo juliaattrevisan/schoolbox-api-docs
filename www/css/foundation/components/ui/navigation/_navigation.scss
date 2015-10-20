@@ -45,7 +45,7 @@ $tabbar-hamburger-icon-gap: 4px;
 // Off Canvas Menu Variables
 $off-canvas-width: rem-calc(260);
 $off-canvas-bg: $off-canvas !default;
-//$off-canvas-bg-hover: darken($tabbar-bg, 10%);
+$off-canvas-bg-hover: false;
 $off-canvas-hover-color: $off-canvas-bg;
 
 // Off Canvas Menu List Variables
@@ -60,7 +60,7 @@ $off-canvas-label-border-bottom: none;
 $off-canvas-label-margin:0;
 
 $off-canvas-link-padding: rem-calc(($base-font-size));
-//$off-canvas-link-color: contrast-bg(0.7, $off-canvas-bg, 0%, $primary-color, $primary-color);
+$off-canvas-link-color: false;
 $off-canvas-link-border-bottom: 0px; //1px solid scale-color($off-canvas-bg, $lightness: -25%);
 
 //$off-canvas-back-bg: $off-canvas-bg-hover;
