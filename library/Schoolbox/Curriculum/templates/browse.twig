@@ -80,24 +80,24 @@
             {{?}}
 
             <article>{{= it.description }}</article>
+
+            {{? !it.readonly }}
+            <ul class="flex-list buttons small-1 medium-2 large-2 xlarge-4 xxlarge-2">
+                <li><a data-interaction="edit" class="icon-modify">Edit</a></li>
+                <li><a data-interaction="add-subsection" class="icon-add" data-nodeid="{{! it.id }}">Add Subsection</a></li>
+                <li><a data-interaction="delete" class="icon-delete" data-nodeid="{{! it.id }}" data-action="{{! it.actions.delete }}">Delete</a></li>
+                <li class="overflow">
+                    <a class="icon-more" data-dropdown="node-template-dropdown"></a>
+                    <ul class="f-dropdown" id="node-template-dropdown" data-dropdown-content>
+                        <li><a data-interaction="edit" class="icon-modify">Edit</a></li>
+                        <li><a data-interaction="add-subsection" class="icon-add" data-nodeid="{{! it.id }}">Add Subsection</a></li>
+                        <li><a data-interaction="delete" class="icon-delete" data-nodeid="{{! it.id }}" data-action="{{! it.actions.delete }}">Delete</a></li>
+                    </ul>
+                </li>
+            </ul>
+            {{?}}
         </div>
     </div>
-
-    {{? !it.readonly }}
-    <ul class="button-group even-3">
-        <li>
-            <button data-interaction="edit" class="button">Edit</button>
-        </li>
-        <li>
-            <button data-interaction="add-subsection" class="button secondary" data-nodeid="{{! it.id }}">Add Subsection</button>
-        </li>
-        <li>
-            <form method="post" action="{{! it.actions.delete }}" data-role="node-delete-form">
-                <button type="submit" class="alert">Delete</button>
-            </form>
-        </li>
-    </ul>
-    {{?}}
 </script>
 {% endverbatim %}
 
