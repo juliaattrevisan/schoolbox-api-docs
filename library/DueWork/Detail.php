@@ -219,6 +219,8 @@ class DueWork_Detail
             return;
         }
 
+        $tabindex = 0;
+
         // process each student
         foreach ($data as $record) {
             // printf('<pre style="margin-left: 300px">%s</pre>', print_r($record, true));
@@ -236,7 +238,7 @@ class DueWork_Detail
                 )
             );
 
-            $this->renderMarking($page, 'OWNER_MARKING', $record['user']['instance']->getId() . $this->submissionBox->getId(), $record['mark'], $location);
+            $this->renderMarking($page, 'OWNER_MARKING', $record['user']['instance']->getId() . $this->submissionBox->getId(), $record['mark'], $location, $tabindex);
 
             //
             // Reset the contents of the submission row block, so that each student starts with a fresh row
@@ -360,6 +362,10 @@ class DueWork_Detail
 
             $page->parse('student_row_block', 'student_row', true);
 
+            /* Increment twice - once for the input, another for the comment
+             */
+            $tabindex += 2;
+
             /* Clear children after parsing out the parent
              */
             $page->setVar(
@@ -414,7 +420,7 @@ class DueWork_Detail
      * @param $markArray
      * @param null $location
      */
-    private function renderMarking(SitePage $page, $handle, $htmlFormID, $markArray, $location)
+    private function renderMarking(SitePage $page, $handle, $htmlFormID, $markArray, $location, $tabindex)
     {
         $templateFile = $this->isReadOnly() ? 'readonly' : 'writable';
         $page->setFile('markTpl', "submission/marktype/$templateFile.html");
@@ -423,7 +429,10 @@ class DueWork_Detail
         // blockify and clear all the marktypes
         foreach ($this->submissionHandler->getMarkTypes(true) as $type) {
             $page->setBlock('markTpl', "mark_type_{$type['slug']}", "mark_type_{$type['slug']}_block");
-            $page->setVar("mark_type_{$type['slug']}_block", '');
+
+            $page->setVar(array(
+                "mark_type_{$type['slug']}_block" => '',
+            ));
         }
 
         // each strategy knows how to output itself
@@ -431,6 +440,12 @@ class DueWork_Detail
 
         // render the appropriate block and parse it into the handle we were provided
         $slug = $this->marksheet->getSlug();
+        /* Tabindex for speedier grading in the Marksheet
+         */
+        $page->setVar(array(
+            'TABINDEX' => ++$tabindex
+        ));
+
         $page->parse("mark_type_{$slug}_block", "mark_type_{$slug}");
 
         /* Column dimensions
@@ -447,6 +462,12 @@ class DueWork_Detail
         $page->setVar(array(
             'COLUMN_DIMENSIONS_WRITABLE' => $columnDimensionsWritable,
             'COLUMN_DIMENSIONS_READONLY' => $columnDimensionsReadonly,
+        ));
+
+        /* Comment Tabindex
+         */
+        $page->setVar(array(
+            'COMMENT_TABINDEX' => ++$tabindex
         ));
 
         $page->parse($handle, 'markTpl');
