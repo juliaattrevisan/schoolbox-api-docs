@@ -104,69 +104,73 @@
 <!-- Template for editing a curriculum node -->
 {% verbatim %}
 <script id="node-edit-template" type="text/x-dot-template">
-    <form method="post" action="{{! it.actions.save }}" data-nodeid="{{! it.id }}" data-role="node-form">
-        <input type="hidden" name="parent" value="{{! it.parent }}" />
-        {{? !it.id && !it.parent }}
-        <h2 id="nodeTitle">Create New Curriculum</h2>
-        <label for="curriculumLearningLevel">Level</label>
-        <select name="learningLevel" id="curriculumLearningLevel">
-            <option value="">-- select a level --</option>
-            {{~ it.levels :levelGroup }}
-            <optgroup label="{{! levelGroup.name || 'Uncategorized' }}">
-                {{~ levelGroup.list :level }}
-                <option value="{{! level.id }}" label="{{! level.name }}">{{! level.name }}</option>
-                {{~ }}
-            </optgroup>
-            {{~}}
-            <option value="" data-interaction="add-level-dialog-open">Add New Level...</option>
-        </select>
-        <label for="curriculumLearningArea">Learning Area</label>
-        <select name="learningArea" id="curriculumLearningArea">
-            <option value="">-- select an area --</option>
-            {{~ it.areas :areaGroup }}
-            <optgroup label="{{! areaGroup.name || 'Uncategorized' }}">
-                {{~ areaGroup.list :area }}
-                <option value="{{! area.id }}" label="{{! area.name }}">{{! area.name }}</option>
-                {{~ }}
-            </optgroup>
-            {{~}}
-            <option value="" data-interaction="add-area-dialog-open">Add New Area...</option>
-        </select>
-        {{?}}
+    <div class="row">
+        <div class="small-12 column">
+            <form method="post" action="{{! it.actions.save }}" data-nodeid="{{! it.id }}" data-role="node-form">
+                <input type="hidden" name="parent" value="{{! it.parent }}" />
+                {{? !it.id && !it.parent }}
+                <h2 id="nodeTitle">Create New Curriculum</h2>
+                <label for="curriculumLearningLevel">Level</label>
+                <select name="learningLevel" id="curriculumLearningLevel">
+                    <option value="">-- select a level --</option>
+                    {{~ it.levels :levelGroup }}
+                    <optgroup label="{{! levelGroup.name || 'Uncategorized' }}">
+                        {{~ levelGroup.list :level }}
+                        <option value="{{! level.id }}" label="{{! level.name }}">{{! level.name }}</option>
+                        {{~ }}
+                    </optgroup>
+                    {{~}}
+                    <option value="" data-interaction="add-level-dialog-open">Add New Level...</option>
+                </select>
+                <label for="curriculumLearningArea">Learning Area</label>
+                <select name="learningArea" id="curriculumLearningArea">
+                    <option value="">-- select an area --</option>
+                    {{~ it.areas :areaGroup }}
+                    <optgroup label="{{! areaGroup.name || 'Uncategorized' }}">
+                        {{~ areaGroup.list :area }}
+                        <option value="{{! area.id }}" label="{{! area.name }}">{{! area.name }}</option>
+                        {{~ }}
+                    </optgroup>
+                    {{~}}
+                    <option value="" data-interaction="add-area-dialog-open">Add New Area...</option>
+                </select>
+                {{?}}
 
-        {{? it.id }}
-        <h2 id="nodeTitle">Edit Curriculum Subsection</h2>
-        {{?}}
-        {{? !it.id && it.parent }}
-        <h2 id="nodeTitle">Create New Curriculum Subsection</h2>
-        {{?}}
-
-        <label for="curriculumName">Name</label>
-        <input id="curriculumName" type="text" name="name" value="{{! it.name }}" />
-        <label for="curriculumCode">Code</label>
-        <input id="curriculumCode" type="text" name="code" value="{{! it.code }}" />
-        <label for="curriculumReference">Reference</label>
-        <input id="curriculumReference" type="text" name="reference" value="{{! it.reference }}" />
-        <label for="curriculumDescription">Description</label>
-        <textarea id="curriculumDescription" name="description">{{! it.description }}</textarea>
-
-        <ul class="button-group even-2">
-            <li>
                 {{? it.id }}
-                    <button type="submit" class="button">Save Changes</button>
+                <h2 id="nodeTitle">Edit Curriculum Subsection</h2>
                 {{?}}
                 {{? !it.id && it.parent }}
-                    <button type="submit" class="button">Create Subsection</button>
+                <h2 id="nodeTitle">Create New Curriculum Subsection</h2>
                 {{?}}
-                {{? !it.id && !it.parent }}
-                    <button type="submit" class="button">Create Curriculum</button>
-                {{?}}
-            </li>
-            <li>
-                <button type="submit" data-interaction="cancel" class="button secondary">Cancel</button>
-            </li>
-        </ul>
-    </form>
+
+                <label for="curriculumName">Name</label>
+                <input id="curriculumName" type="text" name="name" value="{{! it.name }}" />
+                <label for="curriculumCode">Code</label>
+                <input id="curriculumCode" type="text" name="code" value="{{! it.code }}" />
+                <label for="curriculumReference">Reference</label>
+                <input id="curriculumReference" type="text" name="reference" value="{{! it.reference }}" />
+                <label for="curriculumDescription">Description</label>
+                <textarea id="curriculumDescription" name="description">{{! it.description }}</textarea>
+
+                <ul class="button-group even-2">
+                    <li>
+                        {{? it.id }}
+                            <button type="submit" class="button">Save Changes</button>
+                        {{?}}
+                        {{? !it.id && it.parent }}
+                            <button type="submit" class="button">Create Subsection</button>
+                        {{?}}
+                        {{? !it.id && !it.parent }}
+                            <button type="submit" class="button">Create Curriculum</button>
+                        {{?}}
+                    </li>
+                    <li>
+                        <button type="submit" data-interaction="cancel" class="button secondary">Cancel</button>
+                    </li>
+                </ul>
+            </form>
+        </div>
+    </div>
 </script>
 {% endverbatim %}
 
