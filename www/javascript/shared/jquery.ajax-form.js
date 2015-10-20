@@ -7,8 +7,18 @@
     "use strict";
 
     var getAjaxRequest = function(form, options) {
-        // Build options out of form
-        return $.ajax({})
+        // Build options out of form if they aren't there
+        var ajaxOptions = options;
+        if (!('url' in ajaxOptions)) {
+            ajaxOptions.url = form.attr('action');
+        }
+        if (!('data' in ajaxOptions)) {
+            ajaxOptions.data = form.serializeArray();
+        }
+        if (!('method' in ajaxOptions || 'type' in ajaxOptions)) {
+            ajaxOptions.method = form.attr('method');
+        }
+        return $.ajax(ajaxOptions)
             .then(
                 function(data, status, xhr) {
                     form.trigger('done.ajaxForm', [data, status, xhr]);
