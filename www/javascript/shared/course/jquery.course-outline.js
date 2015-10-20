@@ -91,7 +91,8 @@
                         var unit_element = element.closest('[data-unit]');
                         var form         = unit_element.find('[data-form_type="delete_unit"]');
                         $.post(form.attr('action'), form.serialize(), function(data) {
-                            postCallback(form, data);
+                            // Delete this unit from the list
+                            unit_element.remove();
                         }, 'json');
                     }
                 });
