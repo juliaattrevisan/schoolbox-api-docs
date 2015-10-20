@@ -7,47 +7,63 @@
 
     <div>
         <!-- BEGIN mark_type_percent -->
-        <div class="row marking-input">
-            <div class="small-11 medium-10 columns">
-                <input class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" value="{MARK}" data-mark-input data-combobox />
-            </div>
-            <div class="small-1 medium-2 columns">
-                <label for="mark-{OWNER_ID}" class="inline no-margin">%</label>
-            </div>
-        </div>
+        <ul class="action-list">
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="small-12 columns">
+                        <input class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" value="{MARK}" data-mark-input data-combobox />
+                    </div>
+                </div>
+                <nav>
+                    <label for="mark-{OWNER_ID}" class="inline no-margin">%</label>
+                </nav>
+            </li>
+        </ul>
         <!-- END mark_type_percent -->
 
         <!-- BEGIN mark_type_letter -->
-        <div class="row marking-input">
-            <div class="small-11 medium-10 columns">
-                <select class="no-margin" id="mark" name="mark[{OWNER_ID}]" data-mark-input data-marktype="letter">
-                    <!-- BEGIN grade_drop -->
-                    <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED} data-groupId="{GRADE_GROUP_ID}">{GRADE_TEXT}</option>
-                    <!-- END grade_drop -->
-                </select>
-            </div>
-        </div>
+        <ul class="action-list">
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="small-12 columns">
+                        <select class="no-margin" id="mark" name="mark[{OWNER_ID}]" data-mark-input data-marktype="letter">
+                            <!-- BEGIN grade_drop -->
+                            <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED} data-groupId="{GRADE_GROUP_ID}">{GRADE_TEXT}</option>
+                            <!-- END grade_drop -->
+                        </select>
+                    </div>
+                </div>
+            </li>
+        </ul>
         <!-- END mark_type_letter -->
 
         <!-- BEGIN mark_type_raw -->
-        <div class="row marking-input">
-            <div class="small-11 medium-10 columns">
-                <input class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" maxlength="15" value="{MARK}" data-mark-input data-combobox />
-            </div>
-            <div class="small-1 medium-2 columns">
-                <label for="mark-{OWNER_ID}" class="inline no-margin">
-                    / <span data-validation-limit>{MAX_MARK}</span>
-                </label>
-            </div>
-        </div>
+        <ul class="action-list">
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="small-12 columns">
+                        <input class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" maxlength="15" value="{MARK}" data-mark-input data-combobox />
+                    </div>
+                </div>
+                <nav>
+                    <label for="mark-{OWNER_ID}" class="inline no-margin">
+                        / <span data-validation-limit>{MAX_MARK}</span>
+                    </label>
+                </nav>
+            </li>
+        </ul>
         <!-- END mark_type_raw -->
 
         <!-- BEGIN mark_type_free -->
-        <div class="row marking-input">
-            <div class="small-11 medium-10 columns">
-                <input class="no-margin" name="mark[{OWNER_ID}]" type="text" size="4" maxlength="15" value="{MARK}" data-mark-input data-combobox />
-            </div>
-        </div>
+        <ul class="action-list">
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="small-12 columns">
+                        <input class="no-margin" name="mark[{OWNER_ID}]" type="text" size="4" maxlength="15" value="{MARK}" data-mark-input data-combobox />
+                    </div>
+                </div>
+            </li>
+        </ul>
         <!-- END mark_type_free -->
 
         <!-- BEGIN mark_type_none -->
