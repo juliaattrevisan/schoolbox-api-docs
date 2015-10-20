@@ -460,8 +460,8 @@ class DueWork_Detail
             $columnDimensionsReadonly = 'small-12';
         }
         else {
-            $columnDimensionsWritable = 'small-12 medium-6 xlarge-8';
-            $columnDimensionsReadonly = 'small-12 medium-6 xlarge-8';
+            $columnDimensionsWritable = 'small-12 xlarge-8';
+            $columnDimensionsReadonly = 'small-12 xlarge-8';
         }
 
         $page->setVar(array(
