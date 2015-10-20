@@ -1,5 +1,5 @@
 $notification-unread-background: $alert-color !default;
-$notification-unread-color: $navigation-foreground;
+$notification-unread-color: calc-text-color($notification-unread-background);
 $notification-header-background: $navigation-background !default;
 
 // where data-unread != 0
@@ -14,11 +14,12 @@ $notification-header-background: $navigation-background !default;
      */
     &[data-unread] {
         padding-left: 1.75rem;
+        color: $navigation-foreground;
 
         /* The colour of the bell in its idle state
          */
         &:before {
-            color: $navigation-foreground;
+            color: inherit;
             display: inline-block;
             width: 1.5rem;
         }
@@ -65,12 +66,6 @@ $notification-header-background: $navigation-background !default;
             line-height: 3rem;
             background: $notification-unread-background;
             color: $notification-unread-color;
-        }
-
-        /* This is the list of messages you've received.
-         */
-        .action-list li {
-            margin-left: 0;
         }
     }
 
