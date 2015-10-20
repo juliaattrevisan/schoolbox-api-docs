@@ -75,6 +75,10 @@ class Alaress_Twitter_Search
 
             if (is_array($all_tweets)) {
                 foreach ($all_tweets as $result) {
+                    if ($result->possibly_sensitive) {
+                        // This might be not safe for work or children
+                        continue;
+                    }
                     if (!in_array($result->text, $tweetText)) {
                         $processed[] = array(
                             'text'     => $this->getFilter()->filterText($result->text),
