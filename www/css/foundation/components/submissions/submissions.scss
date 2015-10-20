@@ -207,3 +207,20 @@ table.rubric {
 [class^="icon-"].off {
     opacity: 0.3;
 }
+
+/* Marksheet Styles
+ */
+
+/* This pads out the mark type input field (typically this
+ * gets converted into a combobox) in the Marksheet and the
+ * Inline Grader views.
+ */
+.marking-type {
+    padding-top: 0.5rem;
+    padding-left: 0.5rem;
+}
+
+.marking-comment {
+    padding-top: 0.5rem;
+    padding-left: 0.5rem;
+}
