@@ -99,7 +99,7 @@
                         <nav>
                             <!-- BEGIN unit_actions -->
                             <!-- BEGIN unit_delete -->
-                            <a href="#" class="icon-delete" data-interaction="open_delete_unit_form" title="Delete this unit"></a>
+                            <a href="#" data-interaction="open_delete_unit_form" data-reveal-id="unit_delete_form" class="icon-delete" title="Delete this unit"></a>
                             <!-- END unit_delete -->
                             <!-- BEGIN unit_modify -->
                             <a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="icon-modify" title="Modify this unit"></a>
@@ -107,26 +107,25 @@
                             <!-- END unit_actions -->
                         </nav>
 
-                        <div class="content">
-                            <div class="twelve-column hide alert-box" data-form-container data-interaction="delete_unit_container">
-                                <p><span class="label alert full-width">Are you sure you wish to delete this unit?</span></p>
-                                <p>All tasks, linked due work and quizzes within the unit will be deleted.</p>
+                        <div id="unit_delete_form" class="reveal-modal" data-reveal aria-hidden="true" data-form-container data-interaction="delete_unit_container" role="dialog">
+                            <p><span class="label alert full-width">Are you sure you wish to delete this unit?</span></p>
+                            <p>All tasks, linked due work and quizzes within the unit will be deleted.</p>
 
-                                <form action="/course/modifyForm.php" method="post" data-form_type="delete_unit">
-                                    <input type="hidden" name="action"    value="delete" />
-                                    <input type="hidden" name="id"        value="{UNIT_ID}" />
-                                    <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                            <form action="/course/modifyForm.php" method="post" data-form_type="delete_unit">
+                                <input type="hidden" name="action"    value="delete" />
+                                <input type="hidden" name="id"        value="{UNIT_ID}" />
+                                <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
 
-                                    <div class="row">
-                                        <div class="small-6 columns no-pad">
-                                            <input type="submit" class="button expand" data-interaction="delete_confirm" value="Yes">
-                                        </div>
-                                        <div class="small-6 columns no-pad">
-                                            <a href="#" class="button expand" data-interaction="delete_reject">No</a>
-                                        </div>
+                                <div class="row">
+                                    <div class="small-6 columns no-pad">
+                                        <input type="submit" class="button expand" data-interaction="delete_confirm" value="Yes">
                                     </div>
-                                </form>
-                            </div>
+                                    <div class="small-6 columns no-pad">
+                                        <a href="#" class="button expand" data-interaction="delete_reject">No</a>
+                                    </div>
+                                </div>
+                            </form>
+                            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                         </div>
 
                         <ul class="action-list sortable ui-sortable task-list {UNIT_LIST_CLASS}" data-task-list>
@@ -158,7 +157,7 @@
                                         <!-- END unit_task_count -->
 
                                         <!-- BEGIN unit_task_due_date -->
-                                        <p class="meta">
+                                        <p class="meta spaced">
                                             <span class="unit-task-due-date">Due {UNIT_TASK_RELATIVE_DUE_DATE} on {UNIT_TASK_DUE_DATE}</span>
                                         </p>
                                         <!-- END unit_task_due_date -->
@@ -171,7 +170,7 @@
 
                                     <!-- BEGIN unit_task_actions -->
                                     <!-- BEGIN unit_task_delete -->
-                                    <a href="#" class="icon-delete" data-interaction="open_delete_task_form" title="Delete this task"></a>
+                                    <a href="#" class="icon-delete" data-interaction="open_delete_task_form" data-reveal-id="task_delete_form" title="Delete this task"></a>
                                     <!-- END unit_task_delete -->
                                     <!-- BEGIN unit_task_modify -->
                                     <a href="{UNIT_TASK_MODIFY_URL}" class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task"></a>
@@ -249,28 +248,27 @@
                                 <!-- END unit_task_modify_form -->
 
                                 <!-- BEGIN unit_task_delete_form -->
-                                <div class="content">
-                                    <div class="row">
-                                        <div class="small-12 columns alert-box hide" data-form-container data-interaction="delete_task_container">
-                                            <p><span class="label alert full-width">Are you sure you wish to delete this task?</span></p>
-                                            <p>Any linked due work items and quizzes will be deleted, as will all student's completion of this task.</p>
+                                <div id="task_delete_form" class="reveal-modal" data-reveal aria-hidden="true" data-form-container data-interaction="delete_task_container" role="dialog">
+                                    <p><span class="label alert full-width">Are you sure you wish to delete this task?</span></p>
+                                    <p>Any linked due work items and quizzes will be deleted, as will all student's completion of this task.</p>
 
-                                            <form action="/task/saveInstanceForm.php" method="post" data-form_type="delete_task">
-                                                <input type="hidden" name="action"    value="delete" />
-                                                <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
-                                                <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
-                                                <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
+                                    <form action="/task/saveInstanceForm.php" method="post" data-form_type="delete_task">
+                                        <input type="hidden" name="action"    value="delete" />
+                                        <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
+                                        <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                                        <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
 
-                                                <div class="row">
-                                                    <div class="small-6 columns no-pad">
-                                                        <input type="submit" data-interaction="delete_confirm" value="Yes" />
-                                                    </div>
-                                                    <div class="small-6 columns no-pad">
-                                                        <a href="#" class="button expand" data-interaction="delete_reject">No</a>
-                                                    </div>
-                                                </div>
-                                            </form>
+                                        <div class="row">
+                                            <div class="small-6 columns no-pad">
+                                                <input type="submit" class="expand" data-interaction="delete_confirm" value="Yes" />
+                                            </div>
+                                            <div class="small-6 columns no-pad">
+                                                <a href="#" class="button expand close-reveal-modal" data-interaction="delete_reject">No</a>
+                                            </div>
                                         </div>
+                                    </form>
+                                    <div class="row">
+                                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                                     </div>
                                 </div>
                                 <!-- END unit_task_delete_form -->
