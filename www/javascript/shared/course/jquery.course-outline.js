@@ -138,48 +138,17 @@
             'a[data-interaction="open_delete_task_form"]',
             function(event) {
                 event.preventDefault();
-                var element      = $(this);
-                var unit_element = element.closest('[data-unit-task]');
-                var container    = unit_element.find('[data-interaction="delete_task_container"]');
-
-                container.toggleClass('hide');
-                component.find('[data-form-container]').not(container).addClass('hide');
-
-                ///* Hide all other forms first
-                // */
-                //var allForms = component.find('[data-form-container]');
-                //allForms.removeClass('hide').not(container).slideUp('fast');
-                //
-                //if (container.hasClass('hide')) {
-                //    container.stop().removeClass('hide').slideUp(1).slideDown('fast');
-                //}
-                //else {
-                //    container.stop().slideToggle('fast');
-                //}
-            }
-        );
-        // Yes
-        component.on(
-            'submit.courseInstance',
-            'form[data-form_type="delete_task"]',
-            function(event) {
-                event.preventDefault();
-                // Submit form via Ajax
-                var form = $(this);
-                $.post(form.attr('action'), form.serialize(), function(data) {
-                    postCallback(form, data);
-                }, 'json');
-            }
-        );
-        // No
-        component.on(
-            'click.courseInstance',
-            'form[data-form_type="delete_task"] [data-interaction="delete_reject"]',
-            function(event) {
-                event.preventDefault();
-                var container = $(this).closest('[data-interaction="delete_task_container"]');
-                //container.slideToggle('fast');
-                container.toggleClass('hide');
+                var element = $(this);
+                element.confirmDialog({
+                    text: 'Are you sure you wish to delete this task? Any linked due work items and quizzes will be deleted, as will all student\'s completion of this task.',
+                    confirmEvent: function(element) {
+                        var unit_element = element.closest('[data-unit-task]');
+                        var form         = unit_element.find('[data-form_type="delete_task"]');
+                        $.post(form.attr('action'), form.serialize(), function(data) {
+                            postCallback(form, data);
+                        }, 'json');
+                    }
+                });
             }
         );
 
