@@ -1109,8 +1109,6 @@ ul.flex-list {
 
 // Block Grid
 .grid {
-    margin: 0 !important; // It really *is* too specific :'(
-
 	//TODO: find block grid mixin
 	//@media #{$large-up} { @include block-grid(4); }
 	//@media #{$medium-up} { @include block-grid(2); }
