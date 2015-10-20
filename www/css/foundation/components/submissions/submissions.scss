@@ -213,14 +213,9 @@ table.rubric {
 
 /* This pads out the mark type input field (typically this
  * gets converted into a combobox) in the Marksheet and the
- * Inline Grader views.
+ * Inline Grader views. It also pads out the comment textarea
  */
-.marking-type {
-    padding-top: 0.5rem;
-    padding-left: 0.5rem;
-}
-
-.marking-comment {
+.marking-input {
     padding-top: 0.5rem;
     padding-left: 0.5rem;
 }
