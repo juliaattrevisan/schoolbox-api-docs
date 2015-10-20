@@ -436,16 +436,16 @@ class DueWork_Detail
         /* Column dimensions
          */
         if ($location == self::INLINE_GRADER) {
-            $columnDimensions = 'small-12';
+            $columnDimensionsComment = 'small-12';
             $labelClass = '';
         }
         else {
-            $columnDimensions = 'small-12 medium-6 xlarge-8';
+            $columnDimensionsComment = 'small-12 medium-6 xlarge-8';
             $labelClass = 'list-item-content';
         }
 
         $page->setVar(array(
-            'COLUMN_DIMENSIONS' => $columnDimensions,
+            'COLUMN_DIMENSIONS_COMMENT' => $columnDimensionsComment,
             'LABEL_CLASS' => $labelClass,
         ));
 
