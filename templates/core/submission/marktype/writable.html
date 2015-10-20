@@ -11,7 +11,6 @@
                 <!-- BEGIN mark_type_percent -->
                 <div class="list-item">
                     <div class="small-12 columns">
-                        {TABINDEX}
                         <input tabindex='{TABINDEX}' placeholder='%' class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" value="{MARK}" data-mark-input data-combobox />
                     </div>
                 </div>
@@ -20,7 +19,6 @@
                 <!-- BEGIN mark_type_letter -->
                 <div class="list-item">
                     <div class="small-12 columns">
-                        {TABINDEX}
                         <select tabindex='{TABINDEX}'  class="no-margin" id="mark" name="mark[{OWNER_ID}]" data-mark-input data-marktype="letter">
                             <!-- BEGIN grade_drop -->
                             <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED} data-groupId="{GRADE_GROUP_ID}">{GRADE_TEXT}</option>
@@ -33,7 +31,6 @@
                 <!-- BEGIN mark_type_raw -->
                 <div class="list-item">
                     <div class="small-12 columns">
-                        {TABINDEX}
                         <input tabindex='{TABINDEX}' placeholder='/ {MAX_MARK}' data-validation-limit="{MAX_MARK}" class="no-margin" id="mark-{OWNER_ID}" name="mark[{OWNER_ID}]" type="text" maxlength="15" value="{MARK}" data-mark-input data-combobox />
                     </div>
                 </div>
@@ -42,7 +39,6 @@
                 <!-- BEGIN mark_type_free -->
                 <div class="list-item">
                     <div class="small-12 columns">
-                        {TABINDEX}
                         <input tabindex='{TABINDEX}' class="no-margin" name="mark[{OWNER_ID}]" type="text" size="4" maxlength="15" value="{MARK}" data-mark-input data-combobox />
                     </div>
                 </div>
@@ -61,7 +57,6 @@
                 <!-- BEGIN mark_type_rubric -->
                 <div class="list-item">
                     <div class="small-12 columns">
-                        {TABINDEX}
                         <select tabindex='{TABINDEX}' class="no-margin" id="rubricmark" name="mark[{OWNER_ID}]" data-mark-input>
                             <!-- BEGIN rubric_marked -->
                             <option value="{MARK} / {MAX_MARK}">{MARK}&nbsp;/&nbsp;{MAX_MARK}</option>
@@ -85,7 +80,6 @@
             <li class="actions-small-1">
                 <div class="list-item">
                     <div class="small-12 columns">
-                        {COMMENT_TABINDEX}
                         <textarea tabindex='{COMMENT_TABINDEX}' name="comment" rows="4" data-comment>{COMMENT}</textarea>
                     </div>
                 </div>
