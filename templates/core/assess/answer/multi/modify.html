@@ -5,7 +5,7 @@
         <ul id="answerCollection" class="information-list no-pad">
             <!-- BEGIN answerOption -->
             <li class="row" data-input>
-                <div class="small-1 columns" data-answer-code>
+                <div class="small-3 medium-2 columns" data-answer-code>
                     <input name="answerCode[]" type="hidden" value="{ANSWER_VALUE}" data-answer-code-value />
 
                     <input name="answer[]" type="checkbox" value="" {ANSWER_CHECKED} data-answer-option />
@@ -13,13 +13,13 @@
                         <span class="content" data-answer-code-representation>{ANSWER_VALUE})</span>
                     </label>
                 </div>
-                <div class="small-10 columns">
+                <div class="small-8 medium-9 columns">
                     <label class="answer-value">
                         <input name="answerDescription[]" type="text" value="{ANSWER_DESCRIPTION}" data-answer-description />
                     </label>
                 </div>
                 <div class="small-1 columns">
-                    <a class="button icon-delete no-text" data-delete></a>
+                    <a class="icon-delete" data-delete></a>
                 </div>
             </li>
             <!-- END answerOption -->
