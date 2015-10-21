@@ -1254,12 +1254,9 @@ ul.flex-list {
         }
 
 		.label {
-			padding: nth($label-padding, 1) 1rem;
-		}
-
-		.label {
 			margin: 0 -0.5rem 0 -1rem;
-			text-align: left;
+            padding: nth($label-padding, 1) 1rem;
+            text-align: left;
 			position: absolute;
 			bottom: 0;
 			width: calc(100% - 4rem);
