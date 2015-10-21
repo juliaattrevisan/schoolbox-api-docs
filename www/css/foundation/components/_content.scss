@@ -1253,18 +1253,37 @@ ul.flex-list {
             }
         }
 
+        /* .avatar.card .label is used in viewSubmission.html and
+         * navigation-option.html for displaying a status under a
+         * user's name
+         *
+         * But this behaviour is too specific to a user status -
+         * labels should behave generically first, so to indicate
+         * a user status, use .avatar.card .label.status
+         */
 		.label {
-			margin: 0 -0.5rem 0 -1rem;
+            margin: 0.5rem -0.5rem 0 -1rem;
             padding: nth($label-padding, 1) 1rem;
-            text-align: left;
-			position: absolute;
-			bottom: 0;
-			width: calc(100% - 4rem);
-			left: 5rem;
-			@media #{$small-only} {
-				width: calc(100% - 3rem);
-				left: 4rem;
-			}
+
+            /* Can do this, due to .list-item > .card
+             */
+            left: 5rem;
+
+            /* Status Label special definition - this is now uses
+             * a label to indicate a user's current status in some
+             * way, as per original .avatar.card .label intent
+             */
+            &.status {
+                margin: 0 -0.5rem 0 -1rem;
+                text-align: left;
+                position: absolute;
+                bottom: 0;
+                width: calc(100% - 4rem);
+                @media #{$small-only} {
+                    width: calc(100% - 3rem);
+                    left: 4rem;
+                }
+            }
 		}
 
 		p, h3 {
