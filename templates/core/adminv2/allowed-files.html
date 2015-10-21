@@ -8,6 +8,7 @@
             var container = $(this).closest('[data-interaction-container]');
             var display   = container.find('[data-interaction-display]');
             var form      = container.find('[data-interaction-inline-form]');
+
             display.slideUp();
             form.slideDown();
         });
@@ -244,7 +245,7 @@
                             </div>
                         </div>
                     </div>
-                    <nav>
+                    <nav data-interaction-display>
                         <a href="/adminv2/allowed-file/{FILE_ID}/{FILE_ENABLED_ACTION}" class="icon-{FILE_ENABLED_ICON}" title="{FILE_ENABLED_TITLE}" data-interaction-{FILE_ENABLED_ACTION}></a>
                         <a href="/adminv2/allowed-file/{FILE_ID}/modify" class="icon-modify" title="Modify" data-interaction-modify></a>
                         <a href="/adminv2/allowed-file/{FILE_ID}/delete" class="icon-delete" title="Delete" data-interaction-delete></a>
