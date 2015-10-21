@@ -155,20 +155,6 @@
             }
         );
 
-        // Set up the same resource browser as is used in the social stream.
-        var socialstream_browser = component.find('.resource_browser');
-        if (socialstream_browser.length && $.fn.socialstreamBrowser) {
-            component.on('click.courseTaskList','form a[data-function="browse"]' , {}, function(event) {
-                var form = $(this).closest('form');
-                event.preventDefault();
-                socialstream_browser.socialstreamBrowser({
-                    submitCallback: function(url) {
-                        form.find('input[name="link"]').val(url);
-                    }
-                });
-            });
-        }
-
         /**
          * Callback that gets called when the list of tasks changes - it reloads
          * the contents of the component.
