@@ -441,6 +441,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 'UNIT_TASK_MODIFY_URL'            => $task->getType() == Task::TYPE_TASK
                     ? '#'
                     : '/task/instance/modify/' . $task->getId(),
+                'UNIT_TASK_REVEAL_ATTR'           => '',
                 'unit_task_count_block'           => '',
                 'unit_task_completion_block'      => '',
                 'unit_task_due_date_block'        => '',
@@ -480,6 +481,12 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 }
             }
         } else {
+            if ($task->getType() == Task::TYPE_TASK) {
+                $this->setVar(
+                    'UNIT_TASK_REVEAL_ATTR',
+                    'data-reveal-id="modifyTask-' . Scrub::text($task->getId()) . '"'
+                );
+            }
             $this->parse('unit_task_count_block', 'unit_task_count');
             $this->parse('unit_task_delete_block', 'unit_task_delete');
             $this->parse('unit_task_delete_form_block', 'unit_task_delete_form');
