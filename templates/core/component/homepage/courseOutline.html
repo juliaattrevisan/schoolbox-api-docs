@@ -173,7 +173,8 @@
                                 </nav>
 
                                 <!-- BEGIN unit_task_modify_form -->
-                                <div id="modifyTask-{UNIT_TASK_ID}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+                                <div id="modifyTask-{UNIT_TASK_ID}" class="reveal-modal" data-reveal aria-hidden="true" aria-labelledby="modifyTask-{UNIT_TASK_ID}-label" role="dialog">
+                                    <h2 id="modifyTask-{UNIT_TASK_ID}-label">Update Task</h2>
                                     <form action="/task/saveInstanceForm.php" method="post" data-form_type="task" data-component="component{COMPONENT_INSTANCE_ID}">
                                         <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
                                         <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
@@ -181,14 +182,9 @@
                                         <input type="hidden" name="type"      value="string" />
                                         <input type="hidden" name="link"      value="{UNIT_TASK_LINK}" id="link-{UNIT_TASK_ID}" />
 
-                                        <div class="row">
-                                            <div class="small-12 columns">
-                                                <label for="title-{UNIT_TASK_ID}">
-                                                    Update Task
-                                                    <input id="title-{UNIT_TASK_ID}" name="title" type="text" value="{UNIT_TASK_NAME}" />
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <label for="title-{UNIT_TASK_ID}">Title</label>
+                                        <input id="title-{UNIT_TASK_ID}" name="title" type="text" value="{UNIT_TASK_NAME}" />
+
                                         <div class="row post-attachment attach" style="{UNIT_TASK_ATTACH_DISPLAY}">
                                             <div class="small-12 medium-9 columns post-attachment attach">
                                                 {ATTACH_ZONE}
@@ -207,23 +203,18 @@
                                                 <a class='button icon-attach sstream-attachment' data-value='attach'>Attach</a>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="small-12 columns">
-                                                <label for="self_assess-{UNIT_TASK_ID}">
-                                                    Allow self-assessment?
-                                                </label>
-                                                <div class="switch">
-                                                    <input name="self_assess" value="0" type="hidden" />
-                                                    <input name="self_assess" value="1" type="checkbox" id="self_assess-{UNIT_TASK_ID}" {UNIT_TASK_SELF_ASSESS} />
-                                                    <label for="self_assess-{UNIT_TASK_ID}"></label>
-                                                </div>
-                                            </div>
+
+                                        <label for="self_assess-{UNIT_TASK_ID}">
+                                            Allow self-assessment?
+                                        </label>
+
+                                        <div class="switch">
+                                            <input name="self_assess" value="0" type="hidden" />
+                                            <input name="self_assess" value="1" type="checkbox" id="self_assess-{UNIT_TASK_ID}" {UNIT_TASK_SELF_ASSESS} />
+                                            <label for="self_assess-{UNIT_TASK_ID}"></label>
                                         </div>
-                                        <div class="row">
-                                            <div class="small-12 columns">
-                                                <input type="submit" name="Submit" value="Update" />
-                                            </div>
-                                        </div>
+
+                                        <input type="submit" name="Submit" value="Update" />
                                     </form>
                                 </div>
                                 <!-- END unit_task_modify_form -->
