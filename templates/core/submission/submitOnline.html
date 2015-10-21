@@ -155,29 +155,22 @@
 </div>
 
 <div class="row">
-    <div class="small-12 columns">
-        <form id="editor-form" class="top" method="post" action="/submission/submitWorkForm.php" enctype="multipart/form-data">
+    <div class="small-12 island">
+        <form id="editor-form" method="post" action="/submission/submitWorkForm.php" enctype="multipart/form-data">
             <input type="hidden" name="box_id" value="{BOX_ID}" />
             <input type="hidden" name="submission_id" value="{SUBMISSION_ID}" />
-
-            <section>
-                <fieldset class="content">
+            <section class="content">
+                <div class="row">
                     <div class="small-12 large-8 columns">
-                        <h2 class="subheader">Submit Online</h2>
-                        <section class="content">
-                            <textarea id="editor-body" name="body" rows="20">{TEXTBOX_BODY}</textarea>
-                        </section>
+                        <h2>Submit Online</h2>
+                        <textarea id="editor-body" name="body" rows="20">{TEXTBOX_BODY}</textarea>
                     </div>
-
-                    <div class="small-12 large-4 island">
-                        <h2 class="subheader">Attachments</h2>
-                        <section class="content">
-                            {ATTACH_ZONE}
-                        </section>
+                    <div class="small-12 large-4 columns">
+                        <h2>Attachments</h2>
+                        {ATTACH_ZONE}
                     </div>
-                </fieldset>
+                </div>
             </section>
-
             <input type="submit" value="Submit for Assessment" data-action-save />
             <span class="label full-width hide" data-save-draft></span>
         </form>
