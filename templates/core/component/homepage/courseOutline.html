@@ -259,7 +259,7 @@
                         <div id="createTask-{UNIT_ID}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
                             <div class="row">
                                 <div class="small-12 columns alert-box" data-form-container data-for-task data-new-task-container>
-                                    <form action="/task/saveInstanceForm.php" method="post" data-form_type="task">
+                                    <form action="/task/saveInstanceForm.php" method="post" data-form_type="task" data-component="component{COMPONENT_INSTANCE_ID}">
                                         <input type="hidden" name="id" value=""/>
                                         <input type="hidden" name="unit_id" value="{UNIT_ID}"/>
 

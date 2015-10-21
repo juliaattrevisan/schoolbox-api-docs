@@ -120,9 +120,11 @@
         );
 
         // Create/edit task form submission
-        component.on(
+        // Bind to the document and filter on component ID manually,
+        // because the form is no longer a child of the component
+        $(document).on(
             'submit.courseInstance',
-            'form[data-form_type="task"]',
+            'form[data-form_type="task"][data-component="'+component_id+'"]',
             function(event) {
                 var form = $(this);
                 event.preventDefault();
@@ -135,7 +137,7 @@
                 var is_new = !(form.find('input[name="id"]').val());
 
                 $(this).find("input[type=submit]").attr('disabled', true);
-                
+
                 $.post(form.attr('action'), form.serialize(), function(data) {
                     label.labelTimeout({
                         text: 'Saved',
@@ -147,6 +149,7 @@
                         form.get(0).reset();
                     }
 
+                    $(document).foundation('reveal', 'close');
                     postCallback(form, data);
                 }, 'json');
             }
@@ -175,8 +178,8 @@
          *             the contents of this component.
          */
         var postCallback = function(form, data) {
-            var container = form.closest('[data-form-container]');
-            container.addClass('hide');
+            //var container = form.closest('[data-form-container]');
+            //container.addClass('hide');
             reloadTaskList(data);
         };
 
