@@ -204,28 +204,36 @@
                 <li class="actions-small-3" data-interaction-container>
                     <div class="list-item" data-interaction-display>
                         <div class="small-12 avatar card">
+                            <div class="icon-quiz icon-32"></div>
                             <h3>{FILE_DESC}</h3>
 
                             <div class="row">
-                                <div class="small-12 medium-4 columns">
-                                    <p class="meta">{FILE_MIME}</p>
+                                <div class="small-12 medium-4 columns no-pad">
+                                    <span class="meta">{FILE_MIME}</span>
                                 </div>
-                                <div class="small-12 medium-4 columns">
-                                    <p class="meta">{FILE_MAXSIZE}</p>
+                                <div class="small-12 medium-2 columns no-pad">
+                                    <span class="meta">{FILE_MAXSIZE}</span>
                                 </div>
-                                <div class="small-12 medium-4 columns">
-                                    <p class="meta">{FILE_INLINE}</p>
+                                <div class="small-12 medium-3 columns no-pad">
+                                    <span class="meta">{FILE_INLINE}</span>
+                                </div>
+                                <!-- BEGIN enabled -->
+                                <div class="small-12 columns no-pad">
+                                    <span class="label status alert">Disabled</span>
+                                </div>
+                                <!-- END enabled -->
+                            </div>
+
+                            <div class="row">
+                                <div class="small-12 columns">
+                                    <div class="label-group">
+                                        <!-- BEGIN file_extension -->
+                                        <span class="label neutral">{FILE_EXTENSION}</span>
+                                        <!-- END file_extension -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- BEGIN enabled -->
-                        <span class="label alert">Disabled</span>
-                        <!-- END enabled -->
-
-                        <!-- BEGIN file_extension -->
-                        <span class="label neutral">{FILE_EXTENSION}</span>
-                        <!-- END file_extension -->
                     </div>
                     <nav>
                         <a href="/adminv2/allowed-file/{FILE_ID}/{FILE_ENABLED_ACTION}" class="icon-{FILE_ENABLED_ICON}" title="{FILE_ENABLED_TITLE}" data-interaction-{FILE_ENABLED_ACTION}></a>
