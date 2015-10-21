@@ -476,447 +476,7 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="small-12 island">
-        <h1>Sortable</h1>
-        <h2 class="subheader">You Can Rearrange This List</h2>
-        <ul class="meta">
-            <li class="icon-approve icon-16">Any kind of list will work, not just information lists with avatar cards</li>
-        </ul>
-        <section>
-            <ul class="information-list sortable" data-sortable>
-                <li class="row">
-                    <div class="grip"></div>
-                    <div class="small-11 column no-pad">
-                        <div class="avatar card">
-                            <a href="/search/user/230">
-                                <img src="/portrait.php?userId=135&amp;size=square64" />
-                                <h3>David Rhodes</h3>
-                                <p class="meta">Senior Students</p>
-                            </a>
-                        </div>
-                    </div>
-                </li>
-                <li class="row">
-                    <div class="grip"></div>
-                    <div class="small-11 column no-pad">
-                        <div class="avatar card">
-                            <a href="/search/user/206">
-                                <img src="/portrait.php?userId=134&amp;size=square64" />
-                                <h3>Maddison Rhodes</h3>
-                                <p class="meta">Senior Students</p>
-                            </a>
-                        </div>
-                    </div>
-                </li>
-                <li class="row">
-                    <div class="grip"></div>
-                    <div class="small-11 column no-pad">
-                        <div class="avatar card">
-                            <a href="/search/user/151">
-                                <img src="/portrait.php?userId=165&amp;size=square64" />
-                                <h3>Zane Smith</h3>
-                                <p class="meta">Teachers</p>
-                            </a>
-                        </div>
-                    </div>
-                </li>
-                <li class="row">
-                    <div class="grip"></div>
-                    <div class="small-11 column no-pad">
-                        <div class="avatar card">
-                            <a href="/search/user/229">
-                                <img src="/portrait.php?userId=133&amp;size=square64" />
-                                <h3>Rachel Rhodes</h3>
-                                <p class="meta">Senior Students</p>
-                            </a>
-                        </div>
-                    </div>
-                </li>
-                <li class="row">
-                    <div class="grip"></div>
-                    <div class="small-11 column no-pad">
-                        <div class="avatar card">
-                            <a href="/search/user/245">
-                                <img src="/portrait.php?userId=493&amp;size=square64" />
-                                <h3>Caleb Rhodes</h3>
-                                <p class="meta">Junior Students</p>
-                            </a>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </section>
-
-        <div class="alert-box">
-            <code>
-                $('#my-sortable-ul').sortable({ handle: '.grip', axis: 'y' });
-            </code>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Matching Pairs</h2>
-        <section id="equalize-me">
-            <div class="content">
-                <h3>Question <span class="meta">(3 marks)</span></h3>
-                <p>Align the foods to the animals that eat them.</p>
-            </div>
-            <div class="row matching-pairs" data-equalizer>
-                <div class="column small-6">
-                    <ul class="information-list">
-                        <li class="row">
-                            <div class="small-12 column" data-equalizer-watch>
-                                <p>Animalia Chordata Mammalia Carnivora Felidae Felinae Felis Silvestris Catus</p>
-                            </div>
-                        </li>
-                        <li class="row">
-                            <div class="small-12 column" data-equalizer-watch>
-                                <p>Animalia Chordata Mammalia Carnivora Canidae Canis Lupus Familiaris</p>
-                            </div>
-                        </li>
-                        <li class="row">
-                            <div class="small-12 column" data-equalizer-watch>
-                                <p>Animalia Chordata Vertebrata Mammalia Lagomorpha Leporidae Brachylagus Idahoensis</p>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                <div class="column small-6">
-                    <ul class="information-list sortable" data-sortable>
-                        <li class="row">
-                            <div class="grip"></div>
-                            <div class="small-11 column no-pad" data-equalizer-watch>
-                                <p>Cortical Mineralized Osseous Tissue</p>
-                            </div>
-                        </li>
-                        <li class="row">
-                            <div class="grip"></div>
-                            <div class="small-11 column no-pad" data-equalizer-watch>
-                                <p>Plantae Angiosperms Eudicots Asterids Apiales Apiaceae Daucus Carota</p>
-                            </div>
-                        </li>
-                        <li class="row">
-                            <div class="grip"></div>
-                            <div class="small-11 column no-pad" data-equalizer-watch>
-                                <p>Animalia Chordata Mammalia Rodentia Muroidea Muridae Murinae Mus Lepidoides</p>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-        <ul class="meta">
-            <li class="icon-alert">Important! You need a special equalizer initialization:</li>
-        </ul>
-        <section>
-            <pre class="alert-box">
-$(function () {
-    $('#equalize-me').foundation({
-        equalizer: {
-            equalize_on_stack: true
-        }
-    });
-});
-            </pre>
-        </section>
-    </div>
-</div>
-
-<script type="text/javascript">
-    $(function () {
-        $('#equalize-me').foundation({
-            equalizer: {
-                equalize_on_stack: true
-            }
-        });
-    });
-</script>
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Islands</h1>
-    </div>
-</div>
-<div class="row">
-    <div class="small-12 medium-4 island">
-        <section>
-            <div class="content">
-                <h3><a href="#">Frank Costanza</a></h3>
-                <p>Intelligentsia vegan fap bespoke tote bag. Pop-up Echo Park Austin, sustainable wayfarers put a bird on it chia PBR&B tilde cardigan seitan cliche stumptown. Meh 8-bit Carles next level Shoreditch. Normcore ennui mixtape mlkshk.</p>
-            </div>
-        </section>
-    </div>
-    <div class="small-12 medium-4 island">
-        <section>
-            <div class="content">
-                <h3><a href="#">The Man in the cape</a></h3>
-                <p>Intelligentsia vegan fap bespoke tote bag. Pop-up Echo Park Austin, sustainable wayfarers put a bird on it chia PBR&B tilde cardigan seitan cliche stumptown. Meh 8-bit Carles next level Shoreditch. Normcore ennui mixtape mlkshk.</p>
-            </div>
-        </section>
-    </div>
-    <div class="small-12 medium-4 island">
-        <section>
-            <div class="content">
-                <h3><a href="#">Bob Sacamano</a></h3>
-                <p>Intelligentsia vegan fap bespoke tote bag. Pop-up Echo Park Austin, sustainable wayfarers put a bird on it chia.</p>
-                <p>Intelligentsia vegan fap bespoke tote bag. Pop-up Echo Park Austin, sustainable wayfarers put a bird on it chia.</p>
-            </div>
-        </section>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Social Stream - action-list</h1>
-        <ul class="component-titlebar" style='background-color:#ddd'>
-            <li class="actions-small-3">
-                <div class="list-item">
-                    <div class="small-12 card">
-                        <h2><a href="">Example Component Titlebar</a></h2>
-                    </div>
-                </div>
-                <nav>
-                    <a data-target='settings' data-state='closed' href="#" class="icon-settings settings edit" title="Settings"></a>
-                    <a data-collapser="true" href="#" class="icon-collapse collapse" title="Collapse Content"></a>
-                    <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
-                </nav>
-            </li>
-        </ul>
-        <div class="delete-it">
-            <p>Are you sure you want to remove this component? <a href="#" class="success button">Yes</a> <a href="#" class="button">No</a></p>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="small-12 island">
-        <section>
-            <div class="component-form editPanel">
-                <p>This is the settings area for components. Use the existing .editPanel class.</p>
-                <!-- BEGIN socialstream_has_newpost -->
-                <form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}-1' class='addPostForm {FORM_CLASS}' enctype='multipart/form-data'>
-                    <input type='hidden' name='type' value='string' />
-                    <input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
-                    <input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
-                    <input type='hidden' name='parentId' value='0' />
-                    <input type='hidden' name='rootId' value='0' />
-
-                    <textarea rows="3" cols="50" name="body" placeholder="Share something"></textarea>
-
-                    <div class="dz-wrap">
-                        <div class="row post-attachment attach">
-                            <div class="small-12 medium-9 columns">
-                                <div class="dropzone" id="socialZone" action="/cms/myFileForm.php?ajax=1"></div>
-                            </div>
-                            <p class="small-12 medium-1 columns"><strong>or</strong></p>
-                            <p class="small-12 medium-2 columns">
-                                <a class='button icon-link stream-attachment' data-value='url'>Link</a>
-                            </p>
-                        </div>
-                    </div>
-                    <input class='submit-btn-plain' type='submit' value='Post' />
-                </form>
-                <!-- END socialstream_has_newpost -->
-            </div>
-            <ul class="action-list social-stream">
-                <li class="row">
-                    <div class="ten-column">
-                        <div class="avatar-card">
-                            <a href="#" title="View Profile">
-                                <img src="https://placekitten.com/g/64/64" alt="Moggy" class="hide-for-small-only">
-                                <p>Karl Pilkington</p>
-                                <p class="meta">Posted 39 minutes ago</p>
-                            </a>
-                            <div class="body">
-                                <p>no no ono onon no no no n on on o no
-                                no no ono onon no no no n on on o no
-                                no no ono onon no no no n on on o no</p>
-                                <p>no no ono onon no no no n on on o no
-                                no no ono onon no no no n on on o no
-                                no no ono onon no no no n on on o no</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="actions two">
-                        <a href="#" class="no-text icon-comment" title="Comment"></a>
-                        <a href="#" class="no-text icon-delete" title="Delete"></a>
-                    </div>
-                </li>
-                <li class="row">
-                    <div class="ten-column">
-                        <div class="avatar-card">
-                            <a href="#" title="View Profile">
-                                <img src="https://placekitten.com/g/64/64" alt="Moggy" class="hide-for-small-only">
-                                <p>Karl Pilkington</p>
-                                <p class="meta">Posted 39 minutes ago</p>
-                            </a>
-                        </div>
-                        <div class="body">
-                            <img src="https://placeimg.com/300/200/people" alt="Moggy">
-                        </div>
-                    </div>
-                    <div class="actions two">
-                        <a href="#" class="no-text icon-comment" title="Comment"></a>
-                        <a href="#" class="no-text icon-delete" title="Delete"></a>
-                    </div>
-                    <ul class="action-list reply">
-                        <li class="row">
-                            <div class="ten-column">
-                                <div class="avatar-card">
-                                    <a href="#" title="View Profile">
-                                        <img src="https://placekitten.com/g/64/64" alt="Moggy" class="hide-for-small-only">
-                                        <p>Karl Pilkington</p>
-                                        <p class="meta">Posted 39 minutes ago</p>
-                                    </a>
-                                </div>
-                                <div class="body">
-                                    <p>no no ono onon no no no n on on o no</p>
-                                </div>
-                            </div>
-                            <div class="actions two">
-                                <a href="#" class="no-text icon-comment" title="Comment"></a>
-                                <a href="#" class="no-text icon-delete" title="Delete"></a>
-                            </div>
-                            <ul class="action-list reply">
-                                <li class="row">
-                                    <div class="ten-column">
-                                        <div class="avatar-card">
-                                            <a href="#" title="View Profile">
-                                                <img src="https://placekitten.com/g/64/64" alt="Moggy" class="hide-for-small-only">
-                                                <p>Karl Pilkington</p>
-                                                <p class="meta">Posted 39 minutes ago</p>
-                                            </a>
-                                        </div>
-                                        <div class="body">
-                                            <img src="https://placeimg.com/400/200/people" alt="Moggy">
-                                        </div>
-                                    </div>
-                                    <div class="actions two">
-                                        <a href="#" class="no-text icon-comment" title="Comment"></a>
-                                        <a href="#" class="no-text icon-delete" title="Delete"></a>
-                                    </div>
-                                    <div class="component-form editPanel">
-                                        <!-- BEGIN socialstream_has_newpost -->
-                                        <form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}-2' class='addPostForm {FORM_CLASS}' enctype='multipart/form-data'>
-                                            <input type='hidden' name='type' value='string' />
-                                            <input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
-                                            <input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
-                                            <input type='hidden' name='parentId' value='0' />
-                                            <input type='hidden' name='rootId' value='0' />
-
-                                            <textarea rows="3" cols="50" name="body" placeholder="This is the reply form"></textarea>
-
-                                            <div class="dz-wrap">
-                                                <div class="row post-attachment attach">
-                                                    <div class="small-12s medium-9 columns">
-                                                        <div class="dropzone" id="socialZone2" action="/cms/myFileForm.php?ajax=1"></div>
-                                                    </div>
-                                                    <p class="small-12 medium-1 columns"><strong>or</strong></p>
-                                                    <p class="small-12 medium-2 columns">
-                                                        <a class='button icon-link stream-attachment' data-value='url'>Link</a>
-                                                    </p>
-                                                </div>
-
-                                                <div class="post-attachment url" style="display:none;">
-                                                    <label>
-                                                        <input type='text' class='url' name='url' maxlength='1024' placeholder="http://" />
-                                                    </label>
-                                                    <p class="alt-src">
-                                                        or <a class='button icon-image stream-attachment' data-value='attach'>Attach</a>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <input class='submit-btn-plain' type='submit' value='Post' />
-                                        </form>
-                                        <!-- END socialstream_has_newpost -->
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </section>
-    </div>
-</div>
-
 <hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1>Members Component - Block Grid Layout</h1>
-        <ul class="component-titlebar" style='background-color:#ddd'>
-            <li class="actions-small-3">
-                <div class="list-item">
-                    <div class="small-12 card">
-                        <h2><a href="">Example Component Titlebar</a></h2>
-                    </div>
-                </div>
-                <nav>
-                    <a data-target='settings' data-state='closed' href="#" class="icon-settings settings edit" title="Settings"></a>
-                    <a data-collapser="true" href="#" class="icon-collapse collapse" title="Collapse Content"></a>
-                    <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
-                </nav>
-            </li>
-        </ul>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <section>
-            <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-                <li>
-                    <div class="avatar-card">
-                        <a href="#" title="View Profile">
-                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
-                            <p>Karl Pilkington</p>
-                        </a>
-                        <p class="meta">Friday April 12th 2015 11:11am</p>
-                        <p class="meta">Edited five days ago</p>
-                    </div>
-                </li>
-                <li>
-                    <div class="avatar-card">
-                        <a href="#" title="View Profile">
-                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
-                            <p>Karl Pilkington</p>
-                        </a>
-                        <p class="meta">Friday April 12th 2015 11:11am</p>
-                        <p class="meta">Edited five days ago</p>
-                    </div>
-                </li>
-                <li>
-                    <div class="avatar-card">
-                        <a href="#" title="View Profile">
-                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
-                            <p>Karl Pilkington</p>
-                        </a>
-                        <p class="meta">Friday April 12th 2015 11:11am</p>
-                        <p class="meta">Edited five days ago</p>
-                    </div>
-                </li>
-                <li>
-                    <div class="avatar-card">
-                        <a href="#" title="View Profile">
-                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
-                            <p>Karl Pilkington</p>
-                        </a>
-                        <p class="meta">Friday April 12th 2015 11:11am</p>
-                        <p class="meta">Edited five days ago</p>
-                    </div>
-                </li>
-            </ul>
-            <div class="content">
-                <a href="#" class="button icon-email">Email all</a>
-            </div>
-        </section>
-    </div>
-</div>
-
-<hr/>
 
 <div class="row">
     <div class="small-12 island">
@@ -935,59 +495,6 @@ $(function () {
 </div>
 
 <hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="labels">Labels</h1>
-
-        <section class="content">
-            <p>
-                For submissions/due work:<br />
-                <span class="submitted label">Submitted</span>
-                <span class="submitted-late label">Submitted Late</span>
-                <span class="unsubmitted label">Unsubmitted</span>
-            </p>
-            <p>
-                For general usage:<br />
-                <span class="success label">Success Label</span>
-                <span class="alert label">Alert Label</span>
-                <span class="neutral label">Neutral Label</span>
-
-            </p>
-            <p>
-                This used to be <code>.label.secondary</code> but has been
-                repurposed. This is now used almost exclusively in ajax indicators
-                in label-timeouts.
-                <span class="label highlight">Highlight Label</span>
-            </p>
-        </section>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="gradients">Grade-ients</h1>
-        <section class="content">
-            <ul>
-                <li><span class="gradient-10">.gradient-10</span></li>
-                <li><span class="gradient-9">.gradient-9</span></li>
-                <li><span class="gradient-8">.gradient-8</span></li>
-                <li><span class="gradient-7">.gradient-7</span></li>
-                <li><span class="gradient-6">.gradient-6</span></li>
-                <li><span class="gradient-5">.gradient-5</span></li>
-                <li><span class="gradient-4">.gradient-4</span></li>
-                <li><span class="gradient-3">.gradient-3</span></li>
-                <li><span class="gradient-2">.gradient-2</span></li>
-                <li><span class="gradient-1">.gradient-1</span></li>
-                <li><span class="gradient-0">.gradient-0</span></li>
-            </ul>
-        </section>
-    </div>
-</div>
-
-<hr/>
 
 <div class="row">
     <div class="small-12 island">
@@ -1180,6 +687,8 @@ $(function () {
     </div>
 </div>
 
+<hr />
+
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Status</h2>
@@ -1209,6 +718,567 @@ $(function () {
         <section class="content">
             <a href="#" class="button icon-teacher">Teacher (icon-teacher)</a>
             <a href="#" class="button icon-staff-students">User (icon-staff-students)</a>
+        </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Standalone</h2>
+        <section class="content">
+            <ul class="inline-list">
+                <li>
+                    <a href="#" title="Download">
+                        <i class="icon-countdown"></i>
+                        Default
+                    </a>
+                </li>
+                <li>
+                    <a href="#" title="Dropbox">
+                        <i class="icon-drop-box success icon-24"></i>
+                        24px
+                    </a>
+                </li>
+                <li>
+                    <a href="#" title="Success">
+                        <i class="icon-drop-box success icon-32"></i>
+                        32px
+                    </a>
+                </li>
+                <li>
+                    <a href="#" title="Due Work">
+                        <i class="icon-due-work warning icon-48"></i>
+                        48px
+                    </a>
+                </li>
+                <li>
+                    <a href="#" title="Quiz">
+                        <i class="icon-quiz alert icon-64"></i>
+                        64px
+                    </a>
+                </li>
+            </ul>
+        </section>
+
+        <h2 class="subheader">Progress report</h2>
+        <section class="content">
+            <ul class="inline-list" id="progress-icon" style="padding:1rem 0;">
+                <li>
+                    <a href="#" class="progress-tick no-text"></a>
+                </li>
+                <li>
+                    <a href="#" class="progress-tick pending no-text"></a>
+                </li>
+                <li>
+                    <a href="#" class="progress-tick complete no-text"></a>
+                </li>
+            </ul>
+        </section>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="small-12 island">
+        <h1 id="labels">Labels</h1>
+
+        <section class="content">
+            <p>
+                For submissions/due work:<br />
+                <span class="submitted label">Submitted</span>
+                <span class="submitted-late label">Submitted Late</span>
+                <span class="unsubmitted label">Unsubmitted</span>
+            </p>
+            <p>
+                For general usage:<br />
+                <span class="success label">Success Label</span>
+                <span class="alert label">Alert Label</span>
+                <span class="neutral label">Neutral Label</span>
+
+            </p>
+            <p>
+                This used to be <code>.label.secondary</code> but has been
+                repurposed. This is now used almost exclusively in ajax indicators
+                in label-timeouts.
+                <span class="label highlight">Highlight Label</span>
+            </p>
+        </section>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Islands</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 medium-4 island">
+        <section>
+            <div class="content">
+                <h3><a href="#">Frank Costanza</a></h3>
+                <p>Intelligentsia vegan fap bespoke tote bag. Pop-up Echo Park Austin, sustainable wayfarers put a bird on it chia PBR&B tilde cardigan seitan cliche stumptown. Meh 8-bit Carles next level Shoreditch. Normcore ennui mixtape mlkshk.</p>
+            </div>
+        </section>
+    </div>
+    <div class="small-12 medium-4 island">
+        <section>
+            <div class="content">
+                <h3><a href="#">The Man in the cape</a></h3>
+                <p>Intelligentsia vegan fap bespoke tote bag. Pop-up Echo Park Austin, sustainable wayfarers put a bird on it chia PBR&B tilde cardigan seitan cliche stumptown. Meh 8-bit Carles next level Shoreditch. Normcore ennui mixtape mlkshk.</p>
+            </div>
+        </section>
+    </div>
+    <div class="small-12 medium-4 island">
+        <section>
+            <div class="content">
+                <h3><a href="#">Bob Sacamano</a></h3>
+                <p>Intelligentsia vegan fap bespoke tote bag. Pop-up Echo Park Austin, sustainable wayfarers put a bird on it chia.</p>
+                <p>Intelligentsia vegan fap bespoke tote bag. Pop-up Echo Park Austin, sustainable wayfarers put a bird on it chia.</p>
+            </div>
+        </section>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>Sortable</h1>
+        <h2 class="subheader">You Can Rearrange This List</h2>
+        <ul class="meta">
+            <li class="icon-approve icon-16">Any kind of list will work, not just information lists with avatar cards</li>
+        </ul>
+        <section>
+            <ul class="information-list sortable" data-sortable>
+                <li class="row">
+                    <div class="grip"></div>
+                    <div class="small-11 column no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/230">
+                                <img src="/portrait.php?userId=135&amp;size=square64" />
+                                <h3>David Rhodes</h3>
+                                <p class="meta">Senior Students</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="row">
+                    <div class="grip"></div>
+                    <div class="small-11 column no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/206">
+                                <img src="/portrait.php?userId=134&amp;size=square64" />
+                                <h3>Maddison Rhodes</h3>
+                                <p class="meta">Senior Students</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="row">
+                    <div class="grip"></div>
+                    <div class="small-11 column no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/151">
+                                <img src="/portrait.php?userId=165&amp;size=square64" />
+                                <h3>Zane Smith</h3>
+                                <p class="meta">Teachers</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="row">
+                    <div class="grip"></div>
+                    <div class="small-11 column no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/229">
+                                <img src="/portrait.php?userId=133&amp;size=square64" />
+                                <h3>Rachel Rhodes</h3>
+                                <p class="meta">Senior Students</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="row">
+                    <div class="grip"></div>
+                    <div class="small-11 column no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/245">
+                                <img src="/portrait.php?userId=493&amp;size=square64" />
+                                <h3>Caleb Rhodes</h3>
+                                <p class="meta">Junior Students</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <div class="alert-box">
+            <code>
+                $('#my-sortable-ul').sortable({ handle: '.grip', axis: 'y' });
+            </code>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Matching Pairs</h2>
+        <section id="equalize-me">
+            <div class="content">
+                <h3>Question <span class="meta">(3 marks)</span></h3>
+                <p>Align the foods to the animals that eat them.</p>
+            </div>
+            <div class="row matching-pairs" data-equalizer>
+                <div class="column small-6">
+                    <ul class="information-list">
+                        <li class="row">
+                            <div class="small-12 column" data-equalizer-watch>
+                                <p>Animalia Chordata Mammalia Carnivora Felidae Felinae Felis Silvestris Catus</p>
+                            </div>
+                        </li>
+                        <li class="row">
+                            <div class="small-12 column" data-equalizer-watch>
+                                <p>Animalia Chordata Mammalia Carnivora Canidae Canis Lupus Familiaris</p>
+                            </div>
+                        </li>
+                        <li class="row">
+                            <div class="small-12 column" data-equalizer-watch>
+                                <p>Animalia Chordata Vertebrata Mammalia Lagomorpha Leporidae Brachylagus Idahoensis</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="column small-6">
+                    <ul class="information-list sortable" data-sortable>
+                        <li class="row">
+                            <div class="grip"></div>
+                            <div class="small-11 column no-pad" data-equalizer-watch>
+                                <p>Cortical Mineralized Osseous Tissue</p>
+                            </div>
+                        </li>
+                        <li class="row">
+                            <div class="grip"></div>
+                            <div class="small-11 column no-pad" data-equalizer-watch>
+                                <p>Plantae Angiosperms Eudicots Asterids Apiales Apiaceae Daucus Carota</p>
+                            </div>
+                        </li>
+                        <li class="row">
+                            <div class="grip"></div>
+                            <div class="small-11 column no-pad" data-equalizer-watch>
+                                <p>Animalia Chordata Mammalia Rodentia Muroidea Muridae Murinae Mus Lepidoides</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        <ul class="meta">
+            <li class="icon-alert">Important! You need a special equalizer initialization:</li>
+        </ul>
+        <section>
+            <pre class="alert-box">
+$(function () {
+    $('#equalize-me').foundation({
+        equalizer: {
+            equalize_on_stack: true
+        }
+    });
+});
+            </pre>
+        </section>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('#equalize-me').foundation({
+            equalizer: {
+                equalize_on_stack: true
+            }
+        });
+    });
+</script>
+
+<hr />
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Social Stream</h1>
+        <ul class="meta">
+            <li class="icon-approve icon-16">A unique ingredient; primarily used only in Social Stream but the nested Reply structure may be found in Blog Commentary</li>
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 columns">
+        <ul class="component-titlebar" style='background-color:#ddd'>
+            <li class="actions-small-3">
+                <div class="list-item">
+                    <div class="small-12 card">
+                        <h2><a href="">Example Component Titlebar</a></h2>
+                    </div>
+                </div>
+                <nav>
+                    <a data-target='settings' data-state='closed' href="#" class="icon-settings settings edit" title="Settings"></a>
+                    <a data-collapser="true" href="#" class="icon-collapse collapse" title="Collapse Content"></a>
+                    <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
+                </nav>
+            </li>
+        </ul>
+        <div class="delete-it">
+            <p>Are you sure you want to remove this component? <a href="#" class="success button">Yes</a> <a href="#" class="button">No</a></p>
+        </div>
+    </div>
+</div>
+<div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+    <div class="small-12 island">
+        <section>
+            <div data-socialstream-form class="editPanel socialstream-new-post">
+                <!-- BEGIN socialstream_has_newpost -->
+                <form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}' data-add-post-form class='{FORM_CLASS}' enctype='multipart/form-data'>
+                    <input type='hidden' name='type' value='string' />
+                    <input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
+                    <input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
+                    <input type='hidden' name='parentId' value='0' />
+                    <input type='hidden' name='rootId' value='0' />
+
+                    <label>
+                        <textarea rows="3" cols="50" name="body" placeholder="Share something"></textarea>
+                    </label>
+                    <p>
+                        <input type='submit' value='Post' />
+                    </p>
+                    <div class="row post-attachment attach">
+                        <div class="small-8 large-9 columns">
+                            {ATTACH_ZONE}
+                        </div>
+                        <div class="small-4 large-3 columns">
+                            <a class='button icon-link sstream-attachment' data-value='url'>Link</a>
+                        </div>
+                    </div>
+                    <div class="row post-attachment url" style="display:none">
+                        <div class="small-8 large-9 columns">
+                            <label>
+                                <input type='text' class='url' name='url' maxlength='1024' placeholder="http://" />
+                            </label>
+                        </div>
+                        <div class="small-4 large-3 columns">
+                            <a class='button icon-attach sstream-attachment' data-value='attach'>Attach</a>
+                        </div>
+                    </div>
+                </form>
+                <!-- END socialstream_has_newpost -->
+            </div>
+
+            <div data-socialstream-browser></div>
+
+            <div id='socialstream-{COMPONENT_INSTANCE_ID}'>
+                <ul class='information-list social-stream' data-socialstream-threads>
+                    <!-- BEGIN socialstream_post -->
+                    <li class="actions-small-1" data-socialstream-row>
+                        <div class="list-item">
+                            <div class="avatar card small-12">
+                                <a href="/search/user/3" title="View Profile">
+                                    <img src="/portrait.php?userId=8&size=square64" alt="Moggy" class="hide-for-small-only">
+                                    <p>Celia Glenn</p>
+                                    <p class="meta">Posted 43 seconds ago</p>
+                                </a>
+                            </div>
+                            <article data-body class="body">
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce fringilla risus imperdiet lacus lacinia, non vestibulum mauris fermentum. Aenean ac cursus nulla, eu mattis lorem. Ut id nisi velit. In eu congue odio. Morbi leo diam, viverra ut massa ut, lobortis tincidunt nulla. Suspendisse non neque non est tincidunt lacinia at at erat. In in varius erat. Nam vulputate est est, eu mattis eros interdum vitae. Integer leo leo, gravida bibendum dui eget, placerat sagittis libero. Nullam ac semper tortor. Mauris augue nunc, porttitor in nulla nec, consectetur ultrices ex. Vestibulum sit amet nisi scelerisque odio convallis elementum. Proin vitae varius nulla.
+                                </p>
+                            </article>
+                        </div>
+                        <nav>
+                            <!-- BEGIN socialstream_post_has_delete -->
+                            <a href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}" class="icon-delete no-text" title='Delete post' data-socialstream-delete></a>
+                            <!-- END socialstream_post_has_delete -->
+
+                            <!-- BEGIN socialstream_post_has_add -->
+                            <a href="#" class="icon-comment no-text" title="Add Reply" data-parentid="{SOCIALSTREAM_POST_POST_ID}" data-add-post-link data-rootid="{SOCIALSTREAM_POST_POST_ID}"></a>
+                            <!-- END socialstream_post_has_add -->
+                        </nav>
+
+                        <!-------------------------->
+                        <!-- Socialstream Comment -->
+                        <!-------------------------->
+                        <ul class="information-list reply">
+                            <!-- BEGIN socialstream_comment -->
+                            <li class="actions-small-1" data-socialstream-row>
+                                <div class="list-item">
+                                    <div class="avatar card small-12">
+                                        <a href="/search/user/230" title="View Profile">
+                                            <img src="/portrait.php?userId=135&size=square64" alt="" class="hide-for-small-only">
+                                            <p>Dr Hodes</p>
+                                            <p class="meta">Posted 43 seconds ago</p>
+                                        </a>
+                                    </div>
+
+                                    <article data-body class="body">
+                                        <p>
+                                            Duis a justo non urna posuere consequat eget ut arcu. Quisque sed nisi metus. Mauris eu pulvinar dui, vel efficitur nisi. Nam sed dolor tortor. Sed eleifend consequat eros, a consectetur quam dapibus vel. Morbi fermentum purus arcu, quis eleifend metus volutpat sit amet. Nulla tristique risus ex, non fermentum nibh condimentum ac. Morbi condimentum orci a sem hendrerit laoreet.
+                                        </p>
+                                    </article>
+                                </div>
+                                <nav>
+                                    <!-- BEGIN socialstream_comment_has_delete -->
+                                    <a class="icon-delete" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}" title="Delete Comment" data-socialstream-delete></a>
+                                    <!-- END socialstream_comment_has_delete -->
+
+                                    <!-- BEGIN socialstream_comment_has_add -->
+                                    <a class="icon-comment" href="#" title="Add Reply" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_COMMENT_POST_ID}" data-add-post-link></a>
+                                    <!-- END socialstream_comment_has_add -->
+                                </nav>
+
+                                <!------------------------>
+                                <!-- Socialstream Reply -->
+                                <!------------------------>
+                                <ul class="information-list reply">
+                                    <!-- BEGIN socialstream_reply -->
+                                    <li class="actions-small-1" data-socialstream-row>
+                                        <div class="list-item">
+                                            <div class="avatar card small-12">
+                                                <a href="/search/user/19" title="View Profile">
+                                                    <img src="/portrait.php?userId=485&size=square64" alt="" class="hide-for-small-only">
+                                                    <p>Alaress Admin</p>
+
+                                                    <p class="meta">Posted 43 seconds ago</p>
+                                                </a>
+                                            </div>
+
+                                            <article data-body class="body">
+                                                <p>
+                                                    Nullam finibus ultrices lorem, et cursus augue mattis vitae. Nulla tincidunt elementum eros a elementum. Cras eget lorem pulvinar, luctus justo quis, volutpat ex. Suspendisse et odio libero. Phasellus ac libero at nibh imperdiet tristique a vel dolor. Phasellus euismod orci vel ipsum cursus, a venenatis ex feugiat. Praesent eleifend dolor vel massa fermentum gravida.
+                                                </p>
+                                            </article>
+                                        </div>
+                                        <nav>
+                                            <!-- BEGIN socialstream_reply_has_delete -->
+                                            <a class="icon-delete" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}" title="Delete Reply" data-socialstream-delete></a>
+                                            <!-- END socialstream_reply_has_delete -->
+                                        </nav>
+                                    </li>
+                                    <!-- END socialstream_reply -->
+                                </ul>
+                                <!------------------------>
+                                <!-- Socialstream Reply -->
+                                <!------------------------>
+                            </li>
+                            <!-- END socialstream_comment -->
+                        </ul>
+                        <!-------------------------->
+                        <!-- Socialstream Comment -->
+                        <!-------------------------->
+                    </li>
+                    <!-- END socialstream_post -->
+                </ul>
+
+                <div class="content">
+                    <a class="button icon-comment" data-socialstream-view-more>Load More</a>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>Members Component - Block Grid Layout</h1>
+        <ul class="component-titlebar" style='background-color:#ddd'>
+            <li class="actions-small-3">
+                <div class="list-item">
+                    <div class="small-12 card">
+                        <h2><a href="">Example Component Titlebar</a></h2>
+                    </div>
+                </div>
+                <nav>
+                    <a data-target='settings' data-state='closed' href="#" class="icon-settings settings edit" title="Settings"></a>
+                    <a data-collapser="true" href="#" class="icon-collapse collapse" title="Collapse Content"></a>
+                    <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
+                </nav>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+                <li>
+                    <div class="avatar-card">
+                        <a href="#" title="View Profile">
+                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
+                            <p>Karl Pilkington</p>
+                        </a>
+                        <p class="meta">Friday April 12th 2015 11:11am</p>
+                        <p class="meta">Edited five days ago</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="avatar-card">
+                        <a href="#" title="View Profile">
+                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
+                            <p>Karl Pilkington</p>
+                        </a>
+                        <p class="meta">Friday April 12th 2015 11:11am</p>
+                        <p class="meta">Edited five days ago</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="avatar-card">
+                        <a href="#" title="View Profile">
+                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
+                            <p>Karl Pilkington</p>
+                        </a>
+                        <p class="meta">Friday April 12th 2015 11:11am</p>
+                        <p class="meta">Edited five days ago</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="avatar-card">
+                        <a href="#" title="View Profile">
+                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
+                            <p>Karl Pilkington</p>
+                        </a>
+                        <p class="meta">Friday April 12th 2015 11:11am</p>
+                        <p class="meta">Edited five days ago</p>
+                    </div>
+                </li>
+            </ul>
+            <div class="content">
+                <a href="#" class="button icon-email">Email all</a>
+            </div>
+        </section>
+    </div>
+</div>
+
+<hr/>
+
+<div class="row">
+    <div class="small-12 island">
+        <h1 id="gradients">Grade-ients</h1>
+        <section class="content">
+            <ul>
+                <li><span class="gradient-10">.gradient-10</span></li>
+                <li><span class="gradient-9">.gradient-9</span></li>
+                <li><span class="gradient-8">.gradient-8</span></li>
+                <li><span class="gradient-7">.gradient-7</span></li>
+                <li><span class="gradient-6">.gradient-6</span></li>
+                <li><span class="gradient-5">.gradient-5</span></li>
+                <li><span class="gradient-4">.gradient-4</span></li>
+                <li><span class="gradient-3">.gradient-3</span></li>
+                <li><span class="gradient-2">.gradient-2</span></li>
+                <li><span class="gradient-1">.gradient-1</span></li>
+                <li><span class="gradient-0">.gradient-0</span></li>
+            </ul>
         </section>
     </div>
 </div>
@@ -1243,64 +1313,6 @@ $(function () {
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1>Icons</h1>
-        <h2 class="subheader">Standalone</h2>
-        <section class="content">
-            <ul class="inline-list">
-                <li>
-                    <a href="#" title="Download">
-                        <i class="icon-countdown"></i>
-                        Default
-                    </a>
-                </li>
-                <li>
-                     <a href="#" title="Dropbox">
-                        <i class="icon-drop-box success icon-24"></i>
-                        24px
-                    </a>
-                </li>
-                <li>
-                     <a href="#" title="Success">
-                        <i class="icon-drop-box success icon-32"></i>
-                        32px
-                    </a>
-                </li>
-                <li>
-                    <a href="#" title="Due Work">
-                        <i class="icon-due-work warning icon-48"></i>
-                        48px
-                    </a>
-                </li>
-                <li>
-                    <a href="#" title="Quiz">
-                        <i class="icon-quiz alert icon-64"></i>
-                        64px
-                    </a>
-                </li>
-            </ul>
-        </section>
-
-        <h2 class="subheader">Progress report</h2>
-        <section class="content">
-            <ul class="inline-list" id="progress-icon" style="padding:1rem 0;">
-                <li>
-                    <a href="#" class="progress-tick no-text"></a>
-                </li>
-                <li>
-                    <a href="#" class="progress-tick pending no-text"></a>
-                </li>
-                <li>
-                    <a href="#" class="progress-tick complete no-text"></a>
-                </li>
-            </ul>
-        </section>
     </div>
 </div>
 
