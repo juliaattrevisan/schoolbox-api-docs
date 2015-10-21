@@ -119,59 +119,6 @@
             }
         );
 
-        // Create new tasks: show inline form if there is one.
-        component.on(
-            'click.courseInstance',
-            '[data-add-button][data-form_class="for-task"]',
-            function(event) {
-                event.preventDefault();
-                var thisCreateForm = $(this).closest('[data-unit]').find('[data-new-task-container]');
-
-                thisCreateForm.toggleClass('hide');
-                component.find('[data-form-container]').not(thisCreateForm).addClass('hide');
-                ///* Hide all other forms first
-                // */
-                //var allForms = component.find('[data-form-container]');
-                //allForms.removeClass('hide').not(thisCreateForm).slideUp('fast');
-                //
-                //if (thisCreateForm.hasClass('hide')) {
-                //    thisCreateForm.stop().removeClass('hide').slideUp(1).slideDown('fast');
-                //}
-                //else {
-                //    thisCreateForm.stop().slideToggle('fast');
-                //}
-            }
-        );
-
-        // show/hide the edit task dialog (if it exists?)
-        component.on(
-            'click.courseInstance',
-            'a[data-interaction="open_edit_task_form"]',
-            function(event) {
-                var element      = $(this);
-                var unit_element = element.closest('[data-unit-task]');
-                var container    = unit_element.find('[data-interaction="edit_task_container"]');
-
-                /* Hide all other forms first
-                 */
-                //var allForms = component.find('[data-form-container]');
-                //allForms.removeClass('hide').not(container).slideUp('fast');
-
-                if (container.length) {
-                    event.preventDefault();
-                    container.toggleClass('hide');
-                    component.find('[data-form-container]').not(container).addClass('hide');
-
-                    //if (container.hasClass('hide')) {
-                    //    container.stop().removeClass('hide').slideUp(1).slideDown('fast');
-                    //}
-                    //else {
-                    //    container.stop().slideToggle('fast');
-                    //}
-                }
-            }
-        );
-
         // Create/edit task form submission
         component.on(
             'submit.courseInstance',
