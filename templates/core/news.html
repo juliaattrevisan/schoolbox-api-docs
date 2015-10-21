@@ -1,3 +1,14 @@
+<ul class="breadcrumb">
+    <li><a href="/news">News</a></li>
+    <li><a href="/news-archive">Archive</a></li>
+    <li><a href="/news-archive/{MENU_TOPIC_CLEAN}">{MENU_TOPIC_NAME}</a></li>
+    <!-- BEGIN crumb_year -->
+    <li><a href="/news-archive/{MENU_TOPIC_CLEAN}/{SELECTED_YEAR}">{SELECTED_YEAR}</a></li>
+    <!-- END crumb_year -->
+    <!-- BEGIN crumb_month -->
+    <li><a href="/news-archive/{MENU_TOPIC_CLEAN}/{SELECTED_YEAR}/{SELECTED_MONTH}">{SELECTED_MONTH_NAME}</a></li>
+    <!-- END crumb_month -->
+</ul>
 <div class="row">
     <div class="column small-12">
         <div class="actions-small-1 row">

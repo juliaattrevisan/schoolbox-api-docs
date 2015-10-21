@@ -135,7 +135,10 @@ $outputPagination = array(
 $this->setVar($outputPagination);
 
 $items = $newsHandler->getNewsListing(false, $topicSlugMap[$selectedTopic], 0, 0, $newsIndex, $newsPerPage, true);
-$this->setVar('TOPIC_CLEAN', $selectedTopic);
+$this->setVar([
+    'TOPIC_CLEAN' => $selectedTopic,
+    'TOPIC_TITLE' => $topicSlugMap[$selectedTopic] ?: 'All'
+]);
 
 if (is_array($items)) {
 
