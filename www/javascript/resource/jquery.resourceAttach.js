@@ -357,7 +357,7 @@ if(typeof window.location.origin == 'undefined') {
 
         // reinit
         $(document)
-            .foundation('reveal', 'reflow')
+            //.foundation('reveal', 'reflow')
             .on('closed.fndtn.reveal', '[data-reveal]', function () {
                 if (singletonModal) {
                     singletonModal.detach();
