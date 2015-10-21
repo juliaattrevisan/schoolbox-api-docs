@@ -41,8 +41,17 @@ $timetable-cell-border: $body-bg;
 /* Active subject(s) decoration
  */
 .timetable-subject-active {
-    border: 0.5rem solid $timetable-indicator-color;
-    box-sizing: border-box;
+    position: relative;
+    &:before {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 0;
+        content: " ";
+        border-top: 3rem solid $accent-foreground;
+        border-left: 3rem solid transparent;
+    }
 }
 
 /* Fifty-fifty split on small devices
