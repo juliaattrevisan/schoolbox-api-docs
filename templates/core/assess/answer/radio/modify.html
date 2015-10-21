@@ -1,35 +1,37 @@
-<fieldset>
-    <legend>Answer</legend>
+<fieldset class="content">
+    <div class="column small-12">
+        <legend>Answer</legend>
 
-    <ul id="answerCollection" class="information-list">
-        <!-- BEGIN answerOption -->
-        <li class="row" data-input>
-            <div class="small-1 columns" data-answer-code>
-                <input name="answerCode[]" type="hidden" value="{ANSWER_VALUE}" data-answer-code-value />
+        <ul id="answerCollection" class="information-list no-pad">
+            <!-- BEGIN answerOption -->
+            <li class="row" data-input>
+                <div class="small-3 medium-2 columns" data-answer-code>
+                    <input name="answerCode[]" type="hidden" value="{ANSWER_VALUE}" data-answer-code-value />
 
-                <input name="answer[]" type="radio" value="" {ANSWER_CHECKED} data-answer-option />
-                <label class="radio-label">
-                    <span class="content" data-answer-code-representation>{ANSWER_VALUE})</span>
-                </label>
-            </div>
-            <div class="small-10 columns">
-                <label class="answer-value">
-                    <input name="answerDescription[]" type="text" value="{ANSWER_DESCRIPTION}" data-answer-description />
-                </label>
-            </div>
-            <div class="small-1 columns">
-                <a class="button icon-delete no-text" data-delete></a>
-            </div>
-        </li>
-        <!-- END answerOption -->
-    </ul>
+                    <input name="answer[]" type="radio" value="" {ANSWER_CHECKED} data-answer-option />
+                    <label class="radio-label">
+                        <span class="content" data-answer-code-representation>{ANSWER_VALUE})</span>
+                    </label>
+                </div>
+                <div class="small-8 medium-9 columns">
+                    <label class="answer-value">
+                        <input name="answerDescription[]" type="text" value="{ANSWER_DESCRIPTION}" data-answer-description />
+                    </label>
+                </div>
+                <div class="small-1 columns">
+                    <a class="icon-delete" data-delete title="Remove"></a>
+                </div>
+            </li>
+            <!-- END answerOption -->
+        </ul>
 
-    <a class="button icon-add" href="#" data-add-answer>Add answer option</a>
+        <a class="button icon-add" href="#" data-add-answer>Add answer option</a>
+    </div>
 </fieldset>
 
 <ul class="hide" data-clone>
     <li class="row" data-input>
-        <div class="small-1 columns" data-answer-code>
+        <div class="small-3 medium-2 columns" data-answer-code>
             <input name="answerCode[]" type="hidden" value="" data-answer-code-value />
 
             <input name="answer[]" type="radio" value="" data-answer-option />
@@ -37,13 +39,13 @@
                 <span class="content" data-answer-code-representation></span>
             </label>
         </div>
-        <div class="small-10 columns">
+        <div class="small-8 medium-9 columns">
             <label class="answer-value">
                 <input name="answerDescription[]" type="text" value="" data-answer-description />
             </label>
         </div>
         <div class="small-1 columns">
-            <a class="button icon-delete no-text" data-delete></a>
+            <a class="icon-delete" data-delete title="Remove"></a>
         </div>
     </li>
 </ul>
