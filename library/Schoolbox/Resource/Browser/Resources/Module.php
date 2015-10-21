@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Browser\Resources;
 
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Aura\Router\Router;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -30,6 +31,21 @@ class Module extends AbstractModule
         $this->basename = 'resourceBrowser';
     }
 
+    /**
+     * Add a link route as well
+     *
+     * @param Router $router
+     * @param string $basePath
+     */
+    public function initRoutes(Router $router, $basePath)
+    {
+        parent::initRoutes($router, $basePath);
+        $routes = $router->getRoutes();
+        $routes->addGet(
+            "$this->basename.showLinkInfo",
+            $basePath.'/link/{linkId}/info'
+        )->addTokens([ 'linkId' => '\d+' ]);
+    }
 
     /**
      * @return string
@@ -51,6 +67,7 @@ class Module extends AbstractModule
             'setTreeBuilder'      => $ci->lazyNew(Resource\Browser\Resources\TreeBuilder::class),
             'setFolderMapper'     => $ci->lazyNew(Resource\Folder\Mapper::class),
             'setFileMapper'       => $ci->lazyNew(Resource\File\Mapper::class),
+            'setLinkMapper'       => $ci->lazyNew(Resource\LinkMapper::class),
             'setUserAccessMapper' => $ci->lazyNew(UserAccessMapper::class),
             'setRoleAccessMapper' => $ci->lazyNew(RoleAccessMapper::class),
             'setNodeType'         => Resource\Browser\NodeFactory::SBFS,
@@ -70,7 +87,11 @@ class Module extends AbstractModule
         $injector->params[TreeBuilder::class]['locator']          = $setters['setFolderMapper'];
         $injector->params[TreeBuilder::class]['userAccessMapper'] = $setters['setUserAccessMapper'];
         $injector->params[TreeBuilder::class]['roleAccessMapper'] = $setters['setRoleAccessMapper'];
-        $injector->setters[TreeBuilder::class]['setFileLocator']  = $setters['setFileMapper'];
+        $injector->setters[TreeBuilder::class]['setFileLocator']  = $injector->lazy(
+            function () use ($injector) {
+                return new Resource\File\CompositeLocator(new Resource\File\Mapper(), new Resource\LinkMapper());
+            }
+        );
 
         $injector->params[TreeBuilder::class]['user'] = $injector->lazy(
             function () use ($injector) {

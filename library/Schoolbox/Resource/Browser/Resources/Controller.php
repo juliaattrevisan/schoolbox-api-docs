@@ -26,6 +26,14 @@ class Controller extends AbstractController
     /** @var UserAccessMapper */
     protected $userAccessMapper;
 
+    /**
+     * @var Resource\LinkMapper
+     */
+    protected $linkMapper;
+
+
+    // Injectables
+
 
     /**
      * @param RoleAccessMapper $roleAccessMapper
@@ -46,6 +54,51 @@ class Controller extends AbstractController
     {
         $this->userAccessMapper = $userAccessMapper;
         return $this;
+    }
+
+
+    /**
+     * @param Resource\LinkMapper $linkMapper
+     * @return self
+     */
+    public function setLinkMapper($linkMapper)
+    {
+        $this->linkMapper = $linkMapper;
+        return $this;
+    }
+
+
+    // API methods
+
+
+    /**
+     * @api GET /resources/link/:linkId/info
+     * @level 150
+     *
+     * @param int $linkId
+     */
+    public function showLinkInfo($linkId)
+    {
+        $link = $this->linkMapper->findById($linkId);
+
+        $folderId = $link->getFolder()->getId();
+
+        $server = $this->getRequest()->server;
+
+        $data = [
+            'file'      => $link,
+            'type'      => 'link',
+            'tree'      => $this->getBreadcrumbs($link->getFolder()),
+            'host'      => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_HOST')),
+            'access'    => $this->getAccess([ $folderId ]),
+            'namespace' => $this->namespace
+        ];
+
+        $this->getResponse()->content->set([
+            'template' => '@resourceBrowser/showLinkInfo.twig',
+            'format'   => 'nochrome',
+            'data'     => $data,
+        ]);
     }
 
 

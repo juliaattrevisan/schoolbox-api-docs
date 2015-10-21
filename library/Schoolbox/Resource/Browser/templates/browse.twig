@@ -22,7 +22,8 @@
             metaData         = $('#meta'),
             listItem         = 'li',
             folderInfoUri    = '/:id/info',
-            fileInfoUri      = '/file/:id/info';
+            fileInfoUri      = '/file/:id/info',
+            linkInfoUri      = '/link/:id/info';
 
         tree.resourceTree({
             data: {
@@ -41,10 +42,13 @@
 
         tree.on('select_node.jstree', function(event, jstree) {
             jstree.instance.open_node(jstree.node.id);
+            var nodeId = jstree.node.li_attr['data-id'];
             if (jstree.node.type == 'file') {
-                loadPanel(metaData, fileInfoUri, jstree.node.li_attr['data-id']);
+                loadPanel(metaData, fileInfoUri, nodeId);
+            } else if (jstree.node.type == 'link') {
+                loadPanel(metaData, linkInfoUri, nodeId);
             } else {
-                loadPanel(metaData, folderInfoUri, jstree.node.li_attr['data-id']);
+                loadPanel(metaData, folderInfoUri, nodeId);
             }
         });
 

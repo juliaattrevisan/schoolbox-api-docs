@@ -160,6 +160,9 @@
                     file: {
                         icon: 'icon-document'
                     },
+                    link: {
+                        icon: 'icon-link'
+                    },
                     folder: {
                         icon: 'icon-folder'
                     },

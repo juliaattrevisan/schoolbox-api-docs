@@ -1,0 +1,58 @@
+{% set portrait = '/portrait.php?size=square48&userId=' %}
+{% set mime     = '/images/mime/128x128/' %}
+{% set modify   = '/cms/link/' %}
+
+{% if access > 0 %}
+
+<ul class="breadcrumb" id="breadcrumbs">
+    {% for node in tree %}
+        <li><a data-selectnode="{{ node.categoryId }}" href="/resources/{{ node.categoryId }}">{{ node.name }}</a></li>
+    {% endfor %}
+</ul>
+
+<div class="row">
+    <div class="small-4 column text-center">
+        {# Links don't yet have thumbnails. Eventually add them here? #}
+        <img class="icon" src="{{ mime }}html.png" alt="{{ file.description }}" />
+    </div>
+    <div class="small-8 column">
+        <div class="actions-small-1">
+            <div class="list-item">
+                <h3>{{ file.description }}</h3>
+            </div>
+            <nav>
+                <a href="#" class="icon-eye" data-reveal-id="modal-link-{{ file.id }}"></a>
+            </nav>
+        </div>
+        <p>{{ file.comment }}</p>
+
+        {% set fileActionList %}
+
+            <li><a class="icon-document" data-action="open" href="{{ file.getHref() }}" target="_blank">Open</a></li>
+            {% if access >= 2 %}
+                <li><a class="icon-modify" data-action="modify" href="{{ modify ~ file.id }}">Modify</a></li>
+                <li><a class="icon-delete" data-action="delete" href="#">Delete</a></li>
+            {% endif %}
+
+        {% endset %}
+
+        {% include '@resourceBrowser/actionBar.twig' with { id: 'file-actions', list: fileActionList, sizing: { small: 1, medium: 2, large: 2, xlarge: 4, xxlarge: 2 } } %}
+
+        <div class="reveal-modal" data-reveal id="modal-link-{{ file.id }}">
+
+            <h2>{{ file.description }}</h2>
+
+            {% include '@resourceBrowser/fileInfo/link.twig' %}
+
+            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+
+        </div>
+
+    </div>
+</div>
+{% else %}
+<li>
+    <img class="icon" src="/images/core/icons/error-icon.png" alt="No access"/>
+    <h3>No access</h3>
+</li>
+{% endif %}
