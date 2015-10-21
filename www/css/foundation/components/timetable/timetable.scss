@@ -1,4 +1,3 @@
-$timetable-indicator-color: #ffd100 !default;
 $timetable-cell-border: $body-bg;
 
 .timetable, .timetable-small {
@@ -6,20 +5,10 @@ $timetable-cell-border: $body-bg;
         border: 1px solid $timetable-cell-border;
     }
 
-    th {
-        &.timetable-day-active {
-            // background-color: $timetable-indicator-color;
-        }
-
-        &.timetable-period-active {
-            // background-color: $timetable-indicator-color;
-        }
-    }
-
     /* Remove padding on cells containing classes
      */
     td {
-        padding: 0px;
+        padding: 0;
     }
 
     /* For subtext under period names to sit correctly
