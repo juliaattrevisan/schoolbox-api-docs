@@ -272,11 +272,11 @@ $.widget("ui.chat",  {
                 for (var $i in $data.users) {
                     var $user = $data.users[$i];
 
-                    var $user_el = $('<li class="row"></li>');
+                    var $user_el = $('<li class="actions-small-1"></li>');
 					var $tpl =
-                        '<div class="column no-pad small-11">' +
-                            '<div class="avatar card">' +
-                                '<img class="icon" src="/portrait.php?userId={1}&size=square64" title="{0}" />' +
+                        '<div class="list-item">' +
+                            '<div class="small-12 avatar card">' +
+                                '<img src="/portrait.php?userId={1}&size=square64" title="{0}" />' +
                                 '<h3>{0}</h3>' +
                             '</div>' +
                         '</div>';
@@ -296,7 +296,7 @@ $.widget("ui.chat",  {
 
                     /* Mute/unmute buttons */
                     if ($self.options.user_perm > $user.perm && $user.user_id != $self.options.user_id) {
-                        var $mute_el = $('<div class="one actions"><a href="#" data-interaction-mute class="no-text icon-mute" title="Mute"></a></div>');
+                        var $mute_el = $('<nav><a href="#" class="icon-mute" title="Mute" data-interaction-mute></a></nav>');
 
                         if ($data.config.muted_users != undefined && $.inArray($user.user_id, $data.config.muted_users) > -1) {
                             $user_el.addClass('chat-user-muted');
