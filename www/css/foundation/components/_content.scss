@@ -1224,6 +1224,13 @@ ul.flex-list {
         padding: 0.5rem 0.5rem 0 1rem;
     }
 
+    /* Avatar Card
+     * Displays an icon, or a profile picture, in the left column
+     * Right column contains text, metadata, or a variety of other
+     * interface elements
+     *
+     * Can be used in conjunction with lists
+     */
     &.avatar {
         img, [class^="icon-"] {
             float: left;
@@ -1327,6 +1334,7 @@ ul.flex-list {
                 /* Hairline fracture between labels in sequence
                  */
                 .label {
+                    margin-top: 0.125rem;
                     margin-right: -0.125rem;
                 }
             }
