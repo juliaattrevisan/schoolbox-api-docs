@@ -141,31 +141,31 @@
             <ul class="action-list">
                 <!-- BEGIN work -->
                 <li class="actions-small-1">
-                    <div class="list-item">
-                        <div class="small-12 large-5 columns content">
-                            <div class="small-12 info card no-pad">
+                    <div class="list-item clearfix content">
+                        <div class="row">
+                            <div class="small-12 large-5 info card column">
                                 <!-- BEGIN work_clickable -->
                                 <a href="/{WORK_HREF}{WORK_ID}/{WORK_USER_ID}">
-                                    <p>{WORK_TITLE}</p>
+                                    <h3>{WORK_TITLE}</h3>
                                 </a>
                                 <!-- END work_clickable -->
                                 <!-- BEGIN work_unclickable -->
-                                <p>{WORK_TITLE}</p>
+                                <h3>{WORK_TITLE}</h3>
                                 <!-- END work_unclickable -->
                                 <p class="meta">
                                     <a href="/homepage/{SUBJ_ID}">{SUBJ_NAME}</a> {WORK_TYPE}
                                 </p>
                             </div>
-                        </div>
 
-                        <div class="small-12 large-4 columns grade content">
-                            <p class="gradient-{WORK_GRADIENT}"><span>{WORK_GRADE}</span></p>
-                            <p class="comment">{WORK_COMMENT}</p>
-                        </div>
+                            <div class="small-12 large-4 columns grade">
+                                <p class="gradient-{WORK_GRADIENT}"><span>{WORK_GRADE}</span></p>
+                                <p class="comment">{WORK_COMMENT}</p>
+                            </div>
 
-                        <div class="small-12 large-3 columns content">
-                            Due <span class="gradient-{WORK_URGENCY}">{WORK_DATE}</span>
-                            on {WORK_TIME}
+                            <div class="small-12 large-3 columns">
+                                Due <span class="gradient-{WORK_URGENCY}">{WORK_DATE}</span>
+                                on {WORK_TIME}
+                            </div>
                         </div>
                     </div>
                     <nav>
