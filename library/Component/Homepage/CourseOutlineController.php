@@ -481,19 +481,14 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 }
             }
         } else {
+            // Only show modify form if this is a simple task.
+            // (No assessment or due work)
             if ($task->getType() == Task::TYPE_TASK) {
                 $this->setVar(
                     'UNIT_TASK_REVEAL_ATTR',
                     'data-reveal-id="modifyTask-' . Scrub::text($task->getId()) . '"'
                 );
-            }
-            $this->parse('unit_task_count_block', 'unit_task_count');
-            $this->parse('unit_task_delete_block', 'unit_task_delete');
-            $this->parse('unit_task_delete_form_block', 'unit_task_delete_form');
-            $this->parse('unit_task_modify_block', 'unit_task_modify');
-            // Only show modify form if this is a simple task.
-            // (No assessment or due work)
-            if ($task->getType() == Task::TYPE_TASK) {
+
                 $zone = $this->newZone('az-task-' . $task->getId());
                 if (strpos($task->getLink(), '/storage/fetch.php') === 0) {
                     $zone->attachFiles(array(substr($task->getLink(), -40)));
@@ -524,6 +519,10 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 $this->setVar('UNIT_QUIZ_ID', Scrub::text($task->getAssessment()->getId()));
                 $this->parse('unit_task_quiz_results_block', 'unit_task_quiz_results');
             }
+            $this->parse('unit_task_count_block', 'unit_task_count');
+            $this->parse('unit_task_delete_block', 'unit_task_delete');
+            $this->parse('unit_task_delete_form_block', 'unit_task_delete_form');
+            $this->parse('unit_task_modify_block', 'unit_task_modify');
             $this->parse('unit_task_actions_block', 'unit_task_actions');
         }
 
