@@ -103,8 +103,7 @@
 
             var enable = typeof $(this).attr('data-interaction-disable') == 'undefined' ? 'true' : 'false';
 
-            var form = $(this).closest('form');
-
+            var form = $(this).closest('[data-interaction-container]').find('form');
             form.find('input[name=enable]').val(enable);
             form.submit();
         });
