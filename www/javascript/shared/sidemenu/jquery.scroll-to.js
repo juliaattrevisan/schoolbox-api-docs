@@ -34,7 +34,9 @@
 
                 /* Animation velocity
                  */
-                velocity: 500
+                velocity: 500,
+
+                cancel: function () { return false; }
             }
 
             var derived = {
@@ -49,10 +51,12 @@
          * Setup
          */
         function setupScrollToTop() {
-            $(config.element).find(config.activator).click(function(event) {
-                $('html, body').animate({
-                    scrollTop: $(config.scrollTo).offset().top
-                }, config.velocity);
+            $(config.element).on('click', config.activator, function(event) {
+                if (config.cancel.apply(this) == false) {
+                    $('html, body').animate({
+                        scrollTop: $(config.scrollTo).offset().top
+                    }, config.velocity);
+                }
             });
         }
     }
