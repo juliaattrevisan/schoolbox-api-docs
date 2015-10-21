@@ -176,6 +176,8 @@ class Scrub
                 )
             );
 
+            // Don't allow classes that affect layout in Foundation
+            $config->set('Attr.ForbiddenClasses', ['row', 'column', 'island',]);
 
             $config->set(
                 'URI.AllowedSchemes', array(
