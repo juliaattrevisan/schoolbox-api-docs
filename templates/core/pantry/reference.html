@@ -1,0 +1,130 @@
+<div class="row">
+    <div class="small-12 island">
+        <h1 id="visibility-classes">Visibility Classes</h1>
+        <h2 class="subheader" id="screen-size-visibility-control-show-">Screen Size Visibility Control (Show)</h2>
+        <section class="content">
+            <p>The following text should describe the screen size you&#39;re using:</p>
+            <p class="alert-box">
+                <strong class="show-for-small">You are on a small screen.</strong>
+                <strong class="show-for-medium">You are on a medium screen.</strong>
+                <strong class="show-for-medium-up">You are on a medium, large or xlarge screen.</strong>
+                <strong class="show-for-medium-down">You are on a medium or small screen.</strong>
+                <strong class="show-for-large">You are on a large screen.</strong>
+                <strong class="show-for-large-up">You are on a large or xlarge screen.</strong>
+                <strong class="show-for-large-down">You are on a large, medium or small screen.</strong>
+                <strong class="show-for-xlarge">You are on a xlarge screen.</strong>
+            </p>
+        </section>
+        <h2 class="subheader" id="screen-size-visibility-control-hide-">Screen Size Visibility Control (Hide)</h2>
+        <section class="content">
+            <p>The following text should describe the screen size you aren&#39;t using:</p>
+            <p class="alert-box">
+                <strong class="hide-for-small">You are <em>not</em> on a small screen.</strong>
+                <strong class="hide-for-medium">You are <em>not</em> on a medium screen.</strong>
+                <strong class="hide-for-medium-up">You are <em>not</em> on a medium, large or xlarge screen.</strong>
+                <strong class="hide-for-medium-down">You are <em>not</em> on a medium or small screen.</strong>
+                <strong class="hide-for-large">You are <em>not</em> on a large screen.</strong>
+                <strong class="hide-for-large-up">You are <em>not</em> on a large or xlarge screen.</strong>
+                <strong class="hide-for-large-down">You are <em>not</em> on a large, medium or small screen.</strong>
+                <strong class="hide-for-xlarge">You are <em>not</em> on a xlarge screen.</strong>
+            </p>
+        </section>
+        <h2 class="subheader" id="orientation-detection">Orientation Detection</h2>
+        <section class="content">
+            <p>The following text should describe the device orientation you&#39;re using:</p>
+            <p class="alert-box">
+                <strong class="show-for-landscape">You are in landscape orientation.</strong>
+                <strong class="show-for-portrait">You are in portrait orientation.</strong>
+            </p>
+        </section>
+
+        <h2 class="subheader" id="touch-detection">Touch Detection</h2>
+        <section class="content">
+            <p>The following text should describe if you&#39;re using a touch device:</p>
+            <p class="alert-box">
+                <strong class="show-for-touch">You are on a touch-enabled device.</strong>
+                <strong class="hide-for-touch">You are not on a touch-enabled device.</strong>
+            </p>
+        </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h1 id="type">Typography</h1>
+        <h1>h1. This is a very large header.</h1>
+        <section class="content">
+            <h2>h2. This is a large header.</h2>
+            <h3>h3. This is a medium header.</h3>
+            <h4>h4. This is a moderate header.</h4>
+            <h5>h5. This is a small header.</h5>
+            <h6>h6. This is a tiny header.</h6>
+        </section>
+
+        <h1 class="subheader">h1.subheader</h1>
+        <h2 class="subheader">h2.subheader</h2>
+        <h3 class="subheader">h3.subheader</h3>
+        <h4 class="subheader">h4.subheader</h4>
+        <h5 class="subheader">h5.subheader</h5>
+        <h6 class="subheader">h6.subheader</h6>
+        <section class="content">
+            Use the subheader class for headers in the ocean
+        </section>
+    </div>
+</div>
+
+<hr />
+
+<script type="text/javascript">
+    $(function() {
+        $("#joyride-go").foundation('joyride', 'start');
+    });
+</script>
+
+<!-- <h1 id="joyride">Joyride</h1> -->
+<!-- At the bottom of your page but inside of the body tag -->
+<!-- <ol class="joyride-list" data-joyride>
+    <li data-id="firstStop" data-text="Next" data-options="tip_location: top; prev_button: false">
+        <p>Hello and welcome to the Joyride documentation page.</p>
+    </li>
+    <li data-id="numero1" data-class="custom so-awesome" data-text="Next" data-prev-text="Prev">
+        <h1>Stop #1</h1>
+        <p>You can control all the details for you tour stop. Any valid HTML will work inside of Joyride.</p>
+    </li>
+    <li data-id="numero2" data-button="Next" data-prev-text="Prev" data-options="tip_location:top;tip_animation:fade">
+        <h1>Stop #2</h1>
+        <p>Get the details right by styling Joyride with a custom stylesheet!</p>
+    </li>
+    <li data-button="End" data-prev-text="Prev">
+        <h1>Stop #3</h1>
+        <p>It works as a modal too!</p>
+    </li>
+</ol>
+<div id="firstStop" class="panel"><p>Ride the whale.</p></div>
+<p id="numero1" class="panel">Megalodon<p>
+<p id="numero2" class="panel">Kraken</p>
+<p id="End" class="panel">Whale</p>
+&lt;!&ndash; At the bottom of your page but inside of the body tag &ndash;&gt;
+    <div id="joyride-go">
+        <ol class="joyride-list" data-joyride>
+            <li data-id="firstStop" data-text="Next" data-options="tip_location: top; prev_button: false">
+                <p>Welcome to Rapture, the home of Schoolbox.</p>
+                <p><img src="http://www.twinfinite.net/wp-content/uploads/2014/07/bioshock-rapture-city1.jpg" /></p>
+            </li>
+            <li data-id="numero1" data-class="custom so-awesome" data-text="Next" data-prev-text="Prev">
+                <h1>Stop #1</h1>
+                <p>You can control all the details for you tour stop. Any valid HTML will work inside of Joyride.</p>
+            </li>
+            <li data-id="numero2" data-button="Next" data-prev-text="Prev" data-options="tip_location:top;tip_animation:fade">
+                <h1>Stop #2</h1>
+                <p>Get the details right by styling Joyride with a custom stylesheet!</p>
+            </li>
+            <li data-button="End" data-prev-text="Prev">
+                <h1>Stop #3</h1>
+                <p>It works as a modal too!</p>
+                <p><img src="http://www.emeraldene.com.au/blog/wp-content/uploads/2013/05/Whale-Watching-2013.jpg" /></p>
+            </li>
+        </ol>
+    </div>
+    <p>To make something pretty, press and hold <kbd>cmd + alt + shift + w + a + !</kbd></p>
+    <hr> -->

@@ -1,0 +1,291 @@
+<div class="row">
+    <div class="small-12 island">
+        <h1 id="switches">Switches</h1>
+        <h2 class="subheader">Checkbox Switch with Text</h2>
+        <section class="content">
+            <input id="textCheckboxToggle" type="checkbox">
+            <label for="textCheckboxToggle" class="checkbox-toggle">V</label>
+            <input id="textCheckboxToggle2" type="checkbox">
+            <label for="textCheckboxToggle2" class="checkbox-toggle">A</label>
+            <input id="textCheckboxToggle3" type="checkbox">
+            <label for="textCheckboxToggle3" class="checkbox-toggle">P</label>
+            <input id="textCheckboxToggle4" type="checkbox">
+            <label for="textCheckboxToggle4" class="checkbox-toggle">O</label>
+            <input id="textCheckboxToggle5" type="checkbox">
+            <label for="textCheckboxToggle5" class="checkbox-toggle">R</label>
+            <input id="textCheckboxToggle6" type="checkbox">
+            <label for="textCheckboxToggle6" class="checkbox-toggle">W</label>
+            <input id="textCheckboxToggle7" type="checkbox">
+            <label for="textCheckboxToggle7" class="checkbox-toggle">A</label>
+            <input id="textCheckboxToggle8" type="checkbox">
+            <label for="textCheckboxToggle8" class="checkbox-toggle">V</label>
+            <input id="textCheckboxToggle9" type="checkbox">
+            <label for="textCheckboxToggle9" class="checkbox-toggle">E</label>
+        </section>
+
+        <h2 class="subheader">Checkbox Switch with Icons</h2>
+        <section class="content">
+            <input id="iconCheckboxToggle0" type="checkbox" />
+            <label for="iconCheckboxToggle0" class="checkbox-toggle">
+                <span class="icon-close alert" title="Remove From Group"></span>
+            </label>
+            <input id="iconCheckboxToggle1" type="checkbox" />
+            <label for="iconCheckboxToggle1" class="checkbox-toggle">
+                <span class="icon-eye" title="Remove From Group"></span>
+            </label>
+            <input id="iconCheckboxToggle2" type="checkbox" />
+            <label for="iconCheckboxToggle2" class="checkbox-toggle">
+                <span class="icon-modify" title="Remove From Group"></span>
+            </label>
+        </section>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Context Switch</h1>
+        <ul class="meta">
+            <li class="icon-wolfram-alpha">You can simply omit the subject selector where appropriate</li>
+        </ul>
+    </div>
+    <div class="small-12 medium-9 medium-offset-3 medium-7 medium-offset-5 columns">
+        <div class="content">
+            <div class="context-switch">
+                <nav>
+                    <a href="/submission/listSubmission/2015/1"></a>
+                </nav>
+                <div class="semester">
+                    <select>
+                        <option>Semester 2, 2015</option>
+                    </select>
+                </div>
+                <nav>
+                    <a href="/submission/listSubmission/2016/1"></a>
+                </nav>
+                <div class="subject">
+                    <select>
+                        <option>English 3 4 (EN344)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>Members Component - Block Grid Layout</h1>
+        <ul class="component-titlebar" style='background-color:#ddd'>
+            <li class="actions-small-3">
+                <div class="list-item">
+                    <div class="small-12 card">
+                        <h2><a href="">Example Component Titlebar</a></h2>
+                    </div>
+                </div>
+                <nav>
+                    <a data-target='settings' data-state='closed' href="#" class="icon-settings settings edit" title="Settings"></a>
+                    <a data-collapser="true" href="#" class="icon-collapse collapse" title="Collapse Content"></a>
+                    <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
+                </nav>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <ul class="grid medium-block-grid-2 large-block-grid-4">
+                <li>
+                    <div class="avatar-card">
+                        <a href="#" title="View Profile">
+                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
+                            <p>Karl Pilkington</p>
+                        </a>
+                        <p class="meta">Friday April 12th 2015 11:11am</p>
+                        <p class="meta">Edited five days ago</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="avatar-card">
+                        <a href="#" title="View Profile">
+                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
+                            <p>Karl Pilkington</p>
+                        </a>
+                        <p class="meta">Friday April 12th 2015 11:11am</p>
+                        <p class="meta">Edited five days ago</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="avatar-card">
+                        <a href="#" title="View Profile">
+                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
+                            <p>Karl Pilkington</p>
+                        </a>
+                        <p class="meta">Friday April 12th 2015 11:11am</p>
+                        <p class="meta">Edited five days ago</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="avatar-card">
+                        <a href="#" title="View Profile">
+                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
+                            <p>Karl Pilkington</p>
+                        </a>
+                        <p class="meta">Friday April 12th 2015 11:11am</p>
+                        <p class="meta">Edited five days ago</p>
+                    </div>
+                </li>
+            </ul>
+            <div class="content">
+                <a href="#" class="button icon-email">Email all</a>
+            </div>
+        </section>
+    </div>
+</div>
+
+<hr />
+
+<script type="text/javascript">
+    $(function() {
+        $('#content').find('ul[data-sortable]').sortable({
+            handle:      '.grip',
+            axis:        'y'
+        });
+    });
+</script>
+<div class="row">
+    <div class="small-12 island">
+        <h1>Sortable</h1>
+        <h2 class="subheader">You Can Rearrange This List</h2>
+        <ul class="meta">
+            <li class="icon-approve icon-16">Any kind of list will work, not just information lists with avatar cards</li>
+        </ul>
+        <section>
+            <ul class="information-list sortable" data-sortable>
+                <li class="row">
+                    <div class="grip"></div>
+                    <div class="small-11 column no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/230">
+                                <img src="/portrait.php?userId=135&amp;size=square64" />
+                                <h3>David Rhodes</h3>
+                                <p class="meta">Senior Students</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="row">
+                    <div class="grip"></div>
+                    <div class="small-11 column no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/206">
+                                <img src="/portrait.php?userId=134&amp;size=square64" />
+                                <h3>Maddison Rhodes</h3>
+                                <p class="meta">Senior Students</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="row">
+                    <div class="grip"></div>
+                    <div class="small-11 column no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/151">
+                                <img src="/portrait.php?userId=165&amp;size=square64" />
+                                <h3>Zane Smith</h3>
+                                <p class="meta">Teachers</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="row">
+                    <div class="grip"></div>
+                    <div class="small-11 column no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/229">
+                                <img src="/portrait.php?userId=133&amp;size=square64" />
+                                <h3>Rachel Rhodes</h3>
+                                <p class="meta">Senior Students</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="row">
+                    <div class="grip"></div>
+                    <div class="small-11 column no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/245">
+                                <img src="/portrait.php?userId=493&amp;size=square64" />
+                                <h3>Caleb Rhodes</h3>
+                                <p class="meta">Junior Students</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <div class="alert-box">
+            <code>
+                $('#my-sortable-ul').sortable({ handle: '.grip', axis: 'y' });
+            </code>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="small-12 island">
+        <h1 id="image-slider">Image Slider</h1>
+        <!-- Custom javascript -->
+        <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
+        <script type="text/javascript">
+            $(function(){
+                $('[data-imageslider]').anyslider({
+                    interval: 2000,
+                    prevLabel: '',
+                    nextLabel: ''
+                });
+            });
+        </script>
+        <div class="imageslider-container">
+            <div data-imageslider class="imageslider">
+                <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="small-12 island">
+        <h1 id="thumbnails">Thumbnails</h1>
+        <section class="content">
+            <p><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/earth-th-sm.jpg" alt=""><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/space-th-sm.jpg" alt=""></p>
+        </section>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="small-12 island">
+        <h1 id="blockquote">Blockquote</h1>
+        <section class="content">
+            <blockquote>Just because everything else is square, doesn't mean the switch can't be round.<cite>Matthew Sambell</cite></blockquote>
+        </section>
+    </div>
+</div>
+
+<hr />

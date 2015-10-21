@@ -1,0 +1,269 @@
+<script type="text/javascript">
+    $(function() {
+        $('#content').find('ul[data-sortable]').sortable({
+            handle:      '.grip',
+            axis:        'y'
+        });
+    });
+</script>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Matching Pairs</h2>
+        <section id="equalize-me">
+            <div class="content">
+                <h3>Question <span class="meta">(3 marks)</span></h3>
+                <p>Align the foods to the animals that eat them.</p>
+            </div>
+            <div class="row matching-pairs" data-equalizer>
+                <div class="column small-6">
+                    <ul class="information-list">
+                        <li class="row">
+                            <div class="small-12 column" data-equalizer-watch>
+                                <p>Animalia Chordata Mammalia Carnivora Felidae Felinae Felis Silvestris Catus</p>
+                            </div>
+                        </li>
+                        <li class="row">
+                            <div class="small-12 column" data-equalizer-watch>
+                                <p>Animalia Chordata Mammalia Carnivora Canidae Canis Lupus Familiaris</p>
+                            </div>
+                        </li>
+                        <li class="row">
+                            <div class="small-12 column" data-equalizer-watch>
+                                <p>Animalia Chordata Vertebrata Mammalia Lagomorpha Leporidae Brachylagus Idahoensis</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="column small-6">
+                    <ul class="information-list sortable" data-sortable>
+                        <li class="row">
+                            <div class="grip"></div>
+                            <div class="small-11 column no-pad" data-equalizer-watch>
+                                <p>Cortical Mineralized Osseous Tissue</p>
+                            </div>
+                        </li>
+                        <li class="row">
+                            <div class="grip"></div>
+                            <div class="small-11 column no-pad" data-equalizer-watch>
+                                <p>Plantae Angiosperms Eudicots Asterids Apiales Apiaceae Daucus Carota</p>
+                            </div>
+                        </li>
+                        <li class="row">
+                            <div class="grip"></div>
+                            <div class="small-11 column no-pad" data-equalizer-watch>
+                                <p>Animalia Chordata Mammalia Rodentia Muroidea Muridae Murinae Mus Lepidoides</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        <ul class="meta">
+            <li class="icon-alert">Important! You need a special equalizer initialization:</li>
+        </ul>
+        <section>
+            <pre class="alert-box">
+$(function () {
+    $('#equalize-me').foundation({
+        equalizer: {
+            equalize_on_stack: true
+        }
+    });
+});
+            </pre>
+        </section>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('#equalize-me').foundation({
+            equalizer: {
+                equalize_on_stack: true
+            }
+        });
+    });
+</script>
+
+<hr />
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Social Stream</h1>
+        <ul class="meta">
+            <li class="icon-approve icon-16">A unique ingredient; primarily used only in Social Stream but the nested Reply structure may be found in Blog Commentary</li>
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 columns">
+        <ul class="component-titlebar" style='background-color:#ddd'>
+            <li class="actions-small-3">
+                <div class="list-item">
+                    <div class="small-12 card">
+                        <h2><a href="">Example Component Titlebar</a></h2>
+                    </div>
+                </div>
+                <nav>
+                    <a data-target='settings' data-state='closed' href="#" class="icon-settings settings edit" title="Settings"></a>
+                    <a data-collapser="true" href="#" class="icon-collapse collapse" title="Collapse Content"></a>
+                    <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
+                </nav>
+            </li>
+        </ul>
+        <div class="delete-it">
+            <p>Are you sure you want to remove this component? <a href="#" class="success button">Yes</a> <a href="#" class="button">No</a></p>
+        </div>
+    </div>
+</div>
+<div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+    <div class="small-12 island">
+        <section>
+            <div data-socialstream-form class="editPanel socialstream-new-post">
+                <!-- BEGIN socialstream_has_newpost -->
+                <form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}' data-add-post-form class='{FORM_CLASS}' enctype='multipart/form-data'>
+                    <input type='hidden' name='type' value='string' />
+                    <input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
+                    <input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
+                    <input type='hidden' name='parentId' value='0' />
+                    <input type='hidden' name='rootId' value='0' />
+
+                    <label>
+                        <textarea rows="3" cols="50" name="body" placeholder="Share something"></textarea>
+                    </label>
+                    <p>
+                        <input type='submit' value='Post' />
+                    </p>
+                    <div class="row post-attachment attach">
+                        <div class="small-8 large-9 columns">
+                            {ATTACH_ZONE}
+                        </div>
+                        <div class="small-4 large-3 columns">
+                            <a class='button icon-link sstream-attachment' data-value='url'>Link</a>
+                        </div>
+                    </div>
+                    <div class="row post-attachment url" style="display:none">
+                        <div class="small-8 large-9 columns">
+                            <label>
+                                <input type='text' class='url' name='url' maxlength='1024' placeholder="http://" />
+                            </label>
+                        </div>
+                        <div class="small-4 large-3 columns">
+                            <a class='button icon-attach sstream-attachment' data-value='attach'>Attach</a>
+                        </div>
+                    </div>
+                </form>
+                <!-- END socialstream_has_newpost -->
+            </div>
+
+            <div data-socialstream-browser></div>
+
+            <div id='socialstream-{COMPONENT_INSTANCE_ID}'>
+                <ul class='information-list social-stream' data-socialstream-threads>
+                    <!-- BEGIN socialstream_post -->
+                    <li class="actions-small-1" data-socialstream-row>
+                        <div class="list-item">
+                            <div class="avatar card small-12">
+                                <a href="/search/user/3" title="View Profile">
+                                    <img src="/portrait.php?userId=8&size=square64" alt="Moggy" class="hide-for-small-only">
+                                    <p>Celia Glenn</p>
+                                    <p class="meta">Posted 43 seconds ago</p>
+                                </a>
+                            </div>
+                            <article data-body class="body">
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce fringilla risus imperdiet lacus lacinia, non vestibulum mauris fermentum. Aenean ac cursus nulla, eu mattis lorem. Ut id nisi velit. In eu congue odio. Morbi leo diam, viverra ut massa ut, lobortis tincidunt nulla. Suspendisse non neque non est tincidunt lacinia at at erat. In in varius erat. Nam vulputate est est, eu mattis eros interdum vitae. Integer leo leo, gravida bibendum dui eget, placerat sagittis libero. Nullam ac semper tortor. Mauris augue nunc, porttitor in nulla nec, consectetur ultrices ex. Vestibulum sit amet nisi scelerisque odio convallis elementum. Proin vitae varius nulla.
+                                </p>
+                            </article>
+                        </div>
+                        <nav>
+                            <!-- BEGIN socialstream_post_has_delete -->
+                            <a href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}" class="icon-delete no-text" title='Delete post' data-socialstream-delete></a>
+                            <!-- END socialstream_post_has_delete -->
+
+                            <!-- BEGIN socialstream_post_has_add -->
+                            <a href="#" class="icon-comment no-text" title="Add Reply" data-parentid="{SOCIALSTREAM_POST_POST_ID}" data-add-post-link data-rootid="{SOCIALSTREAM_POST_POST_ID}"></a>
+                            <!-- END socialstream_post_has_add -->
+                        </nav>
+
+                        <!-------------------------->
+                        <!-- Socialstream Comment -->
+                        <!-------------------------->
+                        <ul class="information-list reply">
+                            <!-- BEGIN socialstream_comment -->
+                            <li class="actions-small-1" data-socialstream-row>
+                                <div class="list-item">
+                                    <div class="avatar card small-12">
+                                        <a href="/search/user/230" title="View Profile">
+                                            <img src="/portrait.php?userId=135&size=square64" alt="" class="hide-for-small-only">
+                                            <p>Dr Hodes</p>
+                                            <p class="meta">Posted 43 seconds ago</p>
+                                        </a>
+                                    </div>
+
+                                    <article data-body class="body">
+                                        <p>
+                                            Duis a justo non urna posuere consequat eget ut arcu. Quisque sed nisi metus. Mauris eu pulvinar dui, vel efficitur nisi. Nam sed dolor tortor. Sed eleifend consequat eros, a consectetur quam dapibus vel. Morbi fermentum purus arcu, quis eleifend metus volutpat sit amet. Nulla tristique risus ex, non fermentum nibh condimentum ac. Morbi condimentum orci a sem hendrerit laoreet.
+                                        </p>
+                                    </article>
+                                </div>
+                                <nav>
+                                    <!-- BEGIN socialstream_comment_has_delete -->
+                                    <a class="icon-delete" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}" title="Delete Comment" data-socialstream-delete></a>
+                                    <!-- END socialstream_comment_has_delete -->
+
+                                    <!-- BEGIN socialstream_comment_has_add -->
+                                    <a class="icon-comment" href="#" title="Add Reply" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_COMMENT_POST_ID}" data-add-post-link></a>
+                                    <!-- END socialstream_comment_has_add -->
+                                </nav>
+
+                                <!------------------------>
+                                <!-- Socialstream Reply -->
+                                <!------------------------>
+                                <ul class="information-list reply">
+                                    <!-- BEGIN socialstream_reply -->
+                                    <li class="actions-small-1" data-socialstream-row>
+                                        <div class="list-item">
+                                            <div class="avatar card small-12">
+                                                <a href="/search/user/19" title="View Profile">
+                                                    <img src="/portrait.php?userId=485&size=square64" alt="" class="hide-for-small-only">
+                                                    <p>Alaress Admin</p>
+
+                                                    <p class="meta">Posted 43 seconds ago</p>
+                                                </a>
+                                            </div>
+
+                                            <article data-body class="body">
+                                                <p>
+                                                    Nullam finibus ultrices lorem, et cursus augue mattis vitae. Nulla tincidunt elementum eros a elementum. Cras eget lorem pulvinar, luctus justo quis, volutpat ex. Suspendisse et odio libero. Phasellus ac libero at nibh imperdiet tristique a vel dolor. Phasellus euismod orci vel ipsum cursus, a venenatis ex feugiat. Praesent eleifend dolor vel massa fermentum gravida.
+                                                </p>
+                                            </article>
+                                        </div>
+                                        <nav>
+                                            <!-- BEGIN socialstream_reply_has_delete -->
+                                            <a class="icon-delete" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}" title="Delete Reply" data-socialstream-delete></a>
+                                            <!-- END socialstream_reply_has_delete -->
+                                        </nav>
+                                    </li>
+                                    <!-- END socialstream_reply -->
+                                </ul>
+                                <!------------------------>
+                                <!-- Socialstream Reply -->
+                                <!------------------------>
+                            </li>
+                            <!-- END socialstream_comment -->
+                        </ul>
+                        <!-------------------------->
+                        <!-- Socialstream Comment -->
+                        <!-------------------------->
+                    </li>
+                    <!-- END socialstream_post -->
+                </ul>
+
+                <div class="content">
+                    <a class="button icon-comment" data-socialstream-view-more>Load More</a>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
