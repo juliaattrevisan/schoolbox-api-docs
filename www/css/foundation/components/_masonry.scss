@@ -35,7 +35,7 @@ $masonry-drop-background: $input-focus-bg-color;
      */
     margin: 0 !important;
 
-    &.disabled {
+    .disabled {
         opacity: 0.3;
         pointer-events: none;
         cursor: not-allowed;
