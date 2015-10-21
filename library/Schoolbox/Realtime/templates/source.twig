@@ -1,26 +1,23 @@
-<li class="source" data-source="{{ sources[source.id].key }}">
-    <form> {# for some reason required for formatting and js targeting -_- #}
-        <h4>
-            <a class="exp darr" href="#">&#9660;</a>
-            <span class="label">"Send a message when {{ sources[source.id].description }}."</span>
-            <em class="summary">&nbsp;</em>
-        </h4>
-    </form>
-    <form method="post" style="display:none;" action="{{ routeLookup('adminMessages.saveConfig') }}">
-        <table class="roles digest-settings">
-            {% for role in source.roles %}
-                <tr class="role" data-role="{{ role.id }}">
-                    <th width="300">
-                        {{ roles[role.id].name }}
-                    </th>
-                    {% include '@messages/options.twig' with { mode: 'p' } %}
-                    <td class="custom">
-                        <span class="actions">
-                            <a href="#" class="btn no-text modify" title="Advanced"><span></span></a>
-                        </span>
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
-    </form>
-</li>
+<fieldset class="collapsible content" data-source="{{ sources[source.id].key }}">
+    <legend data-collapser="fset-{{ ns[namespace.id].slug }}-{{ sources[source.id].key }}" class="icon-add">Send a message when {{ sources[source.id].description }}.</legend>
+    <div class="small-12 column">
+        <p class="meta" data-summary></p>
+    </div>
+    <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="fset-{{ ns[namespace.id].slug }}-{{ sources[source.id].key }}">
+        <form method="post" action="{{ routeLookup('adminMessages.saveConfig') }}">
+            <ul class="permission-list" data-roles data-digest-settings>
+                {% for role in source.roles %}
+                <li data-role="{{ role.id }}">
+                    <label data-role-title>{{ roles[role.id].name }}</label>
+                    <div class="actions-small-6">
+                        <nav data-custom>
+                            {% include '@messages/options.twig' with { mode: 'p' } %}
+                            <a href="#" class="icon-modify" title="Advanced" data-custom-advanced></a>
+                        </nav>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </form>
+    </div>
+</fieldset>

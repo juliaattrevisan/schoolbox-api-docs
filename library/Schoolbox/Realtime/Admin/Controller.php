@@ -256,8 +256,10 @@ class Controller extends BaseController
 
 
     /**
-     * @api   POST /adminv2/messages/configure
-     * @level 150
+     * Note: roletype is actually ignored...
+     *
+     * @api   POST /adminv2/messages/configure{/roletype}
+     * @level 155
      */
     public function saveConfig()
     {

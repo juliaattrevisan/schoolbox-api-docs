@@ -1,6 +1,6 @@
 /* Action buttons in Action/Information Lists
  */
-@mixin action-html-classes($size, $button-size: 3rem, $button-color: $content-ui-foreground) {
+@mixin action-html-classes($size, $button-size: rem-calc(38px), $button-color: $content-ui-foreground) {
 	@for $i from 1 through $total-columns {
 		.actions-#{$size}-#{$i} {
 			position: relative;
@@ -24,12 +24,14 @@
 				top: 0;
 				right: 0;
 				height: $button-size;
+				white-space: nowrap;
 
 				a {
 					display: inline-block;
 					text-align: center;
 					width: $button-size;
 					line-height: $button-size;
+					height: $button-size;
 					color: $button-color;
 
 					&:before {
@@ -42,8 +44,11 @@
 						color: $content-ui-selected;
 						background-color: $button-color;
 					}
-					&:hover {
-					    background-color: $content-ui-hover;
+				}
+				input:checked + label {
+					a {
+						background-color: $button-color;
+						color: calc-text-color($button-color);
 					}
 				}
 			}

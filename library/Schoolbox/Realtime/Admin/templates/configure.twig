@@ -1,5 +1,5 @@
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/notifications/jquery.msg-config.js"></script>
-<script type="text/javascript" src="/javascript/shared/notifications/jquery.svg-inline.js"></script>
 <!--suppress NonShortCircuitBooleanExpressionJS -->
 <script type="text/javascript">
 
@@ -20,17 +20,14 @@
 
         var ii, configurator;
 
-        // inlineify all SVGs
-        $('body').svgInline();
-
         configurator = $('#configurator').msgconfig({
-            sourceSelector: 'li.source',
-            tableSelector:  '.digest-settings',
-            roleSelector:   'tr',
-            customSelector: 'td.custom',
-            permSelector:   '.perm',
+            sourceSelector: '[data-source]',
+            tableSelector:  '[data-digest-settings]',
+            roleSelector:   '[data-role]',
+            customSelector: '[data-custom]',
+            permSelector:   '[data-perm-container]',
             persist: function () {
-                var form = this.children('form[method=post]');
+                var form = this.find('form[method=post]');
 
                 // clear any previous cache-timeout
                 if (ii) {
@@ -38,22 +35,22 @@
                 }
 
                 ii = setTimeout(function () {
-                    $.post(form.attr('action'), form.serialize(), customiserCallback);
+                    $.post(form.attr('action'), form.serialize()).done(customiserCallback);
                 }, 1000);
 
             },
             describe: function () {
 
-                var summary = this.find('h4 em.summary'),
-                    table   = this.find('table.roles'),
-                    rows    = table.find('tr.role'),
+                var summary = this.find('[data-summary]'),
+                    table   = this.find('[data-roles]'),
+                    rows    = table.find('[data-role]'),
                     text    = 'Sent to ',
                     count   = 0;
 
                 rows.each(function () {
                     var row  = $(this),
                         ins  = row.find('input[data-perm]:checked'),
-                        role = row.children('th').text(),
+                        role = row.find('[data-role-title]').text(),
                         sum  = 0;
 
                     if (!role) {
@@ -100,30 +97,46 @@
 
             },
             advanced: function () {
-                var row    = this.closest('tr'),
+                var row    = this.closest('[data-role]'),
                     dialog = $('#slider-modal'),
-                    query  = [
-                        'source='+row.closest('[data-source]').data('source'),
-                        'slug='+row.closest('[data-namespace]').data('namespace'),
-                        {% if filters.options[filters.selected] != 'all' %}'roletype={{ filters.options[filters.selected] }}',{% endif %}{# twig inside js... what could possibly go wrong... #}
-                        'role='+row.data('role')
-                    ].join('&');
+                    src = row.closest('[data-source]');
 
-                dialog.load('/adminv2/messages/configure/custom', query, function () {
-                    var src = row.closest('.source');
+                var data = {
+                    source: row.closest('[data-source]').data('source'),
+                    slug: row.closest('[data-namespace]').data('namespace'),
 
-                    dialog.dialog({
-                        modal: true,
-                        resizable: false,
-                        width: 640,
-                        title: 'Advanced Settings',
-                        close: function () {
-                            configurator.msgconfig('describe', src);
-                        }
-                    });
+                    {# twig inside js... what could possibly go wrong... #}
+                    {% if filters.options[filters.selected] != 'all' %}
+                    roletype: '{{ filters.options[filters.selected] }}',
+                    {% endif %}
+
+                    role: row.data('role')
+                }
+
+                /* Replace with a foundation modal
+                 */
+                // url with extra parameters
+                dialog.foundation('reveal', 'open', {
+                    url: '/adminv2/messages/configure/custom',
+                    data: data
+                });
+
+                /* Bypass foundation bug
+                 * https://github.com/zurb/foundation/issues/4746
+                 */
+                dialog.on('opened', function() {
+                    var closeButton = '<a class="close-reveal-modal">&#215;</a>';
+
+                    dialog.append(closeButton);
+                });
+
+                dialog.on('close.fndtn.reveal', function() {
+                    configurator.msgconfig('describe', src);
                 });
             }
         });
+
+        $('[data-collapser]').collapsable();
     });
 
     function customiserCallback(data) {
@@ -132,15 +145,15 @@
 
         $.each(data, function (slug, sources) {
 
-            var $ns = $('#configurator').find('li[data-namespace='+slug+']');
+            var $ns = $('#configurator').find('[data-namespace='+slug+']');
 
             $.each(sources, function (source, roles) {
 
-                var $src = $ns.find('li[data-source='+source+']');
+                var $src = $ns.find('[data-source='+source+']');
 
                 $.each(roles, function (role, config) {
 
-                    var $role = $src.find('tr[data-role='+role+']'),
+                    var $role = $src.find('[data-role='+role+']'),
                         options,
                         inDefault = function () {
                             var p = $(this).data('perm');
@@ -176,21 +189,29 @@
             });
         });
     }
-
-
 </script>
-<div class="admin-contents clearfix">
-    <h2>Global Message Settings</h2>
-    <p class="clearfix">
-        <a class="btn go-back float-left" href="{{ '/adminv2/messages' }}"><span></span>Back to Messages</a>
-    </p>
-    <div class="level clearfix">
-        <p>Use this page to configure the messages the system will send to users.</p>
-        <h3>Settings</h3>
-        <div class="wysiwyg">
+
+<ul class="breadcrumb">
+    <li><a href="/adminv2/home">Admin</a></li>
+    <li><a href="/adminv2/messages">Messages</a></li>
+    <li class="active"><a href="">Global Message Settings</a></li>
+</ul>
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Global Message Settings</h1>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <p>Use this page to configure the messages the system will send to users.</p>
             <ul>
                 <li>
-                    <em>Selected options</em> are way this message should be received (remembering users can personalise their settings).
+                    <em>Selected options</em> are way this message should be received by default (remembering users can personalise their settings).
                 </li>
                 <li>
                     <em>Disabled options</em> will not be selectable by users of the given role
@@ -202,31 +223,44 @@
                     To hide a message source from members of a role, lock that source to Muted
                 </li>
             </ul>
+        </section>
+
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader" id="filter">Configure Settings</h2>
+                </div>
+            </div>
+            <nav>
+                <a href="#" data-reveal-id="legend-modal" class="icon-help" title="View Help"></a>
+            </nav>
         </div>
-        {% include '@messages/legend.twig' with { digest: true, mobile: 'plural', who: 'users' } %}
-        <ul class="filter admin-nav clearfix">
-            <li>
-                <span>Filter messages relevant to:</span>
-            </li>
+
+        <ul class="sub-nav">
             {% for i, filter in filters.options %}
-            <li>
-                <a href="/adminv2/messages/configure{{ filter == 'all' ? '' : ('/' ~ filter) }}" class="{% if filters.selected == i %}current{% endif %}">{{ filter | capitalize }}</a>
-            </li>
+                <li class="{% if filters.selected == i %}active{% endif %}">
+                    <a href="/adminv2/messages/configure{{ filter == 'all' ? '' : ('/' ~ filter) }}">{{ filter | capitalize }}</a>
+                </li>
             {% endfor %}
         </ul>
-        <div class="clearfix pad-it"></div>
-        <ul id="configurator" class="namespaces">
+
+        <div id="configurator">
             {% for namespace in config %}
-            <li class="namespace" data-namespace="{{ ns[namespace.id].slug }}">
-                <h3>{{ ns[namespace.id].label }}</h3>
-                <ul class="sources">
+            <h3 class="subheader">{{ ns[namespace.id].label }}</h3>
+            <section data-namespace="{{ ns[namespace.id].slug }}">
                 {% for source in namespace.sources %}
                     {% include '@messages/source.twig' with { source: source } %}
                 {% endfor %}
-                </ul>
-            </li>
+            </section>
             {% endfor %}
-        </ul>
+        </div>
     </div>
 </div>
-<div id="slider-modal" class="namespaces" style="display:none;"></div>
+
+<div id="slider-modal" class="reveal-modal" data-reveal></div>
+
+<div id="legend-modal" class="reveal-modal" data-reveal>
+    {% include '@messages/legend.twig' with { digest: true, mobile: 'plural', who: 'users' } %}
+
+    <a class="close-reveal-modal">&#215;</a>
+</div>

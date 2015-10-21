@@ -297,6 +297,48 @@ th, td{
     }
 }
 
+// Toggle Checkbox (VAPORWAVE)
+@mixin vaporwave($label-class: false, $toggle-size: ($input-height - 0.5), $background-color: $content-ui-foreground, $hover-background-color: $button-bg-hover, $active-color: $content-ui-foreground) {
+
+	$label-selector: "label";
+
+	// overwrite to append class if required
+	@if($label-class) {
+		$label-selector: "label.#{$label-class}";
+	}
+
+	+ #{$label-selector} {
+		font-weight: $font-weight-normal;
+		margin: 0;
+		line-height: $toggle-size;
+		height: $toggle-size;
+		width: $toggle-size;
+		text-align: center;
+		@include single-transition(background-color, 0.15s, linear);
+		span:before{
+			@extend .no-text;
+			display: block;
+			float: none;
+		}
+	}
+
+	&:hover {
+		+ #{$label-selector} {
+			background-color: $hover-background-color;
+		}
+	}
+
+	&:checked {
+		+ #{$label-selector} {
+			background-color: $active-color;
+			color: calc-text-color($active-color);
+			[class^="icon-"]{
+				color: calc-text-color($active-color);
+			}
+		}
+	}
+}
+
 // Beautifully styled checkboxes - just use the "plain" class
 input[type=radio].plain,
 input[type=checkbox].plain {
@@ -311,8 +353,30 @@ input[type=checkbox].plain {
     }
 }
 
-input[type=radio]:not(.plain)    { @include fancy-check('radio-label'); }
-input[type=checkbox]:not(.plain) { @include fancy-check('checkbox-label'); }
+.toggle-set {
+	@include flex;
+	justify-content: space-between;
+	max-width: 20rem;
+
+	> div {
+		display: inline; // this is purely to appease IE 9, you can kill it once we drop support
+	}
+
+	input[type=radio]:not(.plain),
+	input[type=checkbox]:not(.plain) {
+		@include vaporwave();
+	}
+}
+
+input[type=radio]:not(.plain)    {
+	@include fancy-check('radio-label');
+	@include vaporwave('radio-toggle');
+}
+
+input[type=checkbox]:not(.plain) {
+	@include fancy-check('checkbox-label');
+	@include vaporwave('checkbox-toggle');
+}
 
 input[type=radio]:not(.plain) + label {
     &:before, &:after {
@@ -334,37 +398,6 @@ input[type=radio]:not(.plain):disabled{
 input[type=checkbox]:not(.plain):disabled:checked + label,
 input[type=radio]:not(.plain):disabled:checked + label{
   opacity: 0.5;
-}
-
-// Toggle Checkbox (VAPORWAVE)
-input[type=checkbox]:not(.plain) + label.checkbox-toggle,
-input[type=radio]:not(.plain) + label.radio-toggle {
-	background-color: $content-ui-foreground;
-	font-weight: $font-weight-normal;
-	margin-left: 0;
-	height: 1.5rem;
-	width: 1.5rem;
-	text-align: center;
-	@include single-transition(background-color, 0.15s, linear);
-	span:before{
-		@extend .no-text;
-		display: block;
-		float: none;
-	}
-}
-
-input[type=checkbox]:not(.plain):hover + label.checkbox-toggle,
-input[type=radio]:not(.plain):hover + label.radio-toggle {
-	background-color: $button-bg-hover;
-}
-
-input[type=checkbox]:not(.plain):checked + label.checkbox-toggle,
-input[type=radio]:not(.plain):checked + label.radio-toggle {
-	background-color: $success-color;
-	color: $white;
-	[class^="icon-"]{
-		color: $white;
-	}
 }
 
 select.visibility {
@@ -455,6 +488,29 @@ section > fieldset {
 	}
 	@media #{$medium-only} {
 		padding: 0 0.25rem;
+	}
+
+	&.collapsible {
+
+		> legend {
+
+			color: inherit;
+			width: auto;
+			text-indent: rem-calc(-26px);
+
+			@media #{$small-only} {
+				margin-left: 0;
+			}
+			@media #{$medium-up} {
+				margin-left: rem-calc(26px);
+			}
+
+			&:before {
+				@extend a;
+			}
+
+		}
+
 	}
 
 	// second sibling onwards

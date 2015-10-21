@@ -1,49 +1,93 @@
-{# TODO move this to core #}
-<style type="text/css">
-    dl {
-        padding: 16px 16px 0 16px;
-        background: #fafafa;
-        border: solid 1px #f0f0f0;
-        margin-bottom: 16px;
-    }
-    dd {
-        margin-bottom: 18px;
-    }
-    dt {
-        width: 32px;
-        margin-left: 8px;
-    }
-    dt.undefined {
-        width: 16px;
-        text-align: center;
-        height: 24px;
-        line-height: 16px;
-        font-weight: normal;
-    }
-    em em {
-        color: red;
-        font-weight: bold;
-        font-size: 1.2em;
-    }
-</style>
-<h3>Message Delivery Options</h3>
-<dl>
-    <dt><img src="/images/core/messaging/muted.svg" alt="Muted" width="16" /></dt>
-    <dd>Muted: {{ who }} won't receive this message.</dd>
-    {% if digest %}
-        <dt><img src="/images/core/messaging/digest.svg" alt="Digest" width="16" /></dt>
-        <dd>Digest: this message will be collated and emailed to {{ who }} in a digest{% if digest | length > 1 %} <strong>{{ digest | raw }}</strong>{% endif %}.<br/>
-            It will not appear in {{ who }}{{ who == 'you' ? 'r' : "'" }} internal messages list.
-        </dd>
-    {% endif %}
-    <dt><img src="/images/core/messaging/instant.svg" alt="Instant" width="16" /></dt>
-    <dd>Instant: this message will appear in {{ who }}{{ who == 'you' ? 'r' : "'" }} internal messages list.</dd>
-    <dt class="undefined">+</dt>
-    {% if mobile %}
-        <dt><img src="/images/core/messaging/mobile.svg" alt="Mobile" width="16" /></dt>
-        <dd>Mobile: this message will be pushed to {{ who }}{{ who == 'you' ? 'r' : "'" }} mobile device{% if mobile | length > 1 %}s{% endif %}. <em><em>*</em>Requires Instant to be enabled.</em></dd>
-    {% endif %}
-    <dt><img src="/images/core/messaging/email.svg" alt="Email" width="16" /></dt>
-    <dd>Email: this message will be immediately emailed to {{ who }}. <em><em>*</em>Requires Instant to be enabled.</em></dd>
-    <dt class="clearfix" style="float:none;"></dt>
-</dl>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Message Delivery Options</h2>
+        <section>
+            <ul class="information-list">
+                <li>
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
+                            <span class="icon-mute icon-32"></span>
+                            <p>
+                                Muted
+                            </p>
+                            <p class="meta">
+                                {{ who | capitalize }} won't receive this message.
+                            </p>
+                        </div>
+                    </div>
+                </li>
+
+                {% if digest %}
+                <li>
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
+                            <span class="icon-news icon-32"></span>
+                            <p>
+                                Digest
+                            </p>
+                            <p class="meta">
+                                This message will be collated and emailed to {{ who }} in a digest{% if digest | length > 1 %} <strong>{{ digest | raw }}</strong>{% endif %}.<br/>
+                                It will not appear in {{ who }}{{ who == 'you' ? 'r' : "'" }} internal messages list.
+                            </p>
+                        </div>
+                    </div>
+                </li>
+                {% endif %}
+
+                <li>
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
+                            <span class="icon-notifications icon-32"></span>
+                            <p>
+                                Instant
+                            </p>
+                            <p class="meta">
+                                This message will appear in {{ who }}{{ who == 'you' ? 'r' : "'" }} internal messages list.
+                            </p>
+                        </div>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
+                            <span class="icon-add icon-32"></span>
+                        </div>
+                    </div>
+                </li>
+
+                {% if mobile %}
+                <li>
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
+                            <span class="icon-mobile icon-32"></span>
+                            <p>
+                                Mobile
+                            </p>
+                            <p class="meta">
+                                This message will be pushed to {{ who }}{{ who == 'you' ? 'r' : "'" }} mobile device{% if mobile | length > 1 %}s{% endif %}. <br />
+                                * Requires Instant to be enabled.
+                            </p>
+                        </div>
+                    </div>
+                </li>
+                {% endif %}
+
+                <li>
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
+                            <span class="icon-email icon-32"></span>
+                            <p>
+                                Email
+                            </p>
+                            <p class="meta">
+                                This message will be immediately emailed to {{ who }}.<br />
+                                * Requires Instant to be enabled.
+                            </p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+</div>

@@ -12,25 +12,11 @@
         noop       = function () {};
 
     var defaults = {
-        sourceSelector: 'li[data-source]',
-        tableSelector:  'table[data-settings]',
-        roleSelector:   'tr',
-        customSelector: 'td[data-custom]',
+        sourceSelector: '[data-source]',
+        tableSelector:  '[data-settings]',
+        roleSelector:   '[data-role]',
+        customSelector: '[data-custom]',
         permSelector:   '[data-perm]',
-
-        expand: {
-            selector: 'a.exp',
-            duration: 200,
-            down: {
-                btnClass: 'darr',
-                arrow: "&#9660;"
-            },
-            up: {
-                btnClass: 'uarr',
-                arrow: "&#9650;"
-            },
-            target: function () { return this.closest('form').siblings('form').eq(0); }
-        },
 
         disabledClass:     'disable',
         simpleClass:       'modify',
@@ -79,37 +65,13 @@
         this.sources = $(this.element).find(this.sel('source'));
 
         if (self.options.customSelector) {
-            $(this.element).on('click', this.sel('custom', 'a'), function (e) {
+            $(this.element).on('click', this.sel('[data-custom]', '[data-custom-advanced]'), function (e) {
                 var link = $(this);
 
                 e.preventDefault();
                 e.stopPropagation();
 
                 self.options.advanced.call(link);
-            });
-        }
-
-        if (self.options.expand) {
-            $(this.element).on('click', self.options.expand.selector, function (e) {
-                var btn  = $(this),
-                    form = self.options.expand.target.call(btn),
-                    up   = self.options.expand.up,
-                    down = self.options.expand.down;
-
-                e.preventDefault();
-                e.stopPropagation();
-
-                if (btn.hasClass(down.btnClass)) {
-                    // change to uarr, expand content
-                    btn.removeClass(down.btnClass).addClass(up.btnClass).html(down.arrow);
-                    form.show(self.options.expand.duration);
-
-                } else {
-                    // change to darr, contract content
-                    btn.removeClass(up.btnClass).addClass(down.btnClass).html(up.arrow);
-                    form.hide(self.options.expand.duration);
-                }
-
             });
         }
 

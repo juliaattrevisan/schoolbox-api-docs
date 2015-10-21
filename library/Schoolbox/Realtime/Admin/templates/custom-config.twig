@@ -1,3 +1,14 @@
+{# Translate into class names #}
+{%
+set iconClassnames = {
+    'Muted': 'mute',
+    'Digest': 'news',
+    'Instant': 'notifications',
+    'Mobile': 'mobile',
+    'Email': 'email'
+}
+%}
+
 <script type="text/javascript">
     $(function () {
 
@@ -20,7 +31,7 @@
 
                 if (tgt.data('perm') == 1) {
                     // deselect the other perms
-                    src.closest('tr').find('input').filter(
+                    src.closest('[data-role]').find('input').filter(
                         function () {
                             return this.value > 1 && this.value < 8
                         }
@@ -50,18 +61,17 @@
         posTable.on('click preclick', 'input[value=2], input[value=4]', function (e) {
             if ($(this).prop('checked')) {
                 // ensure instant is checked
-                $(this).closest('tr').find('input[value=1]').prop('checked', true).trigger('preclick');
+                $(this).closest('[data-role]').find('input[value=1]').prop('checked', true).trigger('preclick');
             }
         });
 
         posTable.find('input').trigger('preclick');
 
-        // inlineify all SVGs and apply message admin constraints
+        // Apply message admin constraints
         $('#adv')
-            .svgInline()
             .msgconfig({
-                roleSelector: 'tr[data-role]',
-                permSelector: 'td.perm',
+                roleSelector: '[data-role]',
+                permSelector: '[data-perm-container]',
                 toggleSelector: null,
                 muteSelector: null,
                 customSelector: null
@@ -72,57 +82,78 @@
             $(this).find('input[type=submit]').attr('disabled', 'disabled').val('Saving');
 
             $.post('/adminv2/messages/configure', $(this).serialize(), function (data) {
-                console.log(data);
                 customiserCallback(data);
-                $('#slider-modal').dialog('close').dialog('destroy');
+                $('#slider-modal').foundation('reveal', 'close');
             });
         });
 
     });
 </script>
-<ul class="namespaces" id="adv">
-<li class="source" data-source="{{ source.id }}">
-    <form method="post" action="">
-        <h4>
-            <span class="label">"Send a message when {{ source.description }}."</span>
-            <em class="summary">&rarr; {{ role.name }}</em>
-        </h4>
-        <p>
-            <strong>Step 1:</strong> Select the settings that members of '{{ role.name }}' are <em>allowed to select</em> for this message when customizing their notifications.
-            If you only select a single option, users will be locked to that option.
-        </p>
-        <table class="roles digest-settings" id="adv-possibilities">
-            <tr class="role">
-                {% for level, perm in perms %}
-                    <td class="perm">
-                        <input id="opt-{{ source.id }}-{{ role.id }}-{{ level }}"
-                               name="data[{{ ns[namespace.id].slug ?: 0 }}][{{ source.key ?: 0 }}][{{ role.id }}][mask][]"
-                               value="{{ level }}" type="checkbox"
-                               {% if perm[1] | slice(0, 2) | upper in role.mask %}checked="checked"{% endif %}
-                        />
-                        <label for="opt-{{ source.id }}-{{ role.id }}-{{ level }}" title="{{ perm[1] }}">
-                            <span>
-                                <img src="/images/core/messaging/{{ perm[1] | lower }}.svg" alt="{{ perm[1] }}" />
-                                {#{% include '@adminMessages/icons/' ~ perm[1] | lower ~ '.svg' %}#}
-                                {#{{ perm[1] | slice(0, 2) | upper }}#}
-                            </span>
-                        </label>
-                    </td>
-                    {% if level == 1 %}<td>+</td>{% endif %}
-                {% endfor %}
-            </tr>
-        </table>
-        <p><strong>Step 2:</strong> Select the default setting for members of '{{ role.name }}' for this message.</p>
-        <table class="roles digest-settings" data-settings id="adv-selection">
-            <tr class="role" data-role="{{ role.id }}">
-                {% include '@messages/options.twig' with { mode: 'def' } %}
-            </tr>
-        </table>
-        <label class="float-right">
-            <input type="checkbox" name="copy-to" value="{{ roletype ?: 'all' }}" /> Copy these message settings for all {{ roletype }} roles
-        </label>
-        <input type="submit" class="submit-btn-plain" value="Save" />
-    </form>
-</li>
-</ul>
 
+<ul id="adv" class="information-list">
+    <li data-source="{{ source.id }}">
+        <form method="post" action="">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <h4>Send a message when {{ source.description }}.</h4>
+                        <p class="meta" data-summary>Sends to {{ role.name }}</p>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <p>
+                            <strong>Step 1:</strong> Select the settings that members of '{{ role.name }}' are <em>allowed to select</em> for this message when customizing their notifications.
+                            If you only select a single option, users will be locked to that option.
+                        </p>
+
+                        <ul class="permission-list" id="adv-possibilities" data-roles data-digest-settings>
+                            <li data-role>
+                                {% for level, perm in perms %}
+                                    <span data-perm-container>
+                                        <input id="opt-{{ source.id }}-{{ role.id }}-{{ level }}"
+                                               name="data[{{ ns[namespace.id].slug ?: 0 }}][{{ source.key ?: 0 }}][{{ role.id }}][mask][]"
+                                               value="{{ level }}" type="checkbox"
+                                               {% if perm[1] | slice(0, 2) | upper in role.mask %}checked="checked"{% endif %}
+                                        />
+                                        <label for="opt-{{ source.id }}-{{ role.id }}-{{ level }}" title="{{ perm[1] }}" class="no-margin">
+                                            <a class="icon-{{ iconClassnames[perm[1]] }}" title="{{ perm[1] }}"></a>
+                                        </label>
+                                    </span>
+                                    {% if level == 1 %}
+                                    <span class="icon-add"></span>
+                                    {% endif %}
+                                {% endfor %}
+                            </li>
+                        </ul>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <p>
+                            <strong>Step 2:</strong> Select the default setting for members of '{{ role.name }}' for this message.
+                        </p>
+                        <ul class="permission-list" id="adv-selection" data-roles data-digest-settings data-settings>
+                            <li data-role="{{ role.id }}">
+                                {% include '@messages/options.twig' with { mode: 'def' } %}
+                            </li>
+                        </ul>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <p>
+                            <strong>Copy settings?</strong>
+                        </p>
+                        <input type="checkbox" id='copy-message-settings' name="copy-to" value="{{ roletype ?: 'all' }}" />
+                        <label for="copy-message-settings" class="checkbox-label">
+                            Copy these message settings for all {{ roletype }} roles
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Save" />
+        </form>
+    </li>
+</ul>
