@@ -447,12 +447,13 @@ ul.az-error-list {
         text-align: center;
     }
     .dz-remove {
-        color: $content-ui-foreground;
+        //@extend .button;
+        //color: $content-ui-foreground;
         //position: absolute;
         //bottom: 0;
         //left: 0;
-        width: 100%;
-        text-align: center;
+        //width: 100%;
+        //text-align: center;
     }
     .dz-error .dz-error-mark,
     .dz-success .dz-success-mark {
