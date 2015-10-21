@@ -983,12 +983,18 @@ nav {
 			> li {
 
 				@media #{$media-down} {
-					&:nth-child(n+#{$i + 1}) {
+					// Any button after $i not an overflow gets hidden
+					&:nth-child(n+#{$i + 1}):not(.overflow) {
+						@content;
+					}
+					// Any overflow before $i - 1 gets hidden
+					&:nth-child(-n+#{$i - 1}).overflow {
 						@content;
 					}
 				}
 
 				@media #{$media-up} {
+					// In the overflow: any button before $i gets hidden
 					&.overflow > ul.f-dropdown {
 						li:nth-child(-n+#{$i}) {
 							@content;
@@ -1021,7 +1027,6 @@ ul.flex-list {
 		}
 		&.overflow {
 			width: 3rem;
-			display: table-cell !important; // override flex hiding
 		}
 		> a {
 			width: 100%;
