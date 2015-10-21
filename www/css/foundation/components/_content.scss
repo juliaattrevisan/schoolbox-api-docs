@@ -1297,15 +1297,37 @@ ul.flex-list {
              */
             .label {
                 &.status {
-                    margin-left: 0.125rem;
                     position: static;
+                    @media #{$medium-up} {
+                        margin-left: -0.125rem;
+                    }
+                    @media #{$large-up} {
+                        margin-left: 0.125rem;
+                    }
                 }
             }
 
             /* A sequence of labels
              */
             .label-group {
+                margin-top: 0.5rem;
+
+                /* Align text within labels
+                 */
+                @media #{$small-only} {
+                    margin-left: -1.5rem;
+                }
+                @media #{$medium-up} {
+                    margin-left: -0.875rem;
+                }
+                @media #{$large-up} {
+                    margin-left: -0.875rem;
+                }
+
+                /* Hairline fracture between labels in sequence
+                 */
                 .label {
+                    margin-right: -0.125rem;
                 }
             }
         }
