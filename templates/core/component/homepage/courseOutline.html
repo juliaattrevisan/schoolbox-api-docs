@@ -158,7 +158,7 @@
                                     <a href="#" class="icon-delete" data-interaction="open_delete_task_form" title="Delete this task"></a>
                                     <!-- END unit_task_delete -->
                                     <!-- BEGIN unit_task_modify -->
-                                    <a href="{UNIT_TASK_MODIFY_URL}" class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task"></a>
+                                    <a href="{UNIT_TASK_MODIFY_URL}" data-reveal-id="modifyTask-{UNIT_TASK_ID}" class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task"></a>
                                     <!-- END unit_task_modify -->
                                     <!-- BEGIN unit_task_quiz_results -->
                                     <a href="/assess/results/{UNIT_QUIZ_ID}" class="icon-progress" title="View Results"></a>
@@ -173,10 +173,10 @@
                                 </nav>
 
                                 <!-- BEGIN unit_task_modify_form -->
-                                <div class="content">
+                                <div id="modifyTask-{UNIT_TASK_ID}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
                                     <div class="row">
-                                        <div class="small-12 columns alert-box hide" data-form-container data-interaction="edit_task_container">
-                                            <form action="/task/saveInstanceForm.php" method="post" data-form_type="task">
+                                        <div class="small-12 columns alert-box" data-form-container data-interaction="edit_task_container">
+                                            <form action="/task/saveInstanceForm.php" method="post" data-form_type="task" data-component="component{COMPONENT_INSTANCE_ID}">
                                                 <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
                                                 <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
                                                 <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
