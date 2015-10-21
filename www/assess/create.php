@@ -219,17 +219,16 @@ else {
         'ASSESS_START_DATE'         => $assessDate->getLocalShort(),
         'ASSESS_FINISH_DATE'        => $assessEndDate->getLocalShort(),
         'ASSESS_COMPLETION_MESSAGE' => '',
-        'HAS_ALL_QUESTIONS'         => 'large-12'
-    ));
-
-    // Curriculum codes: by default use the ones that are part of the folder
-    $this->setVar(
-        'CURRICULUM_CODE_INPUT',
-        $this->getTwig()->render(
+        'HAS_ALL_QUESTIONS'         => 'large-12',
+        // Curriculum codes: by default use the ones that are part of the folder
+        'CURRICULUM_CODE_INPUT'     => $this->getTwig()->render(
             'sub/curriculumCodeSelector.twig',
-            ['codeList' => $folder->getCurriculumNodes()]
-        )
-    );
+            ['codeList' => $folder->getCurriculumNodes(), 'renderButton' => false,]
+        ),
+        'CURRICULUM_BROWSE_BUTTON' => $this->getTwig()->render(
+            'sub/curriculumBrowseButton.twig'
+        ),
+    ));
 
     /* Render starting times
      */

@@ -170,9 +170,12 @@ else {
         'ASSESS_COMPLETION_MESSAGE' => Scrub::text($assessment->getCompletionMessage()),
         'HAS_ALL_QUESTIONS'         => 'large-8',
         'CURRICULUM_CODE_INPUT'     => $this->getTwig()->render(
-                'sub/curriculumCodeSelector.twig',
-                ['codeList' => $assessment->getCurriculumNodes()]
-            ),
+            'sub/curriculumCodeSelector.twig',
+            ['codeList' => $assessment->getCurriculumNodes(), 'renderButton' => false,]
+        ),
+        'CURRICULUM_BROWSE_BUTTON' => $this->getTwig()->render(
+            'sub/curriculumBrowseButton.twig'
+        ),
     ));
 
     /* Render starting times
