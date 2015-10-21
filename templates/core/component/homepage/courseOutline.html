@@ -251,14 +251,14 @@
                             <!-- BEGIN unit_add_task_actions -->
                             <a href="/submission/createSubmission/new/{ID}/unit:{UNIT_ID}" class="button icon-due-work" data-add-button data-form_class="for-due-work">Post Due Work</a>
                             <a href="/assess/create/{ID}/unit:{UNIT_ID}" class="button icon-quiz" data-add-button data-form_class="for-assessment">Create Quiz</a>
-                            <a href="/task/createInstance/{UNIT_ID}" class="button icon-task" data-add-button data-form_class="for-task">Add Task</a>
+                            <a href="/task/createInstance/{UNIT_ID}" class="button icon-task" data-reveal-id="createTask-{UNIT_ID}">Add Task</a>
                             <!-- END unit_add_task_actions -->
                         </div>
 
                         <!-- This is the form for inline creation of tasks -->
-                        <div class="content">
+                        <div id="createTask-{UNIT_ID}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
                             <div class="row">
-                                <div class="small-12 columns alert-box hide" data-form-container data-for-task data-new-task-container>
+                                <div class="small-12 columns alert-box" data-form-container data-for-task data-new-task-container>
                                     <form action="/task/saveInstanceForm.php" method="post" data-form_type="task">
                                         <input type="hidden" name="id" value=""/>
                                         <input type="hidden" name="unit_id" value="{UNIT_ID}"/>
