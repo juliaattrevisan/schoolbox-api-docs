@@ -1286,7 +1286,9 @@ ul.flex-list {
          * few rems, to accommodate the image/icon (only affects avatar card)
          */
         .row {
-            padding-left: 4rem;
+            @media #{$medium-up} {
+                padding-left: 4rem;
+            }
             @media #{$small-only} {
                 padding-left: 3.5rem;
             }
