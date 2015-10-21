@@ -1262,12 +1262,7 @@ ul.flex-list {
          * a user status, use .avatar.card .label.status
          */
 		.label {
-            margin: 0.5rem -0.5rem 0 -1rem;
             padding: nth($label-padding, 1) 1rem;
-
-            /* Can do this, due to .list-item > .card
-             */
-            left: 5rem;
 
             /* Status Label special definition - this is now uses
              * a label to indicate a user's current status in some
@@ -1277,6 +1272,7 @@ ul.flex-list {
                 margin: 0 -0.5rem 0 -1rem;
                 text-align: left;
                 position: absolute;
+                left: 5rem;
                 bottom: 0;
                 width: calc(100% - 4rem);
                 @media #{$small-only} {
@@ -1285,6 +1281,32 @@ ul.flex-list {
                 }
             }
 		}
+
+        /* row/col constructs inside an avatar card need to be kicked in a
+         * few rems, to accommodate the image/icon (only affects avatar card)
+         */
+        .row {
+            padding-left: 4rem;
+            @media #{$small-only} {
+                padding-left: 3.5rem;
+            }
+
+            /* A status label inside a row/col construct
+             */
+            .label {
+                &.status {
+                    margin-left: 0.125rem;
+                    position: static;
+                }
+            }
+
+            /* A sequence of labels
+             */
+            .label-group {
+                .label {
+                }
+            }
+        }
 
 		p, h3 {
             line-height: 1.25rem;
