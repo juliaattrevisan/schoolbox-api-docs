@@ -607,14 +607,6 @@ $rotate-th-width: $square-grid-td-size;
 	@media #{$xlarge-down}  { @include table-stack($size:xlarge);  }
 }
 
-// Panels
-.island-panel {
-  @include panel(
-    // Sets the panel background color. Default: $panel-pg
-    $bg: $white
-  );
-}
-
 %container {
 	background-color: $white;
 	margin-bottom: rem-calc(($base-font-size));
