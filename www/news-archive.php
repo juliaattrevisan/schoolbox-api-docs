@@ -40,6 +40,8 @@ Filter $visibleList[TopicSubset] into $visibleList[TopicSubset]MonthSubset
  */
 
 $this->setFile(TEMPLATE_content, 'news.html');
+$this->setBlock(TEMPLATE_content, 'crumb_year', 'crumb_year_block');
+$this->setBlock(TEMPLATE_content, 'crumb_month', 'crumb_month_block');
 $this->setBlock(TEMPLATE_content, 'add_news', 'add_news_block');
 $this->setBlock(TEMPLATE_content, 'topic_header', 'topic_header_block');
 $this->setBlock(TEMPLATE_content, 'topic', 'topic_block');
@@ -58,7 +60,11 @@ $this->setBlock('news', 'has_expiry', 'has_expiry_block');
 $this->setBlock('news', "news_image", "news_image_block");
 
 
-$this->setVar('topic_header_block', '');
+$this->setVar([
+    'crumb_year_block'   => '',
+    'crumb_month_block'  => '',
+    'topic_header_block' => ''
+]);
 
 $this->setTab('news');
 
@@ -106,6 +112,19 @@ $defaults = array(
     'month' => 'all',
     'page' => 1
 );
+
+if (is_numeric($filter['year'])) {
+    $this->setVar('SELECTED_YEAR', $filter['year']);
+    $this->parse('crumb_year_block', 'crumb_year');
+}
+
+if (is_numeric($filter['month'])) {
+    $this->setVar('SELECTED_MONTH_NAME', DateTime::createFromFormat('!m', $filter['month'])->format('F'));
+    $this->setVar('SELECTED_MONTH', $filter['month']);
+    $this->parse('crumb_month_block', 'crumb_month');
+}
+
+
 foreach ($defaults as $field => $default) {
     if (!is_numeric($filter[$field])) {
         $filter[$field] = $default;
@@ -155,7 +174,8 @@ if ($occupiedDateList) {
                 'MONTH' => $format->getUsingFormat('F'),
                 'MONTH_NUMBER' => $date['month'],
                 'MONTH_CLASS' => $monthClass,
-                'MENU_TOPIC_CLEAN' => $filter['archive'] . $filter['topicSlug']
+                'MENU_TOPIC_CLEAN' => $filter['archive'] . $filter['topicSlug'],
+                'MENU_TOPIC_NAME'  => ucwords($filter['topic'])
             )
         );
 
