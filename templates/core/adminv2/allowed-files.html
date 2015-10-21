@@ -145,57 +145,66 @@
     </div>
 </div>
 
-<form id="newAllowedFile" method="post" data-action="createNewFileType" action="/adminv2/allowed-fileForm.php" class="panel" style="display:none;">
-    <input type="hidden" readonly="readonly" name="fileTypeId" value=""/>
-    <h3>Create new file type</h3>
-    <div class="row add-new">
-        <div class="column small-6">
-            <label>Icon <span data-tooltip class="hint has-tip tip-bottom" title="The icon used to represent this type of file">?</span></label>
-            <a href="#" class="button no-text" id="icon-choice-new" data-reveal-id="allowed-file-dialog" data-file-id="new">
-                <img src="/images/mime/22x22/txt.png">
-            </a>
-            <input type="hidden" name="iconFile" id="button-new" class="chosen-one" value="{FILE_ICON}"/>
-        </div>
-        <div class="column small-6">
-            <label>Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Controls if files of this type can be uploaded">?</span></label>
-            <span class="switch">
-                <input type="hidden" name="enable" value="false" />
-                <input id="enabled-new" type="checkbox" name="enable" checked="checked" value="true" />
-                <label for="enabled-new"></label>
-            </span>
-        </div>
-        <div class="column">
-            <label>Description <span data-tooltip class="hint has-tip tip-bottom" title="A simple name for the type of file">?</span></label>
-            <input type="text" class="text-input" name="description">
-        </div>
-        <div class="column large-6">
-            <label>Mime <span data-tooltip class="hint has-tip tip-bottom" title="The mime type for a file can be found by searching Google">?</span></label>
-            <input type="text" class="text-input" name="mime">
-        </div>
-        <div class="column large-3">
-            <label>Max Size <span data-tooltip class="hint has-tip tip-bottom" title="The maximum file size when uploading a file of this type - defaults to system-wide max file size">?</span></label>
-            <input type="text" class="text-input" name="max_file_size" placeholder="{FILE_MAXSIZE_PLACEHOLDER}" value=""/>
-        </div>
-        <div class="column large-3">
-            <label>Inline <span data-tooltip class="hint has-tip tip-bottom" title="Determines if file will be opened in the browser or by a third party application">?</span></label>
-            <select name="inline">
-                <option value="true">Inline</option>
-                <option value="false">External</option>
-            </select>
-        </div>
-    </div>
-    <div class="row">
-        <div class="column">
-            <label>Extensions<span data-tooltip class="hint has-tip tip-bottom" title="The file extension, everything after the dot. Comma-separate multiple extensions">?</span></label>
-            <input type="text" class="text-input" name="extension" value=""/>
-        </div>
-    </div>
-    <div class="row">
-        <div class="column">
+<div class="row">
+    <div class="small-12 island">
+        <form id="newAllowedFile" method="post" data-action="createNewFileType" action="/adminv2/allowed-fileForm.php" style="display:none;">
+            <input type="hidden" readonly="readonly" name="fileTypeId" value=""/>
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <h3>Create new file type</h3>
+                    </div>
+
+                    <div class="add-new">
+                        <div class="column small-6">
+                            <label>Icon <span data-tooltip class="hint has-tip tip-bottom" title="The icon used to represent this type of file">?</span></label>
+                            <a href="#" class="button no-text" id="icon-choice-new" data-reveal-id="allowed-file-dialog" data-file-id="new">
+                                <img src="/images/mime/22x22/txt.png">
+                            </a>
+                            <input type="hidden" name="iconFile" id="button-new" class="chosen-one" value="{FILE_ICON}"/>
+                        </div>
+                        <div class="column small-6">
+                            <label>Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Controls if files of this type can be uploaded">?</span></label>
+                            <span class="switch">
+                                <input type="hidden" name="enable" value="false" />
+                                <input id="enabled-new" type="checkbox" name="enable" checked="checked" value="true" />
+                                <label for="enabled-new"></label>
+                            </span>
+                        </div>
+                        <div class="column">
+                            <label>Description <span data-tooltip class="hint has-tip tip-bottom" title="A simple name for the type of file">?</span></label>
+                            <input type="text" class="text-input" name="description">
+                        </div>
+                        <div class="column large-6">
+                            <label>Mime <span data-tooltip class="hint has-tip tip-bottom" title="The mime type for a file can be found by searching Google">?</span></label>
+                            <input type="text" class="text-input" name="mime">
+                        </div>
+                        <div class="column large-3">
+                            <label>Max Size <span data-tooltip class="hint has-tip tip-bottom" title="The maximum file size when uploading a file of this type - defaults to system-wide max file size">?</span></label>
+                            <input type="text" class="text-input" name="max_file_size" placeholder="{FILE_MAXSIZE_PLACEHOLDER}" value=""/>
+                        </div>
+                        <div class="column large-3">
+                            <label>Inline <span data-tooltip class="hint has-tip tip-bottom" title="Determines if file will be opened in the browser or by a third party application">?</span></label>
+                            <select name="inline">
+                                <option value="true">Inline</option>
+                                <option value="false">External</option>
+                            </select>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>Extensions<span data-tooltip class="hint has-tip tip-bottom" title="The file extension, everything after the dot. Comma-separate multiple extensions">?</span></label>
+                        <input type="text" class="text-input" name="extension" value=""/>
+                    </div>
+                </fieldset>
+            </section>
             <input type="submit" value="Add" />
-        </div>
+        </form>
     </div>
-</form>
+</div>
+
 <div class="row">
     <div class="island small-12">
         <section>
