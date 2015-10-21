@@ -1095,9 +1095,6 @@ ul.flex-list {
 	> li{
 		&:hover{
 			background-color: $row-hover-background;
-			.actions > a, nav a {
-				opacity: 1;
-			}
 		}
 	}
 	.expanded .task-list{
@@ -1138,66 +1135,6 @@ ul.flex-list {
 		//&:last-child{
 		//	border: 0;
 		//}
-	}
-}
-
-// Actions in lists & tables
-.actions{
-	list-style: none;
-	margin: 0;
-	padding: 0 !important;
-	> a{
-		display: inline-block;
-		opacity: 0.3;
-		text-align: center;
-		&:hover{
-			background-color: $row-action-hover-background;
-		}
-		&:before{
-			@media #{$small-only, $medium-only}{
-				font-size: rem-calc(($base-font-size - 4));
-			}
-		}
-	}
-	//Grid for 1 action
-	&.one{
-		@media #{$small-up} { @include grid-column(1); }
-		a{
-			@media #{$small-up} { @include grid-column(12); }
-		}
-	}
-	//Grid for 2 actions
-	&.two{
-		@media #{$small-up} { @include grid-column(2); }
-		a{
-			@media #{$small-up} { @include grid-column(6); }
-		}
-	}
-	//Grid for 3 actions
-	&.three{
-		@media #{$small-up} { @include grid-column(3); }
-		a{
-			@media #{$small-up} { @include grid-column(4); }
-
-			// When you need space for 3 actions but only have 2
-			@include with-count(2) {
-			    width: 50%;
-			}
-		}
-	}
-	// Respsonsive Padding
-	&.one a,
-	&.two a,
-	&.three a{
-		@media #{$small-up} {
-			padding: rem-calc(($base-font-size - 8));
-		}
-		@media #{$medium-up} {
-			padding: rem-calc(($base-font-size - 4));
-		}
-		@media #{$large-up} {
-			padding: rem-calc(($base-font-size));
-		}
 	}
 }
 
