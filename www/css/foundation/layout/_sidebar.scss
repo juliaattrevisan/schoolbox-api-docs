@@ -4,8 +4,8 @@
   &.move-right {
     .hybrid-bar, .main-section {
       filter: url("#exit-off-canvas-filter");
-      -webkit-filter: blur(.125rem) grayscale(50%);
-      filter: blur(.125rem) grayscale(50%);
+      -webkit-filter: grayscale(50%);
+      filter: grayscale(50%);
 
       -webkit-transition: -webkit-filter 300ms ease;
       transition: filter 300ms ease;
