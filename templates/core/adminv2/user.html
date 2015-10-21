@@ -135,7 +135,7 @@
             <h3>Upload bulk users CSV</h3>
             <form action="/adminv2/bulkAdd" method="post" enctype="multipart/form-data">
                 <input name="bulkadd" type="file">
-                <button type="submit" class="icon-add">Add Users</button>
+                <input type="submit" class="icon-add" value="Add Users" />
             </form>
         </section>
         <h2 class="subheader">Remove Users</h2>
@@ -146,7 +146,7 @@
             <h3>Upload bulk remove users CSV</h3>
             <form action="/adminv2/bulkRemove" method="post" enctype="multipart/form-data">
                 <input name="bulkremove" type="file">
-                <button type="submit" class="icon-delete">Remove Users</button>
+                <input type="submit" class="icon-delete" value="Remove Users" />
             </form>
         </section>
         <h2 class="subheader">Clone Role</h2>
@@ -175,7 +175,7 @@
                 </label>
                 <!-- END new_role -->
                 <!-- END select_clone -->
-                <button type="submit" class="icon-copy">Clone</button>
+                <input type="submit" class="icon-copy" value="Clone" />
             </form>
         </section>
     </div>
