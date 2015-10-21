@@ -1,0 +1,43 @@
+/* Weekly Weather display
+ */
+.weather-list {
+    @include information-list;
+    &.active {
+        background-color: $row-hover-background;
+    }
+    li {
+        border: 0;
+        border-right: 1px solid $body-bg;
+        text-align: center;
+
+        &:first-child {
+            padding-top: 1rem;
+        }
+
+        &:last-child {
+            border-right: 1px solid $body-bg;
+            border-bottom: 1px solid $body-bg;
+        }
+    }
+}
+
+.weather-list-summary {
+    @include information-list;
+    .active {
+        background-color: $row-hover-background;
+    }
+}
+
+/* Separate for usage in component view
+ */
+.temperature {
+    text-align: center;
+
+    .hot {
+        color: $hot-color;
+        margin-right: 1rem;
+    }
+    .cold {
+        color: $cold-color;
+    }
+}
