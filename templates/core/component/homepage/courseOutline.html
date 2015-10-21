@@ -16,7 +16,9 @@
                 });
 
                 // Url attachment options
-                component.on('click', 'form .post-attachment a[data-value]', function() {
+                // Attach these to forms instead of component,
+                // because they're in reveal modals (which exist outside component)
+                $(document).on('click', 'form[data-component="component{COMPONENT_INSTANCE_ID}"] .post-attachment a[data-value]', function() {
                     var self = $(this),
                             form = self.closest('form'),
                             type = self.attr('data-value');
@@ -41,13 +43,13 @@
                 });
 
                 // Did I remove an attachment? Remove the URL too
-                component.on('click', 'a[data-dz-remove]', function() {
+                $(document).on('click', 'form[data-component="component{COMPONENT_INSTANCE_ID}"] a[data-dz-remove]', function() {
                     $(this).closest('form').find('input[name=url]').val('').prop('readonly', false);
                 });
 
                 /* Alternate expando style
                  */
-                $('a[data-interaction="toggle-expanded"]').on('click', function(event){
+                component.find('a[data-interaction="toggle-expanded"]').on('click', function(event){
                     event.preventDefault();
 
                     $(this).closest('li').find('[data-task-list]').removeClass('hide');
