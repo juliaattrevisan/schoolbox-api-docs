@@ -64,7 +64,10 @@ if (is_numeric($this->arg[0])) {
         'REQUIRED_PERMS' => $_SESSION['gid'],
         'CURRICULUM_CODE_INPUT' => $this->getTwig()->render(
             'sub/curriculumCodeSelector.twig',
-            ['codeList' => $folder->getCurriculumNodes()]
+            ['codeList' => $folder->getCurriculumNodes(), 'renderButton' => false,]
+        ),
+        'CURRICULUM_BROWSE_BUTTON' => $this->getTwig()->render(
+            'sub/curriculumBrowseButton.twig'
         ),
     );
 
@@ -199,7 +202,10 @@ else {
             'DATABASE_TYPE' => ucfirst(Cfg::get('database_type')),
             'CURRICULUM_CODE_INPUT' => $this->getTwig()->render(
                 'sub/curriculumCodeSelector.twig',
-                ['codeList' => []]
+                ['codeList' => [], 'renderButton' => false,]
+            ),
+            'CURRICULUM_BROWSE_BUTTON' => $this->getTwig()->render(
+                'sub/curriculumBrowseButton.twig'
             ),
         ));
 
