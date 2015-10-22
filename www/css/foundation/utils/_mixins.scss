@@ -222,7 +222,8 @@
 			color: $derived;
 		}
 		.#{$prefix}-bg-#{$i} {
-			@include test-lum($derived, $light, $dark);
+			background-color: $derived;
+			color: calc-text-color($derived, $light, $dark);
 
 		}
 	}
