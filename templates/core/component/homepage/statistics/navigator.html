@@ -1,26 +1,9 @@
-<div class="small-12 island">
-    <h2 class="subheader">Hits and Rating</h2>
-    <section>
-        <div class="row content">
-            <div class="small-12 columns">
-                <!-- BEGIN star -->
-                <!-- END star -->
-
-                <p class="meta">{RATING}</p>
-
-                <div class="progress" title="{RATING}">
-                    <span class="meter" style="width: {STAR_WIDTH}%"></span>
-                </div>
-            </div>
-        </div>
-    </section>
-</div>
-
 <div id="statistics-date-range" class="reveal-modal" data-reveal>
     <div class="row">
         <form action="/statistics/homepage/{ID}" method="GET">
             <section>
                 <fieldset class="content">
+                    <legend>Select Date Range</legend>
                     <div class="small-12 medium-4 columns">
                         <label for="date_start">
                             From
@@ -53,8 +36,8 @@
                     </div>
                 </fieldset>
             </section>
-
             <input type="submit" class='expand' value="Update" />
         </form>
+        <a class="close-reveal-modal" aria-label="Close">×</a>
     </div>
 </div>
