@@ -37,12 +37,12 @@
     @include information-list;
 
     .card {
+        /* Padding to reposition text and offset multi-line
+         * component heading scenario
+         */
+        padding-top: 0.125rem;
+        padding-bottom: 0.375rem;
         min-height: 1rem;
-    }
-    /* Weird extra pixel that comes out of nowhere
-     */
-    nav {
-        overflow: hidden;
     }
     h2 {
         font-size: 1.3125rem;

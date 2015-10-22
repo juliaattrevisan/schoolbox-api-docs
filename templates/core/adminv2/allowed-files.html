@@ -8,6 +8,7 @@
             var container = $(this).closest('[data-interaction-container]');
             var display   = container.find('[data-interaction-display]');
             var form      = container.find('[data-interaction-inline-form]');
+
             display.slideUp();
             form.slideDown();
         });
@@ -102,8 +103,7 @@
 
             var enable = typeof $(this).attr('data-interaction-disable') == 'undefined' ? 'true' : 'false';
 
-            var form = $(this).closest('form');
-
+            var form = $(this).closest('[data-interaction-container]').find('form');
             form.find('input[name=enable]').val(enable);
             form.submit();
         });
@@ -145,169 +145,170 @@
     </div>
 </div>
 
-<form id="newAllowedFile" method="post" data-action="createNewFileType" action="/adminv2/allowed-fileForm.php" class="panel" style="display:none;">
-    <input type="hidden" readonly="readonly" name="fileTypeId" value=""/>
-    <h3>Create new file type</h3>
-    <div class="row allowed-files add-new">
-        <div class="column small-6">
-            <label>Icon <span data-tooltip class="hint has-tip tip-bottom" title="The icon used to represent this type of file">?</span></label>
-            <a href="#" class="button no-text" id="icon-choice-new" data-reveal-id="allowed-file-dialog" data-file-id="new">
-                <img src="/images/mime/22x22/txt.png">
-            </a>
-            <input type="hidden" name="iconFile" id="button-new" class="chosen-one" value="{FILE_ICON}"/>
-        </div>
-        <div class="column small-6">
-            <label>Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Controls if files of this type can be uploaded">?</span></label>
-            <span class="switch">
-                <input type="hidden" name="enable" value="false" />
-                <input id="enabled-new" type="checkbox" name="enable" checked="checked" value="true" />
-                <label for="enabled-new"></label>
-            </span>
-        </div>
-        <div class="column">
-            <label>Description <span data-tooltip class="hint has-tip tip-bottom" title="A simple name for the type of file">?</span></label>
-            <input type="text" class="text-input" name="description">
-        </div>
-        <div class="column large-6">
-            <label>Mime <span data-tooltip class="hint has-tip tip-bottom" title="The mime type for a file can be found by searching Google">?</span></label>
-            <input type="text" class="text-input" name="mime">
-        </div>
-        <div class="column large-3">
-            <label>Max Size <span data-tooltip class="hint has-tip tip-bottom" title="The maximum file size when uploading a file of this type - defaults to system-wide max file size">?</span></label>
-            <input type="text" class="text-input" name="max_file_size" placeholder="{FILE_MAXSIZE_PLACEHOLDER}" value=""/>
-        </div>
-        <div class="column large-3">
-            <label>Inline <span data-tooltip class="hint has-tip tip-bottom" title="Determines if file will be opened in the browser or by a third party application">?</span></label>
-            <select name="inline">
-                <option value="true">Inline</option>
-                <option value="false">External</option>
-            </select>
-        </div>
-    </div>
-    <div class="row">
-        <div class="column">
-            <label>Extensions<span data-tooltip class="hint has-tip tip-bottom" title="The file extension, everything after the dot. Comma-separate multiple extensions">?</span></label>
-            <input type="text" class="text-input" name="extension" value=""/>
-        </div>
-    </div>
-    <div class="row">
-        <div class="column">
+<div class="row">
+    <div class="small-12 island">
+        <form id="newAllowedFile" method="post" data-action="createNewFileType" action="/adminv2/allowed-fileForm.php" style="display:none;">
+            <input type="hidden" readonly="readonly" name="fileTypeId" value=""/>
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <h3>Create new file type</h3>
+                    </div>
+
+                    <div class="add-new">
+                        <div class="column small-6">
+                            <label>Icon <span data-tooltip class="hint has-tip tip-bottom" title="The icon used to represent this type of file">?</span></label>
+                            <a href="#" class="button no-text" id="icon-choice-new" data-reveal-id="allowed-file-dialog" data-file-id="new">
+                                <img src="/images/mime/22x22/txt.png">
+                            </a>
+                            <input type="hidden" name="iconFile" id="button-new" class="chosen-one" value="{FILE_ICON}"/>
+                        </div>
+                        <div class="column small-6">
+                            <label>Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Controls if files of this type can be uploaded">?</span></label>
+                            <span class="switch">
+                                <input type="hidden" name="enable" value="false" />
+                                <input id="enabled-new" type="checkbox" name="enable" checked="checked" value="true" />
+                                <label for="enabled-new"></label>
+                            </span>
+                        </div>
+                        <div class="column">
+                            <label>Description <span data-tooltip class="hint has-tip tip-bottom" title="A simple name for the type of file">?</span></label>
+                            <input type="text" class="text-input" name="description">
+                        </div>
+                        <div class="column large-6">
+                            <label>Mime <span data-tooltip class="hint has-tip tip-bottom" title="The mime type for a file can be found by searching Google">?</span></label>
+                            <input type="text" class="text-input" name="mime">
+                        </div>
+                        <div class="column large-3">
+                            <label>Max Size <span data-tooltip class="hint has-tip tip-bottom" title="The maximum file size when uploading a file of this type - defaults to system-wide max file size">?</span></label>
+                            <input type="text" class="text-input" name="max_file_size" placeholder="{FILE_MAXSIZE_PLACEHOLDER}" value=""/>
+                        </div>
+                        <div class="column large-3">
+                            <label>Inline <span data-tooltip class="hint has-tip tip-bottom" title="Determines if file will be opened in the browser or by a third party application">?</span></label>
+                            <select name="inline">
+                                <option value="true">Inline</option>
+                                <option value="false">External</option>
+                            </select>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>Extensions<span data-tooltip class="hint has-tip tip-bottom" title="The file extension, everything after the dot. Comma-separate multiple extensions">?</span></label>
+                        <input type="text" class="text-input" name="extension" value=""/>
+                    </div>
+                </fieldset>
+            </section>
             <input type="submit" value="Add" />
-        </div>
+        </form>
     </div>
-</form>
+</div>
+
 <div class="row">
     <div class="island small-12">
         <section>
-            <ul class="allowed-files action-list">
+            <ul class="action-list">
                 <!-- BEGIN file -->
-                <li class="row" data-interaction-container>
-                    <form data-action="updateFileType" style="margin:0" id="allowed-file{FILE_ID}" method="post" action="/adminv2/allowed-fileForm.php">
-                        <div data-interaction-display>
-                            <div class="column one-column">
-                                <img src="/images/mime/60x60/{FILE_ICON}"/>
+                <li class="actions-small-3" data-interaction-container>
+                    <div class="list-item" data-interaction-display>
+                        <div class="small-12 avatar card">
+                            <div class="icon-quiz icon-32"></div>
+                            <h3>{FILE_DESC}</h3>
+
+                            <div class="row">
+                                <div class="small-12 medium-4 columns no-pad">
+                                    <span class="meta">{FILE_MIME}</span>
+                                </div>
+                                <div class="small-12 medium-2 columns no-pad">
+                                    <span class="meta">{FILE_MAXSIZE}</span>
+                                </div>
+                                <div class="small-12 medium-3 columns no-pad">
+                                    <span class="meta">{FILE_INLINE}</span>
+                                </div>
+                                <!-- BEGIN enabled -->
+                                <div class="small-12 columns no-pad">
+                                    <span class="label status alert">Disabled</span>
+                                </div>
+                                <!-- END enabled -->
                             </div>
-                            <div class="column small-10 medium-8 content">
-                                <h3>{FILE_DESC}
-                                    <!-- BEGIN enabled -->
-                                    <span class="label alert">Disabled</span>
-                                    <!-- END enabled -->
-                                </h3>
-                                <div class="row">
-                                    <div class="column small-12 medium-8">
-                                        <p>{FILE_MIME}</p>
-                                    </div>
-                                    <div class="column small-6 medium-2">
-                                        <p>{FILE_MAXSIZE}</p>
-                                    </div>
-                                    <div class="column small-6 medium-2">
-                                        <p>{FILE_INLINE}</p>
+
+                            <div class="row">
+                                <div class="small-12 columns">
+                                    <div class="label-group">
+                                        <!-- BEGIN file_extension -->
+                                        <span class="label neutral">{FILE_EXTENSION}</span>
+                                        <!-- END file_extension -->
                                     </div>
                                 </div>
-                                <dl>
-                                    <!-- BEGIN file_extension -->
-                                    <dd class="label neutral">{FILE_EXTENSION}</dd>
-                                    <!-- END file_extension -->
-                                </dl>
                             </div>
-                            <div class="actions three show-for-medium-up">
-                                <a href="/adminv2/allowed-file/{FILE_ID}/{FILE_ENABLED_ACTION}" data-interaction-{FILE_ENABLED_ACTION} class="no-text icon-{FILE_ENABLED_ICON}"  title="{FILE_ENABLED_TITLE}"></a>
-                                <a href="/adminv2/allowed-file/{FILE_ID}/modify" data-interaction-modify  class="no-text icon-modify" title="Modify"></a>
-                                <a href="/adminv2/allowed-file/{FILE_ID}/delete" data-interaction-delete  class="no-text delete icon-delete" title="Delete"></a>
-                            </div>
-                            <div class="actions one hide-for-medium-up">
-                                <a href="#" data-dropdown="more-{FILE_ID}" data-options="align:left" class="no-text icon-more"></a>
-                            </div>
-                            <ul class="f-dropdown hide-for-medium-up" data-dropdown-content id="more-{FILE_ID}">
-                                <li>
-                                    <a href="/adminv2/allowed-file/{FILE_ID}/{FILE_ENABLED_ACTION}" data-interaction-{FILE_ENABLED_ACTION} class="icon-{FILE_ENABLED_ICON}">{FILE_ENABLED_TITLE}</a>
-                                </li>
-                                <li>
-                                    <a href="/adminv2/allowed-file/{FILE_ID}/modify"  data-interaction-modify  class="icon-modify">Modify</a>
-                                </li>
-                                <li>
-                                    <a href="/adminv2/allowed-file/{FILE_ID}/delete"  data-interaction-delete  class="icon-delete">Delete</a>
-                                </li>
-                            </ul>
                         </div>
+                    </div>
+                    <nav data-interaction-display>
+                        <a href="/adminv2/allowed-file/{FILE_ID}/{FILE_ENABLED_ACTION}" class="icon-{FILE_ENABLED_ICON}" title="{FILE_ENABLED_TITLE}" data-interaction-{FILE_ENABLED_ACTION}></a>
+                        <a href="/adminv2/allowed-file/{FILE_ID}/modify" class="icon-modify" title="Modify" data-interaction-modify></a>
+                        <a href="/adminv2/allowed-file/{FILE_ID}/delete" class="icon-delete" title="Delete" data-interaction-delete></a>
+                    </nav>
+
+                    <form data-action="updateFileType" id="allowed-file{FILE_ID}" method="post" action="/adminv2/allowed-fileForm.php">
                         <div style="display:none;" data-interaction-inline-form>
                             <div class="content">
-                        <!--/adminv2/allowed-fileForm.php-->
-                            <input type="hidden" readonly="readonly" name="fileTypeId" value="{FILE_ID}"/>
-                            <input id="enabled-{FILE_ID}" type="hidden" name="enable" value="{FILE_ENABLED}" />
-                            <div class="row">
-                                <div class="column">
-                                    <label for="icon-choice-{FILE_ID}">Icon</label>
-                                    <a href="#" class="button no-text" id="icon-choice-{FILE_ID}" data-reveal-id="allowed-file-dialog" data-file-id="{FILE_ID}">
-                                        <img src="/images/mime/22x22/{FILE_ICON}" alt="{FILE_ICON}" />
-                                    </a>
-                                    <input type="hidden" name="iconFile" id="button-{FILE_ID}" class="chosen-one" value="{FILE_ICON}"/>
+                                <!--/adminv2/allowed-fileForm.php-->
+                                <input type="hidden" readonly="readonly" name="fileTypeId" value="{FILE_ID}"/>
+                                <input id="enabled-{FILE_ID}" type="hidden" name="enable" value="{FILE_ENABLED}" />
+                                <div class="row">
+                                    <div class="column">
+                                        <label for="icon-choice-{FILE_ID}">Icon</label>
+                                        <a href="#" class="button no-text" id="icon-choice-{FILE_ID}" data-reveal-id="allowed-file-dialog" data-file-id="{FILE_ID}">
+                                            <img src="/images/mime/22x22/{FILE_ICON}" alt="{FILE_ICON}" />
+                                        </a>
+                                        <input type="hidden" name="iconFile" id="button-{FILE_ID}" class="chosen-one" value="{FILE_ICON}"/>
+                                    </div>
+                                    <div class="description column">
+                                        <div>
+                                            <label for="description-{FILE_ID}">Description</label>
+                                            <input id="description-{FILE_ID}" type="text" class="text-input" name="description" value="{FILE_DESC}"/>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="description column">
-                                    <div>
-                                        <label for="description-{FILE_ID}">Description</label>
-                                        <input id="description-{FILE_ID}" type="text" class="text-input" name="description" value="{FILE_DESC}"/>
+                                <div class="row">
+                                    <div class="mime column large-6">
+                                        <div>
+                                            <label for="mime-{FILE_ID}">Mime</label>
+                                            <input id="mime-{FILE_ID}" type="text" class="text-input" name="mime" value="{FILE_MIME}"/>
+                                        </div>
+                                    </div>
+                                    <div class="max_size column large-3">
+                                        <div>
+                                            <label for="max_file_size-{FILE_ID}">Max Size</label>
+                                            <input id="max_file_size-{FILE_ID}" type="text" class="text-input" name="max_file_size" placeholder="{FILE_MAXSIZE_PLACEHOLDER}" value="{FILE_MAXSIZE_INPUT}"/>
+                                        </div>
+                                    </div>
+                                    <div class="inline column large-3">
+                                        <div>
+                                            <label for="inline-{FILE_ID}">Inline</label>
+                                            <select name="inline" id="inline-{FILE_ID}">
+                                                <option value="true">Inline</option>
+                                                <option value="false" {FILE_EXTERN_CHECKED}>External</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="extensions column">
+                                        <div>
+                                            <label for="extension-{FILE_ID}">Extensions</label>
+                                            <input id="extension-{FILE_ID}" type="text" class="text-input" name="extension" value="{FILE_EXTENSION_CSV}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="column">
+                                        <input type="submit" data-interaction-save value="Save" />
+                                        <button data-interaction-cancel >Cancel</button>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="mime column large-6">
-                                    <div>
-                                        <label for="mime-{FILE_ID}">Mime</label>
-                                        <input id="mime-{FILE_ID}" type="text" class="text-input" name="mime" value="{FILE_MIME}"/>
-                                    </div>
-                                </div>
-                                <div class="max_size column large-3">
-                                    <div>
-                                        <label for="max_file_size-{FILE_ID}">Max Size</label>
-                                        <input id="max_file_size-{FILE_ID}" type="text" class="text-input" name="max_file_size" placeholder="{FILE_MAXSIZE_PLACEHOLDER}" value="{FILE_MAXSIZE_INPUT}"/>
-                                    </div>
-                                </div>
-                                <div class="inline column large-3">
-                                    <div>
-                                        <label for="inline-{FILE_ID}">Inline</label>
-                                        <select name="inline" id="inline-{FILE_ID}">
-                                            <option value="true">Inline</option>
-                                            <option value="false" {FILE_EXTERN_CHECKED}>External</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="extensions column">
-                                    <div>
-                                        <label for="extension-{FILE_ID}">Extensions</label>
-                                        <input id="extension-{FILE_ID}" type="text" class="text-input" name="extension" value="{FILE_EXTENSION_CSV}"/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="column">
-                                    <input type="submit" data-interaction-save value="Save" />
-                                    <button data-interaction-cancel >Cancel</button>
-                                </div>
-                            </div>
-                        </div>
                         </div>
                     </form>
                 </li>

@@ -607,14 +607,6 @@ $rotate-th-width: $square-grid-td-size;
 	@media #{$xlarge-down}  { @include table-stack($size:xlarge);  }
 }
 
-// Panels
-.island-panel {
-  @include panel(
-    // Sets the panel background color. Default: $panel-pg
-    $bg: $white
-  );
-}
-
 %container {
 	background-color: $white;
 	margin-bottom: rem-calc(($base-font-size));
@@ -1103,9 +1095,6 @@ ul.flex-list {
 	> li{
 		&:hover{
 			background-color: $row-hover-background;
-			.actions > a, nav a {
-				opacity: 1;
-			}
 		}
 	}
 	.expanded .task-list{
@@ -1149,66 +1138,6 @@ ul.flex-list {
 	}
 }
 
-// Actions in lists & tables
-.actions{
-	list-style: none;
-	margin: 0;
-	padding: 0 !important;
-	> a{
-		display: inline-block;
-		opacity: 0.3;
-		text-align: center;
-		&:hover{
-			background-color: $row-action-hover-background;
-		}
-		&:before{
-			@media #{$small-only, $medium-only}{
-				font-size: rem-calc(($base-font-size - 4));
-			}
-		}
-	}
-	//Grid for 1 action
-	&.one{
-		@media #{$small-up} { @include grid-column(1); }
-		a{
-			@media #{$small-up} { @include grid-column(12); }
-		}
-	}
-	//Grid for 2 actions
-	&.two{
-		@media #{$small-up} { @include grid-column(2); }
-		a{
-			@media #{$small-up} { @include grid-column(6); }
-		}
-	}
-	//Grid for 3 actions
-	&.three{
-		@media #{$small-up} { @include grid-column(3); }
-		a{
-			@media #{$small-up} { @include grid-column(4); }
-
-			// When you need space for 3 actions but only have 2
-			@include with-count(2) {
-			    width: 50%;
-			}
-		}
-	}
-	// Respsonsive Padding
-	&.one a,
-	&.two a,
-	&.three a{
-		@media #{$small-up} {
-			padding: rem-calc(($base-font-size - 8));
-		}
-		@media #{$medium-up} {
-			padding: rem-calc(($base-font-size - 4));
-		}
-		@media #{$large-up} {
-			padding: rem-calc(($base-font-size));
-		}
-	}
-}
-
 // Avatar Card
 .avatar-card {
     @extend .card;
@@ -1224,6 +1153,13 @@ ul.flex-list {
         padding: 0.5rem 0.5rem 0 1rem;
     }
 
+    /* Avatar Card
+     * Displays an icon, or a profile picture, in the left column
+     * Right column contains text, metadata, or a variety of other
+     * interface elements
+     *
+     * Can be used in conjunction with lists
+     */
     &.avatar {
         img, [class^="icon-"] {
             float: left;
@@ -1253,22 +1189,85 @@ ul.flex-list {
             }
         }
 
+        /* .avatar.card .label is used in viewSubmission.html and
+         * navigation-option.html for displaying a status under a
+         * user's name
+         *
+         * But this behaviour is too specific to a user status -
+         * labels should behave generically first, so to indicate
+         * a user status, use .avatar.card .label.status
+         */
 		.label {
-			padding: nth($label-padding, 1) 1rem;
+            padding: nth($label-padding, 1) 1rem;
+
+            /* Status Label special definition - this is now uses
+             * a label to indicate a user's current status in some
+             * way, as per original .avatar.card .label intent
+             */
+            &.status {
+                margin: 0 -0.5rem 0 -1rem;
+                text-align: left;
+                position: absolute;
+                left: 5rem;
+                bottom: 0;
+                width: calc(100% - 4rem);
+                @media #{$small-only} {
+                    width: calc(100% - 3rem);
+                    left: 4rem;
+                }
+            }
 		}
 
-		.label {
-			margin: 0 -0.5rem 0 -1rem;
-			text-align: left;
-			position: absolute;
-			bottom: 0;
-			width: calc(100% - 4rem);
-			left: 5rem;
-			@media #{$small-only} {
-				width: calc(100% - 3rem);
-				left: 4rem;
-			}
-		}
+        /* row/col constructs inside an avatar card need to be kicked in a
+         * few rems, to accommodate the image/icon (only affects avatar card)
+         */
+        .row {
+            @media #{$medium-up} {
+                padding-left: 4rem;
+            }
+            @media #{$small-only} {
+                padding-left: 3.5rem;
+            }
+
+            /* A status label inside a row/col construct
+             */
+            .label {
+                &.status {
+                    position: static;
+                    @media #{$medium-up} {
+                        margin-left: -0.125rem;
+                    }
+                    @media #{$large-up} {
+                        margin-left: 0.125rem;
+                    }
+                }
+            }
+
+            /* A sequence of labels
+             */
+            .label-group {
+                margin-top: 0.5rem;
+
+                /* Align text within labels
+                 */
+                @media #{$small-only} {
+                    margin-left: -1.5rem;
+                }
+                @media #{$medium-up} {
+                    margin-left: -0.875rem;
+                }
+                @media #{$large-up} {
+                    margin-left: -0.875rem;
+                }
+
+                /* Hairline fracture between labels in sequence
+                 */
+                .label {
+                    margin-top: 0.125rem;
+                    margin-right: -0.125rem;
+                }
+            }
+        }
 
 		p, h3 {
             line-height: 1.25rem;

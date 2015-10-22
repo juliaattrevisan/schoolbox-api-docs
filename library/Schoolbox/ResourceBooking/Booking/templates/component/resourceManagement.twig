@@ -54,10 +54,10 @@
             <div class="list-item-content">
                 <ul class="action-list">
                     {% for event in item.bookingEvents %}
-                        <li class="row">
-                            <div class="small-10 column no-pad">
+                        <li class="actions-small-2">
+                            <div class="list-item">
                                 {# show booker's avatar card #}
-                                <div class="avatar card">
+                                <div class="small-12 avatar card">
                                     <a href="/search/user/{{ event.booking.event.owner.id }}">
                                         <img src="/portrait.php?userId={{ event.booking.event.owner.externalId|e('url') }}&amp;size=square64" />
                                     </a>
@@ -80,31 +80,30 @@
                                     </p>
                                 </div>
                             </div>
-
-                            <div class="two actions">
-                                <a class="icon-modify no-text" href="/resource-booking/booking/{{ event.booking.id }}/edit" title="Modify Booking"></a>
-                                <a href="#" data-dropdown="resourceManagement-status-{{ event.booking.id }}" aria-controls="resourceManagement-status-{{ event.booking.id }}" aria-expanded="false" title="Set Status" data-tooltip class="icon-more no-text dropdown"></a>
-                                <ul data-dropdown-content id="resourceManagement-status-{{ event.booking.id }}" class="f-dropdown" aria-hidden="true">
-                                    <li>
-                                        <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
-                                           data-series-id="{{ event.booking.event.seriesId }}"
-                                           data-set-status="approved"
-                                           class="icon-approve">Approved</a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
-                                           data-series-id="{{ event.booking.event.seriesId }}"
-                                           data-set-status="pending"
-                                           class="icon-undo">Pending</a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
-                                           data-series-id="{{ event.booking.event.seriesId }}"
-                                           data-set-status="rejected"
-                                           class="icon-close">Rejected</a>
-                                    </li>
-                                </ul>
-                            </div>
+                            <nav>
+                                <a class="icon-modify" href="/resource-booking/booking/{{ event.booking.id }}/edit" title="Modify Booking"></a>
+                                <a href="#" data-dropdown="resourceManagement-status-{{ event.booking.id }}" aria-controls="resourceManagement-status-{{ event.booking.id }}" aria-expanded="false" title="Set Status" data-tooltip class="icon-more dropdown"></a>
+                            </nav>
+                            <ul id="resourceManagement-status-{{ event.booking.id }}" class="f-dropdown" aria-hidden="true" data-dropdown-content>
+                                <li>
+                                    <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
+                                       data-series-id="{{ event.booking.event.seriesId }}"
+                                       data-set-status="approved"
+                                       class="icon-approve">Approved</a>
+                                </li>
+                                <li>
+                                    <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
+                                       data-series-id="{{ event.booking.event.seriesId }}"
+                                       data-set-status="pending"
+                                       class="icon-undo">Pending</a>
+                                </li>
+                                <li>
+                                    <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
+                                       data-series-id="{{ event.booking.event.seriesId }}"
+                                       data-set-status="rejected"
+                                       class="icon-close">Rejected</a>
+                                </li>
+                            </ul>
                         </li>
                     {% endfor %}
                 </ul>

@@ -1,17 +1,12 @@
 <!-- This is the 'Pantry', a place where developers come to pick their 'Ingredients' -->
 
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/jquery.pantry.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 <script type="text/javascript">
     Dropzone.autoDiscover = false;
 </script>
-
-<style type="text/css">
-    .component {
-        background-color: #a0a0a0;
-    }
-</style>
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript">
     $(function() {
@@ -24,7 +19,7 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Files List</h1>
+        <h1>Avatar Card Universal List</h1>
         <ul class="meta">
             <li class="icon-wolfram-alpha"><strong>Things to Note</strong>
                 <ul style="margin:0;text-indent:0;">
@@ -269,7 +264,7 @@
                                             <img src="/portrait.php?userId=306&amp;size=square64" alt="View Profile">
                                             <h3>Bowman, Dana</h3>
                                         </a>
-                                        <span class="label neutral">Unsubmitted</span>
+                                        <span class="label status neutral">Unsubmitted</span>
                                     </div>
                                 </div>
                             </li>
@@ -284,7 +279,6 @@
                                     </div>
                                 </div>
                                 <nav>
-
                                     <span class="show-for-large-up">
                                         <a href="#" class="icon-poll" title="View Results"></a>
                                         <a href="#" class="icon-modify" title="Modify"></a>
@@ -294,8 +288,43 @@
                                     <span class="hide-for-large-up">
                                         <a href="#" class="icon-overflow"></a>
                                     </span>
+                                </nav>
+                            </li>
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="small-12 avatar card">
+                                        <div class="icon-quiz icon-32"></div>
+                                        <h3>ActiveInspire Flipchart</h3>
 
+                                        <div class="row">
+                                            <div class="small-12 medium-4 columns no-pad">
+                                                <span class="meta">application/Inspire</span>
+                                            </div>
+                                            <div class="small-12 medium-2 columns no-pad">
+                                                <span class="meta">500 MB</span>
+                                            </div>
+                                            <div class="small-12 medium-3 columns no-pad">
+                                                <span class="meta">External</span>
+                                            </div>
+                                            <div class="small-12 columns no-pad">
+                                                <span class="label status alert">Disabled</span>
+                                            </div>
+                                        </div>
 
+                                        <div class="row">
+                                            <div class="small-12 columns">
+                                                <div class="label-group">
+                                                    <span class="label neutral">flipchart</span>
+                                                    <span class="label neutral">flipchart</span>
+                                                    <span class="label neutral">flipchart</span>
+                                                    <span class="label neutral">flipchart</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a href="#" class="icon-modify" title="Modify"></a>
                                 </nav>
                             </li>
                             <li>
@@ -361,7 +390,7 @@
                                                         <p>Rhodes, David</p>
                                                     </a>
                                                     <p>
-                                                        <span class="label neutral full-width">Complicated Example</span>
+                                                        <span class="label status neutral">Complicated Example</span>
                                                     </p>
                                                 </div>
                                                 <div class="small-12 columns no-pad">
@@ -395,12 +424,8 @@
                                                 <input type="hidden" class="uid" name="uid" value="234">
                                                 <input type="hidden" class="box_id" name="box_id" value="42">
                                                 <input type="hidden" class="mark-update" name="markUpdate" value="true">
-
                                             </div>
                                         </div>
-
-
-
                                     </div>
                                     <nav>
                                         <span class="show-for-medium-up">
@@ -416,7 +441,6 @@
                                         <li><a href="#" class="icon-history">View History</a></li>
                                     </ul>
                                 </div>
-
                             </li>
                             <li>
                                 <div class="avatar card small-12">
@@ -442,518 +466,7 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="small-12 island">
-        <h1>Sortable</h1>
-        <h2 class="subheader">You Can Rearrange This List</h2>
-        <ul class="meta">
-            <li class="icon-approve icon-16">Any kind of list will work, not just information lists with avatar cards</li>
-        </ul>
-        <section>
-            <ul class="information-list sortable" data-sortable>
-                <li class="row">
-                    <div class="grip"></div>
-                    <div class="small-11 column no-pad">
-                        <div class="avatar card">
-                            <a href="/search/user/230">
-                                <img src="/portrait.php?userId=135&amp;size=square64" />
-                                <h3>David Rhodes</h3>
-                                <p class="meta">Senior Students</p>
-                            </a>
-                        </div>
-                    </div>
-                </li>
-                <li class="row">
-                    <div class="grip"></div>
-                    <div class="small-11 column no-pad">
-                        <div class="avatar card">
-                            <a href="/search/user/206">
-                                <img src="/portrait.php?userId=134&amp;size=square64" />
-                                <h3>Maddison Rhodes</h3>
-                                <p class="meta">Senior Students</p>
-                            </a>
-                        </div>
-                    </div>
-                </li>
-                <li class="row">
-                    <div class="grip"></div>
-                    <div class="small-11 column no-pad">
-                        <div class="avatar card">
-                            <a href="/search/user/151">
-                                <img src="/portrait.php?userId=165&amp;size=square64" />
-                                <h3>Zane Smith</h3>
-                                <p class="meta">Teachers</p>
-                            </a>
-                        </div>
-                    </div>
-                </li>
-                <li class="row">
-                    <div class="grip"></div>
-                    <div class="small-11 column no-pad">
-                        <div class="avatar card">
-                            <a href="/search/user/229">
-                                <img src="/portrait.php?userId=133&amp;size=square64" />
-                                <h3>Rachel Rhodes</h3>
-                                <p class="meta">Senior Students</p>
-                            </a>
-                        </div>
-                    </div>
-                </li>
-                <li class="row">
-                    <div class="grip"></div>
-                    <div class="small-11 column no-pad">
-                        <div class="avatar card">
-                            <a href="/search/user/245">
-                                <img src="/portrait.php?userId=493&amp;size=square64" />
-                                <h3>Caleb Rhodes</h3>
-                                <p class="meta">Junior Students</p>
-                            </a>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </section>
-
-        <div class="alert-box">
-            <code>
-                $('#my-sortable-ul').sortable({ handle: '.grip', axis: 'y' });
-            </code>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Matching Pairs</h2>
-        <section id="equalize-me">
-            <div class="content">
-                <h3>Question <span class="meta">(3 marks)</span></h3>
-                <p>Align the foods to the animals that eat them.</p>
-            </div>
-            <div class="row matching-pairs" data-equalizer>
-                <div class="column small-6">
-                    <ul class="information-list">
-                        <li class="row">
-                            <div class="small-12 column" data-equalizer-watch>
-                                <p>Animalia Chordata Mammalia Carnivora Felidae Felinae Felis Silvestris Catus</p>
-                            </div>
-                        </li>
-                        <li class="row">
-                            <div class="small-12 column" data-equalizer-watch>
-                                <p>Animalia Chordata Mammalia Carnivora Canidae Canis Lupus Familiaris</p>
-                            </div>
-                        </li>
-                        <li class="row">
-                            <div class="small-12 column" data-equalizer-watch>
-                                <p>Animalia Chordata Vertebrata Mammalia Lagomorpha Leporidae Brachylagus Idahoensis</p>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                <div class="column small-6">
-                    <ul class="information-list sortable" data-sortable>
-                        <li class="row">
-                            <div class="grip"></div>
-                            <div class="small-11 column no-pad" data-equalizer-watch>
-                                <p>Cortical Mineralized Osseous Tissue</p>
-                            </div>
-                        </li>
-                        <li class="row">
-                            <div class="grip"></div>
-                            <div class="small-11 column no-pad" data-equalizer-watch>
-                                <p>Plantae Angiosperms Eudicots Asterids Apiales Apiaceae Daucus Carota</p>
-                            </div>
-                        </li>
-                        <li class="row">
-                            <div class="grip"></div>
-                            <div class="small-11 column no-pad" data-equalizer-watch>
-                                <p>Animalia Chordata Mammalia Rodentia Muroidea Muridae Murinae Mus Lepidoides</p>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-        <ul class="meta">
-            <li class="icon-alert">Important! You need a special equalizer initialization:</li>
-        </ul>
-        <section>
-            <pre class="alert-box">
-$(function () {
-    $('#equalize-me').foundation({
-        equalizer: {
-            equalize_on_stack: true
-        }
-    });
-});
-            </pre>
-        </section>
-    </div>
-</div>
-
-<script type="text/javascript">
-    $(function () {
-        $('#equalize-me').foundation({
-            equalizer: {
-                equalize_on_stack: true
-            }
-        });
-    });
-</script>
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Islands</h1>
-    </div>
-</div>
-<div class="row">
-    <div class="small-12 medium-4 island">
-        <section>
-            <div class="content">
-                <h3><a href="#">Frank Costanza</a></h3>
-                <p>Intelligentsia vegan fap bespoke tote bag. Pop-up Echo Park Austin, sustainable wayfarers put a bird on it chia PBR&B tilde cardigan seitan cliche stumptown. Meh 8-bit Carles next level Shoreditch. Normcore ennui mixtape mlkshk.</p>
-            </div>
-        </section>
-    </div>
-    <div class="small-12 medium-4 island">
-        <section>
-            <div class="content">
-                <h3><a href="#">The Man in the cape</a></h3>
-                <p>Intelligentsia vegan fap bespoke tote bag. Pop-up Echo Park Austin, sustainable wayfarers put a bird on it chia PBR&B tilde cardigan seitan cliche stumptown. Meh 8-bit Carles next level Shoreditch. Normcore ennui mixtape mlkshk.</p>
-            </div>
-        </section>
-    </div>
-    <div class="small-12 medium-4 island">
-        <section>
-            <div class="content">
-                <h3><a href="#">Bob Sacamano</a></h3>
-                <p>Intelligentsia vegan fap bespoke tote bag. Pop-up Echo Park Austin, sustainable wayfarers put a bird on it chia.</p>
-                <p>Intelligentsia vegan fap bespoke tote bag. Pop-up Echo Park Austin, sustainable wayfarers put a bird on it chia.</p>
-            </div>
-        </section>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Social Stream - action-list</h1>
-        <ul class="component-titlebar" style='background-color:#ddd'>
-            <li class="actions-small-3">
-                <div class="list-item">
-                    <div class="small-12 card">
-                        <h2><a href="">Example Component Titlebar</a></h2>
-                    </div>
-                </div>
-                <nav>
-                    <a data-target='settings' data-state='closed' href="#" class="icon-settings settings edit" title="Settings"></a>
-                    <a data-collapser="true" href="#" class="icon-collapse collapse" title="Collapse Content"></a>
-                    <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
-                </nav>
-            </li>
-        </ul>
-        <div class="delete-it">
-            <p>Are you sure you want to remove this component? <a href="#" class="success button">Yes</a> <a href="#" class="button">No</a></p>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="small-12 island">
-        <section>
-            <div class="component-form editPanel">
-                <p>This is the settings area for components. Use the existing .editPanel class.</p>
-                <!-- BEGIN socialstream_has_newpost -->
-                <form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}-1' class='addPostForm {FORM_CLASS}' enctype='multipart/form-data'>
-                    <input type='hidden' name='type' value='string' />
-                    <input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
-                    <input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
-                    <input type='hidden' name='parentId' value='0' />
-                    <input type='hidden' name='rootId' value='0' />
-
-                    <textarea rows="3" cols="50" name="body" placeholder="Share something"></textarea>
-
-                    <div class="dz-wrap">
-                        <div class="row post-attachment attach">
-                            <div class="small-12 medium-9 columns">
-                                <div class="dropzone" id="socialZone" action="/cms/myFileForm.php?ajax=1"></div>
-                            </div>
-                            <p class="small-12 medium-1 columns"><strong>or</strong></p>
-                            <p class="small-12 medium-2 columns">
-                                <a class='button icon-link stream-attachment' data-value='url'>Link</a>
-                            </p>
-                        </div>
-                    </div>
-                    <input class='submit-btn-plain' type='submit' value='Post' />
-                </form>
-                <!-- END socialstream_has_newpost -->
-            </div>
-            <ul class="action-list social-stream">
-                <li class="row">
-                    <div class="ten-column">
-                        <div class="avatar-card">
-                            <a href="#" title="View Profile">
-                                <img src="https://placekitten.com/g/64/64" alt="Moggy" class="hide-for-small-only">
-                                <p>Karl Pilkington</p>
-                                <p class="meta">Posted 39 minutes ago</p>
-                            </a>
-                            <div class="body">
-                                <p>no no ono onon no no no n on on o no
-                                no no ono onon no no no n on on o no
-                                no no ono onon no no no n on on o no</p>
-                                <p>no no ono onon no no no n on on o no
-                                no no ono onon no no no n on on o no
-                                no no ono onon no no no n on on o no</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="actions two">
-                        <a href="#" class="no-text icon-comment" title="Comment"></a>
-                        <a href="#" class="no-text icon-delete" title="Delete"></a>
-                    </div>
-                </li>
-                <li class="row">
-                    <div class="ten-column">
-                        <div class="avatar-card">
-                            <a href="#" title="View Profile">
-                                <img src="https://placekitten.com/g/64/64" alt="Moggy" class="hide-for-small-only">
-                                <p>Karl Pilkington</p>
-                                <p class="meta">Posted 39 minutes ago</p>
-                            </a>
-                        </div>
-                        <div class="body">
-                            <img src="https://placeimg.com/300/200/people" alt="Moggy">
-                        </div>
-                    </div>
-                    <div class="actions two">
-                        <a href="#" class="no-text icon-comment" title="Comment"></a>
-                        <a href="#" class="no-text icon-delete" title="Delete"></a>
-                    </div>
-                    <ul class="action-list reply">
-                        <li class="row">
-                            <div class="ten-column">
-                                <div class="avatar-card">
-                                    <a href="#" title="View Profile">
-                                        <img src="https://placekitten.com/g/64/64" alt="Moggy" class="hide-for-small-only">
-                                        <p>Karl Pilkington</p>
-                                        <p class="meta">Posted 39 minutes ago</p>
-                                    </a>
-                                </div>
-                                <div class="body">
-                                    <p>no no ono onon no no no n on on o no</p>
-                                </div>
-                            </div>
-                            <div class="actions two">
-                                <a href="#" class="no-text icon-comment" title="Comment"></a>
-                                <a href="#" class="no-text icon-delete" title="Delete"></a>
-                            </div>
-                            <ul class="action-list reply">
-                                <li class="row">
-                                    <div class="ten-column">
-                                        <div class="avatar-card">
-                                            <a href="#" title="View Profile">
-                                                <img src="https://placekitten.com/g/64/64" alt="Moggy" class="hide-for-small-only">
-                                                <p>Karl Pilkington</p>
-                                                <p class="meta">Posted 39 minutes ago</p>
-                                            </a>
-                                        </div>
-                                        <div class="body">
-                                            <img src="https://placeimg.com/400/200/people" alt="Moggy">
-                                        </div>
-                                    </div>
-                                    <div class="actions two">
-                                        <a href="#" class="no-text icon-comment" title="Comment"></a>
-                                        <a href="#" class="no-text icon-delete" title="Delete"></a>
-                                    </div>
-                                    <div class="component-form editPanel">
-                                        <!-- BEGIN socialstream_has_newpost -->
-                                        <form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}-2' class='addPostForm {FORM_CLASS}' enctype='multipart/form-data'>
-                                            <input type='hidden' name='type' value='string' />
-                                            <input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
-                                            <input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
-                                            <input type='hidden' name='parentId' value='0' />
-                                            <input type='hidden' name='rootId' value='0' />
-
-                                            <textarea rows="3" cols="50" name="body" placeholder="This is the reply form"></textarea>
-
-                                            <div class="dz-wrap">
-                                                <div class="row post-attachment attach">
-                                                    <div class="small-12s medium-9 columns">
-                                                        <div class="dropzone" id="socialZone2" action="/cms/myFileForm.php?ajax=1"></div>
-                                                    </div>
-                                                    <p class="small-12 medium-1 columns"><strong>or</strong></p>
-                                                    <p class="small-12 medium-2 columns">
-                                                        <a class='button icon-link stream-attachment' data-value='url'>Link</a>
-                                                    </p>
-                                                </div>
-
-                                                <div class="post-attachment url" style="display:none;">
-                                                    <label>
-                                                        <input type='text' class='url' name='url' maxlength='1024' placeholder="http://" />
-                                                    </label>
-                                                    <p class="alt-src">
-                                                        or <a class='button icon-image stream-attachment' data-value='attach'>Attach</a>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <input class='submit-btn-plain' type='submit' value='Post' />
-                                        </form>
-                                        <!-- END socialstream_has_newpost -->
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </section>
-    </div>
-</div>
-
 <hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1>Members Component - Block Grid Layout</h1>
-        <ul class="component-titlebar" style='background-color:#ddd'>
-            <li class="actions-small-3">
-                <div class="list-item">
-                    <div class="small-12 card">
-                        <h2><a href="">Example Component Titlebar</a></h2>
-                    </div>
-                </div>
-                <nav>
-                    <a data-target='settings' data-state='closed' href="#" class="icon-settings settings edit" title="Settings"></a>
-                    <a data-collapser="true" href="#" class="icon-collapse collapse" title="Collapse Content"></a>
-                    <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
-                </nav>
-            </li>
-        </ul>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <section>
-            <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-                <li>
-                    <div class="avatar-card">
-                        <a href="#" title="View Profile">
-                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
-                            <p>Karl Pilkington</p>
-                        </a>
-                        <p class="meta">Friday April 12th 2015 11:11am</p>
-                        <p class="meta">Edited five days ago</p>
-                    </div>
-                </li>
-                <li>
-                    <div class="avatar-card">
-                        <a href="#" title="View Profile">
-                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
-                            <p>Karl Pilkington</p>
-                        </a>
-                        <p class="meta">Friday April 12th 2015 11:11am</p>
-                        <p class="meta">Edited five days ago</p>
-                    </div>
-                </li>
-                <li>
-                    <div class="avatar-card">
-                        <a href="#" title="View Profile">
-                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
-                            <p>Karl Pilkington</p>
-                        </a>
-                        <p class="meta">Friday April 12th 2015 11:11am</p>
-                        <p class="meta">Edited five days ago</p>
-                    </div>
-                </li>
-                <li>
-                    <div class="avatar-card">
-                        <a href="#" title="View Profile">
-                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
-                            <p>Karl Pilkington</p>
-                        </a>
-                        <p class="meta">Friday April 12th 2015 11:11am</p>
-                        <p class="meta">Edited five days ago</p>
-                    </div>
-                </li>
-            </ul>
-            <div class="content">
-                <a href="#" class="button icon-email">Email all</a>
-            </div>
-        </section>
-    </div>
-</div>
-
-<hr/>
-
-<div class="row">
-    <div class="small-12 island">
-        <h1>Avatar Card</h1>
-        <section>
-            <div class="avatar-card">
-                <a href="#" title="View Profile">
-                    <img src="https://placekitten.com/g/64/64" alt="Moggy">
-                    <p>Karl Pilkington</p>
-                </a>
-                <p class="meta">Friday April 12th 2015 11:11am</p>
-                <p class="meta hide-for-small-only">Edited five days ago</p>
-            </div>
-        </section>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="labels">Labels</h1>
-
-        <section class="content">
-            <p>
-                For submissions/due work:<br />
-                <span class="submitted label">Submitted</span>
-                <span class="submitted-late label">Submitted Late</span>
-                <span class="unsubmitted label">Unsubmitted</span>
-            </p>
-            <p>
-                For general usage:<br />
-                <span class="success label">Success Label</span>
-                <span class="alert label">Alert Label</span>
-                <span class="neutral label">Neutral Label</span>
-
-            </p>
-            <p>
-                This used to be <code>.label.secondary</code> but has been
-                repurposed. This is now used almost exclusively in ajax indicators
-                in label-timeouts.
-                <span class="label highlight">Highlight Label</span>
-            </p>
-        </section>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="gradients">Grade-ients</h1>
-        <section class="content">
-            <ul>
-                <li><span class="gradient-10">.gradient-10</span></li>
-                <li><span class="gradient-9">.gradient-9</span></li>
-                <li><span class="gradient-8">.gradient-8</span></li>
-                <li><span class="gradient-7">.gradient-7</span></li>
-                <li><span class="gradient-6">.gradient-6</span></li>
-                <li><span class="gradient-5">.gradient-5</span></li>
-                <li><span class="gradient-4">.gradient-4</span></li>
-                <li><span class="gradient-3">.gradient-3</span></li>
-                <li><span class="gradient-2">.gradient-2</span></li>
-                <li><span class="gradient-1">.gradient-1</span></li>
-                <li><span class="gradient-0">.gradient-0</span></li>
-            </ul>
-        </section>
-    </div>
-</div>
-
-<hr/>
 
 <div class="row">
     <div class="small-12 island">
@@ -1146,6 +659,8 @@ $(function () {
     </div>
 </div>
 
+<hr />
+
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Status</h2>
@@ -1179,44 +694,8 @@ $(function () {
     </div>
 </div>
 
-<hr />
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Context Switch</h1>
-        <ul class="meta">
-            <li class="icon-wolfram-alpha">You can simply omit the subject selector where appropriate</li>
-        </ul>
-    </div>
-    <div class="small-12 medium-9 medium-offset-3 medium-7 medium-offset-5 columns">
-        <div class="content">
-            <div class="context-switch">
-                <nav>
-                    <a href="/submission/listSubmission/2015/1"></a>
-                </nav>
-                <div class="semester">
-                    <select>
-                        <option>Semester 2, 2015</option>
-                    </select>
-                </div>
-                <nav>
-                    <a href="/submission/listSubmission/2016/1"></a>
-                </nav>
-                <div class="subject">
-                    <select>
-                        <option>English 3 4 (EN344)</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<hr />
-
 <div class="row">
     <div class="small-12 island">
-        <h1>Icons</h1>
         <h2 class="subheader">Standalone</h2>
         <section class="content">
             <ul class="inline-list">
@@ -1227,13 +706,13 @@ $(function () {
                     </a>
                 </li>
                 <li>
-                     <a href="#" title="Dropbox">
+                    <a href="#" title="Dropbox">
                         <i class="icon-drop-box success icon-24"></i>
                         24px
                     </a>
                 </li>
                 <li>
-                     <a href="#" title="Success">
+                    <a href="#" title="Success">
                         <i class="icon-drop-box success icon-32"></i>
                         32px
                     </a>
@@ -1267,38 +746,6 @@ $(function () {
                 </li>
             </ul>
         </section>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="meta">REDUX Prac Writeup</h1>
-        <p><a href="/pantry/redux">See shelf</a></p>
-    </div>
-</div>
-
-<hr/>
-
-<div class="row">
-    <div class="small-12 island">
-        <h1>Preloader .gif</h1>
-        <div class="loader"></div>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="breadcrumbs">Breadcrumbs</h1>
-        <ul class="breadcrumb">
-            <li><a href="#">Home</a></li>
-            <li class="active"><a href="#">Features</a></li>
-            <li class="unavailable"><a href="#">Gene Splicing</a></li>
-            <li><a href="#">Cloning</a></li>
-        </ul>
     </div>
 </div>
 
@@ -1354,124 +801,92 @@ $(function () {
 
 <div class="row">
     <div class="small-12 island">
-        <h1 id="pagination">Pagination</h1>
-        <section class="content">
-            <p>Here's a <code>&lt;section&gt;</code> you could paginate.</p>
-        </section>
-        <ul class="pagination">
-            <li class="arrow unavailable"><a href="">&lsaquo;</a></li>
-            <li class="active"><a href="">1</a></li>
-            <li><a href="">2</a></li>
-            <li><a href="">3</a></li>
-            <li><a href="">4</a></li>
-            <li class="unavailable"><a href="">&hellip;</a></li>
-            <li><a href="">12</a></li>
-            <li><a href="">13</a></li>
-            <li class="arrow"><a href="">&rsaquo;</a></li>
-        </ul>
-    </div>
-</div>
+        <h1 id="labels">Labels</h1>
 
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="inline-lists">Inline Lists</h1>
         <section class="content">
-        <ul class="inline-list">
-            <li><a href="#">Link 1</a></li>
-            <li><a href="#">Link 2</a></li>
-            <li><a href="#">Link 3</a></li>
-            <li><a href="#">Link 4</a></li>
-            <li><a href="#">Link 5</a></li>
-        </ul>
+            <p>
+                For submissions/due work:<br />
+                <span class="submitted label">Submitted</span>
+                <span class="submitted-late label">Submitted Late</span>
+                <span class="unsubmitted label">Unsubmitted</span>
+            </p>
+            <p>
+                For general usage:<br />
+                <span class="success label">Success Label</span>
+                <span class="alert label">Alert Label</span>
+                <span class="neutral label">Neutral Label</span>
+            </p>
+            <p>
+                <span class="label highlight">Highlight Label</span><br />
+                This used to be <code>.label.secondary</code> but has been
+                repurposed. This is now used almost exclusively in ajax indicators
+                in label-timeouts.
+            </p>
         </section>
     </div>
 </div>
 
 <hr />
 
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="switches">Switches</h1>
-        <h2 class="subheader">Checkbox Switch with Text</h2>
-        <section class="content">
-            <input id="textCheckboxToggle" type="checkbox">
-            <label for="textCheckboxToggle" class="checkbox-toggle">V</label>
-            <input id="textCheckboxToggle2" type="checkbox">
-            <label for="textCheckboxToggle2" class="checkbox-toggle">A</label>
-            <input id="textCheckboxToggle3" type="checkbox">
-            <label for="textCheckboxToggle3" class="checkbox-toggle">P</label>
-            <input id="textCheckboxToggle4" type="checkbox">
-            <label for="textCheckboxToggle4" class="checkbox-toggle">O</label>
-            <input id="textCheckboxToggle5" type="checkbox">
-            <label for="textCheckboxToggle5" class="checkbox-toggle">R</label>
-            <input id="textCheckboxToggle6" type="checkbox">
-            <label for="textCheckboxToggle6" class="checkbox-toggle">W</label>
-            <input id="textCheckboxToggle7" type="checkbox">
-            <label for="textCheckboxToggle7" class="checkbox-toggle">A</label>
-            <input id="textCheckboxToggle8" type="checkbox">
-            <label for="textCheckboxToggle8" class="checkbox-toggle">V</label>
-            <input id="textCheckboxToggle9" type="checkbox">
-            <label for="textCheckboxToggle9" class="checkbox-toggle">E</label>
-        </section>
-
-        <h2 class="subheader">Checkbox Switch with Icons</h2>
-        <section class="content">
-            <input id="iconCheckboxToggle0" type="checkbox" />
-            <label for="iconCheckboxToggle0" class="checkbox-toggle">
-                <span class="icon-close alert" title="Remove From Group"></span>
-            </label>
-            <input id="iconCheckboxToggle1" type="checkbox" />
-            <label for="iconCheckboxToggle1" class="checkbox-toggle">
-                <span class="icon-eye" title="Remove From Group"></span>
-            </label>
-            <input id="iconCheckboxToggle2" type="checkbox" />
-            <label for="iconCheckboxToggle2" class="checkbox-toggle">
-                <span class="icon-modify" title="Remove From Group"></span>
-            </label>
-        </section>
+<div class="row actions-small-3">
+    <div class="list-item">
+        <div class="small-12 island">
+            <h1>Heading with Actions a.k.a. Jelly Tot Menu</h1>
+        </div>
     </div>
+    <nav>
+        <a href='#' class='icon-folder' title="Primary Action"></a>
+        <a href='#' class='icon-previous' title="Return to Homepage"></a>
+        <a href="#" class="icon-more" data-dropdown="header-options"></a>
+    </nav>
+    <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
+        <li class="separator">Quiz</li>
+        <li><a href='#' class='icon-modify'>Modify</a></li>
+        <li><a href='#' class='icon-export'>Export</a></li>
+        <li><a href='#' class='icon-delete'>Delete</a></li>
+        <li class="separator">Section</li>
+        <li><a href="#" class="icon-add">Add</a></li>
+        <li><a href="#" class="icon-add">Add from Question Bank</a></li>
+        <li><a href="#" class="icon-modify">Modify</a></li>
+        <li><a href="#" class="icon-delete">Delete</a></li>
+    </ul>
 </div>
 
 <hr />
 
 <div class="row">
-    <div class="small-12 island">
-        <h1 id="alert-boxes">Alert Boxes</h1>
-        <section class="content">
-            <div data-alert class="alert-box">
-                This is a standard alert (div.alert-box).
-                <a href="" class="close">&times;</a>
-            </div>
-            <div data-alert class="alert-box success">
-                This is a success alert (div.alert-box.success).
-                <a href="" class="close">&times;</a>
-            </div>
-
-            <div data-alert class="alert-box warning">
-                This is a warning alert (div.alert-box.warning).
-                <a href="" class="close">&times;</a>
-            </div>
-
-            <div data-alert class="alert-box alert">
-                This is a danger alert (div.alert-box.alert).
-                <a href="" class="close">&times;</a>
-            </div>
-        </section>
+    <div class="small-12 columns">
+        <h1 id="reveal">Modal / Reveal</h1>
+        <!-- Triggers the modals -->
+        <a href="#" data-reveal-id="firstModal" class="radius button">Modal in a modal&hellip;</a>
+        <a href="#" data-reveal-id="videoModal" class="radius button">Example Modal with Video&hellip;</a>
     </div>
 </div>
 
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="forms">Forms</h1>
-        <ul class="meta">
-            <li><a href="/pantry/form">See shelf</a></li>
-        </ul>
-    </div>
+<!-- Reveal Modals begin -->
+<div id="firstModal" class="reveal-modal" data-reveal aria-labelledby="firstModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="firstModalTitle">This is a modal.</h2>
+    <p>Reveal makes these very easy to summon and dismiss. The close button is simply an anchor with a unicode character icon and a class of <code>close-reveal-modal</code>. Clicking anywhere outside the modal will also dismiss it.</p>
+    <p>Finally, if your modal summons another Reveal modal, the plugin will handle that for you gracefully.</p>
+    <p><a href="#" data-reveal-id="secondModal" class="secondary button">Second Modal...</a></p>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
+
+<div id="secondModal" class="reveal-modal" data-reveal aria-labelledby="secondModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="secondModalTitle">This is a second modal.</h2>
+    <p>See? It just slides into place after the other first modal. Very handy when you need subsequent dialogs, or when a modal option impacts or requires another decision.</p>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div id="videoModal" class="reveal-modal large" data-reveal aria-labelledby="videoModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="videoModalTitle">This modal has video</h2>
+    <div class="flex-video widescreen vimeo">
+        <iframe width="1280" height="720" src="//www.youtube-nocookie.com/embed/wnXCopXXblE?rel=0" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+<!-- Reveal Modals end -->
 
 <hr />
 
@@ -1536,380 +951,6 @@ $(function () {
 
 <div class="row">
     <div class="small-12 island">
-        <h1>WYSIWYG / Article</h1>
-        <ul class="meta">
-            <li class="icon-settings">Use the <code>&lt;article /&gt;</code> tag force WYSIWYG styles</li>
-        </ul>
-        <section class="content">
-            <article>
-                <h1>The main title of this WYSIWYG content</h1>
-                <p>
-                    <img style="float:right;margin-left:8px;" src="https://placeimg.com/80/80/animals" alt="Enimerlz!">
-                    Here's some paragraph text for you. Dreamcatcher artisan kale chips, Marfa 3 wolf moon biodiesel skateboard Tumblr
-                    8-bit master cleanse American Apparel kitsch fashion axe. Tousled tattooed fashion axe occupy cray fap, you probably
-                    haven't heard of them pickled put a bird on it meh slow-carb lo-fi Vice. Food truck next level mustache, heirloom
-                    mumblecore mixtape High Life locavore messenger bag.
-                </p>
-                <h2>Boarding Leave Rules</h2>
-                <ul>
-                    <li>
-                        An email will automatically be sent to the email address your parents/guardian have supplied the school. Your
-                        parents/guardian then need to contact your Housemaster (e.g. phone/fax/email) to confirm they are aware of your
-                        leave request and approve of it.
-                    </li>
-                    <li>
-                        If you are staying at a host other than family, then the host parent/guardian will need to contact your Housemaster
-                        (e.g. phone/fax/email) to confirm they are aware of your leave request and approve of it.  You can forward your
-                        email copy of your leave request to them.
-                    </li>
-                    <li>
-                        You and your parents/guardian will receive notification by email of the status of your leave - approved, modified
-                        or rejected.
-                    </li>
-                    <li>
-                        Confirmation from your parents/guardian and/or hosts must be received by your Housemaster by 8:00pm on the Thursday
-                        prior to your leave request.
-                    </li>
-                    <li>You should advise your Housemaster as soon as possible if your leave arrangements change.</li>
-                    <li>This application is a request for leave and the School reserves the right to approve/deny leave.</li>
-                </ul>
-            </article>
-        </section>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="block-grid">Block Grid</h1>
-        <section class="content">
-            <ul class="small-block-grid-2 large-block-grid-4">
-                <li><img class="th" src="https://placeimg.com/300/300/animals" alt=""></li>
-                <li><img class="th" src="https://placeimg.com/300/300/animals" alt=""></li>
-                <li><img class="th" src="https://placeimg.com/300/300/animals" alt=""></li>
-                <li><img class="th" src="https://placeimg.com/300/300/animals" alt=""></li>
-            </ul>
-        </section>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="clearing">Clearing</h1>
-        <section class="content">
-            <ul class="clearing-thumbs" data-clearing>
-                <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/comet.jpg"><img data-caption="Nulla vitae elit libero, a pharetra augue. Cras mattis consectetur purus sit amet fermentum." src="http://foundation.zurb.com/docs/assets/img/examples/comet-th-sm.jpg" alt=""></a></li>
-                <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/earth.jpg"><img src="http://foundation.zurb.com/docs/assets/img/examples/earth-th-sm.jpg" alt=""></a></li>
-                <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/launch.jpg"><img data-caption="Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus." src="http://foundation.zurb.com/docs/assets/img/examples/launch-th-sm.jpg" alt=""></a></li>
-                <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/satelite.jpg"><img src="http://foundation.zurb.com/docs/assets/img/examples/satelite-th-sm.jpg" alt=""></a></li>
-                <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/space.jpg"><img data-caption="Integer posuere erat a ante venenatis dapibus posuere velit aliquet." src="http://foundation.zurb.com/docs/assets/img/examples/space-th-sm.jpg" alt=""></a></li>
-            </ul>
-        </section>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-
-    <h1 id="flex-video">Flex Video</h1>
-    <div class="flex-video">
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/mqy98hcMV9w?list=PL07CD71F1ABDD9785" frameborder="0" allowfullscreen></iframe>
-    </div>
-    </div>
-</div>
-
-<hr />
-    <!-- <h1 id="joyride">Joyride</h1> -->
-    <!-- At the bottom of your page but inside of the body tag -->
-    <!-- <ol class="joyride-list" data-joyride>
-        <li data-id="firstStop" data-text="Next" data-options="tip_location: top; prev_button: false">
-            <p>Hello and welcome to the Joyride documentation page.</p>
-        </li>
-        <li data-id="numero1" data-class="custom so-awesome" data-text="Next" data-prev-text="Prev">
-            <h1>Stop #1</h1>
-            <p>You can control all the details for you tour stop. Any valid HTML will work inside of Joyride.</p>
-        </li>
-        <li data-id="numero2" data-button="Next" data-prev-text="Prev" data-options="tip_location:top;tip_animation:fade">
-            <h1>Stop #2</h1>
-            <p>Get the details right by styling Joyride with a custom stylesheet!</p>
-        </li>
-        <li data-button="End" data-prev-text="Prev">
-            <h1>Stop #3</h1>
-            <p>It works as a modal too!</p>
-        </li>
-    </ol>
-    <div id="firstStop" class="panel"><p>Ride the whale.</p></div>
-    <p id="numero1" class="panel">Megalodon<p>
-    <p id="numero2" class="panel">Kraken</p>
-    <p id="End" class="panel">Whale</p>
-    &lt;!&ndash; At the bottom of your page but inside of the body tag &ndash;&gt;
-    <div id="joyride-go">
-        <ol class="joyride-list" data-joyride>
-            <li data-id="firstStop" data-text="Next" data-options="tip_location: top; prev_button: false">
-                <p>Welcome to Rapture, the home of Schoolbox.</p>
-                <p><img src="http://www.twinfinite.net/wp-content/uploads/2014/07/bioshock-rapture-city1.jpg" /></p>
-            </li>
-            <li data-id="numero1" data-class="custom so-awesome" data-text="Next" data-prev-text="Prev">
-                <h1>Stop #1</h1>
-                <p>You can control all the details for you tour stop. Any valid HTML will work inside of Joyride.</p>
-            </li>
-            <li data-id="numero2" data-button="Next" data-prev-text="Prev" data-options="tip_location:top;tip_animation:fade">
-                <h1>Stop #2</h1>
-                <p>Get the details right by styling Joyride with a custom stylesheet!</p>
-            </li>
-            <li data-button="End" data-prev-text="Prev">
-                <h1>Stop #3</h1>
-                <p>It works as a modal too!</p>
-                <p><img src="http://www.emeraldene.com.au/blog/wp-content/uploads/2013/05/Whale-Watching-2013.jpg" /></p>
-            </li>
-        </ol>
-    </div>
-    <p>To make something pretty, press and hold <kbd>cmd + alt + shift + w + a + !</kbd></p>
-    <hr> -->
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="magellan">Magellan (Sticky Nav)</h1>
-    </div>
-</div>
-
-<div class="magellan-container" data-magellan-expedition="fixed">
-    <ul class="sub-nav inline-list">
-        <li data-magellan-arrival="build"><a href="#build">Build with HTML</a></li>
-        <li data-magellan-arrival="js"><a href="#js">Using Javascript</a></li>
-    </ul>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <div class="content">
-            <a name="build"></a>
-            <h5 data-magellan-destination="build">Build With Predefined HTML Structure</h5>
-
-            <a name="js"></a>
-            <h5 data-magellan-destination="js">Awesome JS Goodness</h5>
-        </div>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="image-slider">Image Slider</h1>
-        <!-- Custom javascript -->
-        <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
-        <script type="text/javascript">
-            $(function(){
-              $('[data-imageslider]').anyslider({
-                    interval: 2000,
-                    prevLabel: '',
-                    nextLabel: ''
-                });
-            });
-        </script>
-        <div class="imageslider-container">
-              <div data-imageslider class="imageslider">
-                  <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
-                  <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
-                  <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
-                  <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
-                  <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
-              </div>
-        </div>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1 id="progress-bars">Progress Bars</h1>
-        <div class="progress large-6"><span class="meter" style="width: 40%"></span></div>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1 id="reveal">Modal / Reveal</h1>
-        <!-- Triggers the modals -->
-        <a href="#" data-reveal-id="firstModal" class="radius button">Modal in a modal&hellip;</a>
-        <a href="#" data-reveal-id="videoModal" class="radius button">Example Modal with Video&hellip;</a>
-    </div>
-</div>
-
-<!-- Reveal Modals begin -->
-<div id="firstModal" class="reveal-modal" data-reveal aria-labelledby="firstModalTitle" aria-hidden="true" role="dialog">
-    <h2 id="firstModalTitle">This is a modal.</h2>
-    <p>Reveal makes these very easy to summon and dismiss. The close button is simply an anchor with a unicode character icon and a class of <code>close-reveal-modal</code>. Clicking anywhere outside the modal will also dismiss it.</p>
-    <p>Finally, if your modal summons another Reveal modal, the plugin will handle that for you gracefully.</p>
-    <p><a href="#" data-reveal-id="secondModal" class="secondary button">Second Modal...</a></p>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-
-<div id="secondModal" class="reveal-modal" data-reveal aria-labelledby="secondModalTitle" aria-hidden="true" role="dialog">
-    <h2 id="secondModalTitle">This is a second modal.</h2>
-    <p>See? It just slides into place after the other first modal. Very handy when you need subsequent dialogs, or when a modal option impacts or requires another decision.</p>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-
-<div id="videoModal" class="reveal-modal large" data-reveal aria-labelledby="videoModalTitle" aria-hidden="true" role="dialog">
-    <h2 id="videoModalTitle">This modal has video</h2>
-    <div class="flex-video widescreen vimeo">
-        <iframe width="1280" height="720" src="//www.youtube-nocookie.com/embed/wnXCopXXblE?rel=0" frameborder="0" allowfullscreen></iframe>
-    </div>
-
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-<!-- Reveal Modals end -->
-
-<hr />
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1 id="accordion">Accordion</h1>
-        <dl class="accordion" data-accordion>
-            <dd class="accordion-navigation">
-                <a href="#panel1">Accordion 1</a>
-                <div id="panel1" class="content active">
-                    <dl class="tabs" data-tab>
-                        <dd class="active"><a href="#panel1-1">Tab 1</a></dd>
-                        <dd><a href="#panel1-2">Tab 2</a></dd>
-                        <dd><a href="#panel1-3">Tab 3</a></dd>
-                        <dd><a href="#panel1-4">Tab 4</a></dd>
-                    </dl>
-                    <div class="tabs-content">
-                        <div class="content active" id="panel1-1">
-                            <p>First panel content goes here...</p>
-                        </div>
-                        <div class="content" id="panel1-2">
-                            <p>Second panel content goes here...</p>
-                        </div>
-                        <div class="content" id="panel1-3">
-                            <p>Third panel content goes here...</p>
-                        </div>
-                        <div class="content" id="panel1-4">
-                            <p>Fourth panel content goes here...</p>
-                        </div>
-                    </div>
-                </div>
-            </dd>
-            <dd class="accordion-navigation">
-                <a href="#panel2">Accordion 2</a>
-                <div id="panel2" class="content">
-                    Panel 2. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                </div>
-            </dd>
-            <dd class="accordion-navigation">
-                <a href="#panel3">Accordion 3</a>
-                <div id="panel3" class="content">
-                    Panel 3. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                </div>
-            </dd>
-        </dl>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Tabs</h1>
-        <dl class="tabs" data-tab>
-            <dd class="active"><a href="#panel2-1">Tab 1</a></dd>
-            <dd><a href="#panel2-2">Tab 2</a></dd>
-            <dd><a href="#panel2-3">Tab 3</a></dd>
-            <dd><a href="#panel2-4">Tab 4</a></dd>
-        </dl>
-
-        <div class="tabs-content">
-            <div class="content active" id="panel2-1">
-                <p>First panel content goes here...</p>
-            </div>
-            <div class="content" id="panel2-2">
-                <p>Second panel content goes here...</p>
-            </div>
-            <div class="content" id="panel2-3">
-                <p>Third panel content goes here...</p>
-            </div>
-            <div class="content" id="panel2-4">
-                <p>Fourth panel content goes here...</p>
-            </div>
-        </div>
-
-        <dl class="tabs vertical" data-tab="">
-            <dd class="active"><a href="#panel1a">Tab 1</a></dd>
-            <dd><a href="#panel2a">Tab 2</a></dd>
-            <dd><a href="#panel3a">Tab 3</a></dd>
-            <dd><a href="#panel4a">Tab 4</a></dd>
-        </dl>
-
-        <div class="tabs-content vertical">
-            <div class="content active" id="panel1a">
-                <p>Panel 1 content goes here.</p>
-            </div>
-            <div class="content" id="panel2a">
-                <p>Panel 2 content goes here.</p>
-            </div>
-            <div class="content" id="panel3a">
-                <p>Panel 3 content goes here.</p>
-            </div>
-            <div class="content" id="panel4a">
-                <p>Panel 4 content goes here.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1 id="sub-nav">Sub Nav</h1>
-        <dl class="sub-nav">
-            <dd><a href="#">All</a></dd>
-            <dd class="active"><a href="#">Active</a></dd>
-            <dd><a href="#">Pending</a></dd>
-            <dd><a href="#">Suspended</a></dd>
-        </dl>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="tables">Tables</h1>
-        <section class="content">
-            <p>
-                <a href="/pantry/tables">See tables shelf</a>
-            </p>
-        </section>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="thumbnails">Thumbnails</h1>
-        <section class="content">
-            <p><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/earth-th-sm.jpg" alt=""><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/space-th-sm.jpg" alt=""></p>
-        </section>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
         <h1 id="tooltips">Tooltips</h1>
         <section class="content">
             <p>The tooltips can be positioned on the <span data-tooltip class="has-tip" data-width="400" title="I'm on bottom and the default position.">&quot;tip-bottom&quot;</span>, which is the default position, <span data-tooltip class="has-tip tip-top noradius" data-width="210" title="I'm on the top and I'm not rounded!">&quot;tip-top&quot; (hehe)</span>, <span data-tooltip="left" class="has-tip tip-left" data-width="90" title="I'm on the left!">&quot;tip-left&quot;</span>, or <span data-tooltip="right" class="has-tip tip-right" data-width="520" title="I'm on the right!">&quot;tip-right&quot;</span> of the target element by adding the appropriate class to them. You can even add your own custom class to style each tip differently. On a small device, the tooltips are full width and bottom aligned.</p>
@@ -1919,124 +960,49 @@ $(function () {
 
 <hr />
 
-<div class="row actions-small-3">
-    <div class="list-item">
-        <div class="small-12 island">
-            <h1>Heading with Actions</h1>
-        </div>
-    </div>
-    <nav>
-        <a href='#' class='icon-folder' title="Primary Action"></a>
-        <a href='#' class='icon-previous' title="Return to Homepage"></a>
-        <a href="#" class="icon-more" data-dropdown="header-options"></a>
-    </nav>
-    <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
-        <li class="separator">Quiz</li>
-        <li><a href='#' class='icon-modify'>Modify</a></li>
-        <li><a href='#' class='icon-export'>Export</a></li>
-        <li><a href='#' class='icon-delete'>Delete</a></li>
-        <li class="separator">Section</li>
-        <li><a href="#" class="icon-add">Add</a></li>
-        <li><a href="#" class="icon-add">Add from Question Bank</a></li>
-        <li><a href="#" class="icon-modify">Modify</a></li>
-        <li><a href="#" class="icon-delete">Delete</a></li>
-    </ul>
-</div>
-
-<hr />
-
 <div class="row">
-    <div class="small-12 island">
-        <h1 id="type">Typography</h1>
-        <h1>h1. This is a very large header.</h1>
-        <section class="content">
-        <h2>h2. This is a large header.</h2>
-        <h3>h3. This is a medium header.</h3>
-        <h4>h4. This is a moderate header.</h4>
-        <h5>h5. This is a small header.</h5>
-        <h6>h6. This is a tiny header.</h6>
-        </section>
-
-        <h1 class="subheader">h1.subheader</h1>
-        <h2 class="subheader">h2.subheader</h2>
-        <h3 class="subheader">h3.subheader</h3>
-        <h4 class="subheader">h4.subheader</h4>
-        <h5 class="subheader">h5.subheader</h5>
-        <h6 class="subheader">h6.subheader</h6>
-        <section class="content">
-            Use the subheader class for headers in the ocean
-        </section>
+    <div class="small-12 columns">
+        <ul class="information-list">
+            <li>
+                <h1 id="common" class="no-margin"><a href="/pantry/common">Common Ingredients</a></h1>
+                <p class="meta">These ingredients are universally applicable, but we don't use them as much as Primaries, which are listed on this very page.</p>
+            </li>
+            <li>
+                <h1 id="rare" class="no-margin"><a href="/pantry/rare">Rare Ingredients</a></h1>
+                <p class="meta">These ingredients are used only a handful of times.</p>
+            </li>
+            <li>
+                <h1 id="Unique" class="no-margin"><a href="/pantry/unique">Unique Ingredients</a></h1>
+                <p class="meta">These ingredients are used only once.</p>
+            </li>
+        </ul>
     </div>
 </div>
 
 <hr />
 
 <div class="row">
-    <div class="small-12 island">
-        <h1 id="blockquote">Blockquote</h1>
-        <section class="content">
-        <blockquote>Just because everything else is square, doesn't mean the switch can't be round.<cite>Matthew Sambell</cite></blockquote>
-        </section>
+    <div class="small-12 columns">
+        <h1 id="meta"><a href="/pantry/redux">Shelf: REDUX Prac Writeup (Entity Meta)</a></h1>
+        <h1 id="forms"><a href="/pantry/form">Shelf: Forms</a></h1>
+        <h1 id="tables"><a href="/pantry/tables">Shelf: Tables</a></h1>
+    </div>
+</div>
+
+<hr/>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1 id="touchy"><a href="/pantry/touchy">Reference: Touchy</a></h1>
+        <h1 id="reference"><a href="/pantry/reference">Reference: Miscellaneous</a></h1>
     </div>
 </div>
 
 <hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="visibility-classes">Visibility Classes</h1>
-        <h2 class="subheader" id="screen-size-visibility-control-show-">Screen Size Visibility Control (Show)</h2>
-        <section class="content">
-            <p>The following text should describe the screen size you&#39;re using:</p>
-            <p class="alert-box">
-                <strong class="show-for-small">You are on a small screen.</strong>
-                <strong class="show-for-medium">You are on a medium screen.</strong>
-                <strong class="show-for-medium-up">You are on a medium, large or xlarge screen.</strong>
-                <strong class="show-for-medium-down">You are on a medium or small screen.</strong>
-                <strong class="show-for-large">You are on a large screen.</strong>
-                <strong class="show-for-large-up">You are on a large or xlarge screen.</strong>
-                <strong class="show-for-large-down">You are on a large, medium or small screen.</strong>
-                <strong class="show-for-xlarge">You are on a xlarge screen.</strong>
-            </p>
-        </section>
-        <h2 class="subheader" id="screen-size-visibility-control-hide-">Screen Size Visibility Control (Hide)</h2>
-        <section class="content">
-            <p>The following text should describe the screen size you aren&#39;t using:</p>
-            <p class="alert-box">
-                <strong class="hide-for-small">You are <em>not</em> on a small screen.</strong>
-                <strong class="hide-for-medium">You are <em>not</em> on a medium screen.</strong>
-                <strong class="hide-for-medium-up">You are <em>not</em> on a medium, large or xlarge screen.</strong>
-                <strong class="hide-for-medium-down">You are <em>not</em> on a medium or small screen.</strong>
-                <strong class="hide-for-large">You are <em>not</em> on a large screen.</strong>
-                <strong class="hide-for-large-up">You are <em>not</em> on a large or xlarge screen.</strong>
-                <strong class="hide-for-large-down">You are <em>not</em> on a large, medium or small screen.</strong>
-                <strong class="hide-for-xlarge">You are <em>not</em> on a xlarge screen.</strong>
-            </p>
-        </section>
-        <h2 class="subheader" id="orientation-detection">Orientation Detection</h2>
-        <section class="content">
-            <p>The following text should describe the device orientation you&#39;re using:</p>
-            <p class="alert-box">
-                <strong class="show-for-landscape">You are in landscape orientation.</strong>
-                <strong class="show-for-portrait">You are in portrait orientation.</strong>
-            </p>
-        </section>
-
-        <h2 class="subheader" id="touch-detection">Touch Detection</h2>
-        <section class="content">
-            <p>The following text should describe if you&#39;re using a touch device:</p>
-            <p class="alert-box">
-                <strong class="show-for-touch">You are on a touch-enabled device.</strong>
-                <strong class="hide-for-touch">You are not on a touch-enabled device.</strong>
-            </p>
-        </section>
-    </div>
-</div>
 
 <script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
 <script>
     $(document).ready( function () {
-
         $('#progress-icon').on('click', 'a', function (e) {
             e.preventDefault();
 
@@ -2049,15 +1015,6 @@ $(function () {
             } else {
                 $a.addClass('pending');
             }
-
-        });
-
-        $("#joyride-go").foundation('joyride', 'start');
-
-        $('#sortable').DataTable({
-            info: false,
-            paging: false,
-            searching: false
         });
 
         $(function() {
@@ -2101,60 +1058,8 @@ $(function () {
             }
         });
 
-        $('#content').find('ul[data-sortable]').sortable({
-            handle:      '.grip',
-            axis:        'y',
-        });
-
-
-
-
-        // auto TOC
-        var toc = $('<ol id="toc" style="padding:0 1rem;" />');
-
-        $('#content').find('h1').each(function () {
-
-            var h1 = $(this), id;
-
-            if ('undefined' == typeof h1.attr('id')) {
-                // set an ID
-                id = h1.text().trim().toLowerCase().replace(/[^a-z0-9]+/ig, '-');
-
-                h1.attr('id', id);
-
-            } else {
-                id = h1.attr('id');
-            }
-
-            toc.append($('<li/>').html(
-                $('<a />').text(h1.text()).attr('href', '#' + id)
-            ));
-
-            if (h1.children('a.permalink').length == 0) {
-                // add a permalink
-                h1.append($('<a style="opacity:0.2;margin-left:1rem;" class="permalink">#</a>').attr('href', '#' + h1.attr('id')));
-            }
-
-        });
-
-        $('aside.right-off-canvas-menu').append($('<h2 class="subheader" style="padding:0;margin-top:1rem;min-height:1rem;"/>').text('Pantry TOC')).append(toc);
-
-        $('#toc').on('click', 'a', function (e) {
-
-            e.preventDefault();
-
-            var target = this.href.split('#')[1],
-                top    = $('#' + target).offset().top;
-
-            $('html, body').animate({scrollTop: top}, 700, 'easeInOutSine');
-
-            $('.off-canvas-wrap').removeClass('move-left');
-
-        });
-
         $('a[href=#]').on('click', function (e) {
             e.preventDefault();
         });
-
     });
 </script>
