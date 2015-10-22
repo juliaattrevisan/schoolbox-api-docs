@@ -2,7 +2,8 @@
     <script type="text/javascript" src="/javascript/chat.js"></script>
     <script type="text/javascript">
         $(function () {
-            $('#component{COMPONENT_INSTANCE_ID}').chat({
+            var component = $('#component{COMPONENT_INSTANCE_ID}');
+            component.chat({
                 state: '{CHAT_STATE}',
                 category_id: '{ID}',
                 component_id: '{CHAT_COMPONENT_ID}',
@@ -13,6 +14,11 @@
                 log_el: 'ul[data-chat-log]',
                 send_el: 'a[data-interaction-send]',
                 users_el: 'ul[data-chat-users]'
+            });
+
+            // Collapsables
+            component.find('[data-collapser="participants"]').collapsable({
+                container: '[data-collapsable-container="participants"]'
             });
 
             $('.show-users').click(function(event) {
@@ -66,7 +72,12 @@
                         </form>
                     </div>
                 <div class="chat-error hide"></div>
-                <ul class="chat-users small-block-grid-2 medium-block-grid-3 large-block-grid-4" data-chat-users></ul>
+                <div data-collapsable-container="participants">
+                    <a data-collapser="participants" href="#" class="icon-collapse">Participants</a>
+                    <ul class="chat-users small-block-grid-2 medium-block-grid-3 large-block-grid-4 hide"
+                        data-chat-users
+                        data-collapsable="participants"></ul>
+                </div>
             </section>
         </div>
     </div>
