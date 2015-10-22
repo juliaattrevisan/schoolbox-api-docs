@@ -540,54 +540,52 @@
                 <!-- END user_curriculum -->
 
                 <li class="actions-small-1">
-                    <div class="list-item">
-                        <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService" data-action="addService">
-                            <div class="small-4 columns">
-                                <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
-                                    <option value="" data-identifier="none">Select Service</option>
-                                    <option value="2" data-identifier="campus">Calendar</option>
-                                    <option value="3" data-identifier="campus">News</option>
-                                    <option value="5" data-identifier="none">CMS</option>
-                                    <option value="6" data-identifier="residentialHouse">Housemaster</option>
-                                    <option value="7" data-identifier="none">Resource Booking</option>
-                                    <option value="8" data-identifier="none">Curriculum</option>
-                                </select>
-                            </div>
-                            <div class="small-4 columns">
-                                <select data-service-type="campus" name="sid" id="campusSelect" class="hide" disabled required>
-                                    <option value="">Select Campus</option>
-                                    <!-- BEGIN campusPermsList -->
-                                    <!-- BEGIN perm_campus -->
-                                    <option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED}>{PERM_CAMPUS_NAME}</option>
-                                    <!-- END perm_campus -->
-                                    <!-- END campusPermsList -->
-                                </select>
-                                <select data-service-type="residentialHouse" name="sid" id="residentialHouseSelect" class="hide" disabled required>
-                                    <option value="">Select residential house</option>
-                                    <!-- BEGIN residentialHousePermsList -->
-                                    <!-- BEGIN perm_residential_house -->
-                                    <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
-                                    <!-- END perm_residential_house -->
-                                    <!-- END residentialHousePermsList -->
-                                </select>
-                                <select data-service-type="none" name="sid" id="defaultSelect">
-                                    <option value="" disabled>--</option>
-                                </select>
-                            </div>
-                            <div class="small-4 columns end">
-                                <select name="type" form="serviceCloneForm" required>
-                                    <option value="1">Read</option>
-                                    <option value="2">Write</option>
-                                    <option value="3">Moderate</option>
-                                </select>
-                                <input type="hidden" name="addService" />
-                                <input type="hidden" value="{USERID}" name="uid">
-                            </div>
-                            <div class="small-12 columns">
-                                <input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
-                            </div>
-                        </form>
-                    </div>
+                    <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService" data-action="addService" class="list-item">
+                        <div class="small-4 info card">
+                            <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
+                                <option value="" data-identifier="none">Select Service</option>
+                                <option value="2" data-identifier="campus">Calendar</option>
+                                <option value="3" data-identifier="campus">News</option>
+                                <option value="5" data-identifier="none">CMS</option>
+                                <option value="6" data-identifier="residentialHouse">Housemaster</option>
+                                <option value="7" data-identifier="none">Resource Booking</option>
+                                <option value="8" data-identifier="none">Curriculum</option>
+                            </select>
+                        </div>
+                        <div class="small-4 info card">
+                            <select data-service-type="campus" name="sid" id="campusSelect" class="hide" disabled required>
+                                <option value="">Select Campus</option>
+                                <!-- BEGIN campusPermsList -->
+                                <!-- BEGIN perm_campus -->
+                                <option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED}>{PERM_CAMPUS_NAME}</option>
+                                <!-- END perm_campus -->
+                                <!-- END campusPermsList -->
+                            </select>
+                            <select data-service-type="residentialHouse" name="sid" id="residentialHouseSelect" class="hide" disabled required>
+                                <option value="">Select residential house</option>
+                                <!-- BEGIN residentialHousePermsList -->
+                                <!-- BEGIN perm_residential_house -->
+                                <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
+                                <!-- END perm_residential_house -->
+                                <!-- END residentialHousePermsList -->
+                            </select>
+                            <select data-service-type="none" name="sid" id="defaultSelect">
+                                <option value="" disabled>--</option>
+                            </select>
+                        </div>
+                        <div class="small-4 info card end">
+                            <select name="type" form="serviceCloneForm" required>
+                                <option value="1">Read</option>
+                                <option value="2">Write</option>
+                                <option value="3">Moderate</option>
+                            </select>
+                            <input type="hidden" name="addService" />
+                            <input type="hidden" value="{USERID}" name="uid">
+                        </div>
+                        <div class="small-12 info card">
+                            <input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
+                        </div>
+                    </form>
                 </li>
             </ul>
         </section>
