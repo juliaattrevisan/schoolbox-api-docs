@@ -34,6 +34,7 @@ $deletedUnitList = UnitInstanceMapper::getInstance()->findOrphanedForCategoryId(
 foreach ($deletedUnitList as $unit) {
     if (!empty($_POST['unit'][$unit->getId()])) {
         $unit->setComponent($component);
+        $unit->setDeleted(null);
         UnitInstanceMapper::getInstance()->save($unit);
     }
 }
