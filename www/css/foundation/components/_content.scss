@@ -1119,6 +1119,18 @@ ul.flex-list {
 			padding-top: 1rem;
 		}
 	}
+	> .resource {
+		vertical-align: middle;
+		a {
+			display: block;
+			&[class^="icon-"]:before, &[class*=" icon-"]:before {
+				vertical-align: middle;
+			}
+			img[class^="mime-"], img[class*=" mime-"] {
+				vertical-align: middle;
+			}
+		}
+	}
 }
 
 // Block Grid
