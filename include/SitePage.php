@@ -1421,14 +1421,16 @@ class SitePage extends Page
      */
     protected function localise()
     {
-        while ($r = $this->getDi()->get('l10n')->fetch(PDO::FETCH_ASSOC)) {
-            $term = strtoupper($r['term']);
+        $l10n = $this->getDi()->get('l10n');
+
+        foreach ($l10n as $term => $displayAs) {
+            $term = strtoupper($term);
 
             $this->setVar([
-                "TPL_LOCAL_$term" => $r['display_as'],
-//                "TPL_LOCAL_{$term}_UC" => strtoupper($r['display_as']),
-//                "TPL_LOCAL_{$term}_LC" => strtolower($r['display_as']),
-                "TPL_LOCAL_{$term}_PC" => ucwords($r['display_as']),
+                "TPL_LOCAL_$term" => $displayAs,
+//                "TPL_LOCAL_{$term}_UC" => strtoupper($displayAs),
+//                "TPL_LOCAL_{$term}_LC" => strtolower($displayAs),
+                "TPL_LOCAL_{$term}_PC" => ucwords($displayAs),
             ]);
         }
     }

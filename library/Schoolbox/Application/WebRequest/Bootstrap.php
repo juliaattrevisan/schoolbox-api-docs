@@ -216,7 +216,16 @@ class Bootstrap implements BootstrapInterface {
 			'l10n',
 			$di->lazy(
 				function () {
-					return Database::getInstance()->query("SELECT term, display_as FROM localisation");
+					$db = Database::getInstance();
+					$st = $db->query("SELECT term, display_as FROM localisation");
+
+					$l10n = [];
+
+					while ($r = $st->fetch(PDO::FETCH_ASSOC)) {
+						$l10n[$r['term']] = $r['display_as'];
+					}
+
+					return $l10n;
 				}
 			)
 		);
@@ -370,11 +379,7 @@ class Bootstrap implements BootstrapInterface {
 					// Global access to config object and localisation
 					$twig->addGlobal('config', $config);
 
-					$l10n = [];
-
-					while ($r = $di->get('l10n')->fetch(PDO::FETCH_ASSOC)) {
-						$l10n[$r['term']] = $r['display_as'];
-					}
+					$l10n = $di->get('l10n');
 
 					$l10n['date'] = new Alaress_Date_Locale_Config();
 
