@@ -8,9 +8,6 @@
         <li><a class="icon-link"     data-action="link"     href="/cms/link/new/{{ folder.id }}">Add Link</a></li>
         <li><a class="icon-download" data-action="download" href="#">Download</a></li>
     {% endif %}
-    {% if access >= 3 or user.isSuperuser %}
-        <li><a class="icon-upload"   data-action="multi"    href="/cms/file/multi/{{ folder.id }}">Upload Multiple Files</a></li>
-    {% endif %}
     {% if user.isSuperuser or (access >= 2 and conf.enable_teacher_zip_upload) %}
         <li><a class="icon-upload"   data-action="zip"      href="/cms/zipFile/{{ folder.id }}">Upload ZIP</a></li>
     {% endif %}
