@@ -9,17 +9,6 @@ use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Link;
 use Schoolbox\Resource\LinkMapper;
 
-/* Force session usage due to flash uploader
- * http://www.uploadify.com/forums/discussion/43/using-sessions-tricking-basic-authentication/p1
- */
-if (isset($_POST[session_name()])) {
-    session_id($_POST[session_name()]);
-}
-
-if (isset($_GET[session_name()])) {
-    session_id($_GET[session_name()]);
-}
-
 $ajax = isset($_GET['ajax']) && $_GET['ajax'];
 
 if ($ajax) {
