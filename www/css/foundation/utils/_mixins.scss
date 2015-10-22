@@ -239,7 +239,7 @@
 	}
 }
 
-@mixin selection($color: $accent-background) {
+@mixin selection($color: $accent-foreground) {
 	::-moz-selection {
 		color: calc-text-color($color);
 		background-color: $color;
