@@ -4,7 +4,8 @@
     /* Modal for URL homepage selection
      */
 
-    $('#launch-browser-{COMPONENT_HANDLE}').on('click', function() {
+    $('#launch-browser-{COMPONENT_HANDLE}').on('click', function(e) {
+      e.preventDefault();
       var self = $(this);
 
       $('#resource-browser').socialstreamBrowser({
