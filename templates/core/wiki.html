@@ -44,15 +44,19 @@
         </ul>
 	</div>
 	<nav>
-		<!-- BEGIN lock_link -->
-		<a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}" class="icon-locked" title="{LOCK_UNLOCK}"></a>
-		<!-- END lock_link -->
         <!-- BEGIN modify_link -->
         <a href="/wiki/modify/{WIKI_ID}" class="icon-modify" title="Modify"></a>
         <!-- END modify_link -->
         <a href="#" class="icon-more" data-dropdown="more-options"></a>
 	</nav>
 	<ul class="f-dropdown" data-dropdown-content="" id="more-options">
+		<!-- BEGIN lock_link -->
+		<li><a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}" class="icon-locked">Lock</a></li>
+		<!-- END lock_link -->
+		<!-- BEGIN unlock_link -->
+		<li class="separator">This wiki is locked</li>
+		<li><a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}" class="icon-unlocked">Unlock</a></li>
+		<!-- END unlock_link -->
 		<!-- BEGIN delete_link -->
 		<li><a href="/wiki/modifyForm.php?delete={WIKI_ID}" class="icon-delete" data-delete-wiki>Delete</a></li>
 		<!-- END delete_link -->

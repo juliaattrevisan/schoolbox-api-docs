@@ -16,6 +16,7 @@ if ($this->arg[0] == 'revision') {
     $this->setBlock(TEMPLATE_content, 'delete_link', 'delete_link_block');
     $this->setBlock(TEMPLATE_content, 'revert_link', 'revert_link_block');
     $this->setBlock(TEMPLATE_content, 'lock_link', 'lock_link_block');
+    $this->setBlock(TEMPLATE_content, 'unlock_link', 'unlock_link_block');
     $this->setBlock(TEMPLATE_content, 'export_link', 'export_link_block');
     $this->setBlock(TEMPLATE_content, 'revision_list', 'revision_list_block');
     $this->setBlock(TEMPLATE_content, 'wiki_locked', 'wiki_locked_block');
@@ -63,7 +64,8 @@ if ($this->arg[0] == 'revision') {
 
     $this->setVar($output);
 
-    if ($wiki['locked'] == 'true') {
+    $locked = ($wiki['locked'] == 'true');
+    if ($locked) {
         $this->parse('wiki_locked_block', 'wiki_locked');
     }
     else {
@@ -122,12 +124,17 @@ if ($this->arg[0] == 'revision') {
     }
 
     $this->setVar('lock_link_block', '');
+    $this->setVar('unlock_link_block', '');
     if ($permission >= WRITE_ACCESS) {
-        $this->parse('lock_link_block', 'lock_link');
+        if ($locked) {
+            $this->parse('unlock_link_block', 'unlock_link');
+        } else {
+            $this->parse('lock_link_block', 'lock_link');
+        }
     }
 
     $this->setVar('modify_link_block', '');
-    if (($permission >= READ_ACCESS && $wiki['locked'] == 'false') || $permission >= WRITE_ACCESS) {
+    if (($permission >= READ_ACCESS && !$locked) || $permission >= WRITE_ACCESS) {
         $this->parse('modify_link_block', 'modify_link');
     }
 
@@ -205,6 +212,7 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         $this->setBlock(TEMPLATE_content, 'delete_link', 'delete_link_block');
         $this->setBlock(TEMPLATE_content, 'revert_link', 'revert_link_block');
         $this->setBlock(TEMPLATE_content, 'lock_link', 'lock_link_block');
+        $this->setBlock(TEMPLATE_content, 'unlock_link', 'unlock_link_block');
         $this->setBlock(TEMPLATE_content, 'export_link', 'export_link_block');
         $this->setBlock(TEMPLATE_content, 'revision_list', 'revision_list_block');
         $this->setBlock(TEMPLATE_content, 'wiki_locked', 'wiki_locked_block');
@@ -252,7 +260,8 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
 
         $this->setVar($output);
 
-        if ($wiki['locked'] == 'true') {
+        $locked = ($wiki['locked'] == 'true');
+        if ($locked) {
             $this->parse('wiki_locked_block', 'wiki_locked');
         }
         else {
@@ -311,12 +320,17 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         }
 
         $this->setVar('lock_link_block', '');
+        $this->setVar('unlock_link_block', '');
         if ($permission >= WRITE_ACCESS) {
-            $this->parse('lock_link_block', 'lock_link');
+            if ($locked) {
+                $this->parse('unlock_link_block', 'unlock_link');
+            } else {
+                $this->parse('lock_link_block', 'lock_link');
+            }
         }
 
         $this->setVar('modify_link_block', '');
-        if (($permission >= READ_ACCESS && $wiki['locked'] == 'false') || $permission >= WRITE_ACCESS) {
+        if (($permission >= READ_ACCESS && !$locked) || $permission >= WRITE_ACCESS) {
             $this->parse('modify_link_block', 'modify_link');
         }
 
