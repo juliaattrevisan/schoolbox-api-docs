@@ -282,15 +282,20 @@
                             <input name="weight" type="text" size="3" maxlength="3" value="{ASSESS_WEIGHT}" id="weight"/>
                         </label>
                         <!-- END mark_weight -->
-
-                        <!-- BEGIN curriculum_code_input -->
+                    </div>
+                    <!-- BEGIN curriculum_code_input -->
+                    <div class="small-12 large-10 columns">
                         <label>
                             Curriculum Codes
-                            <span class="hint has-tip tip-top" data-tooltip title="If you want to associate curriculum codes with this assessment, enter them here. (By default, it will be associated with the same codes that its folder is.)">?</span>
-                            {CURRICULUM_CODE_INPUT}
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Link this folder with a corresponding curriculum area, you can link multiple curriculum areas to this folder">?</span>
                         </label>
-                        <!-- END curriculum_code_input -->
+                        {CURRICULUM_CODE_INPUT}
                     </div>
+                    <div class="small-12 large-2 columns">
+                        <label>Browse</label>
+                        {CURRICULUM_BROWSE_BUTTON}
+                    </div>
+                    <!-- END curriculum_code_input -->
                 </fieldset>
             </section>
             <div class="row">

@@ -150,14 +150,20 @@
 							<input type="text" name="code" size="40" value="{CODE}" />
 						</label>
 						<!-- END synergy_input -->
-						<!-- BEGIN curriculum_code_input -->
-						<label>
-                            Curriculum Codes
-							<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Link this folder with a corresponding curriculum area, you can link multiple curriculum areas to this folder">?</span>
-							{CURRICULUM_CODE_INPUT}
-						</label>
-						<!-- END curriculum_code_input -->
 					</div>
+                    <!-- BEGIN curriculum_code_input -->
+                    <div class="small-12 large-10 columns">
+                        <label>
+                            Curriculum Codes
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Link this folder with a corresponding curriculum area, you can link multiple curriculum areas to this folder">?</span>
+                        </label>
+                        {CURRICULUM_CODE_INPUT}
+                    </div>
+                    <div class="small-12 large-2 columns">
+                        <label>Browse</label>
+                        {CURRICULUM_BROWSE_BUTTON}
+                    </div>
+                    <!-- END curriculum_code_input -->
 				</fieldset>
 			</section>
 			<div class="row">
