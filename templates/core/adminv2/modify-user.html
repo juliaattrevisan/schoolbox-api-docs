@@ -615,17 +615,15 @@
                 </li>
                 <!-- END user_linked -->
                 <li class="actions-small-1">
-                    <div class="list-item">
-                        <form action="/adminv2/userForm.php" method="post" id="linkedUserAdd">
-                            <div class="small-12 columns">
-                                <select data-selectizeuser="addUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select>
-                            </div>
-                            <div class="small-12 columns">
-                                <input type="hidden" name="userID" value="{USERID}" />
-                                <input type="submit" value="Add" disabled />
-                            </div>
-                        </form>
-                    </div>
+                    <form action="/adminv2/userForm.php" method="post" id="linkedUserAdd" class="list-item">
+                        <div class="small-12 info card">
+                            <select data-selectizeuser="addUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select>
+                        </div>
+                        <div class="small-12 info card">
+                            <input type="hidden" name="userID" value="{USERID}" />
+                            <input type="submit" value="Add" disabled />
+                        </div>
+                    </form>
                 </li>
             </ul>
         </section>
