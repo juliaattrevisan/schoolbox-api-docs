@@ -16,7 +16,6 @@ class Component_Homepage_Statistics_NavigatorController extends Component_Homepa
 
     public function execute()
     {
-        $this->calculateStarRating();
     }
 
     public function renderTemplate($templateHandle)
@@ -24,15 +23,6 @@ class Component_Homepage_Statistics_NavigatorController extends Component_Homepa
         if (!parent::loadTemplate($templateHandle, 'navigator')) {
             return false;
         }
-
-        // parse stars
-        $stars = $this->rating * self::STAR_COUNT;
-        $this->setBlock($templateHandle, 'star', 'star_block');
-        for ($i = 0; $i < self::STAR_COUNT; ++$i) {
-            $this->parse('star_block', 'star', true);
-        }
-        $this->setVar('STAR_WIDTH', (int)($this->rating * 100));
-        $this->setVar('RATING', sprintf('%0.1f / %0.1f (%s hits)', $stars, self::STAR_COUNT, $this->hits));
 
         // parse time-period navigator
         // 100 days
@@ -84,50 +74,5 @@ class Component_Homepage_Statistics_NavigatorController extends Component_Homepa
         }
 
         return true;
-    }
-
-
-
-
-    /**
-     * THIS METHOD CAN BE REPLACED WITH SOMETHING MORE REASONABLE
-     * ONLY CONDITION IS THAT AT THE END IT SETS $this->rating AND $this->hits
-     * FOR THE RATING TO BE MEANINGFUL, THIS METHOD SHOULD CONTAIN LOGIC THAT ACCOUNTS FOR UNIQUE-VISITS-PER-TIME-PERIOD
-     * AS WELL AS PER-CAPITA (GROUP SIZE) WEIGHTINGS (but for now, it doesn't)
-     */
-    private function calculateStarRating()
-    {
-        $categoryID = $this->getContext()->getId();
-
-        $inner = "
-            SELECT cid, LOG(2, SUM(hitcount)) AS hits, SUM(hitcount) AS raw_hits
-            FROM homepage_log hl
-            RIGHT JOIN category c ON hl.`cid` = c.id
-            GROUP BY cid
-            ORDER BY hits DESC";
-
-        $outer = "
-            SELECT cid, raw_hits, ((hits-mean)/dev) AS norm
-            FROM ($inner) AS t1,
-            (
-                SELECT AVG(hits) mean, STDDEV_POP(hits) dev
-                FROM ($inner) AS t0
-            )
-            AS t2";
-
-        $sqlA = $outer . " WHERE cid = $categoryID";
-        $sqlB = "SELECT MAX(norm) `max`, MIN(norm) `min` FROM ($outer)AS t3";
-
-        $a = Database::getInstance()->query($sqlA)->fetch(PDO::FETCH_ASSOC);
-        $b = Database::getInstance()->query($sqlB)->fetch(PDO::FETCH_ASSOC);
-
-        // account for the null case of 0 hits
-        if ($a['norm'] === null) {
-            $this->rating = 0;
-        } else {
-            $this->rating = ($a['norm'] - $b['min']) / ($b['max'] - $b['min']);
-        }
-
-        $this->hits = $a['raw_hits'];
     }
 }

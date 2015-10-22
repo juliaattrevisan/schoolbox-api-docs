@@ -63,6 +63,22 @@ $this->setFile(TEMPLATE_content, 'statistics/homepage.html');
 $this->setVar('CATEGORY_NAME', $folder->getName());
 $this->setVar('ID', $folder->getId());
 
+/* Render out breadcrumbs
+     */
+$trail = new \Schoolbox\Breadcrumbs();
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => $folder->getName(),
+        'href' => "/homepage/{$folder->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => 'Statistics',
+        'href' => '',
+        'class' => 'active',
+    ]
+]);
+
 /* PARSE COMPONENTRY */
 $componentFactory = new Component_Homepage_Statistics_Factory(new \Schoolbox\User(), $this);
 $componentCollection = $componentFactory->buildComponentList($folder->getId());
