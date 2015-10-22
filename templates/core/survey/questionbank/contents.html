@@ -141,16 +141,6 @@
                                 <article>
                                     {QUESTION}
                                 </article>
-
-                                <div class="hide panel" data-answer-content="{QUESTION_BANK_ID}">
-                                    <ul>
-                                        <!-- BEGIN answers -->
-                                        <li>
-                                            <article>{ANSWER_DESCRIPTION}</article>
-                                        </li>
-                                        <!-- END answers -->
-                                    </ul>
-                                </div>
                             </div>
                         </div>
                         <nav>
@@ -160,6 +150,15 @@
                             <!-- END show_delete -->
                             <a class="icon-modify" href="/survey/questionbank/question/modify/{QUESTION_BANK_ID}" title="Modify"></a>
                         </nav>
+                        <div class="small-12 columns">
+                            <div class="alert-box hide" data-answer-content="{QUESTION_BANK_ID}">
+                                <ul>
+                                    <!-- BEGIN answers -->
+                                    <li><article>{ANSWER_DESCRIPTION}</article></li>
+                                    <!-- END answers -->
+                                </ul>
+                            </div>
+                        </div>
                     </li>
                     <!-- END question -->
                 </ul>
