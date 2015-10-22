@@ -70,13 +70,15 @@
                             <!-- END chat_state_inactive -->
                             <a href="/homepage/chatArchive/{ID}/" class="button icon-history">View Chat Archive</a>
                         </form>
+
+                        <div class="chat-error hide"></div>
+                        <div data-collapsable-container="participants">
+                        <a data-collapser="participants" href="#" class="icon-add">Participants</a>
+                        <ul class="chat-users small-block-grid-2 medium-block-grid-3 large-block-grid-4 hide"
+                            data-chat-users
+                            data-collapsable="participants"
+                            data-collapse-state="collapsed"></ul>
                     </div>
-                <div class="chat-error hide"></div>
-                <div data-collapsable-container="participants">
-                    <a data-collapser="participants" href="#" class="icon-collapse">Participants</a>
-                    <ul class="chat-users small-block-grid-2 medium-block-grid-3 large-block-grid-4 hide"
-                        data-chat-users
-                        data-collapsable="participants"></ul>
                 </div>
             </section>
         </div>
