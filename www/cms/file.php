@@ -130,52 +130,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
             'class' => 'active',
         ]
     ]);
-}
-else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
-	/* Upload multiple files at once */
-
-	$this->setFile(TEMPLATE_content, 'cms/add-multi-file.html');
-
-	$this->setTitle('Add Multiple Files');
-	$this->setTab('resources');
-
-    try{
-        $folder = CategoryMapper::getInstance()->findById($this->arg[1]);
-    }
-    catch (Exception $e) {
-		error(13);
-	}
-
-	if ($groupHandler->getPermission($folder->getId()) < WRITE_ACCESS) {
-		error(6);
-	}
-
-	$output = array(
-        'CATEGORY_NAME'		=> Scrub::text($folder->getName()),
-        'CATEGORY_ID'		=> $folder->getId(),
-        'FILE_max_upload'	=> Cfg::get('file_upload_count'),
-        'HIDDEN_SELECTED'	=> (Cfg::get('file_default_to_hidden') ? 'checked="checked"' : ''),
-        'SESSION_NAME'		=> session_name(),
-        'SESSION_ID'		=> session_id(),
-    );
-	$this->setVar($output);
-
-	/* Allowed filetypes
-	 */
-	$extensionMapper = new \Schoolbox\File\ExtensionMapper();
-	$allExtensions = $extensionMapper->findAllowedExtensions();
-
-	$allowedFileTypes = array();
-
-	foreach($allExtensions as $currentExtension) {
-		$allowedFileTypes[] = '*.' . $currentExtension->getExtension();
-	}
-
-	$this->setVar(array(
-		'UPLOADIFY_ALL_ALLOWED_FILETYPES' => implode('; ', $allowedFileTypes)
-	));
-}
-else if($this->arg[0] == 'multicat') {
+} else if($this->arg[0] == 'multicat') {
 	/* Upload a file to multiple categories */
 
 	$this->setFile(TEMPLATE_content, 'cms/add-file-multi-cat.html');
