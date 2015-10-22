@@ -641,6 +641,11 @@
         <h3 class="subheader" id="linked">Linked Accounts</h3>
         <section>
             <ul class="action-list">
+                <li class="actions-small-1">
+                    <div class="list-item row-header">
+                        <div class="small-12 columns"><div class="content">User</div></div>
+                    </div>
+                </li>
                 <!-- BEGIN user_linked -->
                 <li class="actions-small-1">
                     <div class="list-item">
@@ -653,16 +658,18 @@
                     </nav>
                 </li>
                 <!-- END user_linked -->
-                <li class="row">
-                    <form action="/adminv2/userForm.php" method="post" id="linkedUserAdd">
-                        <div class="small-12 columns">
-                            <select data-selectizeuser="addUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select>
-                        </div>
-                        <div class="small-12 columns">
-                            <input type="hidden" name="userID" value="{USERID}" />
-                            <input type="submit" value="Add" disabled />
-                        </div>
-                    </form>
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <form action="/adminv2/userForm.php" method="post" id="linkedUserAdd">
+                            <div class="small-12 columns">
+                                <select data-selectizeuser="addUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select>
+                            </div>
+                            <div class="small-12 columns">
+                                <input type="hidden" name="userID" value="{USERID}" />
+                                <input type="submit" value="Add" disabled />
+                            </div>
+                        </form>
+                    </div>
                 </li>
             </ul>
         </section>
