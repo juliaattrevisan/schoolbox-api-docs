@@ -12,9 +12,7 @@
         </h3>
 
         {% if node.description %}
-        <div class="transparent-panel">
-            <article>{{ node.description|purify }}</article>
-        </div>
+        <article>{{ node.description|purify }}</article>
         {% endif %}
     {% else %}
         No curriculum codes have been set for this folder.
