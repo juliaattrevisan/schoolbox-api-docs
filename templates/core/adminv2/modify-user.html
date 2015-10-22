@@ -329,7 +329,7 @@
                         <div class="info card small-7">
                             <a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a>
                         </div>
-                        <div class="small-5 columns">
+                        <div class="info card small-5">
                             <form action="/adminv2/userForm.php" method="post">
                                 <input type="hidden" name="uid" value="{USERID}" />
                                 <input type="hidden" name="sid" value="{USER_GROUP_ID}" />
@@ -350,31 +350,29 @@
                 </li>
                 <!-- END user_group -->
                 <li class="actions-small-1">
-                    <div class="list-item">
-                        <form action="/adminv2/userForm.php" method="post" id="groupAdd" data-validatable-as="addGroup">
-                            <div class="small-7 columns">
-                                <select required name="sid" id="groupSelect" form="groupAdd" class="required">
-                                    <option value="">Select a Group</option>
-                                    <!-- BEGIN all_group -->
-                                    <option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
-                                    <!-- END all_group -->
-                                </select>
-                            </div>
-                            <div class="small-5 columns end">
-                                <select required name="type" form="groupAdd">
-                                    <option value="1">Read</option>
-                                    <option value="2">Write</option>
-                                    <option value="3">Group Admin</option>
-                                </select>
-                            </div>
-                            <div class="small-12 columns">
-                                <input type="hidden" name="groupSubmit" />
-                                <input type="hidden" value="{USERID}" name="uid" />
-                                <input type="hidden" value="1" name="service" />
-                                <p><input type="submit" value="Add" /></p>
-                            </div>
-                        </form>
-                    </div>
+                    <form action="/adminv2/userForm.php" method="post" id="groupAdd" data-validatable-as="addGroup" class="list-item">
+                        <div class="info card small-7">
+                            <select required name="sid" id="groupSelect" form="groupAdd" class="required">
+                                <option value="">Select a Group</option>
+                                <!-- BEGIN all_group -->
+                                <option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
+                                <!-- END all_group -->
+                            </select>
+                        </div>
+                        <div class="info card small-5 end">
+                            <select required name="type" form="groupAdd">
+                                <option value="1">Read</option>
+                                <option value="2">Write</option>
+                                <option value="3">Group Admin</option>
+                            </select>
+                        </div>
+                        <div class="info card small-12">
+                            <input type="hidden" name="groupSubmit" />
+                            <input type="hidden" value="{USERID}" name="uid" />
+                            <input type="hidden" value="1" name="service" />
+                            <p><input type="submit" value="Add" /></p>
+                        </div>
+                    </form>
                 </li>
             </ul>
         </section>
