@@ -49,8 +49,8 @@
                 // Search for this item, disable others
                 var currentService = $(this).find(':selected').data('identifier');
                 var selectors      = addServiceForm.find(':input[data-service-type]');
-                selectors.hide();
-                selectors.filter('[data-service-type="'+currentService+'"]').show();
+                selectors.addClass('hide').prop('disabled', true);
+                selectors.filter('[data-service-type="'+currentService+'"]').removeClass('hide').prop('disabled', false);
             }
         );
 
@@ -582,17 +582,17 @@
                         <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService" data-action="addService">
                             <div class="small-4 columns">
                                 <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
-                                    <option value="">Select Service</option>
+                                    <option value="" data-identifier="none">Select Service</option>
                                     <option value="2" data-identifier="campus">Calendar</option>
                                     <option value="3" data-identifier="campus">News</option>
-                                    <option value="5">CMS</option>
-                                    <option value="6">Housemaster</option>
-                                    <option value="7">Resource Booking</option>
-                                    <option value="8">Curriculum</option>
+                                    <option value="5" data-identifier="none">CMS</option>
+                                    <option value="6" data-identifier="residentialHouse">Housemaster</option>
+                                    <option value="7" data-identifier="none">Resource Booking</option>
+                                    <option value="8" data-identifier="none">Curriculum</option>
                                 </select>
                             </div>
                             <div class="small-4 columns">
-                                <select data-service-type="campus" name="sid" id="campusSelect" form="serviceCloneForm" required>
+                                <select data-service-type="campus" name="sid" id="campusSelect" class="hide" disabled required>
                                     <option value="">Select Campus</option>
                                     <!-- BEGIN campusPermsList -->
                                     <!-- BEGIN perm_campus -->
@@ -600,13 +600,16 @@
                                     <!-- END perm_campus -->
                                     <!-- END campusPermsList -->
                                 </select>
-                                <select data-service-type="residentialHouse" name="sid" id="residentialHouseSelect" class="hide" disabled>
-                                    <option value="">&lt;- Select residential house -&gt;</option>
+                                <select data-service-type="residentialHouse" name="sid" id="residentialHouseSelect" class="hide" disabled required>
+                                    <option value="">Select residential house</option>
                                     <!-- BEGIN residentialHousePermsList -->
                                     <!-- BEGIN perm_residential_house -->
                                     <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
                                     <!-- END perm_residential_house -->
                                     <!-- END residentialHousePermsList -->
+                                </select>
+                                <select data-service-type="none" name="sid" id="defaultSelect">
+                                    <option value="" disabled>--</option>
                                 </select>
                             </div>
                             <div class="small-4 columns end">
