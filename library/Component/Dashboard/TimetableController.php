@@ -241,6 +241,13 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                 else {
                                     $this->parse('period_class_block', 'period_class',true);
                                 }
+
+                                /* Clear children after parsing out the parent
+                                 */
+                                $this->setVar(array(
+                                    'period_class_link_attendance_block' => '',
+                                    'period_class_attendance_block' => ''
+                                ));
                             }
                         }
 
