@@ -371,7 +371,6 @@ $clearing-carousel-thumb-width: 72px;
 $clearing-carousel-thumb-active-border: 4px solid tint($tertiary, 26%);
 
 @import "../../../javascript/components/foundation/scss/foundation/components/inline-lists";
-//@import "../../../javascript/components/foundation/scss/foundation/components/panels";
 @import "../../../javascript/components/foundation/scss/foundation/components/labels";
 @import "../../../javascript/components/foundation/scss/foundation/components/progress-bars";
 @import "../../../javascript/components/foundation/scss/foundation/components/reveal";
@@ -690,24 +689,6 @@ $rotate-th-width: $square-grid-td-size;
     );
     color: darken($neutral-color, 50%);
 }
-
-//.highlight-panel {
-//	@include panel(
-//		$bg:$row-hover-background,
-//		$adjust:true
-//	);
-//}
-//.alert-panel {
-//	@include panel(
-//		$bg:$alert-color,
-//		$adjust:true
-//	);
-//}
-//.transparent-panel {
-//	@include panel();
-//	background-color: transparent;
-//	border: 1px solid $gainsboro;
-//}
 
 // Hints
 .hint {
