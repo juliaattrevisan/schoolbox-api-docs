@@ -15,7 +15,9 @@
         <article>{{ node.description|purify }}</article>
         {% endif %}
     {% else %}
-        No curriculum codes have been set for this folder.
+        <div class="alert-box warning">
+            No curriculum codes have been set for this folder.
+        </div>
         <a href="/cms/category/{{ context.id }}" class="button icon-modify">Set curriculum codes</a>
     {% endif %}
 </div>
