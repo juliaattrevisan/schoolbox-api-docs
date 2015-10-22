@@ -347,30 +347,32 @@
                     </nav>
                 </li>
                 <!-- END user_group -->
-                <li class="row">
-                    <form action="/adminv2/userForm.php" method="post" id="groupAdd" data-validatable-as="addGroup">
-                        <div class="small-7 columns">
-                            <select required name="sid" id="groupSelect" form="groupAdd" class="required">
-                                <option value="">Select a Group</option>
-                                <!-- BEGIN all_group -->
-                                <option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
-                                <!-- END all_group -->
-                            </select>
-                        </div>
-                        <div class="small-4 columns end">
-                            <select required name="type" form="groupAdd">
-                                <option value="1">Read</option>
-                                <option value="2">Write</option>
-                                <option value="3">Group Admin</option>
-                            </select>
-                        </div>
-                        <div class="small-12 columns">
-                            <input type="hidden" name="groupSubmit" />
-                            <input type="hidden" value="{USERID}" name="uid" />
-                            <input type="hidden" value="1" name="service" />
-                            <p><input type="submit" value="Add" /></p>
-                        </div>
-                    </form>
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <form action="/adminv2/userForm.php" method="post" id="groupAdd" data-validatable-as="addGroup">
+                            <div class="small-7 columns">
+                                <select required name="sid" id="groupSelect" form="groupAdd" class="required">
+                                    <option value="">Select a Group</option>
+                                    <!-- BEGIN all_group -->
+                                    <option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
+                                    <!-- END all_group -->
+                                </select>
+                            </div>
+                            <div class="small-5 columns end">
+                                <select required name="type" form="groupAdd">
+                                    <option value="1">Read</option>
+                                    <option value="2">Write</option>
+                                    <option value="3">Group Admin</option>
+                                </select>
+                            </div>
+                            <div class="small-12 columns">
+                                <input type="hidden" name="groupSubmit" />
+                                <input type="hidden" value="{USERID}" name="uid" />
+                                <input type="hidden" value="1" name="service" />
+                                <p><input type="submit" value="Add" /></p>
+                            </div>
+                        </form>
+                    </div>
                 </li>
             </ul>
         </section>
@@ -575,50 +577,52 @@
                 </li>
                 <!-- END user_curriculum -->
 
-                <li class="row">
-                    <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService" data-action="addService">
-                    <div class="small-4 columns">
-                        <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
-                            <option value="">Select Service</option>
-                            <option value="2" data-identifier="campus">Calendar</option>
-                            <option value="3" data-identifier="campus">News</option>
-                            <option value="5">CMS</option>
-                            <option value="6">Housemaster</option>
-                            <option value="7">Resource Booking</option>
-                            <option value="8">Curriculum</option>
-                        </select>
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService" data-action="addService">
+                            <div class="small-4 columns">
+                                <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
+                                    <option value="">Select Service</option>
+                                    <option value="2" data-identifier="campus">Calendar</option>
+                                    <option value="3" data-identifier="campus">News</option>
+                                    <option value="5">CMS</option>
+                                    <option value="6">Housemaster</option>
+                                    <option value="7">Resource Booking</option>
+                                    <option value="8">Curriculum</option>
+                                </select>
+                            </div>
+                            <div class="small-4 columns">
+                                <select data-service-type="campus" name="sid" id="campusSelect" form="serviceCloneForm" required>
+                                    <option value="">Select Campus</option>
+                                    <!-- BEGIN campusPermsList -->
+                                    <!-- BEGIN perm_campus -->
+                                    <option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED}>{PERM_CAMPUS_NAME}</option>
+                                    <!-- END perm_campus -->
+                                    <!-- END campusPermsList -->
+                                </select>
+                                <select data-service-type="residentialHouse" name="sid" id="residentialHouseSelect" class="hide" disabled>
+                                    <option value="">&lt;- Select residential house -&gt;</option>
+                                    <!-- BEGIN residentialHousePermsList -->
+                                    <!-- BEGIN perm_residential_house -->
+                                    <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
+                                    <!-- END perm_residential_house -->
+                                    <!-- END residentialHousePermsList -->
+                                </select>
+                            </div>
+                            <div class="small-4 columns end">
+                                <select name="type" form="serviceCloneForm" required>
+                                    <option value="1">Read</option>
+                                    <option value="2">Write</option>
+                                    <option value="3">Moderate</option>
+                                </select>
+                                <input type="hidden" name="addService" />
+                                <input type="hidden" value="{USERID}" name="uid">
+                            </div>
+                            <div class="small-12 columns">
+                                <input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
+                            </div>
+                        </form>
                     </div>
-                    <div class="small-4 columns">
-                        <select data-service-type="campus" name="sid" id="campusSelect" form="serviceCloneForm" required>
-                            <option value="">Select Campus</option>
-                            <!-- BEGIN campusPermsList -->
-                            <!-- BEGIN perm_campus -->
-                            <option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED}>{PERM_CAMPUS_NAME}</option>
-                            <!-- END perm_campus -->
-                            <!-- END campusPermsList -->
-                        </select>
-                        <select data-service-type="residentialHouse" name="sid" id="residentialHouseSelect" class="hide" disabled>
-                            <option value="">&lt;- Select residential house -&gt;</option>
-                            <!-- BEGIN residentialHousePermsList -->
-                            <!-- BEGIN perm_residential_house -->
-                            <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
-                            <!-- END perm_residential_house -->
-                            <!-- END residentialHousePermsList -->
-                        </select>
-                    </div>
-                    <div class="small-3 columns end">
-                        <select name="type" form="serviceCloneForm" required>
-                            <option value="1">Read</option>
-                            <option value="2">Write</option>
-                            <option value="3">Moderate</option>
-                        </select>
-                        <input type="hidden" name="addService" />
-                        <input type="hidden" value="{USERID}" name="uid">
-                    </div>
-                    <div class="small-12 columns">
-                        <input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
-                    </div>
-                    </form>
                 </li>
             </ul>
         </section>
