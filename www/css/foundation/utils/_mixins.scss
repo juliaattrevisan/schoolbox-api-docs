@@ -213,9 +213,9 @@
 	@for $i from 1 through $count {
 
 		$derived: hsl(
-						$iHue + ($i - 1) * $dHue,
-						$iSat + ($i - 1) * $dSat,
-						$iLight + ($i - 1) * $dLight
+			$iHue + ($i - 1) * $dHue,
+			$iSat + ($i - 1) * $dSat,
+			$iLight + ($i - 1) * $dLight
 		);
 
 		.#{$prefix}-#{$i} {
