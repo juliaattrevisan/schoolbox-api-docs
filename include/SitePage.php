@@ -112,9 +112,6 @@ class SitePage extends Page
 
     function loadContent($pageFile, $execute = true)
     {
-        // quasi-localisation
-        $this->localise();
-
         $this->pageName = $pageFile;
 
         /* sanitise data, force all 404s through pageNotFound() */
@@ -345,6 +342,8 @@ class SitePage extends Page
 
     function buildPage($customHead = true)
     {
+        // quasi-localisation
+        $this->localise();
 
         $this->groupHandler = new Group;
 
