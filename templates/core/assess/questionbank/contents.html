@@ -38,7 +38,7 @@
 
                 <ul class="action-list">
                     <!-- BEGIN question -->
-                    <li class="actions-small-1" >
+                    <li class="actions-small-3" >
                         <div class="list-item">
                             <div class="small-1 columns">
                                 <!-- BEGIN select_question -->
@@ -60,16 +60,6 @@
                                 <article>
                                     {QUESTION}
                                 </article>
-
-                                <div class="hide panel" data-answer-content="{QUESTION_BANK_ID}">
-                                    <ul>
-                                        <!-- BEGIN answers -->
-                                        <li>
-                                            <article>{ANSWER_DESCRIPTION}</article>
-                                        </li>
-                                        <!-- END answers -->
-                                    </ul>
-                                </div>
                             </div>
                         </div>
                         <nav>
@@ -79,6 +69,15 @@
                             <!-- END show_delete -->
                             <a class="icon-modify" href="/assess/questionbank/question/modify/{QUESTION_BANK_ID}" title="Modify" ></a>
                         </nav>
+                        <div class="small-12 columns">
+                            <div class="alert-box hide" data-answer-content="{QUESTION_BANK_ID}">
+                                <ul>
+                                    <!-- BEGIN answers -->
+                                    <li><article>{ANSWER_DESCRIPTION}</article></li>
+                                    <!-- END answers -->
+                                </ul>
+                            </div>
+                        </div>
                     </li>
                     <!-- END question -->
                 </ul>
