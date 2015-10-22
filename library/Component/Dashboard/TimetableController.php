@@ -228,16 +228,26 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                     );
 
                                     if ($hasLink) {
-                                        $this->parse('period_class_link_attendance_block', 'period_class_link_attendance',true);
-                                    } else {
-                                        $this->parse('period_class_attendance_block', 'period_class_attendance',true);
+                                        $this->parse('period_class_link_attendance_block', 'period_class_link_attendance');
+                                    }
+                                    else {
+                                        $this->parse('period_class_attendance_block', 'period_class_attendance');
                                     }
                                 }
+
                                 if ($hasLink) {
                                     $this->parse('period_class_link_block', 'period_class_link',true);
-                                } else {
+                                }
+                                else {
                                     $this->parse('period_class_block', 'period_class',true);
                                 }
+
+                                /* Clear children after parsing out the parent
+                                 */
+                                $this->setVar(array(
+                                    'period_class_link_attendance_block' => '',
+                                    'period_class_attendance_block' => ''
+                                ));
                             }
                         }
 
