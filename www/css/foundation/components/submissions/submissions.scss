@@ -104,19 +104,16 @@ table.rubric {
                 width: 1.5rem;
 
                 // The criterion that is being edited
-                &.editing {
-                    .criterion-descriptor-points:after {
-                        display: block;
-                        content: "points";
-                        position: absolute;
-                        top: 0;
-                        line-height: 2.5rem;
-                        left: 3.5rem;
-                    }
+                .criterion-descriptor-points:after {
+                    display: block;
+                    content: "points";
+                    position: absolute;
+                    top: 0;
+                    line-height: 2.5rem;
+                    left: 3.5rem;
                 }
                 > textarea {
                     height: 10rem;
-                    border: none;
                     border-bottom: $input-border-style $input-border-width $input-border-color;
                 }
             }
@@ -156,23 +153,19 @@ table.rubric {
         // the table that wraps a crit's descriptors
         .criterion-descriptors {
             margin-top: 0.875rem;
-            border: $input-border-style $input-border-width $input-border-color;
-            tr:hover td {
-                background-color: $input-hover-bg-color;
-            }
         }
 
         // A single descriptor
         .criterion-descriptor {
+            .criterion-descriptor-points input {
+                width: 3rem;
+                text-align: center;
+            }
 
             @extend .no-pad;
             // A descriptor that is being edited right now
             &.editing {
                 background-color: $input-focus-bg-color;
-                .criterion-descriptor-points input {
-                    width: 3rem;
-                    text-align: center;
-                }
             }
             &:not(:last-child) {
                 border-right: $input-border-style $input-border-width $input-border-color;
