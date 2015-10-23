@@ -217,12 +217,16 @@ class Bootstrap implements BootstrapInterface {
 			$di->lazy(
 				function () {
 					$db = Database::getInstance();
-					$st = $db->query("SELECT term, display_as FROM localisation");
+					$st = $db->query("SELECT term, singular_form, plural_form, capitalise_first FROM localisation");
 
 					$l10n = [];
 
 					while ($r = $st->fetch(PDO::FETCH_ASSOC)) {
-						$l10n[$r['term']] = $r['display_as'];
+						$l10n[$r['term']] = [
+							'singular'   => $r['singular_form'],
+							'plural'     => $r['plural_form'],
+							'capitalise' => (bool)$r['capitalise_first']
+						];
 					}
 
 					return $l10n;

@@ -1426,10 +1426,10 @@ class SitePage extends Page
             $term = strtoupper($term);
 
             $this->setVar([
-                "TPL_LOCAL_$term" => $displayAs,
-//                "TPL_LOCAL_{$term}_UC" => strtoupper($displayAs),
-//                "TPL_LOCAL_{$term}_LC" => strtolower($displayAs),
-                "TPL_LOCAL_{$term}_PC" => ucwords($displayAs),
+                "TPL_LOCAL_$term"             => $displayAs['singular'],
+                "TPL_LOCAL_{$term}_PC"        => $displayAs['capitalise'] ? ucwords($displayAs['singular']) : lcfirst(ucwords($displayAs['singular'])),
+                "TPL_LOCAL_{$term}_PLURAL"    => $displayAs['plural'],
+                "TPL_LOCAL_{$term}_PLURAL_PC" => $displayAs['capitalise'] ? ucwords($displayAs['plural']) : lcfirst(ucwords($displayAs['plural'])),
             ]);
         }
     }
