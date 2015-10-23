@@ -34,6 +34,12 @@
 	compress
 }
 
+/var/log/schoolboxdev/transcode*.log /var/log/schoolboxdev/cache-cleanup*.log /var/log/schoolboxdev/skin-builder*.log {
+	weekly
+	missingok
+	rotate 12
+	compress
+}
 
 /var/log/schoolboxdev/digestd*.log /var/log/schoolboxdev/scheduled*.log /var/log/schoolboxdev/socketd*.log /var/log/schoolboxdev/rerouted*.log /var/log/schoolboxdev/belld*.log {
 	size 100M

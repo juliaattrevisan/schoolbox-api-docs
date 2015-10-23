@@ -13,11 +13,10 @@
 MAILTO="support@schoolbox.com.au"
 
 # Video Processing
-#* */4 * * *	www-data	php /usr/share/schoolbox/tools/video/video-scanner.php >/dev/null 2>&1
-*/2 * * * *	www-data	php /usr/share/schoolbox/tools/video/processor.php >/dev/null 2>&1
+*/2 * * * *	www-data	php /usr/share/schoolbox/tools/video/processor.php >> /var/log/schoolbox/transcode.log 2>&1
 
 # Cleanup cache  files (minify,zip,stream) (once a week on a Sunday)
-0 1 * * 0	root	php /usr/share/schoolbox/tools/clean-cache-dir.sh >/dev/null 2>&1
+0 1 * * 0	root	php /usr/share/schoolbox/tools/clean-cache-dir.sh >> /var/log/schoolbox/cache-cleanup.log 2>&1
 
 # Plagscan callback - every hour
 0 * * * *	root	php /usr/share/schoolbox/tools/plagscan/scan.php >> /var/log/schoolbox/plagscan.log 2>&1
@@ -26,7 +25,7 @@ MAILTO="support@schoolbox.com.au"
 30 * * * *	root	php /usr/share/schoolbox/tools/crocodoc/upload.php >> /var/log/schoolbox/crocodoc.log 2>&1
 
 # Etherpad - sync back to MySQL - every hour
-0 * * * *	root	php /usr/share/schoolbox/tools/etherpad-sync.php >> /dev/null 2>&1
+0 * * * *	root	php /usr/share/schoolbox/tools/etherpad-sync.php >> /var/log/schoolbox/etherpad-sync.log 2>&1
 
-# Skin Builder - Every 5 minutes
-*/5 * * * *	root	php /usr/share/schoolbox/tools/skin/builder.php >> /dev/null 2>&1
+# Skin Builder - Every 2 minutes
+*/2 * * * *	root	php /usr/share/schoolbox/tools/skin/builder.php >> /var/log/schoolbox/skin-builder.log 2>&1

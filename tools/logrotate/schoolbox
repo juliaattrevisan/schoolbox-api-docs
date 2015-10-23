@@ -34,6 +34,13 @@
 	compress
 }
 
+/var/log/schoolbox/transcode*.log /var/log/schoolbox/cache-cleanup*.log /var/log/schoolbox/skin-builder*.log {
+	weekly
+	missingok
+	rotate 12 
+	compress
+}
+
 /var/log/schoolbox/digestd*.log /var/log/schoolbox/scheduled*.log /var/log/schoolbox/socketd*.log /var/log/schoolbox/rerouted*.log /var/log/schoolbox/belld*.log {
 	size 100M
 	copytruncate
