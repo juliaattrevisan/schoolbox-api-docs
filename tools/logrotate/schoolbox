@@ -34,7 +34,14 @@
 	compress
 }
 
-/var/log/schoolbox/transcode*.log /var/log/schoolbox/cache-cleanup*.log /var/log/schoolbox/skin-builder*.log {
+/var/lib/schoolbox/cache/logs/*.log {
+	monthly
+	missingok
+	rotate 6
+	compress
+}
+
+/var/log/schoolbox/cache-cleanup*.log /var/log/schoolbox/skin-builder*.log {
 	weekly
 	missingok
 	rotate 12 
