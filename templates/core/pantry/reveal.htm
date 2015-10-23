@@ -1,0 +1,93 @@
+<ul class="breadcrumb">
+    <li><a href="/">Schoolbox</a></li>
+    <li><a href="/pantry">Pantry</a></li>
+    <li class="active"><a href="/pantry/reveal">Reveal</a></li>
+</ul>
+<div class="row">
+    <div class="small-12 island">
+
+        <h2 class="subheader">Simple Reveal</h2>
+        <section class="content">
+            <a class="button" data-reveal-id="simple">Launch Me!</a>
+            <div data-reveal id="simple" class="reveal-modal">
+                <h2>Simple Reveal</h2>
+                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+            </div>
+        </section>
+
+        <h2 class="subheader">AJAX-Load Reveal</h2>
+        <section class="content">
+            <a class="button" data-reveal-id="ajax-load" data-reveal-ajax="/pantry/reveal-ajax?ajax=1">Launch Me!</a>
+            <div data-reveal id="ajax-load" class="reveal-modal"></div>
+        </section>
+
+        <h2 class="subheader">Sequential Reveal</h2>
+        <section class="content">
+            <a class="button" data-reveal-id="sequential-1">Launch Me!</a>
+
+            <div data-reveal id="sequential-1" class="reveal-modal">
+                <h2>Sequential Reveal 1</h2>
+                <a class="button" data-reveal-id="sequential-2">Next</a>
+                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+            </div>
+
+            <div data-reveal id="sequential-2" class="reveal-modal">
+                <h2>Sequential Reveal 2</h2>
+                <p>See? It replaces the first one</p>
+                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+            </div>
+
+        </section>
+
+        <h2 class="subheader">Stacked Reveal</h2>
+        <section class="content">
+            <a class="button" data-reveal-id="stacked-1">Launch Me!</a>
+
+            <div data-reveal id="stacked-1" class="reveal-modal">
+                <h2>Stacked Reveal 1</h2>
+                <p>The initial reveal</p>
+                <a class="button" data-reveal-id="stacked-2">Show me Reveal #2</a>
+                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+            </div>
+
+            <div data-reveal id="stacked-2" data-reveal-reopen="stacked-1" class="reveal-modal">
+                <h2>Stacked Reveal 2</h2>
+                <p>If you close this reveal, the first one will come back</p>
+                <a class="button" data-reveal-id="stacked-3">But wait, there's more!</a>
+                <a class="close-reveal-modal" aria-label="Close">&#65513;</a>
+            </div>
+
+            <div data-reveal id="stacked-3" data-reveal-reopen="stacked-2" class="reveal-modal">
+                <h2>Stacked Reveal 3</h2>
+                <p>Closing this one will show you #2 again</p>
+                <a class="button" data-reveal-id="stacked-4">There's another reveal behind this one</a>
+                <a class="close-reveal-modal" aria-label="Close">&#65513;</a>
+            </div>
+
+            <div data-reveal id="stacked-4" data-reveal-reopen="stacked-3" class="reveal-modal">
+                <h2>Stacked Reveal 4</h2>
+                <p>Ok, this is the last one. There's no fast escape, you have to traverse your way back through the stack now...</p>
+                <a class="close-reveal-modal" aria-label="Close">&#65513;</a>
+            </div>
+
+            <script type="text/javascript">
+                $(function () {
+                    // listen for modal closure - this looks a bit bad because of the
+                    $(document).on('closed.fndtn.reveal', '[data-reveal-reopen]', function (e) {
+                        // compensate for event double-fire: see https://github.com/zurb/foundation/issues/5482
+                        if (e.namespace !== 'fndtn.reveal' || $('[data-reveal].open').length > 0) {
+                            return;
+                        }
+
+                        $('#' + $(this).data('reveal-reopen')).foundation('reveal', 'open');
+
+                        // if you don't want the background to flash, the only solution we've found is to:
+                        //  - change the listener to close.fndtn.revel (not closeD)
+                        //  - once you've opened the previous reveal, crash this event
+                    });
+                });
+            </script>
+        </section>
+
+    </div>
+</div>

@@ -31,3 +31,14 @@ $zone = new Zone('affix-twig-label-here');
 $zone->attachFiles($files)->setMulti(true)->setAttachmentsLabel('Attach your files here');
 $this->setVar('AFFIX_TWIG_LABEL_HERE', $twig->render('attachzone.twig', [ 'attachzone' => $zone->getTwigContext() ]));
 
+// output a few common vars
+$this->setVar([
+
+    'REQUEST_TIME' => Alaress_Date_Format::now()->setTimestamp($_SERVER['REQUEST_TIME'])->getLong()
+
+]);
+
+if (isset($_GET['ajax']) && $_GET['ajax']) {
+    $this->setAjax();
+    $this->template->pparse('finaloutput', TEMPLATE_content);
+}
