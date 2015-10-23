@@ -93,16 +93,6 @@ table.rubric {
             // A descriptor within this criterion
             .criterion-descriptor {
                 width: 1.5rem;
-
-                // The criterion that is being edited
-                &.editing .criterion-descriptor-points:after {
-                    display: block;
-                    content: "points";
-                    position: absolute;
-                    top: 0;
-                    line-height: 2.5rem;
-                    left: 3.5rem;
-                }
                 > textarea {
                     height: 10rem;
                     border-bottom: $input-border-style $input-border-width $input-border-color;
