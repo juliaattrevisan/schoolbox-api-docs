@@ -83,15 +83,6 @@ table.rubric {
         width: 100%;
         position: relative;
         margin: 0;
-        &.highlight {
-            background-color: $input-hover-bg-color;
-            border-color: $input-focus-border-color;
-            border-radius: 0;
-            padding: 0;
-            &.editing {
-                background-color: $input-focus-bg-color;
-            }
-        }
 
         // A criterion that is being edited
         &.editing {
@@ -168,9 +159,6 @@ table.rubric {
             &:not(:last-child) {
                 border-right: $input-border-style $input-border-width $input-border-color;
             }
-            &:hover {
-                background: $white !important;
-            }
             > textarea {
                 width: 100%;
                 height: 3.75rem;
@@ -184,13 +172,6 @@ table.rubric {
             *:hover {
                 cursor: pointer;
             }
-        }
-
-        /* overcome the stratospheric specificity on inputs */
-        textarea[readonly], input[readonly] {
-            border-color: transparent !important;
-            background: transparent !important;
-            box-shadow: none !important;
         }
     }
 }
