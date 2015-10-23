@@ -395,7 +395,13 @@ then
 	if [ "$sourceloc" = '[R]' ];
 	then
 		# Remote Source, transfer the db file locally.
-		sourcedata=${sourcep3%/*};
+		gzipdb=`echo "$sourcep3" | grep '.gz' | wc -l`;
+		if [ "$gzipdb" == "1" ];
+		then
+			sourcedata=${sourcep3%/*}'/../../../';
+		else
+			sourcedata=${sourcep3%/*};
+		fi
 		sourcesqlfilename=${sourcep3##*/};
 		echo -e "\nTransferring database backup";
 		scp $sourcep1:$sourcep3 /tmp >/dev/null 2>&1;
