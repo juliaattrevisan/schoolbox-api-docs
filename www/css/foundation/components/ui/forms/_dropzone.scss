@@ -182,13 +182,13 @@ ul.az-error-list {
         }
         @media #{$small-only} {
             background-size: 1.5rem;
-            height: 3rem;
+            min-height: 3rem;
             padding-left: 3.5rem;
             background-position: 0.75rem;
         }
         @media #{$medium-up} {
             background-size: 2rem;
-            height: 4rem;
+            min-height: 4rem;
             background-position: 0.875rem;
             padding-left: 4.5rem;
         }
@@ -238,13 +238,13 @@ ul.az-error-list {
         }
         @media #{$small-only} {
             background-size: 0.75rem;
-            height: 1.5rem;
+            min-height: 1.5rem;
             padding-left: 2.75rem;
             background-position: 0.75rem;
         }
         @media #{$medium-up} {
             background-size: 1rem;
-            height: 2rem;
+            min-height: 2rem;
             background-position: 0.875rem;
             padding-left: 2.75rem;
         }
@@ -308,9 +308,6 @@ ul.az-error-list {
             display: inline-block;
             vertical-align: middle;
             padding: 4px;
-            position: absolute;
-            top: 50%;
-            @include transform( translateY(-50%) );
         }
     }
     .dz-error {
