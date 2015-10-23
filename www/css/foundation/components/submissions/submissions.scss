@@ -86,10 +86,6 @@ table.rubric {
 
         // A criterion that is being edited
         &.editing {
-            .criterion-descriptor-points {
-                display: block;
-                text-align: center;
-            }
             // A descriptor within this criterion
             .criterion-descriptor {
                 width: 1.5rem;
@@ -123,6 +119,7 @@ table.rubric {
                 width: 100%;
                 padding: 0;
                 @extend %sm;
+                display: inline-block;
             }
         }
 
@@ -142,6 +139,9 @@ table.rubric {
             // A descriptor that is being edited right now
             &.editing {
                 background-color: $input-focus-bg-color;
+                .criterion-descriptor-points {
+                    display: inline-block;
+                }
                 > textarea {
                     min-width: 10rem;
                 }
