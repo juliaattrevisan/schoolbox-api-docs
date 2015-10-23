@@ -208,7 +208,7 @@ searchlist='/etc/schoolbox/conf.php /etc/schoolboxdev/conf.php /vagrant/www/conf
 rm -f $sbrl;
 
 ## Detect database backups for this install
-thisinstall=`ls -1 $thisdatadir/*-*-*-*_*-*-*.sql 2>/dev/null`;
+thisinstall=`ls -1 $thisdatadir/{*-*-*-*_*-*-*.sql,backups/*/*/schoolbox_*-*-*.sql.gz} 2>/dev/null`;
 echo -e "Local installs \c"
 if [ ! -z "$thisinstall" ];
 then
@@ -233,7 +233,7 @@ do
 			tempfiledir=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='file_dir'"`;
 			if [ ! -z $tempfiledir ];
 			then
-				tempdatadirlist=`ls -1 $tempfiledir/../*-*-*-*_*-*-*.sql 2>/dev/null`;
+				tempdatadirlist=`ls -1 $tempfiledir/../{*-*-*-*_*-*-*.sql,backups/*/*/schoolbox_*-*-*.sql.gz} 2>/dev/null`;
 				for i in $tempdatadirlist;
 				do
 					echo -e ".\c";
@@ -263,7 +263,7 @@ do
 				tempfiledir=`ssh $host "mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='file_dir'\""; 2>/dev/null`
 				if [ ! -z $tempfiledir ];
 				then
-					tempdatadirlist=`ssh $host "ls -1 $tempfiledir/../*-*-*-*_*-*-*.sql 2>/dev/null"`;
+					tempdatadirlist=`ssh $host "ls -1 $tempfiledir/../{*-*-*-*_*-*-*.sql,backups/*/*/schoolbox_*-*-*.sql.gz} 2>/dev/null"`;
 					for i in $tempdatadirlist;
 					do
 						echo -e ".\c";
@@ -342,6 +342,7 @@ fi
 
 # Provide feedback for confirmation of what is to be done based on above questions.
 echo -e "\n $restorepretty";
+echo -e "\n     Restore into '$package' at '$instdir'";
 echo -e "\nIs this the correct option? (y/n): \c" && read confirm;
 if [ "$confirm" != "y" ];
 then
@@ -495,6 +496,15 @@ mysqldump --allow-keywords -i -e -q -a --skip-extended-insert -c -u $sqluser -p$
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "DROP DATABASE $sqldb;";
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "CREATE DATABASE $sqldb;";
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < /tmp/$sqldb-config-`date -I`.sql;
+## Unpack if gzipped
+gzipdb=`echo "$sourcedb" | grep '.gz' | wc -l`;
+if [ "$gzipdb" == "1" ];
+then
+	echo "Decompressing database '$sourcedb'";
+	gzip -d $sourcedb;
+	sourcedb=`echo "$sourcedb" | sed 's/\.gz//g'`;
+fi
+echo "Restoring database '$sourcedb'";
 ## Restore specified database
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < $sourcedb;
 ## Fix Collation
