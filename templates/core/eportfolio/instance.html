@@ -384,14 +384,14 @@
             <!--------------------->
             <!-- Component Tab 3 -->
             <!--------------------->
-            <div id="eportfolio-page-controls-tab-3" class="content small-12 island">
-                <form method='post' action='/eportfolio/configForm.php'>
+            <div id="eportfolio-page-controls-tab-3" class="content">
+                <form method='post' action='/eportfolio/configForm.php' class="no-margin">
                     <input type='hidden' name='user_id' value='{ID}' />
                     <input type='hidden' name='page_id' value='{PAGE_ID}' />
                     <input type='hidden' name='update' value='page' />
 
-                    <section>
-                        <fieldset>
+                    <section class="no-margin">
+                        <fieldset class="content">
                             <div class="small-12 columns">
                                 <label>
                                     Page Name
@@ -399,8 +399,7 @@
                                 </label>
                             </div>
                         </fieldset>
-
-                        <fieldset>
+                        <fieldset class="content">
                             <div class="small-12 large-4 columns">
                                 <label>
                                     Group Permissions
