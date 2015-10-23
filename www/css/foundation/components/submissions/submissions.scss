@@ -166,6 +166,9 @@ table.rubric {
             // A descriptor that is being edited right now
             &.editing {
                 background-color: $input-focus-bg-color;
+                > textarea {
+                    min-width: 10rem;
+                }
             }
             &:not(:last-child) {
                 border-right: $input-border-style $input-border-width $input-border-color;
@@ -176,15 +179,12 @@ table.rubric {
             > textarea {
                 width: 100%;
                 height: 3.75rem;
-                min-width: 10rem;
                 margin: 0;
                 resize: none;
                 //.transition(min-width 60ms ease, height 60ms ease);
-                &[readonly] {
-                    min-width: 0;
-                    overflow: hidden;
-                    padding: 0.125rem !important;
-                }
+                min-width: 0;
+                overflow: hidden;
+                padding: 0.125rem !important;
             }
             *:hover {
                 cursor: pointer;
