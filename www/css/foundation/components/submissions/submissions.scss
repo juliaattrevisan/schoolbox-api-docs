@@ -104,7 +104,7 @@ table.rubric {
                 width: 1.5rem;
 
                 // The criterion that is being edited
-                .criterion-descriptor-points:after {
+                &.editing .criterion-descriptor-points:after {
                     display: block;
                     content: "points";
                     position: absolute;
