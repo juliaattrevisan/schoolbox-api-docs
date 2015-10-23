@@ -111,7 +111,7 @@
                 .closest(descriptorSelector)
                 .addClass(editingClass)
                 .find(inputSelector)
-                .prop('readonly', false)
+                //.prop('readonly', false)
                 .attr('placeholder', placeholderText);
         });
 
@@ -122,7 +122,7 @@
             element.find(critSelector + ', ' + descriptorSelector)
                 .removeClass(editingClass)
                 .find(inputSelector)
-                .prop('readonly', true)
+                //.prop('readonly', true)
                 .removeAttr('placeholder');
         });
     };
