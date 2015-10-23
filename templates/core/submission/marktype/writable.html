@@ -1,4 +1,4 @@
-        <div class="small-12 columns no-pad">
+        <div class="small-12 columns">
 
             <!-- BEGIN mark_type_percent -->
             <div class="row">
@@ -14,13 +14,11 @@
             <!-- END mark_type_percent -->
 
             <!-- BEGIN mark_type_letter -->
-            <div class="list-item-content">
-                <select class="no-margin" id="mark" name="mark[{OWNER_ID}]" data-mark-input data-marktype="letter">
-                    <!-- BEGIN grade_drop -->
-                    <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED} data-groupId="{GRADE_GROUP_ID}">{GRADE_TEXT}</option>
-                    <!-- END grade_drop -->
-                </select>
-            </div>
+            <select id="mark" name="mark[{OWNER_ID}]" data-mark-input data-marktype="letter">
+                <!-- BEGIN grade_drop -->
+                <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED} data-groupId="{GRADE_GROUP_ID}">{GRADE_TEXT}</option>
+                <!-- END grade_drop -->
+            </select>
             <!-- END mark_type_letter -->
 
             <!-- BEGIN mark_type_raw -->
@@ -81,11 +79,13 @@
         </div>
     </div>
 </div>
-<div class="small-12 medium-6 xlarge-8 columns">
+<div class="small-12 columns">
     <div class="row">
-        <label class="list-item-content">
-	        <textarea class="comment" name="comment" rows="4" data-comment>{COMMENT}</textarea>
-        </label>
-        <input type="hidden" class="uid" name="uid" value="{OWNER_ID}" />
-        <input type="hidden" class="box_id" name="box_id" value="{BOX_ID}" />
-        <input type="hidden" class="mark-update" name="markUpdate" value="true" />
+        <div class="small-12 columns">
+            <label>
+    	        <textarea class="comment" name="comment" rows="4" data-comment>{COMMENT}</textarea>
+            </label>
+            <input type="hidden" class="uid" name="uid" value="{OWNER_ID}" />
+            <input type="hidden" class="box_id" name="box_id" value="{BOX_ID}" />
+            <input type="hidden" class="mark-update" name="markUpdate" value="true" />
+        </div>
