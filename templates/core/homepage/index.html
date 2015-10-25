@@ -313,14 +313,18 @@
 <div class="row">
     <div class="small-12 island">
         <div id="tabs-homepage" class="tabs-content">
-            <div id="tabs-1" class="content" data-show-empty>
-                <section>
-                    <fieldset class="content">
-                        <legend>
-                            Components
-                            <span data-tooltip class="has-tip tip-top hint" title="Click to add a component, or drag and drop it into position.">?</span>
-                        </legend>
-                        <div class="small-12 columns">
+
+            <!--------------------->
+            <!-- Component Tab 1 -->
+            <!--------------------->
+            <div id="tabs-1" class="content no-pad" data-show-empty>
+                <div class="small-12 island no-pad">
+                    <section>
+                        <div class="content">
+                            <h2>
+                                Components
+                                <span data-tooltip class="has-tip tip-top hint" title="Click to add a component, or drag and drop it into position.">?</span>
+                            </h2>
                             <ul class="tabs" data-tab>
                                 <!-- BEGIN homepage_component_tab -->
                                 <li class="tab-title {COMPONENT_CATEGORY_CLASS}">
@@ -330,36 +334,38 @@
                                 </li>
                                 <!-- END homepage_component_tab -->
                             </ul>
-                            <div class="tabs-content no-margin">
-                                <!-- BEGIN homepage_component_page -->
-                                <ul class="component-palette content grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {HOMEPAGE_COMPONENT_CATEGORY_CLASS}" id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
-                                    <!-- BEGIN homepage_component -->
-                                    <li>
-                                        <div class="{HOMEPAGE_COMPONENT_MULTIPLE_STATE} no-margin"
-                                             data-count="{HOMEPAGE_COMPONENT_COUNT}"
-                                             data-multi="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}"
-                                             data-component-palette
-                                        >
-                                            <div class="avatar card">
-                                                <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
-                                                    <span class="icon-32 icon-masonry icon-masonry-{HOMEPAGE_COMPONENT_CLASS}"></span>
-                                                    <p>{HOMEPAGE_COMPONENT_NAME}</p>
-                                                    <p class="meta">(<span data-relation="count">{HOMEPAGE_COMPONENT_COUNT}</span>)</p>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <!-- END homepage_component -->
-                                </ul>
-                                <!-- END homepage_component_page -->
-                            </div>
                         </div>
-                    </fieldset>
-                </section>
+                        <div class="tabs-content no-margin">
+                            <!-- BEGIN homepage_component_page -->
+                            <ul class="component-palette content no-pad grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {HOMEPAGE_COMPONENT_CATEGORY_CLASS}" id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
+                                <!-- BEGIN homepage_component -->
+                                <li>
+                                    <div class="{HOMEPAGE_COMPONENT_MULTIPLE_STATE} no-margin"
+                                         data-count="{HOMEPAGE_COMPONENT_COUNT}"
+                                         data-multi="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}"
+                                         data-component-palette
+                                            >
+                                        <div class="avatar card">
+                                            <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
+                                                <span class="icon-32 icon-masonry icon-masonry-{HOMEPAGE_COMPONENT_CLASS}"></span>
+                                                <p>{HOMEPAGE_COMPONENT_NAME}</p>
+                                                <p class="meta">(<span data-relation="count">{HOMEPAGE_COMPONENT_COUNT}</span>)</p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <!-- END homepage_component -->
+                            </ul>
+                            <!-- END homepage_component_page -->
+                        </div>
+                    </section>
+                </div>
             </div>
-            <!--/tabs-1-->
 
-            <div id="tabs-2" class="content" data-hide-empty>
+            <!--------------------->
+            <!-- Component Tab 2 -->
+            <!--------------------->
+            <div id="tabs-2" class="content no-pad" data-hide-empty>
                 <form method="POST" action="" name="saveColours" class="no-margin">
                     <section class="no-margin">
                         <!-- don't show a slider for screens which don't have multiple columns -->

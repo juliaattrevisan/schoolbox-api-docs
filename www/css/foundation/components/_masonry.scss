@@ -25,22 +25,48 @@ $masonry-drop-background: $input-focus-bg-color;
   background-color: $masonry-drop-background;
 }
 
-// Disabled components in the palette
-.component-palette .disabled {
-    opacity: 0.3;
-    pointer-events: none;
-    cursor: not-allowed;
-    a {
+/* The drag/drop in Component tab
+ */
+.component-palette {
+    border-top: 1px solid $body-bg;
+
+    /* To overcome the !important from .grid, which overcomes
+     * the too-powerful Foundation defaults
+     */
+    margin: 0 !important;
+
+    .disabled {
+        opacity: 0.3;
         pointer-events: none;
         cursor: not-allowed;
+        a {
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+    }
+
+    /* The Component avatar representations you can drag/drop into
+     * component-based pages like Dashboard, Homepage and ePortfolio
+     *
+     * For compatibility in block grid
+     */
+    .avatar {
+        &.card {
+            .icon-masonry {
+                padding-top: 1rem;
+            }
+        }
     }
 }
 
+// Disabled components in the palette
+
 // Homepage masonry icons
 .icon-masonry:before {
-  // default icon
-  @extend .icon-add:before;
+    // default icon
+    @extend .icon-add:before;
 }
+
 .icon-masonry-Component_Homepage_BreadcrumbController:before {
   @extend .icon-breadcrumbs:before;
 }

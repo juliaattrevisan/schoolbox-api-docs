@@ -242,152 +242,156 @@
 <!-- BEGIN customise_page -->
 <div class="row">
     <div class="small-12 island">
-        <section class="tabs-content">
+        <div class="tabs-content">
 
             <!--------------------->
             <!-- Component Tab 1 -->
             <!--------------------->
-            <div id="eportfolio-page-controls-tab-1" class="content">
-                <fieldset>
-                    <legend>
-                        Components
-                        <span data-tooltip class="has-tip tip-top hint" title="Click to add a component, or drag and drop it into position.">?</span>
-                    </legend>
-                    <!-- BEGIN no_eportfolio_components -->
-                    <p>No components are available for you to add.</p>
-                    <!-- END no_eportfolio_components -->
+            <div id="eportfolio-page-controls-tab-1" class="content no-pad">
+                <div class="small-12 island no-pad">
+                    <section>
+                        <div class="content">
+                            <h2>
+                                Components
+                                <span data-tooltip class="has-tip tip-top hint" title="Click to add a component, or drag and drop it into position.">?</span>
+                            </h2>
 
-                    <ul class="tabs" data-tab id="eportfolio-page-controls-sub">
-                        <!-- BEGIN eportfolio_component_tab -->
-                        <li class="tab-title {COMPONENT_CATEGORY_CLASS}">
-                            <a href="#eportfolio-page-controls-sub-{COMPONENT_CATEGORY_ID}">
-                                {COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})
-                            </a>
-                        </li>
-                        <!-- END eportfolio_component_tab -->
-                    </ul>
+                            <!-- BEGIN no_eportfolio_components -->
+                            <p>No components are available for you to add.</p>
+                            <!-- END no_eportfolio_components -->
 
-                    <div class="tabs-content">
-                        <!-- BEGIN eportfolio_component_page -->
-                        <ul class="component-palette content grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {EPORTFOLIO_COMPONENT_CATEGORY_CLASS}" id="eportfolio-page-controls-sub-{EPORTFOLIO_COMPONENT_CATEGORY_ID}">
-                            <!-- BEGIN eportfolio_component -->
-                            <li>
-                                <div class="{EPORTFOLIO_COMPONENT_MULTIPLE_STATE} no-margin"
-                                     data-count="{EPORTFOLIO_COMPONENT_COUNT}"
-                                     data-multi="{EPORTFOLIO_COMPONENT_MULTIPLE_STATE}"
-                                     data-component-palette
-                                >
-                                    <div class="avatar card">
-                                        <a href="#" rel="{EPORTFOLIO_COMPONENT_DEFINITION_ID} {EPORTFOLIO_COMPONENT_ID}" class="{EPORTFOLIO_COMPONENT_CLASS}" title="{EPORTFOLIO_COMPONENT_DESCRIPTION}">
-                                            <span class="icon-32 icon-masonry icon-masonry-{EPORTFOLIO_COMPONENT_CLASS}"></span>
-                                            <p>{EPORTFOLIO_COMPONENT_NAME}</p>
-                                        </a>
+                            <ul class="tabs" data-tab id="eportfolio-page-controls-sub">
+                                <!-- BEGIN eportfolio_component_tab -->
+                                <li class="tab-title {COMPONENT_CATEGORY_CLASS}">
+                                    <a href="#eportfolio-page-controls-sub-{COMPONENT_CATEGORY_ID}">
+                                        {COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})
+                                    </a>
+                                </li>
+                                <!-- END eportfolio_component_tab -->
+                            </ul>
+                        </div>
+                        <div class="tabs-content no-margin">
+                            <!-- BEGIN eportfolio_component_page -->
+                            <ul class="component-palette content no-pad grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {EPORTFOLIO_COMPONENT_CATEGORY_CLASS}" id="eportfolio-page-controls-sub-{EPORTFOLIO_COMPONENT_CATEGORY_ID}">
+                                <!-- BEGIN eportfolio_component -->
+                                <li>
+                                    <div class="{EPORTFOLIO_COMPONENT_MULTIPLE_STATE} no-margin"
+                                         data-count="{EPORTFOLIO_COMPONENT_COUNT}"
+                                         data-multi="{EPORTFOLIO_COMPONENT_MULTIPLE_STATE}"
+                                         data-component-palette>
+                                        <div class="avatar card">
+                                            <a href="#" rel="{EPORTFOLIO_COMPONENT_DEFINITION_ID} {EPORTFOLIO_COMPONENT_ID}" class="{EPORTFOLIO_COMPONENT_CLASS}" title="{EPORTFOLIO_COMPONENT_DESCRIPTION}">
+                                                <span class="icon-32 icon-masonry icon-masonry-{EPORTFOLIO_COMPONENT_CLASS}"></span>
+                                                <p>{EPORTFOLIO_COMPONENT_NAME}</p>
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
-                            <!-- END eportfolio_component -->
-                        </ul>
-                        <!-- END eportfolio_component_page -->
-                    </div>
-                </fieldset>
+                                </li>
+                                <!-- END eportfolio_component -->
+                            </ul>
+                            <!-- END eportfolio_component_page -->
+                        </div>
+                    </section>
+                </div>
             </div>
 
             <!--------------------->
             <!-- Component Tab 2 -->
             <!--------------------->
-            <div id="eportfolio-page-controls-tab-2" class="content" data-equalizer data-equalizer-mq="medium-up">
+            <div id="eportfolio-page-controls-tab-2" class="content no-pad" data-equalizer data-equalizer-mq="medium-up">
                 <form method="POST" action="" name="saveColours">
-
-                    <!-- don't show a slider for screens which don't have multiple columns -->
-                    <fieldset class="hide-for-medium-down">
-                        <legend>
-                            Column Width
-                            <span data-tooltip class="has-tip tip-top hint" title="Drag the slider to change the width of the left and right columns. (On small screens, the right column will drop below the left.)">?</span>
-                        </legend>
-
-                        <div class="small-6 small-offset-3 end columns">
-                            <div class="range-slider"
-                                 data-original-value="{TEMPLATE_LEFT_COLUMN_WIDTH}"
-                                 data-slider="{TEMPLATE_LEFT_COLUMN_WIDTH}"
-                                 data-interaction="column-width"
-                                 data-options="start: 3; end: 9"
-                                    >
-                                <span class="range-slider-handle" role="slider" tabindex="0"></span>
-                                <span class="range-slider-active-segment"></span>
-                                <input type="hidden" name="width" value="{TEMPLATE_LEFT_COLUMN_WIDTH}">
+                    <section class="no-margin">
+                        <!-- don't show a slider for screens which don't have multiple columns -->
+                        <fieldset class="content hide-for-medium-down">
+                            <legend>
+                                Column Width
+                                <span data-tooltip class="has-tip tip-top hint" title="Drag the slider to change the width of the left and right columns. (On small screens, the right column will drop below the left.)">?</span>
+                            </legend>
+                            <div class="small-12 columns">
+                                <div class="small-6 small-offset-3 end columns">
+                                    <div class="range-slider"
+                                         data-original-value="{TEMPLATE_LEFT_COLUMN_WIDTH}"
+                                         data-slider="{TEMPLATE_LEFT_COLUMN_WIDTH}"
+                                         data-interaction="column-width"
+                                         data-options="start: 3; end: 9"
+                                            >
+                                        <span class="range-slider-handle" role="slider" tabindex="0"></span>
+                                        <span class="range-slider-active-segment"></span>
+                                        <input type="hidden" name="width" value="{TEMPLATE_LEFT_COLUMN_WIDTH}">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </fieldset>
+                        </fieldset>
+                        <fieldset class="content">
+                            <legend>Colours</legend>
+                            <div class="small-12 columns">
+                                <fieldset class="hide-for-medium-down">
+                                    <legend>
+                                        Columns
+                                        <span data-tooltip class="has-tip tip-top hint" title="Select a column to modify colours for.">?</span>
+                                    </legend>
+                                    <div class="small-12 columns">
+                                        <input id="top" type="checkbox" data-column-selector checked />
+                                        <label for="top" class="checkbox-label">Top</label>
+                                    </div>
+                                    <div class="small-12 large-6 columns">
+                                        <input id="left" type="checkbox" data-column-selector checked />
+                                        <label for="left" class="checkbox-label">
+                                            <span class="hide-for-medium-down">Left</span>
+                                            <span class="show-for-medium-down">Middle</span>
+                                        </label>
+                                    </div>
+                                    <div class="small-12 large-6 columns">
+                                        <input id="right" type="checkbox" data-column-selector checked />
+                                        <label for="right" class="checkbox-label">
+                                            <span class="hide-for-medium-down">Right</span>
+                                            <span class="show-for-medium-down">Bottom</span>
+                                        </label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="small-12 medium-6 columns">
+                                <fieldset>
+                                    <legend>Heading</legend>
+                                    <label for="head_font">Text</label>
+                                    <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
+                                    <label for="head_bg">Background</label>
+                                    <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
+                                </fieldset>
+                            </div>
+                            <div class="small-12 medium-6 columns">
+                                <fieldset>
+                                    <legend>Content</legend>
+                                    <label for="font">Text</label>
+                                    <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
+                                    <label for="bg_primary">Background</label>
+                                    <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
+                                </fieldset>
+                            </div>
+                        </fieldset>
 
-                    <fieldset>
-                        <legend>Colours</legend>
-                        <div class="small-12 columns">
-                            <fieldset class="hide-for-medium-down">
-                                <legend>
-                                    Columns
-                                    <span data-tooltip class="has-tip tip-top hint" title="Select a column to modify colours for.">?</span>
-                                </legend>
-                                <div class="small-12 columns">
-                                    <input id="top" type="checkbox" data-column-selector checked />
-                                    <label for="top" class="checkbox-label">Top</label>
-                                </div>
-                                <div class="small-12 large-6 columns">
-                                    <input id="left" type="checkbox" data-column-selector checked />
-                                    <label for="left" class="checkbox-label">
-                                        <span class="hide-for-medium-down">Left</span>
-                                        <span class="show-for-medium-down">Middle</span>
-                                    </label>
-                                </div>
-                                <div class="small-12 large-6 columns">
-                                    <input id="right" type="checkbox" data-column-selector checked />
-                                    <label for="right" class="checkbox-label">
-                                        <span class="hide-for-medium-down">Right</span>
-                                        <span class="show-for-medium-down">Bottom</span>
-                                    </label>
-                                </div>
-                            </fieldset>
+                        <div class="content">
+                            <a href="#" class="button icon-approve no-margin" data-role="save">Save</a>
+                            <a href="#" class="button icon-refresh no-margin" data-role="reset-to-default">Reset</a>
+                            <a href="#" class="button icon-undo no-margin" data-role="undo">Undo Changes</a>
                         </div>
-                        <div class="small-12 medium-6 columns">
-                            <fieldset data-equalizer-watch>
-                                <legend>Heading</legend>
-                                <label for="head_font">Text</label>
-                                <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
-                                <label for="head_bg">Background</label>
-                                <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
-                            </fieldset>
-                        </div>
-                        <div class="small-12 medium-6 columns">
-                            <fieldset data-equalizer-watch>
-                                <legend>Content</legend>
-                                <label for="font">Text</label>
-                                <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
-                                <label for="bg_primary">Background</label>
-                                <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
-                            </fieldset>
-                        </div>
-                    </fieldset>
 
-                    <ul class="button-group even-3">
-                        <li><a href="#" class="button secondary" data-role="save">Save</a></li>
-                        <li><a href="#" class="button" data-role="reset-to-default">Reset</a></li>
-                        <li><a href="#" class="button" data-role="undo">Undo Changes</a></li>
-                    </ul>
-
-                    <span class="label full-width hide" data-relation="saveLayout"></span>
+                        <span class="label full-width hide" data-relation="saveLayout"></span>
+                    </section>
                 </form>
             </div>
 
             <!--------------------->
             <!-- Component Tab 3 -->
             <!--------------------->
-            <div id="eportfolio-page-controls-tab-3" class="content small-12 island">
-                <form method='post' action='/eportfolio/configForm.php'>
+            <div id="eportfolio-page-controls-tab-3" class="content no-pad">
+                <form method='post' action='/eportfolio/configForm.php' class="no-margin">
                     <input type='hidden' name='user_id' value='{ID}' />
                     <input type='hidden' name='page_id' value='{PAGE_ID}' />
                     <input type='hidden' name='update' value='page' />
 
-                    <section>
-                        <fieldset>
+                    <section class="no-margin">
+                        <fieldset class="content">
                             <div class="small-12 columns">
                                 <label>
                                     Page Name
@@ -395,8 +399,7 @@
                                 </label>
                             </div>
                         </fieldset>
-
-                        <fieldset>
+                        <fieldset class="content">
                             <div class="small-12 large-4 columns">
                                 <label>
                                     Group Permissions
@@ -436,7 +439,7 @@
                     </section>
                 </form>
             </div>
-        </section>
+        </div>
     </div>
 </div>
 <!-- END customise_page -->
