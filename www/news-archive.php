@@ -155,7 +155,7 @@ if ($occupiedDateList) {
         $this->setVar(
             array(
                 'YEAR' => $date['year'],
-                'YEAR_ClASS' => $date['year'] == $filter['year'] ? 'current' : ''
+                'YEAR_CLASS' => $date['year'] == $filter['year'] ? 'active' : ''
             )
         );
 
