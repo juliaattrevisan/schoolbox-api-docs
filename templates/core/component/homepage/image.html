@@ -16,11 +16,11 @@
                         </div>
                     </div>
 
-                    <div class="content" data-dz-container>
+                    <div data-dz-container>
                         <!-- BEGIN previewimage -->
-                        <div id="img{COMPONENT_INSTANCE_ID}" style="text-align:{IMAGE_ALIGN};">
+                        <div id="img{COMPONENT_INSTANCE_ID}" class="text-center">
                             {CONTENT_URL_START}
-                            <img class="th" src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}"/>
+                            <img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}"/>
                             {CONTENT_URL_END}
                         </div>
                         <!-- END previewimage -->
@@ -39,7 +39,7 @@
                         previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
                         previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
                         createImageThumbnails: true,
-                        thumbnailHeight: {COMPONENT_CONFIG_PIXEL},
+                        thumbnailHeight: 400,
                         thumbnailWidth: null,
                         dictDefaultMessage: 'You can drag an image into this space.',
                         acceptedFiles: 'image/*',
