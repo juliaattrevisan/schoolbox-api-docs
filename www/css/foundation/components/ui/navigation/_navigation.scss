@@ -85,56 +85,6 @@ $menu-slide: "transform 500ms ease";
 
 $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($background: $tabbar-bg, $opacity: 0.65));
 
-// Hybrid Bar
-.icon-nav{
-	@include inline-list;
-	//@extend .no-pad;
-	margin: 0;
-	height: inherit;
-	li{
-		margin: 0;
-		width: 5rem;
-	}
-	a{
-		height: 5rem;
-		padding: rem-calc(($base-font-size / 2)) rem-calc(($base-font-size));
-		text-align: center;
-		@extend .icon-32;
-		@extend .no-text;
-
-		&.navthis {
-			background-color: calc-text-color(
-				$tabbar-bg,
-				tint($tabbar-bg, 4%),
-				darken($tabbar-bg, 4%)
-			);
-			&:before, span {
-				color: $icon-nav-highlight-color;
-			}
-		}
-
-		&:hover{
-		    background-color: $navigation-hover;
-		}
-
-		&:before{
-			text-align: center;
-			float: none;
-			color: $navigation-foreground;
-		}
-		span {
-			font-weight: $font-weight-normal;
-			color: $navigation-foreground;
-			display: block;
-			line-height: rem-calc($base-font-size);
-		}
-
-		&:before, span {
-			@include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
-		}
-	}
-}
-
 /* Display a logo/background for non-authenticated screens
  * like Forgotten Password, Privacy Policy, Feedback Form etc
  *
@@ -152,49 +102,11 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
     }
 }
 
-.hybrid-bar{
-	.left-small{
-		z-index: 100;
-		.menu-icon{
-			height: $tabbar-height;
-		}
-	}
-	@media #{$small-only} {
-		.tab-bar{
-			height: $tabbar-height * 2;
-			.icon-nav{
-				position: absolute;
-  				left: -5rem;
-			  	top: 80px;
-				width: 100%;
-				li{
-					width: 25%;
-				}
-			}
-		}
-	}
-	.tab-bar-section{
-		padding: 0 rem-calc(($base-font-size * 10)) 0 0;
-		position: relative;
-	}
-	.icon-nav{
-		padding: 0 0 0 rem-calc(($base-font-size - 2));
-
-		li:nth-child(n+5){
-			@extend .show-for-large-up;
-		}
-		li:nth-child(n+7){
-			@extend .show-for-xlarge-up;
-		}
-		a {
-			padding: rem-calc(($base-font-size - 2)) 0;
-		}
-	}
-}
-
-// Logo - Top Bar
+/* Main navigation tab bar at top
+ */
 .hybrid-bar{
     .logo {
+        width: 6rem;
         @media #{$mediumwide-up} {
             display: none !important;
         }
@@ -204,67 +116,147 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
             max-width: none;
         }
     }
-}
+	.left-small{
+		z-index: 100;
+		.menu-icon{
+			height: $tabbar-height;
+		}
+	}
 
-.tab-bar {
-    #search {
-        margin: 0;
-        position: absolute;
-        right: 10rem;
-        top: 0;
-        height: $tabbar-height;
-        @include placeholder-color(transparent, $font-weight-normal);
-        input[type="text"]{
-            border: 0;
-            background-color: transparent;
-            color: $body-bg;
-            float: right;
+    .tab-bar {
+        #search {
+            margin: 0;
+            position: absolute;
+            right: 10rem;
+            top: 0;
             height: $tabbar-height;
-            width: $tabbar-height;
-            padding: $base-font-size;
-            margin: 0;
-            opacity: 0;
-        }
-        &:hover, &.focus {
-            width: 100%;
-            padding-left: 22rem;
-            @include placeholder-color($black, $font-weight-normal);
-        }
+            @include placeholder-color(transparent, $font-weight-normal);
+            input[type="text"]{
+                border: 0;
+                background-color: transparent;
+                color: $body-bg;
+                float: right;
+                height: $tabbar-height;
+                width: $tabbar-height;
+                padding: $base-font-size;
+                margin: 0;
+                opacity: 0;
+            }
+            &:hover, &.focus {
+                width: 100%;
+                padding-left: 22rem;
+                @include placeholder-color($black, $font-weight-normal);
+            }
 
-        /* Search icon in its idle state
-         */
-        .icon-search {
-            @include absolute (0, auto, auto, 32px);
-            @include transition(all, 0.3s, ease-in);
-            margin: 0;
-            z-index: 1;
-            &:before {
-                color: $navigation-foreground;
+            /* Search icon in its idle state
+             */
+            .icon-search {
+                @include absolute (0, auto, auto, 32px);
+                @include transition(all, 0.3s, ease-in);
+                margin: 0;
+                z-index: 1;
+                &:before {
+                    color: $navigation-foreground;
+                }
+            }
+
+            /* Input field when Search feature is activated
+             */
+            [type="text"]:focus,
+            [type="text"]:active,
+            &:hover [type="text"],
+            &:hover [type="text"]:focus{
+                background-color: $white;
+                border: 2px solid $navigation-hover;
+                color: $black;
+                width: 99.7%;
+                opacity: 1;
+            }
+
+            [type="text"]:focus + .icon-search,
+            [type="text"]:active + .icon-search,
+            &:hover .icon-search {
+                @include absolute (0, auto, auto, 16px);
+
+                /* Search icon when Search feature is activated
+                 */
+                &:before {
+                    color: $navigation-background;
+                }
             }
         }
 
-        /* Input field when Search feature is activated
-         */
-        [type="text"]:focus,
-        [type="text"]:active,
-        &:hover [type="text"],
-        &:hover [type="text"]:focus{
-            background-color: $white;
-            border: 2px solid $navigation-hover;
-            color: $black;
-            width: 99.7%;
-            opacity: 1;
+        @media #{$small-only} {
+            height: $tabbar-height * 2;
+            .icon-nav{
+                position: absolute;
+                left: -5rem;
+                top: 80px;
+                width: 100%;
+                li{
+                    width: 25%;
+                }
+            }
         }
 
-        [type="text"]:focus + .icon-search,
-        [type="text"]:active + .icon-search,
-        &:hover .icon-search {
-            @include absolute (0, auto, auto, 16px);
+        .tab-bar-section {
+            position: relative;
 
-            /* Search icon when Search feature is activated
-             */
-            &:before {
-                color: $navigation-background;
+            .icon-nav{
+                @include inline-list;
+                margin: 0;
+                height: inherit;
+                padding: 0 0 0 rem-calc(($base-font-size - 2));
+
+                li:nth-child(n+5){
+                    @extend .show-for-large-up;
+                }
+                li:nth-child(n+7){
+                    @extend .show-for-xlarge-up;
+                }
+
+                //@extend .no-pad;
+                li {
+                    margin: 0;
+                    width: 5rem;
+                    a {
+                        height: 5rem;
+                        padding: rem-calc(($base-font-size - 2)) 0;
+                        text-align: center;
+                        @extend .icon-32;
+                        @extend .no-text;
+
+                        &.navthis {
+                            background-color: calc-text-color(
+                                    $tabbar-bg,
+                                    tint($tabbar-bg, 4%),
+                                    darken($tabbar-bg, 4%)
+                            );
+                            &:before, span {
+                                color: $icon-nav-highlight-color;
+                            }
+                        }
+
+                        &:hover {
+                            background-color: $navigation-hover;
+                        }
+
+                        &:before {
+                            @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
+                            text-align: center;
+                            float: none;
+                            color: $navigation-foreground;
+                        }
+                    }
+
+                    span {
+                        @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
+                        color: $navigation-foreground;
+                        font-weight: $font-weight-normal;
+                        line-height: rem-calc($base-font-size);
+                        display: block;
+                    }
+                }
             }
         }
     }
@@ -559,13 +551,37 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
     }
 }
 
-// Large
+// Medium
 // < 1024px
 @media #{$medium-down} {
-    .tab-bar {
-        #search{
-            &:hover{
-                padding-left: 10rem;
+    .hybrid-bar {
+        .tab-bar {
+            #search{
+                &:hover{
+                    padding-left: 10rem;
+                }
+            }
+        }
+    }
+}
+
+/* Special Small styles
+ */
+@media #{$small-only} {
+    .hybrid-bar {
+        .tab-bar {
+            #search{
+                &:hover{
+                    padding-left: 10rem;
+                }
+            }
+
+            .tab-bar-section {
+                .icon-nav {
+                    li {
+                        width: 25%;
+                    }
+                }
             }
         }
     }
