@@ -53,15 +53,9 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
 
         if (count($fileList)) {
             $image = $fileList->first();
-            $pixel = $this->getConfig('pixel') < 20
-                ? '400'
-                : ($this->getConfig('pixel') > 600
-                    ? 600
-                    : $this->getConfig('pixel')
-                );
 
             //get link
-            $imageurl = "/cms/image.php?id={$image->getId()}&height=$pixel&width=$pixel";
+            $imageurl = "/cms/image.php?id={$image->getId()}&height=1024&width=1024";
 
             $this->setVar("PREVIEW_IMAGE_URL", $imageurl);
             $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image->getDescription()));

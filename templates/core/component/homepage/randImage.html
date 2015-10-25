@@ -3,7 +3,7 @@
 
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="island small-12">
-            <section class="content">
+            <section>
                 <!-- BEGIN previewimage -->
                 <div class="text-center">
                     <img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}"/>
@@ -11,7 +11,9 @@
                 <!-- END previewimage -->
 
                 <!-- BEGIN submit_image -->
-                <a href="/cms/file/new/{ID}" class="button icon-upload">Post Image</a>
+                <div class="content">
+                    <a href="/cms/file/new/{ID}" class="button icon-upload">Post Image</a>
+                </div>
                 <!-- END submit_image -->
             </section>
         </div>
