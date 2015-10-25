@@ -1527,6 +1527,14 @@ tr:hover{
 }
 
 // Reveal
+
+// Headers: don't overlap the close X
+.reveal-modal {
+	h1, h2, h3, h4, h5, h6 {
+		max-width: 90%;
+	}
+}
+
 // Fix stupid foundation bug
 .reveal-modal-bg{
 	position: fixed;
