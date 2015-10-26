@@ -268,6 +268,11 @@ ul.az-error-list {
     }
 }
 
+[id^="component"] .attachzone,
+[id^="component"] .dropzone-wrap{
+    margin-bottom: 0;
+}
+
 .attachzone, .dropzone-wrap {
     min-width: 40px;
     margin-bottom: 1rem;
@@ -353,6 +358,7 @@ ul.az-error-list {
         @include easy-transition(opacity 0.15s $attachzone-overlay-timing);
     }
 }
+
 
 .dzone {
     @extend %p;
