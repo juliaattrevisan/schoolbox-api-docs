@@ -117,7 +117,7 @@
 
             /* For every day, assemble a two column timetable
              */
-            var table = $('<table>');
+            var table = $('<table class="no-hover">');
 
             /* Generate table rows
              */
