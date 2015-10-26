@@ -317,12 +317,13 @@
         <h3 class="subheader">Groups</h3>
         <section>
             <ul class="action-list">
-                <li class="actions-small-1">
-                    <div class="list-item row-header">
-                        <div class="small-7 columns"><div class="content">Group Name</div></div>
-                        <div class="small-5 columns"><div class="content">Access</div></div>
+                <li class="actions-small-1 row-header">
+                    <div class="list-item">
+                        <div class="small-7 columns">Group Name</div>
+                        <div class="small-5 columns">Access</div>
                     </div>
                 </li>
+
                 <!-- BEGIN user_group -->
                 <li class="actions-small-1">
                     <div class="list-item">
@@ -349,6 +350,7 @@
                     </nav>
                 </li>
                 <!-- END user_group -->
+
                 <li class="actions-small-1">
                     <form action="/adminv2/userForm.php" method="post" id="groupAdd" data-validatable-as="addGroup" class="list-item">
                         <div class="info card small-7">
@@ -384,16 +386,16 @@
         <h3 class="subheader" id="permissions">Permissions</h3>
         <section>
             <ul class="action-list">
-                <li class="actions-small-1">
-                    <div class="list-item row-header">
-                        <div class="small-4 columns"><div class="content">Service</div></div>
-                        <div class="small-4 columns"><div class="content">Service Identifier</div></div>
-                        <div class="small-4 columns"><div class="content">Access</div></div>
+                <li class="actions-small-1 row-header">
+                    <div class="list-item">
+                        <div class="small-4 columns">Service</div>
+                        <div class="small-4 columns">Service Identifier</div>
+                        <div class="small-4 columns">Access</div>
                     </div>
                 </li>
                 <!-- BEGIN user_calendar -->
                 <li class="actions-small-1">
-                    <div class="list-item">
+                    <div class="list-item row">
                         <div class="small-4 info card">Calendar</div>
                         <div class="small-4 info card">Campus: {PERM_CAMPUS_NAME}</div>
                         <div class="small-4 info card">
@@ -597,9 +599,9 @@
         <h3 class="subheader" id="linked">Linked Accounts</h3>
         <section>
             <ul class="action-list">
-                <li class="actions-small-1">
-                    <div class="list-item row-header">
-                        <div class="small-12 columns"><div class="content">User</div></div>
+                <li class="actions-small-1 row-header">
+                    <div class="list-item">
+                        <div class="small-12 columns">User</div>
                     </div>
                 </li>
                 <!-- BEGIN user_linked -->
