@@ -194,7 +194,7 @@
             /* For every day, assemble a two column timetable
              */
             for (i = 1; i < numDays; i++) {
-                var table = $('<table>');
+                var table = $('<table class="no-hover">');
 
                 /* Generate table rows
                  */
