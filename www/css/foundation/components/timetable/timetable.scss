@@ -24,6 +24,11 @@ $timetable-cell-border: $body-bg;
      */
     .timetable-subject {
         padding: 1rem;
+        &.timetable-subject-active {
+            // Reduced padding offsets the border
+            padding: .875rem;
+            border: .125rem solid $accent-foreground;
+        }
     }
 }
 
