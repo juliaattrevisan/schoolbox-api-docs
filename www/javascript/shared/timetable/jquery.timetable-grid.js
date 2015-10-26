@@ -191,24 +191,45 @@
 
             $(config.target).append(person);
 
+            /* Figure out which Day is the active one
+             */
+            var activeDay = $(config.element).find('.timetable-day-active').html();
+            var activePeriod = $(config.element).find('.timetable-period-active').html();
+
             /* For every day, assemble a two column timetable
              */
             for (i = 1; i < numDays; i++) {
+
+                /* Assemble island
+                 */
+                var header = $(config.header).append(headerCellSelector(i+1).html());
+
                 var table = $('<table class="no-hover">');
 
                 /* Generate table rows
                  */
                 $.each(periodNames, function(index, element) {
                     var tr = $('<tr></tr>');
-                    tr.append($(element).clone());
+                    var clone = $(element).clone();
+
+                    /* Highlight current Period th
+                     */
+                    if ((header.html() == activeDay) && ($(element).html() == activePeriod)) {
+                        clone.addClass('timetable-period-active');
+                    }
+                    /* Due to reforging, clear the active class from this
+                     * particular instance of th
+                     */
+                    else {
+                        clone.removeClass('timetable-period-active');
+                    }
+
+                    tr.append(clone);
                     tr.append(dataCellSelector(index+1, i+1).clone());
 
                     table.append(tr);
                 });
 
-                /* Assemble island
-                 */
-                var header = $(config.header).append(headerCellSelector(i+1).html());
                 var section = $(config.section).append(table);
                 var island = $(config.island).append(header).append(section)
 
