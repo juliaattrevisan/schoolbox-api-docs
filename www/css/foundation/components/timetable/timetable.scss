@@ -24,17 +24,27 @@ $timetable-cell-border: $body-bg;
      */
     .timetable-subject {
         padding: 1rem;
-        &.timetable-subject-active {
-            // Reduced padding offsets the border
-            padding: .875rem;
-            border: .125rem solid $accent-foreground;
-        }
+    }
+}
+
+/* Fifty-fifty split on small devices
+ */
+.timetable-small {
+    th, td {
+        width: 50%;
     }
 }
 
 /* Active subject(s) decoration
+ *
+ * Indicator effect on a cell containing one or more
+ * subject (div) elements
+ *
+ * Reduced padding offsets the border
  */
 .timetable-subject-active {
+    padding: .875rem;
+    border: .125rem solid $accent-foreground;
     position: relative;
     &:before {
         position: absolute;
@@ -46,21 +56,12 @@ $timetable-cell-border: $body-bg;
         border-top: 1rem solid $accent-foreground;
         border-left: 1rem solid transparent;
     }
-    //&:after {
-    //    @extend .icon-favourite:before;
-    //    position: absolute;
-    //    top: 0;
-    //    right: 0;
-    //    padding: .375rem;
-    //    color: $white;
-    //}
 }
 
-/* Fifty-fifty split on small devices
+/* Fix guttering in small display - subject elements
+ * should fill the entire width of their table cell
  */
-.timetable-small {
-    th, th {
-        width: 50%;
-    }
+#content .row.timetable-small table td:last-child {
+    padding-right: 0;
 }
 
