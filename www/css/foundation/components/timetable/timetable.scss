@@ -38,17 +38,17 @@ $timetable-cell-border: $body-bg;
         width: 0;
         height: 0;
         content: " ";
-        border-top: 3rem solid $accent-foreground;
-        border-left: 3rem solid transparent;
+        border-top: 1rem solid $accent-foreground;
+        border-left: 1rem solid transparent;
     }
-    &:after {
-        @extend .icon-favourite:before;
-        position: absolute;
-        top: 0;
-        right: 0;
-        padding: .375rem;
-        color: $white;
-    }
+    //&:after {
+    //    @extend .icon-favourite:before;
+    //    position: absolute;
+    //    top: 0;
+    //    right: 0;
+    //    padding: .375rem;
+    //    color: $white;
+    //}
 }
 
 /* Fifty-fifty split on small devices
