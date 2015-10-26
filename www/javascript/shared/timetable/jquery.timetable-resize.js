@@ -43,7 +43,15 @@
 
                 /* Subject elements
                  */
-                subject: '[data-timetable-subject]'
+                subject: '[data-timetable-subject]',
+
+                /* Indicator Offset
+                 *
+                 * The total height of the border/padding used to indicate
+                 * the current active period (this is 0.25rem;or 4px which
+                 * is the default value)
+                 */
+                indicatorOffset: 4
             }
 
             var derived = {
@@ -65,8 +73,6 @@
                 height: 'auto'
             });
 
-            var indicatorOffset = 4;
-
             $.each($(config.element).find('tr'), function(index, row) {
                 var rowHeight = $(row).height();
                 var hasActiveSubject = false;
@@ -86,7 +92,7 @@
                     if (allSubjects.length == 1) {
                         if (hasActiveSubject && !$(cell).hasClass('timetable-subject-active')) {
                             allSubjects.css({
-                                height: rowHeight + indicatorOffset + 'px'
+                                height: rowHeight + config.indicatorOffset + 'px'
                             });
                         }
                         else {
@@ -108,7 +114,7 @@
                         /* How much to add per subject
                          */
                         if (hasActiveSubject && !$(cell).hasClass('timetable-subject-active')) {
-                            diff = (rowHeight - subjectHeight + indicatorOffset)/allSubjects.length;
+                            diff = (rowHeight - subjectHeight + config.indicatorOffset)/allSubjects.length;
                         }
                         else {
                             diff = (rowHeight - subjectHeight)/allSubjects.length;
