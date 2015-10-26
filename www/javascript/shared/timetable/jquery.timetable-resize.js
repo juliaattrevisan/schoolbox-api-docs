@@ -113,6 +113,7 @@
                      */
                     else {
                         var subjectHeight = 0;
+                        var diff = 0;
 
                         $.each(allSubjects, function(index, subject) {
                             subjectHeight += $(subject).height();
@@ -121,10 +122,10 @@
                         /* How much to add per subject
                          */
                         if (hasActiveSubject && !$(cell).find('.timetable-subject-active').length) {
-                            var diff = (rowHeight - subjectHeight + config.indicatorOffset)/allSubjects.length;
+                            diff = (rowHeight - subjectHeight + config.indicatorOffset)/allSubjects.length;
                         }
                         else {
-                            var diff = (rowHeight - subjectHeight)/allSubjects.length;
+                            diff = (rowHeight - subjectHeight)/allSubjects.length;
                         }
 
                         $.each(allSubjects, function(index, subject) {

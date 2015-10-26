@@ -18,6 +18,12 @@ $timetable-cell-border: $body-bg;
         .timetable-subject-active {
             border: 0.125rem solid $accent-foreground;
             position: relative;
+
+            /* Ensure Indicator always expands to fill a cell
+             * where there are no classes
+             */
+            min-height: 4.5rem;
+
             &:before {
                 position: absolute;
                 top: 0;
