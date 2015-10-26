@@ -51,7 +51,11 @@
                  * the current active period (this is 0.25rem;or 4px which
                  * is the default value)
                  */
-                indicatorOffset: 4
+                indicatorOffset: 4,
+
+                /* Indicator element
+                 */
+                indicator: '.timetable-subject-active'
             }
 
             var derived = {
@@ -80,7 +84,7 @@
                 /* If this row contains an instance of timetable-subject-active
                  * add extra height to every td, to compensate for Indicator
                  */
-                if ($(row).find('td .timetable-subject-active').length) {
+                if ($(row).find('td ' + config.indicator).length) {
                     hasActiveSubject = true;
                 }
 
@@ -90,14 +94,14 @@
                     /* Make Indicator full height if empty
                      */
                     if (allSubjects.length == 0) {
-                        $(cell).find('.timetable-subject-active').css({
+                        $(cell).find(config.indicator).css({
                             height: rowHeight + config.indicatorOffset + 'px'
                         });
                     }
                     /* Only one subject - make it fill available space
                      */
                     else if (allSubjects.length == 1) {
-                        if (hasActiveSubject && !$(cell).find('.timetable-subject-active').length) {
+                        if (hasActiveSubject && !$(cell).find(config.indicator).length) {
                             allSubjects.css({
                                 height: rowHeight + config.indicatorOffset + 'px'
                             });
@@ -121,7 +125,7 @@
 
                         /* How much to add per subject
                          */
-                        if (hasActiveSubject && !$(cell).find('.timetable-subject-active').length) {
+                        if (hasActiveSubject && !$(cell).find(config.indicator).length) {
                             diff = (rowHeight - subjectHeight + config.indicatorOffset)/allSubjects.length;
                         }
                         else {
