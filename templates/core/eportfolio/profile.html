@@ -37,14 +37,14 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <div class="eportfolio cover-photo text-center">
+        <div class="eportfolio cover-photo text-center"
+             <!-- BEGIN has_cover_photo -->
+             style="background-image: url(/storage/image.php?size=eportfolioCoverPhoto&hash={COVERPHOTO_IMAGEHASH});"
+             <!-- END has_cover_photo -->
+            >
             <img class='eportfolio profile-image' src='/portrait.php?userId={USER_EXTERNAL_ID}&size=constrain200' alt="{USER_FULLNAME}" />
 
-            <!-- BEGIN has_cover_photo -->
-            <img src="/storage/image.php?size=eportfolioCoverPhoto&hash={COVERPHOTO_IMAGEHASH}" />
-            <!-- END has_cover_photo -->
             <!-- BEGIN no_cover_photo -->
-            <img src="/images/core/eportfolio/coverphotoPlaceholder.jpg" />
             <!-- END no_cover_photo -->
 
             <div class="eportfolio cover-photo-controls">
