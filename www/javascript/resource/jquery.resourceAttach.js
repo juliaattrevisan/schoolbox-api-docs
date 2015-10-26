@@ -402,8 +402,10 @@ if(typeof window.location.origin == 'undefined') {
      */
     ResourceAttach.prototype.reopenParentReveal = function(event) {
         // compensate for event double-fire: see https://github.com/zurb/foundation/issues/5482
-        if (event.namespace !== 'fndtn.reveal' || $('[data-reveal].open').length > 0) {
-            return;
+        if (event) {
+            if (event.namespace !== 'fndtn.reveal' || $('[data-reveal].open').length > 0) {
+                return;
+            }
         }
         var parentReveal = $(this.element).closest('[data-reveal]');
         if (parentReveal.length) {
@@ -430,6 +432,9 @@ if(typeof window.location.origin == 'undefined') {
         var i, data, elems = [], self = this;
 
         this.close();
+        // Currently this does the background on when reveal disappears thing again.
+        // Wait for the dialog to fully close.
+        this.reopenParentReveal();
 
         for (i = 0; i < list.length; ++i) {
             data = {
