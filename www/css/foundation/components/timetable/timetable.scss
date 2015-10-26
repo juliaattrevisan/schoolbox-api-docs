@@ -9,6 +9,28 @@ $timetable-cell-border: $body-bg;
      */
     td {
         padding: 0;
+
+        /* Active subject(s) decoration
+         *
+         * Indicator effect on a cell containing one or more
+         * subject (div) elements
+         *
+         * Reduced padding offsets the border
+         */
+        &.timetable-subject-active {
+            border: 0.125rem solid $accent-foreground;
+            position: relative;
+            &:before {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 0;
+                height: 0;
+                content: " ";
+                border-top: 1.25rem solid $accent-foreground;
+                border-left: 1.25rem solid transparent;
+            }
+        }
     }
 
     /* For subtext under period names to sit correctly
@@ -32,29 +54,6 @@ $timetable-cell-border: $body-bg;
 .timetable-small {
     th, td {
         width: 50%;
-    }
-}
-
-/* Active subject(s) decoration
- *
- * Indicator effect on a cell containing one or more
- * subject (div) elements
- *
- * Reduced padding offsets the border
- */
-.timetable-subject-active {
-    padding: .875rem;
-    border: .125rem solid $accent-foreground;
-    position: relative;
-    &:before {
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 0;
-        height: 0;
-        content: " ";
-        border-top: 1rem solid $accent-foreground;
-        border-left: 1rem solid transparent;
     }
 }
 
