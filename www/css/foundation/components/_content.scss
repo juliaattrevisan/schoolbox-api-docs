@@ -1531,7 +1531,9 @@ tr:hover{
 // Headers: don't overlap the close X
 .reveal-modal {
 	h1, h2, h3, h4, h5, h6 {
-		max-width: 90%;
+		// rem-calc must be quoted as otherwise it won't be parsed
+		// (it's in a CSS native function)
+		max-width: calc(100% - #{rem-calc(($base-font-size * 2))});
 	}
 }
 
