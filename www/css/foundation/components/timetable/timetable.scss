@@ -18,7 +18,8 @@ $timetable-cell-border: $body-bg;
          * Reduced padding offsets the border
          */
         &.timetable-subject-active {
-            border: 0.125rem solid $accent-foreground;
+            padding: 0.125rem;
+            background-color: $accent-foreground;
             position: relative;
             &:before {
                 position: absolute;
@@ -30,6 +31,15 @@ $timetable-cell-border: $body-bg;
                 border-top: 1.25rem solid $accent-foreground;
                 border-left: 1.25rem solid transparent;
             }
+            .timetable-subject {
+                padding: 0.875rem;
+            }
+        }
+
+        /* For coloured blocks
+         */
+        .timetable-subject {
+            padding: 1rem;
         }
     }
 
@@ -40,12 +50,6 @@ $timetable-cell-border: $body-bg;
         clear: both;
         display: block;
         font-weight: normal;
-    }
-
-    /* For coloured blocks
-     */
-    .timetable-subject {
-        padding: 1rem;
     }
 }
 
