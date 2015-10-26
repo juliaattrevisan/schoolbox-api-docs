@@ -80,17 +80,24 @@
                 /* If this row contains an instance of timetable-subject-active
                  * add extra height to every td, to compensate for Indicator
                  */
-                if ($(row).find('.timetable-subject-active')) {
+                if ($(row).find('td .timetable-subject-active').length) {
                     hasActiveSubject = true;
                 }
 
                 $.each($(row).find('td'), function(index, cell) {
                     var allSubjects = $(cell).find(config.subject);
 
+                    /* Make Indicator full height if empty
+                     */
+                    if (allSubjects.length == 0) {
+                        $(cell).find('.timetable-subject-active').css({
+                            height: rowHeight + config.indicatorOffset + 'px'
+                        });
+                    }
                     /* Only one subject - make it fill available space
                      */
-                    if (allSubjects.length == 1) {
-                        if (hasActiveSubject && !$(cell).hasClass('timetable-subject-active')) {
+                    else if (allSubjects.length == 1) {
+                        if (hasActiveSubject && !$(cell).find('.timetable-subject-active').length) {
                             allSubjects.css({
                                 height: rowHeight + config.indicatorOffset + 'px'
                             });
@@ -101,11 +108,11 @@
                             });
                         }
                     }
-                    /* Distribute difference equally
+                    /* Multiple classes in this period
+                     * Distribute difference equally
                      */
                     else {
                         var subjectHeight = 0;
-                        var diff = 0;
 
                         $.each(allSubjects, function(index, subject) {
                             subjectHeight += $(subject).height();
@@ -113,11 +120,11 @@
 
                         /* How much to add per subject
                          */
-                        if (hasActiveSubject && !$(cell).hasClass('timetable-subject-active')) {
-                            diff = (rowHeight - subjectHeight + config.indicatorOffset)/allSubjects.length;
+                        if (hasActiveSubject && !$(cell).find('.timetable-subject-active').length) {
+                            var diff = (rowHeight - subjectHeight + config.indicatorOffset)/allSubjects.length;
                         }
                         else {
-                            diff = (rowHeight - subjectHeight)/allSubjects.length;
+                            var diff = (rowHeight - subjectHeight)/allSubjects.length;
                         }
 
                         $.each(allSubjects, function(index, subject) {
