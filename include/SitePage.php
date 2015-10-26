@@ -370,6 +370,15 @@ class SitePage extends Page
 
         if ($_SESSION['id']) {
 
+            /* Output superuser link to administration */
+            $this->setBlock('banner_logged_in', 'admin_only_menu', 'admin_only_menu_block');
+            if($_SESSION['user']->isSuperuser()) {
+                $this->parse('admin_only_menu_block', 'admin_only_menu');
+            }
+            else {
+                $this->setVar('admin_only_menu_block','');
+            }
+
             $canSwitch = false;
 
             /* Output switch user options */
