@@ -125,7 +125,7 @@ $(document).ready(function() {
 {BREADCRUMB}
 
 <div class="row actions-small-1">
-    <div class="list-item">
+    <div class="list-item small-12 columns">
         <h1>Manage Group</h1>
     </div>
     <nav>
@@ -149,7 +149,7 @@ $(document).ready(function() {
         </ul>
 
         <section>
-            <div class="tabs-content no-margin">
+            <div class="tabs-content content no-margin">
                 <div class="content active" id="members">
                     <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
                     <!-- BEGIN groupUnmanaged -->
@@ -347,50 +347,54 @@ $(document).ready(function() {
 
                 <div class="content" id="settings">
                     <form action="/group/modifyForm.php" method="post" class="no-margin">
-                        <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-                        <div class="row">
-                            <div class="small-12 medium-6 columns">
-                                <fieldset class="content">
-                                    <legend>Access</legend>
-                                    <input id="type-1" name="type" type="radio" value="1" {GROUP_TYPE_1} />
-                                    <label for="type-1" class="radio-label">
-                                        Restricted
-                                        <span data-tooltip class="has-tip tip-top hint" title="Membership is only by invitation from a group admin.">?</span>
-                                    </label>
-                                    <input id="type-2" name="type" type="radio" value="2" {GROUP_TYPE_2} />
-                                    <label for="type-2" class="radio-label">
-                                        Moderated
-                                        <span data-tooltip class="has-tip tip-top hint" title="Users may request membership, but must be approved by a group admin.">?</span>
-                                    </label>
-                                    <input id="type-3" name="type" type="radio" value="3" {GROUP_TYPE_3} />
-                                    <label for="type-3" class="radio-label">
-                                        Free
-                                        <span data-tooltip class="has-tip tip-top hint" title="Users may join and leave at any time, without approval.">?</span>
-                                    </label>
-                                </fieldset>
-                            </div>
-                            <!-- BEGIN msg_enabled -->
-                            <div class="small-12 medium-6 columns">
-                                <fieldset class="content">
-                                    <legend>Messaging</legend>
-                                    <input type="hidden" name="msg[enabled]" value="0" />
-                                    <input id="msg-enabled" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} />
-                                    <label for="msg-enabled" class="checkbox-label">Messages enabled</label>
-
-                                    <!-- Hide this if messaging isn't enabled -->
-                                    <div data-hide-watch="#msg-enabled">
-                                        <input name="msg[force_follow]" type="hidden" value="0" />
-                                        <input id="msg-force-follow" name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} />
-                                        <label for="msg-force-follow" class="checkbox-label">
-                                            Force Follow
-                                            <span data-tooltip class="has-tip tip-top hint" title="Group members may not opt out of receiving messages if Force Follow is enabled.">?</span>
-                                        </label>
+                        <section class="no-margin">
+                            <fieldset class="content">
+                                <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                                <div class="row">
+                                    <div class="small-12 medium-6 columns">
+                                        <fieldset>
+                                            <legend>Access</legend>
+                                            <input id="type-1" name="type" type="radio" value="1" {GROUP_TYPE_1} />
+                                            <label for="type-1" class="radio-label">
+                                                Restricted
+                                                <span data-tooltip class="has-tip tip-top hint" title="Membership is only by invitation from a group admin.">?</span>
+                                            </label>
+                                            <input id="type-2" name="type" type="radio" value="2" {GROUP_TYPE_2} />
+                                            <label for="type-2" class="radio-label">
+                                                Moderated
+                                                <span data-tooltip class="has-tip tip-top hint" title="Users may request membership, but must be approved by a group admin.">?</span>
+                                            </label>
+                                            <input id="type-3" name="type" type="radio" value="3" {GROUP_TYPE_3} />
+                                            <label for="type-3" class="radio-label">
+                                                Free
+                                                <span data-tooltip class="has-tip tip-top hint" title="Users may join and leave at any time, without approval.">?</span>
+                                            </label>
+                                        </fieldset>
                                     </div>
-                                </fieldset>
-                            </div>
-                        </div>
-                        <!-- END msg_enabled -->
-                        <input type="submit" name="Submit" />
+                                    <!-- BEGIN msg_enabled -->
+                                    <div class="small-12 medium-6 columns">
+                                        <fieldset>
+                                            <legend>Messaging</legend>
+                                            <input type="hidden" name="msg[enabled]" value="0" />
+                                            <input id="msg-enabled" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} />
+                                            <label for="msg-enabled" class="checkbox-label">Messages enabled</label>
+
+                                            <!-- Hide this if messaging isn't enabled -->
+                                            <div data-hide-watch="#msg-enabled">
+                                                <input name="msg[force_follow]" type="hidden" value="0" />
+                                                <input id="msg-force-follow" name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} />
+                                                <label for="msg-force-follow" class="checkbox-label">
+                                                    Force Follow
+                                                    <span data-tooltip class="has-tip tip-top hint" title="Group members may not opt out of receiving messages if Force Follow is enabled.">?</span>
+                                                </label>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                                <!-- END msg_enabled -->
+                                <input type="submit" name="Submit" />
+                            </fieldset>
+                        </section>
                     </form>
                 </div>
             </div>
