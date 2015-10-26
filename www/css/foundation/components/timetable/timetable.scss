@@ -69,8 +69,9 @@ $timetable-cell-border: $body-bg;
 }
 
 /* Indicate the Day and Period that is currently happening
+ * Special reversed configuration, for extra strongness
  */
 .timetable-day-active, .timetable-period-active {
-    color: contrast-bg($background: $accent-foreground, $dark: $accent-background);
+    color: $accent-background;
     background-color: $accent-foreground;
 }
