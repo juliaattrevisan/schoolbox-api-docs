@@ -49,8 +49,8 @@
                 // Search for this item, disable others
                 var currentService = $(this).find(':selected').data('identifier');
                 var selectors      = addServiceForm.find(':input[data-service-type]');
-                selectors.hide();
-                selectors.filter('[data-service-type="'+currentService+'"]').show();
+                selectors.addClass('hide').prop('disabled', true);
+                selectors.filter('[data-service-type="'+currentService+'"]').removeClass('hide').prop('disabled', false);
             }
         );
 
@@ -317,17 +317,20 @@
         <h3 class="subheader">Groups</h3>
         <section>
             <ul class="action-list">
-                <li class="row row-header">
-                    <div class="small-7 columns"><div class="content">Group Name</div></div>
-                    <div class="small-4 columns end"><div class="content">Access</div></div>
+                <li class="actions-small-1 row-header">
+                    <div class="list-item">
+                        <div class="small-7 columns">Group Name</div>
+                        <div class="small-5 columns">Access</div>
+                    </div>
                 </li>
+
                 <!-- BEGIN user_group -->
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="info card small-7">
                             <a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a>
                         </div>
-                        <div class="small-5 columns">
+                        <div class="info card small-5">
                             <form action="/adminv2/userForm.php" method="post">
                                 <input type="hidden" name="uid" value="{USERID}" />
                                 <input type="hidden" name="sid" value="{USER_GROUP_ID}" />
@@ -347,9 +350,10 @@
                     </nav>
                 </li>
                 <!-- END user_group -->
-                <li class="row">
-                    <form action="/adminv2/userForm.php" method="post" id="groupAdd" data-validatable-as="addGroup">
-                        <div class="small-7 columns">
+
+                <li class="actions-small-1">
+                    <form action="/adminv2/userForm.php" method="post" id="groupAdd" data-validatable-as="addGroup" class="list-item">
+                        <div class="info card small-7">
                             <select required name="sid" id="groupSelect" form="groupAdd" class="required">
                                 <option value="">Select a Group</option>
                                 <!-- BEGIN all_group -->
@@ -357,14 +361,14 @@
                                 <!-- END all_group -->
                             </select>
                         </div>
-                        <div class="small-4 columns end">
+                        <div class="info card small-5 end">
                             <select required name="type" form="groupAdd">
                                 <option value="1">Read</option>
                                 <option value="2">Write</option>
                                 <option value="3">Group Admin</option>
                             </select>
                         </div>
-                        <div class="small-12 columns">
+                        <div class="info card small-12">
                             <input type="hidden" name="groupSubmit" />
                             <input type="hidden" value="{USERID}" name="uid" />
                             <input type="hidden" value="1" name="service" />
@@ -382,25 +386,19 @@
         <h3 class="subheader" id="permissions">Permissions</h3>
         <section>
             <ul class="action-list">
-                <li class="row row-header">
-                    <div class="small-4 columns"><div class="content">Service</div></div>
-                    <div class="small-4 columns"><div class="content">Service Identifier</div></div>
-                    <div class="small-3 columns end"><div class="content">Access</div></div>
+                <li class="actions-small-1 row-header">
+                    <div class="list-item">
+                        <div class="small-4 columns">Service</div>
+                        <div class="small-4 columns">Service Identifier</div>
+                        <div class="small-4 columns">Access</div>
+                    </div>
                 </li>
                 <!-- BEGIN user_calendar -->
                 <li class="actions-small-1">
-                    <div class="list-item">
-                        <div class="small-4 columns">
-                            <div class="content">
-                                Calendar
-                            </div>
-                        </div>
-                        <div class="small-4 columns">
-                            <div class="content">
-                                Campus: {PERM_CAMPUS_NAME}
-                            </div>
-                        </div>
-                        <div class="small-4 columns">
+                    <div class="list-item row">
+                        <div class="small-4 info card">Calendar</div>
+                        <div class="small-4 info card">Campus: {PERM_CAMPUS_NAME}</div>
+                        <div class="small-4 info card">
                             <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                                 <input type="hidden" name="uid" value="{USERID}" />
                                 <input type="hidden" name="sid" value="{SID}" />
@@ -423,17 +421,9 @@
                 <!-- BEGIN user_news -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="small-4 columns">
-                            <div class="content">
-                                News
-                            </div>
-                        </div>
-                        <div class="small-4 columns">
-                            <div class="content">
-                                Campus: {PERM_CAMPUS_NAME}
-                            </div>
-                        </div>
-                        <div class="small-4 columns">
+                        <div class="small-4 info card">News</div>
+                        <div class="small-4 info card">Campus: {PERM_CAMPUS_NAME}</div>
+                        <div class="small-4 info card">
                             <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                                 <input type="hidden" name="uid" value="{USERID}" />
                                 <input type="hidden" name="sid" value="{SID}" />
@@ -456,17 +446,9 @@
                 <!-- BEGIN user_cms -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="small-4 columns">
-                            <div class="content">
-                                CMS
-                            </div>
-                        </div>
-                        <div class="small-4 columns">
-                            <div class="content">
-                                {PERM_CAMPUS_NAME}
-                            </div>
-                        </div>
-                        <div class="small-4 columns">
+                        <div class="small-4 info card">CMS</div>
+                        <div class="small-4 info card">{PERM_CAMPUS_NAME}</div>
+                        <div class="small-4 info card">
                             <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                                 <input type="hidden" name="uid" value="{USERID}" />
                                 <input type="hidden" name="sid" value="{SID}" />
@@ -489,17 +471,9 @@
                 <!-- BEGIN user_housemaster -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="small-4 columns">
-                            <div class="content">
-                                Housemaster
-                            </div>
-                        </div>
-                        <div class="small-4 columns">
-                            <div class="content">
-                                Residential House: {PERM_RESIDENT_HOUSE_NAME}
-                            </div>
-                        </div>
-                        <div class="small-4 columns">
+                        <div class="small-4 info card">Housemaster</div>
+                        <div class="small-4 info card">Residential House: {PERM_RESIDENT_HOUSE_NAME}</div>
+                        <div class="small-4 info card">
                             <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                                 <input type="hidden" name="uid" value="{USERID}" />
                                 <input type="hidden" name="sid" value="{SID}" />
@@ -522,12 +496,8 @@
                 <!-- BEGIN user_resource_booking -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="small-8 columns">
-                            <div class="content">
-                                Resource Booking
-                            </div>
-                        </div>
-                        <div class="small-4 columns">
+                        <div class="small-8 info card">Resource Booking</div>
+                        <div class="small-4 info card">
                             <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                                 <input type="hidden" name="uid" value="{USERID}" />
                                 <input type="hidden" name="sid" value="{SID}" />
@@ -550,12 +520,8 @@
                 <!-- BEGIN user_curriculum -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="small-8 columns">
-                            <div class="content">
-                                Curriculum
-                            </div>
-                        </div>
-                        <div class="small-4 columns">
+                        <div class="small-8 info card">Curriculum</div>
+                        <div class="small-4 info card">
                             <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                                 <input type="hidden" name="uid" value="{USERID}" />
                                 <input type="hidden" name="sid" value="{SID}" />
@@ -575,49 +541,52 @@
                 </li>
                 <!-- END user_curriculum -->
 
-                <li class="row">
-                    <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService" data-action="addService">
-                    <div class="small-4 columns">
-                        <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
-                            <option value="">Select Service</option>
-                            <option value="2" data-identifier="campus">Calendar</option>
-                            <option value="3" data-identifier="campus">News</option>
-                            <option value="5">CMS</option>
-                            <option value="6">Housemaster</option>
-                            <option value="7">Resource Booking</option>
-                            <option value="8">Curriculum</option>
-                        </select>
-                    </div>
-                    <div class="small-4 columns">
-                        <select data-service-type="campus" name="sid" id="campusSelect" form="serviceCloneForm" required>
-                            <option value="">Select Campus</option>
-                            <!-- BEGIN campusPermsList -->
-                            <!-- BEGIN perm_campus -->
-                            <option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED}>{PERM_CAMPUS_NAME}</option>
-                            <!-- END perm_campus -->
-                            <!-- END campusPermsList -->
-                        </select>
-                        <select data-service-type="residentialHouse" name="sid" id="residentialHouseSelect" class="hide" disabled>
-                            <option value="">&lt;- Select residential house -&gt;</option>
-                            <!-- BEGIN residentialHousePermsList -->
-                            <!-- BEGIN perm_residential_house -->
-                            <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
-                            <!-- END perm_residential_house -->
-                            <!-- END residentialHousePermsList -->
-                        </select>
-                    </div>
-                    <div class="small-3 columns end">
-                        <select name="type" form="serviceCloneForm" required>
-                            <option value="1">Read</option>
-                            <option value="2">Write</option>
-                            <option value="3">Moderate</option>
-                        </select>
-                        <input type="hidden" name="addService" />
-                        <input type="hidden" value="{USERID}" name="uid">
-                    </div>
-                    <div class="small-12 columns">
-                        <input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
-                    </div>
+                <li class="actions-small-1">
+                    <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService" data-action="addService" class="list-item">
+                        <div class="small-4 info card">
+                            <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
+                                <option value="" data-identifier="none">Select Service</option>
+                                <option value="2" data-identifier="campus">Calendar</option>
+                                <option value="3" data-identifier="campus">News</option>
+                                <option value="5" data-identifier="none">CMS</option>
+                                <option value="6" data-identifier="residentialHouse">Housemaster</option>
+                                <option value="7" data-identifier="none">Resource Booking</option>
+                                <option value="8" data-identifier="none">Curriculum</option>
+                            </select>
+                        </div>
+                        <div class="small-4 info card">
+                            <select data-service-type="campus" name="sid" id="campusSelect" class="hide" disabled required>
+                                <option value="">Select Campus</option>
+                                <!-- BEGIN campusPermsList -->
+                                <!-- BEGIN perm_campus -->
+                                <option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED}>{PERM_CAMPUS_NAME}</option>
+                                <!-- END perm_campus -->
+                                <!-- END campusPermsList -->
+                            </select>
+                            <select data-service-type="residentialHouse" name="sid" id="residentialHouseSelect" class="hide" disabled required>
+                                <option value="">Select residential house</option>
+                                <!-- BEGIN residentialHousePermsList -->
+                                <!-- BEGIN perm_residential_house -->
+                                <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
+                                <!-- END perm_residential_house -->
+                                <!-- END residentialHousePermsList -->
+                            </select>
+                            <select data-service-type="none" name="sid" id="defaultSelect">
+                                <option value="" disabled>--</option>
+                            </select>
+                        </div>
+                        <div class="small-4 info card end">
+                            <select name="type" form="serviceCloneForm" required>
+                                <option value="1">Read</option>
+                                <option value="2">Write</option>
+                                <option value="3">Moderate</option>
+                            </select>
+                            <input type="hidden" name="addService" />
+                            <input type="hidden" value="{USERID}" name="uid">
+                        </div>
+                        <div class="small-12 info card">
+                            <input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
+                        </div>
                     </form>
                 </li>
             </ul>
@@ -630,6 +599,11 @@
         <h3 class="subheader" id="linked">Linked Accounts</h3>
         <section>
             <ul class="action-list">
+                <li class="actions-small-1 row-header">
+                    <div class="list-item">
+                        <div class="small-12 columns">User</div>
+                    </div>
+                </li>
                 <!-- BEGIN user_linked -->
                 <li class="actions-small-1">
                     <div class="list-item">
@@ -642,12 +616,12 @@
                     </nav>
                 </li>
                 <!-- END user_linked -->
-                <li class="row">
-                    <form action="/adminv2/userForm.php" method="post" id="linkedUserAdd">
-                        <div class="small-12 columns">
+                <li class="actions-small-1">
+                    <form action="/adminv2/userForm.php" method="post" id="linkedUserAdd" class="list-item">
+                        <div class="small-12 info card">
                             <select data-selectizeuser="addUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select>
                         </div>
-                        <div class="small-12 columns">
+                        <div class="small-12 info card">
                             <input type="hidden" name="userID" value="{USERID}" />
                             <input type="submit" value="Add" disabled />
                         </div>
@@ -664,8 +638,8 @@
     </div>
     <div class="small-12 medium-6 island">
         <section>
-            <div class="actions-small-1 row">
-                <div class="list-item content">
+            <div class="actions-small-1">
+                <div class="list-item">
                     <div class="small-12 columns">
                         <h4>Logins</h4>
                     </div>
@@ -698,17 +672,15 @@
 
     <div class="small-12 medium-6 island">
         <section>
-            <div class="">
-                <div class="actions-small-1 row">
-                    <div class="list-item content">
-                        <div class="small-12 columns">
-                            <h4>Activity</h4>
-                        </div>
+            <div class="actions-small-1">
+                <div class="list-item">
+                    <div class="small-12 columns">
+                        <h4>Activity</h4>
                     </div>
-                    <nav>
-                        <a class="icon-view" href="/adminv2/reports/activity/user={USERNAME}" title="See All"></a>
-                    </nav>
                 </div>
+                <nav>
+                    <a class="icon-view" href="/adminv2/reports/activity/user={USERNAME}" title="See All"></a>
+                </nav>
             </div>
 
             <table>
