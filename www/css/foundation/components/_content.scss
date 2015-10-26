@@ -437,8 +437,11 @@ thead tr th, .row-header, .island table.dataTable thead th {
 /* .row-header is designed to have the same style as th elements
  * but the padding is completely different when used on a list-item
  */
-li.row-header {
-    padding-top: 0.5rem;
+.action-list, .information-list {
+    li.row-header {
+        padding-top: 0.5rem;
+        border-bottom: 2px solid $body-bg;
+    }
 }
 
 tbody tr:hover {
