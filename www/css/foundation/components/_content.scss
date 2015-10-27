@@ -1296,22 +1296,23 @@ ul.flex-list {
 				padding: 0.75rem !important;
 			}
 		}
-    }
 
-    /* Progress Meters for List Items
-     * This is no longer inside .card constructs
-     * They are adjacent (siblings) to .card constructs
-     */
-    & + .progress {
-        width: calc(100% - 4rem);
-        margin: 0 -0.5rem 0 -1rem;
-        position: absolute;
-        bottom: 0;
-        left: 5rem;
+        /* Progress Meters for Avatar Card List Items
+         *
+         * This is no longer inside .card constructs
+         * They are adjacent (siblings) to .card constructs
+         */
+        & + .progress {
+            width: calc(100% - 4rem);
+            margin: 0 -0.5rem 0 -1rem;
+            position: absolute;
+            bottom: 0;
+            left: 5rem;
 
-        @media #{$small-only} {
-            width: calc(100% - 3rem);
-            left: 4rem;
+            @media #{$small-only} {
+                width: calc(100% - 3rem);
+                left: 4rem;
+            }
         }
     }
 
