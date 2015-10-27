@@ -232,10 +232,15 @@ ul.countdown {
     }
     &.profile-image {
         margin: auto;
-        padding: 1rem;
+        padding: 10%;
     }
     &.profile-name {
         margin-bottom: 2rem;
+    }
+}
+@media #{$large-up} {
+    .eportfolio.profile-image {
+        padding: 15%;
     }
 }
 /*********************************************************
