@@ -113,6 +113,12 @@ ul.flex-list {
         > li > a {
             @extend .button;
             padding-top: 1rem;
+
+            /* Also allow fake submit styles in flex list
+             */
+            &.submit {
+                @extend input[type="submit"];
+            }
         }
     }
 }
