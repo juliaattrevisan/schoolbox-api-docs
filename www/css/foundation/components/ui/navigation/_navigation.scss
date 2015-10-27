@@ -486,6 +486,11 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		}
 	}
 
+    // 5.5.3 shrinks the submenu for some reason
+    .left-submenu {
+        min-height: 100%;
+    }
+
     /* The Back button in the Off-Canvas Menu
      */
 	.left-submenu .back > a {
