@@ -19,21 +19,21 @@ $sub-nav-active-font-weight: $font-weight-normal;
 // I've temporarily made it the same as the regular sub-nav style
 .sub-nav, .sub-nav.secondary {
 	li, dd {
+        line-height: 1rem;
 		margin: 0 1px 1px 0;
         a {
             color: $content-ui-foreground;
             background-color: $content-ui-background;
             display: inline-block;
-            &:hover {
-                color: $content-ui-foreground;
-                background-color: $content-ui-hover;
-            }
 
             /* Obey global button dimensions
              */
-            &.button {
-                min-height: $global-button-content-height;
-                padding: $global-button-padding;
+            min-height: $global-button-content-height;
+            padding: $global-button-padding;
+
+            &:hover {
+                color: $content-ui-foreground;
+                background-color: $content-ui-hover;
             }
         }
         &.active {
@@ -41,17 +41,16 @@ $sub-nav-active-font-weight: $font-weight-normal;
                 cursor: default;
                 color: $content-ui-foreground;
                 background-color: $content-ui-selected;
+
+                /* Obey global button dimensions
+                 */
+                min-height: $global-button-content-height;
+                padding: $global-button-padding;
+
                 &:hover {
                     cursor: default;
                     color: $content-ui-foreground;
                     background-color: $content-ui-selected;
-                }
-
-                /* Obey global button dimensions
-                 */
-                &.button {
-                    min-height: $global-button-content-height;
-                    padding: $global-button-padding;
                 }
             }
         }
