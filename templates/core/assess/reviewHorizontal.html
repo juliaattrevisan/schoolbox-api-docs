@@ -75,17 +75,25 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <!-- BEGIN previous_question -->
-        <a class="button icon-previous" href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{PREVIOUS_ID}">Previous Question</a>
-        <!-- END previous_question -->
+        <ul class="flex-list buttons">
+            <!-- BEGIN previous_question -->
+            <li>
+                <a class="button icon-previous expand" href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{PREVIOUS_ID}">Previous Question</a>
+            </li>
+            <!-- END previous_question -->
 
-        <!-- BEGIN next_question -->
-        <a class="button icon-next" href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{NEXT_ID}">Next Question</a>
-        <!-- END next_question -->
+            <!-- BEGIN next_question -->
+            <li>
+                <a class="button icon-next expand" href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{NEXT_ID}">Next Question</a>
+            </li>
+            <!-- END next_question -->
 
-        <!-- BEGIN writable_finalise_button -->
-        <a href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/finalise' class="button icon-approve submit">Finalise all attempts</a>
-        <!-- END writable_finalise_button -->
+            <!-- BEGIN writable_finalise_button -->
+            <li>
+                <a href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/finalise' class="button icon-approve submit expand">Finalise all attempts</a>
+            </li>
+            <!-- END writable_finalise_button -->
+        </ul>
     </div>
 </div>
 
