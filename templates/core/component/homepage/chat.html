@@ -16,11 +16,6 @@
                 users_el: 'ul[data-chat-users]'
             });
 
-            // Collapsables
-            component.find('[data-collapser="participants"]').collapsable({
-                container: '[data-collapsable-container="participants"]'
-            });
-
             $('.show-users').click(function(event) {
                 event.preventDefault();
                 $('.chat-users').slideToggle();
@@ -69,16 +64,16 @@
                             <a class="button icon-comment" href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Activate Chat</a>
                             <!-- END chat_state_inactive -->
                             <a href="/homepage/chatArchive/{ID}/" class="button icon-history">View Chat Archive</a>
+                            <a href="#" data-reveal-id="component{COMPONENT_INSTANCE_ID}-participants" class="button icon-chat">Participants<a>
                         </form>
 
                         <div class="chat-error hide"></div>
-                        <div data-collapsable-container="participants">
-                        <a data-collapser="participants" href="#" class="icon-add">Participants</a>
-                        <ul class="chat-users small-block-grid-2 medium-block-grid-3 large-block-grid-4 hide"
-                            data-chat-users
-                            data-collapsable="participants"
-                            data-collapse-state="collapsed"></ul>
-                    </div>
+
+                        <div id="component{COMPONENT_INSTANCE_ID}-participants" class="reveal-modal" data-reveal>
+                            <h2>Chat Participants</h2>
+                            <ul class="chat-users small-block-grid-2 medium-block-grid-3 large-block-grid-4" data-chat-users></ul>
+                            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                        </div>
                 </div>
             </section>
         </div>

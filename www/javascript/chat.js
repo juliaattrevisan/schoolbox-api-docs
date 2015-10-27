@@ -272,14 +272,12 @@ $.widget("ui.chat",  {
                 for (var $i in $data.users) {
                     var $user = $data.users[$i];
 
-                    var $user_el = $('<li class="actions-small-1"></li>');
+                    var $user_el = $('<li></li>');
 					var $tpl =
-                        '<div class="list-item">' +
-                            '<div class="small-12 avatar card">' +
+                            '<div class="avatar card">' +
                                 '<img src="/portrait.php?userId={1}&size=square64" title="{0}" />' +
                                 '<h3>{0}</h3>' +
-                            '</div>' +
-                        '</div>';
+                            '</div>';
 
 					$user_el.html($tpl.format($user.name, $user.user_ext_id));
                     $user_el.data('user_id', $user.user_id);
