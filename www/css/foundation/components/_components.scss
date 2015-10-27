@@ -222,6 +222,7 @@ ul.countdown {
         height: auto;
         background-image: url(/images/core/eportfolio/coverphotoPlaceholder.jpg);
         background-size: cover;
+        background-position: center;
         // relative so that .cover-photo-controls shows inside .cover-photo
         position: relative;
     }
