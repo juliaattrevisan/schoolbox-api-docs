@@ -220,22 +220,28 @@ ul.countdown {
 .eportfolio {
     &.cover-photo {
         height: auto;
+        background-image: url(/images/core/eportfolio/coverphotoPlaceholder.jpg);
+        background-size: cover;
+        background-position: center;
+        // relative so that .cover-photo-controls shows inside .cover-photo
+        position: relative;
     }
     &.cover-photo-controls {
         position: absolute;
-        top: 0px;
-        right: 0px;
+        top: 0;
+        right: 0;
     }
     &.profile-image {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
         margin: auto;
+        padding: 10%;
     }
     &.profile-name {
         margin-bottom: 2rem;
+    }
+}
+@media #{$large-up} {
+    .eportfolio.profile-image {
+        padding: 15%;
     }
 }
 /*********************************************************
