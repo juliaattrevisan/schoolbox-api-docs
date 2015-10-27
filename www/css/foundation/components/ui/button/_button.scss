@@ -86,6 +86,8 @@ input[type="submit"]{
 	}
 }
 
+/* Fake submit button
+ */
 a.submit {
 	@extend input[type="submit"];
 }
@@ -105,10 +107,12 @@ a.submit {
  * This can be found in the meta-panel of Resource Browser
  * I don't think this should be such a strange number; maybe
  * the actual flex-list button dimensions aren't right.
- *
- * 0.9375rem vertically aligns the button text/icon in its
- * native dimensions. Something to investigate.
  */
-ul.flex-list.buttons li a {
-    padding-top: 0.9375rem;
+ul.flex-list {
+    &.buttons {
+        > li > a {
+            @extend .button;
+            padding-top: 1rem;
+        }
+    }
 }
