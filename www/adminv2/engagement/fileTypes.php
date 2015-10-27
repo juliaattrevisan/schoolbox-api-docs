@@ -37,7 +37,7 @@ for($i=0; $i < $months; $i++) {
         $videoTable[$row['name']][$i] = $row['total'];
     }
 
-    $image = $report->log($currentMonth, $endMonth, 'access', 'image');
+    $image = $report->logFileType($currentMonth, $endMonth, 'access', 'image');
     foreach($image as $row) {
         $imageTable[$row['name']][$i] = $row['total'];
     }

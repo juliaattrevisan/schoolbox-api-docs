@@ -39,7 +39,7 @@ for($i=0; $i < $months; $i++) {
 
     $viewed = $report->log($currentMonth, $endMonth, 'access', 'file');
     foreach($viewed as $row) {
-        $createdTable[$row['name']][$i] = $row['total'];
+        $viewedTable[$row['name']][$i] = $row['total'];
     }
 
     $currentMonth->addMonths(1);
