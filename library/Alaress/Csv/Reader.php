@@ -54,9 +54,17 @@ class Reader implements \Iterator {
      */
     protected $escape = '\\';
 
-    protected $fp          = null;
-    protected $current_key = 0;
-    protected $current_row = array();
+    /**
+     * Are empty cells filled with the first non-empty value above them?
+     *
+     * @var bool
+     */
+    protected $fill_down = false;
+
+    protected $fp           = null;
+    protected $current_key  = 0;
+    protected $current_row  = array();
+    protected $previous_row = array();
 
     /**
      * Sets up the reader to read from the current file name.
@@ -81,13 +89,25 @@ class Reader implements \Iterator {
         $parsed_row  = array();
         $column_list = $this->getColumnList();
         if (empty($column_list)) {
-            return $this->current_row;
-        }
-        foreach ($column_list as $i => $column) {
-            if (isset($column)) {
-                $parsed_row[$column] = isset($this->current_row[$i]) ? $this->current_row[$i] : null;
+            $parsed_row = $this->current_row;
+        } else {
+            foreach ($column_list as $i => $column) {
+                if (isset($column)) {
+                    $parsed_row[$column] = isset($this->current_row[$i]) ? $this->current_row[$i] : null;
+                }
             }
         }
+
+        // Fill down
+        if ($this->getFillDown()) {
+            foreach ($parsed_row as $i => $value) {
+                if (strlen($value) === 0 && isset($this->previous_row[$i])) {
+                    $parsed_row[$i] = $this->previous_row[$i];
+                }
+            }
+        }
+
+        $this->previous_row = $parsed_row;
         return $parsed_row;
     }
 
@@ -227,4 +247,21 @@ class Reader implements \Iterator {
         return $this->escape;
     }
 
+    /**
+     * @return bool
+     */
+    public function getFillDown()
+    {
+        return $this->fill_down;
+    }
+
+    /**
+     * @param  bool  $fill_down
+     * @return $this
+     */
+    public function setFillDown($fill_down)
+    {
+        $this->fill_down = $fill_down;
+        return $this;
+    }
 }
