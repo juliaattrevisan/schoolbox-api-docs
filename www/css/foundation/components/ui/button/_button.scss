@@ -76,6 +76,18 @@ a[role="button"] {
 	@extend .button;
 }
 
+/* Arbitrary <button> element
+ */
+button {
+    @extend .button;
+
+    /* Remove mysterious highlight effect when you click
+     * this particular element which, for all intents and
+     * purposes, is visually just another .button
+     */
+    outline: 0;
+}
+
 /* Form submits have a unique styling
  */
 input[type="submit"]{
