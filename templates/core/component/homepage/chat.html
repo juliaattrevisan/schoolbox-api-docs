@@ -2,7 +2,8 @@
     <script type="text/javascript" src="/javascript/chat.js"></script>
     <script type="text/javascript">
         $(function () {
-            $('#component{COMPONENT_INSTANCE_ID}').chat({
+            var component = $('#component{COMPONENT_INSTANCE_ID}');
+            component.chat({
                 state: '{CHAT_STATE}',
                 category_id: '{ID}',
                 component_id: '{CHAT_COMPONENT_ID}',
@@ -49,7 +50,6 @@
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
-                <ul class="chat-users action-list" data-chat-users></ul>
                 <ul class="information-list chat-messages" data-chat-log></ul>
                     <div class="content">
                         <form action="#" method="post" class="chat-send" id="chatSend">
@@ -64,9 +64,17 @@
                             <a class="button icon-comment" href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Activate Chat</a>
                             <!-- END chat_state_inactive -->
                             <a href="/homepage/chatArchive/{ID}/" class="button icon-history">View Chat Archive</a>
+                            <a href="#" data-reveal-id="component{COMPONENT_INSTANCE_ID}-participants" class="button icon-chat">Participants<a>
                         </form>
-                    </div>
-                <div class="chat-error hide"></div>
+
+                        <div class="chat-error hide"></div>
+
+                        <div id="component{COMPONENT_INSTANCE_ID}-participants" class="reveal-modal" data-reveal>
+                            <h2>Chat Participants</h2>
+                            <ul class="chat-users small-block-grid-2 medium-block-grid-3 large-block-grid-4" data-chat-users></ul>
+                            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                        </div>
+                </div>
             </section>
         </div>
     </div>
