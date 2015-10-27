@@ -26,7 +26,7 @@
 
     <div class="small-12 columns">
         <div class="overflow show-for-medium-up">
-            <table class="timetable" data-timetable="{USER_ID}">
+            <table class="timetable no-hover" data-timetable="{USER_ID}">
                 <thead>
                     <tr>
                         <th></th>
@@ -44,22 +44,24 @@
                         </th>
                         <!-- BEGIN day -->
                         <td>
-                            <!-- BEGIN period_class_link -->
-                            <div class='timetable-subject {DAY_CLASS}' style="background-color: {PERIOD_COLOUR};" data-timetable-subject>
-                                <a href="{PERIOD_URL}">
+                            <div class="{DAY_CLASS}">
+                                <!-- BEGIN period_class_link -->
+                                <div class='timetable-subject' style="background-color: {PERIOD_COLOUR};" data-timetable-subject>
+                                    <a href="{PERIOD_URL}">
+                                        {PERIOD_DESC}
+                                        <p class="meta">{PERIOD_CODE}</p>
+                                        <p class="meta">{PERIOD_ROOM} {PERIOD_STAFF}</p>
+                                    </a>
+                                </div>
+                                <!-- END period_class_link -->
+                                <!-- BEGIN period_class -->
+                                <div class='timetable-subject' style="background-color: {PERIOD_COLOUR};" data-timetable-subject>
                                     {PERIOD_DESC}
                                     <p class="meta">{PERIOD_CODE}</p>
                                     <p class="meta">{PERIOD_ROOM} {PERIOD_STAFF}</p>
-                                </a>
+                                </div>
+                                <!-- END period_class -->
                             </div>
-                            <!-- END period_class_link -->
-                            <!-- BEGIN period_class -->
-                            <div class='timetable-subject {DAY_CLASS}' style="background-color: {PERIOD_COLOUR};" data-timetable-subject>
-                                {PERIOD_DESC}
-                                <p class="meta">{PERIOD_CODE}</p>
-                                <p class="meta">{PERIOD_ROOM} {PERIOD_STAFF}</p>
-                            </div>
-                            <!-- END period_class -->
                         </td>
                         <!-- END day -->
                     </tr>

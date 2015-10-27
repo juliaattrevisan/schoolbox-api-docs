@@ -43,7 +43,19 @@
 
                 /* Subject elements
                  */
-                subject: '[data-timetable-subject]'
+                subject: '[data-timetable-subject]',
+
+                /* Indicator Offset
+                 *
+                 * The total height of the border/padding used to indicate
+                 * the current active period (this is 0.25rem;or 4px which
+                 * is the default value)
+                 */
+                indicatorOffset: 4,
+
+                /* Indicator element
+                 */
+                indicator: '.timetable-subject-active'
             }
 
             var derived = {
@@ -67,21 +79,45 @@
 
             $.each($(config.element).find('tr'), function(index, row) {
                 var rowHeight = $(row).height();
+                var hasActiveSubject = false;
+
+                /* If this row contains an instance of timetable-subject-active
+                 * add extra height to every td, to compensate for Indicator
+                 */
+                if ($(row).find('td ' + config.indicator).length) {
+                    hasActiveSubject = true;
+                }
 
                 $.each($(row).find('td'), function(index, cell) {
                     var allSubjects = $(cell).find(config.subject);
 
-                    /* Only one subject - make it fill available space
+                    /* Make Indicator full height if empty
                      */
-                    if (allSubjects.length == 1) {
-                        allSubjects.css({
-                            height: rowHeight + 'px'
+                    if (allSubjects.length == 0) {
+                        $(cell).find(config.indicator).css({
+                            height: rowHeight + config.indicatorOffset + 'px'
                         });
                     }
-                    /* Distribute difference equally
+                    /* Only one subject - make it fill available space
+                     */
+                    else if (allSubjects.length == 1) {
+                        if (hasActiveSubject && !$(cell).find(config.indicator).length) {
+                            allSubjects.css({
+                                height: rowHeight + config.indicatorOffset + 'px'
+                            });
+                        }
+                        else {
+                            allSubjects.css({
+                                height: rowHeight + 'px'
+                            });
+                        }
+                    }
+                    /* Multiple classes in this period
+                     * Distribute difference equally
                      */
                     else {
                         var subjectHeight = 0;
+                        var diff = 0;
 
                         $.each(allSubjects, function(index, subject) {
                             subjectHeight += $(subject).height();
@@ -89,7 +125,12 @@
 
                         /* How much to add per subject
                          */
-                        var diff = (rowHeight - subjectHeight)/allSubjects.length;
+                        if (hasActiveSubject && !$(cell).find(config.indicator).length) {
+                            diff = (rowHeight - subjectHeight + config.indicatorOffset)/allSubjects.length;
+                        }
+                        else {
+                            diff = (rowHeight - subjectHeight)/allSubjects.length;
+                        }
 
                         $.each(allSubjects, function(index, subject) {
                             $(subject).css({

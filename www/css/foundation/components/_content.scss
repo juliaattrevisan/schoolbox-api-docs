@@ -416,7 +416,10 @@ thead tr th, .row-header, .island table.dataTable thead th {
     }
 }
 
-tbody tr:hover {
+/* Don't use row hovers on Timetable Grid screens anymore
+ * They don't do much now due to fully-expanding coloured blocks
+ */
+table:not(.no-hover) tbody tr:hover {
 	th, td {
 		background-color: $row-hover-background;
 	}

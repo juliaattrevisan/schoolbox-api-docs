@@ -99,7 +99,6 @@
                 /* Island html
                  * Sorry, Doctor
                  */
-                header: '<h2 class="subheader"></h2>',
                 island: '<div class="small-12 island no-pad"></div>',
                 section: '<section></section>'
             }
@@ -117,7 +116,7 @@
 
             /* For every day, assemble a two column timetable
              */
-            var table = $('<table>');
+            var table = $('<table class="no-hover">');
 
             /* Generate table rows
              */
