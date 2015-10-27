@@ -28,6 +28,13 @@ $sub-nav-active-font-weight: $font-weight-normal;
                 color: $content-ui-foreground;
                 background-color: $content-ui-hover;
             }
+
+            /* Obey global button dimensions
+             */
+            &.button {
+                min-height: $global-button-content-height;
+                padding: $global-button-padding;
+            }
         }
         &.active {
             a {
@@ -38,6 +45,13 @@ $sub-nav-active-font-weight: $font-weight-normal;
                     cursor: default;
                     color: $content-ui-foreground;
                     background-color: $content-ui-selected;
+                }
+
+                /* Obey global button dimensions
+                 */
+                &.button {
+                    min-height: $global-button-content-height;
+                    padding: $global-button-padding;
                 }
             }
         }
