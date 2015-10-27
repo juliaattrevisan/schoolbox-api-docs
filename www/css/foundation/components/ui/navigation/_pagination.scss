@@ -35,15 +35,22 @@ $pagination-link-current-active-bg: $content-ui-selected;
 @import "../../../../../javascript/components/foundation/scss/foundation/components/pagination";
 
 // Pagination
-ul.pagination li a,
-ul.pagination li button {
-	background-color: $content-ui-background;
-	border-radius: 0px;
-	font-weight: $font-weight-bold;
-}
+ul.pagination {
+    li {
+        line-height: 1rem;
 
-ul.pagination .active a {
-	background-color: $pagination-link-current-background;
-	color: $pagination-link-current-font-color;
+        a, button {
+            @include button-dimensions();
+            background-color: $content-ui-background;
+            border-radius: 0px;
+            font-weight: $font-weight-bold;
+        }
+
+        &.active a {
+            @include button-dimensions();
+            background-color: $pagination-link-current-background;
+            color: $pagination-link-current-font-color;
+        }
+    }
 }
 
