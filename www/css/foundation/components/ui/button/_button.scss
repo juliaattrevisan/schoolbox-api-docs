@@ -21,6 +21,8 @@ a[disabled], a.disabled {
 .button {
     color: $content-ui-foreground;
     background-color: $content-ui-background;
+    min-height: $global-button-content-height;
+    padding: $global-button-padding;
 
 	&:hover {
 	    color: $content-ui-foreground;
@@ -41,7 +43,6 @@ a[disabled], a.disabled {
 	}
 
 	&.expand {
-		padding: 1rem;
 		font-weight: 700;
 	}
 
@@ -112,7 +113,7 @@ ul.flex-list {
     &.buttons {
         > li > a {
             @extend .button;
-            padding-top: 1rem;
+            padding-top: $global-button-padding;
 
             /* Also allow fake submit styles in flex list
              */
