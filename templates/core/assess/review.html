@@ -153,21 +153,29 @@ $(document).ready(function() {
 </div>
 <div class="row">
     <div class="small-12 columns">
-        <!-- BEGIN prevSection -->
-            <a class="button icon-previous" href="/assess/review/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Previous Section</a>
-        <!-- END prevSection -->
-        <!-- BEGIN nextSection -->
-            <a class="button icon-next" href="/assess/review/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Next Section</a>
-        <!-- END nextSection -->
-    </div>
-    <div class="small-12 columns">
-        <!-- BEGIN endAssess -->
-        <!-- BEGIN writable_finalise -->
-        <a class="button expand submit" data-action="finish-review" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Finalise Review</a>
-        <!-- END writable_finalise -->
-        <!-- BEGIN writable_resubmit -->
-        <a class="button expand submit" data-action="finish-review" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Resubmit Review</a>
-        <!-- END writable_resubmit -->
-        <!-- END endAssess -->
+        <ul class="flex-list buttons">
+            <!-- BEGIN prevSection -->
+            <li>
+                <a class="button icon-previous expand" href="/assess/review/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Previous Section</a>
+            </li>
+            <!-- END prevSection -->
+            <!-- BEGIN nextSection -->
+            <li>
+                <a class="button icon-next expand" href="/assess/review/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">Next Section</a>
+            </li>
+            <!-- END nextSection -->
+            <!-- BEGIN endAssess -->
+            <!-- BEGIN writable_finalise -->
+            <li>
+                <a class="button submit expand" data-action="finish-review" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Finalise Review</a>
+            </li>
+            <!-- END writable_finalise -->
+            <!-- BEGIN writable_resubmit -->
+            <li>
+                <a class="button submit expand" data-action="finish-review" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}">Resubmit Review</a>
+            </li>
+            <!-- END writable_resubmit -->
+            <!-- END endAssess -->
+        </ul>
     </div>
 </div>
