@@ -17,6 +17,11 @@
         var self     = this;
         self.element = element;
 
+        // TouchMenu is redundant when using Foundation's off-canvas
+        if (self.element.closest('.left-off-canvas-menu, .right-off-canvas-menu').length) {
+            return;
+        }
+
         // Touch start on a menu item: toggle it
         self.element.on('touchstart.touchMenu, pointerdown.touchMenu, MSPointerDown.touchMenu', 'li', function(event) {
             var item = $(this);
