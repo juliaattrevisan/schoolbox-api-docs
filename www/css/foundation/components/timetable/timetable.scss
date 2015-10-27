@@ -72,6 +72,6 @@ $timetable-cell-border: $body-bg;
  * Special reversed configuration, for extra strongness
  */
 .timetable-day-active, .timetable-period-active {
-    color: $accent-background;
-    background-color: $accent-foreground;
+    color: $accent-foreground;
+    background-color: $accent-background;
 }
