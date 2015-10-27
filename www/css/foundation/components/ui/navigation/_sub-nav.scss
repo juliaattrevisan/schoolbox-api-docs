@@ -22,14 +22,11 @@ $sub-nav-active-font-weight: $font-weight-normal;
         line-height: 1rem;
 		margin: 0 1px 1px 0;
         a {
+            @include button-dimensions();
+
             color: $content-ui-foreground;
             background-color: $content-ui-background;
             display: inline-block;
-
-            /* Obey global button dimensions
-             */
-            min-height: $global-button-content-height;
-            padding: $global-button-padding;
 
             &:hover {
                 color: $content-ui-foreground;
@@ -38,14 +35,11 @@ $sub-nav-active-font-weight: $font-weight-normal;
         }
         &.active {
             a {
+                @include button-dimensions();
+
                 cursor: default;
                 color: $content-ui-foreground;
                 background-color: $content-ui-selected;
-
-                /* Obey global button dimensions
-                 */
-                min-height: $global-button-content-height;
-                padding: $global-button-padding;
 
                 &:hover {
                     cursor: default;

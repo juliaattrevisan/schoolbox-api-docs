@@ -1,3 +1,10 @@
+/* Button Dimensions
+ */
+@mixin button-dimensions() {
+    min-height: $global-button-content-height;
+    padding: $global-button-padding;
+}
+
 /* Link Styles
  * Really hammer out the $primary-color assumption
  * as clicking on a link then hovering away reveals
@@ -19,10 +26,10 @@ a[disabled], a.disabled {
 /* All generic buttons
  */
 .button {
+    @include button-dimensions();
+
     color: $content-ui-foreground;
     background-color: $content-ui-background;
-    min-height: $global-button-content-height;
-    padding: $global-button-padding;
 
 	&:hover {
 	    color: $content-ui-foreground;
@@ -113,7 +120,7 @@ ul.flex-list {
     &.buttons {
         > li > a {
             @extend .button;
-            padding-top: $global-button-padding;
+            @include button-dimensions();
 
             /* Also allow fake submit styles in flex list
              */

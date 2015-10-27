@@ -21,13 +21,14 @@ $tabs-content-padding: rem-calc(($base-font-size - 8));
 
 .tabs {
     dd {
+        /* This comes from some global ul or body element
+         * and is usually 1.5rem - which contributes to how
+         * this element is dimensioned, leading to some
+         * sometimes-unexpected behaviour if you don't know this
+         */
         line-height: 1rem;
         a {
-
-            /* Obey global button dimensions
-             */
-            min-height: $global-button-content-height;
-            padding: $global-button-padding;
+            @include button-dimensions();
         }
     }
 }
