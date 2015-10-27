@@ -24,12 +24,12 @@ $this->setVar('category_header_block', '');
 
 
 $groupHandler = new Group();
-$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+$folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 $chatHandler = new Chat();
 
 // setup filters
 $filter = array(
-    'category' => $this->arg[0],
+    'folder' => $this->arg[0],
     'year' => $this->arg[1],
     'month' => $this->arg[2],
     'page' => $this->arg[3]
@@ -37,18 +37,34 @@ $filter = array(
 
 // if the category doesn't exist, throw an error
 try {
-    $category = $categoryMapper->findById($filter['category']);
+    $folder = $folderMapper->findById($filter['folder']);
 } catch (\Exception $e) {
     error(19);
 }
 
-$this->setTitle("Chat Archive: {$category->getName()}");
-$this->setVar('CATEGORY_TITLE', $category->getName());
-$this->setVar('CATEGORY_ID', $category->getId());
+$this->setTitle("Chat Archive: {$folder->getName()}");
+$this->setVar('CATEGORY_TITLE', $folder->getName());
+$this->setVar('CATEGORY_ID', $folder->getId());
+
+/* Render out breadcrumbs
+ */
+$trail = new \Schoolbox\Breadcrumbs();
+$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => $folder->getName(),
+        'href' => "/homepage/{$folder->getId()}",
+        'class' => '',
+    ],
+    [
+        'text' => 'Chat Archive',
+        'href' => '',
+        'class' => 'active',
+    ]
+]);
 
 // collate the full list of chat the current user is allowed to see in the current context
 // this is used to populate the category headers
-$visibleList = $chatHandler->get_logs($category->getId());
+$visibleList = $chatHandler->get_logs($folder->getId());
 
 
 // sanitise filter inputs
@@ -66,10 +82,10 @@ foreach ($defaults as $field => $default) {
 
 // collate the full list of occupied dates for this category
 // this is used to populate the sidebar
-$occupiedDateList = $chatHandler->getOccupiedDateList($filter['category']);
+$occupiedDateList = $chatHandler->getOccupiedDateList($filter['folder']);
 
 // finally get the list of chat that is visible, based on the filters applied
-$visibleListSubset = $chatHandler->getChatListing($filter['category'], $filter['year'], $filter['month']);
+$visibleListSubset = $chatHandler->getChatListing($filter['folder'], $filter['year'], $filter['month']);
 
 /* Year and Month List */
 if ($occupiedDateList) {
@@ -96,7 +112,7 @@ if ($occupiedDateList) {
                 'MONTH' => $format->getUsingFormat('F'),
                 'MONTH_NUMBER' => $date['month'],
                 'MONTH_CLASS' => $monthClass,
-                'MENU_CATEGORY_CLEAN' => $filter['category']
+                'MENU_CATEGORY_CLEAN' => $filter['folder']
             )
         );
 
@@ -133,7 +149,7 @@ if ($filter['page'] >= $totalPages) {
 }
 
 // set pagination button destinations
-$pageSlug = "${filter['category']}/${filter['year']}/${filter['month']}/";
+$pageSlug = "${filter['folder']}/${filter['year']}/${filter['month']}/";
 
 if ($totalPages > 1) {
     for ($j = 1; $j <= $totalPages; $j++) {
@@ -160,7 +176,7 @@ $outputPagination = array(
 
 $this->setVar($outputPagination);
 
-$items = $chatHandler->getChatListing($filter['category'], $filter['year'], $filter['month'], $chatIndex, $chatPerPage);
+$items = $chatHandler->getChatListing($filter['folder'], $filter['year'], $filter['month'], $chatIndex, $chatPerPage);
 
 if (is_array($items)) {
     $i = 0;
