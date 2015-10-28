@@ -432,9 +432,6 @@ if(typeof window.location.origin == 'undefined') {
         var i, data, elems = [], self = this;
 
         this.close();
-        // Currently this does the background on when reveal disappears thing again.
-        // Wait for the dialog to fully close.
-        this.reopenParentReveal();
 
         for (i = 0; i < list.length; ++i) {
             data = {
