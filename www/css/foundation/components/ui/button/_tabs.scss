@@ -27,6 +27,7 @@ $tabs-content-padding: rem-calc(($base-font-size - 8));
          * sometimes-unexpected behaviour if you don't know this
          */
         line-height: 1rem;
+        margin-right: 1px;
         a {
             @include button-dimensions();
         }
