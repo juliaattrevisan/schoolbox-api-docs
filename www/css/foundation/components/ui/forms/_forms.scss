@@ -475,10 +475,14 @@ select.visibility {
 	.subject, .unit {
 		margin-left: 6rem;
 	}
+}
 
-    /* In Inline Grading, there is a selectize of avatar cards
-     * This is the context-switch which is a special case
-     */
+/* In Inline Grading, there is a selectize of avatar cards
+ * This is the context-switch in a special case
+ */
+.avatar-switch {
+    @extend .context-switch;
+
     .selectize-control {
 
         /* Underneath the avatar card is an input field that you
@@ -491,6 +495,11 @@ select.visibility {
             input[type="text"] {
                 display: none !important;
             }
+
+            /* To combat the weird giant white gap under the current
+             * avatar card selected
+             */
+            line-height: 0.5rem;
         }
 
         /* Repair a miniscule right-margin
