@@ -152,12 +152,22 @@ class External_Maze_Class implements External_ClassInterface {
 		$query = "
 			SELECT
 				TEACHER AS T1TEACH,
-				TEACHERB AS T2TEACH,
-				TEACHERC AS T3TEACH
+				'' AS T2TEACH,
+				'' AS T3TEACH
 			FROM KGC
 			WHERE KGC.ROLL_GROUP = '{$classCode}'
-		";
+			";
 
+		if (Cfg::get('site_location') == 'loreto') {
+			$query = "
+				SELECT
+					TEACHER AS T1TEACH,
+					TEACHERB AS T2TEACH,
+					TEACHERC AS T3TEACH
+				FROM KGC
+				WHERE KGC.ROLL_GROUP = '{$classCode}'
+			";
+		}
 		$part2 = $this->getDb()->getAll($query);
 
 		if (!$part2) {

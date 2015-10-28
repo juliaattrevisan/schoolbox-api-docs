@@ -699,9 +699,14 @@ class External_Maze_User implements External_UserInterface {
 					KGC.DESCRIPTION AS name
 				FROM KGC
 				WHERE TEACHER = '{$externalUserId}'
+			";
+
+			if (Cfg::get('site_location') == 'loreto') {
+				$query = $query . "
 				OR TEACHERB = '{$externalUserId}'
 				OR TEACHERC = '{$externalUserId}'
-			";
+				";
+			}
 
 			$part1 = $this->getDb()->getAll($query);
 
