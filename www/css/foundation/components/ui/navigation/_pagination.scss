@@ -38,6 +38,7 @@ $pagination-link-current-active-bg: $content-ui-selected;
 ul.pagination {
     li {
         line-height: 1rem;
+        margin-right: 1px;
 
         a, button {
             @include button-dimensions();
