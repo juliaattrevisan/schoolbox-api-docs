@@ -14,8 +14,11 @@ use Alaress\Csv\Reader;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\TimetableCampus;
+use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycle;
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
+use Schoolbox\External\TimetablePeriodMapper;
 
 class TimetableStructure
 {
@@ -24,8 +27,26 @@ class TimetableStructure
      */
     protected $csvReader;
 
+    /**
+     * @var TimetableCycleMapper
+     */
+    protected $timetableCycleMapper;
+
+    /**
+     * @var TimetableCampusMapper
+     */
+    protected $timetableCampusMapper;
+
+    /**
+     * @var TimetablePeriodMapper
+     */
+    protected $timetablePeriodMapper;
+
     public function __construct($filename)
     {
+        $this->timetableCycleMapper  = new TimetableCycleMapper();
+        $this->timetableCampusMapper = new TimetableCampusMapper();
+        $this->timetablePeriodMapper = new TimetablePeriodMapper();
         $this->csvReader = new Reader($filename);
         $this->csvReader
             ->setLoadFromFirst(true)
@@ -104,5 +125,31 @@ class TimetableStructure
 
         // Mangle all of this into a list of timetable cycles and stuff
         return $result;
+    }
+
+    public function save()
+    {
+        // Override, or leave untouched?
+        // I think that this should always delete then reinsert,
+        // because this is a less common import than timetable or enrolment.
+        // We still need to keep previous year's enrolments though.
+        foreach ($this->parse() as $row) {
+            /** @var TimetableCycle $cycle */
+            $cycle = $row['cycle'];
+            $this->timetableCycleMapper->save($cycle);
+
+            /** @var TimetableCampus $campus */
+            $campus = $row['campus'];
+            $campus->setCycle($cycle);
+            $this->timetableCampusMapper->save($campus);
+
+            foreach ($row['periods'] as $day => $periods) {
+                /** @var Collection|TimetablePeriod[] $periods */
+                foreach ($periods as $period) {
+                    $period->setCycle($cycle);
+                }
+                $this->timetablePeriodMapper->save($periods);
+            }
+        }
     }
 }
