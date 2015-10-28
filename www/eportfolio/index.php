@@ -12,7 +12,7 @@ $pageId = $this->arg[1]? $this->arg[1]:'profile';
 
 $authenticator = new Eportfolio_Authenticator($currentUserId, $ownerId, $pageId);
 
-if ($authenticator->pageExists($ownerId, $pageId)) {
+if ($authenticator->pageExists()) {
 	if ($authenticator->canCreate() || $authenticator->canModify()) {
 		$factory = new Eportfolio_Page_Factory($this, $ownerId, $pageId, FULL_ACCESS);
 		$factory->getPage()->renderPage();
@@ -26,7 +26,7 @@ if ($authenticator->pageExists($ownerId, $pageId)) {
 	}
 }
 else {
-	error(156);
+	$this->pageNotFound();
 }
 
 
