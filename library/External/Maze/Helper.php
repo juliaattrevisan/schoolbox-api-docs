@@ -50,11 +50,36 @@ class External_Maze_Helper
     }
 
     /**
-     * Get the current timetable period eg. 2013S2
+     * Get the current timetable key eg. 2013S2
      */
     public function getCurrentTHKEY()
     {
         return $this->getCurrentSemester();
+    }
+
+    /**
+     * Get the current timetable period eg. 2013S2
+     */
+    public function getCurrentTTPERIOD()
+    {
+        $query = "SELECT TOP 1 TT.TTPERIOD
+                  FROM TT
+                      JOIN TH ON
+                          TT.TTKEY = TH.TT01KEY OR
+                          TT.TTKEY = TH.TT02KEY OR
+                          TT.TTKEY = TH.TT03KEY OR
+                          TT.TTKEY = TH.TT04KEY OR
+                          TT.TTKEY = TH.TT05KEY OR
+                          TT.TTKEY = TH.TT06KEY OR
+                          TT.TTKEY = TH.TT07KEY OR
+                          TT.TTKEY = TH.TT08KEY OR
+                          TT.TTKEY = TH.TT09KEY OR
+                          TT.TTKEY = TH.TT10KEY OR
+                          TT.TTKEY = TH.TT11KEY OR
+                          TT.TTKEY = TH.TT12KEY OR
+                          TT.TTKEY = TH.TT13KEY
+                  WHERE TH.THKEY = '{$this->getCurrentTHKEY()}'";
+        return $this->getDb()->getOne($query);
     }
 
     /**
