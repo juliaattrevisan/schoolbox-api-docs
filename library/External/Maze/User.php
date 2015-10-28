@@ -694,7 +694,7 @@ class External_Maze_User implements External_UserInterface {
 						TT.TTKEY = TH.TT11KEY OR
 						TT.TTKEY = TH.TT12KEY OR
 						TT.TTKEY = TH.TT13KEY
-					WHERE TH.THKEY = '{$this->getHelper()->getCurrentTTPeriod()}' )
+					WHERE TH.THKEY = '{$this->getHelper()->getCurrentTHKEY()}' )
 			";
 
 			$part2 = $this->getDb()->getAll($query);
@@ -734,7 +734,7 @@ class External_Maze_User implements External_UserInterface {
 					'' AS ClassCampus
 				FROM THTQ
 				INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
-				WHERE THTQ.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+				WHERE THTQ.QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
 				AND (THTQ.T1TEACH = '{$externalUserId}' OR THTQ.T2TEACH = '{$externalUserId}')
 			";
 

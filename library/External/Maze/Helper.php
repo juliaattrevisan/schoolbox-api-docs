@@ -52,7 +52,7 @@ class External_Maze_Helper
     /**
      * Get the current timetable period eg. 2013S2
      */
-    public function getCurrentTTPeriod()
+    public function getCurrentTHKEY()
     {
         return $this->getCurrentSemester();
     }

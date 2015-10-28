@@ -66,8 +66,8 @@ class External_Maze_Timetable implements External_TimetableInterface
 //			INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
 //			INNER JOIN STMA ON THTQ.IDENT = STMA.IDENT
 //			INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
-//			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
-//			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+//			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTHKEY()}'
+//			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
 //			AND TCTD.TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
 //			AND THTQ.QCOL = '{$this->getDayNumber(1)}'
 //			AND STMA.SKEY = 'ABBOMEG'
@@ -78,7 +78,7 @@ class External_Maze_Timetable implements External_TimetableInterface
 //		$query = "
 //			SELECT TOP 100 *
 //			FROM TCTD
-//			WHERE QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+//			WHERE QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
 //			AND TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
 //			ORDER BY TIME_INDEX
 //		";
@@ -103,7 +103,7 @@ class External_Maze_Timetable implements External_TimetableInterface
 			SELECT TOP 50 *
 			FROM TH
 			INNER JOIN TCTD ON TH.THKEY = TCTD.QKEY
-			WHERE THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+			WHERE THKEY = '{$this->getHelper()->getCurrentTHKEY()}'
 		";
 
         $result = $this->getDb()->getAll($query);
@@ -355,8 +355,8 @@ class External_Maze_Timetable implements External_TimetableInterface
 			INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
 			INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
 			INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
-			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
-			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTHKEY()}'
+			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
 			AND TCTD.TCTDKEY = '{$newDate} 12:00:00:000AM'
 			AND THTQ.QCOL = '{$dayNumber}'
 			AND (THTQ.T1TEACH = '{$externalUserId}' OR THTQ.T2TEACH = '{$externalUserId}')
@@ -450,8 +450,8 @@ class External_Maze_Timetable implements External_TimetableInterface
 			INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
 			INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
 			INNER JOIN TTTG ON THTQ.IDENT = TTTG.IDENT
-			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
-			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTHKEY()}'
+			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
 			AND TCTD.TCTDKEY = '{$newDate} 12:00:00:000AM'
 			AND THTQ.QCOL = '{$dayNumber}'
 			AND STMA.SKEY = '{$externalUserId}'
@@ -519,7 +519,7 @@ class External_Maze_Timetable implements External_TimetableInterface
 				CONVERT(VARCHAR, TIME_START, 120) AS startTime,
 				CONVERT(VARCHAR, TIME_END, 120) AS endTime
 			FROM TCTD
-			WHERE QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+			WHERE QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
 		";
 
         $result = $this->getDb()->getAll($query);
