@@ -2,6 +2,11 @@
 /**
  * Importer for timetable structure into the Schoolbox connector.
  *
+ * Saves into the following tables:
+ * * timetable_cycle
+ * * timetable_campus
+ * * timetable_period
+ *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
