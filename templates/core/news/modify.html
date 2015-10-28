@@ -4,6 +4,7 @@
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 <script type="text/javascript">
     $(function () {
         $.fn.alaressTiny({
@@ -39,14 +40,6 @@
             if ($('.advanced').is(':visible')) {
             } else {
                 $('.advanced').queue('fx', []);
-            }
-        });
-
-        $('.select_all').change(function(){
-            if($(this).is(':checked')){
-                $(this).closest('fieldset').find(':checkbox').not('.select_all').prop('checked', true);
-            } else {
-                $(this).closest('fieldset').find(':checkbox').not('.select_all').prop('checked', false);
             }
         });
 
@@ -144,10 +137,10 @@
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This news item will only be visible to the roles you select">?</span>
                         </legend>
                         <!-- BEGIN group_selection -->
-                        <input type="checkbox" id="role{GROUP_ID}" value="{GROUP_ID}" name="group[]" {GROUP_ID_SELECTED}/>
+                        <input type="checkbox" id="role{GROUP_ID}" value="{GROUP_ID}" name="group[]" {GROUP_ID_SELECTED} data-select-all-group="role" />
                         <label for="role{GROUP_ID}" class="checkbox-label">{GROUP_NAME}</label>
                         <!-- END group_selection -->
-                        <input type="checkbox" id="roleAll" value="{GROUP_ID}" name="" class="select_all" />
+                        <input type="checkbox" id="roleAll" value="{GROUP_ID}" name="" data-select-all data-select-all-for-group="role"  />
                         <label for="roleAll" class="checkbox-label">Select all</label>
                     </div>
                     <!-- BEGIN campus_row -->
@@ -156,10 +149,10 @@
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This news item will only be visible to users that are within this campus">?</span>
                         </legend>
                         <!-- BEGIN campus_selection -->
-                        <input type="checkbox" id="campus{CAMPUS_ID}" value="{CAMPUS_ID}" name="campus[]" {CAMPUS_ID_SELECTED} />
+                        <input type="checkbox" id="campus{CAMPUS_ID}" value="{CAMPUS_ID}" name="campus[]" {CAMPUS_ID_SELECTED} data-select-all-group="campus" />
                         <label for="campus{CAMPUS_ID}" class="checkbox-label">{CAMPUS_NAME}</label>
                         <!-- END campus_selection -->
-                        <input type="checkbox" id="campusAll" value="{GROUP_ID}" name="" class="select_all" />
+                        <input type="checkbox" id="campusAll" value="{GROUP_ID}" name="" data-select-all data-select-all-for-group="campus" />
                         <label for="campusAll" class="checkbox-label">Select all</label>
                     </div>
                     <!-- END campus_row -->
