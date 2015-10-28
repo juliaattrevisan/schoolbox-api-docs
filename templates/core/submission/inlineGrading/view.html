@@ -45,7 +45,7 @@
         ize = tgt.selectize(selectizeOptions);
 
         // hack, option not available
-        $('.selectize-input input').prop('disabled', true);
+        $('.selectize-input input').prop('disabled', true).hide();
 
         // manually set the value, because selectize
         ize[0].selectize.setValue("/submission/inlineGrading/view/{INLINE_GRADING_SUBMISSION_BOX_ID}/{INLINE_GRADING_STUDENT_ID}", true);
