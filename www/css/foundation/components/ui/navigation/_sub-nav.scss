@@ -2,8 +2,8 @@ $sub-nav-border-radius: 0px;
 
 $sub-nav-list-margin: 0 0 rem-calc(($base-font-size)) 0;
 
-$sub-nav-padding: rem-calc(($base-font-size - 6));
-$sub-nav-active-padding: $sub-nav-padding;
+//$sub-nav-padding: rem-calc(($base-font-size - 6));
+//$sub-nav-active-padding: $sub-nav-padding;
 $sub-nav-list-padding-top: rem-calc(0);
 
 $sub-nav-font-size: rem-calc(($base-font-size - 2));
@@ -19,11 +19,15 @@ $sub-nav-active-font-weight: $font-weight-normal;
 // I've temporarily made it the same as the regular sub-nav style
 .sub-nav, .sub-nav.secondary {
 	li, dd {
+        line-height: 1rem;
 		margin: 0 1px 1px 0;
         a {
+            @include button-dimensions();
+
             color: $content-ui-foreground;
             background-color: $content-ui-background;
             display: inline-block;
+
             &:hover {
                 color: $content-ui-foreground;
                 background-color: $content-ui-hover;
@@ -31,9 +35,12 @@ $sub-nav-active-font-weight: $font-weight-normal;
         }
         &.active {
             a {
+                @include button-dimensions();
+
                 cursor: default;
                 color: $content-ui-foreground;
                 background-color: $content-ui-selected;
+
                 &:hover {
                     cursor: default;
                     color: $content-ui-foreground;

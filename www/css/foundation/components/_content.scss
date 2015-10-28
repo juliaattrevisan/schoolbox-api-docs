@@ -942,11 +942,18 @@ nav {
 		padding: 0;
 	}
 
+    /* Special 38x38 px for Messaging Configuration
+     * due to lack of space on small viewports
+     */
 	input + label {
-		width: rem-calc(38px);
-		height: rem-calc(38px);
+        width: rem-calc(38px);
+        height: rem-calc(38px);
 		line-height: rem-calc(38px);
-		text-align: center;
+        text-align: center;
+        a {
+            width: rem-calc(38px);
+            height: rem-calc(38px);
+        }
 	}
 
 	input:checked + label {
@@ -993,11 +1000,6 @@ ul.flex-list {
 	display: table;
 	table-layout: fixed;
 	margin: 0;
-	&.buttons {
-		> li > a {
-			@extend .button;
-		}
-	}
 	> li {
 		display: table-cell;
 		margin: 0;

@@ -37,12 +37,17 @@
     @include information-list;
 
     .card {
+
+        /* Same dimensions as generic buttons
+         */
+        @include button-dimensions();
+
         /* Padding to reposition text and offset multi-line
          * component heading scenario
          */
-        padding-top: 0.125rem;
-        padding-bottom: 0.375rem;
-        min-height: 1rem;
+        padding-top: $global-button-padding/2;
+        padding-bottom: $global-button-padding/2;
+
         h2 {
             font-size: 1.3125rem;
         }

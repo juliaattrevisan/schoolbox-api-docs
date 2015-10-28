@@ -1,6 +1,6 @@
 /* Action buttons in Action/Information Lists
  */
-@mixin action-html-classes($size, $button-size: rem-calc(38px), $button-color: $content-ui-foreground) {
+@mixin action-html-classes($size, $button-size: $global-button-height, $button-color: $content-ui-foreground) {
 	@for $i from 1 through $total-columns {
 		.actions-#{$size}-#{$i} {
 			position: relative;
@@ -27,6 +27,8 @@
 				white-space: nowrap;
 
 				a {
+                    @include button-dimensions();
+                    padding:0;
 					display: inline-block;
 					text-align: center;
 					width: $button-size;

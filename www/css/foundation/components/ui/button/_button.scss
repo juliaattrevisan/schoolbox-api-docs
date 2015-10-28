@@ -1,3 +1,10 @@
+/* Button Dimensions
+ */
+@mixin button-dimensions() {
+    min-height: $global-button-height;
+    padding: $global-button-padding;
+}
+
 /* Link Styles
  * Really hammer out the $primary-color assumption
  * as clicking on a link then hovering away reveals
@@ -19,6 +26,8 @@ a[disabled], a.disabled {
 /* All generic buttons
  */
 .button {
+    @include button-dimensions();
+
     color: $content-ui-foreground;
     background-color: $content-ui-background;
 
@@ -41,7 +50,6 @@ a[disabled], a.disabled {
 	}
 
 	&.expand {
-		padding: 1rem;
 		font-weight: 700;
 	}
 
@@ -68,6 +76,18 @@ a[role="button"] {
 	@extend .button;
 }
 
+/* Arbitrary <button> element
+ */
+button {
+    @extend .button;
+
+    /* Remove mysterious highlight effect when you click
+     * this particular element which, for all intents and
+     * purposes, is visually just another .button
+     */
+    outline: 0;
+}
+
 /* Form submits have a unique styling
  */
 input[type="submit"]{
@@ -86,6 +106,8 @@ input[type="submit"]{
 	}
 }
 
+/* Fake submit button
+ */
 a.submit {
 	@extend input[type="submit"];
 }
@@ -105,10 +127,24 @@ a.submit {
  * This can be found in the meta-panel of Resource Browser
  * I don't think this should be such a strange number; maybe
  * the actual flex-list button dimensions aren't right.
- *
- * 0.9375rem vertically aligns the button text/icon in its
- * native dimensions. Something to investigate.
  */
-ul.flex-list.buttons li a {
-    padding-top: 0.9375rem;
+ul.flex-list {
+    &.buttons {
+        > li > a {
+            @extend .button;
+            @include button-dimensions();
+
+            /* Allow long content
+             * This expands UPWARDS! Don't know why
+             */
+            white-space: normal;
+            height: auto;
+
+            /* Also allow fake submit styles in flex list
+             */
+            &.submit {
+                @extend input[type="submit"];
+            }
+        }
+    }
 }

@@ -136,3 +136,18 @@ $include-table-visibility-classes: true;
 $include-legacy-visibility-classes: true;
 $include-accessibility-classes: true;
 $include-xl-html-grid-classes: true;
+
+/* Button dimensions
+ *
+ * text + padding-top + padding-bottom = global-button-height
+ * = 1rem + 1rem + 1rem (since padding-top == padding-bottom)
+ * = 3rem
+ *
+ * Converse also holds true if you adjust the height and need to
+ * decide the padding (this is used to vertically-center text):
+ * global-button-height = 1rem + padding-top + padding-bottom
+ * global-button-height - 1rem = padding * 2
+ * 0.5(global-button-height - 1rem) = padding
+ */
+$global-button-height: 3rem;
+$global-button-padding: 1rem;

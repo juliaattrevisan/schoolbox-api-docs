@@ -8,7 +8,7 @@ $tabs-navigation-bg-color: $content-ui-background;
 $tabs-navigation-active-bg-color: $content-ui-selected;
 $tabs-navigation-hover-bg-color: $content-ui-hover;
 $tabs-navigation-font-color: $content-ui-foreground;
- $tabs-navigation-active-font-color: $tabs-navigation-font-color;
+$tabs-navigation-active-font-color: $tabs-navigation-font-color;
 $tabs-navigation-font-size: rem-calc(($base-font-size - 2));
 // $tabs-navigation-font-family: $body-font-family;
 
@@ -18,3 +18,18 @@ $tabs-content-padding: rem-calc(($base-font-size - 8));
 // $tabs-vertical-navigation-margin-bottom: 1.25rem;
 
 @import "../../../../../javascript/components/foundation/scss/foundation/components/tabs";
+
+.tabs {
+    dd {
+        /* This comes from some global ul or body element
+         * and is usually 1.5rem - which contributes to how
+         * this element is dimensioned, leading to some
+         * sometimes-unexpected behaviour if you don't know this
+         */
+        line-height: 1rem;
+        margin-right: 1px;
+        a {
+            @include button-dimensions();
+        }
+    }
+}
