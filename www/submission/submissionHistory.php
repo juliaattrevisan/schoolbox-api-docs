@@ -141,7 +141,7 @@ $this->setVar(
     array(
         'OWNER_ID'    => $owner['uid'],
         'OWNER_NAME'  => $userHandler->formatName($owner),
-        'OWNER_THUMB' => "/portrait?userId={$owner['synergy_id']}&size=square32"
+        'OWNER_THUMB' => "/portrait?userId={$owner['synergy_id']}&size=square64"
     )
 );
 
