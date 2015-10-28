@@ -475,6 +475,22 @@ select.visibility {
 	.subject, .unit {
 		margin-left: 6rem;
 	}
+
+    /* In Inline Grading, there is a selectize of avatar cards
+     * This is the context-switch which is a special case
+     */
+    .selectize-input {
+
+        /* Underneath the avatar card is an input field that you
+         * could right-click to focus; I think it's where the carat
+         * goes for when you're adding more items (which we don't)
+         *
+         * selectize bangs it, so I have to bang it too
+         */
+        input[type="text"] {
+            display: none !important;
+        }
+    }
 }
 
 section > fieldset {
