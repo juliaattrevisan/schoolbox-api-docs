@@ -1,7 +1,7 @@
 /* Button Dimensions
  */
 @mixin button-dimensions() {
-    min-height: $global-button-content-height;
+    min-height: $global-button-height;
     padding: $global-button-padding;
 }
 
