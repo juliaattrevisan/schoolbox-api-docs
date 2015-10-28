@@ -14,7 +14,7 @@ namespace Schoolbox\External;
 use Schoolbox;
 use Schoolbox\User;
 
-class UserRelationMapper extends Schoolbox\External\Mapper {
+class UserRelationMapper extends Schoolbox\Mapper {
 
     /**
      * {@inheritdoc}
