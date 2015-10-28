@@ -78,6 +78,14 @@ class TimetableStructure
             $result[$key]['periods'][$day]->add($period);
         }
 
+        // Sort the period list, and set sequence based on that
+        foreach ($result as $key => $timetable) {
+            $timetable['cycle']
+                ->setCycleLength(max(array_keys($timetable['periods'])))
+                ->setDayLength(max(array_map('count', $timetable['periods'])))
+            ;
+        }
+
         // Mangle all of this into a list of timetable cycles and stuff
         return $result;
     }
