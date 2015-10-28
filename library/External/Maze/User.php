@@ -378,7 +378,11 @@ class External_Maze_User implements External_UserInterface {
 				SF.FIRST_NAME AS FIRSTNAME,
 				SF.SURNAME
 			FROM KGC
-			LEFT JOIN SF ON KGC.TEACHER = SF.SFKEY OR KGC.TEACHERB = SF.SFKEY
+			LEFT JOIN SF ON KGC.TEACHER = SF.SFKEY";
+                if (Cfg::get('site_location')=='loretto') { 
+                        $query = $query . " OR KGC.TEACHERB = SF.SFKEY"; 
+                } 
+                $query = $query . "
 			WHERE KGC.ROLL_GROUP = '{$student['ROLL_GROUP']}'
 		";
 
