@@ -313,8 +313,14 @@ class External_Maze_User implements External_UserInterface {
 				'' AS TeacherTutorID,
 				'' AS HeadOfHouseID,
 				'' AS StudentHeadOfHouse,
-				'' AS StudentForm,
-				(COORDINATOR.FIRST_NAME + ' ' + COORDINATOR.SURNAME) AS StudentFormStaffName,
+				'' AS StudentForm,";
+		if (Cfg::get('site_location') == 'loreto') {
+			$query = $query . "(COORDINATOR.FIRST_NAME + ' ' + COORDINATOR.SURNAME) AS StudentFormStaffName,";
+		}
+		else {
+			$query = $query . "'' AS StudentFormStaffName,";
+		}
+		$query = $query . "
 				'' AS TeacherFormID,
 				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
@@ -359,8 +365,11 @@ class External_Maze_User implements External_UserInterface {
 			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
 			LEFT JOIN KCT ON ST.SCHOOL_YEAR = KCT.KCTKEY
 			LEFT JOIN SF ADVISOR ON KCT.SFLINK = ADVISOR.SFKEY
-			LEFT JOIN KCY ON ST.SCHOOL_YEAR = KCY.KCYKEY
-			LEFT JOIN SF COORDINATOR ON KCY.YEAR_COORD = COORDINATOR.SFKEY
+			LEFT JOIN KCY ON ST.SCHOOL_YEAR = KCY.KCYKEY";
+		if (Cfg::get('site_location') == 'loreto') {
+			$query = $query . "LEFT JOIN SF COORDINATOR ON KCY.YEAR_COORD = COORDINATOR.SFKEY";
+		}
+		$query = $query . "
 			WHERE STKEY = '{$synId}'
 		";
 
