@@ -446,7 +446,7 @@ class Eportfolio_Authenticator
     /**
      * Set eportfolio handler
      *
-     * @param null $eportfolioHandler
+     * @param Eportfolio $eportfolioHandler
      */
     private function setEportfolioHandler($eportfolioHandler)
     {
@@ -456,7 +456,7 @@ class Eportfolio_Authenticator
     /**
      * Get eportfolio handler
      *
-     * @return null
+     * @return Eportfolio
      */
     private function getEportfolioHandler()
     {
