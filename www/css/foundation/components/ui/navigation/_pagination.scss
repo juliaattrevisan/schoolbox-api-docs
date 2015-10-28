@@ -39,6 +39,11 @@ ul.pagination {
     li {
         line-height: 1rem;
         margin-right: 1px;
+        margin-bottom: 1px;
+
+        /* Allow pagination elements to wrap under itself
+         */
+        height: auto;
 
         a, button {
             @include button-dimensions();
