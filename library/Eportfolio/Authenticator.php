@@ -82,7 +82,11 @@ class Eportfolio_Authenticator
 
         $this->setUserHandler(new User());
         $this->setGroupHandler(new Group(HOMEPAGE_SERVICE));
-        $this->setEportfolioHandler(new Eportfolio($this->getOwnerId(), $this->getPageId()));
+        try {
+            $this->setEportfolioHandler(new Eportfolio($this->getOwnerId(), $this->getPageId()));
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->setEportfolioHandler(new Eportfolio($this->getOwnerId(), null));
+        }
 
         /* The ePortfolio owner
          */
