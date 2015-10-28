@@ -26,7 +26,7 @@ if ($authenticator->pageExists()) {
 	}
 }
 else {
-	error(156);
+	$this->pageNotFound();
 }
 
 
