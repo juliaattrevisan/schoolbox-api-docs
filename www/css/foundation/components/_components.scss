@@ -52,16 +52,6 @@
             font-size: 1.3125rem;
         }
     }
-
-    /* Same dimensions as generic buttons
-     */
-    nav {
-        min-height: $global-button-height;
-
-        a {
-            @include button-dimensions();
-        }
-    }
 }
 
 /* Dashboard, Homepage: Calendar Events
