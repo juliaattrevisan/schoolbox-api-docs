@@ -107,91 +107,17 @@ class External_Maze_Helper
      */
     public function determineCurrentSemester($externalUserId = null)
     {
-        $currentYear = date('Y');
-
         $query = "
-			SELECT THKEY,
-			 	CALENDAR_START01,
-			 	CALENDAR_START02,
-			 	CALENDAR_START03,
-			 	CALENDAR_START04,
-			 	CALENDAR_END01,
-			 	CALENDAR_END02,
-			 	CALENDAR_END03,
-			 	CALENDAR_END04
+			SELECT TOP 1 THKEY
 			FROM TH
-			WHERE THKEY LIKE '{$currentYear}%'
+			WHERE CAST(TH.CALENDAR_END01 AS DATE) >= CAST(GETDATE() AS DATE)
+				OR CAST(TH.CALENDAR_END02 AS DATE) >= CAST(GETDATE() AS DATE)
+				OR CAST(TH.CALENDAR_END03 AS DATE) >= CAST(GETDATE() AS DATE)
+				OR CAST(TH.CALENDAR_END04 AS DATE) >= CAST(GETDATE() AS DATE)
 			ORDER BY THKEY DESC
 		";
 
-        $allRows = $this->getDb()->getAll($query);
-
-        /* For every semester in the current year, find one which fits
-         * the current datetime
-         */
-        foreach ($allRows as $currentRow) {
-
-            /* Find the earliest start
-             */
-            $afterSemesterStart = false;
-
-            for ($i = 1; $i < 5; $i++) {
-                $key = "CALENDAR_START0{$i}";
-
-                if ($currentRow[$key] != '') {
-                    $currentTime = strtotime($currentRow[$key]);
-
-                    if ($currentTime < $_SERVER['REQUEST_TIME']) {
-                        $afterSemesterStart = true;
-                        break;
-                    }
-                }
-            }
-
-            /* Find the latest end
-             */
-            $beforeSemesterEnd = false;
-
-            for ($i = 1; $i < 5; $i++) {
-                $key = "CALENDAR_END0{$i}";
-
-                if ($currentRow[$key] != '') {
-                    $currentTime = strtotime($currentRow[$key]);
-
-                    if ($currentTime >= $_SERVER['REQUEST_TIME']) {
-                        $beforeSemesterEnd = true;
-                        break;
-                    }
-                }
-            }
-
-            /* You are currently in the most recently added semester definition
-             */
-            if ($afterSemesterStart && $beforeSemesterEnd) {
-                return $currentRow['THKEY'];
-            }
-
-            /* Not in this semester yet? Maybe try an older one from the same year
-             * Continue with loop
-             */
-        }
-
-        /* In between semesters
-         * Make a guess as to what data to display. At the end of semester 1,
-         * start trying to display semester 2 data. At the end of semester 2,
-         * start trying to display semester 1 data from the next year.
-         */
-        $this->setBetweenSemesters(true);
-
-        /* If January and between semesters 2 and 1, assume it's semester 1
-         * Otherwise assume between semester 1 and 2, and assume it's semester 2
-         */
-        if (date('n') < 6) {
-            return date('Y') . 'S1';
-        }
-        else {
-            return date('Y') . 'S2';
-        }
+        return $this->getDb()->getOne($query);
     }
 
     /**
