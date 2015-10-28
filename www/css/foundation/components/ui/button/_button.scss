@@ -134,6 +134,12 @@ ul.flex-list {
             @extend .button;
             @include button-dimensions();
 
+            /* Allow long content
+             * This expands UPWARDS! Don't know why
+             */
+            white-space: normal;
+            height: auto;
+
             /* Also allow fake submit styles in flex list
              */
             &.submit {
