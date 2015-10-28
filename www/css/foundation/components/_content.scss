@@ -1123,6 +1123,7 @@ ul.flex-list {
 		vertical-align: middle;
 		a {
 			display: block;
+		  	padding: 0.5rem 0 0.5rem 0;
 			&[class^="icon-"]:before, &[class*=" icon-"]:before {
 				vertical-align: middle;
 			}
