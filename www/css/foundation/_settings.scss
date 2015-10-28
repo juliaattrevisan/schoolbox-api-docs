@@ -139,9 +139,9 @@ $include-xl-html-grid-classes: true;
 
 /* Button dimensions
  *
- * This is the content height (height of the icon/text inside button)
- * Add $global-button-padding x2 for top and bottom padding
- * = total button height (3rem by default)
+ * text + padding-top + padding-bottom = global-button-content-height
+ * = 1rem + 1rem + 1rem
+ * = 3rem
  */
-$global-button-content-height: 1rem;
+$global-button-content-height: 3rem;
 $global-button-padding: 1rem;
