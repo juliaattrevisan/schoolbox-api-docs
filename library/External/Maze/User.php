@@ -446,7 +446,14 @@ class External_Maze_User implements External_UserInterface {
 				ADDRESS01 AS StudentContactAddress1,
 				ADDRESS02 AS StudentContactAddress2,
 				ADDRESS03 AS StudentContactAddress3,
-				SUBURB AS StudentContactSuburb,
+				";
+		if (Cfg::get('site_location') == 'loretto') { 
+			$query = $query ."UM.SUBURB AS StudentContactSuburb,";
+		}
+		else {
+			$query = $query ."'' AS StudentContactSuburb,";
+		}
+		$query = $query . "
 				POSTCODE AS StudentContactPostCode,
 				STATE AS StudentContactState,
 				TELEPHONE AS StudentContactPhoneActual,
@@ -527,14 +534,22 @@ class External_Maze_User implements External_UserInterface {
 				UM.ADDRESS01 AS StudentContactAddress1,
 				UM.ADDRESS02 AS StudentContactAddress2,
 				UM.ADDRESS03 AS StudentContactAddress3,
-				UM.SUBURB AS StudentContactSuburb,
+		";
+		if (Cfg::get('site_location') == 'loretto') { 
+			$query = $query ."UM.SUBURB AS StudentContactSuburb,
+				UM.SUBURB AS StudentContactHomeSuburb,";
+		}
+		else {
+			$query = $query ."'' AS StudentContactSuburb,
+				'' AS StudentContactHomeSuburb,";
+		}
+		$query = $query . "
 				UM.POSTCODE AS StudentContactPostCode,
 				UM.STATE AS StudentContactState,
 				'' AS StudentContactCountryCode,
 				UM.ADDRESS01 AS StudentContactHomeAddress1,
 				UM.ADDRESS02 AS StudentContactHomeAddress2,
 				UM.ADDRESS03 AS StudentContactHomeAddress3,
-				UM.SUBURB AS StudentContactHomeSuburb,
 				UM.POSTCODE AS StudentContactHomePostCode,
 				UM.STATE AS StudentContactHomeState,
 				'' AS StudentContactHomeCountryCode,
