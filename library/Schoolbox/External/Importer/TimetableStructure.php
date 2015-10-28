@@ -53,6 +53,11 @@ class TimetableStructure
      */
     protected $timetablePeriodMapper;
 
+    /**
+     * Constructor
+     *
+     * @param string $filename The filename to load from
+     */
     public function __construct($filename)
     {
         $campusMapper                = new CampusMapper();
@@ -67,7 +72,13 @@ class TimetableStructure
         ;
     }
 
-    public function parse()
+    /**
+     * Reads all rows from the CSV reader, and loads them into an associative
+     * array structure.
+     *
+     * @return array
+     */
+    protected function parse()
     {
         $result = [];
         foreach ($this->csvReader as $row) {
@@ -145,6 +156,9 @@ class TimetableStructure
         return $result;
     }
 
+    /**
+     * Reads the rows to insert from the CSV, and writes to the database.
+     */
     public function save()
     {
         // Eventual override rules:
