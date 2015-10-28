@@ -395,7 +395,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             return $envelope;
         }
 
-        $bob->setIcon("/portrait?userId={$user->getExternalId()}&size=square32")
+        $bob->setIcon("/portrait?userId={$user->getExternalId()}&size=square64")
             ->setHref("/submission/submissionHistory/$boxId")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
@@ -630,7 +630,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         foreach ($unsubmittedStudents as $student) {
             $childId = $student->getId();
             // target the parents of this particular student
-            $bob->setIcon('/portrait?size=square32&userId=' . $student->getExternalId())
+            $bob->setIcon('/portrait?size=square64&userId=' . $student->getExternalId())
                 ->setHref("/submission/submissionHistory/$boxId/$childId")
                 ->setParam('child', new UserParam($student, ParameterInterface::STACKING_REPLACE, '{firstname}'));
             $envelope->targetToParent($childId, $bob->build());
@@ -680,7 +680,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             return $envelope;
         }
 
-        $bob->setIcon("/portrait?userId={$user->getExternalId()}&size=square32")
+        $bob->setIcon("/portrait?userId={$user->getExternalId()}&size=square64")
             ->setHref("/submission/submissionHistory/$boxId")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
