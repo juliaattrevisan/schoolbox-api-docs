@@ -10,25 +10,20 @@
 </ul>
 <ul class="resource-list">
     <!-- BEGIN node_category -->
-    <li data-node-category>
-        <div class="avatar card small-12">
-            <a href="#" rel="{NODE_CATEGORY_ID}" title="{NODE_CATEGORY_NAME}">
-                <div class="icon-{NODE_CATEGORY_TYPE} icon-32"></div>
+    <li data-node-category class="resource">
+            <a href="#" rel="{NODE_CATEGORY_ID}" title="{NODE_CATEGORY_NAME}" class="icon-{NODE_CATEGORY_TYPE} icon-24">
                 {NODE_CATEGORY_NAME}
             </a>
-        </div>
     </li>
     <!-- END node_category -->
 
     <!-- BEGIN node_file -->
-    <li data-node-file>
-        <div class="avatar card small-12">
+    <li data-node-file class="resource">
             <a href="/send.php?id={NODE_FILE_ID}" title="{NODE_FILE_NAME}" data-mime="{NODE_MIME_TYPE}"
                data-size="{NODE_FILE_SIZE}">
-                <img src="/images/mime/60x60/{NODE_FILE_ICON}" alt="{NODE_FILE_NAME}" class="mime" />
+                <img src="/images/mime/60x60/{NODE_FILE_ICON}" alt="{NODE_FILE_NAME}" class="mime-24" />
                 {NODE_FILE_NAME}
             </a>
-        </div>
     </li>
     <!-- END node_file -->
 </ul>
