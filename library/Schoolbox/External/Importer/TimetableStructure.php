@@ -147,10 +147,9 @@ class TimetableStructure
 
     public function save()
     {
-        // Override, or leave untouched?
-        // I think that this should always delete then reinsert,
-        // because this is a less common import than timetable or enrolment.
-        // We still need to keep previous year's enrolments though.
+        // Eventual override rules:
+        // * Term: same title/campus combination
+        // * Period: same term, and period title/day combination
         foreach ($this->parse() as $row) {
             /** @var TimetableCycle $cycle */
             $cycle = $row['cycle'];
