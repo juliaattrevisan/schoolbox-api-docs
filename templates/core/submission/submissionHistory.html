@@ -206,69 +206,66 @@
         </section>
     </div>
     <div id='history-wrap' class="reveal-modal" data-reveal>
-        <div class="small-12 columns">
-            <h2>History</h2>
+        <h2>History</h2>
+        <ul id="history" class="information-list">
+            <!-- BEGIN work -->
+            <li class="{HISTORY_CLASS}">
+                <div class="small-10 columns no-pad">
+                    <div class="avatar card small-12">
+                        <a href="/search/user/{HISTORY_USER_ID}" title="View Profile">
+                            <img src="{HISTORY_USER_THUMB}" alt="View Profile" />
+                            {HISTORY_USER_NAME}
+                        </a>
 
-            <ul id="history" class="information-list no-pad">
-                <!-- BEGIN work -->
-                <li class="row {HISTORY_CLASS}">
-                    <div class="small-10 columns no-pad">
-                        <div class="avatar card small-12">
-                            <a href="/search/user/{HISTORY_USER_ID}" title="View Profile">
-                                <img src="{HISTORY_USER_THUMB}" alt="View Profile" />
-                                {HISTORY_USER_NAME}
-                            </a>
+                        <!-- BEGIN history_submitted -->
+                        submitted <a href="/submission/send.php?id={HISTORY_SUBMISSION_FILE_ID}&save=1">{HISTORY_SUBMISSION_FILE_NAME}</a>
+                        <!-- END history_submitted -->
 
-                            <!-- BEGIN history_submitted -->
-                            submitted <a href="/submission/send.php?id={HISTORY_SUBMISSION_FILE_ID}&save=1">{HISTORY_SUBMISSION_FILE_NAME}</a>
-                            <!-- END history_submitted -->
+                        <!-- BEGIN history_returned -->
+                        returned <a href="/submission/send.php?id={HISTORY_RETURN_FILE_ID}&return=1">{HISTORY_RETURN_FILE_NAME}</a>
+                        <!-- END history_returned -->
 
-                            <!-- BEGIN history_returned -->
-                            returned <a href="/submission/send.php?id={HISTORY_RETURN_FILE_ID}&return=1">{HISTORY_RETURN_FILE_NAME}</a>
-                            <!-- END history_returned -->
+                        <!-- BEGIN history_marked -->
+                        graded your work<!-- BEGIN history_marked_hascomment -->: <em>{HISTORY_COMMENT}</em><!-- END history_marked_hascomment -->
+                        <!-- END history_marked -->
 
-                            <!-- BEGIN history_marked -->
-                            graded your work<!-- BEGIN history_marked_hascomment -->: <em>{HISTORY_COMMENT}</em><!-- END history_marked_hascomment -->
-                            <!-- END history_marked -->
+                        <!-- BEGIN history_extended -->
+                        extended the due date to {HISTORY_EXTENSION}
+                        <!-- END history_extended -->
 
-                            <!-- BEGIN history_extended -->
-                            extended the due date to {HISTORY_EXTENSION}
-                            <!-- END history_extended -->
-
-                            <p class="meta">
-                                <time>{HISTORY_DATETIME}</time>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="small-2 columns">
-                        <!-- BEGIN work_grade -->
-                        <p class="grade">
-                            <span class="gradient-{HISTORY_GRADIENT}">{HISTORY_MARK}</span>
+                        <p class="meta">
+                            <time>{HISTORY_DATETIME}</time>
                         </p>
-                        <!-- END work_grade -->
                     </div>
-                </li>
-                <!-- END work -->
+                </div>
+                <div class="small-2 columns">
+                    <!-- BEGIN work_grade -->
+                    <p class="grade">
+                        <span class="gradient-{HISTORY_GRADIENT}">{HISTORY_MARK}</span>
+                    </p>
+                    <!-- END work_grade -->
+                </div>
+            </li>
+            <!-- END work -->
 
-                <li class="row">
-                    <div class="small-12 columns no-pad">
-                        <div class="avatar card">
-                            <a href="/search/user/{OWNER_ID}" title="View Profile">
-                                <img src="{OWNER_THUMB}" alt="View Profile" />
-                                {OWNER_NAME}
-                            </a>
+            <li class="row">
+                <div class="small-12 columns no-pad">
+                    <div class="avatar card">
+                        <a href="/search/user/{OWNER_ID}" title="View Profile">
+                            <img src="{OWNER_THUMB}" alt="View Profile" />
+                            {OWNER_NAME}
+                        </a>
 
-                            posted <a href="/submission/submissionHistory/{BOX_ID}/{USER_ID}">{BOX_NAME}</a>
+                        posted <a href="/submission/submissionHistory/{BOX_ID}/{USER_ID}">{BOX_NAME}</a>
 
-                            <p class="meta">
-                                <time>{BOX_CREATED}</time>
-                            </p>
-                        </div>
+                        <p class="meta">
+                            <time>{BOX_CREATED}</time>
+                        </p>
                     </div>
-                </li>
-            </ul>
-            <a href="#" class="close-reveal-modal" id="history-close">&#215;</a>
-        </div>
+                </div>
+            </li>
+        </ul>
+        <a href="#" class="close-reveal-modal" id="history-close">&#215;</a>
     </div>
     <!-- END subject -->
 </div>
