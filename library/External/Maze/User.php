@@ -323,12 +323,28 @@ class External_Maze_User implements External_UserInterface {
 				'' AS StudentYearLevelCoordinator,
 				'' AS YearLevelCoordID,
 				'' AS StudentLockerBook,
+			";
+		if (Cfg::get('site_location') == 'loreto') {
+			$query = $query . "
 				ST.EMERGENCY_ONE_NAME AS StudentEmergencyName,
 				ST.EMERGENCY_ONE_PHONE AS StudentEmergencyPhone,
 				ST.EMERGENCY_ONE_MOBILE AS StudentEmergencyPhoneAlt,
 				ST.EMERGENCY_TWO_NAME AS StudentEmergency2Name,
 				ST.EMERGENCY_TWO_PHONE AS StudentEmergency2Phone,
 				ST.EMERGENCY_TWO_MOBILE AS StudentEmergency2PhoneAlt,
+			";
+		}
+		else {
+			$query = $query . "
+				'' AS StudentEmergencyName,
+				'' AS StudentEmergencyPhone,
+				'' AS StudentEmergencyPhoneAlt,
+				'' AS StudentEmergency2Name,
+				'' AS StudentEmergency2Phone,
+				'' AS StudentEmergency2PhoneAlt,
+			";
+		}
+		$query = $query . "
 				'' AS StudentEmergency3Name,
 				'' AS StudentEmergency3Phone,
 				'' AS StudentEmergency3PhoneAlt,
