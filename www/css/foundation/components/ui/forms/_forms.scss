@@ -507,6 +507,13 @@ select.visibility {
              * avatar card selected
              */
             line-height: 0.5rem;
+
+            /* Push the current avatar card to the left, to offset some
+             * other margin setting
+             */
+            .card {
+                margin-left: -0.5rem;
+            }
         }
 
         /* Repair a miniscule right-margin
