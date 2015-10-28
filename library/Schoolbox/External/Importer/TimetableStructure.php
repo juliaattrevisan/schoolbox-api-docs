@@ -16,6 +16,7 @@ namespace Schoolbox\External\Importer;
 
 use Alaress_Date_Format;
 use Alaress\Csv\Reader;
+use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\TimetableCampus;
@@ -33,9 +34,9 @@ class TimetableStructure
     protected $csvReader;
 
     /**
-     * @var CampusMapper
+     * @var Collection|Campus[]
      */
-    protected $campusMapper;
+    protected $campusList;
 
     /**
      * @var TimetableCycleMapper
@@ -54,11 +55,12 @@ class TimetableStructure
 
     public function __construct($filename)
     {
-        $this->campusMapper          = new CampusMapper();
+        $campusMapper                = new CampusMapper();
+        $this->campusList            = $campusMapper->findAll();
         $this->timetableCycleMapper  = new TimetableCycleMapper();
         $this->timetableCampusMapper = new TimetableCampusMapper();
         $this->timetablePeriodMapper = new TimetablePeriodMapper();
-        $this->csvReader = new Reader($filename);
+        $this->csvReader             = new Reader($filename);
         $this->csvReader
             ->setLoadFromFirst(true)
             ->setFillDown(true)
@@ -71,6 +73,11 @@ class TimetableStructure
         foreach ($this->csvReader as $row) {
             $key = sprintf('%s-%s', $row['Term Campus'], $row['Term Title']);
             if (!isset($result[$key])) {
+                $campusObject = $this->campusList->getBy('extTimetableCode', $row['Term Campus']);
+                if (!$campusObject) {
+                    continue;
+                }
+
                 // Timetable cycle - calculate cycle and day length later
                 $cycle = new TimetableCycle();
                 $cycle
@@ -81,7 +88,7 @@ class TimetableStructure
                 // Timetable campus
                 $campus = new TimetableCampus();
                 $campus
-                    ->setCampus($this->campusMapper->findOneByColumn('ext_timetable_code', $row['Term Campus']))
+                    ->setCampus($campusObject)
                     ->setStart(new Alaress_Date_Format($row['Term Start'], Alaress_Date_Format::DATABASE_DATE_FORMAT))
                     ->setFinish(new Alaress_Date_Format($row['Term Finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT))
                     ->setOffset($row['Term Offset'])
