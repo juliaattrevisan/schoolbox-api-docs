@@ -678,7 +678,23 @@ class External_Maze_User implements External_UserInterface {
 				FROM STMA
 				LEFT JOIN SU ON STMA.MKEY = SU.SUKEY
 				WHERE SKEY = '{$externalUserId}'
-				AND STMA.TTPERIOD = '{$this->getHelper()->getCurrentTTPeriod()}'
+				AND STMA.TTPERIOD = ( SELECT TOP 1 TT.TTPERIOD
+					FROM TT
+					JOIN TH ON
+						TT.TTKEY = TH.TT01KEY OR
+						TT.TTKEY = TH.TT02KEY OR
+						TT.TTKEY = TH.TT03KEY OR
+						TT.TTKEY = TH.TT04KEY OR
+						TT.TTKEY = TH.TT05KEY OR
+						TT.TTKEY = TH.TT06KEY OR
+						TT.TTKEY = TH.TT07KEY OR
+						TT.TTKEY = TH.TT08KEY OR
+						TT.TTKEY = TH.TT09KEY OR
+						TT.TTKEY = TH.TT10KEY OR
+						TT.TTKEY = TH.TT11KEY OR
+						TT.TTKEY = TH.TT12KEY OR
+						TT.TTKEY = TH.TT13KEY
+					WHERE TH.THKEY = '{$this->getHelper()->getCurrentTTPeriod()}' )
 			";
 
 			$part2 = $this->getDb()->getAll($query);
