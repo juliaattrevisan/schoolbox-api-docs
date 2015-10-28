@@ -483,6 +483,13 @@ select.visibility {
 .avatar-switch {
     @extend .context-switch;
 
+    nav {
+        a {
+            padding-top: 1.5rem;
+            height: 4.375rem;
+        }
+    }
+
     .selectize-control {
 
         /* Underneath the avatar card is an input field that you
