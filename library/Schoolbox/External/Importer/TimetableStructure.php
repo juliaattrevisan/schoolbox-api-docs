@@ -81,7 +81,7 @@ class TimetableStructure
                 // Timetable campus
                 $campus = new TimetableCampus();
                 $campus
-                    ->setCampus($this->campusMapper->findByColumn('ext_timetable_code', $row['Term Campus']))
+                    ->setCampus($this->campusMapper->findOneByColumn('ext_timetable_code', $row['Term Campus']))
                     ->setStart(new Alaress_Date_Format($row['Term Start'], Alaress_Date_Format::DATABASE_DATE_FORMAT))
                     ->setFinish(new Alaress_Date_Format($row['Term Finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT))
                     ->setOffset($row['Term Offset'])
