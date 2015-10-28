@@ -58,20 +58,24 @@ class TimetableStructure
                 $result[$key] = [
                     'cycle'   => $cycle,
                     'campus'  => $campus,
-                    'periods' => new Collection(),
+                    'periods' => [],
                 ];
             }
 
             // Sort the periods by start then end later, then use that to apply a sequence
+            $day    = $row['Period Day'];
             $period = new TimetablePeriod();
             $period
-                ->setDay($row['Period Day'])
+                ->setDay($day)
                 ->setStart(new Alaress_Date_Format($row['Period Start'], Alaress_Date_Format::DATABASE_TIME_FORMAT))
                 ->setFinish(new Alaress_Date_Format($row['Period Finish'], Alaress_Date_Format::DATABASE_TIME_FORMAT))
                 ->setTitle($row['Period Title'])
                 ->setUsable(true)
             ;
-            $result[$key]['periods']->add($period);
+            if (!isset($result[$key]['periods'][$day])) {
+                $result[$key]['periods'][$day] = new Collection();
+            }
+            $result[$key]['periods'][$day]->add($period);
         }
 
         // Mangle all of this into a list of timetable cycles and stuff
