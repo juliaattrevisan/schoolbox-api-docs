@@ -78,15 +78,8 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
          */
         $this->parseConfig();
 
-        if ($this->getConfig('pixel') > 600) {
-            $pixel = 600;
-        } elseif ($this->getConfig('pixel') < 20) {
-            $pixel = 20;
-        } else {
-            $pixel = $this->getConfig('pixel');
-        }
+        $pixel = 1024;
 
-        $this->setVar("IMAGE_ALIGN", $this->getConfig('align'));
         $this->setVar("PREVIEW_IMAGE_URL", "/cms/image.php?id={$image->getId()}&height=$pixel&width=$pixel");
         $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image->getDescription()));
 
