@@ -479,7 +479,7 @@ select.visibility {
     /* In Inline Grading, there is a selectize of avatar cards
      * This is the context-switch which is a special case
      */
-    .selectize-input {
+    .selectize-control {
 
         /* Underneath the avatar card is an input field that you
          * could right-click to focus; I think it's where the carat
@@ -487,8 +487,16 @@ select.visibility {
          *
          * selectize bangs it, so I have to bang it too
          */
-        input[type="text"] {
-            display: none !important;
+        .selectize-input {
+            input[type="text"] {
+                display: none !important;
+            }
+        }
+
+        /* Repair a miniscule right-margin
+         */
+        .row {
+            width: calc(100% - 2px);
         }
     }
 }
