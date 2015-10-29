@@ -12,6 +12,8 @@ use Alaress\Lumberjack\Logger;
 $logger = new Logger();
 
 define('SKIN_FILE', dirname(__FILE__) .'/../../www/css/foundation/utils/_skin.scss');
+define('CUSTOM_CSS_FILE', dirname(__FILE__) .'/../../www/css/foundation/utils/_custom.scss');
+
 
 $opts  = getopt('f', ['force']);
 $force = isset($opts['f']) || isset($opts['force']);
@@ -48,8 +50,9 @@ if (Config::get('skin_builder')) {
     $logger->info('Skin builder is off - building using default color settings');
 }
 
-if(is_readable(SKIN_FILE)) {
+if(is_readable(SKIN_FILE) && is_readable(CUSTOM_CSS_FILE)) {
     $origSha = sha1_file(SKIN_FILE);
+    $origCustomSha = sha1_file(CUSTOM_CSS_FILE);
     $logger->info("Skin has been built before (hash: $origSha)");
 }
 else {
@@ -58,7 +61,9 @@ else {
     $force = true;
     $origSha = null;
 }
+
 $newSha  = null;
+$customSha = null;
 $fp      = fopen(SKIN_FILE, 'w');
 if($fp) {
     $logger->info('Creating skin file...');
@@ -67,13 +72,22 @@ if($fp) {
     foreach ($vars as $var => $val) {
         fputs($fp, '$'.$var.': '.$val.";\n");
     }
+
     fclose($fp);
 
+    /* Output custom css */
+    if($cfp = fopen(CUSTOM_CSS_FILE, 'w')) {
+        fputs($cfp, "// Do not edit, automatically created by tools/skin/builder.php\n");
+        fputs($cfp, Cfg::get('skin_custom_css'));
+        fclose($cfp);
+    }
+
     $newSha = sha1_file(SKIN_FILE);
+    $newCustomSha = sha1_file(CUSTOM_CSS_FILE);
     $logger->info("Skin file created (hash: $newSha)");
 }
 
-if ($origSha != $newSha || $force) {
+if ($origSha != $newSha || $origCustomSha != $newCustomSha || $force) {
     $logger->info('Skin has changed, or build was forced - rebuilding');
     // Compile the new sass file.
     $infile  = SITE_root . '/www/css/foundation/chrome-foundation.scss';

@@ -28,4 +28,5 @@ vagrantcache/
 tools/browscap/
 vagrant.yaml
 www/css/foundation/utils/_skin.scss
+www/css/foundation/utils/_custom.scss
 .sass-cache/
