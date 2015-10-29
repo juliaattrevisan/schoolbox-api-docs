@@ -163,7 +163,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         if ($this->getGroup()->isStaff($userId)) {
             $statement = $this->getExternalDatabase()->prepare(
                 "
-                                SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
+                                SELECT l.day, l.period, startTime, endTime, l.classCode, l.staffCode, l.room, co.subjectName
                                 FROM People p
                                 RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
                                 RIGHT JOIN Lessons l ON l.staffCode = s.staffCode
@@ -175,7 +175,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         } else {
             $statement = $this->getExternalDatabase()->prepare(
                 "
-                                SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
+                                SELECT l.day, l.period, startTime, endTime, l.classCode, l.staffCode, l.room, co.subjectName
                                 FROM People p
                                 RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
                                 RIGHT JOIN Lessons l ON l.classCode = e.classCode
@@ -195,6 +195,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             foreach ($lessonList as $lesson) {
                 $period = $lesson['period'];
                 $day = $lesson['day'];
+                $periodList[$period]['periodStart'] = date(Cfg::get('date_time'), strtotime($lesson['startTime']));
+                $periodList[$period]['periodEnd'] = date(Cfg::get('date_time'), strtotime($lesson['endTime']));
 
                 if (isset($periodList[$period]['day'][$day])
                     && !isset($periodList[$period]['day'][$day][$lesson['ClassCode']])) {
@@ -237,7 +239,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         if ($this->getGroup()->isStaff($userId)) {
             $statement = $this->getExternalDatabase()->prepare(
                 "
-                                SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
+                                SELECT l.day, l.period, startTime, endTime, l.classCode, l.staffCode, l.room, co.subjectName
                                 FROM People p
                                 RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
                                 RIGHT JOIN Lessons l ON l.staffCode = s.staffCode
@@ -250,7 +252,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         } else {
             $statement = $this->getExternalDatabase()->prepare(
                 "
-                                SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
+                                SELECT l.day, l.period, startTime, endTime, l.classCode, l.staffCode, l.room, co.subjectName
                                 FROM People p
                                 RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
                                 RIGHT JOIN Lessons l ON l.classCode = e.classCode
@@ -271,6 +273,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         if (!empty($lessonList)) {
             foreach ($lessonList as $lesson) {
                 $period = $lesson['period'];
+                $periodList[$period]['periodStart'] = date(Cfg::get('date_time'), strtotime($lesson['startTime']));
+                $periodList[$period]['periodEnd'] = date(Cfg::get('date_time'), strtotime($lesson['endTime']));
 
                 if (isset($periodList[$period])
                     && !isset($periodList[$period]['class'][$lesson['ClassCode']])
