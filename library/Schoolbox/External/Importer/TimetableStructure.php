@@ -102,6 +102,7 @@ class TimetableStructure
                 // Timetable campus
                 $campus = new TimetableCampus();
                 $campus
+                    ->setCycle($cycle)
                     ->setCampus($campusObject)
                     ->setStart(new Alaress_Date_Format($row['Term Start'], Alaress_Date_Format::DATABASE_DATE_FORMAT))
                     ->setFinish(new Alaress_Date_Format($row['Term Finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT))
@@ -123,6 +124,7 @@ class TimetableStructure
             $period = new TimetablePeriod();
             $log->info(sprintf('Parsing period "%s" for day %d', $title, $day));
             $period
+                ->setCycle($result[$key]['cycle'])
                 ->setDay($day)
                 ->setStart(new Alaress_Date_Format($row['Period Start'], Alaress_Date_Format::DATABASE_TIME_FORMAT))
                 ->setFinish(new Alaress_Date_Format($row['Period Finish'], Alaress_Date_Format::DATABASE_TIME_FORMAT))
@@ -203,14 +205,12 @@ class TimetableStructure
 
             /** @var TimetableCampus $campus */
             $campus = $row['campus'];
-            $campus->setCycle($cycle);
             $log->info(sprintf('Saving campus cycle for campus "%s"', $campus->getCampus()->getExtTimetableCode()));
             $this->timetableCampusMapper->save($campus);
 
             foreach ($row['periods'] as $day => $periods) {
                 /** @var Collection|TimetablePeriod[] $periods */
                 foreach ($periods as $period) {
-                    $period->setCycle($cycle);
                     $log->info(sprintf('Saving period "%s" for day %d', $period->getTitle(), $period->getDay()));
                 }
                 $this->timetablePeriodMapper->save($periods);
