@@ -127,7 +127,7 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
             $this->setVar(
                 array(
                     'task_link_block'  => '',
-                    'TASK_ID'          => $task->getId(),
+                    'TASK_ID'          => Scrub::text($task->getId()),
                     'TASK_TITLE'       => Scrub::text($task->getTitle()),
                     'TASK_TYPE'        => '',
                     'TASK_TYPE_LABEL'  => Scrub::text($task->getLabel()),
@@ -136,7 +136,7 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
                     'TASK_LINK'        => Scrub::text($task->getLink()),
                     'TASK_SELF_ASSESS' => ($task->getRequiresConfirmation() ? '' : 'checked'),
                     'TASK_MODIFY_URL'  => $task->getType() == Task::TYPE_TASK ? '#' : '/task/modify/'.$task->getId(),
-                    'DARK'             => ($i++ % 2 === 1 ? 'dark' : ''),
+                    'TASK_REVEAL_ATTR' => '',
                 )
             );
             $this->parse('task_no_link_block', 'task_no_link');
@@ -145,6 +145,10 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
             $task_type = $task->getType();
             $this->setVar('edit_task_form_block', '');
             if ($task_type === Task::TYPE_TASK) {
+                $this->setVar(
+                    'TASK_REVEAL_ATTR',
+                    'data-reveal-id="editTask-' . Scrub::text($task->getId()) . '"'
+                );
                 $zone = $this->newZone('az-task-' . $task->getId());
 
                 if (strpos($task->getLink(), '/storage/fetch.php') === 0) {
