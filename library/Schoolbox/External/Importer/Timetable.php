@@ -16,8 +16,8 @@
 namespace Schoolbox\External\Importer;
 
 use Alaress\Csv\Reader;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Campus;
-use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
@@ -32,11 +32,6 @@ use Schoolbox\UserMapper;
 
 class Timetable
 {
-    /**
-     * @var Reader
-     */
-    protected $csvReader;
-
     /**
      * @var Collection|Campus[]
      */
@@ -64,39 +59,43 @@ class Timetable
 
     /**
      * Constructor
-     *
-     * @param string $filename The filename to load from
      */
-    public function __construct($filename)
+    public function __construct()
     {
         $this->userMapper            = new UserMapper();
         $this->classMapper           = new ClassEntryMapper();
         $this->classPeriodMapper     = new ClassPeriodMapper();
         $this->timetableCampusMapper = new TimetableCampusMapper();
         $this->timetablePeriodMapper = new TimetablePeriodMapper();
-        $this->csvReader             = new Reader($filename);
-        $this->csvReader
-            ->setLoadFromFirst(true)
-            ->setFillDown(true)
-        ;
     }
 
     /**
      * Reads all rows from the CSV reader, and loads them into an associative
      * array structure.
      *
+     * @param Reader          $reader
+     * @param LoggerInterface $log
+     *
      * @return array
      */
-    protected function parse()
+    protected function parse(Reader $reader, LoggerInterface $log)
     {
         $result = [];
-        foreach ($this->csvReader as $row) {
+        foreach ($reader as $i => $row) {
+            $log->info("Parsing row $i...");
             $key = $row['Class Code'];
+
+            if (!isset($key)) {
+                $log->warning('Mandatory field "Class Code" not defined: skipping!');
+                continue;
+            }
+
             if (!isset($result[$key])) {
                 // Class
+                $log->info(sprintf('Class "%s" has not been parsed: parsing now', $key));
                 $class = new ClassEntry();
                 $class
-                    ->setCode($row['Class Code'])
+                    ->setCode($key)
                     ->setDescription($row['Class Description'])
                     ->setName($row['Class Name'])
                 ;
@@ -105,6 +104,8 @@ class Timetable
                     'class'   => $class,
                     'periods' => new Collection(),
                 ];
+            } else {
+                $log->info(sprintf('Class "%s" has been parsed', $key));
             }
 
             // Load period and teacher from DB
@@ -115,6 +116,13 @@ class Timetable
                     $row['Term Campus']
                 );
             } catch (Mapper\Exception $e) {
+                $log->warning(
+                    sprintf(
+                        'Term "%s" for campus "%s" not found: skipping!',
+                        $row['Term Name'],
+                        $row['Term Campus']
+                    )
+                );
                 continue;
             }
 
@@ -126,12 +134,22 @@ class Timetable
                     'day'      => $row['Period Day'],
                 ]);
             } catch (Mapper\Exception $e) {
+                $log->warning(
+                    sprintf(
+                        'Period "%s", day "%s" for term "%s" / campus "%s" not found: skipping!',
+                        $row['Period Name'],
+                        $row['Period Day'],
+                        $row['Term Name'],
+                        $row['Term Campus']
+                    )
+                );
                 continue;
             }
 
             try {
                 $teacher = $this->userMapper->findOneByColumn('synergy_id', $row['Teacher Code']);
             } catch (Mapper\Exception $e) {
+                $log->warning(sprintf('Teacher code "%s" not found: skipping!', $row['Teacher Code']));
                 continue;
             }
             $classPeriod = new ClassPeriod();
@@ -142,24 +160,46 @@ class Timetable
                 ->setPeriod($timetablePeriod)
             ;
             $result[$key]['periods']->add($classPeriod);
+            $log->info(
+                sprintf(
+                    'Period "%s", day "%s" has been parsed',
+                    $row['Period Name'],
+                    $row['Period Day']
+                )
+            );
         }
         return $result;
     }
 
     /**
      * Reads the rows to insert from the CSV, and writes to the database.
+     *
+     * @param Reader          $reader
+     * @param LoggerInterface $log
      */
-    public function save()
+    public function save(Reader $reader, LoggerInterface $log)
     {
         // Eventual override rules:
         // * Class: none, update if there
         // * Class Periods: delete all existing and re-insert
-        foreach ($this->parse() as $row) {
+        foreach ($this->parse($reader, $log) as $row) {
             /** @var ClassEntry $class */
             $class = $row['class'];
+            $log->info(sprintf('Saving class "%s"', $class->getCode()));
             $this->classMapper->save($class);
 
             // Class mapper now has an ID, hence the periods may now be saved
+            foreach ($row['periods'] as $period) {
+                /** @var ClassPeriod $period */
+                $log->info(
+                    sprintf(
+                        'Saving teacher "%s" for day %d, period "%s"',
+                        $period->getTeacher()->getExternalId(),
+                        $period->getPeriod()->getDay(),
+                        $period->getPeriod()->getTitle()
+                    )
+                );
+            }
             $this->classPeriodMapper->save($row['periods']);
         }
     }
