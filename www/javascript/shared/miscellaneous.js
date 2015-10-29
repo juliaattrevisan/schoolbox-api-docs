@@ -5,7 +5,11 @@ $(function() {
      */
     $(document).on('click', 'a[rel=external]', function() {
         $(this).attr('target','_blank');
-    })
+    });
+
+    // jQuery datepickers: close on touchstart as well as mousedown
+    // (Fastclick stops mousedown from triggering?)
+    $(document).on('touchstart', $.datepicker._checkExternalClick);
 
     /**
      * Autoclear the main site search field (works without polyfill in all but IE9)
