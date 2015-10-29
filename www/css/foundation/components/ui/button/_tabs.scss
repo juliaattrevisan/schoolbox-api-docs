@@ -20,7 +20,7 @@ $tabs-content-padding: rem-calc(($base-font-size - 8));
 @import "../../../../../javascript/components/foundation/scss/foundation/components/tabs";
 
 .tabs {
-    dd {
+    dd, li.tab-title {
         /* This comes from some global ul or body element
          * and is usually 1.5rem - which contributes to how
          * this element is dimensioned, leading to some

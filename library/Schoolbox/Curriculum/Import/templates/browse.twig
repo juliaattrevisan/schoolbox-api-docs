@@ -63,11 +63,11 @@
 <div class="row">
     <div class="small-12 island" data-role="curriculum-import">
         <form action="{{ routeLookup('curriculumImport.create')|e('html_attr') }}" method="post">
-            <ul class="tabs" data-tab>
-                <li class="tab-title active"><a href="#step-1">Source</a></li>
-                <li class="tab-title"><a href="#step-2" disabled class="disabled">Curriculum</a></li>
-                <li class="tab-title"><a href="#step-3" disabled class="disabled">Outcomes</a></li>
-            </ul>
+            <dl class="tabs" data-tab>
+                <dd class="active"><a href="#step-1">Source</a></dd>
+                <dd><a href="#step-2" disabled class="disabled">Curriculum</a></dd>
+                <dd><a href="#step-3" disabled class="disabled">Outcomes</a></dd>
+            </dl>
 
             <section>
                 <div class="tabs-content no-margin">
