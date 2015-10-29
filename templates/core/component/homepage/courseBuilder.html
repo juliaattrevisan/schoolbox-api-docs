@@ -88,31 +88,6 @@
                             <!-- END edit_task -->
                         </nav>
 
-                        <div class="content">
-                            <div class="row">
-                                <div class="small-12 columns alert-box hide" data-form-container data-interaction="delete_task_container">
-                                    <p><span class="label alert full-width">Are you sure you wish to delete this task?</span></p>
-                                    <form action="/task/saveForm.php" method="post" data-form_type="delete_task" data-interaction="delete_task">
-                                        <input type="hidden" name="action"    value="delete" />
-                                        <input type="hidden" name="id"        value="{TASK_ID}" />
-                                        <input type="hidden" name="category"  value="{ID}"/>
-                                        <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
-                                        <input type="hidden" name="type"      value="string" />
-                                        <input type="hidden" name="link"      value="{TASK_LINK}" id="link-{TASK_ID}" />
-
-                                        <div class="row">
-                                            <div class="small-6 columns">
-                                                <input type="submit" data-interaction="delete_confirm" value="Yes" />
-                                            </div>
-                                            <div class="small-6 columns">
-                                                <a href="#" class="button expand" data-interaction="delete_reject">No</a>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- BEGIN edit_task_form -->
                         <div class="small-12 columns">
                             <div class="row">
@@ -173,6 +148,14 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Delete form -->
+                        <form action="/task/saveForm.php" method="post" data-form_type="delete_task" class="hide">
+                            <input type="hidden" name="action"    value="delete" />
+                            <input type="hidden" name="id"        value="{TASK_ID}" />
+                            <input type="hidden" name="category"  value="{ID}"/>
+                            <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                        </form>
                         <!-- END edit_task_form -->
                     </li>
                     <!-- END task -->

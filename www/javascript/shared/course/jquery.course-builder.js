@@ -174,31 +174,19 @@
         component.on(
             'click.courseTaskList',
             'a[data-interaction="open_delete_task_form"], a[data-interaction="delete_reject"]',
-            {},
             function(event) {
                 event.preventDefault();
-                var delete_form = $(this).closest('[data-task_id]').find('[data-interaction="delete_task_container"]');
-                delete_form.toggleClass('hide');
-                component.find('[data-form-container]').not(delete_form).addClass('hide');
-            }
-        );
-
-        // "why, yes I am"
-        component.on(
-            'submit.courseTaskList',
-            'form[data-interaction="delete_task"]',
-            {},
-            function(event) {
-                event.preventDefault();
-                var form = $(this);
-                $.post(
-                    form.attr('action'),
-                    form.serialize(),
-                    function(data) {
-                        postCallback(form, data);
-                    },
-                    'json'
-                );
+                var element = $(this);
+                element.confirmDialog({
+                    text: 'Are you sure you wish to delete this task?',
+                    confirmEvent: function(element) {
+                        var unit_element = element.closest('[data-task_id]');
+                        var form         = unit_element.find('[data-form_type="delete_task"]');
+                        $.post(form.attr('action'), form.serialize(), function(data) {
+                            postCallback(form, data);
+                        }, 'json');
+                    }
+                });
             }
         );
 
