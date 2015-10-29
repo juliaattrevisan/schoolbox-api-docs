@@ -16,19 +16,11 @@
 namespace Schoolbox\External\Importer;
 
 use Alaress\Csv\Reader;
-use Schoolbox\Campus;
-use Schoolbox\CampusMapper;
-use Schoolbox\Collection;
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvement;
 use Schoolbox\External\ClassInvolvementMapper;
-use Schoolbox\External\ClassPeriod;
-use Schoolbox\External\ClassPeriodMapper;
-use Schoolbox\External\TimetableCampus;
-use Schoolbox\External\TimetableCampusMapper;
-use Schoolbox\External\TimetablePeriod;
-use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper;
 use Schoolbox\UserMapper;
 
@@ -53,41 +45,47 @@ class Enrolment
 
     /**
      * Constructor
-     *
-     * @param string $filename The filename to load from
      */
-    public function __construct($filename)
+    public function __construct()
     {
         $this->userMapper      = new UserMapper();
         $this->classMapper     = new ClassEntryMapper();
         $this->enrolmentMapper = new ClassInvolvementMapper();
-        $this->csvReader       = new Reader($filename);
-        $this->csvReader
-            ->setLoadFromFirst(true)
-            ->setFillDown(true)
-        ;
     }
 
     /**
      * Reads all rows from the CSV reader, and loads them into an associative
      * array structure.
      *
-     * @return array
+     * @param Reader          $reader
+     * @param LoggerInterface $log
+     *
+     * @return array|ClassInvolvement[]
      */
-    protected function parse()
+    protected function parse(Reader $reader, LoggerInterface $log)
     {
         $result = [];
-        foreach ($this->csvReader as $row) {
+        foreach ($reader as $i => $row) {
+            $log->info("Parsing row $i...");
+            $classCode   = $row['Class Code'];
+            $studentCode = $row['Student Code'];
+            if (!isset($classCode) || !isset($studentCode)) {
+                $log->warning('Mandatory fields "Class Code" and "Student Code" not defined: skipping!');
+                continue;
+            }
+
             // Load student and class from DB
             try {
                 /** @var ClassEntry $class */
-                $class = $this->classMapper->findOneByColumn('code', $row['Class Code']);
+                $class = $this->classMapper->findOneByColumn('code', $classCode);
             } catch (Mapper\Exception $e) {
+                $log->warning(sprintf('Class "%s" not found: skipping!', $classCode));
                 continue;
             }
             try {
-                $student = $this->userMapper->findOneByColumn('synergy_id', $row['Student Code']);
+                $student = $this->userMapper->findOneByColumn('synergy_id', $studentCode);
             } catch (Mapper\Exception $e) {
+                $log->warning(sprintf('Student "%s" not found: skipping!', $studentCode));
                 continue;
             }
             $enrolment = new ClassInvolvement();
@@ -95,6 +93,7 @@ class Enrolment
                 ->setUser($student)
                 ->setClass($class)
             ;
+            $log->info(sprintf('Class "%s", student "%s" has been parsed', $classCode, $studentCode));
             $result[] = $enrolment;
         }
         return $result;
@@ -102,11 +101,24 @@ class Enrolment
 
     /**
      * Reads the rows to insert from the CSV, and writes to the database.
+     *
+     * @param Reader          $reader
+     * @param LoggerInterface $log
      */
-    public function save()
+    public function save(Reader $reader, LoggerInterface $log)
     {
         // Eventual override rules:
         // * Enrolment: delete all existing and re-insert
-        $this->enrolmentMapper->save($this->parse());
+        $result = $this->parse($reader, $log);
+        foreach ($result as $enrolment) {
+            $log->info(
+                sprintf(
+                    'Saving enrolment of student "%s" for class "%s"',
+                    $enrolment->getUser()->getExternalId(),
+                    $enrolment->getClass()->getCode()
+                )
+            );
+        }
+        $this->enrolmentMapper->save($result);
     }
 }
