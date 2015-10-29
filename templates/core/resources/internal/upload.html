@@ -16,7 +16,8 @@
             maxFiles: maxFiles,
             maxFilesize: 2048,
             autoProcessQueue: false,
-            addRemoveLinks: true,
+            addRemoveLinks: false,
+            previewTemplate: $('#ab-preview-template').html(),
             acceptedFiles: {ACCEPTED_FILES},
 
             accept: function (file, done) {
@@ -239,4 +240,22 @@
 <div class="ctrl">
   <a role="button" data-submit class="submit button" disabled="disabled" href="#">Upload</a>
   <a role="button" data-cancel class="cancel button" href="#">Cancel</a>
+</div>
+<div id="ab-preview-template" class="hide">
+    <div class="dz-preview dz-file-preview">
+        <div class="dz-image"><img data-dz-thumbnail /></div>
+        <div class="dz-details">
+            <div class="dz-size"><span data-dz-size></span></div>
+            <div class="dz-filename"><span data-dz-name></span></div>
+        </div>
+        <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+        <a class="button dz-remove full-width no-margin" data-dz-remove>Remove file</a>
+        <div class="dz-error-message"><span data-dz-errormessage></span></div>
+        <div class="dz-success-mark">
+            <span class="icon-approve"></span>
+        </div>
+        <div class="dz-error-mark">
+            <span class="icon-close"></span>
+        </div>
+    </div>
 </div>

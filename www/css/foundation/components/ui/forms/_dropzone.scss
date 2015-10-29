@@ -450,12 +450,6 @@ ul.az-error-list {
         text-align: center;
     }
     .dz-remove {
-        color: $content-ui-foreground;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        text-align: center;
     }
     .dz-error .dz-error-mark,
     .dz-success .dz-success-mark {
@@ -465,7 +459,6 @@ ul.az-error-list {
         background-color: $white;
         position: relative;
         width: 120px;
-        height: 180px;
         border: solid 1px $monsoon;
         box-sizing: border-box;
         float: left;
@@ -475,19 +468,19 @@ ul.az-error-list {
         max-width: 100px;
     }
     .dz-filename {
-        position: static;
+        padding: 0 9px;
+        text-align: center;
         span {
             display: block;
             width: 100%;
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;
-            padding: rem-calc(($base-font-size - 12));
             box-sizing: border-box;
         }
     }
     .dz-size {
-        text-align: right;
+        text-align: center;
         padding: 0 9px;
     }
     .dz-default {
@@ -623,8 +616,8 @@ ul.az-error-list {
 .dz-preview .dz-details,
 .dropzone-previews .dz-preview .dz-details {
     position: relative;
-    padding: 5px;
-    margin-bottom: 22px;
+    //padding: 5px;
+    //margin-bottom: 22px;
 }
 .dz-preview .dz-details .dz-filename,
 .dropzone-previews .dz-preview .dz-details .dz-filename {
@@ -637,14 +630,6 @@ ul.az-error-list {
     left: 0;
     width: 100px;
     height: 100px;
-}
-.dz-preview .dz-details .dz-size,
-.dropzone-previews .dz-preview .dz-details .dz-size {
-    position: absolute;
-    bottom: -28px;
-    left: 3px;
-    height: 28px;
-    line-height: 28px;
 }
 
 .dz-preview .dz-success-mark,
