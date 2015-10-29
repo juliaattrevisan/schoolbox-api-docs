@@ -10,7 +10,7 @@
  * @version     SVN: $Id$
  */
 
-class External_Maze_Loreto_User implements External_Maze_User {
+class External_Maze_Loreto_User extends External_Maze_User {
 
 	/**
 	 * Get a guy's info from Maze

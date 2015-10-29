@@ -10,7 +10,7 @@
  * @version     SVN: $Id$
  */
 
-class External_Maze_Loreto_Class implements External_Maze_Class {
+class External_Maze_Loreto_Class extends External_Maze_Class {
 
 	/**
 	 * Returns a list of *THE IDs OF* teachers that are associated with a class (method is misnamed)
