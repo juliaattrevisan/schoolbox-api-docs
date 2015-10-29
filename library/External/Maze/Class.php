@@ -15,14 +15,14 @@ class External_Maze_Class implements External_ClassInterface {
 	 *
 	 * @var null
 	 */
-	private $db = null;
+	protected $db = null;
 
 	/**
 	 * Helper
 	 *
 	 * @var null
 	 */
-	private $helper = null;
+	protected $helper = null;
 
 	/**
 	 * Constructor
@@ -158,16 +158,6 @@ class External_Maze_Class implements External_ClassInterface {
 			WHERE KGC.ROLL_GROUP = '{$classCode}'
 			";
 
-		if (Cfg::get('site_location') == 'loreto') {
-			$query = "
-				SELECT
-					TEACHER AS T1TEACH,
-					TEACHERB AS T2TEACH,
-					TEACHERC AS T3TEACH
-				FROM KGC
-				WHERE KGC.ROLL_GROUP = '{$classCode}'
-			";
-		}
 		$part2 = $this->getDb()->getAll($query);
 
 		if (!$part2) {
@@ -205,7 +195,7 @@ class External_Maze_Class implements External_ClassInterface {
 	 *
 	 * @param null $db
 	 */
-	private function setDb($db) {
+	protected function setDb($db) {
 		$this->db = $db;
 	}
 
@@ -214,7 +204,7 @@ class External_Maze_Class implements External_ClassInterface {
 	 *
 	 * @return null
 	 */
-	private function getDb() {
+	protected function getDb() {
 		return $this->db;
 	}
 
@@ -223,7 +213,7 @@ class External_Maze_Class implements External_ClassInterface {
 	 *
 	 * @param null $helper
 	 */
-	private function setHelper($helper) {
+	protected function setHelper($helper) {
 		$this->helper = $helper;
 	}
 
@@ -232,7 +222,7 @@ class External_Maze_Class implements External_ClassInterface {
 	 *
 	 * @return null
 	 */
-	private function getHelper() {
+	protected function getHelper() {
 		return $this->helper;
 	}
 } 
