@@ -16,6 +16,7 @@ namespace Schoolbox\External\Importer;
 
 use Alaress_Date_Format;
 use Alaress\Csv\Reader;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -28,11 +29,6 @@ use Schoolbox\External\TimetablePeriodMapper;
 
 class TimetableStructure
 {
-    /**
-     * @var Reader
-     */
-    protected $csvReader;
-
     /**
      * @var Collection|Campus[]
      */
@@ -55,33 +51,30 @@ class TimetableStructure
 
     /**
      * Constructor
-     *
-     * @param string $filename The filename to load from
      */
-    public function __construct($filename)
+    public function __construct()
     {
         $campusMapper                = new CampusMapper();
         $this->campusList            = $campusMapper->findAll();
         $this->timetableCycleMapper  = new TimetableCycleMapper();
         $this->timetableCampusMapper = new TimetableCampusMapper();
         $this->timetablePeriodMapper = new TimetablePeriodMapper();
-        $this->csvReader             = new Reader($filename);
-        $this->csvReader
-            ->setLoadFromFirst(true)
-            ->setFillDown(true)
-        ;
     }
 
     /**
      * Reads all rows from the CSV reader, and loads them into an associative
      * array structure.
      *
+     * @param Reader          $reader
+     * @param LoggerInterface $log
+     *
      * @return array
      */
-    protected function parse()
+    protected function parse(Reader $reader, LoggerInterface $log)
     {
         $result = [];
-        foreach ($this->csvReader as $row) {
+        $reader->setLoadFromFirst(true)->setFillDown(true);
+        foreach ($reader as $row) {
             $key = sprintf('%s-%s', $row['Term Campus'], $row['Term Title']);
             if (!isset($result[$key])) {
                 $campusObject = $this->campusList->getBy('extTimetableCode', $row['Term Campus']);
@@ -158,13 +151,16 @@ class TimetableStructure
 
     /**
      * Reads the rows to insert from the CSV, and writes to the database.
+     *
+     * @param Reader          $reader
+     * @param LoggerInterface $log
      */
-    public function save()
+    public function save(Reader $reader, LoggerInterface $log)
     {
         // Eventual override rules:
         // * Term: same title/campus combination
         // * Period: same term, and period title/day combination
-        foreach ($this->parse() as $row) {
+        foreach ($this->parse($reader, $log) as $row) {
             /** @var TimetableCycle $cycle */
             $cycle = $row['cycle'];
             $this->timetableCycleMapper->save($cycle);
