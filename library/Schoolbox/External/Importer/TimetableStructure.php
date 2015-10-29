@@ -74,18 +74,28 @@ class TimetableStructure
     {
         $result = [];
         $reader->setLoadFromFirst(true)->setFillDown(true);
-        foreach ($reader as $row) {
-            $key = sprintf('%s-%s', $row['Term Campus'], $row['Term Title']);
+        foreach ($reader as $i => $row) {
+            $log->info("Parsing row $i...");
+            if (!isset($row['Term Campus']) || !isset($row['Term Title'])) {
+                $log->warning('Mandatory fields "Term Campus" and "Term Title" not defined: skipping!');
+                continue;
+            }
+
+            $termTitle  = $row['Term Title'];
+            $termCampus = $row['Term Campus'];
+            $key = sprintf('%s-%s', $termCampus, $termTitle);
             if (!isset($result[$key])) {
-                $campusObject = $this->campusList->getBy('extTimetableCode', $row['Term Campus']);
+                $log->info(sprintf('Term "%s" for campus "%s" has not been parsed: parsing now', $termTitle, $termCampus));
+                $campusObject = $this->campusList->getBy('extTimetableCode', $termCampus);
                 if (!$campusObject) {
+                    $log->warning(sprintf('Campus "%s" not found: skipping!', $termCampus));
                     continue;
                 }
 
                 // Timetable cycle - calculate cycle and day length later
                 $cycle = new TimetableCycle();
                 $cycle
-                    ->setTitle($row['Term Title'])
+                    ->setTitle($termTitle)
                     ->setRegular(true)
                 ;
 
@@ -103,11 +113,15 @@ class TimetableStructure
                     'campus'  => $campus,
                     'periods' => [],
                 ];
+            } else {
+                $log->info(sprintf('Term "%s" for campus "%s" has been parsed', $termTitle, $termCampus));
             }
 
             // Sort the periods by start then end later, then use that to apply a sequence
             $day    = $row['Period Day'];
+            $title  = $row['Period Title'];
             $period = new TimetablePeriod();
+            $log->info(sprintf('Parsing period "%s" for day %d', $title, $day));
             $period
                 ->setDay($day)
                 ->setStart(new Alaress_Date_Format($row['Period Start'], Alaress_Date_Format::DATABASE_TIME_FORMAT))
@@ -119,15 +133,26 @@ class TimetableStructure
                 $result[$key]['periods'][$day] = new Collection();
             }
             $result[$key]['periods'][$day]->add($period);
+            $log->info(sprintf('Period "%s" for day %d has been parsed', $title, $day));
         }
+        $log->info("All rows parsed - calculating cycle and day lengths and period sequences");
 
         // Sort the period list, and set sequence based on that
         foreach ($result as $key => $timetable) {
-            $timetable['cycle']
-                ->setCycleLength(max(array_keys($timetable['periods'])))
-                ->setDayLength(max(array_map('count', $timetable['periods'])))
-            ;
+            $log->info(
+                sprintf(
+                    'Calculating day and period count for term "%s" / campus "%s"',
+                    $timetable['cycle']->getTitle(),
+                    $timetable['campus']->getCampus()->getExtTimetableCode()
+                )
+            );
+            $dayCount    = max(array_keys($timetable['periods']));
+            $periodCount = max(array_map('count', $timetable['periods']));
+            $log->info(sprintf('Day count: %d, period count: %d"', $dayCount, $periodCount));
+            $timetable['cycle']->setCycleLength($dayCount)->setDayLength($periodCount);
+
             // Sort periods by day, and then set period sequence that way
+            $log->info('Setting sequence for periods');
             foreach ($timetable['periods'] as $day => $periods) {
                 /** @var Collection|TimetablePeriod[] $periods */
                 $periods->sortByCallback(function($a, $b) {
@@ -140,10 +165,20 @@ class TimetableStructure
                 });
                 $i = 1;
                 foreach ($periods as $period) {
+                    $log->info(
+                        sprintf(
+                            'Period "%s" for day %d has sequence %d',
+                            $period->getTitle(),
+                            $period->getDay(),
+                            $day,
+                            $i
+                        )
+                    );
                     $period->setSequence($i++);
                 }
             }
         }
+        $log->info("Parsing completed");
 
         // Mangle all of this into a list of timetable cycles and stuff
         return $result;
@@ -163,17 +198,20 @@ class TimetableStructure
         foreach ($this->parse($reader, $log) as $row) {
             /** @var TimetableCycle $cycle */
             $cycle = $row['cycle'];
+            $log->info(sprintf('Saving cycle for term "%s"', $cycle->getTitle()));
             $this->timetableCycleMapper->save($cycle);
 
             /** @var TimetableCampus $campus */
             $campus = $row['campus'];
             $campus->setCycle($cycle);
+            $log->info(sprintf('Saving campus cycle for campus "%s"', $campus->getCampus()->getExtTimetableCode()));
             $this->timetableCampusMapper->save($campus);
 
             foreach ($row['periods'] as $day => $periods) {
                 /** @var Collection|TimetablePeriod[] $periods */
                 foreach ($periods as $period) {
                     $period->setCycle($cycle);
+                    $log->info(sprintf('Saving period "%s" for day %d', $period->getTitle(), $period->getDay()));
                 }
                 $this->timetablePeriodMapper->save($periods);
             }
