@@ -1,11 +1,11 @@
 <!-- Template for browsing curricula -->
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
-<script type="application/javascript" src="/javascript/components/jstree/dist/jstree.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
+<script type="text/javascript" src="/javascript/shared/curriculum/jquery.curriculum-browser.js"></script>
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.min.js"></script>
 <script type="text/javascript" src="/javascript/components/doT/doT.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
-<script type="application/javascript">
+<script type="text/javascript">
     (function($) {
         $(function() {
             // Setup Tiny now, for later addition
@@ -13,301 +13,38 @@
                 mode: 'none'
             });
 
-            // Twig-generated JS
-            var readonly  = {% if readonly %}true{% else %}false{% endif %};
-            var areas     = {{ areas|json_encode|raw }};
-            var levels    = {{ levels|json_encode|raw }};
-            var createUri = {{ routeLookup('curriculum.create')|json_encode|raw }};
-
-            // add classes to tree, because jstree doesn't allow me to define
-            // a base style for trees
-            var treeData = {{ tree|json_encode|raw }}.map(function(row) {
-                try {
-                    row.li_attr.class += ' curriculum-node';
-                } catch (e) {
-                    row.li_attr.class = 'curriculum-node';
-                }
-                return row;
-            });
-
-            var dialogOptions = {autoOpen: false, modal: true};
-            var areaDialog    = $('[data-role="add-area-dialog"]').dialog(dialogOptions);
-            var levelDialog   = $('[data-role="add-level-dialog"]').dialog(dialogOptions);
-
-            /**
-             * Builds a readonly view of the curriculum node
-             *
-             * @param actions
-             * @param data
-             */
-            var buildView = function(actions, data) {
-                data.actions  = actions;
-                data.readonly = readonly;
-                formPanel
-                    .empty()
-                    .append(template(data));
-                // Add an edit existing curriculum event to the edit button here
-                formPanel.find('#edit-button').click(function(event) {
-                    event.preventDefault();
-                    buildForm(actions, data);
-                });
-                // Add child to existing curriculum
-                formPanel.find('#create-child-button').click(function(event) {
-                    event.preventDefault();
-                    var form = $(this).closest('form');
-                    buildForm({ save: createUri }, { parent: form.data('nodeid') }, data);
-                });
-            };
-
-            /**
-             * Builds a writable view of the curriculum node
-             *
-             * @param actions
-             * @param data
-             * @param previous If creating a subsection, fall back to this data
-             */
-            var buildForm = function(actions, data, previous) {
-                tinyMCE.execCommand('mceRemoveControl', true, 'node-description');
-                data.actions = actions;
-                data.areas   = areas;
-                data.levels  = levels;
-                formPanel
-                    .empty()
-                    .append(editTemplate(data));
-                // Cancel editing
-                formPanel.find('#cancel-button').click(function(event) {
-                    event.preventDefault();
-                    // Is data empty? Load data from whatever the current node is.
-                    if (!data.id) {
-                        buildView(actions, previous);
-                    } else {
-                        buildView(actions, data);
-                    }
-                });
-                tinyMCE.execCommand('mceAddControl', true, 'node-description');
-            };
-
-            var template     = doT.template($('script#node-template').html().trim());
-            var editTemplate = doT.template($('script#node-edit-template').html().trim());
-            var treePanel    = $('.curriculum-selector');
-            var formPanel    = $('.curriculum-editor');
-            var tree         = $('.curriculum-tree').jstree({
-                core: {
-                    animation: 50,
-                    data: treeData,
-                    force_text: true,
-                    multiple: false,
-                    check_callback: true,
-                    themes: {
-                        variant: "resourcetree",
-                        dots: true,
-                        icons: true,
-                        responsive: false
-                    }
+            // Set up the browser
+            var browser = $('[data-role="curriculum-browser"]').curriculumBrowser({
+                areas: {
+                    data: {{ areas|json_encode|raw }},
+                    dialog: $('[data-role="add-area-dialog"]')
                 },
-                plugins: ['sort', 'types'],
-                types: {
-                    root: {
-                        icon: '/images/tree/server.gif'
+                levels: {
+                    data: {{ levels|json_encode|raw }},
+                    dialog: $('[data-role="add-level-dialog"]')
+                },
+                view: {
+                    readonly: {% if readonly %}true{% else %}false{% endif %},
+                    selector: '[data-role="curriculum-editor"]',
+                    editFormSelector: '[data-role="node-form"]',
+                    deleteFormSelector: '[data-role="node-delete-form"]',
+                    createUri: {{ routeLookup('curriculum.create')|json_encode|raw }},
+                    templates: {
+                        view: $('script#node-template').html().trim(),
+                        edit: $('script#node-edit-template').html().trim()
                     },
-                    'default': {
-                        icon: '/images/icons/22x22/folder.png'
-                    },
-                    folder: {
-                        icon: '/images/icons/22x22/folder.png'
-                    },
-                    code: {
-                        icon: '/images/famicons/star.png'
-                    }
-                }
-            })
-                .on('select_node.jstree', function(event, jstree) {
-                    // Open a node when you select it
-                    jstree.instance.open_node(jstree.node.id);
-                })
-                .on('ready.jstree', function(event, jstree) {
-                    // Is there a hash? If so, open all nodes below that hash.
-                    // (but maybe not curriculum codes)
-                    var match = window.location.hash.match(/^#(.*)/);
-                    if (match) {
-                        jstree.instance.select_node(match[1]);
-                        jstree.instance.open_all(match[1]);
-                    }
-                })
-                .on('select_node.jstree', function(event, jstree) {
-                    // Load this node in the node browser
-                    // read URL comes from the node I just clicked
-                    formPanel
-                        .addClass('loading')
-                        .find(':input').prop('disabled', true);
-                    $.getJSON(jstree.node.a_attr.href+'.json')
-                        .done(function(data) {
-                            buildView(
-                                {
-                                    save:   jstree.node.a_attr['data-saveuri'],
-                                    delete: jstree.node.a_attr['data-deleteuri']
-                                },
-                                data.item
-                            );
-                        })
-                        .fail(function(jqXhr, textStatus, error) {
-                            formPanel.addClass('failed');
-                        })
-                        .always(function() {
-                            formPanel.removeClass('loading');
-                            setTimeout(function() {
-                                formPanel.removeClass('loaded failed');
-                            }, 2000)
-                        });
-                })
-
-            var jstree = $.jstree.reference('.curriculum-tree');
-
-            // resizer - stolen from three panel
-            var resizePanels = function() {
-                $().add(formPanel).add(treePanel).outerHeight(
-                    $(window).height() - $('#header').height() - $('#footer').height() - 50
-                );
-            };
-            resizePanels();
-            $(window).resize(resizePanels);
-
-            // Triggers for adding new levels or areas
-            formPanel.on('change', '#node-form select', function(event) {
-                var option      = $(this).find(':selected');
-                var interaction = option.data('interaction');
-                switch (interaction) {
-                    case 'add-level-dialog-open':
-                        event.preventDefault();
-                        levelDialog.dialog('open');
-                        break;
-                    case 'add-area-dialog-open':
-                        event.preventDefault();
-                        areaDialog.dialog('open');
-                        break;
-                    default:
-                        break;
+                    dialog: $('[data-role="node-dialog"]')
+                },
+                tree: {
+                    data: {{ tree|json_encode|raw }},
+                    selector: '[data-role="curriculum-tree"]'
                 }
             });
-
-            // Node save form submission
-            formPanel.on('submit', '#node-form', function(event) {
-                event.preventDefault();
-
-                // Do it via AJAX instead
-                var form     = $(this);
-                var formData = form.serializeArray();
-                formPanel
-                    .addClass('loading')
-                    .find(':input').prop('disabled', true);
-                $.ajax({
-                    type:     this.method,
-                    data:     formData,
-                    dataType: 'json',
-                    url:      this.action
-                })
-                    .done(function(data) {
-                        // Is this a newly created node? If so, add it in.
-                        // jsTree has no comprehensive updateNode, so update what I can.
-                        formPanel.addClass('loaded');
-                        if (jstree.get_node(data.item.id)) {
-                            jstree.rename_node(data.item.id, data.tree.text);
-                        } else {
-                            jstree.create_node(data.tree.parent, data.tree);
-                            jstree.deselect_all(true);
-                            jstree.select_node(data.tree.id);
-                        }
-                    })
-                    .fail(function(jqXhr, textStatus, error) {
-                        formPanel.addClass('failed');
-                    })
-                    .always(function() {
-                        formPanel.removeClass('loading')
-                            .find(':input').prop('disabled', false);
-                        setTimeout(function() {
-                            formPanel.removeClass('loaded failed');
-                        }, 2000)
-                    });
-            });
-
-            // IE9 doesn't support form attribute on inputs.
-            // Add a click delete button polyfill.
-            if (!('form' in $('<input>')[0])) {
-                formPanel.on('click', '#delete-button', function(event) {
-                    event.preventDefault();
-                    formPanel.find('#node-delete-form').submit();
-                });
-            }
-
-            // Delete node form
-            formPanel.on('submit', '#node-delete-form', function(event) {
-                event.preventDefault();
-                formPanel
-                    .addClass('loading')
-                    .find(':input').prop('disabled', true);
-                $.ajax({
-                    type:     this.method,
-                    dataType: 'json',
-                    url:      this.action
-                })
-                    .done(function(data) {
-                        formPanel.addClass('loaded');
-                        jstree.delete_node(data.item.id);
-                        jstree.select_node(data.tree.parent);
-                    })
-                    .fail(function(jqXhr, textStatus, error) {
-                        formPanel.addClass('failed');
-                    })
-                    .always(function() {
-                        formPanel.removeClass('loading')
-                            .find(':input').prop('disabled', false);
-                    });
-            })
 
             // Create new curriculum
-            treePanel.on('click', '#create-curriculum-button', function(event) {
+            $('[data-interaction="create-curriculum"]').on('click', function(event) {
                 event.preventDefault();
-                buildForm({ save: createUri }, {});
-            });
-
-            // Create new level/area submit event
-            var allDialogs = $(areaDialog).add(levelDialog)
-            allDialogs.on('submit', 'form', function(event) {
-                event.preventDefault();
-                formPanel.addClass('loading');
-                var form     = $(this);
-                var selector = form.data('relation');
-                var submit   = form.find(':submit').prop('disabled', true);
-                var ajax     = $.ajax({
-                    method: this.method,
-                    url:    this.action,
-                    data:   form.serializeArray()
-                });
-                ajax
-                    .done(function(data) {
-                        // Update what gets chosen
-                        formPanel.addClass('loaded');
-                        var nameInput = form.find('input[name="name"]');
-                        var name      = nameInput.val();
-                        nameInput.val('');
-                        formPanel.find('#node-form').find(selector).append(
-                            $('<option />')
-                                .attr('value', data.item.id)
-                                .attr('label', name)
-                                .prop('selected', true)
-                                .text(name)
-                        );
-                        allDialogs.dialog('close');
-                    })
-                    .fail(function() {
-                        // Not sure?
-                        formPanel.addClass('failed');
-                    })
-                    .always(function() {
-                        // Re-enable submit button no matter what
-                        formPanel.removeClass('loading');
-                        submit.prop('disabled', false);
-                    });
+                browser.curriculumBrowser('openCreateForm');
             });
         })
     })(jQuery);
@@ -316,61 +53,54 @@
 <!-- Template for displaying of a curriculum node -->
 {% verbatim %}
 <script id="node-template" type="text/x-dot-template">
-    <h1>
-        {{? it.code }}
-            [{{! it.code }}]
-        {{?}}
-        {{! it.name }}
-    </h1>
+    <div class="row">
+        <div class="small-12 column">
+            <h3 id="nodeTitle">
+                {{? it.code }}
+                    [{{! it.code }}]
+                {{?}}
+                {{! it.name }}
+            </h3>
 
-    {{? it.reference }}
-    <p>
-        <strong>Reference:</strong>
-        <a href="{{! it.reference }}">{{! it.reference }}</a>
-    </p>
-    {{?}}
+            {{? it.reference }}
+            <p class="meta">
+                Reference: <a href="{{! it.reference }}">{{! it.reference }}</a>
+            </p>
+            {{?}}
 
-    {{= it.description }}
+            <article>{{= it.description }}</article>
 
-    {{? !it.readonly }}
-    <form id="node-form" method="post" action="{{! it.actions.save }}" data-nodeid="{{! it.id }}">
-        <input type="submit"
-               class="submit-btn-plain"
-               value="Edit"
-               id="edit-button"
-        />
-        <input type="submit"
-               class="submit-btn-plain"
-               value="Add Subsection"
-               id="create-child-button"
-        />
-    </form>
-    <form action="{{! it.actions.delete }}" method="post">
-        <input type="submit"
-               class="submit-btn-plain"
-               value="Delete"
-               id="delete-button"
-        />
-    </form>
-    {{?}}
+            {{? !it.readonly }}
+            <ul class="flex-list buttons small-1 medium-2 large-2 xlarge-4 xxlarge-2">
+                <li><a data-interaction="edit" class="icon-modify">Edit</a></li>
+                <li><a data-interaction="add-subsection" class="icon-add" data-nodeid="{{! it.id }}">Add Subsection</a></li>
+                <li><a data-interaction="delete" class="icon-delete" data-nodeid="{{! it.id }}" data-action="{{! it.actions.delete }}">Delete</a></li>
+                <li class="overflow">
+                    <a class="icon-more" data-dropdown="node-template-dropdown"></a>
+                    <ul class="f-dropdown" id="node-template-dropdown" data-dropdown-content>
+                        <li><a data-interaction="edit" class="icon-modify">Edit</a></li>
+                        <li><a data-interaction="add-subsection" class="icon-add" data-nodeid="{{! it.id }}">Add Subsection</a></li>
+                        <li><a data-interaction="delete" class="icon-delete" data-nodeid="{{! it.id }}" data-action="{{! it.actions.delete }}">Delete</a></li>
+                    </ul>
+                </li>
+            </ul>
+            {{?}}
+        </div>
+    </div>
 </script>
 {% endverbatim %}
 
 <!-- Template for editing a curriculum node -->
 {% verbatim %}
 <script id="node-edit-template" type="text/x-dot-template">
-    <form id="node-form" method="post" action="{{! it.actions.save }}" data-nodeid="{{! it.id }}">
-        <input type="hidden" name="parent" value="{{! it.parent }}" />
-        <!--
-        Only show curriculum selection for new base nodes
-        Also consider making these selectors selectized so I can add dynamically
-        -->
-        {{? !it.id && !it.parent }}
-        <h1>Create New Curriculum</h1>
-        <dl>
-            <dt>Curriculum</dt>
-            <dd>
-                <select name="learningLevel">
+    <div class="row">
+        <div class="small-12 column">
+            <form method="post" action="{{! it.actions.save }}" data-nodeid="{{! it.id }}" data-role="node-form">
+                <input type="hidden" name="parent" value="{{! it.parent }}" />
+                {{? !it.id && !it.parent }}
+                <h3 id="nodeTitle">Create New Curriculum</h3>
+                <label for="curriculumLearningLevel">Level</label>
+                <select name="learningLevel" id="curriculumLearningLevel">
                     <option value="">-- select a level --</option>
                     {{~ it.levels :levelGroup }}
                     <optgroup label="{{! levelGroup.name || 'Uncategorized' }}">
@@ -381,7 +111,8 @@
                     {{~}}
                     <option value="" data-interaction="add-level-dialog-open">Add New Level...</option>
                 </select>
-                <select name="learningArea">
+                <label for="curriculumLearningArea">Learning Area</label>
+                <select name="learningArea" id="curriculumLearningArea">
                     <option value="">-- select an area --</option>
                     {{~ it.areas :areaGroup }}
                     <optgroup label="{{! areaGroup.name || 'Uncategorized' }}">
@@ -392,93 +123,119 @@
                     {{~}}
                     <option value="" data-interaction="add-area-dialog-open">Add New Area...</option>
                 </select>
-            </dd>
-        </dl>
-        {{?}}
+                {{?}}
 
-        {{? it.id }}
-        <h1>Edit Curriculum Subsection</h1>
-        {{?}}
-        {{? !it.id && it.parent }}
-        <h1>Create New Curriculum Subsection</h1>
-        {{?}}
+                {{? it.id }}
+                <h3 id="nodeTitle">Edit Curriculum Subsection</h3>
+                {{?}}
+                {{? !it.id && it.parent }}
+                <h3 id="nodeTitle">Create New Curriculum Subsection</h3>
+                {{?}}
 
-        <dl>
-            <dt>Name</dt>
-            <dd><input type="text" name="name" value="{{! it.name }}" /></dd>
-        </dl>
-        <dl>
-            <dt>Code</dt>
-            <dd><input type="text" name="code" value="{{! it.code }}" /></dd>
-        </dl>
-        <dl>
-            <dt>Reference</dt>
-            <dd><input type="text" name="reference" value="{{! it.reference }}" /></dd>
-        </dl>
-        <dl>
-            <dt>Description</dt>
-            <dd><textarea id="node-description" name="description">{{! it.description }}</textarea>
-        </dl>
-        {{? it.id }}
-            <input type="submit" class="submit-btn-plain" value="Save Changes" />
-        {{?}}
-        {{? !it.id && it.parent }}
-            <input type="submit" class="submit-btn-plain" value="Create Subsection" />
-        {{?}}
-        {{? !it.id && !it.parent }}
-            <input type="submit" class="submit-btn-plain" value="Create Curriculum" />
-        {{?}}
-        <input type="submit"
-               class="submit-btn-plain"
-               value="Cancel"
-               id="cancel-button"
-        />
-    </form>
+                <label for="curriculumName">Name</label>
+                <input id="curriculumName" type="text" name="name" value="{{! it.name }}" />
+                <label for="curriculumCode">Code</label>
+                <input id="curriculumCode" type="text" name="code" value="{{! it.code }}" />
+                <label for="curriculumReference">Reference</label>
+                <input id="curriculumReference" type="text" name="reference" value="{{! it.reference }}" />
+                <label for="curriculumDescription">Description</label>
+                <textarea id="curriculumDescription" name="description">{{! it.description }}</textarea>
+
+                <ul class="flex-list buttons small-1 medium-2 large-2 xlarge-4 xxlarge-2">
+                    <li>
+                        {{? it.id }}
+                            <input type="submit" value="Save Changes" />
+                        {{?}}
+                        {{? !it.id && it.parent }}
+                            <input type="submit" value="Create Subsection" />
+                        {{?}}
+                        {{? !it.id && !it.parent }}
+                            <input type="submit" value="Create Curriculum" />
+                        {{?}}
+                    </li>
+                    <li><a href="#" data-interaction="cancel" class="icon-cancel">Cancel</a></li>
+                    <li class="overflow">
+                        <a class="icon-more" data-dropdown="node-template-dropdown"></a>
+                        <ul class="f-dropdown" id="node-template-dropdown" data-dropdown-content>
+                            <li><input type="submit" value="Save Changes" /></li>
+                            <li><a href="#" data-interaction="cancel" class="icon-cancel">Cancel</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </form>
+        </div>
+    </div>
 </script>
 {% endverbatim %}
 
-<div class="template2 curriculum-browser">
-    <div class="left">
-        <div class="pane curriculum-selector">
-            <table id="category-head" class="table">
-                <thead>
-                    <tr>
-                        <th>
-                            Curricula
-                            {% if not readonly %}
-                            <a href="{{ routeLookup('curriculum.add')|escape('html_attr') }}"
-                               id="create-curriculum-button"
-                               class="submit-btn-plain float-right inline-block"
-                            >Create New Curriculum</a>
-                            <a href="{{ routeLookup('curriculumImport.browse')|escape('html_attr') }}"
-                               class="submit-btn-plain float-right inline-block"
-                            >Import Curriculum</a>
-                            {% endif %}
-                        </th>
-                    </tr>
-                </thead>
-            </table>
-            <div class="scroller">
-                <div class="curriculum-tree"></div>
-            </div>
+<div class="row {% if not readonly %}actions-small-1 actions-medium-2{% endif %}">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Curriculum Browser</h1>
         </div>
     </div>
-    <div class="right">
-        <div class="pane curriculum-editor">
-        </div>
+    {% if not readonly %}
+    <nav>
+        <span class="hide-for-small">
+            <a href="{{ routeLookup('curriculum.add')|escape('html_attr') }}"
+               data-interaction="create-curriculum"
+               class="icon icon-add"
+               title="Create New Curriculum"></a>
+            <a href="{{ routeLookup('curriculumImport.browse')|escape('html_attr') }}"
+               class="icon icon-upload"
+               title="Import Curriculum"></a>
+        </span>
+        <a href="#" class="icon-more show-for-small" data-dropdown="tab-control"></a>
+    </nav>
+    <ul id="tab-control" class="f-dropdown" data-dropdown-content>
+        <li>
+            <a href="{{ routeLookup('curriculum.add')|escape('html_attr') }}"
+               data-interaction="create-curriculum"
+               class="icon icon-add">Create New Curriculum</a>
+        </li>
+        <li>
+            <a href="{{ routeLookup('curriculumImport.browse')|escape('html_attr') }}"
+               class="icon icon-upload">Import Curriculum</a>
+        </li>
+    </ul>
+    {% endif %}
+</div>
+
+<div class="resource-browser row" data-role="curriculum-browser">
+    <div class="small-12 island">
+        <section>
+            <div class="scroller">
+                <div data-role="curriculum-tree" class="curriculum-tree"></div>
+            </div>
+        </section>
+    </div>
+    <div class="small-12 island">
+        <section>
+            <div class="meta-panel" data-role="curriculum-editor">
+            </div>
+        </section>
     </div>
 </div>
 
-<div data-role="add-area-dialog" title="Create New Learning Area">
+<div class="reveal-modal" data-reveal data-role="add-area-dialog" aria-labelledby="addAreaTitle" aria-hidden="true" role="dialog">
+    <h2 id="addAreaTitle">Create New Learning Area</h2>
     <form action="{{ routeLookup('curriculumLearningArea.create') }}" method="post" data-relation="[name='learningArea']">
         <input name="name" type="text" value="" />
-        <input type="submit" class="submit-btn-plain float-right" value="Create" />
+        <input type="submit" value="Create" />
     </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
-<div data-role="add-level-dialog" title="Create New Learning Level">
+<div class="reveal-modal" data-reveal data-role="add-level-dialog" aria-labelledby="addLevelTitle" aria-hidden="true" role="dialog">
+    <h2 id="addLevelTitle">Create New Learning Level</h2>
     <form action="{{ routeLookup('curriculumLearningLevel.create') }}" method="post" data-relation="[name='learningLevel']">
         <input name="name" type="text" value="" />
-        <input type="submit" class="submit-btn-plain float-right" value="Create" />
+        <input type="submit" value="Create" />
     </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+{# Dialog that replaces the second panel on medium down - for now, readonly #}
+<div class="reveal-modal" data-reveal data-role="node-dialog" aria-labelledby="nodeTitle" aria-hidden="true" role="dialog">
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
