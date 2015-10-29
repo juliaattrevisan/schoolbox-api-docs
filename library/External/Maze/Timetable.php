@@ -160,7 +160,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Get the current day number
+     * Get the day number for the date specified
      *
      * @param \Schoolbox\Campus $campus
      * @param int $date
@@ -168,11 +168,19 @@ class External_Maze_Timetable implements External_TimetableInterface
      */
     public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
+	if ($date == 0) {
+		$tempDate = $this->getHelper()->currentDate();
+	}
+	else {
+		$temp = new \Alaress_Date_Format($date, 'U');
+		$tempDate = $temp->getDatabaseDate();
+	}
+
         $query = "
 			SELECT TOP 1 QCOL
 			FROM TCTQ
 			INNER JOIN TH ON TCTQ.QKEY = TH.THKEY
-			WHERE TCTQKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
+			WHERE TCTQKEY = CAST('{$tempDate}' AS DATE)
 		";
 
         $result = $this->getDb()->getRow($query);
