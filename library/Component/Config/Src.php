@@ -36,21 +36,24 @@ class Component_Config_Src extends Component_Config_Abstract
      */
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
-        try {
-            $folderMapper = new \Schoolbox\Resource\CategoryMapper();
-            $folder = $folderMapper->findById($configValue);
-
-            $page->setVar(array(
-                'COMPONENT_CONFIG_SRC_ID'   => '/homepage/' . $folder->getId(),
-                'COMPONENT_CONFIG_SRC_NAME' => $folder->getName(),
-                'COMPONENT_CONFIG_SRC_CID'  => $folder->getId()
-            ));
-        } catch (\Exception $e) {
-            $page->setVar(array(
-                'COMPONENT_CONFIG_SRC_ID'   => '#',
-                'COMPONENT_CONFIG_SRC_NAME' => 'Local',
-                'COMPONENT_CONFIG_SRC_CID'  => '0'
-            ));
+        $vars = array(
+            'COMPONENT_CONFIG_SRC_ID'   => '#',
+            'COMPONENT_CONFIG_SRC_NAME' => 'Local',
+            'COMPONENT_CONFIG_SRC_CID'  => '0'
+        );
+        if ($configValue) {
+            try {
+                $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+                $folder       = $folderMapper->findById($configValue);
+                $vars         = array(
+                    'COMPONENT_CONFIG_SRC_ID'   => '/homepage/' . $folder->getId(),
+                    'COMPONENT_CONFIG_SRC_NAME' => $folder->getName(),
+                    'COMPONENT_CONFIG_SRC_CID'  => $folder->getId()
+                );
+            } catch (\Exception $e) {
+                // noop - probably a deleted folder or something
+            }
         }
+        $page->setVar($vars);
     }
 }
