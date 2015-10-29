@@ -2,6 +2,15 @@
  * FullCalendar CSS customisations
  */
 
+.fc .fc-button-group>*{
+    margin: 0 1px 0 0;
+    border: 0;
+}
+
+.fc .fc-button-group>*:last-child{
+    margin: 0;
+}
+
 .fc-event {
     min-height: 1em;
 }
