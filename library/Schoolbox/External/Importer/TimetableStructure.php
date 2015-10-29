@@ -150,7 +150,7 @@ class TimetableStructure
             );
             $dayCount    = max(array_keys($timetable['periods']));
             $periodCount = max(array_map('count', $timetable['periods']));
-            $log->info(sprintf('Day count: %d, period count: %d"', $dayCount, $periodCount));
+            $log->info(sprintf('Day count: %d, period count: %d', $dayCount, $periodCount));
             $timetable['cycle']->setCycleLength($dayCount)->setDayLength($periodCount);
 
             // Sort periods by day, and then set period sequence that way
