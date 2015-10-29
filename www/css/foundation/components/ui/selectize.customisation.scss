@@ -55,7 +55,7 @@ $selectize-padding-item-y: 0;
 .selectize-control.multi .selectize-input > div {
 	background: $content-ui-background;
 	padding: 0 0 0 0.5rem;
-	margin: 1px;
+	margin: 1px 0px 1px 1px;
 	a {
 		padding: 0.5rem !important;
 		width: 1.5rem !important;
@@ -99,6 +99,7 @@ $selectize-padding-item-y: 0;
 .selectize-control .progress-tick {
 	margin-top: 0.5rem;
 }
-.row .selectize-control .row {
+
+.selectize-control .row {
 	width: 100%;
 }

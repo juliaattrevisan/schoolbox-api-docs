@@ -45,7 +45,7 @@
         ize = tgt.selectize(selectizeOptions);
 
         // hack, option not available
-        $('.selectize-input input').prop('disabled', true);
+        $('.selectize-input input').prop('disabled', true).hide();
 
         // manually set the value, because selectize
         ize[0].selectize.setValue("/submission/inlineGrading/view/{INLINE_GRADING_SUBMISSION_BOX_ID}/{INLINE_GRADING_STUDENT_ID}", true);
@@ -124,27 +124,27 @@
 </div>
 
 <div class="row">
-    <div class="small-12 column">
-        <div class="row collapse">
-            <div class="small-1 columns">
-                <a class="button icon-previous" rel="prev" href="" title="Previous"></a>
-            </div>
-            <div class="small-10 medium-6 columns">
+    <div class="small-12 medium-8 columns">
+        <div class="avatar-switch">
+            <nav>
+                <a rel="prev" href="" title=""></a>
+            </nav>
+            <div class="student">
                 <select name="student-select"></select>
             </div>
-            <div class="small-1 columns">
-                <a class="button icon-next" rel="next" href="" title="Next"></a>
-            </div>
-            <div class="small-12 medium-4 columns">
-                <form action="/submission/inlineGrading/configForm.php" method="post">
-                    <input type="hidden" name='boxId' value="{BOX_ID}" />
-                    <input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
-                    <input type="hidden" name="skipUnsubmitted" value="0" />
-                    <input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' />
-                    <label for="skipUnsubmitted" class="checkbox-label">Skip Unsubmitted</label>
-                </form>
-            </div>
+            <nav>
+                <a rel="next" href="" title=""></a>
+            </nav>
         </div>
+    </div>
+    <div class="small-12 medium-4 columns">
+        <form action="/submission/inlineGrading/configForm.php" method="post">
+            <input type="hidden" name='boxId' value="{BOX_ID}" />
+            <input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
+            <input type="hidden" name="skipUnsubmitted" value="0" />
+            <input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' />
+            <label for="skipUnsubmitted" class="checkbox-label">Skip Unsubmitted</label>
+        </form>
     </div>
 </div>
 
@@ -168,11 +168,6 @@
             <input type="hidden" name="clearAttachments" value="1" />
 
             <div class="row">
-
-                <div class="small-12 island">
-                    {INJECTED_MARK_RUBRIC}
-                </div>
-
                 <div class="small-12 large-6 island">
                     <!-- BEGIN student_row -->
                     <h2 class="subheader">Grade</h2>
@@ -263,6 +258,8 @@
                     {INJECTED_MARK_TEMPLATE}
                 </div>
                 <div class="small-12 island">
+                    {INJECTED_MARK_RUBRIC}
+
                     {INJECTED_INTERFACE_CONTROL}
                 </div>
 
