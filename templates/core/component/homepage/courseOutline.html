@@ -16,7 +16,9 @@
                 });
 
                 // Url attachment options
-                component.on('click', 'form .post-attachment a[data-value]', function() {
+                // Attach these to forms instead of component,
+                // because they're in reveal modals (which exist outside component)
+                $(document).on('click', 'form[data-component="component{COMPONENT_INSTANCE_ID}"] .post-attachment a[data-value]', function() {
                     var self = $(this),
                             form = self.closest('form'),
                             type = self.attr('data-value');
@@ -41,13 +43,13 @@
                 });
 
                 // Did I remove an attachment? Remove the URL too
-                component.on('click', 'a[data-dz-remove]', function() {
+                $(document).on('click', 'form[data-component="component{COMPONENT_INSTANCE_ID}"] a[data-dz-remove]', function() {
                     $(this).closest('form').find('input[name=url]').val('').prop('readonly', false);
                 });
 
                 /* Alternate expando style
                  */
-                $('a[data-interaction="toggle-expanded"]').on('click', function(event){
+                component.find('a[data-interaction="toggle-expanded"]').on('click', function(event){
                     event.preventDefault();
 
                     $(this).closest('li').find('[data-task-list]').removeClass('hide');
@@ -99,7 +101,7 @@
                         <nav>
                             <!-- BEGIN unit_actions -->
                             <!-- BEGIN unit_delete -->
-                            <a href="#" class="icon-delete" data-interaction="open_delete_unit_form" title="Delete this unit"></a>
+                            <a href="#" data-interaction="open_delete_unit_form" class="icon-delete" title="Delete this unit"></a>
                             <!-- END unit_delete -->
                             <!-- BEGIN unit_modify -->
                             <a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="icon-modify" title="Modify this unit"></a>
@@ -107,27 +109,11 @@
                             <!-- END unit_actions -->
                         </nav>
 
-                        <div class="content">
-                            <div class="twelve-column hide alert-box" data-form-container data-interaction="delete_unit_container">
-                                <p><span class="label alert full-width">Are you sure you wish to delete this unit?</span></p>
-                                <p>All tasks, linked due work and quizzes within the unit will be deleted.</p>
-
-                                <form action="/course/modifyForm.php" method="post" data-form_type="delete_unit">
-                                    <input type="hidden" name="action"    value="delete" />
-                                    <input type="hidden" name="id"        value="{UNIT_ID}" />
-                                    <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
-
-                                    <div class="row">
-                                        <div class="small-6 columns no-pad">
-                                            <input type="submit" class="button expand" data-interaction="delete_confirm" value="Yes">
-                                        </div>
-                                        <div class="small-6 columns no-pad">
-                                            <a href="#" class="button expand" data-interaction="delete_reject">No</a>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+                        <form action="/course/modifyForm.php" method="post" data-form_type="delete_unit" class="hide">
+                            <input type="hidden" name="action"    value="delete" />
+                            <input type="hidden" name="id"        value="{UNIT_ID}" />
+                            <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                        </form>
 
                         <ul class="action-list sortable ui-sortable task-list {UNIT_LIST_CLASS}" data-task-list>
                             <!-- BEGIN unit_task -->
@@ -158,7 +144,7 @@
                                         <!-- END unit_task_count -->
 
                                         <!-- BEGIN unit_task_due_date -->
-                                        <p class="meta">
+                                        <p class="meta spaced">
                                             <span class="unit-task-due-date">Due {UNIT_TASK_RELATIVE_DUE_DATE} on {UNIT_TASK_DUE_DATE}</span>
                                         </p>
                                         <!-- END unit_task_due_date -->
@@ -174,7 +160,7 @@
                                     <a href="#" class="icon-delete" data-interaction="open_delete_task_form" title="Delete this task"></a>
                                     <!-- END unit_task_delete -->
                                     <!-- BEGIN unit_task_modify -->
-                                    <a href="{UNIT_TASK_MODIFY_URL}" class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task"></a>
+                                    <a href="{UNIT_TASK_MODIFY_URL}" {UNIT_TASK_REVEAL_ATTR} class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task"></a>
                                     <!-- END unit_task_modify -->
                                     <!-- BEGIN unit_task_quiz_results -->
                                     <a href="/assess/results/{UNIT_QUIZ_ID}" class="icon-progress" title="View Results"></a>
@@ -189,90 +175,65 @@
                                 </nav>
 
                                 <!-- BEGIN unit_task_modify_form -->
-                                <div class="content">
-                                    <div class="row">
-                                        <div class="small-12 columns alert-box hide" data-form-container data-interaction="edit_task_container">
-                                            <form action="/task/saveInstanceForm.php" method="post" data-form_type="task">
-                                                <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
-                                                <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
-                                                <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
-                                                <input type="hidden" name="type"      value="string" />
-                                                <input type="hidden" name="link"      value="{UNIT_TASK_LINK}" id="link-{UNIT_TASK_ID}" />
+                                <div id="modifyTask-{UNIT_TASK_ID}" class="reveal-modal" data-reveal aria-hidden="true" aria-labelledby="modifyTask-{UNIT_TASK_ID}-label" role="dialog">
+                                    <h2 id="modifyTask-{UNIT_TASK_ID}-label">Update Task</h2>
+                                    <form action="/task/saveInstanceForm.php" method="post" data-form_type="task" data-component="component{COMPONENT_INSTANCE_ID}">
+                                        <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
+                                        <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                                        <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
+                                        <input type="hidden" name="type"      value="string" />
+                                        <input type="hidden" name="link"      value="{UNIT_TASK_LINK}" id="link-{UNIT_TASK_ID}" />
 
-                                                <div class="row">
-                                                    <div class="small-12 columns">
-                                                        <label for="title-{UNIT_TASK_ID}">
-                                                            Update Task
-                                                            <input id="title-{UNIT_TASK_ID}" name="title" type="text" value="{UNIT_TASK_NAME}" />
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <div class="row post-attachment attach" style="{UNIT_TASK_ATTACH_DISPLAY}">
-                                                    <div class="small-12 medium-9 columns post-attachment attach">
-                                                        {ATTACH_ZONE}
-                                                    </div>
-                                                    <div class="small-12 medium-3 columns">
-                                                        <a class='button icon-link sstream-attachment' data-value='url'>Link</a>
-                                                    </div>
-                                                </div>
-                                                <div class="row post-attachment url" style="{UNIT_TASK_URL_DISPLAY}">
-                                                    <div class="small-12 medium-9 columns">
-                                                        <label>
-                                                            <input type='text' class='url' name='url' maxlength='1024' placeholder="http://" value="{UNIT_TASK_LINK}" />
-                                                        </label>
-                                                    </div>
-                                                    <div class="small-12 medium-3 columns">
-                                                        <a class='button icon-attach sstream-attachment' data-value='attach'>Attach</a>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="small-12 columns">
-                                                        <label for="self_assess-{UNIT_TASK_ID}">
-                                                            Allow self-assessment?
-                                                        </label>
-                                                        <div class="switch">
-                                                            <input name="self_assess" value="0" type="hidden" />
-                                                            <input name="self_assess" value="1" type="checkbox" id="self_assess-{UNIT_TASK_ID}" {UNIT_TASK_SELF_ASSESS} />
-                                                            <label for="self_assess-{UNIT_TASK_ID}"></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="small-12 columns">
-                                                        <input type="submit" name="Submit" value="Update" />
-                                                    </div>
-                                                </div>
-                                            </form>
+                                        <label for="title-{UNIT_TASK_ID}">Title</label>
+                                        <input id="title-{UNIT_TASK_ID}" name="title" type="text" value="{UNIT_TASK_NAME}" />
+
+                                        <div class="row post-attachment attach" style="{UNIT_TASK_ATTACH_DISPLAY}">
+                                            <div class="small-12 medium-9 columns post-attachment attach no-pad">
+                                                <label>Attachment</label>
+                                                {ATTACH_ZONE}
+                                            </div>
+                                            <div class="small-12 medium-3 columns no-pad">
+                                                <label>&nbsp;</label>
+                                                <a class='button icon-link sstream-attachment' data-value='url'>Link</a>
+                                            </div>
                                         </div>
-                                    </div>
+                                        <div class="row post-attachment url" style="{UNIT_TASK_URL_DISPLAY}">
+                                            <div class="small-12 medium-9 columns no-pad">
+                                                <label>
+                                                    Link
+                                                    <input type='text' class='url' name='url' maxlength='1024' placeholder="http://" value="{UNIT_TASK_LINK}" />
+                                                </label>
+                                            </div>
+                                            <div class="small-12 medium-3 columns no-pad">
+                                                <label>&nbsp;</label>
+                                                <a class='button icon-attach sstream-attachment' data-value='attach'>Attach</a>
+                                            </div>
+                                        </div>
+
+                                        <label for="self_assess-{UNIT_TASK_ID}">
+                                            Allow self-assessment?
+                                        </label>
+
+                                        <div class="switch">
+                                            <input name="self_assess" value="0" type="hidden" />
+                                            <input name="self_assess" value="1" type="checkbox" id="self_assess-{UNIT_TASK_ID}" {UNIT_TASK_SELF_ASSESS} />
+                                            <label for="self_assess-{UNIT_TASK_ID}"></label>
+                                        </div>
+
+                                        <input type="submit" name="Submit" value="Update" />
+                                        <span class="label full-width hide" data-create-task-indicator></span>
+                                    </form>
+                                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                                 </div>
                                 <!-- END unit_task_modify_form -->
 
                                 <!-- BEGIN unit_task_delete_form -->
-                                <div class="content">
-                                    <div class="row">
-                                        <div class="small-12 columns alert-box hide" data-form-container data-interaction="delete_task_container">
-                                            <p><span class="label alert full-width">Are you sure you wish to delete this task?</span></p>
-                                            <p>Any linked due work items and quizzes will be deleted, as will all student's completion of this task.</p>
-
-                                            <form action="/task/saveInstanceForm.php" method="post" data-form_type="delete_task">
-                                                <input type="hidden" name="action"    value="delete" />
-                                                <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
-                                                <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
-                                                <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
-
-                                                <div class="row">
-                                                    <div class="small-6 columns no-pad">
-                                                        <input type="submit" data-interaction="delete_confirm" value="Yes" />
-                                                    </div>
-                                                    <div class="small-6 columns no-pad">
-                                                        <a href="#" class="button expand" data-interaction="delete_reject">No</a>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
+                                <form action="/task/saveInstanceForm.php" method="post" data-form_type="delete_task" class="hide">
+                                    <input type="hidden" name="action"    value="delete" />
+                                    <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
+                                    <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                                    <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
+                                </form>
                                 <!-- END unit_task_delete_form -->
                             </li>
                             <!-- END unit_task -->
@@ -285,65 +246,57 @@
                             <!-- BEGIN unit_add_task_actions -->
                             <a href="/submission/createSubmission/new/{ID}/unit:{UNIT_ID}" class="button icon-due-work" data-add-button data-form_class="for-due-work">Post Due Work</a>
                             <a href="/assess/create/{ID}/unit:{UNIT_ID}" class="button icon-quiz" data-add-button data-form_class="for-assessment">Create Quiz</a>
-                            <a href="/task/createInstance/{UNIT_ID}" class="button icon-task" data-add-button data-form_class="for-task">Add Task</a>
+                            <a href="/task/createInstance/{UNIT_ID}" class="button icon-task" data-reveal-id="createTask-{UNIT_ID}">Add Task</a>
                             <!-- END unit_add_task_actions -->
                         </div>
 
                         <!-- This is the form for inline creation of tasks -->
-                        <div class="content">
-                            <div class="row">
-                                <div class="small-12 columns alert-box hide" data-form-container data-for-task data-new-task-container>
-                                    <form action="/task/saveInstanceForm.php" method="post" data-form_type="task">
-                                        <input type="hidden" name="id" value=""/>
-                                        <input type="hidden" name="unit_id" value="{UNIT_ID}"/>
+                        <div id="createTask-{UNIT_ID}" class="reveal-modal" data-reveal aria-hidden="true" aria-labelledby="createTask-{UNIT_ID}-label" role="dialog">
+                            <h2 id="createTask-{UNIT_ID}-label">Create Task</h2>
+                            <form action="/task/saveInstanceForm.php" method="post" data-form_type="task" data-component="component{COMPONENT_INSTANCE_ID}">
+                                <input type="hidden" name="id" value=""/>
+                                <input type="hidden" name="unit_id" value="{UNIT_ID}"/>
 
-                                        <div class="row">
-                                            <div class="small-12 columns">
-                                                <label for="title-{UNIT_TASK_ID}">
-                                                    Create Task
-                                                    <input id="title-{UNIT_TASK_ID}" name="title" type="text" value="" />
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="row post-attachment attach">
-                                            <div class="small-12 medium-9 columns post-attachment attach">
-                                                {ATTACH_ZONE}
-                                            </div>
-                                            <div class="small-12 medium-3 columns">
-                                                <a class='button icon-link sstream-attachment' data-value='url'>Link</a>
-                                            </div>
-                                        </div>
-                                        <div class="row post-attachment url" style="display:none">
-                                            <div class="small-12 medium-9 columns">
-                                                <label>
-                                                    <input type='text' class='url' name='url' maxlength='1024' placeholder="http://" value="" />
-                                                </label>
-                                            </div>
-                                            <div class="small-12 medium-3 columns">
-                                                <a class='button icon-attach sstream-attachment' data-value='attach'>Attach</a>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="small-12 columns">
-                                                <label for="self_assess-new_task-{UNIT_ID}">
-                                                    Allow self-assessment?
-                                                </label>
-                                                <div class="switch">
-                                                    <input name="self_assess" value="0" type="hidden" />
-                                                    <input name="self_assess" value="1" type="checkbox" id="self_assess-new_task-{UNIT_ID}" />
-                                                    <label for="self_assess-new_task-{UNIT_ID}"></label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="small-12 columns">
-                                                <input type="submit" name="Submit" value="Create" />
-                                                <span class="label full-width hide" data-create-task-indicator></span>
-                                            </div>
-                                        </div>
-                                    </form>
+                                <label for="title-new-{UNIT_ID}">Title</label>
+                                <input id="title-new-{UNIT_ID}" name="title" type="text" value="" />
+
+                                <div class="row post-attachment attach">
+                                    <div class="small-12 medium-9 columns post-attachment attach no-pad">
+                                        <label>Attachment</label>
+                                        {ATTACH_ZONE}
+                                    </div>
+                                    <div class="small-12 medium-3 columns no-pad">
+                                        <label>&nbsp;</label>
+                                        <a class='button icon-link sstream-attachment' data-value='url'>Link</a>
+                                    </div>
                                 </div>
-                            </div>
+                                <div class="row post-attachment url" style="display:none">
+                                    <div class="small-12 medium-9 columns no-pad">
+                                        <label>
+                                            Link
+                                            <input type='text' class='url' name='url' maxlength='1024' placeholder="http://" value="" />
+                                        </label>
+                                    </div>
+                                    <div class="small-12 medium-3 columns no-pad">
+                                        <label>&nbsp;</label>
+                                        <a class='button icon-attach sstream-attachment' data-value='attach'>Attach</a>
+                                    </div>
+                                </div>
+
+                                <label for="self_assess-new_task-{UNIT_ID}">
+                                    Allow self-assessment?
+                                </label>
+
+                                <div class="switch">
+                                    <input name="self_assess" value="0" type="hidden" />
+                                    <input name="self_assess" value="1" type="checkbox" id="self_assess-new_task-{UNIT_ID}" />
+                                    <label for="self_assess-new_task-{UNIT_ID}"></label>
+                                </div>
+
+                                <input type="submit" name="Submit" value="Create" />
+                                <span class="label full-width hide" data-create-task-indicator></span>
+                            </form>
+                            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                         </div>
                     </li>
                     <!-- END unit -->

@@ -357,7 +357,7 @@ if(typeof window.location.origin == 'undefined') {
 
         // reinit
         $(document)
-            .foundation('reveal', 'reflow')
+            //.foundation('reveal', 'reflow')
             .on('closed.fndtn.reveal', '[data-reveal]', function () {
                 if (singletonModal) {
                     singletonModal.detach();
@@ -373,18 +373,43 @@ if(typeof window.location.origin == 'undefined') {
 
 
     ResourceAttach.prototype.open = function () {
+        var self = this;
         if (singletonModal == null) {
             // this will construct a modal VIA the cache
             this.cacheModal(function () {
-                singletonModal.html(singletonModal.data('content'))
-                              .foundation('reveal', 'open');
-
+                singletonModal
+                    .html(singletonModal.data('content'))
+                    .foundation('reveal', 'open')
+                    .off('closed.fndtn.reveal.attach')
+                    .on('closed.fndtn.reveal.attach', self.reopenParentReveal.bind(self));
             });
         } else {
             // ensure the return points to the right element
-            singletonModal.data('rtn', this)
+            singletonModal
+                .data('rtn', this)
                 .html(singletonModal.data('content'))
-                .foundation('reveal', 'open');
+                .foundation('reveal', 'open')
+                .off('closed.fndtn.reveal.attach')
+                .on('closed.fndtn.reveal.attach', self.reopenParentReveal.bind(self));
+        }
+    };
+
+
+    /**
+     * Is this attachzone in a reveal itself? Reopen it if so.
+     *
+     * @param event
+     */
+    ResourceAttach.prototype.reopenParentReveal = function(event) {
+        // compensate for event double-fire: see https://github.com/zurb/foundation/issues/5482
+        if (event) {
+            if (event.namespace !== 'fndtn.reveal' || $('[data-reveal].open').length > 0) {
+                return;
+            }
+        }
+        var parentReveal = $(this.element).closest('[data-reveal]');
+        if (parentReveal.length) {
+            parentReveal.foundation('reveal', 'open');
         }
     };
 

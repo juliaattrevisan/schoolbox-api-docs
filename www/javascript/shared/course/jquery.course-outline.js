@@ -79,56 +79,23 @@
         );
 
         // Delete unit - "are you sure?"
-        // (write the expand/collapse stuff into its own plugin)
         component.on(
             'click.courseInstance',
             'a[data-interaction="open_delete_unit_form"]',
             function(event) {
                 event.preventDefault();
-                var element      = $(this);
-                var unit_element = element.closest('[data-unit]');
-                var container    = unit_element.find('[data-interaction="delete_unit_container"]');
-
-                container.toggleClass('hide');
-                component.find('[data-form-container]').not(container).addClass('hide');
-
-                ///* Hide all other forms first
-                // */
-                //var allForms = component.find('[data-form-container]');
-                //allForms.removeClass('hide').not(container).slideUp('fast');
-                //
-                //if (container.hasClass('hide')) {
-                //    container.stop().removeClass('hide').slideUp(1).slideDown('fast');
-                //}
-                //else {
-                //    container.stop().slideToggle('fast');
-                //}
-            }
-        );
-
-        // "Yes, I am"
-        component.on(
-            'submit.courseInstance',
-            'form[data-form_type="delete_unit"]',
-            function(event) {
-                event.preventDefault();
-                // Submit form via Ajax
-                var form = $(this);
-                $.post(form.attr('action'), form.serialize(), function(data) {
-                    postCallback(form, data);
-                }, 'json');
-            }
-        );
-
-        // "No, I am not"
-        component.on(
-            'click.courseInstance',
-            'form[data-form_type="delete_unit"] [data-interaction="delete_reject"]',
-            function(event) {
-                event.preventDefault();
-                var container = $(this).closest('[data-interaction="delete_unit_container"]');
-                //container.slideToggle('fast');
-                container.toggleClass('hide');
+                var element = $(this);
+                element.confirmDialog({
+                    text: 'Are you sure you wish to delete this unit? All tasks, linked due work and quizzes within the unit will be deleted.',
+                    confirmEvent: function(element) {
+                        var unit_element = element.closest('[data-unit]');
+                        var form         = unit_element.find('[data-form_type="delete_unit"]');
+                        $.post(form.attr('action'), form.serialize(), function(data) {
+                            // Delete this unit from the list
+                            unit_element.remove();
+                        }, 'json');
+                    }
+                });
             }
         );
 
@@ -138,108 +105,26 @@
             'a[data-interaction="open_delete_task_form"]',
             function(event) {
                 event.preventDefault();
-                var element      = $(this);
-                var unit_element = element.closest('[data-unit-task]');
-                var container    = unit_element.find('[data-interaction="delete_task_container"]');
-
-                container.toggleClass('hide');
-                component.find('[data-form-container]').not(container).addClass('hide');
-
-                ///* Hide all other forms first
-                // */
-                //var allForms = component.find('[data-form-container]');
-                //allForms.removeClass('hide').not(container).slideUp('fast');
-                //
-                //if (container.hasClass('hide')) {
-                //    container.stop().removeClass('hide').slideUp(1).slideDown('fast');
-                //}
-                //else {
-                //    container.stop().slideToggle('fast');
-                //}
-            }
-        );
-        // Yes
-        component.on(
-            'submit.courseInstance',
-            'form[data-form_type="delete_task"]',
-            function(event) {
-                event.preventDefault();
-                // Submit form via Ajax
-                var form = $(this);
-                $.post(form.attr('action'), form.serialize(), function(data) {
-                    postCallback(form, data);
-                }, 'json');
-            }
-        );
-        // No
-        component.on(
-            'click.courseInstance',
-            'form[data-form_type="delete_task"] [data-interaction="delete_reject"]',
-            function(event) {
-                event.preventDefault();
-                var container = $(this).closest('[data-interaction="delete_task_container"]');
-                //container.slideToggle('fast');
-                container.toggleClass('hide');
-            }
-        );
-
-        // Create new tasks: show inline form if there is one.
-        component.on(
-            'click.courseInstance',
-            '[data-add-button][data-form_class="for-task"]',
-            function(event) {
-                event.preventDefault();
-                var thisCreateForm = $(this).closest('[data-unit]').find('[data-new-task-container]');
-
-                thisCreateForm.toggleClass('hide');
-                component.find('[data-form-container]').not(thisCreateForm).addClass('hide');
-                ///* Hide all other forms first
-                // */
-                //var allForms = component.find('[data-form-container]');
-                //allForms.removeClass('hide').not(thisCreateForm).slideUp('fast');
-                //
-                //if (thisCreateForm.hasClass('hide')) {
-                //    thisCreateForm.stop().removeClass('hide').slideUp(1).slideDown('fast');
-                //}
-                //else {
-                //    thisCreateForm.stop().slideToggle('fast');
-                //}
-            }
-        );
-
-        // show/hide the edit task dialog (if it exists?)
-        component.on(
-            'click.courseInstance',
-            'a[data-interaction="open_edit_task_form"]',
-            function(event) {
-                var element      = $(this);
-                var unit_element = element.closest('[data-unit-task]');
-                var container    = unit_element.find('[data-interaction="edit_task_container"]');
-
-                /* Hide all other forms first
-                 */
-                //var allForms = component.find('[data-form-container]');
-                //allForms.removeClass('hide').not(container).slideUp('fast');
-
-                if (container.length) {
-                    event.preventDefault();
-                    container.toggleClass('hide');
-                    component.find('[data-form-container]').not(container).addClass('hide');
-
-                    //if (container.hasClass('hide')) {
-                    //    container.stop().removeClass('hide').slideUp(1).slideDown('fast');
-                    //}
-                    //else {
-                    //    container.stop().slideToggle('fast');
-                    //}
-                }
+                var element = $(this);
+                element.confirmDialog({
+                    text: 'Are you sure you wish to delete this task? Any linked due work items and quizzes will be deleted, as will all student\'s completion of this task.',
+                    confirmEvent: function(element) {
+                        var unit_element = element.closest('[data-unit-task]');
+                        var form         = unit_element.find('[data-form_type="delete_task"]');
+                        $.post(form.attr('action'), form.serialize(), function(data) {
+                            postCallback(form, data);
+                        }, 'json');
+                    }
+                });
             }
         );
 
         // Create/edit task form submission
-        component.on(
+        // Bind to the document and filter on component ID manually,
+        // because the form is no longer a child of the component
+        $(document).on(
             'submit.courseInstance',
-            'form[data-form_type="task"]',
+            'form[data-form_type="task"][data-component="'+component_id+'"]',
             function(event) {
                 var form = $(this);
                 event.preventDefault();
@@ -252,7 +137,7 @@
                 var is_new = !(form.find('input[name="id"]').val());
 
                 $(this).find("input[type=submit]").attr('disabled', true);
-                
+
                 $.post(form.attr('action'), form.serialize(), function(data) {
                     label.labelTimeout({
                         text: 'Saved',
@@ -264,24 +149,11 @@
                         form.get(0).reset();
                     }
 
+                    $(document).foundation('reveal', 'close');
                     postCallback(form, data);
                 }, 'json');
             }
         );
-
-        // Set up the same resource browser as is used in the social stream.
-        var socialstream_browser = component.find('.resource_browser');
-        if (socialstream_browser.length && $.fn.socialstreamBrowser) {
-            component.on('click.courseTaskList','form a[data-function="browse"]' , {}, function(event) {
-                var form = $(this).closest('form');
-                event.preventDefault();
-                socialstream_browser.socialstreamBrowser({
-                    submitCallback: function(url) {
-                        form.find('input[name="link"]').val(url);
-                    }
-                });
-            });
-        }
 
         /**
          * Callback that gets called when the list of tasks changes - it reloads
@@ -292,8 +164,8 @@
          *             the contents of this component.
          */
         var postCallback = function(form, data) {
-            var container = form.closest('[data-form-container]');
-            container.addClass('hide');
+            //var container = form.closest('[data-form-container]');
+            //container.addClass('hide');
             reloadTaskList(data);
         };
 
