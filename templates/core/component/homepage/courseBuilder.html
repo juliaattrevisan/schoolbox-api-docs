@@ -105,21 +105,25 @@
                                 <input id="title-{TASK_ID}" name="title" type="text" value="{TASK_TITLE}" />
 
                                 <div class="row post-attachment attach" style="{TASK_ATTACH_DISPLAY}">
-                                    <div class="small-12 medium-9 columns post-attachment attach">
+                                    <div class="small-12 medium-9 columns post-attachment attach no-pad">
+                                        <label>Attachment</label>
                                         {ATTACH_ZONE}
                                     </div>
-                                    <div class="small-12 medium-3 columns">
+                                    <div class="small-12 medium-3 columns no-pad">
+                                        <label>&nbsp;</label>
                                         <a class='button icon-link sstream-attachment' data-value='url'>Link</a>
                                     </div>
                                 </div>
 
                                 <div class="row post-attachment url" style="{TASK_URL_DISPLAY}">
-                                    <div class="small-12 medium-9 columns">
+                                    <div class="small-12 medium-9 columns no-pad">
                                         <label>
+                                            Link
                                             <input type='text' class='url' name='url' maxlength='1024' placeholder="http://" value="{TASK_LINK}" />
                                         </label>
                                     </div>
-                                    <div class="small-12 medium-3 columns">
+                                    <div class="small-12 medium-3 columns no-pad">
+                                        <label>&nbsp;</label>
                                         <a class='button icon-attach sstream-attachment' data-value='attach'>Attach</a>
                                     </div>
                                 </div>
