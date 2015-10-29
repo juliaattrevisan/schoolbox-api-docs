@@ -164,68 +164,70 @@
                 <div class="content">
                     <a href="/submission/createSubmission/new/{ID}/task" class="button icon-due-work">Post Due Work</a>
                     <a href="/assess/create/{ID}/task" class="button icon-quiz">Create Quiz</a>
-                    <a href="/task/create/{ID}" class="button icon-task" data-interaction="create_task">Add Task</a>
+                    <a href="/task/create/{ID}" class="button icon-task" data-reveal-id="createTask-component{COMPONENT_INSTANCE_ID}">Add Task</a>
                 </div>
 
                 <!-- This is the form for inline creation of tasks -->
-                <div class="content">
-                    <div class="row">
-                        <div class="small-12 columns alert-box hide" data-form-container data-for-task data-new-task-container data-interaction="create_task_container">
-                            <form action="/task/saveForm.php" method="post" data-interaction="create_task">
-                                <input type="hidden" name="id"        value=""/>
-                                <input type="hidden" name="category"  value="{ID}"/>
-                                <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                <div id="createTask-component{COMPONENT_INSTANCE_ID}"
+                     class="reveal-modal"
+                     data-reveal
+                     aria-hidden="true"
+                     aria-labelledby="createTask-component{COMPONENT_INSTANCE_ID}"
+                     role="dialog">
+                    <h2 id="createTask-component{COMPONENT_INSTANCE_ID}-label">Create Task</h2>
+                    <form action="/task/saveForm.php" method="post" data-interaction="create_task">
+                        <input type="hidden" name="id"        value=""/>
+                        <input type="hidden" name="category"  value="{ID}"/>
+                        <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
 
-                                <div class="row">
-                                    <div class="small-12 columns">
-                                        <label for="title-new_task">
-                                            Create Task
-                                            <input id="title-new_task" name="title" type="text" value="" />
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div class="row post-attachment attach">
-                                    <div class="small-12 medium-9 columns post-attachment attach">
-                                        {ATTACH_ZONE}
-                                    </div>
-                                    <div class="small-12 medium-3 columns">
-                                        <a class='button icon-link sstream-attachment' data-value='url'>Link</a>
-                                    </div>
-                                </div>
-
-                                <div class="row post-attachment url" style="display:none">
-                                    <div class="small-12 medium-9 columns">
-                                        <label>
-                                            <input type='text' class='url' name='url' maxlength='1024' placeholder="http://" value="" />
-                                        </label>
-                                    </div>
-                                    <div class="small-12 medium-3 columns">
-                                        <a class='button icon-attach sstream-attachment' data-value='attach'>Attach</a>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="small-12 columns">
-                                        <label for="self_assess-new_task">
-                                            Allow self-assessment?
-                                        </label>
-                                        <div class="switch">
-                                            <input name="self_assess" value="0" type="hidden" />
-                                            <input name="self_assess" value="1" type="checkbox" id="self_assess-new_task" {TASK_SELF_ASSESS} />
-                                            <label for="self_assess-new_task"></label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="small-12 columns">
-                                        <input type="submit" value="Create" disabled />
-                                    </div>
-                                </div>
-                            </form>
+                        <div class="row">
+                            <div class="small-12 columns">
+                                <label for="title-new_task">
+                                    Create Task
+                                    <input id="title-new_task" name="title" type="text" value="" />
+                                </label>
+                            </div>
                         </div>
-                    </div>
+
+                        <div class="row post-attachment attach">
+                            <div class="small-12 medium-9 columns post-attachment attach">
+                                {ATTACH_ZONE}
+                            </div>
+                            <div class="small-12 medium-3 columns">
+                                <a class='button icon-link sstream-attachment' data-value='url'>Link</a>
+                            </div>
+                        </div>
+
+                        <div class="row post-attachment url" style="display:none">
+                            <div class="small-12 medium-9 columns">
+                                <label>
+                                    <input type='text' class='url' name='url' maxlength='1024' placeholder="http://" value="" />
+                                </label>
+                            </div>
+                            <div class="small-12 medium-3 columns">
+                                <a class='button icon-attach sstream-attachment' data-value='attach'>Attach</a>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="small-12 columns">
+                                <label for="self_assess-new_task">
+                                    Allow self-assessment?
+                                </label>
+                                <div class="switch">
+                                    <input name="self_assess" value="0" type="hidden" />
+                                    <input name="self_assess" value="1" type="checkbox" id="self_assess-new_task" {TASK_SELF_ASSESS} />
+                                    <label for="self_assess-new_task"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="small-12 columns">
+                                <input type="submit" value="Create" disabled />
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </section>
         </div>
