@@ -5,13 +5,17 @@
 /* Allow all-day row to be visible in Week and Day views
  * This is the first row which sits above 6am
  */
-.fc .fc-content-skeleton table {
+.fc .fc-content-skeleton table,
+.fc .fc-content-skeleton table tr:nth-of-type(even),
+.fc .fc-content-skeleton table tr:nth-of-type(even):hover,
+.fc table:not(.no-hover) tbody tr:hover td
+{
     background-color: transparent;
 }
 
-.fc .fc-content-skeleton table tr:nth-of-type(even) {
-    background-color: transparent;
-}
+/*.fc table tr:hover td {*/
+    /*background-color: transparent;*/
+/*}*/
 
 /* Vertically center datepicker icon and current month title
  */
@@ -98,10 +102,6 @@
 
 .fc table {
     margin-bottom: 0;
-}
-
-.fc table tr:hover td {
-    background-color: transparent;
 }
 
 .fc-row .fc-content-skeleton td {
