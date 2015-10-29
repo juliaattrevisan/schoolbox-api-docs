@@ -2,6 +2,12 @@
  * FullCalendar CSS customisations
  */
 
+/* Vertically center datepicker icon and current month title
+ */
+.fc .fc-center {
+    padding: 0.375rem 0;
+}
+
 .fc .fc-button-group>*{
     margin: 0 1px 0 0;
     border: 0;
