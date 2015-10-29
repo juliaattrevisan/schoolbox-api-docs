@@ -190,20 +190,6 @@
             }
         );
 
-        // Create new tasks: show inline form if there is one.
-        component.on(
-            'click.courseTaskList',
-            'a[data-interaction="create_task"]',
-                function(event) {
-                var create_form = component.find('[data-interaction="create_task_container"]');
-                if (create_form.length) {
-                    event.preventDefault();
-                    create_form.toggleClass('hide');
-                    component.find('[data-form-container]').not(create_form).addClass('hide');
-                }
-            }
-        );
-
         // Event - save new item, no copy
         component.on(
             'submitNoCopy.courseTaskList',
