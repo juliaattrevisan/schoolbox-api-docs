@@ -2,6 +2,17 @@
  * FullCalendar CSS customisations
  */
 
+/* Allow all-day row to be visible in Week and Day views
+ * This is the first row which sits above 6am
+ */
+.fc .fc-content-skeleton table {
+    background-color: transparent;
+}
+
+.fc .fc-content-skeleton table tr:nth-of-type(even) {
+    background-color: transparent;
+}
+
 /* Vertically center datepicker icon and current month title
  */
 .fc .fc-center {
