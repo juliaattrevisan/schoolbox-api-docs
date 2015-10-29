@@ -17,6 +17,10 @@
     margin: 0;
 }
 
+.fc .fc-axis{
+    padding: 0;
+}
+
 .fc-event {
     min-height: 1em;
 }
