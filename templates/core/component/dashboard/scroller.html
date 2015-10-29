@@ -1,65 +1,19 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container' data-component>
     <!-- Custom javascript -->
-    <script type="text/javascript" src="/javascript/components/jquery-cycle/jquery.cycle.all.js"></script>
+    <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
     <script type="text/javascript" src="/javascript/components/eventie/eventie.js"></script>
     <script type="text/javascript" src="/javascript/components/eventEmitter/EventEmitter.js"></script>
     <script type="text/javascript" src="/javascript/components/imagesloaded/imagesloaded.js"></script>
     <script type="text/javascript">
-        $(function () {
-            //
-            // Calculate slide position and margin for elements
-            var slide_position = 'left';
-            var margin         = '0 auto 0 0';
-            switch ('{COMPONENT_ALIGN}') {
-                case 'center':
-                    slide_position = 'center';
-                    margin         = '0 auto';
-                    break;
-                case 'right':
-                    slide_position = 'right';
-                    margin         = '0 0 0 auto';
-                    break;
-                case 'left':
-                default:
-                    break;
-            };
-
-            //
-            // Callback for when slide changes.
-            var slideCallback = function() {
-                $(this).css('text-align', slide_position);
-            };
-
-            var container = $('#component{COMPONENT_INSTANCE_ID}').find('[data-imagescroller]');
-            var slideshow = container.find('[data-imagescroller-image]');
-            if (slideshow.length > 1) {
-                slideshow.hide();
-            }
-            slideshow.css('text-align', slide_position);
-            if (slideshow.length > 1) {
-                imagesLoaded(container[0], function() {
-
-                    //
-                    // Set width to widest slide.
-                    var width = 0;
-                    slideshow.each(function() {
-                        var this_width = $(this).width();
-                        if (this_width > width) {
-                            width = this_width;
-                        }
-                    });
-
-                    container.cycle({
-                        timeout:{COMPONENT_CONFIG_TIMING_VALUE_MS},
-                        cleartypeNoBg:true,
-                        height:'auto',
-                        width: Math.min(width, container.width()),
-                        fit: true,
-                        before: slideCallback,
-                        after: slideCallback
-                    }).css('margin', margin);
-                });
-            }
+        $(function(){
+            $("#component{COMPONENT_INSTANCE_ID}").find("[data-imageslider]").anyslider({
+                interval: {COMPONENT_CONFIG_TIMING_VALUE_MS},
+                prevLabel: '',
+                nextLabel: '',
+                showBullets: false,
+                showControls: true,
+                interval: 4000,
+            });
         });
     </script>
 
@@ -71,9 +25,9 @@
             <h2 class="subheader">{COMPONENT_NAME}</h2>
             <!-- END has_header -->
             <section class="content">
-                <div data-imagescroller>
+                <div data-imageslider class="imageslider-container">
                     <!-- BEGIN image_scroller -->
-                    <div data-imagescroller-image>
+                    <div data-imagescroller-image class="text-center">
                         <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}"
                              alt="{IMAGE_NAME}"/>
                         <!-- BEGIN show_caption -->
