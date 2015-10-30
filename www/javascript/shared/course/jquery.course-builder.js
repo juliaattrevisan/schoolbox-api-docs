@@ -7,9 +7,9 @@
             units:        [],
             previewSelector: '[data-plugin=preview]'
         };
-        var settings  = $.extend({}, defaults, options);
-        var component = $(this);
-
+        var settings       = $.extend({}, defaults, options);
+        var component      = $(this);
+        var component_id   = component.attr('id');
         var copyTaskDialog = component.find('[data-interaction="copy_task_dialog"]');
 
         /**
@@ -82,9 +82,9 @@
         initTaskList();
 
         // Task editor - prevent empty inputs
-        component.on(
+        $(document).on(
             'change.courseTaskList, keyup.courseTaskList',
-            '[data-new-task-container] input[name="title"]',
+            'form[data-form_type="task"][data-component="'+component_id+'"] input[name="title"]',
             function () {
                 var title = this.value.replace(/^\s+|\s+$/g, '');
                 $(this).closest('form').find(':submit').prop('disabled', title.length === 0);
