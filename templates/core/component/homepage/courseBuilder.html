@@ -96,7 +96,11 @@
                              aria-labelledby="editTask-{TASK_ID}-label"
                              role="dialog">
                             <h2 id="editTask-{TASK_ID}-label">Update Task</h2>
-                            <form action="/task/saveForm.php" method="post" data-form_type="task" data-component="component{COMPONENT_INSTANCE_ID}">
+                            <form action="/task/saveForm.php"
+                                  method="post"
+                                  data-form_type="task"
+                                  data-task="{TASK_ID}"
+                                  data-component="component{COMPONENT_INSTANCE_ID}">
                                 <input type="hidden" name="id"        value="{TASK_ID}"/>
                                 <input type="hidden" name="category"  value="{ID}"/>
                                 <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
@@ -169,7 +173,10 @@
                      aria-labelledby="createTask-component{COMPONENT_INSTANCE_ID}-label"
                      role="dialog">
                     <h2 id="createTask-component{COMPONENT_INSTANCE_ID}-label">Create Task</h2>
-                    <form action="/task/saveForm.php" method="post" data-form_type="task" data-component="component{COMPONENT_INSTANCE_ID}">
+                    <form action="/task/saveForm.php"
+                          method="post"
+                          data-form_type="task"
+                          data-component="component{COMPONENT_INSTANCE_ID}">
                         <input type="hidden" name="id"        value=""/>
                         <input type="hidden" name="category"  value="{ID}"/>
                         <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
