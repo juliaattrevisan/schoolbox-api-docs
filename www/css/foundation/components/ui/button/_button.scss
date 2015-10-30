@@ -51,6 +51,7 @@ a[disabled], a.disabled {
 
 	&.expand {
 		font-weight: 700;
+		padding: $global-button-padding;
 	}
 
 	&:empty {
