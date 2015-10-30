@@ -93,15 +93,14 @@
 
         // AJAX form submissions
         // Only show the dialog if there's a class using this unit.
-        component.on(
+        $(document).on(
             'submit.courseTaskList',
-            'form[data-interaction="create_task"], form[data-interaction="edit_task"]',
-            {},
+            'form[data-form_type="task"][data-component="'+component_id+'"]',
             function(event) {
                 var form = $(this);
                 event.preventDefault();
-                //submitSaveTaskForm($(this), false);
-                if (form.data("interaction") == 'create_task' && settings.units.length > 0) {
+                // Show the dialog for asking whether to copy this task to schools
+                if (form.data("task") && settings.units.length > 0) {
                     // Rewire copy task events
                     copyTaskDialog.off('click.courseTaskList', '[data-action="copy_task"]');
                     copyTaskDialog.on(
@@ -160,20 +159,18 @@
         );
 
         // Event - save new item, no copy
-        component.on(
+        $(document).on(
             'submitNoCopy.courseTaskList',
-            'form[data-interaction="create_task"], form[data-interaction="edit_task"]',
-            {},
+            'form[data-form_type="task"][data-component="'+component_id+'"]',
             function(event) {
                 submitSaveTaskForm($(this), false)
             }
         );
 
         // Event - save new item, copy it across
-        component.on(
+        $(document).on(
             'submitCopy.courseTaskList',
-            'form[data-interaction="create_task"], form[data-interaction="edit_task"]',
-            {},
+            'form[data-form_type="task"][data-component="'+component_id+'"]',
             function(event) {
                 submitSaveTaskForm($(this), true)
             }
