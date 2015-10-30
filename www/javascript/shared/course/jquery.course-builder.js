@@ -110,8 +110,9 @@
                 var form = $(this);
                 event.preventDefault();
                 // Show the dialog for asking whether to copy this task to schools
+                // (This only functions for new tasks)
                 var isNew = !(form.find('input[name="id"]').val());
-                if (!isNew && settings.units.length > 0) {
+                if (isNew && settings.units.length > 0) {
                     // Rewire copy task events
                     copyTaskDialog.off('click.courseTaskList', '[data-action="copy_task"]');
                     copyTaskDialog.on(
