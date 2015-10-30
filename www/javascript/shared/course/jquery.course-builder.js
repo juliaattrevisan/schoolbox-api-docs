@@ -153,23 +153,6 @@
                 }
             });
 
-        // Modify task: if there's a modify form inline, show/hide it.
-        // (Delegate because extra elements can be added via AJAX)
-        component.on(
-            'click.courseTaskList',
-            'a[data-interaction="open_edit_task_form"]',
-            {},
-            function(event) {
-                // Show the form instead
-                var edit_form = $(this).closest('[data-task_id]').find('[data-interaction="edit_task_container"]');
-                if (edit_form.length) {
-                    event.preventDefault();
-                    edit_form.toggleClass('hide');
-                    component.find('[data-form-container]').not(edit_form).addClass('hide');
-                }
-            }
-        );
-
         // Delete task: "are you sure?"
         component.on(
             'click.courseTaskList',
