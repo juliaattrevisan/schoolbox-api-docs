@@ -16,7 +16,7 @@
                 });
 
                 // Url attachment options
-                component.on('click', 'form .post-attachment a[data-value]', function() {
+                $(document).on('click', 'form[data-component="component{COMPONENT_INSTANCE_ID}"] .post-attachment a[data-value]', function() {
                     var self = $(this),
                             form = self.closest('form'),
                             type = self.attr('data-value');
