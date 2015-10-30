@@ -11,10 +11,6 @@
 				padding-right: 0.5 + ($i * $button-size) !important;
 			}
 
-			.subheader {
-				margin-top: rem-calc($base-font-size - 6);
-			}
-
 			> nav {
 				@include button-group-glow();
 				display: inline-block;
