@@ -20,13 +20,23 @@
          */
         var submitSaveTaskForm = function(form, copy) {
             var formData = form.serializeArray();
+            var isNew    = !(form.find('input[name="id"]').val());
+            var label    = form.find('[data-create-task-indicator]');
+            label.labelActivate();
+
             // Booleans in data get passed as string 'true' or 'false', wtf?
             formData.push({name: 'copy', value: (copy ? 1 : 0)});
+            form.find("input[type=submit]").attr('disabled', true);
             $.post(form.attr('action'), formData, function(data) {
+                label.labelTimeout({
+                    text: 'Saved',
+                    css: 'success'
+                });
                 // Clear the create task form
-                if (form.data("interaction") === 'create_task') {
+                if (isNew) {
                     form.get(0).reset();
                 }
+                $(document).foundation('reveal', 'close');
                 postCallback(form, data);
             }, 'json');
         };
@@ -100,7 +110,8 @@
                 var form = $(this);
                 event.preventDefault();
                 // Show the dialog for asking whether to copy this task to schools
-                if (form.data("task") && settings.units.length > 0) {
+                var isNew = !(form.find('input[name="id"]').val());
+                if (!isNew && settings.units.length > 0) {
                     // Rewire copy task events
                     copyTaskDialog.off('click.courseTaskList', '[data-action="copy_task"]');
                     copyTaskDialog.on(
