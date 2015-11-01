@@ -144,7 +144,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
             }
             &:hover, &.focus {
                 width: 100%;
-                padding-left: 21.3rem;
+                padding-left: 21.22rem;
                 @include placeholder-color($black, $font-weight-normal);
             }
 
