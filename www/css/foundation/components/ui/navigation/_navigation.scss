@@ -144,7 +144,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
             }
             &:hover, &.focus {
                 width: 100%;
-                padding-left: 22rem;
+                padding-left: 21.3rem;
                 @include placeholder-color($black, $font-weight-normal);
             }
 
@@ -169,7 +169,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
                 background-color: $white;
                 border: 2px solid $navigation-hover;
                 color: $black;
-                width: 99.7%;
+                width: 100%;
                 opacity: 1;
             }
 
@@ -511,14 +511,16 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 // Only show notifications sidebar on x-large-up screens
 // 1440px >
 @media #{$xlarge-up} {
-    .tab-bar {
-        #search{
-            right: 22.22rem;
-            &:hover{
-                padding-left: 34.22rem;
+    .hybrid-bar{
+        .tab-bar {
+            #search{
+                right: 22.99rem;
+                &:hover{
+                    padding-left: 34.22rem;
+                }
             }
-        }
-	}
+    	}
+    }
     .right-off-canvas-menu {
         position: relative;
         transform: none;
