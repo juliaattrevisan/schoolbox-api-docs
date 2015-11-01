@@ -137,7 +137,7 @@ $include-legacy-visibility-classes: true;
 $include-accessibility-classes: true;
 $include-xl-html-grid-classes: true;
 
-/* Button dimensions
+/* Button/input dimensions
  *
  * text + padding-top + padding-bottom = global-button-height
  * = 1rem + 1rem + 1rem (since padding-top == padding-bottom)
@@ -149,5 +149,6 @@ $include-xl-html-grid-classes: true;
  * global-button-height - 1rem = padding * 2
  * 0.5(global-button-height - 1rem) = padding
  */
-$global-button-height: 3rem;
-$global-button-padding: 1rem;
+$global-button-input-height: rem-calc(($base-font-size  * 2.5)) !default;
+$global-button-height: $global-button-input-height;
+$global-button-padding: (($global-button-height - 1rem) / 2);
