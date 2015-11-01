@@ -166,6 +166,10 @@ input,
 textarea{
 	padding-left: 0.75rem;
 }
+select {
+	padding-top: 0;
+	padding-bottom: 0;
+}
 
 // remove margins on forms inside tables
 th, td{
