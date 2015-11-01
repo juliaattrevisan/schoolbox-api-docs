@@ -56,14 +56,14 @@
                     <!-- BEGIN attempt -->
                     <li class="actions-small-2 {ATTEMPT_HIDDEN}" {ATTEMPT_EXPANDABLE} data-user="{USER_ID}">
                         <div class="list-item">
-                            <div class="card small-1 text-center">
+                            <div class="card small-2 medium-1 text-center">
                                 <!-- BEGIN attempt_delete -->
                                 <input type='checkbox' id="attempt-{ATTEMPT_ATTEMPT_ID}" name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
                                 <label for="attempt-{ATTEMPT_ATTEMPT_ID}" class="checkbox-label"></label>
                                 <!-- END attempt_delete -->
                             </div>
 
-                            <div class="avatar card small-4">
+                            <div class="avatar card small-10 medium-4">
                                 <a href="/search/user/{USER_ID}" title="View Profile">
                                     <img src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square64" alt="View Profile" />
                                     <p>{ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}</p>
@@ -72,7 +72,7 @@
                                 <p class="meta">{ATTEMPT_TIME_TAKEN}</p>
                             </div>
 
-                            <div class="small-2 columns text-center">
+                            <div class="small-12 medium-2 columns text-center">
                                 <!-- BEGIN has_marks -->
                                 <h3>{ATTEMPT_PERCENTAGE}%</h3>
                                 <p>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</p>
@@ -80,7 +80,7 @@
                                 <!-- END has_marks -->
                             </div>
 
-                            <div class="small-5 columns">
+                            <div class="small-12 medium-5 columns">
                                 <!-- BEGIN submitted -->
                                 <span class="submitted label full-width">Finished<br />{ATTEMPT_FINISH}</span>
                                 <!-- END submitted -->
