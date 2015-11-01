@@ -18,7 +18,7 @@ $form-label-bottom-margin: 0;
 // $input-font-family: inherit;
 $input-font-color: $black;
 $input-font-size: rem-calc(($base-font-size - 3));
-$input-height: 2.5rem;
+$input-height: $global-button-input-height;
 
 $input-bg-color: $white;
 
