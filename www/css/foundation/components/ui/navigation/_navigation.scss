@@ -107,12 +107,13 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 .hybrid-bar{
     .logo {
         width: 6rem;
+        height: 5rem;
         @media #{$mediumwide-up} {
             display: none !important;
         }
         img{
             display: block;
-            max-height: 5rem;
+            height: 100%;
             max-width: none;
         }
     }
