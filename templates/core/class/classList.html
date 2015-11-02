@@ -1,14 +1,8 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 <script type="text/javascript" src="/subject/classList/javascript/emailSelected.js"></script>
 <script type="text/javascript">
 $(function() {
-
-	/* Add "select all" functionality
-	 */
-	$('#select-all').addSelectAll({
-		source: $('#contact-table')
-	});
-
 	var form = $('#contact-table-form');
 
 	// Validators for if no student or parent emails were found
@@ -61,7 +55,10 @@ $(function() {
             <thead>
                 <tr>
                     <!-- BEGIN select_all -->
-                    <th><input type="checkbox" id='select-all' value="" /><label for="select-all" class="checkbox-label"></label></th>
+                    <th>
+                        <input type="checkbox" id="select-all" data-select-all data-select-all-for-group="students" value="" />
+                        <label for="select-all" class="checkbox-label"></label>
+                    </th>
                     <!-- END select_all -->
                     <th></th>
                     <th>Name</th>
@@ -76,7 +73,7 @@ $(function() {
             <tr>
                 <td>
                     <!-- BEGIN select_student -->
-                    <input type="checkbox" name="selected[]" id='id-{SYNERGYID}' value="{SYNERGYID}" />
+                    <input type="checkbox" name="selected[]" id='id-{SYNERGYID}' value="{SYNERGYID}" data-select-all-group="students" />
                     <label for="id-{SYNERGYID}" class="checkbox-label"></label>
                     <!-- END select_student -->
                 </td>
