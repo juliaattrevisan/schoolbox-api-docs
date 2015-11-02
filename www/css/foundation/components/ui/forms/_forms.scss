@@ -490,24 +490,36 @@ select.visibility {
     nav {
         float: left;
 
+        /* Force these particular buttons to be square
+         */
+        a {
+            @extend .button;
+            width: $global-button-height;
+        }
+
         &:first-of-type {
             a {
-                @extend .button;
                 @extend .icon-previous;
             }
         }
 
         &:last-of-type {
             a {
-                @extend .button;
                 @extend .icon-next;
             }
         }
     }
 
+    /* Nav button widths = 2 buttons
+     * Previous enforcement of square buttons makes this easy
+     */
     .semester {
-        width: calc(100% - #{($global-button-padding * 4)} - 3rem);
+        width: calc(100% - #{($global-button-height * 2)});
         float: left;
+
+        select {
+            margin-bottom: 0.25rem;
+        }
     }
 }
 
