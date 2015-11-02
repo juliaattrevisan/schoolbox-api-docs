@@ -264,9 +264,17 @@ class Bootstrap implements BootstrapInterface {
 		);
 
 		// inject web params (yep, even Sitepage!)
-		$di->setters['SitePage']['setDi'] = $di;
-		$di->set('layoutEngine', $di->lazyNew('SitePage', array('login' => false)));
-		$di->set('sitePage',     $di->lazyNew('SitePage'));
+//		$di->setters['SitePage']['setDi'] = $di;
+		$di->set('layoutEngine', $di->lazy(function() use ($di) {
+			$sitepage = new \SitePage(false);
+			$sitepage->setDi($di)->localise();
+			return $sitepage;
+		}));;
+		$di->set('sitePage',     $di->lazy(function() use ($di) {
+			$sitepage = new \SitePage();
+			$sitepage->setDi($di)->localise();
+			return $sitepage;
+		}));
 
 		// Web output class - currently uses Sitepage
 		$di->setters['Alaress\\Web\\Output\\Html']['setTemplateEngine'] = $di->lazyGet('templateEngine');

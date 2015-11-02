@@ -1418,7 +1418,7 @@ class SitePage extends Page
     /**
      * Jam localisation vars into the template. Uncomment / modify the list as required
      */
-    protected function localise()
+    public function localise()
     {
         $l10n = $this->getDi()->get('l10n');
 
