@@ -443,50 +443,50 @@ select.visibility {
 	}
 }
 
+//.context-switch {
+//	position: relative;
+//
+//	nav {
+//		position: absolute;
+//		top: 0;
+//		width: 3rem;
+//
+//		&:first-of-type {
+//			left: 0;
+//			a {
+//				@extend .icon-previous;
+//			}
+//		}
+//
+//		&:last-of-type {
+//			right: 0;
+//			a {
+//				@extend .icon-next;
+//			}
+//		}
+//
+//		a {
+//			@extend .button;
+//			width: 3rem;
+//			height: 2.5rem;
+//			line-height: 1.5rem;
+//		}
+//	}
+//
+//	.semester, .subject, .unit, .student {
+//		margin-right: 3rem;
+//	}
+//
+//	.semester, .student {
+//		margin-left: 3rem;
+//	}
+//
+//	.subject, .unit {
+//		margin-left: 6rem;
+//	}
+//}
+
 .context-switch {
-	position: relative;
-
-	nav {
-		position: absolute;
-		top: 0;
-		width: 3rem;
-
-		&:first-of-type {
-			left: 0;
-			a {
-				@extend .icon-previous;
-			}
-		}
-
-		&:last-of-type {
-			right: 0;
-			a {
-				@extend .icon-next;
-			}
-		}
-
-		a {
-			@extend .button;
-			width: 3rem;
-			height: 2.5rem;
-			line-height: 1.5rem;
-		}
-	}
-
-	.semester, .subject, .unit, .student {
-		margin-right: 3rem;
-	}
-
-	.semester, .student {
-		margin-left: 3rem;
-	}
-
-	.subject, .unit {
-		margin-left: 6rem;
-	}
-}
-
-.context-switch-reforged {
     nav {
         float: left;
 
@@ -513,13 +513,17 @@ select.visibility {
     /* Nav button widths = 2 buttons
      * Previous enforcement of square buttons makes this easy
      */
-    .semester {
+    .semester, .subject {
         width: calc(100% - #{($global-button-height * 2)});
         float: left;
 
         select {
             margin-bottom: 0.25rem;
         }
+    }
+
+    .subject {
+        margin-left: $global-button-height;
     }
 }
 
