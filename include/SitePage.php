@@ -1451,7 +1451,7 @@ class SitePage extends Page
             $local = ($plural ? $l10n[$term]['plural'] : $l10n[$term]['singular']);
             if ($capital) {
                 $local = ucwords($local);
-                if ($l10n[$term]['capitalise']) {
+                if (!$l10n[$term]['capitalise']) {
                     $local = lcfirst($local);
                 }
             }
