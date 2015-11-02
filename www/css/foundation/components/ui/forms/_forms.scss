@@ -543,6 +543,11 @@ select.visibility {
         a {
             padding-top: 1.75rem !important;
             height: 4.375rem;
+
+            @media #{$small-only} {
+                padding-top: 1.25rem !important;
+                height: 3.375rem;
+            }
         }
     }
 
