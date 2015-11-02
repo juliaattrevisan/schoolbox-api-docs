@@ -1433,4 +1433,33 @@ class SitePage extends Page
             ]);
         }
     }
+
+    /**
+     * Returns the localised version of this term.
+     *
+     * @param string $term
+     * @param bool   $plural
+     * @param bool   $capital Ca
+     *
+     * @return string
+     */
+    public function getLocalisedTerm($term, $plural = false, $capital = false)
+    {
+        // should I assume this is an array? It is for now, fix this if/when it's an object
+        $l10n = $this->getDi()->get('l10n');
+        if (array_key_exists($term, $l10n)) {
+            $local = ($plural ? $l10n[$term]['plural'] : $l10n[$term]['singular']);
+            if ($capital) {
+                $local = ucwords($local);
+                if ($l10n[$term]['capitalise']) {
+                    $local = lcfirst($local);
+                }
+            }
+            return $local;
+        } else {
+            // Not found
+            user_error(sprintf('Term "%s" not in localisation table', $term), E_USER_WARNING);
+            return '';
+        }
+    }
 }
