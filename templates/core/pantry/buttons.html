@@ -317,9 +317,128 @@
 
             <hr />
 
+            <div class="row">
+                <div class="small-2 columns">
+                    <a class="button">Button</a>
+                </div>
+                <div class="small-10 columns">
+                    <script src="/javascript/shared/jquery.label-timeout.js" type="text/javascript"></script>
+                    <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.js"></script>
+                    <script src="/submission/inlineGrading/js/inlineGrading.js" type="text/javascript"></script>
+                    <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
+                    <script src="/javascript/shared/submissions/jquery.marksheet.js" type="text/javascript"></script>
+                    <script src="/javascript/resource/jquery.resourceAttach.js" type="text/javascript"></script>
+                    <script type="text/javascript">
+                        $(function() {
+                            $('[data-delete-submission]').click(function(event) {
+                                event.preventDefault();
+
+                                var self = $(this);
+
+                                $(this).confirmDialog({
+                                    text: "Remove Alaress Admin's submission?",
+                                    confirmEvent: function() {
+                                        window.location.href = self.attr('href');
+                                    }
+                                });
+                            });
+
+                            var navNext = $('a[rel="next"]');
+                            var navPrev = $('a[rel="prev"]');
+
+                            var tgt = $('select[name=student-select]'), ize,
+                                    skipUnsubmitted = $('#skipUnsubmitted'),
+                                    students = [{"text":"Admin, Alaress","value":"\/submission\/inlineGrading\/view\/22\/19","html":"<div class=\"row\">\n    <div class=\"small-10 columns no-pad\">\n        <div class=\"avatar card\">\n            <img src=\"\/portrait.php?userId=485&size=square64\" alt=\"View Profile\" \/>\n            <p>Admin, Alaress<\/p>\n            <span class=\"label status unsubmitted\">Not Submitted<\/span>\n        <\/div>\n    <\/div>\n    <div class=\"small-2 columns\">\n        <span class=\"progress-tick no-text pending\" title=\"Marked \"><\/span>\n    <\/div>\n<\/div>\n","unsubmitted":true},{"text":"Agius, Byron","value":"\/submission\/inlineGrading\/view\/22\/239","html":"<div class=\"row\">\n    <div class=\"small-10 columns no-pad\">\n        <div class=\"avatar card\">\n            <img src=\"\/portrait.php?userId=287&size=square64\" alt=\"View Profile\" \/>\n            <p>Agius, Byron<\/p>\n            <span class=\"label status submitted\">Submitted on Time<\/span>\n        <\/div>\n    <\/div>\n    <div class=\"small-2 columns\">\n        <span class=\"progress-tick no-text pending\" title=\"Marked \"><\/span>\n    <\/div>\n<\/div>\n","unsubmitted":false}],
+                                    selectizeOptions = {
+                                        preload: true,
+                                        closeAfterSelect: false,
+                                        options: students,
+                                        render: {
+                                            option: function (item) {
+                                                item.disabled = skipUnsubmitted.is(':checked') && item.unsubmitted;
+                                                return $('<div/>').html(item.html).html();
+                                            },
+                                            item: function (item) {
+                                                return $('<div/>').html(item.html).html();
+                                            }
+                                        }
+                                    };
+
+
+                            ize = tgt.selectize(selectizeOptions);
+
+                            // hack, option not available
+                            $('.selectize-input input').prop('disabled', true).hide();
+
+                            // manually set the value, because selectize
+                            ize[0].selectize.setValue("/submission/inlineGrading/view/22/19", true);
+
+                            // add the listener AFTER we've set the value
+                            ize.on('change', function (e) {
+                                window.location.href = e.target.value;
+                            });
+
+                            $('#returnWorkForm').marksheet();
+
+                            $('[data-combobox]').combobox(["Absent","Not Assessed","Not Submitted","Submitted","Pending"]);
+
+                            function refreshNav(nav, source) {
+                                if (source.length) {
+                                    nav.attr('href', source.data('value'))
+                                            .attr('title', source.children('img').attr('alt'))
+                                            .removeAttr('disabled');
+                                } else {
+                                    nav.removeAttr('href')
+                                            .removeAttr('title')
+                                            .attr('disabled', 'disabled');
+                                }
+                            }
+
+                            /* Asynchronous update
+                             * Rerun plugin
+                             */
+                            skipUnsubmitted.change(function (event) {
+
+                                var ize  = tgt[0].selectize,
+                                        skip = $(this).is(':checked') ? 1 : 0,
+                                        form = $(this).closest('form');
+
+                                // clear the selectize render cache
+                                ize.renderCache.option = {};
+
+                                ize.refreshOptions(false);
+
+                                // fire an ajax to persist the "skip_unsubmitted" state for this box...because reasons...
+                                $.post(form.attr('action'), { boxId: form.children('input[name=boxId]').val(), skipUnsubmitted: skip });
+
+                                var val = ize.getOption(ize.getValue());
+
+                                refreshNav(navNext, ize.getAdjacentOption(val, 1));
+                                refreshNav(navPrev, ize.getAdjacentOption(val, -1));
+
+                            }).trigger('change');
+                        });
+                    </script>
+                    <div class="avatar-switch">
+                        <nav>
+                            <a rel="prev" href="" title=""></a>
+                        </nav>
+                        <div class="student">
+                            <select name="student-select"></select>
+                        </div>
+                        <nav>
+                            <a rel="next" href="" title=""></a>
+                        </nav>
+                    </div>
+
+                    <p>Avatar Switch</p>
+                </div>
+            </div>
+
+            <hr />
+
         </div>
     </div>
 </div>
-
 
 
