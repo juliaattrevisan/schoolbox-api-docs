@@ -486,6 +486,31 @@ select.visibility {
 	}
 }
 
+.context-switch-reforged {
+    nav {
+        float: left;
+
+        &:first-of-type {
+            a {
+                @extend .button;
+                @extend .icon-previous;
+            }
+        }
+
+        &:last-of-type {
+            a {
+                @extend .button;
+                @extend .icon-next;
+            }
+        }
+    }
+
+    .semester {
+        width: calc(100% - #{($global-button-padding * 4)} - 3rem);
+        float: left;
+    }
+}
+
 /* In Inline Grading, there is a selectize of avatar cards
  * This is the context-switch in a special case
  */
