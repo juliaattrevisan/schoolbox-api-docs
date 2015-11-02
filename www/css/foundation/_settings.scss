@@ -149,6 +149,7 @@ $include-xl-html-grid-classes: true;
  * global-button-height - 1rem = padding * 2
  * 0.5(global-button-height - 1rem) = padding
  */
-$global-button-input-height: rem-calc(($base-font-size  * 2.5)) !default;
+$button-input-scale: 250 !default;
+$global-button-input-height: rem-calc(($base-font-size  * ($button-input-scale / 100))) !default;
 $global-button-height: $global-button-input-height;
 $global-button-padding: (($global-button-height - 1rem) / 2);
