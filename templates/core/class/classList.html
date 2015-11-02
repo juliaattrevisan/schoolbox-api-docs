@@ -51,106 +51,108 @@ $(function() {
 <div class="row">
     <div class="small-12 island">
         <h1>{SUBJECTNAME}</h1>
-        <table id="contact-table">
-            <thead>
+        <form id="contact-table-form" class="no-margin">
+            <table id="contact-table">
+                <thead>
+                    <tr>
+                        <!-- BEGIN select_all -->
+                        <th>
+                            <input type="checkbox" id="select-all" data-select-all data-select-all-for-group="students" value="" />
+                            <label for="select-all" class="checkbox-label"></label>
+                        </th>
+                        <!-- END select_all -->
+                        <th></th>
+                        <th>Name</th>
+                        <th class="show-for-large-up">Year Level</th>
+                        <th class="show-for-medium-up">House</th>
+                        <th class="show-for-medium-up">Last Visited</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                <!-- BEGIN student_list -->
                 <tr>
-                    <!-- BEGIN select_all -->
-                    <th>
-                        <input type="checkbox" id="select-all" data-select-all data-select-all-for-group="students" value="" />
-                        <label for="select-all" class="checkbox-label"></label>
-                    </th>
-                    <!-- END select_all -->
-                    <th></th>
-                    <th>Name</th>
-                    <th class="show-for-large-up">Year Level</th>
-                    <th class="show-for-medium-up">House</th>
-                    <th class="show-for-medium-up">Last Visited</th>
-                    <th></th>
+                    <td>
+                        <!-- BEGIN select_student -->
+                        <input type="checkbox" name="selected[]" id='id-{SYNERGYID}' value="{SYNERGYID}" data-select-all-group="students" />
+                        <label for="id-{SYNERGYID}" class="checkbox-label"></label>
+                        <!-- END select_student -->
+                    </td>
+                    <td>
+                        <img src="/portrait?userId={SYNERGYID}&size=square64" alt="{FIRSTNAME} {SURNAME}"/>
+                    </td>
+                    <td>
+                        <!-- BEGIN name_with_link -->
+                        <a href="/search/user/{ID}">{SURNAME}, {FIRSTNAME}</a>
+                        <!-- END name_with_link -->
+                        <!-- BEGIN name_without_link -->
+                        {SURNAME}, {FIRSTNAME}
+                        <!-- END name_without_link -->
+                        <span class="meta">({SYNERGYID})</span>
+                        <p class="meta">
+                            <!-- BEGIN special -->
+                            <img src="/images/famicons/bell.png" title="Special Needs"/>
+                            <!-- END special -->
+
+                            <!-- BEGIN medical -->
+                            <img src="/images/famicons/exclamation.png" alt="{MEDICAL_ALERT}" title="Medical Alert: {MEDICAL_ALERT}"/>
+                            <!-- END medical -->
+                        </p>
+
+                        <!-- This is here because if its in the small column it inherits its width and doesnt have enough room -->
+                        <ul class="f-dropdown" data-dropdown-content="" id="overflow{ID}">
+                            <li>
+                                <!-- BEGIN eportfolio_small -->
+                                <a href="/eportfolio/{ID}/profile" class="icon-eportfolio">View ePortfolio</a>
+                                <!-- END eportfolio_small -->
+                            </li>
+                            <li><a href="/submission/dueWork/{ID}" class="icon-timetable">View Due Work</a></li>
+                            <li><a href="/submission/allWork/{ID}" class="icon-approve">View Grades</a></li>
+                            <li>
+                                <!-- BEGIN pastoral_care_small -->
+                                <a href="{SYNWEB_URL}/stud.aspx?id={SYNERGYID}" class="icon-modify" target="_blank">View Pastoral</a>
+                                <!-- END pastoral_care_small -->
+                            </li>
+                            <li>
+                                <!-- BEGIN has_email_small -->
+                                <a href="{HAS_EMAIL_URL}" class="icon-mail" title="Send Email">Email</a>
+                                <!-- END has_email_small -->
+                            </li>
+                        </ul>
+
+                    </td>
+                    <td class="show-for-large-up">{YEARLEVEL}</td>
+                    <td class="show-for-medium-up">{HOUSE}</td>
+                    <td class="show-for-medium-up">{LASTVISIT}
+
+                    </td>
+                    <td class="actions-small-1 actions-large-4">
+                        <!-- BEGIN actions -->
+                        <nav class="hide-for-medium-down">
+                                    <!-- BEGIN eportfolio -->
+                                    <a href="/eportfolio/{ID}/profile" class="icon-eportfolio" title="View ePortfolio"></a>
+                                    <!-- END eportfolio -->
+
+                                    <a href="/submission/dueWork/{ID}" class="icon-timetable" title="View Due Work"></a>
+                                    <a href="/submission/allWork/{ID}" class="icon-approve" title="View Grades"></a>
+
+                                    <!-- BEGIN pastoral_care -->
+                                    <a href="{SYNWEB_URL}/stud.aspx?id={SYNERGYID}" class="icon-modify" title="View Pastoral Care" target="_blank"></a>
+                                    <!-- END pastoral_care -->
+                                    <!-- BEGIN has_email -->
+                                    <a href="{HAS_EMAIL_URL}" class="icon-mail" title="Send Email"></a>
+                                    <!-- END has_email -->
+                        </nav>
+                        <nav class="show-for-medium-down">
+                            <a href="#" data-dropdown="overflow{ID}" class="icon-more"></a>
+                        </nav>
+                        <!-- END actions -->
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-            <!-- BEGIN student_list -->
-            <tr>
-                <td>
-                    <!-- BEGIN select_student -->
-                    <input type="checkbox" name="selected[]" id='id-{SYNERGYID}' value="{SYNERGYID}" data-select-all-group="students" />
-                    <label for="id-{SYNERGYID}" class="checkbox-label"></label>
-                    <!-- END select_student -->
-                </td>
-                <td>
-                    <img src="/portrait?userId={SYNERGYID}&size=square64" alt="{FIRSTNAME} {SURNAME}"/>
-                </td>
-                <td>
-                    <!-- BEGIN name_with_link -->
-                    <a href="/search/user/{ID}">{SURNAME}, {FIRSTNAME}</a>
-                    <!-- END name_with_link -->
-                    <!-- BEGIN name_without_link -->
-                    {SURNAME}, {FIRSTNAME}
-                    <!-- END name_without_link -->
-                    <span class="meta">({SYNERGYID})</span>
-                    <p class="meta">
-                        <!-- BEGIN special -->
-                        <img src="/images/famicons/bell.png" title="Special Needs"/>
-                        <!-- END special -->
-
-                        <!-- BEGIN medical -->
-                        <img src="/images/famicons/exclamation.png" alt="{MEDICAL_ALERT}" title="Medical Alert: {MEDICAL_ALERT}"/>
-                        <!-- END medical -->
-                    </p>
-
-                    <!-- This is here because if its in the small column it inherits its width and doesnt have enough room -->
-                    <ul class="f-dropdown" data-dropdown-content="" id="overflow{ID}">
-                        <li>
-                            <!-- BEGIN eportfolio_small -->
-                            <a href="/eportfolio/{ID}/profile" class="icon-eportfolio">View ePortfolio</a>
-                            <!-- END eportfolio_small -->
-                        </li>
-                        <li><a href="/submission/dueWork/{ID}" class="icon-timetable">View Due Work</a></li>
-                        <li><a href="/submission/allWork/{ID}" class="icon-approve">View Grades</a></li>
-                        <li>
-                            <!-- BEGIN pastoral_care_small -->
-                            <a href="{SYNWEB_URL}/stud.aspx?id={SYNERGYID}" class="icon-modify" target="_blank">View Pastoral</a>
-                            <!-- END pastoral_care_small -->
-                        </li>
-                        <li>
-                            <!-- BEGIN has_email_small -->
-                            <a href="{HAS_EMAIL_URL}" class="icon-mail" title="Send Email">Email</a>
-                            <!-- END has_email_small -->
-                        </li>
-                    </ul>
-
-                </td>
-                <td class="show-for-large-up">{YEARLEVEL}</td>
-                <td class="show-for-medium-up">{HOUSE}</td>
-                <td class="show-for-medium-up">{LASTVISIT}
-
-                </td>
-                <td class="actions-small-1 actions-large-4">
-                    <!-- BEGIN actions -->
-                    <nav class="hide-for-medium-down">
-                                <!-- BEGIN eportfolio -->
-                                <a href="/eportfolio/{ID}/profile" class="icon-eportfolio" title="View ePortfolio"></a>
-                                <!-- END eportfolio -->
-
-                                <a href="/submission/dueWork/{ID}" class="icon-timetable" title="View Due Work"></a>
-                                <a href="/submission/allWork/{ID}" class="icon-approve" title="View Grades"></a>
-
-                                <!-- BEGIN pastoral_care -->
-                                <a href="{SYNWEB_URL}/stud.aspx?id={SYNERGYID}" class="icon-modify" title="View Pastoral Care" target="_blank"></a>
-                                <!-- END pastoral_care -->
-                                <!-- BEGIN has_email -->
-                                <a href="{HAS_EMAIL_URL}" class="icon-mail" title="Send Email"></a>
-                                <!-- END has_email -->
-                    </nav>
-                    <nav class="show-for-medium-down">
-                        <a href="#" data-dropdown="overflow{ID}" class="icon-more"></a>
-                    </nav>
-                    <!-- END actions -->
-                </td>
-            </tr>
-            <!-- END student_list -->
-            </tbody>
-        </table>
+                <!-- END student_list -->
+                </tbody>
+            </table>
+        </form>
     </div>
 </div>
 <div class="row">
