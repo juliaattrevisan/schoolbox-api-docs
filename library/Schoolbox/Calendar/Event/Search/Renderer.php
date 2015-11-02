@@ -37,7 +37,7 @@ class Renderer extends Handler
      */
     public function setup()
     {
-        $this->setTabName($this->getPage()->getLocalisedTerm('calendar'));
+        $this->setTabName($this->getPage()->getLocalisedTerm('calendar', false, true));
     }
 
     /**

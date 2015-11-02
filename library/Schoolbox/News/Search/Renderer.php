@@ -38,7 +38,7 @@ class Renderer extends Handler
      */
     public function setup()
     {
-        $this->setTabName('School '.$this->getPage()->getLocalisedTerm('news'));
+        $this->setTabName('School '.$this->getPage()->getLocalisedTerm('news', false, true));
     }
 
     /**
