@@ -156,6 +156,10 @@ select{
 		outline: none;
 	}
 }
+input:not([type]), #{text-inputs(all, 'input')} {
+	// Ensure input height respects my settings
+	height: $global-button-input-height;
+}
 
 input[type="checkbox"],
 input[type="radio"]{
