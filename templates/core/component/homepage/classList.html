@@ -27,10 +27,10 @@
                 </ul>
 
                 <div class="content">
-                    <ul class="inline-list">
+                    <ul class="inline-list no-margin">
                         <!-- BEGIN student_email -->
-                        <li>
-                            <form action="/mail/createMail.php" method="post" name="form2">
+                        <li class="no-margin">
+                            <form action="/mail/createMail.php" method="post" class="no-margin">
                                 <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLY_TO}&gt;"/>
                                 <input type="hidden" name="bcc" value="{EMAIL_ALL_STUDENTS}"/>
                                 <button type="submit" class="button icon-email">Email Students</button>
@@ -39,11 +39,11 @@
                         <!-- END student_email -->
 
                         <!-- BEGIN parent_email -->
-                        <li>
-                            <form action="/mail/createMail.php" method="post" name="form2">
+                        <li class="no-margin">
+                            <form action="/mail/createMail.php" method="post" class="no-margin">
                                 <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLY_TO}&gt;"/>
                                 <input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
-                                <button type="submit" class="button icon-email">Email Parents</button>
+                                &nbsp;<button type="submit" class="button icon-email">Email Parents</button>
                             </form>
                         </li>
                         <!-- END parent_email -->
