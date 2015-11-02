@@ -1,4 +1,6 @@
-/* Action buttons in Action/Information Lists
+/* Header Actions
+ * These occur as their own row, they aren't nested inside a
+ * column. Typically this will look like .actions-small-12.row
  */
 @mixin action-html-classes($size, $button-size: $global-button-height, $button-color: $content-ui-foreground) {
 	@for $i from 1 through $total-columns {
@@ -18,9 +20,18 @@
 				padding: 0;
 				position: absolute;
 				top: 0;
-				right: 0;
 				height: $button-size;
 				white-space: nowrap;
+
+                @media #{$small-only} {
+                    right: 0rem;
+                }
+                @media #{$medium-only} {
+                    right: 1.5rem;
+                }
+                @media #{$large-up} {
+                    right: 1rem;
+                }
 
 				a {
                     @include button-dimensions();
@@ -51,12 +62,69 @@
 				}
 			}
 		}
-	}
+    }
 }
 
-@media #{$small-up}  { @include action-html-classes($size:small);  }
-@media #{$medium-up} { @include action-html-classes($size:medium); }
-@media #{$large-up}  { @include action-html-classes($size:large);  }
+/* When jelly tots are nested inside a column or island
+ * the padding is all different so we have to account for
+ * those scenarios individually
+ */
+@mixin action-html-classes-nested($size, $button-size: $global-button-height, $button-color: $content-ui-foreground) {
+    @for $i from 1 through $total-columns {
+
+        /* Inside a containing column, but not an action-
+         * or information-list construct (e.g. h2 actions)
+         */
+        .island .actions-#{$size}-#{$i}.row,
+        .columns .actions-#{$size}-#{$i}.row
+        {
+            > nav {
+                @media #{$small-only} {
+                    right: 0rem;
+                }
+                @media #{$medium-only} {
+                    right: -1rem;
+                }
+                @media #{$large-up} {
+                    right: -1rem;
+                }
+            }
+        }
+
+        /* As action- and information-list nav actions
+         */
+        .island .actions-#{$size}-#{$i},
+        .columns .actions-#{$size}-#{$i}
+        {
+            > nav {
+                @media #{$small-only} {
+                    right: 0rem;
+                }
+                @media #{$medium-only} {
+                    right: 0rem;
+                }
+                @media #{$large-up} {
+                    right: 0rem;
+                }
+            }
+        }
+    }
+}
+
+@media #{$small-up}  {
+    @include action-html-classes($size:small);
+    @include action-html-classes-nested($size:small);
+}
+
+@media #{$medium-up} {
+    @include action-html-classes($size:medium);
+    @include action-html-classes-nested($size:medium);
+}
+
+@media #{$large-up}  {
+    @include action-html-classes($size:large);
+    @include action-html-classes-nested($size:large);
+}
 
 @if $include-xl-html-grid-classes {
 	@media #{$xlarge-up}  { @include action-html-classes($size:xlarge);  }
