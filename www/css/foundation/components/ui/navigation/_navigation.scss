@@ -159,6 +159,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
                 &:before {
                     color: $navigation-foreground;
                 }
+                line-height: inherit;
             }
 
             /* Input field when Search feature is activated
