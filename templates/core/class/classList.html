@@ -184,7 +184,7 @@ $(function() {
         <form id="email-selected-students" action="/mail/createMail.php" method="post">
             <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
             <input type="hidden" name="bcc" value=""/>
-            <input type="submit" value="Email Selected Students"/>
+            <button type="submit" class="button icon-email">Email Selected Students</button>
         </form>
         <!-- END email_class -->
         </div>
@@ -215,7 +215,7 @@ $(function() {
         <form id="email-selected-parents" action="/mail/createMail.php" method="post">
             <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
             <input type="hidden" name="bcc" value="" />
-            <input type="submit" value="Email Parents of Selected Students"/>
+            <button type="submit" class="button icon-email">Email Parents of Selected Students</button>
         </form>
         <!-- END parent_email -->
     </div>
