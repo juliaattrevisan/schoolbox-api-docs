@@ -535,49 +535,62 @@ select.visibility {
 .avatar-switch {
     @extend .context-switch;
 
+    /* Somehow this is getting overriden by some other
+     * value in the same rule (.avatar-switch nav a)
+     * Bang it until I figure out why
+     */
     nav {
         a {
-            padding-top: 1.5rem;
+            padding-top: 1.75rem !important;
             height: 4.375rem;
         }
     }
 
-    .selectize-control {
+    .student {
+        width: calc(100% - #{($global-button-height * 2)});
+        float: left;
 
-        /* Underneath the avatar card is an input field that you
-         * could right-click to focus; I think it's where the carat
-         * goes for when you're adding more items (which we don't)
-         *
-         * selectize bangs it, so I have to bang it too
-         */
-        .selectize-input {
-            input[type="text"] {
-                display: none !important;
+        .selectize-control {
+
+            /* Underneath the avatar card is an input field that you
+             * could right-click to focus; I think it's where the carat
+             * goes for when you're adding more items (which we don't)
+             *
+             * selectize bangs it, so I have to bang it too
+             */
+            .selectize-input {
+                input[type="text"] {
+                    display: none !important;
+                }
+
+                /* To combat the weird giant white gap under the current
+                 * avatar card selected
+                 */
+                line-height: 0.5rem;
+
+                /* Push the current avatar card to the left, to offset some
+                 * other margin setting
+                 */
+                .card {
+                    p {
+                        margin: 0;
+                        display: inline;
+                    }
+                    margin-left: -0.5rem;
+                }
             }
 
-            /* To combat the weird giant white gap under the current
-             * avatar card selected
+            /* Repair a miniscule right-margin
              */
-            line-height: 0.5rem;
-
-            /* Push the current avatar card to the left, to offset some
-             * other margin setting
-             */
-            .card {
-                margin-left: -0.5rem;
+            .row {
+                width: calc(100% - 2px);
             }
-        }
 
-        /* Repair a miniscule right-margin
-         */
-        .row {
-            width: calc(100% - 2px);
-        }
-
-        /* Repair .row .row -1rem margin offset
-         */
-        .selectize-dropdown-content .row{
-            margin-left: 0;
+            /* Repair .row .row -1rem margin offset
+             */
+            .selectize-dropdown-content .row{
+                margin-left: 0;
+            }
         }
     }
 }
