@@ -34,6 +34,20 @@ class Renderer extends Handler
     protected $tabName = 'School News';
 
     /**
+     * Constructor
+     *
+     * @param \SitePage $page
+     * @param Base[]    $result Equivalent of $result['blog'] etc.
+     * @param array     $count  Equivalent of $count['blog'] etc.
+     * @param           $currentPage
+     */
+    public function __construct(\SitePage $page, $result, $count, $currentPage)
+    {
+        parent::__construct($page, $result, $count, $currentPage);
+        $this->setTabName('School '.$page->getLocalisedTerm('news'));
+    }
+
+    /**
      * Render
      */
     public function render()
