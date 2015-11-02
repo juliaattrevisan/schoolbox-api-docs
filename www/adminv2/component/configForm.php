@@ -73,7 +73,7 @@ if ($_POST['type'] == 'components') {
             ->setIdentifier($_POST['cid'])
             ->setModule($_POST['context'])
             ->setSequence(0)
-            ->setPosition('left');
+            ->setPosition('top');
 
         $ids        = $componentInstanceMapper->save($newComp);
         $instanceID = $ids[0];

@@ -86,7 +86,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                     ->setIdentifier($_POST['page_id'])
                     ->setModule('eportfolio')
                     ->setSequence(0)
-                    ->setPosition('left');
+                    ->setPosition('top');
 
                 $ids = $componentInstanceMapper->save($newComp);
 

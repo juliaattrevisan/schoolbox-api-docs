@@ -664,7 +664,7 @@
 
                 if (!element.hasClass('disabled')) {
                     element.addClass(loadingClass);
-                    var column = $(masonry.element).find(opt.column.position.left);
+                    var column = $(masonry.element).find(opt.column.position.top);
                     var placeholder = element.closest(palOpt.handleSelector).clone();
                     column.prepend(placeholder);
                     masonry.newComponentInstance(element)

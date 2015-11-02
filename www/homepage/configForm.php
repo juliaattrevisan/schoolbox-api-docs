@@ -70,7 +70,7 @@ if (is_numeric($_REQUEST['cid'])) {
                 ->setIdentifier($_POST['cid'])
                 ->setModule('homepage')
                 ->setSequence(0)
-                ->setPosition('left');
+                ->setPosition('top');
 
             // check perms
             if (($permission = $groupHandler->getPermission($_POST['cid'])) < WRITE_ACCESS) {
