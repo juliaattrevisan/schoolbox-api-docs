@@ -52,6 +52,16 @@ a.right-off-canvas-toggle {
                 background: $notification-header-background;
                 color: contrast-bg(0.4, $notification-header-background);
             }
+
+            /* Hide gap from ".island section" definition
+             */
+            section {
+                margin-bottom: 0;
+            }
+
+            /* Hide Mark All Read button when data-unread=0
+             * ie. when the button is not required
+             */
             .mark-all-read {
                 min-height: 0;
                 height: 0;
