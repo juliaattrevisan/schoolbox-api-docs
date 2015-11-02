@@ -285,6 +285,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
  * This can be summoned using the hamburger if it's not already visible
  */
 .left-off-canvas-menu {
+    background-color: $off-canvas-background;
 
     /* A background colour specifically for the logo/crest
      * so a school logo won't be mashed by the off-canvas colour
@@ -318,7 +319,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
          */
         a {
             color: $off-canvas-foreground;
-            background-color: $off-canvas-background;
+            background-color: $off-canvas;
             &:hover {
                 background-color: $off-canvas-hover;
             }
@@ -335,11 +336,11 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
          * use background not background-color
          */
         .separator {
-            color: contrast-bg($background: $off-canvas-background, $dark: $off-canvas-foreground);
-            background: $off-canvas-background;
+            color: contrast-bg($background: $off-canvas-bg, $dark: $off-canvas-foreground);
+            background: $off-canvas-bg;
 
             &:hover {
-                background: $off-canvas-background;
+                background: $off-canvas-bg;
             }
         }
 
@@ -353,7 +354,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
          * Sledgehammer the Shards of Narsil for now
          */
         .switch-user {
-            background: $off-canvas-background;
+            background: $off-canvas;
 
             &:hover {
                 background: $off-canvas-hover;
@@ -363,7 +364,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
                 &.card {
                     padding: 0.5rem 0rem 0rem 1rem;
                     .meta {
-                        color: contrast-bg($background: $off-canvas-background, $dark: $off-canvas-foreground);
+                        color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
                     }
                     a {
                         background-color: transparent;
