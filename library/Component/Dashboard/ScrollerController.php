@@ -90,7 +90,6 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
 
         $this->setVar(
             array(
-                'COMPONENT_ALIGN'                  => $this->getConfig('align'),
                 'COMPONENT_PIXEL'                  => $pixel,
                 'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig(
                     'timing'
