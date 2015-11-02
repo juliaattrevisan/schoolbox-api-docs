@@ -1,3 +1,9 @@
+/* Button Dimensions
+ */
+@mixin button-dimensions() {
+    min-height: $global-button-height;
+    padding: $global-button-padding;
+}
 
 @mixin flex {
 	// see https://css-tricks.com/using-flexbox/
