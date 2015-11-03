@@ -292,7 +292,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
      * set selections they are allowed to make
      */
     .logo-wrapper {
-        padding: 2rem 0;
         background-color: $logo-background;
 
         .logo {
@@ -300,6 +299,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
                 display: none !important;
             }
             display: block;
+            padding: 2rem 0;
             img {
                 display: block;
                 margin: 0 auto;
