@@ -32,11 +32,11 @@
 		}
 
 		&:hover {
-			background-color: tint(#0ff, 20%);
+			background-color: tint($content-ui-hover, 20%);
 		}
 		&[aria-expanded=true] {
 			@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
-			background-color: #0ff;
+			background-color: $content-ui-background;
 		}
 
 		@media #{$large-up} {
@@ -50,7 +50,7 @@
  */
 h1, h2 {
 	&:hover + .header-actions .button {
-		background-color: #0ff;
+		background-color: $content-ui-background;
 	}
 }
 
