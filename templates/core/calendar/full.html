@@ -433,7 +433,7 @@
             });
 
             var url = $.fn.getExportCalendarLink('{USER_TOKEN}',$(this).serializeArray());
-            $('#calendar-export-dialog-url').text(url).select();
+            $('#calendar-export-dialog-url').text(url);
             $('#calendar-export-dialog').foundation('reveal', 'open');
         });
 
