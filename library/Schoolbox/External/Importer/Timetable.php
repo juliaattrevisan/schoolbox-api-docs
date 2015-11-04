@@ -53,6 +53,11 @@ class Timetable extends AbstractImporter
     protected $classPeriodMapper;
 
     /**
+     * @var timetableCampusMapper
+     */
+    protected $timetableCampusMapper;
+
+    /**
      * @var TimetablePeriodMapper
      */
     protected $timetablePeriodMapper;
@@ -65,6 +70,7 @@ class Timetable extends AbstractImporter
         $this->userMapper            = new UserMapper();
         $this->classMapper           = new ClassEntryMapper();
         $this->classPeriodMapper     = new ClassPeriodMapper();
+        $this->timetableCampusMapper = new TimetableCampusMapper();
         $this->timetablePeriodMapper = new TimetablePeriodMapper();
     }
 
