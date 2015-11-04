@@ -9,7 +9,7 @@ use Schoolbox\External\Importer;
 
 // Manage options
 $options = getopt('v', ['perform-update', 'structure-file:', 'timetable-file:', 'enrolment-file:',]);
-$update  = $options['perform-update'];
+$update  = isset($options['perform-update']);
 
 /**
  * Method for outputting display format.
