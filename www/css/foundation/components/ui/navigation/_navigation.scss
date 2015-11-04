@@ -142,6 +142,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
                 padding: $base-font-size;
                 margin: 0;
                 opacity: 0;
+                line-height: $tabbar-height / 2;
             }
             &:hover, &.focus {
                 width: 100%;
@@ -526,7 +527,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
         .tab-bar {
             #search{
                 right: 22.99rem;
-                &:hover{
+                &:hover, &.focus{
                     padding-left: 34.22rem;
                 }
             }
@@ -575,7 +576,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
     .hybrid-bar {
         .tab-bar {
             #search{
-                &:hover{
+                &:hover, &.focus{
                     padding-left: 10rem;
                 }
             }
@@ -589,7 +590,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
     .hybrid-bar {
         .tab-bar {
             #search{
-                &:hover{
+                &:hover, &.focus{
                     padding-left: 10rem;
                 }
             }
