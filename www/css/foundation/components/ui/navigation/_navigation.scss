@@ -44,7 +44,7 @@ $tabbar-hamburger-icon-gap: 4px;
 
 // Off Canvas Menu Variables
 $off-canvas-width: rem-calc(260);
-$off-canvas-bg: $off-canvas !default;
+$off-canvas-bg: $off-canvas-background !default;
 $off-canvas-bg-hover: false;
 $off-canvas-hover-color: $off-canvas-bg;
 
@@ -287,7 +287,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
  * This can be summoned using the hamburger if it's not already visible
  */
 .left-off-canvas-menu {
-    background-color: $off-canvas-background;
 
     /* A background colour specifically for the logo/crest
      * so a school logo won't be mashed by the off-canvas colour
@@ -338,11 +337,11 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
          * use background not background-color
          */
         .separator {
-            color: contrast-bg($background: $off-canvas-bg, $dark: $off-canvas-foreground);
-            background: $off-canvas-bg;
+            color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
+            background: $off-canvas;
 
             &:hover {
-                background: $off-canvas-bg;
+                background: $off-canvas;
             }
         }
 
@@ -502,6 +501,13 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
     // 5.5.3 shrinks the submenu for some reason
     .left-submenu {
         min-height: 100%;
+        background-color: $off-canvas-background;
+        a {
+            color: $off-canvas-foreground;
+            &:hover {
+                background-color: $off-canvas-hover;
+            }
+        }
     }
 
     /* The Back button in the Off-Canvas Menu
