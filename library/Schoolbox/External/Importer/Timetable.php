@@ -78,26 +78,23 @@ class Timetable extends AbstractImporter
      * Reads all rows from the CSV reader, and loads them into an associative
      * array structure.
      *
-     * @param Reader          $reader
-     * @param LoggerInterface $log
-     *
      * @return array
      */
-    protected function parse(Reader $reader, LoggerInterface $log)
+    protected function parse()
     {
         $result = [];
-        foreach ($reader as $i => $row) {
-            $log->info("Parsing row $i...");
+        foreach ($this->reader as $i => $row) {
+            $this->log->info("Parsing row $i...");
             $key = $row['Class Code'];
 
             if (!isset($key)) {
-                $log->warning('Mandatory field "Class Code" not defined: skipping!');
+                $this->log->warning('Mandatory field "Class Code" not defined: skipping!');
                 continue;
             }
 
             if (!isset($result[$key])) {
                 // Class
-                $log->info(sprintf('Class "%s" has not been parsed: parsing now', $key));
+                $this->log->info(sprintf('Class "%s" has not been parsed: parsing now', $key));
                 $class = new ClassEntry();
                 $class
                     ->setCode($key)
@@ -110,7 +107,7 @@ class Timetable extends AbstractImporter
                     'periods' => new Collection(),
                 ];
             } else {
-                $log->info(sprintf('Class "%s" has been parsed', $key));
+                $this->log->info(sprintf('Class "%s" has been parsed', $key));
             }
 
             // Load period and teacher from DB
@@ -121,7 +118,7 @@ class Timetable extends AbstractImporter
                     $row['Term Campus']
                 );
             } catch (Mapper\Exception $e) {
-                $log->warning(
+                $this->log->warning(
                     sprintf(
                         'Term "%s" for campus "%s" not found: skipping!',
                         $row['Term Name'],
@@ -139,7 +136,7 @@ class Timetable extends AbstractImporter
                     'day'      => $row['Period Day'],
                 ]);
             } catch (Mapper\Exception $e) {
-                $log->warning(
+                $this->log->warning(
                     sprintf(
                         'Period "%s", day "%s" for term "%s" / campus "%s" not found: skipping!',
                         $row['Period Name'],
@@ -154,7 +151,7 @@ class Timetable extends AbstractImporter
             try {
                 $teacher = $this->userMapper->findOneByColumn('synergy_id', $row['Teacher Code']);
             } catch (Mapper\Exception $e) {
-                $log->warning(sprintf('Teacher code "%s" not found: skipping!', $row['Teacher Code']));
+                $this->log->warning(sprintf('Teacher code "%s" not found: skipping!', $row['Teacher Code']));
                 continue;
             }
             $classPeriod = new ClassPeriod();
@@ -165,7 +162,7 @@ class Timetable extends AbstractImporter
                 ->setPeriod($timetablePeriod)
             ;
             $result[$key]['periods']->add($classPeriod);
-            $log->info(
+            $this->log->info(
                 sprintf(
                     'Period "%s", day "%s" has been parsed',
                     $row['Period Name'],
@@ -178,25 +175,22 @@ class Timetable extends AbstractImporter
 
     /**
      * Reads the rows to insert from the CSV, and writes to the database.
-     *
-     * @param Reader          $reader
-     * @param LoggerInterface $log
      */
-    public function save(Reader $reader, LoggerInterface $log)
+    public function save()
     {
         // Eventual override rules:
         // * Class: none, update if there
         // * Class Periods: delete all existing and re-insert
-        foreach ($this->parse($reader, $log) as $row) {
+        foreach ($this->parse() as $row) {
             /** @var ClassEntry $class */
             $class = $row['class'];
-            $log->info(sprintf('Saving class "%s"', $class->getCode()));
+            $this->log->info(sprintf('Saving class "%s"', $class->getCode()));
             $this->classMapper->save($class);
 
             // Class mapper now has an ID, hence the periods may now be saved
             foreach ($row['periods'] as $period) {
                 /** @var ClassPeriod $period */
-                $log->info(
+                $this->log->info(
                     sprintf(
                         'Saving teacher "%s" for day %d, period "%s"',
                         $period->getTeacher()->getExternalId(),

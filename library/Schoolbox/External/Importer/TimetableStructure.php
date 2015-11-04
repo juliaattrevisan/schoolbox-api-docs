@@ -65,19 +65,15 @@ class TimetableStructure extends AbstractImporter
      * Reads all rows from the CSV reader, and loads them into an associative
      * array structure.
      *
-     * @param Reader          $reader
-     * @param LoggerInterface $log
-     *
      * @return array
      */
-    protected function parse(Reader $reader, LoggerInterface $log)
+    protected function parse()
     {
         $result = [];
-        $reader->setLoadFromFirst(true)->setFillDown(true);
-        foreach ($reader as $i => $row) {
-            $log->info("Parsing row $i...");
+        foreach ($this->reader as $i => $row) {
+            $this->log->info("Parsing row $i...");
             if (!isset($row['Term Campus']) || !isset($row['Term Title'])) {
-                $log->warning('Mandatory fields "Term Campus" and "Term Title" not defined: skipping!');
+                $this->log->warning('Mandatory fields "Term Campus" and "Term Title" not defined: skipping!');
                 continue;
             }
 
@@ -85,10 +81,10 @@ class TimetableStructure extends AbstractImporter
             $termCampus = $row['Term Campus'];
             $key = sprintf('%s-%s', $termCampus, $termTitle);
             if (!isset($result[$key])) {
-                $log->info(sprintf('Term "%s" for campus "%s" has not been parsed: parsing now', $termTitle, $termCampus));
+                $this->log->info(sprintf('Term "%s" for campus "%s" has not been parsed: parsing now', $termTitle, $termCampus));
                 $campusObject = $this->campusList->getBy('extTimetableCode', $termCampus);
                 if (!$campusObject) {
-                    $log->warning(sprintf('Campus "%s" not found: skipping!', $termCampus));
+                    $this->log->warning(sprintf('Campus "%s" not found: skipping!', $termCampus));
                     continue;
                 }
 
@@ -115,14 +111,14 @@ class TimetableStructure extends AbstractImporter
                     'periods' => [],
                 ];
             } else {
-                $log->info(sprintf('Term "%s" for campus "%s" has been parsed', $termTitle, $termCampus));
+                $this->log->info(sprintf('Term "%s" for campus "%s" has been parsed', $termTitle, $termCampus));
             }
 
             // Sort the periods by start then end later, then use that to apply a sequence
             $day    = $row['Period Day'];
             $title  = $row['Period Title'];
             $period = new TimetablePeriod();
-            $log->info(sprintf('Parsing period "%s" for day %d', $title, $day));
+            $this->log->info(sprintf('Parsing period "%s" for day %d', $title, $day));
             $period
                 ->setCycle($result[$key]['cycle'])
                 ->setDay($day)
@@ -135,13 +131,13 @@ class TimetableStructure extends AbstractImporter
                 $result[$key]['periods'][$day] = new Collection();
             }
             $result[$key]['periods'][$day]->add($period);
-            $log->info(sprintf('Period "%s" for day %d has been parsed', $title, $day));
+            $this->log->info(sprintf('Period "%s" for day %d has been parsed', $title, $day));
         }
-        $log->info("All rows parsed - calculating cycle and day lengths and period sequences");
+        $this->log->info("All rows parsed - calculating cycle and day lengths and period sequences");
 
         // Sort the period list, and set sequence based on that
         foreach ($result as $key => $timetable) {
-            $log->info(
+            $this->log->info(
                 sprintf(
                     'Calculating day and period count for term "%s" / campus "%s"',
                     $timetable['cycle']->getTitle(),
@@ -150,11 +146,11 @@ class TimetableStructure extends AbstractImporter
             );
             $dayCount    = max(array_keys($timetable['periods']));
             $periodCount = max(array_map('count', $timetable['periods']));
-            $log->info(sprintf('Day count: %d, period count: %d', $dayCount, $periodCount));
+            $this->log->info(sprintf('Day count: %d, period count: %d', $dayCount, $periodCount));
             $timetable['cycle']->setCycleLength($dayCount)->setDayLength($periodCount);
 
             // Sort periods by day, and then set period sequence that way
-            $log->info('Setting sequence for periods');
+            $this->log->info('Setting sequence for periods');
             foreach ($timetable['periods'] as $day => $periods) {
                 /** @var Collection|TimetablePeriod[] $periods */
                 $periods->sortByCallback(function($a, $b) {
@@ -167,7 +163,7 @@ class TimetableStructure extends AbstractImporter
                 });
                 $i = 1;
                 foreach ($periods as $period) {
-                    $log->info(
+                    $this->log->info(
                         sprintf(
                             'Period "%s" for day %d has sequence %d',
                             $period->getTitle(),
@@ -180,7 +176,7 @@ class TimetableStructure extends AbstractImporter
                 }
             }
         }
-        $log->info("Parsing completed");
+        $this->log->info("Parsing completed");
 
         // Mangle all of this into a list of timetable cycles and stuff
         return $result;
@@ -188,30 +184,27 @@ class TimetableStructure extends AbstractImporter
 
     /**
      * Reads the rows to insert from the CSV, and writes to the database.
-     *
-     * @param Reader          $reader
-     * @param LoggerInterface $log
      */
-    public function save(Reader $reader, LoggerInterface $log)
+    public function save()
     {
         // Eventual override rules:
         // * Term: same title/campus combination
         // * Period: same term, and period title/day combination
-        foreach ($this->parse($reader, $log) as $row) {
+        foreach ($this->parse() as $row) {
             /** @var TimetableCycle $cycle */
             $cycle = $row['cycle'];
-            $log->info(sprintf('Saving cycle for term "%s"', $cycle->getTitle()));
+            $this->log->info(sprintf('Saving cycle for term "%s"', $cycle->getTitle()));
             $this->timetableCycleMapper->save($cycle);
 
             /** @var TimetableCampus $campus */
             $campus = $row['campus'];
-            $log->info(sprintf('Saving campus cycle for campus "%s"', $campus->getCampus()->getExtTimetableCode()));
+            $this->log->info(sprintf('Saving campus cycle for campus "%s"', $campus->getCampus()->getExtTimetableCode()));
             $this->timetableCampusMapper->save($campus);
 
             foreach ($row['periods'] as $day => $periods) {
                 /** @var Collection|TimetablePeriod[] $periods */
                 foreach ($periods as $period) {
-                    $log->info(sprintf('Saving period "%s" for day %d', $period->getTitle(), $period->getDay()));
+                    $this->log->info(sprintf('Saving period "%s" for day %d', $period->getTitle(), $period->getDay()));
                 }
                 $this->timetablePeriodMapper->save($periods);
             }

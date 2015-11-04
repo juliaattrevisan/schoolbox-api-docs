@@ -57,20 +57,17 @@ class Enrolment extends AbstractImporter
      * Reads all rows from the CSV reader, and loads them into an associative
      * array structure.
      *
-     * @param Reader          $reader
-     * @param LoggerInterface $log
-     *
      * @return array|ClassInvolvement[]
      */
-    protected function parse(Reader $reader, LoggerInterface $log)
+    protected function parse()
     {
         $result = [];
-        foreach ($reader as $i => $row) {
-            $log->info("Parsing row $i...");
+        foreach ($this->reader as $i => $row) {
+            $this->log->info("Parsing row $i...");
             $classCode   = $row['Class Code'];
             $studentCode = $row['Student Code'];
             if (!isset($classCode) || !isset($studentCode)) {
-                $log->warning('Mandatory fields "Class Code" and "Student Code" not defined: skipping!');
+                $this->log->warning('Mandatory fields "Class Code" and "Student Code" not defined: skipping!');
                 continue;
             }
 
@@ -79,13 +76,13 @@ class Enrolment extends AbstractImporter
                 /** @var ClassEntry $class */
                 $class = $this->classMapper->findOneByColumn('code', $classCode);
             } catch (Mapper\Exception $e) {
-                $log->warning(sprintf('Class "%s" not found: skipping!', $classCode));
+                $this->log->warning(sprintf('Class "%s" not found: skipping!', $classCode));
                 continue;
             }
             try {
                 $student = $this->userMapper->findOneByColumn('synergy_id', $studentCode);
             } catch (Mapper\Exception $e) {
-                $log->warning(sprintf('Student "%s" not found: skipping!', $studentCode));
+                $this->log->warning(sprintf('Student "%s" not found: skipping!', $studentCode));
                 continue;
             }
             $enrolment = new ClassInvolvement();
@@ -93,7 +90,7 @@ class Enrolment extends AbstractImporter
                 ->setUser($student)
                 ->setClass($class)
             ;
-            $log->info(sprintf('Class "%s", student "%s" has been parsed', $classCode, $studentCode));
+            $this->log->info(sprintf('Class "%s", student "%s" has been parsed', $classCode, $studentCode));
             $result[] = $enrolment;
         }
         return $result;
@@ -101,17 +98,14 @@ class Enrolment extends AbstractImporter
 
     /**
      * Reads the rows to insert from the CSV, and writes to the database.
-     *
-     * @param Reader          $reader
-     * @param LoggerInterface $log
      */
-    public function save(Reader $reader, LoggerInterface $log)
+    public function save()
     {
         // Eventual override rules:
         // * Enrolment: delete all existing and re-insert
-        $result = $this->parse($reader, $log);
+        $result = $this->parse();
         foreach ($result as $enrolment) {
-            $log->info(
+            $this->log->info(
                 sprintf(
                     'Saving enrolment of student "%s" for class "%s"',
                     $enrolment->getUser()->getExternalId(),
