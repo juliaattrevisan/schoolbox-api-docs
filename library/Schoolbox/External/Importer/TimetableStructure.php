@@ -27,7 +27,7 @@ use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 
-class TimetableStructure
+class TimetableStructure extends AbstractImporter
 {
     /**
      * @var Collection|Campus[]
@@ -50,9 +50,9 @@ class TimetableStructure
     protected $timetablePeriodMapper;
 
     /**
-     * Constructor
+     * Custom setup function
      */
-    public function __construct()
+    protected function setup()
     {
         $campusMapper                = new CampusMapper();
         $this->campusList            = $campusMapper->findAll();

@@ -30,7 +30,7 @@ use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper;
 use Schoolbox\UserMapper;
 
-class Timetable
+class Timetable extends AbstractImporter
 {
     /**
      * @var Collection|Campus[]
@@ -58,14 +58,13 @@ class Timetable
     protected $timetablePeriodMapper;
 
     /**
-     * Constructor
+     * Custom setup function
      */
-    public function __construct()
+    protected function setup()
     {
         $this->userMapper            = new UserMapper();
         $this->classMapper           = new ClassEntryMapper();
         $this->classPeriodMapper     = new ClassPeriodMapper();
-        $this->timetableCampusMapper = new TimetableCampusMapper();
         $this->timetablePeriodMapper = new TimetablePeriodMapper();
     }
 

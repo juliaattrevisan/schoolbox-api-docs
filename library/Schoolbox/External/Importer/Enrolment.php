@@ -24,7 +24,7 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\Mapper;
 use Schoolbox\UserMapper;
 
-class Enrolment
+class Enrolment extends AbstractImporter
 {
     /**
      * @var Reader
@@ -44,9 +44,9 @@ class Enrolment
     protected $enrolmentMapper;
 
     /**
-     * Constructor
+     * Custom setup function
      */
-    public function __construct()
+    protected function setup()
     {
         $this->userMapper      = new UserMapper();
         $this->classMapper     = new ClassEntryMapper();
