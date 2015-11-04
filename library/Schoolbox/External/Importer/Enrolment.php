@@ -125,7 +125,7 @@ class Enrolment extends AbstractImporter
             if ($this->performUpdate) {
                 $this->log->info('Saving enrolment of student ' . $identifier);
                 if ($this->enrolmentMapper->save($enrolment)) {
-                    $this->log->info('Enrolment saved (ID: #%d)', $enrolment->getId());
+                    $this->log->info(sprintf('Enrolment saved (ID: #%d)', $enrolment->getId()));
                 } else {
                     $this->log->error('Could not save enrolment!');
                 }

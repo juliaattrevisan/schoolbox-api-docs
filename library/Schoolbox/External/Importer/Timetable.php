@@ -204,7 +204,7 @@ class Timetable extends AbstractImporter
             if ($this->performUpdate) {
                 $this->log->info(sprintf('Saving class "%s"', $code));
                 if ($this->classMapper->save($class)) {
-                    $this->log->info('Class saved (ID: #%d)', $class->getId());
+                    $this->log->info(sprintf('Class saved (ID: #%d)', $class->getId()));
                 } else {
                     $this->log->error('Could not save class!');
                 }
@@ -224,7 +224,7 @@ class Timetable extends AbstractImporter
                 if ($this->performUpdate) {
                     $this->log->info('Saving class teacher ' . $identifier);
                     if ($this->classPeriodMapper->save($period)) {
-                        $this->log->info('Class teacher entry saved (ID: #%d)', $period->getId());
+                        $this->log->info(sprintf('Class teacher entry saved (ID: #%d)', $period->getId()));
                     } else {
                         $this->log->error('Could not save class teacher!');
                     }

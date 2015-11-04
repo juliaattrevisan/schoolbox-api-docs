@@ -226,7 +226,7 @@ class TimetableStructure extends AbstractImporter
             if ($this->performUpdate) {
                 $this->log->info(sprintf('Saving campus cycle for campus "%s"', $code));
                 if ($this->timetableCampusMapper->save($campus)) {
-                    $this->log->info('Campus cycle saved (Cycle ID: #%d)', $campus->getCycle()->getId());
+                    $this->log->info(sprintf('Campus cycle saved (Cycle ID: #%d)', $campus->getCycle()->getId()));
                 } else {
                     $this->log->error('Could not save campus cycle!');
                 }
