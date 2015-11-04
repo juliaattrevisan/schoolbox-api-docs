@@ -80,6 +80,10 @@
 				 */
 				defaultForm: $j('#socialstream-form-default-' + options.instanceId),
 
+				/* The new post reveal modal, supersedes defaultForm
+				 */
+				replyModal: $j('#socialstream-reply-' + options.instanceId),
+
 				/* The url to stream from
 				 */
 				streamUrl: generateStreamUrl(options.instanceId, options.homepageId, options.start, options.offset),
@@ -130,6 +134,13 @@
 		 * Allow input forms to be spawned
 		 */
 		function initPostForm() {
+
+			/* Steal focus when reply modal opens
+			 */
+			config.replyModal.on('opened.fndtn.reveal', function() {
+				config.replyModal.find('textarea[name=body]').focus();
+			});
+
 			config.element.on('click', config.addPostLink, function(e) {
 				e.preventDefault();
 
@@ -137,7 +148,6 @@
 				// after it gets removed.
                 var row = $j(this).closest('[data-socialstream-row]');
 				var body = row.find('[data-body]').first();
-				var hasPostForm = (body.find('[data-add-post-form]').length > 0)
 
 				/* Clear out all instances of .addPostForm in the socialstream
 				 */
@@ -150,8 +160,7 @@
 
 				/* Clone an instance of .addPostForm and inject ids
 				 */
-				var clone = config.defaultForm.clone();
-				clone.attr('id', '');
+				var clone = config.replyModal.find('form');
 				clone.find('textarea[name=body]').val('');
 				clone.find('input[name=parentId]').val(parentId);
 				clone.find('input[name=rootId]').val(rootId);
@@ -169,20 +178,6 @@
 				 */
                 azone.resourceAttachClone(config.defaultForm.find('div.attachzone'));
 				initAttachmentSelectors(clone);
-
-				/* Unhide it
-				 */
-				clone.removeClass('hide');
-
-				/* Send In The (singular) Clone
-				 */
-				if (!hasPostForm) {
-					body.append(clone);
-				}
-
-				/* Steal focus
-				 */
-				row.find('[data-socialstream-form]').find('textarea').focus();
 			});
 		}
 

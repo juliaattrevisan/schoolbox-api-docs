@@ -67,6 +67,54 @@
                             </div>
                         </div>
                     </form>
+
+                    <!-- A reveal modal version of the above -->
+                    <div id="socialstream-reply-{COMPONENT_INSTANCE_ID}"
+                         class="reveal-modal"
+                         data-reveal
+                         aria-hidden="true"
+                         aria-labelledby="socialstream-reply-{COMPONENT_INSTANCE_ID}-label"
+                         role="dialog">
+                        <h2 id="socialstream-reply-{COMPONENT_INSTANCE_ID}-label">Post Reply</h2>
+                        <form action='/socialstream/modifyForm.php'
+                              method='post'
+                              data-add-post-form
+                              enctype='multipart/form-data'>
+                            <input type='hidden' name='type' value='string' />
+                            <input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
+                            <input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
+                            <input type='hidden' name='parentId' value='0' />
+                            <input type='hidden' name='rootId' value='0' />
+
+                            <label>
+                                <textarea rows="3" cols="50" name="body" placeholder="Share something"></textarea>
+                            </label>
+
+                            <p>
+                                <input type='submit' class="expand" value='Post' />
+                            </p>
+
+                            <div class="row post-attachment attach">
+                                <div class="small-8 large-9 columns no-pad">
+                                    {ATTACH_ZONE}
+                                </div>
+                                <div class="small-4 large-3 columns">
+                                    <a class='button icon-link sstream-attachment' data-value='url'>Link</a>
+                                </div>
+                            </div>
+                            <div class="row post-attachment url" style="display:none">
+                                <div class="small-8 large-9 columns">
+                                    <label>
+                                        <input type='text' class='url' name='url' maxlength='1024' placeholder="http://" />
+                                    </label>
+                                </div>
+                                <div class="small-4 large-3 columns">
+                                    <a class='button icon-attach sstream-attachment' data-value='attach'>Attach</a>
+                                </div>
+                            </div>
+                        </form>
+                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                    </div>
                     <!-- END socialstream_has_newpost -->
                 </div>
 
