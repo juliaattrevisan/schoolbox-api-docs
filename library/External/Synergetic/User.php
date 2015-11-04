@@ -980,15 +980,15 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function determineBoarderType($boarderValue)
     {
-        $boarders = array('B', 'W');
-        if (!strlen($boarderValue)) {
+        if (strlen($boarderValue) === 0) {
             return '';
-        } else {
-            if (in_array($boarderValue, $boarders)) {
-                return 'Boarder';
-            }
         }
-        return 'Day';
+        $query = "
+            SELECT Description
+            FROM   luBoarder
+            WHERE  Code = '{$this->getDatabase()->quote($boarderValue)}'
+        ";
+        return $this->getDatabase()->getOne($query);
     }
 
     public function getHousemasterByHouseId($houseID)

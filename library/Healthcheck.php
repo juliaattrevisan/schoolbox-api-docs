@@ -204,6 +204,7 @@ class Healthcheck
         $list[] = 'CommunityAlerts';
         $list[] = 'Constituencies';
         $list[] = 'FileSemesters';
+        $list[] = 'luBoarder';
         $list[] = 'luBuilding';
         $list[] = 'luCountry';
         $list[] = 'luDepartment';
