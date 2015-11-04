@@ -624,14 +624,6 @@ $rotate-th-width: $square-grid-td-size;
 	}
 }
 
-// Component specific margin
-.component-container{
-	margin-bottom: rem-calc(($base-font-size));
-	section{
-		margin: 0;
-	}
-}
-
 .list-item-content {
 	@media #{$small-only} {
 		padding: 0.75rem 0 0 3rem;
