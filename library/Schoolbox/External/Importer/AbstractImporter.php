@@ -36,6 +36,16 @@ abstract class AbstractImporter
     protected $performUpdate;
 
     /**
+     * Documentation function for expected format
+     *
+     * @return array
+     */
+    public static function getFormat()
+    {
+        return [];
+    }
+
+    /**
      * Constructor
      *
      * @param Reader          $reader
