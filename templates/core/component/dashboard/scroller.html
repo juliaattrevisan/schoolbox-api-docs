@@ -19,19 +19,17 @@
             <!-- BEGIN has_header -->
             <h2 class="subheader">{COMPONENT_NAME}</h2>
             <!-- END has_header -->
-            <section class="content">
-                <div data-imageslider class="imageslider-container">
-                    <!-- BEGIN image_scroller -->
-                    <div data-imagescroller-image class="text-center">
-                        <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}"
-                             alt="{IMAGE_NAME}"/>
-                        <!-- BEGIN show_caption -->
-                        <p class="meta">{IMAGE_NAME}</p>
-                        <!-- END show_caption -->
-                    </div>
-                    <!-- END image_scroller -->
+            <div data-imageslider class="imageslider-container">
+                <!-- BEGIN image_scroller -->
+                <div data-imagescroller-image class="text-center">
+                    <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}"
+                         alt="{IMAGE_NAME}"/>
+                    <!-- BEGIN show_caption -->
+                    <p class="meta">{IMAGE_NAME}</p>
+                    <!-- END show_caption -->
                 </div>
-            </section>
+                <!-- END image_scroller -->
+            </div>
         </div>
     </div>
 </div>
