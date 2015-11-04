@@ -474,8 +474,6 @@ tr.sub-row {
 	}
 }
 
-
-
 .scrollable {
 
 	@extend .overflow;
@@ -492,7 +490,6 @@ $square-grid-td-size: 4rem;
 $rotate-width: 4.5rem;
 $rotate-angle: 45;
 $rotate-th-width: $square-grid-td-size;
-
 
 .square-grid {
 	td, thead th {
@@ -624,6 +621,14 @@ $rotate-th-width: $square-grid-td-size;
 	}
 	.content{
 		@extend %content;
+	}
+}
+
+// Component specific margin
+[id^="component"]{
+	margin-bottom: rem-calc(($base-font-size));
+	section{
+		margin: 0;
 	}
 }
 
