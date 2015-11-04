@@ -474,8 +474,6 @@ tr.sub-row {
 	}
 }
 
-
-
 .scrollable {
 
 	@extend .overflow;
@@ -492,7 +490,6 @@ $square-grid-td-size: 4rem;
 $rotate-width: 4.5rem;
 $rotate-angle: 45;
 $rotate-th-width: $square-grid-td-size;
-
 
 .square-grid {
 	td, thead th {
