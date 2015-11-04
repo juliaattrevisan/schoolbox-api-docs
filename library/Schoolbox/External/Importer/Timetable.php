@@ -1,11 +1,9 @@
 <?php
 /**
  * Importer for timetable into the Schoolbox connector.
- *
  * Saves into the following tables:
  * * class
  * * class_period
- *
  * Assumes that `Schoolbox\External\Importer\TimetableStructure` has been run.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
@@ -117,8 +115,7 @@ class Timetable extends AbstractImporter
                 $class
                     ->setCode($key)
                     ->setDescription($row['Class Description'])
-                    ->setName($row['Class Title'])
-                ;
+                    ->setName($row['Class Title']);
 
                 $result[$key] = [
                     'class'   => $class,
@@ -148,11 +145,13 @@ class Timetable extends AbstractImporter
 
             try {
                 /** @var TimetablePeriod $timetablePeriod */
-                $timetablePeriod = $this->timetablePeriodMapper->findOneByColumnList([
-                    'cycle_id' => $timetableCampus->getCycle()->getId(),
-                    'title'    => $row['Period Title'],
-                    'day'      => $row['Period Day'],
-                ]);
+                $timetablePeriod = $this->timetablePeriodMapper->findOneByColumnList(
+                    [
+                        'cycle_id' => $timetableCampus->getCycle()->getId(),
+                        'title'    => $row['Period Title'],
+                        'day'      => $row['Period Day'],
+                    ]
+                );
             } catch (Mapper\Exception $e) {
                 $this->log->warning(
                     sprintf(
@@ -177,8 +176,7 @@ class Timetable extends AbstractImporter
                 ->setClass($result[$key]['class'])
                 ->setRoom($row['Class Room'])
                 ->setTeacher($teacher)
-                ->setPeriod($timetablePeriod)
-            ;
+                ->setPeriod($timetablePeriod);
             $result[$key]['periods']->add($classPeriod);
             $this->log->info(
                 sprintf(
@@ -205,7 +203,7 @@ class Timetable extends AbstractImporter
             $code  = $class->getCode();
             if ($this->performUpdate) {
                 $this->log->info(sprintf('Saving class "%s"', $code));
-                if ( $this->classMapper->save($class)) {
+                if ($this->classMapper->save($class)) {
                     $this->log->info('Class saved (ID: #%d)', $class->getId());
                 } else {
                     $this->log->error('Could not save class!');

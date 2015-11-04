@@ -1,10 +1,8 @@
 <?php
 /**
  * Importer for student enrolment into the Schoolbox connector.
- *
  * Saves into the following tables:
  * * class_user
- *
  * Assumes that `Schoolbox\External\Importer\TimetableStructure` and
  * `Schoolbox\External\Importer\Timetable` have been run.
  *
@@ -16,7 +14,6 @@
 namespace Schoolbox\External\Importer;
 
 use Alaress\Csv\Reader;
-use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvement;
@@ -104,8 +101,7 @@ class Enrolment extends AbstractImporter
             $enrolment = new ClassInvolvement();
             $enrolment
                 ->setUser($student)
-                ->setClass($class)
-            ;
+                ->setClass($class);
             $this->log->info(sprintf('Class "%s", student "%s" has been parsed', $classCode, $studentCode));
             $result[] = $enrolment;
         }

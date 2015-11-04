@@ -1,7 +1,6 @@
 <?php
 /**
  * Importer for timetable structure into the Schoolbox connector.
- *
  * Saves into the following tables:
  * * timetable_cycle
  * * timetable_campus
@@ -15,8 +14,6 @@
 namespace Schoolbox\External\Importer;
 
 use Alaress_Date_Format;
-use Alaress\Csv\Reader;
-use Psr\Log\LoggerInterface;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -99,7 +96,7 @@ class TimetableStructure extends AbstractImporter
 
             $termTitle  = $row['Term Title'];
             $termCampus = $row['Term Campus'];
-            $key = sprintf('%s-%s', $termCampus, $termTitle);
+            $key        = sprintf('%s-%s', $termCampus, $termTitle);
             if (!isset($result[$key])) {
                 $this->log->info(sprintf('Term "%s" for campus "%s" has not been parsed: parsing now', $termTitle, $termCampus));
                 $campusObject = $this->campusList->getBy('extTimetableCode', $termCampus);
@@ -112,8 +109,7 @@ class TimetableStructure extends AbstractImporter
                 $cycle = new TimetableCycle();
                 $cycle
                     ->setTitle($termTitle)
-                    ->setRegular(true)
-                ;
+                    ->setRegular(true);
 
                 // Timetable campus
                 $campus = new TimetableCampus();
@@ -122,8 +118,7 @@ class TimetableStructure extends AbstractImporter
                     ->setCampus($campusObject)
                     ->setStart(new Alaress_Date_Format($row['Term Start'], Alaress_Date_Format::DATABASE_DATE_FORMAT))
                     ->setFinish(new Alaress_Date_Format($row['Term Finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT))
-                    ->setOffset($row['Term Offset'])
-                ;
+                    ->setOffset($row['Term Offset']);
 
                 $result[$key] = [
                     'cycle'   => $cycle,
@@ -145,8 +140,7 @@ class TimetableStructure extends AbstractImporter
                 ->setStart(new Alaress_Date_Format($row['Period Start'], Alaress_Date_Format::DATABASE_TIME_FORMAT))
                 ->setFinish(new Alaress_Date_Format($row['Period Finish'], Alaress_Date_Format::DATABASE_TIME_FORMAT))
                 ->setTitle($row['Period Title'])
-                ->setUsable(true)
-            ;
+                ->setUsable(true);
             if (!isset($result[$key]['periods'][$day])) {
                 $result[$key]['periods'][$day] = new Collection();
             }
@@ -173,14 +167,16 @@ class TimetableStructure extends AbstractImporter
             $this->log->info('Setting sequence for periods');
             foreach ($timetable['periods'] as $day => $periods) {
                 /** @var Collection|TimetablePeriod[] $periods */
-                $periods->sortByCallback(function($a, $b) {
-                    /** @var TimetablePeriod $a */
-                    /** @var TimetablePeriod $b */
-                    if (($cmp = $a->getStart()->compare($b->getStart())) !== 0) {
-                        return $cmp;
+                $periods->sortByCallback(
+                    function ($a, $b) {
+                        /** @var TimetablePeriod $a */
+                        /** @var TimetablePeriod $b */
+                        if (($cmp = $a->getStart()->compare($b->getStart())) !== 0) {
+                            return $cmp;
+                        }
+                        return $a->getFinish()->compare($b->getFinish());
                     }
-                    return $a->getFinish()->compare($b->getFinish());
-                });
+                );
                 $i = 1;
                 foreach ($periods as $period) {
                     $this->log->info(
