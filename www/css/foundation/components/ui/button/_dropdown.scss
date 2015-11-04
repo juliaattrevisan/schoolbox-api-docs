@@ -37,7 +37,7 @@ $f-dropdown-icon-align: 0.25rem;
 	}
 	.separator {
 		padding: $f-dropdown-list-padding;
-		font-weight: 100;
+		font-weight: $font-weight-normal;
 		text-transform: uppercase;
 		background-color: transparent;
 		cursor: default;
