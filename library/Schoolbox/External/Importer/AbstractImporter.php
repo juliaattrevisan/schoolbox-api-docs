@@ -15,10 +15,37 @@ use Psr\Log\LoggerInterface;
 abstract class AbstractImporter
 {
     /**
-     * Constructor
+     * The reader from which rows are read.
+     *
+     * @var Reader
      */
-    public function __construct()
+    protected $reader;
+
+    /**
+     * The log object to which log entries are written
+     *
+     * @var LoggerInterface
+     */
+    protected $log;
+
+    /**
+     * Are updates actually performed?
+     *
+     * @var bool
+     */
+    protected $performUpdate;
+
+    /**
+     * Constructor
+     *
+     * @param Reader          $reader
+     * @param LoggerInterface $log
+     * @param bool            $performUpdate
+     */
+    public function __construct(Reader $reader, LoggerInterface $log, $performUpdate = false)
     {
+        $this->reader = $reader;
+        $this->log    = $log;
         $this->setup();
     }
 
@@ -32,21 +59,7 @@ abstract class AbstractImporter
     }
 
     /**
-     * Reads all rows from the CSV reader, and loads them into an associative
-     * array structure.
-     *
-     * @param Reader          $reader
-     * @param LoggerInterface $log
-     *
-     * @return array
+     * Reads the rows to insert from the reader, and writes to the database.
      */
-    abstract protected function parse(Reader $reader, LoggerInterface $log);
-
-    /**
-     * Reads the rows to insert from the CSV, and writes to the database.
-     *
-     * @param Reader          $reader
-     * @param LoggerInterface $log
-     */
-    abstract public function save(Reader $reader, LoggerInterface $log);
+    abstract public function save();
 }
