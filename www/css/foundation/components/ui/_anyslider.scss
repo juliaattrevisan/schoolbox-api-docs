@@ -5,7 +5,7 @@ $anyslider-color: $iron;
 $anyslider-color-hover: $steel;
 .imageslider-container {
     position: relative;
-    margin: 0 0 1rem 0;
+    margin: 0;
     .imageslider {
         position: relative;
     }
@@ -75,5 +75,10 @@ $anyslider-color-hover: $steel;
         margin: 0;
         width: 100%;
         font-style: normal;
+
+        // hide if empty - because padding
+        &:empty{
+            display: none;
+        }
     }
 }
