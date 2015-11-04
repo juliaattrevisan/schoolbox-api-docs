@@ -99,7 +99,7 @@ class Timetable extends AbstractImporter
                 $class
                     ->setCode($key)
                     ->setDescription($row['Class Description'])
-                    ->setName($row['Class Name'])
+                    ->setName($row['Class Title'])
                 ;
 
                 $result[$key] = [
@@ -114,14 +114,14 @@ class Timetable extends AbstractImporter
             try {
                 /** @var TimetableCampus $timetableCampus */
                 $timetableCampus = $this->timetableCampusMapper->findOneByNameAndCampusCode(
-                    $row['Term Name'],
+                    $row['Term Title'],
                     $row['Term Campus']
                 );
             } catch (Mapper\Exception $e) {
                 $this->log->warning(
                     sprintf(
                         'Term "%s" for campus "%s" not found: skipping!',
-                        $row['Term Name'],
+                        $row['Term Title'],
                         $row['Term Campus']
                     )
                 );
@@ -132,16 +132,16 @@ class Timetable extends AbstractImporter
                 /** @var TimetablePeriod $timetablePeriod */
                 $timetablePeriod = $this->timetablePeriodMapper->findOneByColumnList([
                     'cycle_id' => $timetableCampus->getCycle()->getId(),
-                    'title'    => $row['Period Name'],
+                    'title'    => $row['Period Title'],
                     'day'      => $row['Period Day'],
                 ]);
             } catch (Mapper\Exception $e) {
                 $this->log->warning(
                     sprintf(
                         'Period "%s", day "%s" for term "%s" / campus "%s" not found: skipping!',
-                        $row['Period Name'],
+                        $row['Period Title'],
                         $row['Period Day'],
-                        $row['Term Name'],
+                        $row['Term Title'],
                         $row['Term Campus']
                     )
                 );
@@ -165,7 +165,7 @@ class Timetable extends AbstractImporter
             $this->log->info(
                 sprintf(
                     'Period "%s", day "%s" has been parsed',
-                    $row['Period Name'],
+                    $row['Period Title'],
                     $row['Period Day']
                 )
             );
