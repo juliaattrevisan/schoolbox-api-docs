@@ -410,10 +410,14 @@ class Controller extends BaseController
             $conf['follow'] = $this->getConfig()->persistFollow($this->getUser(), $postFollow);
         }
 
-        $this->getResponse()->content->set([
-            'data'   => $conf,
-            'format' => 'json'
-        ]);
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->content->set([
+                'data'   => $conf,
+                'format' => 'json'
+            ]);
+        } else {
+            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('messages.configure'));
+        }
     }
 
 }
