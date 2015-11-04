@@ -14,6 +14,9 @@ $groupID            = $_GET['groupID'];
 $roleTypeID         = $_GET['roleTypeID'];
 $showCampus         = !empty($_GET['showCampus']);
 $residentialHouseID = $_GET['residentialHouseID'];
+if (!empty($residentialHouseID)) {
+    $residentialHouseID = explode(';', $residentialHouseID);
+}
 
 if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
     && (strlen($groupID) || strlen($roleTypeID))
@@ -61,7 +64,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
     $userList = $userHandler->ajaxSearch(
         $keyword,
         $groupID,
-        explode(';', $residentialHouseID),
+        $residentialHouseID,
         30
     );
 
