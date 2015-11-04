@@ -70,8 +70,13 @@ class Reader implements \Iterator {
      * Sets up the reader to read from the current file name.
      *
      * @param string $filename
+     *
+     * @throws \RuntimeException if file isn't found or readable
      */
     public function __construct($filename) {
+        if (!is_readable($filename)) {
+            throw new \RuntimeException(sprintf('File "%s" not found, or is not readable!', $filename));
+        }
         $this->filename = $filename;
     }
 
