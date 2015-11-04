@@ -96,8 +96,9 @@
                 dialog.on('opened', function() {
                     dialogUrl.select();
                 });
-
-                var button = $('#copy-button').show();
+            },
+            onZeroClipboardReady: function() {
+                $('#copy-button').show();
             }
         });
 

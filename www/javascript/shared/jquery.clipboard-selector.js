@@ -59,7 +59,13 @@ $.fn.clipboardSelector = function(options) {
              */
             onReady: function() {
                 defaultOnReady();
-            }
+            },
+
+            /* Executes when ZeroClipboard is ready.
+             * This won't always happen, because it relies on Flash
+             * (whose presence isn't reliable!)
+             */
+            onZeroClipboardReady: function() {}
         }
 
         var derived = {
@@ -111,8 +117,9 @@ $.fn.clipboardSelector = function(options) {
             var button = $(config.copy).hide();
             var client = new ZeroClipboard(button);
 
+            config.onReady();
             client.on('ready', function() {
-                config.onReady();
+                config.onZeroClipboardReady();
             });
         });
     }
