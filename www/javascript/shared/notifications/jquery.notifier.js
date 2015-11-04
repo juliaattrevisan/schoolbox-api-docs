@@ -570,9 +570,10 @@
             $(settings.list).on('click', 'a', function(e) {
 
                 var $a     = $(this);
+                var $aData = $a.data();
                 var $item  = $a.closest('[data-' + settings.tplItem + ']');
-                var pip    = $a.dataIsset(settings.tplItemAck);
-                var action = $a.dataIsset(settings.tplItemHref) && $item.dataIsset(settings.itemUnread);
+                var pip    = settings.tplItemAck in $aData;
+                var action = settings.tplItemHref in $aData && settings.itemUnread in $item.data();
 
                 if (pip || action) {
                     var msgId = $item.attr('id').split('-')[1];
@@ -695,13 +696,4 @@
             return this.reverse().replace(new RegExp(what.reverse()), replacement.reverse()).reverse();
         };
     }
-
-    if(!$.fn.dataIsset) {
-        $.fn.dataIsset = function (data) {
-            return this.each(function () {
-                return ('undefined' != typeof $(this).data(data));
-            });
-        }
-    }
-
 } (jQuery));
