@@ -15,8 +15,6 @@
 
 namespace Schoolbox\External\Importer;
 
-use Alaress\Csv\Reader;
-use Psr\Log\LoggerInterface;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\External\ClassEntry;
@@ -70,14 +68,15 @@ class Timetable extends AbstractImporter
     public static function getFormat()
     {
         return [
-            'Term Campus'  => 'The campus to import a timetable for (must already be imported)',
-            'Term Title'   => 'The name of the term (must already be imported)',
-            'Period Day'   => 'The day number that this period is on (must already be imported)',
-            'Period Title' => 'The name of this period (must already be imported)',
-            'Class Code'   => 'The code for the class',
-            'Class Title'  => 'The display name for the class',
-            'Class Room'   => 'The room that this class is in',
-            'Teacher Code' => 'The code for the teacher of this class (must correspond to a teacher\'s external ID)',
+            'Term Campus'       => 'The campus to import a timetable for (must already be imported)',
+            'Term Title'        => 'The name of the term (must already be imported)',
+            'Period Day'        => 'The day number that this period is on (must already be imported)',
+            'Period Title'      => 'The name of this period (must already be imported)',
+            'Class Code'        => 'The code for the class',
+            'Class Title'       => 'The display name for the class',
+            'Class Room'        => '(optional) The room that this class is in',
+            'Class Description' => '(optional) A description for this class',
+            'Teacher Code'      => 'The code for the teacher of this class (must correspond to a teacher\'s external ID)',
         ];
     }
 
