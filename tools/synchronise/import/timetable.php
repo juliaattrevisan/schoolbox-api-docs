@@ -18,9 +18,9 @@ $update  = $options['perform-update'];
  *
  * @return string
  */
-$displayFormat = function($fields) {
+$displayFormat = function ($fields) {
     $maxFieldLength = max(array_map('strlen', array_keys($fields)));
-    $result = '';
+    $result         = '';
     foreach ($fields as $field => $text) {
         $result .= sprintf(
             "    %s:%s %s\n",
@@ -40,7 +40,7 @@ $displayFormat = function($fields) {
  *
  * @return Reader
  */
-$getReader = function($file, Logger $logger) {
+$getReader = function ($file, Logger $logger) {
     try {
         $reader = new Reader($file);
         $reader->setLoadFromFirst(true)->setFillDown(true);
