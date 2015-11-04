@@ -5,6 +5,7 @@
 <script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
 <script type="text/javascript" src="/javascript/shared/calendar/jquery.fullcalendar.js"></script>
 <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
 <script type="text/javascript">
 
     // provide page-wide access to the calendar object so the callbacks can actually use it
@@ -419,25 +420,30 @@
             window.location = $.fn.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
         });
 
-        //
-        // Form listener for exporter - brings up a dialog box that offers a URL
-        // to click.
-        $('#calendar-export-form').submit(function(event) {
-            event.preventDefault();
+        /* Export calendar
+         */
+        $.fn.clipboardSelector({
+            exportActivator: '#open-calendar-export-dialog',
+            onReady: function() {
+                var form = $('#calendar-export-form');
+                var url = $.fn.getExportCalendarLink('{USER_TOKEN}', form.serializeArray());
 
-            // Copy and paste button - show only when ready
-            var button = $('#copy-button').hide();
-            var client = new ZeroClipboard(button);
-            client.on('ready', function() {
-                button.show();
-            });
+                var dialog = $('#calendar-export-dialog');
+                var dialogUrl = $('#calendar-export-dialog-url');
 
-            var url = $.fn.getExportCalendarLink('{USER_TOKEN}',$(this).serializeArray());
-            $('#calendar-export-dialog-url').text(url);
-            $('#calendar-export-dialog').foundation('reveal', 'open');
+                /* Bypass foundation bug
+                 * https://github.com/zurb/foundation/issues/4746
+                 */
+                dialogUrl.val(url);
+                dialog.foundation('reveal', 'open');
+
+                dialog.on('opened', function() {
+                    dialogUrl.select();
+                });
+
+                var button = $('#copy-button').show();
+            }
         });
-
-
 
         // Copypasted code for updating booking in series
         $('#calendar-bubble').find('#editEvent').on(
