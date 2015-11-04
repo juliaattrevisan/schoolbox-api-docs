@@ -50,6 +50,26 @@ class TimetableStructure extends AbstractImporter
     protected $timetablePeriodMapper;
 
     /**
+     * Documentation function for expected format
+     *
+     * @return array
+     */
+    public static function getFormat()
+    {
+        return [
+            'Term Campus'   => 'The campus to create a term for (must correspond to a campus code in Schoolbox)',
+            'Term Title'    => 'The name of the term',
+            'Term Start'    => 'The date on which the term starts',
+            'Term Finish'   => 'The date on which the term finishes',
+            'Term Offset'   => 'The day number that "Term Start" is',
+            'Period Day'    => 'The day number that this period is on',
+            'Period Title'  => 'The name of this period',
+            'Period Start'  => 'The time at which this period starts',
+            'Period Finish' => 'The time at which this period finishes',
+        ];
+    }
+
+    /**
      * Custom setup function
      */
     protected function setup()

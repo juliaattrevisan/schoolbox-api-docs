@@ -41,7 +41,23 @@ class Enrolment extends AbstractImporter
      */
     protected $classMapper;
 
+    /**
+     * @var ClassInvolvementMapper
+     */
     protected $enrolmentMapper;
+
+    /**
+     * Documentation function for expected format
+     *
+     * @return array
+     */
+    public static function getFormat()
+    {
+        return [
+            'Class Code'   => 'The code for the class',
+            'Student Code' => 'The code for the student (must correspond to a student\'s external ID)',
+        ];
+    }
 
     /**
      * Custom setup function
