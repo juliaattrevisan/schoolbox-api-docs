@@ -85,7 +85,7 @@ $logger = new Logger(STDOUT, STDERR, isset($options['v']) ? Monolog\Logger::DEBU
 // For each of structure file, timetable file and enrolment file:
 if (isset($options['structure-file'])) {
     $logger->info('Starting structure import...');
-    $parser = new Importer\TimetableStructure($getReader($options['structure-file']), $logger, $update);
+    $parser = new Importer\TimetableStructure($getReader($options['structure-file'], $logger), $logger, $update);
     $parser->save();
     $logger->info('Structure import done!');
 } else {
@@ -94,7 +94,7 @@ if (isset($options['structure-file'])) {
 
 if (isset($options['timetable-file'])) {
     $logger->info('Starting timetable import...');
-    $parser = new Importer\Timetable($getReader($options['timetable-file']), $logger, $update);
+    $parser = new Importer\Timetable($getReader($options['timetable-file'], $logger), $logger, $update);
     $parser->save();
     $logger->info('Timetable import done!');
 } else {
@@ -103,7 +103,7 @@ if (isset($options['timetable-file'])) {
 
 if (isset($options['enrolment-file'])) {
     $logger->info('Starting enrolment import...');
-    $parser = new Importer\Enrolment($getReader($options['enrolment-file']), $logger, $update);
+    $parser = new Importer\Enrolment($getReader($options['enrolment-file'], $logger), $logger, $update);
     $parser->save();
     $logger->info('Timetable import done!');
 } else {
