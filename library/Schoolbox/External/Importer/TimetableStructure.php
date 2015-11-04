@@ -213,20 +213,45 @@ class TimetableStructure extends AbstractImporter
         foreach ($this->parse() as $row) {
             /** @var TimetableCycle $cycle */
             $cycle = $row['cycle'];
-            $this->log->info(sprintf('Saving cycle for term "%s"', $cycle->getTitle()));
-            $this->timetableCycleMapper->save($cycle);
+            if ($this->performUpdate) {
+                $this->log->info(sprintf('Saving cycle for term "%s"', $cycle->getTitle()));
+                if ($this->timetableCycleMapper->save($cycle)) {
+                    $this->log->info(sprintf('Cycle saved (ID: #%d)', $cycle->getId()));
+                } else {
+                    $this->log->error('Could not save cycle!');
+                }
+            } else {
+                $this->log->info(sprintf('Pretending to save cycle for term "%s"', $cycle->getTitle()));
+            }
 
             /** @var TimetableCampus $campus */
             $campus = $row['campus'];
-            $this->log->info(sprintf('Saving campus cycle for campus "%s"', $campus->getCampus()->getExtTimetableCode()));
-            $this->timetableCampusMapper->save($campus);
+            $code   = $campus->getCampus()->getExtTimetableCode();
+            if ($this->performUpdate) {
+                $this->log->info(sprintf('Saving campus cycle for campus "%s"', $code));
+                if ($this->timetableCampusMapper->save($campus)) {
+                    $this->log->info('Campus cycle saved (Cycle ID: #%d)', $campus->getCycle()->getId());
+                } else {
+                    $this->log->error('Could not save campus cycle!');
+                }
+            } else {
+                $this->log->info(sprintf('Pretending to save campus cycle for campus "%s"', $code));
+            }
 
             foreach ($row['periods'] as $day => $periods) {
                 /** @var Collection|TimetablePeriod[] $periods */
                 foreach ($periods as $period) {
-                    $this->log->info(sprintf('Saving period "%s" for day %d', $period->getTitle(), $period->getDay()));
+                    if ($this->performUpdate) {
+                        $this->log->info(sprintf('Saving period "%s" for day %d', $period->getTitle(), $period->getDay()));
+                        if ($this->timetablePeriodMapper->save($period)) {
+                            $this->log->info(sprintf('Period saved (ID: #%d)', $period->getId()));
+                        } else {
+                            $this->log->error('Could not save period!');
+                        }
+                    } else {
+                        $this->log->info(sprintf('Pretending to save period "%s" for day %d', $period->getTitle(), $period->getDay()));
+                    }
                 }
-                $this->timetablePeriodMapper->save($periods);
             }
         }
     }

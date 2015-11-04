@@ -121,14 +121,21 @@ class Enrolment extends AbstractImporter
         // * Enrolment: delete all existing and re-insert
         $result = $this->parse();
         foreach ($result as $enrolment) {
-            $this->log->info(
-                sprintf(
-                    'Saving enrolment of student "%s" for class "%s"',
-                    $enrolment->getUser()->getExternalId(),
-                    $enrolment->getClass()->getCode()
-                )
+            $identifier = sprintf(
+                '"%s" for class "%s"',
+                $enrolment->getUser()->getExternalId(),
+                $enrolment->getClass()->getCode()
             );
+            if ($this->performUpdate) {
+                $this->log->info('Saving enrolment of student ' . $identifier);
+                if ($this->enrolmentMapper->save($enrolment)) {
+                    $this->log->info('Enrolment saved (ID: #%d)', $enrolment->getId());
+                } else {
+                    $this->log->error('Could not save enrolment!');
+                }
+            } else {
+                $this->log->info('Pretending to save enrolment of student ' . $identifier);
+            }
         }
-        $this->enrolmentMapper->save($result);
     }
 }
