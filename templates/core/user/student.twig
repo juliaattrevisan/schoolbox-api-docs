@@ -491,7 +491,7 @@
                         <div class="small-12 columns">
                             <input type="hidden" name="replyto" value="{{ session.user.getEmail() }}"/>
                             <input type="hidden" name="bcc" value="{{ teacherEmails }}"/>
-                            <input type="submit" value="Email All {{ group }} Teachers" />
+                            <button type="submit" class="button icon-email">Email All {{ group }} Teachers</button>
                         </div>
                     </div>
                 </form>
