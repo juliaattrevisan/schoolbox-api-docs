@@ -128,9 +128,3 @@
     min-height: 0;
     max-height: 92px;
 }
-
-/* Make close button easier to hit on phones
- */
-.reveal-modal .close-reveal-modal {
-    padding: 0.5rem;
-}
