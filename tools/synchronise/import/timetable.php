@@ -80,12 +80,7 @@ HELP;
 }
 
 // Set up the logger
-$logger = new Logger();
-if (isset($options['v'])) {
-    $logger->setLevel(Monolog\Logger::DEBUG);
-} else {
-    $logger->setLevel(Monolog\Logger::INFO);
-}
+$logger = new Logger(STDOUT, STDERR, isset($options['v']) ? Monolog\Logger::DEBUG : Monolog\Logger::INFO);
 
 // For each of structure file, timetable file and enrolment file:
 if (isset($options['structure-file'])) {
