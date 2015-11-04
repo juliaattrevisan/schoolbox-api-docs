@@ -54,8 +54,9 @@ abstract class AbstractImporter
      */
     public function __construct(Reader $reader, LoggerInterface $log, $performUpdate = false)
     {
-        $this->reader = $reader;
-        $this->log    = $log;
+        $this->reader        = $reader;
+        $this->log           = $log;
+        $this->performUpdate = $performUpdate;
         $this->setup();
     }
 
