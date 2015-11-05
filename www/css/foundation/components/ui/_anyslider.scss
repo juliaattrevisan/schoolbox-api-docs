@@ -4,7 +4,9 @@
 $anyslider-color: $iron;
 $anyslider-color-hover: $steel;
 .imageslider-container {
+    background-color: $white; 
     position: relative;
+    margin: 0;
     .imageslider {
         position: relative;
     }
@@ -61,6 +63,23 @@ $anyslider-color-hover: $steel;
         a.as-active,
         a:hover{
             color: $anyslider-color-hover;
+        }
+    }
+    // image title
+    .meta{
+        background: rgba($black, .7);
+        color: $white;
+        position: absolute;
+        bottom: 0;
+        font-size: 0.8125rem;
+        padding: 1rem;
+        margin: 0;
+        width: 100%;
+        font-style: normal;
+
+        // hide if empty - because padding
+        &:empty{
+            display: none;
         }
     }
 }

@@ -85,13 +85,8 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
             $this->parse('has_header_block', 'has_header');
         }
 
-        // Make sure there a config option
-        $pixel = $this->getConfig('pixel') ? $this->getConfig('pixel') : 200;
-
         $this->setVar(
             array(
-                'COMPONENT_ALIGN'                  => $this->getConfig('align'),
-                'COMPONENT_PIXEL'                  => $pixel,
                 'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig(
                     'timing'
                 ) * 1000 : '2000',
@@ -121,8 +116,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
                 $this->setVar(
                     array(
                         'IMAGE_ID'        => $currentFile->getId(),
-                        'IMAGE_NAME'      => $currentFile->getDescription(),
-                        'IMAGE_DIMENSION' => $pixel
+                        'IMAGE_NAME'      => $currentFile->getTitle(),
                     )
                 );
 

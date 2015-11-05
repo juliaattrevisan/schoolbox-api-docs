@@ -64,13 +64,8 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         $this->setBlock('image_scroller', 'show_caption', 'show_caption_block');
         $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
 
-        // Make sure there a config option
-        $pixel = $this->getConfig('pixel') ? $this->getConfig('pixel') : 200;
-
         $this->setVar(
             array(
-                'COMPONENT_ALIGN'                        => $this->getConfig('align'),
-                'COMPONENT_PIXEL'                        => $pixel,
                 'COMPONENT_CONFIG_TIMING_VALUE_MS'       => $this->getConfig('timing') ? $this->getConfig(
                             'timing'
                         ) * 1000 : '2000',
@@ -89,6 +84,13 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         // Load images for the current homepage
         $allFiles = $this->getFolderMapper()->findImages($this->source, 0, true);
 
+
+        if($this->getConfig('randomStartingSlide')) {
+            $this->setVar('COMPONENT_RANDOM_SLIDE', rand(1, count($allFiles)));
+        }
+        else {
+            $this->setVar('COMPONENT_RANDOM_SLIDE', 1);
+        }
         // Have update form to back to this homepage, not the gallery's homepage
         $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source->getId());
 
@@ -104,8 +106,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
             $this->setVar(
                 array(
                     'IMAGE_ID'        => $currentFile->getId(),
-                    'IMAGE_NAME'      => $currentFile->getDescription(),
-                    'IMAGE_DIMENSION' => $pixel
+                    'IMAGE_NAME'      => Scrub::text($currentFile->getTitle()),
                 )
             );
 
