@@ -2,6 +2,8 @@
 
 use \Schoolbox\Breadcrumbs;
 
+/** @var SitePage $this */
+
 $folderMapper = new \Schoolbox\Resource\CategoryMapper();
 $groupHandler = new Group();
 
@@ -154,7 +156,7 @@ else {
         if ($this->arg[1] == 0) {
             $folderParent = new \Schoolbox\Resource\Category();
             $folderParent->setId(0);
-            $folderParent->setName('Top');
+            $folderParent->setName($this->getLocalisedTerm('resource', true, true));
         } else {
             try {
                 $folderParent = $folderMapper->findById($this->arg[1]);
