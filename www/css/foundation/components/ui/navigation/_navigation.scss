@@ -59,7 +59,7 @@ $off-canvas-label-border-top: 0px; //1px solid scale-color($off-canvas-label-bg,
 $off-canvas-label-border-bottom: none;
 $off-canvas-label-margin:0;
 
-$off-canvas-link-padding: rem-calc(($base-font-size));
+$off-canvas-link-padding: rem-calc(($base-font-size/2)) rem-calc($base-font-size);
 $off-canvas-link-color: false;
 $off-canvas-link-border-bottom: 0px; //1px solid scale-color($off-canvas-bg, $lightness: -25%);
 
