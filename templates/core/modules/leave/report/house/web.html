@@ -49,6 +49,13 @@
 </script>
 <!-- END custom_head -->
 
+<ul class="breadcrumb">
+    <li><a href="/modules/leave/">Boarder Leave</a></li>
+    <li><a href="/modules/leave/house/{HOUSE_ID}">{HOUSE_NAME}</a></li>
+    <li class="active"><a href="#">Leave Report</a></li>
+</ul>
+
+
 <div class="actions-small-3 row">
     <div class="list-item">
         <div class="small-12 column">
@@ -56,7 +63,6 @@
         </div>
     </div>
     <nav>
-        <a class="icon-previous" href="/modules/leave/house/{HOUSE_ID}" title="Return to {HOUSE_NAME}"></a>
         <a class="icon-print" title="Print" data-print></a>
         <a class="icon-export" data-action="export" title="Export"></a>
     </nav>
@@ -75,7 +81,7 @@
 <!-- END no_requests -->
 
 <!-- BEGIN request_list -->
-<div class="row">
+<div class="row hide-for-print">
     <div class="small-12 island">
         <form data-form_type="search">
             <section class="content">
@@ -211,22 +217,8 @@
                     <td colspan="3"></td>
                 </tr>
                 <!-- Signatures and initials -->
-                <tr class="signatures">
-                    <td colspan='3'><strong>Duty Master Initial</strong><br><br></td>
-                    <!-- BEGIN request_period_initial -->
-                    <td></td>
-                    <!-- END request_period_initial -->
-                    <td class="leaveReportNoPrint right-border"></td>
-                    <td class="leaveReportNoPrint"></td>
-                    <td></td>
-                </tr>
-                <tr class="signatures">
-                    <td colspan='3'><strong>Housemaster Signature</strong><br><br></td>
-                    <td colspan="{PERIOD_COUNT}" class="no-right-border"></td>
-                    <td class="leaveReportNoPrint"></td>
-                    <td class="leaveReportNoPrint"></td>
-                    <td></td>
-                </tr>
+                <!-- BEGIN request_period_initial -->
+                <!-- END request_period_initial -->
             </tfoot>
         </table>
     </div>

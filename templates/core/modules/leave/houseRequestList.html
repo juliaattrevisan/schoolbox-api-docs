@@ -11,22 +11,24 @@
     });
 </script>
 <!-- END custom_head -->
+<ul class="breadcrumb">
+    <li><a href="#">Boarder Leave</a></li>
+    <li class="active"><a href="#">{HOUSE_NAME}</a></li>
+</ul>
 
 <div class="actions-small-3 row">
     <div class="list-item">
         <div class="small-12 column">
             <h1>Boarder Leave Requests</h1>
-            <ul class="meta">
-                <li class="icon-home">{HOUSE_NAME}</li>
-            </ul>
         </div>
     </div>
     <nav>
-        <a class="icon-list" href="/modules/leave/report/catering/" title="Catering Report"></a>
-        <a class="icon-list" href="/modules/leave/report/house/{HOUSE_ID}" title="House Report"></a>
+
         <a class="icon-more" href="#" title='Options' data-dropdown="header-options"></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li><a class="icon-report" href="/modules/leave/report/catering/">Catering Report</a>
+        <li><a class="icon-class-list" href="/modules/leave/report/house/{HOUSE_ID}">House Report</a>
         <li><a class="icon-export" href="/modules/leave/house/export/{HOUSE_ID}">Export History</a></li>
         <li><a class="icon-print" data-print>Print</a></li>
     </ul>
