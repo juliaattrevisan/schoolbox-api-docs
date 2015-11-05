@@ -27,10 +27,10 @@
                     right: 0rem;
                 }
                 @media #{$medium-only} {
-                    right: 1.5rem;
+                    right: 2.5rem;
                 }
                 @media #{$large-up} {
-                    right: 1rem;
+                    right: 2rem;
                 }
 
 				a {
@@ -65,47 +65,20 @@
     }
 }
 
-/* When jelly tots are nested inside a column or island
- * the padding is all different so we have to account for
- * those scenarios individually
+/* Inside a containing column, but not an action-
+ * or information-list construct (e.g. h2 actions)
+ *
+ * These attributes also happen apply to the usage
+ * as action- and information-list nav actions which
+ * always appear inside islands or columns
  */
 @mixin action-html-classes-nested($size, $button-size: $global-button-height, $button-color: $content-ui-foreground) {
     @for $i from 1 through $total-columns {
-
-        /* Inside a containing column, but not an action-
-         * or information-list construct (e.g. h2 actions)
-         */
-        .island .actions-#{$size}-#{$i}.row,
-        .columns .actions-#{$size}-#{$i}.row
-        {
-            > nav {
-                @media #{$small-only} {
-                    right: 0rem;
-                }
-                @media #{$medium-only} {
-                    right: -1rem;
-                }
-                @media #{$large-up} {
-                    right: -1rem;
-                }
-            }
-        }
-
-        /* As action- and information-list nav actions
-         */
         .island .actions-#{$size}-#{$i},
         .columns .actions-#{$size}-#{$i}
         {
             > nav {
-                @media #{$small-only} {
-                    right: 0rem;
-                }
-                @media #{$medium-only} {
-                    right: 0rem;
-                }
-                @media #{$large-up} {
-                    right: 0rem;
-                }
+                right: 0rem;
             }
         }
     }
