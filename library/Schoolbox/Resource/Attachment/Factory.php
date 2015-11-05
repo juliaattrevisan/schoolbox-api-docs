@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Attachment;
 
 use OutOfRangeException;
 use Schoolbox\IConfigLoader;
+use Schoolbox\L10n\RosettaStone;
 
 class Factory {
 
@@ -34,6 +35,9 @@ class Factory {
 
     /** @var IConfigLoader */
     protected $conf;
+
+    /** @var RosettaStone */
+    protected $rosetta;
 
 
     /**
@@ -95,6 +99,17 @@ class Factory {
 
 
     /**
+     * @param RosettaStone $rosetta
+     * @return self
+     */
+    public function setRosetta(RosettaStone $rosetta)
+    {
+        $this->rosetta = $rosetta;
+        return $this;
+    }
+
+
+    /**
      * @throws OutOfRangeException
      * @return ControllerInterface
      */
@@ -110,7 +125,7 @@ class Factory {
             throw new OutOfRangeException("No controller found for " . implode(':', array($this->location, $this->source)));
         }
 
-        $controller = new $classname($this->multi, $this->mime, $this->conf);
+        $controller = new $classname($this->multi, $this->mime, $this->conf, $this->rosetta);
 
         if (!$controller instanceof ControllerInterface) {
             throw new OutOfRangeException("Controller does not implement ControllerInterface");
