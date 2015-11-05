@@ -14,11 +14,18 @@ class External_Tass_User implements External_UserInterface
     */
     private $database;
 
+    /**
+     * The TASS company code to use, for queries which require it.
+     *
+     * @var string
+     */
+    private $companyCode;
+
     function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
-
         $this->groupHandler = new Group;
+        $this->companyCode  = Config::get('external_tass_company_code');
     }
 
     function getParent($synID)
