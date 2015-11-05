@@ -477,7 +477,6 @@ tr.sub-row {
 .scrollable {
 
 	@extend .overflow;
-	margin-bottom: 0.875rem; // put the margin on the div, not the table inside it
 
 	table {
 		margin-bottom: 0;
@@ -1359,19 +1358,13 @@ ul.flex-list {
     /* Force same font size, regardless of hierarchy
      * On extra-large viewports, restore native typography sizes
      */
-	&:not(.xl) {
-		h1,h2,h3,h4,h5,h6 {
-			@extend %p;
-			margin-top: 0;
-			margin-bottom: 0;
-		}
+
+	h1,h2,h3,h4,h5,h6 {
+		margin-top: 0;
+		margin-bottom: 0;
 	}
 
-    h3 {
-      margin: 0;
-    }
-
-    h3, p, .meta {
+    h2,h3,h4,h5,h6, p, .meta {
       text-overflow: ellipsis;
       overflow-x: hidden;
       white-space: nowrap;
@@ -1659,6 +1652,17 @@ dl {
             }
         }
     }
+}
+
+@media #{$large-up} {
+  #content > .breadcrumb {
+	margin-left: -1rem;
+  }
+}
+
+
+article {
+  @extend .clearfix;
 }
 
 .alert-box:empty {
