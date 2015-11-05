@@ -10,5 +10,6 @@ CREATE TABLE `localisation`(
 /* Inject initial default values */
 INSERT INTO `localisation` (`term`, `singular_form`, `plural_form`) VALUES
   ('calendar', 'calendar', 'calendars'),
+  ('resource', 'resource', 'resources'),
   ('news', 'news', 'news')
 ON DUPLICATE KEY UPDATE term = term;
