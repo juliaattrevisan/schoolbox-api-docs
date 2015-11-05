@@ -79,7 +79,7 @@
                 <!-- BEGIN course_unit_list -->
                 <ul class="information-list">
                     <!-- BEGIN unit -->
-                    <li class="actions-small-2 interact {UNIT_EXPANDED_STATE}" data-unit data-unit_id="{UNIT_ID}" data-open_date="{UNIT_OPEN_DATE}" data-due_date="{UNIT_DUE_DATE}">
+                    <li class="actions-small-1 interact {UNIT_EXPANDED_STATE}" data-unit data-unit_id="{UNIT_ID}" data-open_date="{UNIT_OPEN_DATE}" data-due_date="{UNIT_DUE_DATE}">
                         <div class="list-item">
                             <div class="info card small-12">
                                 <h3>
@@ -98,16 +98,30 @@
                                 <!-- END unit_completion -->
                             </div>
                         </div>
+                        <!-- BEGIN unit_actions -->
                         <nav>
-                            <!-- BEGIN unit_actions -->
-                            <!-- BEGIN unit_delete -->
-                            <a href="#" data-interaction="open_delete_unit_form" class="icon-delete" title="Delete this unit"></a>
-                            <!-- END unit_delete -->
-                            <!-- BEGIN unit_modify -->
-                            <a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="icon-modify" title="Modify this unit"></a>
-                            <!-- END unit_modify -->
-                            <!-- END unit_actions -->
+                            <a href="#" class="icon-more" data-dropdown="unit-options{UNIT_ID}" aria-expanded="false"></a>
                         </nav>
+                        <ul data-dropdown-content class="f-dropdown" id="unit-options{UNIT_ID}">
+
+                            <!-- BEGIN unit_add_task_actions -->
+                            <li class="separator">Create</li>
+                            <li><a href="/submission/createSubmission/new/{ID}/unit:{UNIT_ID}" class="icon-due-work" data-add-button data-form_class="for-due-work">Due Work</a></li>
+                            <li><a href="/assess/create/{ID}/unit:{UNIT_ID}" class="icon-quiz" data-add-button data-form_class="for-assessment">Quiz</a></li>
+                            <li><a href="/task/createInstance/{UNIT_ID}" class="icon-task" data-reveal-id="createTask-{UNIT_ID}">Task</a></li>
+                            <!-- END unit_add_task_actions -->
+                            <li class="separator">Manage</li>
+                            <!-- BEGIN unit_report_actions -->
+                            <li><a href="/task/progressReport/{ID}/{UNIT_ID}" class="icon-progress" data-add-button>Progress Report</a></li>
+                            <!-- END unit_report_actions -->
+                            <!-- BEGIN unit_modify -->
+                            <li><a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="icon-modify" title="Modify this unit">Modify</a></li>
+                            <!-- END unit_modify -->
+                            <!-- BEGIN unit_delete -->
+                            <li><a href="#" data-interaction="open_delete_unit_form" class="icon-delete" title="Delete this unit">Delete</a></li>
+                            <!-- END unit_delete -->
+                        </ul>
+                        <!-- END unit_actions -->
 
                         <form action="/course/modifyForm.php" method="post" data-form_type="delete_unit" class="hide">
                             <input type="hidden" name="action"    value="delete" />
@@ -117,15 +131,17 @@
 
                         <ul class="action-list sortable ui-sortable task-list {UNIT_LIST_CLASS}" data-task-list>
                             <!-- BEGIN unit_task -->
-                            <li class="actions-small-3 interact" data-unit-task data-unit_task_id="{UNIT_TASK_ID}">
+                            <li class="actions-small-1 interact" data-unit-task data-unit_task_id="{UNIT_TASK_ID}">
                                 <div class="list-item">
+                                    <!-- BEGIN unit_task_allow_move -->
                                     <div class="grip"></div>
-                                    <div class="small-11 avatar card">
+                                    <!-- END unit_task_allow_move -->
+                                    <div class="small-11 avatar card wrap-down">
                                         <a class="icon-32 {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}" {UNIT_TASK_PREVIEW} href="/task/start/{UNIT_TASK_ID}"></a>
 
-                                        <h3>
+                                        <p>
                                             <a title="{UNIT_TASK_TYPE_LABEL}" {UNIT_TASK_PREVIEW} href="/task/start/{UNIT_TASK_ID}">{UNIT_TASK_NAME}</a>
-                                        </h3>
+                                        </p>
 
                                         <!--
                                         Student: see buttons for starting/ending task
@@ -151,28 +167,32 @@
                                     </div>
                                 </div>
                                 <nav>
+                                    <!-- BEGIN unit_task_actions_more -->
+                                    <a href="#" class="icon-more" data-dropdown="options-task{UNIT_TASK_ID}" aria-expanded="false"></a>
+                                    <!-- END unit_task_actions_more -->
                                     <!-- BEGIN unit_task_start -->
                                     <a href="/task/start/{UNIT_TASK_ID}{UNIT_TASK_SET_STATUS}" class="{UNIT_TASK_COMPLETE_CLASS} no-text" data-interaction="update_progress" title="{UNIT_TASK_COMPLETION_TITLE} - click to update"></a>
                                     <!-- END unit_task_start -->
-
+                                </nav>
+                                <ul data-dropdown-content class="f-dropdown" id="options-task{UNIT_TASK_ID}">
                                     <!-- BEGIN unit_task_actions -->
-                                    <!-- BEGIN unit_task_delete -->
-                                    <a href="#" class="icon-delete" data-interaction="open_delete_task_form" title="Delete this task"></a>
-                                    <!-- END unit_task_delete -->
-                                    <!-- BEGIN unit_task_modify -->
-                                    <a href="{UNIT_TASK_MODIFY_URL}" {UNIT_TASK_REVEAL_ATTR} class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task"></a>
-                                    <!-- END unit_task_modify -->
                                     <!-- BEGIN unit_task_quiz_results -->
-                                    <a href="/assess/results/{UNIT_QUIZ_ID}" class="icon-progress" title="View Results"></a>
+                                    <li><a href="/assess/results/{UNIT_QUIZ_ID}" class="icon-progress">View Results</a></li>
                                     <!-- END unit_task_quiz_results -->
                                     <!-- BEGIN unit_task_quiz_attempts -->
-                                    <a href="/assess/attempts/{UNIT_QUIZ_ID}/{USER_ID}" class="icon-quiz" title="See previous attempts"></a>
+                                    <li><a href="/assess/attempts/{UNIT_QUIZ_ID}/{USER_ID}" class="icon-quiz">Previous Attempts</a></li>
                                     <!-- END unit_task_quiz_attempts -->
                                     <!-- BEGIN unit_task_duework_results -->
-                                    <a href="/submission/viewSubmission/{UNIT_DUEWORK_ID}" class="icon-progress" title="View Results"></a>
+                                    <li><a href="/submission/viewSubmission/{UNIT_DUEWORK_ID}" class="icon-progress">View Results</a></li>
                                     <!-- END unit_task_duework_results -->
+                                    <!-- BEGIN unit_task_modify -->
+                                    <li><a href="{UNIT_TASK_MODIFY_URL}" {UNIT_TASK_REVEAL_ATTR} class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task">Modify</a></li>
+                                    <!-- END unit_task_modify -->
+                                    <!-- BEGIN unit_task_delete -->
+                                    <li><a href="#" class="icon-delete" data-interaction="open_delete_task_form" title="Delete this task">Delete</a></li>
+                                    <!-- END unit_task_delete -->
                                     <!-- END unit_task_actions -->
-                                </nav>
+                                </ul>
 
                                 <!-- BEGIN unit_task_modify_form -->
                                 <div id="modifyTask-{UNIT_TASK_ID}" class="reveal-modal" data-reveal aria-hidden="true" aria-labelledby="modifyTask-{UNIT_TASK_ID}-label" role="dialog">
@@ -240,14 +260,7 @@
                         </ul>
 
                         <div class="content">
-                            <!-- BEGIN unit_report_actions -->
-                            <a href="/task/progressReport/{ID}/{UNIT_ID}" class="button icon-progress" data-add-button>Progress Report</a>
-                            <!-- END unit_report_actions -->
-                            <!-- BEGIN unit_add_task_actions -->
-                            <a href="/submission/createSubmission/new/{ID}/unit:{UNIT_ID}" class="button icon-due-work" data-add-button data-form_class="for-due-work">Post Due Work</a>
-                            <a href="/assess/create/{ID}/unit:{UNIT_ID}" class="button icon-quiz" data-add-button data-form_class="for-assessment">Create Quiz</a>
-                            <a href="/task/createInstance/{UNIT_ID}" class="button icon-task" data-reveal-id="createTask-{UNIT_ID}">Add Task</a>
-                            <!-- END unit_add_task_actions -->
+
                         </div>
 
                         <!-- This is the form for inline creation of tasks -->
