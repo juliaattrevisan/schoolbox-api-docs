@@ -1253,7 +1253,7 @@ ul.flex-list {
             }
         }
 
-		p, h3 {
+		p {
             line-height: 1.25rem;
             margin: 0 0 0 (3 * rem-calc($base-font-size));
             @media #{$medium-up} {
