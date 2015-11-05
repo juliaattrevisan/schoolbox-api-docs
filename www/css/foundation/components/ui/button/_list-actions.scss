@@ -23,15 +23,15 @@
 				height: $button-size;
 				white-space: nowrap;
 
-                @media #{$small-only} {
-                    right: 0rem;
-                }
-                @media #{$medium-only} {
-                    right: 2.5rem;
-                }
-                @media #{$large-up} {
-                    right: 2rem;
-                }
+				@media #{$small-only} {
+					right: 0;
+				}
+				@media #{$medium-only} {
+					right: 2.5rem;
+				}
+				@media #{$large-up} {
+					right: 2rem;
+				}
 
 				a {
                     @include button-dimensions();
@@ -62,42 +62,27 @@
 				}
 			}
 		}
-    }
+
+		.island, .column, .columns {
+			/* Inside a containing column, but not an action-
+			 * or information-list construct (e.g. h2 actions)
+			 *
+			 * These attributes also happen apply to the usage
+			 * as action- and information-list nav actions which
+			 * always appear inside islands or columns
+			 */
+			.actions-#{$size}-#{$i} {
+				> nav {
+					right: 0;
+				}
+			}
+		}
+	}
 }
 
-/* Inside a containing column, but not an action-
- * or information-list construct (e.g. h2 actions)
- *
- * These attributes also happen apply to the usage
- * as action- and information-list nav actions which
- * always appear inside islands or columns
- */
-@mixin action-html-classes-nested($size, $button-size: $global-button-height, $button-color: $content-ui-foreground) {
-    @for $i from 1 through $total-columns {
-        .island .actions-#{$size}-#{$i},
-        .columns .actions-#{$size}-#{$i}
-        {
-            > nav {
-                right: 0rem;
-            }
-        }
-    }
-}
-
-@media #{$small-up}  {
-    @include action-html-classes($size:small);
-    @include action-html-classes-nested($size:small);
-}
-
-@media #{$medium-up} {
-    @include action-html-classes($size:medium);
-    @include action-html-classes-nested($size:medium);
-}
-
-@media #{$large-up}  {
-    @include action-html-classes($size:large);
-    @include action-html-classes-nested($size:large);
-}
+@media #{$small-up}  { @include action-html-classes($size:small);  }
+@media #{$medium-up} { @include action-html-classes($size:medium); }
+@media #{$large-up}  { @include action-html-classes($size:large);  }
 
 @if $include-xl-html-grid-classes {
 	@media #{$xlarge-up}  { @include action-html-classes($size:xlarge);  }
