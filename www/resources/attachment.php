@@ -7,6 +7,9 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Resource\Attachment\External;
+use Schoolbox\Resource\Attachment\Internal;
+
 if (empty($this)) {
     require_once __DIR__ . '/../../include/Bootstrap.php';
     SitePage::localRedir('/resources/attachment');
@@ -23,27 +26,25 @@ $this->setBlock(TEMPLATE_content, 'source', 'source_block');
 $multi       = empty($_GET['multi']) ? false : !!($_GET['multi']);
 $mimeFilter  = empty($_GET['mime'])  ? false : $_GET['mime'];
 
-
-$base = '\\Schoolbox\\Resource\\Attachment';
-
 // register our known defaults
 $factory = new \Schoolbox\Resource\Attachment\Factory(array(
     'internal' => array(
-        'upload'    => "$base\\Internal\\UploadController",
-        'usermedia' => "$base\\Internal\\UsermediaController",
-        'browse'    => "$base\\Internal\\BrowseController",
-        'myfile'    => "$base\\Internal\\MyfileController",
+        'upload'    => Internal\UploadController::class,
+        'usermedia' => Internal\UsermediaController::class,
+        'browse'    => Internal\BrowseController::class,
+        'myfile'    => Internal\MyfileController::class,
     ),
     'external' => array(
-        'webdav' => "$base\\External\\WebdavController",
-        'google' => "$base\\External\\GoogleController",
-        'office' => "$base\\External\\Office365Controller"
+        'webdav' => External\WebdavController::class,
+        'google' => External\GoogleController::class,
+        'office' => External\Office365Controller::class
     )
 ));
 
 $factory->allowMulti($multi)
         ->setMimeFilter($mimeFilter)
-        ->setConfig(new \Schoolbox\Config\Loader());
+        ->setConfig(new \Schoolbox\Config\Loader())
+        ->setRosetta($this->getDi()->get('l10n'));
 
 foreach ($factory->getMappedControllers() as $controller) {
 
