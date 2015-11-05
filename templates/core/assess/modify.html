@@ -8,6 +8,7 @@
 <script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.hourpicker.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript">
     $(function() {
         $.fn.alaressTiny({
@@ -42,21 +43,6 @@
                 return $input.closest('.timepick');
             }
         });
-
-        $('[data-show-duration]').change(function() {
-            $('[data-edit-duration]').toggleClass('hide');
-
-            if ($('[data-edit-duration]').hasClass('hide')) {
-                $('#minDuration').val('15');
-            } else {
-                $('#minHours').val('0');
-                $('#minDuration').val('00');
-            }
-        });
-
-        if ($('[data-show-duration]').is(':checked')) {
-            $('[data-edit-duration]').show();
-        }
 
         $('#createAssess').validate({
             rules: {
@@ -222,10 +208,10 @@
                         </label>
                         <div class="switch">
                             <input type="hidden" name="durationSelected" value="0" />
-                            <input type="checkbox" id='durationSelected' name='durationSelected' data-show-duration value='1' {ASSESS_DURATION_CHECKED} />
+                            <input type="checkbox" id='durationSelected' name='durationSelected' value='1' {ASSESS_DURATION_CHECKED} />
                             <label for="durationSelected"></label>
                         </div>
-                        <div data-edit-duration class="row hide">
+                        <div class="row" data-hide-watch="#durationSelected">
                             <div class="small-6 columns">
                                 <label>
                                     Hours
