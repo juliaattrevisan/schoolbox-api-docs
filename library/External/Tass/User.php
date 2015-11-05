@@ -145,15 +145,31 @@ class External_Tass_User implements External_UserInterface
         return $parent;
     }
 
-    function getCurrentSemester($exteralUserId = null)
+    function getCurrentSemester($externalUserId = null)
     {
-        $query = "SELECT curr_sem FROM ttparms WHERE cmpy_code = 01";
+        if (isset($externalUserId)) {
+            $query = "
+                SELECT tt.curr_sem
+                FROM ttparms tt
+                INNER JOIN student s ON tt.cmpy_code = s.cmpy_code
+                WHERE s.stud_code = {$this->getDatabase()->smartQuote($externalUserId)}";
+        } else {
+            $query = "SELECT curr_sem FROM ttparms WHERE cmpy_code = 01";
+        }
         return $this->getDatabase()->getOne($query);
     }
 
     public function getCurrentYear($externalUserId = null)
     {
-        $query = "SELECT curr_year FROM ttparms WHERE cmpy_code = 01";
+        if (isset($externalUserId)) {
+            $query = "
+                SELECT tt.curr_year
+                FROM ttparms tt
+                INNER JOIN student s ON tt.cmpy_code = s.cmpy_code
+                WHERE s.stud_code = {$this->getDatabase()->smartQuote($externalUserId)}";
+        } else {
+            $query = "SELECT curr_year FROM ttparms WHERE cmpy_code = 01";
+        }
         return $this->getDatabase()->getOne($query);
     }
 
