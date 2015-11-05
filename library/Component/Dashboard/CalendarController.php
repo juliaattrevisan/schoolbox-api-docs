@@ -111,16 +111,16 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                 }
 
                 if ($prevDay != false && $currentDay->getDateOnly() != $prevDay->getDateOnly()) {
+                    $this->parse('has_events_block', 'has_events');
                     $this->parse('day_block', 'day', true);
 
                     /* Clear children after parsing out the parent
                      */
-                    $this->setVar('event', '');
+                    $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
+                    $this->setVar('event_block', '');
                 }
 
-                $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
-
-                $this->setVar('event', $this->eventRenderer->renderEvent($currentEvent, 'html'));
+                $this->setVar('EVENT_CONTENT', $this->eventRenderer->renderEvent($currentEvent, 'html'));
 
                 $this->parse("event_block", "event", true);
 
