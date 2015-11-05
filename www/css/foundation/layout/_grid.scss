@@ -99,7 +99,7 @@ $align-block-grid-to-grid: true;
 
 }
 
-@mixin mobile-padding($wide-margin: 2rem, $narrow-margin: 0.5rem) {
+@mixin mobile-padding($wide-margin: 1rem, $narrow-margin: 0.5rem) {
 
     @include responsive-sides($wide-margin, padding, 12, 0);
 
@@ -145,12 +145,6 @@ $align-block-grid-to-grid: true;
 
 // yes, these are really really really specific, but it's for the greater good
 #content {
-
-    @media #{$large-up} {
-        > .row {
-            margin-left: 1rem;
-        }
-    }
 
     > .row {
         > .small-12,
