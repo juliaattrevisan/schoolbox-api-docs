@@ -98,7 +98,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             $j = 0;
 
             $this->setVar('folders_block', '');
-            $icons = array('homepage'=>'home','folder'=>'folder','course'=>'course');
+            $icons = array('homepage'=>'home','folder'=>'folder','course'=>'course-builder');
 
             foreach ($allFolders as $currentFolder) {
                 //set name
