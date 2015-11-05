@@ -75,27 +75,34 @@ switch ($_REQUEST['action']) {
         /* Events aren't visible until this date
          * TODO: Fix validator in Alaress Date Format
          */
-        if (strlen($_POST['publishDate'])) {
-            $pubDateObject = Alaress_Date_Format::newLocalShort($_POST['publishDate']);
+        // Ghetto validation
+        try {
+            if (strlen($_POST['publishDate'])) {
+                $pubDateObject = Alaress_Date_Format::newLocalShort($_POST['publishDate']);
+            }
+            /* Events recur until this time
+             */
+            if (strlen($_POST['repeat_until'])) {
+                $until = Alaress_Date_Format::newLocalShort($_POST['repeat_until'])->endOfDay();
+            }
+            /* Start and end dates
+             */
+            $startDate = Alaress_Date_Format::newLocalShort($_POST['startDate'])
+                ->set12Hour($_POST['startHour'], $_POST['startPeriod'])
+                ->setMinute($_POST['startMinute'])
+            ;
+            $endDate = Alaress_Date_Format::newLocalShort($_POST['endDate'])
+                ->set12Hour($_POST['endHour'], $_POST['endPeriod'])
+                ->setMinute($_POST['endMinute'])
+            ;
+        } catch (RuntimeException $e) {
+            error(15);
+            exit;
         }
-        /* Events recur until this time
-         */
-        if (strlen($_POST['repeat_until'])) {
-            $until = Alaress_Date_Format::newLocalShort($_POST['repeat_until'])->endOfDay();
-        }
-        /* Start and end dates
-         */
-        $startDate = Alaress_Date_Format::newLocalShort($_POST['startDate'])
-            ->set12Hour($_POST['startHour'], $_POST['startPeriod'])
-            ->setMinute($_POST['startMinute'])
-        ;
-        $endDate = Alaress_Date_Format::newLocalShort($_POST['endDate'])
-            ->set12Hour($_POST['endHour'], $_POST['endPeriod'])
-            ->setMinute($_POST['endMinute'])
-        ;
         // Don't allow start to be after end
         if ($startDate->getUnixTimestamp() > $endDate->getUnixTimestamp()) {
             error(145);
+            exit;
         }
         /* We do this checking later
          */
@@ -142,6 +149,7 @@ switch ($_REQUEST['action']) {
         if ($event->isCampusLevel()) {
             if (!is_array($_POST['campus']) || !count($_POST['campus'])) {
                 error(158);
+                exit;
             }
         }
 
