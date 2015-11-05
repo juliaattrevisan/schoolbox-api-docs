@@ -35,6 +35,7 @@ $treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
     TaskMapper::getInstance(),
     UserAccessMapper::getInstance(),
     RoleAccessMapper::getInstance(),
-    $_SESSION['user']
+    $_SESSION['user'],
+    $this->getLocalisedTerm('resource', true, true)
 );
 $this->setVar('TREEDATA', json_encode($treeBuilder->buildPartialTree($openCategory)));

@@ -4,10 +4,13 @@
  * @deprecated this file is deprecated in favour of Schoolbox\Resource\Browser\AbstractController::listNodes()
  */
 
-require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
-// Open session after bootstrap, otherwise $_SESSION[user] won't be a user.
-$page = new SitePage;
+/** @var Kernel $kernel */
+$kernel = require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
+/** @var SitePage $page */
+$page = $kernel->getDependencyInjector()->get('sitePage');
+
+use Alaress\Application\Kernel;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -18,7 +21,8 @@ $treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
     TaskMapper::getInstance(),
     UserAccessMapper::getInstance(),
     RoleAccessMapper::getInstance(),
-    $_SESSION['user']
+    $_SESSION['user'],
+    $page->getLocalisedTerm('resource', true, true)
 );
 
 header('Content-Type: application/json');

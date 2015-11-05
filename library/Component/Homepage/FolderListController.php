@@ -87,7 +87,8 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             TaskMapper::getInstance(),
             UserAccessMapper::getInstance(),
             RoleAccessMapper::getInstance(),
-            $_SESSION['user']
+            $_SESSION['user'],
+            $this->sitepage->getLocalisedTerm('resource', true, true)
         );
         $allFolders = $treeBuilder->buildChildNodes($this->source->getId());
 

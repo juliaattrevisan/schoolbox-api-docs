@@ -1,13 +1,17 @@
 <?php
 
+use Alaress\Application\Kernel;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
+/** @var Kernel $kernel */
+$kernel = require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
-$page = new SitePage;
+/** @var SitePage $page */
+$page = $kernel->getDependencyInjector()->get('sitePage');
+
 $page->template->set_file(TEMPLATE_body, dirname(__FILE__) . '/file_browser.html');
 $page->setBlock(TEMPLATE_body, 'folder_list', 'folder_list_block');
 $page->setBlock(TEMPLATE_body, 'file', 'file_block');
@@ -31,7 +35,8 @@ $treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
     TaskMapper::getInstance(),
     UserAccessMapper::getInstance(),
     RoleAccessMapper::getInstance(),
-    $_SESSION['user']
+    $_SESSION['user'],
+    $page->getLocalisedTerm('resource', true, true)
 );
 $page->setVar('TREEDATA', json_encode($treeBuilder->buildPartialTree($_GET['categoryID'])));
 
