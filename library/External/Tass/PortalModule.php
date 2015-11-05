@@ -7,6 +7,8 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Rule\IsLoggedIn;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 
@@ -57,5 +59,13 @@ class External_Tass_PortalModule extends \Alaress\Module\Module
                 ]
             )
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        $authorizer->addRule('/^tassportal(?:$|\.)/', new IsLoggedIn());
     }
 }
