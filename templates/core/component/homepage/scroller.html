@@ -8,7 +8,9 @@
                 nextLabel: '',
                 showBullets: false,
                 showControls: true,
+                startSlide: {COMPONENT_RANDOM_SLIDE}
             });
+
         });
     </script>
 
@@ -16,16 +18,18 @@
 
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
-            <div data-imageslider class="imageslider-container">
-                <!-- BEGIN image_scroller -->
-                <div data-imageslider-image class="text-center">
-                    <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
-                    <!-- BEGIN show_caption -->
-                    <p class="meta">{IMAGE_NAME}</p>
-                    <!-- END show_caption -->
+            <section>
+                <div data-imageslider class="imageslider-container">
+                    <!-- BEGIN image_scroller -->
+                    <div data-imageslider-image class="text-center">
+                        <img src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}"/>
+                        <!-- BEGIN show_caption -->
+                        <p class="meta">{IMAGE_NAME}</p>
+                        <!-- END show_caption -->
+                    </div>
+                    <!-- END image_scroller -->
                 </div>
-                <!-- END image_scroller -->
-            </div>
+            </section>
             <section class="content">
                 <!-- BEGIN submit_image -->
                 <a href="/cms/file/new/{IMAGESCROLLER_CATEGORY_ID}" class="button icon-upload">Post Image</a>
