@@ -161,7 +161,11 @@ class External_Tass_User implements External_UserInterface
                 INNER JOIN student s ON tt.cmpy_code = s.cmpy_code
                 WHERE s.stud_code = {$this->getDatabase()->smartQuote($externalUserId)}";
         } else {
-            $query = "SELECT curr_sem FROM ttparms WHERE cmpy_code = 01";
+            $query = "
+                SELECT curr_sem
+                FROM ttparms
+                WHERE cmpy_code = {$this->getDatabase()->smartQuote($this->companyCode)}
+            ";
         }
         return $this->getDatabase()->getOne($query);
     }
@@ -175,7 +179,11 @@ class External_Tass_User implements External_UserInterface
                 INNER JOIN student s ON tt.cmpy_code = s.cmpy_code
                 WHERE s.stud_code = {$this->getDatabase()->smartQuote($externalUserId)}";
         } else {
-            $query = "SELECT curr_year FROM ttparms WHERE cmpy_code = 01";
+            $query = "
+                SELECT curr_year
+                FROM ttparms
+                WHERE cmpy_code = {$this->getDatabase()->smartQuote($this->companyCode)}
+            ";
         }
         return $this->getDatabase()->getOne($query);
     }
