@@ -216,10 +216,10 @@
     <nav>
         <!-- BEGIN edit_page -->
         <span data-tab>
-            <span class="tab-title">
+            <span class="tab-title" data-show-empty>
                 <a class="icon-components" href="#tabs-1" title="Add components" data-tab-activator></a>
             </span>
-            <span class="tab-title">
+            <span class="tab-title" data-hide-empty>
                 <a class="icon-edit-columns" href="#tabs-2" title="Edit columns" data-tab-activator></a>
             </span>
         </span>
@@ -317,7 +317,7 @@
             <!--------------------->
             <!-- Component Tab 1 -->
             <!--------------------->
-            <div id="tabs-1" class="content no-pad" data-show-empty>
+            <div id="tabs-1" class="content no-pad">
                 <div class="small-12 island no-pad">
                     <section>
                         <div class="content">
@@ -365,7 +365,7 @@
             <!--------------------->
             <!-- Component Tab 2 -->
             <!--------------------->
-            <div id="tabs-2" class="content no-pad" data-hide-empty>
+            <div id="tabs-2" class="content no-pad">
                 <form method="POST" action="" name="saveColours" class="no-margin">
                     <section class="no-margin">
                         <!-- don't show a slider for screens which don't have multiple columns -->
