@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 
 class SitePage extends Page
@@ -1420,22 +1421,24 @@ class SitePage extends Page
      */
     public function localise()
     {
+        /** @var RosettaStone $l10n */
         $l10n = $this->getDi()->get('l10n');
 
-        foreach ($l10n as $term => $displayAs) {
-            $term = strtoupper($term);
+        foreach ($l10n->getAllTerms() as $term) {
+
+            $upperTerm = strtoupper($term);
 
             $this->setVar([
-                "TPL_LOCAL_$term"             => $displayAs['singular'],
-                "TPL_LOCAL_{$term}_PC"        => $displayAs['capitalise'] ? ucwords($displayAs['singular']) : lcfirst(ucwords($displayAs['singular'])),
-                "TPL_LOCAL_{$term}_PLURAL"    => $displayAs['plural'],
-                "TPL_LOCAL_{$term}_PLURAL_PC" => $displayAs['capitalise'] ? ucwords($displayAs['plural']) : lcfirst(ucwords($displayAs['plural'])),
+                "TPL_LOCAL_$upperTerm"             => $l10n->translate($term, false, false),
+                "TPL_LOCAL_{$upperTerm}_PC"        => $l10n->translate($term, false, true),
+                "TPL_LOCAL_{$upperTerm}_PLURAL"    => $l10n->translate($term, true, false),
+                "TPL_LOCAL_{$upperTerm}_PLURAL_PC" => $l10n->translate($term, true, true)
             ]);
         }
     }
 
     /**
-     * Returns the localised version of this term.
+     * Returns the localised version of this term. Convenience method.
      *
      * @param string $term
      * @param bool   $plural
@@ -1445,21 +1448,9 @@ class SitePage extends Page
      */
     public function getLocalisedTerm($term, $plural = false, $capital = false)
     {
-        // should I assume this is an array? It is for now, fix this if/when it's an object
+        /** @var RosettaStone $l10n */
         $l10n = $this->getDi()->get('l10n');
-        if (array_key_exists($term, $l10n)) {
-            $local = ($plural ? $l10n[$term]['plural'] : $l10n[$term]['singular']);
-            if ($capital) {
-                $local = ucwords($local);
-                if (!$l10n[$term]['capitalise']) {
-                    $local = lcfirst($local);
-                }
-            }
-            return $local;
-        } else {
-            // Not found
-            user_error(sprintf('Term "%s" not in localisation table', $term), E_USER_WARNING);
-            return '';
-        }
+
+        return $l10n->translate($term, $plural, $capital);
     }
 }

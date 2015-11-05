@@ -25,6 +25,7 @@ use Config;
 use Database;
 use DeprecatedDatabase;
 use PDO;
+use Schoolbox\L10n\RosettaStone;
 use Scrub;
 use Twig_Extension_Debug;
 use Twig_Extensions_Extension_Text;
@@ -229,7 +230,7 @@ class Bootstrap implements BootstrapInterface {
 						];
 					}
 
-					return $l10n;
+					return new RosettaStone($l10n);
 				}
 			)
 		);
@@ -393,7 +394,7 @@ class Bootstrap implements BootstrapInterface {
 
 					$l10n = $di->get('l10n');
 
-					$l10n['date'] = new Alaress_Date_Locale_Config();
+//					$l10n['date'] = new Alaress_Date_Locale_Config();
 
 					$twig->addGlobal('locale', $l10n);
 

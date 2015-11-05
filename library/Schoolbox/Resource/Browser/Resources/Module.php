@@ -99,6 +99,8 @@ class Module extends AbstractModule
             }
         );
 
+        $injector->params[TreeBuilder::class]['rootLabel'] = $injector->get('sitePage')->getLocalisedTerm('resource', true, true);
+
     }
 
 } 
