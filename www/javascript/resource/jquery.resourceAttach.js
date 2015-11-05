@@ -350,7 +350,7 @@ if(typeof window.location.origin == 'undefined') {
         this.destroy();
 
         singletonModal = $('<div data-reveal class="reveal-modal file-picker" />')
-            .data('content', $.parseHTML(data, document, true))
+            .data('content', data)
             .data('rtn', this);
 
         body.append(singletonModal);
