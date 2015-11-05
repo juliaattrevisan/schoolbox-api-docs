@@ -65,28 +65,31 @@
 
                 <ul class="information-list sortable" data-task_list>
                     <!-- BEGIN task -->
-                    <li class="actions-small-3" data-task_id="{TASK_ID}">
+                    <li class="actions-small-1" data-task_id="{TASK_ID}">
                         <div class="list-item">
                             <div class="grip"></div>
                             <div class="small-11 avatar card wrap-down">
                                 <!-- BEGIN task_link -->
                                 <span {TASK_PREVIEW} href="{TASK_LINK}" class="icon-32 {TASK_CLASS}" title="{TASK_TYPE_LABEL}"></span>
-                                <h3><a {TASK_PREVIEW} href="{TASK_LINK}">{TASK_TITLE}</a></h3>
+                                <p><a {TASK_PREVIEW} href="{TASK_LINK}">{TASK_TITLE}</a></p>
                                 <!-- END task_link -->
 
                                 <!-- BEGIN task_no_link -->
                                 <span class="icon-32 {TASK_CLASS}" title="{TASK_TYPE_LABEL}"></span>
-                                <h3>{TASK_TITLE}</h3>
+                                <p>{TASK_TITLE}</p>
                                 <!-- END task_no_link -->
                             </div>
                         </div>
+                        <!-- BEGIN edit_task -->
                         <nav>
-                            <!-- BEGIN edit_task -->
-                            <a href="#" class="icon-delete" data-interaction="open_delete_task_form" title="Delete this task"></a>
-                            <a href="{TASK_MODIFY_URL}" {TASK_REVEAL_ATTR} class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task"></a>
-                            <a href="/task/export/{TASK_ID}" class="icon-export" title="Copy this task into classes"></a>
-                            <!-- END edit_task -->
+                            <a href="#" class="icon-more" data-dropdown="options-task{TASK_ID}" aria-expanded="false"></a>
                         </nav>
+                        <ul data-dropdown-content class="f-dropdown" id="options-task{TASK_ID}">
+                            <li><a href="/task/export/{TASK_ID}" class="icon-export" title="Copy this task into classes">Export to Classes</a></li>
+                            <li><a href="{TASK_MODIFY_URL}" {TASK_REVEAL_ATTR} class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task">Modify</a></li>
+                            <li><a href="#" class="icon-delete" data-interaction="open_delete_task_form" title="Delete this task">Delete</a></li>
+                        </ul>
+                        <!-- END edit_task -->
 
                         <!-- BEGIN edit_task_form -->
                         <div id="editTask-{TASK_ID}"
