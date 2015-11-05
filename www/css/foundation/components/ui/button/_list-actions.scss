@@ -1,4 +1,6 @@
-/* Action buttons in Action/Information Lists
+/* Header Actions
+ * These occur as their own row, they aren't nested inside a
+ * column. Typically this will look like .actions-small-12.row
  */
 @mixin action-html-classes($size, $button-size: $global-button-height, $button-color: $content-ui-foreground) {
 	@for $i from 1 through $total-columns {
@@ -18,9 +20,18 @@
 				padding: 0;
 				position: absolute;
 				top: 0;
-				right: 0;
 				height: $button-size;
 				white-space: nowrap;
+
+				@media #{$small-only} {
+					right: 0;
+				}
+				@media #{$medium-only} {
+					right: 2.5rem;
+				}
+				@media #{$large-up} {
+					right: 2rem;
+				}
 
 				a {
                     @include button-dimensions();
@@ -48,6 +59,21 @@
 						background-color: $button-color;
 						color: calc-text-color($button-color);
 					}
+				}
+			}
+		}
+
+		.island, .column, .columns {
+			/* Inside a containing column, but not an action-
+			 * or information-list construct (e.g. h2 actions)
+			 *
+			 * These attributes also happen apply to the usage
+			 * as action- and information-list nav actions which
+			 * always appear inside islands or columns
+			 */
+			.actions-#{$size}-#{$i} {
+				> nav {
+					right: 0;
 				}
 			}
 		}
