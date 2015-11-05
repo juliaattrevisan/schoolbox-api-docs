@@ -240,11 +240,13 @@ class External_Tass_User implements External_UserInterface
             $parentNum = $id[$splitParentLength-1];
 
             $query = "
-                SELECT stud_codes AS RelatedID
-                FROM pia_sfaccess
-                WHERE cmpy_code = '01'
-                AND par_code = '$parentCode'
-                AND sfa_num = '$parentNum'
+                SELECT sf.stud_codes AS RelatedID
+                FROM pia_sfaccess sf
+                LEFT JOIN parent p
+                    ON  p.par_code = sf.par_code
+                    AND p.cmpy_code = sf.cmpy_code
+                WHERE sf.par_code = '$parentCode'
+                AND   sf.sfa_num = '$parentNum'
             ";
 
             $return = array();
@@ -256,16 +258,18 @@ class External_Tass_User implements External_UserInterface
                     // data is stored in a single field, comma separated
                     $list = explode(',', $row['RelatedID']);
                     foreach ($list as $childID) {
-                        $return[] = array('RelatedID' => $childID);
+                        $return[$childID] = array('RelatedID' => $childID);
                     }
                 }
             }
         } else {
             $query = "
-				SELECT stud_code AS RelatedID
-				FROM student
-				WHERE par_code = '$id'
-				AND cmpy_code = '01'
+				SELECT s.stud_code AS RelatedID
+				FROM student s
+                LEFT JOIN parent p
+                    ON  p.par_code = s.par_code
+                    AND p.cmpy_code = s.cmpy_code
+				WHERE s.par_code = '$id'
 			";
             $return = $this->getDatabase()->getAll($query);
         }
