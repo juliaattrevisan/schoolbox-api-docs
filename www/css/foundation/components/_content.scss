@@ -1042,7 +1042,7 @@ ul.flex-list {
 		overflow-x: hidden;
 		text-overflow: ellipsis;
 		font-size: rem-calc(($base-font-size + 8));
-		line-height: 1.8rem;
+		line-height: 2rem;
 	}
 	a:hover{
 		background-color: transparent;
@@ -1535,11 +1535,14 @@ tr:hover{
 	}
 }
 
-.progress-tick {
-    width: 32px; // 2rem
-    height: 32px; // 2rem
+.progress-tick, .action-list nav a.progress-tick {
+    width: 2rem; // 2rem
+    height: 2rem; // 2rem
+    min-width: 2rem;
+    min-height: 2rem;
     display: block;
     background-color: $base;
+    margin: 1rem;
     @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
 	@extend %iconify;
 
@@ -1548,7 +1551,7 @@ tr:hover{
         text-align: center;
         width: 100%;
         height: 100%;
-        line-height: 32px;
+        line-height: 2rem;
     }
 
     &:hover {
