@@ -10,23 +10,25 @@
 namespace Schoolbox\Resource\Category;
 
 
+use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\Message;
-use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Scrub;
-use TextFormatter;
 
 class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 
@@ -116,15 +118,21 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param string $roleType
 	 * @param News $news
 	 * @param User $user
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	protected function generateNotification($roleType, $news, $user) {
-		$msgr = new Messenger();
+
+		$envelope = new Envelope();
+		$bob = new Builder();
+
 
 		$icon = sprintf("/portrait.php?userId=%s&size={$this->iconSize}", $user->getExternalId());
 
 		$articleId = $news->getId();
 		$heading = $news->getHeading();
+
+		$shortDate  = $news->getPostDate()->getDateOnly();
+		$authorName = $user->formatName();
 
 		$cat = $this->categoryMapper->findById($news->getCategory()->getId());
 		$catId = $cat->getId();
@@ -133,34 +141,37 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 		$text = ":user posted the news :title in :catname";
 		$href = "/homepage/$catId#news-$articleId";
 
-		$authorName = $user->formatName();
-		$authorId = $user->getId();
+		$bob->setTitle($text)
+			->setHref($href)
+			->setIcon($icon)
+			->setNamespace($this->getSlug())
+			->setTimestamp($news->getPublishDate()->getUnixTimeStamp())
+			->setSeverity(Logger::INFO)
+			->addTopic("news.$articleId.published")
+			->addFilter('roletype', $roleType)
+			->setMeta([
+				'title'  => $heading,
+				'author' => $user->formatName(),
+				'date'   => $news->getPostDate()->getLong()
+			])
+			->setByline("$shortDate by $authorName in $catName")
+			->setBody($news->getBody())
+			->setParams([
+				'user' => new UserParam($user),
+				'title' => new Param($heading, $href),
+				'catname' => new CategoryParam($cat)
+			]);
 
-		$msg = new Message($text, $icon, $href, array(
-			'subtitle' => 'Posted on '.$news->getPublishDate()->getDateOnly(),
-			'abstract' => TextFormatter::cutSentence(Scrub::html2text($news->getBody()), 300)
-		));
+		$envelope->broadcastToCategory($catId, UserAccess::ACCESS_READ, $bob->build());
 
-		// tell everyone that article $articleId has been posted
-		$msgr->broadcastToCategory($catId, $msg, "news.$articleId.published", Logger::INFO,
-			array(
-				'user'     => array($authorName, "/search/user/$authorId"),
-				'title'    => $heading,
-				'catname'  => array($catName,  "/homepage/$catId")
-			),
-			array(
-				'roletype' => $roleType
-			)
-		);
-
-		return $msgr;
+		return $envelope;
 	}
 
 	/**
 	 * @param News $news
 	 * @param User $user
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStudentPublished($news, $user, $diff = null) {
 		return $this->generateNotification(Role::STUDENT, $news, $user);
@@ -170,7 +181,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param News $news
 	 * @param User $user
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStaffPublished($news, $user, $diff = null) {
 		return $this->generateNotification(Role::STAFF, $news, $user);
@@ -180,7 +191,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param News $news
 	 * @param User $user
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyParentPublished($news, $user, $diff = null) {
 		return $this->generateNotification(Role::PARENT, $news, $user);
