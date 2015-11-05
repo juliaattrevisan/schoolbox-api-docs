@@ -52,6 +52,7 @@
     $.fn.confirmDialog = function(options) {
         var element  = $(this);
         var defaults = {
+            header: 'Please Confirm',
             text: 'Are you sure?',
             confirmLabel: 'Yes',
             confirmEvent: $.confirmDialog.followHref,
@@ -60,7 +61,10 @@
         var settings = $.extend(true, {}, defaults, options);
 
         var modal        = $('<div data-reveal class="reveal-modal" />');
-        var okayButton   = $('<a href="#" class="button" />').text(settings.confirmLabel).on('click.confirmDialog', function(e) {
+        var h2 = $('<h2 />');
+        h2.text(settings.header );
+
+        var okayButton   = $('<a href="#" class="button submit" />').text(settings.confirmLabel).on('click.confirmDialog', function(e) {
             e.preventDefault();
             settings.confirmEvent(element);
             modal.foundation('reveal', 'close');
@@ -69,10 +73,16 @@
             e.preventDefault();
             modal.foundation('reveal', 'close');
         });
+
+        var ul = $('<ul class="flex-list buttons" />');
+        var li = $('<li />');
+        ul.append(li.clone().append(okayButton));
+        ul.append(li.clone().append(cancelButton));
+
         modal
-            .append($('<p />').text(settings.text))
-            .append(okayButton)
-            .append(cancelButton)
+            .append(h2)
+            .append($('<p />').text(settings.text ))
+            .append(ul)
             .append('<a class="close-reveal-modal" aria-label="Close">&#215;</a>');
         modal.appendTo($('body'));
         modal.foundation('reveal', 'reflow').foundation('reveal', 'open');
