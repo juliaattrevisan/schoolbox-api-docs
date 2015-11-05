@@ -126,25 +126,28 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
         foreach ($this->task_list as $task) {
             $this->setVar(
                 array(
-                    'task_link_block'  => '',
-                    'TASK_ID'          => $task->getId(),
-                    'TASK_TITLE'       => Scrub::text($task->getTitle()),
-                    'TASK_TYPE'        => '',
-                    'TASK_TYPE_LABEL'  => Scrub::text($task->getLabel()),
-                    'TASK_CLASS'       => Scrub::text($task->getIconClass()),
-                    'TASK_PREVIEW'     => $task->getType() == Task::TYPE_TASK ? 'data-plugin="preview"' : '',
-                    'TASK_LINK'        => Scrub::text($task->getLink()),
-                    'TASK_SELF_ASSESS' => ($task->getRequiresConfirmation() ? '' : 'checked'),
-                    'TASK_MODIFY_URL'  => $task->getType() == Task::TYPE_TASK ? '#' : '/task/modify/'.$task->getId(),
-                    'DARK'             => ($i++ % 2 === 1 ? 'dark' : ''),
+                    'TASK_ID'              => Scrub::text($task->getId()),
+                    'TASK_TITLE'           => Scrub::text($task->getTitle()),
+                    'TASK_TYPE'            => '',
+                    'TASK_TYPE_LABEL'      => Scrub::text($task->getLabel()),
+                    'TASK_CLASS'           => Scrub::text($task->getIconClass()),
+                    'TASK_PREVIEW'         => $task->getType() == Task::TYPE_TASK ? 'data-plugin="preview"' : '',
+                    'TASK_LINK'            => Scrub::text($task->getLink()),
+                    'TASK_SELF_ASSESS'     => ($task->getRequiresConfirmation() ? '' : 'checked'),
+                    'TASK_MODIFY_URL'      => $task->getType() == Task::TYPE_TASK ? '#' : '/task/modify/'.$task->getId(),
+                    'TASK_REVEAL_ATTR'     => '',
+                    'task_link_block'      => '',
+                    'task_no_link_block'   => '',
+                    'edit_task_form_block' => '',
                 )
             );
-            $this->parse('task_no_link_block', 'task_no_link');
-            $this->parse('edit_task_block', 'edit_task');
 
             $task_type = $task->getType();
-            $this->setVar('edit_task_form_block', '');
             if ($task_type === Task::TYPE_TASK) {
+                $this->setVar(
+                    'TASK_REVEAL_ATTR',
+                    'data-reveal-id="editTask-' . Scrub::text($task->getId()) . '"'
+                );
                 $zone = $this->newZone('az-task-' . $task->getId());
 
                 if (strpos($task->getLink(), '/storage/fetch.php') === 0) {
@@ -170,14 +173,18 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
                 $this->parse('edit_task_form_block', 'edit_task_form');
                 $this->setVar('TASK_TYPE', 'task');
                 if (strlen($task->getLink()) > 0) {
-                    $this->setVar('task_no_link_block', '');
                     $this->parse('task_link_block', 'task_link');
+                } else {
+                    $this->parse('task_no_link_block', 'task_no_link');
                 }
             } elseif ($task_type === Task::TYPE_DUE_WORK) {
                 $this->setVar('TASK_TYPE', 'due_work');
+                $this->parse('task_no_link_block', 'task_no_link');
             } elseif ($task_type === Task::TYPE_ONLINE_ASSESS) {
                 $this->setVar('TASK_TYPE', 'assessment');
+                $this->parse('task_no_link_block', 'task_no_link');
             }
+            $this->parse('edit_task_block', 'edit_task');
             $this->parse('task_block', 'task', true);
         }
 

@@ -7,9 +7,9 @@
             units:        [],
             previewSelector: '[data-plugin=preview]'
         };
-        var settings  = $.extend({}, defaults, options);
-        var component = $(this);
-
+        var settings       = $.extend({}, defaults, options);
+        var component      = $(this);
+        var component_id   = component.attr('id');
         var copyTaskDialog = component.find('[data-interaction="copy_task_dialog"]');
 
         /**
@@ -20,13 +20,23 @@
          */
         var submitSaveTaskForm = function(form, copy) {
             var formData = form.serializeArray();
+            var isNew    = !(form.find('input[name="id"]').val());
+            var label    = form.find('[data-create-task-indicator]');
+            label.labelActivate();
+
             // Booleans in data get passed as string 'true' or 'false', wtf?
             formData.push({name: 'copy', value: (copy ? 1 : 0)});
+            form.find("input[type=submit]").attr('disabled', true);
             $.post(form.attr('action'), formData, function(data) {
+                label.labelTimeout({
+                    text: 'Saved',
+                    css: 'success'
+                });
                 // Clear the create task form
-                if (form.data("interaction") === 'create_task') {
+                if (isNew) {
                     form.get(0).reset();
                 }
+                $(document).foundation('reveal', 'close');
                 postCallback(form, data);
             }, 'json');
         };
@@ -81,24 +91,10 @@
         };
         initTaskList();
 
-        // Set up the same resource browser as is used in the social stream.
-        var socialstream_browser = component.find('.resource_browser');
-        if (socialstream_browser.length && $.fn.socialstreamBrowser) {
-            component.on('click.courseTaskList', 'form a[data-function="browse"]', {}, function(event) {
-                var form = $(this).closest('form');
-                event.preventDefault();
-                socialstream_browser.socialstreamBrowser({
-                    submitCallback: function(url) {
-                        form.find('input[name="link"]').val(url);
-                    }
-                });
-            });
-        }
-
         // Task editor - prevent empty inputs
-        component.on(
+        $(document).on(
             'change.courseTaskList, keyup.courseTaskList',
-            '[data-new-task-container] input[name="title"]',
+            'form[data-form_type="task"][data-component="'+component_id+'"] input[name="title"]',
             function () {
                 var title = this.value.replace(/^\s+|\s+$/g, '');
                 $(this).closest('form').find(':submit').prop('disabled', title.length === 0);
@@ -107,15 +103,16 @@
 
         // AJAX form submissions
         // Only show the dialog if there's a class using this unit.
-        component.on(
+        $(document).on(
             'submit.courseTaskList',
-            'form[data-interaction="create_task"], form[data-interaction="edit_task"]',
-            {},
+            'form[data-form_type="task"][data-component="'+component_id+'"]',
             function(event) {
                 var form = $(this);
                 event.preventDefault();
-                //submitSaveTaskForm($(this), false);
-                if (form.data("interaction") == 'create_task' && settings.units.length > 0) {
+                // Show the dialog for asking whether to copy this task to schools
+                // (This only functions for new tasks)
+                var isNew = !(form.find('input[name="id"]').val());
+                if (isNew && settings.units.length > 0) {
                     // Rewire copy task events
                     copyTaskDialog.off('click.courseTaskList', '[data-action="copy_task"]');
                     copyTaskDialog.on(
@@ -153,84 +150,39 @@
                 }
             });
 
-        // Modify task: if there's a modify form inline, show/hide it.
-        // (Delegate because extra elements can be added via AJAX)
-        component.on(
-            'click.courseTaskList',
-            'a[data-interaction="open_edit_task_form"]',
-            {},
-            function(event) {
-                // Show the form instead
-                var edit_form = $(this).closest('[data-task_id]').find('[data-interaction="edit_task_container"]');
-                if (edit_form.length) {
-                    event.preventDefault();
-                    edit_form.toggleClass('hide');
-                    component.find('[data-form-container]').not(edit_form).addClass('hide');
-                }
-            }
-        );
-
         // Delete task: "are you sure?"
         component.on(
             'click.courseTaskList',
             'a[data-interaction="open_delete_task_form"], a[data-interaction="delete_reject"]',
-            {},
             function(event) {
                 event.preventDefault();
-                var delete_form = $(this).closest('[data-task_id]').find('[data-interaction="delete_task_container"]');
-                delete_form.toggleClass('hide');
-                component.find('[data-form-container]').not(delete_form).addClass('hide');
-            }
-        );
-
-        // "why, yes I am"
-        component.on(
-            'submit.courseTaskList',
-            'form[data-interaction="delete_task"]',
-            {},
-            function(event) {
-                event.preventDefault();
-                var form = $(this);
-                $.post(
-                    form.attr('action'),
-                    form.serialize(),
-                    function(data) {
-                        postCallback(form, data);
-                    },
-                    'json'
-                );
-            }
-        );
-
-        // Create new tasks: show inline form if there is one.
-        component.on(
-            'click.courseTaskList',
-            'a[data-interaction="create_task"]',
-                function(event) {
-                var create_form = component.find('[data-interaction="create_task_container"]');
-                if (create_form.length) {
-                    event.preventDefault();
-                    create_form.toggleClass('hide');
-                    component.find('[data-form-container]').not(create_form).addClass('hide');
-                }
+                var element = $(this);
+                element.confirmDialog({
+                    text: 'Are you sure you wish to delete this task?',
+                    confirmEvent: function(element) {
+                        var unit_element = element.closest('[data-task_id]');
+                        var form         = unit_element.find('[data-form_type="delete_task"]');
+                        $.post(form.attr('action'), form.serialize(), function(data) {
+                            postCallback(form, data);
+                        }, 'json');
+                    }
+                });
             }
         );
 
         // Event - save new item, no copy
-        component.on(
+        $(document).on(
             'submitNoCopy.courseTaskList',
-            'form[data-interaction="create_task"], form[data-interaction="edit_task"]',
-            {},
+            'form[data-form_type="task"][data-component="'+component_id+'"]',
             function(event) {
                 submitSaveTaskForm($(this), false)
             }
         );
 
         // Event - save new item, copy it across
-        component.on(
+        $(document).on(
             'submitCopy.courseTaskList',
-            'form[data-interaction="create_task"], form[data-interaction="edit_task"]',
-            {},
+            'form[data-form_type="task"][data-component="'+component_id+'"]',
             function(event) {
                 submitSaveTaskForm($(this), true)
             }
