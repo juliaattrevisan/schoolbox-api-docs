@@ -240,13 +240,21 @@ class External_Tass_User implements External_UserInterface
             $parentNum = $id[$splitParentLength-1];
 
             $query = "
-                SELECT sf.stud_codes AS RelatedID
-                FROM pia_sfaccess sf
-                LEFT JOIN parent p
-                    ON  p.par_code = sf.par_code
+                SELECT
+                    sf.stud_codes AS RelatedID
+                FROM parent AS p
+                INNER JOIN paraddress as pa
+                    ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code
+                LEFT JOIN pia_sfaccess AS sf
+                    ON p.par_code = sf.par_code
+                    AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
                     AND p.cmpy_code = sf.cmpy_code
-                WHERE sf.par_code = '$parentCode'
-                AND   sf.sfa_num = '$parentNum'
+                LEFT JOIN student as s
+                    ON p.par_code = s.par_code
+                    AND p.cmpy_code = s.cmpy_code
+                WHERE sf.par_code = {$this->getDatabase()->smartQuote($parentCode)}
+                AND   sf.sfa_num  = {$this->getDatabase()->smartQuote($parentNum)}
+                ORDER BY p.par_code ASC
             ";
 
             $return = array();
@@ -269,7 +277,7 @@ class External_Tass_User implements External_UserInterface
                 LEFT JOIN parent p
                     ON  p.par_code = s.par_code
                     AND p.cmpy_code = s.cmpy_code
-				WHERE s.par_code = '$id'
+				WHERE s.par_code = {$this->getDatabase()->smartQuote($id)}
 			";
             $return = $this->getDatabase()->getAll($query);
         }
