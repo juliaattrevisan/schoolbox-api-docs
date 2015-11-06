@@ -104,6 +104,7 @@
                 // update underlying textarea before submit validation
                 tinyMCE.triggerSave();
             }).validate({
+                onfocusout: false,
                 rules: config.rules,
                 messages: config.messages,
 
@@ -343,6 +344,7 @@
                 // update underlying textarea before submit validation
                 tinyMCE.triggerSave();
             }).validate({
+                onfocusout: false,
                 submitHandler: function() {
                     var theForm = $(config.element);
 
