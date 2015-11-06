@@ -106,34 +106,48 @@
 
         <h2 class="subheader">Status of Services</h2>
         <section>
-            <table>
-                <colgroup>
-                    <col />
-                    <col width="20%" />
-                </colgroup>
-                <tbody>
-                    <tr>
-                        <td>{EXTERNAL_DB}</td>
-                        <td><span class="full-width {EXTERNAL_DB_LIGHT} label">{EXTERNAL_DB_STATUS}</span></td>
-                    </tr>
-                    <tr>
-                        <td>Email</td>
-                        <td><span class="full-width {EMAIL_LIGHT} label">{EMAIL_STATUS}</span></td>
-                    </tr>
-                    <tr>
-                        <td>LDAP Primary</td>
-                        <td><span class="full-width {LDAP_LIGHT} label">{LDAP_STATUS}</span></td>
-                    </tr>
-                    <tr>
-                        <td>LDAP Secondary</td>
-                        <td><span class="full-width {LDAP_ALT_LIGHT} label">{LDAP_ALT_STATUS}</span></td>
-                    </tr>
-                    <tr>
-                        <td>WWW</td>
-                        <td><span class="full-width {WWW_LIGHT} label" data-light="www">{WWW_STATUS}</span></td>
-                    </tr>
-                </tbody>
-            </table>
+            <ul class="information-list">
+                <li>
+                    <div class="small-5 columns content">
+                        {EXTERNAL_DB}
+                    </div>
+                    <div class="small-7 columns content">
+                        <span class="full-width {EXTERNAL_DB_LIGHT} label">{EXTERNAL_DB_STATUS}</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="small-5 columns content">
+                        Email
+                    </div>
+                    <div class="small-7 columns content">
+                        <span class="full-width {EMAIL_LIGHT} label">{EMAIL_STATUS}</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="small-5 columns content">
+                        LDAP Primary
+                    </div>
+                    <div class="small-7 columns content">
+                        <span class="full-width {LDAP_LIGHT} label">{LDAP_STATUS}</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="small-5 columns content">
+                        LDAP Secondary
+                    </div>
+                    <div class="small-7 columns content">
+                        <span class="full-width {LDAP_ALT_LIGHT} label">{LDAP_ALT_STATUS}</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="small-5 columns content">
+                        WWW
+                    </div>
+                    <div class="small-7 columns content">
+                        <span class="full-width {WWW_LIGHT} label" data-light="www">{WWW_STATUS}</span>
+                    </div>
+                </li>
+            </ul>
         </section>
 
         <h2 class="subheader">Role Statistics</h2>
