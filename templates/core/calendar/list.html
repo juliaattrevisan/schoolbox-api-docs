@@ -90,7 +90,7 @@
                 /* Bypass foundation bug
                  * https://github.com/zurb/foundation/issues/4746
                  */
-                dialogUrl.val(url);
+                dialogUrl.text(url);
                 dialog.foundation('reveal', 'open');
 
                 dialog.on('opened.fndtn.reveal', function() {
@@ -152,7 +152,7 @@
 <div class="reveal-modal" data-reveal aria-labelledby="calendar-export-dialog-text" aria-hidden="true" role="dialog" id="calendar-export-dialog">
     <h2 id="calendar-export-dialog-text">Live Feed URL</h2>
     <p class="meta">Use the following address to subscribe your favourite calendar application to a live feed.</p>
-    <textarea readonly id="calendar-export-dialog-url" rows="6"></textarea>
+    <div id="calendar-export-dialog-url" class="alert-box"></div>
     <button id="copy-button" data-clipboard-target="calendar-export-dialog-url" class="button icon-copy">Copy to Clipboard</button>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
