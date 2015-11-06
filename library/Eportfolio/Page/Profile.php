@@ -264,7 +264,11 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
     {
         /* Gather everything
          */
-        $allImages = \Component\Eportfolio\FileListMapper::getInstance()->findRecent($this->getUserId(), $this->getNumRecentPhotos());
+        // TODO do this properly instead of by fetching amount*2 then filtering
+        $allImages = \Component\Eportfolio\FileListMapper::getInstance()->findRecent(
+            $this->getUserId(),
+            $this->getNumRecentPhotos() * 2
+        );
         $allImages = $allImages->filter(function($image) {
             /** @var \Component\Eportfolio\FileList $image */
             return $this->canUserViewPage($image->getPageId());
@@ -293,7 +297,11 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
      */
     private function renderRecentBlogs()
     {
-        $allBlogs = \Component\Eportfolio\BlogMapper::getInstance()->findRecent($this->getUserId(), $this->getNumRecentBlogs());
+        //  TODO do this properly instead of by fetching amount*2 then filtering
+        $allBlogs = \Component\Eportfolio\BlogMapper::getInstance()->findRecent(
+            $this->getUserId(),
+            $this->getNumRecentBlogs() * 2
+        );
         $allBlogs = $allBlogs->filter(function($blog) {
             /** @var \Component\Eportfolio\Blog $blog */
             return $this->canUserViewPage($blog->getPageId());
