@@ -139,29 +139,31 @@
         <h2 class="subheader">Role Statistics</h2>
         <section>
             <div class="loading"></div>
-            <table id="group-summary">
-                <colgroup>
-                    <col width="50%" />
-                    <col width="20%" />
-                    <col width="30%" />
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th>Role</th>
-                        <th>Total</th>
-                        <th>Logged In</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- BEGIN group_summary -->
-                    <tr>
-                        <td><a href="/adminv2/reports/group/{GROUP_ID}">{GROUP_NAME}</a></td>
-                        <td>{GROUP_USER}</td>
-                        <td>{GROUP_LOGGED_IN}</td>
-                    </tr>
-                    <!-- END group_summary -->
-                </tbody>
-            </table>
+            <div class="scrollable">
+                <table id="group-summary">
+                    <colgroup>
+                        <col width="50%" />
+                        <col width="20%" />
+                        <col width="30%" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Role</th>
+                            <th>Total</th>
+                            <th>Logged In</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- BEGIN group_summary -->
+                        <tr>
+                            <td><a href="/adminv2/reports/group/{GROUP_ID}">{GROUP_NAME}</a></td>
+                            <td>{GROUP_USER}</td>
+                            <td>{GROUP_LOGGED_IN}</td>
+                        </tr>
+                        <!-- END group_summary -->
+                    </tbody>
+                </table>
+            </div>
 
             <!-- BEGIN no_js_warning -->
             <noscript>
