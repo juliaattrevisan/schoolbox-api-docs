@@ -1,21 +1,61 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" type="text/css" href="/css/{SITE_LOCATION}/print.css"/>
-<script type="text/javascript">
-    $(function () {
-        /*
-         * Hack for the hidden column next to the BS.
-         * */
-        $('.leaveReportHeaderDate:first').attr('colspan', 2)
-
-    });
-</script>
 <!-- END custom_head -->
 <!--
 - print view has no host and no activity.
 - there is a hidden "AM" column
 -->
 
-<div class="indent">
+<style type="text/css">
+    .letterhead {
+        position: relative;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .letterhead .crest {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .letterhead h1 {
+        font-weight: normal;
+        font-size: 2rem;
+        margin: 0;
+    }
+
+    .letterhead h2 {
+        font-size: 1rem;
+    }
+
+    .letterhead address {
+        text-align: center;
+        font-style: normal;
+        font-size: 0.75rem;
+        margin-bottom: 2rem;
+    }
+
+    td {
+        border: 1px solid #ededed;
+    }
+</style>
+
+<div class="letterhead">
+    <img src="/images/kings/school-crest.png" class="crest" alt="The Kings School Crest" width="95" height="120"/>
+
+    <h1>The King&#39;s School</h1>
+
+    <address>
+        PO Box 1 Parramatta NSW 2124 Australia<br/>
+        Phone (02) 9683 8555 Fax (02) 9683 8488<br/>
+        Web Site: www.kings.edu.au<br/>
+        e-mail: tks@kings.edu.au
+    </address>
+
+    <h2>Leave Report for {HOUSE_NAME}&#8202;&mdash;&#8202;Week Ending {WEEK_ENDING}</h2>
+</div>
+
+<div>
     <!-- BEGIN no_requests -->
     {HOUSE_NAME} has no pending or previous requests.
     <!-- END no_requests -->
@@ -23,148 +63,131 @@
     <!-- BEGIN house -->
     <!-- END house -->
 
-    <table id="requestList" class="ruler sortable-table table" width="100%" style="table-layout:fixed;">
+    <table id="requestList">
         <colgroup>
             <col width="15%">
             <col width="3%">
             <col width="3%">
-            <col span="8" class="multi-cell" width="6%">
+            <col span="8" width="6%">
             <col width="15%">
         </colgroup>
 
         <tbody>
-        <tr>
-            <th colspan="12">
+            <tr>
+                <th colspan="4"></th>
+                <!-- BEGIN report_header -->
+                <th colspan="3">
+                    {REPORT_HEADER_WEEKDAY}<br/>
+                    {REPORT_HEADER_DATE}
+                </th>
+                <!-- END report_header -->
+                <th></th>
+            </tr>
 
-                <div id="letterhead">
+            <tr>
+                <th>Name</th>
+                <th>Year</th>
+                <th></th>
+                <!-- BEGIN report_header_subtitle -->
+                <!-- BEGIN report_header_subtitle_show_am -->
+                <th>AM</th>
+                <!-- END report_header_subtitle_show_am -->
 
-                    <img src="/images/kings/school-crest.png" alt="The Kings School Crest" width="95" height="120"/>
+                <!-- BEGIN report_header_subtitle_hide_am -->
+                <th></th>
+                <!-- END report_header_subtitle_hide_am -->
 
-                    <h1>The King&#39;s School</h1>
+                <!-- BEGIN report_header_subtitle_show_day -->
+                <th>PM</th>
+                <!-- END report_header_subtitle_show_day -->
 
-                    <p>PO Box 1 Parramatta NSW 2124 Australia<br/>
-                        Phone (02) 9683 8555 Fax (02) 9683 8488<br/>
-                        Web Site: www.kings.edu.au<br/>
-                        e-mail: tks@kings.edu.au</p>
-                </div>
-                <h1>Leave Report for {HOUSE_NAME}&#8202;&mdash;&#8202;Week Ending {WEEK_ENDING}</h1>
-            </th>
-        </tr>
-        <tr>
-            <th colspan="4"></th>
-            <!-- BEGIN report_header -->
-            <th colspan="3" class="leaveReportHeaderDate leaveReportLeftBorder leaveReportRightBorder">
-                {REPORT_HEADER_WEEKDAY}<br/>
-                {REPORT_HEADER_DATE}
-            </th>
-            <!-- END report_header -->
-            <th></th>
-        </tr>
+                <!-- BEGIN report_header_subtitle_hide_day -->
+                <th></th>
+                <!-- END report_header_subtitle_hide_day -->
 
-        <tr>
-            <th class="text">Name</th>
-            <th class='leaveReportYear'>Year</th>
-            <th></th>
-            <!-- BEGIN report_header_subtitle -->
-            <!-- BEGIN report_header_subtitle_show_am -->
-            <th class='leaveReportMeridiem leaveReportLeftBorder'>AM</th>
-            <!-- END report_header_subtitle_show_am -->
+                <!-- BEGIN report_header_subtitle_show_pm -->
+                <th>Bed</th>
+                <!-- END report_header_subtitle_show_pm -->
 
-            <!-- BEGIN report_header_subtitle_hide_am -->
-            <th class='leaveReportMeridiem leaveReportLeftBorder no-arrow leaveReportHide'></th>
-            <!-- END report_header_subtitle_hide_am -->
+                <!-- END report_header_subtitle -->
+                <th>Approved By</th>
+            </tr>
 
-            <!-- BEGIN report_header_subtitle_show_day -->
-            <th class='leaveReportMeridiem'>PM</th>
-            <!-- END report_header_subtitle_show_day -->
+            <!-- BEGIN row -->
+            <!-- BEGIN request -->
+            <tr>
+                <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
+                <td>{USER_YEAR}</td>
+                <td>{USER_BOARDING_STATUS}</td>
+                <!-- BEGIN request_period -->
+                <!-- BEGIN request_period_show_am -->
+                <td>{REQUEST_PERIOD_MORNING}</td>
+                <!-- END request_period_show_am -->
+                <!-- BEGIN request_period_hide_am -->
+                <td></td>
+                <!-- END request_period_hide_am -->
+                <!-- BEGIN request_period_show_day -->
+                <td>{REQUEST_PERIOD_DAY}</td>
+                <!-- END request_period_show_day -->
+                <!-- BEGIN request_period_hide_day -->
+                <td></td>
+                <!-- END request_period_hide_day -->
+                <!-- BEGIN request_period_show_pm -->
+                <td>{REQUEST_PERIOD_NIGHT}</td>
+                <!-- END request_period_show_pm -->
+                <!-- END request_period -->
 
-            <!-- BEGIN report_header_subtitle_hide_day -->
-            <th class='leaveReportMeridiem no-arrow leaveReportHide'></th>
-            <!-- END report_header_subtitle_hide_day -->
-
-            <!-- BEGIN report_header_subtitle_show_pm -->
-            <th class='leaveReportMeridiem leaveReportRightBorder'>Bed</th>
-            <!-- END report_header_subtitle_show_pm -->
-
-            <!-- END report_header_subtitle -->
-            <th class="text">Approved By</th>
-        </tr>
-
-        <!-- BEGIN row -->
-        <!-- BEGIN request -->
-        <tr class="{CLASS}">
-            <td class="text"><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
-            <td class='leaveReportYear'>{USER_YEAR}</td>
-            <td>{USER_BOARDING_STATUS}</td>
-            <!-- BEGIN request_period -->
-            <!-- BEGIN request_period_show_am -->
-            <td class='leaveReportMeridiem leaveReportLeftBorder'>{REQUEST_PERIOD_MORNING}</td>
-            <!-- END request_period_show_am -->
-            <!-- BEGIN request_period_hide_am -->
-            <td class="leaveReportMeridiem leaveReportLeftBorder leaveReportNoRightBorder leaveReportHide"></td>
-            <!-- END request_period_hide_am -->
-            <!-- BEGIN request_period_show_day -->
-            <td class='leaveReportMeridiem'>{REQUEST_PERIOD_DAY}</td>
-            <!-- END request_period_show_day -->
-            <!-- BEGIN request_period_hide_day -->
-            <td class="leaveReportMeridiem leaveReportNoBorder leaveReportHide"></td>
-            <!-- END request_period_hide_day -->
-            <!-- BEGIN request_period_show_pm -->
-            <td class='leaveReportMeridiem leaveReportRightBorder'>{REQUEST_PERIOD_NIGHT}</td>
-            <!-- END request_period_show_pm -->
-            <!-- END request_period -->
-
-            <td class="text">
-                <!-- BEGIN request_authorisation -->
-                <a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a><br/>
-                <!-- END request_authorisation -->
-            </td>
-        </tr>
-        <!-- END request -->
-        <!-- BEGIN empty_request -->
-        <tr class="{CLASS}">
-            <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
-            <td>{USER_YEAR}</td>
-            <td></td>
-            <td colspan="1" class="leaveReportHide"></td>
-            <td colspan="7"></td>
-            <td></td>
-        </tr>
-        <!-- END empty_request -->
-        <!-- END row -->
-        <tr>
-            <td colspan="3">Totals</td>
-            <!-- BEGIN request_period_total -->
-            <td>{PERIOD_TOTAL}</td>
-            <!-- END request_period_total -->
-            <td></td>
-            <td></td>
-        </tr>
+                <td>
+                    <!-- BEGIN request_authorisation -->
+                    <a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a><br/>
+                    <!-- END request_authorisation -->
+                </td>
+            </tr>
+            <!-- END request -->
+            <!-- BEGIN empty_request -->
+            <tr>
+                <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
+                <td>{USER_YEAR}</td>
+                <td></td>
+                <td colspan="1"></td>
+                <td colspan="7"></td>
+                <td></td>
+            </tr>
+            <!-- END empty_request -->
+            <!-- END row -->
+            <tr>
+                <td colspan="3">Totals</td>
+                <!-- BEGIN request_period_total -->
+                <td>{PERIOD_TOTAL}</td>
+                <!-- END request_period_total -->
+                <td></td>
+                <td></td>
+            </tr>
         </tbody>
     </table>
 
-    <table class="ruler signatures table" width="100%" style="table-layout:fixed;">
+    <table>
         <colgroup>
             <col width="15%">
             <col width="3%">
             <col width="3%">
-            <col span="8" class="multi-cell" width="6%">
+            <col span="8" width="6%">
             <col width="15%">
         </colgroup>
         <tbody>
         <!-- Signatures and initials -->
-        <tr class="signatures">
-            <td class="text" colspan='3'><strong>Duty Master Initial</strong><br><br></td>
-            <td class="leaveReportHide"></td>
+        <tr>
+            <td colspan='3'><strong>Duty Master Initial</strong><br><br></td>
+            <td></td>
             <!-- BEGIN request_period_initial -->
             <td></td>
             <!-- END request_period_initial -->
             <td></td>
         </tr>
-        <tr class="signatures">
-            <td class="text" colspan='3'><strong>Housemaster Signature</strong><br><br></td>
-            <td class="leaveReportHide"></td>
-            <td colspan="8" class="no-right-border"></td>
+        <tr>
+           <td colspan='3'><strong>Housemaster Signature</strong><br><br></td>
+            <td></td>
+            <td colspan="8"></td>
             <td></td>
         </tr>
         </tbody>
