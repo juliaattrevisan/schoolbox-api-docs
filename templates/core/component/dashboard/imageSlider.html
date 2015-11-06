@@ -16,14 +16,16 @@
     <!-- END has_header -->
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="small-12 island imageslider-container">
-            <div data-imageslider class="imageslider">
-                <!-- BEGIN image_scroller -->
-                <a href="{IMAGE_URL}">
-                    <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
-                </a>
-                <!-- END image_scroller -->
-            </div>
+        <div class="small-12 columns">
+            <section class="imageslider-container">
+                <div data-imageslider class="imageslider">
+                    <!-- BEGIN image_scroller -->
+                    <a href="{IMAGE_URL}">
+                        <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
+                    </a>
+                    <!-- END image_scroller -->
+                </div>
+            </section>
         </div>
     </div>
 </div>

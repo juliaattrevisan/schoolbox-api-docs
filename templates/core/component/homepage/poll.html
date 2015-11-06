@@ -27,9 +27,9 @@
             <section>
                 <ul class="action-list">
                     <!-- BEGIN poll_question -->
-                    <li class="actions-small-3">
+                    <li class="actions-small-1">
                         <div class="list-item">
-                            <div class="avatar card small-12">
+                            <div class="avatar card wrap-down small-12">
                                 <a>
                                     <img src="{POLL_AUTHOR_THUMB}" alt="View Profile" />
                                     <h3>{POLL_QUESTION}</h3>
@@ -85,15 +85,18 @@
                         </div>
                         <!-- END poll_vote -->
                         <nav>
-                            <!-- BEGIN show_results -->
-                            <a href="/homepage/{ID}/pollResults" class="icon-poll" title="Show Results"></a>
-                            <!-- END show_results -->
-
-                            <!-- BEGIN modify_poll -->
-                            <a href="/poll/modify/{POLL_ID}" class="icon-modify" title="Modify Poll"></a>
-                            <a href="/poll/modifyForm.php?delete={POLL_ID}&amp;homepageComponentID={COMPONENT_INSTANCE_ID}" data-poll-delete class="icon-delete" title="Delete Poll"></a>
-                            <!-- END modify_poll -->
+                            <a href="#" class="icon-more" data-dropdown="poll-options{POLL_ID}" aria-expanded="false"></a>
                         </nav>
+
+                        <ul data-dropdown-content class="f-dropdown" id="poll-options{POLL_ID}">
+                            <!-- BEGIN show_results -->
+                            <li><a href="/homepage/{ID}/pollResults" class="icon-poll">Show Results</a></li>
+                            <!-- END show_results -->
+                            <!-- BEGIN modify_poll -->
+                            <li><a href="/poll/modify/{POLL_ID}" class="icon-modify">Modify</a></li>
+                            <li><a href="/poll/modifyForm.php?delete={POLL_ID}&amp;homepageComponentID={COMPONENT_INSTANCE_ID}" data-poll-delete class="icon-delete">Delete</a></li>
+                            <!-- END modify_poll -->
+                        </ul>
                     </li>
                     <!-- BEGIN poll_chart -->
                     <li>

@@ -7,7 +7,7 @@
         background-color: {top_head_bg};
     }
 
-    #component-layout .column-top .component-titlebar a {
+    #component-layout .column-top .component-titlebar h2, #component-layout .column-top .component-titlebar a {
         color: {top_head_font};
     }
 
@@ -20,7 +20,7 @@
         background-color: {left_head_bg};
     }
 
-    #component-layout .column-left .component-titlebar a {
+    #component-layout .column-left .component-titlebar h2, #component-layout .column-left .component-titlebar a {
         color: {left_head_font};
     }
 
@@ -33,7 +33,7 @@
         background-color: {right_head_bg};
     }
 
-    #component-layout .column-right .component-titlebar a {
+    #component-layout .column-right .component-titlebar h2, #component-layout .column-right .component-titlebar a {
         color: {right_head_font};
     }
 
@@ -310,146 +310,134 @@
 </div>
 
 <!-- BEGIN customise_page -->
-<div class="row">
-    <div class="small-12 island">
-        <div id="tabs-homepage" class="tabs-content">
-
-            <!--------------------->
-            <!-- Component Tab 1 -->
-            <!--------------------->
-            <div id="tabs-1" class="content no-pad">
-                <div class="small-12 island no-pad">
-                    <section>
-                        <div class="content">
-                            <h2>
-                                Components
-                                <span data-tooltip class="has-tip tip-top hint" title="Click to add a component, or drag and drop it into position.">?</span>
-                            </h2>
-                            <dl class="tabs" data-tab>
-                                <!-- BEGIN homepage_component_tab -->
-                                <dd class="{COMPONENT_CATEGORY_CLASS}">
-                                    <a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">
-                                        {COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})
-                                    </a>
-                                </dd>
-                                <!-- END homepage_component_tab -->
-                            </dl>
+<div id="tabs-homepage" class="tabs-content no-margin">
+    <!--------------------->
+    <!-- Component Tab 1 -->
+    <!--------------------->
+    <div id="tabs-1" class="content">
+        <div class="small-12 island">
+            <dl class="tabs" data-tab>
+                <!-- BEGIN homepage_component_tab -->
+                <dd class="{COMPONENT_CATEGORY_CLASS}">
+                    <a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">
+                        {COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})
+                    </a>
+                </dd>
+                <!-- END homepage_component_tab -->
+            </dl>
+            <div class="tabs-content">
+                <!-- BEGIN homepage_component_page -->
+                <ul class="component-palette content no-pad grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {HOMEPAGE_COMPONENT_CATEGORY_CLASS}" id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
+                    <!-- BEGIN homepage_component -->
+                    <li>
+                        <div class="{HOMEPAGE_COMPONENT_MULTIPLE_STATE} no-margin"
+                             data-count="{HOMEPAGE_COMPONENT_COUNT}"
+                             data-multi="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}"
+                             data-component-palette
+                                >
+                            <div class="avatar card">
+                                <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
+                                    <span class="icon-32 icon-masonry icon-masonry-{HOMEPAGE_COMPONENT_CLASS}"></span>
+                                    <p>{HOMEPAGE_COMPONENT_NAME}</p>
+                                    <p class="meta">(<span data-relation="count">{HOMEPAGE_COMPONENT_COUNT}</span>)</p>
+                                </a>
+                            </div>
                         </div>
-                        <div class="tabs-content no-margin">
-                            <!-- BEGIN homepage_component_page -->
-                            <ul class="component-palette content no-pad grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {HOMEPAGE_COMPONENT_CATEGORY_CLASS}" id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
-                                <!-- BEGIN homepage_component -->
-                                <li>
-                                    <div class="{HOMEPAGE_COMPONENT_MULTIPLE_STATE} no-margin"
-                                         data-count="{HOMEPAGE_COMPONENT_COUNT}"
-                                         data-multi="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}"
-                                         data-component-palette
-                                            >
-                                        <div class="avatar card">
-                                            <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
-                                                <span class="icon-32 icon-masonry icon-masonry-{HOMEPAGE_COMPONENT_CLASS}"></span>
-                                                <p>{HOMEPAGE_COMPONENT_NAME}</p>
-                                                <p class="meta">(<span data-relation="count">{HOMEPAGE_COMPONENT_COUNT}</span>)</p>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </li>
-                                <!-- END homepage_component -->
-                            </ul>
-                            <!-- END homepage_component_page -->
-                        </div>
-                    </section>
-                </div>
+                    </li>
+                    <!-- END homepage_component -->
+                </ul>
+                <!-- END homepage_component_page -->
             </div>
+        </div>
+    </div>
 
-            <!--------------------->
-            <!-- Component Tab 2 -->
-            <!--------------------->
-            <div id="tabs-2" class="content no-pad">
-                <form method="POST" action="" name="saveColours" class="no-margin">
-                    <section class="no-margin">
-                        <!-- don't show a slider for screens which don't have multiple columns -->
-                        <fieldset class="content hide-for-medium-down">
-                            <legend>
-                                Column Width
-                                <span data-tooltip class="has-tip tip-top hint" title="Drag the slider to change the width of the left and right columns. (On small screens, the right column will drop below the left.)">?</span>
-                            </legend>
-                            <div class="small-12 columns">
-                                <div class="small-6 small-offset-3 end columns">
-                                    <div class="range-slider"
-                                         data-original-value="{TEMPLATE_LEFT_COLUMN_WIDTH}"
-                                         data-slider="{TEMPLATE_LEFT_COLUMN_WIDTH}"
-                                         data-interaction="column-width"
-                                         data-options="start: 3; end: 9"
-                                    >
-                                        <span class="range-slider-handle" role="slider" tabindex="0"></span>
-                                        <span class="range-slider-active-segment"></span>
-                                        <input type="hidden" name="width" value="{TEMPLATE_LEFT_COLUMN_WIDTH}">
-                                    </div>
+    <!--------------------->
+    <!-- Component Tab 2 -->
+    <!--------------------->
+    <div id="tabs-2" class="content clearfix">
+        <div class="small-12 island">
+            <form method="POST" action="" name="saveColours">
+                <section>
+                    <!-- don't show a slider for screens which don't have multiple columns -->
+                    <fieldset class="content hide-for-medium-down">
+                        <legend>
+                            Column Width
+                            <span data-tooltip class="has-tip tip-top hint" title="Drag the slider to change the width of the left and right columns. (On small screens, the right column will drop below the left.)">?</span>
+                        </legend>
+                        <div class="small-12 columns">
+                            <div class="small-6 small-offset-3 end columns">
+                                <div class="range-slider"
+                                     data-original-value="{TEMPLATE_LEFT_COLUMN_WIDTH}"
+                                     data-slider="{TEMPLATE_LEFT_COLUMN_WIDTH}"
+                                     data-interaction="column-width"
+                                     data-options="start: 3; end: 9"
+                                >
+                                    <span class="range-slider-handle" role="slider" tabindex="0"></span>
+                                    <span class="range-slider-active-segment"></span>
+                                    <input type="hidden" name="width" value="{TEMPLATE_LEFT_COLUMN_WIDTH}">
                                 </div>
                             </div>
-                        </fieldset>
-
-                        <!-- BEGIN homepage_color_selector -->
-                        <fieldset class="content">
-                            <legend>Colours</legend>
-                            <div class="small-12 columns">
-                                <fieldset class="hide-for-medium-down">
-                                    <legend>
-                                        Columns
-                                        <span data-tooltip class="has-tip tip-top hint" title="Select a column to modify colours for.">?</span>
-                                    </legend>
-                                    <div class="small-12 columns">
-                                        <input id="top" type="checkbox" data-column-selector checked />
-                                        <label for="top" class="checkbox-label">Top</label>
-                                    </div>
-                                    <div class="small-12 large-6 columns">
-                                        <input id="left" type="checkbox" data-column-selector checked />
-                                        <label for="left" class="checkbox-label">
-                                            <span class="hide-for-medium-down">Left</span>
-                                            <span class="show-for-medium-down">Middle</span>
-                                        </label>
-                                    </div>
-                                    <div class="small-12 large-6 columns">
-                                        <input id="right" type="checkbox" data-column-selector checked />
-                                        <label for="right" class="checkbox-label">
-                                            <span class="hide-for-medium-down">Right</span>
-                                            <span class="show-for-medium-down">Bottom</span>
-                                        </label>
-                                    </div>
-                                </fieldset>
-                            </div>
-                            <div class="small-12 medium-6 columns">
-                                <fieldset>
-                                    <legend>Heading</legend>
-                                    <label for="head_font">Text</label>
-                                    <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
-                                    <label for="head_bg">Background</label>
-                                    <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
-                                </fieldset>
-                            </div>
-                            <div class="small-12 medium-6 columns">
-                                <fieldset>
-                                    <legend>Content</legend>
-                                    <label for="font">Text</label>
-                                    <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
-                                    <label for="bg_primary">Background</label>
-                                    <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
-                                </fieldset>
-                            </div>
-                        </fieldset>
-                        <!-- END homepage_color_selector -->
-
-                        <div class="content">
-                            <a href="#" class="button icon-approve submit no-margin" data-role="save">Save</a>
-                            <a href="#" class="button icon-refresh no-margin" data-role="reset-to-default">Reset</a>
-                            <a href="#" class="button icon-undo no-margin" data-role="undo">Undo Changes</a>
                         </div>
+                    </fieldset>
 
-                        <span class="label full-width hide" data-relation="saveLayout"></span>
-                    </section>
-                </form>
-            </div>
+                    <!-- BEGIN homepage_color_selector -->
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <fieldset class="hide-for-medium-down">
+                                <legend>
+                                    Select Columns To Colour
+                                    <span data-tooltip class="has-tip tip-top hint" title="Select a column to modify colours for.">?</span>
+                                </legend>
+                                <div class="small-12 columns">
+                                    <input id="top" type="checkbox" data-column-selector checked />
+                                    <label for="top" class="checkbox-label">Top</label>
+                                </div>
+                                <div class="small-12 large-6 columns">
+                                    <input id="left" type="checkbox" data-column-selector checked />
+                                    <label for="left" class="checkbox-label">
+                                        <span class="hide-for-medium-down">Left</span>
+                                        <span class="show-for-medium-down">Middle</span>
+                                    </label>
+                                </div>
+                                <div class="small-12 large-6 columns">
+                                    <input id="right" type="checkbox" data-column-selector checked />
+                                    <label for="right" class="checkbox-label">
+                                        <span class="hide-for-medium-down">Right</span>
+                                        <span class="show-for-medium-down">Bottom</span>
+                                    </label>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="small-12 medium-6 columns">
+                            <fieldset>
+                                <legend>Heading Colours</legend>
+                                <label for="head_font">Text</label>
+                                <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
+                                <label for="head_bg">Background</label>
+                                <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
+                            </fieldset>
+                        </div>
+                        <div class="small-12 medium-6 columns">
+                            <fieldset>
+                                <legend>Content Colours</legend>
+                                <label for="font">Text</label>
+                                <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
+                                <label for="bg_primary">Background</label>
+                                <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
+                            </fieldset>
+                        </div>
+                    </fieldset>
+                    <!-- END homepage_color_selector -->
+
+                    <ul class="flex-list buttons">
+                        <li><a href="#" class="button icon-approve submit no-margin" data-role="save">Save</a></li>
+                        <li><a href="#" class="button icon-refresh no-margin" data-role="reset-to-default">Reset</a></li>
+                        <li><a href="#" class="button icon-undo no-margin" data-role="undo">Undo Changes</a></li>
+                    </ul>
+
+                    <span class="label full-width hide" data-relation="saveLayout"></span>
+                </section>
+            </form>
         </div>
     </div>
 </div>

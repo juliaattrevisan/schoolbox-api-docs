@@ -118,7 +118,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                         */
                     if ($this->getConfig('displayPortraits') == 'grid') {
                         $this->setVar(array(
-                            'GRID_VIEW_CLASSES' => 'medium-block-grid-2 large-block-grid-3'
+                            'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
                         ));
 
                         $this->parse('has_thumbnail_block', 'has_thumbnail');

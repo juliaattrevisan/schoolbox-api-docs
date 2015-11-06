@@ -1,5 +1,5 @@
 <!-- BEGIN socialstream_post -->
-<li class="actions-small-1" data-socialstream-row>
+<li class="actions-small-1" data-socialstream-row xmlns="http://www.w3.org/1999/html">
     <div class="list-item">
         <div class="avatar card small-12">
             <a href="/search/user/{SOCIALSTREAM_POST_USER_ID}" title="View Profile">
@@ -14,15 +14,24 @@
             <!-- BEGIN socialstream_post_has_attachment -->
             <div class="socialstream-attachment">
                 <!-- BEGIN socialstream_post_has_icon -->
-                <a href='{SOCIALSTREAM_POST_URL}' target="_blank">
-                    <img src="/images/mime/22x22/{SOCIALSTREAM_POST_ICON}" />
-                </a>
+                <div class="avatar card">
+                    <a href='{SOCIALSTREAM_POST_URL}' target="_blank">
+                        <img src="/images/mime/60x60/{SOCIALSTREAM_POST_ICON}" />
+                        <p>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</p>
+                    </a>
+                </div>
+                <article>{SOCIALSTREAM_POST_EXTERNAL_BODY}</article>
+
                 <!-- END socialstream_post_has_icon -->
 
                 <!-- BEGIN socialstream_post_has_thumbnail -->
-                <a href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox" alt="" title="">
-                    <img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64" />
-                </a>
+                <div class="avatar card">
+                    <a href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox" alt="" title="">
+                        <img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64" />
+                        <p>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</p>
+                    </a>
+                </div>
+                <article>{SOCIALSTREAM_POST_EXTERNAL_BODY}</article>
                 <!-- END socialstream_post_has_thumbnail -->
 
                 <!-- BEGIN socialstream_post_has_image -->
@@ -32,8 +41,6 @@
                 <!-- END socialstream_post_has_image -->
 
                 <!-- BEGIN socialstream_post_has_metadata -->
-                <a href="{SOCIALSTREAM_POST_URL}" target="_blank">{SOCIALSTREAM_POST_EXTERNAL_TITLE}</a><br />
-                <span>{SOCIALSTREAM_POST_EXTERNAL_BODY}</span>
                 <!-- END socialstream_post_has_metadata -->
 
                 <!-- BEGIN socialstream_post_has_player -->
@@ -97,9 +104,13 @@
                     <div class="socialstream-attachment">
 
                         <!-- BEGIN socialstream_comment_has_icon -->
-                        <a href="{SOCIALSTREAM_COMMENT_URL}" target="_blank">
-                            <img src="/images/mime/22x22/{SOCIALSTREAM_COMMENT_ICON}" />
-                        </a>
+                        <div class="avatar card">
+                            <a href="{SOCIALSTREAM_COMMENT_URL}" target="_blank">
+                                <img src="/images/mime/60x60/{SOCIALSTREAM_COMMENT_ICON}" />
+                                <p>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</p>
+                            </a>
+                        </div>
+                        <article>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</article>
                         <!-- END socialstream_comment_has_icon -->
 
                         <!-- BEGIN socialstream_comment_has_image -->
@@ -109,9 +120,13 @@
                         <!-- END socialstream_comment_has_image -->
 
                         <!-- BEGIN socialstream_comment_has_thumbnail -->
-                        <a href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
-                            <img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64" />
-                        </a>
+                        <div class="avatar card">
+                            <a href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                                <img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64" />
+                                <p>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</p>
+                            </a>
+                        </div>
+                        <article>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</article>
                         <!-- END socialstream_comment_has_thumbnail -->
 
                         <!-- BEGIN socialstream_comment_has_player -->
@@ -141,8 +156,6 @@
                         <!-- END socialstream_comment_has_video_pending -->
 
                         <!-- BEGIN socialstream_comment_has_metadata -->
-                        <a href="{SOCIALSTREAM_COMMENT_URL}" target="_blank">{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</a><br />
-                        <span>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</span>
                         <!-- END socialstream_comment_has_metadata -->
                     </div>
                     <!-- END socialstream_comment_has_attachment -->
@@ -180,9 +193,13 @@
                             <!-- BEGIN socialstream_reply_has_attachment -->
                             <div data-socialstream-attachment>
                                 <!-- BEGIN socialstream_reply_has_icon -->
-                                <a href="{SOCIALSTREAM_REPLY_URL}" target="_blank">
-                                    <img src="/images/mime/22x22/{SOCIALSTREAM_REPLY_ICON}" />
-                                </a>
+                                <div class="avatar card">
+                                    <a href="{SOCIALSTREAM_REPLY_URL}" target="_blank">
+                                        <img src="/images/mime/60x60/{SOCIALSTREAM_REPLY_ICON}" />
+                                        <p>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</p>
+                                    </a>
+                                </div>
+                                <article>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</article>
                                 <!-- END socialstream_reply_has_icon -->
 
                                 <!-- BEGIN socialstream_reply_has_image -->
@@ -192,9 +209,13 @@
                                 <!-- END socialstream_reply_has_image -->
 
                                 <!-- BEGIN socialstream_reply_has_thumbnail -->
-                                <a href="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
-                                    <img src="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square64" />
-                                </a>
+                                <div class="avatar card">
+                                    <a href="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                                        <img src="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square64" />
+                                        <p>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</p>
+                                    </a>
+                                </div>
+                                <article>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</article>
                                 <!-- END socialstream_reply_has_thumbnail -->
 
                                 <!-- BEGIN socialstream_reply_has_player -->
@@ -218,8 +239,6 @@
                                 <!-- END socialstream_reply_has_video_pending -->
 
                                 <!-- BEGIN socialstream_reply_has_metadata -->
-                                <a href="{SOCIALSTREAM_REPLY_URL}" target="_blank">{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</a><br />
-                                {SOCIALSTREAM_REPLY_EXTERNAL_BODY}
                                 <!-- END socialstream_reply_has_metadata -->
                             </div>
                             <!-- END socialstream_reply_has_attachment -->

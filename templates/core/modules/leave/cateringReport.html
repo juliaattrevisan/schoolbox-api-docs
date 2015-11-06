@@ -32,6 +32,10 @@
     });
 </script>
 <!-- END custom_head -->
+<ul class="breadcrumb">
+    <li><a href="/modules/leave/">Boarder Leave</a></li>
+    <li class="active"><a href="#">Catering Report</a></li>
+</ul>
 
 <div class="actions-small-2 row">
     <div class="list-item">
@@ -58,7 +62,7 @@
 <!-- END no_houses -->
 
 <!-- BEGIN house_list -->
-<div class="row">
+<div class="row hide-for-print">
     <div class="small-12 island">
         <form data-form_type="search">
             <input type="hidden" name="reportHouse" value="1" />
@@ -80,10 +84,6 @@
 
 <div class="row">
     <div class="small-12 island">
-        <section class="content">
-            <p>The following shows the number of people in each House who require food.</p>
-        </section>
-
         <div class="scrollable">
             <table>
                 <thead>

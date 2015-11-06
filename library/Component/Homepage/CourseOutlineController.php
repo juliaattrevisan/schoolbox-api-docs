@@ -163,9 +163,10 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         $this->setBlock('unit', 'unit_actions', 'unit_actions_block');
         $this->setBlock('unit_actions', 'unit_modify', 'unit_modify_block');
         $this->setBlock('unit_actions', 'unit_delete', 'unit_delete_block');
+        $this->setBlock('unit_actions', 'unit_report_actions', 'unit_report_actions_block');
+        $this->setBlock('unit_actions', 'unit_add_task_actions', 'unit_add_task_actions_block');
         $this->setBlock('unit', 'unit_task', 'unit_task_block');
-        $this->setBlock('unit', 'unit_report_actions', 'unit_report_actions_block');
-        $this->setBlock('unit', 'unit_add_task_actions', 'unit_add_task_actions_block');
+        $this->setBlock('unit_task', 'unit_task_allow_move', 'unit_task_allow_move_block');
         $this->setBlock('unit_task', 'unit_task_duework_results', 'unit_task_duework_results_block');
         $this->setBlock('unit_task', 'unit_task_link', 'unit_task_link_block');
         $this->setBlock('unit_task', 'unit_task_no_link', 'unit_task_no_link_block');
@@ -175,6 +176,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         $this->setBlock('unit_task', 'unit_task_start', 'unit_task_start_block');
         $this->setBlock('unit_task', 'unit_task_modify_form', 'unit_task_modify_form_block');
         $this->setBlock('unit_task', 'unit_task_delete_form', 'unit_task_delete_form_block');
+        $this->setBlock('unit_task', 'unit_task_actions_more', 'unit_task_actions_more_block');
         $this->setBlock('unit_task', 'unit_task_actions', 'unit_task_actions_block');
         $this->setBlock('unit_task_actions', 'unit_task_modify', 'unit_task_modify_block');
         $this->setBlock('unit_task_actions', 'unit_task_delete', 'unit_task_delete_block');
@@ -285,6 +287,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 'UNIT_EXPANDED_STATE_ICON'    => ($is_expanded  ? 'icon-collapse' : 'icon-add'),
                 'UNIT_LIST_CLASS'             => ($is_expanded ? '' : 'hide'),
                 'unit_task_block'             => '',
+                'unit_task_allow_move_block'  => '',
                 'unit_completion_block'       => '',
                 'unit_expand_block'           => '',
                 'unit_no_expand_block'        => '',
@@ -293,12 +296,15 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 'unit_modify_block'           => '',
                 'unit_report_actions_block'   => '',
                 'unit_add_task_actions_block' => '',
+
+
             )
         );
 
         if (!$this->readOnly) {
             $this->parse('unit_delete_block', 'unit_delete');
             $this->parse('unit_modify_block', 'unit_modify');
+            $this->parse('unit_task_allow_move_block', 'unit_task_allow_move');
             $this->parse('unit_report_actions_block', 'unit_report_actions');
             if (!$unit->isAfterDueDate()) {
                 $this->parse('unit_add_task_actions_block', 'unit_add_task_actions');
@@ -454,6 +460,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 'unit_task_quiz_results_block'    => '',
                 'unit_task_quiz_attempts_block'   => '',
                 'unit_task_duework_results_block' => '',
+                'unit_task_actions_more_block'    => '',
             )
         );
 
@@ -519,6 +526,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 $this->setVar('UNIT_QUIZ_ID', Scrub::text($task->getAssessment()->getId()));
                 $this->parse('unit_task_quiz_results_block', 'unit_task_quiz_results');
             }
+            $this->parse('unit_task_actions_more_block', 'unit_task_actions_more');
             $this->parse('unit_task_count_block', 'unit_task_count');
             $this->parse('unit_task_delete_block', 'unit_task_delete');
             $this->parse('unit_task_delete_form_block', 'unit_task_delete_form');

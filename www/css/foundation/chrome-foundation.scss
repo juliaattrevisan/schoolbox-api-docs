@@ -25,9 +25,7 @@
 
 @import "components/ui/forms/forms";
 //@import "components/joyride";
-@import "components/ui/navigation/navigation";
 @import "components/tree";
-@import "components/ui/navigation/notification";
 @import "components/masonry";
 @import "components/ui/preview";
 
@@ -42,6 +40,8 @@
 @import "components/ui/button/header-actions";     // requires _list-actions.scss
 @import "components/ui/button/dropdown";
 @import "components/ui/button/tabs";
+@import "components/ui/navigation/navigation";
+@import "components/ui/navigation/notification";   // requires _button.scss
 @import "components/ui/navigation/breadcrumb";
 @import "components/ui/navigation/pagination";
 @import "components/ui/navigation/sub-nav";
