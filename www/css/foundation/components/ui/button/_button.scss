@@ -89,6 +89,14 @@ button {
     outline: 0;
 }
 
+/* Special button in audio/video player
+ */
+.mejs-controls {
+    button {
+        min-height: initial;
+    }
+}
+
 /* Form submits have a unique styling
  */
 input[type="submit"]{
