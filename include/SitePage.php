@@ -5,6 +5,33 @@ use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 
 class SitePage extends Page
 {
+    /**
+     * The site that this SitePage uses to get templates from
+     *
+     * @var string
+     */
+    public $site;
+
+    /**
+     * Is this a responsive skin? Calculated in $this->setSite().
+     *
+     * @var bool
+     */
+    private $responsive;
+
+    /**
+     * The following template paths render the skin's chrome
+     *
+     * The core version is always used if this school uses the skin builder.
+     *
+     * @var array|string[]
+     */
+    private $chromePaths = [
+        'common/*.html',
+        'feedback/*.html',
+        'include/*.html',
+        'policy/*.html',
+    ];
 
     private $ajax;
 
@@ -176,14 +203,13 @@ class SitePage extends Page
 
     function setSite()
     {
-        // If config.skin_builder is on - set $site to core, thus bypassing all custom templates.
         if (Config::get('skin_builder')) {
-            $this->site       = 'demo';
+            // If config.skin_builder is on - set $site to core
             $this->responsive = true;
-            return true;
+        } else {
+            // detect responsiveness: if there's no override for body.html, that school has gone responsive
+            $this->responsive = !file_exists(SITE_root . '/templates/' . Cfg::get('site_location') . '/include/body.html');
         }
-        // detect responsiveness: if there's no override for body.html, that school has gone responsive
-        $this->responsive = !file_exists(SITE_root . '/templates/' . Cfg::get('site_location') . '/include/body.html');
 
         if (Cfg::get('site_detect') == 'domain') {
             //Get site templates via domain name
@@ -312,6 +338,7 @@ class SitePage extends Page
             'SITE_LOGINNAME'         => $userHandler->formatName($_SESSION),
             'SITE_USERNAME'          => $_SESSION['username'],
             'SITE_LOCATION'          => $this->site,
+            'SITE_CHROME_LOCATION'   => (Config::get('skin_builder') ? 'demo' : $this->site),
             'USER_ID'                => $_SESSION['id'],
             'EXTERNAL_ID'            => $_SESSION['sid'],
             'SITE_VERSION'           => Cfg::get('site_version'),
@@ -1002,6 +1029,17 @@ class SitePage extends Page
 
     function getTemplate($template)
     {
+        // Chrome/skin templates are always core if skin builder is on,
+        // even if there's a version for this site_location.
+        if (Config::get('skin_builder')) {
+            foreach ($this->chromePaths as $chromePath) {
+                if (fnmatch($chromePath, $template)) {
+                    return 'core/' . $template;
+                }
+            }
+        }
+
+        // common, feedback, include, policy
         if (is_file($this->templateRoot . '/' . $this->site . '/' . $template)) {
             return $this->site . '/' . $template;
         } else {
