@@ -6,6 +6,12 @@
 -->
 
 <style type="text/css">
+    @media print {
+        #footer {
+            display:none;
+        }
+    }
+
     .boarder-leave-print a {
         text-decoration: none;
         color: #000;
@@ -47,7 +53,9 @@
     .boarder-leave-print th {
         font-size: 0.625rem;
         padding: 0;
+        border-top: 1px solid #ededed;
         border-right: 1px solid #ededed;
+        border-bottom: 1px solid #ededed;
 
         text-align: center;
     }
@@ -55,13 +63,14 @@
     .boarder-leave-print td {
         font-size: 0.625rem;
         padding: 0;
-
         border-top: 1px solid #ededed;
         border-right: 1px solid #ededed;
         border-bottom: 1px solid #ededed;
     }
 
-    .boarder-leave-print td:first-child {
+    .boarder-leave-print th:first-child,
+    .boarder-leave-print td:first-child
+    {
         border-left: 1px solid #ededed;
     }
 
