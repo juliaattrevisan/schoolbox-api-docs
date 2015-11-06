@@ -19,12 +19,6 @@ use Schoolbox\File\MimetypeMapper;
  */
 class MyFileMapper extends Resource\My\File\Mapper implements Resource\FileLocatorInterface, StorageMapperInterface {
 
-	protected function mapping () {
-        parent::mapping();
-		$this->registerCallback('postSave', array($this, 'postSave'));
-	}
-
-
 	/**
 	 * Save the file to the correct location
 	 * Setup video processing
