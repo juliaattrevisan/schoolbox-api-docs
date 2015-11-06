@@ -96,39 +96,6 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
 
 
     /**
-     * TODO remove this when old save locations no longer in use
-     *
-     * @deprecated delete this as soon as possible. It only needs to exist so long as there are references to "{$conf->get('*_dir')}/$id.dat" exist
-     * @param AbstractFile $file
-     * @return bool
-     */
-    protected function postSave(AbstractFile $file)
-    {
-        // thankfully this lines up
-        $confVar = strtolower($this->getTable()) . '_dir';
-
-        // back-reference to old system
-        $deprecatedDir = $this->getConfigLoader()->get($confVar);
-
-        // don't look, it's disgusting from here on!!
-        $mgr = $this->getStorageMapper()->getManager();
-
-        /** @var Filesystem $fs */
-        $fs = $mgr->getFilesystem(Resource\Storage\Manager::FS_STORAGE);
-        /** @var Local $ad */
-        $ad = $fs->getAdapter();
-
-        $storagePath = $ad->applyPathPrefix($mgr->calcPath($file->getStorage()));
-
-        if(!is_link("$deprecatedDir/{$file->getId()}.dat")) {
-            symlink($storagePath, "$deprecatedDir/{$file->getId()}.dat");
-        }
-
-        return true;
-    }
-
-
-    /**
      * @return string
      */
     protected function getSelectString()
