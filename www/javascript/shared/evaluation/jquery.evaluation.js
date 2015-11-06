@@ -94,6 +94,7 @@
 						 */
 						if (configuration.errorContainer != undefined) {
 							$(element).validate({
+								onfocusout: false,
 								errorPlacement: function(error, inputElement) {
 									$(element).find(configuration.errorContainer).html(error);
 								},
@@ -102,6 +103,7 @@
 						}
 						else {
 							$(element).validate({
+								onfocusout: false,
 								ignore: ':hidden:not(:checkbox):not(:radio)'
 							});
 						}
