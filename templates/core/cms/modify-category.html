@@ -43,9 +43,28 @@
 
 {BREADCRUMB}
 
-<div class="row">
-	<div class="small-12 island">
+<div class="row actions-small-1">
+	<div class="list-item small-12 columns">
 		<h1>{ACTION} Folder</h1>
+    </div>
+    <nav>
+        <a href="#" class="icon-more" data-dropdown="folder-options"></a>
+    </nav>
+    <ul class="f-dropdown" data-dropdown-content id="folder-options">
+        <!-- BEGIN indiv_modify -->
+        <li>
+            <a class="icon-group" href="/group/modify/{CATEGORY_ID}" title="Manage individual user access to this folder">Modify Group</a>
+        </li>
+        <!-- END indiv_modify -->
+        <!-- BEGIN reset_content -->
+        <li>
+            <a class="icon-refresh" href="/cms/category/reset/{CATEGORY_ID}" data-reset-homepage-content>Reset Content</a>
+        </li>
+        <!-- END reset_content -->
+    </ul>
+</div>
+<div class="row">
+    <div class="list-item small-12 island">
 		<form action="/cms/categoryForm.php" method="post" id="folderForm" class="top">
             <input type="hidden" id="parent" name="parent" value="{PARENT_ID}" />
             <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
@@ -121,27 +140,8 @@
                     </div>
 					<!-- END indiv_perms -->
 				</div>
-                
-                <!-- BEGIN indiv_modify -->
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>
-                            Group Management<br />
-                            <a class="button icon-group" href="/group/modify/{CATEGORY_ID}" title="Manage individual user access to this folder">Modify Group</a>
-                        </label>
-                    </div>
-                </fieldset>
-                <!-- END indiv_modify -->
-
-				<fieldset class="content">
-					<div class="small-12 columns">
-						<!-- BEGIN reset_content -->
-						<label>
-                            Reset Homepage Content
-							<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Removes all content from modules, clears the folder contents, and resets the homepage to its template">?</span><br />
-							<a class="button alert icon-delete" href="/cms/category/reset/{CATEGORY_ID}" data-reset-homepage-content>Reset Content</a>
-						</label>
-						<!-- END reset_content -->
 						<!-- BEGIN synergy_input -->
 						<label>
                             {DATABASE_TYPE} Subject Codes
@@ -150,6 +150,7 @@
 						</label>
 						<!-- END synergy_input -->
 					</div>
+                
                     <!-- BEGIN curriculum_code_input -->
                     <div class="small-12 large-10 columns">
                         <label>
