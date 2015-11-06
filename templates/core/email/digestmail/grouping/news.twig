@@ -7,7 +7,12 @@
 
 {% block pretty %}
     {% set msg = row.messages | first %}
-    {{ msg.title | raw }}
+    {% if msg.meta.title %}
+        {# use the meta title if possible, it looks nicer #}
+        <a href="{{ msg.href }}" class="title">{{ msg.meta.title }}</a>
+    {% else %}
+        {{ msg.title | raw }}
+    {% endif %}
 {% endblock %}
 
 {% block meta %}
