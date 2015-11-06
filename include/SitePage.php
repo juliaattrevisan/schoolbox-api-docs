@@ -1,6 +1,6 @@
 <?php
 
-use Schoolbox\Realtime\Message\RerouteOverride;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 
 class SitePage extends Page
@@ -370,6 +370,8 @@ class SitePage extends Page
 
     function buildPage($customHead = true)
     {
+        // quasi-localisation
+        $this->localise();
 
         $this->groupHandler = new Group;
 
@@ -1449,5 +1451,44 @@ class SitePage extends Page
             // Don't touch if there is no max execution time
             set_time_limit($currentLimit + $seconds);
         }
+    }
+
+
+    /**
+     * Jam localisation vars into the template. Uncomment / modify the list as required
+     */
+    public function localise()
+    {
+        /** @var RosettaStone $l10n */
+        $l10n = $this->getDi()->get('l10n');
+
+        foreach ($l10n->getAllTerms() as $term) {
+
+            $upperTerm = strtoupper($term);
+
+            $this->setVar([
+                "TPL_LOCAL_$upperTerm"             => $l10n->translate($term, false, false),
+                "TPL_LOCAL_{$upperTerm}_PC"        => $l10n->translate($term, false, true),
+                "TPL_LOCAL_{$upperTerm}_PLURAL"    => $l10n->translate($term, true, false),
+                "TPL_LOCAL_{$upperTerm}_PLURAL_PC" => $l10n->translate($term, true, true)
+            ]);
+        }
+    }
+
+    /**
+     * Returns the localised version of this term. Convenience method.
+     *
+     * @param string $term
+     * @param bool   $plural
+     * @param bool   $capital Ca
+     *
+     * @return string
+     */
+    public function getLocalisedTerm($term, $plural = false, $capital = false)
+    {
+        /** @var RosettaStone $l10n */
+        $l10n = $this->getDi()->get('l10n');
+
+        return $l10n->translate($term, $plural, $capital);
     }
 }

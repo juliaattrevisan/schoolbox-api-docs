@@ -43,9 +43,9 @@ class ThemedHtml extends Html {
             }
         } else {
             $page->setFile(TEMPLATE_content, 'output.html');
+            $page->buildPage();
             $page->setVar('OUTPUT', $this->getTemplateEngine()->render($template, $data));
             $page->setTitle($response['title']);
-            $page->buildPage();
             $page->outputPage(true);
         }
     }

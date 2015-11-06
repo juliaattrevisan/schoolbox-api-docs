@@ -45,10 +45,11 @@ class TreeBuilder extends AbstractTreeBuilder
      * @param UserAccessMapper $userAccessMapper
      * @param RoleAccessMapper $roleAccessMapper
      * @param User             $user
+     * @param string           $rootLabel
      */
-    public function __construct(Folder\ILocator $locator, TaskMapper $taskMapper, $userAccessMapper, $roleAccessMapper, $user)
+    public function __construct(Folder\ILocator $locator, TaskMapper $taskMapper, $userAccessMapper, $roleAccessMapper, $user, $rootLabel = 'Resources')
     {
-        parent::__construct($locator, 'sbfsfile', 'Resources');
+        parent::__construct($locator, 'sbfsfile', $rootLabel);
 
         $this->taskMapper       = $taskMapper;
         $this->userAccessMapper = $userAccessMapper;

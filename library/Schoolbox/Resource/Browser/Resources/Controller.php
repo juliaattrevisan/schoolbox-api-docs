@@ -134,6 +134,10 @@ class Controller extends AbstractController
     protected function getFolder($folderId)
     {
         $folder = $this->folderMapper->findById($folderId);
+        // eaten by l10ns
+        if ($folderId == 0) {
+            $folder->setName($this->getDi()->get('l10n')->translate('resource', true, true));
+        }
         $folder->loadTeachers();
 
         return $folder;

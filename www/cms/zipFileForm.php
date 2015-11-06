@@ -1,10 +1,12 @@
 <?php
-require_once __DIR__ . '/../../include/Bootstrap.php';
+/** @var Alaress\Application\Kernel $kernel */
+$kernel = require_once __DIR__ . '/../../include/Bootstrap.php';
 
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage;
 
 $page = new SitePage();
+$page->setDi($kernel->getDependencyInjector());
 $groupHandler = new Group();
 
 $isSuperuser = $groupHandler->isSuperuser();

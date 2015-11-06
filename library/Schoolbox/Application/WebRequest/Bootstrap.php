@@ -24,6 +24,8 @@ use Autoloader;
 use Config;
 use Database;
 use DeprecatedDatabase;
+use PDO;
+use Schoolbox\L10n\RosettaStone;
 use Scrub;
 use Twig_Extension_Debug;
 use Twig_Extensions_Extension_Text;
@@ -211,6 +213,28 @@ class Bootstrap implements BootstrapInterface {
             )
         );
 
+		$di->set(
+			'l10n',
+			$di->lazy(
+				function () {
+					$db = Database::getInstance();
+					$st = $db->query("SELECT term, singular_form, plural_form, capitalise_first FROM localisation");
+
+					$l10n = [];
+
+					while ($r = $st->fetch(PDO::FETCH_ASSOC)) {
+						$l10n[$r['term']] = [
+							'singular'   => $r['singular_form'],
+							'plural'     => $r['plural_form'],
+							'capitalise' => (bool)$r['capitalise_first']
+						];
+					}
+
+					return new RosettaStone($l10n);
+				}
+			)
+		);
+
 		// Preload of route parameters
 		$di->set('preloader', $di->lazyNew('Alaress\\Web\\Router\\PathMatcher'));
 
@@ -241,9 +265,17 @@ class Bootstrap implements BootstrapInterface {
 		);
 
 		// inject web params (yep, even Sitepage!)
-		$di->setters['SitePage']['setDi'] = $di;
-		$di->set('layoutEngine', $di->lazyNew('SitePage', array('login' => false)));
-		$di->set('sitePage',     $di->lazyNew('SitePage'));
+//		$di->setters['SitePage']['setDi'] = $di;
+		$di->set('layoutEngine', $di->lazy(function() use ($di) {
+			$sitepage = new \SitePage(false);
+			$sitepage->setDi($di)->localise();
+			return $sitepage;
+		}));;
+		$di->set('sitePage',     $di->lazy(function() use ($di) {
+			$sitepage = new \SitePage();
+			$sitepage->setDi($di)->localise();
+			return $sitepage;
+		}));
 
 		// Web output class - currently uses Sitepage
 		$di->setters['Alaress\\Web\\Output\\Html']['setTemplateEngine'] = $di->lazyGet('templateEngine');
@@ -357,11 +389,14 @@ class Bootstrap implements BootstrapInterface {
 						)
 					);
 
-					// Global access to config object and a date locale object
+					// Global access to config object and localisation
 					$twig->addGlobal('config', $config);
-					$twig->addGlobal('locale', array(
-						'date' => new Alaress_Date_Locale_Config()
-					));
+
+					$l10n = $di->get('l10n');
+
+//					$l10n['date'] = new Alaress_Date_Locale_Config();
+
+					$twig->addGlobal('locale', $l10n);
 
 					// Add the route lookup and authorization methods
 					$twig->addFunction(

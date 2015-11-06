@@ -34,6 +34,14 @@ class Renderer extends Handler
     protected $tabName = 'School News';
 
     /**
+     * Set the tab name to a localised format.
+     */
+    public function setup()
+    {
+        $this->setTabName('School '.$this->getPage()->getLocalisedTerm('news', false, true));
+    }
+
+    /**
      * Render
      */
     public function render()

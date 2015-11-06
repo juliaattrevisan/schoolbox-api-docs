@@ -8,7 +8,9 @@ define('MIN_KEYWORD_LENGTH', 2);
 define('AJAX_ENABLED', 1);
 define('AJAX_DISABLED', 0);
 
-$page = new SitePage();
+// Always use the sitepage from DI
+/** @var SitePage $page */
+$page = $this;
 
 $handle = array(
     'all' => array(

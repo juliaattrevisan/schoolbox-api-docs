@@ -79,6 +79,18 @@ abstract class Handler
         $this->setResult($result);
         $this->setCount($count);
         $this->setCurrentPage($currentPage);
+        $this->setup();
+    }
+
+    /**
+     * Setup function called after construction.
+     *
+     * By default does nothing, but can be used to override the tab name, and
+     * anything else which may require localisation.
+     */
+    protected function setup()
+    {
+        // noop
     }
 
     /**

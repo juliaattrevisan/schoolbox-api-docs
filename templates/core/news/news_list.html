@@ -1,23 +1,23 @@
 <!-- BEGIN custom_head -->
-<link rel="alternate" type="application/rss+xml" title="School News" href="{SCHOOL_NEWS_RSS_FEED_URL}" />
+<link rel="alternate" type="application/rss+xml" title="{TPL_LOCAL_NEWS_PC}" href="{SCHOOL_NEWS_RSS_FEED_URL}" />
 <!-- END custom_head -->
 
 <ul class="breadcrumb">
-    <li><a href="/news">News</a></li>
+    <li><a href="/news">{TPL_LOCAL_NEWS_PLURAL_PC}</a></li>
     <li class="active"><a href="/news/{TOPIC_CLEAN}">{TOPIC_TITLE}</a></li>
 </ul>
 <div class="row actions-small-3">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>News</h1>
+            <h1>{TPL_LOCAL_NEWS_PLURAL_PC}</h1>
         </div>
     </div>
     <nav>
         <!-- BEGIN add_news -->
-        <a class="icon-add" href="/news/modify" title="Add News"></a>
+        <a class="icon-add" href="/news/modify" title="Add {TPL_LOCAL_NEWS_PC}"></a>
         <!-- END add_news -->
         <!-- BEGIN allnews_button -->
-        <a class="icon-view" href="/news-archive/{TOPIC_CLEAN}" title="View Archived News"></a>
+        <a class="icon-view" href="/news-archive/{TOPIC_CLEAN}" title="View Archived {TPL_LOCAL_NEWS_PC}"></a>
         <!-- END allnews_button -->
         <a class="icon-rss" href="{SCHOOL_NEWS_RSS_FEED_URL}" title="RSS"></a>
     </nav>
@@ -61,7 +61,7 @@
 
             <!-- BEGIN no_news -->
             <div class="content">
-                <p>No current news in this topic.</p>
+                <p>No current {TPL_LOCAL_NEWS} in this topic.</p>
             </div>
             <!-- END no_news -->
         </section>

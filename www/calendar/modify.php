@@ -1,9 +1,17 @@
 <?php
 
-/* Direct access to modify.php -_-
- */
-require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
-$page = new SitePage();
+if (isset($this)) {
+    $page = $this;
+} else {
+    /* Direct access to modify.php -_-
+     */
+
+    /** @var Alaress\Application\Kernel $kernel */
+    $kernel = require_once(__DIR__ . '/../../include/Bootstrap.php');
+
+    /** @var SitePage $page */
+    $page = $kernel->getDependencyInjector()->get('sitePage');
+}
 
 $page->setFile(TEMPLATE_content, 'calendar/modify.html');
 $page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');

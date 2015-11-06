@@ -12,14 +12,16 @@
 use Schoolbox\File\MimetypeMapper;
 
 if (isset($this)) {
-    $page   = $this;
-    $render = false;
+    $page = $this;
 } else {
     /* Direct access to modify.php -_-
      */
-    require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
-    $page   = new SitePage();
-    $render = true;
+
+    /** @var Alaress\Application\Kernel $kernel */
+    $kernel = require_once(__DIR__ . '/../../../../include/Bootstrap.php');
+
+    /** @var SitePage $page */
+    $page = $kernel->getDependencyInjector()->get('sitePage');
 }
 
 $page->setFile(TEMPLATE_content, 'modules/eotc/manage/modify.html');

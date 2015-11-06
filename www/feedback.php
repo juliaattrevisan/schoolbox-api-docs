@@ -1,9 +1,16 @@
 <?php
-require_once dirname(__FILE__) . '/../include/Bootstrap.php';
+/** @var Alaress\Application\Kernel $kernel */
+$kernel = require_once dirname(__FILE__) . '/../include/Bootstrap.php';
 
 session_start();
 
-$page = new SitePage(false);
+if (isset($this)) {
+    $page = $this;
+} else {
+    /** @var SitePage $page */
+    $page = new SitePage(false);
+    $page->setDi($kernel->getDependencyInjector());
+}
 
 if (is_numeric($_SESSION['id'])) {
     $userHandler = new User;

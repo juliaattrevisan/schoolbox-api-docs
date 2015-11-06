@@ -33,6 +33,14 @@ class Renderer extends Handler
     protected $tabName = 'Calendar';
 
     /**
+     * Set the tab name to a localised format.
+     */
+    public function setup()
+    {
+        $this->setTabName($this->getPage()->getLocalisedTerm('calendar', false, true));
+    }
+
+    /**
      * Render
      */
     public function render()
