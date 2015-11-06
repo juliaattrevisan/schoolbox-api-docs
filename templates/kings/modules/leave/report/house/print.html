@@ -47,19 +47,15 @@
     .boarder-leave-print th {
         font-size: 0.625rem;
         padding: 0;
-
-        border-left: 1px solid #ededed;
         border-right: 1px solid #ededed;
-        text-align: center;
 
+        text-align: center;
     }
 
     .boarder-leave-print td {
         font-size: 0.625rem;
         padding: 0;
-
-        border: 1px solid #ededed;
-        border: 1px solid #000;
+        border-right: 1px solid #ededed;
     }
 
     .boarder-leave-print .short {
@@ -76,6 +72,11 @@
 
     .boarder-leave-print .signature .initial {
         width: 48px;
+    }
+
+    .boarder-leave-print .hidden-column {
+        width: 1px;
+        border: 0;
     }
 
     .boarder-leave-print .text-center {
@@ -128,7 +129,7 @@
                     <!-- END report_header_subtitle_show_am -->
 
                     <!-- BEGIN report_header_subtitle_hide_am -->
-                    <th class="hide"></th>
+                    <th class="hidden-column"></th>
                     <!-- END report_header_subtitle_hide_am -->
 
                     <!-- BEGIN report_header_subtitle_show_day -->
@@ -136,7 +137,7 @@
                     <!-- END report_header_subtitle_show_day -->
 
                     <!-- BEGIN report_header_subtitle_hide_day -->
-                    <th class="hide"></th>
+                    <th class="hidden-column"></th>
                     <!-- END report_header_subtitle_hide_day -->
 
                     <!-- BEGIN report_header_subtitle_show_pm -->
@@ -158,13 +159,13 @@
                     <td>{REQUEST_PERIOD_MORNING}</td>
                     <!-- END request_period_show_am -->
                     <!-- BEGIN request_period_hide_am -->
-                    <td class="hide"></td>
+                    <td class='hidden-column'></td>
                     <!-- END request_period_hide_am -->
                     <!-- BEGIN request_period_show_day -->
                     <td>{REQUEST_PERIOD_DAY}</td>
                     <!-- END request_period_show_day -->
                     <!-- BEGIN request_period_hide_day -->
-                    <td class="hide"></td>
+                    <td class="hidden-column"></td>
                     <!-- END request_period_hide_day -->
                     <!-- BEGIN request_period_show_pm -->
                     <td>{REQUEST_PERIOD_NIGHT}</td>
@@ -191,6 +192,7 @@
                 <!-- END row -->
                 <tr>
                     <td colspan="3">Totals</td>
+                    <td class="hidden-column"></td>
                     <!-- BEGIN request_period_total -->
                     <td class="text-center">{PERIOD_TOTAL}</td>
                     <!-- END request_period_total -->
