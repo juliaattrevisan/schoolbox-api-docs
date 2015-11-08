@@ -25,6 +25,15 @@ class Module {
     protected $injector;
 
     /**
+     * The base name for this module.
+     *
+     * This module will be injected into the dependency injector at "module:$basename".
+     *
+     * @var string
+     */
+    protected $basename;
+
+    /**
      * Constructor
      *
      * TODO don't set $injector here, pass as a param to init() instead.
