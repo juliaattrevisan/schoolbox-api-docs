@@ -98,6 +98,49 @@ class Module {
     public function initRoutes(Router $router, $basePath) {}
 
     /**
+     * Helper for calling $router->addGet() for this component's basename.
+     *
+     * @param Router $router   The router to add the route to
+     * @param string $alias    The alias for this route.
+     *                         Its actual alias will be "$this->basename.$alias"
+     * @param string $basePath The base path for this route
+     * @param string $path     The path for this route.
+     *                         Its actual path will be "$basePath/$path".
+     */
+    protected function addGetRoute(Router $router, $alias, $basePath, $path)
+    {
+        $router->addGet($this->basename.'.'.$alias, $basePath.'/'.$path);
+    }
+
+    /**
+     * Helper for calling $router->addGet() for this component's basename.
+     *
+     * @param Router $router   The router to add the route to
+     * @param string $alias    The alias for this route.
+     *                         Its actual alias will be "$this->basename.$alias"
+     * @param string $basePath The base path for this route
+     * @param string $path     The path for this route.
+     *                         Its actual path will be "$basePath/$path".
+     */
+    protected function addPostRoute(Router $router, $alias, $basePath, $path)
+    {
+        $router->addPost($this->basename.'.'.$alias, $basePath.'/'.$path);
+
+    }
+
+    /**
+     * Helper for attaching a set of REST routes for this module.
+     *
+     * @param Router $router   The router to add the route to
+     * @param string $basePath The base path for this route
+     */
+    protected function attachResourceRoutes(Router $router, $basePath)
+    {
+        $router->attachResource($this->basename, $basePath);
+        $router->attachResourcePostAlias($this->basename, $basePath);
+    }
+
+    /**
      * Initializes any preloads on routes for this module.
      *
      * Preloads adjust route params before they are passed to the controller.
