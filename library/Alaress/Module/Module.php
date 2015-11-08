@@ -175,11 +175,11 @@ class Module {
     /**
      * Helper method for adding a route preload for this component's basename.
      *
-     * @param string      $regexPart  The part of the route to match (after $this->basename)
      * @param PathMatcher $matcher
+     * @param string      $regexPart  The part of the route to match (after $this->basename)
      * @param callable    $preload
      */
-    protected function addRoutePreloadForBasename($regexPart, PathMatcher $matcher, callable $preload)
+    protected function addRoutePreloadForBasename(PathMatcher $matcher, $regexPart, callable $preload)
     {
         $matcher->add("/^{$this->basename}\\.{$regexPart}$/", $preload);
     }
@@ -194,11 +194,11 @@ class Module {
     /**
      * Helper method for adding a route permission for this component's basename.
      *
-     * @param string             $regexPart  The part of the route to match (after $this->basename)
      * @param Authorizer         $authorizer
+     * @param string             $regexPart  The part of the route to match (after $this->basename)
      * @param IAuthorizationRule $rule
      */
-    protected function addRoutePermissionForBasename($regexPart, Authorizer $authorizer, IAuthorizationRule $rule)
+    protected function addRoutePermissionForBasename(Authorizer $authorizer, $regexPart, IAuthorizationRule $rule)
     {
         $authorizer->addRule("/^{$this->basename}\\.{$regexPart}$/", $rule);
     }
@@ -216,7 +216,7 @@ class Module {
      * @param string            $dir            The directory to use as the template path
      * @param Twig_Loader_Chain $templateLoader
      */
-    protected function addTemplatePathForBasename($dir, Twig_Loader_Chain $templateLoader)
+    protected function addTemplatePathForBasename(Twig_Loader_Chain $templateLoader, $dir)
     {
         $loader = new Twig_Loader_Filesystem([]);
         $loader->addPath($dir, $this->basename);
