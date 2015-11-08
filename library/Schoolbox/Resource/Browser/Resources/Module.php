@@ -21,15 +21,7 @@ use Schoolbox\Resource\Browser\AbstractModule;
 
 class Module extends AbstractModule
 {
-
-    /**
-     * @param ContainerInterface $injector
-     */
-    public function __construct(ContainerInterface $injector)
-    {
-        parent::__construct($injector);
-        $this->basename = 'resourceBrowser';
-    }
+    protected $basename = 'resourceBrowser';
 
     /**
      * Add a link route as well

@@ -23,10 +23,6 @@ use Twig_Loader_Filesystem;
 
 abstract class AbstractModule extends BaseModule
 {
-    /** @var string */
-    protected $basename = '';
-
-
     /**
      * @param Router $router
      * @param string $basePath

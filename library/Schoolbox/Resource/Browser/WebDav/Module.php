@@ -19,16 +19,7 @@ use Schoolbox\Resource\Browser\NodeFactory;
 
 class Module extends AbstractModule
 {
-
-    /**
-     * @param ContainerInterface $injector
-     */
-    public function __construct(ContainerInterface $injector)
-    {
-        parent::__construct($injector);
-        $this->basename = 'webDavBrowser';
-    }
-
+    protected $basename = 'webDavBrowser';
 
     /**
      * @param Container $ci
