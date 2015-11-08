@@ -11,6 +11,7 @@ namespace Alaress\Module;
 
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Aura\Di\ContainerInterface;
+use Aura\Router\Route;
 use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Router\PathMatcher;
@@ -98,7 +99,7 @@ class Module {
     public function initRoutes(Router $router, $basePath) {}
 
     /**
-     * Helper for calling $router->addGet() for this component's basename.
+     * Helper for calling $router->add() for this component's basename.
      *
      * @param Router $router   The router to add the route to
      * @param string $alias    The alias for this route.
@@ -106,10 +107,12 @@ class Module {
      * @param string $basePath The base path for this route
      * @param string $path     The path for this route.
      *                         Its actual path will be "$basePath/$path".
+     *
+     * @return Route
      */
-    protected function addGetRoute(Router $router, $alias, $basePath, $path)
+    protected function addRoute(Router $router, $alias, $basePath, $path)
     {
-        $router->addGet($this->basename.'.'.$alias, $basePath.'/'.$path);
+        return $router->add($this->basename.'.'.$alias, $basePath.'/'.$path);
     }
 
     /**
@@ -121,11 +124,29 @@ class Module {
      * @param string $basePath The base path for this route
      * @param string $path     The path for this route.
      *                         Its actual path will be "$basePath/$path".
+     *
+     * @return Route
+     */
+    protected function addGetRoute(Router $router, $alias, $basePath, $path)
+    {
+        return $router->addGet($this->basename.'.'.$alias, $basePath.'/'.$path);
+    }
+
+    /**
+     * Helper for calling $router->addGet() for this component's basename.
+     *
+     * @param Router $router   The router to add the route to
+     * @param string $alias    The alias for this route.
+     *                         Its actual alias will be "$this->basename.$alias"
+     * @param string $basePath The base path for this route
+     * @param string $path     The path for this route.
+     *                         Its actual path will be "$basePath/$path".
+     *
+     * @return Route
      */
     protected function addPostRoute(Router $router, $alias, $basePath, $path)
     {
-        $router->addPost($this->basename.'.'.$alias, $basePath.'/'.$path);
-
+        return $router->addPost($this->basename.'.'.$alias, $basePath.'/'.$path);
     }
 
     /**
