@@ -79,7 +79,7 @@ class Document
 
         $postfields = array(
             'token' => $this->getAuthenticator()->getApiToken(),
-            'file' => '@' . $this->getUrl(),
+            'file' => new \CurlFile($this->getUrl(), $this->getSubmission()->getMimetype()->getMime())
         );
 
         $curl->addOptions(
