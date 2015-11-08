@@ -62,6 +62,16 @@ class Module {
     }
 
     /**
+     * Installs this module into the dependency injection system.
+     *
+     * @param ContainerInterface $injector
+     */
+    protected function installModule(ContainerInterface $injector)
+    {
+        $injector->set('module:'.$this->basename, $this);
+    }
+
+    /**
      * Initializes any submodules of this module.
      *
      * @param ContainerInterface $injector
