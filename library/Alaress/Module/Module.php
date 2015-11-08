@@ -175,13 +175,15 @@ class Module {
     /**
      * Helper method for adding a route preload for this component's basename.
      *
-     * @param PathMatcher $matcher
-     * @param string      $regexPart  The part of the route to match (after $this->basename)
-     * @param callable    $preload
+     * @param  PathMatcher $matcher
+     * @param  string      $regexPart  The part of the route to match (after $this->basename)
+     * @param  callable    $preload
+     * @return $this
      */
     protected function addRoutePreloadForBasename(PathMatcher $matcher, $regexPart, callable $preload)
     {
         $matcher->add("/^{$this->basename}\\.{$regexPart}$/", $preload);
+        return $this;
     }
 
     /**
@@ -194,13 +196,15 @@ class Module {
     /**
      * Helper method for adding a route permission for this component's basename.
      *
-     * @param Authorizer         $authorizer
-     * @param string             $regexPart  The part of the route to match (after $this->basename)
-     * @param IAuthorizationRule $rule
+     * @param  Authorizer         $authorizer
+     * @param  string             $regexPart  The part of the route to match (after $this->basename)
+     * @param  IAuthorizationRule $rule
+     * @return $this
      */
     protected function addRoutePermissionForBasename(Authorizer $authorizer, $regexPart, IAuthorizationRule $rule)
     {
         $authorizer->addRule("/^{$this->basename}\\.{$regexPart}$/", $rule);
+        return $this;
     }
 
     /**
@@ -213,14 +217,16 @@ class Module {
     /**
      * Helper method for adding a template path for this component's basename.
      *
-     * @param string            $dir            The directory to use as the template path
-     * @param Twig_Loader_Chain $templateLoader
+     * @param  string            $dir            The directory to use as the template path
+     * @param  Twig_Loader_Chain $templateLoader
+     * @return $this
      */
     protected function addTemplatePathForBasename(Twig_Loader_Chain $templateLoader, $dir)
     {
         $loader = new Twig_Loader_Filesystem([]);
         $loader->addPath($dir, $this->basename);
         $templateLoader->addLoader($loader);
+        return $this;
     }
 
     /**
