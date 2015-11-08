@@ -55,6 +55,7 @@ class Module {
         $injector = $this->getInjector();
         $this->initSubmodules($injector, $basePath);
         $this->initRoutes($injector->get('router'), $basePath);
+        // TODO preloads and permissions should be able to be set up separately
         $this->initRoutePreloads($injector->get('preloader'));
         $this->initRoutePermissions($injector->get('authorizer'));
         $this->initTemplatePaths($injector->get('templateEngine:loader'));
