@@ -14,6 +14,7 @@ use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Router\PathMatcher;
 use Twig_Loader_Chain;
+use Twig_Loader_Filesystem;
 
 class Module {
 
@@ -119,6 +120,19 @@ class Module {
      * @param Twig_Loader_Chain $templateLoader
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {}
+
+    /**
+     * Helper method for adding a template path for this component's basename.
+     *
+     * @param string            $dir            The directory to use as the template path
+     * @param Twig_Loader_Chain $templateLoader
+     */
+    protected function addTemplatePathForBasename($dir, Twig_Loader_Chain $templateLoader)
+    {
+        $loader = new Twig_Loader_Filesystem([]);
+        $loader->addPath($dir, $this->basename);
+        $templateLoader->addLoader($loader);
+    }
 
     /**
      * Initializes controller classes into the dependency injector.
