@@ -9,6 +9,7 @@
 
 namespace Alaress\Module;
 
+use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
@@ -113,6 +114,18 @@ class Module {
      * @param Authorizer $authorizer
      */
     public function initRoutePermissions(Authorizer $authorizer) {}
+
+    /**
+     * Helper method for adding a route permission for this component's basename.
+     *
+     * @param string             $regexPart  The part of the route to match (after $this->basename)
+     * @param Authorizer         $authorizer
+     * @param IAuthorizationRule $rule
+     */
+    protected function addRoutePermissionForBasename($regexPart, Authorizer $authorizer, IAuthorizationRule $rule)
+    {
+        $authorizer->addRule("/^{$this->basename}\\.{$regexPart}$/", $rule);
+    }
 
     /**
      * Initializes template paths for this module.
