@@ -109,6 +109,18 @@ class Module {
     public function initRoutePreloads(PathMatcher $matcher) {}
 
     /**
+     * Helper method for adding a route preload for this component's basename.
+     *
+     * @param string      $regexPart  The part of the route to match (after $this->basename)
+     * @param PathMatcher $matcher
+     * @param callable    $preload
+     */
+    protected function addRoutePreloadForBasename($regexPart, PathMatcher $matcher, callable $preload)
+    {
+        $matcher->add("/^{$this->basename}\\.{$regexPart}$/", $preload);
+    }
+
+    /**
      * Initializes any permissions on routes for this module.
      *
      * @param Authorizer $authorizer
