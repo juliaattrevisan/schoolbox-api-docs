@@ -18,7 +18,7 @@ $form-label-bottom-margin: 0;
 // $input-font-family: inherit;
 $input-font-color: $black;
 $input-font-size: rem-calc(($base-font-size - 3));
-$input-height: 2.5rem;
+$input-height: $global-button-input-height;
 
 $input-bg-color: $white;
 
@@ -100,7 +100,7 @@ $switch-border-width: 0px;
 // $switch-height-sml: rem-calc(28);
 $switch-height-med: rem-calc(32);
 // $switch-height-lrg: rem-calc(44);
-// $switch-bottom-margin: rem-calc(20);
+$switch-bottom-margin: 1rem;
 
 // We use these to control default font sizes for our classes.
 // $switch-font-size-tny: 11px;
@@ -156,6 +156,10 @@ select{
 		outline: none;
 	}
 }
+input:not([type]), #{text-inputs(all, 'input')} {
+	// Ensure input height respects my settings
+	height: $global-button-input-height;
+}
 
 input[type="checkbox"],
 input[type="radio"]{
@@ -165,6 +169,10 @@ input[type="radio"]{
 input,
 textarea{
 	padding-left: 0.75rem;
+}
+select {
+	padding-top: 0;
+	padding-bottom: 0;
 }
 
 // remove margins on forms inside tables
@@ -435,47 +443,90 @@ select.visibility {
 	}
 }
 
+//.context-switch {
+//	position: relative;
+//
+//	nav {
+//		position: absolute;
+//		top: 0;
+//		width: 3rem;
+//
+//		&:first-of-type {
+//			left: 0;
+//			a {
+//				@extend .icon-previous;
+//			}
+//		}
+//
+//		&:last-of-type {
+//			right: 0;
+//			a {
+//				@extend .icon-next;
+//			}
+//		}
+//
+//		a {
+//			@extend .button;
+//			width: 3rem;
+//			height: 2.5rem;
+//			line-height: 1.5rem;
+//		}
+//	}
+//
+//	.semester, .subject, .unit, .student {
+//		margin-right: 3rem;
+//	}
+//
+//	.semester, .student {
+//		margin-left: 3rem;
+//	}
+//
+//	.subject, .unit {
+//		margin-left: 6rem;
+//	}
+//}
+
 .context-switch {
-	position: relative;
+    margin-bottom: 1rem;
 
-	nav {
-		position: absolute;
-		top: 0;
-		width: 3rem;
+    nav {
+        float: left;
 
-		&:first-of-type {
-			left: 0;
-			a {
-				@extend .icon-previous;
-			}
-		}
+        /* Force these particular buttons to be square
+         */
+        a {
+            @extend .button;
+            width: $global-button-height;
+        }
 
-		&:last-of-type {
-			right: 0;
-			a {
-				@extend .icon-next;
-			}
-		}
+        &:first-of-type {
+            a {
+                @extend .icon-previous;
+            }
+        }
 
-		a {
-			@extend .button;
-			width: 3rem;
-			height: 2.5rem;
-			line-height: 1.5rem;
-		}
-	}
+        &:last-of-type {
+            a {
+                @extend .icon-next;
+            }
+        }
+    }
 
-	.semester, .subject, .unit, .student {
-		margin-right: 3rem;
-	}
+    /* Nav button widths = 2 buttons
+     * Previous enforcement of square buttons makes this easy
+     */
+    .semester, .subject {
+        width: calc(100% - #{($global-button-height * 2)});
+        float: left;
 
-	.semester, .student {
-		margin-left: 3rem;
-	}
+        select {
+            margin-bottom: 0.25rem;
+        }
+    }
 
-	.subject, .unit {
-		margin-left: 6rem;
-	}
+    .subject {
+        margin-left: $global-button-height;
+    }
 }
 
 /* In Inline Grading, there is a selectize of avatar cards
@@ -484,49 +535,67 @@ select.visibility {
 .avatar-switch {
     @extend .context-switch;
 
+    /* Somehow this is getting overriden by some other
+     * value in the same rule (.avatar-switch nav a)
+     * Bang it until I figure out why
+     */
     nav {
         a {
-            padding-top: 1.5rem;
+            padding-top: 1.75rem !important;
             height: 4.375rem;
+
+            @media #{$small-only} {
+                padding-top: 1.25rem !important;
+                height: 3.375rem;
+            }
         }
     }
 
-    .selectize-control {
+    .student {
+        width: calc(100% - #{($global-button-height * 2)});
+        float: left;
 
-        /* Underneath the avatar card is an input field that you
-         * could right-click to focus; I think it's where the carat
-         * goes for when you're adding more items (which we don't)
-         *
-         * selectize bangs it, so I have to bang it too
-         */
-        .selectize-input {
-            input[type="text"] {
-                display: none !important;
+        .selectize-control {
+
+            /* Underneath the avatar card is an input field that you
+             * could right-click to focus; I think it's where the carat
+             * goes for when you're adding more items (which we don't)
+             *
+             * selectize bangs it, so I have to bang it too
+             */
+            .selectize-input {
+                input[type="text"] {
+                    display: none !important;
+                }
+
+                /* To combat the weird giant white gap under the current
+                 * avatar card selected
+                 */
+                line-height: 0.5rem;
+
+                /* Push the current avatar card to the left, to offset some
+                 * other margin setting
+                 */
+                .card {
+                    p {
+                        margin: 0;
+                        display: inline;
+                    }
+                    margin-left: -0.5rem;
+                }
             }
 
-            /* To combat the weird giant white gap under the current
-             * avatar card selected
+            /* Repair a miniscule right-margin
              */
-            line-height: 0.5rem;
-
-            /* Push the current avatar card to the left, to offset some
-             * other margin setting
-             */
-            .card {
-                margin-left: -0.5rem;
+            .row {
+                width: calc(100% - 2px);
             }
-        }
 
-        /* Repair a miniscule right-margin
-         */
-        .row {
-            width: calc(100% - 2px);
-        }
-
-        /* Repair .row .row -1rem margin offset
-         */
-        .selectize-dropdown-content .row{
-            margin-left: 0;
+            /* Repair .row .row -1rem margin offset
+             */
+            .selectize-dropdown-content .row{
+                margin-left: 0;
+            }
         }
     }
 }

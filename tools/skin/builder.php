@@ -41,6 +41,7 @@ if (Config::get('skin_builder')) {
         'accent-hover' => Config::get('skin_colour_accent_hover'),
         'logo-background' => Config::get('skin_colour_logo_background'),
         'body-bg'         => Config::get('skin_colour_body_bg'),
+        'button-input-scale' => Config::get('skin_button_input_scale'),
 
 //        'primary-color'   => Config::get('skin_primary_colour'),
 //        'secondary-color' => Config::get('skin_secondary_colour'),
