@@ -7,6 +7,9 @@ $boarder-leave-print-border: 1px solid #ccc;
 }
 
 .boarder-leave-print {
+
+    /* Hide display of urls
+     */
     a {
         text-decoration: none;
         color: #000;
@@ -16,6 +19,8 @@ $boarder-leave-print-border: 1px solid #ccc;
         content: none !important;
     }
 
+    /* Letterhead Layout
+     */
     .letterhead {
         position: relative;
         margin-bottom: 2rem;
@@ -45,37 +50,47 @@ $boarder-leave-print-border: 1px solid #ccc;
         }
     }
 
-    th {
-        font-size: 0.625rem;
-        padding: 0;
-        border-top: $boarder-leave-print-border;
-        border-right: $boarder-leave-print-border;
-        border-bottom: $boarder-leave-print-border;
-        text-align: center;
-    }
-
-    td {
-        font-size: 0.625rem;
-        padding: 0;
-        border-top: $boarder-leave-print-border;
-        border-right: $boarder-leave-print-border;
-        border-bottom: $boarder-leave-print-border;
-    }
-
+    /* Special styling for top-left corner
+     */
     tr:first-child th:first-child {
         border-top: 0px;
         border-left: 0px;
     }
 
+    /* First header/data (student name) left aligned
+     */
     th:first-child,
     td:first-child
     {
         border-left: $boarder-leave-print-border;
+        padding-left: 0.25rem;
+        text-align: left;
+    }
+
+    /* All table header/data cells
+     */
+    th, td {
+        border-top: $boarder-leave-print-border;
+        border-right: $boarder-leave-print-border;
+        border-bottom: $boarder-leave-print-border;
+        padding: 0;
+    }
+
+    /* Table headers centered by default
+     */
+    th {
+        font-size: 0.625rem;
+        text-align: center;
+    }
+
+    td {
+        font-size: 0.625rem;
     }
 
     .signature {
         .title {
             width: 225px;
+            padding-left: 0.25rem;
             padding-bottom: 2rem;
         }
 
