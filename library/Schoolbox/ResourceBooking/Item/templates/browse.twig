@@ -88,14 +88,14 @@
                         Is there some more semantically correct way of saying that this is a
                         resource, apart from adding classes?
                         #}
-                        <a class="resource-read-link" id="resource-read-{{item.id}}" title="View" href="{{ routeLookup('resourceItem.read', {id: item.id}) }}"></a>
+                        <a class="icon-view resource-read-link" id="resource-read-{{item.id}}" title="View" href="{{ routeLookup('resourceItem.read', {id: item.id}) }}"></a>
 
                         {% if isRouteAuthorized('resourceBooking.book', {id: item.id, item: item}) %}
-                        <a class="resource-book-link" id="resource-book-{{item.id}}" title="Book" href="{{ routeLookup('resourceBooking.book', {id: item.id}) }}"></a>
+                        <a class="icon-add resource-book-link" id="resource-book-{{item.id}}" title="Book" href="{{ routeLookup('resourceBooking.book', {id: item.id}) }}"></a>
                         {% endif %}
 
                         {% if isRouteAuthorized('resourceItem.edit', {id: item.id, item: item}) %}
-                        <a class="resource-name resource-edit-link" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"></a>
+                        <a class="icon-modify resource-name resource-edit-link" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"></a>
                         {% endif %}
                     </nav>
                 </li>
