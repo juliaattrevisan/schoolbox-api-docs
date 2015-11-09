@@ -40,7 +40,7 @@ class Module extends BaseModule
         // Add the item to params, if ID is in the route.
         $this->addRoutePreload(
             $matcher,
-            'resourceItem',
+            '.*',
             function($params) {
                 if (array_key_exists('id', $params)) {
                     return array(
