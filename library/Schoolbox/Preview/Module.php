@@ -74,7 +74,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:preview',
+            'controller:'.$this->basename,
             $injector->lazyNew('Schoolbox\\Preview\\Controller')
         );
     }

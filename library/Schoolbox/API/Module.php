@@ -52,7 +52,7 @@ class Module extends BaseModule {
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:api',
+            'controller:'.$this->basename,
             $injector->lazyNew('Schoolbox\\API\\Controller')
         );
 

@@ -100,7 +100,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:submission',
+            'controller:'.$this->basename,
             $injector->lazyNew(Controller::class)
         );
     }

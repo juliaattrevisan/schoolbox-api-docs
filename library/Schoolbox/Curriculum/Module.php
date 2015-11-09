@@ -103,7 +103,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:curriculum',
+            'controller:'.$this->basename,
             $injector->lazyNew('Schoolbox\\Curriculum\\Controller')
         );
         $injector->setters['Schoolbox\\Curriculum\\Controller']['setNodeMapper']

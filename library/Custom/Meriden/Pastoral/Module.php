@@ -154,7 +154,7 @@ class Module extends BaseModule
             = $injector->lazyNew('MSSQL');
 
         $injector->set(
-            'controller:customMeridenPastoral',
+            'controller:'.$this->basename,
             $injector->lazyNew('Custom\\Meriden\\Pastoral\\Controller')
         );
     }

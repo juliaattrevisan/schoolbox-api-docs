@@ -67,7 +67,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:curriculumImport',
+            'controller:'.$this->basename,
             $injector->lazyNew('Schoolbox\\Curriculum\\Import\\Controller')
         );
         $injector->setters['Schoolbox\\Curriculum\\Import\\Controller']['setSourceMapper']

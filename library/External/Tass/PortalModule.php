@@ -47,7 +47,7 @@ class External_Tass_PortalModule extends \Alaress\Module\Module
             )
         );
         $injector->set(
-            'controller:tassportal',
+            'controller:'.$this->basename,
             $injector->lazyNew(
                 External_Tass_PortalController::class,
                 [

@@ -59,7 +59,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:messages',
+            'controller:'.$this->basename,
             $injector->lazyNew(Controller::class)
         );
     }

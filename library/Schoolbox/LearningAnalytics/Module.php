@@ -239,7 +239,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:learningAnalytics',
+            'controller:'.$this->basename,
             $injector->lazyNew('Schoolbox\\LearningAnalytics\\Controller')
         );
     }

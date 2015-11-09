@@ -79,6 +79,6 @@ class Module extends BaseModule
         $injector->params[Controller::class]['categoryMapper'] = $injector->lazyNew(Category\Mapper::class);
         $injector->params[Controller::class]['apiFactory']     = $injector->lazyNew(CalendarApiFactory::class);
         $injector->params[Controller::class]['api']            = $injector->lazyNew(Calendar_Api_Composite::class);
-        $injector->set('controller:resourceBookingReport', $injector->lazyNew(Controller::class));
+        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
     }
 }

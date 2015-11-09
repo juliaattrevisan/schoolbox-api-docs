@@ -98,7 +98,7 @@ class Module extends BaseModule
                 )
         );
         $injector->set(
-            'controller:resourceItem',
+            'controller:'.$this->basename,
             $injector->lazyNew('Schoolbox\\ResourceBooking\\Item\\Controller')
         );
     }

@@ -148,7 +148,7 @@ class Module extends BaseModule
         $injector->setters[Controller::class]['setCampusMapper']
             = $injector->lazyNew(CampusMapper::class);
         $injector->set(
-            'controller:resourceBooking',
+            'controller:'.$this->basename,
             $injector->lazyNew(Controller::class)
         );
     }

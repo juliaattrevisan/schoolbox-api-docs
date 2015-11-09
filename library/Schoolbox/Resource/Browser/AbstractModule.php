@@ -64,7 +64,7 @@ abstract class AbstractModule extends BaseModule
     {
         // set
         $injector->set(
-            "controller:$this->basename",
+            'controller:'.$this->basename,
             $injector->lazyNew($this->getControllerClass(), [], $this->getSetterList($injector))
         );
 
