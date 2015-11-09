@@ -21,6 +21,8 @@ class Module extends AbstractModule
 {
     protected $basename = 'myFilesBrowser';
 
+    protected $moduleDependencies = ['resourceBrowser'];
+
     /**
      * @param Container $ci
      * @return array
