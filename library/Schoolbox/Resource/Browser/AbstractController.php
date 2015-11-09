@@ -141,6 +141,9 @@ abstract class AbstractController extends BaseController
      */
     protected function getFolderData($folderId)
     {
+        // Redirect to this folder next time page gets reloaded
+        $this->getSession()->set('resourcesID', $folderId);
+
         $folder = $this->getFolder($folderId);
 
         $tree = $folder->getParent() instanceof IFolder ? $this->getBreadcrumbs($folder->getParent()) : [];
