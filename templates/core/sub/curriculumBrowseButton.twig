@@ -1,3 +1,5 @@
+{{ requireModule('curriculum') }}
+
 {# Can this user manage curriculum? #}
 {% if isRouteAuthorized('curriculum.browse') %}
     <a href="{{ routeLookup('curriculum.browse') }}" class="button icon-curriculum" title="Manage Curriculum"></a>
