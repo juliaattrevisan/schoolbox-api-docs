@@ -1,9 +1,165 @@
-.leave-pending {
+/* Generic table cell borders
+ */
+$boarder-leave-print-border: 1px solid #ccc !default;
+
+/* Pending/Approved Decorations
+ */
+$boarder-leave-print-pending-color: #d0d0d0 !default;
+$boarder-leave-print-pending-border-color: #d0d0d0 !default;
+
+.boarder-leave-print {
+
+    /* Hide display of urls
+     */
+    a {
+        text-decoration: none !important;
+        color: #000 !important;
+    }
+
+    a[href]:after {
+        content: none !important;
+    }
+
+    /* Letterhead Layout
+     */
+    .letterhead {
+        position: relative;
+        margin-bottom: 2rem;
+        text-align: center;
+
+        .crest {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        h1 {
+            font-weight: normal;
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        h2 {
+            font-size: 1rem;
+        }
+
+        address {
+            text-align: center;
+            font-style: normal;
+            font-size: 0.75rem;
+            margin-bottom: 2rem;
+        }
+    }
+
+    /* Special styling for top-left corner
+     */
+    tr:first-child th:first-child {
+        border-top: 0px;
+        border-left: 0px;
+    }
+
+    /* First header/data (student name) left aligned
+     */
+    th:first-child,
+    td:first-child
+    {
+        border-left: $boarder-leave-print-border;
+        padding-left: 0.25rem;
+        text-align: left;
+    }
+
+    /* Last header/data (approved by) left aligned
+     */
+    th:last-child,
+    td:last-child
+    {
+        padding-left: 0.25rem;
+        text-align: left;
+    }
+
+    /* All table header/data cells
+     */
+    th, td {
+        border-top: $boarder-leave-print-border;
+        border-right: $boarder-leave-print-border;
+        border-bottom: $boarder-leave-print-border;
+        padding: 0;
+    }
+
+    /* Table headers centered by default
+     */
+    th {
+        font-size: 0.625rem;
+        text-align: center;
+    }
+
+    td {
+        font-size: 0.625rem;
+    }
+
+    .signature {
+        .title {
+            width: 225px;
+            padding-left: 0.25rem;
+            padding-bottom: 2rem;
+        }
+
+        .initial {
+            width: 3rem;
+        }
+    }
+
+    .short {
+        width: 3rem;
+    }
+
+    .medium {
+        width: 8rem;
+    }
+
+    .hidden-column {
+        width: 1px;
+        border: 0;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    /* Pending/Approved decorations
+     * Print version can't do background colours
+     */
+    span.leave-pending, span.leave-approved {
+        padding: 0.125rem;
+        margin: 0.125rem;
+    }
+
+    span.leave-pending {
+        border: 1px solid $boarder-leave-print-pending-border-color;
+    }
+}
+
+/* Pending/Approved decorations
+ */
+span.leave-pending, span.leave-approved {
     @extend .label;
+    font-size: 0.5rem;
+}
+
+span.leave-pending {
     @extend .neutral;
 }
 
-.leave-approved {
-    @extend .label;
+span.leave-approved {
     @extend .success;
+}
+
+@media print {
+    #footer {
+        display:none;
+    }
+
+    span.leave-pending {
+        color: $boarder-leave-print-pending-color !important;
+    }
 }
