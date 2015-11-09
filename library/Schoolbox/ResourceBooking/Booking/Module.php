@@ -24,6 +24,7 @@ use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
 
 class Module extends BaseModule
 {
+    protected $basename = 'resourceBooking';
 
     /**
      * {@inheritdoc}
@@ -32,19 +33,19 @@ class Module extends BaseModule
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $router->addGet('resourceBooking.book', $basePath.'/bookItem/{id}');
-        $router->addGet('resourceBooking.edit', $basePath.'/{id}/edit');
-        $router->addPost('resourceBooking.createBooking', $basePath.'/bookItem/{id}')
+        $this->addGetRoute($router, 'book', $basePath, '/bookItem/{id}');
+        $this->addGetRoute($router, 'edit', $basePath, '/{id}/edit');
+        $this->addPostRoute($router, 'createBooking', $basePath, '/bookItem/{id}')
                ->addValues(array('action' => 'createBooking'));
-        $router->addPost('resourceBooking.update:post', $basePath.'/{id}/update')
+        $this->addPostRoute($router, 'update:post', $basePath, '/{id}/update')
                ->addValues(array('action' => 'update'));
-        $router->add('resourceBooking.bookingCalendar', $basePath.'/itemCalendar/{id}');
+        $this->addRoute($router, 'bookingCalendar', $basePath, '/itemCalendar/{id}');
 
         // Approving or rejecting a single booking
-        $router->add('resourceBooking.approve', $basePath.'/{id}/approve');
-        $router->add('resourceBooking.reject', $basePath.'/{id}/reject');
-        $router->add('resourceBooking.setPending', $basePath.'/{id}/setPending');
-        $router->add('resourceBooking.cancel', $basePath.'/{id}/cancel');
+        $this->addRoute($router, 'approve', $basePath, '/{id}/approve');
+        $this->addRoute($router, 'reject', $basePath, '/{id}/reject');
+        $this->addRoute($router, 'setPending', $basePath, '/{id}/setPending');
+        $this->addRoute($router, 'cancel', $basePath, '/{id}/cancel');
     }
 
     /**

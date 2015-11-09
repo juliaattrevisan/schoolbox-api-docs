@@ -25,6 +25,7 @@ use Schoolbox\ResourceBooking\Item;
 
 class Module extends BaseModule
 {
+    protected $basename = 'resourceBookingReport';
 
     /**
      * {@inheritdoc}
@@ -33,8 +34,8 @@ class Module extends BaseModule
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $router->addGet('resourceBookingReport.index', $basePath);
-        $router->addGet('resourceBookingReport.download', $basePath.'/download');
+        $this->addGetRoute($router, 'index', $basePath, '');
+        $this->addGetRoute($router, 'download', $basePath, '/download');
     }
 
     /**

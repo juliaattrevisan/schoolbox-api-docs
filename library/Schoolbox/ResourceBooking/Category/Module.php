@@ -19,14 +19,16 @@ use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 use Schoolbox\Permission\Access\UserAccess;
 
-class Module extends BaseModule {
+class Module extends BaseModule
+{
+    protected $basename = 'resourceCategory';
 
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath) {
-        $router->attachResource('resourceCategory', $basePath);
-        $router->attachResourcePostAlias('resourceCategory', $basePath);
+    public function initRoutes(Router $router, $basePath)
+    {
+        $this->attachResourceRoutes($router, $basePath);
     }
 
     /**

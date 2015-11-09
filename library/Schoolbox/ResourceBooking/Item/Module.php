@@ -20,15 +20,17 @@ use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 use Schoolbox\Permission\Access\UserAccess;
 
-class Module extends BaseModule {
+class Module extends BaseModule
+{
+    protected $basename = 'resourceItem';
 
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath) {
-        $router->attachResource('resourceItem', $basePath);
-        $router->attachResourcePostAlias('resourceItem', $basePath);
-        $router->add('resourceItem.search', $basePath.'/search');
+    public function initRoutes(Router $router, $basePath)
+    {
+        $this->attachResourceRoutes($router, $basePath);
+        $this->addRoute($router, 'search', $basePath, '/search');
     }
 
     /**
