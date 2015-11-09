@@ -16,6 +16,7 @@ use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Web\Router\RouteCollection;
+use LogicException;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 
@@ -57,23 +58,52 @@ class Module {
      */
     public function init($basePath) {
         $injector = $this->getInjector();
-        $this->initSubmodules($injector, $basePath);
-        $this->initRoutes($injector->get('router'), $basePath);
-        // TODO preloads and permissions should be able to be set up separately
-        $this->initRoutePreloads($injector->get('preloader'));
-        $this->initRoutePermissions($injector->get('authorizer'));
-        $this->initTemplatePaths($injector->get('templateEngine:loader'));
-        $this->initControllers($injector);
+        if ($this->installModule($injector)) {
+            $this->initSubmodules($injector, $basePath);
+            $this->initRoutes($injector->get('router'), $basePath);
+            // TODO preloads and permissions should be able to be set up separately
+            $this->initRoutePreloads($injector->get('preloader'));
+            $this->initRoutePermissions($injector->get('authorizer'));
+            $this->initTemplatePaths($injector->get('templateEngine:loader'));
+            $this->initControllers($injector);
+        }
     }
 
     /**
      * Installs this module into the dependency injection system.
      *
-     * @param ContainerInterface $injector
+     * @param  ContainerInterface $injector
+     * @return bool Was the module installed?
+     * @throws LogicException if this module has no basename, or it is already defined as a different class
      */
     protected function installModule(ContainerInterface $injector)
     {
-        $injector->set('module:'.$this->basename, $this);
+        if (!$this->basename) {
+            throw new \LogicException(sprintf('Module class "%s" has no basename set', get_class($this)));
+        }
+        $key = 'module:'.$this->basename;
+        if ($injector->has($key)) {
+            $other = $injector->get($key);
+            if (get_class($other) != get_class($this)) {
+                throw new \LogicException(
+                    sprintf(
+                        'Module "%s" is already defined as instanceof "%s" - won\'t redefine as instanceof "%s"',
+                        $this->basename,
+                        get_class($other),
+                        get_class($this)
+                    )
+                );
+            } else {
+                user_error(
+                    sprintf('Module "%s" is already defined - not redefining', $this->basename),
+                    E_USER_WARNING
+                );
+                return false;
+            }
+        } else {
+            $injector->set($key, $this);
+        }
+        return true;
     }
 
     /**
