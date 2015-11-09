@@ -562,6 +562,10 @@ section > fieldset {
 
 			&:before {
 				@extend a;
+				font-size: 1rem; // lock this to 16px;
+			}
+			&:hover:before {
+				text-decoration: none !important; // forgive me, for I have sinned
 			}
 
 		}

@@ -32,6 +32,7 @@ $sub-nav-active-font-weight: $font-weight-normal;
             &:hover {
                 color: $content-ui-foreground;
                 background-color: $content-ui-hover;
+                text-decoration: none;
             }
         }
         &.active {
