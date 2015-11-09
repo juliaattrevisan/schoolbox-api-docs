@@ -1,0 +1,9 @@
+.leave-pending {
+    @extend .label;
+    @extend .neutral;
+}
+
+.leave-approved {
+    @extend .label;
+    @extend .success;
+}

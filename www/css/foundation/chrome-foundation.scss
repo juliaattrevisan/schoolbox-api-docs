@@ -64,7 +64,6 @@
 @import "layout/login";
 @import "layout/tiles";
 
-
 // Schoolbox Areas
 @import "components/evaluation/evaluation";
 @import "components/submissions/inline-grading";
@@ -79,6 +78,9 @@
 
 // EOTC
 @import "components/eotc/eotc";
+
+// Boarder Leave
+@import "components/boarder-leave/boarder-leave";
 
 // Needs to be included outside of container in order to work
 @import "../../javascript/components/foundation/scss/foundation/components/reveal";
