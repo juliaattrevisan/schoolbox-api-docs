@@ -154,4 +154,8 @@ ul.flex-list {
             @extend input[type="submit"];
         }
     }
+
+    button {
+        width: 100%;
+    }
 }
