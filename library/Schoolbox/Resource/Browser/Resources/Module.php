@@ -99,8 +99,11 @@ class Module extends AbstractModule
             }
         );
 
-        $injector->params[TreeBuilder::class]['rootLabel'] = $injector->get('l10n')->translate('resource', true, true);
-
+        $injector->params[TreeBuilder::class]['rootLabel'] = $injector->lazy(
+            function () use ($injector) {
+                return $injector->get('l10n')->translate('resource', true, true);
+            }
+        );
     }
 
 } 
