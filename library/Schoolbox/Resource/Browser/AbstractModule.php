@@ -30,11 +30,11 @@ abstract class AbstractModule extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $this->addGetRoute($router, 'browse', $basePath, '{/folderId}')->addTokens([ 'folderId' => '\d+' ]);
-        $this->addGetRoute($router, 'listResources', $basePath, '{folderId}/children')->addTokens([ 'folderId' => '\d+' ]);
-        $this->addGetRoute($router, 'listNodes', $basePath, '{folderId}/nodes')->addTokens([ 'folderId' => '\d+' ]);
-        $this->addGetRoute($router, 'showFolderInfo', $basePath, '{folderId}/info')->addTokens([ 'folderId' => '\d+' ]);
-        $this->addGetRoute($router, 'showFileInfo', $basePath, 'file/{fileId}/info')->addTokens([ 'fileId' => '\d+' ]);
-        $this->addGetRoute($router, 'showMultiFileInfo', $basePath, 'file/{fileIds}/info')->addTokens([ 'fileIds' => '(\d+,)+(\d+)' ]);
+        $this->addGetRoute($router, 'listResources', $basePath, '/{folderId}/children')->addTokens([ 'folderId' => '\d+' ]);
+        $this->addGetRoute($router, 'listNodes', $basePath, '/{folderId}/nodes')->addTokens([ 'folderId' => '\d+' ]);
+        $this->addGetRoute($router, 'showFolderInfo', $basePath, '/{folderId}/info')->addTokens([ 'folderId' => '\d+' ]);
+        $this->addGetRoute($router, 'showFileInfo', $basePath, '/file/{fileId}/info')->addTokens([ 'fileId' => '\d+' ]);
+        $this->addGetRoute($router, 'showMultiFileInfo', $basePath, '/file/{fileIds}/info')->addTokens([ 'fileIds' => '(\d+,)+(\d+)' ]);
     }
 
 

@@ -105,14 +105,14 @@ class Module {
      * @param string $alias    The alias for this route.
      *                         Its actual alias will be "$this->basename.$alias"
      * @param string $basePath The base path for this route
-     * @param string $path     The path for this route.
-     *                         Its actual path will be "$basePath/$path".
+     * @param string $path     The path for this route, including a leading / if required.
+     *                         Its actual path will be "$basePath$path".
      *
      * @return Route
      */
     protected function addRoute(Router $router, $alias, $basePath, $path)
     {
-        return $router->add($this->basename.'.'.$alias, $basePath.'/'.$path);
+        return $router->add($this->basename.'.'.$alias, $basePath.$path);
     }
 
     /**
@@ -122,14 +122,14 @@ class Module {
      * @param string $alias    The alias for this route.
      *                         Its actual alias will be "$this->basename.$alias"
      * @param string $basePath The base path for this route
-     * @param string $path     The path for this route.
-     *                         Its actual path will be "$basePath/$path".
+     * @param string $path     The path for this route, including a leading / if required.
+     *                         Its actual path will be "$basePath$path".
      *
      * @return Route
      */
     protected function addGetRoute(Router $router, $alias, $basePath, $path)
     {
-        return $router->addGet($this->basename.'.'.$alias, $basePath.'/'.$path);
+        return $router->addGet($this->basename.'.'.$alias, $basePath.$path);
     }
 
     /**
@@ -139,14 +139,14 @@ class Module {
      * @param string $alias    The alias for this route.
      *                         Its actual alias will be "$this->basename.$alias"
      * @param string $basePath The base path for this route
-     * @param string $path     The path for this route.
-     *                         Its actual path will be "$basePath/$path".
+     * @param string $path     The path for this route, including a leading / if required.
+     *                         Its actual path will be "$basePath$path".
      *
      * @return Route
      */
     protected function addPostRoute(Router $router, $alias, $basePath, $path)
     {
-        return $router->addPost($this->basename.'.'.$alias, $basePath.'/'.$path);
+        return $router->addPost($this->basename.'.'.$alias, $basePath.$path);
     }
 
     /**

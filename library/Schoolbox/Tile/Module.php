@@ -82,12 +82,12 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'layout', $basePath, 'layout/{componentId}');
-        $this->addPostRoute($router, 'layoutForm', $basePath , 'layout/{componentId}');
+        $this->addGetRoute($router, 'layout', $basePath, '/layout/{componentId}');
+        $this->addPostRoute($router, 'layoutForm', $basePath , '/layout/{componentId}');
         // Attach standard REST routes
         $this->attachResourceRoutes($router, $basePath);
         // but have separate add tile paths
-        $this->addGetRoute($router, 'add', $basePath, 'add/{componentId}');
+        $this->addGetRoute($router, 'add', $basePath, '/add/{componentId}');
         $this->addPostRoute($router, 'create', $basePath, '/add/{componentId}');
     }
 

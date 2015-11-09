@@ -28,8 +28,8 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'impersonate', $basePath, 'switch/{userId}');
-        $this->addGetRoute($router, 'recoverSession', $basePath, 'recoverSession');
+        $this->addGetRoute($router, 'impersonate', $basePath, '/switch/{userId}');
+        $this->addGetRoute($router, 'recoverSession', $basePath, '/recoverSession');
     }
 
     /**

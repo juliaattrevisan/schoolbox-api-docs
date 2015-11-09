@@ -32,7 +32,7 @@ class Module extends AbstractModule
     public function initRoutes(Router $router, $basePath)
     {
         parent::initRoutes($router, $basePath);
-        $this->addGetRoute($router, 'showLinkInfo', $basePath, 'link/{linkId}/info')->addTokens([ 'linkId' => '\d+' ]);
+        $this->addGetRoute($router, 'showLinkInfo', $basePath, '/link/{linkId}/info')->addTokens([ 'linkId' => '\d+' ]);
     }
 
     /**
