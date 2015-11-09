@@ -20,21 +20,17 @@ use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
+    protected $basename = 'curriculumImport';
+
     /**
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->addGet('curriculumImport.browse', $basePath);
-        $router->addPost('curriculumImport.create', $basePath);
-        $router->addGet('curriculumImport.learningLevels', $basePath . '/learningLevels');
-        $router->addGet('curriculumImport.outcomes', $basePath . '/outcomes');
-//        // Attach standard REST routes
-//        $router->attachResource('tile', $basePath);
-//        $router->attachResourcePostAlias('tile', $basePath);
-//        // but have separate add tile paths
-//        $router->addGet('tile.add', $basePath.'/add/{componentId}');
-//        $router->addPost('tile.create', $basePath.'/add/{componentId}');
+        $this->addGetRoute($router, 'browse', $basePath, '');
+        $this->addPostRoute($router, 'create', $basePath, '');
+        $this->addGetRoute($router, 'learningLevels', $basePath, '/learningLevels');
+        $this->addGetRoute($router, 'outcomes', $basePath, '/outcomes');
     }
 
     /**

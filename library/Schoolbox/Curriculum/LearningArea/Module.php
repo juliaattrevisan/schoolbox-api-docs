@@ -19,6 +19,8 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Module extends BaseModule
 {
+    protected $basename = 'curriculumLearningArea';
+
     /**
      * So far, the only action is "create"
      *
@@ -26,7 +28,7 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->addPost('curriculumLearningArea.create', $basePath);
+        $this->addPostRoute($router, 'create', $basePath, '');
     }
 
     /**

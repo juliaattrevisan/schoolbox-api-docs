@@ -21,6 +21,8 @@ use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
+    protected $basename = 'curriculum';
+
     /**
      * {@inheritdoc}
      */
@@ -39,9 +41,8 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->attachResource('curriculum', $basePath);
-        $router->attachResourcePostAlias('curriculum', $basePath);
-        $router->addGet('curriculum.search', $basePath . '/search');
+        $this->attachResourceRoutes($router, $basePath);
+        $this->addGetRoute($router, 'search', $basePath, '/search');
     }
 
     /**
