@@ -29,13 +29,12 @@ abstract class AbstractModule extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $routes = $router->getRoutes();
-        $routes->addGet("$this->basename.browse", $basePath.'{/folderId}')->addTokens([ 'folderId' => '\d+' ]);
-        $routes->addGet("$this->basename.listResources", $basePath.'/{folderId}/children')->addTokens([ 'folderId' => '\d+' ]);
-        $routes->addGet("$this->basename.listNodes", $basePath.'/{folderId}/nodes')->addTokens([ 'folderId' => '\d+' ]);
-        $routes->addGet("$this->basename.showFolderInfo", $basePath.'/{folderId}/info')->addTokens([ 'folderId' => '\d+' ]);
-        $routes->addGet("$this->basename.showFileInfo", $basePath.'/file/{fileId}/info')->addTokens([ 'fileId' => '\d+' ]);
-        $routes->addGet("$this->basename.showMultiFileInfo", $basePath.'/file/{fileIds}/info')->addTokens([ 'fileIds' => '(\d+,)+(\d+)' ]);
+        $this->addGetRoute($router, 'browse', $basePath, '{/folderId}')->addTokens([ 'folderId' => '\d+' ]);
+        $this->addGetRoute($router, 'listResources', $basePath, '{folderId}/children')->addTokens([ 'folderId' => '\d+' ]);
+        $this->addGetRoute($router, 'listNodes', $basePath, '{folderId}/nodes')->addTokens([ 'folderId' => '\d+' ]);
+        $this->addGetRoute($router, 'showFolderInfo', $basePath, '{folderId}/info')->addTokens([ 'folderId' => '\d+' ]);
+        $this->addGetRoute($router, 'showFileInfo', $basePath, 'file/{fileId}/info')->addTokens([ 'fileId' => '\d+' ]);
+        $this->addGetRoute($router, 'showMultiFileInfo', $basePath, 'file/{fileIds}/info')->addTokens([ 'fileIds' => '(\d+,)+(\d+)' ]);
     }
 
 
@@ -44,7 +43,7 @@ abstract class AbstractModule extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer->addRule("/^{$this->basename}\.(?:.+)$/", new Rule\IsLoggedIn());
+        $this->addRoutePermissionForBasename($authorizer, '(?:.+)', new Rule\IsLoggedIn());
     }
 
 
@@ -54,9 +53,7 @@ abstract class AbstractModule extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__.'/templates', $this->basename);
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePathForBasename($templateLoader, __DIR__.'/templates');
     }
 
 
