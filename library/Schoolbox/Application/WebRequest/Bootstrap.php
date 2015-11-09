@@ -13,6 +13,7 @@ namespace Schoolbox\Application\WebRequest;
 use Alaress\Application\Boot\BootstrapInterface;
 use Alaress\DebugBar\DataCollector\XhprofCollector;
 use Alaress\DebugBar\Instance as DebugBar;
+use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use DebugBar\Bridge\Twig\TraceableTwigEnvironment;
 use DebugBar\Bridge\Twig\TwigCollector;
@@ -302,7 +303,7 @@ class Bootstrap implements BootstrapInterface {
 			$di->lazy(
 				function () use ($di) {
 					$config      = $di->get('config');
-					$chainLoader = new Twig_Loader_Chain();
+					$chainLoader = new ChainLoader($di);
 					$baseLoader  = new Twig_Loader_Filesystem(array());
 					// Paths: prefer templates/{site_location} over templates/core
 					$basePath     = $config->get('siteRoot').'/templates/';
