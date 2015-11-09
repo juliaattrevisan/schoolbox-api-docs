@@ -28,8 +28,8 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->addGet($this->basename.'.impersonate', $basePath . '/switch/{userId}');
-        $router->addGet($this->basename.'.recoverSession', $basePath . '/recoverSession');
+        $this->addGetRoute($router, 'impersonate', $basePath, 'switch/{userId}');
+        $this->addGetRoute($router, 'recoverSession', $basePath, 'recoverSession');
     }
 
     /**
@@ -37,8 +37,9 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $matcher->add(
-            "/^{$this->basename}.impersonate$/",
+        $this->addRoutePreloadForBasename(
+            $matcher,
+            'impersonate',
             function ($params) {
                 return array(
                     'user' => UserMapper::getInstance()->findById($params['userId']),
@@ -52,18 +53,23 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer->addRule("/^{$this->basename}.(impersonate|recoverSession)$/", new Rule\IsLoggedIn());
-        $authorizer->addRule("/^{$this->basename}.impersonate$/", new Rule\Callback(
-            function ($params, User $user) {
-                // Do not allow unlinked users to switch
-                foreach($user->getLinkedUser() as $linkedUser ) {
-                    if($params['userId'] == $linkedUser->getId()) {
-                       return true;
+        $this
+            ->addRoutePermissionForBasename($authorizer, '(impersonate|recoverSession)', new Rule\IsLoggedIn())
+            ->addRoutePermissionForBasename(
+                $authorizer,
+                'impersonate',
+                new Rule\Callback(
+                    function ($params, User $user) {
+                        // Do not allow unlinked users to switch
+                        foreach ($user->getLinkedUser() as $linkedUser) {
+                            if ($params['userId'] == $linkedUser->getId()) {
+                                return true;
+                            }
+                        }
+                        throw new Unauthorized();
                     }
-                }
-                throw new Unauthorized();
-            }
-        ));
+                )
+            );
     }
 
     /**
