@@ -54,14 +54,16 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initRoutePermissions(Authorizer $authorizer) {
-        $resourceManageRule = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\HasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL)
-        );
-        $authorizer
-            ->addRule('/^resourceCategory(?:$|\.)/',              new Rule\IsLoggedIn())
-            ->addRule('/^resourceCategory\.(?:add|edit|delete)/', $resourceManageRule)
-        ;
+        $this
+            ->addRoutePermissionForBasename($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermissionForBasename(
+                $authorizer,
+                '(?:add|edit|delete)',
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL)
+                )
+            );
     }
 
     /**

@@ -111,14 +111,11 @@ class Module extends BaseModule
         $isOwnerRule->setMapper(Mapper::getInstance());
         $bookingEditRule = new Rule\Any($baseManageRule, $isOwnerRule);
 
-        $authorizer
-            ->addRule('/^resourceBooking(?:$|\.)/', new Rule\IsLoggedIn())
-            ->addRule('/^resourceBooking\.(?:book|createBooking)$/', $bookingCreateRule)
-            ->addRule(
-                '/^resourceBooking\.(?:approve|reject|setPending)$/',
-                $baseManageRule
-            )
-            ->addRule('/^resourceBooking\.(?:cancel|edit|update:post)$/', $bookingEditRule)
+        $this
+            ->addRoutePermissionForBasename($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermissionForBasename($authorizer, '(?:book|createBooking)', $bookingCreateRule)
+            ->addRoutePermissionForBasename($authorizer, '(?:approve|reject|setPending)', $baseManageRule)
+            ->addRoutePermissionForBasename($authorizer, '(?:cancel|edit|update:post)', $bookingEditRule)
         ;
     }
 

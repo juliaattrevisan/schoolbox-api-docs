@@ -41,14 +41,16 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer->addRule('/^submission\\..*/', new Rule\IsLoggedIn());
-        $authorizer->addRule(
-            '/^submission\\..+(?:Overview)/',
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF)
-            )
-        );
+        $this
+            ->addRoutePermissionForBasename($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermissionForBasename(
+                $authorizer,
+                '.+(?:Overview)',
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF)
+                )
+            );
     }
 
     /**

@@ -45,15 +45,17 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer
-            ->addRule('/^resourceBookingReport\./', new Rule\All(
+        $this->addRoutePermissionForBasename(
+            $authorizer,
+            '.*',
+            new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF)
                 )
-            ))
-        ;
+            )
+        );
     }
 
     /**

@@ -41,7 +41,7 @@ class Module extends BaseModule
     public function initRoutePermissions(Authorizer $authorizer)
     {
         // TODO import this into an Admin baseclass so you don't have to do it for all admin pages
-        $authorizer->addRule('/^adminMessages\\..*/', new Rule\IsSuperuser());
+        $this->addRoutePermissionForBasename($authorizer, '.*', new Rule\IsSuperuser());
     }
 
 

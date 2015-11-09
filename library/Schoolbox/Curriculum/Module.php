@@ -73,17 +73,19 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer->addRule('/^curriculum\\..*/', new Rule\IsLoggedIn());
-        $authorizer->addRule(
-            '/^curriculum\\.(?:edit|add|delete|create|update|replace)/',
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(
-                    UserAccess::SERVICE_CURRICULUM,
-                    UserAccess::ACCESS_WRITE
+        $this
+            ->addRoutePermissionForBasename($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermissionForBasename(
+                $authorizer,
+                '(?:edit|add|delete|create|update|replace)',
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(
+                        UserAccess::SERVICE_CURRICULUM,
+                        UserAccess::ACCESS_WRITE
+                    )
                 )
-            )
-        );
+            );
     }
 
 

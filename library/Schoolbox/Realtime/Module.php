@@ -38,7 +38,7 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer->addRule('/^messages\\..*/', new Rule\IsLoggedIn());
+        $this->addRoutePermissionForBasename($authorizer, '.*', new Rule\IsLoggedIn());
     }
 
 

@@ -70,10 +70,11 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '/^customMeridenPastoral\\.(?:index|subject)/';
-        $authorizer
-            ->addRule($ruleRegexp, new Rule\IsLoggedIn())
-            ->addRule(
+        $ruleRegexp = '(?:index|subject)';
+        $this
+            ->addRoutePermissionForBasename($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
+            ->addRoutePermissionForBasename(
+                $authorizer,
                 $ruleRegexp,
                 new Rule\Any(
                     new Rule\IsSuperuser(),
