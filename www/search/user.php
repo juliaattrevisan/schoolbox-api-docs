@@ -254,7 +254,7 @@ if (is_numeric($this->arg[0])) {
     }
 
     // advanced synergetic information
-    if (Cfg::get('external_enable') && $user['synergy_id']) {
+    if (Cfg::get('external_enable')) {
         $synUserHandler = new External_User();
         if ($groupHandler->isParent($user['uid'])) {
             renderParent(
