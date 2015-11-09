@@ -539,8 +539,15 @@ class Bootstrap implements BootstrapInterface {
                 $output .= '</ul>';
 
                 // Use Sitepage to output an error message in the school's design.
-                $page = new \SitePage(false);
-                $page->error(null, $output, $code);
+                // If there's no SitePage in DI yet: just output a styleless error.
+                $di = $this->kernel->getDependencyInjector();
+                if ($di instanceof Di\Container) {
+                    /** @var \SitePage $page */
+                    $page = $di->get('layoutEngine');
+                    $page->error(null, $output, $code);
+                } else {
+                    echo $output;
+                }
             }
         }
     }
