@@ -212,7 +212,7 @@ class Module {
      * @param  callable    $preload
      * @return $this
      */
-    protected function addRoutePreloadForBasename(PathMatcher $matcher, $regexPart, callable $preload)
+    protected function addRoutePreload(PathMatcher $matcher, $regexPart, callable $preload)
     {
         $matcher->add("/^{$this->basename}\\.{$regexPart}$/", $preload);
         return $this;
@@ -233,7 +233,7 @@ class Module {
      * @param  IAuthorizationRule $rule
      * @return $this
      */
-    protected function addRoutePermissionForBasename(Authorizer $authorizer, $regexPart, IAuthorizationRule $rule)
+    protected function addRoutePermission(Authorizer $authorizer, $regexPart, IAuthorizationRule $rule)
     {
         $authorizer->addRule("/^{$this->basename}\\.{$regexPart}$/", $rule);
         return $this;
@@ -253,7 +253,7 @@ class Module {
      * @param  Twig_Loader_Chain $templateLoader
      * @return $this
      */
-    protected function addTemplatePathForBasename(Twig_Loader_Chain $templateLoader, $dir)
+    protected function addTemplatePath(Twig_Loader_Chain $templateLoader, $dir)
     {
         $loader = new Twig_Loader_Filesystem([]);
         $loader->addPath($dir, $this->basename);

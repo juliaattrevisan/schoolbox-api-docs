@@ -42,8 +42,8 @@ class Module extends BaseModule
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $this
-            ->addRoutePermissionForBasename($authorizer, '.*', new Rule\IsLoggedIn())
-            ->addRoutePermissionForBasename(
+            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermission(
                 $authorizer,
                 '.+(?:Overview)',
                 new Rule\Any(
@@ -62,7 +62,7 @@ class Module extends BaseModule
         // TODO DI these
         $boxMapper = SubmissionBoxMapper::getInstance();
         $catMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
-        $this->addRoutePreloadForBasename(
+        $this->addRoutePreload(
             $matcher,
             '.*',
             function ($params) use ($boxMapper, $catMapper) {
@@ -90,7 +90,7 @@ class Module extends BaseModule
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         // TODO inherit from an Admin baseclass to setup subnav
-        $this->addTemplatePathForBasename($templateLoader, __DIR__ . '/templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
 

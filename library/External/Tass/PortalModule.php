@@ -69,6 +69,6 @@ class External_Tass_PortalModule extends \Alaress\Module\Module
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $this->addRoutePermissionForBasename($authorizer, '.*', new IsLoggedIn());
+        $this->addRoutePermission($authorizer, '.*', new IsLoggedIn());
     }
 }

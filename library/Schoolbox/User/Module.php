@@ -37,7 +37,7 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $this->addRoutePreloadForBasename(
+        $this->addRoutePreload(
             $matcher,
             'impersonate',
             function ($params) {
@@ -54,8 +54,8 @@ class Module extends BaseModule
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $this
-            ->addRoutePermissionForBasename($authorizer, '(impersonate|recoverSession)', new Rule\IsLoggedIn())
-            ->addRoutePermissionForBasename(
+            ->addRoutePermission($authorizer, '(impersonate|recoverSession)', new Rule\IsLoggedIn())
+            ->addRoutePermission(
                 $authorizer,
                 'impersonate',
                 new Rule\Callback(

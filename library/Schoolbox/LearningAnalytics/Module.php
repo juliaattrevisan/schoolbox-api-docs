@@ -202,7 +202,7 @@ class Module extends BaseModule
     {
         /* Inject ingredients into course controller method
          */
-        $this->addRoutePreloadForBasename(
+        $this->addRoutePreload(
             $matcher,
             '(?:course|courseWithTask)',
             function($params) {
@@ -212,7 +212,7 @@ class Module extends BaseModule
 
         /* Inject ingredients into folder controller method
          */
-        $this->addRoutePreloadForBasename(
+        $this->addRoutePreload(
             $matcher,
             '(?:folder|folderWithTask)',
             function($params) {
@@ -228,7 +228,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $this->addTemplatePathForBasename($templateLoader, __DIR__ . '/templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**

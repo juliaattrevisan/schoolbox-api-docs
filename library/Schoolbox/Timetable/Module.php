@@ -54,7 +54,7 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $this->addRoutePermissionForBasename($authorizer, '.*', new Rule\IsLoggedIn());
+        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
     }
 
     /**

@@ -36,7 +36,7 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher) {
         // Add the item to params, if ID is in the route.
-        $this->addRoutePreloadForBasename(
+        $this->addRoutePreload(
             $matcher,
             'resourceCategory',
             function($params) {
@@ -55,8 +55,8 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer) {
         $this
-            ->addRoutePermissionForBasename($authorizer, '.*', new Rule\IsLoggedIn())
-            ->addRoutePermissionForBasename(
+            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermission(
                 $authorizer,
                 '(?:add|edit|delete)',
                 new Rule\Any(
@@ -71,7 +71,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $this->addTemplatePathForBasename($templateLoader, __DIR__ . '/templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**

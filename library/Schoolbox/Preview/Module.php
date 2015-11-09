@@ -42,7 +42,7 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $this->addRoutePreloadForBasename(
+        $this->addRoutePreload(
             $matcher,
             '(?:index|preview)',
             function($params) {
@@ -65,7 +65,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $this->addTemplatePathForBasename($templateLoader, __DIR__ . '/Templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/Templates');
     }
 
     /**

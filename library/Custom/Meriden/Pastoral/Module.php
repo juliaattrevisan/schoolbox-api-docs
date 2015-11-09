@@ -72,8 +72,8 @@ class Module extends BaseModule
     {
         $ruleRegexp = '(?:index|subject)';
         $this
-            ->addRoutePermissionForBasename($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
-            ->addRoutePermissionForBasename(
+            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
+            ->addRoutePermission(
                 $authorizer,
                 $ruleRegexp,
                 new Rule\Any(
@@ -93,7 +93,7 @@ class Module extends BaseModule
         // Search for the user
         // TODO move the mappers out of here, inject their dependency
         $userMapper = $this->userMapper;
-        $this->addRoutePreloadForBasename(
+        $this->addRoutePreload(
             $matcher,
             '(?:index|subject|currentReport)',
             function ($params) use ($userMapper) {
@@ -128,7 +128,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $this->addTemplatePathForBasename($templateLoader, __DIR__ . '/templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**

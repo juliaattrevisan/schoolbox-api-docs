@@ -39,8 +39,8 @@ class Module extends BaseModule
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $this
-            ->addRoutePermissionForBasename($authorizer, '.*', new Rule\IsLoggedIn())
-            ->addRoutePermissionForBasename(
+            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermission(
                 $authorizer,
                 '.*',
                 new Rule\Any(
@@ -58,7 +58,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $this->addTemplatePathForBasename($templateLoader, __DIR__ . '/templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**

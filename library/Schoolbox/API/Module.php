@@ -34,7 +34,7 @@ class Module extends BaseModule {
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $this->addRoutePreloadForBasename(
+        $this->addRoutePreload(
             $matcher,
             'register',
             function ($params) {

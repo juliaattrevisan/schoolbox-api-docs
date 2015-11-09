@@ -38,7 +38,7 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $this->addRoutePermissionForBasename($authorizer, '.*', new Rule\IsLoggedIn());
+        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
     }
 
 
@@ -49,7 +49,7 @@ class Module extends BaseModule
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         // TODO inherit from an Admin baseclass to setup subnav
-        $this->addTemplatePathForBasename($templateLoader, __DIR__ . '/templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
 

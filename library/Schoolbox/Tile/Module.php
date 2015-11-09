@@ -104,7 +104,7 @@ class Module extends BaseModule
 
         // Routes that take a tile ID:
         // Look up the tile, and reverse lookup the component from its layout
-        $this->addRoutePreloadForBasename(
+        $this->addRoutePreload(
             $matcher,
             '(?:edit|update|update:post|delete|delete:post)',
             function ($params) use ($mapper, $componentMapper) {
@@ -127,7 +127,7 @@ class Module extends BaseModule
         );
 
         // Routes that take a component ID: look up component from it
-        $this->addRoutePreloadForBasename(
+        $this->addRoutePreload(
             $matcher,
             '(?:add|create|layout|layoutForm)',
             function ($params) use ($componentMapper) {
@@ -158,7 +158,7 @@ class Module extends BaseModule
 
         // All routes: look up homepage from component
         // (if this component belongs to the homepage!)
-        $this->addRoutePreloadForBasename(
+        $this->addRoutePreload(
             $matcher,
             "(?:add|create|layout|layoutForm|edit|update|update:post|delete|delete:post)",
             function ($params) use ($catMapper) {
@@ -214,8 +214,8 @@ class Module extends BaseModule
             ),
             new Rule\IsTeacherOfClass($this->getExternalDb(), $getHomepageCallback)
         );
-        $this->addRoutePermissionForBasename($authorizer, '.*', new Rule\IsLoggedIn());
-        $this->addRoutePermissionForBasename($authorizer, '.*', $rule);
+        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
+        $this->addRoutePermission($authorizer, '.*', $rule);
     }
 
     /**
@@ -223,7 +223,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $this->addTemplatePathForBasename($templateLoader, __DIR__ . '/templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**

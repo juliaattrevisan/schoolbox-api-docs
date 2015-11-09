@@ -41,7 +41,7 @@ class Module extends BaseModule
     public function initRoutePermissions(Authorizer $authorizer)
     {
         // TODO import this into an Admin baseclass so you don't have to do it for all admin pages
-        $this->addRoutePermissionForBasename($authorizer, '.*', new Rule\IsSuperuser());
+        $this->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
     }
 
 
@@ -63,7 +63,7 @@ class Module extends BaseModule
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         // TODO inherit from an Admin baseclass to setup subnav
-        $this->addTemplatePathForBasename($templateLoader, __DIR__ . '/templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
 

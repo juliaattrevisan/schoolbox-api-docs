@@ -54,7 +54,7 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
         // Add the booking item to params, if ID is in the route.
-        $this->addRoutePreloadForBasename(
+        $this->addRoutePreload(
             $matcher,
             '(?:edit|update|approve|reject|setPending|cancel)',
             function($params) {
@@ -64,7 +64,7 @@ class Module extends BaseModule
             }
         );
         // Add the resource item to params, if item ID is in the route.
-        $this->addRoutePreloadForBasename(
+        $this->addRoutePreload(
             $matcher,
             '(?:book|createBooking|bookingCalendar)',
             function($params) {
@@ -112,10 +112,10 @@ class Module extends BaseModule
         $bookingEditRule = new Rule\Any($baseManageRule, $isOwnerRule);
 
         $this
-            ->addRoutePermissionForBasename($authorizer, '.*', new Rule\IsLoggedIn())
-            ->addRoutePermissionForBasename($authorizer, '(?:book|createBooking)', $bookingCreateRule)
-            ->addRoutePermissionForBasename($authorizer, '(?:approve|reject|setPending)', $baseManageRule)
-            ->addRoutePermissionForBasename($authorizer, '(?:cancel|edit|update:post)', $bookingEditRule)
+            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermission($authorizer, '(?:book|createBooking)', $bookingCreateRule)
+            ->addRoutePermission($authorizer, '(?:approve|reject|setPending)', $baseManageRule)
+            ->addRoutePermission($authorizer, '(?:cancel|edit|update:post)', $bookingEditRule)
         ;
     }
 
@@ -124,7 +124,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $this->addTemplatePathForBasename($templateLoader, __DIR__ . '/templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**
