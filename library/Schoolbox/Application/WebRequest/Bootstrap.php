@@ -268,12 +268,12 @@ class Bootstrap implements BootstrapInterface {
 //		$di->setters['SitePage']['setDi'] = $di;
 		$di->set('layoutEngine', $di->lazy(function() use ($di) {
 			$sitepage = new \SitePage(false);
-			$sitepage->setDi($di)->localise();
+			$sitepage->setDi($di);
 			return $sitepage;
 		}));;
 		$di->set('sitePage',     $di->lazy(function() use ($di) {
 			$sitepage = new \SitePage();
-			$sitepage->setDi($di)->localise();
+			$sitepage->setDi($di);
 			return $sitepage;
 		}));
 
@@ -472,6 +472,7 @@ class Bootstrap implements BootstrapInterface {
                 'file'    => $e->getFile(),
                 'message' => $e->getMessage(),
                 'line'    => $e->getLine(),
+                'type'    => $e->getCode(),
             );
             if ($outputStackTrace) {
                 $error['message'] = "<pre>$e</pre>";
@@ -523,13 +524,19 @@ class Bootstrap implements BootstrapInterface {
                     }
                 }
 
+                if(isset($_SERVER['HTTP_HOST'])) {
+                    $url = 'http'.(getenv("SERVER_PORT") == 443 ? 's://' : '://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+                }
+                else {
+                    $url = '';
+                }
+
                 // explain that something went cataclysmically wrong.
                 $output =
                     "<p><b>$message $info</b></p>" .
                     '<ul>' .
                     '<li>Datetime: ' . date('Y-m-d H:i:s') . '</li>' .
-                    '<li>URL: http' . (getenv("SERVER_PORT") == 443 ? 's://' : '://') .
-                        $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] .
+                    '<li>URL: '.$url.
                     '</li>';
                 if ($outputStackTrace) {
                     $output .= "<li>Error: {$error['message']} in {$error['file']} on line {$error['line']}.</li>";

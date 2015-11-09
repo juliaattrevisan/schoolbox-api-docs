@@ -313,6 +313,8 @@ class SitePage extends Page
         }
 
         if (!$lite && !$this->lite) {
+            // quasi-localisation
+            $this->localise();
             $this->buildPage();
             $this->saveHistory();
         }
@@ -370,9 +372,6 @@ class SitePage extends Page
 
     function buildPage($customHead = true)
     {
-        // quasi-localisation
-        $this->localise();
-
         $this->groupHandler = new Group;
 
         $this->setFile(TEMPLATE_body, 'include/body.html');
