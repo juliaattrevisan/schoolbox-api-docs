@@ -1,1 +1,1 @@
-UPDATE config SET `value` = 0 WHERE `name` = 'debug_templates'
+UPDATE config SET `value` = '0' WHERE `name` = 'debug_templates';
