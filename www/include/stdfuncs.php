@@ -10,16 +10,19 @@
 
 //Function for handling error conditions
 function error($ec, $message="", $code = 400) {
-	global $page;
-	if (is_object($page))
-		$page->error($ec, $message, $code);
-	elseif (is_object($this))
-		$this->error($ec, $message, $code);
-	else {
-		require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
-		$page = new SitePage;
-		$page->error($ec, $message, $code);
-	}
+    /** @var Schoolbox\Application\WebRequest\Kernel $kernel */
+    global $kernel;
+    global $page;
+    if ($page instanceof SitePage) {
+        $page->setDi($kernel->getDependencyInjector());
+        $page->error($ec, $message, $code);
+    } elseif ($this instanceof SitePage) {
+        $this->setDi($kernel->getDependencyInjector());
+        $this->error($ec, $message, $code);
+    } else {
+        $page = $kernel->getDependencyInjector()->get('sitePage');
+        $page->error($ec, $message, $code);
+    }
 }
 
 /**
