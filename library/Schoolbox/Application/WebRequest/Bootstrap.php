@@ -13,6 +13,7 @@ namespace Schoolbox\Application\WebRequest;
 use Alaress\Application\Boot\BootstrapInterface;
 use Alaress\DebugBar\DataCollector\XhprofCollector;
 use Alaress\DebugBar\Instance as DebugBar;
+use Alaress\Twig\Method as TwigMethod;
 use DebugBar\Bridge\Twig\TraceableTwigEnvironment;
 use DebugBar\Bridge\Twig\TwigCollector;
 use Alaress\Redis;
@@ -320,6 +321,9 @@ class Bootstrap implements BootstrapInterface {
 			)
 		);
 
+        $di->params[TwigMethod\RequireModule::class]['di'] = $di;
+        $di->set('templateEngine:requireModule', $di->lazyNew(TwigMethod\RequireModule::class));
+
 		$di->setters['Alaress\\Twig\\Method\\RouteLookup']['setRouter'] = $di->lazyGet('router');
 		$di->set('templateEngine:routeLookup', $di->lazyNew('Alaress\\Twig\\Method\\RouteLookup'));
 
@@ -397,6 +401,11 @@ class Bootstrap implements BootstrapInterface {
 //					$l10n['date'] = new Alaress_Date_Locale_Config();
 
 					$twig->addGlobal('locale', $l10n);
+
+                    // Define modules that are required by a template
+                    $twig->addFunction(
+                        new Twig_SimpleFunction('requireModule', $di->get('templateEngine:requireModule'))
+                    );
 
 					// Add the route lookup and authorization methods
 					$twig->addFunction(
