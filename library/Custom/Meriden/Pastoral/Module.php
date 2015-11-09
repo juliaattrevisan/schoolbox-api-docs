@@ -128,9 +128,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__.'/templates', 'customMeridenPastoral');
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePathForBasename($templateLoader, __DIR__ . '/templates');
     }
 
     /**

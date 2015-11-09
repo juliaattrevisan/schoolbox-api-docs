@@ -63,9 +63,7 @@ class Module extends BaseModule
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         // TODO inherit from an Admin baseclass to setup subnav
-        $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__ . '/templates', 'adminMessages');
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePathForBasename($templateLoader, __DIR__ . '/templates');
     }
 
 
