@@ -53,8 +53,9 @@ class Module extends BaseModule
         // Add the item to params, if ID is in the route.
         // TODO DI this
         $nodeMapper = new Node\Mapper();
-        $matcher->add(
-            '/^curriculum\\./',
+        $this->addRoutePreloadForBasename(
+            $matcher,
+            '.*',
             function ($params) use ($nodeMapper) {
                 if (array_key_exists('id', $params)) {
                     return array(

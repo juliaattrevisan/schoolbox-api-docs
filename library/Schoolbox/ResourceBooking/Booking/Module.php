@@ -54,8 +54,9 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
         // Add the booking item to params, if ID is in the route.
-        $matcher->add(
-            '/^resourceBooking\.(?:edit|update|approve|reject|setPending|cancel)/',
+        $this->addRoutePreloadForBasename(
+            $matcher,
+            '(?:edit|update|approve|reject|setPending|cancel)',
             function($params) {
                 return array(
                     'item' => Mapper::getInstance()->findById($params['id']),
@@ -63,8 +64,9 @@ class Module extends BaseModule
             }
         );
         // Add the resource item to params, if item ID is in the route.
-        $matcher->add(
-            '/^resourceBooking\.(?:book|createBooking|bookingCalendar)/',
+        $this->addRoutePreloadForBasename(
+            $matcher,
+            '(?:book|createBooking|bookingCalendar)',
             function($params) {
                 return array(
                     'item' => ItemMapper::getInstance()->findById($params['id']),

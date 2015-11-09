@@ -60,8 +60,9 @@ class Module extends BaseModule
         // TODO DI these
         $boxMapper = SubmissionBoxMapper::getInstance();
         $catMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
-        $matcher->add(
-            '/^submission\\./',
+        $this->addRoutePreloadForBasename(
+            $matcher,
+            '.*',
             function ($params) use ($boxMapper, $catMapper) {
                 if (array_key_exists('box_id', $params)) {
 

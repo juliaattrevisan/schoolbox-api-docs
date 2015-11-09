@@ -202,32 +202,20 @@ class Module extends BaseModule
     {
         /* Inject ingredients into course controller method
          */
-        $matcher->add(
-            '/^learningAnalytics\.course/', function($params) {
-                return $this->courseDependencies($params);
-            }
-        );
-
-        /* Inject ingredients into course controller method
-         */
-        $matcher->add(
-            '/^learningAnalytics\.courseWithTask/', function($params) {
+        $this->addRoutePreloadForBasename(
+            $matcher,
+            '(?:course|courseWithTask)',
+            function($params) {
                 return $this->courseDependencies($params);
             }
         );
 
         /* Inject ingredients into folder controller method
          */
-        $matcher->add(
-            '/^learningAnalytics\.folder/', function($params) {
-                return $this->folderDependencies($params);
-            }
-        );
-
-        /* Inject ingredients into folder controller method
-         */
-        $matcher->add(
-            '/^learningAnalytics\.folderWithTask/', function($params) {
+        $this->addRoutePreloadForBasename(
+            $matcher,
+            '(?:folder|folderWithTask)',
+            function($params) {
                 return $this->folderDependencies($params);
             }
         );

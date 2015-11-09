@@ -34,11 +34,15 @@ class Module extends BaseModule {
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $matcher->add('`^api\\.(?:register)$`', function ($params) {
-            return array(
-                'provider' => $params['provider'],
-            );
-        });
+        $this->addRoutePreloadForBasename(
+            $matcher,
+            'register',
+            function ($params) {
+                return array(
+                    'provider' => $params['provider'],
+                );
+            }
+        );
     }
 
 

@@ -92,8 +92,9 @@ class Module extends BaseModule
         // Search for the user
         // TODO move the mappers out of here, inject their dependency
         $userMapper = $this->userMapper;
-        $matcher->add(
-            '/^customMeridenPastoral\\.(?:index|subject|currentReport)/',
+        $this->addRoutePreloadForBasename(
+            $matcher,
+            '(?:index|subject|currentReport)',
             function ($params) use ($userMapper) {
                 $student = $userMapper->findWithSubjects($params['id']);
                 $student->setSubjectCollection(

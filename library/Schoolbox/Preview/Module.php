@@ -42,8 +42,9 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $matcher->add(
-            '/^preview\.(index|preview)/',
+        $this->addRoutePreloadForBasename(
+            $matcher,
+            '(?:index|preview)',
             function($params) {
                 return array(
                     'params' => $params
