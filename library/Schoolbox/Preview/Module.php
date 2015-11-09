@@ -18,6 +18,7 @@ use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
+    protected $basename = 'preview';
 
     /**
      * {@inheritdoc}
@@ -26,11 +27,11 @@ class Module extends BaseModule
     {
         /* Default index page
          */
-        $router->addGet('preview.index', $basePath);
+        $this->addGetRoute($router, 'index', $basePath, '');
 
         /* Render html fragment, or redirect
          */
-        $router->addGet('preview.preview', $basePath . '/{encodedUrl}')
+        $this->addGetRoute($router, 'preview', $basePath, '/{encodedUrl}')
             ->addValues([
                 'format' => '.json'
             ]);
