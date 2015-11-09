@@ -15,6 +15,7 @@ use Aura\Router\Route;
 use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Router\PathMatcher;
+use Alaress\Web\Router\RouteCollection;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 
@@ -112,7 +113,7 @@ class Module {
      */
     protected function addRoute(Router $router, $alias, $basePath, $path)
     {
-        return $router->add($this->basename.'.'.$alias, $basePath.$path);
+        return $router->getRoutes()->add($this->basename.'.'.$alias, $basePath.$path);
     }
 
     /**
@@ -129,7 +130,7 @@ class Module {
      */
     protected function addGetRoute(Router $router, $alias, $basePath, $path)
     {
-        return $router->addGet($this->basename.'.'.$alias, $basePath.$path);
+        return $router->getRoutes()->addGet($this->basename.'.'.$alias, $basePath.$path);
     }
 
     /**
@@ -146,7 +147,7 @@ class Module {
      */
     protected function addPostRoute(Router $router, $alias, $basePath, $path)
     {
-        return $router->addPost($this->basename.'.'.$alias, $basePath.$path);
+        return $router->getRoutes()->addPost($this->basename.'.'.$alias, $basePath.$path);
     }
 
     /**
@@ -157,8 +158,10 @@ class Module {
      */
     protected function attachResourceRoutes(Router $router, $basePath)
     {
-        $router->attachResource($this->basename, $basePath);
-        $router->attachResourcePostAlias($this->basename, $basePath);
+        /** @var RouteCollection $routes */
+        $routes = $router->getRoutes();
+        $routes->attachResource($this->basename, $basePath);
+        $routes->attachResourcePostAlias($this->basename, $basePath);
     }
 
     /**
