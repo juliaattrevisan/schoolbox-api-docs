@@ -29,8 +29,9 @@ $f-dropdown-icon-align: 0.25rem;
 // Dropdown
 .f-dropdown{
 	@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
-	a:hover{
+	li a:hover {
 		background-color: $content-ui-hover;
+		text-decoration: none;
 	}
 	.separator, .meta {
 		color: contrast-bg($background: $content-ui-background, $dark: $content-ui-foreground);

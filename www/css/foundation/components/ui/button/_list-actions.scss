@@ -33,7 +33,7 @@
 					right: 1rem;
 				}
 
-				a {
+				a[class*="icon-"] {
                     @include button-dimensions();
                     padding:0;
 					display: inline-block;
@@ -52,6 +52,9 @@
 					&.selected {
 						color: $content-ui-selected;
 						background-color: $button-color;
+					}
+					&:hover {
+						text-decoration: none;
 					}
 				}
 				input:checked + label {

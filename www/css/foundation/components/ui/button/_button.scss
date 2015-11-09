@@ -5,22 +5,18 @@
     padding: $global-button-padding;
 }
 
-/* Link Styles
- * Really hammer out the $primary-color assumption
- * as clicking on a link then hovering away reveals
- * another unseen usage of this var
- */
-a, a:link, a:visited, a:active {
-    color: $content-ui-foreground;
-    &:hover {
-        color: $content-ui-foreground;
-    }
-}
-
 a[disabled], a.disabled {
     // Make disabled links not clickable
     pointer-events: none;
     cursor: default;
+	&:hover {
+		text-decoration: none;
+	}
+}
+
+// rather than use the global (which would affect sidebar, topbar, etc.) limit anchor decoration to explicitly content
+.main-section a:hover {
+	text-decoration: underline;
 }
 
 /* All generic buttons
@@ -34,6 +30,7 @@ a[disabled], a.disabled {
 	&:hover {
 	    color: $content-ui-foreground;
 	    background-color: $content-ui-hover;
+		text-decoration: none !important; // forgive me, for I have sinned.
     }
 
 	&.alert{
