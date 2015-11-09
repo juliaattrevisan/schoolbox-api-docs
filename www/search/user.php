@@ -253,42 +253,35 @@ if (is_numeric($this->arg[0])) {
         error(31);
     }
 
-    // advanced synergetic information
-    if (Cfg::get('external_enable')) {
-        $synUserHandler = new External_User();
-        if ($groupHandler->isParent($user['uid'])) {
-            renderParent(
-                $this,
-                $user,
-                $synUserHandler,
-                new UserMapper(),
-                new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
-            );
-        } elseif ($groupHandler->isStudent($user['uid'])) {
-            renderStudent(
-                $this,
-                $user,
-                $groupHandler,
-                $synUserHandler,
-                new External_Class(),
-                new UserMapper(),
-                new Folder\Mapper(),
-                new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
-            );
-        } elseif ($groupHandler->isStaff($user['uid'])) {
-            renderStaff(
-                $this,
-                $user,
-                $synUserHandler,
-                new UserMapper(),
-                new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
-            );
-        } else {
-            $this->pageNotFound();
-        }
+    $synUserHandler = new External_User();
+    if ($groupHandler->isParent($user['uid'])) {
+        renderParent(
+            $this,
+            $user,
+            $synUserHandler,
+            new UserMapper(),
+            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
+        );
+    } elseif ($groupHandler->isStudent($user['uid'])) {
+        renderStudent(
+            $this,
+            $user,
+            $groupHandler,
+            $synUserHandler,
+            new External_Class(),
+            new UserMapper(),
+            new Folder\Mapper(),
+            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
+        );
+    } elseif ($groupHandler->isStaff($user['uid'])) {
+        renderStaff(
+            $this,
+            $user,
+            $synUserHandler,
+            new UserMapper(),
+            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
+        );
     } else {
-        // Show something else (non-twig)
-        // Probably a 404 screen
         $this->pageNotFound();
     }
 } else {
