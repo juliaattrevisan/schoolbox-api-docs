@@ -142,7 +142,7 @@ abstract class AbstractController extends BaseController
     protected function getFolderData($folderId)
     {
         // Redirect to this folder next time page gets reloaded
-        $this->getSession()->set('resourcesID', $folderId);
+        $this->getSession()->set('resourcesID', $folderId, $this->namespace);
 
         $folder = $this->getFolder($folderId);
 
@@ -189,14 +189,14 @@ abstract class AbstractController extends BaseController
     {
         // if a folder ID was supplied, stash that in session then redirect
         if ($folderId) {
-            $this->getSession()->set('resourcesID', $folderId);
+            $this->getSession()->set('resourcesID', $folderId, $this->namespace);
 
             $this->getResponse()->redirect->to(
                 $this->getRouter()->generate("{$this->namespace}.browse", array())
             );
         }
 
-        $folderId = $this->getSession()->get('resourcesID', 0);
+        $folderId = $this->getSession()->get('resourcesID', 0, $this->namespace);
 
         $data = $this->getFolderData($folderId);
 
