@@ -111,7 +111,7 @@ class Module {
      *
      * @return Route
      */
-    protected function addRoute(Router $router, $alias, $basePath, $path, $path = '')
+    protected function addRoute(Router $router, $alias, $basePath, $path)
     {
         return $router->getRoutes()->add($this->basename.'.'.$alias, $basePath.$path);
     }
@@ -128,7 +128,7 @@ class Module {
      *
      * @return Route
      */
-    protected function addGetRoute(Router $router, $alias, $basePath, $path = '')
+    protected function addGetRoute(Router $router, $alias, $basePath, $path)
     {
         return $router->getRoutes()->addGet($this->basename.'.'.$alias, $basePath.$path);
     }
@@ -145,7 +145,7 @@ class Module {
      *
      * @return Route
      */
-    protected function addPostRoute(Router $router, $alias, $basePath, $path, $path = '')
+    protected function addPostRoute(Router $router, $alias, $basePath, $path)
     {
         return $router->getRoutes()->addPost($this->basename.'.'.$alias, $basePath.$path);
     }
