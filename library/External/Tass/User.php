@@ -14,11 +14,18 @@ class External_Tass_User implements External_UserInterface
     */
     private $database;
 
+    /**
+     * The TASS company code to use, for queries which require it.
+     *
+     * @var string
+     */
+    private $companyCode;
+
     function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
-
         $this->groupHandler = new Group;
+        $this->companyCode  = Config::get('external_tass_company_code');
     }
 
     function getParent($synID)
@@ -145,15 +152,39 @@ class External_Tass_User implements External_UserInterface
         return $parent;
     }
 
-    function getCurrentSemester($exteralUserId = null)
+    function getCurrentSemester($externalUserId = null)
     {
-        $query = "SELECT curr_sem FROM ttparms WHERE cmpy_code = 01";
+        if (isset($externalUserId)) {
+            $query = "
+                SELECT tt.curr_sem
+                FROM ttparms tt
+                INNER JOIN student s ON tt.cmpy_code = s.cmpy_code
+                WHERE s.stud_code = {$this->getDatabase()->smartQuote($externalUserId)}";
+        } else {
+            $query = "
+                SELECT curr_sem
+                FROM ttparms
+                WHERE cmpy_code = {$this->getDatabase()->smartQuote($this->companyCode)}
+            ";
+        }
         return $this->getDatabase()->getOne($query);
     }
 
     public function getCurrentYear($externalUserId = null)
     {
-        $query = "SELECT curr_year FROM ttparms WHERE cmpy_code = 01";
+        if (isset($externalUserId)) {
+            $query = "
+                SELECT tt.curr_year
+                FROM ttparms tt
+                INNER JOIN student s ON tt.cmpy_code = s.cmpy_code
+                WHERE s.stud_code = {$this->getDatabase()->smartQuote($externalUserId)}";
+        } else {
+            $query = "
+                SELECT curr_year
+                FROM ttparms
+                WHERE cmpy_code = {$this->getDatabase()->smartQuote($this->companyCode)}
+            ";
+        }
         return $this->getDatabase()->getOne($query);
     }
 
@@ -224,11 +255,21 @@ class External_Tass_User implements External_UserInterface
             $parentNum = $id[$splitParentLength-1];
 
             $query = "
-                SELECT stud_codes AS RelatedID
-                FROM pia_sfaccess
-                WHERE cmpy_code = '01'
-                AND par_code = '$parentCode'
-                AND sfa_num = '$parentNum'
+                SELECT
+                    sf.stud_codes AS RelatedID
+                FROM parent AS p
+                INNER JOIN paraddress as pa
+                    ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code
+                LEFT JOIN pia_sfaccess AS sf
+                    ON p.par_code = sf.par_code
+                    AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
+                    AND p.cmpy_code = sf.cmpy_code
+                LEFT JOIN student as s
+                    ON p.par_code = s.par_code
+                    AND p.cmpy_code = s.cmpy_code
+                WHERE sf.par_code = {$this->getDatabase()->smartQuote($parentCode)}
+                AND   sf.sfa_num  = {$this->getDatabase()->smartQuote($parentNum)}
+                ORDER BY p.par_code ASC
             ";
 
             $return = array();
@@ -240,16 +281,18 @@ class External_Tass_User implements External_UserInterface
                     // data is stored in a single field, comma separated
                     $list = explode(',', $row['RelatedID']);
                     foreach ($list as $childID) {
-                        $return[] = array('RelatedID' => $childID);
+                        $return[$childID] = array('RelatedID' => $childID);
                     }
                 }
             }
         } else {
             $query = "
-				SELECT stud_code AS RelatedID
-				FROM student
-				WHERE par_code = '$id'
-				AND cmpy_code = '01'
+				SELECT s.stud_code AS RelatedID
+				FROM student s
+                LEFT JOIN parent p
+                    ON  p.par_code = s.par_code
+                    AND p.cmpy_code = s.cmpy_code
+				WHERE s.par_code = {$this->getDatabase()->smartQuote($id)}
 			";
             $return = $this->getDatabase()->getAll($query);
         }

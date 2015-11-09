@@ -38,6 +38,7 @@ class External_Tass_PortalModule extends \Alaress\Module\Module
                 [
                     'configuration' => [
                         'token_key' => $config->get('external_tass_sso_token_key'),
+                        'cmpy_code' => $config->get('external_tass_company_code'),
                     ],
                     'server' => $config->get('external_tass_sso_server'),
                 ]
