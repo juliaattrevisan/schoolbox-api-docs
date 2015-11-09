@@ -15,14 +15,14 @@ class External_Maze_Class implements External_ClassInterface {
 	 *
 	 * @var null
 	 */
-	private $db = null;
+	protected $db = null;
 
 	/**
 	 * Helper
 	 *
 	 * @var null
 	 */
-	private $helper = null;
+	protected $helper = null;
 
 	/**
 	 * Constructor
@@ -39,7 +39,7 @@ class External_Maze_Class implements External_ClassInterface {
 	 * @return array
 	 */
 	public function getStudents($classCode) {
-		$ttPeriod = $this->getHelper()->getCurrentTTPeriod();
+		$ttPeriod = $this->getHelper()->getCurrentTTPERIOD();
 
 		$ingredients = $this->getHelper()->degenerateClassCode($classCode);
 
@@ -123,7 +123,7 @@ class External_Maze_Class implements External_ClassInterface {
 	 * @return array
 	 */
 	public function getTeacherName($classCode) {
-		$ttPeriod = $this->getHelper()->getCurrentTTPeriod();
+		$ttPeriod = $this->getHelper()->getCurrentTTPERIOD();
 
 		/* Assume Schoolbox $classCodes are in the format: '07SCI-1'
 		 * where the 1 represents the Class which could be
@@ -152,11 +152,11 @@ class External_Maze_Class implements External_ClassInterface {
 		$query = "
 			SELECT
 				TEACHER AS T1TEACH,
-				TEACHERB AS T2TEACH,
-				TEACHERC AS T3TEACH
+				'' AS T2TEACH,
+				'' AS T3TEACH
 			FROM KGC
 			WHERE KGC.ROLL_GROUP = '{$classCode}'
-		";
+			";
 
 		$part2 = $this->getDb()->getAll($query);
 
@@ -195,7 +195,7 @@ class External_Maze_Class implements External_ClassInterface {
 	 *
 	 * @param null $db
 	 */
-	private function setDb($db) {
+	protected function setDb($db) {
 		$this->db = $db;
 	}
 
@@ -204,7 +204,7 @@ class External_Maze_Class implements External_ClassInterface {
 	 *
 	 * @return null
 	 */
-	private function getDb() {
+	protected function getDb() {
 		return $this->db;
 	}
 
@@ -213,7 +213,7 @@ class External_Maze_Class implements External_ClassInterface {
 	 *
 	 * @param null $helper
 	 */
-	private function setHelper($helper) {
+	protected function setHelper($helper) {
 		$this->helper = $helper;
 	}
 
@@ -222,7 +222,7 @@ class External_Maze_Class implements External_ClassInterface {
 	 *
 	 * @return null
 	 */
-	private function getHelper() {
+	protected function getHelper() {
 		return $this->helper;
 	}
 } 

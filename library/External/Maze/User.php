@@ -15,21 +15,21 @@ class External_Maze_User implements External_UserInterface {
 	 *
 	 * @var null
 	 */
-	private $db = null;
+	protected $db = null;
 
 	/**
 	 * A Handler of Groups
 	 *
 	 * @var
 	 */
-	private $groupHandler;
+	protected $groupHandler;
 
 	/**
 	 * Helper
 	 *
 	 * @var External_Maze_Helper
 	 */
-	private $helper = null;
+	protected $helper = null;
 
 	/**
 	 * Constructor
@@ -85,7 +85,7 @@ class External_Maze_User implements External_UserInterface {
 	 * @param $family
 	 * @return array
 	 */
-	private function recombine($family) {
+	protected function recombine($family) {
 
 		/* Combine everything into a joint account
 		 *
@@ -314,7 +314,7 @@ class External_Maze_User implements External_UserInterface {
 				'' AS HeadOfHouseID,
 				'' AS StudentHeadOfHouse,
 				'' AS StudentForm,
-				(COORDINATOR.FIRST_NAME + ' ' + COORDINATOR.SURNAME) AS StudentFormStaffName,
+				'' AS StudentFormStaffName,
 				'' AS TeacherFormID,
 				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
@@ -323,12 +323,12 @@ class External_Maze_User implements External_UserInterface {
 				'' AS StudentYearLevelCoordinator,
 				'' AS YearLevelCoordID,
 				'' AS StudentLockerBook,
-				ST.EMERGENCY_ONE_NAME AS StudentEmergencyName,
-				ST.EMERGENCY_ONE_PHONE AS StudentEmergencyPhone,
-				ST.EMERGENCY_ONE_MOBILE AS StudentEmergencyPhoneAlt,
-				ST.EMERGENCY_TWO_NAME AS StudentEmergency2Name,
-				ST.EMERGENCY_TWO_PHONE AS StudentEmergency2Phone,
-				ST.EMERGENCY_TWO_MOBILE AS StudentEmergency2PhoneAlt,
+				'' AS StudentEmergencyName,
+				'' AS StudentEmergencyPhone,
+				'' AS StudentEmergencyPhoneAlt,
+				'' AS StudentEmergency2Name,
+				'' AS StudentEmergency2Phone,
+				'' AS StudentEmergency2PhoneAlt,
 				'' AS StudentEmergency3Name,
 				'' AS StudentEmergency3Phone,
 				'' AS StudentEmergency3PhoneAlt,
@@ -344,7 +344,6 @@ class External_Maze_User implements External_UserInterface {
 			LEFT JOIN KCT ON ST.SCHOOL_YEAR = KCT.KCTKEY
 			LEFT JOIN SF ADVISOR ON KCT.SFLINK = ADVISOR.SFKEY
 			LEFT JOIN KCY ON ST.SCHOOL_YEAR = KCY.KCYKEY
-			LEFT JOIN SF COORDINATOR ON KCY.YEAR_COORD = COORDINATOR.SFKEY
 			WHERE STKEY = '{$synId}'
 		";
 
@@ -362,7 +361,7 @@ class External_Maze_User implements External_UserInterface {
 				SF.FIRST_NAME AS FIRSTNAME,
 				SF.SURNAME
 			FROM KGC
-			LEFT JOIN SF ON KGC.TEACHER = SF.SFKEY OR KGC.TEACHERB = SF.SFKEY
+			LEFT JOIN SF ON KGC.TEACHER = SF.SFKEY
 			WHERE KGC.ROLL_GROUP = '{$student['ROLL_GROUP']}'
 		";
 
@@ -430,7 +429,7 @@ class External_Maze_User implements External_UserInterface {
 				ADDRESS01 AS StudentContactAddress1,
 				ADDRESS02 AS StudentContactAddress2,
 				ADDRESS03 AS StudentContactAddress3,
-				SUBURB AS StudentContactSuburb,
+				'' AS StudentContactSuburb,
 				POSTCODE AS StudentContactPostCode,
 				STATE AS StudentContactState,
 				TELEPHONE AS StudentContactPhoneActual,
@@ -452,7 +451,7 @@ class External_Maze_User implements External_UserInterface {
 			WHERE ST.STKEY = '{$externalUserId}'
 		";
 
-        return $this->getDb()->getAll($query);
+	        return $this->getDb()->getAll($query);
 	}
 
 	/**
@@ -463,9 +462,9 @@ class External_Maze_User implements External_UserInterface {
 	 *
 	 * Note that there is no StudentContactHomeCountryDesc in the Synergetic views
 	 * so I changed it to use CountryCode instead.
-     *
-     * Note that if a student has split parents, they will appear more than once.
-     * They will appear once for each split parent.
+    	 *
+     	 * Note that if a student has split parents, they will appear more than once.
+     	 * They will appear once for each split parent.
 	 *
 	 * @param $yearlevel
 	 * @param $name
@@ -511,18 +510,17 @@ class External_Maze_User implements External_UserInterface {
 				UM.ADDRESS01 AS StudentContactAddress1,
 				UM.ADDRESS02 AS StudentContactAddress2,
 				UM.ADDRESS03 AS StudentContactAddress3,
-				UM.SUBURB AS StudentContactSuburb,
+				'' AS StudentContactSuburb,
+				'' AS StudentContactHomeSuburb,
 				UM.POSTCODE AS StudentContactPostCode,
 				UM.STATE AS StudentContactState,
 				'' AS StudentContactCountryCode,
 				UM.ADDRESS01 AS StudentContactHomeAddress1,
 				UM.ADDRESS02 AS StudentContactHomeAddress2,
 				UM.ADDRESS03 AS StudentContactHomeAddress3,
-				UM.SUBURB AS StudentContactHomeSuburb,
 				UM.POSTCODE AS StudentContactHomePostCode,
 				UM.STATE AS StudentContactHomeState,
 				'' AS StudentContactHomeCountryCode,
-
 				'' AS StudentContactType,
 				UM.SILENT_NUMBER AS StudentContactSilentPhoneFlag,
 				'' AS PrimaryDirectoryIncludeFlag,
@@ -678,7 +676,7 @@ class External_Maze_User implements External_UserInterface {
 				FROM STMA
 				LEFT JOIN SU ON STMA.MKEY = SU.SUKEY
 				WHERE SKEY = '{$externalUserId}'
-				AND STMA.TTPERIOD = '{$this->getHelper()->getCurrentTTPeriod()}'
+				AND STMA.TTPERIOD = '{$this->getHelper()->getCurrentTTPERIOD()}'
 			";
 
 			$part2 = $this->getDb()->getAll($query);
@@ -699,8 +697,6 @@ class External_Maze_User implements External_UserInterface {
 					KGC.DESCRIPTION AS name
 				FROM KGC
 				WHERE TEACHER = '{$externalUserId}'
-				OR TEACHERB = '{$externalUserId}'
-				OR TEACHERC = '{$externalUserId}'
 			";
 
 			$part1 = $this->getDb()->getAll($query);
@@ -718,7 +714,7 @@ class External_Maze_User implements External_UserInterface {
 					'' AS ClassCampus
 				FROM THTQ
 				INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
-				WHERE THTQ.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+				WHERE THTQ.QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
 				AND (THTQ.T1TEACH = '{$externalUserId}' OR THTQ.T2TEACH = '{$externalUserId}')
 			";
 
@@ -1058,7 +1054,7 @@ class External_Maze_User implements External_UserInterface {
 	 *
 	 * @param null $db
 	 */
-	private function setDb($db) {
+	protected function setDb($db) {
 		$this->db = $db;
 	}
 
@@ -1067,7 +1063,7 @@ class External_Maze_User implements External_UserInterface {
 	 *
 	 * @return null
 	 */
-	private function getDb() {
+	protected function getDb() {
 		return $this->db;
 	}
 
@@ -1076,7 +1072,7 @@ class External_Maze_User implements External_UserInterface {
 	 *
 	 * @param Group $groupHandler
 	 */
-	private function setGroup($groupHandler) {
+	protected function setGroup($groupHandler) {
 		$this->groupHandler = $groupHandler;
 	}
 
@@ -1085,7 +1081,7 @@ class External_Maze_User implements External_UserInterface {
 	 *
 	 * @return Group
 	 */
-	private function getGroup() {
+	protected function getGroup() {
 		return $this->groupHandler;
 	}
 
@@ -1094,7 +1090,7 @@ class External_Maze_User implements External_UserInterface {
 	 *
 	 * @param External_Maze_Helper $helper
 	 */
-	private function setHelper($helper) {
+	protected function setHelper($helper) {
 		$this->helper = $helper;
 	}
 
@@ -1103,7 +1099,7 @@ class External_Maze_User implements External_UserInterface {
 	 *
 	 * @return External_Maze_Helper
 	 */
-	private function getHelper() {
+	protected function getHelper() {
 		return $this->helper;
 	}
 }
