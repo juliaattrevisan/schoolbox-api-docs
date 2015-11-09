@@ -23,16 +23,16 @@ use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
+    protected $basename = 'submission';
+
     /**
      * @param Router $router
      * @param string $basePath
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $routes = $router->getRoutes();
-
-        $routes->addGet('submission.viewOverview', "$basePath/overview/{box_id}");
-        $routes->addGet('submission.downloadOverview', "$basePath/overview/{box_id}/csv");
+        $this->addGetRoute($router, 'viewOverview', $basePath, "/overview/{box_id}");
+        $this->addGetRoute($router, 'downloadOverview', $basePath, "/overview/{box_id}/csv");
     }
 
 

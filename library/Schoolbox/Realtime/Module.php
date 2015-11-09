@@ -20,6 +20,7 @@ use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
+    protected $basename = 'messages';
 
     /**
      * @param Router $router
@@ -27,10 +28,8 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $routes = $router->getRoutes();
-
-        $routes->addGet('messages.configure', $basePath);
-        $routes->addPost('messages.saveConfig', $basePath);
+        $this->addGetRoute($router, 'configure', $basePath, '');
+        $this->addPostRoute($router, 'saveConfig', $basePath, '');
     }
 
 
