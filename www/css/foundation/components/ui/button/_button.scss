@@ -138,22 +138,20 @@ a.submit {
  * the actual flex-list button dimensions aren't right.
  */
 ul.flex-list {
-    &.buttons {
-        > li > a {
-            @extend .button;
-            @include button-dimensions();
+    &.buttons > li > a, button {
+        @extend .button;
+        @include button-dimensions();
 
-            /* Allow long content
-             * This expands UPWARDS! Don't know why
-             */
-            white-space: normal;
-            height: auto;
+        /* Allow long content
+         * This expands UPWARDS! Don't know why
+         */
+        white-space: normal;
+        height: auto;
 
-            /* Also allow fake submit styles in flex list
-             */
-            &.submit {
-                @extend input[type="submit"];
-            }
+        /* Also allow fake submit styles in flex list
+         */
+        &.submit {
+            @extend input[type="submit"];
         }
     }
 }
