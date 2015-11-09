@@ -65,7 +65,6 @@ class Module {
             $this->initRoutePreloads($injector->get('preloader'));
             $this->initRoutePermissions($injector->get('authorizer'));
             $this->initTemplatePaths($injector->get('templateEngine:loader'));
-            $this->initControllers($injector);
         }
     }
 
