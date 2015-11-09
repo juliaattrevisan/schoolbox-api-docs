@@ -17,13 +17,15 @@ use Aura\Router\Router;
 
 class Module extends BaseModule {
 
+    protected $basename = 'api';
+
     /**
      * @param Router|RouteCollection $router
      * @param string $basePath
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->addPost('api.register', $basePath . '/register/{provider}');
+        $this->addPostRoute($router, 'register', $basePath, '/register/{provider}');
     }
 
 
