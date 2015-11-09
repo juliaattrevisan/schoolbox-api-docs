@@ -9,6 +9,12 @@ $boarder-leave-print-pending-border-color: #d0d0d0 !default;
 
 .boarder-leave-print {
 
+    /* Prevent some weird clipping (don't know why it occurs)
+     */
+    .boarder-leave-print-container {
+        padding-right: 1rem;
+    }
+
     /* Hide display of urls
      */
     a {
@@ -51,11 +57,18 @@ $boarder-leave-print-pending-border-color: #d0d0d0 !default;
         }
     }
 
-    /* Special styling for top-left corner
+    /* Special styling for top-left corner cell
      */
     tr:first-child th:first-child {
         border-top: 0px;
         border-left: 0px;
+    }
+
+    /* Special styling for top-right corner cell
+     */
+    tr:first-child th:last-child {
+        border-top: 0px;
+        border-right: 0px;
     }
 
     /* First header/data (student name) left aligned
@@ -99,18 +112,18 @@ $boarder-leave-print-pending-border-color: #d0d0d0 !default;
 
     .signature {
         .title {
-            width: 225px;
+            width: 216px;
             padding-left: 0.25rem;
             padding-bottom: 2rem;
         }
 
         .initial {
-            width: 3rem;
+            width: 2.75rem;
         }
     }
 
     .short {
-        width: 3rem;
+        width: 2.75rem;
     }
 
     .medium {
