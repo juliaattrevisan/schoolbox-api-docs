@@ -75,8 +75,6 @@ class Kernel extends \Alaress\Application\Kernel
             preg_match('/^(?P<controller>\w+)\\.(?P<action>\w+)/', $route->name, $parsedName);
             $controllerName = $parsedName['controller'];
             $action         = $parsedName['action'];
-            /** @var \Alaress\Web\Controller\Base $controller */
-            $controller = $this->di->get('controller:'.$controllerName);
             /** @var \Alaress\Session\Session $session */
             $session = $this->di->get('session');
             /** @var \Aura\Web\Response $response */
@@ -133,6 +131,8 @@ class Kernel extends \Alaress\Application\Kernel
                 // If authorizePathForUser() threw no exception, authorization passed!
                 // Call the controller method.
                 // Ensure that the parameters match up with the names used.
+                /** @var \Alaress\Web\Controller\Base $controller */
+                $controller = $this->di->get('controller:'.$controllerName);
                 $method = new ReflectionMethod($controller, $action);
                 $args   = array();
                 foreach ($method->getParameters() as $parameter) {
