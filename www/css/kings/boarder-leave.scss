@@ -1,3 +1,5 @@
+$boarder-leave-print-border: 1px solid #ccc;
+
 @media print {
     #footer {
         display:none;
@@ -46,25 +48,29 @@
     th {
         font-size: 0.625rem;
         padding: 0;
-        border-top: 1px solid #ededed;
-        border-right: 1px solid #ededed;
-        border-bottom: 1px solid #ededed;
-
+        border-top: $boarder-leave-print-border;
+        border-right: $boarder-leave-print-border;
+        border-bottom: $boarder-leave-print-border;
         text-align: center;
     }
 
     td {
         font-size: 0.625rem;
         padding: 0;
-        border-top: 1px solid #ededed;
-        border-right: 1px solid #ededed;
-        border-bottom: 1px solid #ededed;
+        border-top: $boarder-leave-print-border;
+        border-right: $boarder-leave-print-border;
+        border-bottom: $boarder-leave-print-border;
+    }
+
+    tr:first-child th:first-child {
+        border-top: 0px;
+        border-left: 0px;
     }
 
     th:first-child,
     td:first-child
     {
-        border-left: 1px solid #ededed;
+        border-left: $boarder-leave-print-border;
     }
 
     .signature {
