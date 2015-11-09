@@ -313,8 +313,7 @@ class SitePage extends Page
         }
 
         if (!$lite && !$this->lite) {
-            // quasi-localisation
-            $this->localise();
+
             $this->buildPage();
             $this->saveHistory();
         }
@@ -397,6 +396,9 @@ class SitePage extends Page
         $this->setBlock($this->responsive ? TEMPLATE_body : 'bannerTpl', 'banner_logged_in', 'banner_logged_in_block');
 
         if ($_SESSION['id']) {
+
+            // quasi-localisation
+            $this->localise();
 
             /* Output superuser link to administration */
             $this->setBlock('banner_logged_in', 'admin_only_menu', 'admin_only_menu_block');
