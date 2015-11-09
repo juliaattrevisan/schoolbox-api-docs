@@ -77,6 +77,7 @@ class Kernel extends \Alaress\Application\Kernel
             $action         = $parsedName['action'];
             /** @var \Alaress\Module\Module $module */
             $module = $this->di->get('module:'.$controllerName);
+            $module->initControllerDependencies();
             $module->initControllers($this->di);
             unset($module);
             /** @var \Alaress\Web\Controller\Base $controller */
