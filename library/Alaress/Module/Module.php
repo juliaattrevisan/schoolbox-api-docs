@@ -39,6 +39,23 @@ class Module {
     protected $basename;
 
     /**
+     * Modules that this module depends on.
+     *
+     * Each entry must be a module in $this->injector.
+     *
+     * @var array
+     */
+    protected $moduleDependencies = [];
+
+    /**
+     * Has this module had its controller's dependencies installed yet?
+     * They should only be installed once.
+     *
+     * @var bool
+     */
+    protected $isControllerDependenciesInstalled = false;
+
+    /**
      * Constructor
      *
      * TODO don't set $injector here, pass as a param to init() instead.
@@ -52,7 +69,11 @@ class Module {
     }
 
     /**
-     * Inits module
+     * Installs module with its most basic configuration.
+     *
+     * Only the module's submodules and routes should be initialised here -
+     * these are the bare minimum the kernel requires to bind a module to a
+     * route, and then execute it.
      *
      * @param string $basePath The base URL for this module, used by initRoutes
      */
@@ -62,10 +83,27 @@ class Module {
             $this->initSubmodules($injector, $basePath);
             $this->initRoutes($injector->get('router'), $basePath);
             // TODO preloads and permissions should be able to be set up separately
-            $this->initRoutePreloads($injector->get('preloader'));
-            $this->initRoutePermissions($injector->get('authorizer'));
-            $this->initTemplatePaths($injector->get('templateEngine:loader'));
+            $this->initControllerDependencies();
         }
+    }
+
+    /**
+     * Performs setup steps required to use this module's controller.
+     *
+     * This should include the module's route permissions and preloads, and its
+     * template paths, and any modules the controller depends on.
+     */
+    public function initControllerDependencies()
+    {
+        if ($this->isControllerDependenciesInstalled) {
+            return;
+        }
+        $this->isControllerDependenciesInstalled = true;
+        $injector                                = $this->getInjector();
+        $this->initDependingModules();
+        $this->initRoutePreloads($injector->get('preloader'));
+        $this->initRoutePermissions($injector->get('authorizer'));
+        $this->initTemplatePaths($injector->get('templateEngine:loader'));
     }
 
     /**
@@ -78,13 +116,13 @@ class Module {
     protected function installModule(ContainerInterface $injector)
     {
         if (!$this->basename) {
-            throw new \LogicException(sprintf('Module class "%s" has no basename set', get_class($this)));
+            throw new LogicException(sprintf('Module class "%s" has no basename set', get_class($this)));
         }
         $key = 'module:'.$this->basename;
         if ($injector->has($key)) {
             $other = $injector->get($key);
             if (get_class($other) != get_class($this)) {
-                throw new \LogicException(
+                throw new LogicException(
                     sprintf(
                         'Module "%s" is already defined as instanceof "%s" - won\'t redefine as instanceof "%s"',
                         $this->basename,
@@ -191,6 +229,22 @@ class Module {
         $routes = $router->getRoutes();
         $routes->attachResource($this->basename, $basePath);
         $routes->attachResourcePostAlias($this->basename, $basePath);
+    }
+
+    /**
+     * Calls the secondary init on each module that this one depends on.
+     *
+     * @throws LogicException if a dependency doesn't exist
+     */
+    protected function initDependingModules()
+    {
+        foreach ($this->moduleDependencies as $dependency) {
+            $dependingModule = $this->getInjector()->get('module:'.$dependency);
+            if (!$dependingModule instanceof Module) {
+                throw new LogicException(sprintf('Module "%s" does not exist', $dependency));
+            }
+            $dependingModule->initControllerDependencies();
+        }
     }
 
     /**
