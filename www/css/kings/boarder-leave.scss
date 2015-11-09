@@ -1,0 +1,97 @@
+@media print {
+    #footer {
+        display:none;
+    }
+}
+
+.boarder-leave-print {
+    a {
+        text-decoration: none;
+        color: #000;
+    }
+
+    a[href]:after {
+        content: none !important;
+    }
+
+    .letterhead {
+        position: relative;
+        margin-bottom: 2rem;
+        text-align: center;
+
+        .crest {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        h1 {
+            font-weight: normal;
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        h2 {
+            font-size: 1rem;
+        }
+
+        address {
+            text-align: center;
+            font-style: normal;
+            font-size: 0.75rem;
+            margin-bottom: 2rem;
+        }
+    }
+
+    th {
+        font-size: 0.625rem;
+        padding: 0;
+        border-top: 1px solid #ededed;
+        border-right: 1px solid #ededed;
+        border-bottom: 1px solid #ededed;
+
+        text-align: center;
+    }
+
+    td {
+        font-size: 0.625rem;
+        padding: 0;
+        border-top: 1px solid #ededed;
+        border-right: 1px solid #ededed;
+        border-bottom: 1px solid #ededed;
+    }
+
+    th:first-child,
+    td:first-child
+    {
+        border-left: 1px solid #ededed;
+    }
+
+    .signature {
+        .title {
+            width: 225px;
+            padding-bottom: 2rem;
+        }
+
+        .initial {
+            width: 48px;
+        }
+    }
+
+    .short {
+        width: 48px;
+    }
+
+    .medium {
+        width: 128px;
+    }
+
+    .hidden-column {
+        width: 1px;
+        border: 0;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+}
