@@ -82,14 +82,13 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->addGet($this->basename.'.layout', $basePath . '/layout/{componentId}');
-        $router->addPost($this->basename.'.layoutForm', $basePath . '/layout/{componentId}');
+        $this->addGetRoute($router, 'layout', $basePath, 'layout/{componentId}');
+        $this->addPostRoute($router, 'layoutForm', $basePath , 'layout/{componentId}');
         // Attach standard REST routes
-        $router->attachResource($this->basename, $basePath);
-        $router->attachResourcePostAlias($this->basename, $basePath);
+        $this->attachResourceRoutes($router, $basePath);
         // but have separate add tile paths
-        $router->addGet($this->basename.'.add', $basePath.'/add/{componentId}');
-        $router->addPost($this->basename.'.create', $basePath.'/add/{componentId}');
+        $this->addGetRoute($router, 'add', $basePath, 'add/{componentId}');
+        $this->addPostRoute($router, 'create', $basePath, '/add/{componentId}');
     }
 
     /**
@@ -105,8 +104,9 @@ class Module extends BaseModule
 
         // Routes that take a tile ID:
         // Look up the tile, and reverse lookup the component from its layout
-        $matcher->add(
-            "/^{$this->basename}\\.(?:edit|update|update:post|delete|delete:post)$/",
+        $this->addRoutePreloadForBasename(
+            $matcher,
+            '(?:edit|update|update:post|delete|delete:post)',
             function ($params) use ($mapper, $componentMapper) {
                 $item = $mapper->findById(
                     $params['id'],
@@ -127,8 +127,9 @@ class Module extends BaseModule
         );
 
         // Routes that take a component ID: look up component from it
-        $matcher->add(
-            "/^{$this->basename}\\.(?:add|create|layout|layoutForm)$/",
+        $this->addRoutePreloadForBasename(
+            $matcher,
+            '(?:add|create|layout|layoutForm)',
             function ($params) use ($componentMapper) {
                 $component = array_pop($componentMapper->findByInstanceId($params['componentId']));
 
@@ -157,8 +158,9 @@ class Module extends BaseModule
 
         // All routes: look up homepage from component
         // (if this component belongs to the homepage!)
-        $matcher->add(
-            "/^{$this->basename}\\.(?:add|create|layout|layoutForm|edit|update|update:post|delete|delete:post)$/",
+        $this->addRoutePreloadForBasename(
+            $matcher,
+            "(?:add|create|layout|layoutForm|edit|update|update:post|delete|delete:post)",
             function ($params) use ($catMapper) {
                 // augment params with homepage from category
                 if ($params['component']->getModule() == 'homepage') {
@@ -212,8 +214,8 @@ class Module extends BaseModule
             ),
             new Rule\IsTeacherOfClass($this->getExternalDb(), $getHomepageCallback)
         );
-        $authorizer->addRule("/^{$this->basename}\\..*/", new Rule\IsLoggedIn());
-        $authorizer->addRule("/^{$this->basename}\\..*/", $rule);
+        $this->addRoutePermissionForBasename($authorizer, '.*', new Rule\IsLoggedIn());
+        $this->addRoutePermissionForBasename($authorizer, '.*', $rule);
     }
 
     /**
@@ -221,9 +223,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__ . '/templates', $this->basename);
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePathForBasename($templateLoader, __DIR__ . '/templates');
     }
 
     /**
