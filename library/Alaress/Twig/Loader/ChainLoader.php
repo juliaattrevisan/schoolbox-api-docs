@@ -1,6 +1,10 @@
 <?php
 /**
- * Class description here
+ * Custom chain loader for Twig templates.
+
+ * Overrides template methods to first check if the module has been loaded, and
+ * then attempt to load it from the dependency injector before checking whether
+ * this exists or not.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
