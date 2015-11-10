@@ -192,22 +192,25 @@ function renderStudent(
 
     // Load contact's user IDs
     $contacts = [];
-    foreach ($synUserHandler->getStudentContactList($user['synergy_id']) as $contact) {
-        $main = null;
-        try {
-            $main = $userMapper->findByExternalId($contact['StudentContactID']);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // noop
+    $contactList = $synUserHandler->getStudentContactList($user['synergy_id']);
+    if(is_array($contactList)) {
+        foreach ($contactList as $contact) {
+            $main = null;
+            try {
+                $main = $userMapper->findByExternalId($contact['StudentContactID']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // noop
+            }
+            $spouse = null;
+            try {
+                $spouse = $userMapper->findByExternalId($contact['StudentContactSpouseID']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // noop
+            }
+            $contact['main'] = $main;
+            $contact['spouse'] = $spouse;
+            $contacts[] = $contact;
         }
-        $spouse = null;
-        try {
-            $spouse = $userMapper->findByExternalId($contact['StudentContactSpouseID']);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // noop
-        }
-        $contact['main']   = $main;
-        $contact['spouse'] = $spouse;
-        $contacts[]        = $contact;
     }
 
     // TwigLib
