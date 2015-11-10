@@ -617,10 +617,6 @@ abstract class Component_ControllerAbstract
 
         // Render the twig template
         try {
-            // Load the module too
-            if (preg_match('[^@(?P<namespace>.*?)/]', $twigTemplate, $matches)) {
-                $this->sitepage->getDi()->get('module:'.$matches['namespace'])->initControllerDependencies();
-            }
             $content = $this->sitepage->getTwig()->render($twigTemplate, $twigData);
         } catch (\Exception $e) {
             return false;
