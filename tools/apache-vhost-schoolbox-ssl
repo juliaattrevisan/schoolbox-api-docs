@@ -132,6 +132,7 @@ NameVirtualHost *:443
         #RewriteCond %{REQUEST_URI} !^/account/modify
         #RewriteCond %{REQUEST_URI} !^/account/modify/.*
         #RewriteCond %{REQUEST_URI} !^/ajax/.*
+        #RewriteCond %{REQUEST_URI} !^/resources/.*
         #RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
         #RewriteRule ^(.*)$ http://%{HTTP_HOST}%{REQUEST_URI} [R,NE,L]
 
