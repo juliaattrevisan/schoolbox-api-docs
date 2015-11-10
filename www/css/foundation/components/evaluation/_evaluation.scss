@@ -13,6 +13,11 @@
             @extend .icon-tick;
             color: $success-color;
         }
+
+        &.evaluation-incorrect-answer-option {
+            @extend .icon-close;
+            color: $alert-color;
+        }
     }
 
     &.evaluation-selected-answer-option {
