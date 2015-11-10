@@ -57,7 +57,7 @@
             {% if list|length %}
             <ul class="action-list">
                 {% for item in list %}
-                <li class="actions-small-1">
+                <li class="actions-small-2">
                     <div class="list-item">
                         <div class="small-12 avatar card">
                             <a href="{{ routeLookup('resourceItem.read', {id: item.id}) }}">
@@ -65,9 +65,9 @@
                                 <img src="/storage/image.php?size=square64&hash={{ item.image.hash|e('url') }}" />
                                 {% endif %}
 
-                                <p>
+                                <h3>
                                     {% include '@resourceItem/sub/itemName.twig' with {item: item} %}
-                                </p>
+                                </h3>
                             </a>
 
                             <p class="meta">
@@ -88,7 +88,6 @@
                         Is there some more semantically correct way of saying that this is a
                         resource, apart from adding classes?
                         #}
-                        <a class="icon-view resource-read-link" id="resource-read-{{item.id}}" title="View" href="{{ routeLookup('resourceItem.read', {id: item.id}) }}"></a>
 
                         {% if isRouteAuthorized('resourceBooking.book', {id: item.id, item: item}) %}
                         <a class="icon-add resource-book-link" id="resource-book-{{item.id}}" title="Book" href="{{ routeLookup('resourceBooking.book', {id: item.id}) }}"></a>
