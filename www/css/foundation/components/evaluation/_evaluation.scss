@@ -1,16 +1,25 @@
 /* Quiz and Survey
  */
 .evaluation-answer-option {
-    @extend .alert-box;
-    color: #000;
-    background-color: transparent;
+
+    /* Used to inherit alert-box
+     */
+    .close {
+        font-size: rem-calc(($base-font-size + 14));
+        color: #000;
+        position: absolute;
+        right: 0.25rem;
+    }
+
     &.evaluation-correct-answer-option {
         span:before {
-            color: #c3e5c3;
+            color: $success-color;
         }
     }
+
     &.evaluation-selected-answer-option {
-        background-color: #fff3bd;
+        color: $accent-foreground;
+        background-color: $accent-background;
     }
 }
 
