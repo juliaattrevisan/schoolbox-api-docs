@@ -192,22 +192,25 @@ function renderStudent(
 
     // Load contact's user IDs
     $contacts = [];
-    foreach ($synUserHandler->getStudentContactList($user['synergy_id']) as $contact) {
-        $main = null;
-        try {
-            $main = $userMapper->findByExternalId($contact['StudentContactID']);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // noop
+    $contactList = $synUserHandler->getStudentContactList($user['synergy_id']);
+    if(is_array($contactList)) {
+        foreach ($contactList as $contact) {
+            $main = null;
+            try {
+                $main = $userMapper->findByExternalId($contact['StudentContactID']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // noop
+            }
+            $spouse = null;
+            try {
+                $spouse = $userMapper->findByExternalId($contact['StudentContactSpouseID']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // noop
+            }
+            $contact['main'] = $main;
+            $contact['spouse'] = $spouse;
+            $contacts[] = $contact;
         }
-        $spouse = null;
-        try {
-            $spouse = $userMapper->findByExternalId($contact['StudentContactSpouseID']);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // noop
-        }
-        $contact['main']   = $main;
-        $contact['spouse'] = $spouse;
-        $contacts[]        = $contact;
     }
 
     // TwigLib
@@ -253,42 +256,35 @@ if (is_numeric($this->arg[0])) {
         error(31);
     }
 
-    // advanced synergetic information
-    if (Cfg::get('external_enable') && $user['synergy_id']) {
-        $synUserHandler = new External_User();
-        if ($groupHandler->isParent($user['uid'])) {
-            renderParent(
-                $this,
-                $user,
-                $synUserHandler,
-                new UserMapper(),
-                new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
-            );
-        } elseif ($groupHandler->isStudent($user['uid'])) {
-            renderStudent(
-                $this,
-                $user,
-                $groupHandler,
-                $synUserHandler,
-                new External_Class(),
-                new UserMapper(),
-                new Folder\Mapper(),
-                new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
-            );
-        } elseif ($groupHandler->isStaff($user['uid'])) {
-            renderStaff(
-                $this,
-                $user,
-                $synUserHandler,
-                new UserMapper(),
-                new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
-            );
-        } else {
-            $this->pageNotFound();
-        }
+    $synUserHandler = new External_User();
+    if ($groupHandler->isParent($user['uid'])) {
+        renderParent(
+            $this,
+            $user,
+            $synUserHandler,
+            new UserMapper(),
+            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
+        );
+    } elseif ($groupHandler->isStudent($user['uid'])) {
+        renderStudent(
+            $this,
+            $user,
+            $groupHandler,
+            $synUserHandler,
+            new External_Class(),
+            new UserMapper(),
+            new Folder\Mapper(),
+            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
+        );
+    } elseif ($groupHandler->isStaff($user['uid'])) {
+        renderStaff(
+            $this,
+            $user,
+            $synUserHandler,
+            new UserMapper(),
+            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
+        );
     } else {
-        // Show something else (non-twig)
-        // Probably a 404 screen
         $this->pageNotFound();
     }
 } else {
