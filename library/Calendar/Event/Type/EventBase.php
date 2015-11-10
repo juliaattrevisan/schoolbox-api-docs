@@ -121,6 +121,12 @@ abstract class EventBase implements EventInterface
      */
     protected $allday = false;
 
+    /**
+     * Is this event in a series? If it has a series ID, it is.
+     *
+     * @var int
+     */
+    protected $seriesId = null;
 
     /**
      * Constructor
@@ -567,6 +573,22 @@ abstract class EventBase implements EventInterface
     public function getPublishDate()
     {
         return $this->publishDate;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSeriesId()
+    {
+        return $this->seriesId;
+    }
+
+    /**
+     * @param int $seriesId
+     */
+    public function setSeriesId($seriesId)
+    {
+        $this->seriesId = $seriesId;
     }
 
     /**

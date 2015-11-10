@@ -103,6 +103,7 @@ class Javascript extends Base
                         'authorId'    => $this->event->getAuthorId(),
                         'level'       => $this->event->getEventClasses(),
                         'completed'   => $this->event->getCompleted(),
+                        'seriesId'    => $this->event->getSeriesId(),
                     ),
                     'links'      => array(
                         'category' => array(

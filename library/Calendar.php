@@ -724,7 +724,7 @@ class Calendar extends DeprecatedModel
         // get single events for the day
         // Don't get events for resources, get them separately.
         $query = "
-			SELECT DISTINCT event.id, owner,
+			SELECT DISTINCT event.id, event.series_id, owner,
 				GROUP_CONCAT(DISTINCT event_campus.campus_id) as campusList,
 				start_datetime, end_datetime, allday,
 				YEAR(event.start_datetime) AS year,
@@ -785,6 +785,7 @@ class Calendar extends DeprecatedModel
                 $event->setLocation($currentEvent['location']);
                 $event->setPublishDate($currentEvent['publish_date']);
                 $event->setAllDay(!empty($currentEvent['allday']));
+                $event->setSeriesId($currentEvent['series_id']);
 
                 /* If you have write access to the event
                  */
