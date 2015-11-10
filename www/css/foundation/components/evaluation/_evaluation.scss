@@ -6,13 +6,11 @@
      */
     .close {
         font-size: rem-calc(($base-font-size + 14));
-        color: #000;
         position: absolute;
-        right: 0.25rem;
-    }
+        right: 1.25rem;
 
-    &.evaluation-correct-answer-option {
-        span:before {
+        &.evaluation-correct-answer-option {
+            @extend .icon-tick;
             color: $success-color;
         }
     }

@@ -131,7 +131,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
             foreach ($allAnswers as $currentAnswer) {
                 if ($currentAnswer->correct) {
                     $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => 'icon-approve'
+                        'ACTUAL_CORRECT_VALUE' => 'evaluation-correct-answer-option'
                     ));
                 } else {
                     $page->setVar(array(
