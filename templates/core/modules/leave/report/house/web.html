@@ -44,7 +44,15 @@
             window.location.href = location;
         });
 
-        $('[data-print]').artificialPrint();
+        $('a[data-print]').click(function(e) {
+            e.preventDefault();
+
+            var searchForm = $('[data-form_type=search]');
+            var houseId  = searchForm.find(':input[name="reportHouse"]').val();
+            var date     = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
+            var location = '/modules/leave/report/house/' + houseId + '/' + date + '/print';
+            window.location.href = location;
+        })
     });
 </script>
 <!-- END custom_head -->
