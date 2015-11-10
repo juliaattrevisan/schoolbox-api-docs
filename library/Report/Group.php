@@ -11,9 +11,8 @@ class Report_Group extends Report_Abstract implements Report_IReport
     private $groupID = null;
     private $dataSet;
     private $dataCount;
-    private $pageNum;
-    private $perPage;
     private $dataResource;
+    private $emailObj;
 
     // csv field mapping: index => humanreadable
     private $fields = array(
@@ -56,6 +55,8 @@ class Report_Group extends Report_Abstract implements Report_IReport
         $this->getPage()->setVar(array('group_block' => ''));
         $this->getPage()->setTitle('Group Report');
 
+
+        $this->emailObj = new Email();
     }
 
     public function setIndexID($groupID)
@@ -104,9 +105,6 @@ class Report_Group extends Report_Abstract implements Report_IReport
         if($orderDir == '') {
             $orderDir = 'ASC';
         }
-
-        $this->pageNum = ($offset / $limit) + 1;
-        $this->perPage = $limit;
 
         // need fields from which to retrieve data
         if(empty($this->fields))
@@ -169,8 +167,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
 
             foreach ($this->dataSet as $user) {
                 // Format email address
-                $emailObj = new Email();
-                $address = $emailObj->formatEmailFromArray($user);
+                $address = $this->emailObj->formatEmailFromArray($user);
                 $email = $address ? "<a href=\"{$_SESSION['mailhandle']}$address\">$address</a>" : '';
 
                 $page->setVar(array(
@@ -212,8 +209,15 @@ class Report_Group extends Report_Abstract implements Report_IReport
     {
         $exporter = new Report_Exporter($this->getReportTitle());
         $exporter->setHeadings($this->getFields());
-        $exporter->setData($this->dataResource);
+        $exporter->setData($this->dataResource, array($this, 'dataManipulator'));
+
         $exporter->export('CSV');
+    }
+
+    public function dataManipulator($datum) {
+        $address = $this->emailObj->formatEmailFromArray($datum);
+        $datum['alt_email'] = $address;
+        return $datum;
     }
 
     public function displayFilterBlock()
