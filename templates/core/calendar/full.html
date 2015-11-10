@@ -488,26 +488,33 @@
             '[data-interaction="delete"]',
             function(event) {
                 // Do delete stuff
+                var href = this.href;
                 event.preventDefault();
                 var eventId  = editEventForm.find('input[name="eventId"]').val();
                 var seriesId = editEventForm.find('input[name="seriesId"]').val();
-                c.cdelete(
-                    function() {
-                        // Remove this event from the calendar
-                        c.dom.fullCalendar(
-                            'removeEvents',
-                            function(thisEvent) {
-                                try {
-                                    return thisEvent.data.meta.eventId == eventId;
-                                } catch (e) {
-                                    return false;
-                                }
-                            }
-                        );
-                    }
-                );
+                if (seriesId) {
+                    // triple treat!
+                    updateSeriesDialog.find('[data-booking-action-text]').text('delete');
+                    updateSeriesDialog.foundation('reveal', 'open');
+                    updateSeriesDialog.off('click', '[data-efficacy="self"]');
+                    updateSeriesDialog.on('click', '[data-efficacy="self"]', function(e) {
+                        e.preventDefault();
+                        updateSeriesDialog.foundation('reveal', 'close');
+                        window.location.href = href + '&efficacy=self';
+                    });
+                    updateSeriesDialog.off('click', '[data-efficacy="series"]');
+                    updateSeriesDialog.on('click', '[data-efficacy="series"]', function(e) {
+                        e.preventDefault();
+                        updateSeriesDialog.foundation('reveal', 'close');
+                        window.location.href = href + '&efficacy=series&seriesId='+seriesId;
+                    });
+                } else {
+                    // confirmy-dialogy
+                    $(this).confirmDialog({
+                        text: 'Are you sure you wish to delete this event?'
+                    });
+                }
                 c.bubble.hide();
-                e.preventDefault();
             }
         );
 
