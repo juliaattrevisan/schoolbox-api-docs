@@ -446,7 +446,8 @@
         });
 
         // Copypasted code for updating booking in series
-        $('#calendar-bubble').find('#editEvent').on(
+        var editEventForm = $('#calendar-bubble').find('#editEvent');
+        editEventForm.on(
             'click',
             '[booking-button=booking-approve], [booking-button=booking-reject], [booking-button=booking-cancel]',
             function(event) {
@@ -481,7 +482,34 @@
                     callback()
                 }
             }
-        )
+        );
+        editEventForm.on(
+            'click',
+            '[data-interaction="delete"]',
+            function(event) {
+                // Do delete stuff
+                event.preventDefault();
+                var eventId  = editEventForm.find('input[name="eventId"]').val();
+                var seriesId = editEventForm.find('input[name="seriesId"]').val();
+                c.cdelete(
+                    function() {
+                        // Remove this event from the calendar
+                        c.dom.fullCalendar(
+                            'removeEvents',
+                            function(thisEvent) {
+                                try {
+                                    return thisEvent.data.meta.eventId == eventId;
+                                } catch (e) {
+                                    return false;
+                                }
+                            }
+                        );
+                    }
+                );
+                c.bubble.hide();
+                e.preventDefault();
+            }
+        );
 
         // if a checkbox on the calendar is interacted, ajax
         c.dom.on('change', 'input[type=checkbox]', function(e) {
