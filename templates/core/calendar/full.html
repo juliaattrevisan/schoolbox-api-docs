@@ -384,8 +384,8 @@
             chk.trigger('change')
         })
 
-        c.getForm('editTask').on('click', '.deleteTask', function(e) {
-            var id = $(this).siblings('input[name=eventId]').val()
+        c.getForm('editTask').on('click', '[data-interaction="delete"]', function(e) {
+            var id = $(this).siblings('input[name=eventId]').val();
             c.cdelete(
                 {eventId: id},
                 function() {
@@ -398,7 +398,6 @@
                             } catch (e) {
                                 return false;
                             }
-                            return false;
                         }
                     );
                 }
