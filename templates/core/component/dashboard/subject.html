@@ -1,21 +1,20 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container' data-component>
     <!-- Custom javascript -->
-
     {CONFIGURATION}
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <h2 class="subheader">{COMPONENT_NAME}</h2>
             <section>
-                <ul class="dashboard-subject-list content grid small-block-grid-1 medium-block-grid-2 large-block-grid-3">
+                <ul class="dashboard-subject-list grid small-block-grid-1 medium-block-grid-2">
                     <!-- BEGIN subject -->
                     <li class="subject subject-{SUBJECT_CODE}">
-                        <a href="/homepage/{SUBJECT_CODE}" title="{SUBJECT_NAME}">
-                            <div class="avatar card">
+                        <div class="avatar card">
+                            <a href="/homepage/{SUBJECT_CODE}" title="{SUBJECT_NAME}">
                                 <span class="icon-home icon-32"></span>
-                                {SUBJECT_NAME}  
-                            </div>
-                        </a>
+                                <p>{SUBJECT_NAME} </p>
+                            </a>
+                        </div>
                     </li>
                     <!-- END subject -->
                 </ul>
@@ -23,3 +22,4 @@
         </div>
     </div>
 </div>
+
