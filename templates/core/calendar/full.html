@@ -384,8 +384,8 @@
             chk.trigger('change')
         })
 
-        c.getForm('editTask').on('click', '.deleteTask', function(e) {
-            var id = $(this).siblings('input[name=eventId]').val()
+        c.getForm('editTask').on('click', '[data-interaction="delete"]', function(e) {
+            var id = $(this).siblings('input[name=eventId]').val();
             c.cdelete(
                 {eventId: id},
                 function() {
@@ -398,7 +398,6 @@
                             } catch (e) {
                                 return false;
                             }
-                            return false;
                         }
                     );
                 }
@@ -447,7 +446,8 @@
         });
 
         // Copypasted code for updating booking in series
-        $('#calendar-bubble').find('#editEvent').on(
+        var editEventForm = $('#calendar-bubble').find('#editEvent');
+        editEventForm.on(
             'click',
             '[booking-button=booking-approve], [booking-button=booking-reject], [booking-button=booking-cancel]',
             function(event) {
@@ -482,7 +482,47 @@
                     callback()
                 }
             }
-        )
+        );
+        editEventForm.on(
+            'click',
+            '[data-interaction="delete"]',
+            function(event) {
+                // Do delete stuff
+                var href    = this.href;
+                var element = $(this);
+                event.preventDefault();
+                editEventForm.closest('[data-reveal]')
+                    .one('closed.fndtn.reveal', function() {
+                        var eventId  = editEventForm.find('input[name="eventId"]').val();
+                        var seriesId = editEventForm.find('input[name="seriesId"]').val();
+                        if (seriesId) {
+                            // triple treat!
+                            updateSeriesDialog.find('[data-booking-action-text]').text('delete');
+                            updateSeriesDialog.foundation('reveal', 'open');
+                            updateSeriesDialog.off('click', '[data-efficacy="self"]');
+                            updateSeriesDialog.on('click', '[data-efficacy="self"]', function(e) {
+                                e.preventDefault();
+                                updateSeriesDialog.foundation('reveal', 'close');
+                                window.location.href = href + '&efficacy=self';
+                            });
+                            updateSeriesDialog.off('click', '[data-efficacy="series"]');
+                            updateSeriesDialog.on('click', '[data-efficacy="series"]', function(e) {
+                                e.preventDefault();
+                                updateSeriesDialog.foundation('reveal', 'close');
+                                window.location.href = href + '&efficacy=series&seriesId='+seriesId;
+                            });
+                        } else {
+                            // confirmy-dialogy
+                            element.confirmDialog({
+                                text: 'Are you sure you wish to delete this event?',
+                            });
+                        }
+                        c.bubble.hide();
+                    })
+                    .foundation('reveal', 'close');
+
+            }
+        );
 
         // if a checkbox on the calendar is interacted, ajax
         c.dom.on('change', 'input[type=checkbox]', function(e) {
@@ -592,6 +632,7 @@
     <!-- Edit Event Form -->
     <form id="editEvent">
         <input type="hidden" name="eventId" />
+        <input type="hidden" name="seriesId" />
 
         <div class="row">
             <div class="small-12">
@@ -791,11 +832,11 @@
 </div>
 
 <div class="reveal-modal" data-reveal aria-labelledby="dialog-booking-bulk-update-title" aria-hidden="true" role="dialog" id="dialog-booking-bulk-update">
-    <h2 id="dialog-booking-bulk-update-title">This booking is part of a series</h2>
+    <h2 id="dialog-booking-bulk-update-title">This event is part of a series</h2>
     <p>Would you like to <span data-booking-action-text></span> only this booking, or all in the series?</p>
     <ul class="flex-list buttons">
-        <li><a href="#" class="button" data-efficacy="self">Only this booking</a></li>
-        <li><a href="#" class="button" data-efficacy="series">All bookings in the series</a></li>
+        <li><a href="#" class="button" data-efficacy="self">Only this event</a></li>
+        <li><a href="#" class="button" data-efficacy="series">All events in the series</a></li>
         <li><a href="#" class="button" data-interaction="close">Cancel</a></li>
     </ul>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>

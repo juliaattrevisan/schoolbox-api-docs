@@ -139,11 +139,11 @@ function Calendar(id, bubbleId, opts) {
                     }
                     else {
                         url = '/calendar/modify.php?eventID=' + calEvent.data.meta.eventId + '&returnTo=calendar';
-                        deleteUrl = '/calendar/modifyForm.php?action=Delete&id=' + calEvent.data.meta.eventId + '&returnTo=calendar';
-                        data.deleteLink = '<a class="button icon-delete" href="' + deleteUrl + '"><span></span>Delete</a>';
+                        var deleteUrl = '/calendar/modifyForm.php?action=Delete&id=' + calEvent.data.meta.eventId + '&returnTo=calendar';
+                        data.deleteLink = '<a class="button icon-delete" data-interaction="delete" href="' + deleteUrl + '">Delete</a>';
                     }
 
-                    data.modifyLink = '<a class="button icon-modify" href="' + url + '"><span></span>Modify</a>';
+                    data.modifyLink = '<a class="button icon-modify" href="' + url + '">Modify</a>';
                 }
                 else {
                     data.modifyLink = '';
