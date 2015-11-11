@@ -620,6 +620,7 @@ $rotate-th-width: $square-grid-td-size;
 	}
 	.content{
 		@extend %content;
+		@extend .clearfix;
 	}
 }
 

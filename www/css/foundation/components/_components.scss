@@ -381,13 +381,7 @@ ul.countdown {
 /* TIGS: Dashboard subject list
  */
 .dashboard-subject-list {
-    list-style: none;
-    margin: 0;
     .subject{
-        list-style-type: none;
-        margin: 3px;
-        float: left;
-
         &[class*='KMG_'],
         &[class*='1MG_'],
         &[class*='2MG_'],
@@ -464,14 +458,6 @@ ul.countdown {
         &[class*='5LIB_'],
         &[class*='6LIB_']{
             background: url("/images/tigs/class-icons.png") 0px -120px no-repeat;
-        }
-
-        a{
-            display: block;
-            width: 360px;
-            height: 60px;
-            text-shadow: none;
-            color: transparent;
         }
     }
 }
