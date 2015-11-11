@@ -13,6 +13,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use DueWork_Error;
 use Marksheet_Abstract;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Collection;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
@@ -187,6 +188,31 @@ class Factory
      */
     public function start()
     {
+        $allowUpdate      = true;
+        $collectorFactory = new CollectorFactory();
+        $attachments      = $collectorFactory->build($this->getAttachments())->getAll();
+        $returnedItems    = new Collection();
+        if (count($attachments) === 0) {
+            // Update a single returned work item
+            // (Figure out which returned work record to use - assign marks,
+            //  normalized marks, ownerships, etc.)
+            $returnedItems->add($this->processReturnedWork($allowUpdate));
+        } else {
+            foreach ($attachments as $attachment) {
+                $returnedItem = $this->processReturnedWork($allowUpdate);
+                // Does this item already have a storage item?
+                // Don't override it if it did - create a new item.
+                if ($allowUpdate && $returnedItem->getStorage()->getHash()) {
+                    $returnedItem = $this->processReturnedWork(false);
+                }
+                $returnedItem->setStorage($attachment);
+                $returnedItems->add($returnedItem);
+
+                // Only allow update of one return.
+                // Any subsequent attachments are created as new records.
+                $allowUpdate = false;
+            }
+        }
 
         /* Figure out which returned work record to use
          * Assign marks, normalised marks, ownerships etc
