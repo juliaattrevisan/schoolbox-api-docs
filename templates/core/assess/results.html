@@ -50,69 +50,69 @@
 <div class="row">
     <div class="small-12 island">
         <form action='/assess/deleteAttempt' method='post'>
-            <!-- BEGIN user_attempts -->
             <section>
                 <ul class="action-list">
-                    <!-- BEGIN attempt -->
-                    <li class="actions-small-2 {ATTEMPT_HIDDEN}" {ATTEMPT_EXPANDABLE} data-user="{USER_ID}">
-                        <div class="list-item">
-                            <div class="small-1 columns text-center">
-                                <!-- BEGIN attempt_delete -->
-                                <input type='checkbox' id="attempt-{ATTEMPT_ATTEMPT_ID}" name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
-                                <label for="attempt-{ATTEMPT_ATTEMPT_ID}" class="checkbox-label"></label>
-                                <!-- END attempt_delete -->
+                <!-- BEGIN user_attempts -->
+                        <!-- BEGIN attempt -->
+                        <li class="actions-small-2 {ATTEMPT_HIDDEN}" {ATTEMPT_EXPANDABLE} data-user="{USER_ID}">
+                            <div class="list-item">
+                                <div class="card small-2 medium-1 text-center">
+                                    <!-- BEGIN attempt_delete -->
+                                    <input type='checkbox' id="attempt-{ATTEMPT_ATTEMPT_ID}" name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
+                                    <label for="attempt-{ATTEMPT_ATTEMPT_ID}" class="checkbox-label"></label>
+                                    <!-- END attempt_delete -->
+                                </div>
+
+                                <div class="avatar card small-6 medium-4">
+                                    <a href="/search/user/{USER_ID}" title="View Profile">
+                                        <img src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square64" alt="View Profile" />
+                                        <p>{ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}</p>
+                                    </a>
+                                    <!-- BEGIN attempted -->
+                                    <p class="meta icon-timetable" title="Duration">{ATTEMPT_TIME_TAKEN}</p>
+                                    <p class="meta icon-approve" title="Automarked">{ATTEMPT_UNMARKED_RESPONSES}% automarked</p>
+                                    <!-- END attempted -->
+                                </div>
+
+                                <div class="small-4 medium-2 columns text-center">
+                                    <!-- BEGIN has_marks -->
+                                    <h3 class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}%</h3>
+                                    <span>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</span>
+                                    <!-- END has_marks -->
+                                </div>
+
+                                <div class="small-12 medium-5 columns">
+                                    <!-- BEGIN submitted -->
+                                    <span class="submitted label full-width">Finished<br />{ATTEMPT_FINISH}</span>
+                                    <!-- END submitted -->
+
+                                    <!-- BEGIN unsubmitted -->
+                                    <span class="unsubmitted label full-width">{ATTEMPT_FINISH}</span>
+                                    <!-- END unsubmitted -->
+
+                                    <!-- BEGIN reviewed -->
+                                    <span class="success submitted label full-width">Reviewed<br />{ATTEMPT_REVIEW_STATUS}</span>
+                                    <!-- END reviewed -->
+
+                                    <!-- BEGIN not_reviewed -->
+                                    <span class="neutral submitted label full-width">Not Reviewed</span>
+                                    <!-- END not_reviewed -->
+                                </div>
                             </div>
+                            <nav>
+                                <!-- BEGIN has_review -->
+                                <a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}" class="icon-view" title="Review Attempt"></a>
+                                <!-- END has_review -->
 
-                            <div class="avatar card small-4">
-                                <a href="/search/user/{USER_ID}" title="View Profile">
-                                    <img src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square64" alt="View Profile" />
-                                    <p>{ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}</p>
-                                </a>
-
-                                <p class="meta">{ATTEMPT_TIME_TAKEN}</p>
-                            </div>
-
-                            <div class="small-2 columns text-center">
-                                <!-- BEGIN has_marks -->
-                                <h3>{ATTEMPT_PERCENTAGE}%</h3>
-                                <p>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</p>
-                                <p class="meta">{ATTEMPT_UNMARKED_RESPONSES} unmarked responses</p>
-                                <!-- END has_marks -->
-                            </div>
-
-                            <div class="small-5 columns">
-                                <!-- BEGIN submitted -->
-                                <span class="submitted label full-width">Finished<br />{ATTEMPT_FINISH}</span>
-                                <!-- END submitted -->
-
-                                <!-- BEGIN unsubmitted -->
-                                <span class="unsubmitted label full-width">{ATTEMPT_FINISH}</span>
-                                <!-- END unsubmitted -->
-
-                                <!-- BEGIN reviewed -->
-                                <span class="success label full-width">Reviewed<br />{ATTEMPT_REVIEW_STATUS}</span>
-                                <!-- END reviewed -->
-
-                                <!-- BEGIN not_reviewed -->
-                                <span class="neutral label full-width">Not Reviewed</span>
-                                <!-- END not_reviewed -->
-                            </div>
-                        </div>
-                        <nav>
-                            <!-- BEGIN has_review -->
-                            <a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}" class="icon-view" title="Review Attempt"></a>
-                            <!-- END has_review -->
-
-                            <!-- BEGIN expand_attempts -->
-                            <a href="#" class='icon-add' title="Expand attempts by {ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}" data-attempt-expander="{USER_ID}"></a>
-                            <!-- END expand_attempts -->
-                        </nav>
-                    </li>
-                    <!-- END attempt -->
+                                <!-- BEGIN expand_attempts -->
+                                <a href="#" class='icon-add' title="Expand attempts by {ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}" data-attempt-expander="{USER_ID}"></a>
+                                <!-- END expand_attempts -->
+                            </nav>
+                        </li>
+                        <!-- END attempt -->
+                <!-- END user_attempts -->
                 </ul>
             </section>
-            <!-- END user_attempts -->
-
             <!-- BEGIN delete -->
             <input type='submit' value='Delete selected'/>
             <!-- END delete -->

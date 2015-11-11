@@ -58,7 +58,15 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
     /* Count how many responses haven't been automarked
      */
     $numNotAutomarked = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
+    $numAutomarked = $responseHandler->numAutomarked($currentAttempt['attempt_id']);
+    $totalQuestions = $numAutomarked + $numNotAutomarked;
 
+    if($numNotAutomarked) {
+        $percentageReviewed = round(($totalQuestions / $numNotAutomarked) * 100);
+    }
+    else {
+        $percentageReviewed = 100;
+    }
     $page->setVar(array(
         'ASSESS_ASSESS_ID' => $page->arg[0],
         'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
@@ -70,9 +78,9 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
         'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
         'ATTEMPT_PERCENTAGE' => $percentage,
+        'ATTEMPT_GRADIENT'  => (int) ($percentage / 10),
         'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
-        'ATTEMPT_UNMARKED_RESPONSES' => $numNotAutomarked,
-        'ATTEMPT_DELETE_LINK' => "<a href=\"/assess/deleteAttempt/{$currentAttempt['attempt_id']}\">Delete</a>",
+        'ATTEMPT_UNMARKED_RESPONSES' => $percentageReviewed,
     ));
 
     /* Finish time. Show the datetime when the person clicked Finish.
@@ -219,6 +227,7 @@ $this->setFile(TEMPLATE_content, 'assess/results.html');
 $this->setBlock(TEMPLATE_content, 'user_attempts', 'user_attempts_block');
 $this->setBlock('user_attempts', 'attempt', 'attempt_block');
 $this->setBlock('attempt', 'attempt_delete', 'attempt_delete_block');
+$this->setBlock('attempt', 'attempted', 'attempted_block');
 $this->setBlock('attempt', 'reviewed', 'reviewed_block');
 $this->setBlock('attempt', 'not_reviewed', 'not_reviewed_block');
 $this->setBlock('attempt', 'submitted', 'submitted_block');
@@ -312,6 +321,7 @@ $allAttempts = $attemptHandler->getList($this->arg[0]);
  */
 if (is_array($allAttempts) && count($allAttempts)) {
     $this->parse('has_attempt_block', 'has_attempt');
+    $this->parse('attempted_block', 'attempted');
     $this->parse('has_marks_block', 'has_marks');
 } else {
     $this->setVar(array(
@@ -371,7 +381,7 @@ if (is_array($allStudents) && count($allStudents)) {
                 'ATTEMPT_EXTERNAL_ID' => $currentStudent['synergy_id'],
                 'ATTEMPT_FIRSTNAME' => $currentStudent['firstname'],
                 'ATTEMPT_SURNAME' => $currentStudent['lastname'],
-                'ATTEMPT_FINISH' => 'Unfinished',
+                'ATTEMPT_FINISH' => 'Not Attempted',
                 'ATTEMPT_TIME_TAKEN' => '',
                 'ATTEMPT_TOTAL_MARKS' => '',
                 'ATTEMPT_TOTAL_AVAILABLE_MARKS' => '',
@@ -389,9 +399,10 @@ if (is_array($allStudents) && count($allStudents)) {
                 'reviewed_block' => '',
                 'has_review_block' => '',
                 'has_marks_block' => '',
+                'not_reviewed_block' => '',
+                'attempted_block'  => '',
             ));
 
-            $this->parse('not_reviewed_block', 'not_reviewed');
             $this->parse('unsubmitted_block', 'unsubmitted');
 
             $this->parse('attempt_block', 'attempt', true);
