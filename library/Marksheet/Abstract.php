@@ -18,6 +18,14 @@ abstract class Marksheet_Abstract
     protected $subReturnHandler;
 
     /**
+     * The number of action buttons this mark type has in the view submission
+     * and the inline grader UI.
+     *
+     * @var int
+     */
+    protected $actionButtonCount = 0;
+
+    /**
      * @var \Schoolbox\Assessment\Component\SubmissionBox
      */
     protected $submissionBox;
@@ -139,6 +147,14 @@ abstract class Marksheet_Abstract
     {
         $this->extraParams = $extraParams;
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getActionButtonCount()
+    {
+        return $this->actionButtonCount;
     }
 
     /**

@@ -467,6 +467,7 @@ class DueWork_Detail
         $page->setVar(array(
             'COLUMN_DIMENSIONS_WRITABLE' => $columnDimensionsWritable,
             'COLUMN_DIMENSIONS_READONLY' => $columnDimensionsReadonly,
+            'COLUMN_NAV_BUTTON_COUNT'    => $this->marksheet->getActionButtonCount(),
         ));
 
         /* Comment Tabindex
