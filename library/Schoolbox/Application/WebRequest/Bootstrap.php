@@ -238,7 +238,11 @@ class Bootstrap implements BootstrapInterface {
 			)
 		);
 
-		// Preload of route parameters
+		// Preload of route parameters, and its module loader
+        $di->params['Alaress\\Web\\Router\\PathMatcher']['moduleLoader'] = $di->lazyNew(
+            ModuleLoader::class,
+            ['injector' => $di, 'moduleRegex' => '/^(?P<module>[^\\.])\\./']
+        );
 		$di->set('preloader', $di->lazyNew('Alaress\\Web\\Router\\PathMatcher'));
 
 		// Authorization
