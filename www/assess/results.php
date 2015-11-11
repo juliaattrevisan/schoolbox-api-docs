@@ -78,6 +78,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
         'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
         'ATTEMPT_PERCENTAGE' => $percentage,
+        'ATTEMPT_GRADIENT'  => (int) ($percentage / 10),
         'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
         'ATTEMPT_UNMARKED_RESPONSES' => $percentageReviewed,
     ));

@@ -76,8 +76,8 @@
 
                                 <div class="small-4 medium-2 columns text-center">
                                     <!-- BEGIN has_marks -->
-                                    <h3>{ATTEMPT_PERCENTAGE}%</h3>
-                                    <p>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</p>
+                                    <h3 class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}%</h3>
+                                    <span>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</span>
                                     <!-- END has_marks -->
                                 </div>
 
@@ -91,11 +91,11 @@
                                     <!-- END unsubmitted -->
 
                                     <!-- BEGIN reviewed -->
-                                    <span class="success label full-width">Reviewed<br />{ATTEMPT_REVIEW_STATUS}</span>
+                                    <span class="success submitted label full-width">Reviewed<br />{ATTEMPT_REVIEW_STATUS}</span>
                                     <!-- END reviewed -->
 
                                     <!-- BEGIN not_reviewed -->
-                                    <span class="neutral label full-width">Not Reviewed</span>
+                                    <span class="neutral submitted label full-width">Not Reviewed</span>
                                     <!-- END not_reviewed -->
                                 </div>
                             </div>
