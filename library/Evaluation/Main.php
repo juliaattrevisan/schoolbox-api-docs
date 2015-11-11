@@ -278,9 +278,11 @@ abstract class Evaluation_Main extends DeprecatedModel
         $hours = intval(intval($sec) / 3600);
 
         // add hours to $hms (with a leading 0 if asked for)
-        $hms .= ($padHours)
-            ? str_pad($hours, 2, "0", STR_PAD_LEFT) . ":"
-            : $hours . "hrs ";
+        if($hours) {
+            $hms .= ($padHours)
+                ? str_pad($hours, 2, "0", STR_PAD_LEFT) . ":"
+                : $hours . "hrs ";
+        }
 
         // dividing the total seconds by 60 will give us the number of minutes
         // in total, but we're interested in *minutes past the hour* and to get
@@ -288,7 +290,9 @@ abstract class Evaluation_Main extends DeprecatedModel
         $minutes = intval(($sec / 60) % 60);
 
         // add minutes to $hms (with a leading 0 if needed)
-        $hms .= str_pad($minutes, 2, "0", STR_PAD_LEFT) . "min ";
+        if($minutes) {
+            $hms .= str_pad($minutes, 2, "0", STR_PAD_LEFT) . "min ";
+        }
 
         // seconds past the minute are found by dividing the total number of seconds
         // by 60 and using the remainder
