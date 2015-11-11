@@ -134,7 +134,7 @@
                         responsive: false
                     }
                 },
-                plugins : ['dnd', 'sort', 'types', 'wholerow'],
+                plugins : ['dnd', 'sort', 'types', 'wholerow', 'conditionalselect'],
                 dnd: {
                     touch: false, // no dragging on touch screen thanks
                     copy: false,
@@ -149,6 +149,9 @@
                         });
                         return isDraggable;
                     }
+                },
+                conditionalselect: function (node, e) {
+                    return typeof node.li_attr['data-id'] != 'undefined';
                 },
                 types: {
                     root: {
