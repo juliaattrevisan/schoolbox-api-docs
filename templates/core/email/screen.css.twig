@@ -50,11 +50,11 @@ img {
 }
 
 .content {
-    background-color: {{ config.skin_builder ? colours.skin_colour_offcanvas_background : colours.content_background }};
+    background-color: {{ config.skin_builder ? 'white' : colours.content_background }};
 }
 
 .content a {
-    color: {{ config.skin_builder ? colours.skin_colour_navigation_background : colours.link }};
+    color: {{ config.skin_builder ? colours.skin_colour_content_ui_foreground : colours.link }};
 }
 .content p {
     line-height: 20px;
@@ -99,7 +99,7 @@ tr.dark {
 }
 
 .footer p {
-    color: {{ config.skin_builder ? colours.skin_colour_navigation_background : colours.footer_links }};
+    color: {{ config.skin_builder ? 'black' : colours.footer_links }};
     font-family: Arial, sans-serif;
     font-size: 11px;
     line-height: 18px;
@@ -108,7 +108,7 @@ tr.dark {
 }
 
 .footer a {
-    color: {{ config.skin_builder ? colours.skin_colour_navigation_background : colours.footer_links }};
+    color: {{ config.skin_builder ? colours.skin_colour_content_ui_foreground : colours.footer_links }};
     text-decoration: underline;
 }
 
