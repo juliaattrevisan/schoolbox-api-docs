@@ -185,11 +185,14 @@ $user = $userMapper->findById($this->arg[1]);
 
 /* Find all returned work for this student
  */
-$returnWorkMapper = new ReturnedWorkMapper();
-$allReturnedWork = $returnWorkMapper->findByColumnList(
-	['owner' => $user->getId(), 'box_id' => $submissionBox->getId(),],
-	['order' => ['returned' => 'desc']]
-);
+$returnWorkMapper   = new ReturnedWorkMapper();
+$allReturnedWork    = new Collection();
+$returnedActivities = $returnWorkMapper->getHistory($user->getId(), $submissionBox->getId());
+foreach ($returnedActivities as $activity) {
+    if ($activity instanceof Activity) {
+        $allReturnedWork->add($activity->getReturnedWork());
+    }
+}
 
 /* Augment array with data
  */
