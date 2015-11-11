@@ -104,13 +104,8 @@ abstract class Base {
     {
 		$this->getPage()->setFile('injectableUpload', $this->getUploadFile());
 		$this->getPage()->setBlock('injectableUpload', 'returned_work', 'returned_work_block');
-
-        // Try getting all returns for this item
-
-        $return = $this->getReturnedWork();
-
         $this->getPage()->setVar('returned_work_block', '');
-        if ($return instanceof ReturnedWork) {
+        foreach ($this->getReturnedWorkCollection() as $return) {
             if ($return->getStorage()->getFilename() != null) {
                 $storage = $return->getStorage();
 
