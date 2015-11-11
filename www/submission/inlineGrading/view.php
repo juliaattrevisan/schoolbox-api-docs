@@ -217,7 +217,7 @@ $zone = new Zone('inline-return');
 
 $zone->setMulti(false)
     ->setMimeFilter('*/*')
-    ->setThumbnailSize(32)
+    ->setThumbnailSize(64)
     ->setAttachPrompt('Attach file to return')
     ->setModalTitle('Select file')
     ->setAttachmentsLabel('');
