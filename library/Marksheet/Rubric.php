@@ -11,6 +11,8 @@ class Marksheet_Rubric extends Marksheet_Abstract
 
     private $rubricHandler;
 
+    protected $actionButtonCount = 1;
+
     public function __construct($mark_type, $submissionBox, $extraParams)
     {
         parent::__construct($mark_type, $submissionBox, $extraParams);

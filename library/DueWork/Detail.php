@@ -39,6 +39,9 @@ class DueWork_Detail
     protected $marksheet;
     protected $sitepageData;
 
+    const MARKSHEET = 0;
+    const INLINE_GRADER = 1;
+
     /**
      * @var SubmissionBox
      */
@@ -144,11 +147,15 @@ class DueWork_Detail
         }
     }
 
-
     /**
+     * $location is used to determine a context in which the DueWork_Detail
+     * operates. This context is passed to renderMarking() to reconfigure
+     * column dimensions for a slightly different layout in Inline Grader.
+     *
      * @param SitePage $page
+     * @param null $location
      */
-    public function renderDetails(SitePage $page)
+    public function renderDetails(SitePage $page, $location = null)
     {
         // setup blocks, etc
         $page->setTab('submission');
@@ -212,6 +219,8 @@ class DueWork_Detail
             return;
         }
 
+        $tabindex = 0;
+
         // process each student
         foreach ($data as $record) {
             // printf('<pre style="margin-left: 300px">%s</pre>', print_r($record, true));
@@ -229,7 +238,7 @@ class DueWork_Detail
                 )
             );
 
-            $this->renderMarking($page, 'OWNER_MARKING', $record['user']['instance']->getId() . $this->submissionBox->getId(), $record['mark']);
+            $this->renderMarking($page, 'OWNER_MARKING', $record['user']['instance']->getId() . $this->submissionBox->getId(), $record['mark'], $location, $tabindex);
 
             //
             // Reset the contents of the submission row block, so that each student starts with a fresh row
@@ -353,6 +362,10 @@ class DueWork_Detail
 
             $page->parse('student_row_block', 'student_row', true);
 
+            /* Increment twice - once for the input, another for the comment
+             */
+            $tabindex += 2;
+
             /* Clear children after parsing out the parent
              */
             $page->setVar(
@@ -398,14 +411,21 @@ class DueWork_Detail
         }
     }
 
-
     /**
+     * $location is used to reconfigure column dimensions.
+     *
+     * $tabindex is passed in from above; each student is parsed individually
+     * here, but the loop is further up. Passed here to ensure the tabindexes
+     * continue to increment correctly.
+     *
      * @param SitePage $page
      * @param $handle
      * @param $htmlFormID
      * @param $markArray
+     * @param $location
+     * @param $tabindex
      */
-    public function renderMarking(SitePage $page, $handle, $htmlFormID, $markArray)
+    private function renderMarking(SitePage $page, $handle, $htmlFormID, $markArray, $location, $tabindex)
     {
         $templateFile = $this->isReadOnly() ? 'readonly' : 'writable';
         $page->setFile('markTpl', "submission/marktype/$templateFile.html");
@@ -414,7 +434,10 @@ class DueWork_Detail
         // blockify and clear all the marktypes
         foreach ($this->submissionHandler->getMarkTypes(true) as $type) {
             $page->setBlock('markTpl', "mark_type_{$type['slug']}", "mark_type_{$type['slug']}_block");
-            $page->setVar("mark_type_{$type['slug']}_block", '');
+
+            $page->setVar(array(
+                "mark_type_{$type['slug']}_block" => '',
+            ));
         }
 
         // each strategy knows how to output itself
@@ -422,11 +445,39 @@ class DueWork_Detail
 
         // render the appropriate block and parse it into the handle we were provided
         $slug = $this->marksheet->getSlug();
+        /* Tabindex for speedier grading in the Marksheet
+         */
+        $page->setVar(array(
+            'TABINDEX' => ++$tabindex
+        ));
+
         $page->parse("mark_type_{$slug}_block", "mark_type_{$slug}");
+
+        /* Column dimensions
+         */
+        if ($location == self::INLINE_GRADER) {
+            $columnDimensionsWritable = 'small-12';
+            $columnDimensionsReadonly = 'small-12';
+        }
+        else {
+            $columnDimensionsWritable = 'small-12 xlarge-8';
+            $columnDimensionsReadonly = 'small-12 xlarge-8';
+        }
+
+        $page->setVar(array(
+            'COLUMN_DIMENSIONS_WRITABLE' => $columnDimensionsWritable,
+            'COLUMN_DIMENSIONS_READONLY' => $columnDimensionsReadonly,
+            'COLUMN_NAV_BUTTON_COUNT'    => $this->marksheet->getActionButtonCount(),
+        ));
+
+        /* Comment Tabindex
+         */
+        $page->setVar(array(
+            'COMMENT_TABINDEX' => ++$tabindex
+        ));
 
         $page->parse($handle, 'markTpl');
     }
-
 
     /**
      * @return bool

@@ -1289,6 +1289,20 @@ ul.flex-list {
         }
     }
 
+    /* Marksheet Input Card
+     * This displays the Mark and Comment that someone received
+     * for their submission.
+     */
+    &.marksheet-input {
+        .grade {
+            padding: 0.5rem 0;
+        }
+
+        .comment {
+            padding-bottom: 0.75rem;
+        }
+    }
+
     &.info {
         color: $black;
         ~ article, ~ .list-item-content {

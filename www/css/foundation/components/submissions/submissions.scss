@@ -207,3 +207,22 @@ table.rubric {
 [class^="icon-"].off {
     opacity: 0.3;
 }
+
+/* Marksheet Input
+ * This is a very particular kind of information-list, designed
+ * to house the input field and comment elements in a
+ * uniformly-behaving structure so it displays predictably in
+ * both the Marksheet and the Inline Grader.
+ *
+ * This removes the estuary between li elements.
+ */
+.marking-input-list {
+    @include information-list;
+    padding-top: 1rem;
+
+    li {
+        /* Turn off estuary between input and comment
+         */
+        border: 0px;
+    }
+}

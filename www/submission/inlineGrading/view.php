@@ -242,7 +242,7 @@ $oneStudent = new Collection();
 $oneStudent->add($currentAugmented['currentStudent']);
 
 $dueWorkDetail->processStudents($oneStudent);
-$dueWorkDetail->renderDetails($this);
+$dueWorkDetail->renderDetails($this, DueWork_Detail::INLINE_GRADER);
 
 $this->setTitle('Grading '.Scrub::text($submissionBox->getName()).' for '.Scrub::text($user->getFullName()));
 
