@@ -183,16 +183,13 @@ for ($i=0; $i < count($stack); $i++) {
 $userMapper = new UserMapper();
 $user = $userMapper->findById($this->arg[1]);
 
-/* Find the latest returned work
+/* Find all returned work for this student
  */
-$latestReturnedWork = null;
-
 $returnWorkMapper = new ReturnedWorkMapper();
-$latestReturnedActivity = $returnWorkMapper->getHistory($user->getId(), $submissionBox->getId())->first();
-
-if ($latestReturnedActivity instanceof Activity) {
-	$latestReturnedWork = $latestReturnedActivity->getReturnedWork();
-}
+$allReturnedWork = $returnWorkMapper->findByColumnList(
+	['owner' => $user->getId(), 'box_id' => $submissionBox->getId(),],
+	['order' => ['returned' => 'desc']]
+);
 
 /* Augment array with data
  */
@@ -226,7 +223,7 @@ $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 /* Render injectable views
  */
-$templateFactory = new Factory($this, $currentAugmented['submission'], $latestReturnedWork, $navigationElements);
+$templateFactory = new Factory($this, $currentAugmented['submission'], $allReturnedWork, $navigationElements);
 $renderer = $templateFactory->produce();
 $renderer->render();
 
