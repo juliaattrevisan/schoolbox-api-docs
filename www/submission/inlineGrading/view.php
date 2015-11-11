@@ -215,7 +215,7 @@ $navigationDirect = json_encode($navigationElements);
 
 $zone = new Zone('inline-return');
 
-$zone->setMulti(false)
+$zone->setMulti(true)
     ->setMimeFilter('*/*')
     ->setThumbnailSize(64)
     ->setAttachPrompt('Attach file to return')
