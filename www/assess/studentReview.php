@@ -192,11 +192,11 @@ if ($allQuestions) {
         /* If this is a randomised section, number each question incrementally
            */
         if ($section['random'] == 1) {
-            $this->setVar(
-                array(
-                    'QUESTION_SEQUENCE' => $randomQuestionNumber
-                )
-            );
+            $this->setVar(array(
+                'QUESTION_SEQUENCE' => $randomQuestionNumber
+            ));
+
+            $randomQuestionNumber++;
         }
 
         /* Load individual answers
