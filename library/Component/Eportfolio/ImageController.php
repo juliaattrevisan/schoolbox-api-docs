@@ -48,6 +48,7 @@ class Component_Eportfolio_ImageController extends Component_Eportfolio_Controll
 		 */
 		$this->setBlock($templateHandle, 'modify_button', 'modify_button_block');
         $this->setBlock($templateHandle, 'image', 'image_block');
+		$this->setBlock($templateHandle, 'dropzone', 'dropzone_block');
 
 		/* Load a file, if one exists - otherwise clear phplibs
 		 */
@@ -74,10 +75,11 @@ class Component_Eportfolio_ImageController extends Component_Eportfolio_Controll
 		/* Show edit buttons
 		 */
 		if ($this->permission >= WRITE_ACCESS) {
-			$this->parse('modify_button_block','modify_button');
-		}
-		else {
-			$this->setVar('modify_button_block','');
+			$this->parse('dropzone_block', 'dropzone');
+			$this->parse('modify_button_block', 'modify_button');
+		} else {
+			$this->setVar('dropzone_block', '');
+			$this->setVar('modify_button_block', '');
 		}
 	}
 }
