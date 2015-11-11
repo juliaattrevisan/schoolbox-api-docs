@@ -117,9 +117,9 @@ if ($_POST['type'] == 'components') {
 
         // Create a controller object for the config class to use when
         // dehydrating config values into database
-        $cclass = $instance->getDefinition()->getClass();
-        /** @var Component_ControllerAbstract $controller */
-        $controller = new $cclass($instance, new \Schoolbox\User(), $page);
+        $factoryFactory   = new Component_FactoryFactory();
+        $componentFactory = $factoryFactory->build($instance->getModule(), new Schoolbox\User(), $page, true);
+        $controller       = $componentFactory->buildComponent($instance);
 
         /** @var Component_ConfigDefinition $confD */
         foreach ($configDefinitionCollection as $confD) {
