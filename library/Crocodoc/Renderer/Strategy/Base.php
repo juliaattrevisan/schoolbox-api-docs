@@ -111,7 +111,7 @@ abstract class Base {
 
                 $this->getPage()->setVar(array(
                     'MOST_RECENT_RETURN_FILE_ID'    => $return->getId(),
-                    'MOST_RECENT_RETURN_FILE_NAME'  => $storage->getFilename(),
+                    'MOST_RECENT_RETURN_FILE_NAME'  => $storage->getBasename(),
                     'MOST_RECENT_RETURN_FILE_SIZE'  => \Alaress_Byte_Format::bytesToString($storage->getSize()),
                     'MOST_RECENT_RETURN_FILE_THUMB' => $storage->getMimeType()->getIconFile(),
                     'MOST_RECENT_RETURN_FILE_DATE'  => $return->getReturned()->getRelativeTime(),
