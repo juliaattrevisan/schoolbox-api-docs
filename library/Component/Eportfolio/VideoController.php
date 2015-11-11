@@ -92,6 +92,7 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
         $this->setBlock($templateHandle, 'video_list', 'video_list_block');
         $this->setBlock($templateHandle, 'video_pending_list', 'video_pending_list_block');
         $this->setBlock($templateHandle, 'submit_video', 'submit_video_block');
+        $this->setBlock($templateHandle, 'dropzone', 'dropzone_block');
 
         $this->setVar('video_list_block', '');
         $this->setVar('video_pending_list_block', '');
@@ -132,8 +133,10 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
         }
 
         if ($this->permission >= WRITE_ACCESS) {
+            $this->parse('dropzone_block', 'dropzone');
             $this->parse('submit_video_block', 'submit_video');
         } else {
+            $this->setVar('dropzone_block', '');
             $this->setVar('submit_video_block', '');
         }
 

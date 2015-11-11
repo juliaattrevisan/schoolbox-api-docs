@@ -48,6 +48,7 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 		$this->setBlock('list_item', 'has_modify_button', 'has_modify_button_block');
 		$this->setBlock('list_item', 'has_unpublish_form', 'has_unpublish_form_block');
 		$this->setBlock($templateHandle, 'modify_button', 'modify_button_block');
+		$this->setBlock($templateHandle, 'dropzone', 'dropzone_block');
 
 		$this->setVar(array(
 			'list_item_block' => ''
@@ -58,10 +59,11 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 		/* Show edit buttons
 		 */
 		if ($this->permission >= WRITE_ACCESS) {
-			$this->parse('modify_button_block','modify_button');
-		}
-		else {
-			$this->setVar('modify_button_block','');
+			$this->parse('dropzone_block', 'dropzone');
+			$this->parse('modify_button_block', 'modify_button');
+		} else {
+			$this->setVar('dropzone_block', '');
+			$this->setVar('modify_button_block', '');
 		}
 
 		if ($allItems->count()) {
