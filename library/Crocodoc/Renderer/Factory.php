@@ -85,7 +85,7 @@ class Factory
     {
         $work = $this->getSubmission();
 
-        $returnCollection = $this->getReturnedWorkCollection();
+        $returnCollection = $this->getReturnedWorkCollection()->first();
         if ($work === null) {
             // No submission
             return new Strategy\None($this->getPage(), $work, $returnCollection, $this->getNavigationElements());
