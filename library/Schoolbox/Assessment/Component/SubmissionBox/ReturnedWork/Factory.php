@@ -385,26 +385,6 @@ class Factory
         return $returnedWork;
     }
 
-    /**
-     * Add an optional file
-     *
-     * @param ReturnedWork $returnedWork
-     */
-    private function addFile($returnedWork)
-    {
-        $factory = new CollectorFactory();
-
-        try {
-            $returnedWork->setStorage($factory->build($this->getAttachments())->getFirst());
-        } catch (\Schoolbox\Resource\Exception $e) {
-            // No attachments from form:
-            // Remove them completely if it would have been set from the form.
-            if ($this->isRemoveUnsetAttachments()) {
-                $returnedWork->setStorage(null);
-            }
-        }
-    }
-
     /* Getters/Setters
      */
 
