@@ -13,16 +13,18 @@
 
 namespace Alaress\Twig\Loader;
 
-use Alaress\Module\Module as BaseModule;
+use Alaress\Module\Loader as ModuleLoader;
 use Aura\Di;
 use Twig_Loader_Chain;
 
 class ChainLoader extends Twig_Loader_Chain
 {
     /**
-     * @var Di\ContainerInterface
+     * Module loader
+     *
+     * @var ModuleLoader
      */
-    protected $di;
+    protected $moduleLoader;
 
     /**
      * Modules that have been loaded
@@ -34,36 +36,13 @@ class ChainLoader extends Twig_Loader_Chain
     /**
      * Constructor
      *
-     * @param Di\ContainerInterface $di
-     * @param array                 $loaders
+     * @param ModuleLoader $moduleLoader
+     * @param array        $loaders
      */
-    public function __construct(Di\ContainerInterface $di, array $loaders = array())
+    public function __construct(ModuleLoader $moduleLoader, array $loaders = array())
     {
         parent::__construct($loaders);
-        $this->di = $di;
-    }
-
-    /**
-     * If this template's module hasn't yet been loaded, attempt to load it
-     * before checking whether this exists or not.
-     *
-     * @param string $name
-     */
-    protected function loadModuleForTemplate($name)
-    {
-        if (preg_match('[^@(?P<module>.*?)/]', $name, $matches)) {
-            $moduleName = $matches['module'];
-            if (empty($this->loadedModules[$moduleName])) {
-                if ($this->di->has('module:'.$moduleName)) {
-                    $module = $this->di->get('module:'.$moduleName);
-                    if ($module instanceof BaseModule) {
-                        $module->initControllerDependencies();
-                    }
-                }
-                // Don't try to init again, even if it wasn't found
-                $this->loadedModules[$moduleName] = true;
-            }
-        }
+        $this->moduleLoader = $moduleLoader;
     }
 
     /**
@@ -71,7 +50,7 @@ class ChainLoader extends Twig_Loader_Chain
      */
     public function exists($name)
     {
-        $this->loadModuleForTemplate($name);
+        $this->moduleLoader->loadModule($name);
         return parent::exists($name);
     }
 
@@ -80,7 +59,7 @@ class ChainLoader extends Twig_Loader_Chain
      */
     public function getSource($name)
     {
-        $this->loadModuleForTemplate($name);
+        $this->moduleLoader->loadModule($name);
         return parent::getSource($name);
     }
 
@@ -89,7 +68,7 @@ class ChainLoader extends Twig_Loader_Chain
      */
     public function getCacheKey($name)
     {
-        $this->loadModuleForTemplate($name);
+        $this->moduleLoader->loadModule($name);
         return parent::getCacheKey($name);
     }
 
@@ -98,7 +77,7 @@ class ChainLoader extends Twig_Loader_Chain
      */
     public function isFresh($name, $time)
     {
-        $this->loadModuleForTemplate($name);
+        $this->moduleLoader->loadModule($name);
         return parent::isFresh($name, $time);
     }
 }
