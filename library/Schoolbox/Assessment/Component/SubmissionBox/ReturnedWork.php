@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
 
 class ReturnedWork implements ISoftDeletable
@@ -96,6 +97,9 @@ class ReturnedWork implements ISoftDeletable
     {
         $this->setSubmissionBox(new SubmissionBox());
         $this->setOwner(new User());
+        // This is meant to ensure that getStorage() always returns an IStorage,
+        // not to specify that it must be a particular IStorage implementation.
+        $this->setStorage(new StorageModel());
     }
 
     /**
