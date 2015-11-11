@@ -214,49 +214,45 @@ class Factory
             }
         }
 
-        /* Figure out which returned work record to use
-         * Assign marks, normalised marks, ownerships etc
+        /* Ram them home
          */
-        $returnedWork = $this->processReturnedWork();
+        foreach ($returnedItems as $returnedWork) {
+            /** @var ReturnedWork $returnedWork */
+            try {
+                $this->getReturnedWorkMapper()->save($returnedWork);
 
-        /* If there was a file upload, attach it
-         */
-        $this->addFile($returnedWork);
+                // Rubrics have no mappers yet, so handle them the old-fashioned way.
+                if (is_array($this->getRubric())) {
+                    $rubric_handler = new \DueWork_Rubric_Handler();
+                    $rubric_handler->saveMarks(
+                        $this->getRubric(),
+                        $this->getUser()->getId(),
+                        $this->getSubmissionBox()->getId(),
+                        $returnedWork->getReturned()->getDatabase()
+                    );
 
-        /* Ram it home
-         */
-        try {
-            $this->getReturnedWorkMapper()->save($returnedWork);
-
-            // Rubrics have no mappers yet, so handle them the old-fashioned way.
-            if (is_array($this->getRubric())) {
-                $rubric_handler = new \DueWork_Rubric_Handler();
-                $rubric_handler->saveMarks(
-                    $this->getRubric(),
-                    $this->getUser()->getId(),
-                    $this->getSubmissionBox()->getId(),
-                    $returnedWork->getReturned()->getDatabase()
-                );
-
-                /* wat...?
-                 *
-                 * What is the point of this? Why isn't it just the same as the $returnedWork->getReturned()
-                 * value (that is, the timestamp when the Returned Work was last modified)
-                 *
-                 * Why would you want to preserve the timestamp for when this rubric_mark value
-                 * was first created?
-                 *
-                    $stamp = null;
-                    if ($update_existing) {
-                        $stamp = $rubric_handler->getLatestMarkTimestamp($student_id, $box_id);
-                    }
-                    $rubric_handler->saveMarks($rubric, $student_id, $box_id, $stamp);
-                 */
+                    /* wat...?
+                     *
+                     * What is the point of this? Why isn't it just the same as the $returnedWork->getReturned()
+                     * value (that is, the timestamp when the Returned Work was last modified)
+                     *
+                     * Why would you want to preserve the timestamp for when this rubric_mark value
+                     * was first created?
+                     *
+                        $stamp = null;
+                        if ($update_existing) {
+                            $stamp = $rubric_handler->getLatestMarkTimestamp($student_id, $box_id);
+                        }
+                        $rubric_handler->saveMarks($rubric, $student_id, $box_id, $stamp);
+                     */
+                }
+            } catch (\Exception $e) {
+                // noop
+                // Not sure why this exception got swallowed.
+                // Possibly because `saveMarks()` can fail?
             }
-        } catch (\Exception $e) {
         }
-
-        return $returnedWork;
+        return $returnedItems;
     }
 
     /**
