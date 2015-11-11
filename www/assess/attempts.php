@@ -214,7 +214,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
     [
         'text'  => $assess['title'],
-        'href'  => '/assess/summary.' . $assess['assess_id'],
+        'href'  => '/assess/summary/' . $assess['assess_id'],
         'class' => ''
     ],
     [
