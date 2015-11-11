@@ -119,13 +119,14 @@ if ($origSha != $newSha || $origCustomSha != $newCustomSha || $force) {
             $logger->info("Splitting for IE < 10 complete");
             $logger->info("Skin built successfully");
         } else {
-            // Something went wrong through blessc
-            $logger->error("Something went wrong during blessc (exit code: $outputCode)");
+            // Something went wrong through blessc, that's a warning for now rather than an error
+            $logger->warning("Something went wrong during blessc (exit code: $outputCode)");
             $logger->info("Command: $cmd");
             $logger->info("Output:");
             foreach ($output as $line) {
                 $logger->info($line);
             }
+            $outputCode = 0;
         }
     } else {
         // something went wrong
