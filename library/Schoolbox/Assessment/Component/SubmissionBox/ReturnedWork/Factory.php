@@ -237,10 +237,15 @@ class Factory
      * Get the returned work record to deal with
      * This either spawns a new one, or uses an old one from some time ago
      *
+     * @param  bool         $allowUpdate If false, always create new record
      * @return ReturnedWork
      */
-    private function retrieveReturnedWorkRecord()
+    private function retrieveReturnedWorkRecord($allowUpdate)
     {
+        if (!$allowUpdate) {
+            return $this->spawnNewReturnedWork();
+        }
+
         $returnedWork = null;
 
         /* If you can't find an existing record, spawn a new one
@@ -313,11 +318,12 @@ class Factory
     /**
      * Apply updates to the returned work record
      *
+     * @param  bool         $allowUpdate If false, always create new record
      * @return ReturnedWork
      */
-    private function processReturnedWork()
+    private function processReturnedWork($allowUpdate)
     {
-        $returnedWork = $this->retrieveReturnedWorkRecord();
+        $returnedWork = $this->retrieveReturnedWorkRecord($allowUpdate);
         $errors = $this->getErrors();
 
         if (isset($errors[$this->getMark()])) {
