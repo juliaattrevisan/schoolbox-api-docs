@@ -104,8 +104,11 @@ abstract class Base {
 		$this->getPage()->setFile('injectableUpload', $this->getUploadFile());
 		$this->getPage()->setBlock('injectableUpload', 'returned_work', 'returned_work_block');
 
+        // Try getting all returns for this item
+
         $return = $this->getReturnedWork();
 
+        $this->getPage()->setVar('returned_work_block', '');
         if ($return instanceof ReturnedWork) {
             if ($return->getStorage()->getFilename() != null) {
                 $storage = $return->getStorage();
@@ -118,19 +121,9 @@ abstract class Base {
                     'MOST_RECENT_RETURN_FILE_DATE'  => $return->getReturned()->getRelativeTime(),
                 ));
 
-                $this->getPage()->parse('returned_work_block', 'returned_work');
+                $this->getPage()->parse('returned_work_block', 'returned_work', true);
             }
-            else {
-                $this->getPage()->setVar(array(
-                    'returned_work_block' => ''
-                ));
-            }
-		}
-		else {
-			$this->getPage()->setVar(array(
-				'returned_work_block' => ''
-			));
-		}
+        }
 
 		$this->getPage()->parse('INJECTED_MARK_TEMPLATE', 'injectableUpload');
 	}
