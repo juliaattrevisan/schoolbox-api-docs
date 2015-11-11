@@ -24,6 +24,9 @@ table.rubric {
         margin-top: 0;
         padding-left: 0;
         font-weight: $header-font-weight;
+        &:hover{
+            background-color: $body-bg;
+        }
     }
 
     th, td {
