@@ -1,25 +1,30 @@
 {% set portrait = '/portrait.php?size=square48&userId=' %}
 {% set mime     = '/images/mime/128x128/' %}
 
+{#
+Each delete request is an ajax request for compatibility
+These are its args, which is given for you
+#}
+
+{% set deleteArgs = '{ajax: 1, delete: ' ~ file.id ~ '}' %}
 
 {% if namespace == 'resourceBrowser' %}
     {% set send   = '/send.php?id=' %}
     {% set image  = '/cms/image.php?id=' %}
     {% set modify = '/cms/file/' %}
     {% set delete = '/cms/fileForm.php?delete=' %}
-    {% set deleteArgs = '{ajax: 1, delete: ' ~ file.id ~ '}' %}
 
 {% elseif namespace == 'myFilesBrowser' %}
     {% set send   = '/cms/sendMyFile.php?id=' %}
     {% set image  = '/cms/myImage.php?id=' %}
     {% set modify = '/cms/myFile/' %}
     {% set delete = '/cms/myFileForm.php' %}
-    {% set deleteArgs = '{ajax: 1, delete: ' ~ file.id ~ '}' %}
 
 {% else %}
     {% set send   = '/cms/sendNetworkFile.php?id=' %}
     {% set image  = '/cms/networkImage.php?id=' %}
     {% set modify = '/cms/networkFile/' %}
+    {% set delete = '/cms/networkFileForm.php' %}
 
 {% endif %}
 
