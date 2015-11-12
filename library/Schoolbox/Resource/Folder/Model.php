@@ -142,10 +142,10 @@ class Model extends AbstractFolder implements ISoftDeletable
                 $subCodeString[] = $subCode->getCode();
             }
 
-            $codeString = \Scrub::text(implode(',', $subCodeString) . '...');
+            $codeString = implode(',', $subCodeString) . '...';
         }
         else {
-            $codeString = \Scrub::text($this->getCodeString());
+            $codeString = $this->getCodeString();
         }
 
         return $codeString;

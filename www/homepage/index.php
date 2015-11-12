@@ -323,7 +323,7 @@ if ($manageClassController->renderTemplate('manage_class')) {
 $this->parse('page_controls_block', 'page_controls');
 
 if ($_SESSION['user']->getRole()->isStaff()) {
-    $codeString = $category->getTruncatedCodeString();
+    $codeString = Scrub::text($category->getTruncatedCodeString());
 }
 else {
     $codeString = '';
