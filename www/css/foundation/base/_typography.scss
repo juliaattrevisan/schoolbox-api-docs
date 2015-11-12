@@ -137,11 +137,11 @@ $blockquote-cite-link-color: $blockquote-cite-font-color;
 }
 
              //  s,     m,      l+
-$h1-font-scale: (1.5,    1.75,   2.25);
-$h2-font-scale: (1.25,   1.3125, 1.375);
-$h3-font-scale: (1.125,  1.25,   1.25);
-$h4-font-scale: (1.0625  1.125   1.1875);
-$h5-font-scale: (1,      1.0625, 1.125);
+$h1-font-scale: (1.5,    1.75,   2.125);
+$h2-font-scale: (1.25,   1.3125, 1.325);
+$h3-font-scale: (1,  1.125,   1.125);
+$h4-font-scale: (1,  1.0625,   1.0625);
+$h5-font-scale: (1,      1.0625, 1.0625);
 $h6-font-scale: (0.9375, 1,      1.0625);
 $p-font-scale:  (0.8125, 0.8125, 0.8125);
 $sm-font-scale: (0.75,   0.75,   0.8125);
@@ -182,7 +182,6 @@ h1{
 //}
 
 .subheader{
-	font-weight: $font-weight-normal;
 	text-transform: uppercase;
 }
 
