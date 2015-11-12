@@ -526,6 +526,7 @@ abstract class Component_ControllerAbstract
          */
         if (!$hasWriteAccess) {
             $this->renderConfigElements(false, $is_for_template);
+            $this->sitepage->parse($targetHandle, 'configTpl', false);
             return false;
         }
         else {
