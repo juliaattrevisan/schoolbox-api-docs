@@ -198,12 +198,26 @@ abstract class AbstractController extends BaseController
 
         $folderId = $this->getSession()->get('resourcesID', 0, $this->namespace);
 
-        $data = $this->getFolderData($folderId);
+        try {
+            $data = $this->getFolderData($folderId);
 
-        // add files to that
-        $data['files']    = $this->fileMapper->findByFolderId($folderId)->getAll();
-        $data['treedata'] = json_encode($this->treeBuilder->buildPartialTree($folderId));
-        $data['namespace'] = $this->namespace;
+            // add files to that
+            $data['files'] = $this->fileMapper->findByFolderId($folderId)->getAll();
+            $data['treedata'] = json_encode($this->treeBuilder->buildPartialTree($folderId));
+            $data['namespace'] = $this->namespace;
+        }
+        catch (\Exception $e) {
+            //Reset folderid to try and avoid error
+            $folderId = 0;
+            $this->getSession()->set('resourcesID', $folderId, $this->namespace);
+            $data = $this->getFolderData($folderId);
+
+            // add files to that
+            $data['files'] = $this->fileMapper->findByFolderId($folderId)->getAll();
+            $data['treedata'] = json_encode($this->treeBuilder->buildPartialTree($folderId));
+            $data['namespace'] = $this->namespace;
+
+        }
 
         $this->getResponse()->content->set([
             'template' => '@resourceBrowser/browse.twig',

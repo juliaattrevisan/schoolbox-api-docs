@@ -51,6 +51,7 @@ class Node extends AbstractNode
         $this->setGroupHandler(new \Group());
 
         // Check we have permission to render node
+        print_R($nodeId);
         if ($nodeId > 0 && !$this->hasPermission($nodeId, READ_ACCESS)) {
             throw new Exception('Permission denied');
         }
