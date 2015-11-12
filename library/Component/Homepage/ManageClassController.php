@@ -42,7 +42,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             return false;
         }
 
-        $this->parseConfig();
+//        $this->parseConfig();
 
         $this->setBlock($templateHandle, "class_list", "class_list_block");
         $this->setBlock($templateHandle, "class_mark", "class_mark_block");
