@@ -225,28 +225,24 @@ class UserAccessNotifier extends AbstractModuleNotifier
         $cat = CategoryMapper::getInstance()
                              ->findById($userAccess->getServiceIdentifier());
 
-
-//		// moderation approved
-//		if($oldAccess == UserAccess::ACCESS_DENY && $newAccess > UserAccess::ACCESS_DENY) {
-//			$body = ":moderator has approved your request to join :groupname";
-//		}
-//		// elevated privileges
-//		elseif($oldAccess < $newAccess) {
-        $map = array(
-            UserAccess::ACCESS_DENY  => 'no',
-            UserAccess::ACCESS_READ  => 'read',
-            UserAccess::ACCESS_WRITE => 'write',
-            UserAccess::ACCESS_FULL  => 'full'
-        );
-
-//			$body = ":moderator has given you {$map[$newAccess]} access to :groupname";
-//		}
-//		else {
-//			return $msgr;
-//		}
-
+        // Customize the approval message
+        $messageText = '';
+        switch ($userAccess->getAccessLevel()) {
+            case UserAccess::ACCESS_DENY:
+                $messageText = ':moderator has removed your access to :groupname';
+                break;
+            case UserAccess::ACCESS_READ:
+                $messageText = ':moderator has made you a member of :groupname';
+                break;
+            case UserAccess::ACCESS_WRITE:
+                $messageText = ':moderator has allowed you to create content for :groupname';
+                break;
+            case UserAccess::ACCESS_FULL:
+                $messageText = ':moderator has made you an administrator of :groupname';
+                break;
+        }
         $msg = new Message(
-            ":moderator has given you {$map[$userAccess->getAccessLevel()]} access to :groupname",
+            $messageText,
             "/portrait.php?size={$this->iconSize}&userId=" . $user->getExternalId(),
             "/homepage/" . $cat->getId()
         );
