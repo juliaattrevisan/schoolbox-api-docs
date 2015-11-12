@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.scroll-to.js"></script>
 
 {% if namespace == 'myFilesBrowser' %}
     {% set fileController   = 'myFile' %}
@@ -90,6 +91,19 @@
             $footer    = $('#footer'),
             $resources = $('#resources');
 
+
+        // On the initial open of the tree and all its open by default parts:
+        // scroll to it
+        tree.on('after_open.jstree.initial', function(event, jstree) {
+            var nodeId = jstree.node.id;
+
+            // If this node is the parent of the selected: scroll to the selected now
+            var initialNode = jstree.instance.get_children_dom(nodeId).filter('#'+{{ folder.id }});
+            if (initialNode.length) {
+                $resources.scrollTo(initialNode);
+                tree.off('.jstree.initial');
+            }
+        });
 
         function rs()
         {

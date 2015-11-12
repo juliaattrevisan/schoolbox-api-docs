@@ -141,6 +141,9 @@ abstract class AbstractController extends BaseController
      */
     protected function getFolderData($folderId)
     {
+        // Redirect to this folder next time page gets reloaded
+        $this->getSession()->set('resourcesID', $folderId, $this->namespace);
+
         $folder = $this->getFolder($folderId);
 
         $tree = $folder->getParent() instanceof IFolder ? $this->getBreadcrumbs($folder->getParent()) : [];
@@ -186,21 +189,35 @@ abstract class AbstractController extends BaseController
     {
         // if a folder ID was supplied, stash that in session then redirect
         if ($folderId) {
-            $this->getSession()->set('resourcesID', $folderId);
+            $this->getSession()->set('resourcesID', $folderId, $this->namespace);
 
             $this->getResponse()->redirect->to(
                 $this->getRouter()->generate("{$this->namespace}.browse", array())
             );
         }
 
-        $folderId = $this->getSession()->get('resourcesID', 0);
+        $folderId = $this->getSession()->get('resourcesID', 0, $this->namespace);
 
-        $data = $this->getFolderData($folderId);
+        try {
+            $data = $this->getFolderData($folderId);
 
-        // add files to that
-        $data['files']    = $this->fileMapper->findByFolderId($folderId)->getAll();
-        $data['treedata'] = json_encode($this->treeBuilder->buildPartialTree($folderId));
-        $data['namespace'] = $this->namespace;
+            // add files to that
+            $data['files'] = $this->fileMapper->findByFolderId($folderId)->getAll();
+            $data['treedata'] = json_encode($this->treeBuilder->buildPartialTree($folderId));
+            $data['namespace'] = $this->namespace;
+        }
+        catch (\Exception $e) {
+            //Reset folderid to try and avoid error
+            $folderId = 0;
+            $this->getSession()->set('resourcesID', $folderId, $this->namespace);
+            $data = $this->getFolderData($folderId);
+
+            // add files to that
+            $data['files'] = $this->fileMapper->findByFolderId($folderId)->getAll();
+            $data['treedata'] = json_encode($this->treeBuilder->buildPartialTree($folderId));
+            $data['namespace'] = $this->namespace;
+
+        }
 
         $this->getResponse()->content->set([
             'template' => '@resourceBrowser/browse.twig',
