@@ -21,6 +21,8 @@ use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
+    protected $basename = 'curriculum';
+
     /**
      * {@inheritdoc}
      */
@@ -39,9 +41,8 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->attachResource('curriculum', $basePath);
-        $router->attachResourcePostAlias('curriculum', $basePath);
-        $router->addGet('curriculum.search', $basePath . '/search');
+        $this->attachResourceRoutes($router, $basePath);
+        $this->addGetRoute($router, 'search', $basePath, '/search');
     }
 
     /**
@@ -52,8 +53,9 @@ class Module extends BaseModule
         // Add the item to params, if ID is in the route.
         // TODO DI this
         $nodeMapper = new Node\Mapper();
-        $matcher->add(
-            '/^curriculum\\./',
+        $this->addRoutePreload(
+            $matcher,
+            '.*',
             function ($params) use ($nodeMapper) {
                 if (array_key_exists('id', $params)) {
                     return array(
@@ -71,17 +73,19 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer->addRule('/^curriculum\\..*/', new Rule\IsLoggedIn());
-        $authorizer->addRule(
-            '/^curriculum\\.(?:edit|add|delete|create|update|replace)/',
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(
-                    UserAccess::SERVICE_CURRICULUM,
-                    UserAccess::ACCESS_WRITE
+        $this
+            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermission(
+                $authorizer,
+                '(?:edit|add|delete|create|update|replace)',
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(
+                        UserAccess::SERVICE_CURRICULUM,
+                        UserAccess::ACCESS_WRITE
+                    )
                 )
-            )
-        );
+            );
     }
 
 
@@ -90,9 +94,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__ . '/templates', 'curriculum');
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**
@@ -101,7 +103,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:curriculum',
+            'controller:'.$this->basename,
             $injector->lazyNew('Schoolbox\\Curriculum\\Controller')
         );
         $injector->setters['Schoolbox\\Curriculum\\Controller']['setNodeMapper']

@@ -17,13 +17,15 @@ use Aura\Router\Router;
 
 class Module extends BaseModule {
 
+    protected $basename = 'api';
+
     /**
      * @param Router|RouteCollection $router
      * @param string $basePath
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->addPost('api.register', $basePath . '/register/{provider}');
+        $this->addPostRoute($router, 'register', $basePath, '/register/{provider}');
     }
 
 
@@ -32,11 +34,15 @@ class Module extends BaseModule {
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $matcher->add('`^api\\.(?:register)$`', function ($params) {
-            return array(
-                'provider' => $params['provider'],
-            );
-        });
+        $this->addRoutePreload(
+            $matcher,
+            'register',
+            function ($params) {
+                return array(
+                    'provider' => $params['provider'],
+                );
+            }
+        );
     }
 
 
@@ -46,7 +52,7 @@ class Module extends BaseModule {
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:api',
+            'controller:'.$this->basename,
             $injector->lazyNew('Schoolbox\\API\\Controller')
         );
 

@@ -26,7 +26,9 @@ use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Group;
 use Schoolbox\Collection;
 
-class Module extends BaseModule {
+class Module extends BaseModule
+{
+    protected $basename = 'learningAnalytics';
 
     /**
      * Basic routes for this module
@@ -41,20 +43,20 @@ class Module extends BaseModule {
         /* folderId is associated with a course, a set of units. This finds all
          * the units associated with all the folders that use the course.
          */
-        $router->addGet('learningAnalytics.course', "{$basePath}/course/{courseId}");
+        $this->addGetRoute($router, 'course', $basePath, "/course/{courseId}");
 
         /* With optional task filter
          */
-        $router->addGet('learningAnalytics.courseWithTask', "{$basePath}/course/{courseId}/task/{taskId}");
+        $this->addGetRoute($router, 'courseWithTask', $basePath, "/course/{courseId}/task/{taskId}");
 
         /* folderId is associated with a course, a set of units. This finds all
          * the units associated with a particular folder that uses the course.
          */
-        $router->addGet('learningAnalytics.folder', "{$basePath}/course/{courseId}/folder/{folderId}");
+        $this->addGetRoute($router, 'folder', $basePath, "/course/{courseId}/folder/{folderId}");
 
         /* With optional task filter
          */
-        $router->addGet('learningAnalytics.folderWithTask', "{$basePath}/course/{courseId}/folder/{folderId}/task/{taskId}");
+        $this->addGetRoute($router, 'folderWithTask', $basePath, "/course/{courseId}/folder/{folderId}/task/{taskId}");
     }
 
     /**
@@ -200,32 +202,20 @@ class Module extends BaseModule {
     {
         /* Inject ingredients into course controller method
          */
-        $matcher->add(
-            '/^learningAnalytics\.course/', function($params) {
-                return $this->courseDependencies($params);
-            }
-        );
-
-        /* Inject ingredients into course controller method
-         */
-        $matcher->add(
-            '/^learningAnalytics\.courseWithTask/', function($params) {
+        $this->addRoutePreload(
+            $matcher,
+            '(?:course|courseWithTask)',
+            function($params) {
                 return $this->courseDependencies($params);
             }
         );
 
         /* Inject ingredients into folder controller method
          */
-        $matcher->add(
-            '/^learningAnalytics\.folder/', function($params) {
-                return $this->folderDependencies($params);
-            }
-        );
-
-        /* Inject ingredients into folder controller method
-         */
-        $matcher->add(
-            '/^learningAnalytics\.folderWithTask/', function($params) {
+        $this->addRoutePreload(
+            $matcher,
+            '(?:folder|folderWithTask)',
+            function($params) {
                 return $this->folderDependencies($params);
             }
         );
@@ -238,9 +228,7 @@ class Module extends BaseModule {
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__.'/templates', 'learningAnalytics');
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**
@@ -251,7 +239,7 @@ class Module extends BaseModule {
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:learningAnalytics',
+            'controller:'.$this->basename,
             $injector->lazyNew('Schoolbox\\LearningAnalytics\\Controller')
         );
     }

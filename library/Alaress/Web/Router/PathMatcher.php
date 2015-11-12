@@ -17,6 +17,8 @@
 
 namespace Alaress\Web\Router;
 
+use Alaress\Module\Loader as ModuleLoader;
+
 class PathMatcher {
 
     /**
@@ -25,6 +27,23 @@ class PathMatcher {
      * @var array
      */
     protected $ruleList = array();
+
+    /**
+     * Module loader
+     *
+     * @var ModuleLoader
+     */
+    protected $moduleLoader;
+
+    /**
+     * Constructor
+     *
+     * @param ModuleLoader $moduleLoader
+     */
+    public function __construct(ModuleLoader $moduleLoader)
+    {
+        $this->moduleLoader = $moduleLoader;
+    }
 
     /**
      * Adds a rule for a path.
@@ -76,6 +95,8 @@ class PathMatcher {
      * @return array
      */
     public function check($path, $params, $tags = array()) {
+        // First load the module
+        $this->moduleLoader->loadModule($path);
         if (!is_array($tags)) {
             $tags = array($tags);
         }

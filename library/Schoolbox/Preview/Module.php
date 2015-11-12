@@ -18,6 +18,7 @@ use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
+    protected $basename = 'preview';
 
     /**
      * {@inheritdoc}
@@ -26,11 +27,11 @@ class Module extends BaseModule
     {
         /* Default index page
          */
-        $router->addGet('preview.index', $basePath);
+        $this->addGetRoute($router, 'index', $basePath, '');
 
         /* Render html fragment, or redirect
          */
-        $router->addGet('preview.preview', $basePath . '/{encodedUrl}')
+        $this->addGetRoute($router, 'preview', $basePath, '/{encodedUrl}')
             ->addValues([
                 'format' => '.json'
             ]);
@@ -41,8 +42,9 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $matcher->add(
-            '/^preview\.(index|preview)/',
+        $this->addRoutePreload(
+            $matcher,
+            '(?:index|preview)',
             function($params) {
                 return array(
                     'params' => $params
@@ -63,9 +65,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__.'/Templates', 'preview');
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePath($templateLoader, __DIR__ . '/Templates');
     }
 
     /**
@@ -74,7 +74,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:preview',
+            'controller:'.$this->basename,
             $injector->lazyNew('Schoolbox\\Preview\\Controller')
         );
     }

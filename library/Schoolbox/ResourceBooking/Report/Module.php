@@ -25,6 +25,7 @@ use Schoolbox\ResourceBooking\Item;
 
 class Module extends BaseModule
 {
+    protected $basename = 'resourceBookingReport';
 
     /**
      * {@inheritdoc}
@@ -33,8 +34,8 @@ class Module extends BaseModule
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $router->addGet('resourceBookingReport.index', $basePath);
-        $router->addGet('resourceBookingReport.download', $basePath.'/download');
+        $this->addGetRoute($router, 'index', $basePath, '');
+        $this->addGetRoute($router, 'download', $basePath, '/download');
     }
 
     /**
@@ -44,15 +45,17 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer
-            ->addRule('/^resourceBookingReport\./', new Rule\All(
+        $this->addRoutePermission(
+            $authorizer,
+            '.*',
+            new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF)
                 )
-            ))
-        ;
+            )
+        );
     }
 
     /**
@@ -60,9 +63,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__.'/templates', 'resourceBookingReport');
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**
@@ -78,6 +79,6 @@ class Module extends BaseModule
         $injector->params[Controller::class]['categoryMapper'] = $injector->lazyNew(Category\Mapper::class);
         $injector->params[Controller::class]['apiFactory']     = $injector->lazyNew(CalendarApiFactory::class);
         $injector->params[Controller::class]['api']            = $injector->lazyNew(Calendar_Api_Composite::class);
-        $injector->set('controller:resourceBookingReport', $injector->lazyNew(Controller::class));
+        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
     }
 }

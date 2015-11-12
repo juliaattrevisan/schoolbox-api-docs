@@ -75,6 +75,11 @@ class Kernel extends \Alaress\Application\Kernel
             preg_match('/^(?P<controller>\w+)\\.(?P<action>\w+)/', $route->name, $parsedName);
             $controllerName = $parsedName['controller'];
             $action         = $parsedName['action'];
+            /** @var \Alaress\Module\Module $module */
+            $module = $this->di->get('module:'.$controllerName);
+            $module->initControllerDependencies();
+            $module->initControllers($this->di);
+            unset($module);
             /** @var \Alaress\Web\Controller\Base $controller */
             $controller = $this->di->get('controller:'.$controllerName);
             /** @var \Alaress\Session\Session $session */

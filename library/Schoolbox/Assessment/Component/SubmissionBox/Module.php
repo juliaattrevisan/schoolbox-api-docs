@@ -23,16 +23,16 @@ use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
+    protected $basename = 'submission';
+
     /**
      * @param Router $router
      * @param string $basePath
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $routes = $router->getRoutes();
-
-        $routes->addGet('submission.viewOverview', "$basePath/overview/{box_id}");
-        $routes->addGet('submission.downloadOverview', "$basePath/overview/{box_id}/csv");
+        $this->addGetRoute($router, 'viewOverview', $basePath, "/overview/{box_id}");
+        $this->addGetRoute($router, 'downloadOverview', $basePath, "/overview/{box_id}/csv");
     }
 
 
@@ -41,14 +41,16 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer->addRule('/^submission\\..*/', new Rule\IsLoggedIn());
-        $authorizer->addRule(
-            '/^submission\\..+(?:Overview)/',
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF)
-            )
-        );
+        $this
+            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermission(
+                $authorizer,
+                '.+(?:Overview)',
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF)
+                )
+            );
     }
 
     /**
@@ -60,8 +62,9 @@ class Module extends BaseModule
         // TODO DI these
         $boxMapper = SubmissionBoxMapper::getInstance();
         $catMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
-        $matcher->add(
-            '/^submission\\./',
+        $this->addRoutePreload(
+            $matcher,
+            '.*',
             function ($params) use ($boxMapper, $catMapper) {
                 if (array_key_exists('box_id', $params)) {
 
@@ -87,9 +90,7 @@ class Module extends BaseModule
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         // TODO inherit from an Admin baseclass to setup subnav
-        $loader = new Twig_Loader_Filesystem([]);
-        $loader->addPath(__DIR__ . '/templates', 'submission');
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
 
@@ -99,7 +100,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:submission',
+            'controller:'.$this->basename,
             $injector->lazyNew(Controller::class)
         );
     }

@@ -34,15 +34,17 @@ class Module extends BaseModule
      */
     protected $externalDb;
 
+    protected $basename = 'timetable';
+
     /**
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->add(
-            'timetable.dateForTimetableDay',
-            $basePath.'/dateForTimetableDay'
-        )->addValues(array('format' => '.json'));
+        $this
+            ->addRoute($router, 'dateForTimetableDay', $basePath, '/dateForTimetableDay')
+            ->addValues(array('format' => '.json'))
+        ;
     }
 
     /**
@@ -52,7 +54,7 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer->addRule('/^timetable\\..*/', new Rule\IsLoggedIn());
+        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
     }
 
     /**
@@ -61,7 +63,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:timetable',
+            'controller:'.$this->basename,
             $injector->lazyNew(
                 Controller::class,
                 ['externalTimetable' => $this->getExternalDb()]

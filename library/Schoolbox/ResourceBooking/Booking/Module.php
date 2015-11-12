@@ -24,6 +24,7 @@ use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
 
 class Module extends BaseModule
 {
+    protected $basename = 'resourceBooking';
 
     /**
      * {@inheritdoc}
@@ -32,19 +33,19 @@ class Module extends BaseModule
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $router->addGet('resourceBooking.book', $basePath.'/bookItem/{id}');
-        $router->addGet('resourceBooking.edit', $basePath.'/{id}/edit');
-        $router->addPost('resourceBooking.createBooking', $basePath.'/bookItem/{id}')
+        $this->addGetRoute($router, 'book', $basePath, '/bookItem/{id}');
+        $this->addGetRoute($router, 'edit', $basePath, '/{id}/edit');
+        $this->addPostRoute($router, 'createBooking', $basePath, '/bookItem/{id}')
                ->addValues(array('action' => 'createBooking'));
-        $router->addPost('resourceBooking.update:post', $basePath.'/{id}/update')
+        $this->addPostRoute($router, 'update:post', $basePath, '/{id}/update')
                ->addValues(array('action' => 'update'));
-        $router->add('resourceBooking.bookingCalendar', $basePath.'/itemCalendar/{id}');
+        $this->addRoute($router, 'bookingCalendar', $basePath, '/itemCalendar/{id}');
 
         // Approving or rejecting a single booking
-        $router->add('resourceBooking.approve', $basePath.'/{id}/approve');
-        $router->add('resourceBooking.reject', $basePath.'/{id}/reject');
-        $router->add('resourceBooking.setPending', $basePath.'/{id}/setPending');
-        $router->add('resourceBooking.cancel', $basePath.'/{id}/cancel');
+        $this->addRoute($router, 'approve', $basePath, '/{id}/approve');
+        $this->addRoute($router, 'reject', $basePath, '/{id}/reject');
+        $this->addRoute($router, 'setPending', $basePath, '/{id}/setPending');
+        $this->addRoute($router, 'cancel', $basePath, '/{id}/cancel');
     }
 
     /**
@@ -53,8 +54,9 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
         // Add the booking item to params, if ID is in the route.
-        $matcher->add(
-            '/^resourceBooking\.(?:edit|update|approve|reject|setPending|cancel)/',
+        $this->addRoutePreload(
+            $matcher,
+            '(?:edit|update|approve|reject|setPending|cancel)',
             function($params) {
                 return array(
                     'item' => Mapper::getInstance()->findById($params['id']),
@@ -62,8 +64,9 @@ class Module extends BaseModule
             }
         );
         // Add the resource item to params, if item ID is in the route.
-        $matcher->add(
-            '/^resourceBooking\.(?:book|createBooking|bookingCalendar)/',
+        $this->addRoutePreload(
+            $matcher,
+            '(?:book|createBooking|bookingCalendar)',
             function($params) {
                 return array(
                     'item' => ItemMapper::getInstance()->findById($params['id']),
@@ -108,14 +111,11 @@ class Module extends BaseModule
         $isOwnerRule->setMapper(Mapper::getInstance());
         $bookingEditRule = new Rule\Any($baseManageRule, $isOwnerRule);
 
-        $authorizer
-            ->addRule('/^resourceBooking(?:$|\.)/', new Rule\IsLoggedIn())
-            ->addRule('/^resourceBooking\.(?:book|createBooking)$/', $bookingCreateRule)
-            ->addRule(
-                '/^resourceBooking\.(?:approve|reject|setPending)$/',
-                $baseManageRule
-            )
-            ->addRule('/^resourceBooking\.(?:cancel|edit|update:post)$/', $bookingEditRule)
+        $this
+            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermission($authorizer, '(?:book|createBooking)', $bookingCreateRule)
+            ->addRoutePermission($authorizer, '(?:approve|reject|setPending)', $baseManageRule)
+            ->addRoutePermission($authorizer, '(?:cancel|edit|update:post)', $bookingEditRule)
         ;
     }
 
@@ -124,9 +124,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__.'/templates', 'resourceBooking');
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**
@@ -150,7 +148,7 @@ class Module extends BaseModule
         $injector->setters[Controller::class]['setCampusMapper']
             = $injector->lazyNew(CampusMapper::class);
         $injector->set(
-            'controller:resourceBooking',
+            'controller:'.$this->basename,
             $injector->lazyNew(Controller::class)
         );
     }

@@ -19,14 +19,16 @@ use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 use Schoolbox\Permission\Access\UserAccess;
 
-class Module extends BaseModule {
+class Module extends BaseModule
+{
+    protected $basename = 'resourceCategory';
 
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath) {
-        $router->attachResource('resourceCategory', $basePath);
-        $router->attachResourcePostAlias('resourceCategory', $basePath);
+    public function initRoutes(Router $router, $basePath)
+    {
+        $this->attachResourceRoutes($router, $basePath);
     }
 
     /**
@@ -34,8 +36,9 @@ class Module extends BaseModule {
      */
     public function initRoutePreloads(PathMatcher $matcher) {
         // Add the item to params, if ID is in the route.
-        $matcher->add(
-            '/^resourceCategory\./',
+        $this->addRoutePreload(
+            $matcher,
+            'resourceCategory',
             function($params) {
                 if (array_key_exists('id', $params)) {
                     return array(
@@ -51,23 +54,24 @@ class Module extends BaseModule {
      * {@inheritdoc}
      */
     public function initRoutePermissions(Authorizer $authorizer) {
-        $resourceManageRule = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\HasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL)
-        );
-        $authorizer
-            ->addRule('/^resourceCategory(?:$|\.)/',              new Rule\IsLoggedIn())
-            ->addRule('/^resourceCategory\.(?:add|edit|delete)/', $resourceManageRule)
-        ;
+        $this
+            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermission(
+                $authorizer,
+                '(?:add|edit|delete)',
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL)
+                )
+            );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {
-        $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__.'/templates', 'resourceCategory');
-        $templateLoader->addLoader($loader);
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**
@@ -86,7 +90,7 @@ class Module extends BaseModule {
             )
         );
         $injector->set(
-            'controller:resourceCategory',
+            'controller:'.$this->basename,
             $injector->lazyNew('Schoolbox\\ResourceBooking\\Category\\Controller')
         );
     }

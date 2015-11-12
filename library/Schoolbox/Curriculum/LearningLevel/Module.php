@@ -19,6 +19,8 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Module extends BaseModule
 {
+    protected $basename = 'curriculumLearningLevel';
+
     /**
      * So far, the only action is "create"
      *
@@ -26,7 +28,7 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->addPost('curriculumLearningLevel.create', $basePath);
+        $this->addPostRoute($router, 'create', $basePath, '');
     }
 
     /**
@@ -34,17 +36,19 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer->addRule('/^curriculumLearningLevel\\..*/', new Rule\IsLoggedIn());
-        $authorizer->addRule(
-            '/^curriculumLearningLevel\\..*/',
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(
-                    UserAccess::SERVICE_CURRICULUM,
-                    UserAccess::ACCESS_WRITE
+        $this
+            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermission(
+                $authorizer,
+                '.*',
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(
+                        UserAccess::SERVICE_CURRICULUM,
+                        UserAccess::ACCESS_WRITE
+                    )
                 )
-            )
-        );
+            );
     }
 
     /**
@@ -57,7 +61,7 @@ class Module extends BaseModule
         $injector->params[Controller::class]['sourceMapper']
             = $injector->lazyNew(Source\Mapper::class);
         $injector->set(
-            'controller:curriculumLearningLevel',
+            'controller:'.$this->basename,
             $injector->lazyNew(Controller::class)
         );
     }

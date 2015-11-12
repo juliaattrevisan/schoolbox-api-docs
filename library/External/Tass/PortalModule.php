@@ -14,15 +14,17 @@ use Aura\Router\Router;
 
 class External_Tass_PortalModule extends \Alaress\Module\Module
 {
+    protected $basename = 'tassportal';
+
     /**
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->add('tassportal.parentLounge', $basePath.'/parentlounge');
-        $router->add('tassportal.tassWeb', $basePath.'/tassweb');
-        $router->add('tassportal.teacherKiosk', $basePath.'/teacherkiosk');
-        $router->add('tassportal.webBook', $basePath.'/webbook');
+        $this->addRoute($router, 'parentLounge', $basePath, '/parentlounge');
+        $this->addRoute($router, 'tassWeb', $basePath, '/tassweb');
+        $this->addRoute($router, 'teacherKiosk', $basePath, '/teacherkiosk');
+        $this->addRoute($router, 'webBook', $basePath, '/webbook');
     }
 
     /**
@@ -45,7 +47,7 @@ class External_Tass_PortalModule extends \Alaress\Module\Module
             )
         );
         $injector->set(
-            'controller:tassportal',
+            'controller:'.$this->basename,
             $injector->lazyNew(
                 External_Tass_PortalController::class,
                 [
@@ -67,6 +69,6 @@ class External_Tass_PortalModule extends \Alaress\Module\Module
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer->addRule('/^tassportal(?:$|\.)/', new IsLoggedIn());
+        $this->addRoutePermission($authorizer, '.*', new IsLoggedIn());
     }
 }

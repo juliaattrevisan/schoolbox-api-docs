@@ -46,14 +46,16 @@ class Module extends BaseModule
      */
     protected $userMapper;
 
+    protected $basename = 'customMeridenPastoral';
+
     /**
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->addGet('customMeridenPastoral.currentReport', $basePath.'/{id}');
-        $router->addGet('customMeridenPastoral.index', $basePath.'/{id}/{year}');
-        $router->addGet('customMeridenPastoral.subject', $basePath.'/{id}/{year}/{subjectCode}');
+        $this->addGetRoute($router, 'currentReport', $basePath, '/{id}');
+        $this->addGetRoute($router, 'index', $basePath, '/{id}/{year}');
+        $this->addGetRoute($router, 'subject', $basePath, '/{id}/{year}/{subjectCode}');
     }
 
     /**
@@ -68,10 +70,11 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '/^customMeridenPastoral\\.(?:index|subject)/';
-        $authorizer
-            ->addRule($ruleRegexp, new Rule\IsLoggedIn())
-            ->addRule(
+        $ruleRegexp = '(?:index|subject)';
+        $this
+            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
+            ->addRoutePermission(
+                $authorizer,
                 $ruleRegexp,
                 new Rule\Any(
                     new Rule\IsSuperuser(),
@@ -90,8 +93,9 @@ class Module extends BaseModule
         // Search for the user
         // TODO move the mappers out of here, inject their dependency
         $userMapper = $this->userMapper;
-        $matcher->add(
-            '/^customMeridenPastoral\\.(?:index|subject|currentReport)/',
+        $this->addRoutePreload(
+            $matcher,
+            '(?:index|subject|currentReport)',
             function ($params) use ($userMapper) {
                 $student = $userMapper->findWithSubjects($params['id']);
                 $student->setSubjectCollection(
@@ -124,9 +128,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__.'/templates', 'customMeridenPastoral');
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**
@@ -152,7 +154,7 @@ class Module extends BaseModule
             = $injector->lazyNew('MSSQL');
 
         $injector->set(
-            'controller:customMeridenPastoral',
+            'controller:'.$this->basename,
             $injector->lazyNew('Custom\\Meriden\\Pastoral\\Controller')
         );
     }

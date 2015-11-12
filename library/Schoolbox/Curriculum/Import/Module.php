@@ -20,21 +20,17 @@ use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
+    protected $basename = 'curriculumImport';
+
     /**
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->addGet('curriculumImport.browse', $basePath);
-        $router->addPost('curriculumImport.create', $basePath);
-        $router->addGet('curriculumImport.learningLevels', $basePath . '/learningLevels');
-        $router->addGet('curriculumImport.outcomes', $basePath . '/outcomes');
-//        // Attach standard REST routes
-//        $router->attachResource('tile', $basePath);
-//        $router->attachResourcePostAlias('tile', $basePath);
-//        // but have separate add tile paths
-//        $router->addGet('tile.add', $basePath.'/add/{componentId}');
-//        $router->addPost('tile.create', $basePath.'/add/{componentId}');
+        $this->addGetRoute($router, 'browse', $basePath, '');
+        $this->addPostRoute($router, 'create', $basePath, '');
+        $this->addGetRoute($router, 'learningLevels', $basePath, '/learningLevels');
+        $this->addGetRoute($router, 'outcomes', $basePath, '/outcomes');
     }
 
     /**
@@ -42,16 +38,18 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer->addRule('/^curriculumImport\\..*/', new Rule\IsLoggedIn());
-        $authorizer->addRule(
-            '/^curriculumImport\\..*/',
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(
-                    UserAccess::SERVICE_CURRICULUM,
-                    UserAccess::ACCESS_WRITE
+        $this
+            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermission(
+                $authorizer,
+                '.*',
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(
+                        UserAccess::SERVICE_CURRICULUM,
+                        UserAccess::ACCESS_WRITE
+                    )
                 )
-            )
         );
     }
 
@@ -60,9 +58,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__ . '/templates', 'curriculumImport');
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**
@@ -71,7 +67,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:curriculumImport',
+            'controller:'.$this->basename,
             $injector->lazyNew('Schoolbox\\Curriculum\\Import\\Controller')
         );
         $injector->setters['Schoolbox\\Curriculum\\Import\\Controller']['setSourceMapper']

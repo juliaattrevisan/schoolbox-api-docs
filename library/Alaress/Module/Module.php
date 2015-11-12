@@ -9,11 +9,16 @@
 
 namespace Alaress\Module;
 
+use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Aura\Di\ContainerInterface;
+use Aura\Router\Route;
 use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Router\PathMatcher;
+use Alaress\Web\Router\RouteCollection;
+use LogicException;
 use Twig_Loader_Chain;
+use Twig_Loader_Filesystem;
 
 class Module {
 
@@ -23,6 +28,35 @@ class Module {
      * @var ContainerInterface
      */
     protected $injector;
+
+    /**
+     * The base name for this module.
+     *
+     * This module will be injected into the dependency injector at "module:$basename".
+     *
+     * @var string
+     */
+    protected $basename;
+
+    /**
+     * Modules that this module depends on.
+     *
+     * Each entry must be a module in $this->injector.
+     *
+     * @deprecated Module dependencies should now be automatically installed when required
+     *             (@see `Alaress\Module\Loader` and classes which use it)
+     *
+     * @var array
+     */
+    protected $moduleDependencies = [];
+
+    /**
+     * Has this module had its controller's dependencies installed yet?
+     * They should only be installed once.
+     *
+     * @var bool
+     */
+    protected $isControllerDependenciesInstalled = false;
 
     /**
      * Constructor
@@ -38,18 +72,76 @@ class Module {
     }
 
     /**
-     * Inits module
+     * Installs module with its most basic configuration.
+     *
+     * Only the module's submodules and routes should be initialised here -
+     * these are the bare minimum the kernel requires to bind a module to a
+     * route, and then execute it.
      *
      * @param string $basePath The base URL for this module, used by initRoutes
      */
     public function init($basePath) {
         $injector = $this->getInjector();
-        $this->initSubmodules($injector, $basePath);
-        $this->initRoutes($injector->get('router'), $basePath);
+        if ($this->installModule($injector)) {
+            $this->initSubmodules($injector, $basePath);
+            $this->initRoutes($injector->get('router'), $basePath);
+        }
+    }
+
+    /**
+     * Performs setup steps required to use this module's controller.
+     *
+     * This should include the module's route permissions and preloads, and its
+     * template paths, and any modules the controller depends on.
+     */
+    public function initControllerDependencies()
+    {
+        if ($this->isControllerDependenciesInstalled) {
+            return;
+        }
+        $this->isControllerDependenciesInstalled = true;
+        $injector                                = $this->getInjector();
+        $this->initDependingModules();
         $this->initRoutePreloads($injector->get('preloader'));
         $this->initRoutePermissions($injector->get('authorizer'));
         $this->initTemplatePaths($injector->get('templateEngine:loader'));
-        $this->initControllers($injector);
+    }
+
+    /**
+     * Installs this module into the dependency injection system.
+     *
+     * @param  ContainerInterface $injector
+     * @return bool Was the module installed?
+     * @throws LogicException if this module has no basename, or it is already defined as a different class
+     */
+    protected function installModule(ContainerInterface $injector)
+    {
+        if (!$this->basename) {
+            throw new LogicException(sprintf('Module class "%s" has no basename set', get_class($this)));
+        }
+        $key = 'module:'.$this->basename;
+        if ($injector->has($key)) {
+            $other = $injector->get($key);
+            if (get_class($other) != get_class($this)) {
+                throw new LogicException(
+                    sprintf(
+                        'Module "%s" is already defined as instanceof "%s" - won\'t redefine as instanceof "%s"',
+                        $this->basename,
+                        get_class($other),
+                        get_class($this)
+                    )
+                );
+            } else {
+                user_error(
+                    sprintf('Module "%s" is already defined - not redefining', $this->basename),
+                    E_USER_WARNING
+                );
+                return false;
+            }
+        } else {
+            $injector->set($key, $this);
+        }
+        return true;
     }
 
     /**
@@ -76,6 +168,90 @@ class Module {
     public function initRoutes(Router $router, $basePath) {}
 
     /**
+     * Helper for calling $router->add() for this component's basename.
+     *
+     * @param Router $router   The router to add the route to
+     * @param string $alias    The alias for this route.
+     *                         Its actual alias will be "$this->basename.$alias"
+     * @param string $basePath The base path for this route
+     * @param string $path     The path for this route, including a leading / if required.
+     *                         Its actual path will be "$basePath$path".
+     *
+     * @return Route
+     */
+    protected function addRoute(Router $router, $alias, $basePath, $path)
+    {
+        return $router->getRoutes()->add($this->basename.'.'.$alias, $basePath.$path);
+    }
+
+    /**
+     * Helper for calling $router->addGet() for this component's basename.
+     *
+     * @param Router $router   The router to add the route to
+     * @param string $alias    The alias for this route.
+     *                         Its actual alias will be "$this->basename.$alias"
+     * @param string $basePath The base path for this route
+     * @param string $path     The path for this route, including a leading / if required.
+     *                         Its actual path will be "$basePath$path".
+     *
+     * @return Route
+     */
+    protected function addGetRoute(Router $router, $alias, $basePath, $path)
+    {
+        return $router->getRoutes()->addGet($this->basename.'.'.$alias, $basePath.$path);
+    }
+
+    /**
+     * Helper for calling $router->addGet() for this component's basename.
+     *
+     * @param Router $router   The router to add the route to
+     * @param string $alias    The alias for this route.
+     *                         Its actual alias will be "$this->basename.$alias"
+     * @param string $basePath The base path for this route
+     * @param string $path     The path for this route, including a leading / if required.
+     *                         Its actual path will be "$basePath$path".
+     *
+     * @return Route
+     */
+    protected function addPostRoute(Router $router, $alias, $basePath, $path)
+    {
+        return $router->getRoutes()->addPost($this->basename.'.'.$alias, $basePath.$path);
+    }
+
+    /**
+     * Helper for attaching a set of REST routes for this module.
+     *
+     * @param Router $router   The router to add the route to
+     * @param string $basePath The base path for this route
+     */
+    protected function attachResourceRoutes(Router $router, $basePath)
+    {
+        /** @var RouteCollection $routes */
+        $routes = $router->getRoutes();
+        $routes->attachResource($this->basename, $basePath);
+        $routes->attachResourcePostAlias($this->basename, $basePath);
+    }
+
+    /**
+     * Calls the secondary init on each module that this one depends on.
+     *
+     * @deprecated Module dependencies should now be automatically installed when required
+     *             (@see `Alaress\Module\Loader` and classes which use it)
+     *
+     * @throws LogicException if a dependency doesn't exist
+     */
+    protected function initDependingModules()
+    {
+        foreach ($this->moduleDependencies as $dependency) {
+            $dependingModule = $this->getInjector()->get('module:'.$dependency);
+            if (!$dependingModule instanceof Module) {
+                throw new LogicException(sprintf('Module "%s" does not exist', $dependency));
+            }
+            $dependingModule->initControllerDependencies();
+        }
+    }
+
+    /**
      * Initializes any preloads on routes for this module.
      *
      * Preloads adjust route params before they are passed to the controller.
@@ -87,6 +263,20 @@ class Module {
     public function initRoutePreloads(PathMatcher $matcher) {}
 
     /**
+     * Helper method for adding a route preload for this component's basename.
+     *
+     * @param  PathMatcher $matcher
+     * @param  string      $regexPart  The part of the route to match (after $this->basename)
+     * @param  callable    $preload
+     * @return $this
+     */
+    protected function addRoutePreload(PathMatcher $matcher, $regexPart, callable $preload)
+    {
+        $matcher->add("/^{$this->basename}\\.{$regexPart}$/", $preload);
+        return $this;
+    }
+
+    /**
      * Initializes any permissions on routes for this module.
      *
      * @param Authorizer $authorizer
@@ -94,11 +284,40 @@ class Module {
     public function initRoutePermissions(Authorizer $authorizer) {}
 
     /**
+     * Helper method for adding a route permission for this component's basename.
+     *
+     * @param  Authorizer         $authorizer
+     * @param  string             $regexPart  The part of the route to match (after $this->basename)
+     * @param  IAuthorizationRule $rule
+     * @return $this
+     */
+    protected function addRoutePermission(Authorizer $authorizer, $regexPart, IAuthorizationRule $rule)
+    {
+        $authorizer->addRule("/^{$this->basename}\\.{$regexPart}$/", $rule);
+        return $this;
+    }
+
+    /**
      * Initializes template paths for this module.
      *
      * @param Twig_Loader_Chain $templateLoader
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {}
+
+    /**
+     * Helper method for adding a template path for this component's basename.
+     *
+     * @param  string            $dir            The directory to use as the template path
+     * @param  Twig_Loader_Chain $templateLoader
+     * @return $this
+     */
+    protected function addTemplatePath(Twig_Loader_Chain $templateLoader, $dir)
+    {
+        $loader = new Twig_Loader_Filesystem([]);
+        $loader->addPath($dir, $this->basename);
+        $templateLoader->addLoader($loader);
+        return $this;
+    }
 
     /**
      * Initializes controller classes into the dependency injector.

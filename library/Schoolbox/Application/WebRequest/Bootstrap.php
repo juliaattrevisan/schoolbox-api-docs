@@ -13,6 +13,9 @@ namespace Schoolbox\Application\WebRequest;
 use Alaress\Application\Boot\BootstrapInterface;
 use Alaress\DebugBar\DataCollector\XhprofCollector;
 use Alaress\DebugBar\Instance as DebugBar;
+use Alaress\Module\Loader as ModuleLoader;
+use Alaress\Twig\Loader\ChainLoader;
+use Alaress\Twig\Method as TwigMethod;
 use DebugBar\Bridge\Twig\TraceableTwigEnvironment;
 use DebugBar\Bridge\Twig\TwigCollector;
 use Alaress\Redis;
@@ -235,7 +238,11 @@ class Bootstrap implements BootstrapInterface {
 			)
 		);
 
-		// Preload of route parameters
+		// Preload of route parameters, and its module loader
+        $di->params['Alaress\\Web\\Router\\PathMatcher']['moduleLoader'] = $di->lazyNew(
+            ModuleLoader::class,
+            ['injector' => $di, 'moduleRegex' => '/^(?P<module>[^\\.]+)\\./']
+        );
 		$di->set('preloader', $di->lazyNew('Alaress\\Web\\Router\\PathMatcher'));
 
 		// Authorization
@@ -301,7 +308,7 @@ class Bootstrap implements BootstrapInterface {
 			$di->lazy(
 				function () use ($di) {
 					$config      = $di->get('config');
-					$chainLoader = new Twig_Loader_Chain();
+					$chainLoader = new ChainLoader(new ModuleLoader($di, '[^@(?P<module>[^/]+)/]'));
 					$baseLoader  = new Twig_Loader_Filesystem(array());
 					// Paths: prefer templates/{site_location} over templates/core
 					$basePath     = $config->get('siteRoot').'/templates/';
@@ -319,6 +326,9 @@ class Bootstrap implements BootstrapInterface {
 				}
 			)
 		);
+
+        $di->params[TwigMethod\RequireModule::class]['di'] = $di;
+        $di->set('templateEngine:requireModule', $di->lazyNew(TwigMethod\RequireModule::class));
 
 		$di->setters['Alaress\\Twig\\Method\\RouteLookup']['setRouter'] = $di->lazyGet('router');
 		$di->set('templateEngine:routeLookup', $di->lazyNew('Alaress\\Twig\\Method\\RouteLookup'));
@@ -397,6 +407,11 @@ class Bootstrap implements BootstrapInterface {
 //					$l10n['date'] = new Alaress_Date_Locale_Config();
 
 					$twig->addGlobal('locale', $l10n);
+
+                    // Define modules that are required by a template
+                    $twig->addFunction(
+                        new Twig_SimpleFunction('requireModule', $di->get('templateEngine:requireModule'))
+                    );
 
 					// Add the route lookup and authorization methods
 					$twig->addFunction(

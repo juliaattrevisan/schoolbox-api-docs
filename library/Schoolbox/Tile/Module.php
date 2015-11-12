@@ -75,19 +75,20 @@ class Module extends BaseModule
      */
     protected $externalDb;
 
+    protected $basename = 'tile';
+
     /**
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->addGet('tile.layout', $basePath . '/layout/{componentId}');
-        $router->addPost('tile.layoutForm', $basePath . '/layout/{componentId}');
+        $this->addGetRoute($router, 'layout', $basePath, '/layout/{componentId}');
+        $this->addPostRoute($router, 'layoutForm', $basePath , '/layout/{componentId}');
         // Attach standard REST routes
-        $router->attachResource('tile', $basePath);
-        $router->attachResourcePostAlias('tile', $basePath);
+        $this->attachResourceRoutes($router, $basePath);
         // but have separate add tile paths
-        $router->addGet('tile.add', $basePath.'/add/{componentId}');
-        $router->addPost('tile.create', $basePath.'/add/{componentId}');
+        $this->addGetRoute($router, 'add', $basePath, '/add/{componentId}');
+        $this->addPostRoute($router, 'create', $basePath, '/add/{componentId}');
     }
 
     /**
@@ -103,8 +104,9 @@ class Module extends BaseModule
 
         // Routes that take a tile ID:
         // Look up the tile, and reverse lookup the component from its layout
-        $matcher->add(
-            '/^tile\\.(?:edit|update|update:post|delete|delete:post)$/',
+        $this->addRoutePreload(
+            $matcher,
+            '(?:edit|update|update:post|delete|delete:post)',
             function ($params) use ($mapper, $componentMapper) {
                 $item = $mapper->findById(
                     $params['id'],
@@ -125,8 +127,9 @@ class Module extends BaseModule
         );
 
         // Routes that take a component ID: look up component from it
-        $matcher->add(
-            '/^tile\\.(?:add|create|layout|layoutForm)$/',
+        $this->addRoutePreload(
+            $matcher,
+            '(?:add|create|layout|layoutForm)',
             function ($params) use ($componentMapper) {
                 $component = array_pop($componentMapper->findByInstanceId($params['componentId']));
 
@@ -155,8 +158,9 @@ class Module extends BaseModule
 
         // All routes: look up homepage from component
         // (if this component belongs to the homepage!)
-        $matcher->add(
-            '/^tile\\.(?:add|create|layout|layoutForm|edit|update|update:post|delete|delete:post)$/',
+        $this->addRoutePreload(
+            $matcher,
+            "(?:add|create|layout|layoutForm|edit|update|update:post|delete|delete:post)",
             function ($params) use ($catMapper) {
                 // augment params with homepage from category
                 if ($params['component']->getModule() == 'homepage') {
@@ -210,8 +214,8 @@ class Module extends BaseModule
             ),
             new Rule\IsTeacherOfClass($this->getExternalDb(), $getHomepageCallback)
         );
-        $authorizer->addRule('/^tile\\..*/', new Rule\IsLoggedIn());
-        $authorizer->addRule('/^tile\\..*/', $rule);
+        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
+        $this->addRoutePermission($authorizer, '.*', $rule);
     }
 
     /**
@@ -219,9 +223,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
-        $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__ . '/templates', 'tile');
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**
@@ -240,7 +242,7 @@ class Module extends BaseModule
         $injector->setters['Schoolbox\\Tile\\Controller']['setFolderMapper']
             = $this->getCategoryMapper();
         $injector->set(
-            'controller:tile',
+            'controller:'.$this->basename,
             $injector->lazyNew('Schoolbox\\Tile\\Controller')
         );
     }

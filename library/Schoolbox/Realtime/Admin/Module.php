@@ -21,6 +21,7 @@ use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
+    protected $basename = 'adminMessages';
 
     /**
      * @param Router $router
@@ -28,14 +29,9 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $routes = $router->getRoutes();
-
-//        $routes->addGet('admin.messages', $basePath);
-//        $routes->addPost('admin.messages.setDigest', "$basePath/digest");
-
-        $routes->addGet('adminMessages.customConfig', "$basePath/configure/custom");
-        $routes->addGet('adminMessages.configure', "$basePath/configure{/roletype}");
-        $routes->addPost('adminMessages.saveConfig', "$basePath/configure{/roletype}");
+        $this->addGetRoute($router, 'customConfig', $basePath, "/configure/custom");
+        $this->addGetRoute($router, 'configure', $basePath, "/configure{/roletype}");
+        $this->addPostRoute($router, 'saveConfig', $basePath, "/configure{/roletype}");
     }
 
 
@@ -45,7 +41,7 @@ class Module extends BaseModule
     public function initRoutePermissions(Authorizer $authorizer)
     {
         // TODO import this into an Admin baseclass so you don't have to do it for all admin pages
-        $authorizer->addRule('/^adminMessages\\..*/', new Rule\IsSuperuser());
+        $this->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
     }
 
 
@@ -67,9 +63,7 @@ class Module extends BaseModule
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         // TODO inherit from an Admin baseclass to setup subnav
-        $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__ . '/templates', 'adminMessages');
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
 
@@ -79,7 +73,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:adminMessages',
+            'controller:'.$this->basename,
             $injector->lazyNew(Controller::class)
         );
     }

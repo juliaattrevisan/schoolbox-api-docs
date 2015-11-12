@@ -20,6 +20,7 @@ use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
+    protected $basename = 'messages';
 
     /**
      * @param Router $router
@@ -27,10 +28,8 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $routes = $router->getRoutes();
-
-        $routes->addGet('messages.configure', $basePath);
-        $routes->addPost('messages.saveConfig', $basePath);
+        $this->addGetRoute($router, 'configure', $basePath, '');
+        $this->addPostRoute($router, 'saveConfig', $basePath, '');
     }
 
 
@@ -39,7 +38,7 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer->addRule('/^messages\\..*/', new Rule\IsLoggedIn());
+        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
     }
 
 
@@ -50,9 +49,7 @@ class Module extends BaseModule
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         // TODO inherit from an Admin baseclass to setup subnav
-        $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__ . '/templates', 'messages');
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
 
@@ -62,7 +59,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:messages',
+            'controller:'.$this->basename,
             $injector->lazyNew(Controller::class)
         );
     }

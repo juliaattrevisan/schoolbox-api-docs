@@ -21,15 +21,15 @@ use \Alaress\Authorizer\Failure\Unauthorized;
 
 class Module extends BaseModule
 {
+    protected $basename = 'user';
+
     /**
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->addGet('user.impersonate', $basePath . '/switch/{userId}');
-        $router->addGet('user.recoverSession', $basePath . '/recoverSession');
-
-
+        $this->addGetRoute($router, 'impersonate', $basePath, '/switch/{userId}');
+        $this->addGetRoute($router, 'recoverSession', $basePath, '/recoverSession');
     }
 
     /**
@@ -37,8 +37,9 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $matcher->add(
-            '/^user.impersonate$/',
+        $this->addRoutePreload(
+            $matcher,
+            'impersonate',
             function ($params) {
                 return array(
                     'user' => UserMapper::getInstance()->findById($params['userId']),
@@ -48,21 +49,27 @@ class Module extends BaseModule
     }
 
     /**
+     * {@inheritdoc}
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer->addRule('/^user.(impersonate|recoverSession)$/', new Rule\IsLoggedIn());
-        $authorizer->addRule('/^user.impersonate$/', new Rule\Callback(
-            function ($params, User $user) {
-                // Do not allow unlinked users to switch
-                foreach($user->getLinkedUser() as $linkedUser ) {
-                    if($params['userId'] == $linkedUser->getId()) {
-                       return true;
+        $this
+            ->addRoutePermission($authorizer, '(impersonate|recoverSession)', new Rule\IsLoggedIn())
+            ->addRoutePermission(
+                $authorizer,
+                'impersonate',
+                new Rule\Callback(
+                    function ($params, User $user) {
+                        // Do not allow unlinked users to switch
+                        foreach ($user->getLinkedUser() as $linkedUser) {
+                            if ($params['userId'] == $linkedUser->getId()) {
+                                return true;
+                            }
+                        }
+                        throw new Unauthorized();
                     }
-                }
-                throw new Unauthorized();
-            }
-        ));
+                )
+            );
     }
 
     /**
@@ -70,9 +77,6 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:user', $injector->lazyNew('Schoolbox\\User\\Controller'));
+        $injector->set('controller:'.$this->basename, $injector->lazyNew('Schoolbox\\User\\Controller'));
     }
-
-
-
 }
