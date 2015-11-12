@@ -43,6 +43,9 @@ class Module {
      *
      * Each entry must be a module in $this->injector.
      *
+     * @deprecated Module dependencies should now be automatically installed when required
+     *             (@see `Alaress\Module\Loader` and classes which use it)
+     *
      * @var array
      */
     protected $moduleDependencies = [];
@@ -231,6 +234,9 @@ class Module {
 
     /**
      * Calls the secondary init on each module that this one depends on.
+     *
+     * @deprecated Module dependencies should now be automatically installed when required
+     *             (@see `Alaress\Module\Loader` and classes which use it)
      *
      * @throws LogicException if a dependency doesn't exist
      */
