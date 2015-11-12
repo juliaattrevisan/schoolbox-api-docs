@@ -119,6 +119,36 @@ class Model extends AbstractFolder implements ISoftDeletable
     }
 
     /**
+     * Get a truncated version of the Folder Code string
+     * by getting the first $maxCodes codes and appending
+     * an ellipsis to indicate the rest. If there are less
+     * than $maxCodes codes associated with the folder, just
+     * return all of them
+     */
+    public function getTruncatedCodeString() {
+        $maxCodes = 4;
+
+        //Get first 4 codes, clone cause its a mutable collection
+        if ($this->getCodes()->count() > $maxCodes) {
+            $subCodeString = array();
+
+            $subCodes = clone $this->getCodes();
+            $subCodes = $subCodes->slice(0, $maxCodes);
+
+            foreach ($subCodes as $subCode) {
+                $subCodeString[] = $subCode->getCode();
+            }
+
+            $codeString = \Scrub::text(implode(',', $subCodeString) . '...');
+        }
+        else {
+            $codeString = \Scrub::text($this->getCodeString());
+        }
+
+        return $codeString;
+    }
+
+    /**
      * Add code
      *
      * @param  CategoryCode $code
