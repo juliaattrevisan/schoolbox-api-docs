@@ -322,19 +322,11 @@ if ($manageClassController->renderTemplate('manage_class')) {
 
 $this->parse('page_controls_block', 'page_controls');
 
-$codeString = '';
 if ($_SESSION['user']->getRole()->isStaff()) {
-    if ($category->getCodes()->count() > 4) {
-        //Get first 4 codes, clone cause its a mutable collection
-        $subCodes = clone $category->getCodes();
-        $subCodes = $subCodes->slice(0, 4);
-        foreach ($subCodes as $subCode) {
-            $subCodeString[] = $subCode->getCode();
-        }
-        $codeString = Scrub::text(implode(',', $subCodeString).'....');
-    } else {
-        $codeString = Scrub::text($category->getCodeString());
-    }
+    $codeString = Scrub::text($category->getTruncatedCodeString());
+}
+else {
+    $codeString = '';
 }
 
 $allWidths = $homepageHandler->getColumnWidths();
