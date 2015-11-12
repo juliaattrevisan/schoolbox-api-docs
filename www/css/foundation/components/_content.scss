@@ -973,17 +973,20 @@ nav {
 
 				@media #{$media-down} {
 					// Any button after $i not an overflow gets hidden
+					// Say i=4: any button in position 5+ gets hidden
 					&:nth-child(n+#{$i + 1}):not(.overflow) {
 						@content;
 					}
-					// Any overflow before $i - 1 gets hidden
-					&:nth-child(-n+#{$i - 1}).overflow {
+					// Any overflow after $i gets hidden
+					// Say i=4: any overflow in position 5- gets hidden
+					&:nth-child(-n+#{$i + 1}).overflow {
 						@content;
 					}
 				}
 
 				@media #{$media-up} {
 					// In the overflow: any button before $i gets hidden
+					// Say i=4: any button in position 4- gets hidden
 					&.overflow > ul.f-dropdown {
 						li:nth-child(-n+#{$i}) {
 							@content;
@@ -1025,12 +1028,12 @@ ul.flex-list {
 		}
 	}
 
-	@include hide-n(small, $small-only, $small-up) { display: none };
-	@include hide-n(medium, $medium-down, $medium-up) { display: none };
-	@include hide-n(large, $large-down, $large-up) { display: none };
+	@include hide-n(small, $small-only, $small-up) { display: none; };
+	@include hide-n(medium, $medium-only, $medium-up) { display: none; };
+	@include hide-n(large, $large-only, $large-up) { display: none; };
 	@if $include-xl-html-grid-classes {
-		@include hide-n(xlarge, $xlarge-down, $xlarge-up) { display: none };
-		@include hide-n(xxlarge, $xxlarge-down, $xxlarge-up) { display: none };
+		@include hide-n(xlarge, $xlarge-only, $xlarge-up) { display: none; };
+		@include hide-n(xxlarge, $xxlarge-only, $xxlarge-up) { display: none; };
 	}
 }
 
