@@ -475,8 +475,7 @@ tr.sub-row {
 }
 
 .scrollable {
-
-	@extend .overflow;
+    overflow: auto;
 
 	table {
 		margin-bottom: 0;
@@ -1535,10 +1534,6 @@ tr:hover{
 	background: url('/images/foundation/preloader.gif') center center no-repeat;
   	min-height: 68px;
   	min-width: 68px;
-}
-
-.overflow {
-    overflow: auto;
 }
 
 .minw-1  { min-width: 1rem; }
