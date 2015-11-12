@@ -976,8 +976,8 @@ nav {
 					&:nth-child(n+#{$i + 1}):not(.overflow) {
 						@content;
 					}
-					// Any overflow before $i - 1 gets hidden
-					&:nth-child(-n+#{$i - 1}).overflow {
+					// Any overflow after $i gets hidden
+					&:nth-child(-n+#{$i + 1}).overflow {
 						@content;
 					}
 				}
