@@ -104,8 +104,6 @@ class Bootstrap implements BootstrapInterface {
 
 		// XHProf on the debug bar.
 		if($this->debugEnabled && Config::get('debug_xhprof') && extension_loaded('xhprof')) {
-			include_once '/usr/share/php5-xhprof/xhprof_lib/utils/xhprof_lib.php';
-			include_once '/usr/share/php5-xhprof/xhprof_lib/utils/xhprof_runs.php';
 			DebugBar::getInstance()->addCollector(new XhprofCollector());
 		}
 	}
