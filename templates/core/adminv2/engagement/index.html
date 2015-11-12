@@ -44,26 +44,25 @@
 
 <div class="row">
     <div class="small-12 island">
-            <form data-type='calendar-controls' action="#" method="post">
-                <section>
-                    <fieldset>
-                        <legend>Report Range</legend>
-                        <div class="column small-12 medium-6">
-                            <input id="start_date" data-datepicker placeholder="Start Date" value="{SELECTED_FORMATTED_START}" />
-                        </div>
-                        <div class="column small-12 medium-6">
-                            <input id="finish_date" data-datepicker placeholder="End Date" name='finish_date'  value="{SELECTED_FORMATTED_FINISH}" />
-                        </div>
-                    </fieldset>
-                </section>
-                <input type="submit" class="submit-btn-plain" value="Update" />
-            </form>
+        {REPORT_DATA}
     </div>
 </div>
 
 <div class="row">
     <div class="small-12 island">
-        {REPORT_DATA}
+        <form data-type='calendar-controls' action="#" method="post">
+            <section>
+                <fieldset>
+                    <legend>Report Range</legend>
+                    <div class="column small-12 medium-6">
+                        <input id="start_date" data-datepicker placeholder="Start Date" value="{SELECTED_FORMATTED_START}" />
+                    </div>
+                    <div class="column small-12 medium-6">
+                        <input id="finish_date" data-datepicker placeholder="End Date" name='finish_date'  value="{SELECTED_FORMATTED_FINISH}" />
+                    </div>
+                </fieldset>
+            </section>
+            <input type="submit" class="submit-btn-plain" value="Update" />
+        </form>
     </div>
 </div>
-
