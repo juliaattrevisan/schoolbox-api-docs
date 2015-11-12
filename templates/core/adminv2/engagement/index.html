@@ -17,84 +17,53 @@
             window.location.href = url;
         });
 
-        /* date picker */
-        $('#start_date').datepicker({
-            showOn: 'both',
-            buttonImage: '/images/core/calendar/calendar-click.png',
-            buttonImageOnly: true,
-            constrainInput: false,
-            altField: '#start_date_alt',
-            altFormat: 'dd-mm-yy',
-            onClose: function (string) {
-                var input = $(this);
-                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-                    input.val(data.time);
-                })
-            }
-        });
-
-        /* date picker */
-        $('#finish_date').datepicker({
-            showOn: 'both',
-            buttonImage: '/images/core/calendar/calendar-click.png',
-            buttonImageOnly: true,
-            constrainInput: false,
-            altField: '#finish_date_alt',
-            altFormat: 'dd-mm-yy',
-            onClose: function (string) {
-                var input = $(this);
-                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-                    input.val(data.time);
-                })
-            }
-        });
-
         $('#start_date').syncDates({
             endDate: $('#finish_date')
         });
     });
 </script>
 <!-- END custom_head -->
+{ADMIN_NAV}
 
-<h1>Schoolbox Administration</h1>
-<ul class="admin-nav">
-    <!-- BEGIN admin_nav_item -->
-    <li><a href="/adminv2/{ADMNAV_HREF}" class="{ADMNAV_CURRENT}">{ADMNAV_LABEL}</a></li>
-    <!-- END admin_nav_item -->
-</ul>
-<div class="admin-contents clearfix">
-    <h2>Engagement</h2>
-    <div class="clearfix">
-    <form data-type='calendar-controls' action="#" method="post">
-        <input id="start_date_alt" name='start_date' type="hidden" value="{SELECTED_FORMATTED_START}" />
-        <input id="finish_date_alt" name='finish_date' type="hidden" value="{SELECTED_FORMATTED_FINISH}" />
-
-        <div class="float-left dateSelector">
-            <input id='start_date' type="text" size="9" value="{SELECTED_START}" />
-            to <input id='finish_date' type="text" size="9" value="{SELECTED_FINISH}" />
-        </div>
-
-        <input type="submit" class="submit-btn-plain" value="Update" />
-    </form>
+<div class="row">
+    <div class="small-12 columns">
+        <dl class="sub-nav">
+            <dd><a href="/adminv2/engagement/index/login/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Login<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/dueWork/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Due Work<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/quiz/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Quizzes<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/files/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Files<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/links/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Links<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/fileTypes/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">File Types<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/news/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">News Posted<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/collaboration/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Collaboration<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/components/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Component Usage<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/mobile/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Mobile Apps<span></span></a></dd>
+        </dl>
     </div>
+</div>
 
-    <div class="settings-nav-holder">
-        <ul class="admin-nav vertical">
-            <li><a href="/adminv2/engagement/index/login/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Login<span></span></a></li>
-            <li><a href="/adminv2/engagement/index/dueWork/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Due Work<span></span></a></li>
-            <li><a href="/adminv2/engagement/index/quiz/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Quizzes<span></span></a></li>
-            <li><a href="/adminv2/engagement/index/files/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Files<span></span></a></li>
-            <li><a href="/adminv2/engagement/index/links/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Links<span></span></a></li>
-            <li><a href="/adminv2/engagement/index/fileTypes/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">File Types<span></span></a></li>
-            <li><a href="/adminv2/engagement/index/news/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">News Posted<span></span></a></li>
-            <li><a href="/adminv2/engagement/index/collaboration/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Collaboration<span></span></a></li>
-            <li><a href="/adminv2/engagement/index/components/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Component Usage<span></span></a></li>
-            <li><a href="/adminv2/engagement/index/mobile/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Mobile Apps<span></span></a></li>
-        </ul>
+<div class="row">
+    <div class="small-12 island">
+            <form data-type='calendar-controls' action="#" method="post">
+                <section>
+                    <fieldset>
+                        <legend>Report Range</legend>
+                        <div class="column small-12 medium-6">
+                            <input id="start_date" data-datepicker placeholder="Start Date" value="{SELECTED_FORMATTED_START}" />
+                        </div>
+                        <div class="column small-12 medium-6">
+                            <input id="finish_date" data-datepicker placeholder="End Date" name='finish_date'  value="{SELECTED_FORMATTED_FINISH}" />
+                        </div>
+                    </fieldset>
+                </section>
+                <input type="submit" class="submit-btn-plain" value="Update" />
+            </form>
     </div>
+</div>
 
-
-    <div class="settings">
+<div class="row">
+    <div class="small-12 island">
         {REPORT_DATA}
     </div>
 </div>
+
