@@ -76,6 +76,12 @@ class Model extends AbstractFolder implements ISoftDeletable
     protected $teacher_collection;
 
     /**
+     * Maximum number of codes to display before truncation
+     * @var int
+     */
+    protected $maxCodes = 4;
+
+    /**
      * Constructor
      *
      */
@@ -126,14 +132,13 @@ class Model extends AbstractFolder implements ISoftDeletable
      * return all of them
      */
     public function getTruncatedCodeString() {
-        $maxCodes = 4;
 
         //Get first 4 codes, clone cause its a mutable collection
-        if ($this->getCodes()->count() > $maxCodes) {
+        if ($this->getCodes()->count() > $this->getMaxCodes()) {
             $subCodeString = array();
 
             $subCodes = clone $this->getCodes();
-            $subCodes = $subCodes->slice(0, $maxCodes);
+            $subCodes = $subCodes->slice(0, $this->getMaxCodes());
 
             foreach ($subCodes as $subCode) {
                 $subCodeString[] = $subCode->getCode();
@@ -344,5 +349,25 @@ class Model extends AbstractFolder implements ISoftDeletable
     {
         $this->taskCount = $taskCount;
         return $this;
+    }
+
+    /**
+     * Set maxCodes
+     *
+     * @param int $maxCodes
+     */
+    protected function setMaxCodes($maxCodes)
+    {
+        $this->maxCodes = $maxCodes;
+    }
+
+    /**
+     * Get maxCodes
+     *
+     * @return int
+     */
+    protected function getMaxCodes()
+    {
+        return $this->maxCodes;
     }
 }
