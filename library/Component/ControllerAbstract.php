@@ -364,22 +364,18 @@ abstract class Component_ControllerAbstract
      */
     protected function determineTemplate() {
         if ($configTemplate = $this->getConfigurationTemplate()) {
-            $template = $configTemplate;
-        } elseif (in_array($this->instance->getModule(), array('homepage_template', 'eportfolio_template'))) {
-            $template = 'component/config/_templatewrapper.html';
+            return $configTemplate;
         }
-        /* eportfolio uses a special version of le wrapier
+        /* Admin area; used when configuring dashboard/homepage/eportfolio layouts
+         */
+        else if (in_array($this->instance->getModule(), array('homepage_template', 'eportfolio_template'))) {
+            return 'component/config/_templatewrapper.html';
+        }
+        /* Public-facing pages for dashboard, homepage, eportfolio
          */
         else if (in_array($this->instance->getModule(), array('dashboard', 'homepage', 'eportfolio'))) {
-            $template = 'component/config/' . $this->instance->getModule() . '_wrapper.html';
+            return 'component/config/' . $this->instance->getModule() . '_wrapper.html';
         }
-        /* default template
-         */
-        else {
-            $template = 'component/config/_wrapper.html';
-        }
-
-        return $template;
     }
 
     /**

@@ -41,7 +41,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         if (!parent::loadTemplate($templateHandle, 'manageFolder')) {
             return false;
         }
-        $this->parseConfig();
+//        $this->parseConfig();
 
         $this->setBlock($templateHandle, "manage_page", "manage_page_block");
         $this->setBlock($templateHandle, "stats_data", "stats_data_block");
@@ -57,14 +57,14 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
             $this->parse('addmylinks_block', 'addmylinks');
         }
         if ($this->permission >= FULL_ACCESS) {
-//is owner of area
+            //is owner of area
             $this->parse("manage_page_block", "manage_page");
         } else {
             $this->setVar("manage_page_block", "");
         }
 
         if ($this->permission >= WRITE_ACCESS) {
-//has write access
+            //has write access
             $this->parse("stats_data_block", "stats_data");
         } else {
             $this->setVar("stats_data_block", "");
