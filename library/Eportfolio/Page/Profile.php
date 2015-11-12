@@ -9,6 +9,12 @@
  */
 class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 {
+    /**
+     * The current user (used for authenticating whether a user can view something)
+     *
+     * @var \Schoolbox\User
+     */
+    protected $currentUser;
 
     /**
      * Number of Recent Showcased Items to display
@@ -46,6 +52,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         $this->setNumShowcasedItems(3);
         $this->setNumRecentBlogs(3);
         $this->setNumRecentPhotos(3);
+        $this->setCurrentUser($_SESSION['user']);
     }
 
     /**
@@ -147,7 +154,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
         /* Control button
          */
-        if ($_SESSION['id'] == $this->getUserId()) {
+        if ($this->getCurrentUser()->getId() == $this->getUserId()) {
             if ($coverPhotoCollection->count()) {
                 $this->getPage()->parse('has_cover_photo_control_block', 'has_cover_photo_control');
                 $this->getPage()->setVar('no_cover_photo_control_block', '');
@@ -176,8 +183,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
             $previousCategory = null;
             $j = 0;
 
-            /** @var Schoolbox\User $currentUser */
-            $currentUser = $_SESSION['user'];
+            $currentUser = $this->getCurrentUser();
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 $currentBox = $currentShowcasedItem->getSubmissionBox();
 
@@ -256,10 +262,17 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
      */
     private function renderRecentPhotos()
     {
-
         /* Gather everything
          */
-        $allImages = \Component\Eportfolio\FileListMapper::getInstance()->findRecent($this->getUserId(), $this->getNumRecentPhotos());
+        // TODO do this properly instead of by fetching amount*2 then filtering
+        $allImages = \Component\Eportfolio\FileListMapper::getInstance()->findRecent(
+            $this->getUserId(),
+            $this->getNumRecentPhotos() * 2
+        );
+        $allImages = $allImages->filter(function($image) {
+            /** @var \Component\Eportfolio\FileList $image */
+            return $this->canUserViewPage($image->getPageId());
+        });
 
         if ($allImages->count()) {
             foreach ($allImages as $currentImage) {
@@ -284,7 +297,15 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
      */
     private function renderRecentBlogs()
     {
-        $allBlogs = \Component\Eportfolio\BlogMapper::getInstance()->findRecent($this->getUserId(), $this->getNumRecentBlogs());
+        //  TODO do this properly instead of by fetching amount*2 then filtering
+        $allBlogs = \Component\Eportfolio\BlogMapper::getInstance()->findRecent(
+            $this->getUserId(),
+            $this->getNumRecentBlogs() * 2
+        );
+        $allBlogs = $allBlogs->filter(function($blog) {
+            /** @var \Component\Eportfolio\Blog $blog */
+            return $this->canUserViewPage($blog->getPageId());
+        });
 
         if ($allBlogs->count()) {
             $j = 0;
@@ -307,6 +328,17 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
             $this->getPage()->parse('no_recent_blog_block', 'no_recent_blog');
             $this->getPage()->setVar('has_recent_blog_block', '');
         }
+    }
+
+    /**
+     * Can the current user view this page?
+     *
+     * @return bool
+     */
+    private function canUserViewPage($pageId)
+    {
+        $auth = new Eportfolio_Authenticator($this->getCurrentUser()->getId(), $this->getUserId(), $pageId);
+        return $auth->canView();
     }
 
     /**
@@ -517,5 +549,23 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
     private function getNumRecentPhotos()
     {
         return $this->numRecentPhotos;
+    }
+
+    /**
+     * @return \Schoolbox\User
+     */
+    private function getCurrentUser()
+    {
+        return $this->currentUser;
+    }
+
+    /**
+     * @param  \Schoolbox\User $currentUser
+     * @return $this
+     */
+    private function setCurrentUser($currentUser)
+    {
+        $this->currentUser = $currentUser;
+        return $this;
     }
 }
