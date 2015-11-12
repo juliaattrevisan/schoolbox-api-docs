@@ -1,0 +1,68 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
+<script type="text/javascript">
+    $(function() {
+
+        /* Calendar controls
+         */
+        $('[data-type=calendar-controls]').submit(function(event) {
+            event.preventDefault();
+
+            var id = $('[data-type=calendar-controls]').find('input[name=userKey]').val();
+            var start_date = $('[data-type=calendar-controls]').find('input[name=start_date]').val();
+            var finish_date = $('[data-type=calendar-controls]').find('input[name=finish_date]').val();
+
+            var url = '/adminv2/engagement/index/{CURRENT_PAGE}/' + start_date + '/' + finish_date;
+
+            window.location.href = url;
+        });
+
+        $('#start_date').syncDates({
+            endDate: $('#finish_date')
+        });
+    });
+</script>
+<!-- END custom_head -->
+{ADMIN_NAV}
+
+<div class="row">
+    <div class="small-12 columns">
+        <dl class="sub-nav">
+            <dd><a href="/adminv2/engagement/index/login/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Login<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/dueWork/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Due Work<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/quiz/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Quizzes<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/files/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Files<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/links/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Links<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/fileTypes/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">File Types<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/news/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">News Posted<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/collaboration/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Collaboration<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/components/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Component Usage<span></span></a></dd>
+            <dd><a href="/adminv2/engagement/index/mobile/{SELECTED_FORMATTED_START}/{SELECTED_FORMATTED_FINISH}" class="{SETTING_TAB_CURRENT}">Mobile Apps<span></span></a></dd>
+        </dl>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {REPORT_DATA}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form data-type='calendar-controls' action="#" method="post">
+            <section>
+                <fieldset>
+                    <legend>Report Range</legend>
+                    <div class="column small-12 medium-6">
+                        <input id="start_date" data-datepicker placeholder="Start Date" value="{SELECTED_FORMATTED_START}" />
+                    </div>
+                    <div class="column small-12 medium-6">
+                        <input id="finish_date" data-datepicker placeholder="End Date" name='finish_date'  value="{SELECTED_FORMATTED_FINISH}" />
+                    </div>
+                </fieldset>
+            </section>
+            <input type="submit" class="submit-btn-plain" value="Update" />
+        </form>
+    </div>
+</div>

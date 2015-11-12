@@ -20,13 +20,13 @@ class AdminV2_Nav
         'setting' => 'Settings',
         'calendar' => 'Calendar',
         'folder' => 'Folder',
+        'rollover' => 'Rollover',
         'grades' => 'Grades',
         'rubric-results' => 'Rubrics',
         'messages' => 'Messages',
         'list' => 'Lists',
         'cleanup' => 'Cleanup',
-        'usage' => 'Usage',
-        'rollover' => 'Rollover',
+        'engagement' => 'Engagement',
         'synchronise' => 'Synchronise',
     );
 
