@@ -13,6 +13,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use DueWork_Error;
 use Marksheet_Abstract;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Collection;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
@@ -187,60 +188,86 @@ class Factory
      */
     public function start()
     {
+        $allowUpdate      = true;
+        $collectorFactory = new CollectorFactory();
+        $attachments      = $collectorFactory->build($this->getAttachments())->getAll();
+        $returnedItems    = new Collection();
+        if (count($attachments) === 0) {
+            // Update a single returned work item
+            // (Figure out which returned work record to use - assign marks,
+            //  normalized marks, ownerships, etc.)
+            $returnedItems->add($this->processReturnedWork($allowUpdate));
+        } else {
+            foreach ($attachments as $attachment) {
+                $returnedItem = $this->processReturnedWork($allowUpdate);
+                // Does this item already have a storage item?
+                // Don't override it if it did - create a new item.
+                if ($allowUpdate && $returnedItem->getStorage()->getHash()) {
+                    $returnedItem = $this->processReturnedWork(false);
+                }
+                $returnedItem->setStorage($attachment);
+                $returnedItems->add($returnedItem);
 
-        /* Figure out which returned work record to use
-         * Assign marks, normalised marks, ownerships etc
-         */
-        $returnedWork = $this->processReturnedWork();
-
-        /* If there was a file upload, attach it
-         */
-        $this->addFile($returnedWork);
-
-        /* Ram it home
-         */
-        try {
-            $this->getReturnedWorkMapper()->save($returnedWork);
-
-            // Rubrics have no mappers yet, so handle them the old-fashioned way.
-            if (is_array($this->getRubric())) {
-                $rubric_handler = new \DueWork_Rubric_Handler();
-                $rubric_handler->saveMarks(
-                    $this->getRubric(),
-                    $this->getUser()->getId(),
-                    $this->getSubmissionBox()->getId(),
-                    $returnedWork->getReturned()->getDatabase()
-                );
-
-                /* wat...?
-                 *
-                 * What is the point of this? Why isn't it just the same as the $returnedWork->getReturned()
-                 * value (that is, the timestamp when the Returned Work was last modified)
-                 *
-                 * Why would you want to preserve the timestamp for when this rubric_mark value
-                 * was first created?
-                 *
-                    $stamp = null;
-                    if ($update_existing) {
-                        $stamp = $rubric_handler->getLatestMarkTimestamp($student_id, $box_id);
-                    }
-                    $rubric_handler->saveMarks($rubric, $student_id, $box_id, $stamp);
-                 */
+                // Only allow update of one return.
+                // Any subsequent attachments are created as new records.
+                $allowUpdate = false;
             }
-        } catch (\Exception $e) {
         }
 
-        return $returnedWork;
+        /* Ram them home
+         */
+        foreach ($returnedItems as $returnedWork) {
+            /** @var ReturnedWork $returnedWork */
+            try {
+                $this->getReturnedWorkMapper()->save($returnedWork);
+
+                // Rubrics have no mappers yet, so handle them the old-fashioned way.
+                if (is_array($this->getRubric())) {
+                    $rubric_handler = new \DueWork_Rubric_Handler();
+                    $rubric_handler->saveMarks(
+                        $this->getRubric(),
+                        $this->getUser()->getId(),
+                        $this->getSubmissionBox()->getId(),
+                        $returnedWork->getReturned()->getDatabase()
+                    );
+
+                    /* wat...?
+                     *
+                     * What is the point of this? Why isn't it just the same as the $returnedWork->getReturned()
+                     * value (that is, the timestamp when the Returned Work was last modified)
+                     *
+                     * Why would you want to preserve the timestamp for when this rubric_mark value
+                     * was first created?
+                     *
+                        $stamp = null;
+                        if ($update_existing) {
+                            $stamp = $rubric_handler->getLatestMarkTimestamp($student_id, $box_id);
+                        }
+                        $rubric_handler->saveMarks($rubric, $student_id, $box_id, $stamp);
+                     */
+                }
+            } catch (\Exception $e) {
+                // noop
+                // Not sure why this exception got swallowed.
+                // Possibly because `saveMarks()` can fail?
+            }
+        }
+        return $returnedItems;
     }
 
     /**
      * Get the returned work record to deal with
      * This either spawns a new one, or uses an old one from some time ago
      *
+     * @param  bool         $allowUpdate If false, always create new record
      * @return ReturnedWork
      */
-    private function retrieveReturnedWorkRecord()
+    private function retrieveReturnedWorkRecord($allowUpdate)
     {
+        if (!$allowUpdate) {
+            return $this->spawnNewReturnedWork();
+        }
+
         $returnedWork = null;
 
         /* If you can't find an existing record, spawn a new one
@@ -313,11 +340,12 @@ class Factory
     /**
      * Apply updates to the returned work record
      *
+     * @param  bool         $allowUpdate If false, always create new record
      * @return ReturnedWork
      */
-    private function processReturnedWork()
+    private function processReturnedWork($allowUpdate)
     {
-        $returnedWork = $this->retrieveReturnedWorkRecord();
+        $returnedWork = $this->retrieveReturnedWorkRecord($allowUpdate);
         $errors = $this->getErrors();
 
         if (isset($errors[$this->getMark()])) {
@@ -355,26 +383,6 @@ class Factory
         $returnedWork->setUuid($this->getUuid());
 
         return $returnedWork;
-    }
-
-    /**
-     * Add an optional file
-     *
-     * @param ReturnedWork $returnedWork
-     */
-    private function addFile($returnedWork)
-    {
-        $factory = new CollectorFactory();
-
-        try {
-            $returnedWork->setStorage($factory->build($this->getAttachments())->getFirst());
-        } catch (\Schoolbox\Resource\Exception $e) {
-            // No attachments from form:
-            // Remove them completely if it would have been set from the form.
-            if ($this->isRemoveUnsetAttachments()) {
-                $returnedWork->setStorage(null);
-            }
-        }
     }
 
     /* Getters/Setters

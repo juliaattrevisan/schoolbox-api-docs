@@ -12,6 +12,7 @@ namespace Crocodoc\Renderer\Strategy;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Collection;
 use SitePage;
 
 abstract class Base {
@@ -31,11 +32,11 @@ abstract class Base {
 	protected $submission = null;
 
 	/**
-	 * Returned work
+	 * Returned work collection
 	 *
-	 * @var ReturnedWork
+	 * @var ReturnedWork[]|Collection
 	 */
-	protected $returnedWork = null;
+	protected $returnedWorkCollection = null;
 
 	/**
 	 * An array of previous, current and next students
@@ -70,22 +71,22 @@ abstract class Base {
 	 *
 	 * @param $page
 	 * @param Submission\File $submission
-	 * @param ReturnedWork $returnedWork
+	 * @param ReturnedWork[]|Collection $returnedWorkCollection
 	 * @param $navigationElements
 	 */
-	public function __construct($page, Submission\File $submission = null, ReturnedWork $returnedWork = null, $navigationElements)
+	public function __construct($page, Submission\File $submission = null, $returnedWorkCollection = null, $navigationElements)
     {
 		$this->setPage($page);
 		$this->setSubmission($submission);
-		$this->setReturnedWork($returnedWork);
+		$this->setReturnedWorkCollection($returnedWorkCollection);
 		$this->setNavigationElements($navigationElements);
 
 //        /* Fetch mimetype
 //         */
-//        if (($this->getReturnedWork() != null) && strlen($this->getReturnedWork()->getMimetype()->getMime())) {
+//        if (($this->getReturnedWorkCollection() != null) && strlen($this->getReturnedWorkCollection()->getMimetype()->getMime())) {
 //            $mimetypeMapper = new MimetypeMapper();
-//            $mime = $mimetypeMapper->findOneByColumn('mime', $this->getReturnedWork()->getMimeType()->getMime());
-//            $this->getReturnedWork()->setMimetype($mime);
+//            $mime = $mimetypeMapper->findOneByColumn('mime', $this->getReturnedWorkCollection()->getMimeType()->getMime());
+//            $this->getReturnedWorkCollection()->setMimetype($mime);
 //        }
 	}
 
@@ -103,34 +104,22 @@ abstract class Base {
     {
 		$this->getPage()->setFile('injectableUpload', $this->getUploadFile());
 		$this->getPage()->setBlock('injectableUpload', 'returned_work', 'returned_work_block');
-
-        $return = $this->getReturnedWork();
-
-        if ($return instanceof ReturnedWork) {
+        $this->getPage()->setVar('returned_work_block', '');
+        foreach ($this->getReturnedWorkCollection() as $return) {
             if ($return->getStorage()->getFilename() != null) {
                 $storage = $return->getStorage();
 
                 $this->getPage()->setVar(array(
                     'MOST_RECENT_RETURN_FILE_ID'    => $return->getId(),
-                    'MOST_RECENT_RETURN_FILE_NAME'  => $storage->getFilename(),
+                    'MOST_RECENT_RETURN_FILE_NAME'  => $storage->getBasename(),
                     'MOST_RECENT_RETURN_FILE_SIZE'  => \Alaress_Byte_Format::bytesToString($storage->getSize()),
                     'MOST_RECENT_RETURN_FILE_THUMB' => $storage->getMimeType()->getIconFile(),
                     'MOST_RECENT_RETURN_FILE_DATE'  => $return->getReturned()->getRelativeTime(),
                 ));
 
-                $this->getPage()->parse('returned_work_block', 'returned_work');
+                $this->getPage()->parse('returned_work_block', 'returned_work', true);
             }
-            else {
-                $this->getPage()->setVar(array(
-                    'returned_work_block' => ''
-                ));
-            }
-		}
-		else {
-			$this->getPage()->setVar(array(
-				'returned_work_block' => ''
-			));
-		}
+        }
 
 		$this->getPage()->parse('INJECTED_MARK_TEMPLATE', 'injectableUpload');
 	}
@@ -267,18 +256,18 @@ abstract class Base {
 	/**
 	 * Set returned work
 	 *
-	 * @param ReturnedWork $returnedWork
+	 * @param ReturnedWork[]|Collection $returnedWorkCollection
 	 */
-	protected function setReturnedWork($returnedWork) {
-		$this->returnedWork = $returnedWork;
+	protected function setReturnedWorkCollection($returnedWorkCollection) {
+		$this->returnedWorkCollection = $returnedWorkCollection;
 	}
 
 	/**
 	 * Get returned work
 	 *
-	 * @return ReturnedWork
+	 * @return ReturnedWork[]|Collection
 	 */
-	protected function getReturnedWork() {
-		return $this->returnedWork;
+	protected function getReturnedWorkCollection() {
+		return $this->returnedWorkCollection;
 	}
 }

@@ -319,10 +319,14 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 			SELECT
 				{$this->getColumnString('sr')},
 				{$box_join->getColumnString('sb')},
-				{$category_join->getColumnString('c')}
+				{$category_join->getColumnString('c')},
+				{$this->getJoinColumnString('storage', 'file')},
+				{$this->getJoinColumnString('storage.allowedFileExtension', 'mime')}
 			FROM {$this->getTable()} sr
 			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
 			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
+			LEFT JOIN {$this->getJoinSql('storage', 'sr', 'file')}
+			LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'file', 'mime')}
 			WHERE sr.owner = :user_id
 			AND sb.id = :box_id
 			AND sr.deleted IS FALSE

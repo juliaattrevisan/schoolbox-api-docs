@@ -12,25 +12,9 @@ namespace Crocodoc\Renderer\Strategy;
 
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-use SitePage;
 
 class Crocodoc extends Base
 {
-
-    /**
-     * Typehint override
-     *
-     * @param SitePage        $page
-     * @param Submission\File $submission
-     * @param ReturnedWork    $returnedWork
-     * @param array           $navigationElements
-     */
-    public function __construct($page, Submission\File $submission = null, ReturnedWork $returnedWork = null, $navigationElements)
-    {
-        parent::__construct($page, $submission, $returnedWork, $navigationElements);
-    }
-
-
     /**
      * The template file to inject
      *

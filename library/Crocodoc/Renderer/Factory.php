@@ -11,6 +11,7 @@ namespace Crocodoc\Renderer;
 
 use \Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use \Schoolbox\Collection;
 
 class Factory
 {
@@ -23,11 +24,11 @@ class Factory
 	private $submission = null;
 
 	/**
-	 * An instance of ReturnedWork
+	 * All returned work for this submission box for this student.
 	 *
-	 * @var ReturnedWork
+	 * @var ReturnedWork[]|Collection
 	 */
-	private $returnedWork = null;
+	private $returnedWorkCollection = null;
 
     /**
      * Supported mime types
@@ -65,14 +66,14 @@ class Factory
 	 *
 	 * @param $page
 	 * @param Submission\File $submission
-	 * @param ReturnedWork $returnedWork
+	 * @param ReturnedWork[]|Collection $returnedWorkCollection
 	 * @param $navigationElements
 	 */
-	public function __construct($page, Submission\File $submission = null, ReturnedWork $returnedWork = null, $navigationElements) 
+	public function __construct($page, Submission\File $submission = null, $returnedWorkCollection = null, $navigationElements)
     {
 		$this->setPage($page);
 		$this->setSubmission($submission);
-		$this->setReturnedWork($returnedWork);
+		$this->setReturnedWorkCollection($returnedWorkCollection);
 		$this->setNavigationElements($navigationElements);
 	}
 
@@ -84,32 +85,33 @@ class Factory
     {
         $work = $this->getSubmission();
 
+        $returnCollection = $this->getReturnedWorkCollection();
         if ($work === null) {
             // No submission
-            return new Strategy\None($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
+            return new Strategy\None($this->getPage(), $work, $returnCollection, $this->getNavigationElements());
 
         } elseif ($work instanceof Submission\File) {
             if ($this->crocodocable($work)) {
                 // Crocodoc-friendly file types (only if Crocodoc is active with an api token)
-                return new Strategy\Crocodoc($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
+                return new Strategy\Crocodoc($this->getPage(), $work, $returnCollection, $this->getNavigationElements());
 
             } elseif ($work->getMimeType()->isImage()) {
                 // Other special presentation methods for inline viewing of media such as images and videos
-                return new Strategy\Image($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
+                return new Strategy\Image($this->getPage(), $work, $returnCollection, $this->getNavigationElements());
 
             } elseif ($work->getMimetype()->isVideo()) {
-                return new Strategy\Video($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
+                return new Strategy\Video($this->getPage(), $work, $returnCollection, $this->getNavigationElements());
 
             } elseif ($work->getMimetype()->isAudio()) {
-                return new Strategy\Audio($this->getPage(), $this->getSubmission(), $this->getReturnedWork(), $this->getNavigationElements());
+                return new Strategy\Audio($this->getPage(), $this->getSubmission(), $returnCollection, $this->getNavigationElements());
             }
             elseif ($work->getMimeType()->matches('text/html')) {
-                return new Strategy\Html($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
+                return new Strategy\Html($this->getPage(), $work, $returnCollection, $this->getNavigationElements());
             }
 		}
 
         // Otherwise just download the file
-        return new Strategy\Download($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
+        return new Strategy\Download($this->getPage(), $work, $this->getReturnedWorkCollection(), $this->getNavigationElements());
 	}
 
     /**
@@ -207,22 +209,22 @@ class Factory
     }
 
     /**
-     * Set returned work
+     * Set returned work collection
      *
-     * @param ReturnedWork $returnedWork
+     * @param ReturnedWork[]|Collection $returnedWork
      */
-    private function setReturnedWork($returnedWork)
+    private function setReturnedWorkCollection($returnedWork)
     {
-        $this->returnedWork = $returnedWork;
+        $this->returnedWorkCollection = $returnedWork;
     }
 
     /**
-     * Get returned work
+     * Get returned work collection
      *
-     * @return ReturnedWork
+     * @return ReturnedWork[]|Collection
      */
-    private function getReturnedWork()
+    private function getReturnedWorkCollection()
     {
-        return $this->returnedWork;
+        return $this->returnedWorkCollection;
     }
 }

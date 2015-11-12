@@ -183,15 +183,15 @@ for ($i=0; $i < count($stack); $i++) {
 $userMapper = new UserMapper();
 $user = $userMapper->findById($this->arg[1]);
 
-/* Find the latest returned work
+/* Find all returned work for this student
  */
-$latestReturnedWork = null;
-
-$returnWorkMapper = new ReturnedWorkMapper();
-$latestReturnedActivity = $returnWorkMapper->getHistory($user->getId(), $submissionBox->getId())->first();
-
-if ($latestReturnedActivity instanceof Activity) {
-	$latestReturnedWork = $latestReturnedActivity->getReturnedWork();
+$returnWorkMapper   = new ReturnedWorkMapper();
+$allReturnedWork    = new Collection();
+$returnedActivities = $returnWorkMapper->getHistory($user->getId(), $submissionBox->getId());
+foreach ($returnedActivities as $activity) {
+    if ($activity instanceof Activity) {
+        $allReturnedWork->add($activity->getReturnedWork());
+    }
 }
 
 /* Augment array with data
@@ -215,24 +215,18 @@ $navigationDirect = json_encode($navigationElements);
 
 $zone = new Zone('inline-return');
 
-$zone->setMulti(false)
+$zone->setMulti(true)
     ->setMimeFilter('*/*')
-    ->setThumbnailSize(32)
+    ->setThumbnailSize(64)
     ->setAttachPrompt('Attach file to return')
     ->setModalTitle('Select file')
     ->setAttachmentsLabel('');
-
-if($latestReturnedWork instanceof ReturnedWork) {
-    if ($hash = $latestReturnedWork->getStorage()->getHash()) {
-        $zone->attachFiles([$hash]);
-    }
-}
 
 $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 /* Render injectable views
  */
-$templateFactory = new Factory($this, $currentAugmented['submission'], $latestReturnedWork, $navigationElements);
+$templateFactory = new Factory($this, $currentAugmented['submission'], $allReturnedWork, $navigationElements);
 $renderer = $templateFactory->produce();
 $renderer->render();
 
