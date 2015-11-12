@@ -1025,12 +1025,12 @@ ul.flex-list {
 		}
 	}
 
-	@include hide-n(small, $small-only, $small-up) { display: none };
-	@include hide-n(medium, $medium-down, $medium-up) { display: none };
-	@include hide-n(large, $large-down, $large-up) { display: none };
+	@include hide-n(small, $small-only, $small-up) { display: none; };
+	@include hide-n(medium, $medium-only, $medium-up) { display: none; };
+	@include hide-n(large, $large-only, $large-up) { display: none; };
 	@if $include-xl-html-grid-classes {
-		@include hide-n(xlarge, $xlarge-down, $xlarge-up) { display: none };
-		@include hide-n(xxlarge, $xxlarge-down, $xxlarge-up) { display: none };
+		@include hide-n(xlarge, $xlarge-only, $xlarge-up) { display: none; };
+		@include hide-n(xxlarge, $xxlarge-only, $xxlarge-up) { display: none; };
 	}
 }
 
