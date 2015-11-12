@@ -973,10 +973,12 @@ nav {
 
 				@media #{$media-down} {
 					// Any button after $i not an overflow gets hidden
+					// Say i=4: any button in position 5+ gets hidden
 					&:nth-child(n+#{$i + 1}):not(.overflow) {
 						@content;
 					}
 					// Any overflow after $i gets hidden
+					// Say i=4: any overflow in position 5- gets hidden
 					&:nth-child(-n+#{$i + 1}).overflow {
 						@content;
 					}
@@ -984,6 +986,7 @@ nav {
 
 				@media #{$media-up} {
 					// In the overflow: any button before $i gets hidden
+					// Say i=4: any button in position 4- gets hidden
 					&.overflow > ul.f-dropdown {
 						li:nth-child(-n+#{$i}) {
 							@content;
