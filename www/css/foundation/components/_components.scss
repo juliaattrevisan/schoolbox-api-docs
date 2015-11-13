@@ -45,12 +45,8 @@
         /* Padding to reposition text and offset multi-line
          * component heading scenario
          */
-        padding-top: $global-button-padding/2;
-        padding-bottom: $global-button-padding/2;
-
-        h2 {
-            font-size: 1.3125rem;
-        }
+        padding-top: ($global-button-height - nth($h2-font-scale, 3) * 1.4) / 3;
+        padding-bottom: ($global-button-height - nth($h2-font-scale, 3) * 1.4) / 2;
     }
 }
 
