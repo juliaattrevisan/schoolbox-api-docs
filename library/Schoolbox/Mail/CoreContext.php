@@ -29,6 +29,7 @@ class CoreContext {
             'site_hostname',
             'site_location',
             'site_domain',
+            'skin_builder',
         );
 
         foreach($required as $key) {
@@ -69,6 +70,31 @@ class CoreContext {
             SITE_root . "/www/css/core/variables.less",
             SITE_root . "/www/css/$site/chrome.less"
         ));
+
+        // Extract skin builder colors
+        $skinColors = [
+            'skin_colour_navigation_foreground',
+            'skin_colour_navigation_background',
+            'skin_colour_navigation_hover',
+            'skin_colour_offcanvas_foreground',
+            'skin_colour_offcanvas_background',
+            'skin_colour_offcanvas_hover',
+            'skin_colour_off_canvas',
+            'skin_colour_content_ui_foreground',
+            'skin_colour_content_ui_background',
+            'skin_colour_content_ui_hover',
+            'skin_colour_content_ui_selected',
+            'skin_colour_content_ui_submit_foreground',
+            'skin_colour_content_ui_submit_background',
+            'skin_colour_accent_foreground',
+            'skin_colour_accent_background',
+            'skin_colour_accent_hover',
+            'skin_colour_logo_background',
+            'skin_colour_body_bg',
+        ];
+        foreach ($skinColors as $skinColor) {
+            $this->context['colours'][$skinColor] = $conf->get($skinColor);
+        }
     }
 
 
