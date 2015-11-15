@@ -131,25 +131,34 @@ if (!$permission_denied) {
                         break;
                     }
                 }
+                $undelete = array_key_exists($unitInstanceId, $undeletedIds);
 
                 // Not updating either? Go no further
-                if (!($updateOpenDate || $updateDueDate)) {
+                if (!($updateOpenDate || $updateDueDate || $undelete)) {
                     continue;
                 }
 
                 // Get all the tasks out, and update their due dates
+                // (and possibly deleted status)
                 /** @var Task\Instance[] $taskList */
                 $taskList = $taskMapper->findByColumn(
                     'course_unit_instance_id',
-                    $savedInstance->getId()
+                    $savedInstance->getId(),
+                    ['deleted' => $undelete,]
                 );
                 foreach ($taskList as $task) {
-                    $cloner = new Task\Cloner($task);
-                    if ($updateOpenDate) {
-                        $cloner->updateTaskOpenTime();
+                    if ($undelete) {
+                        $task->setDeleted(null);
+                        $taskMapper->save($task);
                     }
-                    if ($updateDueDate) {
-                        $cloner->updateTaskCloseTime();
+                    if ($updateDueDate || $updateOpenDate) {
+                        $cloner = new Task\Cloner($task);
+                        if ($updateOpenDate) {
+                            $cloner->updateTaskOpenTime();
+                        }
+                        if ($updateDueDate) {
+                            $cloner->updateTaskCloseTime();
+                        }
                     }
                 }
 //                $taskMapper->save($taskList);
