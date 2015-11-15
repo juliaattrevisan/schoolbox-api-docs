@@ -126,6 +126,7 @@ class InstanceMapper extends Mapper {
         $this->registerCallback('postSave',       array($this, 'postSave'));
         $this->registerCallback('postDelete',     array($this, 'postDelete'));
         $this->registerCallback('postSoftDelete', array($this, 'postDelete'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'postRestore'));
     }
 
     /**
@@ -205,6 +206,20 @@ class InstanceMapper extends Mapper {
         }
         if ($object->getSubmissionBox()->getId()) {
             SubmissionBoxMapper::getInstance()->delete($object->getSubmissionBox());
+        }
+    }
+
+    /**
+     * Post-restore callback - undeletes related assessment and course.
+     *
+     * @param Instance $object
+     */
+    public function postRestore(Instance $object) {
+        if ($object->getAssessment()->getId()) {
+            OnlineAssessmentMapper::getInstance()->restoreSoftDeleted($object->getAssessment());
+        }
+        if ($object->getSubmissionBox()->getId()) {
+            SubmissionBoxMapper::getInstance()->restoreSoftDeleted($object->getSubmissionBox());
         }
     }
 
