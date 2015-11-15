@@ -28,6 +28,7 @@ use Config;
 use Database;
 use DeprecatedDatabase;
 use PDO;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
 use Scrub;
 use Twig_Extension_Debug;
@@ -156,7 +157,7 @@ class Bootstrap implements BootstrapInterface {
 		}
 
 		// Redis connection configuration
-		Redis::getInstance()->connect(Config::get('redis_url'));
+		Redis::getInstance()->connect(ConfigMapper::getInstance()->get('redis_url'));
 	}
 
 
@@ -167,7 +168,11 @@ class Bootstrap implements BootstrapInterface {
 	 */
 	public function installDependencies() {
 		// Set correct timezone
-		date_default_timezone_set(Config::get('date_timezone'));
+		date_default_timezone_set($timezone = Config::get('date_timezone'));
+
+		// Set up DB timezones here too
+		Database::getInstance()->setTimezone($timezone);
+		DeprecatedDatabase::getInstance()->setTimezone($timezone);
 
 		// Set up the dependency injector
 

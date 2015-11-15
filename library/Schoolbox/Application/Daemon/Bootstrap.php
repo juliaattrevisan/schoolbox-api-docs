@@ -135,7 +135,11 @@ class Bootstrap implements BootstrapInterface {
 		$di->set('config', $di->lazyNew('Schoolbox\\Config\\ConfigMapper'));
 
         // Set correct timezone
-        date_default_timezone_set($di->get('config')->get('date_timezone'));
+        date_default_timezone_set($timezone = $di->get('config')->get('date_timezone'));
+
+        // Set up DB timezones here too.
+        Database::getInstance()->setTimezone($timezone);
+        \DeprecatedDatabase::getInstance()->setTimezone($timezone);
 
         // All modules relate to web requests, not daemons.
         // Therefore, no modules need to be set up.
