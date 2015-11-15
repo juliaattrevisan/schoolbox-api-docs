@@ -89,6 +89,8 @@ abstract class Mapper implements IMapper, Serializable
     const CALLBACK_POSTDELETE = 'postDelete';
     const CALLBACK_PRESOFTDELETE  = 'preSoftDelete';
     const CALLBACK_POSTSOFTDELETE = 'postSoftDelete';
+    const CALLBACK_PRERESTORE     = 'preSoftDeleteRestore';
+    const CALLBACK_POSTRESTORE    = 'postSoftDeleteRestore';
 
     // options for mapping methods
     const COLUMN_IDENTIFIER        = 1;
@@ -1073,8 +1075,8 @@ abstract class Mapper implements IMapper, Serializable
             $object,
             $this->soft_delete_column,
             $this->soft_delete_undeleted_value,
-            'preSoftDeleteRestore',
-            'postSoftDeleteRestore'
+            self::CALLBACK_PRERESTORE,
+            self::CALLBACK_POSTRESTORE
         );
     }
 
