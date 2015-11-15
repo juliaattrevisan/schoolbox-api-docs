@@ -68,6 +68,9 @@ fi
 echo "$vag Stopping background Grunt processes";
 pkill grunt;
 
+echo "$vag Updating timezone data";
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -ptnp879 mysql;
+
 echo "$vag Removing current Schoolbox MySQL database";
 mysql -u root -ptnp879 -e "drop database if exists schoolbox";
 
