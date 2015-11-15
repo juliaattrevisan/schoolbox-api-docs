@@ -83,8 +83,9 @@ if (!$permission_denied) {
                         );
                     } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                         // Deleted? Attempt to restore it
+                        // (Restoration of related tasks is handled in postRestore callbacks)
                         $course_instance = $e->getDeletedObject();
-                        $course_instance->setDeleted(null);
+                        $unitMapper->restoreSoftDeleted($course_instance);
                         $undeletedIds[$course_instance->getId()] = true;
                     }
                 }
@@ -137,30 +138,23 @@ if (!$permission_denied) {
                 }
 
                 // Not updating either? Go no further
-                if (!($updateOpenDate || $updateDueDate || $undelete)) {
+                if (!($updateOpenDate || $updateDueDate)) {
                     continue;
                 }
 
                 // Get all the tasks out, and update their due dates
-                // (and possibly deleted status)
                 /** @var Task\Instance[] $taskList */
                 $taskList = $taskMapper->findByColumn(
                     'course_unit_instance_id',
-                    $savedInstance->getId(),
-                    ['deleted' => $undelete,]
+                    $savedInstance->getId()
                 );
                 foreach ($taskList as $task) {
-                    if ($undelete) {
-                        $task->setDeleted(null);
-                        $taskMapper->save($task);
-                    } elseif ($updateDueDate || $updateOpenDate) {
-                        $cloner = new Task\Cloner($task);
-                        if ($updateOpenDate) {
-                            $cloner->updateTaskOpenTime();
-                        }
-                        if ($updateDueDate) {
-                            $cloner->updateTaskCloseTime();
-                        }
+                    $cloner = new Task\Cloner($task);
+                    if ($updateOpenDate) {
+                        $cloner->updateTaskOpenTime();
+                    }
+                    if ($updateDueDate) {
+                        $cloner->updateTaskCloseTime();
                     }
                 }
 //                $taskMapper->save($taskList);
