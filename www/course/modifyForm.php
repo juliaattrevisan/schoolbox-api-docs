@@ -124,14 +124,16 @@ if (!$permission_denied) {
                 $unitInstanceId = $savedInstance->getId();
                 $updateOpenDate = true;
                 $updateDueDate  = true;
-                foreach ($_POST['unit'] as $unitPost) {
-                    if ($unitPost['unit_instance_id'] == $unitInstanceId) {
-                        $updateOpenDate = $unitPost['update_open_date'];
-                        $updateDueDate  = $unitPost['update_due_date'];
-                        break;
+                $undelete       = array_key_exists($unitInstanceId, $undeletedIds);
+                if (!$undelete) {
+                    foreach ($_POST['unit'] as $unitPost) {
+                        if ($unitPost['unit_instance_id'] == $unitInstanceId) {
+                            $updateOpenDate = $unitPost['update_open_date'];
+                            $updateDueDate  = $unitPost['update_due_date'];
+                            break;
+                        }
                     }
                 }
-                $undelete = array_key_exists($unitInstanceId, $undeletedIds);
 
                 // Not updating either? Go no further
                 if (!($updateOpenDate || $updateDueDate || $undelete)) {
@@ -150,8 +152,7 @@ if (!$permission_denied) {
                     if ($undelete) {
                         $task->setDeleted(null);
                         $taskMapper->save($task);
-                    }
-                    if ($updateDueDate || $updateOpenDate) {
+                    } elseif ($updateDueDate || $updateOpenDate) {
                         $cloner = new Task\Cloner($task);
                         if ($updateOpenDate) {
                             $cloner->updateTaskOpenTime();
