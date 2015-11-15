@@ -47,9 +47,10 @@ if (!$permission_denied) {
     $saved_list   = new Collection();
     $deleted_list = new Collection();
     $undeletedIds = [];
+    $unitMapper   = UnitInstanceMapper::getInstance();
     if ($_POST['action'] === 'delete') {
         // Add only the course instances in $_POST[id] to the list to be deleted.
-        $deleted_list = UnitInstanceMapper::getInstance()->findByColumnList(
+        $deleted_list = $unitMapper->findByColumnList(
             array(
                 'id'           => $_POST['id'],
                 'component_id' => $component_id,
@@ -69,12 +70,12 @@ if (!$permission_denied) {
                 // Is there a unit instance? If so fetch it, otherwise fetch by unit
                 // category and component.
                 if (!empty($unit_data['unit_instance_id'])) {
-                    $course_instance = UnitInstanceMapper::getInstance()->findById($unit_data['unit_instance_id']);
+                    $course_instance = $unitMapper->findById($unit_data['unit_instance_id']);
                 }
                 else {
                     // Try to restore a course before creating a new one.
                     try {
-                        $course_instance = UnitInstanceMapper::getInstance()->findOneByColumnList(
+                        $course_instance = $unitMapper->findOneByColumnList(
                             array(
                                 'component_id'     => $component_id,
                                 'unit_category_id' => $unit_id,
@@ -117,7 +118,7 @@ if (!$permission_denied) {
         }
     }
     if (count($saved_list)) {
-        if (UnitInstanceMapper::getInstance()->save($saved_list)) {
+        if ($unitMapper->save($saved_list)) {
             // Update due dates of items, if required
             $taskMapper = Task\InstanceMapper::getInstance();
             foreach ($saved_list as $savedInstance) {
@@ -167,7 +168,7 @@ if (!$permission_denied) {
         }
     }
     if (count($deleted_list)) {
-        UnitInstanceMapper::getInstance()->delete($deleted_list);
+        $unitMapper->delete($deleted_list);
     }
 }
 
