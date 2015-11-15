@@ -23,8 +23,6 @@ $login-img-max-height: 12rem; // 192px
         margin: 0;
         padding: 0;
 
-        @include contrast-bg(1, $login-overlay);
-
         // background-image is set inline by the random-image selector
         background-color: $body-bg;
         background-position: $login-background-position;
@@ -96,8 +94,15 @@ $login-img-max-height: 12rem; // 192px
         }
 
         a, label, #footer {
-            color: $content-ui-foreground;
             font-size: inherit;
+        }
+
+        a, label {
+            color: calc-text-color($login-form-background-color);
+        }
+
+        #footer {
+            color: calc-text-color($login-overlay);
         }
 
         a:hover {
