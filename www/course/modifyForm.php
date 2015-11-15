@@ -46,6 +46,7 @@ if (!$permission_denied) {
     /** @var Collection|UnitInstance[] $deleted_list */
     $saved_list   = new Collection();
     $deleted_list = new Collection();
+    $undeletedIds = [];
     if ($_POST['action'] === 'delete') {
         // Add only the course instances in $_POST[id] to the list to be deleted.
         $deleted_list = UnitInstanceMapper::getInstance()->findByColumnList(
@@ -60,21 +61,31 @@ if (!$permission_denied) {
             // Figure out which unit instance ID (if any) is attached
             $unit_id   = $unit_data['unit_id'];
             $import    = !empty($unit_data['import']);
+            $deleted   = false;
             $open_date = Alaress_Date_Format::newLocalShort($unit_data['open_date']);
             $due_date  = Alaress_Date_Format::newLocalShort($unit_data['due_date']);
             try {
+                /** @var UnitInstance $course_instance */
                 // Is there a unit instance? If so fetch it, otherwise fetch by unit
                 // category and component.
                 if (!empty($unit_data['unit_instance_id'])) {
                     $course_instance = UnitInstanceMapper::getInstance()->findById($unit_data['unit_instance_id']);
                 }
                 else {
-                    $course_instance = UnitInstanceMapper::getInstance()->findOneByColumnList(
-                        array(
-                            'component_id'     => $component_id,
-                            'unit_category_id' => $unit_id,
-                        )
-                    );
+                    // Try to restore a course before creating a new one.
+                    try {
+                        $course_instance = UnitInstanceMapper::getInstance()->findOneByColumnList(
+                            array(
+                                'component_id'     => $component_id,
+                                'unit_category_id' => $unit_id,
+                            )
+                        );
+                    } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                        // Deleted? Attempt to restore it
+                        $course_instance = $e->getDeletedObject();
+                        $course_instance->setDeleted(null);
+                        $undeletedIds[$course_instance->getId()] = true;
+                    }
                 }
                 if ($import) {
                     $course_instance
