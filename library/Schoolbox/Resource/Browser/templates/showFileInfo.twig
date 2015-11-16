@@ -6,25 +6,23 @@ Each delete request is an ajax request for compatibility
 These are its args, which is given for you
 #}
 
-{% set deleteArgs = '{ajax: 1, delete: ' ~ file.id ~ '}' %}
-
 {% if namespace == 'resourceBrowser' %}
     {% set send   = '/send.php?id=' %}
     {% set image  = '/cms/image.php?id=' %}
     {% set modify = '/cms/file/' %}
-    {% set delete = '/cms/fileForm.php?delete=' %}
+    {% set delete = '/cms/fileForm.php?ajax=1&delete=' %}
 
 {% elseif namespace == 'myFilesBrowser' %}
     {% set send   = '/cms/sendMyFile.php?id=' %}
     {% set image  = '/cms/myImage.php?id=' %}
     {% set modify = '/cms/myFile/' %}
-    {% set delete = '/cms/myFileForm.php' %}
+    {% set delete = '/cms/myFileForm.php?ajax=1&delete=' %}
 
 {% else %}
     {% set send   = '/cms/sendNetworkFile.php?id=' %}
     {% set image  = '/cms/networkImage.php?id=' %}
     {% set modify = '/cms/networkFile/' %}
-    {% set delete = '/cms/networkFileForm.php' %}
+    {% set delete = '/cms/networkFileForm.php?ajax=1&delete=' %}
 
 {% endif %}
 
@@ -60,30 +58,12 @@ These are its args, which is given for you
             <p>{{ file.mimetype.description }}</p>
         {% endif %}
 
-        {# Add delete confirmation if it is available #}
-        {% if access >= 2 %}
-        <script type="text/javascript">
-            $('[data-action="delete"]').click(function(event) {
-                event.preventDefault();
-
-                $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this file?',
-                    confirmEvent: function() {
-                        $.get('{{ delete }}', {{ deleteArgs }}, function() {
-                            window.location = window.location;
-                        });
-                    }
-                });
-            });
-        </script>
-        {% endif %}
-
         {% set fileActionList %}
             <li><a class="icon-document" data-action="open"     href="{{ send ~ file.id }}" target="_blank">Open</a></li>
             <li><a class="icon-download" data-action="download" href="{{ send ~ file.id }}&save=1">Download</a></li>
             {% if access >= 2 %}
                 <li><a class="icon-modify"   data-action="modify"   href="{{ modify ~ file.id }}">Modify</a></li>
-                <li><a class="icon-delete"   data-action="delete"   href="#">Delete</a></li>
+                <li><a class="icon-delete"   data-action="delete"   href="{{ delete ~ file.id }}">Delete</a></li>
             {% endif %}
 
         {% endset %}

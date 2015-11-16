@@ -12,7 +12,7 @@
         <li><a class="icon-upload"   data-action="zip"      href="/cms/zipFile/{{ folder.id }}">Upload ZIP</a></li>
     {% endif %}
     {% if access >= 2 or user.isSuperuser %}
-        <li><a class="icon-delete"   data-action="delete"   href="#">Delete</a></li>
+        <li><a class="icon-delete"   data-action="delete"   href="/cms/categoryForm.php?ajax=1&delete={{ folder.id }}">Delete</a></li>
     {% endif %}
 {% endif %}
 {% if folder.group.category %}

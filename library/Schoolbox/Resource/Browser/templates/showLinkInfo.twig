@@ -1,6 +1,7 @@
 {% set portrait = '/portrait.php?size=square48&userId=' %}
 {% set mime     = '/images/mime/128x128/' %}
 {% set modify   = '/cms/link/' %}
+{% set delete   = '/cms/linkForm.php?ajax=1&delete=' %}
 
 {% if access > 0 %}
 
@@ -31,7 +32,7 @@
             <li><a class="icon-document" data-action="open" href="{{ file.getHref() }}" target="_blank">Open</a></li>
             {% if access >= 2 %}
                 <li><a class="icon-modify" data-action="modify" href="{{ modify ~ file.id }}">Modify</a></li>
-                <li><a class="icon-delete" data-action="delete" href="#">Delete</a></li>
+                <li><a class="icon-delete" data-action="delete" href="{{ delete ~ file.id }}">Delete</a></li>
             {% endif %}
 
         {% endset %}
