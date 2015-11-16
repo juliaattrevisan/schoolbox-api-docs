@@ -152,13 +152,13 @@
                             text: 'Preparing to save'
                         });
 
-                        $.post(config.submitUrl, $form.serialize())
-                            .done(function() {
+                        $form
+                            .ajaxForm({url: config.submitUrl})
+                            .on('done.ajaxForm', function() {
                                 label.labelTimeout({
                                     text: 'Saved',
                                     css: 'success'
                                 });
-
                                 /* Redirect if a redirect input exists
                                  * (force redirect in Inline Grading)
                                  */
@@ -168,7 +168,7 @@
                                     window.location.href = redirect.val();
                                 }
                             })
-                            .fail(function() {
+                            .on('fail.ajaxForm', function() {
                                 label.labelTimeout({
                                     text: 'Error',
                                     css: 'alert'
@@ -375,14 +375,13 @@
 
                 /* Ajax new settings
                  */
-                $.ajax({
-                    type: 'POST',
-                    url: config.url,
-                    data: data,
-                    // callbacks
-                    success: function (data) {
-                        self.prop('disabled', false);
-
+                config.element
+                    .ajaxForm({
+                        type: 'POST',
+                        url: config.url,
+                        data: data
+                    })
+                    .on('done.ajaxForm', function(event, data) {
                         var tbody = $(config.element).children('tbody');
 
                         $.each(data, function (k, v) {
@@ -404,18 +403,16 @@
                             text: 'Saved',
                             css: 'success'
                         });
-                    },
-                    error: function (xhr) {
-                        self.prop('disabled', false);
-
-                        /* Animate label feedback
-                         */
+                    })
+                    .on('fail.ajaxForm', function() {
                         label.labelTimeout({
                             text: 'Value failed to save',
                             css: 'alert'
                         });
-                    }
-                });
+                    })
+                    .on('always.ajaxForm', function() {
+                        self.prop('disabled', false);
+                    });
             });
         }
     }
