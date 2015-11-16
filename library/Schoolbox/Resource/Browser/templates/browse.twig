@@ -8,12 +8,15 @@
 {% if namespace == 'myFilesBrowser' %}
     {% set fileController   = 'myFile' %}
     {% set folderController = 'myFolder' %}
+    {% set folderVar = 'parent' %}
 {% elseif namespace == 'webDavBrowser' %}
     {% set fileController   = 'networkFile' %}
     {% set folderController = 'networkFolder' %}
+    {% set folderVar = 'parent' %}
 {% else %}
     {% set fileController   = 'file' %}
     {% set folderController = 'category' %}
+    {% set folderVar = 'category' %}
 {% endif %}
 
 <script type="text/javascript">
@@ -158,7 +161,7 @@
 
                 var name = file.name.substr(0, file.name.lastIndexOf('.')),
                     data = {
-                        category: openNode,
+                        '{{ folderVar }}': openNode,
                         description: name,
                         comment: '',
                         hidden: 0
@@ -275,7 +278,7 @@
     </div>
     <div class="small-12 island">
         <section class="dropzone-wrap">
-            <form id="async" class="dropzone overlay" action="/cms/fileForm.php?ajax=1" method="post"></form>
+            <form id="async" class="dropzone overlay" action="/cms/{{ fileController }}Form.php?ajax=1" method="post"></form>
             <div class="hide" id="preview-container"></div>
             <div data-ajax id="meta" class="meta-panel">
                 {% include '@resourceBrowser/showFolderInfo.twig' %}
