@@ -1,19 +1,19 @@
 // do we use SASS for our login? (the alernative is the old LESS version)
-$login-html-styles: true;
+$login-html-styles: true !default;
 
-$login-background-position: top right;
-$login-overlay: $content-ui-foreground;
-$login-overlay-opacity: 0;
+$login-background-position: top right !default;
+$login-overlay: $content-ui-foreground !default;
+$login-overlay-opacity: 0 !default;
 
-$login-form-background-color: rgba($black, 0.4);
-$login-form-width: 20rem;    // 320px: this is the functional min-width of Schoolbox
-$login-form-height: 32rem;
-$login-form-padding: 2rem;
+$login-form-background-color: rgba($black, 0.4) !default;
+$login-form-width: 20rem !default;    // 320px: this is the functional min-width of Schoolbox
+$login-form-height: 32rem !default;
+$login-form-padding: 2rem !default;
 
-$login-footer-background-top: rgba($black, 0);
-$login-footer-background-bottom: rgba($black, 0.3);
+$login-footer-background-top: rgba($black, 0) !default;
+$login-footer-background-bottom: rgba($black, 0.3) !default;
 
-$login-img-max-height: 12rem; // 192px
+$login-img-max-height: 12rem !default; // 192px
 
 
 @if ($login-html-styles) {
