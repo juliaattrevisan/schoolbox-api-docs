@@ -2,8 +2,7 @@
 $login-html-styles: true !default;
 
 $login-background-position: top right !default;
-$login-overlay: $content-ui-foreground !default;
-$login-overlay-opacity: 0 !default;
+$login-overlay: transparent !default;
 
 $login-form-background-color: rgba($black, 0.4) !default;
 $login-form-width: 20rem !default;    // 320px: this is the functional min-width of Schoolbox
@@ -37,7 +36,7 @@ $login-img-max-height: 12rem !default; // 192px
             padding: 0;
             width: 100%;
             min-height: 100%;
-            background-color: rgba($login-overlay, $login-overlay-opacity);
+            background-color: $login-overlay;
             position: relative;
         }
 
