@@ -6,10 +6,12 @@ $login-overlay: $content-ui-foreground;
 $login-overlay-opacity: 0;
 
 $login-form-background-color: rgba($black, 0.4);
-
 $login-form-width: 20rem;    // 320px: this is the functional min-width of Schoolbox
 $login-form-height: 32rem;
 $login-form-padding: 2rem;
+
+$login-footer-background-top: rgba($black, 0);
+$login-footer-background-bottom: rgba($black, 0.3);
 
 $login-img-max-height: 12rem; // 192px
 
@@ -63,6 +65,7 @@ $login-img-max-height: 12rem; // 192px
 
         #footer {
             @extend %sm;
+            @include linear-gradient($login-footer-background-top, $login-footer-background-bottom);
             margin: 0 auto 0;
             text-align: center; // but why...?
             height: $login-footer-height;
