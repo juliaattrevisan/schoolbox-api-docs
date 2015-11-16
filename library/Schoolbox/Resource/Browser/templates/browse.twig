@@ -247,6 +247,20 @@
             }
         });
 
+        {# Add delete confirmation if it is available by intercepting delete requests #}
+        metaData.on('click', '[data-action="delete"]', function (event) {
+            event.preventDefault();
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this?',
+                confirmEvent: function (anchor) {
+                    $.get(anchor.attr('href')).always(function () {
+                        window.location.reload();
+                    });
+                }
+            });
+        });
+
     });
 </script>
 {# /HEAD #}
