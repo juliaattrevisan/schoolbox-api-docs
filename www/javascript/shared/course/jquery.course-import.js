@@ -24,7 +24,7 @@
             .filter(':checked')
             .on('click.courseImport', function(e) {
                 var element = $(this);
-                if (!element.prop('checked')) {
+                if (!element.prop('checked') && element.data('unitInstanceId')) {
                     e.preventDefault();
                     element.confirmDialog({
                         text: 'Removing a unit from a class will delete the unit and all of its tasks. Are you sure you wish to do this? (They may be restored by adding the unit back to the class through this page.)',
