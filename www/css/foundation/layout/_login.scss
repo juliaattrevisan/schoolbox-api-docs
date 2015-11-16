@@ -65,7 +65,14 @@ $login-img-max-height: 12rem !default; // 192px
 
         #footer {
             @extend %sm;
-            @include linear-gradient($login-footer-background-top, $login-footer-background-bottom);
+
+            @if ($login-footer-background-top == $login-footer-background-bottom) {
+                // if they're the same, no need to use complex gradient styles
+                background-color: $login-footer-background-top;
+            } @else {
+                @include linear-gradient($login-footer-background-top, $login-footer-background-bottom);
+            }
+
             margin: 0 auto 0;
             text-align: center; // but why...?
             height: $login-footer-height;
