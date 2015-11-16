@@ -111,7 +111,9 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
             error(2);
         }
 
-        if ($_GET['redirect'] == '') {
+        if (isset($_REQUEST['ajax'])) {
+            die(json_encode(['result' => 'success']));
+        } elseif ($_GET['redirect'] == '') {
             $page->backToTheFuture(1);
         } else {
             SitePage::localRedir($_GET['redirect']);
