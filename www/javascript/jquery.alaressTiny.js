@@ -21,6 +21,10 @@
 		 */
 		function init(options) {
 
+
+
+
+
 			/* Standard options across all tinyMCE instances
 			 */
 			// Site location can be a global
@@ -127,7 +131,30 @@
 		 * Disturb the sleeping dragon
 		 */
 		function tiny(config) {
-			tinyMCE.init(config);
+
+            CKEDITOR.editorConfig = function( config ) {
+            	config.toolbarGroups = [
+            		{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+            		{ name: 'insert', groups: [ 'insert' ] },
+            		{ name: 'links', groups: [ 'links' ] },
+            		{ name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi', 'paragraph' ] },
+            		'/',
+            		{ name: 'editing', groups: [ 'find', 'selection', 'spellchecker', 'editing' ] },
+            		{ name: 'clipboard', groups: [ 'clipboard', 'undo' ] },
+            		{ name: 'tools', groups: [ 'tools' ] },
+            		{ name: 'forms', groups: [ 'forms' ] },
+            		{ name: 'document', groups: [ 'mode', 'document', 'doctools' ] },
+            		{ name: 'others', groups: [ 'others' ] },
+            		{ name: 'styles', groups: [ 'styles' ] },
+            		{ name: 'colors', groups: [ 'colors' ] },
+            		{ name: 'about', groups: [ 'about' ] }
+            	];
+
+            	config.removeButtons = 'Underline,Superscript,About,Maximize,Cut,Copy,Paste,Subscript';
+            };
+
+
+            CKEDITOR.replaceAll( );
 		}
 	}
 })(jQuery);
