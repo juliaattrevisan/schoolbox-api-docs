@@ -254,11 +254,15 @@
         metaData.on('click', '[data-action="delete"]', function (event) {
             event.preventDefault();
 
+            var deleteNode = jstree.get_selected(true);
+            var selectParent = deleteNode[0].parent;
+
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this?',
                 confirmEvent: function (anchor) {
-                    $.get(anchor.attr('href')).always(function () {
-                        window.location.reload();
+                    $.get(anchor.attr('href')).done(function () {
+                        jstree.delete_node(deleteNode);
+                        jstree.select_node(selectParent);
                     });
                 }
             });
