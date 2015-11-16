@@ -237,19 +237,30 @@
                  * @param view
                  */
                 loading: function(isLoading, view) {
-
-					/* Show loading div right in the middle
-					 */
-					if (isLoading === true) {
-                        calendarLoadingElement.foundation('reveal','open')
-					}
-					/* Has finished loading
-					 */
-					else {
-
-						/* Hide loading div
-						 */
-                        calendarLoadingElement.foundation('reveal','close')
+                    /* Show loading div right in the middle
+                     */
+                    if (isLoading === true) {
+                        calendarLoadingElement
+                            .data('opened', false)
+                            .foundation('reveal', 'open')
+                            .one('opened.fndtn.reveal', function() {
+                                calendarLoadingElement.data('opened', true);
+                            });
+                    }
+                    /* Has finished loading
+                     */
+                    else {
+                        /* Hide loading div
+                         * Is it open? close it
+                         * Is it not yet open? close it when it is open
+                         */
+                        if (calendarLoadingElement.data('opened')) {
+                            calendarLoadingElement.foundation('reveal', 'close');
+                        } else {
+                            calendarLoadingElement.one('opened.fndtn.reveal', function() {
+                                calendarLoadingElement.foundation('reveal', 'close');
+                            });
+                        }
 
                         // update any tasks that have been completed by strikethrough-ing them
                         $(this).find('input[type=checkbox]').each(function() {
