@@ -1193,6 +1193,9 @@ ul.flex-list {
              * way, as per original .avatar.card .label intent
              */
             &.status {
+                &:empty {
+                    display: none;
+                }
                 margin: 0 -0.5rem 0 -1rem;
                 text-align: left;
                 position: absolute;
