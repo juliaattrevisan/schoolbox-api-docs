@@ -60,6 +60,10 @@
                                     != watchValue;
                             };
                         }
+                    } else if (watch.is(':radio')) {
+                        toggleCallback = function() {
+                            return watch.filter(':checked').val() != watchValue;
+                        };
                     }
                 }
                 watch.on('change.hideWatch', function() {

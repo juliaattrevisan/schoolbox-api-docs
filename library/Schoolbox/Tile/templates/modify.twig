@@ -3,6 +3,7 @@
 <script type="text/javascript" src="/javascript/components/spectrum/spectrum.js"></script>
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript">
 (function($) {
     $(function() {
@@ -54,16 +55,6 @@
                         });
                     });
         }
-
-        // Show/hide background position
-        var backgroundPositioner = form.find('[data-background-position]');
-        form.find('input[name="background_image_contained"]').change(function(event) {
-            if (Number(this.value)) {
-                backgroundPositioner.slideDown('fast');
-            } else {
-                backgroundPositioner.slideUp('fast');
-            }
-        });
     })
 })(jQuery);
 </script>
@@ -325,11 +316,11 @@
                         </label>
                     </div>
                 </fieldset>
-                <fieldset class="content {% if not item.backgroundImageContained %}hide{% endif %}" data-background-position>
+                <fieldset class="content {% if not item.backgroundImageContained %}hide{% endif %}" data-hide-watch="[name='background_image_contained']" data-hide-watch-value="1">
                     <legend>
                         Position
                     </legend>
-                    <div class="small-12 columns {% if not item.backgroundImageContained %}hide{% endif %} background-position" data-background-position>
+                    <div class="small-12 columns no-pad">
                         <table class="position-selector">
                             <thead>
                             <tr>
