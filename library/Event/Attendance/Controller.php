@@ -21,12 +21,14 @@ class Event_Attendance_Controller extends Controller
 
         $this->setUserHandler( new User );
 
-	/* Check if Border Leave is enabled first, before doing this
-	*/
-	if ((Cfg::get('boarder_leave_enabled') == 1) || (Cfg::get('boarder_leave_enabled') == 'true')) {
-	        $this->setLeaveRequestMapper( Leave_RequestMapper::getInstance() );
-	        $this->setLeaveController( new Leave_Controller );
-	}
+        /* Check if Border Leave is enabled and existent first, before doing this
+        */
+        if ((Cfg::get('boarder_leave_enabled') == 1) || (Cfg::get('boarder_leave_enabled') == 'true')) {
+            if (class_exists('Leave_RequestMapper') && class_exists('Leave_Controller')) {
+                $this->setLeaveRequestMapper( Leave_RequestMapper::getInstance() );
+                $this->setLeaveController( new Leave_Controller );
+            }
+        }
     }
 
 	/**
