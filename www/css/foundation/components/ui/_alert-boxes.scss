@@ -58,6 +58,9 @@ $alert-default-background: darken($body-bg, 10%);
     color: calc-text-color($alert-default-background, tint($alert-default-background, $alert-tint-amount), darken($alert-default-background, $alert-tint-amount));
 
     .close {
+        &:hover {
+            text-decoration: none;
+        }
         color: inherit;
         margin: 0;
         line-height: .8;
