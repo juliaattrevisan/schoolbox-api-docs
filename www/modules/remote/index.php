@@ -5,7 +5,9 @@ if ($this->arg[1] == 'window') {
 } else {
     $this->setFile(TEMPLATE_content, 'modules/remote/frame.html');
 }
-$remoteUrl = base64_decode($this->arg[0]);
+// It's not guaranteed that the base64 encoded string will be properly encoded.
+// Fortunately we can convert spaces to +, and directory splits to / chars.
+$remoteUrl = base64_decode(str_replace(' ', '+', implode('/', $this->arg)));
 
 // is this specifying a height for the parent frame?
 $height = '460px';
