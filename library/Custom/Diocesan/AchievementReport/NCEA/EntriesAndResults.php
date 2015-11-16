@@ -183,7 +183,7 @@ class EntriesAndResults extends Base {
                 ClassTeacher2,
                 ClassTeacher2Email,
                 ClassTeacher3,
-                ClassTeacher3Email
+                ClassTeacher3Email,
                 NCEAStandardNumber,
                 InternalorExternalAssessment,
                 StandardTitle,

@@ -54,7 +54,7 @@ class CreditSummary extends Base {
      */
     private function findValues() {
         $query = "
-            SELECT *,
+            SELECT
                 id,
                 Level,
                 InternalorExternalAssessment,
