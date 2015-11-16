@@ -83,40 +83,14 @@ table.rubric {
         width: 100%;
         position: relative;
         margin: 0;
-        &.highlight {
-            background-color: $input-hover-bg-color;
-            border-color: $input-focus-border-color;
-            border-radius: 0;
-            padding: 0;
-            &.editing {
-                background-color: $input-focus-bg-color;
-            }
-        }
 
         // A criterion that is being edited
         &.editing {
-            .criterion-descriptor-points {
-                display: block;
-                text-align: center;
-            }
             // A descriptor within this criterion
             .criterion-descriptor {
                 width: 1.5rem;
-
-                // The criterion that is being edited
-                &.editing {
-                    .criterion-descriptor-points:after {
-                        display: block;
-                        content: "points";
-                        position: absolute;
-                        top: 0;
-                        line-height: 2.5rem;
-                        left: 3.5rem;
-                    }
-                }
                 > textarea {
                     height: 10rem;
-                    border: none;
                     border-bottom: $input-border-style $input-border-width $input-border-color;
                 }
             }
@@ -135,11 +109,6 @@ table.rubric {
             }
         }
 
-        input[readonly] {
-            text-align: right;
-            padding: 0.375rem 0 !important;
-        }
-
         .criterion-descriptor-points {
             position: relative;
             display: none;
@@ -150,59 +119,48 @@ table.rubric {
                 width: 100%;
                 padding: 0;
                 @extend %sm;
+                display: inline-block;
             }
         }
 
         // the table that wraps a crit's descriptors
         .criterion-descriptors {
             margin-top: 0.875rem;
-            border: $input-border-style $input-border-width $input-border-color;
-            tr:hover td {
-                background-color: $input-hover-bg-color;
-            }
         }
 
         // A single descriptor
         .criterion-descriptor {
+            .criterion-descriptor-points input {
+                width: 3rem;
+                text-align: center;
+            }
 
             @extend .no-pad;
             // A descriptor that is being edited right now
             &.editing {
                 background-color: $input-focus-bg-color;
-                .criterion-descriptor-points input {
-                    width: 3rem;
-                    text-align: center;
+                .criterion-descriptor-points {
+                    display: inline-block;
+                }
+                > textarea {
+                    min-width: 10rem;
                 }
             }
             &:not(:last-child) {
                 border-right: $input-border-style $input-border-width $input-border-color;
             }
-            &:hover {
-                background: $white !important;
-            }
             > textarea {
                 width: 100%;
                 height: 3.75rem;
-                min-width: 10rem;
                 margin: 0;
                 resize: none;
                 //.transition(min-width 60ms ease, height 60ms ease);
-                &[readonly] {
-                    min-width: 0;
-                    overflow: hidden;
-                    padding: 0.125rem !important;
-                }
+                min-width: 0;
+                overflow: hidden;
             }
             *:hover {
                 cursor: pointer;
             }
-        }
-
-        /* overcome the stratospheric specificity on inputs */
-        textarea[readonly], input[readonly] {
-            border-color: transparent !important;
-            background: transparent !important;
-            box-shadow: none !important;
         }
     }
 }
