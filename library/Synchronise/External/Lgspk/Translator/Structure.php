@@ -16,7 +16,10 @@ class Synchronise_External_Lgspk_Translator_Structure extends Synchronise_Extern
      */
     public function output()
     {
-//        $reducer = new External_Isams_Batch_Reader_Iterator_Student_Reduce();
+        $reducer = new Synchronise_External_Lgspk_Translator_Structure_Reduce();
+        $result  = [
+            'periods' => [],
+        ];
         foreach (
             new Synchronise_External_Lgspk_Translator_Structure_Map(
                 new Alaress\Xml\Filter\Path(
@@ -25,21 +28,21 @@ class Synchronise_External_Lgspk_Translator_Structure extends Synchronise_Extern
                 )
             ) as $row
         ) {
-            var_dump($row);
-//            $result = $reducer($result, $row);
+            $result = $reducer($result, $row);
         }
+        var_dump($result);
 
-        // Use External\Importer\TimetableStructure to create fields?
-        $fields = [
-            'Term Campus'   => 'The campus to create a term for (must correspond to a campus code in Schoolbox)',
-            'Term Title'    => 'The name of the term',
-            'Term Start'    => 'The date on which the term starts',
-            'Term Finish'   => 'The date on which the term finishes',
-            'Term Offset'   => 'The day number that "Term Start" is',
-            'Period Day'    => 'The day number that this period is on',
-            'Period Title'  => 'The name of this period',
-            'Period Start'  => 'The time at which this period starts',
-            'Period Finish' => 'The time at which this period finishes',
-        ];
+//        // Use External\Importer\TimetableStructure to create fields?
+//        $fields = [
+//            'Term Campus'   => 'The campus to create a term for (must correspond to a campus code in Schoolbox)',
+//            'Term Title'    => 'The name of the term',
+//            'Term Start'    => 'The date on which the term starts',
+//            'Term Finish'   => 'The date on which the term finishes',
+//            'Term Offset'   => 'The day number that "Term Start" is',
+//            'Period Day'    => 'The day number that this period is on',
+//            'Period Title'  => 'The name of this period',
+//            'Period Start'  => 'The time at which this period starts',
+//            'Period Finish' => 'The time at which this period finishes',
+//        ];
     }
 }
