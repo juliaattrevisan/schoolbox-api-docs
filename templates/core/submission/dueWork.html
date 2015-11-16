@@ -165,15 +165,27 @@
                     /* Show loading div right in the middle
                      */
                     if (isLoading === true) {
-                        calendarLoadingElement.foundation('reveal','open');
+                        calendarLoadingElement
+                            .data('opened', false)
+                            .foundation('reveal', 'open')
+                            .one('opened.fndtn.reveal', function() {
+                                calendarLoadingElement.data('opened', true);
+                            });
                     }
                     /* Has finished loading
                      */
                     else {
                         /* Hide loading div
+                         * Is it open? close it
+                         * Is it not yet open? close it when it is open
                          */
-                        calendarLoadingElement.foundation('reveal','close');
-
+                        if (calendarLoadingElement.data('opened')) {
+                            calendarLoadingElement.foundation('reveal', 'close');
+                        } else {
+                            calendarLoadingElement.one('opened.fndtn.reveal', function() {
+                                calendarLoadingElement.foundation('reveal', 'close');
+                            });
+                        }
                         var d = c.dom.fullCalendar('getDate');
                         $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'));
                     }
