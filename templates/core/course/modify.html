@@ -68,7 +68,13 @@
                                 <input name="unit[{UNIT_COUNT}][import]" type="hidden" value="0" />
                                 <div class="list-item" data-type="unit_row">
                                     <div class="info card small-12 medium-6">
-                                        <input id="import-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" {UNIT_ENABLED_CHECKED} />
+                                        <input id="import-{UNIT_COUNT}"
+                                               name="unit[{UNIT_COUNT}][import]"
+                                               type="checkbox"
+                                               value="1"
+                                               data-interaction="enable"
+                                               data-unit-instance-id="{UNIT_INSTANCE_ID}"
+                                               {UNIT_ENABLED_CHECKED} />
                                         <label for="import-{UNIT_COUNT}" class="checkbox-label">{UNIT_NAME}</label>
                                     </div>
                                     <div class="small-12 medium-3 columns" data-hide-watch="#import-{UNIT_COUNT}">

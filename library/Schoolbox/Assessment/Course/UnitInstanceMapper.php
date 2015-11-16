@@ -110,6 +110,7 @@ class UnitInstanceMapper extends Mapper {
         $this->registerCallback('postSave',       array($this, 'postSave'));
         $this->registerCallback('postDelete',     array($this, 'postDelete'));
         $this->registerCallback('postSoftDelete', array($this, 'postDelete'));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'postRestore'));
     }
 
     /**
@@ -535,6 +536,23 @@ class UnitInstanceMapper extends Mapper {
             $task_instance_mapper->findByColumn(
                 'course_unit_instance_id',
                 $object->getId()
+            )
+        );
+    }
+
+    /**
+     * Post-restore callback - restores all task instances that are related to
+     * this item.
+     *
+     * @param UnitInstance $object
+     */
+    protected function postRestore(UnitInstance $object) {
+        $task_instance_mapper = Task\InstanceMapper::getInstance();
+        $task_instance_mapper->restoreSoftDeleted(
+            $task_instance_mapper->findByColumn(
+                'course_unit_instance_id',
+                $object->getId(),
+                ['deleted' => true,]
             )
         );
     }

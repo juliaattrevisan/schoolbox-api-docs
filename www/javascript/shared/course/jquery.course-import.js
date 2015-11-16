@@ -13,12 +13,27 @@
             inputs.prop('disabled', !is_now_enabled);
             row.data('enabled', is_now_enabled);
         };
-        form.on('click.courseImport', 'input[data-interaction="enable"]', function() {
+        form.on('change.courseImport', 'input[data-interaction="enable"]', function() {
             enableUnitClickEvent($(this));
         });
-        form.find('input[data-interaction="enable"]').each(function() {
-            enableUnitClickEvent($(this));
-        });
+        form.find('input[data-interaction="enable"]')
+            .each(function() {
+                enableUnitClickEvent($(this));
+            })
+            // Add a delete prompt when unchecking a unit that is in the course
+            .filter(':checked')
+            .on('click.courseImport', function(e) {
+                var element = $(this);
+                if (!element.prop('checked') && element.data('unitInstanceId')) {
+                    e.preventDefault();
+                    element.confirmDialog({
+                        text: 'Removing a unit from a class will delete the unit and all of its tasks. Are you sure you wish to do this? (They may be restored by adding the unit back to the class through this page.)',
+                        confirmEvent: function() {
+                            element.prop('checked', false).trigger('change.courseImport');
+                        }
+                    });
+                }
+            });
 
         // Form validation: Run the validation on submit only
         form.validate();

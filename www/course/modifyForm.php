@@ -46,9 +46,11 @@ if (!$permission_denied) {
     /** @var Collection|UnitInstance[] $deleted_list */
     $saved_list   = new Collection();
     $deleted_list = new Collection();
+    $undeletedIds = [];
+    $unitMapper   = UnitInstanceMapper::getInstance();
     if ($_POST['action'] === 'delete') {
         // Add only the course instances in $_POST[id] to the list to be deleted.
-        $deleted_list = UnitInstanceMapper::getInstance()->findByColumnList(
+        $deleted_list = $unitMapper->findByColumnList(
             array(
                 'id'           => $_POST['id'],
                 'component_id' => $component_id,
@@ -60,21 +62,32 @@ if (!$permission_denied) {
             // Figure out which unit instance ID (if any) is attached
             $unit_id   = $unit_data['unit_id'];
             $import    = !empty($unit_data['import']);
+            $deleted   = false;
             $open_date = Alaress_Date_Format::newLocalShort($unit_data['open_date']);
             $due_date  = Alaress_Date_Format::newLocalShort($unit_data['due_date']);
             try {
+                /** @var UnitInstance $course_instance */
                 // Is there a unit instance? If so fetch it, otherwise fetch by unit
                 // category and component.
                 if (!empty($unit_data['unit_instance_id'])) {
-                    $course_instance = UnitInstanceMapper::getInstance()->findById($unit_data['unit_instance_id']);
+                    $course_instance = $unitMapper->findById($unit_data['unit_instance_id']);
                 }
                 else {
-                    $course_instance = UnitInstanceMapper::getInstance()->findOneByColumnList(
-                        array(
-                            'component_id'     => $component_id,
-                            'unit_category_id' => $unit_id,
-                        )
-                    );
+                    // Try to restore a course before creating a new one.
+                    try {
+                        $course_instance = $unitMapper->findOneByColumnList(
+                            array(
+                                'component_id'     => $component_id,
+                                'unit_category_id' => $unit_id,
+                            )
+                        );
+                    } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                        // Deleted? Attempt to restore it
+                        // (Restoration of related tasks is handled in postRestore callbacks)
+                        $course_instance = $e->getDeletedObject();
+                        $unitMapper->restoreSoftDeleted($course_instance);
+                        $undeletedIds[$course_instance->getId()] = true;
+                    }
                 }
                 if ($import) {
                     $course_instance
@@ -106,18 +119,21 @@ if (!$permission_denied) {
         }
     }
     if (count($saved_list)) {
-        if (UnitInstanceMapper::getInstance()->save($saved_list)) {
+        if ($unitMapper->save($saved_list)) {
             // Update due dates of items, if required
             $taskMapper = Task\InstanceMapper::getInstance();
             foreach ($saved_list as $savedInstance) {
                 $unitInstanceId = $savedInstance->getId();
                 $updateOpenDate = true;
                 $updateDueDate  = true;
-                foreach ($_POST['unit'] as $unitPost) {
-                    if ($unitPost['unit_instance_id'] == $unitInstanceId) {
-                        $updateOpenDate = $unitPost['update_open_date'];
-                        $updateDueDate  = $unitPost['update_due_date'];
-                        break;
+                $undelete       = array_key_exists($unitInstanceId, $undeletedIds);
+                if (!$undelete) {
+                    foreach ($_POST['unit'] as $unitPost) {
+                        if ($unitPost['unit_instance_id'] == $unitInstanceId) {
+                            $updateOpenDate = $unitPost['update_open_date'];
+                            $updateDueDate  = $unitPost['update_due_date'];
+                            break;
+                        }
                     }
                 }
 
@@ -146,7 +162,7 @@ if (!$permission_denied) {
         }
     }
     if (count($deleted_list)) {
-        UnitInstanceMapper::getInstance()->delete($deleted_list);
+        $unitMapper->delete($deleted_list);
     }
 }
 
