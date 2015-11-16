@@ -42,6 +42,7 @@ if (Config::get('skin_builder')) {
         'logo-background' => Config::get('skin_colour_logo_background'),
         'body-bg'         => Config::get('skin_colour_body_bg'),
         'button-input-scale' => Config::get('skin_button_input_scale'),
+        'login-form-background-color' => Config::get('skin_colour_login_background'),
 
 //        'primary-color'   => Config::get('skin_primary_colour'),
 //        'secondary-color' => Config::get('skin_secondary_colour'),
