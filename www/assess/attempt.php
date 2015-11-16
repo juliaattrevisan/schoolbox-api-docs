@@ -147,8 +147,21 @@ if ($allQuestions) {
     $randomQuestionNumber = 1;
 
     foreach ($allQuestions as $currentQuestion) {
+
+        /* Ignore questions that don't exist, or cannot be determined
+         * This formerly used to error() critically whenever type_id
+         * didn't save properly for whatever reason
+         *
+         * Unfortunately that also occurred whenever a section has no
+         * questions in it - so instead of fatally dying, just ignore
+         * and continue
+         */
         if (!is_numeric($currentQuestion['type_id'])) {
-            error(133);
+            $this->setVar(array(
+                'question_block' => ''
+            ));
+
+            continue;
         }
 
         $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
