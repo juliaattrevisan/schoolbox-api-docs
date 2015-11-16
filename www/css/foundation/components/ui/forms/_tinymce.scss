@@ -33,7 +33,32 @@ body#tinymce span.selected-word{
     }
 }
 
-table.mceLayout tr td {
+// Tables
+.mceEditor table{
+	background: transparent;
+	margin: 0;
+	td{
+		padding: 0;
+	}
+}
+.cirkuitSkin .mceButton {
+	height: auto;
+	width: auto;
+    min-height: initial;
+}
+.cirkuitSkin .mceSplitButton a.mceOpen, .cirkuitSkin .mceSplitButton a.mceAction {
+    min-height: initial;
+}
+
+.mceLayout{
+	border: 1px solid #ccc;
+}
+
+table.mceLayout tbody tr td {
+    background-color: transparent;
+}
+
+table.mceLayout tbody tr:hover td {
     background-color: transparent;
 }
 
