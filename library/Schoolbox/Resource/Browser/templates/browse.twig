@@ -189,19 +189,12 @@
 
                 jstree.create_node(parent, newNode, 'last', function (freshNode) {
                     $(file.previewElement).data('node', freshNode);
-                    console.log('node creation done:' + freshNode.id);
                 });
-
-                // console.log(openNode, name, $(file.previewElement).data());
             },
 
             sending: function (file, xhr, formData) {
 
-                console.log('sending commenced');
-
                 var data = $(file.previewElement).data();
-
-                console.log(data);
 
                 if (data) {
                     // jam file data into form data
