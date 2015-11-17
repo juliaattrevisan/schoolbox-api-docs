@@ -30,6 +30,7 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 
 .dropzone-wrap {
     position: relative;
+    min-height: 4.5rem;
 }
 
 .dropzone {
@@ -273,7 +274,7 @@ ul.az-error-list {
 }
 
 .attachzone, .dropzone-wrap {
-    min-width: 40px;
+    min-width: 2.5rem;
     margin-bottom: 1rem;
     &.dz-unsupported,
     &.dz-max-files-reached {
