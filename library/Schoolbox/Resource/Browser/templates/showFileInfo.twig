@@ -38,15 +38,21 @@ These are its args, which is given for you
 <div class="row">
     <div class="small-4 column text-center">
         {% if file.mimetype.isImage %}
-            <img class="icon" src="{{ image ~ file.id }}&width=128&height=128" alt="{{ file.title }}" />
+            <a data-plugin="preview" href="{{ send ~ file.id }}&width=1024&height=1024">
+                <img class="icon" src="{{ image ~ file.id }}&width=128&height=128" alt="{{ file.title }}" />
+            </a>
         {% else %}
-            <img class="icon" src="{{ mime ~ file.mimetype.iconFile }}" alt="{{ file.title }}" />
+            <a href="{{ send ~ file.id }}" target="_blank">
+                <img class="icon" src="{{ mime ~ file.mimetype.iconFile }}" alt="{{ file.title }}" />
+            </a>
         {% endif %}
     </div>
     <div class="small-8 column">
         <div class="actions-small-1">
             <div class="list-item">
-                <h3>{{ file.title }}</h3>
+                <a href="{{ send ~ file.id }}" target="_blank">
+                    <h3>{{ file.title }}</h3>
+                </a>
             </div>
             <nav>
                 <a href="#" class="icon-eye" data-reveal-id="modal-file-{{ file.id }}"></a>
@@ -82,9 +88,9 @@ These are its args, which is given for you
 
     </div>
 </div>
-{% else %}
-<li>
-    <img class="icon" src="/images/core/icons/error-icon.png" alt="No access"/>
-    <h3>No access</h3>
-</li>
+<script type="text/javascript">
+    $(function() {
+        $('[data-plugin="preview"]','#content').preview();
+    });
+</script>
 {% endif %}
