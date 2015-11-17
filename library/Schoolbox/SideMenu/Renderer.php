@@ -55,6 +55,14 @@ class Renderer
             $children = $menuItem->getChildren();
 
             if (count($children)) {
+                // Does this menu item have both children and a link?
+                // Add a copy of the link to the foot of the tree.
+                $url = $menuItem->getUrl();
+                if ($url && $url != '#') {
+                    $copy = clone $menuItem;
+                    $copy->setChildren(new Collection());
+                    $children->prepend($copy);
+                }
                 $text .= '<li class="has-submenu">' . $aTag;
                 $text .= $this->renderTree($children, ($level + 1));
             } else {
