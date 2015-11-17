@@ -1480,25 +1480,6 @@ p{
 	}
 }
 
-// Tables
-.mceEditor table{
-	background: transparent;
-	margin: 0;
-	tr{
-		background: $white;
-	}
-	td{
-		padding: 0;
-	}
-}
-.cirkuitSkin .mceButton {
-	height: auto;
-	width: auto;
-}
-.mceLayout{
-	border: 1px solid #ccc;
-}
-
 .table-actions{
 	[class^="icon-"]:before,
 	[class*=" icon-"]:before{
