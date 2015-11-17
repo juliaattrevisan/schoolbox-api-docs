@@ -8,21 +8,21 @@
 
 <div class="row">
     <div class="small-4 column text-center">
-        <a{% if folder.hasHomepage %} title="View Homepage" href="/homepage/{{ folder.id }}"{% endif %}>
-        <img class="icon" src="/images/icons/128x128/{{ folder.folderType }}.png" alt="{{ folder.name }}"/>
-        </a>
+        {% if folder.hasHomepage %}<a title="View Homepage" href="/homepage/{{ folder.id }}">{% endif %}
+            <div class="icon-{{ folder.folderType }} icon-64" alt="{{ folder.name }}"></div>
+        {% if folder.hasHomepage %}</a>{% endif %}
     </div>
     <div class="small-8 column">
         <div class="actions-small-1">
             <div class="list-item">
-                <a{% if folder.hasHomepage %} title="View Homepage" href="/homepage/{{ folder.id }}"{% endif %}>
+                {% if folder.hasHomepage %}<a title="View Homepage" href="/homepage/{{ folder.id }}">{% endif %}
                     <h3>
                         {{ folder.name }}
                         {% if folder.codeString %}
                             ({{ folder.codeString }})
                         {% endif %}
                     </h3>
-                </a>
+                {% if folder.hasHomepage %}</a>{% endif %}
 
                 <ul class="inline-list">
 
@@ -124,12 +124,5 @@
 
     </div>
 </div>
-
-
-{% else %}
-<li>
-    <img class="icon" src="/images/core/icons/error-icon.png" alt="No access"/>
-    <h3>No access</h3>
-</li>
 {% endif %}
 
