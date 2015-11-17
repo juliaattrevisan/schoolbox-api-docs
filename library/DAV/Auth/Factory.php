@@ -26,12 +26,14 @@ class DAV_Auth_Factory
     {
         switch ($this->config->get('webdav_auth_type')) {
             case 'basic':
-                return new DAV_Auth_Basic();
+                $auth = new DAV_Auth_Basic();
                 break;
             case 'digest':
             default:
-                return new DAV_Auth_Digest();
+                $auth = new DAV_Auth_Digest();
                 break;
         }
+        $auth->setRealm($this->config->get('site_location'));
+        return $auth;
     }
 }

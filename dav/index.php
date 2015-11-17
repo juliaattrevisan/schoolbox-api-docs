@@ -22,10 +22,7 @@ $server->addPlugin($lockPlugin);
 
 $config = new \Schoolbox\Config\ConfigMapper();
 $authBackendFactory = new DAV_Auth_Factory($config);
-$authPlugin = new Sabre\DAV\Auth\Plugin(
-    $authBackendFactory->build(),
-    $config->get('site_location')
-);
+$authPlugin = new Sabre\DAV\Auth\Plugin($authBackendFactory->build());
 $server->addPlugin($authPlugin);
 
 //$server->addPlugin(new DAV_ExceptionPlugin());
