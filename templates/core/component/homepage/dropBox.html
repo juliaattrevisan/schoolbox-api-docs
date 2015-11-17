@@ -13,7 +13,6 @@
             $('#component{COMPONENT_INSTANCE_ID}-dropBox').validate();
 
             $('#component{COMPONENT_INSTANCE_ID}').find('[data-delete]').click(function(event) {
-                console.log('fox');
                 event.preventDefault();
 
                 var element = $(this);
@@ -31,7 +30,7 @@
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
-            <section class="content">
+            <section>
                 <!-- BEGIN drop_student -->
                 <form action="/subject/modDropBox.php" method="post" enctype="multipart/form-data" id="component{COMPONENT_INSTANCE_ID}-dropBox" >
                     <input type="hidden" name="category" value="{ID}" />
@@ -54,8 +53,8 @@
                         <div class="list-item">
                             <div class="avatar card small-12">
                                 <a href="/subject/modDropBox.php?id={DROPBOX_ID}" title="View File" rel="external">
-                                    <img src="/images/mime/60x60/{DROPBOX_MIME_IMAGE}" />
-                                    <p>{DROPBOX_DESCRIPTION}</p>
+                                    <img src="/images/mime/60x60/{DROPBOX_MIME_IMAGE}" class="mime"/>
+                                    <h3>{DROPBOX_DESCRIPTION}</h3>
                                 </a>
                                 <p class="meta">
                                     By {DROP_SUBMITTED_BY} on {DROP_SUBMITTED_TIME}

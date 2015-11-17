@@ -1,7 +1,22 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container' data-component>
     <a id="textbox{TEXTBOX_ID}"></a>
     <!-- Custom javascript -->
+    <script type="text/javascript">
+        $(function() {
+            $('#component{COMPONENT_INSTANCE_ID}').find('[data-delete]').click(function (event) {
+                event.preventDefault();
 
+                var element = $(this);
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this content permanently?',
+                    confirmEvent: function () {
+                        window.location.href = element.attr('href');
+                    }
+                });
+            });
+        });
+
+    </script>
     {CONFIGURATION}
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
@@ -51,8 +66,8 @@
 
                 <div class="content">
                     <!-- BEGIN modify_text -->
-                    <a href="/textbox/textBoxForm.php?delete={TEXTBOX_ID}&originID={ID}" onclick="return confirm('Are you sure you want to delete this text box?');" class="button icon-delete">Delete</a>
                     <a href="/homepage/{ID}/textBoxModify/{COMPONENT_INSTANCE_ID}#go-to{COMPONENT_INSTANCE_ID}" class="button icon-modify">Modify</a>
+                    <a href="/textbox/textBoxForm.php?delete={TEXTBOX_ID}&originID={ID}" data-delete class="button icon-delete">Delete</a>
                     <!-- END modify_text -->
                     <!-- BEGIN create_text -->
                     <a href="/homepage/{ID}/textBoxCreate/{COMPONENT_INSTANCE_ID}" class="button icon-add">Create</a>

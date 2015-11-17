@@ -1,3 +1,10 @@
+<ul class="breadcrumb">
+    <li><a href="/submission/listSubmission">Submissions</a></li>
+    <li><a href="/submission/listSubmission/{{ box.duedate.getYear }}/{{ box.duedate.getMonth // 6 + 1 }}/{{ box.category.id }}">{{ box.category.name }}</a></li>
+    <li><a href="/submission/viewSubmission/{{ box.id }}">{{ box.name }}</a></li>
+    <li class="active"><a href="#">Overview</a></li>
+</ul>
+
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 columns">
