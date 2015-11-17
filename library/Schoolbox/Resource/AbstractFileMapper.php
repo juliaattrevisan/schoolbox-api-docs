@@ -90,8 +90,6 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
 
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joins('hash', Resource\Storage\Mapper::class, 'hash', null, null, 'storage');
-
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'postSave' ]);
     }
 
 

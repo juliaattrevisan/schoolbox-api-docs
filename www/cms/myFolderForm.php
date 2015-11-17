@@ -40,7 +40,11 @@ elseif (is_numeric($_GET['delete'])) {
 
     $folderHandler->delete($_GET['delete']);
 
-    SitePage::localRedir('/my-files/' . $folder['parent']);
+    if (isset($_REQUEST['ajax'])) {
+        die(json_encode(['result' => 'success']));
+    } else {
+        SitePage::localRedir('/my-files/' . $folder['parent']);
+    }
 }
 elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
     /* Move file from one category to another, after checking permission on both from and to categories */

@@ -44,7 +44,9 @@ else {
 	}
 }
 
-if($_GET['return'])
+if (isset($_REQUEST['ajax'])) {
+	die(json_encode(['result' => 'success']));
+} elseif($_GET['return'])
     SitePage::backToTheFuture(1);
 else
     SitePage::localRedir('/cms/myLinks');

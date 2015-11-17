@@ -8,6 +8,6 @@
         <li><a class="icon-download" data-action="download" href="#">Download</a></li>
     {% endif %}
     {% if access >= 2 or user.isSuperuser %}
-        <li><a class="icon-delete"   data-action="delete"   href="#">Delete</a></li>
+        <li><a class="icon-delete"   data-action="delete"   href="/cms/myFolderForm.php?ajax=1&delete={{ folder.id }}">Delete</a></li>
     {% endif %}
 {% endif %}

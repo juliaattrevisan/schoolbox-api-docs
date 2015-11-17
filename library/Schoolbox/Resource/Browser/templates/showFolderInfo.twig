@@ -1,4 +1,3 @@
-{#<ul class="information-list">#}
 {% if access > 0 or user.isSuperuser %}
 
 <ul class="breadcrumb">
@@ -35,8 +34,6 @@
                             {% set type = 'group' %}
                         {% endif %}
 
-                        {#<h4>Group</h4>#}
-                        {#<h5 class="subheader">Administrator</h5>#}
                         <li class="meta">
                             {% if folder.group.private   %}Private {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Users cannot see or join this {{ type }} unless added by an admin">?</span>{% endif %}
                             {% if folder.group.moderated %}Moderated {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Users can join, but only once access is approved by an admin">?</span>{% endif %}
@@ -135,6 +132,4 @@
     <h3>No access</h3>
 </li>
 {% endif %}
-{#</ul>#}
-{#{{ dump(admin) | raw }}#}
 
