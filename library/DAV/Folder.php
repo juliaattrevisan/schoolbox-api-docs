@@ -45,7 +45,7 @@ class DAV_Folder extends Sabre\DAV\Collection
         $this->setFolderFromPath($path);
 
         // Name may be configurable later on.
-        $this->subject_list = new DAV_SubjectServer_SubjectList('/My Subjects');
+        $this->subject_list = new DAV_SubjectServer_SubjectList('My Subjects');
     }
 
 
@@ -123,7 +123,11 @@ class DAV_Folder extends Sabre\DAV\Collection
             }
         }
 
-        $this_folder = $this->myPath.'/'.$name;
+        if (strlen($this->myPath) === 0) {
+            $this_folder = $name;
+        } else {
+            $this_folder = $this->myPath.'/'.$name;
+        }
 
         if ($this_folder === $this->subject_list->getName()) {
             $user_mapper = new UserMapper();
@@ -150,7 +154,7 @@ class DAV_Folder extends Sabre\DAV\Collection
             if ($result->count()) {
                 return new DAV_File($this->myPath.'/'.$result->first()->getBasename());
             } else {
-                throw new Sabre\DAV\Exception\NotFound('The file with name "' . $name . ' could not be found');
+                throw new Sabre\DAV\Exception\NotFound('The file with name "' . $name . '" could not be found');
             }
         }
 
