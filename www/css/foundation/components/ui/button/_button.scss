@@ -53,6 +53,7 @@ a[disabled], a.disabled {
 
 	&:empty {
 		@extend .no-text;
+		line-height: rem-calc($base-font-size + 3);
 	}
 
 	// Fat button - for when you need a button larger than Steve's mama
