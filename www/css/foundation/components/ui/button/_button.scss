@@ -54,12 +54,9 @@ a[disabled], a.disabled {
 	&:empty {
 		@extend .no-text;
 		&:after {
-			// Ensure empty buttons have line-height of button's non-Schoolbox font
-			// This is some dark magick
-			content: '\a0';
-			position: absolute;
-			top: 0;
-			left: 0;
+			// Use dark magick to ensure empty buttons have line-height of button's non-Schoolbox font.
+			// (This is a zero-width non-joiner - it has the same line height as the font.)
+			content: '\200C';
 		}
 	}
 
