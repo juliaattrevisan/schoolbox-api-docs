@@ -25,6 +25,7 @@ $masonry-drop-background: $input-focus-bg-color;
   background-color: $masonry-drop-background;
 }
 
+
 /* The drag/drop in Component tab
  */
 .component-palette {
@@ -58,6 +59,14 @@ $masonry-drop-background: $input-focus-bg-color;
         }
     }
 }
+
+// Padding when dropping a component onto the page before it is ajaxed in
+#component-layout {
+  .pending {
+      margin-bottom: 2rem;
+  }
+}
+
 
 // Disabled components in the palette
 
