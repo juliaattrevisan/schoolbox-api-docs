@@ -53,6 +53,14 @@ a[disabled], a.disabled {
 
 	&:empty {
 		@extend .no-text;
+		&:after {
+			// Ensure empty buttons have line-height of button's non-Schoolbox font
+			// This is some dark magick
+			content: '\a0';
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
 	}
 
 	// Fat button - for when you need a button larger than Steve's mama
