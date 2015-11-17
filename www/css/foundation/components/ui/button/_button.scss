@@ -53,7 +53,11 @@ a[disabled], a.disabled {
 
 	&:empty {
 		@extend .no-text;
-		line-height: rem-calc($base-font-size + 3);
+		&:after {
+			// Use dark magick to ensure empty buttons have line-height of button's non-Schoolbox font.
+			// (This is a zero-width non-joiner - it has the same line height as the font.)
+			content: '\200C';
+		}
 	}
 
 	// Fat button - for when you need a button larger than Steve's mama
