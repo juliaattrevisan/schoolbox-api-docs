@@ -6,7 +6,7 @@
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class MssqlResultIterator implements Iterator
+class MssqlResultIterator implements SeekableIterator
 {
     /**
      * @var resource
@@ -84,5 +84,18 @@ class MssqlResultIterator implements Iterator
     {
         $this->rowNum = 0;
         mssql_data_seek($this->result, 0);
+    }
+
+    /**
+     * Seeks to a position
+     *
+     * @var int $position
+     */
+    public function seek($position)
+    {
+        if (mssql_data_seek($this->result, $position)) {
+            $this->rowNum = $position;
+        }
+        throw new OutOfBoundsException(sprintf('Position "%s" is out of bounds', $position));
     }
 }
