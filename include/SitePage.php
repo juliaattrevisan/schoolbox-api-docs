@@ -343,6 +343,7 @@ class SitePage extends Page
             'SITE_CHROME_LOCATION'   => (Config::get('skin_builder') ? 'demo' : $this->site),
             'USER_ID'                => $_SESSION['id'],
             'EXTERNAL_ID'            => $_SESSION['sid'],
+            'USER_ROLE'              => $_SESSION['user']->getRole()->getName(),
             'SITE_VERSION'           => Cfg::get('site_version'),
             'SCHOOL_ADDRESS'         => Cfg::get('school_address'),
             'DEBUGBAR'               => $debug_bar_body,
