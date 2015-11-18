@@ -20,26 +20,35 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
 
-$d = new Logger(STDOUT, STDERR, $limits[$threshold]);
-$d->info("Testing external dependencies are online...");
+$threshold = 0;
+if(isset($opts['v'])) {
+    $threshold = 1;
+    if(is_array($opts['v'])) {
+        $threshold = min(3, count($opts['v']));
+    }
+}
+$limits = array(
+    0 => 500, // nil verbosity: exceptional behaviour only
+    1 => 250, // min verbosity: significant events
+    2 => 200, // mod verbosity: most things
+    3 => 100  // max verbosity: EV-ER-Y-THING...
+);
+
+/**
+ * Builds a logger
+ *
+ * @return Logger
+ */
+$buildLogger = function () use ($limits, $threshold) {
+    return new Logger(STDOUT, STDERR, $limits[$threshold]);
+};
 
 try {
     new \Schoolbox\Application\Daemon\Kernel('System Check');
 
-    $threshold = 0;
-    if(isset($opts['v'])) {
-        $threshold = 1;
-        if(is_array($opts['v'])) {
-            $threshold = min(3, count($opts['v']));
-        }
-    }
-
-    $limits = array(
-        0 => 500, // nil verbosity: exceptional behaviour only
-        1 => 250, // min verbosity: significant events
-        2 => 200, // mod verbosity: most things
-        3 => 100  // max verbosity: EV-ER-Y-THING...
-    );
+    /** @var Logger $d */
+    $d = $buildLogger();
+    $d->info("Testing external dependencies are online...");
 
     // test database is online
     if (!Database::getInstance()->isConnected()) {
@@ -70,7 +79,17 @@ try {
     }
 
 } catch (PDOException $e) {
-    $d->alert('MySQL is offline: cannot read Redis or RabbitMQ config');
+    // Logger might not have been set up if MySQL config failed.
+    // In fact, the autoloader might not even have been set up.
+    if (!$d instanceof Logger && class_exists(Logger::class)) {
+        $d = $buildLogger();
+    }
+    $msg = 'MySQL is offline: cannot read Redis or RabbitMQ config';
+    if ($d instanceof Logger) {
+        $d->alert($msg);
+    } else {
+        fwrite(STDERR, $msg);
+    }
     $errors = array('MySQL', 'Redis', 'RabbitMQ');
     $mail = false;
 }
