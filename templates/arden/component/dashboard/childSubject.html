@@ -1,0 +1,58 @@
+<div id='component{COMPONENT_INSTANCE_ID}' class='component-container' data-component>
+    <!-- Custom javascript -->
+
+    {CONFIGURATION}
+
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">{COMPONENT_NAME}</h2>
+            <!-- BEGIN student_block -->
+            <section>
+                <ul class="information-list">
+                    <li class="row">
+                        <div class="column no-pad small-12">
+                            <div class="avatar card">
+                                <a href="/search/user/{STUDENT_ID}">
+                                    <img src="/portrait.php?userId={STUDENT_EXTERNAL_ID}&size=constrain64" title="View Profile" />
+                                    <h3>{STUDENT_NAME}</h3>
+                                </a>
+                                <p class="meta">Year {STUDENT_YEAR}</p>
+                            </div>
+
+                            <ul class="action-list">
+                                <!-- BEGIN subject_block -->
+                                <li>
+                                    <div class="info card small-12">
+                                        <span class="icon-home icon-32" title="Visit Homepage"></span>
+                                        <a href="/homepage/code/{STUDENT_SUBJECT_CODE}">{STUDENT_SUBJECT_NAME}</a>
+                                    </div>
+                                </li>
+                                <!-- END subject_block -->
+                            </ul>
+
+                            <div class="content">
+                                <a href="/timetable/{STUDENT_ID}" class="button icon-timetable">Timetable</a>
+                                <a href="/calendar/full/{CAL_TODAY_DATE}/{STUDENT_ID}" class="button icon-calendar">{TPL_LOCAL_CALENDAR_PC}</a>
+
+                                 <!-- BEGIN due_work -->
+                                <a href="/submission/dueWork/0/{STUDENT_ID}" class="button icon-due-work">Due Work</a>
+                                 <!-- END due_work -->
+
+                                 <!-- BEGIN grades_button -->
+                                <a href="/submission/allWork/{STUDENT_ID}" class="button icon-poll" title="View grades">Grades</a>
+                                 <!-- END grades_button -->
+
+                                 <!-- BEGIN eportfolio -->
+                                <a href="/eportfolio/{STUDENT_ID}/profile" class="button icon-eportfolio">ePortfolio</a>
+                                 <!-- END eportfolio -->
+                                <a href="/synergetic/Docs/?id={STUDENT_EXTERNAL_ID}" class="button icon-document">Reports</a>
+
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+            <!-- END student_block -->
+        </div>
+    </div>
+</div>
