@@ -335,6 +335,8 @@ class MSSQL {
 	 * Gets an 3 dimensional associative array of all rows returned by query,
 	 * returns false if no rows
 	 *
+	 * @deprecated Use getIterator() instead if possible.
+	 *
 	 * @param string $sql_q
 	 * @return array|bool
 	 */
@@ -354,6 +356,16 @@ class MSSQL {
 			return false;
 	}
 
+	/**
+	 * Gets an iterator over a query.
+	 *
+	 * @param string $sql_q
+	 * @return Iterator
+	 */
+	function getIterator($sql_q)
+	{
+		return new MssqlResultIterator($this->query($sql_q));
+	}
 
 	/**
 	 * Returns the next result from a query result resource
