@@ -11,6 +11,10 @@ if($_SESSION['communityLogin']) {
 		$url->setPath('/'.$_GET['page'].'.aspx');
 	}
 
+	if($_GET['id']){
+		$url->setQuery(array('id'=>$_GET['id']));
+	}
+
 	/* If no menu requested turn it off */
 	if($_GET['menu']) {
 		$url->setQuery(array('menu'=>0));
