@@ -27,5 +27,5 @@ abstract class Synchronise_External_Lgspk_Translator_Base
      *
      * @return Iterator
      */
-    abstract public function output();
+    abstract public function translateXmlToArray();
 }
