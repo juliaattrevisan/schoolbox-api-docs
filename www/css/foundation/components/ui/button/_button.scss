@@ -55,8 +55,10 @@ a[disabled], a.disabled {
 		@extend .no-text;
 		&:after {
 			// Use dark magick to ensure empty buttons have line-height of button's non-Schoolbox font.
-			// (This is a zero-width non-joiner - it has the same line height as the font.)
-			content: '\200C';
+			content: ".";
+			visibility: hidden;
+			display: inline-block;
+			width: 0;
 		}
 	}
 
