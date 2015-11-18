@@ -82,6 +82,7 @@ class MssqlResultIterator implements Iterator
      */
     public function rewind()
     {
-        // noop: result set always starts at head
+        $this->rowNum = 0;
+        mssql_data_seek($this->result, 0);
     }
 }
