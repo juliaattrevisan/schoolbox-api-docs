@@ -339,6 +339,7 @@ class SitePage extends Page
             'SITE_LOGINNAME'         => $userHandler->formatName($_SESSION),
             'SITE_USERNAME'          => $_SESSION['username'],
             'SITE_LOCATION'          => $this->site,
+            'SITE_ANALYTICS'         => Cfg::get('site_analytics'),
             'SITE_CHROME_LOCATION'   => (Config::get('skin_builder') ? 'demo' : $this->site),
             'USER_ID'                => $_SESSION['id'],
             'EXTERNAL_ID'            => $_SESSION['sid'],
