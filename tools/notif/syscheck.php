@@ -20,6 +20,9 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
 
+$d = new Logger(STDOUT, STDERR, $limits[$threshold]);
+$d->info("Testing external dependencies are online...");
+
 try {
     new \Schoolbox\Application\Daemon\Kernel('System Check');
 
@@ -37,10 +40,6 @@ try {
         2 => 200, // mod verbosity: most things
         3 => 100  // max verbosity: EV-ER-Y-THING...
     );
-
-    $d = new Logger(STDOUT, STDERR, $limits[$threshold]);
-
-    $d->info("Testing external dependencies are online...");
 
     // test database is online
     if (!Database::getInstance()->isConnected()) {
