@@ -48,7 +48,7 @@ class MssqlResultIterator implements Iterator
      */
     public function next()
     {
-        // noop: next happens in valid()
+        $this->rowNum++;
     }
 
     /**
@@ -58,7 +58,7 @@ class MssqlResultIterator implements Iterator
      */
     public function key()
     {
-        return $this->rowNum++;
+        return $this->rowNum;
     }
 
     /**
