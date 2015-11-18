@@ -170,6 +170,16 @@ interface External_UserInterface {
      */
     public function getStudentUserAccountInfo();
 
+//    /**
+//     * Gets a collection of normalized student objects.
+//     *
+//     * This method should return an iterator instead of an array, for memory
+//     * efficiency reasons.
+//     *
+//     * @return Schoolbox\External\Normalise\User\Student[]
+//     */
+//    public function getStudentUserAccountIterator();
+
     /**
      * Returns a list of email parent email addresseses for students.
      *

@@ -832,6 +832,15 @@ class External_Synergetic_User implements External_UserInterface
         ";
         return $this->getDatabase()->getAll($query);
     }
+//
+//    /**
+//     * {@inheritdoc}
+//     */
+//    public function getStudentUserAccountIterator()
+//    {
+//        // Need a result set iterator
+//        $this->getDatabase()
+//    }
 
     /**
      * Gets all Parents' account info from Synergetic
