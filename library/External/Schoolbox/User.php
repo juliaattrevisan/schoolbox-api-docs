@@ -44,10 +44,16 @@ class External_Schoolbox_User implements External_UserInterface
     public function getParentEmails($synergyIds)
     {
         $emailList = array();
-        $id_list   = implode(',', array_map('intval', $synergyIds));
+        $id_list   = [];
+        foreach ($synergyIds as $id) {
+            if (strlen($id)) {
+                $id_list[] = $this->getDatabase()->quote($id);
+            }
+        };
         if (empty($id_list)) {
             return array();
         }
+        $id_list = implode(',', $id_list);
         $statement = $this->getDatabase()->prepare(
             "
             SELECT
