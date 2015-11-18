@@ -152,39 +152,23 @@ class External_Tass_User implements External_UserInterface
         return $parent;
     }
 
-    function getCurrentSemester($externalUserId = null)
+    public function getCurrentSemester($externalUserId = null)
     {
-        if (isset($externalUserId)) {
-            $query = "
-                SELECT tt.curr_sem
-                FROM ttparms tt
-                INNER JOIN student s ON tt.cmpy_code = s.cmpy_code
-                WHERE s.stud_code = {$this->getDatabase()->smartQuote($externalUserId)}";
-        } else {
-            $query = "
-                SELECT curr_sem
-                FROM ttparms
-                WHERE cmpy_code = {$this->getDatabase()->smartQuote($this->companyCode)}
-            ";
-        }
+        $query = "
+            SELECT curr_sem
+            FROM ttparms
+            WHERE cmpy_code = {$this->getDatabase()->smartQuote($this->companyCode)}
+        ";
         return $this->getDatabase()->getOne($query);
     }
 
     public function getCurrentYear($externalUserId = null)
     {
-        if (isset($externalUserId)) {
-            $query = "
-                SELECT tt.curr_year
-                FROM ttparms tt
-                INNER JOIN student s ON tt.cmpy_code = s.cmpy_code
-                WHERE s.stud_code = {$this->getDatabase()->smartQuote($externalUserId)}";
-        } else {
-            $query = "
-                SELECT curr_year
-                FROM ttparms
-                WHERE cmpy_code = {$this->getDatabase()->smartQuote($this->companyCode)}
-            ";
-        }
+        $query = "
+            SELECT curr_year
+            FROM ttparms
+            WHERE cmpy_code = {$this->getDatabase()->smartQuote($this->companyCode)}
+        ";
         return $this->getDatabase()->getOne($query);
     }
 
