@@ -15,16 +15,6 @@ use Schoolbox\External\Normalise\User\Student;
 class External_ParentAccountIterator extends IteratorIterator
 {
     /**
-     * @var resource
-     */
-    protected $result;
-
-    /**
-     * @var array
-     */
-    protected $currentRow = [];
-
-    /**
      * @var int
      */
     protected $rowNum = 0;
@@ -32,7 +22,7 @@ class External_ParentAccountIterator extends IteratorIterator
     /**
      * @var array|Guardian[]
      */
-    protected $stack;
+    protected $stack = [];
 
     /**
      * Loads separate parent records from the iterator, and loads them into

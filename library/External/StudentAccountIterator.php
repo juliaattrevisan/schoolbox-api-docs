@@ -14,21 +14,6 @@ use Schoolbox\External\Normalise\User\Student;
 class External_StudentAccountIterator extends IteratorIterator
 {
     /**
-     * @var resource
-     */
-    protected $result;
-
-    /**
-     * @var array
-     */
-    protected $currentRow = [];
-
-    /**
-     * @var int
-     */
-    protected $rowNum = 0;
-
-    /**
      * Return the current element
      *
      * @return Student
