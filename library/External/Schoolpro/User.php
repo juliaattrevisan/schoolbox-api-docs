@@ -562,6 +562,14 @@ class External_Schoolpro_User implements External_UserInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getParentUserAccountIterator()
+    {
+        // TODO: Implement getParentUserAccountIterator() method.
+    }
+
+    /**
      * Stub method, probably not used
      */
     public function getStaffUserAccountInfo()

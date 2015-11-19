@@ -360,6 +360,14 @@ class Adapter  implements \External_UserInterface {
         return $collection;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getParentUserAccountIterator()
+    {
+        return $this->getHandler()->getParentUserAccountIterator();
+    }
+
     /* Students
      */
 

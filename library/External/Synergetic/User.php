@@ -899,6 +899,14 @@ class External_Synergetic_User implements External_UserInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getParentUserAccountIterator()
+    {
+        // TODO: Implement getParentUserAccountIterator() method.
+    }
+
+    /**
      * Gets all active Staff's account info from Synergetic
      *
      * @return array|bool

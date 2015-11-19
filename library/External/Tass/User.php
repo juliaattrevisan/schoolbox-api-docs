@@ -526,6 +526,14 @@ class External_Tass_User implements External_UserInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getParentUserAccountIterator()
+    {
+        // TODO: Implement getParentUserAccountIterator() method.
+    }
+
+    /**
      * Get contact list for staff directory
      *
      * @return array

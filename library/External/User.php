@@ -191,6 +191,14 @@ class External_User implements External_UserInterface {
 	}
 
 	/**
+	 * {@inheritdoc}
+	 */
+	public function getParentUserAccountIterator()
+	{
+		return $this->getDatabase()->getParentUserAccountIterator();
+	}
+
+	/**
 	 * No usages found
 	 *
 	 * @todo Review usage of method

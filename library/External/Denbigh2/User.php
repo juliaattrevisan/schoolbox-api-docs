@@ -671,6 +671,14 @@ class External_Denbigh2_User implements External_UserInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getParentUserAccountIterator()
+    {
+        // TODO: Implement getParentUserAccountIterator() method.
+    }
+
+    /**
      * Get the following fields for the staff member $externalUserId
      *
      * SchoolStaffCode,

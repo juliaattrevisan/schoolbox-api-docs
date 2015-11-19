@@ -289,6 +289,16 @@ interface External_UserInterface {
      */
     public function getParentUserAccountInfo();
 
+    /**
+     * Gets a collection of normalized parent objects.
+     *
+     * This method should return an iterator instead of an array, for memory
+     * efficiency reasons.
+     *
+     * @return Schoolbox\External\Normalise\User\Guardian[]|External_ParentAccountIterator
+     */
+    public function getParentUserAccountIterator();
+
     /* Staff-specific
      */
 
