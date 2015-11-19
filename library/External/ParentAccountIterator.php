@@ -121,6 +121,25 @@ class External_ParentAccountIterator extends IteratorIterator
     public function current()
     {
         // Stack is managed by valid()
-        return array_shift($this->stack);
+        return $this->stack[0];
+    }
+
+    /**
+     * Move forward to next element
+     */
+    public function next()
+    {
+        array_shift($this->stack);
+        $this->rowNum++;
+    }
+
+    /**
+     * Get the key of the current element
+     *
+     * @return int
+     */
+    public function key()
+    {
+        return $this->rowNum;
     }
 }
