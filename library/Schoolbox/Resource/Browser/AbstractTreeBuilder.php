@@ -363,10 +363,10 @@ abstract class AbstractTreeBuilder
 
 
     /**
-     * @param int $nodeId
+     * @param  Resource\AbstractFile $file
      * @return string
      */
-    protected function getFilePermission($nodeId)
+    protected function getFilePermission($file)
     {
         return $this->getPermissionString(UserAccess::ACCESS_FULL);
     }
