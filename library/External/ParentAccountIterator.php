@@ -83,15 +83,15 @@ class External_ParentAccountIterator extends IteratorIterator
             // Students
             $student = new Student();
             $student
-                ->setId($currentResult['StudentId'])
-                ->setPreferredName($currentResult['StudentPreferred'])
-                ->setLastname($currentResult['StudentSurname'])
-                ->setGender($currentResult['StudentGender'])
+                ->setId($row['StudentId'])
+                ->setPreferredName($row['StudentPreferred'])
+                ->setLastname($row['StudentSurname'])
+                ->setGender($row['StudentGender'])
             ;
 
             $student
                 ->getYear()
-                ->setLevel($currentResult['StudentYearLevel'])
+                ->setLevel($row['StudentYearLevel'])
             ;
 
             /* Campus
