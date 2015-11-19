@@ -1,6 +1,7 @@
 <?php
 /**
- * Iterator over a MSSQL result set.
+ * Iterator over a `External_UserInterface->getStudentUserAccountIterator()` -
+ * maps each result to a `Schoolbox\External\Normalise\User\Student` object.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
