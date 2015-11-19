@@ -16,6 +16,7 @@ use Schoolbox\User;
 
 class Tokenizer extends Super {
 
+    /** @var string */
     protected $prefix = '';
 
 
