@@ -932,7 +932,26 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getStaffUserAccountIterator()
     {
-        // TODO: Implement getStaffUserAccountIterator() method.
+        $query = "
+            SELECT
+                vStaff.StaffID,
+                NetworkLogin,
+                ActiveFlag,
+                vStaff.StaffTitle,
+                vStaff.StaffPreferredName,
+                vStaff.StaffSurname,
+                DefaultEmailCode,
+                OccupEmail,
+                Email,
+                vStaff.StaffCampus,
+                StaffCategoryType,
+                StaffCategory,
+                vStaff.StaffDepartment
+            FROM SynergyOne.dbo.vStaff vStaff
+            LEFT JOIN Community ON Community.ID = StaffID
+          WHERE ActiveFlag = 1 AND vStaff.StaffRegistrationType != 'STDNT'
+        ";
+        return new External_StaffAccountIterator($this->getDatabase()->getIterator($query));
     }
 
     /**
