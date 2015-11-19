@@ -12,10 +12,7 @@ use Schoolbox\External\Normalise\User\Common;
 use Schoolbox\External\Normalise\User\Guardian;
 use Schoolbox\External\Normalise\User\Student;
 
-/**
- * @method SeekableIterator getInnerIterator()
- */
-class External_ParentAccountIterator extends IteratorIterator //implements SeekableIterator
+class External_ParentAccountIterator extends IteratorIterator
 {
     /**
      * @var resource
@@ -36,16 +33,6 @@ class External_ParentAccountIterator extends IteratorIterator //implements Seeka
      * @var array|Guardian[]
      */
     protected $stack;
-
-    /**
-     * Constructor
-     *
-     * @param SeekableIterator $iterator
-     */
-    public function __construct(SeekableIterator $iterator)
-    {
-        parent::__construct($iterator);
-    }
 
     /**
      * Loads separate parent records from the iterator, and loads them into
@@ -146,14 +133,4 @@ class External_ParentAccountIterator extends IteratorIterator //implements Seeka
         // Stack is managed by valid()
         return array_shift($this->stack);
     }
-
-//    /**
-//     * Seeks to a position
-//     *
-//     * @var int $position
-//     */
-//    public function seek($position)
-//    {
-//        $this->getInnerIterator()->seek($position);
-//    }
 }

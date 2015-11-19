@@ -11,10 +11,7 @@
 use Schoolbox\External\Normalise\User\Common;
 use Schoolbox\External\Normalise\User\Student;
 
-/**
- * @method SeekableIterator getInnerIterator()
- */
-class External_StudentAccountIterator extends IteratorIterator implements SeekableIterator
+class External_StudentAccountIterator extends IteratorIterator
 {
     /**
      * @var resource
@@ -30,16 +27,6 @@ class External_StudentAccountIterator extends IteratorIterator implements Seekab
      * @var int
      */
     protected $rowNum = 0;
-
-    /**
-     * Constructor
-     *
-     * @param SeekableIterator $iterator
-     */
-    public function __construct(SeekableIterator $iterator)
-    {
-        parent::__construct($iterator);
-    }
 
     /**
      * Return the current element
@@ -115,15 +102,5 @@ class External_StudentAccountIterator extends IteratorIterator implements Seekab
             ->add($campus)
         ;
         return $student;
-    }
-
-    /**
-     * Seeks to a position
-     *
-     * @var int $position
-     */
-    public function seek($position)
-    {
-        $this->getInnerIterator()->seek($position);
     }
 }
