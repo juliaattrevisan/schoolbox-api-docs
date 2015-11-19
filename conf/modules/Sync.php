@@ -24,6 +24,6 @@ class Sync implements ModuleConfigInterface {
     public function configure($kernel) {
         $di = $kernel->getDependencyInjector();
         $module = new \Schoolbox\Sync\Module($di);
-        $module->init('/sync');
+        $module->init('/adminv2/sync');
     }
 }
