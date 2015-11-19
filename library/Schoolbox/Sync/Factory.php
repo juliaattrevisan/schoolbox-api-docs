@@ -17,6 +17,9 @@ use Schoolbox\UserMapper;
 
 class Factory
 {
+    const CONDITION_NAMESPACE = '\Schoolbox\Sync\Rules\Condition';
+    const EFFECT_NAMESPACE    = '\Alaress\Rules\Lang';
+
     /** @var UserMapper */
     protected $userMapper;
 
@@ -107,26 +110,11 @@ class Factory
      */
     protected function buildCondition($type, array $args)
     {
-        switch ($type) {
-            case 'UserExists':
-
-                if (count($args) != 1) {
-                    throw new \OutOfRangeException("Expected 1 argument, got " . count($args));
-                }
-
-                return new Rules\Condition\UserExists($args[0]);
-
-            case 'ExternalUserValueIn':
-
-                if (count($args) != 3) {
-                    throw new \OutOfRangeException("Expected 3 arguments, got " . count($args));
-                }
-
-            return new Rules\Condition\ExternalUserValueIn($args[0], $args[1], $args[2]);
-
+        try {
+            return $this->reflectivelyBuild(self::CONDITION_NAMESPACE, $type, $args);
+        } catch (\ReflectionException $e) {
+            throw new \OutOfBoundsException("Condition type '$type' not found.", 0, $e);
         }
-
-        throw new \OutOfBoundsException("Condition type '$type' not found.");
     }
 
 
@@ -139,20 +127,37 @@ class Factory
      */
     protected function buildEffect($type, array $args)
     {
-        switch ($type) {
-            case 'Map':
-
-                if (count($args) != 2) {
-                    throw new \OutOfRangeException("Expected 2 arguments, got " . count($args));
-                }
-
-                return new Map($args[0], $args[1]);
-
-            case 'literal':
-            default:
-                return $args[0];
+        try {
+            // attempt to treat as language construct
+            return $this->reflectivelyBuild(self::EFFECT_NAMESPACE, $type, $args);
+        } catch (\ReflectionException $e) {
+            // no? ok, it's a string literal
+            return $args[0];
         }
     }
 
+
+    /**
+     * @param string $namespace
+     * @param string $classname
+     * @param array $arguments
+     * @return object
+     */
+    protected function reflectivelyBuild($namespace, $classname, array $arguments)
+    {
+        $fqcn = $namespace . '\\' . $classname;
+
+        $rc = new \ReflectionClass($fqcn);
+
+        $expectedCount = $rc->getConstructor()->getNumberOfParameters();
+
+        $actualCount = count($arguments);
+
+        if ($expectedCount != $actualCount) {
+            throw new \OutOfRangeException("$classname expects $expectedCount arguments, got $actualCount");
+        }
+
+        return $rc->newInstanceArgs($arguments);
+    }
 
 }
