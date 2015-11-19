@@ -33,6 +33,11 @@ class External_ParentAccountIterator extends IteratorIterator //implements Seeka
     protected $rowNum = 0;
 
     /**
+     * @var array|Guardian[]
+     */
+    protected $stack;
+
+    /**
      * Constructor
      *
      * @param SeekableIterator $iterator
@@ -43,27 +48,39 @@ class External_ParentAccountIterator extends IteratorIterator //implements Seeka
     }
 
     /**
-     * Return the current element
-     *
-     * @return Guardian
+     * Loads separate parent records from the iterator, and loads them into
+     * the stack for this item.
      */
-    public function current()
+    protected function buildStack()
     {
-        // Build a normalized object out of the current item
-        // (copypasted from Adapter->getParentUserAccountInfo)
-        $currentResult = $this->getInnerIterator()->current();
-        /* Year (common to all Guardians)
-         */
-        $student = new Student();
-        $student
-            ->getYear()
-            ->setLevel($currentResult['StudentYearLevel'])
-        ;
+        $id       = null;
+        $preStack = [];
+        while ($row = $this->getInnerIterator()->current()) {
+            $thisId = $row['StudentContactID'];
+            if (!isset($id)) {
+                $id = $thisId;
+            }
 
-        /* Guardian 1
-         */
-        $guardian1 = new Guardian();
-        $guardian1
+            // Is this the next parent? step back to previous and break
+            if ($thisId != $id) {
+                $this->getInnerIterator()->seek($this->getInnerIterator()->key()-1);
+                break;
+            }
+            $preStack[] = $row;
+        }
+        if (empty($preStack)) {
+            $this->stack = [];
+            return;
+        }
+
+        // Forge a single parent out of the disparate parts of the prestack
+        // Only the following fields will vary:
+        // * StudentYearLevel
+        // * StudentCampus
+        // * StudentGender
+        $currentResult = current($preStack);
+        $guardian      = new Guardian();
+        $guardian
             ->setId($currentResult['StudentContactID'])
             ->setTitle($currentResult['StudentContactTitle'])
             ->setPreferredName($currentResult['StudentContactPreferred'])
@@ -74,87 +91,59 @@ class External_ParentAccountIterator extends IteratorIterator //implements Seeka
         /* Email
          */
         $email = new Common\Email();
-        $email
-            ->setAddress($currentResult['StudentContactDefaultEmail'])
-        ;
-
-        $guardian1
-            ->addEmail($email);
+        $email->setAddress($currentResult['StudentContactDefaultEmail']);
+        $guardian->addEmail($email);
 
         /* Account
          */
-        $guardian1
+        $guardian
             ->getAccount()
             ->setLogin($currentResult['StudentContactNetworkLogin'])
         ;
 
-        /* Campus
-         */
-        $campus = new Common\Campus();
-        $campus
-            ->setName($currentResult['StudentCampus'])
-        ;
+        // Add details for each one of their students
+        foreach ($preStack as $row) {
+            // Students
+            $student = new Student();
+            $student->setGender($currentResult['StudentGender']);
 
-        $guardian1
-            ->getCampus()
-            ->add($campus)
-        ;
+            $student
+                ->getYear()
+                ->setLevel($currentResult['StudentYearLevel'])
+            ;
 
-        /* Guardian 2
-         */
-        $guardian2 = new Guardian();
-        $guardian2
-            ->setId($currentResult['StudentContactSpouseID'])
-            ->setTitle($currentResult['StudentContactSpouseTitle'])
-            ->setPreferredName($currentResult['StudentContactSpousePreferred'])
-            ->setLastname($currentResult['StudentContactSpouseSurname'])
-        ;
-
-        /* Email
-         */
-        $email = new Common\Email();
-        $email
-            ->setAddress($currentResult['StudentContactSpouseDefaultEmail'])
-        ;
-
-        $guardian2
-            ->addEmail($email);
-
-        /* Account
-         */
-        $guardian2
-            ->getAccount()
-            ->setLogin($currentResult['StudentContactSpouseNetworkLogin'])
-        ;
-
-        /* Campus
-         */
-        $campus = new Common\Campus();
-        $campus
-            ->setName($currentResult['StudentCampus'])
-        ;
-
-        $guardian2
-            ->getCampus()
-            ->add($campus)
-        ;
-
-        /* Stack it up
-         */
-        foreach (array($guardian1, $guardian2) as $currentGuardian) {
-            /** @var Guardian $currentGuardian */
-            if (strlen($currentGuardian->getPreferredName())) {
-
-                /* Add guardian to the registry
-                 */
-                if (!isset($allGuardians[$currentGuardian->getId()])) {
-                    $allGuardians[$currentGuardian->getId()] = $currentGuardian;
-                }
-                elseif (!($allGuardians[$currentGuardian->getId()] instanceof Guardian)) {
-                    $allGuardians[$currentGuardian->getId()] = $currentGuardian;
-                }
-            }
+            /* Campus
+             */
+            $campus = new Common\Campus();
+            $campus->setName($row['StudentCampus']);
+            $student->getCampus()->add($campus);
         }
+        $this->stack[] = $guardian;
+    }
+
+    /**
+     * Checks if the iterator is valid
+     *
+     * @return bool
+     */
+    public function valid()
+    {
+        if (!empty($this->stack)) {
+            return true;
+        }
+        $this->buildStack();
+        return !empty($this->stack);
+    }
+
+    /**
+     * Return the current element
+     *
+     * @return Guardian
+     */
+    public function current()
+    {
+        // Stack is managed by valid()
+        return array_shift($this->stack);
     }
 
 //    /**
