@@ -1,0 +1,37 @@
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sync (UPS)</h1>
+    </div>
+
+    <div class="small-12 island">
+        <section class="content">
+            <dl class="tabs" data-tab>
+                <dd class="active"><a href="#ruleset-student">Student</a></dd>
+                <dd><a href="#ruleset-parent">Parent</a></dd>
+                <dd><a href="#ruleset-staff">Staff</a></dd>
+            </dl>
+        </section>
+
+        <form action='/adminv2/sync/testsubmit' method="post">
+            <h2 class="subheader">Student Ruleset</h2>
+
+            <section class="content">
+                <h3>Conditions</h3>
+
+                <ul class="information-list">
+                    {% for currentCondition in allConditions %}
+                        {% if currentCondition.condition.type == 1 %}
+                            {% include '@syncCondition/general.twig' with currentCondition %}
+                        {% elseif currentCondition.condition.type == 2 %}
+                            {% include '@syncCondition/userExists.twig' with currentCondition %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+
+                <h3>Effects</h3>
+            </section>
+
+            <input type="submit" />
+        </form>
+    </div>
+</div>

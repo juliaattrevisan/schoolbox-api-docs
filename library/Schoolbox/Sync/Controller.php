@@ -19,7 +19,7 @@ class Controller extends Base {
      *
      * @param array $params
      */
-    public function test($params) {
+    public function student($params) {
         $allConditions = array(
             [
                 'condition' => [
@@ -46,7 +46,7 @@ class Controller extends Base {
         /* Twig data
          */
         $this->getResponse()->content->set([
-            'template' => '@sync/test.twig',
+            'template' => '@sync/student.twig',
             'data' => [
                 'allConditions' => $allConditions,
             ]
