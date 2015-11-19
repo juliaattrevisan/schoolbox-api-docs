@@ -19,8 +19,8 @@
                         <h3>Conditions</h3>
 
                         <ul class="information-list">
-                            {#{% include '@sync/conditions/templates/general.twig' with { conditionId: 1231, selectedNDSField: 3, selectedMatches: 1, selectedValues:"Mort\nBart\nGruber"} %}#}
-                            {#{% include '@sync/conditions/userExists.twig' with { conditionId: 1232, selectedMatches: 1 } %}#}
+                            {% include '@syncCondition/general.twig' with { conditionId: 1231, selectedNDSField: 3, selectedMatches: 1, selectedValues:"Mort\nBart\nGruber"} %}
+                            {% include '@syncCondition/userExists.twig' with { conditionId: 1232, selectedMatches: 1 } %}
                         </ul>
 
                         <h3>Effects</h3>
