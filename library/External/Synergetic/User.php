@@ -911,21 +911,33 @@ class External_Synergetic_User implements External_UserInterface
                 s.StudentContactPreferred,
                 s.StudentContactSurname,
                 s.StudentContactDefaultEmail,
-                cs.NetworkLogin AS StudentContactSpouseNetworkLogin,
-                s.StudentContactSpouseID,
-                s.StudentContactSpouseTitle,
-                s.StudentContactSpousePreferred,
-                s.StudentContactSpouseSurname,
-                s.StudentContactSpouseDefaultEmail,
                 s.StudentYearLevel,
                 s.StudentCampus,
                 s.StudentGender
             FROM SynergyOne.dbo.vStudentContactAllAddress s
-            LEFT JOIN SynergyOne.dbo.Community cp ON s.StudentContactID = cp.ID
-            LEFT JOIN SynergyOne.dbo.Community cs ON s.StudentContactSpouseID = cs.ID
-            WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
-            AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
-            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
+            INNER JOIN SynergyOne.dbo.Community cp ON s.StudentContactID = cp.ID
+            WHERE (s.StudentContactType IN ('SC1', 'SC2'))
+            AND   s.FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
+            AND   s.FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
+
+            UNION ALL
+
+            SELECT DISTINCT
+                cs.NetworkLogin AS StudentContactNetworkLogin,
+                s.StudentContactSpouseID AS StudentContactID,
+                s.StudentContactSpouseTitle AS StudentContactTitle,
+                s.StudentContactSpousePreferred AS StudentContactPreferred,
+                s.StudentContactSpouseSurname AS StudentContactSurname,
+                s.StudentContactSpouseDefaultEmail AS StudentContactDefaultEmail,
+                s.StudentYearLevel,
+                s.StudentCampus,
+                s.StudentGender
+            FROM SynergyOne.dbo.vStudentContactAllAddress s
+            INNER JOIN SynergyOne.dbo.Community cs ON s.StudentContactSpouseID = cs.ID
+            WHERE (s.StudentContactType IN ('SC1', 'SC2'))
+            AND   s.FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
+            AND   s.FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
+
             ORDER BY StudentContactID
         ";
         return new External_ParentAccountIterator($this->getDatabase()->getIterator($query));
