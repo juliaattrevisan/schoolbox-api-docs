@@ -200,7 +200,7 @@ abstract class AbstractTreeBuilder
      */
     protected function buildFileNode(Resource\AbstractFile $file)
     {
-        $permission = $this->getFilePermission($file->getId());
+        $permission = $this->getFilePermission($file);
         if (empty($permission)) {
             throw new Resource\Exception("No permission for this node");
         }
@@ -363,10 +363,10 @@ abstract class AbstractTreeBuilder
 
 
     /**
-     * @param int $nodeId
+     * @param  Resource\AbstractFile $file
      * @return string
      */
-    protected function getFilePermission($nodeId)
+    protected function getFilePermission($file)
     {
         return $this->getPermissionString(UserAccess::ACCESS_FULL);
     }

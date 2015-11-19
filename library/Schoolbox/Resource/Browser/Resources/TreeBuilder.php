@@ -153,24 +153,23 @@ class TreeBuilder extends AbstractTreeBuilder
 
 
     /**
-     * @param int $nodeId
+     * @param  Resource\AbstractFile $file
      * @return string
      */
-    protected function getFilePermission($nodeId)
+    protected function getFilePermission($file)
     {
         if (!$this->fileLocator) {
             return $this->getPermissionString(UserAccess::ACCESS_DENY);
         }
 
-        /** @var File\Model $file */
-        $file = $this->fileLocator->findById($nodeId);
-
         // retrieve the folder permission
         $folderPerm = $this->getFolderPermission($file->getFolder()->getId());
 
         // if read and hidden, cast to none; otherwise leave as-is
-        if ($folderPerm == 'read' && $file->isHidden()) {
-            $folderPerm = '';
+        if ($folderPerm == $this->getPermissionString(UserAccess::ACCESS_READ)
+            && $file->isHidden()
+        ) {
+            $folderPerm = $this->getPermissionString(UserAccess::ACCESS_DENY);
         }
 
         return $folderPerm;
@@ -209,7 +208,7 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     protected function buildFileNode($file)
     {
-        $permission = $this->getFilePermission($file->getId());
+        $permission = $this->getFilePermission($file);
         if (empty($permission)) {
             throw new Resource\Exception("No permission for this node");
         }
