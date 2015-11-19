@@ -9,6 +9,7 @@
  */
 
 use Schoolbox\External\Normalise\User\Common;
+use Schoolbox\External\Normalise\User\Student;
 
 /**
  * @method SeekableIterator getInnerIterator()
@@ -43,14 +44,14 @@ class External_StudentAccountIterator extends IteratorIterator implements Seekab
     /**
      * Return the current element
      *
-     * @return array
+     * @return Student
      */
     public function current()
     {
         // Build a normalized object out of the current item
         // (copypasted from Adapter->getStudentUserAccountInfo)
         $currentResult = $this->getInnerIterator()->current();
-        $student       = new Schoolbox\External\Normalise\User\Student();
+        $student       = new Student();
         $student
             ->setId($currentResult['StudentID'])
             ->setTitle($currentResult['StudentTitle'])

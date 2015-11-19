@@ -45,7 +45,7 @@ class External_ParentAccountIterator extends IteratorIterator implements Seekabl
     /**
      * Return the current element
      *
-     * @return array
+     * @return Guardian
      */
     public function current()
     {
