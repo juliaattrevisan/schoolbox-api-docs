@@ -61,6 +61,9 @@ class Factory implements IFactory
             case Mapper::TYPE_SERIALIZED:
                 $column = new Serialized();
                 break;
+            case Mapper::TYPE_JSON:
+                $column = new JSON();
+                break;
             case Mapper::TYPE_DECIMAL:
                 $column = new Decimal();
                 $column->setPlaces(2);
