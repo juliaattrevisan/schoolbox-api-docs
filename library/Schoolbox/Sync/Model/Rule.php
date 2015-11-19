@@ -10,6 +10,8 @@
 namespace Schoolbox\Sync\Model;
 
 
+use Schoolbox\Collection;
+
 class Rule
 {
 
@@ -24,6 +26,12 @@ class Rule
 
     /** @var int */
     protected $sequence;
+
+    /** @var Collection|Condition[] */
+    protected $conditions;
+
+    /** @var Collection|Effect[] */
+    protected $effects;
 
 
     /**
@@ -76,6 +84,16 @@ class Rule
 
 
     /**
+     * @deprecated dynamic mapper use only
+     * @return bool
+     */
+    public function getEnabled()
+    {
+        return $this->isEnabled();
+    }
+
+
+    /**
      * @param boolean $enabled
      * @return static
      */
@@ -106,5 +124,43 @@ class Rule
     }
 
 
+    /**
+     * @return Collection|Condition[]
+     */
+    public function getConditions()
+    {
+        return $this->conditions;
+    }
+
+
+    /**
+     * @param Collection|Condition[] $conditions
+     * @return static
+     */
+    public function setConditions($conditions)
+    {
+        $this->conditions = $conditions;
+        return $this;
+    }
+
+
+    /**
+     * @return Collection|Effect[]
+     */
+    public function getEffects()
+    {
+        return $this->effects;
+    }
+
+
+    /**
+     * @param Collection|Effect[] $effects
+     * @return static
+     */
+    public function setEffects($effects)
+    {
+        $this->effects = $effects;
+        return $this;
+    }
 
 }
