@@ -832,15 +832,35 @@ class External_Synergetic_User implements External_UserInterface
         ";
         return $this->getDatabase()->getAll($query);
     }
-//
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function getStudentUserAccountIterator()
-//    {
-//        // Need a result set iterator
-//        $this->getDatabase()
-//    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStudentUserAccountIterator()
+    {
+        $query = "
+            SELECT
+                vStudents.StudentID,
+                NetworkLogin,
+                vStudents.StudentTitle,
+                vStudents.StudentPreferred,
+                vStudents.StudentSurname,
+                StudentGender,
+                StudentEmail,
+                StudentOccupEmail,
+                vStudents.StudentYearLevel,
+                vStudents.StudentHouse,
+                vStudents.StudentBoarder,
+                vStudents.StudentBoardingHouse,
+                StudentCampus
+            FROM SynergyOne.dbo.vStudents vStudents
+            LEFT JOIN Community ON Community.ID = StudentID
+            WHERE
+            FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
+            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
+        ";
+        return new External_StudentAccountIterator($this->getDatabase()->getIterator($query));
+    }
 
     /**
      * Gets all Parents' account info from Synergetic
