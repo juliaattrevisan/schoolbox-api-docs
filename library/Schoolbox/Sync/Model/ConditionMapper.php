@@ -66,10 +66,15 @@ class ConditionMapper extends Mapper
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $condition = $this->hydrate($row);
-            $condition->setConditionType($this->hydrateJoin($row, 'condition_type_id', 't'));
+            try {
+                $condition = $this->hydrate($row);
+                $condition->setConditionType($this->hydrateJoin($row, 'condition_type_id', 't'));
 
-            $collection->add($condition);
+                $collection->add($condition);
+            } catch (\InvalidArgumentException $e) {
+                // this will have been thrown if the arguments field failed to JSON-decode
+                // not much we can really do about that except keep it from blowing everything else up...
+            }
         }
 
         return $collection;

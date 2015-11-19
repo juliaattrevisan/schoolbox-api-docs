@@ -67,10 +67,15 @@ class EffectMapper extends Mapper
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $effect = $this->hydrate($row);
-            $effect->setEffectType($this->hydrateJoin($row, 'effect_type_id', 't'));
+            try {
+                $effect = $this->hydrate($row);
+                $effect->setEffectType($this->hydrateJoin($row, 'effect_type_id', 't'));
 
-            $collection->add($effect);
+                $collection->add($effect);
+            } catch (\InvalidArgumentException $e) {
+                // this will have been thrown if the arguments field failed to JSON-decode
+                // not much we can really do about that except keep it from blowing everything else up...
+            }
         }
 
         return $collection;

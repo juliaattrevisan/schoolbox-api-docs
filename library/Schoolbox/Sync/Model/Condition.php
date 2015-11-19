@@ -101,6 +101,10 @@ class Condition
      */
     public function setArguments($arguments)
     {
+        // rather than typehint and have it blow up, at least using an exception is recoverable
+        if (!is_array($arguments)) {
+            throw new \InvalidArgumentException('Arguments must be an array, got ' . gettype($arguments));
+        }
         $this->arguments = $arguments;
         return $this;
     }
