@@ -35,13 +35,15 @@ CREATE TABLE `ups_effect`(
 CREATE TABLE `ups_condition_type`(
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(64) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX (`name`)
 );
 
 CREATE TABLE `ups_effect_type`(
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(64) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX (`name`)
 );
 
 
@@ -54,3 +56,14 @@ ALTER TABLE `ups_condition`
 ALTER TABLE `ups_effect`
   ADD FOREIGN KEY (`rule_id`) REFERENCES `ups_rule`(`id`) ON UPDATE CASCADE ON DELETE CASCADE,
   ADD FOREIGN KEY (`effect_type_id`) REFERENCES `ups_effect_type`(`id`) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+/* Inject lookup data */
+
+INSERT INTO `ups_condition_type` (`name`)
+  VALUES ('ExternalUserValueIn'), ('UserExists')
+  ON DUPLICATE KEY UPDATE `id` = `id`;
+
+INSERT INTO `ups_effect_type` (`name`)
+  VALUES ('Map'), ('literal')
+  ON DUPLICATE KEY UPDATE `id` = `id`;
