@@ -20,6 +20,25 @@ $allElements = array();
 if (is_numeric($_GET['categoryId'])) {
     if ($groupHandler->getPermission($_GET['categoryId']) >= READ_ACCESS) {
         switch ($_GET['type']) {
+            case 'video':
+                // All videos on this page
+                $videoMapper = new \Schoolbox\Video\ResourceVideoMapper();
+                $videos      = $videoMapper->findByCategory(
+                    $_GET['categoryId'],
+                    ['sort' => 'name', 'sortdir' => 'asc']
+                );
+                foreach ($videos as $video) {
+                    /** @var \Schoolbox\Video\ResourceVideo $video */
+                    // I know that this is a file from the resource browser
+                    /** @var \Schoolbox\Resource\AbstractFile $file */
+                    $file    = $video->getFile();
+                    $element = array(
+                        'name'  => $file->getTitle(),
+                        'value' => $file->getId(),
+                    );
+                    $allElements[] = $element;
+                }
+                break;
             case 'tileSource':
                 // Get all components that are a part of this page.
                 /** @var Component_Instance[] $components */
@@ -43,7 +62,7 @@ if (is_numeric($_GET['categoryId'])) {
 
                 foreach ($allTextboxes as $currentTextbox) {
                     $element = array(
-                        'name' => Scrub::text($currentTextbox->getHeading()),
+                        'name'  => $currentTextbox->getHeading(),
                         'value' => $currentTextbox->getId(),
                     );
 

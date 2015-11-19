@@ -77,25 +77,21 @@ $j(function() {
 		 * Loads a new select element into config.target
 		 */
 		function load() {
-			$j.get(config.url, config.payload, function(responseText) {
-				var response = new Function('return ' + responseText);
-				var allTextboxes = response();
-
+			$j.get(config.url, config.payload, function(allTextboxes) {
 				/* If there are textboxes for this homepage, glue
 				 * them all together
 				 */
+				var allOptions = [];
 				if (allTextboxes.length) {
-					var allOptions = '';
 
 					/* Accumulate a list of <options>
 					 */
 					for (var i = 0; i < allTextboxes.length; i++) {
-						var currentOption = '<option value="'+allTextboxes[i].value+'">'+allTextboxes[i].name+'</option>';
-						allOptions += currentOption;
+						allOptions.push($('<option/>').val(allTextboxes[i].value).text(allTextboxes[i].name));
 					}
 				}
 				else {
-					var allOptions = '<option value="0" disabled="disabled"> (none) </option>';
+					allOptions.push($('<option/>').val(0).text('(none)').prop('disabled', true));
 				}
 
 				/* If the target exists, replace it - since Resource Browser
@@ -105,7 +101,7 @@ $j(function() {
 				if (config.target.length) {
 					config.target.empty().append(allOptions);
 				}
-			});
+			}, 'json');
 		}
 	}
 }(jQuery));
