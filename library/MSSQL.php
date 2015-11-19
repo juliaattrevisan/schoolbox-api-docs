@@ -360,7 +360,7 @@ class MSSQL {
 	 * Gets an iterator over a query.
 	 *
 	 * @param string $sql_q
-	 * @return Iterator
+	 * @return MssqlResultIterator
 	 */
 	function getIterator($sql_q)
 	{
