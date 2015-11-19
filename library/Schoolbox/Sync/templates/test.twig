@@ -13,16 +13,20 @@
 
             <div class="tabs-content">
                 <div id="ruleset-student" class="content active">
-                    <h2>Student Ruleset</h2>
+                    <form action='/adminv2/sync/testsubmit' method="post">
+                        <h2>Student Ruleset</h2>
 
-                    <h3>Conditions</h3>
+                        <h3>Conditions</h3>
 
-                    <ul class="information-list">
-                        {% include '@sync/conditions/general.twig' with { conditionId: 1231, selectedNDSField: 3, selectedMatches: 1, selectedValues:"Mort\nBart\nGruber"} %}
-                        {% include '@sync/conditions/userExists.twig' with { conditionId: 1232, selectedMatches: 1 } %}
-                    </ul>
+                        <ul class="information-list">
+                            {% include '@sync/conditions/general.twig' with { conditionId: 1231, selectedNDSField: 3, selectedMatches: 1, selectedValues:"Mort\nBart\nGruber"} %}
+                            {% include '@sync/conditions/userExists.twig' with { conditionId: 1232, selectedMatches: 1 } %}
+                        </ul>
 
-                    <h3>Effects</h3>
+                        <h3>Effects</h3>
+
+                        <input type="submit" />
+                    </form>
                 </div>
 
                 <div id="ruleset-parent" class="content">

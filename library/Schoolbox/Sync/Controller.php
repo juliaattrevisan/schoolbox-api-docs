@@ -27,4 +27,13 @@ class Controller extends Base {
             'template' => '@sync/test.twig',
         ]);
     }
+
+    /**
+     * Test Method
+     *
+     * @param $params
+     */
+    public function testsubmit($params) {
+        new \Alaress_Probe($_POST);
+    }
 }

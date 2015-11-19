@@ -34,6 +34,7 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath) {
         $this->addGetRoute($router, 'test', $basePath, "/test");
+        $this->addPostRoute($router, 'testsubmit', $basePath, "/testsubmit");
     }
 
     /**
