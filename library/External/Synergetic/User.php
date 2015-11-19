@@ -903,7 +903,32 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getParentUserAccountIterator()
     {
-        // TODO: Implement getParentUserAccountIterator() method.
+        $query = "
+            SELECT DISTINCT
+                cp.NetworkLogin AS StudentContactNetworkLogin,
+                s.StudentContactID,
+                s.StudentContactTitle,
+                s.StudentContactPreferred,
+                s.StudentContactSurname,
+                s.StudentContactDefaultEmail,
+                cs.NetworkLogin AS StudentContactSpouseNetworkLogin,
+                s.StudentContactSpouseID,
+                s.StudentContactSpouseTitle,
+                s.StudentContactSpousePreferred,
+                s.StudentContactSpouseSurname,
+                s.StudentContactSpouseDefaultEmail,
+                s.StudentYearLevel,
+                s.StudentCampus,
+                s.StudentGender
+            FROM SynergyOne.dbo.vStudentContactAllAddress s
+            LEFT JOIN SynergyOne.dbo.Community cp ON s.StudentContactID = cp.ID
+            LEFT JOIN SynergyOne.dbo.Community cs ON s.StudentContactSpouseID = cs.ID
+            WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
+            AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
+            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
+            ORDER BY StudentContactID
+        ";
+        return new External_ParentAccountIterator($this->getDatabase()->getIterator($query));
     }
 
     /**
