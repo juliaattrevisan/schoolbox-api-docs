@@ -858,6 +858,7 @@ class External_Synergetic_User implements External_UserInterface
             WHERE
             FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
             AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
+            ORDER BY vStudents.StudentID ASC
         ";
         return new External_StudentAccountIterator($this->getDatabase()->getIterator($query));
     }
@@ -938,7 +939,7 @@ class External_Synergetic_User implements External_UserInterface
             AND   s.FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
             AND   s.FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
 
-            ORDER BY StudentContactID
+            ORDER BY StudentContactID ASC
         ";
         return new External_ParentAccountIterator($this->getDatabase()->getIterator($query));
     }
@@ -994,7 +995,8 @@ class External_Synergetic_User implements External_UserInterface
                 vStaff.StaffDepartment
             FROM SynergyOne.dbo.vStaff vStaff
             LEFT JOIN Community ON Community.ID = StaffID
-          WHERE ActiveFlag = 1 AND vStaff.StaffRegistrationType != 'STDNT'
+            WHERE ActiveFlag = 1 AND vStaff.StaffRegistrationType != 'STDNT'
+            ORDER BY vStaff.StaffID ASC
         ";
         return new External_StaffAccountIterator($this->getDatabase()->getIterator($query));
     }
