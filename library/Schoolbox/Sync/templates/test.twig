@@ -21,6 +21,10 @@
                         <li class="actions-small-2 content">
                             {% include '@sync/conditions/general.twig' with { conditionId: 1231, selectedNDSField: 3, selectedMatches: 1, selectedValues:"Mort\nBart\nGruber"} %}
                         </li>
+
+                        <li class="actions-small-2 content">
+                            {% include '@sync/conditions/userExists.twig' with { conditionId: 1232, selectedMatches: 1 } %}
+                        </li>
                     </ul>
 
                     <h3>Effects</h3>

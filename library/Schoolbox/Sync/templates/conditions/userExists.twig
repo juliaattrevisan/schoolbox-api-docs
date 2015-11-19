@@ -1,0 +1,20 @@
+{% set allMatches = ['User Exists', "User Doesn't Exist"] %}
+
+<div class="list-item">
+    <div class="row" id="user-condition-{{ conditionId }}">
+        <div class="small-1 columns">
+            If
+        </div>
+        <div class="small-11 columns">
+            <select name="user-condition-matches-{{ conditionId }}">
+                {% for currentMatches in allMatches %}
+                <option value="{{ loop.index0 }}" {% if loop.index0 == selectedMatches %}selected="selected"{% endif %}>{{ currentMatches }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>
+<nav>
+    <a href="" class="icon-delete" title="Delete"></a>
+    <a href="" class="icon-modify" title="Modify"></a>
+</nav>
