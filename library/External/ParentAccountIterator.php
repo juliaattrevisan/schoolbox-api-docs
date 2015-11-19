@@ -9,6 +9,8 @@
  */
 
 use Schoolbox\External\Normalise\User\Common;
+use Schoolbox\External\Normalise\User\Guardian;
+use Schoolbox\External\Normalise\User\Student;
 
 /**
  * @method SeekableIterator getInnerIterator()
@@ -48,59 +50,43 @@ class External_ParentAccountIterator extends IteratorIterator implements Seekabl
     public function current()
     {
         // Build a normalized object out of the current item
-        // (copypasted from Adapter->getStudentUserAccountInfo)
+        // (copypasted from Adapter->getParentUserAccountInfo)
         $currentResult = $this->getInnerIterator()->current();
-        $student       = new Schoolbox\External\Normalise\User\Student();
-        $student
-            ->setId($currentResult['StudentID'])
-            ->setTitle($currentResult['StudentTitle'])
-            ->setPreferredName($currentResult['StudentPreferred'])
-            ->setLastname($currentResult['StudentSurname'])
-            ->setGender($currentResult['StudentGender'])
-        ;
-
+        /* Year (common to all Guardians)
+         */
+        $student = new Student();
         $student
             ->getYear()
             ->setLevel($currentResult['StudentYearLevel'])
         ;
 
-        $student
-            ->getHouse()
-            ->setName($currentResult['StudentHouse'])
-        ;
-
-        $student
-            ->getAccount()
-            ->setLogin($currentResult['NetworkLogin'])
-        ;
-
-        /* Assign emails
+        /* Guardian 1
          */
-        $email1 = new Common\Email();
-        $email1
-            ->setAddress($currentResult['StudentEmail']);
+        $guardian1 = new Guardian();
+        $guardian1
+            ->setId($currentResult['StudentContactID'])
+            ->setTitle($currentResult['StudentContactTitle'])
+            ->setPreferredName($currentResult['StudentContactPreferred'])
+            ->setLastname($currentResult['StudentContactSurname'])
+            ->setGender($currentResult['StudentGender'])
+        ;
 
-        $email2 = new Common\Email();
-        $email2
-            ->setAddress($currentResult['StudentOccupEmail']);
+        /* Email
+         */
+        $email = new Common\Email();
+        $email
+            ->setAddress($currentResult['StudentContactDefaultEmail'])
+        ;
 
-        foreach (array($email1, $email2) as $currentEmail) {
-            /** @var Common\Email $currentEmail */
-            if (strlen($currentEmail->getAddress())) {
-                $student->addEmail($currentEmail);
-            }
-        }
+        $guardian1
+            ->addEmail($email);
 
-        if ($currentResult['StudentBoarder'] == 'Y') {
-            $boardingHouse = new Common\BoardingHouse();
-            $boardingHouse
-                ->setName($currentResult['StudentBoardingHouse'])
-            ;
-
-            $student
-                ->setBoardingHouse($boardingHouse)
-            ;
-        }
+        /* Account
+         */
+        $guardian1
+            ->getAccount()
+            ->setLogin($currentResult['StudentContactNetworkLogin'])
+        ;
 
         /* Campus
          */
@@ -109,11 +95,66 @@ class External_ParentAccountIterator extends IteratorIterator implements Seekabl
             ->setName($currentResult['StudentCampus'])
         ;
 
-        $student
+        $guardian1
             ->getCampus()
             ->add($campus)
         ;
-        return $student;
+
+        /* Guardian 2
+         */
+        $guardian2 = new Guardian();
+        $guardian2
+            ->setId($currentResult['StudentContactSpouseID'])
+            ->setTitle($currentResult['StudentContactSpouseTitle'])
+            ->setPreferredName($currentResult['StudentContactSpousePreferred'])
+            ->setLastname($currentResult['StudentContactSpouseSurname'])
+        ;
+
+        /* Email
+         */
+        $email = new Common\Email();
+        $email
+            ->setAddress($currentResult['StudentContactSpouseDefaultEmail'])
+        ;
+
+        $guardian2
+            ->addEmail($email);
+
+        /* Account
+         */
+        $guardian2
+            ->getAccount()
+            ->setLogin($currentResult['StudentContactSpouseNetworkLogin'])
+        ;
+
+        /* Campus
+         */
+        $campus = new Common\Campus();
+        $campus
+            ->setName($currentResult['StudentCampus'])
+        ;
+
+        $guardian2
+            ->getCampus()
+            ->add($campus)
+        ;
+
+        /* Stack it up
+         */
+        foreach (array($guardian1, $guardian2) as $currentGuardian) {
+            /** @var Guardian $currentGuardian */
+            if (strlen($currentGuardian->getPreferredName())) {
+
+                /* Add guardian to the registry
+                 */
+                if (!isset($allGuardians[$currentGuardian->getId()])) {
+                    $allGuardians[$currentGuardian->getId()] = $currentGuardian;
+                }
+                elseif (!($allGuardians[$currentGuardian->getId()] instanceof Guardian)) {
+                    $allGuardians[$currentGuardian->getId()] = $currentGuardian;
+                }
+            }
+        }
     }
 
     /**
