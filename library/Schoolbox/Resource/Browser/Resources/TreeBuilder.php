@@ -131,6 +131,10 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     protected function getFolderPermission($folderId)
     {
+        if ($this->user->isSuperuser()) {
+            return $this->getPermissionString(UserAccess::ACCESS_FULL);
+        }
+
         // check user access first, then role access if that fails
         try {
             $access = $this->userAccessMapper
@@ -158,6 +162,10 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     protected function getFilePermission($file)
     {
+        if ($this->user->isSuperuser()) {
+            return $this->getPermissionString(UserAccess::ACCESS_FULL);
+        }
+
         if (!$this->fileLocator) {
             return $this->getPermissionString(UserAccess::ACCESS_DENY);
         }
