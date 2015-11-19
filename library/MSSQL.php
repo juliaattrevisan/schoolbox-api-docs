@@ -346,6 +346,24 @@ class MSSQL {
 	}
 
 	/**
+	 * Gets an iterator over a stored procedure.
+	 *
+	 * This currently only works with stored procs that return a result set
+	 * directly - any result text or output variables will be ignored.
+	 *
+	 * @see $this->executeProcedure()
+	 *
+	 * @return MssqlResultIterator
+	 */
+	public function getProcedureIterator($name, $params)
+	{
+		// Bound outputs will be ignored
+		$bound_outputs = [];
+		$proc          = $this->buildProcedure($name, $params, $bound_outputs);
+		return new MssqlResultIterator(mssql_execute($proc));
+	}
+
+	/**
 	 * Returns the next result from a query result resource
 	 * Can be optionally passed a result resource otherwise it uses current result resource
 	 *
