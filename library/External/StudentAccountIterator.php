@@ -68,6 +68,12 @@ class External_StudentAccountIterator extends IteratorIterator implements Seekab
             ->setName($currentResult['StudentHouse'])
         ;
 
+        $student
+            ->getAccount()
+                ->setLogin($currentResult['NetworkLogin'])
+                ->setActive($currentResult['ActiveFlag'])
+        ;
+
         /* Assign emails
          */
         $email1 = new Common\Email();
