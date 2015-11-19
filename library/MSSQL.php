@@ -235,36 +235,14 @@ class MSSQL {
 	 *               result:  if the procedure returned a result set, the results
 	 *                        from the procedure (untested)
 	 */
-	public function executeProcedure($name, $params) {
-		$proc          = mssql_init($name, $this->dbf);
-		$bound_inputs  = array();
+	public function executeProcedure($name, $params)
+	{
 		$bound_outputs = array();
-
-		// Bind each parameter to the procedure
-		foreach ($params as $param) {
-			list($param_name, $var, $type, $is_output, $is_null, $maxlen) = $param;
-			if (!$is_output) {
-				$is_output = false;
-			}
-			if (!$is_null) {
-				$is_null = false;
-			}
-			if (!$maxlen) {
-				$maxlen = -1;
-			}
-			if ($is_output) {
-				mssql_bind($proc, $param_name, $bound_outputs[$param_name], $type, true, $is_null, $maxlen);
-			}
-			else {
-				$bound_inputs[$param_name] = $var;
-				mssql_bind($proc, $param_name, $bound_inputs[$param_name], $type, false, $is_null, $maxlen);
-			}
-		}
+		$proc          = $this->buildProcedure($name, $params, $bound_outputs);
 
 		// Run procedure, fetching the result set if there is one
 		$success = true;
 		$return  = array();
-		$message = '';
 		try {
 			$result  = mssql_execute($proc);
 			$message = mssql_get_last_message();
@@ -362,7 +340,7 @@ class MSSQL {
 	 * @param string $sql_q
 	 * @return MssqlResultIterator
 	 */
-	function getIterator($sql_q)
+	public function getIterator($sql_q)
 	{
 		return new MssqlResultIterator($this->query($sql_q));
 	}
@@ -529,5 +507,39 @@ class MSSQL {
 		}
 
 		return false;
+	}
+
+	/**
+	 * @param string $name
+	 * @param array  $params
+	 * @param array  &$bound_outputs
+	 *
+	 * @return resource
+	 */
+	protected function buildProcedure($name, $params, &$bound_outputs)
+	{
+		$proc         = mssql_init($name, $this->dbf);
+		$bound_inputs = array();
+
+		// Bind each parameter to the procedure
+		foreach ($params as $param) {
+			list($param_name, $var, $type, $is_output, $is_null, $maxlen) = $param;
+			if (!$is_output) {
+				$is_output = false;
+			}
+			if (!$is_null) {
+				$is_null = false;
+			}
+			if (!$maxlen) {
+				$maxlen = -1;
+			}
+			if ($is_output) {
+				mssql_bind($proc, $param_name, $bound_outputs[$param_name], $type, true, $is_null, $maxlen);
+			} else {
+				$bound_inputs[$param_name] = $var;
+				mssql_bind($proc, $param_name, $bound_inputs[$param_name], $type, false, $is_null, $maxlen);
+			}
+		}
+		return $proc;
 	}
 }
