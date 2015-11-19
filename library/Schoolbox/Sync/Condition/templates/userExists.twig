@@ -1,7 +1,7 @@
 {% set allMatches = ['User Exists', "User Doesn't Exist"] %}
 
-<li id="user-condition-{{ conditionId }}" class="actions-small-2 content">
-    <input type="hidden" name="condition[{{ conditionId }}][type]" value="1">
+<li id="user-condition-{{ currentCondition.condition.id }}" class="actions-small-2 content">
+    <input type="hidden" name="condition[{{ currentCondition.condition.id }}][type]" value="1">
 
     <div class="list-item">
         <div class="row">
@@ -9,16 +9,16 @@
                 If
             </div>
             <div class="small-11 columns">
-                <select name="condition[{{ conditionId }}][matches]">
+                <select name="condition[{{ currentCondition.condition.id }}][matches]">
                     {% for currentMatches in allMatches %}
-                    <option value="{{ loop.index0 }}" {% if loop.index0 == selectedMatches %}selected="selected"{% endif %}>{{ currentMatches }}</option>
+                    <option value="{{ loop.index0 }}" {% if loop.index0 == currentCondition.selected.matches %}selected="selected"{% endif %}>{{ currentMatches }}</option>
                     {% endfor %}
                 </select>
             </div>
         </div>
     </div>
     <nav>
-        <a href="/adminv2/sync/condition/delete/{{ conditionId }}" class="icon-delete" title="Delete"></a>
+        <a href="/adminv2/sync/condition/delete/{{ currentCondition.condition.id }}" class="icon-delete" title="Delete"></a>
         <a href="" class="icon-modify" title="Modify"></a>
     </nav>
 </li>

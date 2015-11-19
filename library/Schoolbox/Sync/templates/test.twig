@@ -19,8 +19,13 @@
                         <h3>Conditions</h3>
 
                         <ul class="information-list">
-                            {% include '@syncCondition/general.twig' with { conditionId: 1231, selectedNDSField: 3, selectedMatches: 1, selectedValues:"Mort\nBart\nGruber"} %}
-                            {% include '@syncCondition/userExists.twig' with { conditionId: 1232, selectedMatches: 1 } %}
+                            {% for currentCondition in allConditions %}
+                                {% if currentCondition.condition.type == 1 %}
+                                    {% include '@syncCondition/general.twig' with currentCondition %}
+                                {% elseif currentCondition.condition.type == 2 %}
+                                    {% include '@syncCondition/userExists.twig' with currentCondition %}
+                                {% endif %}
+                            {% endfor %}
                         </ul>
 
                         <h3>Effects</h3>
