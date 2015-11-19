@@ -192,6 +192,16 @@ class Link implements ISoftDeletable
     }
 
     /**
+     * Check if hidden
+     *
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return (bool)$this->getHidden();
+    }
+
+    /**
      * Get relative url
      *
      * @return mixed
