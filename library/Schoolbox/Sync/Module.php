@@ -45,6 +45,16 @@ class Module extends BaseModule
     }
 
     /**
+     * Only admins can use this
+     *
+     * @param Authorizer $authorizer
+     */
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        $this->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
+    }
+
+    /**
      * Template locations for this module
      *
      * {@inheritdoc}
