@@ -55,7 +55,7 @@ class External_ParentAccountIterator extends IteratorIterator //implements Seeka
     {
         $id       = null;
         $preStack = [];
-        while ($row = $this->getInnerIterator()->current()) {
+        while ($this->getInnerIterator()->valid() && $row = $this->getInnerIterator()->current()) {
             $thisId = $row['StudentContactID'];
             if (!isset($id)) {
                 $id = $thisId;
@@ -63,10 +63,10 @@ class External_ParentAccountIterator extends IteratorIterator //implements Seeka
 
             // Is this the next parent? step back to previous and break
             if ($thisId != $id) {
-                $this->getInnerIterator()->seek($this->getInnerIterator()->key()-1);
                 break;
             }
             $preStack[] = $row;
+            $this->getInnerIterator()->next();
         }
         if (empty($preStack)) {
             $this->stack = [];
@@ -117,6 +117,7 @@ class External_ParentAccountIterator extends IteratorIterator //implements Seeka
             $campus = new Common\Campus();
             $campus->setName($row['StudentCampus']);
             $student->getCampus()->add($campus);
+            $guardian->addStudent($student);
         }
         $this->stack[] = $guardian;
     }
