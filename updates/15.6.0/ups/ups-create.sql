@@ -27,7 +27,8 @@ CREATE TABLE `ups_effect`(
   `effect_type_id` INT UNSIGNED NOT NULL,
   `arguments` VARCHAR(512) NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX (`rule_id`)
+  INDEX (`rule_id`),
+  UNIQUE INDEX (`rule_id`, `user_property`)
 );
 
 /* Lookup tables */
