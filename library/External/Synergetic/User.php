@@ -860,7 +860,7 @@ class External_Synergetic_User implements External_UserInterface
             AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
             ORDER BY vStudents.StudentID ASC
         ";
-        return new External_StudentAccountIterator($this->getDatabase()->getIterator($query));
+        return new Schoolbox\Sync\Iterator\Student($this->getDatabase()->getIterator($query));
     }
 
     /**
@@ -947,7 +947,7 @@ class External_Synergetic_User implements External_UserInterface
 
             ORDER BY StudentContactID ASC
         ";
-        return new External_ParentAccountIterator($this->getDatabase()->getIterator($query));
+        return new Schoolbox\Sync\Iterator\Guardian($this->getDatabase()->getIterator($query));
     }
 
     /**
@@ -1004,7 +1004,7 @@ class External_Synergetic_User implements External_UserInterface
             WHERE ActiveFlag = 1 AND vStaff.StaffRegistrationType != 'STDNT'
             ORDER BY vStaff.StaffID ASC
         ";
-        return new External_StaffAccountIterator($this->getDatabase()->getIterator($query));
+        return new Schoolbox\Sync\Iterator\Staff($this->getDatabase()->getIterator($query));
     }
 
     /**

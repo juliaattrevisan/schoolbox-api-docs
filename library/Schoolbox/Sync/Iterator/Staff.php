@@ -8,10 +8,12 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\External\Normalise\User\Common;
-use Schoolbox\External\Normalise\User\Staff;
+namespace Schoolbox\Sync\Iterator;
 
-class External_StaffAccountIterator extends IteratorIterator
+use IteratorIterator;
+use Schoolbox\External\Normalise\User;
+
+class Staff extends IteratorIterator
 {
     /**
      * Return the current element
@@ -23,7 +25,7 @@ class External_StaffAccountIterator extends IteratorIterator
         // Build a normalized object out of the current item
         // (copypasted from Adapter->getStaffUserAccountInfo)
         $currentResult = $this->getInnerIterator()->current();
-        $staff         = new Staff();
+        $staff         = new User\Staff();
         $staff
             ->setId($currentResult['StaffID'])
             ->setTitle($currentResult['StaffTitle'])
@@ -49,18 +51,18 @@ class External_StaffAccountIterator extends IteratorIterator
 
         /* Email
          */
-        $email1 = new Common\Email();
+        $email1 = new User\Common\Email();
         $email1
             ->setAddress($currentResult['Email'])
         ;
 
-        $email2 = new Common\Email();
+        $email2 = new User\Common\Email();
         $email2
             ->setAddress($currentResult['OccupEmail'])
         ;
 
         foreach (array($email1, $email2) as $currentEmail) {
-            /** @var Common\Email $currentEmail */
+            /** @var User\Common\Email $currentEmail */
             if (strlen($currentEmail->getAddress())) {
                 $staff->addEmail($currentEmail);
             }
@@ -68,7 +70,7 @@ class External_StaffAccountIterator extends IteratorIterator
 
         /* Campus
          */
-        $campus = new Common\Campus();
+        $campus = new User\Common\Campus();
         $campus
             ->setName($currentResult['StaffCampus'])
         ;

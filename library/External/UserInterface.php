@@ -176,7 +176,7 @@ interface External_UserInterface {
      * This method should return an iterator instead of an array, for memory
      * efficiency reasons.
      *
-     * @return Schoolbox\External\Normalise\User\Student[]|External_StudentAccountIterator
+     * @return Schoolbox\External\Normalise\User\Student[]|Schoolbox\Sync\Iterator\Student
      */
     public function getStudentUserAccountIterator();
 
@@ -295,7 +295,7 @@ interface External_UserInterface {
      * This method should return an iterator instead of an array, for memory
      * efficiency reasons.
      *
-     * @return Schoolbox\External\Normalise\User\Guardian[]|External_ParentAccountIterator
+     * @return Schoolbox\External\Normalise\User\Guardian[]|Schoolbox\Sync\Iterator\Guardian
      */
     public function getParentUserAccountIterator();
 
@@ -351,7 +351,7 @@ interface External_UserInterface {
      * This method should return an iterator instead of an array, for memory
      * efficiency reasons.
      *
-     * @return Schoolbox\External\Normalise\User\Staff[]|External_StaffAccountIterator
+     * @return Schoolbox\External\Normalise\User\Staff[]|Schoolbox\Sync\Iterator\Staff
      */
     public function getStaffUserAccountIterator();
 

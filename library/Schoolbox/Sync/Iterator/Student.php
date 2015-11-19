@@ -8,22 +8,24 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\External\Normalise\User\Common;
-use Schoolbox\External\Normalise\User\Student;
+namespace Schoolbox\Sync\Iterator;
 
-class External_StudentAccountIterator extends IteratorIterator
+use IteratorIterator;
+use Schoolbox\External\Normalise\User;
+
+class Student extends IteratorIterator
 {
     /**
      * Return the current element
      *
-     * @return Student
+     * @return User\Student
      */
     public function current()
     {
         // Build a normalized object out of the current item
         // (copypasted from Adapter->getStudentUserAccountInfo)
         $currentResult = $this->getInnerIterator()->current();
-        $student       = new Student();
+        $student       = new User\Student();
         $student
             ->setId($currentResult['StudentID'])
             ->setTitle($currentResult['StudentTitle'])
@@ -49,23 +51,23 @@ class External_StudentAccountIterator extends IteratorIterator
 
         /* Assign emails
          */
-        $email1 = new Common\Email();
+        $email1 = new User\Common\Email();
         $email1
             ->setAddress($currentResult['StudentEmail']);
 
-        $email2 = new Common\Email();
+        $email2 = new User\Common\Email();
         $email2
             ->setAddress($currentResult['StudentOccupEmail']);
 
         foreach (array($email1, $email2) as $currentEmail) {
-            /** @var Common\Email $currentEmail */
+            /** @var User\Common\Email $currentEmail */
             if (strlen($currentEmail->getAddress())) {
                 $student->addEmail($currentEmail);
             }
         }
 
         if ($currentResult['StudentBoarder'] == 'Y') {
-            $boardingHouse = new Common\BoardingHouse();
+            $boardingHouse = new User\Common\BoardingHouse();
             $boardingHouse
                 ->setName($currentResult['StudentBoardingHouse'])
             ;
@@ -77,7 +79,7 @@ class External_StudentAccountIterator extends IteratorIterator
 
         /* Campus
          */
-        $campus = new Common\Campus();
+        $campus = new User\Common\Campus();
         $campus
             ->setName($currentResult['StudentCampus'])
         ;

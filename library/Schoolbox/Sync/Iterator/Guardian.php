@@ -8,11 +8,12 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\External\Normalise\User\Common;
-use Schoolbox\External\Normalise\User\Guardian;
-use Schoolbox\External\Normalise\User\Student;
+namespace Schoolbox\Sync\Iterator;
 
-class External_ParentAccountIterator extends IteratorIterator
+use IteratorIterator;
+use Schoolbox\External\Normalise\User;
+
+class Guardian extends IteratorIterator
 {
     /**
      * @var int
@@ -56,7 +57,7 @@ class External_ParentAccountIterator extends IteratorIterator
         // * StudentCampus
         // * StudentGender
         $currentResult = current($preStack);
-        $guardian      = new Guardian();
+        $guardian      = new User\Guardian();
         $guardian
             ->setId($currentResult['StudentContactID'])
             ->setTitle($currentResult['StudentContactTitle'])
@@ -67,7 +68,7 @@ class External_ParentAccountIterator extends IteratorIterator
 
         /* Email
          */
-        $email = new Common\Email();
+        $email = new User\Common\Email();
         $email->setAddress($currentResult['StudentContactDefaultEmail']);
         $guardian->addEmail($email);
 
@@ -81,7 +82,7 @@ class External_ParentAccountIterator extends IteratorIterator
         // Add details for each one of their students
         foreach ($preStack as $row) {
             // Students
-            $student = new Student();
+            $student = new User\Student();
             $student
                 ->setId($row['StudentId'])
                 ->setPreferredName($row['StudentPreferred'])
@@ -96,7 +97,7 @@ class External_ParentAccountIterator extends IteratorIterator
 
             /* Campus
              */
-            $campus = new Common\Campus();
+            $campus = new User\Common\Campus();
             $campus->setName($row['StudentCampus']);
             $student->getCampus()->add($campus);
             $guardian->addStudent($student);
