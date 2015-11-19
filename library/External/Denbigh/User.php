@@ -463,6 +463,14 @@ class External_Denbigh_User implements External_UserInterface {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getStaffUserAccountIterator()
+    {
+        // TODO: Implement getStaffUserAccountIterator() method.
+    }
+
+    /**
      * Determine the boarder type based on a value
      * Returns a human-readable string
      *

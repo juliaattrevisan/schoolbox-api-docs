@@ -98,6 +98,14 @@ class External_Offline_User implements External_UserInterface
         // Return nothing
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getStaffUserAccountIterator()
+    {
+        // Return nothing
+    }
+
     public function determineBoarderType($boarderValue)
     {
         // Return nothing

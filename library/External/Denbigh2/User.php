@@ -769,6 +769,14 @@ class External_Denbigh2_User implements External_UserInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getStaffUserAccountIterator()
+    {
+        // TODO: Implement getStaffUserAccountIterator() method.
+    }
+
+    /**
      * Get contact list for staff directory
      *
      * @return array(

@@ -453,7 +453,13 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         return $stmt->fetchAll(DB2::FETCH_ASSOC);
     }
 
-
+    /**
+     * {@inheritdoc}
+     */
+    public function getStaffUserAccountIterator()
+    {
+        // TODO: Implement getStaffUserAccountIterator() method.
+    }
 
     /**
      * Method not implemented

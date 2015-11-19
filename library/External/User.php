@@ -200,6 +200,14 @@ class External_User implements External_UserInterface {
 		return $this->getDatabase()->getStaffUserAccountInfo();
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getStaffUserAccountIterator()
+	{
+		return $this->getDatabase()->getStaffUserAccountIterator();
+	}
+
     /**
      * Determine the boarder type of a student
      *

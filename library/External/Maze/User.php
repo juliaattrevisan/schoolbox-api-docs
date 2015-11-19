@@ -1005,6 +1005,14 @@ class External_Maze_User implements External_UserInterface {
 		return $this->getDb()->getAll($query);
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getStaffUserAccountIterator()
+	{
+		// TODO: Implement getStaffUserAccountIterator() method.
+	}
+
     /**
      * List of campuses a staff member is involved in based on timetable
      *

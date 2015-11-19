@@ -335,6 +335,16 @@ interface External_UserInterface {
      */
     public function getStaffUserAccountInfo();
 
+    /**
+     * Gets a collection of normalized staff objects.
+     *
+     * This method should return an iterator instead of an array, for memory
+     * efficiency reasons.
+     *
+     * @return Schoolbox\External\Normalise\User\Staff[]|External_StaffAccountIterator
+     */
+    public function getStaffUserAccountIterator();
+
     /* Common methods
      */
 

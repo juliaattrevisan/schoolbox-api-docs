@@ -370,6 +370,14 @@ class External_Tass_User implements External_UserInterface
         return $staffList;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getStaffUserAccountIterator()
+    {
+        // TODO: Implement getStaffUserAccountIterator() method.
+    }
+
     public function getStudentUserAccountInfo()
     {
         // Get all students who have a campus, and don't have a leaving date?

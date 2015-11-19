@@ -1295,6 +1295,14 @@ class Adapter  implements \External_UserInterface {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getStaffUserAccountIterator()
+    {
+        return $this->getHandler()->getStaffUserAccountIterator();
+    }
+
+    /**
      * Get a list of students belonging to $externalUserId
      *
      * @param $externalUserId

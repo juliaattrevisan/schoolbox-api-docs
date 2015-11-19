@@ -580,6 +580,14 @@ class External_Schoolpro_User implements External_UserInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getStaffUserAccountIterator()
+    {
+        // TODO: Implement getStaffUserAccountIterator() method.
+    }
+
+    /**
      * Stub method, probably not used
      */
     public function determineBoarderType($boarderValue)
