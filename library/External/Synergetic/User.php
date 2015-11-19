@@ -912,9 +912,12 @@ class External_Synergetic_User implements External_UserInterface
                 s.StudentContactPreferred,
                 s.StudentContactSurname,
                 s.StudentContactDefaultEmail,
+                s.StudentId,
                 s.StudentYearLevel,
                 s.StudentCampus,
-                s.StudentGender
+                s.StudentGender,
+                s.StudentPreferred,
+                s.StudentSurname
             FROM SynergyOne.dbo.vStudentContactAllAddress s
             INNER JOIN SynergyOne.dbo.Community cp ON s.StudentContactID = cp.ID
             WHERE (s.StudentContactType IN ('SC1', 'SC2'))
@@ -930,9 +933,12 @@ class External_Synergetic_User implements External_UserInterface
                 s.StudentContactSpousePreferred AS StudentContactPreferred,
                 s.StudentContactSpouseSurname AS StudentContactSurname,
                 s.StudentContactSpouseDefaultEmail AS StudentContactDefaultEmail,
+                s.StudentId,
                 s.StudentYearLevel,
                 s.StudentCampus,
-                s.StudentGender
+                s.StudentGender,
+                s.StudentPreferred,
+                s.StudentSurname
             FROM SynergyOne.dbo.vStudentContactAllAddress s
             INNER JOIN SynergyOne.dbo.Community cs ON s.StudentContactSpouseID = cs.ID
             WHERE (s.StudentContactType IN ('SC1', 'SC2'))
