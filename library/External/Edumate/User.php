@@ -392,6 +392,14 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getStudentUserAccountIterator()
+    {
+        // TODO: Implement getStudentUserAccountIterator() method.
+    }
+
+    /**
      * Sync Method: Parent
      */
     public function getParentUserAccountInfo() {

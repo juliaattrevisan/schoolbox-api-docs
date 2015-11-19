@@ -911,6 +911,14 @@ class External_Maze_User implements External_UserInterface {
 	}
 
 	/**
+	 * {@inheritdoc}
+	 */
+	public function getStudentUserAccountIterator()
+	{
+		// TODO: Implement getStudentUserAccountIterator() method.
+	}
+
+	/**
 	 * Used in sync scripts
 	 */
 	public function getParentUserAccountInfo() {

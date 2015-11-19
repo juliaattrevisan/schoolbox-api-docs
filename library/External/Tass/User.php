@@ -397,6 +397,14 @@ class External_Tass_User implements External_UserInterface
         return $result;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getStudentUserAccountIterator()
+    {
+        // TODO: Implement getStudentUserAccountIterator() method.
+    }
+
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
     {
     }

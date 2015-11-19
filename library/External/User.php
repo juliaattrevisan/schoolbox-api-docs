@@ -173,6 +173,14 @@ class External_User implements External_UserInterface {
 	}
 
 	/**
+	 * {@inheritdoc}
+	 */
+	public function getStudentUserAccountIterator()
+	{
+		return $this->getDatabase()->getStudentUserAccountIterator();
+	}
+
+	/**
 	 * No usages found
 	 *
 	 * @todo Review usage of method

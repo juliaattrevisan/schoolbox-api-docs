@@ -398,6 +398,14 @@ class External_Denbigh2_User implements External_UserInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getStudentUserAccountIterator()
+    {
+        // TODO: Implement getStudentUserAccountIterator() method.
+    }
+
+    /**
      * Returns a list of email parent email addresseses for students.
      *
      * @param array $synergyIds

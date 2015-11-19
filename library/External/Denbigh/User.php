@@ -424,6 +424,14 @@ class External_Denbigh_User implements External_UserInterface {
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getStudentUserAccountIterator()
+    {
+        // TODO: Implement getStudentUserAccountIterator() method.
+    }
+
     public function getParentUserAccountInfo() {
         $query = $this->getExternalDatabase()->query(
             "

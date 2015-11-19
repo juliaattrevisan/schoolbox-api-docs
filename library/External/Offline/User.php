@@ -80,6 +80,14 @@ class External_Offline_User implements External_UserInterface
         // Return nothing
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getStudentUserAccountIterator()
+    {
+        // Return nothing
+    }
+
     public function getParentUserAccountInfo()
     {
         // Return nothing

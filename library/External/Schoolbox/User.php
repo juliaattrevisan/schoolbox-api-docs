@@ -317,6 +317,14 @@ class External_Schoolbox_User implements External_UserInterface
 
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getStudentUserAccountIterator()
+    {
+        // TODO: Implement getStudentUserAccountIterator() method.
+    }
+
     public function getParentUserAccountInfo()
     {
     }
