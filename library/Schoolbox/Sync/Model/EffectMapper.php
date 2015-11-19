@@ -37,7 +37,7 @@ class EffectMapper extends Mapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('user_property', self::TYPE_STRING);
-        $this->uses('arguments', self::TYPE_SERIALIZED);
+        $this->uses('arguments', self::TYPE_JSON);
 
 //        $this->joins('rule_id', RuleMapper::class);
         $this->joins('effect_type_id', EffectTypeMapper::class);

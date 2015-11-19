@@ -2,8 +2,7 @@
 SQLyog Ultimate v11.31 (64 bit)
 MySQL - 5.5.43-0ubuntu0.14.04.1 : Database - schoolbox
 *********************************************************************
-*/
-
+*/
 
 /*!40101 SET NAMES utf8 */;
 
@@ -17,7 +16,7 @@ MySQL - 5.5.43-0ubuntu0.14.04.1 : Database - schoolbox
 
 LOCK TABLES `ups_condition` WRITE;
 
-insert  into `ups_condition`(`id`,`rule_id`,`condition_type_id`,`arguments`) values (1,1,2,'a:1:{i:0;b:1;}'),(2,3,1,'a:3:{i:0;s:16:\"StudentYearLevel\";i:1;a:7:{i:0;i:0;i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;i:5;i:5;i:6;i:6;}i:2;b:0;}'),(3,4,1,'a:3:{i:0;s:12:\"NetworkLogin\";i:1;N;i:2;b:0;}');
+insert  into `ups_condition`(`id`,`rule_id`,`condition_type_id`,`arguments`) values (1,1,2,'[true]'),(2,3,1,'[\"StudentYearLevel\",[0,1,2,3,4,5,6],false]'),(3,4,1,'[\"NetworkLogin\",null,false]');
 
 UNLOCK TABLES;
 
@@ -25,7 +24,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `ups_effect` WRITE;
 
-insert  into `ups_effect`(`id`,`rule_id`,`user_property`,`effect_type_id`,`arguments`) values (1,1,'enabled',2,'a:1:{i:0;b:0;}'),(30,2,'username',2,'a:1:{i:0;s:15:\"{:NetworkLogin}\";}'),(31,2,'title',2,'a:1:{i:0;N;}'),(32,2,'firstname',2,'a:1:{i:0;s:19:\"{:StudentPreferred}\";}'),(33,2,'lastname',2,'a:1:{i:0;s:17:\"{:StudentSurname}\";}'),(34,2,'altEmail',2,'a:1:{i:0;s:15:\"{:StudentEmail}\";}'),(35,2,'localEmail',2,'a:1:{i:0;b:1;}'),(36,2,'eportfolioEnable',2,'a:1:{i:0;b:1;}'),(37,2,'year',2,'a:1:{i:0;s:19:\"{:StudentYearLevel}\";}'),(38,2,'externalId',2,'a:1:{i:0;s:12:\"{:StudentID}\";}'),(39,2,'superuser',2,'a:1:{i:0;b:0;}'),(40,2,'password',2,'a:1:{i:0;s:8:\"password\";}'),(41,2,'defaultCampus',1,'a:2:{i:0;s:16:\"{:StudentCampus}\";i:1;a:2:{s:1:\"S\";i:1;s:1:\"J\";i:2;}}'),(42,2,'schoolHouse',1,'a:2:{i:0;s:15:\"{:StudentHouse}\";i:1;a:4:{s:2:\"Da\";i:1;s:2:\"Fo\";i:2;s:2:\"Oa\";i:3;s:2:\"Th\";i:4;}}'),(44,3,'role',2,'a:1:{i:0;i:3;}'),(45,4,'username',2,'a:1:{i:0;s:54:\"{:StudentPreferred|lc|first}{:StudentSurname|alpha|lc}\";}');
+insert  into `ups_effect`(`id`,`rule_id`,`user_property`,`effect_type_id`,`arguments`) values (1,1,'enabled',2,'[false]'),(30,2,'username',2,'[\"{:NetworkLogin}\"]'),(31,2,'title',2,'[null]'),(32,2,'firstname',2,'[\"{:StudentPreferred}\"]'),(33,2,'lastname',2,'[\"{:StudentSurname}\"]'),(34,2,'altEmail',2,'[\"{:StudentEmail}\"]'),(35,2,'localEmail',2,'[true]'),(36,2,'eportfolioEnable',2,'[true]'),(37,2,'year',2,'[\"{:StudentYearLevel}\"]'),(38,2,'externalId',2,'[\"{:StudentID}\"]'),(39,2,'superuser',2,'[false]'),(40,2,'password',2,'[\"password\"]'),(41,2,'defaultCampus',1,'[\"{:StudentCampus}\",{\"S\":1,\"J\":2}]'),(42,2,'schoolHouse',1,'[\"{:StudentHouse}\",{\"Da\":1,\"Fo\":2,\"Oa\":3,\"Th\":4}]'),(44,3,'role',2,'[3]'),(45,4,'username',2,'[\"{:StudentPreferred|lc|first}{:StudentSurname|alpha|lc}\"]');
 
 UNLOCK TABLES;
 
