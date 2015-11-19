@@ -8,13 +8,10 @@
  */
 
 
-use Alaress\Rules\Lang\Map;
 use Schoolbox\Role;
 use Schoolbox\Sync;
-use Schoolbox\Sync\Rules\UserRuleset;
 use Schoolbox\Sync\Rules\Condition;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 
 if (empty($this)) {
@@ -23,117 +20,57 @@ if (empty($this)) {
     exit;
 }
 
+/** @var SitePage $this */
+
 if (!$_SESSION['user']->isSuperUser()) {
     error(19);
     exit;
 }
 
-/* DATA SETUP */
-
-/* Mirroring the Schoolbox Sync */
-//$studentSet = new UserRuleset(UserMapper::getInstance(), 'Student');
-//
-//$studentSet->newRule([
-//    // IF user NOT EXISTS
-//    new Condition\UserExists(true)
-//], [
-//    'enabled' => true
-//]);
-//
-//$studentSet->newRule([
-//    // IF :input.StudentBoardingHouse NOT BLANK
-//    new Condition\ExternalUserValueIn('StudentBoarder', null, true)
-//], [
-//    'residentialHouse' => 1
-//]);
-//
-//$studentSet->newRule([
-//    // ALWAYS
-//], [
-//    'username'         => '{:NetworkLogin}',
-//    'title'            => null,
-//    'firstname'        => '{:StudentPreferred}',
-//    'lastname'         => '{:StudentSurname}',
-//    'altEmail'         => '{:StudentEmail}',
-//    'localEmail'       => true,
-//    'eportfolioEnable' => true,
-//    'year'             => '{:StudentYearLevel}',
-//    'externalId'       => '{:StudentID}',
-//    'superuser'        => false,
-//    'password'         => 'password',
-//    'defaultCampus'    => new Map('{:StudentCampus}', [
-//        'S' => 1,
-//        'J' => 2,
-//    ]),
-//    'schoolHouse'      => new Map('{:StudentHouse}', [
-//        'Da' => 1,
-//        'Fo' => 2,
-//        'Oa' => 3,
-//        'Th' => 4,
-//    ]),
-//]);
-//
-//$studentSet->newRule([
-//    // IF :input.StudentYearLevel IN (0, 1, 2, 3, 4, 5, 6)
-//    new Condition\ExternalUserValueIn('StudentYearLevel', [0,1,2,3,4,5,6])
-//], [
-//    'role' => 5
-//]);
-//
-//$studentSet->newRule([
-//    // IF :input.StudentYearLevel IN (7, 8, 9, 10, 11, 12)
-//    new Condition\ExternalUserValueIn('StudentYearLevel', [7,8,9,10,11,12])
-//],[
-//    'role' => 3
-//]);
-//
-//$studentSet->newRule([
-//    // IF :input.NetworkLogin IS BLANK
-//    new Condition\ExternalUserValueIn('NetworkLogin', null)
-//], [
-//    'username' => '{:StudentPreferred|lc|first}{:StudentSurname|alpha|lc}'
-//]);
-
 $stratFactory = new Sync\Factory();
 
 $studentSet = $stratFactory->build(Role::STUDENT);
 
-$euh = new External_User();
+
+function testData(Sync\Rules\Ruleset $studentSet)
+{
+
+    $euh = new External_User();
 
 // students
-$studentUserAccountInfo = $euh->getStudentUserAccountInfo();
-$studentData = [];
+    $studentUserAccountInfo = $euh->getStudentUserAccountInfo();
+    $studentData            = [];
 
 // collate the student data, because there be lotsa dupes
-foreach ($studentUserAccountInfo as $datum) {
-    $studentData[$datum['StudentID']] = $datum;
-}
-
-
-/** @var SitePage $this */
-
-if ($this->arg[0] == 'example' && $this->arg[1] == 'rule') {
-
-    if (!isset($this->arg[2])) {
-        error(2);
+    foreach ($studentUserAccountInfo as $datum) {
+        $studentData[$datum['StudentID']] = $datum;
     }
 
-    $input  = $studentData[array_rand($studentData)];
 
-    $result = $studentSet->applyPartial([ $this->arg[2] ], $input);
+    /** @var SitePage $this */
 
-    new Alaress_Probe($input, $result);
+    if ($this->arg[0] == 'example' && $this->arg[1] == 'rule') {
 
-    exit;
-}
+        if (!isset($this->arg[2])) {
+            error(2);
+        }
 
+        $input = $studentData[array_rand($studentData)];
 
-$x = microtime(true);
-foreach ($studentData as $externalStudent) {
+        $result = $studentSet->applyPartial([$this->arg[2]], $input);
 
-    if (!$externalStudent['StudentID']) {
-        continue;
+        new Alaress_Probe($input, $result);
+
+        exit;
     }
+
+
+    $x = microtime(true);
+    foreach ($studentData as $externalStudent) {
+
+        if (!$externalStudent['StudentID']) {
+            continue;
+        }
 
 //    try {
         // has this student already been loaded into Schoolbox?
@@ -147,21 +84,29 @@ foreach ($studentData as $externalStudent) {
 //        continue; // for testing, only interested in existing users
 //    }
 
-    $results[] = $studentSet->applyTo($externalStudent, $internalStudent);
-}
+        $results[] = $studentSet->applyTo($externalStudent, $internalStudent);
+    }
 
-$duration = microtime(true) - $x;
+    $duration = microtime(true) - $x;
 
-$a = array('s', 'ms', '&mu;s');
+    $a = array('s', 'ms', '&mu;s');
 
-for ($i = 0; $duration < 1 && $i < count($a); $i++) {
-    $duration *= 1000;
-}
+    for ($i = 0; $duration < 1 && $i < count($a); $i++) {
+        $duration *= 1000;
+    }
 
-$duration = round($duration, 2) . $a[$i];
+    $duration = round($duration, 2) . $a[$i];
 
 //new Alaress_Probe($output[0], $output[1]);
-printf("<pre>%d users processed in %s</pre>", count($results), $duration);
+    printf("<pre>%d users processed in %s</pre>", count($results), $duration);
+
+}
+
+
+if ($_GET['test'] || count($this->arg)) {
+    testData($studentSet);
+}
+
 
 
 $this->setFile(TEMPLATE_content, 'adminv2/sync-config.html');
