@@ -111,9 +111,41 @@ class Ruleset extends TokenizedRuleset
 
 
     /**
+     * Compatibility method, defaults to sequence
+     *
+     * @param bool $byPrecedence
      * @return Rule[]
      */
-    public function getRules()
+    public function getRules($byPrecedence = false)
+    {
+        if ($byPrecedence) {
+            return $this->getRulesByPrecedence();
+        }
+
+        return $this->getRulesBySequence();
+    }
+
+
+    /**
+     * @return Rule[]
+     */
+    function getRulesBySequence()
+    {
+        $all = [];
+
+        // spit them out in the order they came in
+        foreach ($this->rules as $r) {
+            $all[] = $r;
+        }
+
+        return $all;
+    }
+
+
+    /**
+     * @return Rule[]
+     */
+    public function getRulesByPrecedence()
     {
         $all = array();
 

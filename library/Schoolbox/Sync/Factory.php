@@ -74,7 +74,12 @@ class Factory
     {
         $rules = [];
 
-        $dbRules = $this->ruleMapper->findByColumn('role_type', $roletype);
+        // pull these rules out in sequence
+        $dbRules = $this->ruleMapper->findByColumn('role_type', $roletype, [
+            'order' => [
+                'sequence' => 'ASC'
+            ]
+        ]);
 
         foreach ($dbRules as $i => $rule) {
 
