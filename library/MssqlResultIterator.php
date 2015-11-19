@@ -82,8 +82,7 @@ class MssqlResultIterator implements SeekableIterator
      */
     public function rewind()
     {
-        $this->rowNum = 0;
-        mssql_data_seek($this->result, 0);
+        $this->seek(0);
     }
 
     /**
@@ -95,8 +94,10 @@ class MssqlResultIterator implements SeekableIterator
     {
         if (mssql_data_seek($this->result, $position)) {
             $this->rowNum = $position;
-        } else {
-            throw new OutOfBoundsException(sprintf('Position "%s" is out of bounds', $position));
+            if ($this->valid()) {
+                return;
+            }
         }
+        throw new OutOfBoundsException(sprintf('Position "%s" is out of bounds', $position));
     }
 }
