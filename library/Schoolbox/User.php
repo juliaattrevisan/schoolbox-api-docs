@@ -95,6 +95,7 @@ class User implements JsonSerializable
         $this->setCampusCollection(new CampusCollection(array()));
         $this->setConfigLoader(new ConfigLoader());
         $this->setLinkedUser(new \Schoolbox\Collection(array()));
+        $this->setRole(new Role());
     }
 
     /**
