@@ -15,7 +15,7 @@ use Schoolbox\External\Normalise\User\Student;
 /**
  * @method SeekableIterator getInnerIterator()
  */
-class External_ParentAccountIterator extends IteratorIterator implements SeekableIterator
+class External_ParentAccountIterator extends IteratorIterator //implements SeekableIterator
 {
     /**
      * @var resource
@@ -157,13 +157,13 @@ class External_ParentAccountIterator extends IteratorIterator implements Seekabl
         }
     }
 
-    /**
-     * Seeks to a position
-     *
-     * @var int $position
-     */
-    public function seek($position)
-    {
-        $this->getInnerIterator()->seek($position);
-    }
+//    /**
+//     * Seeks to a position
+//     *
+//     * @var int $position
+//     */
+//    public function seek($position)
+//    {
+//        $this->getInnerIterator()->seek($position);
+//    }
 }
