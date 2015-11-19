@@ -11,21 +11,25 @@ namespace Schoolbox\Sync;
 
 
 use Alaress\Rules\Lang\Map;
+use Schoolbox\Sync\Model\RuleMapper;
 use Schoolbox\Sync\Rules\UserRuleset;
 use Schoolbox\UserMapper;
 
 class Factory
 {
     /** @var UserMapper */
-    protected $mapper;
+    protected $userMapper;
 
+    /** @var RuleMapper */
+    protected $ruleMapper;
 
     /**
      * TODO expose hidden dependencies
      */
     public function __construct()
     {
-        $this->mapper = UserMapper::getInstance();
+        $this->userMapper = UserMapper::getInstance();
+        $this->ruleMapper = RuleMapper::getInstance();
 
     }
 
@@ -40,7 +44,7 @@ class Factory
     {
         $context = ucfirst($roletype);
 
-        $set = new UserRuleset($this->mapper, $context);
+        $set = new UserRuleset($this->userMapper, $context);
 
         foreach ($this->findRulesForRoleType($roletype) as $rule) {
 
@@ -64,59 +68,11 @@ class Factory
      */
     protected function findRulesForRoleType($roletype)
     {
-        // TODO db queries
-        $fakeStructure = [
-            [
-                'conditions' => [
-                    [
-                        'type' => 'UserExists',
-                        'args' => [ true ]
-                    ]
-                ],
-                'effects' => [
-                    'enabled' => [
-                        'type' => 'literal',
-                        'args' => [ true ]
-                    ]
-                ]
-            ],
-            [
-                'conditions' => [
-                    [
-                        'type' => 'ExternalUserValueIn',
-                        'args' => [ 'StudentYearLevel', [ 0, 1, 2, 3, 4, 5, 6 ], false ]
-                    ]
-                ],
-                'effects' => [
-                    'role' => [
-                        'type' => 'literal',
-                        'args' => [ 5 ]
-                    ]
-                ]
-            ],
-            [
-                'conditions' => [
-                ],
-                'effects' => [
-                    'schoolHouse' => [
-                        'type' => 'Map',
-                        'args' => [
-                            '{:StudentHouse}', [
-                                'Da' => 1,
-                                'Fo' => 2,
-                                'Oa' => 3,
-                                'Th' => 4
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ];
-
-
         $rules = [];
 
-        foreach ($fakeStructure as $i => $rule) {
+        $dbRules = $this->ruleMapper->findByColumn('role_type', $roletype);
+
+        foreach ($dbRules as $i => $rule) {
 
             $rules[$i] = [
                 'conditions' => [],
@@ -124,15 +80,15 @@ class Factory
                 'negate' => false
             ];
 
-            foreach ($rule['conditions'] as $condition) {
-                $rules[$i]['conditions'][] = $this->buildCondition($condition['type'], $condition['args']);
+            foreach ($rule->getConditions() as $condition) {
+                $rules[$i]['conditions'][] = $this->buildCondition($condition->getConditionType()->getName(), $condition->getArguments());
             }
 
-            foreach ($rule['effects'] as $property => $effect) {
-                $rules[$i]['effects'][$property] = $this->buildEffect($effect['type'], $effect['args']);
+            foreach ($rule->getEffects() as $effect) {
+                $rules[$i]['effects'][$effect->getUserProperty()] = $this->buildEffect($effect->getEffectType()->getName(), $effect->getArguments());
             }
 
-            $rules[$i]['negate'] = isset($rule['negate']) && $rule['negate'];
+//            $rules[$i]['negate'] = isset($rule['negate']) && $rule['negate'];
         }
 
         return $rules;
