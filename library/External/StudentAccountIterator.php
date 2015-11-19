@@ -47,7 +47,7 @@ class External_StudentAccountIterator extends IteratorIterator implements Seekab
     public function current()
     {
         // Build a normalized object out of the current item
-        // (copypasted from Adapter->getStudnetUserAccountinfo)
+        // (copypasted from Adapter->getStudentUserAccountInfo)
         $currentResult = $this->getInnerIterator()->current();
         $student       = new Schoolbox\External\Normalise\User\Student();
         $student
@@ -107,6 +107,7 @@ class External_StudentAccountIterator extends IteratorIterator implements Seekab
             ->getCampus()
             ->add($campus)
         ;
+        return $student;
     }
 
     /**
