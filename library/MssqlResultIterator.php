@@ -95,7 +95,8 @@ class MssqlResultIterator implements SeekableIterator
     {
         if (mssql_data_seek($this->result, $position)) {
             $this->rowNum = $position;
+        } else {
+            throw new OutOfBoundsException(sprintf('Position "%s" is out of bounds', $position));
         }
-        throw new OutOfBoundsException(sprintf('Position "%s" is out of bounds', $position));
     }
 }
