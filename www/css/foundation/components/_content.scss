@@ -1133,10 +1133,10 @@ ul.flex-list {
 .card {
 	position: relative;
     min-height: (3 * rem-calc($base-font-size));
-    padding: 0.25rem 0.5rem 0 1rem;
+    padding: 0.25rem 1rem 0 1rem;
     @media #{$medium-up} {
         min-height: (4 * rem-calc($base-font-size));
-        padding: 0.5rem 0.5rem 0 1rem;
+        padding: 0.5rem 1rem 0 1rem;
     }
 
     /* Avatar Card
@@ -1172,6 +1172,16 @@ ul.flex-list {
             margin-left: (rem-calc($base-font-size));
             @media #{$medium-up} {
                 margin-left: (5 * rem-calc($base-font-size));
+            }
+        }
+		
+		/* When things like news have no feature image,
+         * keep these things inline with article
+         */
+        a h3:only-child, .meta{
+        	margin-left: 0;
+            @media #{$medium-up} {
+                margin-left: (4 * rem-calc($base-font-size));
             }
         }
 
@@ -1415,7 +1425,7 @@ ul.flex-list {
     ~ article, ~ .list-item-content {
         clear:both;
         margin-top: 0.5rem;
-        padding-right: (0.5 * rem-calc($base-font-size));
+        padding-right: (rem-calc($base-font-size));
 		@media #{$small-only} {
 			p {
 				font-size: (0.8125 * rem-calc($base-font-size));
