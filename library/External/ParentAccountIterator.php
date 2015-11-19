@@ -82,7 +82,12 @@ class External_ParentAccountIterator extends IteratorIterator
         foreach ($preStack as $row) {
             // Students
             $student = new Student();
-            $student->setGender($currentResult['StudentGender']);
+            $student
+                ->setId($currentResult['StudentId'])
+                ->setPreferredName($currentResult['StudentPreferred'])
+                ->setLastname($currentResult['StudentSurname'])
+                ->setGender($currentResult['StudentGender'])
+            ;
 
             $student
                 ->getYear()
