@@ -9,6 +9,8 @@
 
 
 use Alaress\Rules\Lang\Map;
+use Schoolbox\Role;
+use Schoolbox\Sync;
 use Schoolbox\Sync\Rules\UserRuleset;
 use Schoolbox\Sync\Rules\Condition;
 use Schoolbox\User;
@@ -29,68 +31,72 @@ if (!$_SESSION['user']->isSuperUser()) {
 /* DATA SETUP */
 
 /* Mirroring the Schoolbox Sync */
-$studentSet = new UserRuleset(UserMapper::getInstance(), 'Student');
+//$studentSet = new UserRuleset(UserMapper::getInstance(), 'Student');
+//
+//$studentSet->newRule([
+//    // IF user NOT EXISTS
+//    new Condition\UserExists(true)
+//], [
+//    'enabled' => true
+//]);
+//
+//$studentSet->newRule([
+//    // IF :input.StudentBoardingHouse NOT BLANK
+//    new Condition\ExternalUserValueIn('StudentBoarder', null, true)
+//], [
+//    'residentialHouse' => 1
+//]);
+//
+//$studentSet->newRule([
+//    // ALWAYS
+//], [
+//    'username'         => '{:NetworkLogin}',
+//    'title'            => null,
+//    'firstname'        => '{:StudentPreferred}',
+//    'lastname'         => '{:StudentSurname}',
+//    'altEmail'         => '{:StudentEmail}',
+//    'localEmail'       => true,
+//    'eportfolioEnable' => true,
+//    'year'             => '{:StudentYearLevel}',
+//    'externalId'       => '{:StudentID}',
+//    'superuser'        => false,
+//    'password'         => 'password',
+//    'defaultCampus'    => new Map('{:StudentCampus}', [
+//        'S' => 1,
+//        'J' => 2,
+//    ]),
+//    'schoolHouse'      => new Map('{:StudentHouse}', [
+//        'Da' => 1,
+//        'Fo' => 2,
+//        'Oa' => 3,
+//        'Th' => 4,
+//    ]),
+//]);
+//
+//$studentSet->newRule([
+//    // IF :input.StudentYearLevel IN (0, 1, 2, 3, 4, 5, 6)
+//    new Condition\ExternalUserValueIn('StudentYearLevel', [0,1,2,3,4,5,6])
+//], [
+//    'role' => 5
+//]);
+//
+//$studentSet->newRule([
+//    // IF :input.StudentYearLevel IN (7, 8, 9, 10, 11, 12)
+//    new Condition\ExternalUserValueIn('StudentYearLevel', [7,8,9,10,11,12])
+//],[
+//    'role' => 3
+//]);
+//
+//$studentSet->newRule([
+//    // IF :input.NetworkLogin IS BLANK
+//    new Condition\ExternalUserValueIn('NetworkLogin', null)
+//], [
+//    'username' => '{:StudentPreferred|lc|first}{:StudentSurname|alpha|lc}'
+//]);
 
-$studentSet->newRule([
-    // IF user NOT EXISTS
-    new Condition\UserExists(true)
-], [
-    'enabled' => true
-]);
+$stratFactory = new Sync\Factory();
 
-$studentSet->newRule([
-    // IF :input.StudentBoardingHouse NOT BLANK
-    new Condition\ExternalUserValueIn('StudentBoarder', null, true)
-], [
-    'residentialHouse' => 1
-]);
-
-$studentSet->newRule([
-    // ALWAYS
-], [
-    'username'         => '{:NetworkLogin}',
-    'title'            => null,
-    'firstname'        => '{:StudentPreferred}',
-    'lastname'         => '{:StudentSurname}',
-    'altEmail'         => '{:StudentEmail}',
-    'localEmail'       => true,
-    'eportfolioEnable' => true,
-    'year'             => '{:StudentYearLevel}',
-    'externalId'       => '{:StudentID}',
-    'superuser'        => false,
-    'password'         => 'password',
-    'defaultCampus'    => new Map('{:StudentCampus}', [
-        'S' => 1,
-        'J' => 2,
-    ]),
-    'schoolHouse'      => new Map('{:StudentHouse}', [
-        'Da' => 1,
-        'Fo' => 2,
-        'Oa' => 3,
-        'Th' => 4,
-    ]),
-]);
-
-$studentSet->newRule([
-    // IF :input.StudentYearLevel IN (0, 1, 2, 3, 4, 5, 6)
-    new Condition\ExternalUserValueIn('StudentYearLevel', [0,1,2,3,4,5,6])
-], [
-    'role' => 5
-]);
-
-$studentSet->newRule([
-    // IF :input.StudentYearLevel IN (7, 8, 9, 10, 11, 12)
-    new Condition\ExternalUserValueIn('StudentYearLevel', [7,8,9,10,11,12])
-],[
-    'role' => 3
-]);
-
-$studentSet->newRule([
-    // IF :input.NetworkLogin IS BLANK
-    new Condition\ExternalUserValueIn('NetworkLogin', null)
-], [
-    'username' => '{:StudentPreferred|lc|first}{:StudentSurname|alpha|lc}'
-]);
+$studentSet = $stratFactory->build(Role::STUDENT);
 
 $euh = new External_User();
 
