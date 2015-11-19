@@ -23,14 +23,15 @@ class Factory
     /** @var RuleMapper */
     protected $ruleMapper;
 
-    /**
-     * TODO expose hidden dependencies
-     */
-    public function __construct()
-    {
-        $this->userMapper = UserMapper::getInstance();
-        $this->ruleMapper = RuleMapper::getInstance();
 
+    /**
+     * @param UserMapper $userMapper
+     * @param RuleMapper $ruleMapper
+     */
+    public function __construct(UserMapper $userMapper = null, RuleMapper $ruleMapper = null)
+    {
+        $this->userMapper = $userMapper ?: UserMapper::getInstance();
+        $this->ruleMapper = $ruleMapper ?: RuleMapper::getInstance();
     }
 
 
