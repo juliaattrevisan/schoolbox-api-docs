@@ -1,21 +1,29 @@
+{% set allNDSField = ['Alpha', 'Bravo', 'Charlie', 'Delta'] %}
+{% set allMatches = ['Matches', "Doesn't Match"] %}
+
 <div class="list-item">
-    <div class="row" id="general-condition-{{ id }}">
+    <div class="row" id="general-condition-{{ conditionId }}">
         <div class="small-1 medium-1 large-1 columns">
             If
         </div>
         <div class="small-11 medium-5 large-5 columns">
-            <select name="general-condition-ndsfield-{{ id }}">
-                <option>Mong</option>
+            <select name="general-condition-ndsfield-{{ conditionId }}">
+                {% for currentNDSField in allNDSField %}
+                <option value="{{ loop.index0 }}" {% if loop.index0 == selectedNDSField %}selected="selected"{% endif %}>
+                    {{ currentNDSField }}
+                </option>
+                {% endfor %}
             </select>
         </div>
         <div class="small-6 medium-3 large-3 columns">
-            <select name="general-condition-matches-{{ id }}">
-                <option>Matches</option>
-                <option>Not Matches</option>
+            <select name="general-condition-matches-{{ conditionId }}">
+                {% for currentMatches in allMatches %}
+                <option value="{{ loop.index0 }}" {% if loop.index0 == selectedMatches %}selected="selected"{% endif %}>{{ currentMatches }}</option>
+                {% endfor %}
             </select>
         </div>
         <div class="small-6 medium-3 large-3 columns">
-            <textarea name='general-condition-values-{{ id }}' rows="5"></textarea>
+            <textarea name='general-condition-values-{{ conditionId }}' rows="5">{{ selectedValues }}</textarea>
         </div>
     </div>
 </div>
