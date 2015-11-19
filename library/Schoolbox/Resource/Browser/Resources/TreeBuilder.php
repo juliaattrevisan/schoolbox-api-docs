@@ -166,8 +166,11 @@ class TreeBuilder extends AbstractTreeBuilder
         $folderPerm = $this->getFolderPermission($file->getFolder()->getId());
 
         // if read and hidden, cast to none; otherwise leave as-is
-        if ($folderPerm == 'read' && $file->isHidden()) {
-            $folderPerm = '';
+        if ($folderPerm == $this->getPermissionString(UserAccess::ACCESS_READ)
+            && $file instanceof File\Model
+            && $file->isHidden()
+        ) {
+            $folderPerm = $this->getPermissionString(UserAccess::ACCESS_DENY);
         }
 
         return $folderPerm;
