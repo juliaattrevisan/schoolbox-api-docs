@@ -98,7 +98,6 @@
 
         /* Collapsable Rules
          */
-
         $('[data-collapser]').collapsable();
     });
 </script>
@@ -118,16 +117,30 @@
         <form id='ruleset' action='/adminv2/sync/testsubmit' method="post">
             <input type="hidden" name="ruleset" value="student" />
 
+            <div class="actions-small-1 row">
+                <div class="list-item">
+                    <div class="small-12 columns">
+                        <h2 class="subheader">Student Ruleset</h2>
+                    </div>
+                </div>
+                <nav>
+                    <a class="icon-more" title="" data-dropdown="ruleset-options"></a>
+                </nav>
+                <ul id="ruleset-options" class="f-dropdown" data-dropdown-content>
+                    <li><a href='/adminv2/rule/create' class="icon-add" title="Add New Rule">Add New Rule</a></li>
+                </ul>
+            </div>
+
             {% for currentRule in ruleset.rules %}
             <div class="actions-small-1 row">
                 <div class="list-item">
                     <div class="small-12 columns">
-                        <h2 class="subheader">
+                        <h3 class="subheader">
                             {{ currentRule.name }}
                             {% if currentRule.description|length %}
                                 <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
                             {% endif %}
-                        </h2>
+                        </h3>
                     </div>
                 </div>
                 <nav>
@@ -138,7 +151,7 @@
                 <div class="actions-small-1 row">
                     <div class="list-item">
                         <div class="small-12 columns">
-                            <h3>Conditions</h3>
+                            <h4>Conditions</h4>
                         </div>
                     </div>
                     <nav>
@@ -160,7 +173,7 @@
                     {% endfor %}
                 </ul>
 
-                <h3>Effects</h3>
+                <h4>Effects</h4>
             </section>
             {% endfor %}
 
