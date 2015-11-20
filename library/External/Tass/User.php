@@ -375,7 +375,31 @@ class External_Tass_User implements External_UserInterface
      */
     public function getStaffUserAccountIterator()
     {
-        // TODO: Implement getStaffUserAccountIterator() method.
+        $query = "
+            SELECT
+                te.tch_code AS StaffID,
+                '' AS NetworkLogin,
+                CASE
+                    WHEN (t.term_date) IS NULL THEN 0
+                    ELSE 1
+                END AS ActiveFlag,
+                t.salutation_flag AS StaffTitle,
+                t.prefer_name_text AS StaffPreferredName,
+                t.surname_text AS StaffSurname,
+                '' AS DefaultEmailCode,
+                '' AS OccupEmail,
+                t.e_mail AS Email,
+                '' AS StaffCampus,
+                '' AS StaffCategoryType,
+                '' AS StaffCategory,
+                td.tch_dept AS StaffDepartment
+            FROM tel_vw_telemf AS t
+            LEFT JOIN teacher AS te ON t.emp_code = te.emp_code
+            LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code
+        ";
+        return new \Schoolbox\Sync\Iterator\Staff(
+            $this->getDatabase()->getIterator($query)->addMap([$this, 'trimRow'])
+        );
     }
 
     public function getStudentUserAccountInfo()
