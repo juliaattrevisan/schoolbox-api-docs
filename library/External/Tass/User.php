@@ -410,7 +410,28 @@ class External_Tass_User implements External_UserInterface
      */
     public function getStudentUserAccountIterator()
     {
-        // TODO: Implement getStudentUserAccountIterator() method.
+        $query = "
+            SELECT
+                s.stud_code AS StudentID,
+                '' AS NetworkLogin,
+                '' AS StudentTitle,
+                s.preferred_name AS StudentPreferred,
+                s.surname AS StudentSurname,
+                s.sex AS StudentGender,
+                s.e_mail AS StudentEmail,
+                '' AS StudentOccupEmail,
+                s.year_grp AS StudentYearLevel,
+                s.house AS StudentHouse,
+                (IF ((sb.resid_code IS NOT NULL), 'Y', 'N')) AS StudentBoarder,
+                sb.resid_code AS StudentBoardingHouse,
+                s.campus_code AS StudentCampus
+            FROM student AS s
+            LEFT JOIN studboard AS sb ON s.stud_code = sb.stud_code AND s.cmpy_code = sb.cmpy_code
+            WHERE s.dol IS NULL
+        ";
+        return new \Schoolbox\Sync\Iterator\Student(
+            $this->getDatabase()->getIterator($query)->addMap([$this, 'trimRow'])
+        );
     }
 
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
