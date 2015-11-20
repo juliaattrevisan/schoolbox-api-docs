@@ -29,6 +29,7 @@ class Controller extends Base {
                             'condition' => [
                                 'id' => 1231,
                                 'type' => 1,
+                                'rule_id' => 999
                             ],
                             'selected' => [
                                 'NDSField' => 3,
@@ -40,6 +41,7 @@ class Controller extends Base {
                             'condition' => [
                                 'id' => 4458,
                                 'type' => 2,
+                                'rule_id' => 999
                             ],
                             'selected' => [
                                 'matches' => 1,
@@ -50,11 +52,13 @@ class Controller extends Base {
                     ]
                 ],
                 [
+                    'id' => 1000,
                     'conditions' => [
                         [
                             'condition' => [
                                 'id' => 789,
                                 'type' => 1,
+                                'rule_id' => 1000
                             ],
                             'selected' => [
                                 'NDSField' => 1,
