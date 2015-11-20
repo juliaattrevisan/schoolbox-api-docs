@@ -22,6 +22,23 @@
             });
         });
 
+        /* Delete a Condition
+         */
+        $('#ruleset').on('click', '[data-condition-delete]', function(event) {
+            event.preventDefault();
+
+            var conditionId = $(this).attr('data-condition-delete');
+
+            $.post('/adminv2/sync/condition/delete', { conditionId: conditionId }, function(responseText) {
+                if (responseText == '1') {
+                    console.log('deletion success', responseText);
+                }
+                else {
+                    console.log('deletion failure', responseText);
+                }
+            });
+        });
+
         /* Toggle input disability for modification
          * Works on both Conditions and Effects
          */

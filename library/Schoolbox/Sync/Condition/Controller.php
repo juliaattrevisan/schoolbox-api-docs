@@ -13,23 +13,41 @@ namespace Schoolbox\Sync\Condition;
 use Alaress\Web\Controller\Base;
 
 class Controller extends Base {
-
     const CONDITION_GENERAL = 1;
     const CONDITION_USER = 2;
 
     /**
-     * Test Method
+     * Delete a Condition asynchronously
      *
-     * @param array $params
+     * Return true if deletion was successful
+     *
+     * TODO: Perform actual deletion from db via mappers etc
+     *
+     * @return bool
      */
-    public function delete($params) {
-        new \Alaress_Probe($params);
+    public function delete() {
+        // new \Alaress_Probe($_POST);
+
+        /* Tell us whether the deletion was successful
+         * 1 is successfully deleted
+         * 0 is not
+         */
+        $deleted = false;
+
+        if ($deleted) {
+            echo true;
+            exit();
+        }
+
+        exit();
     }
 
     /**
      * Forge a data structure to feed into twig template,
      * so that new Conditions can be injected directly into
      * the ui after being received via ajax
+     *
+     * TODO: Populate type and id from database
      *
      * @param $params
      */
