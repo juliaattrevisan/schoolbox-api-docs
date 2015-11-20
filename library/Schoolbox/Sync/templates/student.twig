@@ -15,11 +15,12 @@
         <form action='/adminv2/sync/testsubmit' method="post">
             <h2 class="subheader">Student Ruleset</h2>
 
+            {% for currentRule in ruleset.rules %}
             <section class="content">
                 <h3>Conditions</h3>
 
                 <ul class="information-list">
-                    {% for currentCondition in allConditions %}
+                    {% for currentCondition in currentRule.conditions %}
                         {% if currentCondition.condition.type == 1 %}
                             {% include '@syncCondition/general.twig' with currentCondition %}
                         {% elseif currentCondition.condition.type == 2 %}
@@ -30,6 +31,7 @@
 
                 <h3>Effects</h3>
             </section>
+            {% endfor %}
 
             <input type="submit" />
         </form>

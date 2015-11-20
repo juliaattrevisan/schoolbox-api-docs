@@ -20,35 +20,60 @@ class Controller extends Base {
      * @param array $params
      */
     public function student($params) {
-        $allConditions = array(
-            [
-                'condition' => [
-                    'id' => 1231,
-                    'type' => 1,
+        $ruleset = [
+            'rules' => [
+                [
+                    'conditions' => [
+                        [
+                            'condition' => [
+                                'id' => 1231,
+                                'type' => 1,
+                            ],
+                            'selected' => [
+                                'NDSField' => 3,
+                                'matches' => 1,
+                                'values' => "Mort\nBart\nGruber"
+                            ]
+                        ],
+                        [
+                            'condition' => [
+                                'id' => 4458,
+                                'type' => 2,
+                            ],
+                            'selected' => [
+                                'matches' => 1,
+                            ]
+                        ]
+                    ],
+                    'effects' => [
+                    ]
                 ],
-                'selected' => [
-                    'NDSField' => 3,
-                    'matches' => 1,
-                    'values' => "Mort\nBart\nGruber"
-                ]
-            ],
-            [
-                'condition' => [
-                    'id' => 4458,
-                    'type' => 2,
-                ],
-                'selected' => [
-                    'matches' => 1,
+                [
+                    'conditions' => [
+                        [
+                            'condition' => [
+                                'id' => 789,
+                                'type' => 1,
+                            ],
+                            'selected' => [
+                                'NDSField' => 1,
+                                'matches' => 2,
+                                'values' => "S-12344"
+                            ]
+                        ]
+                    ],
+                    'effects' => [
+                    ]
                 ]
             ]
-        );
+        ];
 
         /* Twig data
          */
         $this->getResponse()->content->set([
             'template' => '@sync/student.twig',
             'data' => [
-                'allConditions' => $allConditions,
+                'ruleset' => $ruleset,
             ]
         ]);
     }
