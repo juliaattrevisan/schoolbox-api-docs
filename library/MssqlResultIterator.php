@@ -24,6 +24,13 @@ class MssqlResultIterator implements SeekableIterator
     protected $rowNum = 0;
 
     /**
+     * A list of map functions to apply to each result.
+     *
+     * @var array|callable[]
+     */
+    protected $maps = [];
+
+    /**
      * Constructor
      *
      * @param resource $result A result from mssql_query
@@ -73,6 +80,9 @@ class MssqlResultIterator implements SeekableIterator
         if ($row === false) {
             return false;
         }
+        foreach ($this->maps as $map) {
+            $row = $map($row);
+        }
         $this->currentRow = $row;
         return true;
     }
@@ -97,5 +107,17 @@ class MssqlResultIterator implements SeekableIterator
             return;
         }
         throw new OutOfBoundsException(sprintf('Position "%s" is out of bounds', $position));
+    }
+
+    /**
+     * Adds a map function to each row
+     *
+     * @param  callable $map
+     * @return $this
+     */
+    public function addMap(callable $map)
+    {
+        $this->maps[] = $map;
+        return $this;
     }
 }
