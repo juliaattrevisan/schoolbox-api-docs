@@ -429,7 +429,26 @@ class External_Denbigh_User implements External_UserInterface {
      */
     public function getStudentUserAccountIterator()
     {
-        // TODO: Implement getStudentUserAccountIterator() method.
+        $statement = $this->getExternalDatabase()->prepare("
+            SELECT
+                denbighID AS StudentID,
+                username AS NetworkLogin,
+                '' AS StudentTitle,
+                firstname AS StudentPreferred,
+                surname AS StudentSurname,
+                '' AS StudentGender,
+                email AS StudentEmail,
+                '' AS StudentOccupEmail,
+                academicYear AS StudentYearLevel,
+                house AS StudentHouse,
+                boardingStatus AS StudentBoarder,
+                cateringHouse AS StudentBoardingHouse,
+                '' AS StudentCampus
+            FROM Schoolbox_Student
+            ORDER BY denbighID ASC
+        ");
+        $statement->execute();
+        return new \Schoolbox\Sync\Iterator\Student($statement);
     }
 
     public function getParentUserAccountInfo() {
