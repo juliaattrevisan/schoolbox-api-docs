@@ -93,13 +93,11 @@
     </div>
 
     <div class="small-12 island">
-        <section class="content">
-            <dl class="sub-nav">
-                <dd class="active"><a href="/adminv2/sync/student">Student</a></dd>
-                <dd><a href="/adminv2/sync/parent">Parent</a></dd>
-                <dd><a href="/adminv2/sync/staff">Staff</a></dd>
-            </dl>
-        </section>
+        <dl class="sub-nav">
+            <dd class="active"><a href="/adminv2/sync/student">Student</a></dd>
+            <dd><a href="/adminv2/sync/parent">Parent</a></dd>
+            <dd><a href="/adminv2/sync/staff">Staff</a></dd>
+        </dl>
 
         <form id='ruleset' action='/adminv2/sync/testsubmit' method="post">
             {% for currentRule in ruleset.rules %}
