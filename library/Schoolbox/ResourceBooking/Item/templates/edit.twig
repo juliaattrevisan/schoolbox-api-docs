@@ -2,6 +2,7 @@
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
@@ -228,15 +229,7 @@
                         <label>
                             Image
                         </label>
-                        {% if item.image.hash %}
-                            <input type="hidden" name="image" value="{{ item.image.hash }}">
-                            <img src="/storage/image.php?size=constrain200&hash={{ item.image.hash|e('url') }}" />
-                            <input id='delete-image' type="checkbox" name="image" value="" />
-                            <label for="delete-image" class="checkbox-label">Delete Image</label>
-                            <input type="file" name="image" class="prettify">
-                        {% else %}
-                            <input type="file" name="image" class="prettify">
-                        {% endif %}
+                        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
                     </div>
                 </fieldset>
 

@@ -16,6 +16,7 @@ use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\RoleMapper;
+use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage;
 
 class Controller extends Base
@@ -155,6 +156,7 @@ class Controller extends Base
                     'moderatorList'   => array(),
                     'relatedItemList' => array(),
                     'roleList'        => $this->roleMapper->findAll(),
+                    'attachzone'      => $this->getAttachZoneData($this->getMapper()->createModel()),
                 ),
             )
         );
@@ -219,6 +221,7 @@ class Controller extends Base
                     'moderatorList'   => $moderatorList,
                     'relatedItemList' => $relatedItemList,
                     'roleList'        => $this->roleMapper->findAll(),
+                    'attachzone'      => $this->getAttachZoneData($item),
                 ),
             )
         );
@@ -367,6 +370,28 @@ class Controller extends Base
         return new \DateInterval(
             sprintf('PT%dH%dM', ($formPart['day'] * 24 + $formPart['hour']), $formPart['minute'])
         );
+    }
+
+    /**
+     * @param Model $model
+     * @return array
+     */
+    protected function getAttachZoneData(Model $model)
+    {
+        $zone = new Zone('image');
+        $zone
+            ->setThumbnailSize(64)
+            ->setModalTitle('Select Image')
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('Upload Image')
+            ->setMimeFilter('image/*')
+            ->setReadOnly(false)
+            ->setMulti(false);
+
+        if ($model->getImage()->getHash()) {
+            $zone->attachFiles(array($model->getImage()->getHash()));
+        }
+        return $zone->getTwigContext();
     }
 
     /**
