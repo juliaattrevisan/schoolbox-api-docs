@@ -1,6 +1,27 @@
 {% set conditionGeneral = 1 %}
 {% set conditionUserExists = 2 %}
 
+<script type="text/javascript">
+    $(function() {
+
+        $('#ruleset').on('click', '[data-condition-create]', function(event) {
+            event.preventDefault();
+
+            /* The Rule into which the new Condition is injected
+             */
+            var ruleId = '#rule-' + $(this).attr('data-condition-create') + '-conditions';
+
+            /* The url from which new Conditions are spawned
+             */
+            var url = $(this).attr('href');
+
+            $.get(url, function(responseText) {
+                $(ruleId).append(responseText);
+            });
+        });
+    });
+</script>
+
 <div class="row">
     <div class="small-12 columns">
         <h1>Sync (UPS)</h1>
@@ -17,7 +38,7 @@
 
         <h2 class="subheader">Student Ruleset</h2>
 
-        <form action='/adminv2/sync/testsubmit' method="post">
+        <form id='ruleset' action='/adminv2/sync/testsubmit' method="post">
             {% for currentRule in ruleset.rules %}
             <section class="content">
                 <div class="actions-small-1 row">
@@ -30,12 +51,12 @@
                         <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-options"></a>
                     </nav>
                     <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
-                        <li><a href="/adminv2/sync/condition/create/{{ currentRule.id }}/{{ conditionGeneral }}" class="icon-add" title="Spawn new General Condition">General Condition</a></li>
-                        <li><a href="/adminv2/sync/condition/create/{{ currentRule.id }}/{{ conditionUserExists }}" class="icon-add" title="Spawn new User Exists Condition">User Exists Condition</a></li>
+                        <li><a href="/adminv2/sync/condition/create/{{ currentRule.id }}/{{ conditionGeneral }}" class="icon-add" title="Spawn new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
+                        <li><a href="/adminv2/sync/condition/create/{{ currentRule.id }}/{{ conditionUserExists }}" class="icon-add" title="Spawn new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
                     </ul>
                 </div>
 
-                <ul class="information-list">
+                <ul class="information-list" id="rule-{{ currentRule.id }}-conditions">
                     {% for currentCondition in currentRule.conditions %}
                         {% if currentCondition.condition.type == conditionGeneral %}
                             {% include '@syncCondition/general.twig' with currentCondition %}

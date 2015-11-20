@@ -34,19 +34,23 @@ class Controller extends Base {
      * @param $params
      */
     public function create($params) {
+        $data = [
+            'currentCondition' => [
+                'condition' => [
+                    'id' => rand(0, 10000),
+                    'type' => $params['conditionType'],
+                    'rule_id' => $params['ruleId']
+                ]
+            ]
+        ];
+
         switch ($params['conditionType']) {
             case self::CONDITION_GENERAL:
-            case self::CONDITION_USER:
-                $fragment = $this->getDi()->get('templateEngine')->render('@syncCondition/general.twig', [
-                    'currentCondition' => [
-                        'condition' => [
-                            'id' => rand(0,10000),
-                            'type' => $params['conditionType'],
-                            'rule_id' => $params['ruleId']
-                        ]
-                    ]
-                ]);
+                $fragment = $this->getDi()->get('templateEngine')->render('@syncCondition/general.twig', $data);
+                break;
 
+            case self::CONDITION_USER:
+                $fragment = $this->getDi()->get('templateEngine')->render('@syncCondition/userExists.twig', $data);
                 break;
 
             default:
