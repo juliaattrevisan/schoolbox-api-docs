@@ -618,10 +618,9 @@ class External_Tass_User implements External_UserInterface
             $this->getDatabase()->getIterator($query)
                 ->addMap([$this, 'trimRow'])
                 ->addMap(function ($row) {
-                    list($contactFirstName, $contactSurname)
-                        = preg_split("/\\s+/", $row['StudentContactPreferred'], 2);
-                    $row['StudentContactPreferred'] = $contactFirstName;
-                    $row['StudentContactSurname']   = $contactSurname;
+                    list($firstName, $surname)      = preg_split("/\\s+/", $row['StudentContactPreferred'], 2);
+                    $row['StudentContactPreferred'] = $firstName;
+                    $row['StudentContactSurname']   = $surname;
                     return $row;
                 })
         );
