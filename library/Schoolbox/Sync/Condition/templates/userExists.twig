@@ -1,6 +1,6 @@
 {% set allMatches = ['User Exists', "User Doesn't Exist"] %}
 
-<li id="condition-{{ currentCondition.condition.id }}" class="actions-small-2 content" data-locked="{{ currentCondition.condition.lockStatus }}">
+<li id="condition-{{ currentCondition.condition.id }}" class="actions-small-2 content" data-locked="{{ currentCondition.condition.meta.lock.status }}">
     <input type="hidden" name="rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][type]" value="2">
 
     <div class="list-item">
@@ -9,7 +9,7 @@
                 If
             </div>
             <div class="small-11 columns">
-                <select {{ currentCondition.condition.disabled }} name="rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][selected][matches]">
+                <select {{ currentCondition.condition.meta.disabled }} name="rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][selected][matches]">
                     {% for currentMatches in allMatches %}
                     <option value="{{ loop.index0 }}" {% if loop.index0 == currentCondition.selected.matches %}selected="selected"{% endif %}>{{ currentMatches }}</option>
                     {% endfor %}
@@ -19,7 +19,7 @@
     </div>
     <nav>
         <a href="/adminv2/sync/condition/delete/{{ currentCondition.condition.id }}" class="icon-delete" title="Delete" data-condition-delete="{{ currentCondition.condition.id }}"></a>
-        <a href="" class="icon-{{ currentCondition.condition.lockStatusIcon }}" title='Toggle Readonly Mode' data-modify-lock="condition-{{ currentCondition.condition.id }}"></a>
+        <a href="" class="icon-{{ currentCondition.condition.meta.lock.icon }}" title='Toggle Readonly Mode' data-modify-lock="condition-{{ currentCondition.condition.id }}"></a>
     </nav>
 
     <span id='condition-{{ currentCondition.condition.id }}-status' class="label highlight full-width hide"></span>

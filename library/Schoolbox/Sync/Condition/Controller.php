@@ -52,20 +52,33 @@ class Controller extends Base {
      * @param $params
      */
     public function create($params) {
+
+        /* A meta field for various Condition-specific UI
+         * so that when you load a Ruleset UI, all Conditions are
+         * impossible to accidentally break. You must actively unlock
+         * each Condition you want to edit.
+         *
+         * meta->disabled is the attribute on input, select, textarea elements
+         * meta->lock->status is a flag for whether the Condition is locked (1 yes, 0 no)
+         * meta->lock->icon is the action button icon- class to start with
+         *
+         * Should be set to "disabled", "1" and "locked" by default
+         */
+        $meta = [
+            'disabled' => '',
+            'lock' => [
+                'status' => 0,
+                'icon' => 'locked',
+            ]
+        ];
+
         $data = [
             'currentCondition' => [
                 'condition' => [
                     'id' => rand(0, 10000),
                     'type' => $params['conditionType'],
                     'rule_id' => $params['ruleId'],
-
-                    /* A meta field which determines whether the "disabled"
-                     * attribute is applied to all inputs/selects/textareas
-                     * in this Condition
-                     */
-                    'disabled' => '',
-                    'lockStatus' => 0,
-                    'lockStatusIcon' => 'locked',
+                    'meta' => $meta,
                 ]
             ]
         ];

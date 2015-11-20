@@ -20,6 +20,28 @@ class Controller extends Base {
      * @param array $params
      */
     public function student($params) {
+
+        /* A meta field for various Condition-specific UI
+         * so that when you load a Ruleset UI, all Conditions are
+         * impossible to accidentally break. You must actively unlock
+         * each Condition you want to edit.
+         *
+         * meta->disabled is the attribute on input, select, textarea elements
+         * meta->lock->status is a flag for whether the Condition is locked (1 yes, 0 no)
+         * meta->lock->icon is the action button icon- class to start with
+         *
+         * Should be set to "disabled", "1" and "locked" by default
+         */
+        $meta = [
+            'disabled' => 'disabled',
+            'lock' => [
+                'status' => 1,
+                'icon' => 'unlocked',
+            ]
+        ];
+
+        /* The actual ruleset construct
+         */
         $ruleset = [
             'rules' => [
                 [
@@ -30,19 +52,7 @@ class Controller extends Base {
                                 'id' => 1231,
                                 'type' => 1,
                                 'rule_id' => 999,
-
-                                /* Should be set to "disabled" and "locked" by default
-                                 * so that when you load a Ruleset ui, all Conditions are
-                                 * impossible to accidentally break. You must actively unlock
-                                 * each Condition you want to edit.
-                                 *
-                                 * disabled is the attribute on input, select, textarea elements
-                                 * lockStatus is a flag for whether the Condition is locked (1 yes, 0 no)
-                                 * lockStatusIcon is the action button icon- class to start with
-                                 */
-                                'disabled' => 'disabled',
-                                'lockStatus' => 1,
-                                'lockStatusIcon' => 'unlocked',
+                                'meta' => $meta
                             ],
                             'selected' => [
                                 'NDSField' => 3,
@@ -55,19 +65,7 @@ class Controller extends Base {
                                 'id' => 4458,
                                 'type' => 2,
                                 'rule_id' => 999,
-
-                                /* Should be set to "disabled" and "locked" by default
-                                 * so that when you load a Ruleset ui, all Conditions are
-                                 * impossible to accidentally break. You must actively unlock
-                                 * each Condition you want to edit.
-                                 *
-                                 * disabled is the attribute on input, select, textarea elements
-                                 * lockStatus is a flag for whether the Condition is locked (1 yes, 0 no)
-                                 * lockStatusIcon is the action button icon- class to start with
-                                 */
-                                'disabled' => 'disabled',
-                                'lockStatus' => 1,
-                                'lockStatusIcon' => 'unlocked',
+                                'meta' => $meta
                             ],
                             'selected' => [
                                 'matches' => 1,
@@ -85,19 +83,7 @@ class Controller extends Base {
                                 'id' => 789,
                                 'type' => 1,
                                 'rule_id' => 1000,
-
-                                /* Should be set to "disabled" and "locked" by default
-                                 * so that when you load a Ruleset ui, all Conditions are
-                                 * impossible to accidentally break. You must actively unlock
-                                 * each Condition you want to edit.
-                                 *
-                                 * disabled is the attribute on input, select, textarea elements
-                                 * lockStatus is a flag for whether the Condition is locked (1 yes, 0 no)
-                                 * lockStatusIcon is the action button icon- class to start with
-                                 */
-                                'disabled' => 'disabled',
-                                'lockStatus' => 1,
-                                'lockStatusIcon' => 'unlocked',
+                                'meta' => $meta
                             ],
                             'selected' => [
                                 'NDSField' => 1,
