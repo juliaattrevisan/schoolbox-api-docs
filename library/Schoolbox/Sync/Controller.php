@@ -30,7 +30,19 @@ class Controller extends Base {
                                 'id' => 1231,
                                 'type' => 1,
                                 'rule_id' => 999,
+
+                                /* Should be set to "disabled" and "locked" by default
+                                 * so that when you load a Ruleset ui, all Conditions are
+                                 * impossible to accidentally break. You must actively unlock
+                                 * each Condition you want to edit.
+                                 *
+                                 * disabled is the attribute on input, select, textarea elements
+                                 * lockStatus is a flag for whether the Condition is locked (1 yes, 0 no)
+                                 * lockStatusIcon is the action button icon- class to start with
+                                 */
                                 'disabled' => 'disabled',
+                                'lockStatus' => 1,
+                                'lockStatusIcon' => 'unlocked',
                             ],
                             'selected' => [
                                 'NDSField' => 3,
@@ -43,7 +55,19 @@ class Controller extends Base {
                                 'id' => 4458,
                                 'type' => 2,
                                 'rule_id' => 999,
+
+                                /* Should be set to "disabled" and "locked" by default
+                                 * so that when you load a Ruleset ui, all Conditions are
+                                 * impossible to accidentally break. You must actively unlock
+                                 * each Condition you want to edit.
+                                 *
+                                 * disabled is the attribute on input, select, textarea elements
+                                 * lockStatus is a flag for whether the Condition is locked (1 yes, 0 no)
+                                 * lockStatusIcon is the action button icon- class to start with
+                                 */
                                 'disabled' => 'disabled',
+                                'lockStatus' => 1,
+                                'lockStatusIcon' => 'unlocked',
                             ],
                             'selected' => [
                                 'matches' => 1,
@@ -61,7 +85,19 @@ class Controller extends Base {
                                 'id' => 789,
                                 'type' => 1,
                                 'rule_id' => 1000,
+
+                                /* Should be set to "disabled" and "locked" by default
+                                 * so that when you load a Ruleset ui, all Conditions are
+                                 * impossible to accidentally break. You must actively unlock
+                                 * each Condition you want to edit.
+                                 *
+                                 * disabled is the attribute on input, select, textarea elements
+                                 * lockStatus is a flag for whether the Condition is locked (1 yes, 0 no)
+                                 * lockStatusIcon is the action button icon- class to start with
+                                 */
                                 'disabled' => 'disabled',
+                                'lockStatus' => 1,
+                                'lockStatusIcon' => 'unlocked',
                             ],
                             'selected' => [
                                 'NDSField' => 1,

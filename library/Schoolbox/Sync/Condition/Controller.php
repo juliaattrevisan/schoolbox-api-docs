@@ -63,7 +63,9 @@ class Controller extends Base {
                      * attribute is applied to all inputs/selects/textareas
                      * in this Condition
                      */
-                    'disabled' => ''
+                    'disabled' => '',
+                    'lockStatus' => 0,
+                    'lockStatusIcon' => 'locked',
                 ]
             ]
         ];
