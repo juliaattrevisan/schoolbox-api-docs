@@ -84,6 +84,17 @@
                 $(this).removeClass('icon-locked').addClass('icon-unlocked');
             }
         });
+
+        /* Enable all input fields for form submission, otherwise they
+         * don't get transmitted; then immediately disable them lol
+         */
+        $('#ruleset').on('click', 'input[type=submit]', function(event) {
+            event.preventDefault();
+
+            $('#ruleset').find('input, select, textarea').attr('disabled', false);
+            $('#ruleset').submit();
+            $('#ruleset').find('input, select, textarea').attr('disabled', true);
+        });
     });
 </script>
 
