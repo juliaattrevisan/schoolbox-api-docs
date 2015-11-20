@@ -2,7 +2,7 @@
 {% set allMatches = ['Matches', "Doesn't Match"] %}
 
 <li id="condition-{{ currentCondition.condition.id }}" class="actions-small-2 content">
-    <input type="hidden" name="condition[{{ currentCondition.condition.id }}][type]" value="0">
+    <input type="hidden" name="rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][type]" value="1">
 
     <div class="list-item">
         <div class="row">
@@ -10,7 +10,7 @@
                 If
             </div>
             <div class="small-11 medium-5 large-5 columns">
-                <select name="condition[{{ currentCondition.condition.id }}][ndsfield]">
+                <select name="rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][selected][ndsfield]">
                     {% for currentNDSField in allNDSField %}
                     <option value="{{ loop.index0 }}" {% if loop.index0 == currentCondition.selected.NDSField %}selected="selected"{% endif %}>
                         {{ currentNDSField }}
@@ -19,14 +19,14 @@
                 </select>
             </div>
             <div class="small-6 medium-3 large-3 columns">
-                <select name="condition[{{ currentCondition.condition.id }}][matches]">
+                <select name="rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][selected][matches]">
                     {% for currentMatches in allMatches %}
                     <option value="{{ loop.index0 }}" {% if loop.index0 == currentCondition.selected.matches %}selected="selected"{% endif %}>{{ currentMatches }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="small-6 medium-3 large-3 columns">
-                <textarea name='condition[{{ currentCondition.condition.id }}][values]' rows="5">{{ currentCondition.selected.values }}</textarea>
+                <textarea name='rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][selected][values]' rows="5">{{ currentCondition.selected.values }}</textarea>
             </div>
         </div>
     </div>

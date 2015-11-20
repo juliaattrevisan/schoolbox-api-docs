@@ -1,7 +1,7 @@
 {% set allMatches = ['User Exists', "User Doesn't Exist"] %}
 
 <li id="user-condition-{{ currentCondition.condition.id }}" class="actions-small-2 content">
-    <input type="hidden" name="condition[{{ currentCondition.condition.id }}][type]" value="1">
+    <input type="hidden" name="rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][type]" value="2">
 
     <div class="list-item">
         <div class="row">
@@ -9,7 +9,7 @@
                 If
             </div>
             <div class="small-11 columns">
-                <select name="condition[{{ currentCondition.condition.id }}][matches]">
+                <select name="rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][selected][matches]">
                     {% for currentMatches in allMatches %}
                     <option value="{{ loop.index0 }}" {% if loop.index0 == currentCondition.selected.matches %}selected="selected"{% endif %}>{{ currentMatches }}</option>
                     {% endfor %}
