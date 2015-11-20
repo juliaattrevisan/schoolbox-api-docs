@@ -23,6 +23,7 @@ class Controller extends Base {
         $ruleset = [
             'rules' => [
                 [
+                    'id' => 999,
                     'conditions' => [
                         [
                             'condition' => [

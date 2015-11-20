@@ -12,12 +12,25 @@
             </dl>
         </section>
 
-        <form action='/adminv2/sync/testsubmit' method="post">
-            <h2 class="subheader">Student Ruleset</h2>
+        <h2 class="subheader">Student Ruleset</h2>
 
+        <form action='/adminv2/sync/testsubmit' method="post">
             {% for currentRule in ruleset.rules %}
             <section class="content">
-                <h3>Conditions</h3>
+                <div class="actions-small-1 row">
+                    <div class="list-item">
+                        <div class="small-12 columns">
+                            <h3>Conditions</h3>
+                        </div>
+                    </div>
+                    <nav>
+                        <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-options"></a>
+                    </nav>
+                    <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
+                        <li><a href="/adminv2/sync/condition/new/general" class="icon-add" title="Spawn new General Condition">General Condition</a></li>
+                        <li><a href="/adminv2/sync/condition/new/user" class="icon-add" title="Spawn new User Condition">User Condition</a></li>
+                    </ul>
+                </div>
 
                 <ul class="information-list">
                     {% for currentCondition in currentRule.conditions %}
