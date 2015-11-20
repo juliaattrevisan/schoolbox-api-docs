@@ -591,8 +591,7 @@ class External_Tass_User implements External_UserInterface
                 s.surname AS StudentSurname
             FROM parent AS p
             INNER JOIN student as s
-                ON p.par_code = s.par_code
-                AND p.cmpy_code = s.cmpy_code
+                ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
             WHERE p.f_name IS NOT NULL
 
             UNION ALL
@@ -610,8 +609,7 @@ class External_Tass_User implements External_UserInterface
                 s.surname AS StudentSurname
             FROM parent AS p
             INNER JOIN student as s
-                ON p.par_code = s.par_code
-                AND p.cmpy_code = s.cmpy_code
+                ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
             WHERE p.m_name IS NOT NULL
 
             ORDER BY StudentContactID ASC
