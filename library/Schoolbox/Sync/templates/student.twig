@@ -1,6 +1,6 @@
 {% set conditionGeneral = 1 %}
 {% set conditionUserExists = 2 %}
-
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript">
     $(function() {
@@ -95,6 +95,11 @@
             $('#ruleset').submit();
             $('#ruleset').find('input, select, textarea').attr('disabled', true);
         });
+
+        /* Collapsable Rules
+         */
+
+        $('[data-collapser]').collapsable();
     });
 </script>
 
@@ -114,14 +119,22 @@
             <input type="hidden" name="ruleset" value="student" />
 
             {% for currentRule in ruleset.rules %}
-            <h2 class="subheader">
-                {{ currentRule.name }}
-                {% if currentRule.description|length %}
-                <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
-                {% endif %}
-            </h2>
-
-            <section class="content">
+            <div class="actions-small-1 row">
+                <div class="list-item">
+                    <div class="small-12 columns">
+                        <h2 class="subheader">
+                            {{ currentRule.name }}
+                            {% if currentRule.description|length %}
+                                <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
+                            {% endif %}
+                        </h2>
+                    </div>
+                </div>
+                <nav>
+                    <a data-collapser="rule-{{ currentRule.id }}-contents" href="#" class="icon-add" title="Collapse Content"></a>
+                </nav>
+            </div>
+            <section class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
                 <div class="actions-small-1 row">
                     <div class="list-item">
                         <div class="small-12 columns">
