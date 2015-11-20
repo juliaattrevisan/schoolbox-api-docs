@@ -101,10 +101,15 @@
             </dl>
         </section>
 
-        <h2 class="subheader">Student Ruleset</h2>
-
         <form id='ruleset' action='/adminv2/sync/testsubmit' method="post">
             {% for currentRule in ruleset.rules %}
+            <h2 class="subheader">
+                {{ currentRule.name }}
+                {% if currentRule.description|length %}
+                <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
+                {% endif %}
+            </h2>
+
             <section class="content">
                 <div class="actions-small-1 row">
                     <div class="list-item">

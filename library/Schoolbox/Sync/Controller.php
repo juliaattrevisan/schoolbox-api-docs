@@ -46,6 +46,8 @@ class Controller extends Base {
             'rules' => [
                 [
                     'id' => 999,
+                    'name' => 'The First Rule',
+                    'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin tempus consequat leo, id tempor arcu dapibus sit amet. Maecenas at bibendum leo, quis vestibulum dolor.',
                     'conditions' => [
                         [
                             'condition' => [
@@ -77,6 +79,8 @@ class Controller extends Base {
                 ],
                 [
                     'id' => 1000,
+                    'name' => 'The Second Rule',
+                    'description' => 'Duis lobortis, augue eget luctus pulvinar, est mauris pellentesque eros, non bibendum diam urna a libero. Nam mattis nulla eu tincidunt vestibulum. Integer feugiat auctor massa ac egestas',
                     'conditions' => [
                         [
                             'condition' => [
