@@ -29,11 +29,17 @@
 
             var conditionId = $(this).attr('data-condition-delete');
 
-            /* Delete asynchronously if successful; ignore if unsuccessful
-             */
-            $.post('/adminv2/sync/condition/delete', { conditionId: conditionId }, function(responseText) {
-                if (responseText == '1') {
-                    $('#condition-' + conditionId).remove();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this Condition?',
+                confirmEvent: function() {
+
+                    /* Delete asynchronously if successful; ignore if unsuccessful
+                     */
+                    $.post('/adminv2/sync/condition/delete', { conditionId: conditionId }, function(responseText) {
+                        if (responseText == '1') {
+                            $('#condition-' + conditionId).remove();
+                        }
+                    });
                 }
             });
         });
