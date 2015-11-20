@@ -73,13 +73,15 @@
 
             if ($(id).attr('data-locked') == 1) {
                 $(id).find('input, textarea, select').attr('disabled', false);
-
                 $(id).attr('data-locked', 0);
+
+                $(this).removeClass('icon-unlocked').addClass('icon-locked');
             }
             else {
                 $(id).find('input, textarea, select').attr('disabled', true);
-
                 $(id).attr('data-locked', 1);
+
+                $(this).removeClass('icon-locked').addClass('icon-unlocked');
             }
         });
     });
