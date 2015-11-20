@@ -29,7 +29,8 @@ class Controller extends Base {
                             'condition' => [
                                 'id' => 1231,
                                 'type' => 1,
-                                'rule_id' => 999
+                                'rule_id' => 999,
+                                'disabled' => 'disabled',
                             ],
                             'selected' => [
                                 'NDSField' => 3,
@@ -41,7 +42,8 @@ class Controller extends Base {
                             'condition' => [
                                 'id' => 4458,
                                 'type' => 2,
-                                'rule_id' => 999
+                                'rule_id' => 999,
+                                'disabled' => 'disabled',
                             ],
                             'selected' => [
                                 'matches' => 1,
@@ -58,7 +60,8 @@ class Controller extends Base {
                             'condition' => [
                                 'id' => 789,
                                 'type' => 1,
-                                'rule_id' => 1000
+                                'rule_id' => 1000,
+                                'disabled' => 'disabled',
                             ],
                             'selected' => [
                                 'NDSField' => 1,

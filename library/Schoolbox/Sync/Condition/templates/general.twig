@@ -10,7 +10,7 @@
                 If
             </div>
             <div class="small-11 medium-5 large-5 columns">
-                <select disabled name="rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][selected][ndsfield]">
+                <select {{ currentCondition.condition.disabled }} name="rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][selected][ndsfield]">
                     {% for currentNDSField in allNDSField %}
                     <option value="{{ loop.index0 }}" {% if loop.index0 == currentCondition.selected.NDSField %}selected="selected"{% endif %}>
                         {{ currentNDSField }}
@@ -19,14 +19,14 @@
                 </select>
             </div>
             <div class="small-6 medium-3 large-3 columns">
-                <select disabled name="rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][selected][matches]">
+                <select {{ currentCondition.condition.disabled }} name="rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][selected][matches]">
                     {% for currentMatches in allMatches %}
                     <option value="{{ loop.index0 }}" {% if loop.index0 == currentCondition.selected.matches %}selected="selected"{% endif %}>{{ currentMatches }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="small-6 medium-3 large-3 columns">
-                <textarea disabled name='rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][selected][values]' rows="5">{{ currentCondition.selected.values }}</textarea>
+                <textarea {{ currentCondition.condition.disabled }} name='rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][selected][values]' rows="5">{{ currentCondition.selected.values }}</textarea>
             </div>
         </div>
     </div>

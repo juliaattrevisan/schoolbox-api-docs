@@ -57,7 +57,13 @@ class Controller extends Base {
                 'condition' => [
                     'id' => rand(0, 10000),
                     'type' => $params['conditionType'],
-                    'rule_id' => $params['ruleId']
+                    'rule_id' => $params['ruleId'],
+
+                    /* A meta field which determines whether the "disabled"
+                     * attribute is applied to all inputs/selects/textareas
+                     * in this Condition
+                     */
+                    'disabled' => ''
                 ]
             ]
         ];
