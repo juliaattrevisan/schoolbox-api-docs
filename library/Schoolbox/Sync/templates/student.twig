@@ -29,12 +29,11 @@
 
             var conditionId = $(this).attr('data-condition-delete');
 
+            /* Delete asynchronously if successful; ignore if unsuccessful
+             */
             $.post('/adminv2/sync/condition/delete', { conditionId: conditionId }, function(responseText) {
                 if (responseText == '1') {
-                    console.log('deletion success', responseText);
-                }
-                else {
-                    console.log('deletion failure', responseText);
+                    $('#condition-' + conditionId).remove();
                 }
             });
         });
