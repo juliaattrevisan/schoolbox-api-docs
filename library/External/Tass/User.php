@@ -575,7 +575,58 @@ class External_Tass_User implements External_UserInterface
      */
     public function getParentUserAccountIterator()
     {
-        // TODO: Implement getParentUserAccountIterator() method.
+        // Attempt to create separate accounts for parent and spouse
+        // Not yet supported: split families
+        $query = "
+            SELECT
+                'P' + p.par_code AS StudentContactID,
+                '' AS StudentContactTitle,
+                p.f_name AS StudentContactPreferred,
+                '' AS StudentContactSurname,
+                '' AS StudentContactDefaultEmail,
+                s.year_grp AS StudentYearLevel,
+                s.campus_code AS StudentCampus,
+                s.sex AS StudentGender,
+                s.preferred_name AS StudentPreferred,
+                s.surname AS StudentSurname
+            FROM parent AS p
+            INNER JOIN student as s
+                ON p.par_code = s.par_code
+                AND p.cmpy_code = s.cmpy_code
+            WHERE p.f_name IS NOT NULL
+
+            UNION ALL
+
+            SELECT
+                'S' + p.par_code AS StudentContactID,
+                '' AS StudentContactTitle,
+                p.m_name AS StudentContactPreferred,
+                '' AS StudentContactSurname,
+                '' AS StudentContactDefaultEmail,
+                s.year_grp AS StudentYearLevel,
+                s.campus_code AS StudentCampus,
+                s.sex AS StudentGender,
+                s.preferred_name AS StudentPreferred,
+                s.surname AS StudentSurname
+            FROM parent AS p
+            INNER JOIN student as s
+                ON p.par_code = s.par_code
+                AND p.cmpy_code = s.cmpy_code
+            WHERE p.m_name IS NOT NULL
+
+            ORDER BY StudentContactID ASC
+        ";
+        return new \Schoolbox\Sync\Iterator\Student(
+            $this->getDatabase()->getIterator($query)
+                ->addMap([$this, 'trimRow'])
+                ->addMap(function ($row) {
+                    list($contactFirstName, $contactSurname)
+                        = preg_split("/\\s+/", $row['StudentContactPreferred'], 2);
+                    $row['StudentContactPreferred'] = $contactFirstName;
+                    $row['StudentContactSurname']   = $contactSurname;
+                    return $row;
+                })
+        );
     }
 
     /**
