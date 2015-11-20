@@ -5,6 +5,7 @@ CREATE TABLE `ups_rule`(
   `role_type` ENUM('student','parent','staff') NOT NULL, -- omitting 'guest', this enum mirrors groups.group_type
   `enabled` BOOL NOT NULL DEFAULT 1,
   `sequence` INT UNSIGNED NOT NULL,
+  `name` VARCHAR(256) NULL,
   PRIMARY KEY (`id`),
   INDEX (`role_type`),
   INDEX (`role_type`, `enabled`),
