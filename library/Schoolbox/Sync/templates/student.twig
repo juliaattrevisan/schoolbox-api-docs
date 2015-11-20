@@ -4,6 +4,8 @@
 <script type="text/javascript">
     $(function() {
 
+        /* Insert a new Condition
+         */
         $('#ruleset').on('click', '[data-condition-create]', function(event) {
             event.preventDefault();
 
@@ -18,6 +20,26 @@
             $.get(url, function(responseText) {
                 $(ruleId).append(responseText);
             });
+        });
+
+        /* Toggle input disability for modification
+         * Works on both Conditions and Effects
+         */
+        $('#ruleset').on('click', '[data-modify-lock]', function(event) {
+            event.preventDefault();
+
+            var id = '#' + $(this).attr('data-modify-lock');
+
+            if ($(id).attr('data-locked') == 1) {
+                $(id).find('input, textarea, select').attr('disabled', false);
+
+                $(id).attr('data-locked', 0);
+            }
+            else {
+                $(id).find('input, textarea, select').attr('disabled', true);
+
+                $(id).attr('data-locked', 1);
+            }
         });
     });
 </script>
