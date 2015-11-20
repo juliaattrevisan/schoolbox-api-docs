@@ -27,19 +27,34 @@ class Controller extends Base {
     }
 
     /**
-     * Test method
+     * Forge a data structure to feed into twig template,
+     * so that new Conditions can be injected directly into
+     * the ui after being received via ajax
      *
      * @param $params
      */
     public function create($params) {
+        switch ($params['conditionType']) {
+            case self::CONDITION_GENERAL:
+            case self::CONDITION_USER:
+                $fragment = $this->getDi()->get('templateEngine')->render('@syncCondition/general.twig', [
+                    'currentCondition' => [
+                        'condition' => [
+                            'id' => rand(0,10000),
+                            'type' => $params['conditionType'],
+                            'rule_id' => $params['ruleId']
+                        ]
+                    ]
+                ]);
 
-        /* Is a factory?
-         */
-        if ($params['conditionType'] == self::CONDITION_GENERAL) {
-        }
-        else if ($params['conditionType'] == self::CONDITION_USER) {
+                break;
+
+            default:
+                $fragment = '';
+                break;
         }
 
-        new \Alaress_Probe($params);
+        echo $fragment;
+        exit();
     }
 }
