@@ -471,7 +471,30 @@ class External_Denbigh_User implements External_UserInterface {
      */
     public function getParentUserAccountIterator()
     {
-        // TODO: Implement getParentUserAccountIterator() method.
+        $statement = $this->getExternalDatabase()->prepare("
+            SELECT
+                par.loginID AS StudentContactNetworkLogin,
+                peo.denbighID AS StudentContactID,
+                peo.title AS StudentContactTitle,
+                preferred_name AS StudentContactPreferred,
+                peo.surname AS StudentContactSurname,
+                peo.email AS StudentContactDefaultEmail,
+                s.denbighID AS StudentId,
+                s.academicYear AS StudentYearLevel,
+                '' AS StudentCampus,
+                s.gender AS StudentGender,
+                s.preferred_name AS StudentPreferred,
+                s.surname AS StudentSurname
+            FROM Addresses adr
+            LEFT JOIN Parents par ON par.familyDenbighID = adr.familyDenbighID
+            LEFT JOIN People peo ON peo.denbighID = par.peopleDenbighID
+            LEFT JOIN Students s ON s.familyDenbighID = par.familyDenbighID
+            WHERE peo.id IS NOT NULL
+            GROUP BY peo.denbighID
+            ORDER BY familyDenbighID ASC, denbighID ASC
+        ");
+        $statement->execute();
+        return new \Schoolbox\Sync\Iterator\Guardian($statement);
     }
 
     /**
