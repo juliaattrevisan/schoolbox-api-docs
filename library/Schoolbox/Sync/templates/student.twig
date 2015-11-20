@@ -100,6 +100,8 @@
         </dl>
 
         <form id='ruleset' action='/adminv2/sync/testsubmit' method="post">
+            <input type="hidden" name="ruleset" value="student" />
+
             {% for currentRule in ruleset.rules %}
             <h2 class="subheader">
                 {{ currentRule.name }}
@@ -138,7 +140,7 @@
             </section>
             {% endfor %}
 
-            <input type="submit" />
+            <input type="submit" value="Save Ruleset" />
         </form>
     </div>
 </div>
