@@ -34,6 +34,7 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath) {
         $this->addGetRoute($router, 'delete', $basePath, "/delete/{conditionId}");
+        $this->addGetRoute($router, 'create', $basePath, "/create/{conditionType}");
     }
 
     /**
@@ -44,7 +45,7 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher) {
         $this->addRoutePreload(
             $matcher,
-            '(?:delete)',
+            '(?:create|delete)',
             function($params) {
                 return array(
                     'params' => $params,
