@@ -1,3 +1,6 @@
+{% set conditionGeneral = 1 %}
+{% set conditionUserExists = 2 %}
+
 <div class="row">
     <div class="small-12 columns">
         <h1>Sync (UPS)</h1>
@@ -27,16 +30,16 @@
                         <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-options"></a>
                     </nav>
                     <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
-                        <li><a href="/adminv2/sync/condition/new/general" class="icon-add" title="Spawn new General Condition">General Condition</a></li>
-                        <li><a href="/adminv2/sync/condition/new/user" class="icon-add" title="Spawn new User Condition">User Condition</a></li>
+                        <li><a href="/adminv2/sync/condition/create/{{ currentRule.id }}/{{ conditionGeneral }}" class="icon-add" title="Spawn new General Condition">General Condition</a></li>
+                        <li><a href="/adminv2/sync/condition/create/{{ currentRule.id }}/{{ conditionUserExists }}" class="icon-add" title="Spawn new User Exists Condition">User Exists Condition</a></li>
                     </ul>
                 </div>
 
                 <ul class="information-list">
                     {% for currentCondition in currentRule.conditions %}
-                        {% if currentCondition.condition.type == 1 %}
+                        {% if currentCondition.condition.type == conditionGeneral %}
                             {% include '@syncCondition/general.twig' with currentCondition %}
-                        {% elseif currentCondition.condition.type == 2 %}
+                        {% elseif currentCondition.condition.type == conditionUserExists %}
                             {% include '@syncCondition/userExists.twig' with currentCondition %}
                         {% endif %}
                     {% endfor %}

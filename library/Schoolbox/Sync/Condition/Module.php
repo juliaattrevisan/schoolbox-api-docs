@@ -33,8 +33,8 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath) {
+        $this->addGetRoute($router, 'create', $basePath, "/create/{ruleId}/{conditionType}");
         $this->addGetRoute($router, 'delete', $basePath, "/delete/{conditionId}");
-        $this->addGetRoute($router, 'create', $basePath, "/create/{conditionType}");
     }
 
     /**
