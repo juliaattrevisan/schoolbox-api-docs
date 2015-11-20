@@ -616,7 +616,7 @@ class External_Tass_User implements External_UserInterface
 
             ORDER BY StudentContactID ASC
         ";
-        return new \Schoolbox\Sync\Iterator\Student(
+        return new \Schoolbox\Sync\Iterator\Guardian(
             $this->getDatabase()->getIterator($query)
                 ->addMap([$this, 'trimRow'])
                 ->addMap(function ($row) {
