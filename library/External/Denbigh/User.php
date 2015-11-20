@@ -493,7 +493,26 @@ class External_Denbigh_User implements External_UserInterface {
      */
     public function getStaffUserAccountIterator()
     {
-        // TODO: Implement getStaffUserAccountIterator() method.
+        $statement = $this->getExternalDatabase()->prepare("
+            SELECT
+                p.denbighID AS StaffID,
+                staffCode AS NetworkLogin,
+                1 AS ActiveFlag,
+                title AS StaffTitle,
+                preferred_name AS StaffPreferredName,
+                surname AS StaffSurname,
+                '' AS DefaultEmailCode,
+                '' AS OccupEmail,
+                email AS Email,
+                '' AS StaffCampus,
+                '' AS StaffCategoryType,
+                '' AS StaffCategory,
+                '' AS StaffDepartment
+            FROM Staff s
+            LEFT JOIN People p ON s.peopleDenbighID = p.denbighID
+        ");
+        $statement->execute();
+        return new \Schoolbox\Sync\Iterator\Staff($statement);
     }
 
     /**
