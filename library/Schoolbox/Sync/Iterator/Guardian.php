@@ -3,6 +3,10 @@
  * Iterator over a `External_UserInterface->getParentUserAccountIterator()` -
  * maps each result to a `Schoolbox\External\Normalise\User\Guardian` object.
  *
+ * Note: most implementations of `External_UserInterface->getParentUserAccountInfo()`
+ * return a parent and their spouse in a single row. This class expects that
+ * parents and speese will be in separate rows.
+ *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
