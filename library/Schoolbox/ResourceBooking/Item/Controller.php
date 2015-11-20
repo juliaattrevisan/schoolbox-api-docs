@@ -16,6 +16,7 @@ use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\RoleMapper;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage;
 
@@ -256,8 +257,7 @@ class Controller extends Base
     {
         $this->updateItemWithFormValues(
             $item,
-            $this->getRequest()->post,
-            $this->getRequest()->files
+            $this->getRequest()->post
         );
         $this->getMapper()->save($item);
         // Return something.
@@ -284,11 +284,10 @@ class Controller extends Base
     /**
      * Updates fields in the model with values from the form.
      *
-     * @param Model $model The resource to update
-     * @param array $post  Data from $_POST
-     * @param array $files Data from $_FILES
+     * @param Model        $model The resource to update
+     * @param \ArrayObject $post  An array-like object that abstracts $_POST
      */
-    protected function updateItemWithFormValues(Model $model, $post, $files)
+    protected function updateItemWithFormValues(Model $model, $post)
     {
         $model
             ->setName($post['name'])
@@ -300,23 +299,20 @@ class Controller extends Base
             ->setMinReservationTime($this->getDateIntervalFromForm($post['min_reservation_time']))
             ->setMaxReservationTime($this->getDateIntervalFromForm($post['max_reservation_time']))
         ;
-        if (($upload = $files['image']) && empty($upload['error'])) {
-            // Rectumize the file that was uploaded
-            $image = Storage\Mapper::getInstance()->accept(
-                $upload['name'], $upload['tmp_name'], $this->getUser()->getId()
-            );
-            $model->setImage($image);
-        } else {
-            // Get the file out of the rectum, and put it in the resource
-            if ($post['image']) {
-                try {
-                    $model->setImage(Storage\Mapper::getInstance()->findByHash($post['image']));
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    $model->setImage(null);
-                }
-            } else {
-                $model->setImage(null);
+
+        // Rectumize the file that was uploaded
+        if (is_array($post['attachment'])) {
+            try {
+                // Get the file out of the rectum, and put it in the resource
+                $factory = new CollectorFactory();
+                $image = $factory->build($post['attachment'])->getFirst();
+                $model->setImage($image);
+            } catch (\Schoolbox\Resource\Exception $e) {
+                error(43);
+                exit;
             }
+        } else {
+            $model->setImage(null);
         }
 
         // Clear and create the moderator list
@@ -378,7 +374,7 @@ class Controller extends Base
      */
     protected function getAttachZoneData(Model $model)
     {
-        $zone = new Zone('image');
+        $zone = new Zone('attachment');
         $zone
             ->setThumbnailSize(64)
             ->setModalTitle('Select Image')
