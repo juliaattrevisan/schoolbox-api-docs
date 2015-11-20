@@ -1,6 +1,7 @@
 {% set conditionGeneral = 1 %}
 {% set conditionUserExists = 2 %}
 
+<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript">
     $(function() {
 
@@ -28,16 +29,34 @@
             event.preventDefault();
 
             var conditionId = $(this).attr('data-condition-delete');
+            var label = $('#condition-' + conditionId + '-status');
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Condition?',
                 confirmEvent: function() {
+
+                    /* Activate indicator label
+                     */
+                    label.labelActivate();
 
                     /* Delete asynchronously if successful; ignore if unsuccessful
                      */
                     $.post('/adminv2/sync/condition/delete', { conditionId: conditionId }, function(responseText) {
                         if (responseText == '1') {
                             $('#condition-' + conditionId).remove();
+
+                            /* Indicator label gets removed with the condition so we
+                             * don't need to bother showing animation
+                             */
+                        }
+                        else {
+
+                            /* Show that something failed
+                             */
+                            label.labelTimeout({
+                                text: 'Failed',
+                                css: 'alert'
+                            });
                         }
                     });
                 }

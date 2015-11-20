@@ -32,7 +32,7 @@ class Controller extends Base {
          * 1 is successfully deleted
          * 0 is not
          */
-        $deleted = true;
+        $deleted = false;
 
         if ($deleted) {
             echo true;
