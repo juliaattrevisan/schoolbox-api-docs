@@ -14,6 +14,9 @@ use Alaress\Web\Controller\Base;
 
 class Controller extends Base {
 
+    const CONDITION_GENERAL = 1;
+    const CONDITION_USER = 2;
+
     /**
      * Test Method
      *
@@ -32,9 +35,9 @@ class Controller extends Base {
 
         /* Is a factory?
          */
-        if ($params['conditionType'] == 'general') {
+        if ($params['conditionType'] == self::CONDITION_GENERAL) {
         }
-        else if ($params['conditionType'] == 'user') {
+        else if ($params['conditionType'] == self::CONDITION_USER) {
         }
 
         new \Alaress_Probe($params);
