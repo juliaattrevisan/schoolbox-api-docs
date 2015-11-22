@@ -330,20 +330,24 @@ class SitePage extends Page
             $debug_bar_body = $renderer->render();
         }
 
+        $user = $_SESSION['user'];
+        if (!$user instanceof \Schoolbox\User) {
+            $user = new \Schoolbox\User();
+        }
         $dateFormat  = Config::get('date_local');
         $templateVar = array(
             'TEMPLATE_YEAR'          => date('Y'),
             'SITE_NAME'              => Cfg::get('school_name'),
             'SITE_TITLE'             => Cfg::get('title'),
             'SITE_GREETING'          => TextFormatter::greeting(), // TODO: This should be an object
-            'SITE_LOGINNAME'         => $userHandler->formatName($_SESSION),
-            'SITE_USERNAME'          => $_SESSION['username'],
+            'SITE_LOGINNAME'         => $user->formatName(),
+            'SITE_USERNAME'          => $user->getUsername(),
             'SITE_LOCATION'          => $this->site,
             'SITE_ANALYTICS'         => Cfg::get('site_analytics'),
             'SITE_CHROME_LOCATION'   => (Config::get('skin_builder') ? 'demo' : $this->site),
-            'USER_ID'                => $_SESSION['id'],
-            'EXTERNAL_ID'            => $_SESSION['sid'],
-            'USER_ROLE'              => $_SESSION['user']->getRole()->getName(),
+            'USER_ID'                => $user->getId(),
+            'EXTERNAL_ID'            => $user->getExternalId(),
+            'USER_ROLE'              => $user->getRole()->getName(),
             'SITE_VERSION'           => Cfg::get('site_version'),
             'SCHOOL_ADDRESS'         => Cfg::get('school_address'),
             'DEBUGBAR'               => $debug_bar_body,
