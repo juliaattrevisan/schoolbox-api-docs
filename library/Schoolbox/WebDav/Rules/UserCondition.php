@@ -9,6 +9,7 @@
 
 namespace Schoolbox\WebDav\Rules;
 
+use Alaress\ObjectReader;
 use Alaress\Rules\Condition;
 use Schoolbox\User;
 
@@ -33,35 +34,8 @@ class UserCondition extends Condition\In {
     {
 //        printf("ASSERT: %s.%s IN (%s)\n", $user->getUsername(), $this->field, implode(', ', $this->validValues));
 
-        if (strpos($this->field, '.') !== false) {
-            $path = explode('.', $this->field);
-        } else {
-            $path = array($this->field);
-        }
-
-        // could be something like role.type or defaultCampus.id
-        // will be cast to $user->getRole()->getType()
-        $value  = $user;
-        $string = 'User';
-
-        try {
-            foreach ($path as $get) {
-
-                if (is_object($value)) {
-                    $string .= '->get'.ucfirst($get).'()';
-                    $value = $this->readObjectProperty($value, $get);
-
-                } elseif (is_array($value)) {
-                    $string .= "[$get]";
-                    $value = $this->readArrayProperty($value, $get);
-
-                } else {
-                    throw new \DomainException("Property $value is not readable");
-                }
-            }
-        } catch (\DomainException $e) {
-            throw new \DomainException("Failed to retrieve $string, does not exist", 0, $e);
-        }
+        $reader = new ObjectReader();
+        $value  = $reader->read($user, $this->field);
 
         return in_array($value, $this->validValues);
     }

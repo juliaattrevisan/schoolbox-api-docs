@@ -10,6 +10,7 @@
 namespace Alaress\Rules\Token;
 
 
+use Alaress\ObjectReader;
 use Alaress\Rules\Lang\Construct;
 
 abstract class Tokenizer {
@@ -164,7 +165,10 @@ abstract class Tokenizer {
             // TODO should this throw an OOB?
             return '';
         }
-        return $this->tokens[$token]->apply($input, $settings);
+
+        $reader = new ObjectReader();
+
+        return $reader->coerceToString($this->tokens[$token]->apply($input, $settings));
     }
 
 

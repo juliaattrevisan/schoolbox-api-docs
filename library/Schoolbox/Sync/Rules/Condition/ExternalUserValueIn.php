@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Sync\Rules\Condition;
 
+use Alaress\ObjectReader;
 use Alaress\Rules\Condition;
 use Schoolbox\User;
 
@@ -31,12 +32,15 @@ class ExternalUserValueIn extends Condition\In
 
 
     /**
-     * @param array $externalUser
+     * @param mixed $externalUser
      * @return bool
      */
     public function assertIn($externalUser)
     {
-        return in_array($externalUser[$this->field], $this->validValues);
+        $reader = new ObjectReader();
+        $value  = $reader->read($externalUser, $this->field);
+
+        return in_array($value, $this->validValues);
     }
 
 
