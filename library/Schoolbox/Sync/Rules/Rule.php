@@ -18,7 +18,7 @@ class Rule extends Super
 {
 
     /**
-     * @return User
+     * @return array
      */
     public function getEffect()
     {
@@ -81,8 +81,8 @@ class Rule extends Super
     public function getHtmlSummary()
     {
         $formatting = [
-            '`(=|[A-Z][A-Z]+)(\s|$)`'                    => '<span class="ctrl $1">$1</span>$2',
-            '`({:[a-z][a-z_0-9]*(?:\s*\|\s*[a-z]+)*})`i' => '<span class="tok">$1</span>'
+            '`(=|[A-Z][A-Z]+)(\s|$)`'                      => '<span class="ctrl $1">$1</span>$2',
+            '`({:[a-z][a-z_0-9\.]*(?:\s*\|\s*[a-z]+)*})`i' => '<span class="tok">$1</span>'
         ];
 
         $summary = preg_replace(array_keys($formatting), array_values($formatting), $this->getSummary());
@@ -92,7 +92,7 @@ class Rule extends Super
 
 
     /**
-     * @param $obj
+     * @param mixed $obj
      * @return string
      */
     public function getObjectOutput($obj)

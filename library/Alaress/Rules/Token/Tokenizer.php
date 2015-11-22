@@ -112,7 +112,7 @@ abstract class Tokenizer {
 
         if (is_string($fieldValue)) {
             $settings[$field] = $fieldValue;
-            if (preg_match_all('`{:([a-z_][a-z_0-9]*)((?:\s*\|\s*[a-z]+)*)?}`i', $fieldValue, $matches)) {
+            if (preg_match_all('`{:([a-z_][a-z_0-9\.]*)((?:\s*\|\s*[a-z]+)*)?}`i', $fieldValue, $matches)) {
 
                 $len = count($matches[0]);
 
