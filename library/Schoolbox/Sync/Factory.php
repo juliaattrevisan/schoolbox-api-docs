@@ -11,6 +11,9 @@ namespace Schoolbox\Sync;
 
 
 use Alaress\Rules\Lang\Map;
+use OutOfBoundsException;
+use OutOfRangeException;
+use ReflectionException;
 use Schoolbox\Sync\Model\RuleMapper;
 use Schoolbox\Sync\Rules\UserRuleset;
 use Schoolbox\UserMapper;
@@ -68,14 +71,26 @@ class Factory
      * Retrieves and prepares the rule data for the given roletype
      *
      * @param string $roletype
+     * @param bool   $includeDisabled
      * @return array
      */
-    protected function findRulesForRoleType($roletype)
+    protected function findRulesForRoleType($roletype, $includeDisabled = false)
     {
         $rules = [];
 
-        // pull these rules out in sequence
-        $dbRules = $this->ruleMapper->findByColumn('role_type', $roletype, [
+        $search = [
+            'role_type' => $roletype,
+        ];
+
+        if (!$includeDisabled) {
+            $search['enabled'] = true;
+        }
+
+        /**
+         * pull these rules out in sequence
+         * @var Model\Rule[] $dbRules
+         */
+        $dbRules = $this->ruleMapper->findByColumnList($search, [
             'order' => [
                 'sequence' => 'ASC'
             ]
@@ -109,16 +124,16 @@ class Factory
      *
      * @param string $type
      * @param array  $args
-     * @throws \OutOfBoundsException
-     * @throws \OutOfRangeException
+     * @throws OutOfBoundsException
+     * @throws OutOfRangeException
      * @return \Alaress\Rules\Condition
      */
     protected function buildCondition($type, array $args)
     {
         try {
             return $this->reflectivelyBuild(self::CONDITION_NAMESPACE, $type, $args);
-        } catch (\ReflectionException $e) {
-            throw new \OutOfBoundsException("Condition type '$type' not found.", 0, $e);
+        } catch (ReflectionException $e) {
+            throw new OutOfBoundsException("Condition type '$type' not found.", 0, $e);
         }
     }
 
@@ -135,7 +150,7 @@ class Factory
         try {
             // attempt to treat as language construct
             return $this->reflectivelyBuild(self::EFFECT_NAMESPACE, $type, $args);
-        } catch (\ReflectionException $e) {
+        } catch (ReflectionException $e) {
             // no? ok, it's a string literal
             return $args[0];
         }
@@ -159,7 +174,7 @@ class Factory
         $actualCount = count($arguments);
 
         if ($expectedCount != $actualCount) {
-            throw new \OutOfRangeException("$classname expects $expectedCount arguments, got $actualCount");
+            throw new OutOfRangeException("$classname expects $expectedCount arguments, got $actualCount");
         }
 
         return $rc->newInstanceArgs($arguments);
