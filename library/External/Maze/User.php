@@ -13,7 +13,7 @@ class External_Maze_User implements External_UserInterface {
 	/**
 	 * An instance of MSSQL
 	 *
-	 * @var null
+	 * @var MSSQL
 	 */
 	protected $db = null;
 
@@ -915,7 +915,23 @@ class External_Maze_User implements External_UserInterface {
 	 */
 	public function getStudentUserAccountIterator()
 	{
-		// TODO: Implement getStudentUserAccountIterator() method.
+		$query = "
+			SELECT
+				STKEY      AS StudentID,
+				USER_NAME  AS NetworkLogin,
+				NULL       AS StudentTitle,
+				FIRST_NAME AS StudentPreferred,
+				SURNAME    AS StudentSurname,
+				NULL       AS StudentOccupEmail,
+				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
+				HOUSE      AS StudentHouse,
+				BOARDER    AS StudentBoarder,
+				NULL       AS StudentBoardingHouse,
+				CAMPUS     AS StudentCampus
+			FROM ST
+			WHERE STATUS != 'LEFT'
+		";
+		return new \Schoolbox\Sync\Iterator\Student($this->getDb()->getIterator($query));
 	}
 
 	/**
@@ -1018,7 +1034,26 @@ class External_Maze_User implements External_UserInterface {
 	 */
 	public function getStaffUserAccountIterator()
 	{
-		// TODO: Implement getStaffUserAccountIterator() method.
+		$query = "
+			SELECT
+				SFKEY      AS StaffID,
+				USER_NAME  AS NetworkLogin,
+				STAFF_TYPE AS ActiveFlag,
+				NULL       AS StaffTitle,
+				FIRST_NAME AS StaffPreferredName,
+				SURNAME    AS StaffSurname,
+				NULL       AS DefaultEmailCode,
+				NULL       AS OccupEmail,
+				SF_EMAIL   AS Email,
+				CAMPUS     AS StaffCampus,
+				NULL       AS StaffCategoryType,
+				NULL       AS StaffCategory,
+				NULL       AS StaffDepartment
+			FROM SF
+			WHERE FINISH IS NULL
+			AND STAFF_TYPE != 'L'
+		";
+		return new \Schoolbox\Sync\Iterator\Staff($this->getDb()->getIterator($query));
 	}
 
     /**
@@ -1076,7 +1111,7 @@ class External_Maze_User implements External_UserInterface {
 	/**
 	 * Set db
 	 *
-	 * @param null $db
+	 * @param MSSQL $db
 	 */
 	protected function setDb($db) {
 		$this->db = $db;
@@ -1085,7 +1120,7 @@ class External_Maze_User implements External_UserInterface {
 	/**
 	 * Get db
 	 *
-	 * @return null
+	 * @return MSSQL
 	 */
 	protected function getDb() {
 		return $this->db;
