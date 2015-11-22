@@ -10,6 +10,7 @@
 namespace Alaress\Rules;
 
 
+use Alaress\Rules\Lang\Construct;
 use SplObjectStorage;
 
 abstract class Ruleset
@@ -50,9 +51,9 @@ abstract class Ruleset
 
 
     /**
-     * @param Condition[] $conditions
-     * @param mixed       $response
-     * @param bool        $negate
+     * @param Condition[]     $conditions the list of conditions that must pass for this rule to take effect
+     * @param Construct|mixed $response   the output of this rule if the conditions pass, which is either with a Construct to be applied, or a literal value
+     * @param bool            $negate     whether or not to negate
      */
     public function newRule(array $conditions, $response, $negate = false)
     {
