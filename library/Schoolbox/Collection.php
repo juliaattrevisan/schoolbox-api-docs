@@ -9,12 +9,13 @@
 
 namespace Schoolbox;
 
+use ArrayAccess;
 use Schoolbox;
 use ArrayIterator;
 use ICollection;
 use JsonSerializable;
 
-class Collection implements ICollection, JsonSerializable
+class Collection implements ICollection, JsonSerializable, ArrayAccess
 {
     protected $stack = array();
     protected $position = 0;
