@@ -15,23 +15,36 @@ use Alaress\Web\Controller\Base;
 class Controller extends Base {
 
     /**
-     * Test Method
+     * Form for creation
+     *
      * @param $params
      */
     public function add($params) {
-        new \Alaress_Probe($params);
-
-
-        /* Twig data
-         */
         $this->getResponse()->content->set([
             'template' => '@syncRule/add.twig',
-            'data' => []
+            'data' => [
+                'rulesetId' => $params['rulesetId']
+            ]
         ]);
     }
 
     /**
      * Test Method
+     *
+     * TODO: Redirect back to Ruleset when finished
+     *
+     * @param $params
+     */
+    public function create($params) {
+        new \Alaress_Probe($params);
+
+        echo "Create Rule";
+        exit();
+    }
+
+    /**
+     * Test Method
+     *
      * @param $params
      */
     public function delete($params) {
