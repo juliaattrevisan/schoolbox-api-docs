@@ -11,6 +11,7 @@ namespace Alaress;
 
 use ArrayAccess;
 use DomainException;
+use Traversable;
 
 /**
  * Class ObjectReader
@@ -45,6 +46,10 @@ class ObjectReader
     {
         $value  = $input;
         $string = is_object($input) ? get_class($input) : gettype($input);
+
+        // replace array[notation] with dot.notation
+        $path = preg_replace('`\[(\d+)\]`', '.$1', $path);
+
         $parts  = explode('.', $path);
 
         try {
@@ -52,21 +57,56 @@ class ObjectReader
 
                 if ($value instanceof ArrayAccess) {
 
-                    if (!$value->offsetExists($get)) {
-                        // it's empty! bug out early and just return null
-                        return null;
+                    if ($value->offsetExists($get)) {
+                        // simple. just get it.
+                        $string .= "[$get]";
+                        $value = $value->offsetGet($get);
+
+                    } else {
+                        // so that offset doesn't exist...
+                        // BUT! ...maybe it exists in the subordinate objects (and we're getting a collection return)
+                        if (!$value instanceof Traversable) {
+                            return null;
+                        }
+
+                        $values = [];
+                        $append = '';
+
+                        foreach ($value as $k => $v) {
+
+                            try {
+                                if (is_object($v)) {
+                                    $append =  '->get'.ucfirst($get).'()[]';
+                                    $values[] = $this->readObjectProperty($v, $get);
+                                } elseif (is_array($v)) {
+                                    $append = "[$get][]";
+                                    $values[] = $this->readArrayProperty($v, $get);
+                                }
+                            } catch (DomainException $e) {
+                                // do nothing - ignore it and keep going
+                            }
+
+                        }
+
+                        if (count($values) == 0) {
+                            // nothing in the traversable matched, bug out
+                            return null;
+                        }
+
+                        // this array is what we'll operate on from here
+                        $string .= $append;
+                        $value = $values;
+
                     }
 
-                    $string .= "[$get]";
-                    $value = $value->offsetGet($get);
-                }
-                elseif (is_object($value)) {
+                } elseif (is_object($value)) {
                     $string .= '->get'.ucfirst($get).'()';
                     $value = $this->readObjectProperty($value, $get);
 
                 } elseif (is_array($value)) {
                     $string .= "[$get]";
                     $value = $this->readArrayProperty($value, $get);
+
                 } else {
                     throw new DomainException("Reading '$get' from $string, but property '$value' is not readable (path was $path)");
                 }
@@ -79,6 +119,7 @@ class ObjectReader
             $value = $this->coerceToString($value);
         }
 
+        var_dump($string);
         return $value;
     }
 
@@ -91,13 +132,19 @@ class ObjectReader
      */
     protected function readObjectProperty($object, $get)
     {
+        // test for getter access
         $method = array($object, "get$get"); // methods aren't case sensitive......
 
         if (is_callable($method)) {
             return call_user_func($method);
         }
 
-        throw new DomainException(sprintf("Method %s::%s() is not callable", get_class($object), $method[1]));
+        // test for direct access
+        if (property_exists($object, $get)) {
+            return $object->$get;
+        }
+
+        throw new DomainException(sprintf("Property %s.%s is not readable", get_class($object), $get));
     }
 
 
