@@ -125,7 +125,7 @@ class Factory {
             'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
             'allNavigation' => $allNavigation->getAllNodes(),
             'rulesetId' => $this->getType(),
-            'ruleset' => $this->findRuleset($this->getType()),
+            'ruleset' => $this->findRuleset(),
         ];
     }
 
@@ -134,12 +134,11 @@ class Factory {
      *
      * TODO: Load from database
      *
-     * @param $type
      * @return array
      */
-    private function findRuleset($type) {
+    private function findRuleset() {
 
-        /* TODO: Construct Ruleset from database
+        /* TODO: Construct Ruleset from database via $this->getType()
          * This is an example Ruleset structure
          */
         $ruleset = [
