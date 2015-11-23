@@ -21,8 +21,6 @@ class Controller extends Base {
      * so that new Conditions can be injected directly into
      * the ui after being received via ajax
      *
-     * TODO: Populate type and id from database
-     *
      * @param $params
      */
     public function add($params) {
@@ -46,6 +44,8 @@ class Controller extends Base {
             ]
         ];
 
+        /* TODO: Populate type and id from database
+         */
         $data = [
             'currentCondition' => [
                 'condition' => [
@@ -57,6 +57,8 @@ class Controller extends Base {
             ]
         ];
 
+        /* Is a factory?
+         */
         switch ($params['conditionType']) {
             case self::CONDITION_GENERAL:
                 $fragment = $this->getDi()->get('templateEngine')->render('@syncCondition/general.twig', $data);
@@ -80,12 +82,13 @@ class Controller extends Base {
      *
      * Return true if deletion was successful
      *
-     * TODO: Perform actual deletion from db via mappers etc
-     *
      * @return bool
      */
     public function delete() {
-        // new \Alaress_Probe($_POST);
+
+        /* TODO: Perform actual deletion from db via mappers etc
+         * new \Alaress_Probe($_POST);
+         */
 
         /* Tell us whether the deletion was successful
          * 1 is successfully deleted
