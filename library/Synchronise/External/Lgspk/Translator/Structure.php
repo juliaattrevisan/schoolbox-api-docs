@@ -18,6 +18,7 @@ class Synchronise_External_Lgspk_Translator_Structure extends Synchronise_Extern
     {
         $reducer = new Synchronise_External_Lgspk_Translator_Structure_Reduce();
         $result  = [
+            'termStart' => null,
             'dayCount'  => 0,
             'termTitle' => '',
             'periods'   => [],

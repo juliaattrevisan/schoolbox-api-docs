@@ -25,14 +25,21 @@ class Synchronise_External_Lgspk_Translator_Structure_Map extends IteratorIterat
                 'termTitle' => (string)$attrs->name,
             ];
         } elseif ($current->matches('//daysdefs/daysdef')) {
-            if ((string)$attrs->short === 'E') {
-                return [
-                    'type'     => 'daysdef',
-                    'id'       => (string)$attrs->name,
-                    'dayCount' => strlen((string)$attrs->days),
-                ];
-            } else {
-                return [];
+            // Is this day 1? use this as the reset day of this timetable
+            $days = (string)$attrs->days;
+            if (substr($days, 0, 1) === '1') {
+                // Days will be in format "(Mon|Tue|Wed|etc.)-(dom)"
+                $name = (string)$attrs->name;
+                if (preg_match('/^([a-z]{3})-(\\d{1,2})$/i', $name, $matches)) {
+                    $monthDay = $matches[2];
+                    // What's the date of $monthDay in the current month?
+                    return [
+                        'type'      => 'daysdef',
+                        'id'        => $name,
+                        'dayCount'  => strlen($days),
+                        'startDate' => Alaress_Date_Format::now()->setTime(0, 0, 0)->setDay(intval($monthDay)),
+                    ];
+                }
             }
         } elseif ($current->matches('//periods/period')) {
             return [
@@ -42,8 +49,8 @@ class Synchronise_External_Lgspk_Translator_Structure_Map extends IteratorIterat
                 'periodStart'  => (string)$attrs->starttime,
                 'periodFinish' => (string)$attrs->endtime,
             ];
-        } else {
-            return [];
         }
+        // Fall through all cases - return nothing
+        return [];
     }
 }

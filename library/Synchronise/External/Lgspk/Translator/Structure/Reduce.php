@@ -25,7 +25,8 @@ class Synchronise_External_Lgspk_Translator_Structure_Reduce
                 $carry['termTitle'] = $item['termTitle'];
                 break;
             case 'daysdef':
-                $carry['dayCount'] = $item['dayCount'];
+                $carry['termStart'] = $item['startDate'];
+                $carry['dayCount']  = $item['dayCount'];
                 break;
             case 'period':
                 $carry['periods'][] = [
