@@ -18,11 +18,16 @@ class Controller extends Base {
      * Test Method
      * @param $params
      */
-    public function create($params) {
+    public function add($params) {
         new \Alaress_Probe($params);
 
-        echo "Create rule";
-        exit();
+
+        /* Twig data
+         */
+        $this->getResponse()->content->set([
+            'template' => '@syncRule/add.twig',
+            'data' => []
+        ]);
     }
 
     /**

@@ -33,7 +33,7 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath) {
-        $this->addGetRoute($router, 'create', $basePath, "/create/{rulesetId}");
+        $this->addGetRoute($router, 'add', $basePath, "/add/{rulesetId}");
         $this->addPostRoute($router, 'delete', $basePath, "/delete/{ruleId}");
     }
 
