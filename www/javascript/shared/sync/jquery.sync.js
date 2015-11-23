@@ -33,10 +33,28 @@
         function init(options, element) {
             var defaults = {
                 element: element,
+
+                /* Condition Settings
+                 */
                 condition: {
                     type: {
                         general: 1,
                         userExists: 2
+                    },
+                    delete: {
+                        url: '/adminv2/sync/condition/delete',
+                        confirm: 'Are you sure you want to delete this Condition?',
+                        fail: 'Could not delete Condition'
+                    }
+                },
+
+                /* Rule Settings
+                 */
+                rule: {
+                    delete: {
+                        url: '/adminv2/sync/rule/delete',
+                        confirm: 'Are you sure you want to delete this Rule?',
+                        fail: 'Could not delete Rule'
                     }
                 },
 
@@ -86,7 +104,7 @@
                 var label = $('#rule-' + ruleId + '-status');
 
                 $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this Rule?',
+                    text: config.rule.delete.confirm,
                     confirmEvent: function() {
 
                         /* Activate indicator label
@@ -95,7 +113,7 @@
 
                         /* Delete asynchronously if successful; ignore if unsuccessful
                          */
-                        $.post('/adminv2/sync/rule/delete', { ruleId: ruleId }, function(responseText) {
+                        $.post(config.rule.delete.url, { ruleId: ruleId }, function(responseText) {
                             if (responseText == config.success) {
                                 $('#rule-' + ruleId).remove();
 
@@ -108,7 +126,7 @@
                                 /* Show that something failed
                                  */
                                 label.labelTimeout({
-                                    text: 'Failed',
+                                    text: config.rule.delete.fail,
                                     css: 'alert'
                                 });
                             }
@@ -184,7 +202,7 @@
                 var label = $('#condition-' + conditionId + '-status');
 
                 $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this Condition?',
+                    text: config.condition.delete.confirm,
                     confirmEvent: function() {
 
                         /* Activate indicator label
@@ -193,7 +211,7 @@
 
                         /* Delete asynchronously if successful; ignore if unsuccessful
                          */
-                        $.post('/adminv2/sync/condition/delete', { conditionId: conditionId }, function(responseText) {
+                        $.post(config.condition.delete.url, { conditionId: conditionId }, function(responseText) {
                             if (responseText == config.success) {
                                 $('#condition-' + conditionId).remove();
 
@@ -206,7 +224,7 @@
                                 /* Show that something failed
                                  */
                                 label.labelTimeout({
-                                    text: 'Failed',
+                                    text: config.condition.delete.fail,
                                     css: 'alert'
                                 });
                             }
