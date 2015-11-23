@@ -26,7 +26,7 @@ class Controller extends Base {
         /* Breadcrumbs
          */
         $allBreadcrumbs = new Navigator(
-            new Node('Home', '/adminv2', false),
+            new Node('Home', '/adminv2/home', false),
             new Node('Sync (UPS)', '/adminv2/sync', false),
             new Node(ucwords($params['rulesetId']), "/adminv2/sync/{$params['rulesetId']}", false),
             new Node('Add Rule', '#', true)
@@ -85,7 +85,7 @@ class Controller extends Base {
         /* Breadcrumbs
          */
         $allBreadcrumbs = new Navigator(
-            new Node('Home', '/adminv2', false),
+            new Node('Home', '/adminv2/home', false),
             new Node('Sync (UPS)', '/adminv2/sync', false),
             new Node(ucwords($rulesetId), "/adminv2/sync/{$rulesetId}", true)
         );

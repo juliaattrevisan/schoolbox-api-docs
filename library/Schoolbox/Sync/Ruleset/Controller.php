@@ -24,7 +24,7 @@ class Controller extends Base {
         /* Breadcrumbs
          */
         $allBreadcrumbs = new Navigator(
-            new Node('Home', '/adminv2', false),
+            new Node('Home', '/adminv2/home', false),
             new Node('Sync (UPS)', '/adminv2/sync', true)
         );
 

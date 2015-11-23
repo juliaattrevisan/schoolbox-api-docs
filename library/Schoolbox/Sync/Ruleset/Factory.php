@@ -65,7 +65,7 @@ class Factory {
              */
             case 'student':
                 $allBreadcrumbs = new Navigator(
-                    new Node('Home', '/adminv2', false),
+                    new Node('Home', '/adminv2/home', false),
                     new Node('Sync (UPS)', '/adminv2/sync', false),
                     new Node('Student', '/adminv2/sync/student', true)
                 );
@@ -82,7 +82,7 @@ class Factory {
              */
             case 'parent':
                 $allBreadcrumbs = new Navigator(
-                    new Node('Home', '/adminv2', false),
+                    new Node('Home', '/adminv2/home', false),
                     new Node('Sync (UPS)', '/adminv2/sync', false),
                     new Node('Parent', '/adminv2/sync/parent', true)
                 );
@@ -99,7 +99,7 @@ class Factory {
              */
             case 'staff':
                 $allBreadcrumbs = new Navigator(
-                    new Node('Home', '/adminv2', false),
+                    new Node('Home', '/adminv2/home', false),
                     new Node('Sync (UPS)', '/adminv2/sync', false),
                     new Node('Staff', '/adminv2/sync/staff', true)
                 );
