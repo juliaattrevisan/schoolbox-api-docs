@@ -15,7 +15,7 @@ use Alaress\Web\Controller\Base;
 class Controller extends Base {
 
     /**
-     * Form for creation
+     * Form
      *
      * @param $params
      */
@@ -23,22 +23,70 @@ class Controller extends Base {
         $this->getResponse()->content->set([
             'template' => '@syncRule/add.twig',
             'data' => [
-                'rulesetId' => $params['rulesetId']
+                'rulesetId' => $params['rulesetId'],
+
+                /* TODO: Empty Rule instance
+                 */
+                'rule' => []
             ]
         ]);
     }
 
     /**
-     * Test Method
-     *
-     * TODO: Redirect back to Ruleset when finished
+     * Perform
      *
      * @param $params
      */
     public function create($params) {
-        new \Alaress_Probe($params);
 
+        /* TODO: Database Transaction
+         */
+        new \Alaress_Probe($params, $_POST);
+
+        /* TODO: Redirect back to Ruleset when finished
+         */
         echo "Create Rule";
+        exit();
+    }
+
+    /**
+     * Form
+     *
+     * @param $params
+     */
+    public function edit($params) {
+
+        /* TODO: Fetch from db
+         */
+        $rule = [
+            'id' => $params['ruleId'],
+            'name' => "Some generic name for ruleId: {$params['ruleId']}",
+            'description' => 'Some generic rule description'
+        ];
+
+        $this->getResponse()->content->set([
+            'template' => '@syncRule/add.twig',
+            'data' => [
+                'rulesetId' => $params['rulesetId'],
+                'rule' => $rule
+            ]
+        ]);
+    }
+
+    /**
+     * Perform
+     *
+     * @param $params
+     */
+    public function update($params) {
+
+        /* TODO: Database Transaction
+         */
+        new \Alaress_Probe($params, $_POST);
+
+        /* TODO: Redirect back to Ruleset when finished
+         */
+        echo "Update Rule";
         exit();
     }
 
@@ -48,8 +96,13 @@ class Controller extends Base {
      * @param $params
      */
     public function delete($params) {
-        new \Alaress_Probe($params);
 
+        /* TODO: Database Transaction
+         */
+        new \Alaress_Probe($params, $_POST);
+
+        /* TODO: Redirect back to Ruleset when finished
+         */
         echo "Delete rule";
         exit();
     }
