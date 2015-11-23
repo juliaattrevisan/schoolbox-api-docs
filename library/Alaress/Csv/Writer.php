@@ -54,10 +54,6 @@ class Writer
      */
     protected $dataset = [];
 
-    protected $current_key  = 0;
-    protected $current_row  = array();
-    protected $previous_row = array();
-
     /**
      * Sets up the writer to write to a resource.
      *
