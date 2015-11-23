@@ -27,6 +27,9 @@ class Sync implements ModuleConfigInterface {
         $ruleset = new \Schoolbox\Sync\Module($di);
         $ruleset->init('/adminv2/sync');
 
+        $rule = new \Schoolbox\Sync\Rule\Module($di);
+        $rule->init('/adminv2/sync/rule');
+
         $condition = new \Schoolbox\Sync\Condition\Module($di);
         $condition->init('/adminv2/sync/condition');
     }
