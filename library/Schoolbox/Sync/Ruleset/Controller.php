@@ -67,11 +67,18 @@ class Controller extends Base {
     }
 
     /**
-     * Test Method
-     *
-     * @param $params
+     * Update each Rule in the Ruleset
      */
-    public function update($params) {
-        new \Alaress_Probe($params, $_POST);
+    public function update() {
+
+        /* TODO: Database Transaction
+         */
+        new \Alaress_Probe($_POST);
+
+        /* TODO: Redirect back to Ruleset when finished
+         * $this->getResponse()->redirect->to("/adminv2/sync/{$_POST['rulesetId']}");
+         */
+        echo "Update Rule";
+        exit();
     }
 }
