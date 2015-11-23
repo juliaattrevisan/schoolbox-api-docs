@@ -48,11 +48,25 @@ class Controller extends Base {
     }
 
     /**
+     * Ruleset view
+     *
+     * @param $params
+     */
+    public function ruleset($params) {
+        switch ($params['rulesetId']) {
+            case 'student': $this->student($params); break;
+            case 'parent': $this->parent($params); break;
+            case 'staff': $this->staff($params); break;
+            default: break;
+        }
+    }
+
+    /**
      * Student Test Method
      *
      * @param array $params
      */
-    public function student($params) {
+    private function student($params) {
 
         /* Breadcrumbs
          */
@@ -91,7 +105,7 @@ class Controller extends Base {
      *
      * @param array $params
      */
-    public function parent($params) {
+    private function parent($params) {
 
         /* Breadcrumbs
          */
@@ -130,7 +144,7 @@ class Controller extends Base {
      *
      * @param array $params
      */
-    public function staff($params) {
+    private function staff($params) {
 
         /* Breadcrumbs
          */

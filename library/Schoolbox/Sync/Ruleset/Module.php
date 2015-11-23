@@ -34,9 +34,7 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath) {
         $this->addGetRoute($router, 'intro', $basePath, "");
-        $this->addGetRoute($router, 'student', $basePath, "/student");
-        $this->addGetRoute($router, 'parent', $basePath, "/parent");
-        $this->addGetRoute($router, 'staff', $basePath, "/staff");
+        $this->addGetRoute($router, 'ruleset', $basePath, "/{rulesetId}");
         $this->addPostRoute($router, 'testsubmit', $basePath, "/testsubmit");
     }
 
@@ -46,6 +44,15 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initRoutePreloads(PathMatcher $matcher) {
+        $this->addRoutePreload(
+            $matcher,
+            '(?:ruleset)',
+            function($params) {
+                return array(
+                    'params' => $params,
+                );
+            }
+        );
     }
 
     /**
