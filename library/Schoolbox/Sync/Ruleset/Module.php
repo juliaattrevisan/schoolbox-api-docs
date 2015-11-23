@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync;
+namespace Schoolbox\Sync\Ruleset;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
@@ -74,7 +74,7 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew('Schoolbox\\Sync\\Controller')
+            $injector->lazyNew('Schoolbox\\Sync\\Ruleset\\Controller')
         );
     }
 }

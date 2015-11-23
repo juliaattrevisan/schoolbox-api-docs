@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync;
+namespace Schoolbox\Sync\Ruleset;
 
 use Alaress\Web\Controller\Base;
 
