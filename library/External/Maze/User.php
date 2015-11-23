@@ -996,7 +996,44 @@ class External_Maze_User implements External_UserInterface {
 	 */
 	public function getParentUserAccountIterator()
 	{
-		// TODO: Implement getParentUserAccountIterator() method.
+		// TODO this spouse StudentContactID won't work, as getEnrolledStudents doesn't support it
+		$query = "
+			SELECT
+				NULL          AS StudentContactNetworkLogin,
+				DF.DFKEY      AS StudentContactID,
+				DF.FTITLE     AS StudentContactTitle,
+				DF.FNAME      AS StudentContactPreferred,
+				DF.FSURNAME   AS StudentContactSurname,
+				DF.F_EMAIL    AS StudentContactDefaultEmail,
+				ST.STKEY      AS StudentId,
+				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
+				ST.CAMPUS     AS StudentCampus,
+				ST.FIRST_NAME AS StudentPreferred,
+				ST.SURNAME    AS StudentSurname
+			FROM ST
+			LEFT JOIN DF ON (ST.FAMILY = DF.DFKEY OR ST.FAMB = DF.DFKEY)
+
+			UNION ALL
+
+			-- Speese
+			SELECT
+				NULL           AS StudentContactNetworkLogin,
+				(DF.DFKEY+'1') AS StudentContactID,
+				DF.MTITLE      AS StudentContactTitle,
+				DF.MNAME       AS StudentContactPreferred,
+				DF.MSURNAME    AS StudentContactSurname,
+				DF.M_EMAIL     AS StudentContactDefaultEmail,
+				ST.STKEY       AS StudentId,
+				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
+				ST.CAMPUS      AS StudentCampus,
+				ST.FIRST_NAME  AS StudentPreferred,
+				ST.SURNAME     AS StudentSurname
+			FROM ST
+			LEFT JOIN DF ON (ST.FAMILY = DF.DFKEY OR ST.FAMB = DF.DFKEY)
+
+			ORDER BY StudentContactID ASC
+		";
+		return new \Schoolbox\Sync\Iterator\Guardian($this->getDb()->getIterator($query));
 	}
 
 	/**
