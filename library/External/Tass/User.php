@@ -659,6 +659,12 @@ class External_Tass_User implements External_UserInterface
                     $row['StudentContactSurname']   = $surname;
                     return $row;
                 })
+                ->addMap(function ($row) {
+                    if (isset($row['StudentContactSplitFamilyNumber'])) {
+                        $row['StudentContactID'] .= $row['StudentContactSplitFamilyNumber'];
+                    }
+                    return $row;
+                })
         );
     }
 
