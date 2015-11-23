@@ -119,7 +119,6 @@ class ObjectReader
             $value = $this->coerceToString($value);
         }
 
-        var_dump($string);
         return $value;
     }
 
