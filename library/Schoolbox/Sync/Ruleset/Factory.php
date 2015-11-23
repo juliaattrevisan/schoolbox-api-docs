@@ -23,6 +23,28 @@ class Factory {
     private $type = '';
 
     /**
+     * Default state of Conditions when loading a Ruleset
+     *
+     * A meta field for various Condition-specific UI
+     * so that when you load a Ruleset UI, all Conditions are
+     * impossible to accidentally break. You must actively unlock
+     * each Condition you want to edit.
+     *
+     * meta->disabled is the attribute on input, select, textarea elements
+     * meta->lock->status is a flag for whether the Condition is locked (1 yes, 0 no)
+     * meta->lock->icon is the action button icon- class to start with (opposite to its actual state)
+     *
+     * Should be set to "disabled", "1" and "unlocked" by default
+     */
+    private $meta = [
+        'disabled' => 'disabled',
+        'lock' => [
+            'status' => 1,
+            'icon' => 'unlocked',
+        ]
+    ];
+
+    /**
      * Constructor
      *
      * @param $rulesetId
@@ -108,30 +130,6 @@ class Factory {
     }
 
     /**
-     * A meta field for various Condition-specific UI
-     * so that when you load a Ruleset UI, all Conditions are
-     * impossible to accidentally break. You must actively unlock
-     * each Condition you want to edit.
-     *
-     * meta->disabled is the attribute on input, select, textarea elements
-     * meta->lock->status is a flag for whether the Condition is locked (1 yes, 0 no)
-     * meta->lock->icon is the action button icon- class to start with
-     *
-     * Should be set to "disabled", "1" and "locked" by default
-     */
-    private function getMeta() {
-        $meta = [
-            'disabled' => 'disabled',
-            'lock' => [
-                'status' => 1,
-                'icon' => 'unlocked',
-            ]
-        ];
-
-        return $meta;
-    }
-
-    /**
      * Load a Ruleset based on Role Type student|parent|staff
      *
      * TODO: Load from database
@@ -209,6 +207,15 @@ class Factory {
 
     /* Getters/Setters
      */
+
+    /**
+     * Get meta
+     *
+     * @return array
+     */
+    private function getMeta() {
+        return $this->meta;
+    }
 
     /**
      * @param string $type
