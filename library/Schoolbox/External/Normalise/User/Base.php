@@ -230,7 +230,7 @@ abstract class Base {
     /**
      * Set email
      *
-     * @param string $email
+     * @param Collection $email
      * @return $this
      */
     public function setEmail($email)
@@ -242,7 +242,7 @@ abstract class Base {
     /**
      * Get email
      *
-     * @return string
+     * @return Collection
      */
     public function getEmail()
     {
