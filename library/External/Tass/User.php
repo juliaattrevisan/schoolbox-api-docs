@@ -591,7 +591,13 @@ class External_Tass_User implements External_UserInterface
                 s.preferred_name AS StudentPreferred,
                 s.surname        AS StudentSurname
             FROM parent AS p
-            INNER JOIN student as s
+            INNER JOIN paraddress as pa
+                ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code
+            LEFT JOIN pia_sfaccess AS sf
+                ON p.par_code = sf.par_code
+                AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
+                AND p.cmpy_code = sf.cmpy_code
+            LEFT JOIN student as s
                 ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
             WHERE p.f_name IS NOT NULL
 
@@ -610,7 +616,13 @@ class External_Tass_User implements External_UserInterface
                 s.preferred_name AS StudentPreferred,
                 s.surname        AS StudentSurname
             FROM parent AS p
-            INNER JOIN student as s
+            INNER JOIN paraddress as pa
+                ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code
+            LEFT JOIN pia_sfaccess AS sf
+                ON p.par_code = sf.par_code
+                AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
+                AND p.cmpy_code = sf.cmpy_code
+            LEFT JOIN student as s
                 ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
             WHERE p.m_name IS NOT NULL
 
