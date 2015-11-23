@@ -23,12 +23,16 @@ class Controller extends Base {
 
         /* Breadcrumbs
          */
+        $allBreadcrumbs = new Breadcrumbs(
+            new Breadcrumb('Home', '/adminv2', false),
+            new Breadcrumb('Sync (UPS)', '/adminv2/sync', true)
+        );
 
         /* Navigation
          */
         $allNavigation = new Breadcrumbs(
             new Breadcrumb('Student', '/adminv2/sync/student', false),
-            new Breadcrumb('Parent', '/adminv2/sync/parent', true),
+            new Breadcrumb('Parent', '/adminv2/sync/parent', false),
             new Breadcrumb('Staff', '/adminv2/sync/staff', false)
         );
 
@@ -37,6 +41,7 @@ class Controller extends Base {
         $this->getResponse()->content->set([
             'template' => '@sync/intro.twig',
             'data' => [
+                'allBreadcrumbs' => $allBreadcrumbs->getAllBreadcrumbs(),
                 'allNavigation' => $allNavigation->getAllBreadcrumbs(),
             ]
         ]);
@@ -132,6 +137,11 @@ class Controller extends Base {
 
         /* Breadcrumbs
          */
+        $allBreadcrumbs = new Breadcrumbs(
+            new Breadcrumb('Home', '/adminv2', false),
+            new Breadcrumb('Sync (UPS)', '/adminv2/sync', false),
+            new Breadcrumb('Student', '/adminv2/sync/student', true)
+        );
 
         /* Navigation
          */
@@ -146,6 +156,7 @@ class Controller extends Base {
         $this->getResponse()->content->set([
             'template' => '@sync/student.twig',
             'data' => [
+                'allBreadcrumbs' => $allBreadcrumbs->getAllBreadcrumbs(),
                 'allNavigation' => $allNavigation->getAllBreadcrumbs(),
                 'ruleset' => $ruleset,
             ]
