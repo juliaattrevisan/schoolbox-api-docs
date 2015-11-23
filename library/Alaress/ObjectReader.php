@@ -29,7 +29,22 @@ class ObjectReader
      */
     public function coerceToString($value)
     {
-        if (is_array($value) || (is_object($value) && !method_exists($value, '__toString'))) {
+        if (is_array($value)) {
+            // attempt to recover
+            $filtered = array_filter($value);
+
+            if (count($filtered) > 1) {
+                throw new DomainException("Value cannot be coerced to string");
+            }
+
+            if (count($filtered) == 0) {
+                return null;
+            }
+
+            return $filtered[0];
+        }
+
+        if (is_object($value) && !method_exists($value, '__toString')) {
             throw new DomainException("Value cannot be coerced to string");
         }
 
