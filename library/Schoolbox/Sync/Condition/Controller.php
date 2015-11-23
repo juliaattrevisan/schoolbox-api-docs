@@ -94,7 +94,7 @@ class Controller extends Base {
          * 1 is successfully deleted
          * 0 is not
          */
-        $deleted = false;
+        $deleted = true;
 
         if ($deleted) {
             echo true;
