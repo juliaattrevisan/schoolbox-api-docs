@@ -48,95 +48,11 @@ class Controller extends Base {
     }
 
     /**
-     * Test Method
+     * Student Test Method
      *
      * @param array $params
      */
     public function student($params) {
-
-        /* A meta field for various Condition-specific UI
-         * so that when you load a Ruleset UI, all Conditions are
-         * impossible to accidentally break. You must actively unlock
-         * each Condition you want to edit.
-         *
-         * meta->disabled is the attribute on input, select, textarea elements
-         * meta->lock->status is a flag for whether the Condition is locked (1 yes, 0 no)
-         * meta->lock->icon is the action button icon- class to start with
-         *
-         * Should be set to "disabled", "1" and "locked" by default
-         */
-        $meta = [
-            'disabled' => 'disabled',
-            'lock' => [
-                'status' => 1,
-                'icon' => 'unlocked',
-            ]
-        ];
-
-        /* TODO: Construct Ruleset from database
-         */
-
-        /* The actual ruleset construct
-         */
-        $ruleset = [
-            'rules' => [
-                [
-                    'id' => 999,
-                    'name' => 'The First Rule',
-                    'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin tempus consequat leo, id tempor arcu dapibus sit amet. Maecenas at bibendum leo, quis vestibulum dolor.',
-                    'conditions' => [
-                        [
-                            'condition' => [
-                                'id' => 1231,
-                                'type' => 1,
-                                'rule_id' => 999,
-                                'meta' => $meta
-                            ],
-                            'selected' => [
-                                'NDSField' => 3,
-                                'matches' => 1,
-                                'values' => "Mort\nBart\nGruber"
-                            ]
-                        ],
-                        [
-                            'condition' => [
-                                'id' => 4458,
-                                'type' => 2,
-                                'rule_id' => 999,
-                                'meta' => $meta
-                            ],
-                            'selected' => [
-                                'matches' => 1,
-                            ]
-                        ]
-                    ],
-                    'effects' => [
-                    ]
-                ],
-                [
-                    'id' => 1000,
-                    'name' => 'The Second Rule',
-                    'description' => 'Duis lobortis, augue eget luctus pulvinar, est mauris pellentesque eros, non bibendum diam urna a libero. Nam mattis nulla eu tincidunt vestibulum. Integer feugiat auctor massa ac egestas',
-                    'conditions' => [
-                        [
-                            'condition' => [
-                                'id' => 789,
-                                'type' => 1,
-                                'rule_id' => 1000,
-                                'meta' => $meta
-                            ],
-                            'selected' => [
-                                'NDSField' => 1,
-                                'matches' => 2,
-                                'values' => "S-12344"
-                            ]
-                        ]
-                    ],
-                    'effects' => [
-                    ]
-                ]
-            ]
-        ];
 
         /* Breadcrumbs
          */
@@ -162,9 +78,111 @@ class Controller extends Base {
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'allNavigation' => $allNavigation->getAllNodes(),
                 'rulesetId' => 'student',
-                'ruleset' => $ruleset,
+                'ruleset' => $this->getTestRuleset(),
             ]
         ]);
+    }
+
+    public function parent() {
+    }
+
+    public function staff() {
+    }
+
+    /**
+     * A meta field for various Condition-specific UI
+     * so that when you load a Ruleset UI, all Conditions are
+     * impossible to accidentally break. You must actively unlock
+     * each Condition you want to edit.
+     *
+     * meta->disabled is the attribute on input, select, textarea elements
+     * meta->lock->status is a flag for whether the Condition is locked (1 yes, 0 no)
+     * meta->lock->icon is the action button icon- class to start with
+     *
+     * Should be set to "disabled", "1" and "locked" by default
+     */
+    private function getMeta() {
+        $meta = [
+            'disabled' => 'disabled',
+            'lock' => [
+                'status' => 1,
+                'icon' => 'unlocked',
+            ]
+        ];
+
+        return $meta;
+    }
+
+    /**
+     * Get an example Ruleset structure
+     *
+     * @return array
+     */
+    private function getTestRuleset() {
+
+        /* TODO: Construct Ruleset from database
+         */
+        $ruleset = [
+            'rules' => [
+                [
+                    'id' => 999,
+                    'name' => 'The First Rule',
+                    'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin tempus consequat leo, id tempor arcu dapibus sit amet. Maecenas at bibendum leo, quis vestibulum dolor.',
+                    'conditions' => [
+                        [
+                            'condition' => [
+                                'id' => 1231,
+                                'type' => 1,
+                                'rule_id' => 999,
+                                'meta' => $this->getMeta()
+                            ],
+                            'selected' => [
+                                'NDSField' => 3,
+                                'matches' => 1,
+                                'values' => "Mort\nBart\nGruber"
+                            ]
+                        ],
+                        [
+                            'condition' => [
+                                'id' => 4458,
+                                'type' => 2,
+                                'rule_id' => 999,
+                                'meta' => $this->getMeta()
+                            ],
+                            'selected' => [
+                                'matches' => 1,
+                            ]
+                        ]
+                    ],
+                    'effects' => [
+                    ]
+                ],
+                [
+                    'id' => 1000,
+                    'name' => 'The Second Rule',
+                    'description' => 'Duis lobortis, augue eget luctus pulvinar, est mauris pellentesque eros, non bibendum diam urna a libero. Nam mattis nulla eu tincidunt vestibulum. Integer feugiat auctor massa ac egestas',
+                    'conditions' => [
+                        [
+                            'condition' => [
+                                'id' => 789,
+                                'type' => 1,
+                                'rule_id' => 1000,
+                                'meta' => $this->getMeta()
+                            ],
+                            'selected' => [
+                                'NDSField' => 1,
+                                'matches' => 2,
+                                'values' => "S-12344"
+                            ]
+                        ]
+                    ],
+                    'effects' => [
+                    ]
+                ]
+            ]
+        ];
+
+        return $ruleset;
     }
 
     /**
