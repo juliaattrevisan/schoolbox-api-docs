@@ -12,7 +12,7 @@ class Synchronise_External_Lgspk_Translator_Structure extends Synchronise_Extern
     /**
      * Translates the input XML file to a timetable structure.
      *
-     * @return Iterator
+     * @return Iterator|array[]
      */
     public function translateXmlToArray()
     {
