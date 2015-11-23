@@ -1,5 +1,7 @@
+{% set rulesetId = 'student' %}
 {% set conditionGeneral = 1 %}
 {% set conditionUserExists = 2 %}
+
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript">
@@ -115,19 +117,19 @@
         </dl>
 
         <form id='ruleset' action='/adminv2/sync/testsubmit' method="post">
-            <input type="hidden" name="ruleset" value="student" />
+            <input type="hidden" name="ruleset" value="{{ rulesetId }}" />
 
             <div class="actions-small-1 row">
                 <div class="list-item">
                     <div class="small-12 columns">
-                        <h2 class="subheader">Student Ruleset</h2>
+                        <h2 class="subheader">{{ rulesetId }} Ruleset</h2>
                     </div>
                 </div>
                 <nav>
                     <a class="icon-more" title="" data-dropdown="ruleset-options"></a>
                 </nav>
                 <ul id="ruleset-options" class="f-dropdown" data-dropdown-content>
-                    <li><a href='/adminv2/rule/create' class="icon-add" title="Add New Rule">Add New Rule</a></li>
+                    <li><a href='/adminv2/rule/create/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
                 </ul>
             </div>
 
