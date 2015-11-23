@@ -17,32 +17,6 @@ class Controller extends Base {
     const CONDITION_USER = 2;
 
     /**
-     * Delete a Condition asynchronously
-     *
-     * Return true if deletion was successful
-     *
-     * TODO: Perform actual deletion from db via mappers etc
-     *
-     * @return bool
-     */
-    public function delete() {
-        // new \Alaress_Probe($_POST);
-
-        /* Tell us whether the deletion was successful
-         * 1 is successfully deleted
-         * 0 is not
-         */
-        $deleted = false;
-
-        if ($deleted) {
-            echo true;
-            exit();
-        }
-
-        exit();
-    }
-
-    /**
      * Forge a data structure to feed into twig template,
      * so that new Conditions can be injected directly into
      * the ui after being received via ajax
@@ -51,7 +25,7 @@ class Controller extends Base {
      *
      * @param $params
      */
-    public function create($params) {
+    public function add($params) {
 
         /* A meta field for various Condition-specific UI
          * so that when you load a Ruleset UI, all Conditions are
@@ -98,6 +72,32 @@ class Controller extends Base {
         }
 
         echo $fragment;
+        exit();
+    }
+
+    /**
+     * Delete a Condition asynchronously
+     *
+     * Return true if deletion was successful
+     *
+     * TODO: Perform actual deletion from db via mappers etc
+     *
+     * @return bool
+     */
+    public function delete() {
+        // new \Alaress_Probe($_POST);
+
+        /* Tell us whether the deletion was successful
+         * 1 is successfully deleted
+         * 0 is not
+         */
+        $deleted = false;
+
+        if ($deleted) {
+            echo true;
+            exit();
+        }
+
         exit();
     }
 }

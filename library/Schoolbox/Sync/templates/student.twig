@@ -129,7 +129,7 @@
                     <a class="icon-more" title="" data-dropdown="ruleset-options"></a>
                 </nav>
                 <ul id="ruleset-options" class="f-dropdown" data-dropdown-content>
-                    <li><a href='/adminv2/rule/create/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
+                    <li><a href='/adminv2/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
                 </ul>
             </div>
 
@@ -160,8 +160,8 @@
                         <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-options"></a>
                     </nav>
                     <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
-                        <li><a href="/adminv2/sync/condition/create/{{ currentRule.id }}/{{ conditionGeneral }}" class="icon-add" title="Spawn new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
-                        <li><a href="/adminv2/sync/condition/create/{{ currentRule.id }}/{{ conditionUserExists }}" class="icon-add" title="Spawn new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
+                        <li><a href="/adminv2/sync/condition/add/{{ currentRule.id }}/{{ conditionGeneral }}" class="icon-add" title="Spawn new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
+                        <li><a href="/adminv2/sync/condition/add/{{ currentRule.id }}/{{ conditionUserExists }}" class="icon-add" title="Spawn new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
                     </ul>
                 </div>
 
