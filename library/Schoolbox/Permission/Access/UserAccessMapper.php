@@ -399,6 +399,14 @@ class UserAccessMapper extends Mapper
      */
     public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE)
     {
+        if (!isset($serviceIdentifier)) {
+            return $this->findOneByColumnList(
+                array(
+                    'service' => $service,
+                    'uid'     => $user->getId(),
+                )
+            );
+        }
         return $this->findOneByColumnList(
             array(
                 'service' => $service,
