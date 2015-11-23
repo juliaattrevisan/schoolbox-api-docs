@@ -580,15 +580,16 @@ class External_Tass_User implements External_UserInterface
         $query = "
             SELECT
                 'P' + p.par_code AS StudentContactID,
-                '' AS StudentContactTitle,
-                p.f_name AS StudentContactPreferred,
-                '' AS StudentContactSurname,
-                '' AS StudentContactDefaultEmail,
-                s.year_grp AS StudentYearLevel,
-                s.campus_code AS StudentCampus,
-                s.sex AS StudentGender,
+                ''               AS StudentContactTitle,
+                p.f_name         AS StudentContactPreferred,
+                ''               AS StudentContactSurname,
+                ''               AS StudentContactDefaultEmail,
+                sf.sfa_num       AS StudentContactSplitFamilyNumber,
+                s.year_grp       AS StudentYearLevel,
+                s.campus_code    AS StudentCampus,
+                s.sex            AS StudentGender,
                 s.preferred_name AS StudentPreferred,
-                s.surname AS StudentSurname
+                s.surname        AS StudentSurname
             FROM parent AS p
             INNER JOIN student as s
                 ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
@@ -598,15 +599,16 @@ class External_Tass_User implements External_UserInterface
 
             SELECT
                 'S' + p.par_code AS StudentContactID,
-                '' AS StudentContactTitle,
-                p.m_name AS StudentContactPreferred,
-                '' AS StudentContactSurname,
-                '' AS StudentContactDefaultEmail,
-                s.year_grp AS StudentYearLevel,
-                s.campus_code AS StudentCampus,
-                s.sex AS StudentGender,
+                ''               AS StudentContactTitle,
+                p.m_name         AS StudentContactPreferred,
+                ''               AS StudentContactSurname,
+                ''               AS StudentContactDefaultEmail,
+                sf.sfa_num       AS StudentContactSplitFamilyNumber,
+                s.year_grp       AS StudentYearLevel,
+                s.campus_code    AS StudentCampus,
+                s.sex            AS StudentGender,
                 s.preferred_name AS StudentPreferred,
-                s.surname AS StudentSurname
+                s.surname        AS StudentSurname
             FROM parent AS p
             INNER JOIN student as s
                 ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
