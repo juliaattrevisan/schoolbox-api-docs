@@ -11,6 +11,8 @@
 namespace Schoolbox\Sync\Rule;
 
 use Alaress\Web\Controller\Base;
+use \Schoolbox\Sync\Navigator\Navigator;
+use \Schoolbox\Sync\Navigator\Node;
 
 class Controller extends Base {
 
@@ -20,9 +22,20 @@ class Controller extends Base {
      * @param $params
      */
     public function add($params) {
+
+        /* Breadcrumbs
+         */
+        $allBreadcrumbs = new Navigator(
+            new Node('Home', '/adminv2', false),
+            new Node('Sync (UPS)', '/adminv2/sync', false),
+            new Node(ucwords($params['rulesetId']), "/adminv2/sync/{$params['rulesetId']}", false),
+            new Node('Add Rule', '#', true)
+        );
+
         $this->getResponse()->content->set([
             'template' => '@syncRule/add.twig',
             'data' => [
+                'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'rulesetId' => $params['rulesetId'],
 
                 /* TODO: Empty Rule instance
@@ -58,16 +71,29 @@ class Controller extends Base {
 
         /* TODO: Fetch from db
          */
+        $rulesetId = 'student';
+
+        /* TODO: Fetch from db
+         */
         $rule = [
             'id' => $params['ruleId'],
             'name' => "Some generic name for ruleId: {$params['ruleId']}",
             'description' => 'Some generic rule description'
         ];
 
+        /* Breadcrumbs
+         */
+        $allBreadcrumbs = new Navigator(
+            new Node('Home', '/adminv2', false),
+            new Node('Sync (UPS)', '/adminv2/sync', false),
+            new Node(ucwords($rulesetId), "/adminv2/sync/{$rulesetId}", true)
+        );
+
         $this->getResponse()->content->set([
             'template' => '@syncRule/add.twig',
             'data' => [
-                'rulesetId' => $params['rulesetId'],
+                'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
+                'rulesetId' => $rulesetId,
                 'rule' => $rule
             ]
         ]);

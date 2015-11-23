@@ -6,12 +6,7 @@
     {% set url = 'create' %}
 {% endif %}
 
-<ul class="breadcrumb">
-    <li><a href="/adminv2/home">Home</a></li>
-    <li><a href="/adminv2/sync">Sync (UPS)</a></li>
-    <li><a href="/adminv2/sync/{{ rulesetId }}">{{ rulesetId|capitalize }}</a></li>
-    <li class="active"><a href="#">Add Rule</a></li>
-</ul>
+{% include '@sync/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
 
 <div class="row">
     <div class="small-12 columns">
