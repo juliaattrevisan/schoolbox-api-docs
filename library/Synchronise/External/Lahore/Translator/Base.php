@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-abstract class Synchronise_External_Lgspk_Translator_Base
+abstract class Synchronise_External_Lahore_Translator_Base
 {
     /**
      * @var Iterator

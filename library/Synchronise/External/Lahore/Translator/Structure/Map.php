@@ -7,7 +7,7 @@
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_External_Lgspk_Translator_Structure_Map extends IteratorIterator
+class Synchronise_External_Lahore_Translator_Structure_Map extends IteratorIterator
 {
     /**
      * @return array
