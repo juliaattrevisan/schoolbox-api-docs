@@ -13,7 +13,21 @@ namespace Alaress\Rules\Token;
 use Alaress\ObjectReader;
 use Alaress\Rules\Lang\Construct;
 
-abstract class Tokenizer {
+abstract class Tokenizer
+{
+    const TOKEN_REGEX = '`
+        {:                              # token start
+            (                           # $1
+                [a-z_]                  # must start with alpha or underscore
+                [a-z_0-9\.\[\]]*        # only alphanum, period or squarebrackets allowed
+            )                           # /$1
+            (                           # $2
+                (?:
+                    \s*\|\s*[a-z]+      # filters are prepended with a pipe, then alpha only
+                )*
+            )?                          # /$2
+        }                               # token end
+    `ix';
 
     /** @var Token[] */
     protected $tokens;
@@ -113,7 +127,7 @@ abstract class Tokenizer {
 
         if (is_string($fieldValue)) {
             $settings[$field] = $fieldValue;
-            if (preg_match_all('`{:([a-z_][a-z_0-9\.]*)((?:\s*\|\s*[a-z]+)*)?}`i', $fieldValue, $matches)) {
+            if (preg_match_all(self::TOKEN_REGEX, $fieldValue, $matches)) {
 
                 $len = count($matches[0]);
 

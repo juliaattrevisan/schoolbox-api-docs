@@ -12,6 +12,7 @@ namespace Schoolbox\Sync\Rules;
 use Alaress\Rules\Condition;
 use Alaress\Rules\Lang\Construct;
 use Alaress\Rules\Rule as Super;
+use Alaress\Rules\Token;
 use Schoolbox\User;
 
 class Rule extends Super
@@ -81,8 +82,8 @@ class Rule extends Super
     public function getHtmlSummary()
     {
         $formatting = [
-            '`(=|[A-Z][A-Z]+)(\s|$)`'                      => '<span class="ctrl $1">$1</span>$2',
-            '`({:[a-z][a-z_0-9\.]*(?:\s*\|\s*[a-z]+)*})`i' => '<span class="tok">$1</span>'
+            '`(=|[A-Z][A-Z]+)(\s|$)`'    => '<span class="ctrl $1">$1</span>$2',
+            Token\Tokenizer::TOKEN_REGEX => '<span class="tok">{:$1$2}</span>'
         ];
 
         $summary = preg_replace(array_keys($formatting), array_values($formatting), $this->getSummary());
