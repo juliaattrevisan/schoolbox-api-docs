@@ -45,7 +45,7 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher) {
         $this->addRoutePreload(
             $matcher,
-            '(?:create|delete)',
+            '(?:add|delete)',
             function($params) {
                 return array(
                     'params' => $params,
