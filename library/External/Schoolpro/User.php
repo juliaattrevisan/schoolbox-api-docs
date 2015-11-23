@@ -13,7 +13,7 @@ class External_Schoolpro_User implements External_UserInterface
     /**
      * An instance of MSSQL
      *
-     * @var null
+     * @var MSSQL
      */
     private $db = null;
 
@@ -540,7 +540,18 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getStudentUserAccountIterator()
     {
-        // TODO: Implement getStudentUserAccountIterator() method.
+        // This might work!
+        $vars = array(
+            'sbGetStudentAccounts',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+            )
+        );
+
+        return new \Schoolbox\Sync\Iterator\Student(
+            $this->getDb()->getProcedureIterator($vars[0], $vars[1])
+        );
     }
 
     /**
@@ -566,7 +577,19 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getParentUserAccountIterator()
     {
-        // TODO: Implement getParentUserAccountIterator() method.
+        // This might work!
+        // It probably returns both parents in one row though.
+        $vars = array(
+            'sbGetGuardianAccounts',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+            )
+        );
+
+        return new \Schoolbox\Sync\Iterator\Guardian(
+            $this->getDb()->getProcedureIterator($vars[0], $vars[1])
+        );
     }
 
     /**
@@ -592,7 +615,18 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getStaffUserAccountIterator()
     {
-        // TODO: Implement getStaffUserAccountIterator() method.
+        // This might work!
+        $vars = array(
+            'sbGetStaffAccounts',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+            )
+        );
+
+        return new \Schoolbox\Sync\Iterator\Staff(
+            $this->getDb()->getProcedureIterator($vars[0], $vars[1])
+        );
     }
 
     /**
@@ -647,7 +681,7 @@ class External_Schoolpro_User implements External_UserInterface
     /**
      * Set db
      *
-     * @param null $db
+     * @param MSSQL $db
      */
     private function setDb($db)
     {
@@ -657,7 +691,7 @@ class External_Schoolpro_User implements External_UserInterface
     /**
      * Get db
      *
-     * @return null
+     * @return MSSQL
      */
     private function getDb()
     {
