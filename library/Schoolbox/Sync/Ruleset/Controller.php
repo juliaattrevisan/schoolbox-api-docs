@@ -11,6 +11,8 @@
 namespace Schoolbox\Sync\Ruleset;
 
 use Alaress\Web\Controller\Base;
+use \Schoolbox\Sync\Breadcrumb\Facade as Breadcrumbs;
+use \Schoolbox\Sync\Breadcrumb\Node as Breadcrumb;
 
 class Controller extends Base {
 
@@ -19,10 +21,21 @@ class Controller extends Base {
      */
     public function intro() {
 
+        /* Breadcrumbs
+         */
+        $allBreadcrumbs = new Breadcrumbs(
+            new Breadcrumb('Student', '/adminv2/sync/student', false),
+            new Breadcrumb('Parent', '/adminv2/sync/parent', true),
+            new Breadcrumb('Staff', '/adminv2/sync/staff', false)
+        );
+
         /* Twig data
          */
         $this->getResponse()->content->set([
             'template' => '@sync/intro.twig',
+            'data' => [
+                'allBreadcrumbs' => $allBreadcrumbs->getAllBreadcrumbs(),
+            ]
         ]);
     }
 
