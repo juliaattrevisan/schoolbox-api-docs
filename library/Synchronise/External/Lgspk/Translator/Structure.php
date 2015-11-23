@@ -34,38 +34,30 @@ class Synchronise_External_Lgspk_Translator_Structure extends Synchronise_Extern
             $result = $reducer($result, $row);
         }
 
-        $termStart  = '';
-        $termFinish = '';
-        foreach (\Schoolbox\CampusMapper::getInstance()->findAll() as $campus) {
-            /** @var \Schoolbox\Campus $campus */
-            foreach ($result['periods'] as $period) {
-                foreach (range(1, $result['dayCount']) as $day) {
-                    $fields = [
-                        'Term Campus'   => $campus->getExtTimetableCode(),
-                        'Term Title'    => $result['termTitle'],
-                        'Term Start'    => 'The date on which the term starts',
-                        'Term Finish'   => 'The date on which the term finishes',
-                        'Term Offset'   => 'The day number that "Term Start" is',
-                        'Period Day'    => $day,
-                        'Period Title'  => 'Day '.$day,
-                        'Period Start'  => 'The time at which this period starts',
-                        'Period Finish' => 'The time at which this period finishes',
-                    ];
+        $endResult = [];
+        if ($result['termStart'] instanceof Alaress_Date_Format) {
+            $termStart  = $result['termStart']->getDatabaseDate();
+            $termFinish = clone $result['termStart'];
+            $termFinish = $termFinish->addYears(1)->getDatabaseDate();
+            foreach (\Schoolbox\CampusMapper::getInstance()->findAll() as $campus) {
+                /** @var \Schoolbox\Campus $campus */
+                foreach ($result['periods'] as $period) {
+                    foreach (range(1, $result['dayCount']) as $day) {
+                        $endResult[] = [
+                            'Term Campus'   => $campus->getExtTimetableCode(),
+                            'Term Title'    => $result['termTitle'],
+                            'Term Start'    => $termStart,
+                            'Term Finish'   => $termFinish,
+                            'Term Offset'   => 0,
+                            'Period Day'    => $day,
+                            'Period Title'  => 'Day '.$day,
+                            'Period Start'  => $period['start'],
+                            'Period Finish' => $period['finish'],
+                        ];
+                    }
                 }
             }
         }
-
-//        // Use External\Importer\TimetableStructure to create fields?
-//        $fields = [
-//            'Term Campus'   => 'The campus to create a term for (must correspond to a campus code in Schoolbox)',
-//            'Term Title'    => 'The name of the term',
-//            'Term Start'    => 'The date on which the term starts',
-//            'Term Finish'   => 'The date on which the term finishes',
-//            'Term Offset'   => 'The day number that "Term Start" is',
-//            'Period Day'    => 'The day number that this period is on',
-//            'Period Title'  => 'The name of this period',
-//            'Period Start'  => 'The time at which this period starts',
-//            'Period Finish' => 'The time at which this period finishes',
-//        ];
+        return $endResult;
     }
 }
