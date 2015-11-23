@@ -44,7 +44,8 @@ class Controller extends Base {
             ]
         ];
 
-        /* TODO: Populate type and id from database
+        /* TODO: Save instance to db, then populate type and id
+         * TODO: This new Condition should exist in the db so it has an id and type
          */
         $data = [
             'currentCondition' => [
