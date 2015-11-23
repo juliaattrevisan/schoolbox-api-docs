@@ -162,6 +162,10 @@ class Controller extends AbstractController
             $accessLevels[] = $this->userAccessMapper
                 ->getAccess($this->getUser(), null, UserAccess::SERVICE_CMS)
                 ->getAccessLevel();
+            // Shortcircuit if access is full
+            if (in_array(UserAccess::ACCESS_FULL, $accessLevels)) {
+                return UserAccess::ACCESS_FULL;
+            }
         } catch (Mapper\Exception $e) {
             // noop
         }
@@ -177,6 +181,10 @@ class Controller extends AbstractController
                 $accessLevels[] = $this->userAccessMapper
                     ->getAccess($this->getUser(), $folderIds[0])
                     ->getAccessLevel();
+                // Shortcircuit if access is full
+                if (in_array(UserAccess::ACCESS_FULL, $accessLevels)) {
+                    return UserAccess::ACCESS_FULL;
+                }
             } catch (Mapper\Exception $e) {
                 // noop
             }
