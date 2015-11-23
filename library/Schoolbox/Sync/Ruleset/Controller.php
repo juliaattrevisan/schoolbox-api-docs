@@ -73,7 +73,7 @@ class Controller extends Base {
         /* Twig data
          */
         $this->getResponse()->content->set([
-            'template' => '@sync/student.twig',
+            'template' => '@sync/ruleset.twig',
             'data' => [
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'allNavigation' => $allNavigation->getAllNodes(),
@@ -112,7 +112,7 @@ class Controller extends Base {
         /* Twig data
          */
         $this->getResponse()->content->set([
-            'template' => '@sync/parent.twig',
+            'template' => '@sync/ruleset.twig',
             'data' => [
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'allNavigation' => $allNavigation->getAllNodes(),
@@ -151,7 +151,7 @@ class Controller extends Base {
         /* Twig data
          */
         $this->getResponse()->content->set([
-            'template' => '@sync/staff.twig',
+            'template' => '@sync/ruleset.twig',
             'data' => [
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'allNavigation' => $allNavigation->getAllNodes(),
