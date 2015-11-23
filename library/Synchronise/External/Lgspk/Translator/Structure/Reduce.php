@@ -17,6 +17,9 @@ class Synchronise_External_Lgspk_Translator_Structure_Reduce
      */
     public function __invoke($carry, $item)
     {
+        if (!isset($item['type'])) {
+            return $carry;
+        }
         switch ($item['type']) {
             case 'termsdef':
                 $carry['termTitle'] = $item['termTitle'];
