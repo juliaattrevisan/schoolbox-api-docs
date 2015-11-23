@@ -68,10 +68,10 @@
         /* Toggle input disability for modification
          * Works on both Conditions and Effects
          */
-        $('#ruleset').on('click', '[data-modify-lock]', function(event) {
+        $('#ruleset').on('click', '[data-condition-modify-lock]', function(event) {
             event.preventDefault();
 
-            var id = '#' + $(this).attr('data-modify-lock');
+            var id = '#' + $(this).attr('data-condition-modify-lock');
 
             if ($(id).attr('data-locked') == 1) {
                 $(id).find('input, textarea, select').attr('disabled', false);
@@ -134,7 +134,7 @@
             </div>
 
             {% for currentRule in ruleset.rules %}
-            <div class="actions-small-1 row">
+            <div class="actions-small-3 row">
                 <div class="list-item">
                     <div class="small-12 columns">
                         <h3 class="subheader">
@@ -146,7 +146,9 @@
                     </div>
                 </div>
                 <nav>
-                    <a data-collapser="rule-{{ currentRule.id }}-contents" href="#" class="icon-add" title="Collapse Content"></a>
+                    <a href="#" class="icon-add" data-collapser="rule-{{ currentRule.id }}-contents" title="Collapse Content"></a>
+                    <a href="/adminv2/sync/rule/edit/{{ currentRule.id }}" class="icon-modify" title="Edit Rule"></a>
+                    <a href="/adminv2/sync/rule/delete/{{ currentRule.id }}" class="icon-delete" title="Delete Rule"></a>
                 </nav>
             </div>
             <section class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
