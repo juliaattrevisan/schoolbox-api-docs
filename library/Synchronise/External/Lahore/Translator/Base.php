@@ -1,6 +1,6 @@
 <?php
 /**
- * XML reader for finding items in iSAMS' batch API response.
+ * Base translator from Lahore's ASC Timetables XML export to Schoolbox CSV.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
@@ -25,7 +25,7 @@ abstract class Synchronise_External_Lahore_Translator_Base
     /**
      * Gets a list of results from whatever XML document was set into this reader.
      *
-     * @return Iterator
+     * @return array[]
      */
     abstract public function translateXmlToArray();
 }

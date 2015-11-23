@@ -1,7 +1,7 @@
 <?php
 /**
- * Translator from unknown XML format to a CSV representation of timetable
- * structure.
+ * Translator from Lahore's ASC Timetables XML export to Schoolbox CSV
+ * timetable structure import format.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
@@ -12,7 +12,7 @@ class Synchronise_External_Lahore_Translator_Structure extends Synchronise_Exter
     /**
      * Translates the input XML file to a timetable structure.
      *
-     * @return Iterator|array[]
+     * @return array[]
      */
     public function translateXmlToArray()
     {

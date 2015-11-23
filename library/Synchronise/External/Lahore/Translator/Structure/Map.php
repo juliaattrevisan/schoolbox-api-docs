@@ -1,7 +1,7 @@
 <?php
 /**
- * Translator from unknown XML format to a CSV representation of timetable
- * structure.
+ * Map function - converts an XML node from Lahore's ASC Timetables XML export
+ * to a more understandable intermediary format.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
