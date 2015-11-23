@@ -13,7 +13,6 @@ namespace Schoolbox\Sync\Ruleset;
 use Alaress\Web\Controller\Base;
 use \Schoolbox\Sync\Navigator\Navigator;
 use \Schoolbox\Sync\Navigator\Node;
-use Schoolbox\Sync\Ruleset\Factory;
 
 class Controller extends Base {
 
