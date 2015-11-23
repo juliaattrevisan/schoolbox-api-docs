@@ -18,7 +18,7 @@ class Staff extends IteratorIterator
     /**
      * Return the current element
      *
-     * @return Staff
+     * @return User\Staff
      */
     public function current()
     {

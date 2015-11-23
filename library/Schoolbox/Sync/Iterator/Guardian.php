@@ -126,7 +126,7 @@ class Guardian extends IteratorIterator
     /**
      * Return the current element
      *
-     * @return Guardian
+     * @return User\Guardian
      */
     public function current()
     {
