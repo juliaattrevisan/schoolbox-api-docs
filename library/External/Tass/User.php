@@ -614,6 +614,28 @@ class External_Tass_User implements External_UserInterface
 
             ORDER BY StudentContactID ASC
         ";
+
+//        // Queries for students that are in split families
+//        $studentSubquery = "
+//            SELECT
+//                s.year_grp AS StudentYearLevel,
+//                s.campus_code AS StudentCampus,
+//                s.sex AS StudentGender,
+//                s.preferred_name AS StudentPreferred,
+//                s.surname AS StudentSurname
+//            FROM student as s
+//            WHERE s.stud_code IN ($studentCodes)
+//        ";
+//        $studentCodeSubquery = "
+//            SELECT sf.stud_codes
+//            FROM paraddress as pa
+//            INNER JOIN pia_sfaccess AS sf
+//                ON p.par_code = sf.par_code
+//                AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
+//                AND p.cmpy_code = sf.cmpy_code
+//            WHERE pa.par_code = $parentCode AND pa.cmpy_code = $companyCode
+//        ";
+
         return new \Schoolbox\Sync\Iterator\Guardian(
             $this->getDatabase()->getIterator($query)
                 ->addMap([$this, 'trimRow'])
