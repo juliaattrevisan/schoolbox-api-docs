@@ -57,6 +57,7 @@ class Controller extends Base {
         new \Alaress_Probe($params, $_POST);
 
         /* TODO: Redirect back to Ruleset when finished
+         * $this->getResponse()->redirect->to("/adminv2/{$params['rulesetId']}");
          */
         echo "Create Rule";
         exit();
@@ -111,6 +112,7 @@ class Controller extends Base {
         new \Alaress_Probe($params, $_POST);
 
         /* TODO: Redirect back to Ruleset when finished
+         * $this->getResponse()->redirect->to("/adminv2/{$params['rulesetId']}");
          */
         echo "Update Rule";
         exit();
