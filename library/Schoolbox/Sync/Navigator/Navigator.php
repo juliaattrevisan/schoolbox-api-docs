@@ -1,8 +1,8 @@
 <?php
 /**
- * Facade
+ * Navigator
  *
- * Internally collect and remember breadcrumb node data
+ * Internally collect and remember navigation node data
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -10,18 +10,18 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Breadcrumb;
+namespace Schoolbox\Sync\Navigator;
 
 use \Schoolbox\Collection;
 
-class Facade {
+class Navigator {
 
     /**
-     * A collection of Breadcrumb Nodes
+     * A collection of Nodes
      *
      * @var Collection
      */
-    private $allBreadcrumbs = null;
+    private $allNodes = null;
 
     /**
      * Constructor
@@ -29,7 +29,7 @@ class Facade {
      * Accepts any number of breadcrumb nodes
      */
     public function __construct() {
-        $this->setAllBreadcrumbs(new Collection());
+        $this->setAllNodes(new Collection());
 
         $numArgs = func_num_args();
 
@@ -37,10 +37,10 @@ class Facade {
             for ($i = 0; $i < $numArgs; $i++) {
                 $currentNode = func_get_arg($i);
 
-                /* Only add instances of \Schoolbox\Sync\Breadcrumb\Node
+                /* Only add instances of \Schoolbox\Sync\Navigator\Node
                  */
                 if ($currentNode instanceof Node) {
-                    $this->getAllBreadcrumbs()->add($currentNode);
+                    $this->getAllNodes()->add($currentNode);
                 }
             }
         }
@@ -50,22 +50,22 @@ class Facade {
      */
 
     /**
-     * Set all breadcrumbs
+     * Set all Nodes
      *
-     * @param \Schoolbox\Collection $allBreadcrumbs
+     * @param \Schoolbox\Collection $allNodes
      */
-    private function setAllBreadcrumbs($allBreadcrumbs)
+    private function setAllNodes($allNodes)
     {
-        $this->allBreadcrumbs = $allBreadcrumbs;
+        $this->allNodes = $allNodes;
     }
 
     /**
-     * Get all breadcrumbs
+     * Get all Nodes
      *
      * @return \Schoolbox\Collection
      */
-    public function getAllBreadcrumbs()
+    public function getAllNodes()
     {
-        return $this->allBreadcrumbs;
+        return $this->allNodes;
     }
 }

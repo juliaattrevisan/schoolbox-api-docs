@@ -64,7 +64,7 @@ class Module extends BaseModule
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-        $this->addTemplatePath($templateLoader, __DIR__ . '/../Breadcrumb/templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/../Navigator/templates');
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Breadcrumb node
+ * Navigator Node
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -9,7 +9,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Breadcrumb;
+namespace Schoolbox\Sync\Navigator;
 
 class Node {
 

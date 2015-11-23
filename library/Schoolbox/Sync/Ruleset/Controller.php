@@ -11,8 +11,8 @@
 namespace Schoolbox\Sync\Ruleset;
 
 use Alaress\Web\Controller\Base;
-use \Schoolbox\Sync\Breadcrumb\Facade as Breadcrumbs;
-use \Schoolbox\Sync\Breadcrumb\Node as Breadcrumb;
+use \Schoolbox\Sync\Navigator\Navigator;
+use \Schoolbox\Sync\Navigator\Node;
 
 class Controller extends Base {
 
@@ -23,17 +23,17 @@ class Controller extends Base {
 
         /* Breadcrumbs
          */
-        $allBreadcrumbs = new Breadcrumbs(
-            new Breadcrumb('Home', '/adminv2', false),
-            new Breadcrumb('Sync (UPS)', '/adminv2/sync', true)
+        $allBreadcrumbs = new Navigator(
+            new Node('Home', '/adminv2', false),
+            new Node('Sync (UPS)', '/adminv2/sync', true)
         );
 
         /* Navigation
          */
-        $allNavigation = new Breadcrumbs(
-            new Breadcrumb('Student', '/adminv2/sync/student', false),
-            new Breadcrumb('Parent', '/adminv2/sync/parent', false),
-            new Breadcrumb('Staff', '/adminv2/sync/staff', false)
+        $allNavigation = new Navigator(
+            new Node('Student', '/adminv2/sync/student', false),
+            new Node('Parent', '/adminv2/sync/parent', false),
+            new Node('Staff', '/adminv2/sync/staff', false)
         );
 
         /* Twig data
@@ -41,8 +41,8 @@ class Controller extends Base {
         $this->getResponse()->content->set([
             'template' => '@sync/intro.twig',
             'data' => [
-                'allBreadcrumbs' => $allBreadcrumbs->getAllBreadcrumbs(),
-                'allNavigation' => $allNavigation->getAllBreadcrumbs(),
+                'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
+                'allNavigation' => $allNavigation->getAllNodes(),
             ]
         ]);
     }
@@ -72,6 +72,9 @@ class Controller extends Base {
                 'icon' => 'unlocked',
             ]
         ];
+
+        /* TODO: Construct Ruleset from database
+         */
 
         /* The actual ruleset construct
          */
@@ -137,18 +140,18 @@ class Controller extends Base {
 
         /* Breadcrumbs
          */
-        $allBreadcrumbs = new Breadcrumbs(
-            new Breadcrumb('Home', '/adminv2', false),
-            new Breadcrumb('Sync (UPS)', '/adminv2/sync', false),
-            new Breadcrumb('Student', '/adminv2/sync/student', true)
+        $allBreadcrumbs = new Navigator(
+            new Node('Home', '/adminv2', false),
+            new Node('Sync (UPS)', '/adminv2/sync', false),
+            new Node('Student', '/adminv2/sync/student', true)
         );
 
         /* Navigation
          */
-        $allNavigation = new Breadcrumbs(
-            new Breadcrumb('Student', '/adminv2/sync/student', true),
-            new Breadcrumb('Parent', '/adminv2/sync/parent', false),
-            new Breadcrumb('Staff', '/adminv2/sync/staff', false)
+        $allNavigation = new Navigator(
+            new Node('Student', '/adminv2/sync/student', true),
+            new Node('Parent', '/adminv2/sync/parent', false),
+            new Node('Staff', '/adminv2/sync/staff', false)
         );
 
         /* Twig data
@@ -156,8 +159,8 @@ class Controller extends Base {
         $this->getResponse()->content->set([
             'template' => '@sync/student.twig',
             'data' => [
-                'allBreadcrumbs' => $allBreadcrumbs->getAllBreadcrumbs(),
-                'allNavigation' => $allNavigation->getAllBreadcrumbs(),
+                'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
+                'allNavigation' => $allNavigation->getAllNodes(),
                 'ruleset' => $ruleset,
             ]
         ]);
