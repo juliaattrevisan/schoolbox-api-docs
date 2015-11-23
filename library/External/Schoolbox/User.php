@@ -323,7 +323,7 @@ class External_Schoolbox_User implements External_UserInterface
     public function getStudentUserAccountIterator()
     {
         // Will probably never exist for Schoolbox connector
-        return new Schoolbox\Sync\Iterator\Student(new ArrayIterator());
+        return [];
     }
 
     public function getParentUserAccountInfo()
@@ -336,7 +336,7 @@ class External_Schoolbox_User implements External_UserInterface
     public function getParentUserAccountIterator()
     {
         // Will probably never exist for Schoolbox connector
-        return new Schoolbox\Sync\Iterator\Guardian(new ArrayIterator());
+        return [];
     }
 
     public function getStaffUserAccountInfo()
@@ -350,7 +350,7 @@ class External_Schoolbox_User implements External_UserInterface
     public function getStaffUserAccountIterator()
     {
         // Will probably never exist for Schoolbox connector
-        return new Schoolbox\Sync\Iterator\Staff(new ArrayIterator());
+        return [];
     }
 
     /**
